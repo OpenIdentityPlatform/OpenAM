@@ -23,7 +23,6 @@ import com.google.inject.TypeLiteral;
 import javax.inject.Named;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.inject.Provider;
 
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.StaticSTSProperties;
@@ -38,7 +37,6 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.token.UsernameToken;
-import org.apache.ws.security.validate.NoOpValidator;
 import org.forgerock.openam.sts.DefaultHttpURLConnectionFactory;
 import org.forgerock.openam.sts.HttpURLConnectionFactory;
 import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
@@ -46,15 +44,16 @@ import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.XmlMarshaller;
-import org.forgerock.openam.sts.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.soap.STSEndpoint;
 import org.forgerock.openam.sts.soap.SoapSTSCallbackHandler;
+import org.forgerock.openam.sts.soap.config.user.TokenValidationConfig;
 import org.forgerock.openam.sts.soap.token.config.TokenIssueOperationProvider;
 import org.forgerock.openam.sts.soap.token.config.TokenOperationFactory;
 import org.forgerock.openam.sts.soap.token.config.TokenOperationFactoryImpl;
 import org.forgerock.openam.sts.soap.token.config.TokenValidateOperationProvider;
 import org.forgerock.openam.sts.soap.token.delegation.TokenDelegationHandlersProvider;
-import org.forgerock.openam.sts.soap.token.validator.wss.BinarySecurityTokenValidator;
+import org.forgerock.openam.sts.soap.token.validator.wss.WSSValidatorFactory;
+import org.forgerock.openam.sts.soap.token.validator.wss.WSSValidatorFactoryImpl;
 import org.forgerock.openam.sts.token.AMTokenParser;
 import org.forgerock.openam.sts.token.AMTokenParserImpl;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
@@ -67,7 +66,9 @@ import org.forgerock.openam.sts.token.provider.AMSessionInvalidator;
 import org.forgerock.openam.sts.token.provider.AMSessionInvalidatorImpl;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumerImpl;
+import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
 import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
+import org.forgerock.openam.sts.token.validator.wss.disp.CertificateAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.validator.wss.disp.TokenAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.validator.wss.disp.UsernameTokenAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.AMSTSConstants;
@@ -75,12 +76,12 @@ import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
 import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandlerImpl;
-import org.forgerock.openam.sts.token.validator.wss.UsernameTokenValidator;
 import org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProviderImpl;
 import org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProvider;
 
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -114,26 +115,35 @@ public class SoapSTSInstanceModule extends AbstractModule {
 
         bind(new TypeLiteral<TokenAuthenticationRequestDispatcher<UsernameToken>>(){})
                 .to(UsernameTokenAuthenticationRequestDispatcher.class);
-
         bind(new TypeLiteral<AuthenticationHandler<UsernameToken>>(){})
                 .to(new TypeLiteral<AuthenticationHandlerImpl<UsernameToken>>() {});
+
+        bind(new TypeLiteral<TokenAuthenticationRequestDispatcher<X509Certificate[]>>(){})
+                .to(CertificateAuthenticationRequestDispatcher.class);
+        bind(new TypeLiteral<AuthenticationHandler<X509Certificate[]>>() {})
+                .to(new TypeLiteral<AuthenticationHandlerImpl<X509Certificate[]>>() {});
 
         /*
         bind the class that can issue XML Element instances encapsulating an OpenAM session Id.
          */
         bind(new TypeLiteral<XmlMarshaller<OpenAMSessionToken>>(){}).to(OpenAMSessionTokenMarshaller.class);
 
-//        bind(new TypeLiteral<XmlMarshaller<OpenIdConnectIdToken>>(){}).to(OpenIdConnectIdTokenMarshaller.class);
-//        bind(new TypeLiteral<JsonMarshaller<OpenIdConnectIdToken>>(){}).to(OpenIdConnectIdTokenMarshaller.class);
-
         //binding all of the Providers of the various sorts of operations
         bind(TokenOperationFactory.class).to(TokenOperationFactoryImpl.class).in(Scopes.SINGLETON);
         bind(IssueOperation.class).toProvider(TokenIssueOperationProvider.class);
         bind(ValidateOperation.class).toProvider(TokenValidateOperationProvider.class);
-        //TODO: don't bind renewal - probably won't renew tokens
+        //TODO: don't bind renewal - renewal will be designed as part of AME-5878
 //        bind(RenewOperation.class).toProvider(TokenRenewOperationProvider.class);
 
-        //bind the class defining the core STS functionality - necessary for its dependencies to be injected
+        /*
+        bind the class which produces the wss Validator instances necessary to validate the SupportingTokens specified
+        in SecurityPolicy bindings
+         */
+        bind(WSSValidatorFactory.class).to(WSSValidatorFactoryImpl.class).in(Scopes.SINGLETON);
+
+        /*
+        bind the class defining the core STS functionality - necessary for its dependencies to be injected
+         */
         bind(SecurityTokenServiceProvider.class).to(STSEndpoint.class);
         bind(UrlConstituentCatenator.class).to(UrlConstituentCatenatorImpl.class);
 
@@ -163,7 +173,6 @@ public class SoapSTSInstanceModule extends AbstractModule {
         Bind the Provider responsible for providing the List<TokenDelegationHandler> required by the IssueOperation.
          */
         bind(new TypeLiteral<List<TokenDelegationHandler>>(){}).toProvider(TokenDelegationHandlersProvider.class);
-
     }
 
     /**
@@ -195,27 +204,31 @@ public class SoapSTSInstanceModule extends AbstractModule {
         return stsProperties;
     }
     /*
-        These properties configure the web-service deployment, and are primarily referenced by the ws-security interceptors
-        deployed as part of CXF. These interceptors are responsible for enforcing the security-policy bindings protecting
-        the STS. To this end, various crypto objects are required.
+     */
+
+    /**
+     * These properties configure the web-service deployment, and are primarily referenced by the ws-security interceptors
+     * deployed as part of CXF. These interceptors are responsible for enforcing the security-policy bindings protecting
+     * the STS. To this end, various crypto objects are required, and the TokenValidators for the configured validated
+     * token types are plugged-in.
+     * @param wssValidatorFactory the factory class which will produce the wss Validator instances to enforce SecurityPolicy bindings
+     * @param logger for error state logging
+     * @return the Map that serves to configure the web-service deployment
+     * @throws WSSecurityException In case an unexpected TokenType is encountered, or a TokenValidator could not be created.
      */
     @Provides
     @Named(AMSTSConstants.STS_WEB_SERVICE_PROPERTIES)
     @Inject
-    Map<String, Object> getProperties(Provider<UsernameTokenValidator> usernameTokenValidatorProvider,
-                                      Logger logger) throws WSSecurityException {
+    Map<String, Object> getProperties(WSSValidatorFactory wssValidatorFactory, Logger logger) throws WSSecurityException {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(SecurityConstants.CALLBACK_HANDLER, new SoapSTSCallbackHandler(stsInstanceConfig.getKeystoreConfig(), logger));
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         properties.put(SecurityConstants.ENCRYPT_CRYPTO, crypto);
         properties.put(SecurityConstants.SIGNATURE_CRYPTO, crypto);
-
         properties.put(SecurityConstants.SIGNATURE_USERNAME, stsInstanceConfig.getKeystoreConfig().getSignatureKeyAlias());
-
         properties.put("faultStackTraceEnabled", "true");
         properties.put("exceptionMessageCauseEnabled", "true");
-
-        processSecurityPolicyTokenValidatorConfiguration(properties, usernameTokenValidatorProvider);
+        processSecurityPolicyTokenValidatorConfiguration(properties, wssValidatorFactory, logger);
         return properties;
     }
 
@@ -223,21 +236,51 @@ public class SoapSTSInstanceModule extends AbstractModule {
      This method will plug-in the set of TokenValidator for the SupportingTokens specified in the SecurityPolicy bindings
      specified for this sts instance. These configurations are achieved by plugging-in object instances corresponding to
      specific keys in the webServicesProperties map.
-     TODO: determine the specific set of validators to be plugged-in depending upon the security policy bindings, especially
-     in the context of a custom .wsdl file. Support for a custom .wsdl file seems to require explicit specification of the
-     SupportingToken type in the SecurityPolicy bindings. For now, just hard-code.
+     Note that the set of TokenValidators plugged-in to handle the authN of the SupportingTokens defined in any SecurityPolicy
+     bindings will be determined by the SoapSTSInstanceConfig#getValidatedTokenConfiguration. Note however, that the
+     cxf/wss4j support for plugging-in custom assertions requires that the context validating the OpenAM session tokens
+     must be plugged-in at the bus level, which happens globally for all soap-sts instances for a given realm. See
+     SoapSTSLifecycleImpl#registerCustomPolicyInterceptors for details. This means that the OPENAM tokens will not be
+     handled in this method, as they are registered globally.
      */
     private void processSecurityPolicyTokenValidatorConfiguration(Map<String, Object> webServiceProperties,
-                                                                  Provider<UsernameTokenValidator> usernameTokenValidatorProvider) {
-        webServiceProperties.put(SecurityConstants.USERNAME_TOKEN_VALIDATOR, usernameTokenValidatorProvider.get());
+                                                                  WSSValidatorFactory wssValidatorFactory,
+                                                                  Logger logger) throws WSSecurityException {
+        for (TokenValidationConfig tokenValidationConfig : stsInstanceConfig.getValidatedTokenConfiguration())  {
+            TokenType tokenType = tokenValidationConfig.getValidatedTokenType();
+            switch (tokenType) {
+                case USERNAME:
+                    webServiceProperties.put(SecurityConstants.USERNAME_TOKEN_VALIDATOR,
+                            wssValidatorFactory.getValidator(
+                                                            TokenType.USERNAME,
+                                                            ValidationInvocationContext.SOAP_SECURITY_POLICY,
+                                                            tokenValidationConfig.invalidateInterimOpenAMSession()));
+                    break;
+                case X509:
+                //    webServiceProperties.put(SecurityConstants.SIGNATURE_TOKEN_VALIDATOR,
+                //            wssValidatorFactory.getValidator(
+                //                    TokenType.X509,
+                //                    ValidationInvocationContext.SOAP_SECURITY_POLICY,
+                //                    tokenValidationConfig.invalidateInterimOpenAMSession()));
+                    break;
+                case OPENAM:
+                    //OPENAM session tokens are handled by the PolicyInterceptors registered with the cxf bus.
+                    continue;
+                default:
+                    String message = "Unexpected TokenType in processSecurityPolicyTokenValidatorConfiguration: " + tokenType;
+                    logger.error(message);
+                    throw new WSSecurityException(message);
+            }
+        }
         /*
-            Signed tokens, like x509 and SAML2 assertions, are validated, by default, by a SignatureTrustValidator, which
-            determines whether the singing party has trusted entry in the keystore. Because all authN is delegated to
-            OpenAM, the NoOpValidator will be plugged-in as the signature validator.
+        By default, if the sts did not specify an X500 token in the ValidatedTokenConfiguration, the
+        org.apache.ws.security.validate.SignatureTrustValidator will be the default SecurityConstants.SIGNATURE_TOKEN_VALIDATOR
+        Validator instance. If the user does specify x509 tokens as part of the ValidatedTokenConfiguration, the
+        SoapCertificateTokenValidator will be plugged in as the SecurityConstants.SIGNATURE_TOKEN_VALIDATOR (in the X509 case above).
+        Note that this class extends the SignatureTrustValidator. It is not clear whether symmetric and asymmetric binding
+        enforcement requires the SignatureTrustValidator. TODO - investigate and determine.
+        See comments in the SoapCertificateTokenValidator for details.
          */
-        webServiceProperties.put(SecurityConstants.SIGNATURE_TOKEN_VALIDATOR, new NoOpValidator());
-        //TODO: inject via a provider, once things understood/working.
-//        webServiceProperties.put(SecurityConstants.BST_TOKEN_VALIDATOR, new BinarySecurityTokenValidator());
     }
 
     private Properties getEncryptionProperties() {
@@ -267,36 +310,6 @@ public class SoapSTSInstanceModule extends AbstractModule {
     @Named(AMSTSConstants.TOKEN_ISSUE_OPERATION)
     Set<TokenType> issueTokenTypes() {
         return stsInstanceConfig.getIssueTokenTypes();
-    }
-
-    /*
-    Provides the valid input->output mappings for the token transformations that can be realized by the validate
-    method.
-     */
-    @Provides
-    Set<TokenTransformConfig> getValidateTransformTypes() {
-        return stsInstanceConfig.getValidateTokenTranslations();
-    }
-
-    /*
-    Provides the WSSUsernameTokenValidator provider to the TokenOperationProviderImpl. Also is the UsernameTokenValidator
-    used to validate UNTs in the SecurityPolicy enforcement context. TODO: need to configure instances of this class
-    with state which will allow it to invalidate the sessions created - or perhaps to authenticate without creating a
-    session. In other words, if a sts instance is protected by a SecurityPolicy binding which includes a UNT ProtectionToken,
-    and then seeks to validate the UNT, a session will be created twice, once for SecurityPolicy enforcement, and once for
-    UNT verification, and caching the sessionId in the ThreadLocalTokenCache the second time will cause it to emit a warning
-    message. I only need to cache any interim AMSession instance as part of a token transformation - i.e. if the principal
-    associated with the token validation operation is necessary for the token issue operation. So my UsernameTokenValidator
-    needs the contextual information necessary to make this distinction. But does it make sense to define a UNT-based token
-    transformation protected by a UNT-based SecurityPolicy binding?
-     */
-    @Provides
-    @Inject
-    UsernameTokenValidator getWssUsernameTokenValidator(
-            AuthenticationHandler<UsernameToken> authenticationHandler,
-            Logger logger) {
-        return new UsernameTokenValidator(logger, authenticationHandler);
-
     }
 
     @Provides
@@ -389,12 +402,21 @@ public class SoapSTSInstanceModule extends AbstractModule {
     }
 
     /*
+    Provides the TokenValidationConfig instances which determine which TokenValidators will be plugged-in to validate
+    the SupportingTokens specified in SecurityPolicy bindings, and the tokens validated as part of the VALIDATE operation.
+     */
+    @Provides
+    Set<TokenValidationConfig> getTokenValidationConfig() {
+        return stsInstanceConfig.getValidatedTokenConfiguration();
+    }
+
+    /*
     Returns the set token types for which TokenValidators will be plugged-in to validate ActAs or OnBehalfOf tokens.
     Consumed by the TokenIssueOperationProvider.
      */
     @Provides
     @Named(AMSTSConstants.DELEGATED_TOKEN_VALIDATORS)
-    Set<TokenType> getDelegatedTokenValidators() {
+    Set<TokenValidationConfig> getDelegatedTokenValidators() {
         if (stsInstanceConfig.delegationRelationshipsSupported()) {
             return stsInstanceConfig.getSoapDelegationConfig().getValidatedDelegatedTokenTypes();
         } else {

@@ -28,6 +28,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 
@@ -71,32 +72,41 @@ public class AMSessionInvalidatorImpl implements AMSessionInvalidator {
     }
 
     @Override
-    public void invalidateAMSession(String sessionId) throws TokenCreationException {
-        try {
-            Map<String, String> headerMap = new HashMap<String, String>();
-            headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
-            headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersionSessionService);
-            headerMap.put(amSessionCookieName, sessionId);
-            HttpURLConnectionWrapper.ConnectionResult connectionResult =
-                    connectionWrapperFactory
-                    .httpURLConnectionWrapper(logoutUrl)
-                    .setRequestHeaders(headerMap)
-                    .setRequestMethod(AMSTSConstants.POST)
-                    .makeInvocation();
-            final int responseCode = connectionResult.getStatusCode();
-            if (responseCode != HttpURLConnection.HTTP_OK) {
-                throw new TokenCreationException(responseCode, "Non-200 response from invalidating session " + sessionId +
-                        "against url " + logoutUrl);
-            } else {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Invalidated session " + sessionId);
+    public void invalidateAMSessions(Set<String> sessionIds) throws TokenCreationException {
+        TokenCreationException tokenCreationException = null;
+        for (String sessionId : sessionIds) {
+            try {
+                Map<String, String> headerMap = new HashMap<String, String>();
+                headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
+                headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersionSessionService);
+                headerMap.put(amSessionCookieName, sessionId);
+                HttpURLConnectionWrapper.ConnectionResult connectionResult =
+                        connectionWrapperFactory
+                                .httpURLConnectionWrapper(logoutUrl)
+                                .setRequestHeaders(headerMap)
+                                .setRequestMethod(AMSTSConstants.POST)
+                                .makeInvocation();
+                final int responseCode = connectionResult.getStatusCode();
+                if (responseCode != HttpURLConnection.HTTP_OK) {
+                    throw new TokenCreationException(responseCode, "Non-200 response from invalidating session " + sessionId +
+                            "against url " + logoutUrl);
+                } else {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Invalidated session " + sessionId);
+                    }
                 }
+            } catch (IOException e) {
+                tokenCreationException = new TokenCreationException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR,
+                        "Exception caught invalidating session: " + sessionId + " against Url " + logoutUrl
+                                + ". Exception: " + e, e);
             }
-        } catch (IOException e) {
-            throw new TokenCreationException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR,
-                    "Exception caught invalidating session: " + sessionId + " against Url " + logoutUrl
-                            + ". Exception: " + e, e);
         }
-
+        /*
+        This approach only causes us to throw the last exception, but these exceptions will almost certainly only result
+        from a network failure, where the last exception is the same as the first.
+         */
+        if (tokenCreationException != null) {
+            throw tokenCreationException;
+        }
     }
 }

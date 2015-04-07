@@ -132,7 +132,9 @@ public class OpenAMSessionTokenServerInterceptor extends AbstractOpenAMSessionTo
         try {
             final String sessionId = tokenElement.getTextContent();
             final Principal principal = principalFromSession.getPrincipalFromSession(sessionId);
-            threadLocalAMTokenCache.cacheAMToken(sessionId);
+            //because we are dealing with an OpenAM session which was not created as part of TokenValidation, but
+            //rather pre-existed this validation, it should not be invalidated.
+            threadLocalAMTokenCache.cacheAMSessionId(sessionId, false);
             result.put(WSSecurityEngineResult.TAG_VALIDATED_TOKEN, Boolean.TRUE);
             result.put(WSSecurityEngineResult.TAG_PRINCIPAL, principal);
 

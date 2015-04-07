@@ -19,16 +19,9 @@ package org.forgerock.openam.sts.soap.token.config;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.name.Named;
-import com.google.inject.name.Names;
 import org.apache.cxf.sts.STSPropertiesMBean;
-import org.apache.cxf.sts.operation.TokenIssueOperation;
 import org.apache.cxf.sts.operation.TokenRenewOperation;
-import org.apache.cxf.sts.operation.TokenValidateOperation;
-import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
-import org.apache.cxf.sts.token.provider.TokenProvider;
-import org.apache.cxf.sts.token.renewer.SAMLTokenRenewer;
 import org.apache.cxf.sts.token.renewer.TokenRenewer;
-import org.apache.cxf.sts.token.validator.SAMLTokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
@@ -37,14 +30,10 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
-import org.forgerock.openam.sts.token.validator.AMTokenValidator;
-
+import org.forgerock.openam.sts.TokenType;
 
 import javax.xml.ws.WebServiceContext;
 
-import org.forgerock.openam.sts.TokenType;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -59,7 +48,7 @@ import org.slf4j.Logger;
  * what is injected is itself a Provider, which has the state necessary to provide the various interface instances necessary
  * to configure a SAMLTokenValidator
  *
- * TODO: get rid of this class? Probably not going to provide for token renewal?
+ * TODO: this class will be resurrected when AME-5869 is implemented
  *
  */
 public class TokenRenewOperationProvider implements Provider<RenewOperation> {
@@ -80,7 +69,7 @@ public class TokenRenewOperationProvider implements Provider<RenewOperation> {
             try {
                 return renewDelegate.renew(request, context);
             } finally {
-                threadLocalAMTokenCache.clearAMToken();
+                threadLocalAMTokenCache.clearCachedSessions();
             }
         }
     }
@@ -114,27 +103,22 @@ public class TokenRenewOperationProvider implements Provider<RenewOperation> {
             tokenRenewOperation.setStsProperties(stsPropertiesMBean);
             tokenRenewOperation.setTokenStore(tokenStore);
 
-            /*
-            Token validators must be provided to the token renewal operation, as renewal first involves
-            validation. The set of renewable tokens should define the set of validated tokens, so I can use
-            the TOKEN_RENEW_OPERATION as the list for both validators and renewers.
-             */
-            List<TokenValidator> tokenValidators = new ArrayList<TokenValidator>();
-            for(TokenType tokenType: renewTokenTypes) {
-                tokenValidators.add(operationFactory.getTokenValidatorForRenewal(tokenType));
-            }
-            tokenRenewOperation.setTokenValidators(tokenValidators);
+            tokenRenewOperation.setTokenValidators(getTokenValidators());
 
-            List<TokenRenewer> tokenRenewers = new ArrayList<TokenRenewer>();
-            for(TokenType tokenType: renewTokenTypes) {
-                tokenRenewers.add(operationFactory.getTokenRenewerForType(tokenType));
-            }
-            tokenRenewOperation.setTokenRenewers(tokenRenewers);
+            tokenRenewOperation.setTokenRenewers(getTokenRenewers());
 
             return new TokenRenewOperationWrapper(tokenRenewOperation, threadLocalAMTokenCache);
         } catch (STSInitializationException e) {
             logger.error("Exception caught initializing a RenewOperation: " + e, e);
             throw new RuntimeException(e);
         }
+    }
+
+    private List<TokenValidator> getTokenValidators() throws STSInitializationException {
+        return null;
+    }
+
+    private List<TokenRenewer> getTokenRenewers() throws STSInitializationException {
+        return null;
     }
 }

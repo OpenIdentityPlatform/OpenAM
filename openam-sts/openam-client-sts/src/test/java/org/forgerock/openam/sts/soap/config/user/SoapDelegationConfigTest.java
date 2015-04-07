@@ -19,6 +19,9 @@ package org.forgerock.openam.sts.soap.config.user;
 import org.forgerock.openam.sts.TokenType;
 import org.testng.annotations.Test;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
@@ -27,6 +30,8 @@ public class SoapDelegationConfigTest {
     public static final boolean WITH_CUSTOM_DELEGATION_HANDLERS = true;
     public static final boolean WITH_DELEGATION_TOKEN_TYPES = true;
     public static final String CUSTOM_DELEGATION_HANDLER_CLASS_NAME = "org.company.DelegationHandlerImpl";
+    private static final TokenValidationConfig AM_TOKEN_VALIDATION_CONFIG = new TokenValidationConfig(TokenType.OPENAM, false);
+    private static final TokenValidationConfig USERNAME_TOKEN_VALIDATION_CONFIG = new TokenValidationConfig(TokenType.USERNAME, true);
 
     @Test
     public void testEquals() {
@@ -71,8 +76,8 @@ public class SoapDelegationConfigTest {
         SoapDelegationConfig sdc1 = buildSoapDelegationConfig(WITH_DELEGATION_TOKEN_TYPES, WITH_CUSTOM_DELEGATION_HANDLERS);
         assertEquals(sdc1, SoapDelegationConfig.fromJson(sdc1.toJson()));
         assertTrue(SoapDelegationConfig.fromJson(sdc1.toJson()).getCustomDelegationTokenHandlers().contains(CUSTOM_DELEGATION_HANDLER_CLASS_NAME));
-        assertTrue(SoapDelegationConfig.fromJson(sdc1.toJson()).getValidatedDelegatedTokenTypes().contains(TokenType.OPENAM));
-        assertTrue(SoapDelegationConfig.fromJson(sdc1.toJson()).getValidatedDelegatedTokenTypes().contains(TokenType.USERNAME));
+        assertTrue(SoapDelegationConfig.fromJson(sdc1.toJson()).getValidatedDelegatedTokenTypes().contains(AM_TOKEN_VALIDATION_CONFIG));
+        assertTrue(SoapDelegationConfig.fromJson(sdc1.toJson()).getValidatedDelegatedTokenTypes().contains(USERNAME_TOKEN_VALIDATION_CONFIG));
 
         sdc1 = buildSoapDelegationConfig(!WITH_DELEGATION_TOKEN_TYPES, WITH_CUSTOM_DELEGATION_HANDLERS);
         assertEquals(sdc1, SoapDelegationConfig.fromJson(sdc1.toJson()));
@@ -96,7 +101,10 @@ public class SoapDelegationConfigTest {
     private SoapDelegationConfig buildSoapDelegationConfig(boolean withDelegationTokenTypes, boolean withCustomDelegationHandlers) {
         SoapDelegationConfig.SoapDelegationConfigBuilder builder = SoapDelegationConfig.builder();
         if (withDelegationTokenTypes) {
-            builder.addValidatedDelegationTokenType(TokenType.OPENAM).addValidatedDelegationTokenType(TokenType.USERNAME);
+            Set<TokenValidationConfig> validationConfigs = new HashSet<TokenValidationConfig>(2);
+            validationConfigs.add(AM_TOKEN_VALIDATION_CONFIG);
+            validationConfigs.add(USERNAME_TOKEN_VALIDATION_CONFIG);
+            builder.setValidatedDelegatedTokenSet(validationConfigs);
         }
         if (withCustomDelegationHandlers) {
             builder.addCustomDelegationTokenHandler(CUSTOM_DELEGATION_HANDLER_CLASS_NAME);

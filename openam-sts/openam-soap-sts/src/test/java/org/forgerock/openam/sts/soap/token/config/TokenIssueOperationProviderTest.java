@@ -29,6 +29,7 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.soap.config.user.TokenValidationConfig;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCacheImpl;
 import org.slf4j.Logger;
@@ -77,10 +78,13 @@ public class TokenIssueOperationProviderTest {
         Logger getSlf4jLogger() {
             return LoggerFactory.getLogger(AMSTSConstants.REST_STS_DEBUG_ID);
         }
+
         @Provides
         @javax.inject.Named(AMSTSConstants.DELEGATED_TOKEN_VALIDATORS)
-        Set<TokenType> getDelegatedTokenValidators() {
-            return Collections.emptySet();
+        Set<TokenValidationConfig> getDelegatedTokenValidators() {
+            Set<TokenValidationConfig> validationConfigs = new HashSet<TokenValidationConfig>();
+            validationConfigs.add(new TokenValidationConfig(TokenType.USERNAME, true));
+            return validationConfigs;
         }
 
         @Provides
@@ -94,7 +98,7 @@ public class TokenIssueOperationProviderTest {
     public void testDelegate() throws STSInitializationException {
         TokenOperationFactory mockOperationFactory = mock(TokenOperationFactory.class);
         TokenProvider mockProvider = mock(TokenProvider.class);
-        when(mockOperationFactory.getTokenProviderForType(any(TokenType.class))).thenReturn(mockProvider);
+        when(mockOperationFactory.getTokenProvider(any(TokenType.class))).thenReturn(mockProvider);
         TokenIssueOperationProvider issueOperationProvider =
                 Guice.createInjector(new MyModule(mockOperationFactory)).getInstance(TokenIssueOperationProvider.class);
         assertTrue(issueOperationProvider.get() instanceof TokenIssueOperationProvider.TokenIssueOperationWrapper);
@@ -104,7 +108,7 @@ public class TokenIssueOperationProviderTest {
     public void testExceptionInitialization() throws STSInitializationException {
         TokenOperationFactory mockOperationFactory = mock(TokenOperationFactory.class);
         TokenProvider mockProvider = mock(TokenProvider.class);
-        when(mockOperationFactory.getTokenProviderForType(any(TokenType.class))).thenThrow(STSInitializationException.class);
+        when(mockOperationFactory.getTokenProvider(any(TokenType.class))).thenThrow(STSInitializationException.class);
         TokenIssueOperationProvider issueOperationProvider =
                 Guice.createInjector(new MyModule(mockOperationFactory)).getInstance(TokenIssueOperationProvider.class);
         issueOperationProvider.get();

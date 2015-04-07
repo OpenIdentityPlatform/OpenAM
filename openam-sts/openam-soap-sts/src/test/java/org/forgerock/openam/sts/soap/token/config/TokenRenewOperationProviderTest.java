@@ -42,6 +42,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.testng.Assert.assertTrue;
 
+/*
+Tests in this class are disabled for the moment, as token renewal is being revamped, and will be re-introduced as part
+of AME-5878. When this functionality is re-introduced, this test class will likely be refactored and tests re-enabled.
+TODO
+ */
 public class TokenRenewOperationProviderTest {
     static class MyModule extends AbstractModule {
         TokenOperationFactory tokenOperationFactory;
@@ -77,7 +82,7 @@ public class TokenRenewOperationProviderTest {
 
     }
 
-    @Test
+/*    @Test
     public void testDelegate() throws STSInitializationException {
         TokenOperationFactory mockOperationFactory = mock(TokenOperationFactory.class);
         TokenRenewer mockRenewer = mock(TokenRenewer.class);
@@ -96,4 +101,5 @@ public class TokenRenewOperationProviderTest {
                 Guice.createInjector(new MyModule(mockOperationFactory)).getInstance(TokenRenewOperationProvider.class);
         renewOperationProvider.get();
     }
+    */
 }

@@ -44,10 +44,15 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Note that the process of unit-testing the SoapSTSInstancePublisherImpl involves ultimately creating the SoapSTSInstanceModule
+ * corresponding to a to-be-published soap-sts instance. Exceptions in this process are logged in the SoapSTSInstancePublisherImpl#run
+ * method, but they don't show up in the maven output. Test errors in this class are almost always a function of missing
+ * guice configurations, which can be best debugged by putting a breakpoint in SoapSTSInstancePublisherImpl#publishInstance,
+ * so that the guice errors can be examined directly, as these errors are logged to the OpenAM debug log context, and thus
+ * don't seem to surface in the maven output.
+ */
 public class SoapSTSInstancePublisherImplTest {
-    private static final boolean WITH_KEYSTORE_CONFIG = true;
-    private static final boolean WITH_VALIDATE_TRANSFORM = true;
-    private static final boolean WITH_ISSUE_OPERATION = true;
 
     private SoapSTSInstanceLifecycleManager mockLifecycleManager;
     private PublishServiceConsumer mockPublishServiceConsumer;
@@ -73,11 +78,11 @@ public class SoapSTSInstancePublisherImplTest {
     public void setUp() {
         instancePublisher = Guice.createInjector(new MyModule()).getInstance(SoapSTSInstancePublisher.class);
     }
-
+    @SuppressWarnings("unchecked")
     @Test
     public void testPublishAndRemove() throws ResourceException, UnsupportedEncodingException {
         Set<SoapSTSInstanceConfig> initialSet = Sets.newHashSet(createInstanceConfig("instanceOne",
-                "http://host.com:8080/am", WITH_KEYSTORE_CONFIG, WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION));
+                "http://host.com:8080/am"));
         when(mockPublishServiceConsumer.getPublishedInstances()).thenReturn(initialSet);
         when(mockLifecycleManager.exposeSTSInstanceAsWebService(
                 any(Map.class), any(SecurityTokenServiceProvider.class), any(SoapSTSInstanceConfig.class))).thenReturn(mockServer);
@@ -94,10 +99,11 @@ public class SoapSTSInstancePublisherImplTest {
         verify(mockLifecycleManager, times(1)).destroySTSInstance(any(Server.class));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testNoUpdate() throws ResourceException, UnsupportedEncodingException {
         SoapSTSInstanceConfig instanceConfig = createInstanceConfig("instanceOne",
-                "http://host.com:8080/am", WITH_KEYSTORE_CONFIG, WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION);
+                "http://host.com:8080/am");
         Set<SoapSTSInstanceConfig> initialSet = Sets.newHashSet(instanceConfig);
         when(mockPublishServiceConsumer.getPublishedInstances()).thenReturn(initialSet);
         when(mockLifecycleManager.exposeSTSInstanceAsWebService(
@@ -113,10 +119,11 @@ public class SoapSTSInstancePublisherImplTest {
         verify(mockLifecycleManager, times(0)).destroySTSInstance(any(Server.class));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testUpdate() throws ResourceException, UnsupportedEncodingException {
         SoapSTSInstanceConfig instanceConfig = createInstanceConfig("instanceOne",
-                "http://host.com:8080/am", WITH_KEYSTORE_CONFIG, WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION);
+                "http://host.com:8080/am");
         Set<SoapSTSInstanceConfig> initialSet = Sets.newHashSet(instanceConfig);
         when(mockPublishServiceConsumer.getPublishedInstances()).thenReturn(initialSet);
         when(mockLifecycleManager.exposeSTSInstanceAsWebService(
@@ -126,7 +133,7 @@ public class SoapSTSInstancePublisherImplTest {
                 any(SecurityTokenServiceProvider.class), any(SoapSTSInstanceConfig.class));
 
         SoapSTSInstanceConfig updatedConfig = createInstanceConfig("instanceOne",
-                "http://host.com:8080/am2", WITH_KEYSTORE_CONFIG, WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION);
+                "http://host.com:8080/am2");
         when(mockPublishServiceConsumer.getPublishedInstances()).thenReturn(Sets.newHashSet(updatedConfig));
         instancePublisher.run();
         verify(mockLifecycleManager, times(2)).exposeSTSInstanceAsWebService(any(Map.class),
@@ -134,17 +141,15 @@ public class SoapSTSInstancePublisherImplTest {
         verify(mockLifecycleManager, times(1)).destroySTSInstance(any(Server.class));
     }
 
-    private SoapSTSInstanceConfig createInstanceConfig(String uriElement, String amDeploymentUrl,
-                                                       boolean withKeystoreConfig, boolean withValidateTransform,
-                                                       boolean withIssueOperation) throws UnsupportedEncodingException {
+    private SoapSTSInstanceConfig createInstanceConfig(String uriElement, String amDeploymentUrl) throws UnsupportedEncodingException {
         AuthTargetMapping mapping = AuthTargetMapping.builder()
                 .addMapping(TokenType.USERNAME, "service", "ldap")
                 .build();
 
         SoapDeploymentConfig deploymentConfig =
                 SoapDeploymentConfig.builder()
-                        .portQName(AMSTSConstants.UNPROTECTED_STS_SERVICE_PORT)
-                        .serviceQName(AMSTSConstants.UNPROTECTED_STS_SERVICE)
+                        .portQName(AMSTSConstants.AM_TRANSPORT_STS_SERVICE_PORT)
+                        .serviceQName(AMSTSConstants.AM_TRANSPORT_STS_SERVICE)
                         .wsdlLocation("wsdl_loc")
                         .realm("realm")
                         .amDeploymentUrl(amDeploymentUrl)
@@ -152,10 +157,7 @@ public class SoapSTSInstancePublisherImplTest {
                         .authTargetMapping(mapping)
                         .build();
 
-        SoapSTSKeystoreConfig keystoreConfig = null;
-        if (withKeystoreConfig) {
-            keystoreConfig =
-                    SoapSTSKeystoreConfig.builder()
+        SoapSTSKeystoreConfig keystoreConfig = SoapSTSKeystoreConfig.builder()
                             .keystoreFileName("stsstore.jks")
                             .keystorePassword("frstssrvkspw".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                             .encryptionKeyAlias("frstssrval")
@@ -163,15 +165,12 @@ public class SoapSTSInstancePublisherImplTest {
                             .signatureKeyAlias("frstssrval")
                             .signatureKeyPassword("frstssrvpw".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                             .build();
-        }
 
         SoapSTSInstanceConfig.SoapSTSInstanceConfigBuilderBase<?> builder = SoapSTSInstanceConfig.builder();
-        if (withValidateTransform) {
-            builder.addValidateTokenTranslation(TokenType.OPENAM, TokenType.SAML2, false);
-        }
-        if (withIssueOperation) {
-            builder.addIssueTokenType(TokenType.SAML2);
-        }
+        builder.addTokenValidationConfiguration(TokenType.OPENAM, false);
+        builder.addTokenValidationConfiguration(TokenType.USERNAME, true);
+
+        builder.addIssueTokenType(TokenType.SAML2);
         Map<String,String> attributeMap = new HashMap<String, String>();
         attributeMap.put("mail", "email");
         attributeMap.put("uid", "id");
@@ -199,5 +198,4 @@ public class SoapSTSInstancePublisherImplTest {
                 .saml2Config(saml2Config)
                 .build();
     }
-
 }

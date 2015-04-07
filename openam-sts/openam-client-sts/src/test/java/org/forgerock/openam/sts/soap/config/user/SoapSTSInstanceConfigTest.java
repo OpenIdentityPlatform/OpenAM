@@ -40,7 +40,7 @@ import static org.testng.Assert.assertTrue;
 
 public class SoapSTSInstanceConfigTest {
     private static final boolean WITH_KEYSTORE_CONFIG = true;
-    private static final boolean WITH_VALIDATE_TRANSFORM = true;
+    private static final boolean WITH_VALIDATE_CONFIG = true;
     private static final boolean WITH_ISSUE_OPERATION = true;
     private static final boolean DELEGATION_VALIDATORS_SPECIFIED = true;
     private static final boolean CUSTOM_DELEGATION_HANDLER = true;
@@ -48,44 +48,44 @@ public class SoapSTSInstanceConfigTest {
     @Test
     public void testEquals() throws UnsupportedEncodingException {
         SoapSTSInstanceConfig ric1 = createInstanceConfig("/bob", "http://localhost:8080/openam", WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
         SoapSTSInstanceConfig ric2 = createInstanceConfig("/bob", "http://localhost:8080/openam", WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
         assertEquals(ric1, ric2);
         assertEquals(ric1.hashCode(), ric2.hashCode());
 
         ric1 = createInstanceConfig("/bob", "http://localhost:8080/openam", !WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
         ric2 = createInstanceConfig("/bob", "http://localhost:8080/openam", !WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
         assertEquals(ric1, ric2);
         assertEquals(ric1.hashCode(), ric2.hashCode());
 
         ric1 = createInstanceConfig("/bob", "http://localhost:8080/openam", !WITH_KEYSTORE_CONFIG,
-                !WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
+                !WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
         ric2 = createInstanceConfig("/bob", "http://localhost:8080/openam", !WITH_KEYSTORE_CONFIG,
-                !WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
+                !WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
         assertEquals(ric1, ric2);
         assertEquals(ric1.hashCode(), ric2.hashCode());
 
         ric1 = createInstanceConfig("/bob", "http://localhost:8080/openam", WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, !WITH_ISSUE_OPERATION, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
         ric2 = createInstanceConfig("/bob", "http://localhost:8080/openam", WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, !WITH_ISSUE_OPERATION, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
         assertEquals(ric1, ric2);
         assertEquals(ric1.hashCode(), ric2.hashCode());
 
         ric1 = createInstanceConfig("/bob", "http://localhost:8080/openam", !WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
         ric2 = createInstanceConfig("/bob", "http://localhost:8080/openam", !WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
         assertEquals(ric1, ric2);
         assertEquals(ric1.hashCode(), ric2.hashCode());
 
         ric1 = createInstanceConfig("/bob", "http://localhost:8080/openam", WITH_KEYSTORE_CONFIG,
-                !WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+                !WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
         ric2 = createInstanceConfig("/bob", "http://localhost:8080/openam", WITH_KEYSTORE_CONFIG,
-                !WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+                !WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
         assertEquals(ric1, ric2);
         assertEquals(ric1.hashCode(), ric2.hashCode());
     }
@@ -93,58 +93,44 @@ public class SoapSTSInstanceConfigTest {
     @Test
     public void testNotEquals() throws UnsupportedEncodingException {
         SoapSTSInstanceConfig ric1 = createInstanceConfig("/bob", "http://localhost:8080/openam", WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
         SoapSTSInstanceConfig ric2 = createInstanceConfig("/bobo", "http://localhost:8080/openam", WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
         assertNotEquals(ric1, ric2);
         assertNotEquals(ric1.hashCode(), ric2.hashCode());
 
         ric1 = createInstanceConfig("/bob", "http://localhost:8080/openam", WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
         ric2 = createInstanceConfig("/bob", "http://localhost:8080/", WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
         assertNotEquals(ric1, ric2);
         assertNotEquals(ric1.hashCode(), ric2.hashCode());
 
         ric1 = createInstanceConfig("/bob", "http://localhost:8080/", WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
         ric2 = createInstanceConfig("/bob", "http://localhost:8080/", !WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
         assertNotEquals(ric1, ric2);
         assertNotEquals(ric1.hashCode(), ric2.hashCode());
 
         ric1 = createInstanceConfig("/bob", "http://localhost:8080/", !WITH_KEYSTORE_CONFIG,
-                !WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+                !WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
         ric2 = createInstanceConfig("/bob", "http://localhost:8080/", !WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
         assertNotEquals(ric1, ric2);
         assertNotEquals(ric1.hashCode(), ric2.hashCode());
 
         ric1 = createInstanceConfig("/bob", "http://localhost:8080/", WITH_KEYSTORE_CONFIG,
-                !WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
         ric2 = createInstanceConfig("/bob", "http://localhost:8080/", WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
         assertNotEquals(ric1, ric2);
         assertNotEquals(ric1.hashCode(), ric2.hashCode());
 
         ric1 = createInstanceConfig("/bob", "http://localhost:8080/", WITH_KEYSTORE_CONFIG,
-                !WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
         ric2 = createInstanceConfig("/bob", "http://localhost:8080/", WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
-        assertNotEquals(ric1, ric2);
-        assertNotEquals(ric1.hashCode(), ric2.hashCode());
-
-        ric1 = createInstanceConfig("/bob", "http://localhost:8080/", WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, !WITH_ISSUE_OPERATION, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
-        ric2 = createInstanceConfig("/bob", "http://localhost:8080/", WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
-        assertNotEquals(ric1, ric2);
-        assertNotEquals(ric1.hashCode(), ric2.hashCode());
-
-        ric1 = createInstanceConfig("/bob", "http://localhost:8080/", WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, !WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
-        ric2 = createInstanceConfig("/bob", "http://localhost:8080/", WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
         assertNotEquals(ric1, ric2);
         assertNotEquals(ric1.hashCode(), ric2.hashCode());
     }
@@ -154,87 +140,72 @@ public class SoapSTSInstanceConfigTest {
         createIncompleteInstanceConfig();
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testRejectIfNeitherIssueNorValidateTransform() throws UnsupportedEncodingException {
-        createInstanceConfig("/bob", "http://localhost:8080/", WITH_KEYSTORE_CONFIG,
-                !WITH_VALIDATE_TRANSFORM, !WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
-    }
-
     @Test
     public void testJsonRoundTrip() throws UnsupportedEncodingException {
         SoapSTSInstanceConfig instanceConfig = createInstanceConfig("/bobo/instance1", "http://host.com:8080/am",
-                WITH_KEYSTORE_CONFIG, WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
+                WITH_KEYSTORE_CONFIG, WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
         assertEquals(instanceConfig, SoapSTSInstanceConfig.fromJson(instanceConfig.toJson()));
 
         instanceConfig = createInstanceConfig("/bobo/instance1", "http://host.com:8080/am", !WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
         assertEquals(instanceConfig, SoapSTSInstanceConfig.fromJson(instanceConfig.toJson()));
 
         instanceConfig = createInstanceConfig("/bobo/instance1", "http://host.com:8080/am", WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, !WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
         assertEquals(instanceConfig, SoapSTSInstanceConfig.fromJson(instanceConfig.toJson()));
 
         instanceConfig = createInstanceConfig("/bobo/instance1", "http://host.com:8080/am", !WITH_KEYSTORE_CONFIG,
-                !WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
+                !WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
         assertEquals(instanceConfig, SoapSTSInstanceConfig.fromJson(instanceConfig.toJson()));
 
         instanceConfig = createInstanceConfig("/bobo/instance1", "http://host.com:8080/am", WITH_KEYSTORE_CONFIG,
-                !WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
-        assertEquals(instanceConfig, SoapSTSInstanceConfig.fromJson(instanceConfig.toJson()));
-
-        instanceConfig = createInstanceConfig("/bobo/instance1", "http://host.com:8080/am", WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, !WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
-        assertEquals(instanceConfig, SoapSTSInstanceConfig.fromJson(instanceConfig.toJson()));
-
-        instanceConfig = createInstanceConfig("/bobo/instance1", "http://host.com:8080/am", WITH_KEYSTORE_CONFIG,
-                !WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
         assertEquals(instanceConfig, SoapSTSInstanceConfig.fromJson(instanceConfig.toJson()));
 
         instanceConfig = createInstanceConfig("/bobo/instance1", "http://host.com:8080/am", !WITH_KEYSTORE_CONFIG,
-                !WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+                !WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
         assertEquals(instanceConfig, SoapSTSInstanceConfig.fromJson(instanceConfig.toJson()));
+    }
+
+    @Test(expectedExceptions=IllegalStateException.class)
+    public void testNoValidationAndNoDelegation() throws UnsupportedEncodingException {
+        createInstanceConfig("/bobo/instance1", "http://host.com:8080/am", WITH_KEYSTORE_CONFIG,
+                !WITH_VALIDATE_CONFIG, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+
     }
 
     @Test
     public void testMapMarshalRoundTrip() throws UnsupportedEncodingException {
         SoapSTSInstanceConfig instanceConfig = createInstanceConfig("/bobo/instance1", "http://host.com:8080/am",
-                WITH_KEYSTORE_CONFIG, WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED,
+                WITH_KEYSTORE_CONFIG, WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED,
                 !CUSTOM_DELEGATION_HANDLER);
         assertEquals(instanceConfig, SoapSTSInstanceConfig.marshalFromAttributeMap(instanceConfig.marshalToAttributeMap()));
 
         instanceConfig = createInstanceConfig("/bobo/instance1", "http://host.com:8080/am", !WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
         assertEquals(instanceConfig, SoapSTSInstanceConfig.marshalFromAttributeMap(instanceConfig.marshalToAttributeMap()));
 
         instanceConfig = createInstanceConfig("/bobo/instance1", "http://host.com:8080/am", WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, !WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
-        assertEquals(instanceConfig, SoapSTSInstanceConfig.marshalFromAttributeMap(instanceConfig.marshalToAttributeMap()));
-
-        instanceConfig = createInstanceConfig("/bobo/instance1", "http://host.com:8080/am", !WITH_KEYSTORE_CONFIG,
-                !WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
         assertEquals(instanceConfig, SoapSTSInstanceConfig.marshalFromAttributeMap(instanceConfig.marshalToAttributeMap()));
 
         instanceConfig = createInstanceConfig("/bobo/instance1", "http://host.com:8080/am", WITH_KEYSTORE_CONFIG,
-                !WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, !DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
+                !WITH_VALIDATE_CONFIG, !DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
         assertEquals(instanceConfig, SoapSTSInstanceConfig.marshalFromAttributeMap(instanceConfig.marshalToAttributeMap()));
 
         instanceConfig = createInstanceConfig("/bobo/instance1", "http://host.com:8080/am", WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, !WITH_ISSUE_OPERATION, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
         assertEquals(instanceConfig, SoapSTSInstanceConfig.marshalFromAttributeMap(instanceConfig.marshalToAttributeMap()));
 
         instanceConfig = createInstanceConfig("/bobo/instance1", "http://host.com:8080/am", WITH_KEYSTORE_CONFIG,
-                !WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
-        assertEquals(instanceConfig, SoapSTSInstanceConfig.marshalFromAttributeMap(instanceConfig.marshalToAttributeMap()));
-
-        instanceConfig = createInstanceConfig("/bobo/instance1", "http://host.com:8080/am", !WITH_KEYSTORE_CONFIG,
-                !WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+                !WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
         assertEquals(instanceConfig, SoapSTSInstanceConfig.marshalFromAttributeMap(instanceConfig.marshalToAttributeMap()));
     }
 
     @Test
     public void testOldJacksonJsonStringMarhalling() throws IOException {
         SoapSTSInstanceConfig origConfig = createInstanceConfig("/bobo/instance1", "http://host.com:8080/am", WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
         /*
         This is how the Crest HttpServletAdapter ultimately constitutes a JsonValue from a json string. See the
         org.forgerock.json.resource.servlet.HttpUtils.parseJsonBody (called from HttpServletAdapter.getJsonContent)
@@ -250,7 +221,7 @@ public class SoapSTSInstanceConfigTest {
     @Test
     public void testJsonStringMarshalling() throws IOException {
         SoapSTSInstanceConfig origConfig = createInstanceConfig("/bobo/instance1", "http://host.com:8080/am", WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
 
         /*
         This is how the Crest HttpServletAdapter ultimately constitutes a JsonValue from a json string. See the
@@ -266,13 +237,13 @@ public class SoapSTSInstanceConfigTest {
     @Test
     public void testJsonMapMarshalRoundTrip() throws IOException {
         SoapSTSInstanceConfig config = createInstanceConfig("/bobo/instance1", "http://host.com:8080/am", WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, !DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER);
         Map<String, Set<String>> attributeMap = config.marshalToAttributeMap();
         JsonValue jsonMap = new JsonValue(marshalSetValuesToListValues(attributeMap));
         assertEquals(config, SoapSTSInstanceConfig.marshalFromJsonAttributeMap(jsonMap));
 
         config = createInstanceConfig("/bobo/instance1", "http://host.com:8080/am", !WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_TRANSFORM, WITH_ISSUE_OPERATION, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
+                WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER);
         attributeMap = config.marshalToAttributeMap();
         jsonMap = new JsonValue(marshalSetValuesToListValues(attributeMap));
         assertEquals(config, SoapSTSInstanceConfig.marshalFromJsonAttributeMap(jsonMap));
@@ -300,18 +271,24 @@ public class SoapSTSInstanceConfigTest {
         assertTrue(fileContent.contains(SoapDeploymentConfig.SERVICE_PORT));
         assertTrue(fileContent.contains(SoapDeploymentConfig.WSDL_LOCATION));
         assertTrue(fileContent.contains(SoapDeploymentConfig.AM_DEPLOYMENT_URL));
+        assertTrue(fileContent.contains(SoapDeploymentConfig.CUSTOM_PORT_QNAME));
+        assertTrue(fileContent.contains(SoapDeploymentConfig.CUSTOM_SERVICE_QNAME));
+        assertTrue(fileContent.contains(SoapDeploymentConfig.CUSTOM_WSDL_LOCATION));
+        assertTrue(fileContent.contains(SoapDeploymentConfig.CUSTOM_SOAP_STS_SERVICE_NAME_INDICATOR));
+        assertTrue(fileContent.contains(SoapDeploymentConfig.CUSTOM_SOAP_STS_SERVICE_PORT_INDICATOR));
+        assertTrue(fileContent.contains(SoapDeploymentConfig.CUSTOM_SOAP_STS_WSDL_FILE_INDICATOR));
 
         assertTrue(fileContent.contains(SoapDelegationConfig.DELEGATION_TOKEN_VALIDATORS));
         assertTrue(fileContent.contains(SoapDelegationConfig.CUSTOM_DELEGATION_TOKEN_HANDLERS));
 
         assertTrue(fileContent.contains(SoapSTSInstanceConfig.ISSUE_TOKEN_TYPES));
-        assertTrue(fileContent.contains(SoapSTSInstanceConfig.TRANSFORMED_TOKEN_TYPES));
+        assertTrue(fileContent.contains(SoapSTSInstanceConfig.VALIDATED_TOKEN_CONFIG));
         assertTrue(fileContent.contains(SoapSTSInstanceConfig.DELEGATION_RELATIONSHIP_SUPPORTED));
     }
 
     private SoapSTSInstanceConfig createInstanceConfig(String uriElement, String amDeploymentUrl,
-                                                       boolean withKeystoreConfig, boolean withValidateTransform,
-                                                       boolean withIssueOperation,
+                                                       boolean withKeystoreConfig,
+                                                       boolean withValidationConfig,
                                                        boolean delegationValidatorsSpecified,
                                                        boolean customDelegationHandler) throws UnsupportedEncodingException {
         AuthTargetMapping mapping = AuthTargetMapping.builder()
@@ -320,8 +297,8 @@ public class SoapSTSInstanceConfigTest {
 
         SoapDeploymentConfig deploymentConfig =
                 SoapDeploymentConfig.builder()
-                        .portQName(AMSTSConstants.UNPROTECTED_STS_SERVICE_PORT)
-                        .serviceQName(AMSTSConstants.UNPROTECTED_STS_SERVICE)
+                        .portQName(AMSTSConstants.AM_TRANSPORT_STS_SERVICE_PORT)
+                        .serviceQName(AMSTSConstants.AM_TRANSPORT_STS_SERVICE)
                         .wsdlLocation("wsdl_loc")
                         .realm("realm")
                         .amDeploymentUrl(amDeploymentUrl)
@@ -343,12 +320,12 @@ public class SoapSTSInstanceConfigTest {
         }
 
         SoapSTSInstanceConfig.SoapSTSInstanceConfigBuilderBase<?> builder = SoapSTSInstanceConfig.builder();
-        if (withValidateTransform) {
-            builder.addValidateTokenTranslation(TokenType.OPENAM, TokenType.SAML2, false);
+        if (withValidationConfig) {
+            builder.addTokenValidationConfiguration(TokenType.OPENAM, false);
+            builder.addTokenValidationConfiguration(TokenType.USERNAME, true);
+            builder.addTokenValidationConfiguration(TokenType.X509, true);
         }
-        if (withIssueOperation) {
-            builder.addIssueTokenType(TokenType.SAML2);
-        }
+        builder.addIssueTokenType(TokenType.SAML2);
         Map<String,String> attributeMap = new HashMap<String, String>();
         attributeMap.put("mail", "email");
         attributeMap.put("uid", "id");
@@ -373,8 +350,8 @@ public class SoapSTSInstanceConfigTest {
             SoapDelegationConfig.SoapDelegationConfigBuilder delegationConfigBuilder = SoapDelegationConfig.builder();
             if (delegationValidatorsSpecified) {
                 delegationConfigBuilder
-                        .addValidatedDelegationTokenType(TokenType.USERNAME)
-                        .addValidatedDelegationTokenType(TokenType.OPENAM);
+                        .addValidatedDelegationTokenType(TokenType.USERNAME, true)
+                        .addValidatedDelegationTokenType(TokenType.OPENAM, false);
             }
             if (customDelegationHandler) {
                 delegationConfigBuilder.addCustomDelegationTokenHandler("com.org.TokenDelegationHandlerImpl");

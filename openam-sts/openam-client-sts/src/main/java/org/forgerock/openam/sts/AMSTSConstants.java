@@ -36,37 +36,19 @@ public class AMSTSConstants {
     These constants define the QNames referencing services and ports in wsdl documents which define the semantics and
     SecurityPolicy bindings of published STS instances.
      */
-    public static final QName UNPROTECTED_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "unprotected_sts_service");
-    public static final QName UNPROTECTED_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "unprotected_sts_service_port");
-    public static final QName SYMMETRIC_UT_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "symmetric_ut_sts_service");
-    public static final QName SYMMETRIC_UT_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "symmetric_ut_sts_service_port");
-    public static final QName ASYMMETRIC_UT_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "asymmetric_ut_sts_service");
-    public static final QName ASYMMETRIC_UT_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "asymmetric_ut_sts_service_port");
-    public static final QName TRANSPORT_UT_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "transport_ut_sts_service");
-    public static final QName TRANSPORT_UT_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "transport_ut_sts_service_port");
+    public static final QName UT_SYMMETRIC_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "ut_symmetric_sts_service");
+    public static final QName UT_SYMMETRIC_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "ut_symmetric_sts_service_port");
+    public static final QName UT_ASYMMETRIC_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "ut_asymmetric_sts_service");
+    public static final QName UT_ASYMMETRIC_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "ut_asymmetric_sts_service_port");
+    public static final QName UT_TRANSPORT_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "ut_transport_sts_service");
+    public static final QName UT_TRANSPORT_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "ut_transport_sts_service_port");
     public static final QName SYMMETRIC_ENDORSING_CERT_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "symmetric_endorsing_cert_sts_service");
     public static final QName SYMMETRIC_ENDORSING_CERT_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "symmetric_endorsing_cert_sts_service_port");
 
-    public static final QName SYMMETRIC_AM_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "symmetric_am_sts_service");
-    public static final QName SYMMETRIC_AM_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "symmetric_am_sts_service_port");
-    public static final QName ASYMMETRIC_AM_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "asymmetric_am_sts_service");
-    public static final QName ASYMMETRIC_AM_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "asymmetric_am_sts_service_port");
-    public static final QName TRANSPORT_AM_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "transport_am_sts_service");
-    public static final QName TRANSPORT_AM_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "transport_am_sts_service_port");
-    public static final QName UNPROTECTED_AM_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "unprotected_am_sts_service");
-    public static final QName UNPROTECTED_AM_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "unprotected_am_sts_service_port");
-
-    /*
-    These constants define some strings which are used to specify the type of STS instance to publish. This is
-    a simple specification used only when consuming the STS-instance-publishing web-service in integration tests.
-    These values will be replaced by more a more detailed specification of STS instance details and the associated
-    configuration state. They are being kept around for ease of use in integration tests.
-     */
-    public static final String UNPROTECTED_BINDING = "unprotected_binding";
-    public static final String SYMMETRIC_USERNAME_TOKEN_BINDING = "symmetric_username_token_binding";
-    public static final String ASYMMETRIC_USERNAME_TOKEN_BINDING = "asymmetric_username_token_binding";
-    public static final String TRANSPORT_USERNAME_TOKEN_BINDING = "transport_username_token_binding";
-    public static final String SYMMETRIC_ENDORSING_CERT_BINDING = "symmetric_endorsing_cert_binding";
+    public static final QName AM_TRANSPORT_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "am_transport_sts_service");
+    public static final QName AM_TRANSPORT_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "am_transport_sts_service_port");
+    public static final QName AM_BARE_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "am_bare_sts_service");
+    public static final QName AM_BARE_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "am_bare_sts_service_port");
 
     /*
     Used in conjunction with com.google.inject.Names.named to distinguish e.g. a Provider of the token types for
@@ -74,7 +56,6 @@ public class AMSTSConstants {
     we need @Named with one of the values below for disambiguation.
      */
     public static final String TOKEN_ISSUE_OPERATION = "token_issue_operation";
-    public static final String TOKEN_VALIDATE_OPERATION_STATUS = "token_validate_operation_status";
     public static final String TOKEN_RENEW_OPERATION = "token_renew_operation";
 
     /*
@@ -446,8 +427,23 @@ public class AMSTSConstants {
      * a soap-sts instance which specifies custom implementations of org.apache.cxf.sts.token.delegation.TokenDelegationHandler.
      * If only such implementations are specified to validate the delegated token, this handler has to set
      * the OpenAM session id corresponding to this delegated token in the additionalProperties map in the
-     * org.apache.cxf.sts.token.delegation.TokenDelegationResponse keyed by the string below if the TokenGenerationService
-     * is to issue tokens corresponding to this principal.
+     * org.apache.cxf.sts.token.delegation.TokenDelegationResponse keyed by the string below. If this is not done,
+     * the token issue operation will fail, as the principal asserted by the token generation service is based upon the
+     * OpenAM session passed in the TGS invocation.
      */
     public static final String CUSTOM_DELEGATION_HANDLER_AM_SESSION_ID = "custom_delegation_handler_am_session_id";
+
+    /**
+     * For soap-sts instance which support token delegation (ActAs/OnBehalfOf elements), users have the option to publish
+     * a soap-sts instance which specifies custom implementations of org.apache.cxf.sts.token.delegation.TokenDelegationHandler.
+     * If only such implementations are specified to validate the delegated token, this handler has to set
+     * the OpenAM session id corresponding to this delegated token in the additionalProperties map in the
+     * org.apache.cxf.sts.token.delegation.TokenDelegationResponse. In addition, the custom TokenDelegationHandlers can
+     * determine whether the interim OpenAM session, generated by the validation of the delegated token type, should be
+     * invalidated following the generation of the to-be-issued token. By default, this interim OpenAM session will be
+     * invalidated, to prevent the in-memory session table from growing (for stateless sessions). If the custom TokenDelegationHandler
+     * wishes to over-ride this default behavior, they can set a Boolean corresponding to the key below in the additionalProperties
+     * in the TokenDelegationResponse.
+     */
+    public static final String CUSTOM_DELEGATION_HANDLER_INVALIDATE_AM_SESSION = "custom_delegation_handler_invalidate_am_session";
 }

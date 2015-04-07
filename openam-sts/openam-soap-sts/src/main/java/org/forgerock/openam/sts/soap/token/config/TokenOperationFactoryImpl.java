@@ -21,17 +21,13 @@ import javax.inject.Named;
 
 import com.google.inject.Provider;
 import org.apache.cxf.sts.token.provider.TokenProvider;
-import org.apache.cxf.sts.token.renewer.SAMLTokenRenewer;
-import org.apache.cxf.sts.token.renewer.TokenRenewer;
-import org.apache.cxf.sts.token.validator.SAMLTokenValidator;
-import org.apache.cxf.sts.token.validator.UsernameTokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidator;
+import org.apache.ws.security.message.token.UsernameToken;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XmlMarshaller;
-import org.forgerock.openam.sts.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProvider;
 import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
 import org.forgerock.openam.sts.soap.token.provider.SoapSamlTokenProvider;
@@ -43,6 +39,9 @@ import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
 import org.forgerock.openam.sts.token.validator.AMTokenValidator;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
+import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
+import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
+import org.forgerock.openam.sts.token.validator.wss.OpenAMWSSUsernameTokenValidator;
 import org.slf4j.Logger;
 
 /**
@@ -50,7 +49,6 @@ import org.slf4j.Logger;
  * plugged-into the top-level operation classes corresponding to the fundamental operations defined in WS-Trust.
  */
 public class TokenOperationFactoryImpl implements TokenOperationFactory {
-    private final Provider<org.forgerock.openam.sts.token.validator.wss.UsernameTokenValidator> wssUsernameTokenValidatorProvider;
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
     private final PrincipalFromSession principalFromSession;
     private final TokenGenerationServiceConsumer tokenGenerationServiceConsumer;
@@ -62,6 +60,7 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
     private final Provider<AMSessionInvalidator> amSessionInvalidatorProvider;
     private final SoapSTSAccessTokenProvider soapSTSAccessTokenProvider;
     private final SoapSTSInstanceConfig soapSTSInstanceConfig;
+    private final AuthenticationHandler<UsernameToken> usernameTokenAuthenticationHandler;
     private final Logger logger;
 
     /**
@@ -70,7 +69,6 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
      */
     @Inject
     public TokenOperationFactoryImpl(
-            Provider<org.forgerock.openam.sts.token.validator.wss.UsernameTokenValidator> wssUsernameTokenValidatorProvider,
             ThreadLocalAMTokenCache threadLocalAMTokenCache,
             PrincipalFromSession principalFromSession,
             TokenGenerationServiceConsumer tokenGenerationServiceConsumer,
@@ -82,8 +80,8 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
             Provider<AMSessionInvalidator> amSessionInvalidatorProvider,
             SoapSTSAccessTokenProvider soapSTSAccessTokenProvider,
             SoapSTSInstanceConfig soapSTSInstanceConfig,
+            AuthenticationHandler<UsernameToken> usernameTokenAuthenticationHandler,
             Logger logger) {
-        this.wssUsernameTokenValidatorProvider = wssUsernameTokenValidatorProvider;
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
         this.principalFromSession = principalFromSession;
         this.tokenGenerationServiceConsumer = tokenGenerationServiceConsumer;
@@ -95,64 +93,38 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
         this.amSessionInvalidatorProvider = amSessionInvalidatorProvider;
         this.soapSTSAccessTokenProvider = soapSTSAccessTokenProvider;
         this.soapSTSInstanceConfig = soapSTSInstanceConfig;
+        this.usernameTokenAuthenticationHandler = usernameTokenAuthenticationHandler;
         this.logger = logger;
     }
     /**
-     * Returns a TokenValidator instance that can validate the status of the specified TokenType.
-     * TODO: are we doing status validation?
+     * Returns a TokenValidator instance that can validate the status of the specified TokenType. This method will be
+     * consumed to obtain the TokenValidators necessary to enforce SecurityPolicy bindings, and delegated token relationships.
+     * @param validatedTokenType The type of token to be validated
+     * @return The TokenValidation implementation which can validate the specified TokenType
+     * @throws STSInitializationException if the TokenValidator cannot be instantiated
      */
     @Override
-    public TokenValidator getTokenStatusValidatorForType(TokenType tokenType) throws STSInitializationException {
-        if (TokenType.SAML2.equals(tokenType)) {
-            //TODO: do we want to distinguish SAML1 and SAML2? The SAMLTokenProvider does both, but...
-            return new SAMLTokenValidator();
-        } else if (TokenType.OPENAM.equals(tokenType)) {
-            return buildAMTokenValidator();
-        } else if (TokenType.USERNAME.equals(tokenType)) {
-            /*
-            Here I want to return the sts.token.validator.UsernameTokenValidator, but I want to set the wss validator
-            (to which the actual validation is delegated) to an instance of my WSSUsernameTokenValidator. But this guy needs
-            the AuthenticationHandler injected - so I will provide a WSS TokenValidator provider to this class? Try the
-            specific class, and then refactor as necessary
-             */
-            logger.debug("Plugging in the UsernameTokenValidator.");
-            UsernameTokenValidator validator = new UsernameTokenValidator();
-            validator.setValidator(wssUsernameTokenValidatorProvider.get());
-            return validator;
+    public TokenValidator getTokenValidator(TokenType validatedTokenType, ValidationInvocationContext validationInvocationContext,
+                                            boolean invalidateAMSession) throws STSInitializationException {
+        if (TokenType.OPENAM.equals(validatedTokenType)) {
+            return buildAMTokenValidator(validationInvocationContext, invalidateAMSession);
+        } else if (TokenType.USERNAME.equals(validatedTokenType)) {
+            return buildUsernameTokenValidator(validationInvocationContext, invalidateAMSession);
         } else {
-            throw new STSInitializationException(ResourceException.BAD_REQUEST, "In TokenOperationFactory, unknown TokenType provided to obtain status TokenValidator: "
-                    + tokenType);
+            throw new STSInitializationException(ResourceException.BAD_REQUEST, "In TokenOperationFactory, unknown " +
+                    "TokenType provided to obtain status TokenValidator: " + validatedTokenType);
         }
     }
 
     /**
-     * Called to obtain the set of TokenValidate instances to validate the initial token in the context of token transformation -
-     * the validate operation called with a TokenType other than STATUS.
+     *
+     * @param issuedTokenType
+     * @return
+     * @throws STSInitializationException
      */
     @Override
-    public TokenValidator getTokenValidatorForTransformOperation(TokenTransformConfig tokenTransformConfig) throws STSInitializationException{
-        final TokenType inputTokenType = tokenTransformConfig.getInputTokenType();
-        if (TokenType.OPENAM.equals(inputTokenType)) {
-            return buildAMTokenValidator();
-        } else if (TokenType.USERNAME.equals(inputTokenType)) {
-            UsernameTokenValidator validator = new UsernameTokenValidator();
-            validator.setValidator(wssUsernameTokenValidatorProvider.get());
-            return validator;
-        } else {
-            throw new STSInitializationException(ResourceException.BAD_REQUEST, "In TokenOperationFactory, unknown TokenType provided to obtain status TokenValidator: "
-                    + inputTokenType);
-        }
-    }
-
-    /**
-     * Returns a TokenProvider instance in the context of the Validate 'token transformation' operation.
-     * @param tokenTransformConfig The token transformation configuration state configured in the SoapSTSInstanceConfig
-     * @return A TokenProvider which can issue the TokenType specified in the outputTokenType parameter.
-     */
-    @Override
-    public TokenProvider getTokenProviderForTransformOperation(TokenTransformConfig tokenTransformConfig) throws STSInitializationException{
-        final TokenType outputTokenType = tokenTransformConfig.getOutputTokenType();
-        if (TokenType.SAML2.equals(outputTokenType)) {
+    public TokenProvider getTokenProvider(TokenType issuedTokenType) throws STSInitializationException{
+        if (TokenType.SAML2.equals(issuedTokenType)) {
             return  SoapSamlTokenProvider.builder()
                     .tokenGenerationServiceConsumer(tokenGenerationServiceConsumer)
                     .amSessionInvalidator(amSessionInvalidatorProvider.get())
@@ -167,83 +139,20 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
                     .build();
         }
         throw new STSInitializationException(ResourceException.BAD_REQUEST, "Unhandled outputTokenType specified in " +
-                "getTokenProviderForTransformOperation. OutputTokenType: " + outputTokenType);
+                "getTokenProviderForTransformOperation. OutputTokenType: " + issuedTokenType);
     }
 
-    /*
-    This method is called to constitute the ISSUE operation.
-     */
-    public TokenProvider getTokenProviderForType(TokenType tokenType) throws STSInitializationException {
-        if (TokenType.SAML2.equals(tokenType)) {
-            return  SoapSamlTokenProvider.builder()
-                    .tokenGenerationServiceConsumer(tokenGenerationServiceConsumer)
-                    .amSessionInvalidator(getAMSessionInvalidator(tokenType))
-                    .threadLocalAMTokenCache(threadLocalAMTokenCache)
-                    .stsInstanceId(stsInstanceId)
-                    .realm(realm)
-                    .xmlUtilities(xmlUtilities)
-                    .authnContextMapper(xmlTokenAuthnContextMapper)
-                    .amSessionTokenXmlMarshaller(amSessionTokenXmlMarshaller)
-                    .soapSTSAccessTokenProvider(soapSTSAccessTokenProvider)
-                    .logger(logger)
-                    .build();
-        } else {
-            //we are only supporting issuing SAML tokens at this point.
-            throw new STSInitializationException(ResourceException.BAD_REQUEST,
-                    "In TokenOperationFactory, unknown TokenType provided to obtain TokenProvider: "
-                    + tokenType);
-        }
+    private AMTokenValidator buildAMTokenValidator(ValidationInvocationContext validationInvocationContext, boolean invalidateAMSession) {
+        return new AMTokenValidator(threadLocalAMTokenCache, principalFromSession, validationInvocationContext,
+                invalidateAMSession, logger);
     }
 
-    /*
-    Called to determine whether a non-null AMSessionInvalidator should be set in the SoapSamlTokenProvider. Will
-    examine the TokenTransformConfig associated with the ISSUE operation to make this determination. TODO.
-    For now, I will simply examine the wsdl file to see if it references an OpenAMSession SecurityPolicy.
-     */
-    private AMSessionInvalidator getAMSessionInvalidator(TokenType outputTokenType) throws STSInitializationException {
-        if (TokenType.SAML2.equals(outputTokenType)) {
-            return "sts_am.wsdl".equals(soapSTSInstanceConfig.getDeploymentConfig().getWsdlLocation()) ? null :
-                    amSessionInvalidatorProvider.get();
-        } else {
-            //we are only supporting issuing SAML tokens at this point.
-            throw new STSInitializationException(ResourceException.BAD_REQUEST,
-                    "In TokenOperationFactory, unknown TokenType provided to obtain TokenProvider: "
-                            + outputTokenType);
-        }
-    }
-
-    public TokenValidator getTokenValidatorForRenewal(TokenType tokenType) throws STSInitializationException{
-        if (TokenType.SAML2.equals(tokenType)) {
-            return new SAMLTokenValidator();
-        } else if (TokenType.OPENAM.equals(tokenType)) {
-            return buildAMTokenValidator();
-        } else {
-            throw new STSInitializationException(ResourceException.BAD_REQUEST,
-                    "In TokenOperationFactory, unknown TokenType provided to obtain TokenValidator: "
-                    + tokenType);
-        }
-    }
-
-    public TokenRenewer getTokenRenewerForType(TokenType tokenType) throws  STSInitializationException {
-        if (TokenType.SAML2.equals(tokenType)) {
-            SAMLTokenRenewer samlTokenRenewer =  new SAMLTokenRenewer();
-            /*
-            TODO: if the line below is commented-out, current state does not allow this to work - investigate!!
-            What happens is the STSCallbackHandler gets called with a WSPasswordCallback instance but with usage identifier
-            of SECRET_KEY (9). The identifier is some long string - e.g. _E56EE83BEB8E9F63C9136683677368353, which is
-            obviously not a key alias we are providing. So I am not quite sure what is going on. Need to do some more digging
-            before the line below can be commented-out. (And it probably should be configurable).
-             */
-            samlTokenRenewer.setVerifyProofOfPossession(false);
-            return samlTokenRenewer;
-        } else {
-            throw new STSInitializationException(ResourceException.BAD_REQUEST,
-                    "In TokenOperationFactory, unknown TokenType provided to obtain TokenRenewer: "
-                    + tokenType);
-        }
-    }
-
-    private AMTokenValidator buildAMTokenValidator() {
-        return new AMTokenValidator(threadLocalAMTokenCache, principalFromSession, logger);
+    private org.apache.cxf.sts.token.validator.UsernameTokenValidator buildUsernameTokenValidator(
+            ValidationInvocationContext validationInvocationContext, boolean invalidateAMSession) {
+        org.apache.cxf.sts.token.validator.UsernameTokenValidator validator =
+                new org.apache.cxf.sts.token.validator.UsernameTokenValidator();
+        validator.setValidator(new OpenAMWSSUsernameTokenValidator(usernameTokenAuthenticationHandler,
+                validationInvocationContext, invalidateAMSession, logger));
+        return validator;
     }
 }

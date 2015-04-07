@@ -18,11 +18,13 @@ package org.forgerock.openam.sts.token.validator.wss;
 
 import org.apache.ws.security.handler.RequestData;
 import org.forgerock.openam.sts.TokenValidationException;
+import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
 
 /**
  * Defines the authentication interface which hooks the wss4j token authenticators into the OpenAM authentication context.
  * @param <T> The to-be-authenticated token.
  */
 public interface AuthenticationHandler<T> {
-    void authenticate(RequestData data, T token) throws TokenValidationException;
+    void authenticate(RequestData data, T token, ValidationInvocationContext validationInvocationContext,
+                      boolean invalidateOpenAMSessionFollowingTokenGeneration) throws TokenValidationException;
 }

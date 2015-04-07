@@ -112,8 +112,8 @@ public class SoapSTSInstanceStateProviderTest {
 
         SoapDeploymentConfig deploymentConfig =
                 SoapDeploymentConfig.builder()
-                        .portQName(AMSTSConstants.UNPROTECTED_STS_SERVICE_PORT)
-                        .serviceQName(AMSTSConstants.UNPROTECTED_STS_SERVICE)
+                        .portQName(AMSTSConstants.AM_TRANSPORT_STS_SERVICE_PORT)
+                        .serviceQName(AMSTSConstants.AM_TRANSPORT_STS_SERVICE)
                         .wsdlLocation("wsdl_loc")
                         .realm("realm")
                         .amDeploymentUrl(AM_DEPLOYMENT_URL)
@@ -139,10 +139,9 @@ public class SoapSTSInstanceStateProviderTest {
                         .spEntityId("http://host.com/sp/entity/id")
                         .build();
 
-        SoapSTSInstanceConfig.SoapSTSInstanceConfigBuilderBase<?> builder = SoapSTSInstanceConfig.builder();
-        builder.addValidateTokenTranslation(TokenType.OPENAM, TokenType.SAML2, false);
-        builder.addIssueTokenType(TokenType.SAML2);
-        return  builder
+        return  SoapSTSInstanceConfig.builder()
+                .addIssueTokenType(TokenType.SAML2)
+                .addTokenValidationConfiguration(TokenType.OPENAM, false)
                 .deploymentConfig(deploymentConfig)
                 .soapSTSKeystoreConfig(keystoreConfig)
                 .issuerName("Cornholio")

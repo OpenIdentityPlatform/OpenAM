@@ -19,15 +19,23 @@ package org.forgerock.openam.sts.soap.config.user;
 import org.forgerock.guava.common.collect.Sets;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
+
+import java.util.Map;
+import java.util.Set;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 
 public class SoapDeploymentConfigTest {
     private static final boolean WITH_TLS_OFFLOAD_CONFIG = true;
+    private static final String CUSTOM_PORT = "{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}cho_mama_port";
+    private static final String CUSTOM_SERVICE = "{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}cho_mama_service";
+    private static final String CUSTOM_WSDL = "cho_mama.wsdl";
+
     @Test
     public void testEquals() {
         SoapDeploymentConfig dc1 = soapDeploymentConfig(WITH_TLS_OFFLOAD_CONFIG);
@@ -106,6 +114,14 @@ public class SoapDeploymentConfigTest {
         assertEquals(dc1, SoapDeploymentConfig.marshalFromAttributeMap(dc1.marshalToAttributeMap()));
     }
 
+    @Test
+    public void testAttributeMapMarshalingWithCustomWsdlSettings() {
+        SoapDeploymentConfig sdc = SoapDeploymentConfig.marshalFromAttributeMap(getAttributeMapWithCustomWsdl());
+        assertEquals(CUSTOM_PORT, sdc.getPort().toString());
+        assertEquals(CUSTOM_SERVICE, sdc.getService().toString());
+        assertEquals(CUSTOM_WSDL, sdc.getWsdlLocation());
+    }
+
     private SoapDeploymentConfig soapDeploymentConfig(boolean withTLSOffloadConfig) {
         AuthTargetMapping atm = AuthTargetMapping.builder()
                 .addMapping(TokenType.USERNAME, "module", "untmodule")
@@ -125,5 +141,31 @@ public class SoapDeploymentConfigTest {
         }
 
         return builder.build();
+    }
+
+    /**
+     * This method simulates what will happen when the AdminUI populates a property-sheet with custom wsdl file/service/port
+     * location information.
+     * @return the attribute map with custom wsdl specified
+     */
+    private Map<String, Set<String>> getAttributeMapWithCustomWsdl() {
+        Map<String, Set<String>> attributeMap = soapDeploymentConfig(!WITH_TLS_OFFLOAD_CONFIG).marshalToAttributeMap();
+
+        Set<String> wsdlLocation = attributeMap.get(SoapDeploymentConfig.WSDL_LOCATION);
+        wsdlLocation.clear();
+        wsdlLocation.add(SoapDeploymentConfig.CUSTOM_SOAP_STS_WSDL_FILE_INDICATOR);
+        attributeMap.put(SoapDeploymentConfig.CUSTOM_WSDL_LOCATION, CollectionUtils.asSet(CUSTOM_WSDL));
+
+        Set<String> serviceName = attributeMap.get(SoapDeploymentConfig.SERVICE_QNAME);
+        serviceName.clear();
+        serviceName.add(SoapDeploymentConfig.CUSTOM_SOAP_STS_SERVICE_NAME_INDICATOR);
+        attributeMap.put(SoapDeploymentConfig.CUSTOM_SERVICE_QNAME, CollectionUtils.asSet(CUSTOM_SERVICE.toString()));
+
+        Set<String> servicePort = attributeMap.get(SoapDeploymentConfig.SERVICE_PORT);
+        servicePort.clear();
+        servicePort.add(SoapDeploymentConfig.CUSTOM_SOAP_STS_SERVICE_PORT_INDICATOR);
+        attributeMap.put(SoapDeploymentConfig.CUSTOM_PORT_QNAME, CollectionUtils.asSet(CUSTOM_PORT.toString()));
+
+        return attributeMap;
     }
 }

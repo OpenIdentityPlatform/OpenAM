@@ -21,6 +21,7 @@ import com.google.inject.Guice;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
+import org.apache.ws.security.message.token.UsernameToken;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.DefaultHttpURLConnectionFactory;
 import org.forgerock.openam.sts.HttpURLConnectionFactory;
@@ -47,10 +48,10 @@ import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSessionImpl;
 import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
 import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandlerImpl;
-import org.forgerock.openam.sts.token.validator.wss.UsernameTokenValidator;
 import org.forgerock.openam.sts.token.validator.wss.disp.CertificateAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.validator.wss.disp.OpenIdConnectAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.validator.wss.disp.TokenAuthenticationRequestDispatcher;
+import org.forgerock.openam.sts.token.validator.wss.disp.UsernameTokenAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProvider;
 import org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProviderImpl;
 import org.slf4j.Logger;
@@ -91,6 +92,11 @@ public class TokenTransformFactoryImplTest {
                     .to(new TypeLiteral<AuthenticationHandlerImpl<X509Certificate[]>>() {
                     });
 
+            bind(new TypeLiteral<TokenAuthenticationRequestDispatcher<UsernameToken>>(){})
+                    .to(UsernameTokenAuthenticationRequestDispatcher.class);
+            bind(new TypeLiteral<AuthenticationHandler<UsernameToken>>(){})
+                    .to(new TypeLiteral<AuthenticationHandlerImpl<UsernameToken>>() {
+                    });
             bind(AuthenticationUrlProvider.class)
                     .to(AuthenticationUrlProviderImpl.class);
             bind(AMTokenParser.class).to(AMTokenParserImpl.class);
@@ -99,11 +105,6 @@ public class TokenTransformFactoryImplTest {
             bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
             bind(JsonTokenAuthnContextMapper.class).to(JsonTokenAuthnContextMapperImpl.class);
             bind(HttpURLConnectionFactory.class).to(DefaultHttpURLConnectionFactory.class);
-        }
-
-        @Provides
-        UsernameTokenValidator getUsernameTokenValidator() {
-            return null;
         }
 
         @Provides

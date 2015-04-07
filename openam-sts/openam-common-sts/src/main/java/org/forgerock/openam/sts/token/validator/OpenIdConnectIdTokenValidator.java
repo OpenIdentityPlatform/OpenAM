@@ -46,17 +46,23 @@ public class OpenIdConnectIdTokenValidator implements TokenValidator {
     private final XmlMarshaller<OpenIdConnectIdToken> idTokenXmlMarshaller;
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
     private final PrincipalFromSession principalFromSession;
+    private final ValidationInvocationContext validationInvocationContext;
+    private final boolean invalidateAMSession;
     private final Logger logger;
 
     public OpenIdConnectIdTokenValidator(AuthenticationHandler<OpenIdConnectIdToken> authenticationHandler,
                                          XmlMarshaller<OpenIdConnectIdToken> idTokenXmlMarshaller,
                                          ThreadLocalAMTokenCache threadLocalAMTokenCache,
                                          PrincipalFromSession principalFromSession,
+                                         ValidationInvocationContext validationInvocationContext,
+                                         boolean invalidateAMSession,
                                          Logger logger) {
         this.authenticationHandler = authenticationHandler;
         this.idTokenXmlMarshaller = idTokenXmlMarshaller;
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
         this.principalFromSession = principalFromSession;
+        this.validationInvocationContext = validationInvocationContext;
+        this.invalidateAMSession = invalidateAMSession;
         this.logger = logger;
     }
     public boolean canHandleToken(ReceivedToken validateTarget) {
@@ -99,12 +105,19 @@ public class OpenIdConnectIdTokenValidator implements TokenValidator {
                     "Token passed to OpenIdConnectIdTokenValidator not DOM Element, as expected.");
         }
         try {
-            authenticationHandler.authenticate(makeRequestData(tokenParameters), idToken);
+            authenticationHandler.authenticate(makeRequestData(tokenParameters), idToken, validationInvocationContext,
+                    invalidateAMSession);
             /*
             a successful call to the authenticationHandler will put the sessionId in the tokenCache. Pull it
             out and use it to obtain the principal corresponding to the Session.
              */
-            Principal principal = principalFromSession.getPrincipalFromSession(threadLocalAMTokenCache.getAMToken());
+            String sessionId;
+            if (ValidationInvocationContext.SOAP_TOKEN_DELEGATION.equals(validationInvocationContext)) {
+                sessionId = threadLocalAMTokenCache.getDelegatedAMSessionId();
+            } else {
+                sessionId = threadLocalAMTokenCache.getAMSessionId();
+            }
+            Principal principal = principalFromSession.getPrincipalFromSession(sessionId);
             response.setPrincipal(principal);
             validateTarget.setState(ReceivedToken.STATE.VALID);
         } catch (TokenValidationException e) {

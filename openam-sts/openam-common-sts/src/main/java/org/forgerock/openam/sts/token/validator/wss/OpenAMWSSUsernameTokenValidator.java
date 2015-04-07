@@ -20,6 +20,7 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.message.token.UsernameToken;
+import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
 import org.slf4j.Logger;
 
 /**
@@ -29,20 +30,26 @@ import org.slf4j.Logger;
  * UsernameToken validation by calling the OpenAM REST interface via bound TokenAuthenticationRequestDispacher<UsernameToken>
  *
  */
-public class UsernameTokenValidator extends org.apache.ws.security.validate.UsernameTokenValidator {
-    private final Logger logger;
+public class OpenAMWSSUsernameTokenValidator extends org.apache.ws.security.validate.UsernameTokenValidator {
     private final AuthenticationHandler<UsernameToken> authenticationHandler;
+    private final ValidationInvocationContext validationInvocationContext;
+    private final boolean invalidateOpenAMSession;
+    private final Logger logger;
 
-    public UsernameTokenValidator(Logger logger, AuthenticationHandler<UsernameToken> authenticationHandler) {
-        this.logger = logger;
+    public OpenAMWSSUsernameTokenValidator(AuthenticationHandler<UsernameToken> authenticationHandler,
+                                           ValidationInvocationContext validationInvocationContext,
+                                           boolean invalidateOpenAMSession, Logger logger) {
         this.authenticationHandler = authenticationHandler;
+        this.validationInvocationContext = validationInvocationContext;
+        this.invalidateOpenAMSession = invalidateOpenAMSession;
+        this.logger = logger;
     }
 
     @Override
     protected void verifyPlaintextPassword(UsernameToken usernameToken,
                                            RequestData data) throws WSSecurityException {
         try {
-            authenticationHandler.authenticate(data, usernameToken);
+            authenticationHandler.authenticate(data, usernameToken, validationInvocationContext, invalidateOpenAMSession);
         } catch (Exception e) {
             String message = "Exception caught authenticating UsernameToken with OpenAM: " + e;
             logger.error(message, e);

@@ -51,7 +51,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.security.cert.X509Certificate;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -207,17 +206,15 @@ public class SoapSamlTokenProvider implements TokenProvider {
             tokenProviderResponse.setTokenId(assertionElement.getAttributeNS(null, "ID"));
             return tokenProviderResponse;
         } finally {
-            if (amSessionInvalidator != null) {
-                try {
-                    amSessionInvalidator.invalidateAMSession(threadLocalAMTokenCache.getAMToken());
-                } catch (Exception e) {
-                    String message = "Exception caught invalidating interim AMSession: " + e;
-                    logger.warn(message, e);
+            try {
+                amSessionInvalidator.invalidateAMSessions(threadLocalAMTokenCache.getToBeInvalidatedAMSessionIds());
+            } catch (Exception e) {
+                String message = "Exception caught invalidating interim AMSession: " + e;
+                logger.warn(message, e);
                 /*
                 The fact that the interim OpenAM session was not invalidated should not prevent a token from being issued, so
                 I will not throw a AMSTSRuntimeException
-                 */
-                }
+                */
             }
         }
     }
@@ -346,8 +343,8 @@ public class SoapSamlTokenProvider implements TokenProvider {
                             "OnBehalfOf tokens found!");
         }
         final TokenType tokenType = parseTokenTypeFromDelegatedReceivedToken(delgatedToken);
-        final Element tokenElement = getDelegatedReceivedTokenElement(delgatedToken);
-        return authnContextMapper.getAuthnContext(tokenType, tokenElement);
+        final Object tokenObject = getDelegatedReceivedTokenObject(delgatedToken);
+        return authnContextMapper.getAuthnContext(tokenType, tokenObject);
     }
 
     private TokenType parseTokenTypeFromDelegatedReceivedToken(ReceivedToken receivedToken) {
@@ -381,19 +378,22 @@ public class SoapSamlTokenProvider implements TokenProvider {
         }
     }
 
-    private Element getDelegatedReceivedTokenElement(ReceivedToken receivedToken) {
+    private Object getDelegatedReceivedTokenObject(ReceivedToken receivedToken) {
         /*
-            See org.apache.cxf.sts.request.RequestParser#parseTokenElements for details on how ActAs/OnBehalfOf token elements
-            are parsed - an element will be set straight out of the RST payload.
-         */
-        if (receivedToken.isDOMElement()) {
-            return (Element) receivedToken.getToken();
-        } else {
-            logger.error("Unexpected state in getDelegatedReceivedTokenElement: the ReceivedToken is not an Element. The token class: " +
-                    receivedToken.getToken().getClass().getCanonicalName() + "; toString on the token: " + receivedToken.getToken() +
-                    "; Returning a null token type.");
-            return null;
-        }
+        This method is called to obtain the Element corresponding to a delegated token (Act-As and OnBehalfOf), which is
+        then passed to the configured XmlTokenAuthnContextMapper implementation, so the AuthnContextClassRef can be obtained
+        for the invocation of the TokenGenerationService.
+
+        See org.apache.cxf.sts.request.RequestParser#parseTokenRequirements for details on how ActAs/OnBehalfOf token elements
+        are parsed - an element will be set straight out of the RST payload. It will be either a DOM Element or a
+        JAXBElement. See the org.apache.cxf.sts.request.ReceivedToken ctor for details.
+        TODO: if we are supporting ActAs/OnBehalfOf asserted as x509 or even a OpenAM token, then this method will have to
+        get more sophisticated, if we want to determine unequivocally the type of object returned. For now, I will simply
+        return the Object encapsulated in the ReceivedToken. Note that the objects
+        in the ReceivedTokens appear to be either be DOM Elements, or objects in the org.apache.cxf.ws.security.sts.provider.model.secext
+        package, as these seem to be the objects wrapped in the JAXBElement<?> passed to the ReceivedToken ctor.
+        */
+        return receivedToken.getToken();
     }
 
     private String getAuthnContextFromSecurityPolicyBindings(TokenProviderParameters tokenProviderParameters) {
@@ -408,13 +408,20 @@ public class SoapSamlTokenProvider implements TokenProvider {
             Note that the code referenced in the forum link above
             (https://git-wip-us.apache.org/repos/asf?p=cxf.git;a=blob_plain;f=services/sts/sts-core/src/main/java/org/apache/cxf/sts/request/RequestParser.java;hb=HEAD)
             seems to be doing about the same thing (obtaining a token element), but does not do any sanity checking on the
-            number of handlerResults or engineResults - it just processes and returns the first element encountered. I will
-            do the same, but log a warning if additional elements encountered.
+            number of handlerResults or engineResults - it just processes and returns the first element. Note that
+            this seems a bit sloppy, but the AbstractTokenInterceptor subclasses, like org.apache.cxf.ws.security.wss4j.UsernameTokenInterceptor
+            SamlTokenInterceptor, and KerberosTokenInterceptor insure that the results of processing the token go in the first
+            element of the WSHandlerResult array, a pattern which the OpenAMSessionTokenServerInterceptor follows. Note that
+            I get two WSHandlerResult instances when invoked via the am_transport binding, but the OpenAMSessionTokenServerInterceptor
+            is only invoked once, and only creates a single WSHandlerResult instance - not sure where the other result gets generated, but
+            it seems to occur as part of timestamp verification, and it pre-exists OpenAMSessionTokenInterceptor#processToken, and includes
+            both timestamp verification results, and the OpenAM BST. So I will bump the log severity down to debug, as it does not
+            seem to be an error.
          */
         if (handlerResults != null && handlerResults.size() > 0) {
             final WSHandlerResult handlerResult = handlerResults.get(0);
             if (handlerResults.size() > 1) {
-                logger.warn("WSHanderResults obtained from the MessageContext in SoapSamlTokenProvider#getAuthnContextClassRef > 1:"
+                logger.debug("WSHanderResults obtained from the MessageContext in SoapSamlTokenProvider#getAuthnContextClassRef > 1: actual size:"
                         + handlerResults.size() + "; The results: " + getWSHandlerResultsDebug(handlerResults));
             }
             final List<WSSecurityEngineResult> engineResults = handlerResult.getResults();
@@ -430,11 +437,11 @@ public class SoapSamlTokenProvider implements TokenProvider {
             }
             throw new AMSTSRuntimeException(ResourceException.INTERNAL_ERROR, "No WSHandlerResult instances to " +
                     "inspect to obtain the input token validated by SecurityPolicy bindings in " +
-                    "SoapSamlTokenProvider#getAuthnContextClassRef");
+                    "SoapSamlTokenProvider#getAuthnContextFromSecurityPolicyBindings");
         } else {
             throw new AMSTSRuntimeException(ResourceException.INTERNAL_ERROR, "No WSSecurityEngineResult obtained " +
                     "from the WSHandlerResult as necessary to inspect to obtain the input token validated by " +
-                    "SecurityPolicy bindings in SoapSamlTokenProvider#getAuthnContextClassRef");
+                    "SecurityPolicy bindings in SoapSamlTokenProvider#getAuthnContextFromSecurityPolicyBindings");
         }
     }
 
@@ -497,8 +504,7 @@ public class SoapSamlTokenProvider implements TokenProvider {
             return TokenType.USERNAME;
         } else if (engineResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION) != null) {
             return TokenType.SAML2;
-        } else if ((engineResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN) != null) &&
-                (engineResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN) instanceof BinarySecurity) &&
+        } else if ((engineResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN) instanceof BinarySecurity) &&
                 AMSTSConstants.AM_SESSION_TOKEN_ASSERTION_BST_VALUE_TYPE.equals(((BinarySecurity)engineResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN)).getValueType())) {
             return TokenType.OPENAM;
         } else {
@@ -570,13 +576,13 @@ public class SoapSamlTokenProvider implements TokenProvider {
             consumptionToken = getTokenGenerationServiceConsumptionToken();
             switch (subjectConfirmation) {
                 case BEARER:
-                    return tokenGenerationServiceConsumer.getSAML2BearerAssertion(threadLocalAMTokenCache.getAMToken(),
+                    return tokenGenerationServiceConsumer.getSAML2BearerAssertion(threadLocalAMTokenCache.getAMSessionId(),
                             stsInstanceId, realm, authnContextClassRef, consumptionToken);
                 case SENDER_VOUCHES:
-                    return tokenGenerationServiceConsumer.getSAML2SenderVouchesAssertion(threadLocalAMTokenCache.getAMToken(),
+                    return tokenGenerationServiceConsumer.getSAML2SenderVouchesAssertion(threadLocalAMTokenCache.getDelegatedAMSessionId(),
                             stsInstanceId, realm, authnContextClassRef, consumptionToken);
                 case HOLDER_OF_KEY:
-                    return tokenGenerationServiceConsumer.getSAML2HolderOfKeyAssertion(threadLocalAMTokenCache.getAMToken(),
+                    return tokenGenerationServiceConsumer.getSAML2HolderOfKeyAssertion(threadLocalAMTokenCache.getAMSessionId(),
                             stsInstanceId, realm, authnContextClassRef, proofTokenState, consumptionToken);
             }
             throw new TokenCreationException(ResourceException.INTERNAL_ERROR,

@@ -38,15 +38,28 @@ import javax.xml.stream.XMLStreamWriter;
 public class OpenAMSessionAssertion extends Token {
     private final String sessionId;
 
+    /**
+     *
+     * @param version Constant indicating what SecurityPolicy version is being used(1.1 vs. 1.2). I believe that it is
+     *                used to distinguish different QNames for different constructs in different versions
+     * @param includeTokenType The SecurityPolicy specification of when to include the token - e.g. always, never,
+     *                         always-to-recipient, etc.
+     * @param nestedPolicy The policy element nested within the OpenAM Session assertion. WS-SecurityPolicy nests policies
+     *                     within policies, and the nested policies qualify the enclosing policy. For the OpenAM session assertion,
+     *                     the nested policy is empty, but must be present in the SecurityPolicy binding, as the cxf runtime
+     *                     expects this nested policy element. Could be used to specify the version of the assertion, as is
+     *                     done for Username tokens.
+     * @param sessionId The OpenAM session id. When the OpenAMSessionAssertion builder constructs the OpenAMSessionAssertion,
+     *                  it will set the sessionId. This sessionId will be specified by the client and set by the
+     *                  OpenAMSessionTokenClientAssertionBuilder, and pulled from the BinarySecurityToken element which
+     *                  encapsulates this sessionId when it arrives at the targeted sts.
+     */
     public OpenAMSessionAssertion(SPConstants version, SPConstants.IncludeTokenType includeTokenType, Element nestedPolicy, String sessionId) {
         super(version);
         setInclusion(includeTokenType);
         setIgnorable(false);
         setOptional(false);
         setPolicy(nestedPolicy);
-        if (sessionId == null) {
-            throw new IllegalStateException("The sessionId passed to the OpenAMSessionAssertion ctor cannot be null!");
-        }
         this.sessionId = sessionId;
     }
 

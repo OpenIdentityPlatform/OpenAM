@@ -20,14 +20,13 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.operation.TokenValidateOperation;
-import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.operation.ValidateOperation;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.forgerock.openam.sts.STSInitializationException;
-import org.forgerock.openam.sts.config.user.TokenTransformConfig;
+import org.forgerock.openam.sts.soap.config.user.TokenValidationConfig;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 
 import javax.xml.ws.WebServiceContext;
@@ -35,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
 import org.slf4j.Logger;
 
 /**
@@ -65,14 +65,14 @@ public class TokenValidateOperationProvider implements Provider<ValidateOperatio
             try {
                 return validateDelegate.validate(request, context);
             } finally {
-                threadLocalAMTokenCache.clearAMToken();
+                threadLocalAMTokenCache.clearCachedSessions();
             }
         }
     }
 
     private final STSPropertiesMBean stsPropertiesMBean;
     private final TokenStore tokenStore;
-    private final Set<TokenTransformConfig> transformTokenTypes;
+    private final Set<TokenValidationConfig> validatedTokenConfig;
     private final TokenOperationFactory operationFactory;
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
     private final Logger logger;
@@ -81,13 +81,13 @@ public class TokenValidateOperationProvider implements Provider<ValidateOperatio
     TokenValidateOperationProvider(
             STSPropertiesMBean stsPropertiesMBean,
             TokenStore tokenStore,
-            Set<TokenTransformConfig> transformTokenTypes,
+            Set<TokenValidationConfig> validatedTokenConfig,
             TokenOperationFactory operationFactory,
             ThreadLocalAMTokenCache threadLocalAMTokenCache,
             Logger logger) {
         this.stsPropertiesMBean = stsPropertiesMBean;
         this.tokenStore = tokenStore;
-        this.transformTokenTypes = transformTokenTypes;
+        this.validatedTokenConfig = validatedTokenConfig;
         this.operationFactory = operationFactory;
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
         this.logger = logger;
@@ -102,34 +102,11 @@ public class TokenValidateOperationProvider implements Provider<ValidateOperatio
             tokenValidateOperation.setTokenStore(tokenStore);
 
             List<TokenValidator> tokenValidators = new ArrayList<TokenValidator>();
-            /*
-            Plug-in the TokenValidator instances for the input-set in the token transformation operations.
-             */
-            for (TokenTransformConfig tokenTransformConfig : transformTokenTypes) {
-                tokenValidators.add(operationFactory.getTokenValidatorForTransformOperation(tokenTransformConfig));
+            for (TokenValidationConfig tokenValidationConfig : validatedTokenConfig) {
+                tokenValidators.add(operationFactory.getTokenValidator(tokenValidationConfig.getValidatedTokenType(),
+                        ValidationInvocationContext.SOAP_TOKEN_VALIDATION, tokenValidationConfig.invalidateInterimOpenAMSession()));
             }
-
             tokenValidateOperation.setTokenValidators(tokenValidators);
-
-            /*
-            Now set the providers, using the values in the transformTokenTypes Map. A problem is the fact that the TokenValidateOperation
-            just maintains a set of validators and providers, but there need not be a token transformation available for every
-            token type for which token status is available. In other words, the TokenValidateOperation does not maintain two
-            collections, a Set and a Map, the first corresponding to the set of tokens for which status can be obtained, and the
-            second for the Map of available token transformations. So I need to address this semantic impurity somehow. I think
-            every TokenIssueOperation associated with the TokenValidateOperation needs to know what the valid transformation are,
-            and can pull the initial token passed to the validate operation from the TokenValidatorParameters.getToken method. But
-            wait - if I just plug in the wss TokenValidator, I will not have access to this state. So I may need to plug in the actual
-            sts.token.Validator class, so I can get at this state. This state is necessary to determine if the desired token transformation
-            is allowed, if a transformation is indeed being specified.
-            TODO
-             */
-            List<TokenProvider> tokenProviders = new ArrayList<TokenProvider>();
-            for (TokenTransformConfig tokenTransformConfig : transformTokenTypes) {
-                tokenProviders.add(operationFactory.getTokenProviderForTransformOperation(tokenTransformConfig));
-            }
-            tokenValidateOperation.setTokenProviders(tokenProviders);
-
             return new TokenValidateOperationWrapper(tokenValidateOperation, threadLocalAMTokenCache);
         } catch (STSInitializationException e) {
             logger.error("Exception caught initializing a Validate operation: " + e, e);

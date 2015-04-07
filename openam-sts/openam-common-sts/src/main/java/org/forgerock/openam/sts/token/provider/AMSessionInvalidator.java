@@ -11,17 +11,24 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.sts.token.provider;
 
 import org.forgerock.openam.sts.TokenCreationException;
 
+import java.util.Set;
+
 /**
- * Invoked by TokenProviders to invalidate the interim OpenAM session generated as part of any token transformation if the
- * TokenTransform instance has be configured to invalidate interim OpenAM sessions.
+ * Invoked by TokenProviders to invalidate any interim OpenAM sessions generated as part of any STS token operation
+ * if indicated by sts configuration state.
  */
 public interface AMSessionInvalidator {
-    void invalidateAMSession(String sessionId) throws TokenCreationException;
+    /**
+     *
+     * @param sessionIds the to-be-invalidated session ids. Can be empty. Will not be null.
+     * @throws TokenCreationException
+     */
+    void invalidateAMSessions(Set<String> sessionIds) throws TokenCreationException;
 }

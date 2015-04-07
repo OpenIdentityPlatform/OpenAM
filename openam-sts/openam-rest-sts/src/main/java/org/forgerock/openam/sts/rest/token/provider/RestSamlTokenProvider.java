@@ -131,17 +131,15 @@ public class RestSamlTokenProvider implements TokenProvider {
             tokenProviderResponse.setTokenId(assertionElement.getAttributeNS(null, SAML2Constants.ID));
             return tokenProviderResponse;
         } finally {
-            if (amSessionInvalidator != null) {
-                try {
-                    amSessionInvalidator.invalidateAMSession(threadLocalAMTokenCache.getAMToken());
-                } catch (Exception e) {
-                    String message = "Exception caught invalidating interim AMSession: " + e;
-                    logger.warn(message, e);
+            try {
+                amSessionInvalidator.invalidateAMSessions(threadLocalAMTokenCache.getToBeInvalidatedAMSessionIds());
+            } catch (Exception e) {
+                String message = "Exception caught invalidating interim AMSession: " + e;
+                logger.warn(message, e);
                 /*
                 The fact that the interim OpenAM session was not invalidated should not prevent a token from being issued, so
                 I will not throw a AMSTSRuntimeException
-                 */
-                }
+                */
             }
         }
     }
@@ -172,10 +170,14 @@ public class RestSamlTokenProvider implements TokenProvider {
                                 Map<String, Object> additionalProperties) throws TokenCreationException {
         switch (subjectConfirmation) {
             case BEARER:
-                return tokenGenerationServiceConsumer.getSAML2BearerAssertion(threadLocalAMTokenCache.getAMToken(),
+                return tokenGenerationServiceConsumer.getSAML2BearerAssertion(threadLocalAMTokenCache.getAMSessionId(),
                         stsInstanceId, realm, authnContextClassRef, getAdminToken());
             case SENDER_VOUCHES:
-                return tokenGenerationServiceConsumer.getSAML2SenderVouchesAssertion(threadLocalAMTokenCache.getAMToken(),
+                /*
+                Note that for the rest-sts, there is no delegated token relationship, as there is in ws-trust, so I just
+                pull the standard, non-delegated AMSessionId from the ThreadLocalAMTokenCache.
+                 */
+                return tokenGenerationServiceConsumer.getSAML2SenderVouchesAssertion(threadLocalAMTokenCache.getAMSessionId(),
                         stsInstanceId, realm, authnContextClassRef, getAdminToken());
             case HOLDER_OF_KEY:
                 Object proofTokenStateObject = additionalProperties.get(AMSTSConstants.PROOF_TOKEN_STATE_KEY);
@@ -184,7 +186,7 @@ public class RestSamlTokenProvider implements TokenProvider {
                             "No ProofTokenState entry in additionalProperties map in TokenProvideProperties for "
                                     + AMSTSConstants.PROOF_TOKEN_STATE_KEY);
                 }
-                return tokenGenerationServiceConsumer.getSAML2HolderOfKeyAssertion(threadLocalAMTokenCache.getAMToken(),
+                return tokenGenerationServiceConsumer.getSAML2HolderOfKeyAssertion(threadLocalAMTokenCache.getAMSessionId(),
                         stsInstanceId, realm, authnContextClassRef, (ProofTokenState)proofTokenStateObject, getAdminToken());
         }
         throw new TokenCreationException(ResourceException.INTERNAL_ERROR,

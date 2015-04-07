@@ -24,7 +24,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
-import org.apache.cxf.sts.token.renewer.SAMLTokenRenewer;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.DefaultHttpURLConnectionFactory;
@@ -57,9 +56,10 @@ import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumerImpl;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSessionImpl;
+import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
 import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
 import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandlerImpl;
-import org.forgerock.openam.sts.token.validator.wss.UsernameTokenValidator;
+import org.forgerock.openam.sts.token.validator.wss.OpenAMWSSUsernameTokenValidator;
 import org.forgerock.openam.sts.token.validator.wss.disp.TokenAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.validator.wss.disp.UsernameTokenAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProvider;
@@ -150,10 +150,11 @@ public class TokenOperationFactoryImplTest {
 
         @Provides
         @Inject
-        UsernameTokenValidator getWssUsernameTokenValidator(
+        OpenAMWSSUsernameTokenValidator getWssUsernameTokenValidator(
                 AuthenticationHandler<UsernameToken> authenticationHandler,
                 Logger logger) {
-            return new UsernameTokenValidator(logger, authenticationHandler);
+            return new OpenAMWSSUsernameTokenValidator(authenticationHandler, ValidationInvocationContext.SOAP_SECURITY_POLICY,
+                    true, logger);
         }
 
         @Provides
@@ -261,26 +262,17 @@ public class TokenOperationFactoryImplTest {
 
     @Test
     public void testGetUsernameTokenValidator() throws STSInitializationException {
-        assertTrue(operationFactory.getTokenStatusValidatorForType(TokenType.USERNAME) instanceof org.apache.cxf.sts.token.validator.UsernameTokenValidator);
-    }
-
-    @Test
-    public void testTokenRenewer() throws STSInitializationException {
-        assertTrue(operationFactory.getTokenRenewerForType(TokenType.SAML2) instanceof SAMLTokenRenewer);
-    }
-
-    @Test(expectedExceptions = STSInitializationException.class)
-    public void testNonExistentTokenRenewer() throws STSInitializationException {
-        operationFactory.getTokenRenewerForType(TokenType.USERNAME);
+        assertTrue(operationFactory.getTokenValidator(TokenType.USERNAME, ValidationInvocationContext.SOAP_SECURITY_POLICY, true)
+                instanceof org.apache.cxf.sts.token.validator.UsernameTokenValidator);
     }
 
     @Test
     public void testProvider() throws STSInitializationException {
-        assertTrue(operationFactory.getTokenProviderForType(TokenType.SAML2) instanceof SoapSamlTokenProvider);
+        assertTrue(operationFactory.getTokenProvider(TokenType.SAML2) instanceof SoapSamlTokenProvider);
     }
 
     @Test(expectedExceptions = STSInitializationException.class)
     public void testNonExistentProvider() throws STSInitializationException {
-        operationFactory.getTokenProviderForType(TokenType.USERNAME);
+        operationFactory.getTokenProvider(TokenType.USERNAME);
     }
 }

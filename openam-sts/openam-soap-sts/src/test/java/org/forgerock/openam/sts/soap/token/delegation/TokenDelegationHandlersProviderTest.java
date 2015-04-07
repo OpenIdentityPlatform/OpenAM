@@ -24,6 +24,7 @@ import org.forgerock.openam.sts.soap.config.user.SoapDelegationConfig;
 import org.forgerock.openam.sts.soap.config.user.SoapDeploymentConfig;
 import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
 import org.forgerock.openam.sts.soap.config.user.SoapSTSKeystoreConfig;
+import org.forgerock.openam.sts.soap.config.user.TokenValidationConfig;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.slf4j.Logger;
 import org.testng.annotations.Test;
@@ -72,8 +73,8 @@ public class TokenDelegationHandlersProviderTest {
 
         SoapDeploymentConfig deploymentConfig =
                 SoapDeploymentConfig.builder()
-                        .portQName(AMSTSConstants.UNPROTECTED_STS_SERVICE_PORT)
-                        .serviceQName(AMSTSConstants.UNPROTECTED_STS_SERVICE)
+                        .portQName(AMSTSConstants.AM_TRANSPORT_STS_SERVICE_PORT)
+                        .serviceQName(AMSTSConstants.AM_TRANSPORT_STS_SERVICE)
                         .wsdlLocation("wsdl_loc")
                         .realm("realm")
                         .amDeploymentUrl("http://host.com/am:443")
@@ -93,7 +94,7 @@ public class TokenDelegationHandlersProviderTest {
                         .build();
 
         SoapSTSInstanceConfig.SoapSTSInstanceConfigBuilderBase<?> builder = SoapSTSInstanceConfig.builder();
-        builder.addValidateTokenTranslation(TokenType.OPENAM, TokenType.SAML2, false);
+        builder.addTokenValidationConfiguration(TokenType.OPENAM, false);
         builder.addIssueTokenType(TokenType.SAML2);
         Map<String,String> attributeMap = new HashMap<String, String>();
         attributeMap.put("mail", "email");
@@ -119,8 +120,8 @@ public class TokenDelegationHandlersProviderTest {
             SoapDelegationConfig.SoapDelegationConfigBuilder delegationConfigBuilder = SoapDelegationConfig.builder();
             if (delegationValidatorsSpecified) {
                 delegationConfigBuilder
-                        .addValidatedDelegationTokenType(TokenType.USERNAME)
-                        .addValidatedDelegationTokenType(TokenType.OPENAM);
+                        .addValidatedDelegationTokenType(TokenType.USERNAME, true)
+                        .addValidatedDelegationTokenType(TokenType.OPENAM, false);
             }
             if (customDelegationHandler) {
                 delegationConfigBuilder.addCustomDelegationTokenHandler("org.forgerock.openam.sts.soap.token.delegation.DefaultTokenDelegationHandler");

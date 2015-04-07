@@ -32,6 +32,7 @@ import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
+import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
 import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
 
 import java.io.ByteArrayInputStream;
@@ -51,7 +52,7 @@ import java.security.cert.X509Certificate;
  * AuthTargetMapping for X509 token-transformations must be configured with the name of this header (similar to
  * OIDC token transformations). Note that this is not the same header value configured in the RestDeploymentConfig
  * for rest-sts instances, which specifies the header key where the rest-sts expects to find the client certificate. (The
- * header for the AuthTargetMapping could be re-used for this purpose, but rest-sts instances should be able to uniquivocally
+ * header for the AuthTargetMapping could be re-used for this purpose, but rest-sts instances should be able to unequivocally
  * determine where the user intends the certificate to be found(in a header, or in the javax.servlet.request.X509Certificate
  * attribute. Because the AuthTargetMapping has to be defined for all X509 token transformations, the presence/absence
  * of this state cannot be used to determine where the rest-sts should find the client's certificate (and simply looking
@@ -63,6 +64,8 @@ public class RestCertificateTokenValidator implements TokenValidator {
     private final AuthenticationHandler<X509Certificate[]> authenticationHandler;
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
     private final PrincipalFromSession principalFromSession;
+    private final ValidationInvocationContext validationInvocationContext;
+    private final boolean invalidateAMSession;
 
 
     /*
@@ -70,12 +73,16 @@ public class RestCertificateTokenValidator implements TokenValidator {
      */
     public RestCertificateTokenValidator(AuthenticationHandler<X509Certificate[]> authenticationHandler,
                                          ThreadLocalAMTokenCache threadLocalAMTokenCache,
-                                         PrincipalFromSession principalFromSession) {
+                                         PrincipalFromSession principalFromSession,
+                                         ValidationInvocationContext validationInvocationContext,
+                                         boolean invalidateAMSession) {
         this.authenticationHandler = authenticationHandler;
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
         this.principalFromSession = principalFromSession;
-
+        this.validationInvocationContext = validationInvocationContext;
+        this.invalidateAMSession = invalidateAMSession;
     }
+
     @Override
     public boolean canHandleToken(ReceivedToken validateTarget) {
         return canHandleToken(validateTarget, null);
@@ -102,12 +109,19 @@ public class RestCertificateTokenValidator implements TokenValidator {
                 marshalBinarySecurityTokenToCertArray((BinarySecurityTokenType)validateTarget.getToken());
 
         try {
-            authenticationHandler.authenticate(makeRequestData(tokenParameters), x509Certificates);
+            authenticationHandler.authenticate(makeRequestData(tokenParameters), x509Certificates,
+                    validationInvocationContext, invalidateAMSession);
             /*
             a successful call to the authenticationHandler will put the sessionId in the tokenCache. Pull it
             out and use it to obtain the principal corresponding to the Session.
              */
-            Principal principal = principalFromSession.getPrincipalFromSession(threadLocalAMTokenCache.getAMToken());
+            String sessionId;
+            if (ValidationInvocationContext.SOAP_TOKEN_DELEGATION.equals(validationInvocationContext)) {
+                sessionId = threadLocalAMTokenCache.getDelegatedAMSessionId();
+            } else {
+                sessionId = threadLocalAMTokenCache.getAMSessionId();
+            }
+            Principal principal = principalFromSession.getPrincipalFromSession(sessionId);
             response.setPrincipal(principal);
             validateTarget.setState(ReceivedToken.STATE.VALID);
         } catch (TokenValidationException e) {

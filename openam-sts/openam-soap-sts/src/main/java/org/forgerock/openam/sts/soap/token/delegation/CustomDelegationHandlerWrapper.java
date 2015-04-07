@@ -20,7 +20,9 @@ import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.token.delegation.TokenDelegationHandler;
 import org.apache.cxf.sts.token.delegation.TokenDelegationParameters;
 import org.apache.cxf.sts.token.delegation.TokenDelegationResponse;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.AMSTSRuntimeException;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.slf4j.Logger;
 
@@ -63,14 +65,23 @@ public class CustomDelegationHandlerWrapper implements TokenDelegationHandler {
             final Map<String, Object> additionalProperties = tokenDelegationResponse.getAdditionalProperties();
             if ((additionalProperties != null) &&
                     additionalProperties.get(AMSTSConstants.CUSTOM_DELEGATION_HANDLER_AM_SESSION_ID) instanceof String) {
-                threadLocalAMTokenCache.cacheAMToken((String)additionalProperties.get(AMSTSConstants.CUSTOM_DELEGATION_HANDLER_AM_SESSION_ID));
+                boolean invalidateInterimSession = true;
+                Object invalidateSessionObject = additionalProperties.get(AMSTSConstants.CUSTOM_DELEGATION_HANDLER_INVALIDATE_AM_SESSION);
+                if (invalidateSessionObject instanceof Boolean) {
+                    invalidateInterimSession = (Boolean)invalidateSessionObject;
+                }
+                threadLocalAMTokenCache.cacheDelegatedAMSessionId(
+                        (String)additionalProperties.get(AMSTSConstants.CUSTOM_DELEGATION_HANDLER_AM_SESSION_ID),
+                        invalidateInterimSession);
             } else {
                 if (!delegationValidatorsSpecified) {
-                    logger.warn("In a custom TokenDelegationHandler, the delegated token is allowed, no delegation " +
+                    String message = "In a custom TokenDelegationHandler, the delegated token is allowed, no delegation " +
                             "validators have been specified, and the AM Session Id was not specified in the " +
                             "DelegationHandlerResponse#getAdditionalProperties keyed by "
                             + AMSTSConstants.CUSTOM_DELEGATION_HANDLER_AM_SESSION_ID + ". This means the " +
-                            "TokenGenerationService will not issue an assertion corresponding to the delegated token.");
+                            "TokenGenerationService cannot issue an assertion corresponding to the delegated token.";
+                    logger.error(message);
+                    throw new AMSTSRuntimeException(ResourceException.UNAVAILABLE, message);
                 }
             }
         }

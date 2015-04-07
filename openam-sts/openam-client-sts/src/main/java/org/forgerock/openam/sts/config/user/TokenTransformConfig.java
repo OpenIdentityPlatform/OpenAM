@@ -63,7 +63,7 @@ public class TokenTransformConfig {
         return outputTokenType;
     }
 
-    public boolean isInvalidateInterimOpenAMSession() {
+    public boolean invalidateInterimOpenAMSession() {
         return invalidateInterimOpenAMSession;
     }
 

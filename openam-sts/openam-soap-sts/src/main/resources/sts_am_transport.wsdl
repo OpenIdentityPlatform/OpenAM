@@ -12,18 +12,22 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2015 ForgeRock AS.
 -->
 <wsdl:definitions
         targetNamespace="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
         xmlns:tns="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
+        xmlns:wstrust="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
         xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
         xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-        xmlns:wst="http://docs.oasis-open.org/ws-sx/ws-trust/200512/">
+        xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+        xmlns:wsp="http://www.w3.org/ns/ws-policy"
+        xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
 
     <wsdl:import location="ws-trust-1.4-service.wsdl"	namespace="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"/>
 
-    <wsdl:binding name="unprotected_binding" type="wst:STS">
+    <wsdl:binding name="am_token_transport_binding" type="wstrust:STS">
+        <wsp:PolicyReference URI="#am_token_transport_policy" />
         <soap:binding style="document"
                       transport="http://schemas.xmlsoap.org/soap/http" />
         <wsdl:operation name="Issue">
@@ -88,11 +92,71 @@
         </wsdl:operation>
     </wsdl:binding>
 
-    <wsdl:service name="unprotected_sts_service">
-        <wsdl:port name="unprotected_sts_service_port" binding="tns:unprotected_binding">
-            <soap:address location="" />
+
+    <wsp:Policy wsu:Id="am_token_transport_policy">
+        <sp:TransportBinding>
+            <wsp:Policy>
+                <sp:TransportToken>
+                    <wsp:Policy>
+                        <sp:HttpsToken>
+                            <wsp:Policy/>
+                        </sp:HttpsToken>
+                    </wsp:Policy>
+                </sp:TransportToken>
+                <sp:AlgorithmSuite>
+                    <wsp:Policy>
+                        <sp:Basic128 />
+                    </wsp:Policy>
+                </sp:AlgorithmSuite>
+                <sp:Layout>
+                    <wsp:Policy>
+                        <sp:Strict />
+                    </wsp:Policy>
+                </sp:Layout>
+                <sp:IncludeTimestamp />
+            </wsp:Policy>
+        </sp:TransportBinding>
+        <sp:SupportingTokens>
+            <wsp:Policy>
+                <ForgeRock:OpenAMSessionToken
+                        sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient"
+                        xmlns:ForgeRock="http://schemas.forgerock.org/ws/securitypolicy">
+                    <wsp:Policy/>
+                </ForgeRock:OpenAMSessionToken>
+            </wsp:Policy>
+        </sp:SupportingTokens>
+    </wsp:Policy>
+
+    <wsp:Policy wsu:Id="signed_body_input_policy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:SignedParts>
+                    <sp:Body/>
+                </sp:SignedParts>
+                <!--    <sp:EncryptedParts>
+                        <sp:Body/>
+                    </sp:EncryptedParts> -->
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+
+    <wsp:Policy wsu:Id="signed_body_output_policy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:SignedParts>
+                    <sp:Body/>
+                </sp:SignedParts>
+                <!--    <sp:EncryptedParts>
+                        <sp:Body/>
+                    </sp:EncryptedParts> -->
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+
+    <wsdl:service name="am_transport_sts_service">
+        <wsdl:port name="am_transport_sts_service_port" binding="tns:am_token_transport_binding">
+            <soap:address location=""/>
         </wsdl:port>
     </wsdl:service>
-
 </wsdl:definitions>
 

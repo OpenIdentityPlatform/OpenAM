@@ -19,7 +19,6 @@ package org.forgerock.openam.sts.soap.token.provider;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.forgerock.openam.sts.TokenType;
 import org.slf4j.Logger;
-import org.w3c.dom.Element;
 
 import javax.inject.Inject;
 
@@ -33,13 +32,11 @@ public class XmlTokenAuthnContextMapperImpl implements XmlTokenAuthnContextMappe
     public XmlTokenAuthnContextMapperImpl(Logger logger) {
         this.logger = logger;
     }
-    public String getAuthnContext(TokenType inputTokenType, Element inputToken) {
+    public String getAuthnContext(TokenType inputTokenType, Object inputToken) {
         switch (inputTokenType) {
             case OPENAM:
                 return SAML2Constants.AUTH_CONTEXT_CLASS_REF_PREVIOUS_SESSION;
             case USERNAME:
-                return SAML2Constants.AUTH_CONTEXT_CLASS_REF_PASSWORD_PROTECTED_TRANSPORT;
-            case OPENIDCONNECT:
                 return SAML2Constants.AUTH_CONTEXT_CLASS_REF_PASSWORD_PROTECTED_TRANSPORT;
             case X509:
                 return SAML2Constants.AUTH_CONTEXT_CLASS_REF_X509;

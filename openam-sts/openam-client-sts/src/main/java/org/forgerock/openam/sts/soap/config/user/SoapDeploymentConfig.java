@@ -49,6 +49,26 @@ public class SoapDeploymentConfig extends DeploymentConfig {
     static final String SERVICE_PORT = "deployment-service-port";
     static final String WSDL_LOCATION = "deployment-wsdl-location";
     static final String AM_DEPLOYMENT_URL = "deployment-am-url";
+    static final String CUSTOM_SERVICE_QNAME = "deployment-custom-service-name";
+    static final String CUSTOM_PORT_QNAME = "deployment-custom-service-port";
+    static final String CUSTOM_WSDL_LOCATION = "deployment-custom-wsdl-location";
+
+    /*
+    The AdminUI will allow users to publish soap-sts instances with a set of pre-deployed wsdl files. These wsdl files will
+    define the WS-Trust defined interface, and a specific SecurityPolicy binding. However, we must support the specification
+    of a custom wsdl file deployed in the soap-sts .war file. Thus the soap-sts AdminUI
+    configuration page will all users to specify custom service-names/ports/wsdl-locations in the drop-down defining these
+    selections, and free-form text-entry fields where the end-users can specify the actual name of the custom service/port/wsdl-file.
+    The bottom line is that we want to constrain the 80% of the use-cases, while still allowing for ultimate flexibility.
+    The presence of these three fields as the value for the serivce-name/port/wsdl-location will allow
+    SoapDeploymentConfig#marshalFromAttributeMap to know to reference the custom field keys, which will contain the
+    value corresponding to the free-form text entered by the end-user. Note that there must be correspondence between these
+    values and the values defined in soapSTS.xml.
+     */
+    public static final String CUSTOM_SOAP_STS_SERVICE_NAME_INDICATOR = "{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}custom_service_name";
+    public static final String CUSTOM_SOAP_STS_SERVICE_PORT_INDICATOR = "{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}custom_service_port";
+    public static final String CUSTOM_SOAP_STS_WSDL_FILE_INDICATOR = "custom_wsdl_file";
+
     abstract static class SoapDeploymentConfigBuilderBase<T extends SoapDeploymentConfigBuilderBase<T>>
             extends DeploymentConfig.DeploymentConfigBuilderBase<T> {
         private QName service;
@@ -225,9 +245,31 @@ public class SoapDeploymentConfig extends DeploymentConfig {
                 .tlsOffloadEngineHostIpAddrs(baseConfig.getTlsOffloadEngineHostIpAddrs())
                 .uriElement(baseConfig.getUriElement())
                 .amDeploymentUrl(CollectionUtils.getFirstItem(attributeMap.get(AM_DEPLOYMENT_URL), null))
-                .portQName(QName.valueOf(CollectionUtils.getFirstItem(attributeMap.get(SERVICE_PORT), null)))
-                .serviceQName(QName.valueOf(CollectionUtils.getFirstItem(attributeMap.get(SERVICE_QNAME), null)))
-                .wsdlLocation(CollectionUtils.getFirstItem(attributeMap.get(WSDL_LOCATION), null))
+                .portQName(QName.valueOf(getPotentiallyCustomValue(attributeMap, SERVICE_PORT, CUSTOM_SOAP_STS_SERVICE_PORT_INDICATOR, CUSTOM_PORT_QNAME)))
+                .serviceQName(QName.valueOf(getPotentiallyCustomValue(attributeMap, SERVICE_QNAME, CUSTOM_SOAP_STS_SERVICE_NAME_INDICATOR, CUSTOM_SERVICE_QNAME)))
+                .wsdlLocation(getPotentiallyCustomValue(attributeMap, WSDL_LOCATION, CUSTOM_SOAP_STS_WSDL_FILE_INDICATOR, CUSTOM_WSDL_LOCATION))
                 .build();
+    }
+
+    /**
+     * End-users can specify custom wsdl-files/service-names/service-ports in the AdminUI. When they do so, they must
+     * indicate a custom selection in the drop-down, and then fill-in the custom, free-form text field. This method
+     * will determine whether the 'custom' choice in the drop-down was selected, and if so, return the custom-specified
+     * value.
+     * @param attributeMap The attributeMap populated by the Admin UI ViewBean
+     * @param standardKey  The key corresponding to the selected field - corresponds to a AttributeSchema in soapSTS.xml
+     * @param customValueIndicator The value corresponding to the standardKey which indicates a custom selection
+     * @param customKey The key identifying the AttributeSchema entry where the custom value can be entered
+     * @return The standard value selected from the drop-down, or the custom, user-entered value if the user chose to
+     * deploy a custom wsdl file. The value can be null.
+     */
+    private static String getPotentiallyCustomValue(Map<String, Set<String>> attributeMap, String standardKey,
+                                                    String customValueIndicator, String customKey) {
+        final String value = CollectionUtils.getFirstItem(attributeMap.get(standardKey), null);
+        if (customValueIndicator.equals(value)) {
+            return CollectionUtils.getFirstItem(attributeMap.get(customKey), null);
+        }  else {
+            return value;
+        }
     }
 }

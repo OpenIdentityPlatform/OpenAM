@@ -76,7 +76,6 @@ import org.forgerock.openam.sts.token.validator.wss.disp.OpenIdConnectAuthentica
 import org.forgerock.openam.sts.token.validator.wss.disp.TokenAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.validator.wss.disp.UsernameTokenAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandlerImpl;
-import org.forgerock.openam.sts.token.validator.wss.UsernameTokenValidator;
 import org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProviderImpl;
 import org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProvider;
 
@@ -93,14 +92,10 @@ import org.slf4j.LoggerFactory;
  * graph.
  */
 public class RestSTSInstanceModule extends AbstractModule {
-
     private final RestSTSInstanceConfig stsInstanceConfig;
-    private final Logger logger;
-
 
     public RestSTSInstanceModule(RestSTSInstanceConfig stsInstanceConfig) {
         this.stsInstanceConfig = stsInstanceConfig;
-        logger = LoggerFactory.getLogger(AMSTSConstants.REST_STS_DEBUG_ID);
     }
 
     public void configure() {
@@ -112,7 +107,6 @@ public class RestSTSInstanceModule extends AbstractModule {
          */
         bind(TokenStore.class).to(DefaultInMemoryTokenStore.class).in(Scopes.SINGLETON);
 
-//        bind(AMTokenCache.class).to(AMTokenCacheImpl.class).in(Scopes.SINGLETON);
         bind(ThreadLocalAMTokenCache.class).to(ThreadLocalAMTokenCacheImpl.class).in(Scopes.SINGLETON);
 
 
@@ -182,19 +176,6 @@ public class RestSTSInstanceModule extends AbstractModule {
         stsProperties.setIssuer(stsInstanceConfig.getIssuerName());
         return stsProperties;
     }
-
-    /*
-    Provides the WSSUsernameTokenValidator provider to the TokenTransformFactoryImpl
-     */
-    @Provides
-    @Inject
-    UsernameTokenValidator getWssUsernameTokenValidator(
-            AuthenticationHandler<UsernameToken> authenticationHandler,
-            Logger logger) {
-        return new UsernameTokenValidator(logger, authenticationHandler);
-
-    }
-
 
     /*
     Bindings below required by the STSAuthenticationUriProviderImpl - necessary to construct the URI for the REST authn call.

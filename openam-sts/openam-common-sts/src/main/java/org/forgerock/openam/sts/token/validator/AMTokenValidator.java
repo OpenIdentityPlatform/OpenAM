@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.sts.token.validator;
@@ -50,14 +50,20 @@ import org.slf4j.Logger;
 public class AMTokenValidator implements TokenValidator {
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
     private final PrincipalFromSession principalFromSession;
+    private final ValidationInvocationContext validationInvocationContext;
+    private final boolean invalidateAMSession;
     private final Logger logger;
 
     /*
     The lifecycle for this class is controlled by the TokenOperationFactoryImpl, and thus needs no @Inject.
      */
-    public AMTokenValidator(ThreadLocalAMTokenCache threadLocalAMTokenCache, PrincipalFromSession principalFromSession, Logger logger) {
+    public AMTokenValidator(ThreadLocalAMTokenCache threadLocalAMTokenCache, PrincipalFromSession principalFromSession,
+                            ValidationInvocationContext validationInvocationContext,
+                            boolean invalidateAMSession, Logger logger) {
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
         this.principalFromSession = principalFromSession;
+        this.validationInvocationContext = validationInvocationContext;
+        this.invalidateAMSession = invalidateAMSession;
         this.logger = logger;
     }
 
@@ -88,7 +94,11 @@ public class AMTokenValidator implements TokenValidator {
         response.setToken(validateTarget);
         try {
             String sessionId = parseSessionIdFromRequest(tokenParameters.getToken());
-            threadLocalAMTokenCache.cacheAMToken(sessionId);
+            if (ValidationInvocationContext.SOAP_TOKEN_DELEGATION.equals(validationInvocationContext)) {
+                threadLocalAMTokenCache.cacheDelegatedAMSessionId(sessionId, invalidateAMSession);
+            } else {
+                threadLocalAMTokenCache.cacheAMSessionId(sessionId, invalidateAMSession);
+            }
             Principal principal = principalFromSession.getPrincipalFromSession(sessionId);
             response.setPrincipal(principal);
             validateTarget.setState(ReceivedToken.STATE.VALID);

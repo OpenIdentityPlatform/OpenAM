@@ -17,11 +17,10 @@
 package org.forgerock.openam.sts.soap.token.config;
 
 import org.apache.cxf.sts.token.provider.TokenProvider;
-import org.apache.cxf.sts.token.renewer.TokenRenewer;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
-import org.forgerock.openam.sts.config.user.TokenTransformConfig;
+import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
 
 /**
  * Interface consumed by the Token*OperationProvider classes to obtain instances of the TokenValidator, TokenProvider,
@@ -29,37 +28,24 @@ import org.forgerock.openam.sts.config.user.TokenTransformConfig;
  */
 public interface TokenOperationFactory {
     /**
-     * Called to obtain the set of TokenValidator instances to perform pure token validation (not transformation).
+     * Called to obtain the set of TokenValidator instances to perform pure token validation in the context of
+     * enforcing SecurityPolicy bindings and validating delegated tokens (ActAs/OnBehalfOf case).
+     * @param validatedTokenType the type of token to be validated
+     * @param validationInvocationContext the context of this validation (SecurityPolicy binding enforcement, delegated token
+     *                                    context).
+     * @param invalidateAMSession whether the OpenAM session resulting from successful token validation should be invalidated
+     *                            at the completion of the operation
+     * @return A TokenValidator implementation which can validate the specified token type
+     * @throws STSInitializationException if the TokenValidator cannot be created
      */
-    TokenValidator getTokenStatusValidatorForType(TokenType tokenType) throws STSInitializationException;
-
-    /**
-     * Called to obtain the set of TokenProvider instances to create a new token in the context of token transformation -
-     * the validate operation called with a TokenType other than STATUS.
-     */
-    TokenProvider getTokenProviderForTransformOperation(TokenTransformConfig tokenTransformConfig) throws STSInitializationException;
-
-    /**
-     * Called to obtain the set of TokenValidate instances to validate the initial token in the context of token transformation -
-     * the validate operation called with a TokenType other than STATUS.
-     */
-    TokenValidator getTokenValidatorForTransformOperation(TokenTransformConfig tokenTransformConfig) throws STSInitializationException;
+    TokenValidator getTokenValidator(TokenType validatedTokenType, ValidationInvocationContext validationInvocationContext,
+                                     boolean invalidateAMSession) throws STSInitializationException;
 
     /**
      * Called to obtain the set of of TokenProvider instances to satisfy the issue operation.
+     * @param issuedTokenType The type of token to be issued
+     * @return the TokenProvider which can issue the specified type
+     * @throws STSInitializationException if the TokenProvider cannot be created.
      */
-    TokenProvider getTokenProviderForType(TokenType tokenType) throws STSInitializationException;
-
-    /**
-     * Called to obtain a TokenValidator used in the context of token renewal.
-     * TODO: are we supporting renew?
-     */
-    TokenValidator getTokenValidatorForRenewal(TokenType tokenType) throws STSInitializationException;
-    /**
-     * Called to obtain the set of TokenRenewer instances to satisfy the renew operation.
-     * Note that the TokenRenewOperation encapsulates a set of TokenValidators and TokenRenewers, as the
-     * process of renewing a token first involves validating the existing token, and then renewing the existing token.
-     * TODO: are we supporting renew?
-     */
-    TokenRenewer getTokenRenewerForType(TokenType tokenType) throws STSInitializationException;
+    TokenProvider getTokenProvider(TokenType issuedTokenType) throws STSInitializationException;
 }

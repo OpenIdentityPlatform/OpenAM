@@ -41,62 +41,68 @@
                     </DefaultValues>
                 </AttributeSchema>
 
-                <AttributeSchema name="transformed-token-types"
+                <AttributeSchema name="validated-token-config"
                                  type="list"
                                  syntax="string"
                                  validator="RequiredValueValidator"
-                                 i18nKey="transformed_token_types">
+                                 i18nKey="validated_token_config">
                     <DefaultValues>
-                        <Value>USERNAME|SAML2|true</Value>
-                        <Value>OPENIDCONNECT|SAML2|true</Value>
-                        <Value>OPENAM|SAML2|false</Value>
-                        <Value>X509|SAML2|true</Value>
+                        <Value>USERNAME|true</Value>
+                        <Value>OPENAM|false</Value>
+                        <Value>X509|true</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
                 <AttributeSchema name="deployment-service-name"
-                                 type="single_choice" syntax="string" i18nKey="deployment_service_qname_alias"
+                                 type="single_choice" syntax="string" i18nKey="deployment_service_name"
                                  validator="RequiredValueValidator">
                     <ChoiceValues>
-                        <ChoiceValue i18nKey="symmetric_ut_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}symmetric_ut_sts_service</ChoiceValue>
-                        <ChoiceValue i18nKey="asymmetric_ut_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}asymmetric_ut_sts_service</ChoiceValue>
-                        <ChoiceValue i18nKey="transport_ut_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}transport_ut_sts_service</ChoiceValue>
-                        <ChoiceValue i18nKey="symmetric_am_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}symmetric_am_sts_service</ChoiceValue>
-                        <ChoiceValue i18nKey="asymmetric_am_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}asymmetric_am_sts_service</ChoiceValue>
-                        <ChoiceValue i18nKey="transport_am_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}transport_am_sts_service</ChoiceValue>
-                        <ChoiceValue i18nKey="unprotected_am_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}unprotected_am_sts_service</ChoiceValue>
+                        <ChoiceValue i18nKey="ut_symmetric_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}ut_symmetric_sts_service</ChoiceValue>
+                        <ChoiceValue i18nKey="ut_asymmetric_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}ut_asymmetric_sts_service</ChoiceValue>
+                        <ChoiceValue i18nKey="ut_transport_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}ut_transport_sts_service</ChoiceValue>
+                        <ChoiceValue i18nKey="am_transport_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}am_transport_sts_service</ChoiceValue>
+                        <ChoiceValue i18nKey="am_bare_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}am_bare_sts_service</ChoiceValue>
                         <ChoiceValue i18nKey="custom_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}custom_service_name</ChoiceValue>
-                        <!--
-                        Add for x509, OIDC?
-                        -->
                     </ChoiceValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="deployment-custom-service-name"
+                                 type="single" syntax="string" i18nKey="deployment_custom_service_name">
                 </AttributeSchema>
 
                 <AttributeSchema name="deployment-service-port"
                                  type="single_choice" syntax="string" i18nKey="deployment_service_port_alias"
                                  validator="RequiredValueValidator">
                     <ChoiceValues>
-                        <ChoiceValue i18nKey="symmetric_ut_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}symmetric_ut_sts_service_port</ChoiceValue>
-                        <ChoiceValue i18nKey="asymmetric_ut_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}asymmetric_ut_sts_service_port</ChoiceValue>
-                        <ChoiceValue i18nKey="transport_ut_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}transport_ut_sts_service_port</ChoiceValue>
-                        <ChoiceValue i18nKey="symmetric_am_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}symmetric_am_sts_service_port</ChoiceValue>
-                        <ChoiceValue i18nKey="asymmetric_am_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}asymmetric_am_sts_service_port</ChoiceValue>
-                        <ChoiceValue i18nKey="transport_am_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}transport_am_sts_service_port</ChoiceValue>
-                        <ChoiceValue i18nKey="unprotected_am_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}unprotected_am_sts_service_port</ChoiceValue>
+                        <ChoiceValue i18nKey="ut_symmetric_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}ut_symmetric_sts_service_port</ChoiceValue>
+                        <ChoiceValue i18nKey="ut_asymmetric_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}ut_asymmetric_sts_service_port</ChoiceValue>
+                        <ChoiceValue i18nKey="ut_transport_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}ut_transport_sts_service_port</ChoiceValue>
+                        <ChoiceValue i18nKey="am_transport_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}am_transport_sts_service_port</ChoiceValue>
+                        <ChoiceValue i18nKey="am_bare_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}am_bare_sts_service_port</ChoiceValue>
                         <ChoiceValue i18nKey="custom_service_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}custom_service_port</ChoiceValue>
                     </ChoiceValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="deployment-custom-service-port"
+                                 type="single" syntax="string" i18nKey="deployment_custom_service_port">
                 </AttributeSchema>
 
                 <AttributeSchema name="deployment-wsdl-location"
                                  type="single_choice" syntax="string" i18nKey="deployment_wsdl_location"
                                  validator="RequiredValueValidator">
                     <ChoiceValues>
-                        <ChoiceValue i18nKey="ut">sts_ut.wsdl</ChoiceValue>
+                        <ChoiceValue i18nKey="ut_transport_wsdl">sts_ut_transport.wsdl</ChoiceValue>
+                        <ChoiceValue i18nKey="ut_symmetric_wsdl">sts_ut_symmetric.wsdl</ChoiceValue>
+                        <ChoiceValue i18nKey="ut_asymmetric_wsdl">sts_ut_asymmetric.wsdl</ChoiceValue>
+                        <ChoiceValue i18nKey="openam_transport_wsdl">sts_am_transport.wsdl</ChoiceValue>
+                        <ChoiceValue i18nKey="openam_bare_wsdl">sts_am_bare.wsdl</ChoiceValue>
                         <ChoiceValue i18nKey="x509">sts_x509.wsdl</ChoiceValue>
-                        <ChoiceValue i18nKey="no_protection_token">sts_unprotected.wsdl</ChoiceValue>
-                        <ChoiceValue i18nKey="openam">sts_am.wsdl</ChoiceValue>
                         <ChoiceValue i18nKey="custom_wsdl_file">custom_wsdl_file</ChoiceValue>
                     </ChoiceValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="deployment-custom-wsdl-location"
+                                 type="single" syntax="string" i18nKey="deployment_custom_wsdl_location">
                 </AttributeSchema>
 
                 <AttributeSchema name="deployment-am-url"
@@ -138,8 +144,8 @@
                                  syntax="string"
                                  i18nKey="validated_delegated_token_types">
                     <DefaultValues>
-                        <Value>USERNAME</Value>
-                        <Value>OPENAM</Value>
+                        <Value>USERNAME|true</Value>
+                        <Value>OPENAM|false</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="custom-delegation-token-handlers"
@@ -272,62 +278,68 @@
                         </DefaultValues>
                     </AttributeSchema>
 
-                    <AttributeSchema name="transformed-token-types"
+                    <AttributeSchema name="validated-token-config"
                                      type="list"
                                      syntax="string"
                                      validator="RequiredValueValidator"
-                                     i18nKey="transformed_token_types">
+                                     i18nKey="validated_token_config">
                         <DefaultValues>
-                            <Value>USERNAME|SAML2|true</Value>
-                            <Value>OPENIDCONNECT|SAML2|true</Value>
-                            <Value>OPENAM|SAML2|false</Value>
-                            <Value>X509|SAML2|true</Value>
+                            <Value>USERNAME|true</Value>
+                            <Value>OPENAM|false</Value>
+                            <Value>X509|true</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
                     <AttributeSchema name="deployment-service-name"
-                                     type="single_choice" syntax="string" i18nKey="deployment_service_qname_alias"
+                                     type="single_choice" syntax="string" i18nKey="deployment_service_name"
                                      validator="RequiredValueValidator">
                         <ChoiceValues>
-                            <ChoiceValue i18nKey="symmetric_ut_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}symmetric_ut_sts_service</ChoiceValue>
-                            <ChoiceValue i18nKey="asymmetric_ut_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}asymmetric_ut_sts_service</ChoiceValue>
-                            <ChoiceValue i18nKey="transport_ut_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}transport_ut_sts_service</ChoiceValue>
-                            <ChoiceValue i18nKey="symmetric_am_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}symmetric_am_sts_service</ChoiceValue>
-                            <ChoiceValue i18nKey="asymmetric_am_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}asymmetric_am_sts_service</ChoiceValue>
-                            <ChoiceValue i18nKey="transport_am_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}transport_am_sts_service</ChoiceValue>
-                            <ChoiceValue i18nKey="unprotected_am_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}unprotected_am_sts_service</ChoiceValue>
+                            <ChoiceValue i18nKey="ut_symmetric_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}ut_symmetric_sts_service</ChoiceValue>
+                            <ChoiceValue i18nKey="ut_asymmetric_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}ut_asymmetric_sts_service</ChoiceValue>
+                            <ChoiceValue i18nKey="ut_transport_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}ut_transport_sts_service</ChoiceValue>
+                            <ChoiceValue i18nKey="am_transport_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}am_transport_sts_service</ChoiceValue>
+                            <ChoiceValue i18nKey="am_bare_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}am_bare_sts_service</ChoiceValue>
                             <ChoiceValue i18nKey="custom_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}custom_service_name</ChoiceValue>
-                            <!--
-                            Add for x509, OIDC?
-                            -->
                         </ChoiceValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="deployment-custom-service-name"
+                                     type="single" syntax="string" i18nKey="deployment_custom_service_name">
                     </AttributeSchema>
 
                     <AttributeSchema name="deployment-service-port"
                                      type="single_choice" syntax="string" i18nKey="deployment_service_port_alias"
                                      validator="RequiredValueValidator">
                         <ChoiceValues>
-                            <ChoiceValue i18nKey="symmetric_ut_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}symmetric_ut_sts_service_port</ChoiceValue>
-                            <ChoiceValue i18nKey="asymmetric_ut_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}asymmetric_ut_sts_service_port</ChoiceValue>
-                            <ChoiceValue i18nKey="transport_ut_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}transport_ut_sts_service_port</ChoiceValue>
-                            <ChoiceValue i18nKey="symmetric_am_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}symmetric_am_sts_service_port</ChoiceValue>
-                            <ChoiceValue i18nKey="asymmetric_am_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}asymmetric_am_sts_service_port</ChoiceValue>
-                            <ChoiceValue i18nKey="transport_am_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}transport_am_sts_service_port</ChoiceValue>
-                            <ChoiceValue i18nKey="unprotected_am_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}unprotected_am_sts_service_port</ChoiceValue>
+                            <ChoiceValue i18nKey="ut_symmetric_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}ut_symmetric_sts_service_port</ChoiceValue>
+                            <ChoiceValue i18nKey="ut_asymmetric_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}ut_asymmetric_sts_service_port</ChoiceValue>
+                            <ChoiceValue i18nKey="ut_transport_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}ut_transport_sts_service_port</ChoiceValue>
+                            <ChoiceValue i18nKey="am_transport_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}am_transport_sts_service_port</ChoiceValue>
+                            <ChoiceValue i18nKey="am_bare_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}am_bare_sts_service_port</ChoiceValue>
                             <ChoiceValue i18nKey="custom_service_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}custom_service_port</ChoiceValue>
                         </ChoiceValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="deployment-custom-service-port"
+                                     type="single" syntax="string" i18nKey="deployment_custom_service_port">
                     </AttributeSchema>
 
                     <AttributeSchema name="deployment-wsdl-location"
                                      type="single_choice" syntax="string" i18nKey="deployment_wsdl_location"
                                      validator="RequiredValueValidator">
                         <ChoiceValues>
-                            <ChoiceValue i18nKey="ut">sts_ut.wsdl</ChoiceValue>
+                            <ChoiceValue i18nKey="ut_transport_wsdl">sts_ut_transport.wsdl</ChoiceValue>
+                            <ChoiceValue i18nKey="ut_symmetric_wsdl">sts_ut_symmetric.wsdl</ChoiceValue>
+                            <ChoiceValue i18nKey="ut_asymmetric_wsdl">sts_ut_asymmetric.wsdl</ChoiceValue>
+                            <ChoiceValue i18nKey="openam_transport_wsdl">sts_am_transport.wsdl</ChoiceValue>
+                            <ChoiceValue i18nKey="openam_bare_wsdl">sts_am_bare.wsdl</ChoiceValue>
                             <ChoiceValue i18nKey="x509">sts_x509.wsdl</ChoiceValue>
-                            <ChoiceValue i18nKey="no_protection_token">sts_unprotected.wsdl</ChoiceValue>
-                            <ChoiceValue i18nKey="openam">sts_am.wsdl</ChoiceValue>
                             <ChoiceValue i18nKey="custom_wsdl_file">custom_wsdl_file</ChoiceValue>
                         </ChoiceValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="deployment-custom-wsdl-location"
+                                     type="single" syntax="string" i18nKey="deployment_custom_wsdl_location">
                     </AttributeSchema>
 
                     <AttributeSchema name="deployment-am-url"
@@ -369,8 +381,8 @@
                                      syntax="string"
                                      i18nKey="validated_delegated_token_types">
                         <DefaultValues>
-                            <Value>USERNAME</Value>
-                            <Value>OPENAM</Value>
+                            <Value>USERNAME|true</Value>
+                            <Value>OPENAM|false</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="custom-delegation-token-handlers"

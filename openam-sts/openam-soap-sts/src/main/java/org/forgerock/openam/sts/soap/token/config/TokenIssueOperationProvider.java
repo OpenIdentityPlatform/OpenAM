@@ -32,6 +32,7 @@ import org.apache.cxf.ws.security.sts.provider.operation.IssueSingleOperation;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.STSInitializationException;
+import org.forgerock.openam.sts.soap.config.user.TokenValidationConfig;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 
 
@@ -43,6 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
 import org.slf4j.Logger;
 
 /**
@@ -73,7 +75,7 @@ public class TokenIssueOperationProvider implements Provider<IssueOperation> {
             try {
                 return issueDelegate.issue(request, context);
             } finally {
-                threadLocalAMTokenCache.clearAMToken();
+                threadLocalAMTokenCache.clearCachedSessions();
             }
         }
 
@@ -82,14 +84,14 @@ public class TokenIssueOperationProvider implements Provider<IssueOperation> {
             try {
                 return issueDelegate.issueSingle(request, context);
             } finally {
-                threadLocalAMTokenCache.clearAMToken();
+                threadLocalAMTokenCache.clearCachedSessions();
             }
         }
     }
     private final STSPropertiesMBean stsPropertiesMBean;
     private final TokenStore tokenStore;
     private final Set<TokenType> issueTokenTypes;
-    private final Set<TokenType> delegatedTokenValidatorTypes;
+    private final Set<TokenValidationConfig> delegatedTokenValidationConfig;
     private final List<TokenDelegationHandler> tokenDelegationHandlers;
     private final TokenOperationFactory operationFactory;
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
@@ -100,7 +102,7 @@ public class TokenIssueOperationProvider implements Provider<IssueOperation> {
             STSPropertiesMBean stsPropertiesMBean,
             TokenStore tokenStore,
             @Named(AMSTSConstants.TOKEN_ISSUE_OPERATION) Set<TokenType> issueTokenTypes,
-            @Named(AMSTSConstants.DELEGATED_TOKEN_VALIDATORS) Set<TokenType> delegatedTokenValidators,
+            @Named(AMSTSConstants.DELEGATED_TOKEN_VALIDATORS) Set<TokenValidationConfig> delegatedTokenValidationConfig,
             List<TokenDelegationHandler> tokenDelegationHandlers,
             TokenOperationFactory operationFactory,
             ThreadLocalAMTokenCache threadLocalAMTokenCache,
@@ -108,7 +110,7 @@ public class TokenIssueOperationProvider implements Provider<IssueOperation> {
         this.stsPropertiesMBean = stsPropertiesMBean;
         this.tokenStore = tokenStore;
         this.issueTokenTypes = issueTokenTypes;
-        this.delegatedTokenValidatorTypes = delegatedTokenValidators;
+        this.delegatedTokenValidationConfig = delegatedTokenValidationConfig;
         this.tokenDelegationHandlers = tokenDelegationHandlers;
         this.operationFactory = operationFactory;
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
@@ -140,7 +142,7 @@ public class TokenIssueOperationProvider implements Provider<IssueOperation> {
 
             List<TokenProvider> tokenProviders = new ArrayList<TokenProvider>();
             for(TokenType tokenType: issueTokenTypes) {
-                tokenProviders.add(operationFactory.getTokenProviderForType(tokenType));
+                tokenProviders.add(operationFactory.getTokenProvider(tokenType));
             }
             tokenIssueOperation.setTokenProviders(tokenProviders);
             return new TokenIssueOperationWrapper(tokenIssueOperation, threadLocalAMTokenCache);
@@ -152,8 +154,11 @@ public class TokenIssueOperationProvider implements Provider<IssueOperation> {
 
     private List<TokenValidator> getDelegationTokenValidators() throws STSInitializationException {
         List<TokenValidator> tokenValidators = new ArrayList<TokenValidator>();
-        for (TokenType tokenType : delegatedTokenValidatorTypes) {
-            tokenValidators.add(operationFactory.getTokenStatusValidatorForType(tokenType));
+        for (TokenValidationConfig tokenValidationConfig : delegatedTokenValidationConfig) {
+            tokenValidators.add(operationFactory.getTokenValidator(
+                    tokenValidationConfig.getValidatedTokenType(),
+                    ValidationInvocationContext.SOAP_TOKEN_DELEGATION,
+                    tokenValidationConfig.invalidateInterimOpenAMSession()));
         }
         return tokenValidators;
     }

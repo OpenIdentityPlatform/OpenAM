@@ -19,7 +19,6 @@ package org.forgerock.openam.sts.soap.token.config;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Provides;
-import com.google.inject.name.Named;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
@@ -28,9 +27,10 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
-import org.forgerock.openam.sts.config.user.TokenTransformConfig;
+import org.forgerock.openam.sts.soap.config.user.TokenValidationConfig;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCacheImpl;
+import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
@@ -63,11 +63,19 @@ public class TokenValidateOperationProviderTest {
         }
 
         @Provides
-        Set<TokenTransformConfig> getValidateTransformations() {
-            Set<TokenTransformConfig> transformConfigs = new HashSet<TokenTransformConfig>();
-            transformConfigs.add(new TokenTransformConfig(TokenType.OPENAM, TokenType.SAML2, false));
-            transformConfigs.add(new TokenTransformConfig(TokenType.USERNAME, TokenType.SAML2, true));
-            return transformConfigs;
+        Set<TokenValidationConfig> getValidateConfig() {
+            Set<TokenValidationConfig> validationConfigs = new HashSet<TokenValidationConfig>();
+            validationConfigs.add(new TokenValidationConfig(TokenType.OPENAM, false));
+            validationConfigs.add(new TokenValidationConfig(TokenType.USERNAME, true));
+            return validationConfigs;
+        }
+
+        @Provides
+        @javax.inject.Named(AMSTSConstants.DELEGATED_TOKEN_VALIDATORS)
+        Set<TokenValidationConfig> getDelegatedTokenValidators() {
+            Set<TokenValidationConfig> validationConfigs = new HashSet<TokenValidationConfig>();
+            validationConfigs.add(new TokenValidationConfig(TokenType.USERNAME, true));
+            return validationConfigs;
         }
 
         @Provides
@@ -81,7 +89,8 @@ public class TokenValidateOperationProviderTest {
     public void testDelegate() throws STSInitializationException {
         TokenOperationFactory mockOperationFactory = mock(TokenOperationFactory.class);
         TokenValidator mockValidator = mock(TokenValidator.class);
-        when(mockOperationFactory.getTokenStatusValidatorForType(any(TokenType.class))).thenReturn(mockValidator);
+        when(mockOperationFactory.getTokenValidator(any(TokenType.class), any(ValidationInvocationContext.class),
+                any(boolean.class))).thenReturn(mockValidator);
         TokenValidateOperationProvider validateOperationProvider =
                 Guice.createInjector(new MyModule(mockOperationFactory)).getInstance(TokenValidateOperationProvider.class);
         assertTrue(validateOperationProvider.get() instanceof TokenValidateOperationProvider.TokenValidateOperationWrapper);
@@ -91,7 +100,8 @@ public class TokenValidateOperationProviderTest {
     public void testExceptionInitialization() throws STSInitializationException {
         TokenOperationFactory mockOperationFactory = mock(TokenOperationFactory.class);
         TokenValidator mockValidator = mock(TokenValidator.class);
-        when(mockOperationFactory.getTokenValidatorForTransformOperation(any(TokenTransformConfig.class))).thenThrow(STSInitializationException.class);
+        when(mockOperationFactory.getTokenValidator(any(TokenType.class), any(ValidationInvocationContext.class),
+                any(boolean.class))).thenThrow(STSInitializationException.class);
         TokenValidateOperationProvider validateOperationProvider =
                 Guice.createInjector(new MyModule(mockOperationFactory)).getInstance(TokenValidateOperationProvider.class);
         validateOperationProvider.get();

@@ -116,8 +116,8 @@ public class SoapSTSInstanceStateServiceListenerTest {
 
         SoapDeploymentConfig deploymentConfig =
                 SoapDeploymentConfig.builder()
-                        .portQName(AMSTSConstants.UNPROTECTED_STS_SERVICE_PORT)
-                        .serviceQName(AMSTSConstants.UNPROTECTED_STS_SERVICE)
+                        .portQName(AMSTSConstants.AM_TRANSPORT_STS_SERVICE_PORT)
+                        .serviceQName(AMSTSConstants.AM_TRANSPORT_STS_SERVICE)
                         .wsdlLocation("wsdl_loc")
                         .realm("realm")
                         .amDeploymentUrl(amDeploymentUrl)
@@ -144,7 +144,7 @@ public class SoapSTSInstanceStateServiceListenerTest {
                         .build();
 
         SoapSTSInstanceConfig.SoapSTSInstanceConfigBuilderBase<?> builder = SoapSTSInstanceConfig.builder();
-        builder.addValidateTokenTranslation(TokenType.OPENAM, TokenType.SAML2, false);
+        builder.addTokenValidationConfiguration(TokenType.OPENAM, false);
         builder.addIssueTokenType(TokenType.SAML2);
         return  builder
                 .deploymentConfig(deploymentConfig)
@@ -153,6 +153,4 @@ public class SoapSTSInstanceStateServiceListenerTest {
                 .saml2Config(saml2Config)
                 .build();
     }
-
-
 }

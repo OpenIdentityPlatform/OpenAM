@@ -22,14 +22,10 @@ import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenCreationException;
-import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
-import org.forgerock.openam.sts.token.ThreadLocalAMTokenCacheImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
-
-import java.util.concurrent.Callable;
 
 import static org.testng.Assert.assertTrue;
 
@@ -58,9 +54,9 @@ public class ThreadLocalAMTokenCacheTest {
         }
 
         public void run() {
-            tokenCache.cacheAMToken(value);
+            tokenCache.cacheAMSessionId(value, true);
             try {
-                assertTrue(tokenCache.getAMToken().equals(value));
+                assertTrue(tokenCache.getAMSessionId().equals(value));
             } catch (TokenCreationException e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
