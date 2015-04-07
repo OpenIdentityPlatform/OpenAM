@@ -343,7 +343,17 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             options,
             hideButton,
             defaultOption,
-            btnClass = '';
+            btnClass = '',
+            callbackType = {
+                PasswordCallback : "PasswordCallback",
+                TextInputCallback : "TextInputCallback",
+                TextOutputCallback: "TextOutputCallback",
+                ConfirmationCallback : "ConfirmationCallback",
+                ChoiceCallback : "ChoiceCallback",
+                HiddenValueCallback : "HiddenValueCallback",
+                RedirectCallback : "RedirectCallback",
+                ScriptTextOutputCallback : "4" //Magic number 4 is for a <script>, taken from ScriptTextOutputCallback.java
+            };
 
 
         _.find(cb.output, function (obj) {
@@ -352,22 +362,21 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             }
         });
 
-
         switch (cb.type) {
-            case "PasswordCallback" :
+            case callbackType.PasswordCallback :
                 result += '<input type="password" name="callback_' + cb.input.index + '" class="form-control input-lg" placeholder="' + prompt + '" value="' + cb.input.value + '" data-validator="required" required data-validator-event="keyup">';
                 break;
 
-            case "TextInputCallback" :
+            case callbackType.TextInputCallback :
                 result += '<textarea name="callback_' + cb.input.index + '" data-validator="required" required data-validator-event="keyup">' + cb.input.value + '</textarea>';
                 break;
 
-            case "TextOutputCallback" :
+            case callbackType.TextOutputCallback :
                 options = [];
                 options.message = _.find(cb.output, function (o) { return o.name === "message"; });
                 options.type = _.find(cb.output, function (o) { return o.name === "messageType"; });
 
-                if (options.type.value === "4") { //4 is our magic number for a <script>, taken from ScriptTextOutputCallback.java
+                if (options.type.value === callbackType.ScriptTextOutputCallback) {
                     hideButton = "if(document.getElementsByClassName('button')[0] != undefined){document" +
                         ".getElementsByClassName" +
                         "('button')[0].style.visibility = 'hidden';}";
@@ -378,7 +387,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
                 break;
 
-            case "ConfirmationCallback" :
+            case callbackType.ConfirmationCallback :
                 options = _.find(cb.output, function (o) { return o.name === "options"; });
 
                 if (options && options.value !== undefined) {
@@ -390,7 +399,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     });
                 }
                 break;
-            case "ChoiceCallback" :
+            case callbackType.ChoiceCallback :
                 options = _.find(cb.output, function (o) { return o.name === "choices"; });
                 defaultOption = cb.input.value;
 
@@ -409,14 +418,14 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 }
 
                 break;
-            case "HiddenValueCallback" :
-                result += '<input type="hidden" id="' + cb.input.value + '" name="callback_' + cb.input.index + '" value="" data-validator="required" required data-validator-event="keyup" />';
+            case callbackType.HiddenValueCallback :
+                result += '<input type="hidden" id="' + cb.input.value + '" name="callback_' + cb.input.index + '" value="" />';
                 break;
-            case "RedirectCallback":
-                result += 'Redirecting...';
+            case callbackType.RedirectCallback:
+                result += '<p class="text-center">Redirecting...</p>';
                 break;
             default:
-                result += '<input type="text" name="callback_' + cb.input.index + '" id="login" value="' + cb.input.value + '" data-validator="required" required data-validator-event="keyup" class="form-control input-lg" placeholder="'+ prompt +'">';
+                result += '<input type="text" name="callback_' + cb.input.index + '" value="' + cb.input.value + '" data-validator="required" required data-validator-event="keyup" class="form-control input-lg" placeholder="'+ prompt +'">';
                 break;
         }
 
