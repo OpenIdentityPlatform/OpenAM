@@ -87,6 +87,16 @@ define("config/process/AMConfig", [
                     }
                 }
             }
+        },
+        {
+            startEvent: Constants.EVENT_SHOW_CONFIRM_PASSWORD_DIALOG,
+            description: "",
+            dependencies: [
+                "org/forgerock/commons/ui/user/profile/ConfirmPasswordDialog"
+            ],
+            processDescription: function(event, ConfirmPasswordDialog) {
+                ConfirmPasswordDialog.show();
+            }
         }
     ];
     return obj;

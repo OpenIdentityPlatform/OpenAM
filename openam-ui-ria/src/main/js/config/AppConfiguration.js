@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2011-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -47,7 +47,6 @@ define("config/AppConfiguration", [
                         LoginDialog : "org/forgerock/openam/ui/user/login/RESTLoginDialog",
                         RegisterView : "org/forgerock/openam/ui/user/profile/RegisterView",
                         ChangeSecurityDataDialog : "org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog",
-                        ConfirmPasswordDialog : "org/forgerock/commons/ui/user/profile/ConfirmPasswordDialog",
                         DialogShare : "org/forgerock/openam/ui/uma/views/share/DialogShare"
                     }
                 },
@@ -103,7 +102,8 @@ define("config/AppConfiguration", [
                     configuration: {
                         templateUrls: [
                             "templates/uma/backgrid/cell/RevokeCell.html",
-                            "templates/uma/backgrid/cell/SelectizeCell.html"
+                            "templates/uma/backgrid/cell/SelectizeCell.html",
+                            "templates/user/ConfirmPasswordDialogTemplate.html"
                         ]
                     }
                 },
