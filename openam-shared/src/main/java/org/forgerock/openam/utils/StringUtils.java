@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Utility class for handling Strings
@@ -206,5 +207,68 @@ public final class StringUtils {
      */
     public static boolean compareCaseInsensitiveString(String s1, String s2) {
         return s1 == null ? s2 == null : s1.equalsIgnoreCase(s2);
+    }
+
+    /**
+     * Check if one string contains another string.
+     * @param s1 The string to check in.
+     * @param s2 The string to check for.
+     * @return False if either string is null or if the first does not contain the second, otherwise true.
+     */
+    public static boolean contains(String s1, String s2) {
+        if (s1 == null || s2 == null) {
+            return false;
+        }
+        return s1.contains(s2);
+    }
+
+    /**
+     * Check if one string starts with another string.
+     * @param s1 The string to check in.
+     * @param s2 The string to check for.
+     * @return False if either string is null or if the first does not start with the second, otherwise true.
+     */
+    public static boolean startsWith(String s1, String s2) {
+        if (s1 == null || s2 == null) {
+            return false;
+        }
+        return s1.startsWith(s2);
+    }
+
+    /**
+     * Match the value to the regular expression pattern. The pattern given can contain a file name like search,
+     * e.g. '*service*', which will be converted to a valid regular expression, e.g. '.*?service.*'.
+     * @param value The value to match on.
+     * @param strPattern The pattern to match.
+     * @return True if the value matches the pattern, false otherwise.
+     */
+    public static boolean match(String value, String strPattern) {
+        if (isNotEmpty(strPattern)) {
+            if (isBlank(value)) {
+                return strPattern.equals("*");
+            }
+            value = value.toLowerCase();
+            strPattern = strPattern.toLowerCase();
+            StringBuilder buff = new StringBuilder();
+
+            for (int i = 0; i < strPattern.length() - 1; i++) {
+                char c = strPattern.charAt(i);
+                if (c == '*') {
+                    buff.append(".*?");
+                } else {
+                    buff.append(c);
+                }
+            }
+
+            char lastChar = strPattern.charAt(strPattern.length()-1);
+            if (lastChar == '*') {
+                buff.append(".*");
+            } else {
+                buff.append(lastChar);
+            }
+            return Pattern.matches(buff.toString(), value);
+        }
+
+        return true;
     }
 }

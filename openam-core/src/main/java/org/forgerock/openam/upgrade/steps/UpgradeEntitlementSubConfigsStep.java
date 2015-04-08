@@ -803,16 +803,8 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractEntitlementUpgrade
      * @return Set of strings representing the resource type uuids.
      */
     private Set<String> getResourceTypeUUIDs(String realm) throws UpgradeException {
-
-        Set<String> result = new HashSet<String>();
         try {
-            Map<String, ResourceType> resourceTypes =
-                    resourceTypeConfiguration.getResourceTypes(getAdminSubject(), realm);
-
-            for (Map.Entry<String, ResourceType> entry : resourceTypes.entrySet()) {
-                result.add(entry.getValue().getUUID());
-            }
-            return result;
+            return resourceTypeConfiguration.getResourceTypesData(getAdminSubject(), realm).keySet();
         } catch (EntitlementException ee) {
             throw new UpgradeException(ee);
         }

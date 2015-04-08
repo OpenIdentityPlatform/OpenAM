@@ -96,28 +96,20 @@ public class ResourceTypeConfigurationImpl extends AbstractConfiguration impleme
      * {@inheritDoc}
      */
     @Override
-    public Map<String, ResourceType> getResourceTypes(Subject subject, String realm) throws EntitlementException {
-        final Map<String, ResourceType> resourceTypeMap = new HashMap<String, ResourceType>();
+    public ResourceType getResourceType(Subject subject, String realm, String uuid) throws EntitlementException {
+        if (!containsUUID(subject, realm, uuid)) {
+            return null;
+        }
         try {
-            final ServiceConfig subOrgConfig = getOrgConfig(subject, realm).getSubConfig(CONFIG_RESOURCE_TYPES);
-            if (subOrgConfig == null) {
-                return resourceTypeMap;
-            }
-            final Set<String> uuids = subOrgConfig.getSubConfigNames();
-
-            for (String uuid : uuids) {
-                final Map<String, Set<String>> data = subOrgConfig.getSubConfig(uuid).getAttributes();
-                final ResourceType resourceType = resourceTypeFromMap(realm, uuid, data);
-                resourceTypeMap.put(uuid, resourceType);
-            }
+            return resourceTypeFromMap(realm, uuid, getOrgConfig(subject, realm).getSubConfig(CONFIG_RESOURCE_TYPES)
+                    .getSubConfig(uuid).getAttributesForRead());
         } catch (SMSException ex) {
-            PrivilegeManager.debug.error("ResourceTypeConfiguration.getResourceTypes", ex);
+            PrivilegeManager.debug.error("ResourceTypeConfiguration.getResourceType", ex);
             throw new EntitlementException(RESOURCE_TYPE_RETRIEVAL_ERROR, ex, realm);
         } catch (SSOException ex) {
-            PrivilegeManager.debug.error("ResourceTypeConfiguration.getResourceTypes", ex);
+            PrivilegeManager.debug.error("ResourceTypeConfiguration.getResourceType", ex);
             throw new EntitlementException(RESOURCE_TYPE_RETRIEVAL_ERROR, ex, realm);
         }
-        return resourceTypeMap;
     }
 
     /**
@@ -310,6 +302,30 @@ public class ResourceTypeConfigurationImpl extends AbstractConfiguration impleme
         return resourceTypes;
     }
 
+    @Override
+    public Map<String, Map<String, Set<String>>> getResourceTypesData(Subject subject, String realm)
+            throws EntitlementException {
+
+        final Map<String, Map<String, Set<String>>> configData = new HashMap<String, Map<String, Set<String>>>();
+        try {
+            final ServiceConfig subOrgConfig = getOrgConfig(subject, realm).getSubConfig(CONFIG_RESOURCE_TYPES);
+            if (subOrgConfig == null) {
+                return configData;
+            }
+            final Set<String> uuids = subOrgConfig.getSubConfigNames();
+            for (String uuid : uuids) {
+                configData.put(uuid, subOrgConfig.getSubConfig(uuid).getAttributesForRead());
+            }
+        } catch (SMSException ex) {
+            PrivilegeManager.debug.error("ResourceTypeConfiguration.getResourceTypesData", ex);
+            throw new EntitlementException(RESOURCE_TYPE_RETRIEVAL_ERROR, ex, realm);
+        } catch (SSOException ex) {
+            PrivilegeManager.debug.error("ResourceTypeConfiguration.getResourceTypesData", ex);
+            throw new EntitlementException(RESOURCE_TYPE_RETRIEVAL_ERROR, ex, realm);
+        }
+        return configData;
+    }
+
     /**
      * Create the config instance in the data store where new resource types can be added to.
      * @param realm The realm in which to create the config instance.
@@ -359,40 +375,43 @@ public class ResourceTypeConfigurationImpl extends AbstractConfiguration impleme
         final Map<String, Set<String>> map = new HashMap<String, Set<String>>();
         prepareAttributeMap(map, RESOURCE_TYPE);
 
-        Set<String> data = new HashSet<String>();
-        map.put(SMSEntry.ATTR_KEYVAL, data);
-
-        data.add(CONFIG_NAME + "=" + resourceType.getName());
+        Set<String> nonSearchableData = new HashSet<String>();
+        map.put(SMSEntry.ATTR_KEYVAL, nonSearchableData);
 
         if (resourceType.getDescription() != null) {
-            data.add(CONFIG_DESCRIPTION + "=" + resourceType.getDescription());
+            nonSearchableData.add(CONFIG_DESCRIPTION + "=" + resourceType.getDescription());
         } else {
-            data.add(CONFIG_DESCRIPTION + "=");
+            nonSearchableData.add(CONFIG_DESCRIPTION + "=");
         }
 
+        nonSearchableData.add(CONFIG_CREATION_DATE + "=" + resourceType.getCreationDate());
+
+        if (resourceType.getLastModifiedBy() != null) {
+            nonSearchableData.add(CONFIG_LAST_MODIFIED_BY + "=" + resourceType.getLastModifiedBy());
+        } else {
+            nonSearchableData.add(CONFIG_LAST_MODIFIED_BY + "=");
+        }
+
+        nonSearchableData.add(CONFIG_LAST_MODIFIED_DATE + "=" + resourceType.getLastModifiedDate());
+
+        Set<String> searchableData = new HashSet<String>();
+        map.put(SMSEntry.ATTR_XML_KEYVAL, searchableData);
+
+        searchableData.add(CONFIG_NAME + "=" + resourceType.getName());
+
         for (String pattern : resourceType.getPatterns()) {
-            data.add(CONFIG_PATTERNS + "=" + pattern);
+            searchableData.add(CONFIG_PATTERNS + "=" + pattern);
         }
 
         for (String actionPair : getActionSet(resourceType.getActions())) {
-            data.add(CONFIG_ACTIONS + "=" + actionPair);
+            searchableData.add(CONFIG_ACTIONS + "=" + actionPair);
         }
 
         if (resourceType.getCreatedBy() != null) {
-            data.add(CONFIG_CREATED_BY + "=" + resourceType.getCreatedBy());
+            searchableData.add(CONFIG_CREATED_BY + "=" + resourceType.getCreatedBy());
         } else {
-            data.add(CONFIG_CREATED_BY + "=");
+            searchableData.add(CONFIG_CREATED_BY + "=");
         }
-
-        data.add(CONFIG_CREATION_DATE + "=" + resourceType.getCreationDate());
-
-        if (resourceType.getLastModifiedBy() != null) {
-            data.add(CONFIG_LAST_MODIFIED_BY + "=" + resourceType.getLastModifiedBy());
-        } else {
-            data.add(CONFIG_LAST_MODIFIED_BY + "=");
-        }
-
-        data.add(CONFIG_LAST_MODIFIED_DATE + "=" + resourceType.getLastModifiedDate());
 
         return map;
     }

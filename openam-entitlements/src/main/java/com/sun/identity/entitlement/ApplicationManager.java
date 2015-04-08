@@ -34,10 +34,10 @@ import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.annotations.VisibleForTesting;
 
-import static org.forgerock.openam.utils.StringUtils.*;
-
+import javax.security.auth.Subject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.Principal;
@@ -48,8 +48,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.regex.Pattern;
-import javax.security.auth.Subject;
 
 /**
  * Application Manager handles addition, deletion and listing of applications for each realm.
@@ -118,19 +116,19 @@ public final class ApplicationManager {
     static boolean match(Set<SearchFilter> filters, Application app) {
         for (SearchFilter filter : filters) {
             if (Application.NAME_ATTRIBUTE.equals(filter.getName()))  {
-                if (!match(app.getName(), filter.getValue())) {
+                if (!StringUtils.match(app.getName(), filter.getValue())) {
                     return false;
                 }
             } else if (Application.DESCRIPTION_ATTRIBUTE.equals(filter.getName())) {
-                if (!match(app.getDescription(), filter.getValue())) {
+                if (!StringUtils.match(app.getDescription(), filter.getValue())) {
                     return false;
                 }
             } else if (Application.CREATED_BY_ATTRIBUTE.equals(filter.getName())) {
-                if (!match(app.getCreatedBy(), filter.getValue())) {
+                if (!StringUtils.match(app.getCreatedBy(), filter.getValue())) {
                     return false;
                 }
             } else if (Application.LAST_MODIFIED_BY_ATTRIBUTE.equals(filter.getName())) {
-                if (!match(app.getLastModifiedBy(), filter.getValue())) {
+                if (!StringUtils.match(app.getLastModifiedBy(), filter.getValue())) {
                     return false;
                 }
             } else if (Application.CREATION_DATE_ATTRIBUTE.equals(filter.getName())) {
@@ -161,36 +159,6 @@ public final class ApplicationManager {
             default:
                 return false;
         }
-    }
-
-    private static boolean match(String value, String strPattern) {
-        if (isNotEmpty(strPattern)) {
-            if (isBlank(value)) {
-                return strPattern.equals("*");
-            }
-            value = value.toLowerCase();
-            strPattern = strPattern.toLowerCase();
-            StringBuilder buff = new StringBuilder();
-            
-            for (int i = 0; i < strPattern.length() - 1; i++) {
-                char c = strPattern.charAt(i);
-                if (c == '*') {
-                    buff.append(".*?");
-                } else {
-                    buff.append(c);
-                }
-            }
-
-            char lastChar = strPattern.charAt(strPattern.length()-1);
-            if (lastChar == '*') {
-                buff.append(".*");
-            } else {
-                buff.append(lastChar);
-            }
-            return Pattern.matches(buff.toString(), value);
-        }
-
-        return true;
     }
 
     /**

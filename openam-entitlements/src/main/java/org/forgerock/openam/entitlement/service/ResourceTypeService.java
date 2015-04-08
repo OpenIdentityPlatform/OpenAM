@@ -21,6 +21,7 @@ import org.forgerock.openam.entitlement.configuration.SmsAttribute;
 import org.forgerock.util.query.QueryFilter;
 
 import javax.security.auth.Subject;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -50,14 +51,16 @@ public interface ResourceTypeService {
     public void deleteResourceType(Subject subject, String realm, String uuid) throws EntitlementException;
 
     /**
-     * Retrieve the resource types stored under the specified realm from the data store. Also indicate if the resource
-     * types from the parent realms should be included.
+     * Retrieve the resource types stored under the specified realm from the data store.
      * @param subject The subject with privilege to access the resource types in this realm.
      * @param realm The realm from which to retrieve the resource types.
-     * @return A set of registered resource types.
+     * @return The registered resource types in a map. The outer map holds the resource type UUID as the key. The inner
+     * map (value of the outer map) holds the names of the attributes of the resource type as keys and a set of values
+     * for that attribute as the value.
      * @throws EntitlementException If the retrieval of the resource type failed.
      */
-    public Set<ResourceType> getResourceTypes(Subject subject, String realm) throws EntitlementException;
+    public Map<String, Map<String, Set<String>>> getResourceTypesData(Subject subject, String realm)
+            throws EntitlementException;
 
     /**
      * Retrieve the resource type with the given UUID, stored under the specified realm.

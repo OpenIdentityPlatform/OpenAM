@@ -29,13 +29,14 @@ import java.util.Set;
 public interface ResourceTypeConfiguration {
 
     /**
-     * Retrieve a map of registered resource types, keyed on their uuid.
+     * Retrieve a registered resource type by id.
      * @param subject The subject for whom the resource type should be retrieved.
      * @param realm The realm in which the resource type resides.
-     * @return A map of registered resource types, keyed on their uuid.
+     * @param uuid The unique identifier for the resource type.
+     * @return The registered resource type.
      * @throws EntitlementException If the retrieval of the resource type failed.
      */
-    public Map<String, ResourceType> getResourceTypes(Subject subject, String realm) throws EntitlementException;
+    public ResourceType getResourceType(Subject subject, String realm, String uuid) throws EntitlementException;
 
     /**
      * Check to see if a resource type with the given UUID already exists in this realm.
@@ -89,5 +90,17 @@ public interface ResourceTypeConfiguration {
      */
     public Set<ResourceType> getResourceTypes(QueryFilter<SmsAttribute> filter,
                                               Subject subject, String realm) throws EntitlementException;
+
+    /**
+     * Retrieve the resource types stored under the specified realm from the data store.
+     * @param subject The subject with privilege to access the resource types in this realm.
+     * @param realm The realm from which to retrieve the resource types.
+     * @return The registered resource types in a map. The outer map holds the resource type UUID as the key. The inner
+     * map (value of the outer map) holds the names of the attributes of the resource type as keys and a set of values
+     * for that attribute as the value.
+     * @throws EntitlementException If the retrieval of the resource type failed.
+     */
+    public Map<String, Map<String, Set<String>>> getResourceTypesData(Subject subject, String realm)
+            throws EntitlementException;
 
 }

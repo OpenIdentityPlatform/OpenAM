@@ -25,12 +25,12 @@ public final class ResourceTypeSmsAttributes {
     private ResourceTypeSmsAttributes() {
     }
 
-    public static final SmsAttribute NAME = SmsAttribute.newNoneSearchableInstance("name");
-    public static final SmsAttribute ACTIONS = SmsAttribute.newNoneSearchableInstance("actions");
-    public static final SmsAttribute PATTERNS = SmsAttribute.newNoneSearchableInstance("patterns");
+    public static final SmsAttribute NAME = SmsAttribute.newSearchableInstance("name");
+    public static final SmsAttribute ACTIONS = SmsAttribute.newSearchableInstance("actions");
+    public static final SmsAttribute PATTERNS = SmsAttribute.newSearchableInstance("patterns");
     public static final SmsAttribute DESCRIPTION = SmsAttribute.newNoneSearchableInstance("description");
 
-    public static final SmsAttribute CREATED_BY = SmsAttribute.newNoneSearchableInstance("createdBy");
+    public static final SmsAttribute CREATED_BY = SmsAttribute.newSearchableInstance("createdBy");
     public static final SmsAttribute CREATED_DATE = SmsAttribute.newNoneSearchableInstance("createdDate");
     public static final SmsAttribute LAST_MODIFIED_BY = SmsAttribute.newNoneSearchableInstance("lastModifiedBy");
     public static final SmsAttribute LAST_MODIFIED_DATE = SmsAttribute.newNoneSearchableInstance("lastModifiedDate");
