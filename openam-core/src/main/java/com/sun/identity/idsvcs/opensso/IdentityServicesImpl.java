@@ -24,7 +24,7 @@
  *
  * $Id: IdentityServicesImpl.java,v 1.20 2010/01/06 19:11:17 veiming Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS
  */
 package com.sun.identity.idsvcs.opensso;
 
@@ -550,6 +550,10 @@ public class IdentityServicesImpl
         } catch (SSOException e) {
             debug.error("IdentityServicesImpl:attributes", e);
             throw new GeneralFailure(e.getMessage());
+        }
+        catch (TokenExpired e) {
+            debug.warning("IdentityServicesImpl:attributes original error", e);
+            throw new TokenExpired("Cannot retrieve Token.");
         }
 
         // todo handle token translation
@@ -1876,7 +1880,7 @@ public class IdentityServicesImpl
             token = mgr.createSSOToken(admin.getId());
         } catch (SSOException ex) {
             // throw TokenExpired exception
-            throw (new TokenExpired(ex.getMessage()));
+            throw new TokenExpired(ex.getMessage());
         }
         return (token);
     }
