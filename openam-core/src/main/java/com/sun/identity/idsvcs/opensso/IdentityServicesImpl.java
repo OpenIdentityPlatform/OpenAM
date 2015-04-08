@@ -557,6 +557,10 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
             debug.error("IdentityServicesImpl:attributes", e);
             throw new GeneralFailure(e.getMessage());
         }
+        catch (TokenExpired e) {
+            debug.warning("IdentityServicesImpl:attributes original error", e);
+            throw new TokenExpired("Cannot retrieve Token.");
+        }
 
         // todo handle token translation
         details.setToken(subject);
@@ -1852,7 +1856,7 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
             token = mgr.createSSOToken(admin.getId());
         } catch (SSOException ex) {
             // throw TokenExpired exception
-            throw (new TokenExpired(ex.getMessage()));
+            throw new TokenExpired(ex.getMessage());
         }
         return (token);
     }
