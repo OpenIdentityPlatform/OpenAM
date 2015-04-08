@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: ConfigurationBase.java,v 1.4 2009/07/07 06:14:12 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.common.configuration;
@@ -65,12 +62,12 @@ public abstract class ConfigurationBase {
     protected static final String OLD_ATTR_SERVER_LIST = 
         "iplanet-am-platform-server-list";
 
-    static final String CONFIG_SERVERS = "com-sun-identity-servers";
-    protected static final String SUBSCHEMA_SERVER = "server";
+    public static final String CONFIG_SERVERS = "com-sun-identity-servers";
+    public static final String SUBSCHEMA_SERVER = "server";
     protected static final String ATTR_SERVER_ID = "serverid";
     
-    protected static final String SUBSCHEMA_SITE = "site";
-    protected static final String CONFIG_SITES = "com-sun-identity-sites";
+    public static final String SUBSCHEMA_SITE = "site";
+    public static final String CONFIG_SITES = "com-sun-identity-sites";
     protected static final String SUBCONFIG_ACCESS_URL = "accesspoint";
     protected static final String ATTR_PRIMARY_SITE_ID = "primary-siteid";
     protected static final String ATTR_PRIMARY_SITE_URL = "primary-url";
