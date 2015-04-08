@@ -56,6 +56,7 @@ public class ExcludedServicesProvider implements Provider<Collection<String>> {
                 "banking",
                 "openProvisioning"
         ));
+        excludedServices.remove(SmsRequestHandler.IDFF_METADATA_SERVICE);
         return excludedServices;
     }
 

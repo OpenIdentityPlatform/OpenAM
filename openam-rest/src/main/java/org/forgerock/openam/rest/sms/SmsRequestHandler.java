@@ -18,6 +18,7 @@ package org.forgerock.openam.rest.sms;
 
 import static org.forgerock.openam.rest.sms.SmsRouteTree.*;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.security.AccessController;
@@ -77,10 +78,21 @@ import org.forgerock.json.resource.UpdateRequest;
  */
 public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
 
-    private static final Function<String, Boolean> AUTHENTICATION_HANDLES_FUNCTION = new Function<String, Boolean>() {
-        @Override
-        public Boolean apply(String serviceName) {
-            return ISAuthConstants.AUTH_SERVICE_NAME.equals(serviceName);
+    private static final String COT_CONFIG_SERVICE = "sunFMCOTConfigService";
+    static final String IDFF_METADATA_SERVICE = "sunFMIDFFMetadataService";
+    private static final String SAML2_METADATA_SERVICE = "sunFMSAML2MetadataService";
+    private static final String WS_METADATA_SERVICE = "sunFMWSFederationMetadataService";
+
+    private static final Function<String, Boolean> AUTHENTICATION_HANDLES_FUNCTION =
+            new SingleServiceFunction(ISAuthConstants.AUTH_SERVICE_NAME);
+    private static final Function<String, Boolean> CIRCLES_OF_TRUST_HANDLES_FUNCTION =
+            new SingleServiceFunction(COT_CONFIG_SERVICE);
+    private static final Function<String, Boolean> ENTITYPROVIDER_HANDLES_FUNCTION = new Function<String, Boolean>() {
+        private final List<String> services =
+                Arrays.asList(IDFF_METADATA_SERVICE, SAML2_METADATA_SERVICE, WS_METADATA_SERVICE);
+
+        public Boolean apply(@Nullable String name) {
+            return services.contains(name);
         }
     };
 
@@ -91,25 +103,15 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
         }
     };
 
-    private static final Function<String, Boolean> FEDERATION_HANDLES_FUNCTION = new Function<String, Boolean>() {
-        private final List<String> FEDERATION_SERVICES = Arrays.asList(
-                "sunFMIDFFMetadataService",
-                "sunFMCOTConfigService",
-                "sunFMSAML2MetadataService",
-                "sunFMWSFederationMetadataService"
-        );
-        @Override
-        public Boolean apply(String serviceName) {
-            return FEDERATION_SERVICES.contains(serviceName);
-        }
-    };
-
     /**
      * Services are all the services not handled by other handlers for specific service schema types.
      */
     private static final Function<String, Boolean> SERVICES_HANDLES_FUNCTION = new Function<String, Boolean>() {
         private final List<Function<String, Boolean>> ALREADY_HANDLED = Arrays.asList(
-                AUTHENTICATION_HANDLES_FUNCTION, AUTHENTICATION_MODULE_HANDLES_FUNCTION, FEDERATION_HANDLES_FUNCTION
+                AUTHENTICATION_HANDLES_FUNCTION,
+                AUTHENTICATION_MODULE_HANDLES_FUNCTION,
+                CIRCLES_OF_TRUST_HANDLES_FUNCTION,
+                ENTITYPROVIDER_HANDLES_FUNCTION
         );
         @Override
         public Boolean apply(String serviceName) {
@@ -123,6 +125,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
     };
 
     private static final String DEFAULT_VERSION = "1.0";
+    private static final String USE_PARENT_PATH = "USE-PARENT";
     private final SmsCollectionProviderFactory collectionProviderFactory;
     private final SmsSingletonProviderFactory singletonProviderFactory;
     private final SchemaType schemaType;
@@ -146,6 +149,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
                 Pattern.quote(ServiceManager.getServiceDN()) + "$");
         routeTree = tree(
                 branch("/authentication", leaf("/modules", AUTHENTICATION_MODULE_HANDLES_FUNCTION)),
+                branch("/federation", CIRCLES_OF_TRUST_HANDLES_FUNCTION,
+                        leaf("/entityproviders", ENTITYPROVIDER_HANDLES_FUNCTION)),
                 leaf("/services", SERVICES_HANDLES_FUNCTION)
         );
 
@@ -290,7 +295,9 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
         // Top-level schemas don't have a name and we don't want them in our schema path
         if (schemaName != null && schemaName.length() > 0) {
             schemaPath.add(schema);
-            path += "/" + schemaName;
+            if (!USE_PARENT_PATH.equals(schemaName)) {
+                path += "/" + schemaName;
+            }
         }
         if (!schema.getAttributeSchemas().isEmpty() || schema.supportsMultipleConfigurations()) {
             if (schema.supportsMultipleConfigurations()) {
@@ -394,5 +401,20 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
     @Override
     public void handleUpdate(ServerContext context, UpdateRequest request, ResultHandler<Resource> handler) {
         routeTree.handleUpdate(context, request, handler);
+    }
+
+    private static final class SingleServiceFunction implements Function<String, Boolean> {
+
+        private final String serviceName;
+
+        SingleServiceFunction(String serviceName) {
+            this.serviceName = serviceName;
+        }
+
+        @Nullable
+        @Override
+        public Boolean apply(String name) {
+            return serviceName.equals(name);
+        }
     }
 }

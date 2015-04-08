@@ -25,7 +25,8 @@
    "Portions Copyrighted [year] [name of copyright owner]"
                                                                                 
    $Id: fmCOTConfig.xml,v 1.2 2008/06/25 05:51:14 qcheng Exp $
-                                                                                
+
+   Portions Copyrighted 2015 ForgeRock AS.
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -37,19 +38,22 @@
         <Schema
             i18nFileName="fmCOTConfiguration"
             i18nKey=""
-            revisionNumber="20">
+            revisionNumber="20"
+            resourceName="circlesoftrust">
 
             <Organization>
-                <SubSchema name = "cot" inheritance = "multiple"
-                    i18nKey = "a200">
+                <SubSchema name="cot" inheritance="multiple"
+                    i18nKey="a200" resourceName="USE-PARENT">
                     <AttributeSchema name="sun-fm-cot-description"
                         type="single"
                         syntax="string"
-                        i18nKey="a201">
+                        i18nKey="a201"
+                        resourceName="description">
                     </AttributeSchema>
                     <AttributeSchema name="sun-fm-cot-status"
                         type="single_choice"
-                        i18nKey="a205">
+                        i18nKey="a205"
+                        resourceName="status">
                         <ChoiceValues>
                               <ChoiceValue i18nKey="a206">Active</ChoiceValue>
                              <ChoiceValue i18nKey="a207">Inactive</ChoiceValue>
@@ -61,27 +65,32 @@
                     <AttributeSchema name="sun-fm-saml2-writerservice-url"
                         type="single"
                         syntax="url"
-                        i18nKey="a211">
+                        i18nKey="a211"
+                        resourceName="saml2WriterServiceUrl">
                     </AttributeSchema>
                     <AttributeSchema name="sun-fm-saml2-readerservice-url"
                         type="single"
                         syntax="url"
-                        i18nKey="a212">
+                        i18nKey="a212"
+                        resourceName="saml2ReaderServiceUrl">
                     </AttributeSchema>
                     <AttributeSchema name="sun-fm-idff-writerservice-url"
                         type="single"
                         syntax="url"
-                        i18nKey="a213">
+                        i18nKey="a213"
+                        resourceName="idffWriterServiceUrl">
                     </AttributeSchema>
                     <AttributeSchema name="sun-fm-idff-readerservice-url"
                         type="single"
                         syntax="url"
-                        i18nKey="a214">
+                        i18nKey="a214"
+                        resourceName="idffReaderServiceUrl">
                     </AttributeSchema>
                     <AttributeSchema name="sun-fm-trusted-providers"
                         type="list"
                         syntax="string"
-                        i18nKey="a210">
+                        i18nKey="a210"
+                        resourceName="trustedProviders">
                     </AttributeSchema>
                 </SubSchema>
             </Organization>

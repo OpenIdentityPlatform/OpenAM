@@ -38,6 +38,7 @@ import org.forgerock.json.resource.Router;
 import org.forgerock.json.resource.RoutingMode;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.utils.StringUtils;
 
 /**
  * Represents a {@code Router} tree. Allows the structuring of Routers in a tree like manner whilst
@@ -78,11 +79,25 @@ class SmsRouteTree implements RequestHandler {
     }
 
     /**
+     * Creates a builder which adds a branch to the route tree, and handles services at this path.
+     *
+     * @param uriTemplate The uri template that matches roots from the parent router.
+     * @param handlesFunction The function that determines whether this router should handle the
+     *                        service being registered.
+     * @param subTreeBuilders The sub trees.
+     * @return A {@code SmsRouteTreeBuilder}.
+     */
+    static SmsRouteTreeBuilder branch(String uriTemplate, Function<String, Boolean> handlesFunction,
+            SmsRouteTreeBuilder... subTreeBuilders) {
+        return new SmsRouteTreeBuilder(new Router(), uriTemplate, handlesFunction, subTreeBuilders);
+    }
+
+    /**
      * Creates a builder which adds a leaf to the route tree.
      *
      * @param uriTemplate The uri template that matches roots from the parent router.
      * @param handlesFunction The function that determines whether this router should handle the
-     *                        route being registered.
+     *                        service being registered.
      * @return A {@code SmsRouteTreeBuilder}.
      */
     static SmsRouteTreeBuilder leaf(String uriTemplate, Function<String, Boolean> handlesFunction) {
@@ -202,6 +217,12 @@ class SmsRouteTree implements RequestHandler {
             this.subTreeBuilders = new HashSet<SmsRouteTreeBuilder>(Arrays.asList(subTreeBuilders));
         }
 
+        public SmsRouteTreeBuilder(Router router, String uriTemplate, Function<String, Boolean> handlesFunction,
+                SmsRouteTreeBuilder... subTreeBuilders) {
+            this(router, uriTemplate, subTreeBuilders);
+            this.subTreeBuilders.add(new SmsRouteTreeLeafBuilder(router, null, handlesFunction));
+        }
+
         SmsRouteTree build(Router parent) {
             parent.addRoute(RoutingMode.STARTS_WITH, uriTemplate, router);
             return createRouteTree(false, router, subTreeBuilders);
@@ -228,7 +249,9 @@ class SmsRouteTree implements RequestHandler {
 
         @Override
         SmsRouteTree build(Router parent) {
-            parent.addRoute(RoutingMode.STARTS_WITH, uriTemplate, router);
+            if (StringUtils.isNotEmpty(uriTemplate)) {
+                parent.addRoute(RoutingMode.STARTS_WITH, uriTemplate, router);
+            }
             return new SmsRouteTreeLeaf(router, handlesFunction);
         }
     }

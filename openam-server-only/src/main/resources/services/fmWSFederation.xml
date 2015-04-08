@@ -26,6 +26,7 @@
                                                                                 
    $Id: fmWSFederation.xml,v 1.2 2008/06/25 05:51:14 qcheng Exp $
                                                                                 
+   Portions Copyrighted 2015 ForgeRock AS.
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -37,20 +38,22 @@
         <Schema
             i18nFileName="fmWSFederationConfiguration"
             i18nKey=""
-            revisionNumber="10">
+            revisionNumber="10"
+            resourceName="ws">
 
             <Organization>
-                <SubSchema name = "EntityDescriptor" inheritance = "multiple"
-                    i18nKey = "a100">
+                <SubSchema name="EntityDescriptor" inheritance="multiple" i18nKey="a100" resourceName="USE-PARENT">
                     <AttributeSchema name="sun-fm-wsfederation-metadata"
                         type="single"
                         syntax="string"
-                        i18nKey="a101">
+                        i18nKey="a101"
+                        resourceName="metadata">
                     </AttributeSchema>
                     <AttributeSchema name="sun-fm-wsfederation-entityconfig"
                         type="single"
                         syntax="string"
-                        i18nKey="a102">
+                        i18nKey="a102"
+                        resourceName="entityConfig">
                     </AttributeSchema>
                 </SubSchema>
             </Organization>
