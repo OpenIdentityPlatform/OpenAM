@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -127,9 +128,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
         }
     };
 
-    private static final List<Pattern> IGNORED_ROUTES = Arrays.asList(
-            Pattern.compile("^platform/sites(/.*)?$")
-    );
+    private static final List<Pattern> DEFAULT_IGNORED_ROUTES =
+            Arrays.asList(Pattern.compile("^platform/sites(/.*)?$"), Pattern.compile("^platform/servers(/.*)?$"));
     private static final String DEFAULT_VERSION = "1.0";
     private static final String USE_PARENT_PATH = "USE-PARENT";
     private final SmsCollectionProviderFactory collectionProviderFactory;
@@ -246,13 +246,22 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
     private void addServersAndSitesRoutes(ServiceManager sm, Map<String, Map<SmsRouteTree, Set<Route>>> serviceRoutes)
             throws SSOException, SMSException {
         ServiceSchemaManager ssm = sm.getSchemaManager(ISAuthConstants.PLATFORM_SERVICE_NAME, DEFAULT_VERSION);
-        ServiceSchema parentSchema = ssm.getGlobalSchema().getSubSchema(ConfigurationBase.CONFIG_SITES);
-        ServiceSchema schema = parentSchema.getSubSchema(ConfigurationBase.SUBSCHEMA_SITE);
+        HashSet<Route> rootRoutes = new HashSet<Route>();
+        serviceRoutes.get(ISAuthConstants.PLATFORM_SERVICE_NAME).put(routeTree, rootRoutes);
+        addServersAndSitesRoutes(ssm, rootRoutes, ConfigurationBase.CONFIG_SITES, ConfigurationBase.SUBSCHEMA_SITE);
+        addServersAndSitesRoutes(ssm, rootRoutes, ConfigurationBase.CONFIG_SERVERS, ConfigurationBase.SUBSCHEMA_SERVER);
+    }
+
+    private void addServersAndSitesRoutes(ServiceSchemaManager ssm, Set<Route> serviceRoutes, String parentName,
+            String schemaName) throws SSOException, SMSException {
+        ServiceSchema parentSchema = ssm.getGlobalSchema().getSubSchema(parentName);
+        ServiceSchema schema = parentSchema.getSubSchema(schemaName);
         HashMap<SmsRouteTree, Set<Route>> routes = new HashMap<SmsRouteTree, Set<Route>>();
         addPaths("", new ArrayList<ServiceSchema>(Collections.singletonList(parentSchema)), schema, routes,
                 Collections.<Pattern>emptyList(), routeTree);
-        serviceRoutes.get(ISAuthConstants.PLATFORM_SERVICE_NAME).putAll(routes);
+        serviceRoutes.addAll(routes.get(routeTree));
     }
+
 
     /**
      * Remove routes for the service name.
@@ -293,13 +302,13 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
             ServiceSchema globalSchema = ssm.getGlobalSchema();
             if (globalSchema != null) {
                 debug.message("Adding global schema REST SMS endpoints for service: {}", serviceName);
-                addPaths(resourceName, new ArrayList<ServiceSchema>(), globalSchema, routes, IGNORED_ROUTES, null);
+                addPaths(resourceName, new ArrayList<ServiceSchema>(), globalSchema, routes, DEFAULT_IGNORED_ROUTES, null);
             }
         }
         ServiceSchema organizationSchema = ssm.getOrganizationSchema();
         if (organizationSchema != null) {
             debug.message("Adding realm schema REST SMS endpoints for service: {}", serviceName);
-            addPaths(resourceName, new ArrayList<ServiceSchema>(), organizationSchema, routes, IGNORED_ROUTES, null);
+            addPaths(resourceName, new ArrayList<ServiceSchema>(), organizationSchema, routes, DEFAULT_IGNORED_ROUTES, null);
         }
         return routes;
     }
