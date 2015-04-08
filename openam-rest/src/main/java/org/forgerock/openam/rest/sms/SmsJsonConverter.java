@@ -190,8 +190,8 @@ public class SmsJsonConverter {
     }
 
     private boolean isAMap(AttributeSchema.UIType type) {
-        return type.equals(AttributeSchema.UIType.MAPLIST)
-                || type.equals(AttributeSchema.UIType.GLOBALMAPLIST);
+        return AttributeSchema.UIType.MAPLIST.equals(type)
+                || AttributeSchema.UIType.GLOBALMAPLIST.equals(type);
     }
 
     private boolean containsMultipleValues(AttributeSchema.Type type) {
