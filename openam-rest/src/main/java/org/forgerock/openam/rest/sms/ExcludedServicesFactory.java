@@ -29,18 +29,16 @@ import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import com.sun.identity.coretoken.CoreTokenConstants;
 import com.sun.identity.entitlement.opensso.EntitlementService;
 import com.sun.identity.idm.IdConstants;
+import com.sun.identity.sm.SchemaType;
 
 /**
  * Global service schemas are hidden from the console by having a value of {@code .} in the {@code amServiceTable}
  * file. This provider gives a list of all services so configured, along with other services that should be hidden
  * from the REST SMS due to lack of configurable properties.
  */
-public class ExcludedServicesProvider implements Provider<Collection<String>> {
+public class ExcludedServicesFactory {
 
-    public static final String NAME = "excludedServices";
-
-    @Override
-    public Collection<String> get() {
+    public Collection<String> get(SchemaType type) {
         Collection<String> excludedServices = new HashSet<String>();
         ResourceBundle amServiceTable = ResourceBundle.getBundle("amServiceTable");
         for (String service : Collections.list(amServiceTable.getKeys())) {
@@ -56,7 +54,18 @@ public class ExcludedServicesProvider implements Provider<Collection<String>> {
                 "banking",
                 "openProvisioning"
         ));
+
         excludedServices.remove(SmsRequestHandler.IDFF_METADATA_SERVICE);
+
+        if (type == SchemaType.GLOBAL) {
+            excludedServices.addAll(Arrays.asList(
+                    SmsRequestHandler.IDFF_METADATA_SERVICE,
+                    SmsRequestHandler.COT_CONFIG_SERVICE,
+                    SmsRequestHandler.SAML2_METADATA_SERVICE,
+                    SmsRequestHandler.WS_METADATA_SERVICE
+            ));
+        }
+
         return excludedServices;
     }
 

@@ -27,7 +27,6 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
-import com.google.inject.util.Types;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.delegation.DelegationEvaluator;
@@ -37,7 +36,6 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.opensso.PolicyPrivilegeManager;
-import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoCreationListener;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
@@ -70,7 +68,6 @@ import org.forgerock.openam.forgerockrest.utils.SoapSTSAgentIdentity;
 import org.forgerock.openam.forgerockrest.utils.SoapSTSAgentIdentityImpl;
 import org.forgerock.openam.forgerockrest.utils.SpecialUserIdentity;
 import org.forgerock.openam.forgerockrest.utils.SpecialUserIdentityImpl;
-import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
 import org.forgerock.openam.rest.RestEndpointServlet;
 import org.forgerock.openam.rest.RestEndpoints;
 import org.forgerock.openam.rest.authz.CoreTokenResourceAuthzModule;
@@ -82,7 +79,7 @@ import org.forgerock.openam.rest.router.DelegationEvaluatorProxy;
 import org.forgerock.openam.rest.router.RestEndpointManager;
 import org.forgerock.openam.rest.router.RestEndpointManagerProxy;
 import org.forgerock.openam.rest.scripting.ScriptExceptionMappingHandler;
-import org.forgerock.openam.rest.sms.ExcludedServicesProvider;
+import org.forgerock.openam.rest.sms.ExcludedServicesFactory;
 import org.forgerock.openam.rest.sms.SmsCollectionProvider;
 import org.forgerock.openam.rest.sms.SmsCollectionProviderFactory;
 import org.forgerock.openam.rest.sms.SmsRequestHandler;
@@ -107,9 +104,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 /**
  * Guice Module for configuring bindings for the AuthenticationRestService classes.
@@ -179,10 +174,6 @@ public class ForgerockRestGuiceModule extends AbstractModule {
         bind(UmaPolicyService.class).to(UmaPolicyServiceImpl.class);
         bind(SoapSTSAgentIdentity.class).to(SoapSTSAgentIdentityImpl.class);
         bind(SpecialUserIdentity.class).to(SpecialUserIdentityImpl.class);
-
-        bind(new TypeLiteral<Collection<String>>() {})
-                .annotatedWith(Names.named(ExcludedServicesProvider.NAME))
-                .toProvider(ExcludedServicesProvider.class);
 
         Multibinder.newSetBinder(binder(), IdRepoCreationListener.class)
                 .addBinding().to(UmaIdRepoCreationListener.class);

@@ -82,10 +82,10 @@ import org.forgerock.json.resource.UpdateRequest;
  */
 public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
 
-    private static final String COT_CONFIG_SERVICE = "sunFMCOTConfigService";
+    static final String COT_CONFIG_SERVICE = "sunFMCOTConfigService";
     static final String IDFF_METADATA_SERVICE = "sunFMIDFFMetadataService";
-    private static final String SAML2_METADATA_SERVICE = "sunFMSAML2MetadataService";
-    private static final String WS_METADATA_SERVICE = "sunFMWSFederationMetadataService";
+    static final String SAML2_METADATA_SERVICE = "sunFMSAML2MetadataService";
+    static final String WS_METADATA_SERVICE = "sunFMWSFederationMetadataService";
 
     private static final Function<String, Boolean> AUTHENTICATION_HANDLES_FUNCTION =
             new SingleServiceFunction(ISAuthConstants.AUTH_SERVICE_NAME);
@@ -144,13 +144,13 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
     @Inject
     public SmsRequestHandler(@Assisted SchemaType type, SmsCollectionProviderFactory collectionProviderFactory,
             SmsSingletonProviderFactory singletonProviderFactory, @Named("frRest") Debug debug,
-            @Named("excludedServices") Collection<String> excludedServices)
+            ExcludedServicesFactory excludedServicesFactory)
             throws SMSException, SSOException {
         this.schemaType = type;
         this.collectionProviderFactory = collectionProviderFactory;
         this.singletonProviderFactory = singletonProviderFactory;
         this.debug = debug;
-        this.excludedServices = excludedServices;
+        this.excludedServices = excludedServicesFactory.get(type);
         this.schemaDnPattern = Pattern.compile("^ou=([.0-9]+),ou=([^,]+)," +
                 Pattern.quote(ServiceManager.getServiceDN()) + "$");
         routeTree = tree(
