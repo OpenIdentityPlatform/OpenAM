@@ -17,6 +17,7 @@ package org.forgerock.openam.upgrade.steps;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.configuration.ServerConfiguration;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.upgrade.ServerUpgrade;
 import org.forgerock.openam.upgrade.UpgradeException;
@@ -164,6 +165,7 @@ public class UpgradeServerDefaultsStep extends AbstractUpgradeStep {
             Map<String, String> upgradedValues = new HashMap<String, String>(existingDefaults);
             upgradedValues.putAll(addedAttrs);
             upgradedValues.putAll(modifiedAttrs);
+            upgradedValues.putAll(getUpdatedDefaults());
             upgradedValues.keySet().removeAll(deletedAttrs);
 
             ServerConfiguration.upgradeServerInstance(getAdminToken(), DEFAULT_SERVER_CONFIG, DEFAULT_SERVER_ID,
@@ -244,5 +246,32 @@ public class UpgradeServerDefaultsStep extends AbstractUpgradeStep {
             tags.put(DEL_ATTRS, BUNDLE.getString("upgrade.none"));
         }
         return tagSwapReport(tags, "upgrade.defaultsreport");
+    }
+    
+    
+    /**
+     * Gets the current server default values to see if any updates in previous upgrade steps need to be re-applied.
+     * @return the key value pairs of attributes that will need to be re-applied
+     * @throws UpgradeException
+     */
+    private Map<String, String> getUpdatedDefaults() throws UpgradeException {
+        HashMap<String, String> modifiedValues = new HashMap<String, String>();
+        try {
+            Map<String, String> currentDefaults = new HashMap(ServerConfiguration.getServerInstance(getAdminToken(),
+                    ServerConfiguration.DEFAULT_SERVER_CONFIG));
+            String currentDefault = currentDefaults.get(CoreTokenConstants.CTS_STORE_HOSTNAME);
+            String existingDefault = existingDefaults.get(CoreTokenConstants.CTS_STORE_HOSTNAME);
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("currentDefault: " + currentDefault + "existingDefault: "
+                        + existingDefault);
+            }
+            if (currentDefault != null && existingDefault != null && !existingDefault.equals(currentDefault)) {
+                modifiedValues.put(CoreTokenConstants.CTS_STORE_HOSTNAME, currentDefault);
+            }
+        } catch (Exception ex) {
+            DEBUG.error("An error occurred trying to get current configuration.", ex);
+            throw new UpgradeException(ex);
+        }
+        return modifiedValues;
     }
 }
