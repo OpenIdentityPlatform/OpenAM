@@ -106,7 +106,7 @@ define("config/process/AMConfig", [
                 "org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog"
             ],
             processDescription: function(event, ChangeSecurityDataDialog) {
-                ChangeSecurityDataDialog.show();
+                ChangeSecurityDataDialog.show(event);
             }
         }
 
