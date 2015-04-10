@@ -115,12 +115,7 @@ public class RestCertificateTokenValidator implements TokenValidator {
             a successful call to the authenticationHandler will put the sessionId in the tokenCache. Pull it
             out and use it to obtain the principal corresponding to the Session.
              */
-            String sessionId;
-            if (ValidationInvocationContext.SOAP_TOKEN_DELEGATION.equals(validationInvocationContext)) {
-                sessionId = threadLocalAMTokenCache.getDelegatedAMSessionId();
-            } else {
-                sessionId = threadLocalAMTokenCache.getAMSessionId();
-            }
+            String sessionId = threadLocalAMTokenCache.getSessionIdForContext(validationInvocationContext);
             Principal principal = principalFromSession.getPrincipalFromSession(sessionId);
             response.setPrincipal(principal);
             validateTarget.setState(ReceivedToken.STATE.VALID);

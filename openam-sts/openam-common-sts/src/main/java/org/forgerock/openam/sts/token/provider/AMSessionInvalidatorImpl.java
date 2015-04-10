@@ -96,9 +96,11 @@ public class AMSessionInvalidatorImpl implements AMSessionInvalidator {
                     }
                 }
             } catch (IOException e) {
+                String message  = "Exception caught invalidating session: " + sessionId + " against Url " + logoutUrl
+                        + ". Exception: " + e;
+                logger.error(message);
                 tokenCreationException = new TokenCreationException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR,
-                        "Exception caught invalidating session: " + sessionId + " against Url " + logoutUrl
-                                + ". Exception: " + e, e);
+                        message, e);
             }
         }
         /*

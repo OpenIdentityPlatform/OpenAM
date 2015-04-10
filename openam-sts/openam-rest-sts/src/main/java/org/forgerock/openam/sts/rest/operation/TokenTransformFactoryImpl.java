@@ -180,7 +180,8 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
                     new AMSessionInvalidatorImpl(amDeploymentUrl, jsonRestRoot, realm, restLogoutUriElement,
                             amSessionCookieName, urlConstituentCatenator, crestVersionSessionService, connectionWrapperFactory, logger);
             return new RestSamlTokenProvider(tokenGenerationServiceConsumer, sessionInvalidator,
-                    threadLocalAMTokenCache, stsInstanceId, realm, xmlUtilities, jsonTokenAuthnContextMapper, logger);
+                    threadLocalAMTokenCache, stsInstanceId, realm, xmlUtilities, jsonTokenAuthnContextMapper,
+                    ValidationInvocationContext.REST_TOKEN_TRANSFORMATION, logger);
         } catch (MalformedURLException e) {
             throw new STSInitializationException(ResourceException.INTERNAL_ERROR, e.getMessage(), e);
         }

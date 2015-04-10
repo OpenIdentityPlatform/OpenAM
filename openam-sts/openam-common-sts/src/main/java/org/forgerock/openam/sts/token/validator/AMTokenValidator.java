@@ -94,11 +94,7 @@ public class AMTokenValidator implements TokenValidator {
         response.setToken(validateTarget);
         try {
             String sessionId = parseSessionIdFromRequest(tokenParameters.getToken());
-            if (ValidationInvocationContext.SOAP_TOKEN_DELEGATION.equals(validationInvocationContext)) {
-                threadLocalAMTokenCache.cacheDelegatedAMSessionId(sessionId, invalidateAMSession);
-            } else {
-                threadLocalAMTokenCache.cacheAMSessionId(sessionId, invalidateAMSession);
-            }
+            threadLocalAMTokenCache.cacheSessionIdForContext(validationInvocationContext, sessionId, invalidateAMSession);
             Principal principal = principalFromSession.getPrincipalFromSession(sessionId);
             response.setPrincipal(principal);
             validateTarget.setState(ReceivedToken.STATE.VALID);

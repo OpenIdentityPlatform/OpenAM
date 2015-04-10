@@ -66,7 +66,6 @@ public class TokenValidationConfigTest {
         TokenValidationConfig tvc1 = new TokenValidationConfig(TokenType.OPENAM, AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION);
         TokenValidationConfig tvc2 = new TokenValidationConfig(TokenType.USERNAME, AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION);
         assertNotEquals(tvc1, tvc2);
-        assertNotEquals(tvc1.hashCode(), tvc2.hashCode());
     }
     
     @Test

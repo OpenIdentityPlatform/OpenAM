@@ -63,10 +63,6 @@ public class AuthenticationHandlerImpl<T> implements AuthenticationHandler<T> {
         logger.debug("STSAuthenticationHandler: The authUri: " + authUrl.toString());
         final String response = requestDispatcher.dispatch(authUrl, authTargetMapping.getAuthTargetMapping(token.getClass()), token);
         final String sessionId = tokenParser.getSessionFromAuthNResponse(response);
-        if (ValidationInvocationContext.SOAP_TOKEN_DELEGATION.equals(validationInvocationContext)) {
-            tokenCache.cacheDelegatedAMSessionId(sessionId, invalidateOpenAMSession);
-        } else {
-            tokenCache.cacheAMSessionId(sessionId, invalidateOpenAMSession);
-        }
+        tokenCache.cacheSessionIdForContext(validationInvocationContext, sessionId, invalidateOpenAMSession);
     }
 }

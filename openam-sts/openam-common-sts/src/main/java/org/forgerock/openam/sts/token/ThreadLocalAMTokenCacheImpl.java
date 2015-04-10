@@ -21,6 +21,9 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.TokenCreationException;
 
 import javax.inject.Inject;
+
+import org.forgerock.openam.sts.TokenValidationException;
+import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
 import org.slf4j.Logger;
 
 import java.util.HashSet;
@@ -52,20 +55,14 @@ public class ThreadLocalAMTokenCacheImpl implements ThreadLocalAMTokenCache {
         /**
          * @param sessionId the sessionId to cache
          * @param invalidateAfterTokenCreation whether the session should be invalidated after token creation
-         * @throws IllegalStateException if there was a previous cached session - an illegal state. The exception is caught
-         * by the methods defined in ThreadLocalAMTokenCache, and serves as a sanity check to insure that things are
-         * indeed working as designed.
+         * @throws TokenValidationException if there was a previous cached session - an illegal state.
          */
-        void setSessionEntry(String sessionId, boolean invalidateAfterTokenCreation) throws IllegalStateException {
-            IllegalStateException illegalStateException = null;
+        void setSessionEntry(String sessionId, boolean invalidateAfterTokenCreation) throws TokenValidationException {
             if (sessionEntry != null) {
-                illegalStateException =  new IllegalStateException("In the ThreadLocalAMTokenCache, a session entry is " +
-                        "being set over an existing session entry. Illegal state!");
+                throw new TokenValidationException(ResourceException.INTERNAL_ERROR, "In the ThreadLocalAMTokenCache, " +
+                        "a session entry is being set over an existing session entry. Illegal state!");
             }
             sessionEntry = new AMSessionCacheEntry(sessionId, invalidateAfterTokenCreation);
-            if (illegalStateException != null) {
-                throw illegalStateException;
-            }
         }
 
         AMSessionCacheEntry getSessionEntry() {
@@ -75,20 +72,14 @@ public class ThreadLocalAMTokenCacheImpl implements ThreadLocalAMTokenCache {
         /**
          * @param delegatedSessionId the sessionId to cache
          * @param invalidateAfterTokenCreation whether the session should be invalidated after token creation
-         * @throws IllegalStateException if there was a previous cached session - an illegal state. The exception is caught
-         * by the methods defined in ThreadLocalAMTokenCache, and serves as a sanity check to insure that things are
-         * indeed working as designed.
+         * @throws TokenValidationException if there was a previous cached session - an illegal state.
          */
-        void setDelegatedSessionEntry(String delegatedSessionId, boolean invalidateAfterTokenCreation) throws IllegalStateException {
-            IllegalStateException illegalStateException = null;
+        void setDelegatedSessionEntry(String delegatedSessionId, boolean invalidateAfterTokenCreation) throws TokenValidationException {
             if (delegatedSessionEntry != null) {
-                illegalStateException = new IllegalStateException("In the ThreadLocalAMTokenCache, a session entry is " +
-                        "being set over an existing delegated session entry. Illegal state!");
+                throw new TokenValidationException(ResourceException.INTERNAL_ERROR, "In the ThreadLocalAMTokenCache, " +
+                        "a delegated session entry is being set over an existing delegated session entry. Illegal state!");
             }
             delegatedSessionEntry = new AMSessionCacheEntry(delegatedSessionId, invalidateAfterTokenCreation);
-            if (illegalStateException != null) {
-                throw illegalStateException;
-            }
         }
 
         AMSessionCacheEntry getDelegatedSessionEntry() {
@@ -115,43 +106,37 @@ public class ThreadLocalAMTokenCacheImpl implements ThreadLocalAMTokenCache {
         this.logger = logger;
     }
 
-
     @Override
-    public void cacheAMSessionId(String sessionId, boolean invalidateAfterTokenCreation) {
-        try {
-            sessionCacheHolder.get().setSessionEntry(sessionId, invalidateAfterTokenCreation);
-        } catch (IllegalStateException e) {
-            logger.error(e.getMessage());
+    public String getSessionIdForContext(ValidationInvocationContext context) throws TokenCreationException {
+        String sessionId;
+        AMSessionCache.AMSessionCacheEntry cacheEntry;
+        if (ValidationInvocationContext.SOAP_TOKEN_DELEGATION.equals(context)) {
+            cacheEntry = sessionCacheHolder.get().getDelegatedSessionEntry();
+        } else {
+            cacheEntry = sessionCacheHolder.get().getSessionEntry();
         }
-    }
+        if (cacheEntry == null) {
+            throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
+                    "No AMSessionCacheEntry in ThreadLocal for ValidationInvocationContext " + context);
+        } else {
+            sessionId = cacheEntry.sessionId;
+        }
 
-    @Override
-    public String getAMSessionId() throws TokenCreationException {
-        String sessionId = sessionCacheHolder.get().getSessionEntry().sessionId;
         if (sessionId == null) {
             throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
-                    "No sessionId cached in ThreadLocal. Illegal State!");
+                    "No sessionId cached in ThreadLocal for ValidationInvocationContext " + context);
         }
         return sessionId;
     }
 
     @Override
-    public void cacheDelegatedAMSessionId(String sessionId, boolean invalidateAfterTokenCreation) {
-        try {
+    public void cacheSessionIdForContext(ValidationInvocationContext context, String sessionId,
+                                  boolean invalidateAfterTokenCreation) throws TokenValidationException {
+        if (ValidationInvocationContext.SOAP_TOKEN_DELEGATION.equals(context)) {
             sessionCacheHolder.get().setDelegatedSessionEntry(sessionId, invalidateAfterTokenCreation);
-        } catch (IllegalStateException e) {
-            logger.error(e.getMessage());
+        } else {
+            sessionCacheHolder.get().setSessionEntry(sessionId, invalidateAfterTokenCreation);
         }
-    }
-
-    @Override
-    public String getDelegatedAMSessionId() throws TokenCreationException {
-        String sessionId = sessionCacheHolder.get().getDelegatedSessionEntry().sessionId;
-        if (sessionId == null) {
-            throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
-                    "No delegated sessionId cached in ThreadLocal. Illegal State!");
-        }
-        return sessionId;
     }
 
     @Override

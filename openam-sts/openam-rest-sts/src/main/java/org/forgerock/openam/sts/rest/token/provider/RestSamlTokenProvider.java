@@ -34,6 +34,7 @@ import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 
 import org.forgerock.openam.sts.token.provider.AMSessionInvalidator;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
+import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
 import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -62,6 +63,7 @@ public class RestSamlTokenProvider implements TokenProvider {
     private final String realm;
     private final XMLUtilities xmlUtilities;
     private final JsonTokenAuthnContextMapper authnContextMapper;
+    private final ValidationInvocationContext validationInvocationContext;
     private final Logger logger;
 
     /*
@@ -74,6 +76,7 @@ public class RestSamlTokenProvider implements TokenProvider {
                                String realm,
                                XMLUtilities xmlUtilities,
                                JsonTokenAuthnContextMapper authnContextMapper,
+                               ValidationInvocationContext validationInvocationContext,
                                Logger logger) {
         this.tokenGenerationServiceConsumer = tokenGenerationServiceConsumer;
         this.amSessionInvalidator = amSessionInvalidator;
@@ -82,6 +85,7 @@ public class RestSamlTokenProvider implements TokenProvider {
         this.realm = realm;
         this.xmlUtilities = xmlUtilities;
         this.authnContextMapper = authnContextMapper;
+        this.validationInvocationContext = validationInvocationContext;
         this.logger = logger;
     }
 
@@ -170,14 +174,16 @@ public class RestSamlTokenProvider implements TokenProvider {
                                 Map<String, Object> additionalProperties) throws TokenCreationException {
         switch (subjectConfirmation) {
             case BEARER:
-                return tokenGenerationServiceConsumer.getSAML2BearerAssertion(threadLocalAMTokenCache.getAMSessionId(),
+                return tokenGenerationServiceConsumer.getSAML2BearerAssertion(
+                        threadLocalAMTokenCache.getSessionIdForContext(validationInvocationContext),
                         stsInstanceId, realm, authnContextClassRef, getAdminToken());
             case SENDER_VOUCHES:
                 /*
                 Note that for the rest-sts, there is no delegated token relationship, as there is in ws-trust, so I just
                 pull the standard, non-delegated AMSessionId from the ThreadLocalAMTokenCache.
                  */
-                return tokenGenerationServiceConsumer.getSAML2SenderVouchesAssertion(threadLocalAMTokenCache.getAMSessionId(),
+                return tokenGenerationServiceConsumer.getSAML2SenderVouchesAssertion(
+                        threadLocalAMTokenCache.getSessionIdForContext(validationInvocationContext),
                         stsInstanceId, realm, authnContextClassRef, getAdminToken());
             case HOLDER_OF_KEY:
                 Object proofTokenStateObject = additionalProperties.get(AMSTSConstants.PROOF_TOKEN_STATE_KEY);
@@ -186,7 +192,8 @@ public class RestSamlTokenProvider implements TokenProvider {
                             "No ProofTokenState entry in additionalProperties map in TokenProvideProperties for "
                                     + AMSTSConstants.PROOF_TOKEN_STATE_KEY);
                 }
-                return tokenGenerationServiceConsumer.getSAML2HolderOfKeyAssertion(threadLocalAMTokenCache.getAMSessionId(),
+                return tokenGenerationServiceConsumer.getSAML2HolderOfKeyAssertion(
+                        threadLocalAMTokenCache.getSessionIdForContext(validationInvocationContext),
                         stsInstanceId, realm, authnContextClassRef, (ProofTokenState)proofTokenStateObject, getAdminToken());
         }
         throw new TokenCreationException(ResourceException.INTERNAL_ERROR,

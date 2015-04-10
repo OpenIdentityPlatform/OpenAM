@@ -102,8 +102,8 @@ public class TokenValidationConfig {
 
     public static TokenValidationConfig fromJson(JsonValue json) {
         return new TokenValidationConfig(
-                Enum.valueOf(TokenType.class, json.get(VALIDATED_TOKEN_TYPE).asString()),
-                json.get(INVALIDATE_INTERIM_OPENAM_SESSION).asBoolean());
+                TokenType.valueOf(json.get(VALIDATED_TOKEN_TYPE).required().asString()),
+                json.get(INVALIDATE_INTERIM_OPENAM_SESSION).required().asBoolean());
     }
 
     /*

@@ -1,143 +1,31 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
 <!--
- * The contents of this file are subject to the terms of the Common Development and
- * Distribution License (the License). You may not use this file except in compliance with the
- * License.
- *
- * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
- * specific language governing permission and limitations under the License.
- *
- * When distributing Covered Software, include this CDDL Header Notice in each file and include
- * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
- * Header, with the fields enclosed by brackets [] replaced by your own identifying
- * information: "Portions Copyrighted [year] [name of copyright owner]".
- *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
-  -->
-
+    * The contents of this file are subject to the terms of the Common Development and
+    * Distribution License (the License). You may not use this file except in compliance with the
+    * License.
+    *
+    * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+    * specific language governing permission and limitations under the License.
+    *
+    * When distributing Covered Software, include this CDDL Header Notice in each file and include
+    * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+    * Header, with the fields enclosed by brackets [] replaced by your own identifying
+    * information: "Portions Copyrighted [year] [name of copyright owner]".
+    *
+    * Copyright 2015 ForgeRock AS.
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-sts</artifactId>
         <version>13.0.0-SNAPSHOT</version>
     </parent>
-
-    <name>OpenAM SOAP STS</name>
-    <description>OpenAM implementation of WS-Trust SecureTokenService</description>
     <artifactId>openam-soap-sts</artifactId>
-    <packaging>war</packaging>
+    <packaging>pom</packaging>
+    <name>OpenAM Soap STS</name>
 
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-war-plugin</artifactId>
-                    <configuration>
-                        <attachClasses>true</attachClasses>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-common-sts</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-client-sts</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.commons.guava</groupId>
-            <artifactId>forgerock-guava-collect</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-frontend-jaxws</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-http</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-bindings-soap</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-http-jetty</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-ws-policy</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-ws-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf.services.sts</groupId>
-            <artifactId>cxf-services-sts-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.santuario</groupId>
-            <artifactId>xmlsec</artifactId>
-        </dependency>
-        <!--
-            the cxf-rt-transports depends on cxf-rt-transports-jetty, which depends on slf4j-api(1.6.2). In some cases,
-            cxf does not find a slf4j spi, so defaults to a no-op logger, so I am introducing this dependency.
-        -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-jdk14</artifactId>
-          <!--  <scope>test</scope>  can't have test scope here, as it appears that slf4j is present in our war anyway.
-          If this is not included, I see messages about the slf4j no-op logger being engaged, at least on tomcat. On Jboss,
-          I get an IllegalStateException that prevents a web-service from being successfully published. On WebSphere 8.5,
-          I get a message about multiple bindings, as WebSphere seems to have its own binding: WebSphere error:
-            SLF4J: Class path contains multiple SLF4J bindings.
-            SLF4J: Found binding in [bundleresource://242.fwk1296609135:1/org/slf4j/impl/StaticLoggerBinder.class]
-            SLF4J: Found binding in [wsjar:file:/home/dhogan/IBM/WebSphere/AppServer/profiles/AppSrv02/installedApps/websphere-85-hostNode01Cell/openam_war.ear/openam.war/WEB-INF/lib/slf4j-jdk14-1.7.2.jar!/org/slf4j/impl/StaticLoggerBinder.class]
-
-          It does not seem like I should have a jdk14 dependency anyway - this requires more investigation.
-          -->
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.jse</groupId>
-            <artifactId>org.restlet</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.inject</groupId>
-            <artifactId>guice</artifactId>
-            <classifier>no_aop</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-core-asl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-        </dependency>
-
-        <!-- test dependencies -->
-
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-        </dependency>
-    </dependencies>
+    <modules>
+        <module>openam-soap-sts-server</module>
+        <module>openam-soap-sts-client</module>
+    </modules>
 </project>

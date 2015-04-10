@@ -17,6 +17,8 @@
 package org.forgerock.openam.sts.token;
 
 import org.forgerock.openam.sts.TokenCreationException;
+import org.forgerock.openam.sts.TokenValidationException;
+import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
 
 import java.util.Set;
 
@@ -41,14 +43,29 @@ import java.util.Set;
  * must be invalidated following output token creation.
  */
 public interface ThreadLocalAMTokenCache {
-    void cacheAMSessionId(String sessionId, boolean invalidateAfterTokenCreation);
+    /**
+     *
+     * @param context The validation context which generated the OpenAM Session. Determines where the session will
+     *                be cached.
+     * @return The OpenAM session id. Will not be null.
+     * @throws TokenCreationException If no cache entry corresponding to the validation context exists.
+     */
+    String getSessionIdForContext(ValidationInvocationContext context) throws TokenCreationException;
 
-    String getAMSessionId() throws TokenCreationException;
+    /**
+     *
+     * @param context The validation context which generated the OpenAM Session. Determines which cache will be consulted.
+     * @param sessionId The to-be-cached OpenAM session id
+     * @param invalidateAfterTokenCreation Whether this session should be invalidated at the conclusion of the current operation
+     * @throws TokenValidationException If a cache entry already exists
+     */
+    void cacheSessionIdForContext(ValidationInvocationContext context, String sessionId,
+                                  boolean invalidateAfterTokenCreation) throws TokenValidationException;
 
-    void cacheDelegatedAMSessionId(String sessionId, boolean invalidateAfterTokenCreation);
-
-    String getDelegatedAMSessionId() throws TokenCreationException;
-
+    /**
+     *
+     * @return The non-null, but possibly empty, set of OpenAM session ids which should be invalidated.
+     */
     Set<String> getToBeInvalidatedAMSessionIds();
 
     /**
