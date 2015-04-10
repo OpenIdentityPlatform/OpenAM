@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.security.auth.Subject;
 import java.security.AccessController;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,6 +70,7 @@ import org.forgerock.openam.rest.resource.PromisedRequestHandler;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.openam.uma.UmaConstants;
+import org.forgerock.openam.uma.UmaResourceTypeFactory;
 import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.openam.utils.OpenAMSettingsImpl;
 import org.forgerock.util.Pair;
@@ -94,6 +96,7 @@ public class UmaPolicyApplicationListener implements IdEventListener {
     private final ApplicationTypeManagerWrapper applicationTypeManagerWrapper;
     private final PromisedRequestHandler policyResource;
     private final ResourceSetStoreFactory resourceSetStoreFactory;
+    private final UmaResourceTypeFactory resourceTypeFactory;
 
     /**
      * Creates an instance of the {@code UmaPolicyApplicationListener}.
@@ -109,12 +112,13 @@ public class UmaPolicyApplicationListener implements IdEventListener {
             ApplicationManagerWrapper applicationManager,
             ApplicationTypeManagerWrapper applicationTypeManagerWrapper,
             @Named(UMA_BACKEND_POLICY_RESOURCE_HANDLER) PromisedRequestHandler policyResource,
-            ResourceSetStoreFactory resourceSetStoreFactory) {
+            ResourceSetStoreFactory resourceSetStoreFactory, UmaResourceTypeFactory resourceTypeFactory) {
         this.idRepoFactory = idRepoFactory;
         this.applicationManager = applicationManager;
         this.applicationTypeManagerWrapper = applicationTypeManagerWrapper;
         this.policyResource = policyResource;
         this.resourceSetStoreFactory = resourceSetStoreFactory;
+        this.resourceTypeFactory = resourceTypeFactory;
     }
 
     /**
@@ -234,6 +238,7 @@ public class UmaPolicyApplicationListener implements IdEventListener {
                         UmaConstants.UMA_POLICY_APPLICATION_TYPE);
                 application = new Application(realm, resourceServerId, applicationType);
                 application.setEntitlementCombiner(DenyOverride.class);
+                application.addAllResourceTypeUuids(Collections.singleton(resourceTypeFactory.getOrCreateResourceType(realm)));
                 applicationManager.saveApplication(adminSubject, application);
             }
         } catch (EntitlementException e) {
