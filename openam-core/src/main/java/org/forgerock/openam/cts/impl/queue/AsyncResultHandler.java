@@ -98,6 +98,11 @@ public class AsyncResultHandler<T> implements ResultHandler<T, CoreTokenExceptio
                 throw (CoreTokenException) value;
             }
 
+            if (value instanceof Exception) {
+                final Exception ex = (Exception) value;
+                throw new CoreTokenException(ex.getMessage(), ex);
+            }
+
             debug("Results: {0}", value.toString());
             return (T) value;
         } catch (InterruptedException e) {

@@ -59,6 +59,20 @@ public class AsyncResultHandlerTest {
     }
 
     @Test
+    public void shouldWrapNonCoreTokenExceptions() {
+        // Given
+        Exception ex = new Exception("test");
+
+        // When
+        handler.processError(ex);
+        Exception result = (Exception) await(handler);
+
+        // Then
+        assertThat(result).isInstanceOf(CoreTokenException.class);
+        assertThat(result.getCause()).isSameAs(ex);
+    }
+
+    @Test
     public void shouldHandleNullObject() {
         handler.processResults(null);
         assertThat(await(handler)).isNull();
