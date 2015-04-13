@@ -54,7 +54,6 @@ import java.util.List;
 import java.util.Set;
 
 import static org.forgerock.oauth2.core.Utils.isEmpty;
-import static org.forgerock.oauth2.core.Utils.joinScope;
 import static org.forgerock.oauth2.core.Utils.splitScope;
 
 /**
@@ -128,10 +127,6 @@ public class Saml2GrantTypeHandler implements GrantTypeHandler {
                 assertionObject.getSubject().getNameID().getValue(), clientRegistration.getClientId(), null,
                 validatedScope, null, null, request);
         logger.trace("Token created: " + accessToken.toString());
-
-        if (validatedScope != null && !validatedScope.isEmpty()) {
-            accessToken.add("scope", joinScope(validatedScope));
-        }
 
         return accessToken;
     }
