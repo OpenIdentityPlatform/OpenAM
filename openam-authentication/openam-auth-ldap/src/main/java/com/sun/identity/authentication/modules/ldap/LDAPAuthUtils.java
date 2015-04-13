@@ -24,10 +24,7 @@
  *
  * $Id: LDAPAuthUtils.java,v 1.21 2009/12/28 03:01:26 222713 Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 
@@ -121,8 +118,9 @@ public class LDAPAuthUtils {
     private int graceLogins;
     private int operationsTimeout = 0;
     private static final Debug debug = Debug.getInstance("amAuthLDAP");
-    // JSS integration
-    private boolean ldapSSL = false;
+
+    private boolean isSecure = false;
+    private boolean useStartTLS = false;
     private boolean beheraEnabled = true;
     private boolean trustAll = true;
     private boolean isAd = false;
@@ -221,19 +219,19 @@ public class LDAPAuthUtils {
      *
      * @param primaryServers List of primary servers.
      * @param secondaryServers List of secondary servers.
-     * @param ldapSSL <code>true</code> if it is SSL.
+     * @param isSecure <code>true</code> if connection to server is secured.
      * @param bundle ResourceBundle to be used for getting localized messages.
      * @param baseDN Directory Base DN.
      * @throws LDAPUtilException If the provided search base was invalid.
      */
-    public LDAPAuthUtils(Set<String> primaryServers, Set<String> secondaryServers, boolean ldapSSL,
+    public LDAPAuthUtils(Set<String> primaryServers, Set<String> secondaryServers, boolean isSecure,
             ResourceBundle bundle, String baseDN) throws LDAPUtilException {
         this.primaryServers = primaryServers;
         this.secondaryServers = secondaryServers;
         servers = new LinkedHashSet<String>(primaryServers);
         servers.addAll(secondaryServers);
         this.bundle = bundle;
-        this.ldapSSL = ldapSSL;
+        this.isSecure = isSecure;
 
         this.baseDN = baseDN;
 
@@ -312,7 +310,7 @@ public class LDAPAuthUtils {
                             debug.message("LDAPAuthUtils.LDAPAuthUtils: min="
                                     + min + ", max=" + max);
                         }
-                        if (ldapSSL) {
+                        if (isSecure) {
                             SSLContextBuilder builder = new SSLContextBuilder();
 
                             if (trustAll) {
@@ -321,6 +319,9 @@ public class LDAPAuthUtils {
 
                             SSLContext sslContext = builder.getSSLContext();
                             options.setSSLContext(sslContext);
+                            if (useStartTLS) {
+                                options.setUseStartTLS(true);
+                            }
                         }
 
                         final ConnectionFactory connFactory;
@@ -1543,6 +1544,15 @@ public class LDAPAuthUtils {
      */
     public void setUserAttrs(String[] attrs) {
         this.attrs = attrs;
+    }
+
+    /**
+     * Sets whether the startTLS extended operation should be used to establish connection to LDAP server(s).
+     *
+     * @param useStartTLS true if startTLS extended operation should be used.
+     */
+    public void setUseStartTLS(boolean useStartTLS) {
+        this.useStartTLS = useStartTLS;
     }
 
     class PasswordPolicyResult {
