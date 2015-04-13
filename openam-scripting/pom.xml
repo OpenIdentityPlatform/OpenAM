@@ -28,7 +28,7 @@
     <parent>
         <artifactId>openam</artifactId>
         <groupId>org.forgerock.openam</groupId>
-        <version>12.0.1-SNAPSHOT</version>
+        <version>12.0.1</version>
     </parent>
 
     <dependencies>

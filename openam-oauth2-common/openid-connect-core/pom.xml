@@ -21,7 +21,7 @@
     <parent>
         <artifactId>openam-oauth2-common</artifactId>
         <groupId>org.forgerock.openam</groupId>
-        <version>12.0.1-SNAPSHOT</version>
+        <version>12.0.1</version>
     </parent>
 
     <artifactId>openid-connect-core</artifactId>
