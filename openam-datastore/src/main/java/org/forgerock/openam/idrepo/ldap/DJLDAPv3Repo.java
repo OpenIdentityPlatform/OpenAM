@@ -211,6 +211,11 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         heartBeatInterval = CollectionHelper.getIntMapAttr(configParams, LDAP_SERVER_HEARTBEAT_INTERVAL, "10",
                 DEBUG);
         heartBeatTimeUnit = CollectionHelper.getMapAttr(configParams, LDAP_SERVER_HEARTBEAT_TIME_UNIT, "SECONDS");
+
+        String connectionMode = CollectionHelper.getMapAttr(configParams, LDAP_CONNECTION_MODE);
+        useStartTLS = LDAP_CONNECTION_MODE_STARTTLS.equalsIgnoreCase(connectionMode);
+        isSecure = LDAP_CONNECTION_MODE_LDAPS.equalsIgnoreCase(connectionMode) || useStartTLS;
+
         bindConnectionFactory = createConnectionFactory(null, null, maxPoolSize);
         connectionFactory = createConnectionFactory(username, password, maxPoolSize);
 
@@ -287,11 +292,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         } else {
             helper = new DirectoryHelper();
         }
-        
-        String connectionMode = CollectionHelper.getMapAttr(configParams, LDAP_CONNECTION_MODE);
-        useStartTLS = LDAP_CONNECTION_MODE_STARTTLS.equalsIgnoreCase(connectionMode);
-        isSecure = LDAP_CONNECTION_MODE_LDAPS.equalsIgnoreCase(connectionMode) || useStartTLS;
-        
+
         if (DEBUG.messageEnabled()) {
             DEBUG.message("IdRepo configuration:\n"
                     + IdRepoUtils.getAttrMapWithoutPasswordAttrs(configMap, asSet(LDAP_SERVER_PASSWORD)));
