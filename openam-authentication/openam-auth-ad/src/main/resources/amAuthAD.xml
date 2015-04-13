@@ -110,12 +110,17 @@
                         <Value>SUBTREE</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="iplanet-am-auth-ldap-ssl-enabled"
-                    type="single"
-                    syntax="boolean"
+                <AttributeSchema name="openam-auth-ldap-connection-mode"
+                    type="single_choice"
+                    syntax="string"
                     i18nKey="a110">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="a1101">LDAP</ChoiceValue>
+                        <ChoiceValue i18nKey="a1102">LDAPS</ChoiceValue>
+                        <ChoiceValue i18nKey="a1103">StartTLS</ChoiceValue>
+                    </ChoiceValues>
                     <DefaultValues>
-                        <Value>false</Value>
+                        <Value>@LDAP_CONNECTION_MODE@</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-ldap-ssl-trust-all"
@@ -257,12 +262,17 @@
                             <Value>SUBTREE</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="iplanet-am-auth-ldap-ssl-enabled"
-                        type="single"
-                        syntax="boolean"
+                    <AttributeSchema name="openam-auth-ldap-connection-mode"
+                        type="single_choice"
+                        syntax="string"
                         i18nKey="a110">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="a1101">LDAP</ChoiceValue>
+                            <ChoiceValue i18nKey="a1102">LDAPS</ChoiceValue>
+                            <ChoiceValue i18nKey="a1103">StartTLS</ChoiceValue>
+                        </ChoiceValues>
                         <DefaultValues>
-                            <Value>false</Value>
+                            <Value>@LDAP_CONNECTION_MODE@</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-ldap-ssl-trust-all"
