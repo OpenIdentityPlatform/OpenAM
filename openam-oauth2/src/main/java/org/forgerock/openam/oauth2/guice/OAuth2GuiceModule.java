@@ -96,6 +96,7 @@ import org.forgerock.openam.oauth2.OpenAMResourceOwnerSessionValidator;
 import org.forgerock.openam.oauth2.OpenAMTokenStore;
 import org.forgerock.openam.oauth2.resources.OpenAMResourceSetStore;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
+import org.forgerock.openam.oauth2.saml2.core.Saml2GrantTypeHandler;
 import org.forgerock.openam.oauth2.scripting.ScriptedConfigurator;
 import org.forgerock.openam.scripting.ScriptEngineConfiguration;
 import org.forgerock.openam.scripting.ScriptEvaluator;
@@ -190,6 +191,7 @@ public class OAuth2GuiceModule extends AbstractModule {
         grantTypeHandlers.addBinding("password").to(PasswordCredentialsGrantTypeHandler.class);
         grantTypeHandlers.addBinding("authorization_code").to(AuthorizationCodeGrantTypeHandler.class);
         grantTypeHandlers.addBinding(OAuth2Constants.TokenEndpoint.JWT_BEARER).to(JwtBearerGrantTypeHandler.class);
+        grantTypeHandlers.addBinding(OAuth2Constants.TokenEndpoint.SAML2_BEARER).to(Saml2GrantTypeHandler.class);
 
         final Multibinder<AuthorizeRequestHook> authorizeRequestHooks = Multibinder.newSetBinder(
                 binder(), AuthorizeRequestHook.class);

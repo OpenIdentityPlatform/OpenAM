@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -44,6 +44,7 @@ public class AccessTokenFlowFinder extends OAuth2FlowFinder {
         endpointClasses.put(CLIENT_CREDENTIALS, wrap(TokenEndpointResource.class));
         endpointClasses.put(PASSWORD, wrap(TokenEndpointResource.class));
         endpointClasses.put(JWT_BEARER, wrap(TokenEndpointResource.class));
+        endpointClasses.put(SAML2_BEARER, wrap(TokenEndpointResource.class));
         return endpointClasses;
     }
 

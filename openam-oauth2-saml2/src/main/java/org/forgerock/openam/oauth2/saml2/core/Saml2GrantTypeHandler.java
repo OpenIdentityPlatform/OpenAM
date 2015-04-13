@@ -133,10 +133,6 @@ public class Saml2GrantTypeHandler extends GrantTypeHandler {
                 validatedScope, null, null, request);
         logger.trace("Token created: " + accessToken.toString());
 
-        if (validatedScope != null && !validatedScope.isEmpty()) {
-            accessToken.add("scope", joinScope(validatedScope));
-        }
-
         return accessToken;
     }
 
