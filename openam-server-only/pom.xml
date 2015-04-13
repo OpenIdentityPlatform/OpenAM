@@ -464,33 +464,6 @@
                             </transformationSets>
                         </configuration>
                     </plugin>
-                    <!-- Transform the 'serviceNames.xml' to add the SecurID auth module -->
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>xml-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>transform</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <catalogs>
-                                <catalog>src/main/xslt/catalog.xml</catalog>
-                            </catalogs>
-                            <transformationSets>
-                                <transformationSet>
-                                    <dir>${project.build.outputDirectory}</dir>
-                                    <includes>
-                                        <include>amAuth.xml</include>
-                                    </includes>
-                                    <stylesheet>src/main/xslt/amAuthTransform.xslt</stylesheet>
-                                    <outputDir>${project.build.outputDirectory}</outputDir>
-                                </transformationSet>
-                            </transformationSets>
-                        </configuration>
-                    </plugin>
                 </plugins>
             </build>
         </profile>
