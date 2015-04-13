@@ -34,7 +34,6 @@
     </parent>
 
     <artifactId>oauth2-core</artifactId>
-    <version>13.0.0-SNAPSHOT</version>
 
     <name>OAuth2 Core</name>
     <description>OAuth2 Core library</description>
