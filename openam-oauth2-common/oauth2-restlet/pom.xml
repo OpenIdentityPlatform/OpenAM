@@ -34,7 +34,6 @@
     </parent>
 
     <artifactId>oauth2-restlet</artifactId>
-    <version>12.0.1-SNAPSHOT</version>
 
     <name>OAuth2 Restlet Integration</name>
     <description>OAuth2 Restlet library to provide HTTP integration</description>
