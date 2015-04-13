@@ -85,7 +85,6 @@ define("config/routes/AMRoutesConfig", [
             argumentNames: ["realm","additionalParameters"]
         },
 
-
         "uma": {
             view: "org/forgerock/openam/ui/uma/views/resource/ListResource",
             url: /^uma/,
@@ -143,8 +142,15 @@ define("config/routes/AMRoutesConfig", [
             defaults: [""],
             url: /^uma\/apps\/(.*?)(?:\/){0,1}$/,
             pattern: "uma/apps/?"
-        }
+        },
 
+        // Console
+        "console": {
+            view: "org/forgerock/openam/ui/console/views/Settings",
+            url: /^console/,
+            pattern: "console/",
+            role: "ui-admin"
+        }
     };
 
     return obj;

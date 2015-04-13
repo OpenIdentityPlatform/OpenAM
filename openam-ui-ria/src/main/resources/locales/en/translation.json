@@ -80,7 +80,8 @@
                         "resources" : "Resources",
                         "users" : "Users",
                         "apps" : "Apps"
-                    }
+                    },
+                    "console": "Console"
                 }
             }
         }

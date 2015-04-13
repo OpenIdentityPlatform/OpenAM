@@ -149,6 +149,16 @@ define("config/AppConfiguration", [
                             }
                         ],
                         links: {
+                            "admin": {
+                                "role": "ui-admin",
+                                "urls": {
+                                    "console": {
+                                        "url": "#console",
+                                        "name": "config.AppConfiguration.Navigation.links.console",
+                                        "icon": "fa fa-cubes"
+                                    }
+                                }
+                            },
                             "user" : {
                                 "urls": {
                                     "dashboard": {

@@ -151,7 +151,8 @@ require([
     "backgrid.filter",
     "bootstrap",
     "bootstrap-dialog",
-    "org/forgerock/openam/ui/uma/main"
+    "org/forgerock/openam/ui/uma/main",
+    "org/forgerock/openam/ui/console/main"
 ], function(constants, eventManager, $, _, Backbone) {
     // Helpers for the code that hasn't been properly migrated to require these as explicit dependencies:
     window.$ = $;
