@@ -129,12 +129,7 @@ public class ResourceTypesResource extends RealmAwareResource {
         try {
             final Subject subject = getSubject(context);
             principalName = PrincipalRestUtils.getPrincipalNameFromSubject(subject);
-            final String realm = getRealm(context);
             final JsonResourceType jsonWrapper = createJsonResourceType(request.getContent());
-
-            if (!realm.equals(jsonWrapper.getRealm())) {
-                throw new EntitlementException(INVALID_RESOURCE_TYPE_REALM, jsonWrapper.getRealm(), realm);
-            }
 
             if (StringUtils.isEmpty(jsonWrapper.getName())) {
                 throw new EntitlementException(MISSING_RESOURCE_TYPE_NAME);
@@ -144,7 +139,7 @@ public class ResourceTypesResource extends RealmAwareResource {
             // adds all manner of good stuff - creation dates, updated dates, etc. etc.  It is the resource type filled
             // out with this extra stuff that we put into the resource and the user gets to see.
             //
-            final ResourceType savedResourceType = resourceTypeService.saveResourceType(subject,
+            final ResourceType savedResourceType = resourceTypeService.saveResourceType(subject, getRealm(context),
                     jsonWrapper.getResourceType(true));
 
             if (logger.messageEnabled()) {
@@ -229,19 +224,13 @@ public class ResourceTypesResource extends RealmAwareResource {
         try {
             final Subject subject = getSubject(context);
             principalName = PrincipalRestUtils.getPrincipalNameFromSubject(subject);
-            final String realm = getRealm(context);
-
             final JsonResourceType jsonWrapper = createJsonResourceType(request.getContent());
-
-            if (!realm.equals(jsonWrapper.getRealm())) {
-                throw new EntitlementException(INVALID_RESOURCE_TYPE_REALM, jsonWrapper.getRealm(), realm);
-            }
 
             if (StringUtils.isEmpty(jsonWrapper.getName())) {
                 throw new EntitlementException(MISSING_RESOURCE_TYPE_NAME);
             }
 
-            final ResourceType updatedResourceType = resourceTypeService.updateResourceType(subject,
+            final ResourceType updatedResourceType = resourceTypeService.updateResourceType(subject, getRealm(context),
                     jsonWrapper.getResourceType(false));
 
             if (logger.messageEnabled()) {

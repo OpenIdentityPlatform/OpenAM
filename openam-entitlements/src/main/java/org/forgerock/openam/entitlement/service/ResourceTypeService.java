@@ -35,11 +35,13 @@ public interface ResourceTypeService {
      * Save the ResourceType in the data store under the resource type's realm. This will also add the creation meta
      * data, if this resource type does not already exist, and the last modified meta data.
      * @param subject The subject with privilege to create resource types.
+     * @param realm The realm in which to save the resource type.
      * @param resourceType The resource type to save.
      * @return The modified resource type.
-     * @throws com.sun.identity.entitlement.EntitlementException If the resource type fails to save.
+     * @throws EntitlementException If the resource type fails to save.
      */
-    public ResourceType saveResourceType(Subject subject, ResourceType resourceType) throws EntitlementException;
+    public ResourceType saveResourceType(Subject subject, String realm, ResourceType resourceType)
+            throws EntitlementException;
 
     /**
      * Delete the resource type with the given UUID stored under the given realm from the data store.
@@ -75,11 +77,13 @@ public interface ResourceTypeService {
     /**
      * Update the given resource type. If it does not exist, it will be created.
      * @param subject The subject with privilege to update the resource type.
+     * @param realm The realm in which the resource type resides.
      * @param resourceType The resource type to update.
      * @return The updated resource type.
      * @throws EntitlementException If the update of the resource type failed.
      */
-    public ResourceType updateResourceType(Subject subject, ResourceType resourceType) throws EntitlementException;
+    public ResourceType updateResourceType(Subject subject, String realm, ResourceType resourceType)
+            throws EntitlementException;
 
     /**
      * Determines whether the resource type Id represents a valid and present resource type.

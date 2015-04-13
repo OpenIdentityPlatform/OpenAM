@@ -54,7 +54,8 @@ public class ResourceTypeServiceTest {
     @Test
     public void shouldModifyResourceTypeMetaData() throws EntitlementException {
         // given
-        ResourceType resourceType = ResourceType.builder("URL", "/testRealm").generateUUID()
+        ResourceType resourceType = ResourceType.builder().generateUUID()
+                .setName("URL")
                 .setDescription("This is a URL resource type")
                 .addPattern("*://*:*/*")
                 .addPattern("*://*:*/*?*")
@@ -62,7 +63,7 @@ public class ResourceTypeServiceTest {
                 .addAction("PUT", false).build();
 
         // when
-        resourceType = service.saveResourceType(subject, resourceType);
+        resourceType = service.saveResourceType(subject, "/testRealm", resourceType);
 
         // then
         assertNotNull(resourceType.getCreatedBy());

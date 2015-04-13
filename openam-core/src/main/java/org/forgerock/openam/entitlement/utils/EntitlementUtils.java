@@ -413,14 +413,14 @@ public final class EntitlementUtils {
 
     /**
      * Create a ResourceType object from a map, mapping strings to sets.
-     * @param realm The realm in which to create the new ResourceType object.
      * @param uuid The uuid of the created resource type object.
      * @param data The data map for the object.
      * @return The newly created ResourceType object.
      */
-    public static ResourceType resourceTypeFromMap(String realm, String uuid, Map<String, Set<String>> data) {
-        return ResourceType.builder(getAttribute(data, CONFIG_NAME), realm)
+    public static ResourceType resourceTypeFromMap(String uuid, Map<String, Set<String>> data) {
+        return ResourceType.builder()
                 .setUUID(uuid)
+                .setName(getAttribute(data, CONFIG_NAME))
                 .setDescription(getAttribute(data, CONFIG_DESCRIPTION, EMPTY))
                 .addPatterns(data.get(CONFIG_PATTERNS))
                 .addActions(getActions(data))

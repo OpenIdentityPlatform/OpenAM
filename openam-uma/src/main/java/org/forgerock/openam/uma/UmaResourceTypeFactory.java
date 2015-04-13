@@ -16,22 +16,18 @@
 
 package org.forgerock.openam.uma;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.opensso.SubjectUtils;
+import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.entitlement.ResourceType;
+import org.forgerock.openam.entitlement.service.ResourceTypeService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.security.auth.Subject;
-
-import org.forgerock.openam.entitlement.ResourceType;
-import org.forgerock.openam.entitlement.service.ResourceTypeService;
-import org.forgerock.openam.uma.UmaConstants;
-
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.opensso.SubjectUtils;
-import com.sun.identity.shared.debug.Debug;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Provides access to a {@link ResourceType} instance for UMA providers on a realm.
@@ -100,13 +96,14 @@ public class UmaResourceTypeFactory {
 
     private synchronized void createResourceType(String realm) throws EntitlementException {
         if (!realmResourceTypeUuids.containsKey(realm)) {
-            ResourceType resourceType = ResourceType.builder(RESOURCE_TYPE_NAME, realm)
+            ResourceType resourceType = ResourceType.builder()
+                    .setName(RESOURCE_TYPE_NAME)
                     .addPattern(UmaConstants.UMA_POLICY_SCHEME_PATTERN)
                     .setDescription(RESOURCE_TYPE_DESCRIPTION)
-                    .setUUID(UUID.randomUUID().toString())
+                    .generateUUID()
                     .build();
             Subject adminSubject = SubjectUtils.createSuperAdminSubject();
-            resourceTypeService.saveResourceType(adminSubject, resourceType);
+            resourceTypeService.saveResourceType(adminSubject, realm, resourceType);
         }
     }
 

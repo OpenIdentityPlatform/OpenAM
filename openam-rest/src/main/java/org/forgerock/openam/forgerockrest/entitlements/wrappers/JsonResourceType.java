@@ -35,12 +35,8 @@ import java.util.Set;
  */
 public class JsonResourceType {
 
-    // Field used as resource ID
-    public static String FIELD_NAME = "name";
-
     private String uuid;
     private String name;
-    private String realm;
     private String description;
     private Set<String> patterns;
     private Map<String, Boolean> actions;
@@ -56,7 +52,6 @@ public class JsonResourceType {
     public JsonResourceType(final ResourceType resourceType) {
         uuid = resourceType.getUUID();
         name = resourceType.getName();
-        realm = resourceType.getRealm();
         description = resourceType.getDescription();
         patterns = resourceType.getPatterns();
         actions = resourceType.getActions();
@@ -84,16 +79,6 @@ public class JsonResourceType {
     @JsonProperty("name")
     public void setName(String name) {
         this.name = name;
-    }
-
-    @JsonProperty("realm")
-    public String getRealm() {
-        return realm;
-    }
-
-    @JsonProperty("realm")
-    public void setRealm(String realm) {
-        this.realm = realm;
     }
 
     @JsonProperty("description")
@@ -168,8 +153,9 @@ public class JsonResourceType {
 
     @JsonIgnore
     public ResourceType getResourceType(boolean generateID) {
-        final ResourceType.Builder builder = ResourceType.builder(name, realm)
+        final ResourceType.Builder builder = ResourceType.builder()
                 .setUUID(uuid)
+                .setName(name)
                 .addPatterns(patterns)
                 .addActions(actions)
                 .setDescription(description)

@@ -29,7 +29,8 @@ public class ResourceTypeTest {
     @Test
     public void shouldBuildResourceType() {
         //given
-        ResourceType.Builder builder = ResourceType.builder("URL", "/testRealm").generateUUID()
+        ResourceType.Builder builder = ResourceType.builder().generateUUID()
+                .setName("URL")
                 .setDescription("This is a URL resource type")
                 .addPattern("*://*:*/*")
                 .addPattern("*://*:*/*?*")
@@ -45,7 +46,6 @@ public class ResourceTypeTest {
 
         //then
         assertEquals(resourceType.getName(), "URL");
-        assertEquals(resourceType.getRealm(), "/testRealm");
         assertEquals(resourceType.getDescription(), "This is a URL resource type");
         assertEquals(resourceType.getPatterns().contains("*://*:*/*"), true);
         assertEquals(resourceType.getPatterns().contains("*://*:*/*?*"), true);
@@ -63,7 +63,8 @@ public class ResourceTypeTest {
     @Test(expectedExceptions = UnsupportedOperationException.class)
     public void shouldNotAllowPatternSetModification() {
         //given
-        ResourceType resourceType = ResourceType.builder("URL", "/testRealm").generateUUID()
+        ResourceType resourceType = ResourceType.builder().generateUUID()
+                .setName("URL")
                 .addPattern("*://*:*/*")
                 .addPattern("*://*:*/*?*")
                 .build();
@@ -77,7 +78,8 @@ public class ResourceTypeTest {
     @Test(expectedExceptions = UnsupportedOperationException.class)
     public void shouldNotAllowActionMapModification() {
         //given
-        ResourceType resourceType = ResourceType.builder("URL", "/testRealm").generateUUID()
+        ResourceType resourceType = ResourceType.builder().generateUUID()
+                .setName("URL")
                 .addAction("GET", true)
                 .addAction("PUT", false)
                 .build();
@@ -92,7 +94,8 @@ public class ResourceTypeTest {
     public void shouldCreateEqualResourceTypes() {
         //given
         String uuid = UUID.randomUUID().toString();
-        ResourceType.Builder builder1 = ResourceType.builder("URL", "/testRealm").setUUID(uuid)
+        ResourceType.Builder builder1 = ResourceType.builder().setUUID(uuid)
+                .setName("URL")
                 .setDescription("This is a URL resource type")
                 .addPattern("*://*:*/*")
                 .addPattern("*://*:*/*?*")
@@ -102,7 +105,8 @@ public class ResourceTypeTest {
                 .setCreationDate(1422886484092l)
                 .setLastModifiedBy("TestUser2")
                 .setLastModifiedDate(1422886484098l);
-        ResourceType.Builder builder2 = ResourceType.builder("URL", "/testRealm").setUUID(uuid)
+        ResourceType.Builder builder2 = ResourceType.builder().setUUID(uuid)
+                .setName("URL")
                 .setDescription("This is a URL resource type")
                 .addPattern("*://*:*/*")
                 .addPattern("*://*:*/*?*")
@@ -126,7 +130,8 @@ public class ResourceTypeTest {
     @Test
     public void shouldCreateDifferentResourceTypes() {
         //given
-        ResourceType.Builder builder1 = ResourceType.builder("URL", "/testRealm").generateUUID()
+        ResourceType.Builder builder1 = ResourceType.builder().generateUUID()
+                .setName("URL")
                 .setDescription("This is a URL resource type")
                 .addPattern("*://*:*/realm1")
                 .addPattern("*://*:*/*?realm1")
@@ -136,7 +141,8 @@ public class ResourceTypeTest {
                 .setCreationDate(1422886484092l)
                 .setLastModifiedBy("TestUser2")
                 .setLastModifiedDate(1422886484098l);
-        ResourceType.Builder builder2 = ResourceType.builder("URL", "/testRealm").generateUUID()
+        ResourceType.Builder builder2 = ResourceType.builder().generateUUID()
+                .setName("URL")
                 .setDescription("This is a URL resource type")
                 .addPattern("*://*:*/realm2")
                 .addPattern("*://*:*/*?realm2")
@@ -160,7 +166,8 @@ public class ResourceTypeTest {
     @Test
     public void shouldCreateEditableBuilderForMetaData() {
         //given
-        ResourceType rt1 = ResourceType.builder("URL", "/testRealm").generateUUID()
+        ResourceType rt1 = ResourceType.builder().generateUUID()
+                .setName("URL")
                 .setDescription("This is a URL resource type")
                 .addPattern("*://*:*/realm1")
                 .addPattern("*://*:*/*?realm1")
@@ -172,7 +179,7 @@ public class ResourceTypeTest {
                 .setLastModifiedDate(1422886484098l).build();
 
         //when
-        ResourceType.Builder builder1 = rt1.builder();
+        ResourceType.Builder builder1 = rt1.populatedBuilder();
         ResourceType rt2 = builder1.setCreatedBy("TestUser3")
                 .setCreationDate(1422886484093l)
                 .setLastModifiedBy("TestUser4")
@@ -189,7 +196,8 @@ public class ResourceTypeTest {
     @Test
     public void shouldCreateBuilderForClone() {
         //given
-        ResourceType rt1 = ResourceType.builder("URL", "/testRealm").generateUUID()
+        ResourceType rt1 = ResourceType.builder().generateUUID()
+                .setName("URL")
                 .setDescription("This is a URL resource type")
                 .addPattern("*://*:*/realm1")
                 .addPattern("*://*:*/*?realm1")
@@ -201,7 +209,7 @@ public class ResourceTypeTest {
                 .setLastModifiedDate(1422886484098l).build();
 
         //when
-        ResourceType rt2 = rt1.builder().build();
+        ResourceType rt2 = rt1.populatedBuilder().build();
 
         //then
         assertEquals(rt1, rt2);
@@ -213,7 +221,7 @@ public class ResourceTypeTest {
     @Test(expectedExceptions = NullPointerException.class)
     public void shouldNotAllowNullUUID() {
         //given
-        ResourceType.Builder builder = ResourceType.builder("URL", "/testRealm");
+        ResourceType.Builder builder = ResourceType.builder().setName("URL");
 
         //when
         builder.build();

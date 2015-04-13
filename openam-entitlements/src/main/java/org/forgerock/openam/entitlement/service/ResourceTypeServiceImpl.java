@@ -49,16 +49,16 @@ public class ResourceTypeServiceImpl implements ResourceTypeService {
      * {@inheritDoc}
      */
     @Override
-    public ResourceType saveResourceType(Subject subject, ResourceType resourceType) throws EntitlementException {
+    public ResourceType saveResourceType(Subject subject, String realm, ResourceType resourceType)
+            throws EntitlementException {
 
-        final String realm = resourceType.getRealm();
         final String name = resourceType.getName();
         if (configuration.containsName(subject, realm, name)) {
             throw new EntitlementException(RESOURCE_TYPE_ALREADY_EXISTS, name);
         }
 
         final ResourceType updatedResourceType = setMetaData(subject, realm, resourceType);
-        configuration.storeResourceType(subject, updatedResourceType);
+        configuration.storeResourceType(subject, realm, updatedResourceType);
 
         return updatedResourceType;
     }
@@ -74,7 +74,7 @@ public class ResourceTypeServiceImpl implements ResourceTypeService {
         final long now = new Date().getTime();
         final String principalName = getPrincipalName(subject);
         final ResourceType oldResourceType = getResourceType(subject, realm, resourceType.getUUID());
-        final ResourceType.Builder builder = resourceType.builder();
+        final ResourceType.Builder builder = resourceType.populatedBuilder();
 
         if (oldResourceType == null) {
             builder.setCreatedBy(principalName);
@@ -115,9 +115,9 @@ public class ResourceTypeServiceImpl implements ResourceTypeService {
      * {@inheritDoc}
      */
     @Override
-    public ResourceType updateResourceType(Subject subject, ResourceType resourceType) throws EntitlementException {
+    public ResourceType updateResourceType(Subject subject, String realm, ResourceType resourceType)
+            throws EntitlementException {
 
-        final String realm = resourceType.getRealm();
         final String uuid = resourceType.getUUID();
         final String name = resourceType.getName();
 
@@ -134,7 +134,7 @@ public class ResourceTypeServiceImpl implements ResourceTypeService {
         }
 
         final ResourceType updatedResourceType = setMetaData(subject, realm, resourceType);
-        configuration.storeResourceType(subject, updatedResourceType);
+        configuration.storeResourceType(subject, realm, updatedResourceType);
 
         return updatedResourceType;
     }

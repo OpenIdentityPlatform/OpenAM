@@ -140,7 +140,8 @@ public class ApplicationV1FilterTest {
 
         Set<ResourceType> resourceTypes = CollectionUtils
                 .asSet(ResourceType
-                                .builder("test", "/abc")
+                                .builder()
+                                .setName("test")
                                 .setUUID(TestData.DATA_SET_1.getResourceTypeUuid())
                                 .build()
                 );
@@ -186,12 +187,14 @@ public class ApplicationV1FilterTest {
                 queryFilterCaptor.capture(), eq(subject), eq("/abc"))).willReturn(resourceTypes);
 
         ResourceType resourceType = ResourceType
-                .builder("test", "/abc")
+                .builder()
+                .setName("test")
                 .setUUID("some-test-uuid")
                 .setActions(TestData.DATA_SET_1.getActions().getUnderlyingMap())
                 .setPatterns(TestData.DATA_SET_1.getResources().getUnderlyingSet())
                 .build();
-        given(resourceTypeService.saveResourceType(eq(subject), resourceTypeCaptor.capture())).willReturn(resourceType);
+        given(resourceTypeService.saveResourceType(eq(subject), eq("/abc"), resourceTypeCaptor.capture()))
+                .willReturn(resourceType);
 
 
         // When
@@ -287,7 +290,8 @@ public class ApplicationV1FilterTest {
         given(application.getResourceTypeUuids()).willReturn(resourceTypeUUIDs);
 
         ResourceType resourceType = ResourceType
-                .builder("test", "/abc")
+                .builder()
+                .setName("test")
                 .setUUID("abc-def-ghi")
                 .setActions(TestData.DATA_SET_2.getActions().getUnderlyingMap())
                 .setPatterns(TestData.DATA_SET_2.getResources().getUnderlyingSet())
@@ -299,7 +303,7 @@ public class ApplicationV1FilterTest {
 
         // Then
         assertThat(jsonValue.get("resourceTypeUuids").asSet(String.class)).containsOnly("abc-def-ghi");
-        verify(resourceTypeService).updateResourceType(eq(subject), resourceTypeCaptor.capture());
+        verify(resourceTypeService).updateResourceType(eq(subject), eq("/abc"), resourceTypeCaptor.capture());
         verify(requestHandler).handleUpdate(eq(context), eq(updateRequest), resourceResultHandlerCaptor.capture());
 
         ResourceType capturedResourceType = resourceTypeCaptor.getValue();
@@ -501,7 +505,8 @@ public class ApplicationV1FilterTest {
             String resourceTypeUuid = testData.getResourceTypeUuid();
 
             ResourceType resourceType = ResourceType
-                    .builder("test", "/abc")
+                    .builder()
+                    .setName("test")
                     .setUUID(resourceTypeUuid)
                     .setActions(testData.getActions().getUnderlyingMap())
                     .setPatterns(testData.getResources().getUnderlyingSet())
@@ -542,7 +547,8 @@ public class ApplicationV1FilterTest {
             String resourceTypeUuid = testData.getResourceTypeUuid();
 
             ResourceType resourceType = ResourceType
-                    .builder("test", "/abc")
+                    .builder()
+                    .setName("test")
                     .setUUID(resourceTypeUuid)
                     .setActions(testData.getActions().getUnderlyingMap())
                     .setPatterns(testData.getResources().getUnderlyingSet())

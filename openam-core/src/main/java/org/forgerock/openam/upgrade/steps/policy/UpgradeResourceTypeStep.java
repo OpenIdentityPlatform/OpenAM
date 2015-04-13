@@ -290,13 +290,14 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
             return resourceTypes.iterator().next();
         }
 
-        ResourceType resourceType = ResourceType.builder(state.appName + RESOURCES_TYPE_NAME_SUFFIX, realm)
+        ResourceType resourceType = ResourceType.builder()
+                .setName(state.appName + RESOURCES_TYPE_NAME_SUFFIX)
                 .addActions(getActions(state.actions))
                 .addPatterns(state.patterns)
                 .setDescription(RESOURCE_TYPE_DESCRIPTION + state.appName)
                 .generateUUID()
                 .build();
-        saveResourceType(resourceType);
+        saveResourceType(resourceType, realm);
         state.resourceTypeName = resourceType.getName();
 
         return resourceType;
@@ -307,10 +308,10 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
      * @param resourceType The resource type to save.
      * @throws UpgradeException If the resource type failed to persist.
      */
-    private void saveResourceType(ResourceType resourceType) throws UpgradeException {
+    private void saveResourceType(ResourceType resourceType, String realm) throws UpgradeException {
         try {
             UpgradeProgress.reportStart(AUDIT_CREATE_RESOURCE_TYPE_START, resourceType.getName());
-            resourceTypeService.saveResourceType(getAdminSubject(), resourceType);
+            resourceTypeService.saveResourceType(getAdminSubject(), realm, resourceType);
             UpgradeProgress.reportEnd(AUDIT_UPGRADE_SUCCESS);
         } catch (EntitlementException ee) {
             UpgradeProgress.reportEnd(AUDIT_UPGRADE_FAIL);

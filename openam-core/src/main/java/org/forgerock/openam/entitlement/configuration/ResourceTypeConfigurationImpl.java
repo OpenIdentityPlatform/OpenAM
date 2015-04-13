@@ -101,7 +101,7 @@ public class ResourceTypeConfigurationImpl extends AbstractConfiguration impleme
             return null;
         }
         try {
-            return resourceTypeFromMap(realm, uuid, getOrgConfig(subject, realm).getSubConfig(CONFIG_RESOURCE_TYPES)
+            return resourceTypeFromMap(uuid, getOrgConfig(subject, realm).getSubConfig(CONFIG_RESOURCE_TYPES)
                     .getSubConfig(uuid).getAttributesForRead());
         } catch (SMSException ex) {
             PrivilegeManager.debug.error("ResourceTypeConfiguration.getResourceType", ex);
@@ -227,8 +227,7 @@ public class ResourceTypeConfigurationImpl extends AbstractConfiguration impleme
      * {@inheritDoc}
      */
     @Override
-    public void storeResourceType(Subject subject, ResourceType resourceType) throws EntitlementException {
-        final String realm = resourceType.getRealm();
+    public void storeResourceType(Subject subject, String realm, ResourceType resourceType) throws EntitlementException {
         final String uuid = resourceType.getUUID();
         createResourceTypeCollectionConfig(subject, realm, uuid);
 
@@ -282,8 +281,9 @@ public class ResourceTypeConfigurationImpl extends AbstractConfiguration impleme
                 final String modifiedDate = entry.getAttributeValue(CONFIG_LAST_MODIFIED_DATE);
 
                 final ResourceType resourceType = ResourceType
-                        .builder(name, realm)
+                        .builder()
                         .setUUID(uuid)
+                        .setName(name)
                         .setActions(actions)
                         .setPatterns(resources)
                         .setDescription(description)

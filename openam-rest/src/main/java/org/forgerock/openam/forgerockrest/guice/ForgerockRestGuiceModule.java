@@ -358,7 +358,6 @@ public class ForgerockRestGuiceModule extends AbstractModule {
             handlers.put(EntitlementException.APP_NOT_CREATED_POLICIES_EXIST, ResourceException.CONFLICT);
             handlers.put(EntitlementException.INVALID_APP_TYPE, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.INVALID_APP_REALM, ResourceException.BAD_REQUEST);
-            handlers.put(EntitlementException.INVALID_RESOURCE_TYPE_REALM, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.PROPERTY_CONTAINS_BLANK_VALUE, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.APPLICATION_NAME_MISMATCH, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.INVALID_CLASS, ResourceException.BAD_REQUEST);

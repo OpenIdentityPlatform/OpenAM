@@ -582,13 +582,13 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractEntitlementUpgrade
             final Map<String, Set<String>> keyValueMap = parseAttributeValuePairTags(typeNode);
             final String uuid = getNodeAttributeValue(typeNode, NAME);
             final String name = retrieveSingleValue(NAME, keyValueMap);
-            final ResourceType resourceType = resourceTypeFromMap(ROOT_REALM, uuid, keyValueMap);
+            final ResourceType resourceType = resourceTypeFromMap(uuid, keyValueMap);
 
             UpgradeProgress.reportStart(AUDIT_NEW_RESOURCE_TYPE_START, name);
 
             try {
                 DEBUG.message("Saving standard resource type {} with UUID {}", name, uuid);
-                resourceTypeConfiguration.storeResourceType(getAdminSubject(), resourceType);
+                resourceTypeConfiguration.storeResourceType(getAdminSubject(), ROOT_REALM, resourceType);
                 UpgradeProgress.reportEnd(AUDIT_UPGRADE_SUCCESS);
             } catch (EntitlementException eE) {
                 UpgradeProgress.reportEnd(AUDIT_UPGRADE_FAIL);

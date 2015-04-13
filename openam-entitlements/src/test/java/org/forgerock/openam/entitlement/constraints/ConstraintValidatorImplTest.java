@@ -43,7 +43,8 @@ public class ConstraintValidatorImplTest {
     public void exactActionsPass() {
         // Given
         ResourceType resourceType = ResourceType
-                .builder("test", "/")
+                .builder()
+                .setName("test")
                 .setUUID("abc")
                 .addAction("GET", true)
                 .addAction("POST", true)
@@ -65,7 +66,8 @@ public class ConstraintValidatorImplTest {
     public void subsetActionsPass() {
         // Given
         ResourceType resourceType = ResourceType
-                .builder("test", "/")
+                .builder()
+                .setName("test")
                 .setUUID("abc")
                 .addAction("GET", true)
                 .addAction("POST", true)
@@ -89,7 +91,8 @@ public class ConstraintValidatorImplTest {
     public void additionalActionsFail() {
         // Given
         ResourceType resourceType = ResourceType
-                .builder("test", "/")
+                .builder()
+                .setName("test")
                 .setUUID("abc")
                 .addAction("GET", true)
                 .addAction("POST", true)
@@ -112,7 +115,8 @@ public class ConstraintValidatorImplTest {
     public void throwsExceptionWhenActionsFail() throws ConstraintFailureException {
         // Given
         ResourceType resourceType = ResourceType
-                .builder("test", "/")
+                .builder()
+                .setName("test")
                 .setUUID("abc")
                 .addAction("GET", true)
                 .addAction("POST", true)
@@ -131,7 +135,8 @@ public class ConstraintValidatorImplTest {
     public void validResourcesPass() {
         // Given
         ResourceType resourceType = ResourceType
-                .builder("test", "/")
+                .builder()
+                .setName("test")
                 .setUUID("abc")
                 .addPattern("a://b:c/*")
                 .addPattern("d://*:*/*")
@@ -154,7 +159,8 @@ public class ConstraintValidatorImplTest {
     public void invalidResourcesFail() {
         // Given
         ResourceType resourceType = ResourceType
-                .builder("test", "/")
+                .builder()
+                .setName("test")
                 .setUUID("abc")
                 .addPattern("a://b:c/*")
                 .addPattern("d://*:*/*")
@@ -178,7 +184,8 @@ public class ConstraintValidatorImplTest {
     public void throwsExceptionWhenResourcesFail() throws ConstraintFailureException {
         // Given
         ResourceType resourceType = ResourceType
-                .builder("test", "/")
+                .builder()
+                .setName("test")
                 .setUUID("abc")
                 .addPattern("a://b:c/*")
                 .addPattern("d://*:*/*")

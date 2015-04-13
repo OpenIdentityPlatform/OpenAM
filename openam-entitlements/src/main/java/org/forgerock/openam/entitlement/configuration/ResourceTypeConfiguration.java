@@ -68,10 +68,11 @@ public interface ResourceTypeConfiguration {
     /**
      * Stores the resource type to the data store.
      * @param subject The subject for whom the resource type should be stored.
+     * @param realm The realm in which the resource type resides.
      * @param resourceType The resource type to store.
      * @throws EntitlementException if the resource type cannot be stored.
      */
-    public void storeResourceType(Subject subject, ResourceType resourceType) throws EntitlementException;
+    public void storeResourceType(Subject subject, String realm, ResourceType resourceType) throws EntitlementException;
 
     /**
      * Retrieves a set of resource types based on the passed query filter.

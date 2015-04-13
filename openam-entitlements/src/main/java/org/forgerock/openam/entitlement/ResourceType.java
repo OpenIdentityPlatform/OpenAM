@@ -38,7 +38,6 @@ public final class ResourceType {
 
     private final String uuid;
     private final String name;
-    private final String realm;
     private final String description;
     private final Set<String> patterns;
     private final Map<String, Boolean> actions;
@@ -53,7 +52,6 @@ public final class ResourceType {
 
         private String uuid;
         private String name;
-        private String realm;
         private String description;
         private Set<String> patterns = new HashSet<String>();
         private Map<String, Boolean> actions = new HashMap<String, Boolean>();
@@ -63,16 +61,10 @@ public final class ResourceType {
         private long lastModifiedDate;
 
         /**
-         * Create a builder for ResourceType with the required parameters, name and realm.
-         * @param name A unique name (in the realm) for this resource type.
-         * @param realm The realm in which this resource type is visible.
-         * @throws NullPointerException if either name or realm is null.
+         * This {@code Builder} can be constructed from {@code ResourceType} with the
+         * {@link org.forgerock.openam.entitlement.ResourceType#builder()} builder} method.
          */
-        public Builder(String name, String realm) {
-            Reject.ifNull(name, "ResourceType name may not be null.");
-            Reject.ifNull(realm, "ResourceType realm may not be null.");
-            this.name = name;
-            this.realm = realm;
+        private Builder() {
         }
 
         /**
@@ -234,14 +226,11 @@ public final class ResourceType {
     }
 
     /**
-     * Create a builder for ResourceType with the required parameters, name and realm.
-     * @param name A unique name (in the realm) for this resource type.
-     * @param realm The realm in which this resource type is visible.
-     * @throws NullPointerException if either name or realm is null.
+     * Create a builder for ResourceType.
      * @return A ResourceType builder
      */
-    public static final Builder builder(String name, String realm) {
-        return new Builder(name, realm);
+    public static final Builder builder() {
+        return new Builder();
     }
 
     /**
@@ -251,7 +240,6 @@ public final class ResourceType {
     private ResourceType(Builder builder) {
         this.uuid = builder.uuid;
         this.name = builder.name;
-        this.realm = builder.realm;
         this.description = builder.description;
         this.patterns = Collections.unmodifiableSet(builder.patterns);
         this.actions = Collections.unmodifiableMap(builder.actions);
@@ -275,14 +263,6 @@ public final class ResourceType {
      */
     public String getName() {
         return name;
-    }
-
-    /**
-     * Get the realm in which this resource type is visible.
-     * @return The realm name.
-     */
-    public String getRealm() {
-        return realm;
     }
 
     /**
@@ -353,7 +333,6 @@ public final class ResourceType {
         }
         ResourceType rt = (ResourceType)o;
         return rt.name.equals(name)
-                && rt.realm.equals(realm)
                 && StringUtils.isEqualTo(rt.description, description)
                 && rt.patterns.equals(patterns)
                 && rt.actions.equals(actions)
@@ -371,7 +350,6 @@ public final class ResourceType {
             int prime = 31;
             result = 17;
             result = prime * result + name.hashCode();
-            result = prime * result + realm.hashCode();
             result = prime * result + (description == null ? 0 : description.hashCode());
             result = prime * result + patterns.hashCode();
             result = prime * result + actions.hashCode();
@@ -389,8 +367,8 @@ public final class ResourceType {
      * Create a builder for this ResourceType with all fields populated and ready for modification.
      * @return A populated ResourceType builder.
      */
-    public Builder builder() {
-        return new Builder(name, realm).setUUID(uuid).setDescription(description)
+    public Builder populatedBuilder() {
+        return new Builder().setUUID(uuid).setName(name).setDescription(description)
                 .addPatterns(new HashSet<String>(patterns)).addActions(new HashMap<String, Boolean>(actions))
                 .setCreatedBy(createdBy).setCreationDate(creationDate)
                 .setLastModifiedBy(lastModifiedBy).setLastModifiedDate(lastModifiedDate);

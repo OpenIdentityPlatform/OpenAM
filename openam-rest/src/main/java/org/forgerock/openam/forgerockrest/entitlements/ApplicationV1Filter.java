@@ -181,7 +181,8 @@ public class ApplicationV1Filter implements Filter {
 
         final String resourceTypeName = generateResourceTypeName(request);
         final ResourceType resourceType = ResourceType
-                .builder(resourceTypeName, realm)
+                .builder()
+                .setName(resourceTypeName)
                 .setActions(actions)
                 .setPatterns(resources)
                 .setDescription("Generated resource type")
@@ -189,7 +190,7 @@ public class ApplicationV1Filter implements Filter {
                 .build();
 
         // Create and return new resource type.
-        return resourceTypeService.saveResourceType(callingSubject, resourceType);
+        return resourceTypeService.saveResourceType(callingSubject, realm, resourceType);
     }
 
     /**
@@ -285,7 +286,7 @@ public class ApplicationV1Filter implements Filter {
             if (!actions.equals(resourceType.getActions())) {
                 resourceTypeModified = true;
                 resourceType = resourceType
-                        .builder()
+                        .populatedBuilder()
                         .setActions(actions)
                         .build();
             }
@@ -293,13 +294,13 @@ public class ApplicationV1Filter implements Filter {
             if (!resources.equals(resourceType.getPatterns())) {
                 resourceTypeModified = true;
                 resourceType = resourceType
-                        .builder()
+                        .populatedBuilder()
                         .setPatterns(resources)
                         .build();
             }
 
             if (resourceTypeModified) {
-                resourceTypeService.updateResourceType(callingSubject, resourceType);
+                resourceTypeService.updateResourceType(callingSubject, realm, resourceType);
             }
 
             // Ensure the resource type UUID isn't lost.
