@@ -2,7 +2,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
+* Copyright (c) 2011-2015 ForgeRock AS. All Rights Reserved
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -418,33 +418,6 @@
             <build>
                 <plugins>
                     <!-- Transform the 'amAuth.xml' to add the SecurID auth module -->
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>xml-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>transform</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <catalogs>
-                                <catalog>src/main/xslt/catalog.xml</catalog>
-                            </catalogs>
-                            <transformationSets>
-                                <transformationSet>
-                                    <dir>${project.build.outputDirectory}</dir>
-                                    <includes>
-                                        <include>amAuth.xml</include>
-                                    </includes>
-                                    <stylesheet>src/main/xslt/amAuthTransform.xslt</stylesheet>
-                                    <outputDir>${project.build.outputDirectory}</outputDir>
-                                </transformationSet>
-                            </transformationSets>
-                        </configuration>
-                    </plugin>
-                    <!-- Transform the 'serviceNames.xml' to add the SecurID auth module -->
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>xml-maven-plugin</artifactId>
