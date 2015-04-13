@@ -24,10 +24,7 @@
  *
  * $Id: LDAP.java,v 1.17 2010/01/25 22:09:16 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.modules.ldap;
@@ -67,7 +64,8 @@ public class LDAP extends AMLoginModule {
     private static final String PIPE_SEPARATOR="|";
     private static final String AM_AUTH = "amAuth";
     private boolean sslTrustAll = false;
-    private boolean sslEnabled = false;
+    private boolean isSecure = false;
+    private boolean useStartTLS = false;
     
     private static final String OPERATION_TIMEOUT_ATTR = "openam-auth-ldap-operation-timeout";
 
@@ -195,9 +193,12 @@ public class LDAP extends AMLoginModule {
                 "iplanet-am-auth-ldap-user-search-attributes");
             String searchFilter = CollectionHelper.getMapAttr(
                 currentConfig, "iplanet-am-auth-ldap-search-filter", "");
-            sslEnabled = Boolean.valueOf(CollectionHelper.getMapAttr(
-                currentConfig, "iplanet-am-auth-ldap-ssl-enabled", "false")
-                ).booleanValue();
+
+            final String connectionMode = CollectionHelper.getMapAttr(
+                currentConfig, "openam-auth-ldap-connection-mode", "LDAP");
+            useStartTLS = connectionMode.equalsIgnoreCase("StartTLS");
+            isSecure = connectionMode.equalsIgnoreCase("LDAPS") || useStartTLS;
+
             getUserCreationAttrs(currentConfig);
             String tmp = CollectionHelper.getMapAttr(currentConfig,
                 "iplanet-am-auth-ldap-search-scope", "SUBTREE");
@@ -241,7 +242,7 @@ public class LDAP extends AMLoginModule {
 
             isProfileCreationEnabled = isDynamicProfileCreationEnabled();
             // set the optional attributes here
-            ldapUtil = new LDAPAuthUtils(primaryServers, secondaryServers, sslEnabled, bundle, baseDN);
+            ldapUtil = new LDAPAuthUtils(primaryServers, secondaryServers, isSecure, bundle, baseDN);
             ldapUtil.setScope(searchScope);
             ldapUtil.setFilter(searchFilter);
             ldapUtil.setUserNamingAttribute(userNamingAttr);
@@ -251,6 +252,7 @@ public class LDAP extends AMLoginModule {
             ldapUtil.setReturnUserDN(returnUserDN);
             ldapUtil.setUserAttributes(userCreationAttrs);
             ldapUtil.setTrustAll(sslTrustAll);
+            ldapUtil.setUseStartTLS(useStartTLS);
             ldapUtil.setDynamicProfileCreationEnabled(
                 isProfileCreationEnabled);
             ldapUtil.setBeheraEnabled(beheraEnabled);
@@ -267,7 +269,8 @@ public class LDAP extends AMLoginModule {
                         + "\nuserCreationAttrs-> " + userCreationAttrs
                         + "\nsearchFilter-> " + searchFilter
                         + "\nsearchScope-> " + searchScope
-                        + "\nssl-> " + sslEnabled
+                        + "\nisSecure-> " + isSecure
+                        + "\nuseStartTLS-> " + useStartTLS
                         + "\ntrustAll-> " + sslTrustAll
                         + "\nauthLevel-> " + authLevel
                         + "\nbeheraEnabled->" + beheraEnabled

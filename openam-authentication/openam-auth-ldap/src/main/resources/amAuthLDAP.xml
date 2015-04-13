@@ -26,9 +26,6 @@
 
     $Id: amAuthLDAP.xml,v 1.8 2010/01/25 22:09:17 qcheng Exp $
 
--->
-
-<!--
     Portions Copyrighted 2011-2015 ForgeRock AS.
 -->
 
@@ -123,17 +120,17 @@
                         <Value>SUBTREE</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="iplanet-am-auth-ldap-ssl-enabled"
-                    type="single"
-                    syntax="boolean"
-                    i18nKey="a110"
-                    resourceName="sslEnabled">
-                    <BooleanValues>
-                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-                    </BooleanValues>
+                <AttributeSchema name="openam-auth-ldap-connection-mode"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="a110">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="a1101">LDAP</ChoiceValue>
+                        <ChoiceValue i18nKey="a1102">LDAPS</ChoiceValue>
+                        <ChoiceValue i18nKey="a1103">StartTLS</ChoiceValue>
+                    </ChoiceValues>
                     <DefaultValues>
-                        <Value>@UM_SSL@</Value>
+                        <Value>@LDAP_CONNECTION_MODE@</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-ldap-ssl-trust-all"
@@ -238,7 +235,7 @@
                     <DefaultValues>
                         <Value>0</Value>
                     </DefaultValues>
-                </AttributeSchema>                 
+                </AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple">
                     <AttributeSchema name="iplanet-am-auth-ldap-server"
                         type="list"
@@ -317,17 +314,17 @@
                             <Value>SUBTREE</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="iplanet-am-auth-ldap-ssl-enabled"
-                        type="single"
-                        syntax="boolean"
-                        i18nKey="a110"
-                        resourceName="sslEnabled">
-                        <BooleanValues>
-                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-                        </BooleanValues>
+                    <AttributeSchema name="openam-auth-ldap-connection-mode"
+                        type="single_choice"
+                        syntax="string"
+                        i18nKey="a110">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="a1101">LDAP</ChoiceValue>
+                            <ChoiceValue i18nKey="a1102">LDAPS</ChoiceValue>
+                            <ChoiceValue i18nKey="a1103">StartTLS</ChoiceValue>
+                        </ChoiceValues>
                         <DefaultValues>
-                            <Value>@UM_SSL@</Value>
+                            <Value>@LDAP_CONNECTION_MODE@</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-ldap-ssl-trust-all"
@@ -432,7 +429,7 @@
                         <DefaultValues>
                             <Value>0</Value>
                         </DefaultValues>
-                    </AttributeSchema>                    
+                    </AttributeSchema>
                 </SubSchema>
             </Organization>
         </Schema>
