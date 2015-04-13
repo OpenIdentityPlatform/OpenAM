@@ -86,6 +86,17 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
         }
     });
 
+    obj.ClassHeaderCell = Backgrid.HeaderCell.extend({
+        className: '',
+        render: function () {
+            obj.ClassHeaderCell.__super__.render.apply(this);
+            this.delegateEvents();
+            return this;
+        }
+    });
+
+
+
     obj.UriExtCell = Backgrid.UriCell.extend({
         events: {
             'click': 'gotoUrl'
@@ -126,6 +137,9 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
                 placeholder: $.t('uma.resources.all.grid.filter', { header: this.column.get("label") }),
                 collection: this.collection
             });
+            if (this.addClassName) {
+                this.$el.addClass(this.addClassName);
+            }
             this.collection.state.filters = this.collection.state.filters ? this.collection.state.filters : [];
             this.collection.state.filters.push(filter);
             obj.FilterHeaderCell.__super__.render.apply(this);

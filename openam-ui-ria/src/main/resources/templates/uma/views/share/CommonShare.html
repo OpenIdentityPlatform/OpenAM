@@ -1,6 +1,7 @@
- <div class="page-header">
+
+<div class="page-header">
     {{#if icon}}
-        <img title="{{ name }}" src="{{ icon }}" class="float-left border-circle-32"/>
+        <img title="{{ name }}" src="{{ icon }}" alt="Image not found" class="float-left border-circle-32"/>
     {{/if}}
     <h1>{{ name }}</h1>
 </div>
@@ -46,16 +47,16 @@
     </div>
 
     <div id="footerShare" class="form-group clearfix">
+        <div id="footerNav" class="form-group">
+            <a href="#" id="toggleAdvanced" ><span class="icon-cog"></span>{{t 'uma.share.advanced'}}</a>
+            <div id="shareCounter"></div>
+        </div>
         {{#if dialog}}
         <div id="footerActions" class="form-group">
             <a class="btn btn-primary" href="#uma/resources/" id="done" >{{t 'common.form.done'}}</a>
         </div>
         {{/if}}
 
-        <div id="footerNav" class="form-group">
-            <a href="#" id="toggleAdvanced" ><span class="icon-cog"></span>{{t 'uma.share.advanced'}}</a>
-            <div id="shareCounter"></div>
-        </div>
     </div>
 
 </div>

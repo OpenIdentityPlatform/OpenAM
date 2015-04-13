@@ -65,14 +65,18 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
                 columns: [{
                     name: "requestingPartyId",
                     label: $.t("uma.history.grid.header.0"),
-                    headerCell: BackgridUtils.FilterHeaderCell,
+                    headerCell: BackgridUtils.FilterHeaderCell.extend({
+                        addClassName: "col-md-4"
+                    }),
                     cell: 'string',
                     editable: false,
                     sortType: "toggle"
                 }, {
                     name: "resourceSetName",
                     label: $.t("uma.history.grid.header.1"),
-                    headerCell: BackgridUtils.FilterHeaderCell,
+                    headerCell: BackgridUtils.FilterHeaderCell.extend({
+                        addClassName: "col-md-4"
+                    }),
                     cell: BackgridUtils.UriExtCell,
                     href: function(rawValue, formattedValue, model){
                         return "#uma/resources/" + encodeURIComponent(model.get('resourceSetId'));
@@ -89,15 +93,22 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
                         }
                     }),
                     editable: false,
-                    sortType: "toggle"
+                    sortType: "toggle",
+                    headerCell : BackgridUtils.ClassHeaderCell.extend({
+                        className: "col-md-2"
+                    })
                 }, {
                     name: "eventTime",
                     label: $.t("uma.history.grid.header.3"),
                     cell: BackgridUtils.DatetimeAgoCell,
                     editable: false,
-                    sortType: "toggle"
+                    sortType: "toggle",
+                    headerCell : BackgridUtils.ClassHeaderCell.extend({
+                        className: "col-md-2"
+                    })
                 }],
                 emptyText: $.t("uma.all.grid.empty"),
+                className:"backgrid table table-striped",
                 collection: collection
             });
 

@@ -41,14 +41,18 @@ define("org/forgerock/openam/ui/uma/views/share/BootstrapModalShare", [
 
         actions: [],
 
+        initialize: function() {
+            $('body').append('<div id="dialogs"></div>');
+        },
+
         show: function(callback) {
 
             this.data.dialogTitle = 'Share the resource';
+            this.$el.empty();
 
             this.parentRender(_.bind(function() {      
                 var self = this,
                     commonShareView = new CommonShare();
-
                 this.$el.addClass('show');
                 this.$el.on('click','#done , #btn-close, #shareButton' , _.bind(this.close, this));
 
@@ -58,10 +62,11 @@ define("org/forgerock/openam/ui/uma/views/share/BootstrapModalShare", [
                 commonShareView.render([this.data.currentResourceSetId, true], callback);
 
                 this.$el.find("#modal")
+                    .modal('show')
                     .on("hidden.bs.modal", function (e) {
                         self.close(e);
-                    })
-                    .modal("show");
+                    });
+                    
 
             }, this));
         },
@@ -71,8 +76,8 @@ define("org/forgerock/openam/ui/uma/views/share/BootstrapModalShare", [
         },
 
         close: function(e) {
-            this.$el.find("#modal").modal("hide");
-            this.$el.removeClass('show').hide().empty();        
+            this.$el.find("#modal").modal('hide');
+            this.$el.removeClass('show');
         },
 
         render: function() {

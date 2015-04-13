@@ -116,7 +116,10 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                     name: "subject",
                     label: $.t("uma.resources.show.grid.0"),
                     cell: 'string',
-                    editable: false
+                    editable: false,
+                    headerCell : BackgridUtils.ClassHeaderCell.extend({
+                          className: "col-md-6"
+                    })
                 },
                 {
                     name: "scopes",
@@ -131,10 +134,14 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                         }
 
                     }),
-                    editable: false
+                    editable: false,
+                    headerCell : BackgridUtils.ClassHeaderCell.extend({
+                          className: "col-md-6"
+                    })
                 }],
                 collection: collection,
-                emptyText: $.t("uma.all.grid.empty")
+                emptyText: $.t("uma.all.grid.empty"),
+                className:"backgrid table table-striped"
             });
 
             this.parentRender(function() {
@@ -142,6 +149,9 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                 self.renderPermissionOptions();
                 self.renderShareCounter(callback);
                 self.$el.find("#advancedView").append(grid.render().el);
+                self.$el.find(".page-header img").error(function () { 
+                    $(this).hide(); 
+                });
             });
         },
         renderPermissionOptions: function() {

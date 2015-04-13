@@ -1,6 +1,7 @@
 /* VARIABLES */
 @table-base-color: #1f6fb1;
-@cell-hover-color: #B6D4EA;
+@cell-hover-color: #519387;
+@text-base-color: #1f2223;
 
 .webkit-text-rendering-bugfix{
     -webkit-transform: translateZ(0px);
@@ -220,6 +221,10 @@ body, .modal-open {
     }
 }
 
+.modal-header {
+    background-color:@cell-hover-color;
+}
+
 .page-header {
     h1 {
         .fa {
@@ -227,6 +232,9 @@ body, .modal-open {
             font-size: 20px;
             vertical-align: middle;
         }
+    }
+    img {
+    float: left;
     }
 }
 
@@ -262,43 +270,58 @@ body, .modal-open {
         color: grey;
     }
 
-    .backgrid{
+    .panel-body {
+        padding: 5px 20px;
+    }
 
-        max-width: none;
-        position: relative;
+    .template-cell a {
+        float:right;
+    }
+
+
+    .backgrid{
 
         .string-cell, .uri-cell, .email-cell,  .string-cell.editor input[type=text],  .uri-cell.editor input[type=text], .email-cell.editor input[type=text], .datetime-cell {
             text-align: left;
         }
 
         td.uri-cell{
-            padding:13px 5px;
-            border-left: 1px solid transparent;
-            border-right: 1px solid transparent;
 
             // TODO: BOOTSTRAP: Removed due to build issues. Will need re-adding
             //.transition(background, 0.1s);
             &:hover{
                 background-color: @cell-hover-color;
                 cursor:pointer;
-                border-color: lighten(@table-base-color, 35%);
+                a {
+                    color:#f7f7f7;
+                }
             }
+            
         }
 
         td:not(.uri-cell) a {
             // Adds the click event to the td so that the entire cell is clickable so underline not needed
             text-decoration: underline;
         }
-
+               
         th {
             text-align: left;
-            border-bottom: none;
             font-weight: bold;
             font-size: 15px;
             vertical-align: bottom;
-            background-color: white;
+            background-color:transparent;
+
+            &.colored {
+                a {
+                    color: @cell-hover-color;
+                }       
+            }
+
             a {
-                color: #777;
+                float: left;
+                color: @text-base-color;
+                font-size: 14px;
+
             }
 
             &.sortable a {
@@ -306,49 +329,29 @@ body, .modal-open {
             }
 
             &.descending a, &.ascending a {
-                color: @table-base-color;
                 padding-right:0;
             }
         }
 
-        thead tr {
-            border-bottom: 1px solid lighten(@table-base-color, 45%);
-        }
-
         tbody tr {
-            background-color: lighten(@table-base-color, 50%);
-            border-bottom: 1px solid  lighten(@table-base-color, 45%);
-            color: @table-base-color;
-
-            &:nth-child(even) {
-                background-color: lighten(@table-base-color, 55%);
-            }
 
             &.empty {
-                .invalid-background(lighten(@table-base-color, 45%));
-                border-top: 1px solid lighten(@table-base-color, 45%);
-                td{
+                td {
                     display: table-cell;
                     padding:10px;
                 }
             }
 
             td {
-                border-bottom: 1px solid lighten(@table-base-color, 45%);
-
-                a {
-                    color: @table-base-color;
-                    text-decoration: none;
-                    font-weight:bold;
-                }
+                padding: 8px 8px;
+                vertical-align: middle;
 
                 &.icon-share {
-                    font-size:15px;
-                    padding:0 10px;
-                    text-align:center;
+                    font-size:14px;
+                    text-align:right;
 
                     &:hover {
-                        background-color: @cell-hover-color;
+                        color: @cell-hover-color;
                     }
                 }
             }
@@ -356,11 +359,18 @@ body, .modal-open {
 
         }
         .ascending .sort-caret{
-            border-bottom: 4px solid @table-base-color;
+            border-bottom: 4px solid @cell-hover-color;
+        }
+        .ascending a{
+            color: @cell-hover-color;
+        }
+
+        .descending a{
+            color: @cell-hover-color;
         }
 
         .descending .sort-caret {
-            border-top: 4px solid @table-base-color;
+            border-top: 4px solid @cell-hover-color;
         }
 
         tbody tr.unsaved-changes {
@@ -395,7 +405,6 @@ body, .modal-open {
     .backgrid-container{
         width: 100%;
         overflow-x: scroll;
-        border: 1px solid lighten(@table-base-color, 45%);
         border-bottom: none;
         height: auto;
         overflow: auto;
@@ -436,12 +445,7 @@ body, .modal-open {
     }
 
     .search {
-        &:after {
-            background-color: lighten(@table-base-color, 30%);
-        }
-        &:before {
-            border: 3px solid lighten(@table-base-color, 30%);
-        }
+    
     }
 
     .selectize-control.multi .selectize-input, .selectize-control.single .selectize-input{
@@ -470,6 +474,7 @@ body, .modal-open {
         margin: 15px -10px -20px -10px;
         border-top: 1px solid rgb(213, 213, 213);
         padding: 15px;
+        padding-bottom: 0px;
         background-color: #eee;
         border-radius: 0 0 5px 5px;
         #footerNav{
@@ -495,6 +500,14 @@ body, .modal-open {
                 cursor:auto;
             }
         }
+
+        #footerActions {
+            float:right;
+        }
+
+        #footerNav {
+            float:left;
+        }
     }
 
     #advancedView {
@@ -502,7 +515,6 @@ body, .modal-open {
         max-height:0;
         opacity:0;
         transition:max-height 500ms ease-out, opacity 500ms ease-in-out ;
-        border: 1px solid lighten(@table-base-color, 45%);
         border-bottom:none;
     }
 

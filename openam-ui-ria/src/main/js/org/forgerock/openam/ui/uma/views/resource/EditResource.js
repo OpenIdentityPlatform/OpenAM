@@ -87,7 +87,7 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
         },
         onShare: function() {
             BootstrapModalShare.data.currentResourceSetId = this.model.id;
-            BootstrapModalShare.render();
+            BootstrapModalShare.render();        
         },
         render: function(args, callback) {
             var collection, grid, id = null, options, paginator, RevokeCell, SelectizeCell, self = this;
@@ -198,24 +198,34 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
                         label: $.t("uma.resources.show.grid.0"),
                         cell: 'string',
                         // headerCell: BackgridUtils.FilterHeaderCell,
-                        editable: false
+                        editable: false,
+                        headerCell : BackgridUtils.ClassHeaderCell.extend({
+                            className: "col-md-4"
+                        })
                     },
                     {
                         name: "permissions",
                         label: $.t("uma.resources.show.grid.2"),
                         cell: SelectizeCell,
                         editable: false,
-                        sortable: false
+                        sortable: false,
+                        headerCell : BackgridUtils.ClassHeaderCell.extend({
+                            className: "col-md-6"
+                        })
                     },
                     {
                         name: "edit",
                         label: "",
                         cell: RevokeCell,
                         editable: false,
-                        sortable: false
+                        sortable: false,
+                        headerCell : BackgridUtils.ClassHeaderCell.extend({
+                            className: "col-md-2"
+                        })
                     }],
                 collection: collection,
-                emptyText: $.t("uma.all.grid.empty")
+                emptyText: $.t("uma.all.grid.empty"),
+                className:"backgrid table table-striped"
             });
 
             // FIXME: Re-enable filtering and pagination

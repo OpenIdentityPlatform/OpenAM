@@ -108,31 +108,12 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
 
             columns = [
                 {
-                    name: "share",
-                    label: "",
-                    cell: Backgrid.Cell.extend({
-                        className: "icon-share",
-                        events: { "click": "share" },
-                        share: function(e) {
-                            self.data.currentResourceSetId = this.model.get('_id');
-
-                            EventManager.sendEvent(Constants.EVENT_SHOW_DIALOG,{
-                                route: Router.configuration.routes.dialogShare,
-                                noViewChange: true
-                            });
-                        },
-                        render: function () {
-                            this.delegateEvents();
-                            return this;
-                        }
-                    }),
-                    editable: false
-                },
-                {
                     name: "name",
                     label: $.t("uma.resources.list.grid.0"),
                     cell: BackgridUtils.UriExtCell,
-                    headerCell: BackgridUtils.FilterHeaderCell,
+                    headerCell: BackgridUtils.FilterHeaderCell.extend({
+                        addClassName: "col-md-5"
+                    }),
                     href: function(rawValue, formattedValue, model){
                         return "#uma/resources/" + model.get('_id');
                     },
@@ -147,13 +128,44 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
                         return "#uma/apps/" + encodeURIComponent(model.get('resourceServer'));
                     },*/
                     cell: "string",
-                    editable: false
+                    editable: false,
+                    headerCell : BackgridUtils.ClassHeaderCell.extend({
+                        className: "col-md-1"
+                    })
                 },
                 {
                     name: "type",
                     label: $.t("uma.resources.list.grid.2"),
                     cell: "string",
+                    headerCell : BackgridUtils.ClassHeaderCell.extend({
+                        className: "col-md-4"
+                    }),
                     editable: false
+                },
+                {
+                    name: "share",
+                    label: "",
+                    cell: Backgrid.Cell.extend({
+                        className: "icon-share",
+                        events: { "click": "share" },
+                        share: function(e) {
+                            self.data.currentResourceSetId = this.model.get('_id');
+
+                            EventManager.sendEvent(Constants.EVENT_SHOW_DIALOG,{
+                                route: Router.configuration.routes.dialogShare,
+                                noViewChange: true
+                            });
+                        },
+                        render: function () {
+                            this.$el.attr({"title": "Share the resource"});
+                            this.delegateEvents();
+                            return this;
+                        }
+                    }),
+                    editable: false,
+                    headerCell : BackgridUtils.ClassHeaderCell.extend({
+                        className: "col-md-1"
+                    })
                 }
             ];
 
@@ -162,6 +174,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
 
             grid = new Backgrid.Grid({
                 columns: columns,
+                className:"backgrid table table-striped",
                 collection: self.data.resourceSetCollection,
                 emptyText: $.t("uma.all.grid.empty")
             });
