@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock Inc
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 package com.sun.identity.sm;
 
@@ -384,8 +384,8 @@ public class SMSSchema {
             Document doc = builder.parse(in);
             return (doc);
         } catch (SAXParseException pe) {
-            SMSEntry.debug.error("SMSSchema: SAXPasrseException", pe);
-            Object params[] = { new Integer(pe.getLineNumber()) };
+            SMSEntry.debug.error("SMSSchema: SAXParseException", pe);
+            Object params[] = { new Integer(pe.getLineNumber()), pe };
             throw (new SchemaException(IUMSConstants.UMS_BUNDLE_NAME,
                     IUMSConstants.SMS_SMSSchema_parser_error, params));
         } catch (SAXException sax) {
