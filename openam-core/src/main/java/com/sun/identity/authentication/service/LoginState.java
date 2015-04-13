@@ -28,10 +28,6 @@
  */
 package com.sun.identity.authentication.service;
 
-import static java.util.Collections.unmodifiableSet;
-import static org.forgerock.openam.session.SessionConstants.*;
-import static org.forgerock.openam.utils.CollectionUtils.asSet;
-
 import com.iplanet.am.sdk.AMException;
 import com.iplanet.am.sdk.AMObject;
 import com.iplanet.am.sdk.AMStoreConnection;
@@ -110,6 +106,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+
+import static java.util.Collections.unmodifiableSet;
+import static org.forgerock.openam.session.SessionConstants.*;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
 /**
  * This class maintains the User's login state information from the time user
@@ -5624,7 +5624,7 @@ public class LoginState {
      * failover is enabled
      */
     void updateSessionForFailover() {
-        if (!isNoSession() || stateless) {
+        if (stateless || isNoSession()) {
             return;
         }
 
