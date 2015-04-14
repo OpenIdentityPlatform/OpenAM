@@ -24,10 +24,7 @@
  *
  * $Id: UserIdRepo.java,v 1.21 2009/12/23 00:22:34 goodearth Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.setup;
 
@@ -164,8 +161,9 @@ class UserIdRepo {
                 XMLUtils.escapeSpecialCharacters(getBindPassword(userRepo)));
 
             String s = (String) userRepo.get(SetupConstants.USER_STORE_SSL);
-            String ssl = ((s != null) && s.equals("SSL")) ? "true" : "false";
-            xml = StringUtils.strReplaceAll(xml, "@UM_SSL@", ssl);
+            boolean ssl = "SSL".equals(s);
+            xml = StringUtils.strReplaceAll(xml, "@LDAP_CONNECTION_MODE@",
+                    ssl ? SetupConstants.LDAP_CONNECTION_MODE_LDAPS : SetupConstants.LDAP_CONNECTION_MODE_LDAP);
             xml = StringUtils.strReplaceAll(xml, "@CONFIG_NAME@", configName);
             xml = StringUtils.strReplaceAll(xml, "@CONFIG_ID@", type);
 
