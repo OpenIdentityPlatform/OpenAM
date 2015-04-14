@@ -18,7 +18,6 @@ package org.forgerock.openam.rest.uma;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.forgerock.json.fluent.JsonValue.*;
-import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
@@ -56,7 +55,6 @@ import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.openam.uma.UmaPolicy;
-import org.forgerock.openam.uma.UmaPolicyConverter;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.Pair;
@@ -72,7 +70,6 @@ public class UmaPolicyServiceImplTest {
 
     private PolicyResourceDelegate policyResourceDelegate;
     private ResourceSetDescription resourceSet;
-    private UmaPolicyConverter policyConverter;
 
     @BeforeMethod
     public void setup() throws org.forgerock.oauth2.core.exceptions.NotFoundException, ServerException {
@@ -82,9 +79,8 @@ public class UmaPolicyServiceImplTest {
         Config<UmaAuditLogger> lazyAuditLogger = mock(Config.class);
         UmaAuditLogger auditLogger = mock(UmaAuditLogger.class);
         ContextHelper contextHelper = mock(ContextHelper.class);
-        policyConverter = mock(UmaPolicyConverter.class);
         policyService = new UmaPolicyServiceImpl(policyResourceDelegate, resourceSetStoreFactory, lazyAuditLogger,
-                contextHelper, policyConverter);
+                contextHelper);
 
         given(contextHelper.getRealm(Matchers.<ServerContext>anyObject())).willReturn("REALM");
         given(contextHelper.getUserId(Matchers.<ServerContext>anyObject())).willReturn("RESOURCE_OWNER_ID");
@@ -204,11 +200,10 @@ public class UmaPolicyServiceImplTest {
                 Promises.newFailedPromise((ResourceException) new NotFoundException());
         Promise<List<Resource>, ResourceException> createPolicyPromise = Promises.newSuccessfulPromise(createdPolicies);
 
-        Set<JsonValue> jsonPolicies = asSet(createBackendScopeAPolicyJson(), createBackendScopeBPolicyJson());
-        given(policyConverter.asUnderlyingPolicies(any(UmaPolicy.class))).willReturn(jsonPolicies);
-
-        given(policyResourceDelegate.queryPolicies(eq(context), any(QueryRequest.class))).willReturn(queryPromise);
-        given(policyResourceDelegate.createPolicies(context, jsonPolicies)).willReturn(createPolicyPromise);
+        given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
+                .willReturn(queryPromise);
+        given(policyResourceDelegate.createPolicies(eq(context), Matchers.<Set<JsonValue>>anyObject()))
+                .willReturn(createPolicyPromise);
 
         //When
         UmaPolicy umaPolicy = policyService.createPolicy(context, policy).getOrThrowUninterruptibly();

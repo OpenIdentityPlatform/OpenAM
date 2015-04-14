@@ -219,7 +219,20 @@ public class UmaPolicy {
         return scopes;
     }
 
-    JsonValue convertFromUmaPolicy() {
+    /**
+     * Converts the {@code UmaPolicy} into its underlying backend policies in JSON format.
+     *
+     * @return The set of underlying backend policies that represent this UMA policy.
+     */
+    public Set<JsonValue> asUnderlyingPolicies() {
+        Set<JsonValue> underlyingPolicies = new HashSet<JsonValue>();
+        for (JsonValue p : convertFromUmaPolicy()) {
+            underlyingPolicies.add(createPolicyJson(p));
+        }
+        return underlyingPolicies;
+    }
+
+    private JsonValue convertFromUmaPolicy() {
         JsonValue policies = json(object());
         for (JsonValue permission : policy.get(PERMISSIONS_KEY)) {
             for (JsonValue scope : permission.get(SCOPES_KEY)) {
@@ -230,6 +243,31 @@ public class UmaPolicy {
             }
         }
         return policies;
+    }
+
+    private JsonValue createPolicyJson(JsonValue aggregatePolicy) {
+        String policyName = resourceSet.getName() + " - " + resourceSet.getId() + "-"
+                + aggregatePolicy.getPointer().get(0).hashCode();
+        List<Object> subjects = new ArrayList<Object>();
+        for (String subject : aggregatePolicy.asList(String.class)) {
+            subjects.add(object(
+                    field(BACKEND_POLICY_SUBJECT_TYPE_KEY, BACKEND_POLICY_SUBJECT_TYPE_JWT_CLAIM),
+                    field(BACKEND_POLICY_SUBJECT_CLAIM_NAME_KEY, BACKEND_POLICY_SUBJECT_CLAIM_NAME),
+                    field(BACKEND_POLICY_SUBJECT_CLAIM_VALUE_KEY, subject)));
+        }
+        return json(object(
+                field(BACKEND_POLICY_NAME_KEY, policyName),
+                field("applicationName", getResourceServerId().toLowerCase()), //Lowercase as ldap is case insensitive
+                field(BACKEND_POLICY_RESOURCE_TYPE_KEY, resourceSet.getId()),
+                field(BACKEND_POLICY_RESOURCES_KEY, array(UMA_POLICY_SCHEME + getId())),
+                field(BACKEND_POLICY_ACTION_VALUES_KEY, object(
+                                field(aggregatePolicy.getPointer().get(0), true))
+                ),
+                field(BACKEND_POLICY_SUBJECT_KEY, object(
+                                field(BACKEND_POLICY_SUBJECT_TYPE_KEY, BACKEND_POLICY_SUBJECT_TYPE_OR),
+                                field(BACKEND_POLICY_SUBJECTS_KEY, subjects))
+                )
+        ));
     }
 
     /**

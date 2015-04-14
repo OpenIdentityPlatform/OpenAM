@@ -42,7 +42,7 @@ public class UmaPolicyTest {
         resourceSet.setDescription(json(object(field("name", "NAME"))));
     }
 
-    static JsonValue createUmaPolicyJson() {
+    private JsonValue createUmaPolicyJson() {
         return json(object(
                 field("policyId", "POLICY_ID"),
                 field("permissions",  array(
@@ -56,22 +56,22 @@ public class UmaPolicyTest {
         ));
     }
 
-    static Set<Resource> createUnderlyingPolicies() {
+    private Set<Resource> createUnderlyingPolicies() {
         Set<Resource> policies = new HashSet<Resource>();
         policies.add(new Resource("ID_1", "REVISION_1", createUnderlyingScopeAPolicyJson()));
         policies.add(new Resource("ID_2", "REVISION_2", createUnderlyingScopeBPolicyJson()));
         return policies;
     }
 
-    static JsonValue createUnderlyingScopeAPolicyJson() {
+    private JsonValue createUnderlyingScopeAPolicyJson() {
         return createUnderlyingScopeAPolicyJson("POLICY_ID");
     }
 
-    static JsonValue createUnderlyingScopeAPolicyJson(String id) {
+    private JsonValue createUnderlyingScopeAPolicyJson(String id) {
         return json(object(
                 field("name", "NAME - " + id + "-" + "SCOPE_A".hashCode()),
                 field("applicationName", "client_id"),
-                field("resourceTypeUuid", "RESOURCE_TYPE_UUID"),
+                field("resourceTypeUuid", "RESOURCE_SET_ID"),
                 field("resources", array("uma://POLICY_ID")),
                 field("actionValues", object(field("SCOPE_A", true))),
                 field("subject", object(
@@ -90,15 +90,15 @@ public class UmaPolicyTest {
         ));
     }
 
-    static JsonValue createUnderlyingScopeBPolicyJson() {
+    private JsonValue createUnderlyingScopeBPolicyJson() {
         return createUnderlyingScopeBPolicyJson("POLICY_ID");
     }
 
-    static JsonValue createUnderlyingScopeBPolicyJson(String id) {
+    private JsonValue createUnderlyingScopeBPolicyJson(String id) {
         return json(object(
                 field("name", "NAME - " + id + "-" + "SCOPE_B".hashCode()),
                 field("applicationName", "client_id"),
-                field("resourceTypeUuid", "RESOURCE_TYPE_UUID"),
+                field("resourceTypeUuid", "RESOURCE_SET_ID"),
                 field("resources", array("uma://POLICY_ID")),
                 field("actionValues", object(field("SCOPE_B", true))),
                 field("subject", object(
@@ -366,4 +366,28 @@ public class UmaPolicyTest {
         assertThat(scopes).containsOnly("SCOPE_A", "SCOPE_B");
     }
 
+    @Test
+    public void shouldConvertUmaPolicyToUnderlyingPolicies() throws BadRequestException {
+
+        //Given
+        UmaPolicy umaPolicy = UmaPolicy.valueOf(resourceSet, createUmaPolicyJson());
+
+        //When
+        Set<JsonValue> underlyingPolicies = umaPolicy.asUnderlyingPolicies();
+
+        //Then
+        boolean foundScopeAPolicy = false;
+        boolean foundScopeBPolicy = false;
+        for (JsonValue policy : underlyingPolicies) {
+            if (policy.contains("NAME - RESOURCE_SET_ID-" + "SCOPE_A".hashCode())) {
+                assertThat(policy.asMap()).isEqualTo(createUnderlyingScopeAPolicyJson("RESOURCE_SET_ID").asMap());
+                foundScopeAPolicy = true;
+            } else if (policy.contains("NAME - RESOURCE_SET_ID-"+ "SCOPE_B".hashCode())) {
+                assertThat(policy.asMap()).isEqualTo(createUnderlyingScopeBPolicyJson("RESOURCE_SET_ID").asMap());
+                foundScopeBPolicy = true;
+            }
+        }
+        assertThat(foundScopeAPolicy).isTrue();
+        assertThat(foundScopeBPolicy).isTrue();
+    }
 }

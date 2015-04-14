@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: ApplicationManager.java,v 1.11 2010/01/13 23:41:57 veiming Exp $
  *
- * Portions Copyrighted 2013-2015 ForgeRock AS
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
@@ -184,7 +184,7 @@ public final class ApplicationManager {
     private static Set<Application> getAllApplication(String realm) 
         throws EntitlementException {
         EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            PrivilegeManager.superAdminSubject, realm);
+                PrivilegeManager.superAdminSubject, realm);
         realm = ec.getRealmName(realm);
 
         Set<Application> appls = applications.get(realm);
@@ -337,10 +337,34 @@ public final class ApplicationManager {
      * @param application Application object.
      */
     public static void saveApplication(
-        Subject adminSubject,
-        String realm,
-        Application application
+            Subject adminSubject,
+            String realm,
+            Application application
     ) throws EntitlementException {
+        saveApplication(adminSubject, realm, application, true);
+    }
+
+    /**
+     * Saves an UMA application - does not require a resource type.
+     *
+     * @param adminSubject Admin Subject who has the rights to access
+     *        configuration datastore.
+     * @param realm Realm Name.
+     * @param application Application object.
+     */
+    public static void saveUmaApplication(
+            Subject adminSubject,
+            String realm,
+            Application application
+    ) throws EntitlementException {
+        saveApplication(adminSubject, realm, application, false);
+    }
+
+    private static void saveApplication(
+            Subject adminSubject,
+            String realm,
+            Application application,
+            boolean requireResourceTypes) throws EntitlementException {
         boolean allow = (adminSubject == PrivilegeManager.superAdminSubject);
         
         if (!allow) {
@@ -362,18 +386,20 @@ public final class ApplicationManager {
             throw new EntitlementException(228);
         }
 
-        Set<String> resourceTypeIds = application.getResourceTypeUuids();
+        if (requireResourceTypes) {
+            Set<String> resourceTypeIds = application.getResourceTypeUuids();
 
-        if (CollectionUtils.isEmpty(resourceTypeIds)) {
-            throw new EntitlementException(EntitlementException.MISSING_RESOURCE_TYPE);
-        }
+            if (CollectionUtils.isEmpty(resourceTypeIds)) {
+                throw new EntitlementException(EntitlementException.MISSING_RESOURCE_TYPE);
+            }
 
-        // When this class is refactored (AME-6287) this dependency should be injected.
-        ResourceTypeService resourceTypeService = InjectorHolder.getInstance(ResourceTypeService.class);
+            // When this class is refactored (AME-6287) this dependency should be injected.
+            ResourceTypeService resourceTypeService = InjectorHolder.getInstance(ResourceTypeService.class);
 
-        for (String resourceTypeId : resourceTypeIds) {
-            if (!resourceTypeService.contains(adminSubject, realm, resourceTypeId)) {
-                throw new EntitlementException(EntitlementException.INVALID_RESOURCE_TYPE, resourceTypeId);
+            for (String resourceTypeId : resourceTypeIds) {
+                if (!resourceTypeService.contains(adminSubject, realm, resourceTypeId)) {
+                    throw new EntitlementException(EntitlementException.INVALID_RESOURCE_TYPE, resourceTypeId);
+                }
             }
         }
 

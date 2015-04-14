@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-2015 ForgeRock AS.
 */
 package org.forgerock.openam.forgerockrest.entitlements.wrappers;
 
@@ -30,7 +30,7 @@ public class ApplicationManagerWrapper {
 
     /**
      * Wrapper for the static method
-     * {@link ApplicationManager#saveApplication(javax.security.auth.Subject, String, Application)}.
+     * {@link ApplicationManager#saveApplication(Subject, String, Application)}.
      *
      * @param adminSubject An admin-level {@link Subject}.
      * @param application The {@link Application} to save
@@ -39,6 +39,19 @@ public class ApplicationManagerWrapper {
     public void saveApplication(Subject adminSubject, Application application)
             throws EntitlementException {
         ApplicationManager.saveApplication(adminSubject, application.getRealm(), application);
+    }
+
+    /**
+     * Wrapper for the static method
+     * {@link ApplicationManager#saveUmaApplication(Subject, String, Application)}.
+     *
+     * @param adminSubject An admin-level {@link Subject}.
+     * @param application The {@link Application} to save
+     * @throws EntitlementException If there was an issue saving the application
+     */
+    public void saveUmaApplication(Subject adminSubject, Application application)
+            throws EntitlementException {
+        ApplicationManager.saveUmaApplication(adminSubject, application.getRealm(), application);
     }
 
     /**

@@ -33,7 +33,7 @@ public final class UmaConstants {
     /** Constant for the UMA policy scheme. */
     public static final String UMA_POLICY_SCHEME = "uma://";
     /** Constant for the UMA policy scheme pattern. */
-    public static final String UMA_POLICY_SCHEME_PATTERN = UMA_POLICY_SCHEME + "*";
+    public static final String UMA_POLICY_SCHEME_PATTERN = UMA_POLICY_SCHEME + "-*-";
 
     /** */
     public static final String UMA_POLICY_APPLICATION_TYPE = "iPlanetAMWebAgentService"; //TODO

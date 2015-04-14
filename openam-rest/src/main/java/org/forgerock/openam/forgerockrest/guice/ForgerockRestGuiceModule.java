@@ -76,6 +76,7 @@ import org.forgerock.openam.rest.sms.SmsSingletonProvider;
 import org.forgerock.openam.rest.sms.SmsSingletonProviderFactory;
 import org.forgerock.openam.rest.uma.UmaIdRepoCreationListener;
 import org.forgerock.openam.rest.uma.UmaPolicyServiceImpl;
+import org.forgerock.openam.rest.uma.UmaResourceSetRegistrationListener;
 import org.forgerock.openam.scripting.ScriptException;
 import org.forgerock.openam.uma.UmaPolicyService;
 import org.forgerock.openam.utils.AMKeyProvider;
@@ -175,7 +176,8 @@ public class ForgerockRestGuiceModule extends AbstractModule {
         Multibinder.newSetBinder(binder(), IdRepoCreationListener.class)
                 .addBinding().to(UmaIdRepoCreationListener.class);
 
-        Multibinder.newSetBinder(binder(), ResourceSetRegistrationListener.class);
+        Multibinder.newSetBinder(binder(), ResourceSetRegistrationListener.class)
+                .addBinding().to(UmaResourceSetRegistrationListener.class);
 
         // Scripting configuration
         bind(new TypeLiteral<ExceptionMappingHandler<ScriptException, ResourceException>>() {})
