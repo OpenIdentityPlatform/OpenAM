@@ -62,6 +62,13 @@
             <classifier>min</classifier>
             <type>js</type>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>qrcode</artifactId>
+            <version>1.0.0</version>
+            <classifier>min</classifier>
+            <type>js</type>
+        </dependency>
     </dependencies>
 
     <build>

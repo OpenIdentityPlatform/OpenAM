@@ -29,14 +29,31 @@
 
 
 <ModuleProperties moduleName="OATH" version="1.0">
-    <Callbacks length="2" order="1" timeout="120" header="Sign in to OpenAM">
+    <Callbacks length="2" order="1" timeout="120" header="Two Factor Authentication - 2nd factor">
         <PasswordCallback>
-            <Prompt>One Time Password:</Prompt>
+            <Prompt>Enter verification code:</Prompt>
         </PasswordCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value>Submit OTP Code</Value>
+                    <Value>Submit</Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value>Register device</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    <Callbacks length="3" order="2" timeout="120" header="Register your device with OpenAM">
+        <TextOutputCallback>
+            Scan the barcode image below with the ForgeRock Authenticator App. Once registered click the button to
+            enter your verification code and login.
+        </TextOutputCallback>
+        <TextOutputCallback messageType="script">PLACEHOLDER</TextOutputCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>Login using verification code</Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>

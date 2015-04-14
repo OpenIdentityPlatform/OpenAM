@@ -35,7 +35,6 @@ require.config({
 
         "bootstrap":        "libs/bootstrap.min",
         "bootstrap-dialog": "libs/bootstrap-dialog.min",
-
         "doTimeout":  "libs/jquery.ba-dotimeout-1.0-min",
         "form2js":    "libs/form2js-2.0",
         "handlebars": "libs/handlebars-1.3.0-min",
@@ -47,6 +46,7 @@ require.config({
         "spin":       "libs/spin-2.0.1-min",
         "underscore": "libs/lodash-2.4.1-min",
         "xdate":      "libs/xdate-0.8-min",
+        "qrcode":       "libs/qrcode-1.0.0-min",
 
         "ThemeManager": "org/forgerock/openam/ui/common/util/ThemeManager",
         "UserDelegate": "org/forgerock/openam/ui/user/delegates/UserDelegate"
@@ -112,6 +112,9 @@ require.config({
         },
         "xdate": {
             exports: "xdate"
+        },
+        "qrcode": {
+            exports: "qrcode"
         }
     }
 });
@@ -152,7 +155,8 @@ require([
     "bootstrap",
     "bootstrap-dialog",
     "org/forgerock/openam/ui/uma/main",
-    "org/forgerock/openam/ui/console/main"
+    "org/forgerock/openam/ui/console/main",
+    "qrcode"
 ], function(constants, eventManager, $, _, Backbone) {
     // Helpers for the code that hasn't been properly migrated to require these as explicit dependencies:
     window.$ = $;

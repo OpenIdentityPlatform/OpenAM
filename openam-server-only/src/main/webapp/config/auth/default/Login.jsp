@@ -26,7 +26,7 @@
 
 --%>
 <%--
-   Portions Copyrighted 2012-2014 ForgeRock AS
+   Portions Copyrighted 2012-2015 ForgeRock AS
 --%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -55,6 +55,7 @@
             <!--[if IE 9]> <link href="<%= ServiceURI%>/css/ie9.css" rel="stylesheet" type="text/css"> <![endif]-->
             <!--[if lte IE 7]> <link href="<%= ServiceURI%>/css/ie7.css" rel="stylesheet" type="text/css"> <![endif]-->
             <script language="JavaScript" src="<%= ServiceURI%>/js/auth.js" type="text/javascript"></script>
+            <script language="JavaScript" src="<%= ServiceURI%>/js/qrcode.js" type="text/javascript"></script>
             <jato:content name="validContent">
                 <script language="JavaScript" type="text/javascript">
                     <!--
