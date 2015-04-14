@@ -58,18 +58,25 @@ import static org.forgerock.json.fluent.JsonValue.json;
  */
 public class SmsJsonConverter {
     private final ServiceSchema schema;
-    private final BiMap<String, String> attributeNameToResourceName;
-    private final BiMap<String, String> resourceNameToAttributeName;
-    private final HashMap<String, String> attributeNameToSection;
-
     private final MapValueParser nameValueParser = new MapValueParser();
-    private final Debug debug;
-    private Map<String, AttributeSchemaConverter> attributeSchemaConverters = new HashMap<String, AttributeSchemaConverter>();
+    private final Debug debug = Debug.getInstance("SmsJsonConverter");
+    private final Map<String, AttributeSchemaConverter> attributeSchemaConverters = new HashMap<String, AttributeSchemaConverter>();
+
+    private BiMap<String, String> attributeNameToResourceName;
+    private BiMap<String, String> resourceNameToAttributeName;
+    private HashMap<String, String> attributeNameToSection;
     private List<String> hiddenAttributeNames;
+    private boolean initialised = false;
 
     @Inject
     public SmsJsonConverter(ServiceSchema schema) {
         this.schema = schema;
+    }
+
+    private synchronized void init() {
+        if (initialised) {
+            return;
+        }
         attributeNameToResourceName = getAttributeNameToResourceName(schema);
         hiddenAttributeNames = getHiddenAttributeNames();
 
@@ -91,7 +98,8 @@ public class SmsJsonConverter {
 
         resourceNameToAttributeName = attributeNameToResourceName.inverse();
         attributeNameToSection = getAttributeNameToSection();
-        this.debug = Debug.getInstance("SmsJsonConverter");
+
+        initialised = true;
     }
 
     private AttributeSchemaConverter getAttributeSchemaValue(AttributeSchema.Syntax syntax) {
@@ -116,6 +124,10 @@ public class SmsJsonConverter {
      * @return Json representation of attributeValuePairs
      */
     public JsonValue toJson(Map<String, HashSet<String>> attributeValuePairs) {
+        if (!initialised) {
+            init();
+        }
+
         JsonValue parentJson = json(new HashMap<String, Object>());
 
         try {
@@ -230,6 +242,10 @@ public class SmsJsonConverter {
      * @return Map representation of jsonValue
      */
     public Map<String, Set<String>> fromJson(JsonValue jsonValue) {
+        if (!initialised) {
+            init();
+        }
+
         Map<String, Object> translatedAttributeValuePairs = getTranslatedAttributeValuePairs(jsonValue.asMap());
         Map<String, Set<String>> result = new HashMap<String, Set<String>>();
 
