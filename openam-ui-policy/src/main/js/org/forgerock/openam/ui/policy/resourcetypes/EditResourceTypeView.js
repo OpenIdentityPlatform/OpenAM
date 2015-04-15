@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2015 ForgeRock AS. All rights reserved.
+ * Copyright 2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -57,10 +57,7 @@ define("org/forgerock/openam/ui/policy/resourcetypes/EditResourceTypeView", [
 
                 data.entity = resourceType || {};
                 data.uuid = uuid;
-
-                if (!data.entity.realm) {
-                    data.entity.realm = conf.globalData.auth.realm;
-                }
+                data.realm = conf.globalData.auth.realm;
 
                 data.actions = [];
                 _.each(data.entity.actions, function (v, k) {
