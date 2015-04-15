@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2015 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -646,7 +646,8 @@ public final class OpenDJUpgrader {
                 "--configClass", "org.opends.server.extensions.ConfigFileHandler",
                 "--configFile", installRoot + "/config/config.ldif",
                 "--rebuildAll",
-                "--baseDN", baseDN.toString()
+                "--baseDN", baseDN.toString(),
+                "--noPropertiesFile"
         };
         // @formatter:on
 
