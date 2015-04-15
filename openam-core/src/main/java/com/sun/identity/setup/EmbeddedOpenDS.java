@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.setup;
@@ -398,7 +398,8 @@ public class EmbeddedOpenDS {
                 "--no-prompt",                  // 14
                 "--doNotStart",                 // 15
                 "--hostname",                   // 16
-                "hostname"                      // 17
+                "hostname",                     // 17
+                "--noPropertiesFile"            // 18
         };
 
         setupCmd[2] = (String) map.get(SetupConstants.CONFIG_VAR_DIRECTORY_ADMIN_SERVER_PORT);
@@ -576,7 +577,8 @@ public class EmbeddedOpenDS {
                 "dc=example,dc=com",     // 27
                 "--trustAll",            // 28
                 "--configFile",          // 29
-                "path/to/config.ldif"    // 30
+                "path/to/config.ldif",   // 30
+                "--noPropertiesFile"     // 31
         };
         enableCmd[3] = (String) map.get(SetupConstants.DS_EMB_REPL_HOST2);
         enableCmd[5] = (String) map.get(SetupConstants.DS_EMB_REPL_ADMINPORT2);
@@ -650,7 +652,8 @@ public class EmbeddedOpenDS {
                 "51389",                      // 15
                 "--trustAll",                 // 16
                 "--configFile",               // 17
-                "path/to/config.ldif"         // 18
+                "path/to/config.ldif",        // 18
+                "--noPropertiesFile"          // 19
         };
         initializeCmd[3] = (String) map.get(SetupConstants.CONFIG_VAR_ROOT_SUFFIX);
         initializeCmd[9] = (String) map.get(SetupConstants.DS_EMB_REPL_HOST2);
@@ -699,7 +702,8 @@ public class EmbeddedOpenDS {
                 "--adminPassword", passwd,
                 "-s",
                 "--configFile",
-                baseDir + "/opends/config/config.ldif"
+                baseDir + "/opends/config/config.ldif",
+                "--noPropertiesFile"
         };
         if (debug.messageEnabled()) {
             String dbgcmd = concat(statusCmd).replaceAll(passwd, "****");
@@ -769,7 +773,8 @@ public class EmbeddedOpenDS {
                             "-D",                                               // 9
                             "cn=Directory Manager",                             // 10
                             "-w",                                               // 11
-                            "password"                                          // 12
+                            "password",                                         // 12
+                            "--noPropertiesFile"                                // 13
                     };
             args1[10] = (String) map.get(SetupConstants.CONFIG_VAR_DS_MGR_DN);
             args1[12] = (String) map.get(SetupConstants.CONFIG_VAR_DS_MGR_PWD);
@@ -924,7 +929,8 @@ public class EmbeddedOpenDS {
                 "list-replication-server",
                 "--provider-name", "Multimaster Synchronization",
                 "--property", "replication-server",
-                "--property", "replication-port", "--no-prompt", "--trustAll"
+                "--property", "replication-port", "--no-prompt", "--trustAll",
+                "--noPropertiesFile"
         };
         if (debug.messageEnabled()) {
             String dbgcmd = concat(args).replaceAll(passwd, "****");
@@ -990,6 +996,7 @@ public class EmbeddedOpenDS {
             cmdlist.add("set-replication-server-prop");
             cmdlist.add("--provider-name");
             cmdlist.add("Multimaster Synchronization");
+            cmdlist.add("--noPropertiesFile");
 
             int numremoved = 0;
             while (stok.hasMoreTokens()) {
@@ -1045,7 +1052,8 @@ public class EmbeddedOpenDS {
                 "--provider-name", "Multimaster Synchronization",
                 "--property", "replication-server",
                 "--no-prompt",
-                "--trustAll"
+                "--trustAll",
+                "--noPropertiesFile"
         };
         if (debug.messageEnabled()) {
             String dbgcmd = concat(args).replaceAll(passwd, "****");
@@ -1104,6 +1112,7 @@ public class EmbeddedOpenDS {
                     cmdlist.add("Multimaster Synchronization");
                     cmdlist.add("--domain-name");
                     cmdlist.add(domainname);
+                    cmdlist.add("--noPropertiesFile");
 
                     int numremoved = 0;
                     while (stok.hasMoreTokens()) {
@@ -1333,7 +1342,8 @@ public class EmbeddedOpenDS {
                 getOpenDJConfigFile(map),
                 "--baseDN",
                 (String) map.get(SetupConstants.CONFIG_VAR_ROOT_SUFFIX),
-                "--rebuildAll"};
+                "--rebuildAll",
+                "--noPropertiesFile"};
         OutputStream bos = new ByteArrayOutputStream();
         OutputStream boe = new ByteArrayOutputStream();
         TimeThread.start();
