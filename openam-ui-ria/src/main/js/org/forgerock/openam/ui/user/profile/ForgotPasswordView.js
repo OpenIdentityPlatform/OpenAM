@@ -53,8 +53,7 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
         },
         render: function(args, callback) {
             this.data.urlParams = uiUtils.convertCurrentUrlToJSON().params;
-            this.data.isStageOne = true;
-            this.data.isStageOne = _.isEmpty(this.data.urlParams);
+            this.data.isStageOne = _.keys(_.pick(this.data.urlParams, 'confirmationId', 'tokenId')).length !== 2;
 
             this.parentRender(function() {
                validatorsManager.bindValidators(this.$el);
