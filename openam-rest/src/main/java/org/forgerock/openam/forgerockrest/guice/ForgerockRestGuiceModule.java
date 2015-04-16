@@ -70,6 +70,8 @@ import org.forgerock.openam.rest.router.RestEndpointManagerProxy;
 import org.forgerock.openam.rest.scripting.ScriptExceptionMappingHandler;
 import org.forgerock.openam.rest.sms.SmsCollectionProvider;
 import org.forgerock.openam.rest.sms.SmsCollectionProviderFactory;
+import org.forgerock.openam.rest.sms.SmsGlobalSingletonProvider;
+import org.forgerock.openam.rest.sms.SmsGlobalSingletonProviderFactory;
 import org.forgerock.openam.rest.sms.SmsRequestHandler;
 import org.forgerock.openam.rest.sms.SmsRequestHandlerFactory;
 import org.forgerock.openam.rest.sms.SmsSingletonProvider;
@@ -194,6 +196,10 @@ public class ForgerockRestGuiceModule extends AbstractModule {
         install(new FactoryModuleBuilder()
                 .implement(SmsSingletonProvider.class, SmsSingletonProvider.class)
                 .build(SmsSingletonProviderFactory.class));
+
+        install(new FactoryModuleBuilder()
+                .implement(SmsGlobalSingletonProvider.class, SmsGlobalSingletonProvider.class)
+                .build(SmsGlobalSingletonProviderFactory.class));
     }
 
     @Provides

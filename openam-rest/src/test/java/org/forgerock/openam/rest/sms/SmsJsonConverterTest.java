@@ -64,7 +64,7 @@ public class SmsJsonConverterTest {
     public static final boolean BOOLEAN_VALUE = true;
     public static final String SECTION_1_STRING_VALUE_NAME = "section1StringValueName";
     private ServiceSchema serviceSchema;
-    private Map<String, HashSet<String>> mapRepresentation;
+    private Map<String, Set<String>> mapRepresentation;
     private JsonValue jsonRepresentation;
     private SmsJsonConverter converter;
 
@@ -109,7 +109,7 @@ public class SmsJsonConverterTest {
         converter = new TestJsonConverter(serviceSchema);
 
         //create map version..
-        mapRepresentation = new HashMap<String, HashSet<String>>();
+        mapRepresentation = new HashMap<String, Set<String>>();
         mapRepresentation.put(STRING_VALUE_NAME, getHashSet(STRING_VALUE));
         mapRepresentation.put(INT_VALUE_NAME, getHashSet(Integer.toString(INT_VALUE)));
         mapRepresentation.put(BOOLEAN_VALUE_NAME, getHashSet(Boolean.toString(BOOLEAN_VALUE)));

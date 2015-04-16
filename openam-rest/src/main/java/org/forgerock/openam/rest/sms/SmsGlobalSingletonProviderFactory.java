@@ -23,12 +23,14 @@ import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceSchema;
 
 /**
- * A Guice factory interface for creating {@link org.forgerock.openam.rest.sms.SmsSingletonProvider} instances.
+ * A Guice factory interface for creating {@link SmsGlobalSingletonProvider} instances.
+ *
  * @since 13.0.0
  */
-public interface SmsSingletonProviderFactory {
+public interface SmsGlobalSingletonProviderFactory {
 
-    SmsSingletonProvider create(SmsJsonConverter converter, @Assisted("schema") ServiceSchema schema,
-            @Assisted("dynamic") ServiceSchema dynamicSchema, SchemaType type,
-            List<ServiceSchema> subSchemaPath, String uriPath, boolean serviceHasInstanceName);
+    SmsGlobalSingletonProvider create(SmsJsonConverter globalConverter,
+            @Assisted("global") ServiceSchema globalSchema, @Assisted("organization") ServiceSchema organizationSchema,
+            @Assisted("dynamic") ServiceSchema dynamicSchema, SchemaType type, List<ServiceSchema> subSchemaPath,
+            String uriPath, boolean serviceHasInstanceName);
 }

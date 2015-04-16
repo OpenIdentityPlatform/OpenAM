@@ -28,6 +28,23 @@
  */
 package com.sun.identity.authentication.service;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 import com.iplanet.am.sdk.AMStoreConnection;
 import com.iplanet.am.util.Misc;
 import com.iplanet.am.util.SystemProperties;
@@ -68,23 +85,6 @@ import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 
 /**
@@ -463,13 +463,10 @@ public class AuthD  {
      * @return Map containing the attributes of the service.
      */
     public Map getOrgServiceAttributes(String orgDN, String serviceName) {
-        Map map = Collections.EMPTY_MAP;
         try {
-            AMIdentityRepository idRepo = getAMIdentityRepository(orgDN);
-            AMIdentity realmIdentity = idRepo.getRealmIdentity();
-            Set set = realmIdentity.getAssignedServices();
-            if (set.contains(serviceName)) {
-                map = realmIdentity.getServiceAttributes(serviceName);
+            AMIdentity realmIdentity = getRealmIdentity(orgDN, serviceName);
+            if (realmIdentity.getAssignedServices().contains(serviceName)) {
+                return realmIdentity.getServiceAttributes(serviceName);
             }
         } catch (Exception e) {
             if (debug.messageEnabled()) {
@@ -477,7 +474,36 @@ public class AuthD  {
                     + serviceName + " in org " + orgDN);
             }
         }
-        return map;
+        return Collections.emptyMap();
+    }
+
+    /**
+     * Sets the provided attribute map on the specified service in the specified organization.
+     *
+     * @param orgDN Organization DN in which the service exists.
+     * @param serviceName Service name of which the attributes are retrieved.
+     * @param attributes The attributes to set on the service.
+     */
+    public void setOrgServiceAttributes(String orgDN, String serviceName, Map<String, Set<String>> attributes)
+            throws IdRepoException, SSOException {
+        AMIdentity realmIdentity = getRealmIdentity(orgDN, serviceName);
+        if (realmIdentity.getAssignedServices().contains(serviceName)) {
+            realmIdentity.modifyService(serviceName, attributes);
+        } else {
+            //TODO add it somehow?
+        }
+    }
+
+    private AMIdentity getRealmIdentity(String orgDN, String serviceName) {
+        try {
+            AMIdentityRepository idRepo = getAMIdentityRepository(orgDN);
+            return idRepo.getRealmIdentity();
+        } catch (Exception e) {
+            if (debug.messageEnabled()) {
+                debug.warning("Exception in getting service attributes for {} in org {}", serviceName, orgDN);
+            }
+        }
+        return null;
     }
     
     /**

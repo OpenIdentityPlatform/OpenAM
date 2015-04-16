@@ -123,7 +123,7 @@ public class SmsJsonConverter {
      * @param attributeValuePairs
      * @return Json representation of attributeValuePairs
      */
-    public JsonValue toJson(Map<String, HashSet<String>> attributeValuePairs) {
+    public JsonValue toJson(Map<String, Set<String>> attributeValuePairs) {
         if (!initialised) {
             init();
         }
@@ -149,7 +149,7 @@ public class SmsJsonConverter {
                     }
 
                     AttributeSchema.Type type = attributeSchema.getType();
-                    final HashSet<String> object = attributeValuePairs.get(attributeName);
+                    final Set<String> object = attributeValuePairs.get(attributeName);
 
                     Object jsonAttributeValue = null;
 
@@ -246,8 +246,11 @@ public class SmsJsonConverter {
             init();
         }
 
-        Map<String, Object> translatedAttributeValuePairs = getTranslatedAttributeValuePairs(jsonValue.asMap());
         Map<String, Set<String>> result = new HashMap<String, Set<String>>();
+        if (jsonValue == null || jsonValue.isNull()) {
+            return result;
+        }
+        Map<String, Object> translatedAttributeValuePairs = getTranslatedAttributeValuePairs(jsonValue.asMap());
 
         for (String attributeName : translatedAttributeValuePairs.keySet()) {
 
@@ -277,7 +280,7 @@ public class SmsJsonConverter {
         }
 
         try {
-            if (schema.validateAttributes(translatedAttributeValuePairs)) {
+            if (result.isEmpty() || schema.validateAttributes(result)) {
                 return result;
             } else {
                 throw new JsonException("Invalid attributes");

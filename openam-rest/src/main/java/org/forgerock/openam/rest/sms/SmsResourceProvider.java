@@ -17,7 +17,8 @@
 package org.forgerock.openam.rest.sms;
 
 import static com.sun.identity.sm.AttributeSchema.Syntax.*;
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.fluent.JsonValue.field;
+import static org.forgerock.json.fluent.JsonValue.object;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,9 +32,19 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.AttributeSchema;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SchemaType;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceSchema;
 import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -45,16 +56,6 @@ import org.forgerock.json.resource.ServerContext;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.StringUtils;
-
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.AttributeSchema;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.SchemaType;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceSchema;
 
 /**
  * A base class for resource providers for the REST SMS services - provides common utility methods for
@@ -175,23 +176,32 @@ abstract class SmsResourceProvider {
         }
     }
 
-    private JsonValue createTemplate(ServerContext context) {
+    protected JsonValue createTemplate(ServerContext context) {
         Map attrs = schema.getAttributeDefaults();
         JsonValue result = converter.toJson(attrs);
 
         Map<String, String> attributeSectionMap = getAttributeNameToSection(schema);
-        ResourceBundle i18n = ResourceBundle.getBundle(schema.getI18NFileName());
         ResourceBundle console = ResourceBundle.getBundle("amConsole");
         String serviceType = schema.getServiceType().getType();
 
-        String sectionOrder = console.getString("sections." + serviceName + "." + serviceType);
-        NumberFormat sectionFormat = new DecimalFormat("00");
+        String sectionOrder = getConsoleString(console, "sections." + serviceName + "." + serviceType);
         List<String> sections = new ArrayList<String>();
         if (StringUtils.isNotEmpty(sectionOrder)) {
             sections.addAll(Arrays.asList(sectionOrder.split("\\s+")));
         }
 
-        for (AttributeSchema attribute : (Set<AttributeSchema>)schema.getAttributeSchemas()) {
+        addAttributeSchema(result, "/_schema/properties/", schema, sections, attributeSectionMap, console, serviceType);
+
+        return result;
+    }
+
+    protected void addAttributeSchema(JsonValue result, String path, ServiceSchema schema, List<String> sections,
+            Map<String, String> attributeSectionMap, ResourceBundle console, String serviceType) {
+
+        ResourceBundle i18n = ResourceBundle.getBundle(schema.getI18NFileName());
+        NumberFormat sectionFormat = new DecimalFormat("00");
+
+        for (AttributeSchema attribute : (Set<AttributeSchema>) schema.getAttributeSchemas()) {
             String i18NKey = attribute.getI18NKey();
             if (i18NKey != null && i18NKey.length() > 0) {
                 String attributePath = attribute.getResourceName();
@@ -199,20 +209,27 @@ abstract class SmsResourceProvider {
                     String section = attributeSectionMap.get(attribute.getName());
                     String sectionLabel = "section.label." + serviceName + "." + serviceType + "." + section;
                     attributePath = section + "/properties/" + attributePath;
-                    result.putPermissive(new JsonPointer("/_schema/properties/" + section + "/type"), "object");
-                    result.putPermissive(new JsonPointer("/_schema/properties/" + section + "/title"),
-                            console.getString(sectionLabel));
-                    result.putPermissive(new JsonPointer("/_schema/properties/" + section + "/order"),
+                    result.putPermissive(new JsonPointer(path + section + "/type"), "object");
+
+                    result.putPermissive(new JsonPointer(path + section + "/title"),
+                            getConsoleString(console, sectionLabel));
+                    result.putPermissive(new JsonPointer(path + section + "/order"),
                             "z" + sectionFormat.format(sections.indexOf(section)));
                 }
-                addType(result, "/_schema/properties/" + attributePath, attribute);
-                result.addPermissive(new JsonPointer("/_schema/properties/" + attributePath + "/title"),
+                addType(result, path + attributePath, attribute);
+                result.addPermissive(new JsonPointer(path + attributePath + "/title"),
                         i18n.getString(i18NKey));
-                result.addPermissive(new JsonPointer("/_schema/properties/" + attributePath + "/order"), i18NKey);
+                result.addPermissive(new JsonPointer(path + attributePath + "/order"), i18NKey);
             }
         }
+    }
 
-        return result;
+    protected String getConsoleString(ResourceBundle console, String key) {
+        try {
+            return console.getString(key);
+        } catch (MissingResourceException e) {
+            return "";
+        }
     }
 
     private void addType(JsonValue result, String pointer, AttributeSchema attribute) {

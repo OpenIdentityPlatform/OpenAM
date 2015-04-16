@@ -134,6 +134,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
     private static final String USE_PARENT_PATH = "USE-PARENT";
     private final SmsCollectionProviderFactory collectionProviderFactory;
     private final SmsSingletonProviderFactory singletonProviderFactory;
+    private final SmsGlobalSingletonProviderFactory globalSingletonProviderFactory;
     private final SchemaType schemaType;
     private final Debug debug;
     private final Pattern schemaDnPattern;
@@ -143,12 +144,14 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
 
     @Inject
     public SmsRequestHandler(@Assisted SchemaType type, SmsCollectionProviderFactory collectionProviderFactory,
-            SmsSingletonProviderFactory singletonProviderFactory, @Named("frRest") Debug debug,
+            SmsSingletonProviderFactory singletonProviderFactory,
+            SmsGlobalSingletonProviderFactory globalSingletonProviderFactory, @Named("frRest") Debug debug,
             ExcludedServicesFactory excludedServicesFactory)
             throws SMSException, SSOException {
         this.schemaType = type;
         this.collectionProviderFactory = collectionProviderFactory;
         this.singletonProviderFactory = singletonProviderFactory;
+        this.globalSingletonProviderFactory = globalSingletonProviderFactory;
         this.debug = debug;
         this.excludedServices = excludedServicesFactory.get(type);
         this.schemaDnPattern = Pattern.compile("^ou=([.0-9]+),ou=([^,]+)," +
@@ -257,8 +260,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
         ServiceSchema parentSchema = ssm.getGlobalSchema().getSubSchema(parentName);
         ServiceSchema schema = parentSchema.getSubSchema(schemaName);
         HashMap<SmsRouteTree, Set<Route>> routes = new HashMap<SmsRouteTree, Set<Route>>();
-        addPaths("", new ArrayList<ServiceSchema>(Collections.singletonList(parentSchema)), schema, routes,
-                Collections.<Pattern>emptyList(), routeTree);
+        addPaths("", new ArrayList<ServiceSchema>(Collections.singletonList(parentSchema)), schema,
+                null, routes, Collections.<Pattern>emptyList(), routeTree);
         serviceRoutes.addAll(routes.get(routeTree));
     }
 
@@ -298,44 +301,76 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
         String resourceName = ssm.getResourceName();
         Map<SmsRouteTree, Set<Route>> routes = new HashMap<SmsRouteTree, Set<Route>>();
 
+        ServiceSchema organizationSchema = ssm.getOrganizationSchema();
+        ServiceSchema dynamicSchema = ssm.getDynamicSchema();
         if (schemaType == SchemaType.GLOBAL) {
             ServiceSchema globalSchema = ssm.getGlobalSchema();
             if (globalSchema != null) {
                 debug.message("Adding global schema REST SMS endpoints for service: {}", serviceName);
-                addPaths(resourceName, new ArrayList<ServiceSchema>(), globalSchema, routes, DEFAULT_IGNORED_ROUTES, null);
+                addGlobalPaths(resourceName, new ArrayList<ServiceSchema>(), globalSchema, organizationSchema, dynamicSchema, routes, DEFAULT_IGNORED_ROUTES, null);
+            } else if (organizationSchema != null) {
+                debug.message("Adding global schema REST SMS endpoints for service: {}", serviceName);
+                addGlobalPaths(resourceName, new ArrayList<ServiceSchema>(), organizationSchema, organizationSchema, dynamicSchema, routes, DEFAULT_IGNORED_ROUTES, null);
             }
-        }
-        ServiceSchema organizationSchema = ssm.getOrganizationSchema();
-        if (organizationSchema != null) {
-            debug.message("Adding realm schema REST SMS endpoints for service: {}", serviceName);
-            addPaths(resourceName, new ArrayList<ServiceSchema>(), organizationSchema, routes, DEFAULT_IGNORED_ROUTES, null);
+        } else {
+            if (organizationSchema != null) {
+                debug.message("Adding realm schema REST SMS endpoints for service: {}", serviceName);
+                addPaths(resourceName, new ArrayList<ServiceSchema>(), organizationSchema, dynamicSchema, routes, DEFAULT_IGNORED_ROUTES, null);
+            } else if (dynamicSchema != null) {
+                debug.message("Adding realm schema REST SMS endpoints for service: {}", serviceName);
+                addPaths(resourceName, new ArrayList<ServiceSchema>(), dynamicSchema, dynamicSchema, routes, DEFAULT_IGNORED_ROUTES, null);
+            }
         }
         return routes;
     }
 
     /**
+     * Recursively adds global routes for the schema paths found in the schema instance.
+     *
+     * @param parentPath The parent route path to add new routes beneath.
+     * @param schemaPath The path for schema that is built up as we navigate through the Schema and SubSchema
+     *                   declarations for the service.
+     * @param globalSchema The Global Schema instance.
+     * @param organizationSchema The Organization Schema instance, or {@code null} if no organization schema is defined.
+     * @param dynamicSchema The Dynamic Schema instance, or {@code null} if no dynamic schema is defined.
+     * @param serviceRoutes Routes added for the service are added for later removal if needed.
+     * @param ignoredRoutes Any routes to be ignored.
+     * @param routeTree The tree to add routes to. If null, the root tree will be used to find the appropriate node.
+     * @throws SMSException From downstream service manager layer.
+     */
+    private void addGlobalPaths(String parentPath, List<ServiceSchema> schemaPath, ServiceSchema globalSchema,
+            ServiceSchema organizationSchema, ServiceSchema dynamicSchema, Map<SmsRouteTree, Set<Route>> serviceRoutes,
+            List<Pattern> ignoredRoutes, SmsRouteTree routeTree) throws SMSException {
+        String schemaName = globalSchema.getResourceName();
+        String path = getPath(parentPath, schemaName, schemaPath, globalSchema);
+
+        SmsGlobalSingletonProvider handler = globalSingletonProviderFactory.create(new SmsJsonConverter(globalSchema),
+                globalSchema, organizationSchema, dynamicSchema, schemaType, new ArrayList<ServiceSchema>(schemaPath),
+                parentPath, true);
+        debug.message("Adding singleton path {}", path);
+        serviceRoutes.putAll(addRoute(globalSchema, RoutingMode.EQUALS, path, handler, ignoredRoutes, routeTree));
+
+        addPaths(parentPath, schemaPath, globalSchema, serviceRoutes, ignoredRoutes);
+    }
+
+    /**
      * Recursively adds routes for the schema paths found in the schema instance.
+     *
      * @param parentPath The parent route path to add new routes beneath.
      * @param schemaPath The path for schema that is built up as we navigate through the Schema and SubSchema
      *                   declarations for the service.
      * @param schema The Schema or SubSchema instance for this iteration of the method.
+     * @param dynamicSchema The dynamic Schema instance, or {@code null} if no dynamic schema is defined.
      * @param serviceRoutes Routes added for the service are added for later removal if needed.
      * @param ignoredRoutes Any routes to be ignored.
      * @param routeTree The tree to add routes to. If null, the root tree will be used to find the appropriate node.
      * @throws SMSException From downstream service manager layer.
      */
     private void addPaths(String parentPath, List<ServiceSchema> schemaPath, ServiceSchema schema,
-            Map<SmsRouteTree, Set<Route>> serviceRoutes, List<Pattern> ignoredRoutes, SmsRouteTree routeTree)
-            throws SMSException {
+            ServiceSchema dynamicSchema, Map<SmsRouteTree, Set<Route>> serviceRoutes, List<Pattern> ignoredRoutes,
+            SmsRouteTree routeTree) throws SMSException {
         String schemaName = schema.getResourceName();
-        String path = parentPath;
-        // Top-level schemas don't have a name and we don't want them in our schema path
-        if (schemaName != null && schemaName.length() > 0) {
-            schemaPath.add(schema);
-            if (!USE_PARENT_PATH.equals(schemaName)) {
-                path += "/" + schemaName;
-            }
-        }
+        String path = getPath(parentPath, schemaName, schemaPath, schema);
         if (!schema.getAttributeSchemas().isEmpty() || schema.supportsMultipleConfigurations()) {
             if (schema.supportsMultipleConfigurations()) {
                 RequestHandler handler = Resources.newCollection(collectionProviderFactory.create(
@@ -346,17 +381,35 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
                 parentPath = path + "/{" + schemaName + "}";
             } else {
                 RequestHandler handler = singletonProviderFactory.create(
-                         new SmsJsonConverter(schema), schema, schemaType, new ArrayList<ServiceSchema>(schemaPath),
-                         parentPath, true);
+                        new SmsJsonConverter(schema), schema, dynamicSchema, schemaType,
+                        new ArrayList<ServiceSchema>(schemaPath), parentPath, true);
                 debug.message("Adding singleton path {}", path);
                 serviceRoutes.putAll(addRoute(schema, RoutingMode.EQUALS, path, handler, ignoredRoutes, routeTree));
                 parentPath = path;
             }
         }
+
+        addPaths(parentPath, schemaPath, schema, serviceRoutes, ignoredRoutes);
+    }
+
+    private void addPaths(String parentPath, List<ServiceSchema> schemaPath, ServiceSchema schema,
+            Map<SmsRouteTree, Set<Route>> serviceRoutes, List<Pattern> ignoredRoutes) throws SMSException {
         for (String subSchema : (Set<String>) schema.getSubSchemaNames()) {
             addPaths(parentPath, new ArrayList<ServiceSchema>(schemaPath), schema.getSubSchema(subSchema),
-                    serviceRoutes, ignoredRoutes, routeTree);
+                    null, serviceRoutes, ignoredRoutes, routeTree);
         }
+    }
+
+    private String getPath(String parentPath, String schemaName, List<ServiceSchema> schemaPath, ServiceSchema schema) {
+        String path = parentPath;
+        // Top-level schemas don't have a name and we don't want them in our schema path
+        if (schemaName != null && schemaName.length() > 0) {
+            schemaPath.add(schema);
+            if (!USE_PARENT_PATH.equals(schemaName)) {
+                path += "/" + schemaName;
+            }
+        }
+        return path;
     }
 
     private Map<SmsRouteTree, Set<Route>> addRoute(ServiceSchema schema, RoutingMode mode, String path,

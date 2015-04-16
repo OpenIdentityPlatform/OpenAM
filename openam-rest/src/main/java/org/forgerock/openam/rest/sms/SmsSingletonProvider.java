@@ -18,13 +18,27 @@ package org.forgerock.openam.rest.sms;
 
 import static org.forgerock.json.fluent.JsonValue.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+import java.util.Set;
 
+import com.google.inject.assistedinject.Assisted;
+import com.iplanet.sso.SSOException;
+import com.sun.identity.authentication.service.AuthD;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SchemaType;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceSchema;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
@@ -41,16 +55,8 @@ import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
-
-import com.google.inject.assistedinject.Assisted;
-import com.iplanet.sso.SSOException;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.SchemaType;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceSchema;
 
 /**
  * A CREST singleton provider for SMS schema config.
@@ -58,12 +64,22 @@ import com.sun.identity.sm.ServiceSchema;
  */
 public class SmsSingletonProvider extends SmsResourceProvider implements RequestHandler {
 
+    final ServiceSchema dynamicSchema;
+    private final SmsJsonConverter dynamicConverter;
+
     @Inject
-    SmsSingletonProvider(@Assisted SmsJsonConverter converter, @Assisted ServiceSchema schema,
-            @Assisted SchemaType type, @Assisted List<ServiceSchema> subSchemaPath, @Assisted String uriPath,
+    SmsSingletonProvider(@Assisted SmsJsonConverter converter,  @Assisted("schema") ServiceSchema schema,
+            @Assisted("dynamic") @Nullable ServiceSchema dynamicSchema, @Assisted SchemaType type,
+            @Assisted List<ServiceSchema> subSchemaPath, @Assisted String uriPath,
             @Assisted boolean serviceHasInstanceName, @Named("frRest") Debug debug) {
         super(schema, type, subSchemaPath, uriPath, serviceHasInstanceName, converter, debug);
         Reject.ifTrue(type != SchemaType.GLOBAL && type != SchemaType.ORGANIZATION, "Unsupported type: " + type);
+        this.dynamicSchema = dynamicSchema;
+        if (dynamicSchema != null) {
+            this.dynamicConverter = new SmsJsonConverter(dynamicSchema);
+        } else {
+            this.dynamicConverter = null;
+        }
     }
 
     /**
@@ -75,7 +91,7 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
         String resourceId = resourceId();
         try {
             ServiceConfig config = getServiceConfigNode(serverContext, resourceId);
-            JsonValue result = converter.toJson(config.getAttributes());
+            JsonValue result = withExtraAttributes(serverContext, convertToJson(config));
             handler.handleResult(new Resource(resourceId, String.valueOf(result.hashCode()), result));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on create", e);
@@ -88,6 +104,33 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
         }
     }
 
+    protected Map<String, Set<String>> getDynamicAttributes(ServerContext context) {
+        return AuthD.getAuth().getOrgServiceAttributes(realmFor(context), serviceName);
+    }
+
+    /**
+     * Augments the provided {@code JsonValue} to include any dynamic attributes, if present.
+     *
+     * @param value The {@code JsonValue} to augment.
+     * @return The same {@code JsonValue} after is has been augmented.
+     */
+    protected JsonValue withExtraAttributes(ServerContext context, JsonValue value) {
+        if (dynamicConverter != null) {
+            value.add("dynamic", dynamicConverter.toJson(getDynamicAttributes(context)).getObject());
+        }
+        return value;
+    }
+
+    private void updateDynamicAttributes(ServerContext context, JsonValue value) throws SMSException, SSOException,
+            IdRepoException {
+        Map<String, Set<String>> dynamic = dynamicConverter.fromJson(value.get("dynamic"));
+        if (SchemaType.GLOBAL.equals(type)) {
+            dynamicSchema.setAttributeDefaults(dynamic);
+        } else {
+            AuthD.getAuth().setOrgServiceAttributes(realmFor(context), serviceName, dynamic);
+        }
+    }
+
     /**
      * Updates config for the singleton instance referenced, and returns the JsonValue representation.
      * {@inheritDoc}
@@ -95,10 +138,24 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
     @Override
     public void handleUpdate(ServerContext serverContext, UpdateRequest updateRequest, ResultHandler<Resource> handler) {
         String resourceId = resourceId();
+        if (dynamicSchema != null) {
+            try {
+                updateDynamicAttributes(serverContext, updateRequest.getContent());
+            } catch (SMSException e) {
+                debug.warning("::SmsCollectionProvider:: SMSException on create", e);
+                handler.handleError(new InternalServerErrorException("Unable to update SMS config: " + e.getMessage()));
+            } catch (SSOException e) {
+                debug.warning("::SmsCollectionProvider:: SSOException on create", e);
+                handler.handleError(new InternalServerErrorException("Unable to update SMS config: " + e.getMessage()));
+            } catch (IdRepoException e) {
+                debug.warning("::SmsCollectionProvider:: IdRepoException on create", e);
+                handler.handleError(new InternalServerErrorException("Unable to update SMS config: " + e.getMessage()));
+            }
+        }
         try {
             ServiceConfig config = getServiceConfigNode(serverContext, resourceId);
-            config.setAttributes(converter.fromJson(updateRequest.getContent()));
-            JsonValue result = converter.toJson(config.getAttributes());
+            saveConfigAttributes(config, convertFromJson(updateRequest.getContent()));
+            JsonValue result = withExtraAttributes(serverContext, convertToJson(config));
             handler.handleResult(new Resource(resourceId, String.valueOf(result.hashCode()), result));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on create", e);
@@ -145,7 +202,7 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
      */
     @Override
     public void handleCreate(ServerContext serverContext, CreateRequest createRequest, ResultHandler<Resource> handler) {
-        Map<String, Set<String>> attrs = converter.fromJson(createRequest.getContent());
+        Map<String, Set<String>> attrs = convertFromJson(createRequest.getContent());
         try {
             ServiceConfigManager scm = getServiceConfigManager(serverContext);
             ServiceConfig config;
@@ -160,7 +217,7 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
                 parent.addSubConfig(resourceId(), lastSchemaNodeName(), -1, attrs);
                 config = parent.getSubConfig(lastSchemaNodeName());
             }
-            JsonValue result = converter.toJson(config.getAttributes());
+            JsonValue result = withExtraAttributes(serverContext, convertToJson(config));
             handler.handleResult(new Resource(resourceId(), String.valueOf(result.hashCode()), result));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on create", e);
@@ -176,6 +233,24 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
         super.handleAction(context, request, handler);
     }
 
+    @Override
+    protected JsonValue createTemplate(ServerContext context) {
+        JsonValue result = super.createTemplate(context);
+        if (dynamicSchema != null) {
+            Map<String, String> attributeSectionMap = getAttributeNameToSection(dynamicSchema);
+            ResourceBundle console = ResourceBundle.getBundle("amConsole");
+            String serviceType = dynamicSchema.getServiceType().getType();
+            String sectionOrder = getConsoleString(console, "sections." + serviceName + "." + serviceType);
+            List<String> sections = new ArrayList<String>();
+            if (StringUtils.isNotEmpty(sectionOrder)) {
+                sections.addAll(Arrays.asList(sectionOrder.split("\\s+")));
+            }
+            addAttributeSchema(result, "/_schema/properties/dynamic/", dynamicSchema, sections, attributeSectionMap,
+                    console, serviceType);
+        }
+        return result;
+    }
+
     /**
      * Gets the referenced {@link ServiceConfig} for the current request.
      * @param serverContext The request context.
@@ -186,23 +261,73 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
      * @throws SSOException From downstream service manager layer.
      * @throws NotFoundException If the config being addressed doesn't exist.
      */
-    protected ServiceConfig getServiceConfigNode(ServerContext serverContext, String resourceId) throws SSOException, SMSException, NotFoundException {
+    protected ServiceConfig getServiceConfigNode(ServerContext serverContext, String resourceId) throws SSOException,
+            SMSException, NotFoundException {
         ServiceConfigManager scm = getServiceConfigManager(serverContext);
         ServiceConfig result;
         if (subSchemaPath.isEmpty()) {
             if (type == SchemaType.GLOBAL) {
-                result = scm.getGlobalConfig(resourceId);
+                result = getGlobalConfigNode(scm, resourceId);
             } else {
                 result = scm.getOrganizationConfig(realmFor(serverContext), resourceId);
+                if ((result == null || !result.exists()) && dynamicSchema == null) {
+                    throw new NotFoundException();
+                }
             }
         } else {
             ServiceConfig config = parentSubConfigFor(serverContext, scm);
             result = checkedInstanceSubConfig(resourceId, config);
+            if (result == null || !result.exists()) {
+                throw new NotFoundException();
+            }
         }
-        if (result == null || !result.exists()) {
+        return result;
+    }
+
+    /**
+     * Gets the referenced global {@link ServiceConfig} for the current request.
+     *
+     * @param scm The {@code ServerConfigManager} instance.
+     * @param resourceId The name of the config. If this is root Schema config, this will be null. Otherwise, it will
+     *                   be the name of the schema type.
+     * @return The global instance retrieved from the service manager layer.
+     * @throws SMSException From downstream service manager layer.
+     * @throws SSOException From downstream service manager layer.
+     * @throws NotFoundException If the config being addressed doesn't exist.
+     */
+    protected ServiceConfig getGlobalConfigNode(ServiceConfigManager scm, String resourceId) throws SSOException,
+            SMSException, NotFoundException {
+        ServiceConfig result = scm.getGlobalConfig(resourceId);
+        if (result == null) {
             throw new NotFoundException();
         }
         return result;
+    }
+
+    private JsonValue convertToJson(ServiceConfig config) {
+        if (config == null) {
+            return json(object());
+        } else {
+            return converter.toJson(config.getAttributes());
+        }
+    }
+
+    protected JsonValue preprocessJsonValue(JsonValue value) {
+        value.remove("defaults");
+        value.remove("dynamic");
+        return value;
+    }
+
+    private Map<String, Set<String>> convertFromJson(JsonValue value) {
+        preprocessJsonValue(value);
+        return converter.fromJson(value);
+    }
+
+    protected void saveConfigAttributes(ServiceConfig config, Map<String, Set<String>> attributes) throws SSOException,
+            SMSException {
+        if (config != null) {
+            config.setAttributes(attributes);
+        }
     }
 
     /**
