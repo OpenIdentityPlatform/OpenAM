@@ -46,6 +46,21 @@ public final class ScriptConstants {
     public static final String SCRIPT_CONFIGURATIONS = "scriptConfigurations";
     public static final String EMPTY = "";
 
+    public static final String SCRIPT_TIMEOUT = "serverTimeout";
+    public static final String THREAD_POOL_CORE_SIZE = "coreThreads";
+    public static final String THREAD_POOL_MAX_SIZE = "maxThreads";
+    public static final String THREAD_POOL_QUEUE_SIZE = "queueSize";
+    public static final String THREAD_POOL_IDLE_TIMEOUT = "idleTimeout";
+    public static final String WHITE_LIST = "whiteList";
+    public static final String BLACK_LIST = "blackList";
+    public static final String USE_SECURITY_MANAGER = "useSecurityManager";
+    public static final String ENGINE_CONFIGURATION = "EngineConfiguration";
+
+    public static final int DEFAULT_CORE_THREADS = 10;
+    public static final int DEFAULT_MAX_THREADS = 10;
+    public static final int DEFAULT_QUEUE_SIZE = 10;
+    public static final long DEFAULT_IDLE_TIMEOUT_SECONDS = 60l; // Seconds
+
     /**
      * The context in which a script will be used.
      */

@@ -20,43 +20,213 @@
 
 <ServicesConfiguration>
     <Service name="ScriptingService" version="1.0">
+
         <Schema serviceHierarchy="/DSAMEConfig/ScriptingService"
                 i18nFileName="scripting"
                 revisionNumber="1"
-                i18nKey="description"
+                i18nKey="service-description"
                 resourceName="scripting">
+            <Global>
+                <AttributeSchema name="defaultScriptContext" i18nKey="g101" type="single_choice" resourceName="defaultContext">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="script-type-01">AUTHORIZATION_ENTITLEMENT_CONDITION</ChoiceValue>
+                        <ChoiceValue i18nKey="script-type-02">AUTHENTICATION_SERVER_SIDE</ChoiceValue>
+                        <ChoiceValue i18nKey="script-type-03">AUTHENTICATION_CLIENT_SIDE</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>AUTHORIZATION_ENTITLEMENT_CONDITION</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <SubSchema name="scriptContext" inheritance="multiple" resourceName="contexts">
+                    <AttributeSchema name="languages" type="list" syntax="string" i18nKey="st101">
+                        <DefaultValues>
+                            <Value>JAVASCRIPT</Value>
+                            <Value>GROOVY</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="defaultLanguage" type="single" syntax="string" i18nKey="st102">
+                        <DefaultValues>
+                            <Value>JAVASCRIPT</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="defaultScript"
+                                     type="single" syntax="script" validator="ScriptValidator" i18nKey="st103">
+                    </AttributeSchema>
+                    <SubSchema name="engineConfiguration" i18nKey="ec100">
+                        <AttributeSchema name="serverTimeout"
+                                         type="single" syntax="number_range" rangeStart="0"
+                                         rangeEnd="2147483647" i18nKey="ec101">
+                            <DefaultValues>
+                                <Value>0</Value>
+                            </DefaultValues>
+                        </AttributeSchema>
+                        <AttributeSchema name="coreThreads"
+                                         type="single" syntax="number_range" rangeStart="1"
+                                         rangeEnd="2147483647" i18nKey="ec102">
+                            <DefaultValues>
+                                <Value>10</Value>
+                            </DefaultValues>
+                        </AttributeSchema>
+                        <AttributeSchema name="maxThreads"
+                                         type="single" syntax="number_range" rangeStart="1"
+                                         rangeEnd="2147483647" i18nKey="ec103">
+                            <DefaultValues>
+                                <Value>50</Value>
+                            </DefaultValues>
+                        </AttributeSchema>
+                        <AttributeSchema name="queueSize"
+                                         type="single" syntax="number_range" rangeStart="-1"
+                                         rangeEnd="2147483647" i18nKey="ec104">
+                            <DefaultValues>
+                                <Value>10</Value>
+                            </DefaultValues>
+                        </AttributeSchema>
+                        <AttributeSchema name="idleTimeout"
+                                         type="single" syntax="number_range" rangeStart="0"
+                                         rangeEnd="2147483647" i18nKey="ec105">
+                            <DefaultValues>
+                                <Value>60</Value>
+                            </DefaultValues>
+                        </AttributeSchema>
+                        <AttributeSchema name="whiteList"
+                                         type="list" syntax="string" i18nKey="ec106">
+                            <DefaultValues>
+                                <Value>java.lang.Boolean</Value>
+                                <Value>java.lang.Byte</Value>
+                                <Value>java.lang.Character</Value>
+                                <Value>java.lang.Character$Subset</Value>
+                                <Value>java.lang.Character$UnicodeBlock</Value>
+                                <Value>java.lang.Double</Value>
+                                <Value>java.lang.Float</Value>
+                                <Value>java.lang.Integer</Value>
+                                <Value>java.lang.Long</Value>
+                                <Value>java.lang.Math</Value>
+                                <Value>java.lang.Number</Value>
+                                <Value>java.lang.Object</Value>
+                                <Value>java.lang.Short</Value>
+                                <Value>java.lang.StrictMath</Value>
+                                <Value>java.lang.String</Value>
+                                <Value>java.lang.Void</Value>
+                                <Value>java.util.ArrayList</Value>
+                                <Value>java.util.HashSet</Value>
+                                <Value>java.util.HashMap</Value>
+                                <Value>java.util.HashMap$KeyIterator</Value>
+                                <Value>java.util.LinkedHashMap</Value>
+                                <Value>java.util.LinkedHashSet</Value>
+                                <Value>java.util.LinkedList</Value>
+                                <Value>java.util.TreeMap</Value>
+                                <Value>java.util.TreeSet</Value>
+                                <Value>com.sun.identity.shared.debug.Debug</Value>
+                                <Value>org.forgerock.http.client.*</Value>
+                                <Value>groovy.json.JsonSlurper</Value>
+                            </DefaultValues>
+                        </AttributeSchema>
+                        <AttributeSchema name="blackList"
+                                         type="list" syntax="string" i18nKey="ec107">
+                            <DefaultValues>
+                                <Value>java.security.AccessController</Value>
+                                <Value>java.lang.Class</Value>
+                                <Value>java.lang.reflect.*</Value>
+                            </DefaultValues>
+                        </AttributeSchema>
+                        <AttributeSchema name="useSecurityManager"
+                                         type="single" syntax="boolean" i18nKey="ec108">
+                            <BooleanValues>
+                                <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                                <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                            </BooleanValues>
+                            <DefaultValues>
+                                <Value>true</Value>
+                            </DefaultValues>
+                        </AttributeSchema>
+                    </SubSchema>
+                </SubSchema>
+            </Global>
             <Organization>
-                <SubSchema name="scriptConfigurations" inheritance="multiple">
-                    <SubSchema name="scriptConfiguration" inheritance="multiple">
-                        <AttributeSchema name="name" type="single" syntax="string" />
-                        <AttributeSchema name="description" type="single" syntax="string" />
-                        <AttributeSchema name="script" type="single" syntax="script" />
-                        <AttributeSchema name="language" type="single_choice" syntax="string">
-                            <ChoiceValues>
-                                <ChoiceValue>JAVASCRIPT</ChoiceValue>
-                                <ChoiceValue>GROOVY</ChoiceValue>
-                            </ChoiceValues>
-                            <DefaultValues>
-                                <Value>JavaScript</Value>
-                            </DefaultValues>
-                        </AttributeSchema>
-                        <AttributeSchema name="context" type="single_choice" syntax="string">
-                            <ChoiceValues>
-                                <ChoiceValue>AUTHENTICATION_SERVER_SIDE</ChoiceValue>
-                                <ChoiceValue>AUTHENTICATION_CLIENT_SIDE</ChoiceValue>
-                                <ChoiceValue>AUTHORIZATION_ENTITLEMENT_CONDITION</ChoiceValue>
-                            </ChoiceValues>
-                            <DefaultValues>
-                                <Value>AuthorizationEntitlementCondition</Value>
-                            </DefaultValues>
-                        </AttributeSchema>
-                        <AttributeSchema name="createdBy" type="single" syntax="string" />
-                        <AttributeSchema name="creationDate" type="single" syntax="string" />
-                        <AttributeSchema name="lastModifiedBy" type="single" syntax="string" />
-                        <AttributeSchema name="lastModifiedDate" type="single" syntax="string" />
+                <SubSchema name="scriptConfigurations">
+                    <SubSchema name="scriptConfiguration" inheritance="multiple" resourceName="scripts">
+                        <AttributeSchema name="name" type="single" syntax="string" i18nKey="no-i18n"/>
+                        <AttributeSchema name="description" type="single" syntax="string" i18nKey="no-i18n"/>
+                        <AttributeSchema name="script" type="single" syntax="script" i18nKey="no-i18n"/>
+                        <AttributeSchema name="language" type="single" syntax="string" i18nKey="no-i18n"/>
+                        <AttributeSchema name="context" type="single" syntax="string" i18nKey="no-i18n"/>
+                        <AttributeSchema name="createdBy" type="single" syntax="string" i18nKey="no-i18n"/>
+                        <AttributeSchema name="creationDate" type="single" syntax="string" i18nKey="no-i18n"/>
+                        <AttributeSchema name="lastModifiedBy" type="single" syntax="string" i18nKey="no-i18n"/>
+                        <AttributeSchema name="lastModifiedDate" type="single" syntax="string" i18nKey="no-i18n"/>
                     </SubSchema>
                 </SubSchema>
             </Organization>
         </Schema>
+
+        <Configuration>
+            <GlobalConfiguration>
+                <SubConfiguration name="AUTHORIZATION_ENTITLEMENT_CONDITION" id="scriptContext" i18nKey="script-type-01">
+                    <AttributeValuePair>
+                        <Attribute name="defaultScript"/>
+                        <Value>
+                            // Server-side Authorization Entitlement Conditions script
+                        </Value>
+                    </AttributeValuePair>
+                    <SubConfiguration name="EngineConfiguration" id="engineConfiguration"/>
+                </SubConfiguration>
+                <SubConfiguration name="AUTHENTICATION_SERVER_SIDE" id="scriptContext" i18nKey="script-type-02">
+                    <AttributeValuePair>
+                        <Attribute name="defaultScript"/>
+                        <Value>
+                            // Server-side Authentication script
+                        </Value>
+                    </AttributeValuePair>
+                    <SubConfiguration name="EngineConfiguration" id="engineConfiguration">
+                        <AttributeValuePair>
+                            <Attribute name="whiteList"/>
+                            <Value>java.lang.Boolean</Value>
+                            <Value>java.lang.Byte</Value>
+                            <Value>java.lang.Character</Value>
+                            <Value>java.lang.Character$Subset</Value>
+                            <Value>java.lang.Character$UnicodeBlock</Value>
+                            <Value>java.lang.Double</Value>
+                            <Value>java.lang.Float</Value>
+                            <Value>java.lang.Integer</Value>
+                            <Value>java.lang.Long</Value>
+                            <Value>java.lang.Math</Value>
+                            <Value>java.lang.Number</Value>
+                            <Value>java.lang.Object</Value>
+                            <Value>java.lang.Short</Value>
+                            <Value>java.lang.StrictMath</Value>
+                            <Value>java.lang.String</Value>
+                            <Value>java.lang.Void</Value>
+                            <Value>java.util.ArrayList</Value>
+                            <Value>java.util.HashSet</Value>
+                            <Value>java.util.HashMap</Value>
+                            <Value>java.util.HashMap$KeyIterator</Value>
+                            <Value>java.util.LinkedHashMap</Value>
+                            <Value>java.util.LinkedHashSet</Value>
+                            <Value>java.util.LinkedList</Value>
+                            <Value>java.util.TreeMap</Value>
+                            <Value>java.util.TreeSet</Value>
+                            <Value>com.sun.identity.shared.debug.Debug</Value>
+                            <Value>org.forgerock.openam.authentication.modules.scripted.*</Value>
+                            <Value>org.forgerock.openam.authentication.modules.scripted.http.*</Value>
+                            <Value>org.forgerock.http.client.*</Value>
+                            <Value>groovy.json.JsonSlurper</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                </SubConfiguration>
+                <SubConfiguration name="AUTHENTICATION_CLIENT_SIDE" id="scriptContext" i18nKey="script-type-03">
+                    <AttributeValuePair>
+                        <Attribute name="languages"/>
+                        <Value>JAVASCRIPT</Value>
+                    </AttributeValuePair>
+                    <AttributeValuePair>
+                        <Attribute name="defaultScript"/>
+                        <Value>
+                            // Client-side script
+                        </Value>
+                    </AttributeValuePair>
+                </SubConfiguration>
+            </GlobalConfiguration>
+        </Configuration>
+
     </Service>
 </ServicesConfiguration>
