@@ -64,7 +64,7 @@
                 <div id="header" class="clearfix">
                     <div id="logo" class="main-logo-holder">
                         <a href="#" title="ForgeRock">
-                            <img src="${baseUrl?html}/XUI/images/login-logo.png" style="width:156px; height:104px;" alt="ForgeRock">
+                            <img src="${baseUrl?html}/XUI/images/login-logo.png" style="width:210px; height:104px;" alt="ForgeRock">
                         </a>
                     </div>
                 </div>

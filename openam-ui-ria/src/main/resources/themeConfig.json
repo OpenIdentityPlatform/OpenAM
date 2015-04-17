@@ -17,7 +17,7 @@
                         "title": "ForgeRock",
                         "alt": "ForgeRock",
                         "height": "104px",
-                        "width": "156px"
+                        "width": "210px"
                     },
                     "lessVars": {
                         "footer-background-color": "rgba(238, 238, 238, 0.7)",
@@ -25,7 +25,7 @@
                         "column-padding": "111px",
 
                         "login-container-label-align": "right",
-                
+
                         "message-background-color": "#fff",
                         "content-background": "#f9f9f9",
                         "font-color": "#5a646d",
