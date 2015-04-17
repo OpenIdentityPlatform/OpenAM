@@ -56,6 +56,6 @@ define("org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy", [
             relatedModel: UMAPolicyPermissionScope,
             parse: true
         }],
-        urlRoot: URLHelper.substitute("__api__/users/__username__/oauth2/resourcesets")
+        urlRoot: URLHelper.substitute("__api__/__subrealm__/users/__username__/oauth2/resourcesets")
     });
 });

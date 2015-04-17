@@ -63,6 +63,6 @@ define('org/forgerock/openam/ui/uma/models/UMAPolicy', [
 
             return Backbone.Model.prototype.sync.call(this, method, model, options);
         },
-        urlRoot: URLHelper.substitute("__api__/users/__username__/uma/policies")
+        urlRoot: URLHelper.substitute("__api__/__subrealm__/users/__username__/uma/policies")
     });
 });

@@ -25,8 +25,9 @@
 /*global define*/
 define("org/forgerock/openam/ui/uma/util/URLHelper", [
     "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/util/Constants"
-], function(Configuration, Constants) {
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/openam/ui/common/util/RealmHelper"
+], function(Configuration, Constants, RealmHelper) {
     return {
         substitute: function(url) {
             return function() {
@@ -34,6 +35,8 @@ define("org/forgerock/openam/ui/uma/util/URLHelper", [
                          .replace("__host__", Constants.host)
                          .replace("__context__", Constants.context)
                          .replace("__username__", Configuration.loggedUser.username);
+
+                url = RealmHelper.RealmHelper.decorateURIWithRealm(url);
 
                 return url;
             };

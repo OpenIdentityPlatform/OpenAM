@@ -25,8 +25,8 @@
 /*global _ define*/
 define('org/forgerock/openam/ui/common/util/RealmHelper', [
     'org/forgerock/commons/ui/common/main/Configuration',
-    'org/forgerock/commons/ui/common/util/UIUtils'
-], function(Configuration, UIUtils) {
+    'org/forgerock/commons/ui/common/main/Router'
+], function(Configuration, Router) {
     /**
      * @exports org/forgerock/openam/ui/common/util/RealmHelper
      */
@@ -90,8 +90,8 @@ define('org/forgerock/openam/ui/common/util/RealmHelper', [
      * @returns Override realm AS IS (no slash modification) (e.g. <code>/</code> or <code>/realm1</code>)
      */
     obj.getOverrideRealm = function() {
-        var uri = UIUtils.convertQueryParametersToJSON(UIUtils.getURIQueryString()).realm, // Realm from URI query string
-            fragment = UIUtils.convertQueryParametersToJSON(UIUtils.getURIFragmentQueryString()).realm; // Realm from Fragment query string
+        var uri = Router.convertQueryParametersToJSON(Router.getURIQueryString()).realm, // Realm from URI query string
+            fragment = Router.convertQueryParametersToJSON(Router.getURIFragmentQueryString()).realm; // Realm from Fragment query string
 
         return uri ? uri : fragment;
     };
@@ -105,7 +105,7 @@ define('org/forgerock/openam/ui/common/util/RealmHelper', [
             subRealm,
             subRealmSplit;
 
-        subRealmSplit = UIUtils.getURIFragment().split('/');
+        subRealmSplit = Router.getURIFragment().split('/');
         page = subRealmSplit.shift().split('&')[0];
 
         if(page && _.include(['login', 'forgotPassword'], page)) {

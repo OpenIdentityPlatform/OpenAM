@@ -27,21 +27,16 @@
  */
 
 /*global document, $, define, _, window */
-
 define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
-    "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/CookieHelper",
-    "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/commons/ui/common/main/i18nManager",
-    "org/forgerock/openam/ui/user/delegates/SessionDelegate",
+    "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function(constants, AbstractDelegate, conf, eventManager, cookieHelper, router, i18nManager, sessionDelegate, messageManager, RealmHelper) {
-
-    var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json/"),
+], function(AbstractDelegate, Configuration, Constants, CookieHelper, EventManager, Messages, RealmHelper) {
+    var obj = new AbstractDelegate(Constants.host + "/"+ Constants.context + "/json/"),
         requirementList = [],
         knownAuth = {}; // to be used to keep track of the attributes associated with whatever requirementList contains
 
@@ -51,18 +46,18 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
             tokenCookie,
             promise = $.Deferred();
 
-        knownAuth = _.clone(conf.globalData.auth);
+        knownAuth = _.clone(Configuration.globalData.auth);
 
         /**
          * args is the URL query string
-         * conf.globalData.auth.urlParams is fragment query string
+         * Configuration.globalData.auth.urlParams is fragment query string
          */
-        if (conf.globalData.auth.urlParams) {
-            _.extend(args, conf.globalData.auth.urlParams);
+        if (Configuration.globalData.auth.urlParams) {
+            _.extend(args, Configuration.globalData.auth.urlParams);
         }
 
         // In case user has logged in already update session
-        tokenCookie = cookieHelper.getCookie(conf.globalData.auth.cookieName);
+        tokenCookie = CookieHelper.getCookie(Configuration.globalData.auth.cookieName);
         if (tokenCookie) {
             args.sessionUpgradeSSOTokenId = tokenCookie;
         }
@@ -126,12 +121,12 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
         if (requirements.hasOwnProperty("authId")) {
             requirementList.push(requirements);
         } else if (requirements.hasOwnProperty("tokenId")) {
-            if (conf.globalData.auth.cookieDomains && conf.globalData.auth.cookieDomains.length !== 0){
-                _.each(conf.globalData.auth.cookieDomains,function(cookieDomain){
-                    cookieHelper.setCookie(conf.globalData.auth.cookieName, requirements.tokenId, "", "/", cookieDomain, conf.globalData.secureCookie);
+            if (Configuration.globalData.auth.cookieDomains && Configuration.globalData.auth.cookieDomains.length !== 0){
+                _.each(Configuration.globalData.auth.cookieDomains,function(cookieDomain){
+                    CookieHelper.setCookie(Configuration.globalData.auth.cookieName, requirements.tokenId, "", "/", cookieDomain, Configuration.globalData.secureCookie);
                 });
             } else {
-                cookieHelper.setCookie(conf.globalData.auth.cookieName, requirements.tokenId, "", "/", location.hostname, conf.globalData.secureCookie);
+                CookieHelper.setCookie(Configuration.globalData.auth.cookieName, requirements.tokenId, "", "/", location.hostname, Configuration.globalData.secureCookie);
             }
         }
     };
@@ -195,7 +190,7 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                                             .fail(processFailed);
                                     } else {
                                         // restart the process at the beginning
-                                        eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "loginTimeout");
+                                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "loginTimeout");
                                         promise.resolve(requirements);
                                     }
                                 } else {
@@ -208,7 +203,7 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                                 message: responseMessage,
                                 type: "error"
                         };
-                    messageManager.messages.addMessage(msg);
+                    Messages.messages.addMessage(msg);
                     } else { // we have a 401 unauthorized response
                         errorBody = $.parseJSON(jqXHR.responseText);
 
@@ -221,7 +216,7 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
                                .fail(processFailed);
 
                         } else {
-                            // TODO to refactor this switch soon. Something like a map from error.message to failReason 
+                            // TODO to refactor this switch soon. Something like a map from error.message to failReason
                             // http://sources.forgerock.org/cru/CR-6216#CFR-114597
                             switch (errorBody.message) {
                                 case "User Account Locked":
@@ -259,7 +254,7 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
         var ret = $.Deferred();
 
         // if we don't have any requires yet, or if the realm changes.
-        if (requirementList.length === 0 || !_.isEqual(conf.globalData.auth, knownAuth)) {
+        if (requirementList.length === 0 || !_.isEqual(Configuration.globalData.auth, knownAuth)) {
 
             obj.begin(args)
                .done(function (requirements) {
@@ -284,7 +279,7 @@ define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
             headers: {"Accept-API-Version": "protocol=1.0,resource=2.0"},
             data: JSON.stringify(args),
             url: "",
-            serviceUrl: constants.host + "/" + constants.context + "/json/users?_action=validateGoto",
+            serviceUrl: Constants.host + "/" + Constants.context + "/json/users?_action=validateGoto",
             errorsHandlers: {"Bad Request": {status: "400"}}
         });
     };
