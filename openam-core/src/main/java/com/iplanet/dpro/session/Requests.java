@@ -116,6 +116,7 @@ public class Requests {
             sres = pllSender.sendPLLRequest(svcurl, sreq);
             while (sres.getException() != null) {
                 session.processSessionResponseException(sres, appSSOToken);
+                context = session.getContext();
                 if (context != null) {
                     sreq.setRequester(RestrictedTokenContext.marshal(context));
                 }
