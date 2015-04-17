@@ -90,7 +90,7 @@
                         <Value>*|(|)|&amp;|!</Value>
                     </DefaultValues>
                 </AttributeSchema>                            
-                <SubSchema name="serverconfig" inheritance="multiple">
+                <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                         <AttributeSchema name="iplanet-am-auth-membership-min-password-length"
                         type="single"
                         syntax="number"

@@ -154,11 +154,15 @@ abstract class SmsResourceProvider {
      */
     protected ServiceConfig checkedInstanceSubConfig(String resourceId, ServiceConfig config)
             throws SSOException, SMSException, NotFoundException {
-        ServiceConfig subConfig = config.getSubConfig(resourceId);
-        if (subConfig == null || !subConfig.getSchemaID().equals(lastSchemaNodeName()) || !subConfig.exists()) {
-            throw new NotFoundException();
+        if (!config.getSubConfigNames().contains(resourceId) && config.exists()) {
+            return config;
+        } else {
+            ServiceConfig subConfig = config.getSubConfig(resourceId);
+            if (subConfig == null || !subConfig.getSchemaID().equals(lastSchemaNodeName()) || !subConfig.exists()) {
+                throw new NotFoundException();
+            }
+            return subConfig;
         }
-        return subConfig;
     }
 
     /**

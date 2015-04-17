@@ -138,7 +138,7 @@
                         <Value>0</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <SubSchema name="serverconfig" inheritance="multiple">
+                <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                     <AttributeSchema name="sunAMAuthJDBCConnectionType"
                         type="single_choice"
                         syntax="string"

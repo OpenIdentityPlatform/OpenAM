@@ -241,7 +241,7 @@
                         <Value></Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <SubSchema name="serverconfig" inheritance="multiple">
+                <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                     <AttributeSchema name="iplanet-am-auth-cert-check-cert-in-ldap"
                         type="single"
                         syntax="boolean"

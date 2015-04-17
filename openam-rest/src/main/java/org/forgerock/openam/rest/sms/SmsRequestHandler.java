@@ -69,6 +69,7 @@ import org.forgerock.json.resource.Router;
 import org.forgerock.json.resource.RoutingMode;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.utils.CollectionUtils;
 
 /**
  * A CREST routing request handler that creates collection and singleton resource providers for
@@ -144,6 +145,10 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
     private final Debug debug;
     private final Pattern schemaDnPattern;
     private final Collection<String> excludedServices;
+    private final Map<SchemaType, Collection<Function<String, Boolean>>> excludedServiceSingletons =
+            new HashMap<SchemaType, Collection<Function<String, Boolean>>>();
+    private final Map<SchemaType, Collection<Function<String, Boolean>>> excludedServiceCollections =
+            new HashMap<SchemaType, Collection<Function<String, Boolean>>>();
     private Map<String, Map<SmsRouteTree, Set<Route>>> serviceRoutes = new HashMap<String, Map<SmsRouteTree, Set<Route>>>();
     private final SmsRouteTree routeTree;
 
@@ -168,9 +173,17 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
                         leaf("/entityproviders", ENTITYPROVIDER_HANDLES_FUNCTION)),
                 leaf("/services", SERVICES_HANDLES_FUNCTION)
         );
+        addExcludedServiceProviders();
 
         createServices();
         SMSNotificationManager.getInstance().registerCallbackHandler(this);
+    }
+
+    private void addExcludedServiceProviders() {
+        excludedServiceSingletons.put(SchemaType.GLOBAL, CollectionUtils.<Function<String, Boolean>>asSet());
+        excludedServiceSingletons.put(SchemaType.ORGANIZATION, asSet(AUTHENTICATION_MODULE_HANDLES_FUNCTION));
+        excludedServiceCollections.put(SchemaType.GLOBAL, asSet(AUTHENTICATION_MODULE_HANDLES_FUNCTION));
+        excludedServiceCollections.put(SchemaType.ORGANIZATION, CollectionUtils.<Function<String, Boolean>>asSet());
     }
 
     /**
@@ -359,6 +372,23 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
         addPaths(parentPath, schemaPath, globalSchema, serviceRoutes, ignoredRoutes, routeTree);
     }
 
+    private boolean excludeSingleton(String serviceName) {
+        return exclude(excludedServiceSingletons.get(schemaType), serviceName);
+    }
+
+    private boolean excludeCollection(String serviceName) {
+        return exclude(excludedServiceCollections.get(schemaType), serviceName);
+    }
+
+    private boolean exclude(Collection<Function<String, Boolean>> excludeFunctions, String serviceName) {
+        for (Function<String, Boolean> f : excludeFunctions) {
+            if (f.apply(serviceName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Recursively adds routes for the schema paths found in the schema instance.
      *
@@ -378,14 +408,14 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
         String schemaName = schema.getResourceName();
         String path = getPath(parentPath, schemaName, schemaPath, schema);
         if (!schema.getAttributeSchemas().isEmpty() || schema.supportsMultipleConfigurations()) {
-            if (schema.supportsMultipleConfigurations()) {
+            if (schema.supportsMultipleConfigurations() && !excludeCollection(schema.getServiceName())) {
                 RequestHandler handler = Resources.newCollection(collectionProviderFactory.create(
                         new SmsJsonConverter(schema), schema, schemaType, new ArrayList<ServiceSchema>(schemaPath),
                         parentPath, true));
                 debug.message("Adding collection path {}", path);
                 serviceRoutes.putAll(addRoute(schema, RoutingMode.STARTS_WITH, path, handler, ignoredRoutes, routeTree));
                 parentPath = path + "/{" + schemaName + "}";
-            } else {
+            } else if (!excludeSingleton(schema.getServiceName())) {
                 RequestHandler handler = singletonProviderFactory.create(
                         new SmsJsonConverter(schema), schema, dynamicSchema, schemaType,
                         new ArrayList<ServiceSchema>(schemaPath), parentPath, true);

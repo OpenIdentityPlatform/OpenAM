@@ -65,7 +65,7 @@
                         <Value>0</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <SubSchema name="serverconfig" inheritance="multiple">
+                <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                     <AttributeSchema name="iplanet-am-auth-http-basic-module-configured"
                         type="single_choice"
                         syntax="string"

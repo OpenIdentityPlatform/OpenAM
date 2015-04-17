@@ -106,7 +106,7 @@
                         <Value>5</Value>
 		    </DefaultValues>
 		</AttributeSchema>
-		<SubSchema name="serverconfig" inheritance="multiple">
+		<SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                     <AttributeSchema name="iplanet-am-auth-radius-server1"
                         type="list"
                         syntax="string"

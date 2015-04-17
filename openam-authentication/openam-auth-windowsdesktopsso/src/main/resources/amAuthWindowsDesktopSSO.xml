@@ -110,7 +110,7 @@
                     resourceName="trustedKerberosRealms">
                     <DefaultValues/>
                 </AttributeSchema>
-                <SubSchema name="serverconfig" inheritance="multiple">
+                <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                         <AttributeSchema name="iplanet-am-auth-windowsdesktopsso-principal-name"
                         type="single"
                         syntax="string"

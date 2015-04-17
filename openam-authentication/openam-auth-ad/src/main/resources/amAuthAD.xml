@@ -210,7 +210,7 @@
                         <Value>0</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <SubSchema name="serverconfig" inheritance="multiple">
+                <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                     <AttributeSchema name="iplanet-am-auth-ldap-server"
                         type="list"
                         syntax="string"

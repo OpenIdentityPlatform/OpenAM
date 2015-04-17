@@ -267,7 +267,7 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                                  resourceName="openidConnectContextValue">
                 </AttributeSchema>
 
-                <SubSchema name="serverconfig" inheritance="multiple">
+                <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                     <AttributeSchema name="iplanet-am-auth-oauth-client-id"
                                      type="single" syntax="string" i18nKey="a101" resourceName="clientId">
                     </AttributeSchema>

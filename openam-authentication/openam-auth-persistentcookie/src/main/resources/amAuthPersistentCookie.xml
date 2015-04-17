@@ -79,7 +79,7 @@
                         <Value>true</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <SubSchema name="serverconfig" inheritance="multiple">
+                <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                     <AttributeSchema
                             name="openam-auth-persistent-cookie-idle-time"
                             type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"

@@ -431,7 +431,7 @@
 
                 <!-- HOTP Attributes END -->
 
-				<SubSchema name="serverconfig" inheritance="multiple">
+				<SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
 					<AttributeSchema name="openam-auth-adaptive-auth-level"
 						 cosQualifier="default" type="single" syntax="number" i18nKey="a000"
 						 resourceName="authenticationLevel">

@@ -62,7 +62,7 @@
                         <Value>*|(|)|&amp;|!</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <SubSchema name="serverconfig" inheritance="multiple">
+                <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                     <AttributeSchema name="sunAMAuthDataStoreAuthLevel"
                         type="single"
                         syntax="number_range" rangeStart="0" rangeEnd="2147483647"
