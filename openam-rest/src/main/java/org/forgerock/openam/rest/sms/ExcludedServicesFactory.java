@@ -24,6 +24,7 @@ import java.util.ResourceBundle;
 
 import javax.inject.Provider;
 
+import com.sun.identity.authentication.util.ISAuthConstants;
 import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 
 import com.sun.identity.coretoken.CoreTokenConstants;
@@ -56,6 +57,7 @@ public class ExcludedServicesFactory {
         ));
 
         excludedServices.remove(SmsRequestHandler.IDFF_METADATA_SERVICE);
+        excludedServices.remove(ISAuthConstants.AUTHCONFIG_SERVICE_NAME);
 
         if (type == SchemaType.GLOBAL) {
             excludedServices.addAll(Arrays.asList(

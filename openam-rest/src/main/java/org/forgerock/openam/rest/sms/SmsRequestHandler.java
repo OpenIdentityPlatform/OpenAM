@@ -87,8 +87,6 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
     static final String SAML2_METADATA_SERVICE = "sunFMSAML2MetadataService";
     static final String WS_METADATA_SERVICE = "sunFMWSFederationMetadataService";
 
-    private static final Function<String, Boolean> AUTHENTICATION_HANDLES_FUNCTION =
-            new SingleServiceFunction(ISAuthConstants.AUTH_SERVICE_NAME);
     private static final Function<String, Boolean> CIRCLES_OF_TRUST_HANDLES_FUNCTION =
             new SingleServiceFunction(COT_CONFIG_SERVICE);
     private static final Function<String, Boolean> ENTITYPROVIDER_HANDLES_FUNCTION = new Function<String, Boolean>() {
@@ -100,6 +98,13 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
         }
     };
 
+    private static final Function<String, Boolean> AUTHENTICATION_AND_CHAINS_HANDLES_FUNCTION = new Function<String, Boolean>() {
+        @Nullable
+        @Override
+        public Boolean apply(@Nullable String s) {
+            return ISAuthConstants.AUTH_SERVICE_NAME.equals(s) || ISAuthConstants.AUTHCONFIG_SERVICE_NAME.equals(s);
+        }
+    };
     private static final Function<String, Boolean> AUTHENTICATION_MODULE_HANDLES_FUNCTION = new Function<String, Boolean>() {
         @Override
         public Boolean apply(String serviceName) {
@@ -112,7 +117,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
      */
     private static final Function<String, Boolean> SERVICES_HANDLES_FUNCTION = new Function<String, Boolean>() {
         private final List<Function<String, Boolean>> ALREADY_HANDLED = Arrays.asList(
-                AUTHENTICATION_HANDLES_FUNCTION,
+                AUTHENTICATION_AND_CHAINS_HANDLES_FUNCTION,
                 AUTHENTICATION_MODULE_HANDLES_FUNCTION,
                 CIRCLES_OF_TRUST_HANDLES_FUNCTION,
                 ENTITYPROVIDER_HANDLES_FUNCTION
@@ -157,7 +162,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
         this.schemaDnPattern = Pattern.compile("^ou=([.0-9]+),ou=([^,]+)," +
                 Pattern.quote(ServiceManager.getServiceDN()) + "$");
         routeTree = tree(
-                branch("/authentication", leaf("/modules", AUTHENTICATION_MODULE_HANDLES_FUNCTION)),
+                branch("/authentication", AUTHENTICATION_AND_CHAINS_HANDLES_FUNCTION,
+                        leaf("/modules", AUTHENTICATION_MODULE_HANDLES_FUNCTION)),
                 branch("/federation", CIRCLES_OF_TRUST_HANDLES_FUNCTION,
                         leaf("/entityproviders", ENTITYPROVIDER_HANDLES_FUNCTION)),
                 leaf("/services", SERVICES_HANDLES_FUNCTION)
@@ -350,7 +356,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
         debug.message("Adding singleton path {}", path);
         serviceRoutes.putAll(addRoute(globalSchema, RoutingMode.EQUALS, path, handler, ignoredRoutes, routeTree));
 
-        addPaths(parentPath, schemaPath, globalSchema, serviceRoutes, ignoredRoutes);
+        addPaths(parentPath, schemaPath, globalSchema, serviceRoutes, ignoredRoutes, routeTree);
     }
 
     /**
@@ -389,11 +395,12 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
             }
         }
 
-        addPaths(parentPath, schemaPath, schema, serviceRoutes, ignoredRoutes);
+        addPaths(parentPath, schemaPath, schema, serviceRoutes, ignoredRoutes, routeTree);
     }
 
     private void addPaths(String parentPath, List<ServiceSchema> schemaPath, ServiceSchema schema,
-            Map<SmsRouteTree, Set<Route>> serviceRoutes, List<Pattern> ignoredRoutes) throws SMSException {
+            Map<SmsRouteTree, Set<Route>> serviceRoutes, List<Pattern> ignoredRoutes, SmsRouteTree routeTree)
+            throws SMSException {
         for (String subSchema : (Set<String>) schema.getSubSchemaNames()) {
             addPaths(parentPath, new ArrayList<ServiceSchema>(schemaPath), schema.getSubSchema(subSchema),
                     null, serviceRoutes, ignoredRoutes, routeTree);

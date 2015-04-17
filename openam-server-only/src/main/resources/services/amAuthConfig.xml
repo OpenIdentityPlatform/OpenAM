@@ -27,6 +27,9 @@
     $Id: amAuthConfig.xml,v 1.3 2008/06/25 05:45:41 qcheng Exp $
 
 -->
+<!--
+    Portions Copyrighted 2015 ForgeRock AS.
+-->
 
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
@@ -39,7 +42,8 @@
             i18nFileName="amAuthConfig"
             i18nKey="iplanet-am-auth-config-service-description"
             revisionNumber="20"
-            propertiesViewBeanURL="@CONSOLE_URI@/auth/ACServiceInstanceList"> 
+            propertiesViewBeanURL="@CONSOLE_URI@/auth/ACServiceInstanceList"
+            resourceName="chains">
             <Global>
                 <AttributeSchema name="serviceObjectClasses"
                     type="list"
@@ -52,20 +56,23 @@
             </Global>
 
             <Organization> 
-                <SubSchema name="Configurations"> 
+                <SubSchema name="Configurations" resourceName="USE-PARENT">
                     <SubSchema name="NamedConfiguration" 
-                        inheritance="multiple"> 
+                        inheritance="multiple"
+                        resourceName="USE-PARENT">
                         <AttributeSchema 
                             name="iplanet-am-auth-configuration" 
                             type="single" 
                             syntax="string"
                             propertiesViewBeanURL="@CONSOLE_URI@/auth/ACModuleList" 
                             uitype="link"
-                            i18nKey="a101" />
+                            i18nKey="a101"
+                            resourceName="authChainConfiguration"/>
                              <AttributeSchema name="iplanet-am-auth-login-success-url"
                             type="list"
                             syntax="string"
-                            i18nKey="a102">
+                            i18nKey="a102"
+                            resourceName="loginSuccessUrl">
                             <DefaultValues>
                                   <Value/>
                             </DefaultValues>
@@ -73,7 +80,8 @@
                         <AttributeSchema name="iplanet-am-auth-login-failure-url"
                             type="list"
                             syntax="string"
-                            i18nKey="a103">
+                            i18nKey="a103"
+                            resourceName="loginFailureUrl">
                             <DefaultValues>
                                 <Value/>
                             </DefaultValues>
@@ -81,7 +89,8 @@
                          <AttributeSchema name="iplanet-am-auth-post-login-process-class"
                             type="list"
                             syntax="string"
-                            i18nKey="a104">
+                            i18nKey="a104"
+                            resourceName="loginPostProcessClass">
                         </AttributeSchema>
 
                     </SubSchema> 
@@ -92,7 +101,8 @@
                 <AttributeSchema name="iplanet-am-auth-configuration"
                     type="single_choice"
                     syntax="string"
-                    i18nKey="a101">
+                    i18nKey="a101"
+                    resourceName="authChainConfiguration">
                     <ChoiceValues>
                         <ChoiceValuesClassName
                     className= "com.sun.identity.authentication.service.ConfiguredAuthServices" />

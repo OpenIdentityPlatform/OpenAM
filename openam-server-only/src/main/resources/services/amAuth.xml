@@ -42,12 +42,14 @@
                 serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthService"
                 i18nFileName="amAuth"
                 revisionNumber="60"
-                i18nKey="iplanet-am-auth-service-description">
+                i18nKey="iplanet-am-auth-service-description"
+                resourceName="">
             <Global>
                 <AttributeSchema name="iplanet-am-auth-authenticators"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a117">
+                                 i18nKey="a117"
+                                 resourceName="authenticators">
                     <DefaultValues>
                         <Value>com.sun.identity.authentication.modules.ldap.LDAP</Value>
                         <Value>com.sun.identity.authentication.modules.ad.AD</Value>
@@ -76,12 +78,14 @@
                 <AttributeSchema name="iplanet-am-auth-ldap-connection-pool-size"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a140">
+                                 i18nKey="a140"
+                                 resourceName="ldapConnectionPoolSize">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-ldap-connection-pool-default-size"
                                  type="single"
                                  syntax="string"
-                                 i18nKey="a141">
+                                 i18nKey="a141"
+                                 resourceName="ldapConnectionPoolDefaultSize">
                     <DefaultValues>
                         <Value>1:10</Value>
                     </DefaultValues>
@@ -97,7 +101,8 @@
                 <AttributeSchema name="sunRemoteAuthSecurityEnabled"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a146">
+                                 i18nKey="a146"
+                                 resourceName="remoteAuthSecurityEnabled">
                     <DefaultValues>
                         <Value>false</Value>
                     </DefaultValues>
@@ -105,7 +110,8 @@
                 <AttributeSchema name="sunAMAuthKeepPostProcessInstances"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a148">
+                                 i18nKey="a148"
+                                 resourceName="keepPostProcessInstances">
                     <DefaultValues>
                         <Value>false</Value>
                     </DefaultValues>
@@ -113,7 +119,8 @@
                 <AttributeSchema name="sunAMAuthKeepAuthModuleIntances"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a149">
+                                 i18nKey="a149"
+                                 resourceName="keepAuthModuleInstances">
                     <DefaultValues>
                         <Value>false</Value>
                     </DefaultValues>
@@ -121,7 +128,8 @@
                 <AttributeSchema name="openam-xui-interface-enabled"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a154">
+                                 i18nKey="a154"
+                                 resourceName="xuiInterfaceEnabled">
                     <DefaultValues>
                         <Value>true</Value>
                     </DefaultValues>
@@ -136,7 +144,8 @@
                 <AttributeSchema name="iplanet-am-auth-dynamic-profile-creation"
                                  type="single_choice"
                                  syntax="string"
-                                 i18nKey="a102">
+                                 i18nKey="a102"
+                                 resourceName="dynamicProfileCreation">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="Create">true</ChoiceValue>
                         <ChoiceValue i18nKey="CreateWithAlias">createAlias</ChoiceValue>
@@ -150,7 +159,8 @@
                 <AttributeSchema name="iplanet-am-auth-admin-auth-module"
                                  type="single_choice"
                                  syntax="string"
-                                 i18nKey="a104">
+                                 i18nKey="a104"
+                                 resourceName="adminAuthModule">
                     <ChoiceValues>
                         <ChoiceValuesClassName
                                 className=
@@ -163,7 +173,8 @@
                 <AttributeSchema name="iplanet-am-auth-key-alias"
                                  type="single"
                                  syntax="string"
-                                 i18nKey="a151">
+                                 i18nKey="a151"
+                                 resourceName="keyAlias">
                     <DefaultValues>
                         <Value>test</Value>
                     </DefaultValues>
@@ -171,12 +182,14 @@
                 <AttributeSchema name="iplanet-am-auth-default-role"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a105">
+                                 i18nKey="a105"
+                                 resourceName="defaultRole">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-persistent-cookie-mode"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a108">
+                                 i18nKey="a108"
+                                 resourceName="persistentCookieMode">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -188,7 +201,8 @@
                 <AttributeSchema name="iplanet-am-auth-persistent-cookie-time"
                                  type="single"
                                  syntax="number"
-                                 i18nKey="a109">
+                                 i18nKey="a109"
+                                 resourceName="persistentCookieMaxTime">
                     <DefaultValues>
                         <Value>2147483</Value>
                     </DefaultValues>
@@ -196,7 +210,8 @@
                 <AttributeSchema name="sunEnableModuleBasedAuth"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a145">
+                                 i18nKey="a145"
+                                 resourceName="moduleBasedAuthEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -208,7 +223,8 @@
                 <AttributeSchema name="openam-auth-stateless-sessions"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a157">
+                                 i18nKey="a157"
+                                 resourceName="statelessSessionsEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -220,7 +236,8 @@
                 <AttributeSchema name="openam.auth.zero.page.login.enabled"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a152">
+                                 i18nKey="a152"
+                                 resourceName="zeroPageLoginEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -230,9 +247,10 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam.auth.zero.page.login.referer.whitelist"
-                                type="list"
-                                syntax="string"
-                                i18nKey="a155">
+                                 type="list"
+                                 syntax="string"
+                                 i18nKey="a155"
+                                 resourceName="zeroPageLoginReferrerWhiteList">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -240,7 +258,8 @@
                 <AttributeSchema name="openam.auth.zero.page.login.allow.null.referer"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a156">
+                                 i18nKey="a156"
+                                 resourceName="zeroPageLoginAllowedWithoutReferrer">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -252,7 +271,8 @@
                 <AttributeSchema name="iplanet-am-auth-login-failure-lockout-mode"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a125">
+                                 i18nKey="a125"
+                                 resourceName="loginFailureLockoutMode">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -264,7 +284,8 @@
                 <AttributeSchema name="sunStoreInvalidAttemptsInDS"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a144">
+                                 i18nKey="a144"
+                                 resourceName="storeInvalidAttemptsInDataStore">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -276,7 +297,8 @@
                 <AttributeSchema name="iplanet-am-auth-lockout-duration"
                                  type="single"
                                  syntax="number"
-                                 i18nKey="a130">
+                                 i18nKey="a130"
+                                 resourceName="lockoutDuration">
                     <DefaultValues>
                         <Value>0</Value>
                     </DefaultValues>
@@ -284,7 +306,8 @@
                 <AttributeSchema name="sunLockoutDurationMultiplier"
                                  type="single"
                                  syntax="number"
-                                 i18nKey="a1301">
+                                 i18nKey="a1301"
+                                 resourceName="lockoutDurationMultiplier">
                     <DefaultValues>
                         <Value>1</Value>
                     </DefaultValues>
@@ -292,7 +315,8 @@
                 <AttributeSchema name="iplanet-am-auth-login-failure-count"
                                  type="single"
                                  syntax="number"
-                                 i18nKey="a126">
+                                 i18nKey="a126"
+                                 resourceName="loginFailureCount">
                     <DefaultValues>
                         <Value>5</Value>
                     </DefaultValues>
@@ -300,7 +324,8 @@
                 <AttributeSchema name="iplanet-am-auth-login-failure-duration"
                                  type="single"
                                  syntax="number"
-                                 i18nKey="a127">
+                                 i18nKey="a127"
+                                 resourceName="loginFailureDuration">
                     <DefaultValues>
                         <Value>300</Value>
                     </DefaultValues>
@@ -309,12 +334,14 @@
                 <AttributeSchema name="iplanet-am-auth-lockout-email-address"
                                  type="single"
                                  syntax="string"
-                                 i18nKey="a128">
+                                 i18nKey="a128"
+                                 resourceName="lockoutEmailAddress">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-lockout-warn-user"
                                  type="single"
                                  syntax="number"
-                                 i18nKey="a129">
+                                 i18nKey="a129"
+                                 resourceName="lockoutWarnUserCount">
                     <DefaultValues>
                         <Value>4</Value>
                     </DefaultValues>
@@ -322,17 +349,20 @@
                 <AttributeSchema name="iplanet-am-auth-lockout-attribute-name"
                                  type="single"
                                  syntax="string"
-                                 i18nKey="a131">
+                                 i18nKey="a131"
+                                 resourceName="lockoutAttributeName">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-lockout-attribute-value"
                                  type="single"
                                  syntax="string"
-                                 i18nKey="a132">
+                                 i18nKey="a132"
+                                 resourceName="lockoutAttributeValue">
                 </AttributeSchema>
                 <AttributeSchema name="sunAMAuthInvalidAttemptsDataAttrName"
                                  type="single"
                                  syntax="string"
-                                 i18nKey="a1321">
+                                 i18nKey="a1321"
+                                 resourceName="invalidAttemptsDataAttributeName">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-user-container"
                                  type="list"
@@ -345,7 +375,8 @@
                 <AttributeSchema name="iplanet-am-auth-alias-attr-name"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a114">
+                                 i18nKey="a114"
+                                 resourceName="aliasAttributeName">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-user-naming-attr"
                                  type="single"
@@ -358,7 +389,8 @@
                 <AttributeSchema name="iplanet-am-auth-default-auth-level"
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                 i18nKey="a500">
+                                 i18nKey="a500"
+                                 resourceName="defaultAuthLevel">
                     <DefaultValues>
                         <Value>0</Value>
                     </DefaultValues>
@@ -366,7 +398,8 @@
                 <AttributeSchema name="iplanet-am-auth-locale"
                                  type="single"
                                  syntax="string"
-                                 i18nKey="a120">
+                                 i18nKey="a120"
+                                 resourceName="locale">
                     <DefaultValues>
                         <Value>@PLATFORM_LOCALE@</Value>
                     </DefaultValues>
@@ -374,7 +407,8 @@
                 <AttributeSchema name="iplanet-am-auth-org-config"
                                  type="single_choice"
                                  syntax="string"
-                                 i18nKey="a121">
+                                 i18nKey="a121"
+                                 resourceName="orgConfig">
                     <ChoiceValues>
                         <ChoiceValuesClassName
                                 className=
@@ -387,7 +421,8 @@
                 <AttributeSchema name="iplanet-am-auth-login-success-url"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a133">
+                                 i18nKey="a133"
+                                 resourceName="loginSuccessUrl">
                     <DefaultValues>
                         <Value>/@SERVER_URI@/console</Value>
                     </DefaultValues>
@@ -395,7 +430,8 @@
                 <AttributeSchema name="iplanet-am-auth-login-failure-url"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a134">
+                                 i18nKey="a134"
+                                 resourceName="loginFailureUrl">
                     <DefaultValues>
                         <Value/>
                     </DefaultValues>
@@ -403,12 +439,14 @@
                 <AttributeSchema name="iplanet-am-auth-post-login-process-class"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a135">
+                                 i18nKey="a135"
+                                 resourceName="loginPostProcessClass">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-username-generator-enabled"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a138">
+                                 i18nKey="a138"
+                                 resourceName="usernameGeneratorEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -420,7 +458,8 @@
                 <AttributeSchema name="iplanet-am-auth-username-generator-class"
                                  type="single"
                                  syntax="string"
-                                 i18nKey="a139">
+                                 i18nKey="a139"
+                                 resourceName="usernameGeneratorClass">
                     <DefaultValues>
                         <Value>com.sun.identity.authentication.spi.DefaultUserIDGenerator</Value>
                     </DefaultValues>
@@ -428,7 +467,8 @@
                 <AttributeSchema name="sunAMIdentityType"
                                  type="multiple_choice"
                                  syntax="string"
-                                 i18nKey="a142">
+                                 i18nKey="a142"
+                                 resourceName="identityType">
                     <ChoiceValues>
                         <ChoiceValuesClassName
                                 className="com.sun.identity.authentication.service.ConfiguredIdentityTypes"/>
@@ -441,12 +481,14 @@
                 <AttributeSchema name="sunAMUserStatusCallbackPlugins"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a143">
+                                 i18nKey="a143"
+                                 resourceName="userStatusCallbackPlugins">
                 </AttributeSchema>
                 <AttributeSchema name="sunAMUserAttributesSessionMapping"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a147">
+                                 i18nKey="a147"
+                                 resourceName="userAttributeSessionMapping">
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-valid-goto-domains"
                                  type="list"
@@ -456,7 +498,8 @@
                 <AttributeSchema name="openam-auth-pcookie-auth-level"
                                  type="single"
                                  syntax="string"
-                                 i18nKey="a153">
+                                 i18nKey="a153"
+                                 resourceName="persistentCookieAuthLevel">
                     <DefaultValues>
                         <Value>0</Value>
                     </DefaultValues>

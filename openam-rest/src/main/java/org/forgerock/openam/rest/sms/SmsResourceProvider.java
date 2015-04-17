@@ -127,11 +127,11 @@ abstract class SmsResourceProvider {
             name = uriTemplateVariables.get("name");
         }
         ServiceConfig config = type == SchemaType.GLOBAL ?
-                scm.getGlobalConfig(name) : scm.getOrganizationConfig(realmFor(context), name);
+                scm.getGlobalConfig(name) : scm.getOrganizationConfig(realmFor(context), null);
         for (int i = 0; i < subSchemaPath.size() - 1; i++) {
             ServiceSchema schema = subSchemaPath.get(i);
             String pathFragment = schema.getResourceName();
-            if (pathFragment == null) {
+            if (pathFragment == null || "USE-PARENT".equals(pathFragment)) {
                 pathFragment = schema.getName();
             }
             if (uriPath.contains("{" + pathFragment + "}")) {
