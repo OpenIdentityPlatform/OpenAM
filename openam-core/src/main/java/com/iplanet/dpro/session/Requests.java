@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -112,6 +112,7 @@ public class Requests {
             sres = Session.sendPLLRequest(svcurl, sreq);
             while (sres.getException() != null) {
                 session.processSessionResponseException(sres, appSSOToken);
+                context = session.getContext();
                 if (context != null) {
                     sreq.setRequester(RestrictedTokenContext.marshal(context));
                 }
