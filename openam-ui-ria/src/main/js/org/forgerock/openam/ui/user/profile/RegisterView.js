@@ -54,10 +54,12 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
         },
         render: function(args, callback) {
             this.data.urlParams = uiUtils.convertCurrentUrlToJSON().params;
-            this.data.isStageOne = true;
-            if (this.data.urlParams) {
-                this.data.isStageOne = false;
+            if(this.data.urlParams) {
+                this.data.isStageOne = _.keys(_.pick(this.data.urlParams, 'confirmationId', 'tokenId')).length !== 2;
+            } else {
+                this.data.isStageOne = true;
             }
+
             this.parentRender(function() {
                validatorsManager.bindValidators(this.$el);
             });
