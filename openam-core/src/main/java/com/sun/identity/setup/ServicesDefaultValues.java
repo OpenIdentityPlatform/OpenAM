@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -354,7 +354,7 @@ public class ServicesDefaultValues {
         String ekey = ((String)map.get(
                 SetupConstants.CONFIG_VAR_ENCRYPTION_KEY));
         if (ekey == null) {
-            ekey = AMSetupServlet.getRandomString().trim();
+            ekey = AMSetupUtils.getRandomString().trim();
             map.put(SetupConstants.CONFIG_VAR_ENCRYPTION_KEY, ekey);
         }
         // in future release need to check if length of greater from 10.

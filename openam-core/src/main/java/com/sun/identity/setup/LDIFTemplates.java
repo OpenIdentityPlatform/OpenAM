@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -23,12 +23,13 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: LDIFTemplates.java,v 1.5 2009/10/27 05:33:39 hengming Exp $
+ *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted 2011-2013 ForgeRock AS
- */
 package com.sun.identity.setup;
+
+import static org.forgerock.openam.utils.IOUtils.writeToFile;
 
 import com.sun.identity.shared.debug.Debug;
 import java.io.File;
@@ -67,11 +68,11 @@ public class LDIFTemplates {
                     copyRecursively(servletCtx, resourcePath, to);
                 } else {
                     try {
-                        StringBuffer content = AMSetupServlet.readFile(resourcePath);
+                        String content = AMSetupUtils.readFile(servletCtx, resourcePath);
                         String newPath = to + "/ldif/" + resourcePath.substring(PATH_PREFIX.length());
                         File file = new File(newPath);
                         file.getParentFile().mkdirs();
-                        AMSetupServlet.writeToFile(newPath, content.toString());
+                        writeToFile(newPath, content);
                     } catch (IOException ioe) {
                         Debug.getInstance(SetupConstants.DEBUG_NAME).error("LDIFTemplates.copy", ioe);
                     }

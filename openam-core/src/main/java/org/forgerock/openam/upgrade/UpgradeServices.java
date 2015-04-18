@@ -1,7 +1,7 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2011-2014 ForgeRock AS.
+ * Copyright 2011-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -29,6 +29,8 @@
 
 package org.forgerock.openam.upgrade;
 
+import static org.forgerock.openam.utils.IOUtils.writeToFile;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.util.AMEncryption;
 import com.iplanet.services.util.ConfigurableKey;
@@ -38,6 +40,7 @@ import com.sun.identity.password.plugins.PasswordGenerator;
 import com.sun.identity.password.plugins.RandomPasswordGenerator;
 import com.sun.identity.password.ui.model.PWResetException;
 import com.sun.identity.setup.AMSetupServlet;
+import com.sun.identity.setup.AMSetupUtils;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
 import com.sun.identity.sm.ServiceManager;
@@ -235,7 +238,7 @@ public class UpgradeServices {
             }
 
             sb.append(generateDetailedUpgradeReport(adminToken, false));
-            AMSetupServlet.writeToFile(reportFile, sb.toString());
+            writeToFile(reportFile, sb.toString());
         } catch (IOException ioe) {
             throw new UpgradeException(ioe.getMessage());
         }
@@ -401,7 +404,7 @@ public class UpgradeServices {
             if (!dotVersionFile.exists()) {
                 debug.error("File " + dotVersionFile.getName() + " does not exist!");
             }
-            AMSetupServlet.writeToFile(dotVersionFilePath, version);
+            writeToFile(dotVersionFilePath, version);
         } catch (IOException ioe) {
             throw new UpgradeException(ioe);
         }

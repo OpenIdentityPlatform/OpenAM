@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,13 +24,14 @@
  *
  * $Id: DefaultSummary.java,v 1.13 2009/01/05 23:17:09 veiming Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.config;
 
 import com.sun.identity.config.util.ProtectedPage;
 import com.sun.identity.setup.AMSetupServlet;
+import com.sun.identity.setup.AMSetupUtils;
 import com.sun.identity.setup.HttpServletRequestWrapper;
 import com.sun.identity.setup.HttpServletResponseWrapper;
 import com.sun.identity.setup.SetupConstants;
@@ -78,13 +79,11 @@ public class DefaultSummary extends ProtectedPage {
             SetupConstants.CONFIG_VAR_DIRECTORY_SERVER_HOST, getHostName());
         request.addParameter(
             SetupConstants.CONFIG_VAR_DIRECTORY_SERVER_PORT, 
-            "" + AMSetupServlet.getUnusedPort(getHostName(),50389, 1000));
-        request.addParameter(
-            SetupConstants.CONFIG_VAR_DIRECTORY_ADMIN_SERVER_PORT,
-            Integer.toString(AMSetupServlet.getUnusedPort(getHostName(), 4444, 1000)));
-        request.addParameter(
-            SetupConstants.CONFIG_VAR_DIRECTORY_JMX_SERVER_PORT,
-            Integer.toString(AMSetupServlet.getUnusedPort(getHostName(), 1689, 1000)));
+            "" + AMSetupUtils.getFirstUnusedPort(getHostName(), 50389, 1000));
+        request.addParameter(SetupConstants.CONFIG_VAR_DIRECTORY_ADMIN_SERVER_PORT,
+            Integer.toString(AMSetupUtils.getFirstUnusedPort(getHostName(), 4444, 1000)));
+        request.addParameter(SetupConstants.CONFIG_VAR_DIRECTORY_JMX_SERVER_PORT,
+            Integer.toString(AMSetupUtils.getFirstUnusedPort(getHostName(), 1689, 1000)));
         
         request.addParameter(
             SetupConstants.CONFIG_VAR_SERVER_HOST, getHostName());
@@ -100,9 +99,7 @@ public class DefaultSummary extends ProtectedPage {
             SetupConstants.CONFIG_VAR_BASE_DIR, getBaseDir(
                 getContext().getRequest()));
 
-        request.addParameter(
-            SetupConstants.CONFIG_VAR_ENCRYPTION_KEY, 
-            AMSetupServlet.getRandomString());
+        request.addParameter(SetupConstants.CONFIG_VAR_ENCRYPTION_KEY, AMSetupUtils.getRandomString());
         
         request.addParameter(
             SetupConstants.CONFIG_VAR_COOKIE_DOMAIN, getCookieDomain());

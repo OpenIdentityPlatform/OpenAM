@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: Wizard.java,v 1.27 2009/01/17 02:05:35 kevinserwin Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.config.wizard;
@@ -32,6 +32,7 @@ package com.sun.identity.config.wizard;
 import com.sun.identity.config.SessionAttributeNames;
 import com.sun.identity.config.util.ProtectedPage;
 import com.sun.identity.setup.AMSetupServlet;
+import com.sun.identity.setup.AMSetupUtils;
 import com.sun.identity.setup.ConfiguratorException;
 import com.sun.identity.setup.HttpServletRequestWrapper;
 import com.sun.identity.setup.HttpServletResponseWrapper;
@@ -63,11 +64,11 @@ public class Wizard extends ProtectedPage implements Constants {
     public static String defaultRootSuffix = DEFAULT_ROOT_SUFFIX;
 
     public String defaultPort = Integer.toString(
-        AMSetupServlet.getUnusedPort(hostName, 50389, 1000));
+            AMSetupUtils.getFirstUnusedPort(hostName, 50389, 1000));
     public String defaultAdminPort = Integer.toString(
-        AMSetupServlet.getUnusedPort(hostName, 4444, 1000));
+            AMSetupUtils.getFirstUnusedPort(hostName, 4444, 1000));
     public String defaultJmxPort = Integer.toString(
-        AMSetupServlet.getUnusedPort(hostName, 1689, 1000));
+            AMSetupUtils.getFirstUnusedPort(hostName, 1689, 1000));
     
     /**
      * This is the 'execute' operation for the entire wizard.  This method 
@@ -267,7 +268,7 @@ public class Wizard extends ProtectedPage implements Constants {
         tmp = (String)getContext().getSessionAttribute(
             SessionAttributeNames.ENCRYPTION_KEY);
         if (tmp == null) {
-            tmp = AMSetupServlet.getRandomString();
+            tmp = AMSetupUtils.getRandomString();
         }
         request.addParameter(
             SetupConstants.CONFIG_VAR_ENCRYPTION_KEY, tmp);

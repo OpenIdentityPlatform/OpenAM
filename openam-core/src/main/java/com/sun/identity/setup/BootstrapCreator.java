@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,11 @@
  *
  * $Id: BootstrapCreator.java,v 1.14 2009/08/03 23:32:54 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.setup;
+
+import static org.forgerock.openam.utils.IOUtils.writeToFile;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.ldap.DSConfigMgr;
@@ -115,7 +114,7 @@ public class BootstrapCreator {
                 Thread.sleep(3000);
             }
 
-            AMSetupServlet.writeToFile(file, bootstrapString);
+            writeToFile(file, bootstrapString);
 
             // not exist means that the product is first configured.
             // set permission to 400

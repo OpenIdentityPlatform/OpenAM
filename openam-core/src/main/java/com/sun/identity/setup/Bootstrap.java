@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,11 @@
  *
  * $Id: Bootstrap.java,v 1.18 2009/05/13 21:26:36 hengming Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.setup;
+
+import static org.forgerock.openam.utils.IOUtils.writeToFile;
 
 import com.iplanet.am.util.AdminUtils;
 import com.iplanet.am.util.SystemProperties;
@@ -335,8 +334,8 @@ public class Bootstrap {
             String url = (String)i.next();
             buff.append(modifyDSAMEUserPassword(url, password)).append("\n");
         }
-        
-        AMSetupServlet.writeToFile(bootstrapFile, buff.toString());
+
+        writeToFile(bootstrapFile, buff.toString());
     }
         
     private static String modifyDSAMEUserPassword(String url, String password) 

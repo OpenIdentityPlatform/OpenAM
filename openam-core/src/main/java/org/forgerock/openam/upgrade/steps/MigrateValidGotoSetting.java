@@ -146,7 +146,7 @@ public class MigrateValidGotoSetting extends AbstractUpgradeStep {
             }
             UpgradeProgress.reportStart("upgrade.goto.policy.start");
             final PolicyManager pm = new PolicyManager(getAdminToken(), HIDDEN_REALM);
-            String policy = AMSetupServlet.readFile(DELEGATION_POLICY_FILE).toString();
+            String policy = AMSetupServlet.readFile(DELEGATION_POLICY_FILE);
             policy = ServicesDefaultValues.tagSwap(policy, true);
             //Adding the delegation privileges to allow agent accounts to read the new validationService.
             PolicyUtils.createPolicies(pm, new ByteArrayInputStream(policy.getBytes()));

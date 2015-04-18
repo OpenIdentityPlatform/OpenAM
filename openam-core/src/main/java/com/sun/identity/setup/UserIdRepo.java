@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
+
 package com.sun.identity.setup;
 
 import com.iplanet.am.util.SSLSocketFactoryManager;
@@ -293,8 +294,7 @@ class UserIdRepo {
         StringTokenizer st = new StringTokenizer(strFiles);
         while (st.hasMoreTokens()) {
             String file = st.nextToken();
-            InputStreamReader fin = new InputStreamReader(
-                AMSetupServlet.getResourceAsStream(servletCtx, file));
+            InputStreamReader fin = new InputStreamReader(AMSetupUtils.getResourceAsStream(servletCtx, file));
             StringBuilder sbuf = new StringBuilder();
             char[] cbuf = new char[1024];
             int len;

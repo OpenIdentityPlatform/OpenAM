@@ -29,16 +29,15 @@
 
 package com.sun.identity.setup;
 
+import static com.sun.identity.setup.AMSetupUtils.getResourceAsStream;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.forgerock.openam.utils.IOUtils.writeToFile;
 
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -49,24 +48,15 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.security.AccessController;
-import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -130,7 +120,6 @@ import com.sun.identity.security.DecodeAction;
 import com.sun.identity.security.EncodeAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.Hash;
 import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.sm.AttributeSchema;
@@ -178,7 +167,6 @@ public class AMSetupServlet extends HttpServlet {
     final static String BOOTSTRAP_EXTRA = "bootstrap";    
     final static String BOOTSTRAP_FILE_LOC = "bootstrap.file";
     final static String OPENDS_DIR = "/opends";
-    private static final String HTTPS = "https";
 
     private static String errorMessage = null;
     private static java.util.Locale configLocale;
@@ -1179,7 +1167,7 @@ public class AMSetupServlet extends HttpServlet {
                 //ignored because bootstrap properties file maybe absent.
             }
         }
-            
+
         if (configDir != null && configDir.length() > 0) {
             String realPath = getNormalizedRealPath(servletCtx);
             if (realPath != null) {
@@ -1302,7 +1290,7 @@ public class AMSetupServlet extends HttpServlet {
             return null;
         }
     }
-    
+
     public static String getBaseDir() throws ConfiguratorException {
         String configDir = getPresetConfigDir();
         if (configDir != null && configDir.length() > 0) {
@@ -1448,7 +1436,7 @@ public class AMSetupServlet extends HttpServlet {
         // this is for the servicetag-registry.xml stuff, a bit later
 
         for (String file : dataFiles) {
-            StringBuffer sbuf;
+            StringBuilder sbuf;
     
             /*
              * if the file's not there, just skip it
@@ -1456,7 +1444,7 @@ public class AMSetupServlet extends HttpServlet {
              * so it's informational, rather than a "real" error.
              */
             try {
-                sbuf = readFile(file);
+                sbuf = new StringBuilder(readFile(file));
             } catch (IOException ioex) {
                 break;
             }
@@ -1502,252 +1490,16 @@ public class AMSetupServlet extends HttpServlet {
         return mapFileNameToContent;
     }
 
-    public static StringBuffer readFile(String file) throws IOException {
-        InputStreamReader fin = null;
-        StringBuffer sbuf = new StringBuffer();
-        InputStream is = null;
-        
-        try {
-            if ((is = getResourceAsStream(servletCtx, file)) == null) {
-                throw new IOException(file + " not found");
-            }
-            fin = new InputStreamReader(is);
-            char[] cbuf = new char[1024];
-            int len;
-            while ((len = fin.read(cbuf)) > 0) {
-                sbuf.append(cbuf, 0, len);
-            }
-        } finally {
-            if (fin != null) {
-                try {
-                    fin.close();
-                } catch (Exception ex) {
-                    //No handling required
-                }
-            }
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (Exception ex) {
-                    // no handling required
-                }
-            }
-        }
-        return sbuf;
+    public static String readFile(String file) throws IOException {
+        return AMSetupUtils.readFile(servletCtx, file);
     }
-    
+
     private static void writeToFileEx(String fileName, String content) throws IOException {
         File btsFile = new File(fileName);
         if (!btsFile.getParentFile().exists()) {
             btsFile.getParentFile().mkdirs();
         }
         writeToFile(fileName, content);
-    }
-    
-    public static void writeToFile(String fileName, String content) throws IOException {
-        FileWriter fout = null;
-        try {
-            fout = new FileWriter(fileName);
-            fout.write(content);
-        } catch (IOException e) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).error("AMSetupServlet.writeToFile", e);
-            throw e;
-        } finally {
-            if (fout != null) {
-                try {
-                    fout.close();
-                } catch (Exception ex) {
-                    //No handling required
-                }
-            }
-        }
-    }
-
-    /**
-     * Returns secure random string.
-     *
-     * @return secure random string.
-     */
-    public static String getRandomString() {
-        String randomStr;
-        try {
-            byte [] bytes = new byte[24];
-            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-            random.nextBytes(bytes);
-            randomStr = Base64.encode(bytes).trim();
-        } catch (Exception e) {
-            randomStr = null;
-            Debug.getInstance(SetupConstants.DEBUG_NAME)
-                    .message("AMSetupServlet.getRandomString:Exception in generating encryption key.", e);
-        }
-        return randomStr != null ? randomStr : SetupConstants.CONFIG_VAR_DEFAULT_SHARED_KEY;
-    }
-
-    /**
-     * Returns a unused port on a given host.
-     * @param hostname (eg localhost)
-     * @param start starting port number to check (eg 389).
-     * @param incr port number increments to check (eg 1000).
-     * @return available port num if found. -1 of not found.
-     */
-    static public int getUnusedPort(String hostname, int start, int incr) {
-        int defaultPort = -1;
-        for (int i = start; i < 65535 && defaultPort == -1; i += incr) {
-            if (canUseAsPort(hostname, i)) {
-                defaultPort = i;
-            }
-        }
-        return defaultPort;
-    }
-    
-    /**
-     * Checks whether the given host:port is currenly under use.
-     * @param hostname (eg localhost)
-     * @param port port number.
-     * @return  true if not in use, false if in use.
-     */
-    public static boolean canUseAsPort(String hostname, int port) {
-        boolean canUseAsPort = false;
-        ServerSocket serverSocket = null;
-        try {
-            InetSocketAddress socketAddress = new InetSocketAddress(hostname, port);
-            serverSocket = new ServerSocket();
-            serverSocket.bind(socketAddress);
-            canUseAsPort = true;
-     
-            serverSocket.close();
-       
-            Socket s = null;
-            try {
-              s = new Socket();
-              s.connect(socketAddress, 1000);
-              canUseAsPort = false;
-       
-            } catch (IOException e) {
-            }
-            finally {
-                if (s != null) {
-                    try {
-                        s.close();
-                    } catch (IOException e) {
-                    }
-                }
-            }
-     
-     
-        } catch (IOException ex) {
-          canUseAsPort = false;
-        } catch (NullPointerException ne) {      
-           canUseAsPort = false;  
-        } finally {
-            try {
-                if (serverSocket != null) {
-                    serverSocket.close();
-            }
-            } catch (IOException ex) { }
-        }
-     
-        return canUseAsPort;
-    }
-
-    /**
-     * Obtains misc config data from a remote OpenAM server :
-     *     opends admin port
-     *     config basedn
-     *     flag to indicate replication is already on or not
-     *     opends replication port or opends sugested port
-     *
-     * @param server URL string representing the remote OpenAM
-     *        server
-     * @param userid - admin userid on remote server (only amdmin)
-      * @param pwd - admin password
-     * @return Map of confif params.
-     * @throws <code>ConfiguratonException</code>
-     *   errorCodes :
-     *     400=Bad Request - userid/passwd param missing
-     *     401=Unauthorized - invalid credentials
-     *     405=Method Not Allowed - only POST is honored
-     *     408=Request Timeout - requested timed out
-     *     500=Internal Server Error
-     *     701=File Not Found - incorrect deployuri/server
-     *     702=Connection Error - failed to connect
-     */
-    public static Map getRemoteServerInfo(String server, String userid, String pwd) throws ConfigurationException {
-        HttpURLConnection conn = null;
-        try {
-            // Construct data
-            String data = "IDToken1=" + URLEncoder.encode(userid, "UTF-8") + "&IDToken2="
-                    + URLEncoder.encode(pwd, "UTF-8");
-            // Send data
-            URL url = new URL(server + "/getServerInfo.jsp");
-            
-            conn = (HttpURLConnection) url.openConnection();
-            
-            if (url.getProtocol().equals(HTTPS)) {
-                HttpsURLConnection sslConn = (HttpsURLConnection) conn;
-                sslConn.setHostnameVerifier(new HostnameVerifier() {
-                    public boolean verify(String hostname, SSLSession session) {
-                        return true;
-                    }
-                });
-            }
-            
-            conn.setDoOutput(true);
-            OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-            wr.write(data);
-            wr.flush();
-
-            BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String line;
-            Map info = null;
-            while ((line = rd.readLine()) != null) {
-                if (line.length() == 0) {
-                    continue;
-                }
-                info = BootstrapData.queryStringToMap(line);
-            }
-            wr.close();
-            rd.close();
-            return info;
-        } catch (javax.net.ssl.SSLHandshakeException e) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).warning("AMSetupServlet.getRemoteServerInfo()", e);
-            throw new ConfiguratorException("702", null, java.util.Locale.getDefault());
-        } catch (IllegalArgumentException e) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).warning("AMSetupServlet.getRemoteServerInfo()", e);
-            throw new ConfiguratorException("702", null, java.util.Locale.getDefault());
-        } catch (java.net.MalformedURLException e) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).warning("AMSetupServlet.getRemoteServerInfo()", e);
-            throw new ConfiguratorException("702", null, java.util.Locale.getDefault());
-        } catch (java.net.UnknownHostException e) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).warning("AMSetupServlet.getRemoteServerInfo()", e);
-            throw new ConfiguratorException("702", null, java.util.Locale.getDefault());
-        } catch (FileNotFoundException e) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).warning("AMSetupServlet.getRemoteServerInfo()", e);
-            throw new ConfiguratorException("701", null, java.util.Locale.getDefault());
-        } catch (java.net.ConnectException e) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).warning("AMSetupServlet.getRemoteServerInfo()", e);
-            throw new ConfiguratorException("702", null, java.util.Locale.getDefault());
-        } catch (IOException e) {
-            ConfiguratorException cex;
-            int status = 0;
-            if (conn != null) {
-                try {
-                   status = conn.getResponseCode();
-                } catch (Exception ig) {}
-            }
-  
-            if (status == 401 || status == 400 || status == 405 || status == 408 ) {
-                 cex = new ConfiguratorException("" + status, null, java.util.Locale.getDefault());
-            } else  {
-                 cex = new ConfiguratorException(e.getMessage());
-            }
-            Debug.getInstance(SetupConstants.DEBUG_NAME).warning("AMSetupServlet.getRemoteServerInfo()", e);
-            throw cex;
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
-        }
     }
 
     /**
@@ -1798,7 +1550,7 @@ public class AMSetupServlet extends HttpServlet {
         SetupProgress.reportStart("configurator.progress.tagswap.schemafiles", null);
         Set<String> absSchemaFiles = new HashSet<String>();
         for (String file : schemaFiles) {
-            String content = readFile(file).toString();
+            String content = readFile(file);
             FileWriter fout = null;
             
             try {
@@ -2367,16 +2119,6 @@ public class AMSetupServlet extends HttpServlet {
         } catch (Exception ex ) {
             Debug.getInstance(SetupConstants.DEBUG_NAME).error("AMSetupServlet.updateReplPortInfo: "
                     + "could not add replication port info to SM", ex);
-        }
-    }
-
-    public static InputStream getResourceAsStream(ServletContext servletContext, String file) {
-        if (servletContext == null) {
-            // remove leading '/'
-            file = file.substring(1);
-            return Thread.currentThread().getContextClassLoader().getResourceAsStream(file);
-        } else {
-            return servletContext.getResourceAsStream(file);
         }
     }
 

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -33,7 +33,7 @@ import com.iplanet.am.util.SSLSocketFactoryManager;
 import com.iplanet.services.util.Crypt;
 import com.sun.identity.common.configuration.ConfigurationException;
 import com.sun.identity.config.SessionAttributeNames;
-import com.sun.identity.setup.AMSetupServlet;
+import com.sun.identity.setup.AMSetupUtils;
 import com.sun.identity.setup.BootstrapData;
 import com.sun.identity.setup.ConfiguratorException;
 import com.sun.identity.setup.SetupConstants;
@@ -88,7 +88,7 @@ public class Step3 extends LDAPStoreWizardPage {
         String val = getAttribute("rootSuffix", Wizard.defaultRootSuffix);
         addModel("rootSuffix", val);
 
-        val = getAttribute("encryptionKey", AMSetupServlet.getRandomString());
+        val = getAttribute("encryptionKey", AMSetupUtils.getRandomString());
         addModel("encryptionKey", val);
         
         val = getAttribute("configStorePort", getAvailablePort(50389));
@@ -220,7 +220,7 @@ public class Step3 extends LDAPStoreWizardPage {
                         if (host == null) {
                             host = "localhost";
                         }
-                        if (AMSetupServlet.canUseAsPort(host, val)) {
+                        if (AMSetupUtils.isPortInUse(host, val)) {
                             ok = true;
                         } else {
                             writeToResponse(getLocalizedString("invalid.port.used"));
@@ -266,7 +266,7 @@ public class Step3 extends LDAPStoreWizardPage {
                         if (host == null) {
                             host = "localhost";
                         }
-                        if (AMSetupServlet.canUseAsPort(host, val)) {
+                        if (AMSetupUtils.isPortInUse(host, val)) {
                             ok = true;
                         } else {
                             writeToResponse(getLocalizedString("invalid.port.used"));
@@ -312,7 +312,7 @@ public class Step3 extends LDAPStoreWizardPage {
                         if (host == null) {
                             host = "localhost";
                         }
-                        if (AMSetupServlet.canUseAsPort(host, val)) {
+                        if (AMSetupUtils.isPortInUse(host, val)) {
                             ok = true;
                         } else {
                             writeToResponse(getLocalizedString("invalid.port.used"));
@@ -409,8 +409,7 @@ public class Step3 extends LDAPStoreWizardPage {
             
             try { 
                 String dsType;
-                Map data = AMSetupServlet.getRemoteServerInfo(
-                    hostName, admin, password);
+                Map data = AMSetupUtils.getRemoteServerInfo(hostName, admin, password);
                 
                 // data returned from existing OpenAM server
                 if (data != null && !data.isEmpty()) {                    

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -23,12 +23,13 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: ServiceXMLTemplates.java,v 1.2 2009/05/02 23:07:18 kevinserwin Exp $
+ *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.sun.identity.setup;
+
+import static org.forgerock.openam.utils.IOUtils.writeToFile;
 
 import com.sun.identity.shared.debug.Debug;
 import java.io.File;
@@ -61,7 +62,7 @@ public class ServiceXMLTemplates {
                 String content = getContent(templ, servletCtx);
                 String fileName = templ.substring(classesDir.length()+1);
                 try {
-                    AMSetupServlet.writeToFile(dir + "/" + fileName, content);
+                    writeToFile(dir + "/" + fileName, content);
                 } catch (IOException e) {
                     Debug.getInstance(SetupConstants.DEBUG_NAME).error(
                         "ServiceXMLTemplates.copy", e);
@@ -79,7 +80,7 @@ public class ServiceXMLTemplates {
 
         try {
             fin = new InputStreamReader(
-                AMSetupServlet.getResourceAsStream(servletCtx, templateName));
+                    AMSetupUtils.getResourceAsStream(servletCtx, templateName));
             char[] cbuf = new char[1024];
             int len;
             while ((len = fin.read(cbuf)) > 0) {

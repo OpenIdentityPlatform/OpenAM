@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: ConfigureData.java,v 1.11 2009/05/02 23:05:13 kevinserwin Exp $
  *
- * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.sun.identity.setup;
@@ -152,8 +152,7 @@ public class ConfigureData {
     {
         PolicyManager pm = new PolicyManager(ssoToken, realmName);
 
-        InputStreamReader fin = new InputStreamReader(
-            AMSetupServlet.getResourceAsStream(sctx, xmlFile));
+        InputStreamReader fin = new InputStreamReader(AMSetupUtils.getResourceAsStream(sctx, xmlFile));
         StringBuilder sbuf = new StringBuilder();
         char[] cbuf = new char[1024];
         int len;
@@ -218,8 +217,7 @@ public class ConfigureData {
         throws IOException
     {
         StringBuilder sbuf = new StringBuilder();
-        InputStreamReader fin = new InputStreamReader(
-            AMSetupServlet.getResourceAsStream(sctx, baseDir + "/" + fileName));
+        InputStreamReader fin = new InputStreamReader(AMSetupUtils.getResourceAsStream(sctx, baseDir + "/" + fileName));
         char[] cbuf = new char[1024];
         int len;
 

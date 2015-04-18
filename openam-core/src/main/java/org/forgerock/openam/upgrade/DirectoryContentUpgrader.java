@@ -175,8 +175,8 @@ public class DirectoryContentUpgrader {
             tags.put("@SM_CONFIG_ROOT_SUFFIX@", baseDN);
             //external configstore won't get the indexes during upgrade, and this is safe for embedded
             tags.put("@DB_NAME@", "userRoot");
-            StringBuffer content = AMSetupServlet.readFile(path);
-            String tagSwapped = UpgradeServices.tagSwap(tags, content.toString());
+            String content = AMSetupServlet.readFile(path);
+            String tagSwapped = UpgradeServices.tagSwap(tags, content);
             reader = new LDIFChangeRecordReader(
                     new ByteArrayInputStream(tagSwapped.getBytes(Charset.forName("UTF-8"))));
             ChangeRecordWriter writer = new ConnectionChangeRecordWriter(conn);

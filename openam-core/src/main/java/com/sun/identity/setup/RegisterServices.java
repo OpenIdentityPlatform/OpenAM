@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,12 @@
  *
  * $Id: RegisterServices.java,v 1.21 2010/01/05 18:11:34 goodearth Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted 2011-2013 ForgeRock AS
- */
 package com.sun.identity.setup;
+
+import static org.forgerock.openam.utils.IOUtils.writeToFile;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -110,8 +110,7 @@ public class RegisterServices {
             }
 
             // Write to file without visible password values.
-            AMSetupServlet.writeToFile(dirXML + "/" + serviceFileName,
-                content);
+            writeToFile(dirXML + "/" + serviceFileName, content);
 
             // Write to directory server with original password 
             // values.

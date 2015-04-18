@@ -94,7 +94,7 @@ public class AllowEvaluateForAgentsUpgradeStep extends AbstractUpgradeStep {
 
             // Creates a new policy entry to represent the new agent privilege.
             DEBUG.message("Creating new default privilege for agents called " + EVALUATE_POLICY);
-            String policy = AMSetupServlet.readFile(DELEGATION_POLICY_FILE).toString();
+            String policy = AMSetupServlet.readFile(DELEGATION_POLICY_FILE);
             policy = ServicesDefaultValues.tagSwap(policy, true);
             PolicyUtils.createPolicies(manager, new ByteArrayInputStream(policy.getBytes()));
 

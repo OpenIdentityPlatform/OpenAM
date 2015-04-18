@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: BootstrapData.java,v 1.16 2009/05/05 21:24:47 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2013 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.setup;
@@ -368,9 +365,9 @@ public class BootstrapData {
         return template;
     }
     
-    public static Map queryStringToMap(String str)
+    public static Map<String, String> queryStringToMap(String str)
         throws UnsupportedEncodingException {
-        Map map = new HashMap();
+        Map<String, String> map = new HashMap<String, String>();
         StringTokenizer st = new StringTokenizer(str, "&");
 
         while (st.hasMoreTokens()) {

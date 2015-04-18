@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,6 @@
  *
  * $Id: EmbeddedOpenDS.java,v 1.27 2010/01/15 01:22:39 goodearth Exp $
  *
- */
-
-/*
  * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
@@ -147,7 +144,7 @@ public class EmbeddedOpenDS {
         SetupProgress.reportStart("emb.opends.start", null);
         String zipFileName = "/WEB-INF/template/opendj/opendj.zip";
         BufferedInputStream bin = new BufferedInputStream(
-                AMSetupServlet.getResourceAsStream(servletCtx, zipFileName), 10000);
+                AMSetupUtils.getResourceAsStream(servletCtx, zipFileName), 10000);
         BufferedOutputStream bout = new BufferedOutputStream(
                 new FileOutputStream(odsRoot + "/opendj.zip"), 10000);
 

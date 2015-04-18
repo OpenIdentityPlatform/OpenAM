@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2011-2015 ForgeRock AS. All Rights Reserved
@@ -21,15 +21,12 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- */
-
-/*
-   Portions Copyrighted 2013 ForgeRock, AS.
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.upgrade;
 
-import com.sun.identity.setup.AMSetupServlet;
+import com.sun.identity.setup.AMSetupUtils;
 import com.sun.identity.setup.SetupConstants;
 import com.sun.identity.shared.debug.Debug;
 
@@ -72,7 +69,6 @@ import org.forgerock.opendj.ldif.LDIFEntryWriter;
 import org.opends.server.core.LockFileManager;
 import org.opends.server.tools.RebuildIndex;
 import org.opends.server.util.TimeThread;
-
 
 /**
  * Upgrade tool for upgrading the embedded instance of OpenDS to OpenDJ.
@@ -559,7 +555,7 @@ public final class OpenDJUpgrader {
         ZipInputStream zis = null;
         
         try {
-            is = AMSetupServlet.getResourceAsStream(servletCtx, ZIP_FILE);
+            is = AMSetupUtils.getResourceAsStream(servletCtx, ZIP_FILE);
             zis = new ZipInputStream(is);
             
             for (ZipEntry zipEntry = zis.getNextEntry(); zipEntry != null; zipEntry = zis.getNextEntry()) {
@@ -597,7 +593,7 @@ public final class OpenDJUpgrader {
         FileOutputStream fos = null;
         
         try {
-            is = AMSetupServlet.getResourceAsStream(servletCtx, ZIP_FILE);
+            is = AMSetupUtils.getResourceAsStream(servletCtx, ZIP_FILE);
             zis = new ZipInputStream(is);
 
             for (ZipEntry zipEntry = zis.getNextEntry(); zipEntry != null; zipEntry = zis.getNextEntry()) {

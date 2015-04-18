@@ -1,7 +1,7 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2013 ForgeRock, Inc. All Rights Reserved
+ * Copyright 2011-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,17 +20,19 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- *
  */
+
 package org.forgerock.openam.utils;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 
 /**
  * Utility class for handling I/O streams
@@ -145,6 +147,23 @@ public final class IOUtils {
     }
 
     /**
+     * Writes the provided content to a file with the provided name.
+     *
+     * @param fileName The name of the file to write to.
+     * @param content The contents to write.
+     * @throws IOException If the file could be written to.
+     */
+    public static void writeToFile(String fileName, String content) throws IOException {
+        FileWriter fileWriter = null;
+        try {
+            fileWriter = new FileWriter(fileName);
+            fileWriter.write(content);
+        } finally {
+            closeIfNotNull(fileWriter);
+        }
+    }
+
+    /**
      * Closes the passed in resource if not null.
      *
      * @param closeable The resource that needs to be closed.
@@ -155,6 +174,22 @@ public final class IOUtils {
                 closeable.close();
             } catch (IOException ignored) {
             }
+        }
+    }
+
+    /**
+     * Closes all of the provided {@link Closeable}s and swallows any exceptions.
+     *
+     * <p>Also performs a {@code null} check on the {@code Closeable}.</p>
+     *
+     * @param o The {@code Closeable}s.
+     */
+    public static void closeIfNotNull(Closeable... o) {
+        if (o == null) {
+            return;
+        }
+        for (Closeable c : o) {
+            closeIfNotNull(c);
         }
     }
 }

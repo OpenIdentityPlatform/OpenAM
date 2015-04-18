@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,16 +24,14 @@
  *
  * $Id: AjaxPage.java,v 1.24 2010/01/04 19:15:16 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2012 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.sun.identity.config.util;
 
 import com.sun.identity.config.SessionAttributeNames;
 import com.sun.identity.setup.AMSetupServlet;
+import com.sun.identity.setup.AMSetupUtils;
 import com.sun.identity.setup.SetupConstants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
@@ -49,7 +47,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.click.Page;
 import org.apache.click.control.ActionLink;
 import org.publicsuffix.PSS;
-
 
 public abstract class AjaxPage extends Page {
 
@@ -330,7 +327,7 @@ public abstract class AjaxPage extends Page {
           
     public String getAvailablePort(int portNumber) {
         return Integer.toString(
-            AMSetupServlet.getUnusedPort(getHostName(), portNumber, 1000));
+            AMSetupUtils.getFirstUnusedPort(getHostName(), portNumber, 1000));
     }  
     
     public boolean checkPasswords() {

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,6 @@
  *
  * $Id: AMSetupFilter.java,v 1.12 2008/07/13 06:06:49 kevinserwin Exp $
  *
- */
-
-/*
  * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
@@ -158,7 +155,7 @@ public final class AMSetupFilter implements Filter {
         ServletContext servletCtx = filterConfig.getServletContext();
         if (!AMSetupServlet.checkInitState(servletCtx)) {
             //Set the encryption Key
-            servletCtx.setAttribute("am.enc.pwd", AMSetupServlet.getRandomString());
+            servletCtx.setAttribute("am.enc.pwd", AMSetupUtils.getRandomString());
         }
     }
     
