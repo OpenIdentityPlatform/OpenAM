@@ -458,8 +458,7 @@ public class OATH extends AMLoginModule {
     private boolean checkOTP(String otp) throws AuthLoginException {
 
         //get user id
-        AMIdentity id = null;
-        id = getIdentity(userName);
+        AMIdentity id = getIdentity();
 
         if (id == null) {
             //error message already printed in the getIdentity function
@@ -758,10 +757,9 @@ public class OATH extends AMLoginModule {
     /**
      * Gets the AMIdentity of a user with username equal to uName.
      *
-     * @param uName username of the user to get.
      * @return The AMIdentity of user with username equal to uName.
      */
-    private AMIdentity getIdentity(String uName) {
+    private AMIdentity getIdentity() {
         AMIdentity theID = null;
         AMIdentityRepository amIdRepo = getAMIdentityRepository(getRequestOrg());
 
@@ -772,20 +770,21 @@ public class OATH extends AMLoginModule {
         Set<AMIdentity> results = Collections.EMPTY_SET;
         try {
             idsc.setMaxResults(0);
-            IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, uName, idsc);
+            IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, userName, idsc);
             if (searchResults != null) {
                 results = searchResults.getSearchResults();
             }
             if (results.isEmpty()) {
-                throw new IdRepoException("OATH.getIdentity : User " + uName + " is not found");
+                debug.error("OATH.getIdentity : User " + userName + " is not found");
             } else if (results.size() > 1) {
-                throw new IdRepoException("OATH.getIdentity : More than one user found for the userName " + uName);
+                debug.error("OATH.getIdentity : More than one user found for the userName " + userName);
+            } else {
+                theID = results.iterator().next();
             }
-            theID = results.iterator().next();
         } catch (IdRepoException e) {
-            debug.error("OATH.getIdentity : error searching Identities with username : " + uName, e);
+            debug.error("OATH.getIdentity : Error searching Identities with username : " + userName, e);
         } catch (SSOException e) {
-            debug.error("OATH.getIdentity : AuthOATH module exception : ", e);
+            debug.error("OATH.getIdentity : Module exception : ", e);
         }
         return theID;
     }

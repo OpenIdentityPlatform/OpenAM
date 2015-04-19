@@ -25,7 +25,7 @@
  * $Id: HOTP.java,v 1.1 2009/03/24 23:52:12 pluo Exp $
  *
  * Portions Copyrighted 2013-2015 ForgeRock AS.
- * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2014-2015 Nomura Research Institute, Ltd.
  */
 
 package com.sun.identity.authentication.modules.hotp;
@@ -179,44 +179,13 @@ public class HOTPService {
      */
     private void sendHOTP(String otpCode, String subject, String message) throws AuthLoginException {
 
-        IdSearchControl idsc = new IdSearchControl();
-        idsc.setRecursive(true);
-        idsc.setTimeOut(0);
-        final Set<String> returnAttributes = getReturnAttributes();
-        idsc.setReturnAttributes(returnAttributes);
-        // search for the identity
-        Set<AMIdentity> results = Collections.emptySet();
         Exception cause = null;
         try {
-            idsc.setMaxResults(0);
-
-            IdSearchResults searchResults = amIdentityRepo.searchIdentities(IdType.USER, userName, idsc);
-            if (searchResults.getSearchResults().isEmpty() && !userSearchAttributes.isEmpty()) {
-                if (DEBUG.messageEnabled()) {
-                    DEBUG.message("HOTP.sendHOTP() searching user identity "
-                            + "with alternative attributes " + userSearchAttributes);
-                }
-                final Map<String, Set<String>> searchAVP = CollectionUtils.toAvPairMap(userSearchAttributes, userName);
-                idsc.setSearchModifiers(IdSearchOpModifier.OR, searchAVP);
-                //workaround as data store always adds 'user-naming-attribute' to searchfilter
-                searchResults = amIdentityRepo.searchIdentities(IdType.USER, "*", idsc);
+            AMIdentity identity = getIdentity();
+            if (identity == null) {
+                throw new AuthLoginException("HOTP.sendSMS() : Unable to send OTP code "
+                        + "because of error searching identities with username : " + userName);
             }
-                    
-            if (searchResults != null) {
-                results = searchResults.getSearchResults();
-            }
-
-            if (results.isEmpty()) {
-                throw new IdRepoException("HTOP:sendSMS : User " + userName
-                        + " is not found");
-            } else if (results.size() > 1) {
-                throw new IdRepoException(
-                        "HTOP:sendSMS : More than one user found for the userName "
-                                + userName);
-            }
-
-            Object[] identities = results.toArray();
-            AMIdentity identity = (AMIdentity) identities[0];
 
             String phone = getTelephoneNumber(identity);
             String mail = getEmailAddress(identity);
@@ -256,7 +225,8 @@ public class HOTPService {
                 if (DEBUG.messageEnabled()) {
                     DEBUG.message("HOTP.sendSMS() : IdRepo: no phone or email found with username : " + userName);
                 }
-                throw new AuthLoginException("No phone or e-mail found for user: " + userName);
+                throw new AuthLoginException("HOTP.sendSMS() : Unable to send OTP code "
+                        + "because no phone or e-mail found for user: " + userName);
             }
         } catch (ClassNotFoundException ee) {
             DEBUG.error("HOTP.sendSMS() : " + "class not found SMSGateway class", ee);
@@ -267,6 +237,8 @@ public class HOTPService {
         } catch (IdRepoException e) {
             DEBUG.error("HOTP.sendSMS() : error searching Identities with username : " + userName, e);
             cause = e;
+        } catch (AuthLoginException e) {
+            throw e;
         } catch (Exception e) {
             DEBUG.error("HOTP.sendSMS() : HOTP module exception : ", e);
             cause = e;
@@ -274,6 +246,50 @@ public class HOTPService {
         if (cause != null) {
             throw new AuthLoginException("HOTP.sendSMS() : Unable to send OTP code", cause);
         }
+    }
+
+    private AMIdentity getIdentity() {
+        AMIdentity amIdentity = null;
+        IdSearchControl idsc = new IdSearchControl();
+        idsc.setRecursive(true);
+        idsc.setTimeOut(0);
+        final Set<String> returnAttributes = getReturnAttributes();
+        idsc.setReturnAttributes(returnAttributes);
+        // search for the identity
+        Set<AMIdentity> results = Collections.EMPTY_SET;
+        idsc.setMaxResults(0);
+
+        IdSearchResults searchResults;
+        try {
+            searchResults = amIdentityRepo.searchIdentities(IdType.USER, userName, idsc);
+            if (searchResults.getSearchResults().isEmpty() && !userSearchAttributes.isEmpty()) {
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("HOTP.getIdentity: searching user identity " + "with alternative attributes "
+                            + userSearchAttributes);
+                }
+                final Map<String, Set<String>> searchAVP = CollectionUtils.toAvPairMap(userSearchAttributes, userName);
+                idsc.setSearchModifiers(IdSearchOpModifier.OR, searchAVP);
+                // workaround as data store always adds 'user-naming-attribute' to searchfilter
+                searchResults = amIdentityRepo.searchIdentities(IdType.USER, "*", idsc);
+            }
+
+            if (searchResults != null) {
+                results = searchResults.getSearchResults();
+            }
+
+            if (results.isEmpty()) {
+                DEBUG.error("HTOP:getIdentity : User " + userName + " is not found");
+            } else if (results.size() > 1) {
+                DEBUG.error("HTOP:getIdentity : More than one user found for the userName " + userName);
+            } else {
+                amIdentity = results.iterator().next();
+            }
+        } catch (IdRepoException e) {
+            DEBUG.error("HTOP.getIdentity : Error searching Identities with username : " + userName, e);
+        } catch (SSOException e) {
+            DEBUG.error("HTOP.getIdentity : Module exception : ", e);
+        }
+        return amIdentity;
     }
 
     /**

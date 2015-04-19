@@ -11,7 +11,8 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openam.rest.dashboard;
@@ -167,15 +168,13 @@ public class TrustedDevicesDao {
             }
 
             if (results.isEmpty()) {
-                throw new IdRepoException("getIdentity : User " + userName
-                        + " is not found");
+                throw new InternalServerErrorException("TrustedDevicesDao.getIdentity : User " + userName + " is not found");
             } else if (results.size() > 1) {
-                throw new IdRepoException(
-                        "getIdentity : More than one user found for the userName "
-                                + userName);
+                throw new InternalServerErrorException("TrustedDevicesDao.getIdentity : More than one user found for the userName " + userName);
+            } else {
+                amIdentity = results.iterator().next();
             }
 
-            amIdentity = results.iterator().next();
         } catch (IdRepoException e) {
             throw new InternalServerErrorException(e.getMessage(), e);
         } catch (SSOException e) {

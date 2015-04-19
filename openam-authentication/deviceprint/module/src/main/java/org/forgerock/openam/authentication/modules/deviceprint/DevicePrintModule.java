@@ -25,8 +25,8 @@
  */
 /*
  * Portions Copyrighted 2013 Syntegrity.
- * Portions Copyrighted 2013-2014 ForgeRock AS
- * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2014-2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openam.authentication.modules.deviceprint;
@@ -86,7 +86,7 @@ public class DevicePrintModule extends AMLoginModule {
         }
 
         AMIdentityRepository amIdentityRepository = getAMIdentityRepository(getRequestOrg());
-        AMIdentity amIdentity = getIdentity(userName);
+        AMIdentity amIdentity = getIdentity();
 
         HOTPService hotpService = moduleInitialiser.getHOTPService(getLoginLocale(), amCache, userName,
                 amIdentityRepository, options);
@@ -113,10 +113,9 @@ public class DevicePrintModule extends AMLoginModule {
     /**
      * Gets the user's AMIdentity from LDAP.
      *
-     * @param userName The user's name.
      * @return The AMIdentity for the user.
      */
-    public AMIdentity getIdentity(String userName) {
+    public AMIdentity getIdentity() {
         AMIdentity amIdentity = null;
         AMIdentityRepository amIdRepo = getAMIdentityRepository(getRequestOrg());
 
@@ -132,19 +131,17 @@ public class DevicePrintModule extends AMLoginModule {
             }
 
             if (results.isEmpty()) {
-                throw new IdRepoException("getIdentity : User " + userName
-                        + " is not found");
+                DEBUG.error("DevicePrintModule.getIdentity : User " + userName + " is not found");
             } else if (results.size() > 1) {
-                throw new IdRepoException(
-                        "getIdentity : More than one user found for the userName "
-                                + userName);
+                DEBUG.error("DevicePrintModule.getIdentity : More than one user found for the userName " + userName);
+            } else {
+                amIdentity = results.iterator().next();
             }
 
-            amIdentity = results.iterator().next();
         } catch (IdRepoException e) {
-            DEBUG.error("Error searching Identities with username : " + userName, e);
+            DEBUG.error("DevicePrintModule.getIdentity : Error searching Identities with username : " + userName, e);
         } catch (SSOException e) {
-            DEBUG.error("Module exception : ", e);
+            DEBUG.error("DevicePrintModule.getIdentity : Module exception : ", e);
         }
 
         return amIdentity;

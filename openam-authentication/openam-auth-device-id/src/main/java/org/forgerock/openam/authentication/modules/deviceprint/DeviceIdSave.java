@@ -11,7 +11,8 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openam.authentication.modules.deviceprint;
@@ -71,10 +72,10 @@ public class DeviceIdSave extends AMLoginModule {
                     MAPPER.readValue((String) sharedState.get(DEVICE_PRINT_PROFILE_KEY), Map.class);
             boolean autoStoreProfiles = Boolean.parseBoolean(CollectionHelper.getMapAttr(config, AUTO_STORE_PROFILES_KEY));
             ProfilePersister profilePersister = new ProfilePersister(maxProfilesAllowed, new DevicePrintDao(),
-                    getIdentity(userName));
+                    getIdentity());
             processor = new PersistModuleProcessor(devicePrintProfile, autoStoreProfiles, profilePersister);
         } catch (IOException e) {
-            e.printStackTrace();
+            DEBUG.error("DeviceIdSave.init : Module exception : ", e);
         }
     }
 
@@ -89,10 +90,10 @@ public class DeviceIdSave extends AMLoginModule {
     /**
      * Gets the identity of the user.
      *
-     * @param userName The user's name.
      * @return The user's identity.
      */
-    private AMIdentityWrapper getIdentity(String userName) {
+    private AMIdentityWrapper getIdentity() {
+        AMIdentityWrapper amIdentity = null;
         AMIdentityRepository amIdRepo = getAMIdentityRepository(getRequestOrg());
 
         IdSearchControl idsc = new IdSearchControl();
@@ -107,24 +108,19 @@ public class DeviceIdSave extends AMLoginModule {
             }
 
             if (results.isEmpty()) {
-                throw new IdRepoException("getIdentity : User " + userName
-                        + " is not found");
+                DEBUG.error("DeviceIdSave.getIdentity : User " + userName + " is not found");
             } else if (results.size() > 1) {
-                throw new IdRepoException(
-                        "getIdentity : More than one user found for the userName "
-                                + userName);
+                DEBUG.error("DeviceIdSave.getIdentity : More than one user found for the userName " + userName);
+            } else {
+                amIdentity = new AMIdentityWrapper(results.iterator().next());
             }
 
-            AMIdentity amIdentity = results.iterator().next();
-            return new AMIdentityWrapper(amIdentity);
-
         } catch (IdRepoException e) {
-            DEBUG.error("Error searching Identities with username : " + userName, e);
-            return null;
+            DEBUG.error("DeviceIdSave.getIdentity : Error searching Identities with username : " + userName, e);
         } catch (SSOException e) {
-            DEBUG.error("Module exception : ", e);
-            return null;
+            DEBUG.error("DeviceIdSave.getIdentity : Module exception : ", e);
         }
+        return amIdentity;
     }
 
     /**

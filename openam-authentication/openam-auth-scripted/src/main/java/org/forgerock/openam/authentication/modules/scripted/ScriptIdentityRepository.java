@@ -32,11 +32,13 @@
 package org.forgerock.openam.authentication.modules.scripted;
 
 import com.iplanet.sso.SSOException;
+import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.idm.*;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.util.Reject;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -65,7 +67,11 @@ public class ScriptIdentityRepository {
      */
     public Set getAttribute(String userName, String attributeName) {
         ScriptedIdentity amIdentity = getIdentity(userName);
-        return amIdentity.getAttribute(attributeName);
+        if (amIdentity != null) {
+            return amIdentity.getAttribute(attributeName);
+        } else {
+            return new HashSet<String>();
+        }
     }
 
     /**
@@ -77,8 +83,10 @@ public class ScriptIdentityRepository {
      */
     public void setAttribute(String userName, String attributeName, String[] attributeValues) {
         ScriptedIdentity amIdentity = getIdentity(userName);
-        amIdentity.setAttribute(attributeName, attributeValues);
-        amIdentity.store();
+        if (amIdentity != null) {
+            amIdentity.setAttribute(attributeName, attributeValues);
+            amIdentity.store();
+        }
     }
 
     /**
@@ -89,8 +97,10 @@ public class ScriptIdentityRepository {
      */
     public void addAttribute(String userName, String attributeName, String attributeValue) {
         ScriptedIdentity amIdentity = getIdentity(userName);
-        amIdentity.addAttribute(attributeName, attributeValue);
-        amIdentity.store();
+        if (amIdentity != null) {
+            amIdentity.addAttribute(attributeName, attributeValue);
+            amIdentity.store();
+        }
     }
 
     /**
@@ -100,8 +110,7 @@ public class ScriptIdentityRepository {
      * @return A ScriptedIdentity object containing the attributes for the specified user
      */
     private ScriptedIdentity getIdentity(String userName) {
-        AMIdentity amIdentity = null;
-
+        ScriptedIdentity amIdentity = null;
         IdSearchControl idsc = new IdSearchControl();
         idsc.setAllReturnAttributes(true);
         idsc.setMaxResults(0);
@@ -112,25 +121,19 @@ public class ScriptIdentityRepository {
             if (searchResults != null) {
                 results = searchResults.getSearchResults();
             }
-
             if (results.isEmpty()) {
-                throw new IdRepoException("getIdentity : User " + userName
-                        + " is not found");
+                DEBUG.error("ScriptedModule.getIdentity : User " + userName + " is not found");
             } else if (results.size() > 1) {
-                throw new IdRepoException(
-                        "getIdentity : More than one user found for the userName "
-                                + userName
-                );
+                DEBUG.error("ScriptedModule.getIdentity : More than one user found for the userName " + userName);
+            } else {
+                amIdentity = new ScriptedIdentity(results.iterator().next());
             }
-
-            amIdentity = results.iterator().next();
         } catch (IdRepoException e) {
-            DEBUG.error("Error searching Identities with username : " + userName, e);
+            DEBUG.error("ScriptedModule.getIdentity : Error searching Identities with username : " + userName, e);
         } catch (SSOException e) {
-            DEBUG.error("Module exception : ", e);
+            DEBUG.error("ScriptedModule.getIdentity : Module exception : ", e);
         }
-
-        return new ScriptedIdentity(amIdentity);
+        return amIdentity;
     }
 
 }

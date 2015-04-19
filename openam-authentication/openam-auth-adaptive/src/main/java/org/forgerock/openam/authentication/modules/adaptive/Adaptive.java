@@ -24,7 +24,7 @@
  */
 
 /*
- * Portions Copyrighted 2013-2014 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2013-2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openam.authentication.modules.adaptive;
@@ -287,11 +287,10 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         }
         debug.message(ADAPTIVE + ": Login Attempt User = " + userName);
 
-        amAuthIdentity = getIdentity(userName);
+        amAuthIdentity = getIdentity();
         clientIP = ClientUtils.getClientIPAddress(getHttpServletRequest());
 
         if (amAuthIdentity == null) {
-            debug.message(ADAPTIVE + ": amAuthIdentity NULL : " + userName);
             throw new AuthLoginException(ADAPTIVE, "noIdentity", null);
         }
 
@@ -800,10 +799,10 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                     if (lastLogin != null) {
                         try {
                             loginTime = formatter.parse(lastLogin); // "2002.01.29.08.36.33");
+                            if ((now.getTime() - loginTime.getTime()) < timeSinceLastLoginValue * 1000 * 60 * 60 * 24L) {
+                                retVal = timeSinceLastLoginScore;
+                            }
                         } catch (ParseException pe) {
-                        }
-                        if ((now.getTime() - loginTime.getTime()) < timeSinceLastLoginValue * 1000 * 60 * 60 * 24L) {
-                            retVal = timeSinceLastLoginScore;
                         }
                     }
                 }
@@ -885,7 +884,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
 
     }
 
-    private AMIdentity getIdentity(String uName) {
+    private AMIdentity getIdentity() {
         AMIdentity theID = null;
         AMIdentityRepository amIdRepo = getAMIdentityRepository(getRequestOrg());
 
@@ -896,8 +895,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         Set<AMIdentity> results = Collections.EMPTY_SET;
         try {
             idsc.setMaxResults(0);
-            IdSearchResults searchResults =
-                    amIdRepo.searchIdentities(IdType.USER, uName, idsc);
+            IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, userName, idsc);
 
             if (searchResults.getSearchResults().isEmpty() && !userSearchAttributes.isEmpty()) {
                 if (debug.messageEnabled()) {
@@ -915,19 +913,17 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             }
 
             if (results.isEmpty()) {
-                throw new IdRepoException(ADAPTIVE + ".getIdentity : User "
-                        + uName + " is not found");
+                debug.error("Adaptive.getIdentity : User " + userName + " is not found");
             } else if (results.size() > 1) {
-                throw new IdRepoException(ADAPTIVE
-                        + ".getIdentity : More than one user found for the userName "
-                        + userName);
+                debug.error("Adaptive.getIdentity : More than one user found for the userName " + userName);
+            } else {
+                theID = results.iterator().next();
             }
 
-            theID = results.iterator().next();
         } catch (IdRepoException e) {
-            debug.error(ADAPTIVE + ".getIdentity : " + "error searching Identities with username : " + userName, e);
+            debug.error("Adaptive.getIdentity : " + "Error searching Identities with username : " + userName, e);
         } catch (SSOException e) {
-            debug.error(ADAPTIVE + ".getIdentity : " + "AuthAdaptive module exception : ", e);
+            debug.error("Adaptive.getIdentity : " + "Mmodule exception : ", e);
         }
         return theID;
     }
