@@ -24,7 +24,7 @@
  *
  * $Id: SessionService.java,v 1.37 2010/02/03 03:52:54 bina Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session.service;
@@ -2143,7 +2143,7 @@ public class SessionService {
                         .get(Constants.NOTIFICATION_PROPERTY_LIST);
             }
 
-            timeoutHandlers = (Set<String>) attrs.get(Constants.TIMEOUT_HANDLER_LIST);
+            setTimeoutHandlers((Set<String>) attrs.get(Constants.TIMEOUT_HANDLER_LIST));
 
             String trimSessionStr = CollectionHelper.getMapAttr(
                     attrs, Constants.ENABLE_TRIM_SESSION, "NO");
@@ -3612,7 +3612,15 @@ public class SessionService {
         if (handlers == null) {
             timeoutHandlers = Collections.EMPTY_SET;
         } else {
-            timeoutHandlers = new HashSet<String>(handlers);
+            // Only copy non-empty String values to avoid triggering a ClassNotFoundException on empty values when
+            // SessionService iterates over the list to call the handlers.
+            Set<String> handlersCopy = new HashSet<String>(handlers.size());
+            for (String handler : handlers) {
+                if (!handler.isEmpty()) {
+                    handlersCopy.add(handler);
+                }
+            }
+            timeoutHandlers = handlersCopy;
         }
     }
     // TODO check if restructuring of interface between Auth and Session
