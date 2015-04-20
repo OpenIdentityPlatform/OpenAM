@@ -247,16 +247,24 @@ public class SessionServiceConfig {
         }
 
         private Set<String> loadTimeoutHandlersServiceSchemaSetting(Map attrs) {
-            Set<String> value = (Set<String>) attrs.get(Constants.TIMEOUT_HANDLER_LIST);
-            if (value == null) {
-                value = Collections.emptySet();
+            Set<String> values = (Set<String>) attrs.get(Constants.TIMEOUT_HANDLER_LIST);
+            if (values == null) {
+                values = Collections.emptySet();
             } else {
-                value = new HashSet<String>(value);
+                // Only copy non-empty String values to avoid triggering a ClassNotFoundException on empty values when
+                // SessionService iterates over the list to call the handlers.
+                Set<String> valuesCopy = new HashSet<String>(values.size());
+                for (String value : values) {
+                    if (!value.isEmpty()) {
+                        valuesCopy.add(value);
+                    }
+                }
+                values = valuesCopy;
             }
             if (sessionDebug.messageEnabled()) {
-                sessionDebug.message("timeoutHandlers=" + value);
+                sessionDebug.message("timeoutHandlers=" + values);
             }
-            return value;
+            return values;
         }
 
         private boolean loadSessionTrimmingServiceSchemaSetting(Map attrs) {
