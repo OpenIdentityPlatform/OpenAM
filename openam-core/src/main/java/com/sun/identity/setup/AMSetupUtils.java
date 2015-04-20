@@ -17,6 +17,7 @@
 package com.sun.identity.setup;
 
 import static org.forgerock.openam.utils.IOUtils.closeIfNotNull;
+import static org.forgerock.openam.utils.IOUtils.readStream;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -43,7 +44,6 @@ import java.util.Map;
 import com.sun.identity.common.configuration.ConfigurationException;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
-import org.forgerock.openam.utils.IOUtils;
 
 /**
  * Utility methods that are used by various setup/startup classes.
@@ -70,15 +70,11 @@ public final class AMSetupUtils {
      * @throws IOException If the file could not be found or read.
      */
     public static String readFile(ServletContext servletContext, String file) throws IOException {
-        InputStream inputStream = null;
-        try {
-            if ((inputStream = getResourceAsStream(servletContext, file)) == null) {
-                throw new IOException(file + " not found");
-            }
-            return IOUtils.readStream(inputStream);
-        } finally {
-            closeIfNotNull(inputStream);
+        InputStream inputStream;
+        if ((inputStream = getResourceAsStream(servletContext, file)) == null) {
+            throw new IOException(file + " not found");
         }
+        return readStream(inputStream);
     }
 
     /**
@@ -257,7 +253,7 @@ public final class AMSetupUtils {
     }
 
     private static String readFromConnection(URLConnection connection) throws IOException {
-        return IOUtils.readStream(connection.getInputStream());
+        return readStream(connection.getInputStream());
     }
 
     private static ConfiguratorException newConfigurationException(String errorCode) {
