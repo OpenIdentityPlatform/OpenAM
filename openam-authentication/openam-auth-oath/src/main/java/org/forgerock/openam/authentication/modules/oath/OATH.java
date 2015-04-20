@@ -401,7 +401,7 @@ public class OATH extends AMLoginModule {
     }
 
     private String getAuthenticatorAppRegistrationUri() throws AuthLoginException {
-        AMIdentity id = getIdentity(userName);
+        AMIdentity id = getIdentity();
         String secretHex = getSecretKey(id);
 
         AuthenticatorAppRegistrationURIBuilder builder = new AuthenticatorAppRegistrationURIBuilder(id, secretHex);
