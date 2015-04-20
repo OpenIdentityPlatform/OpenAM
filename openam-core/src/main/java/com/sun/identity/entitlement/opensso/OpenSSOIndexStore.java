@@ -24,7 +24,7 @@
  *
  * $Id: OpenSSOIndexStore.java,v 1.13 2010/01/25 23:48:15 veiming Exp $
  *
- * Portions copyright 2011-2014 ForgeRock, AS
+ * Portions copyright 2011-2015 ForgeRock, AS
  */
 package com.sun.identity.entitlement.opensso;
 
@@ -40,7 +40,6 @@ import com.sun.identity.entitlement.EntitlementThreadPool;
 import com.sun.identity.entitlement.IPrivilege;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeIndexStore;
-import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.ReferralPrivilege;
 import com.sun.identity.entitlement.ReferredApplicationManager;
 import com.sun.identity.entitlement.ResourceSaveIndexes;
@@ -49,6 +48,7 @@ import com.sun.identity.entitlement.SequentialThreadPool;
 import com.sun.identity.entitlement.SubjectAttributesManager;
 import com.sun.identity.entitlement.interfaces.IThreadPool;
 import com.sun.identity.entitlement.util.SearchFilter;
+import com.sun.identity.entitlement.util.SimpleIterator;
 import com.sun.identity.policy.PolicyConfig;
 import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.security.AdminTokenAction;
@@ -62,6 +62,9 @@ import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.openam.entitlement.PolicyConstants;
+
+import javax.security.auth.Subject;
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashMap;
@@ -69,7 +72,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import javax.security.auth.Subject;
 
 
 public class OpenSSOIndexStore extends PrivilegeIndexStore {
@@ -129,7 +131,7 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
                 adminToken);
             serviceConfigManager.addListener(new EntitlementsListener());
         } catch (Exception e) {
-            PrivilegeManager.debug.error("OpenSSOIndexStore.init " +
+            PolicyConstants.DEBUG.error("OpenSSOIndexStore.init " +
                 "Unable to register for SMS notifications", e);
         }
     }
@@ -463,7 +465,7 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
                 cache(result, null, getRealm());
                 return result;
             } catch (EntitlementException e) {
-                PrivilegeManager.debug.error(
+                PolicyConstants.DEBUG.error(
                         "OpenSSOIndexStore.GetTask.runPolicy", e);
             }
         }
@@ -494,10 +496,10 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
                         map, realms);
                 }
             } catch (SSOException e) {
-                PrivilegeManager.debug.error(
+                PolicyConstants.DEBUG.error(
                     "OpenSSOIndexStore.getOrgAliasReferral", e);
             } catch (SMSException e) {
-                PrivilegeManager.debug.error(
+                PolicyConstants.DEBUG.error(
                     "OpenSSOIndexStore.getOrgAliasReferral", e);
             }
         }
@@ -786,7 +788,7 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
                         r.getOriginalMapApplNameToResources();
                     for (String a : map.keySet()) {
                         Application appl = ApplicationManager.getApplication(
-                            PrivilegeManager.superAdminSubject, realmName, a);
+                            PolicyConstants.SUPER_ADMIN_SUBJECT, realmName, a);
                         if (appl.getApplicationType().getName().equals(
                             applicationTypeName)) {
                             results.addAll(map.get(a));
@@ -800,7 +802,7 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
 
             return results;
         } catch (SMSException ex) {
-            PrivilegeManager.debug.error(
+            PolicyConstants.DEBUG.error(
                 "OpenSSOIndexStore.getReferredResources", ex);
             Object[] param = {realm};
             throw new EntitlementException(275, param);
@@ -890,11 +892,11 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
                 return false;
             }
         } catch (SMSException ex) {
-            PrivilegeManager.debug.error(
+            PolicyConstants.DEBUG.error(
                 "OpenSSOIndexStore.isOrgAliasMappingResourceEnabled", ex);
             return false;
         } catch (SSOException ex) {
-            PrivilegeManager.debug.error(
+            PolicyConstants.DEBUG.error(
                 "OpenSSOIndexStore.isOrgAliasMappingResourceEnabled", ex);
             return false;
         }
@@ -958,7 +960,7 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
                 }
             } catch (EntitlementException ex) {
                 iterator.isDone();
-                PrivilegeManager.debug.error(
+                PolicyConstants.DEBUG.error(
                     "OpenSSOIndexStore.SearchTask.runPolicy", ex);
             }
         }

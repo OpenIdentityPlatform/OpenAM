@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2015 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -28,22 +28,22 @@ package com.sun.identity.entitlement.opensso;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.ResourceAttribute;
 import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.interfaces.ResponseProvider;
 import com.sun.identity.shared.JSONUtils;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.forgerock.openam.entitlement.PolicyConstants;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import javax.security.auth.Subject;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import javax.security.auth.Subject;
-
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * This class is used to wrap legacy response providers from previous OpenAM
@@ -206,7 +206,7 @@ public class PolicyResponseProvider implements ResourceAttribute {
             jo.put("propertyName", propertyName);
             return jo.toString(2);
         } catch (JSONException ex) {
-            PrivilegeManager.debug.error("PolicyCondition.getState", ex);
+            PolicyConstants.DEBUG.error("PolicyCondition.getState", ex);
         }
         return "";
     }
@@ -223,7 +223,7 @@ public class PolicyResponseProvider implements ResourceAttribute {
             this.pResponseProviderName = jo.optString("pResponseProviderName");
             this.propertyName = jo.optString("propertyName");
         } catch (JSONException e) {
-            PrivilegeManager.debug.error("PolicyCondition.setState", e);
+            PolicyConstants.DEBUG.error("PolicyCondition.setState", e);
         }
     }
     

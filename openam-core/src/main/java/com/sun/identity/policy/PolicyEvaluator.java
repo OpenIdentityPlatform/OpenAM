@@ -24,50 +24,51 @@
  *
  * $Id: PolicyEvaluator.java,v 1.19 2010/01/14 23:18:35 dillidorai Exp $
  *
- * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.policy;
 
-import java.util.Set;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Collections;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
+
+import com.iplanet.am.sdk.AMException;
 import com.iplanet.am.sdk.AMStoreConnection;
 import com.iplanet.am.sdk.AMUser;
-import com.iplanet.am.sdk.AMException;
 import com.iplanet.am.util.Cache;
 import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.stats.Stats;
+import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenListener;
-import com.iplanet.sso.SSOException;
-import com.sun.identity.monitoring.Agent;
-import com.sun.identity.monitoring.SsoServerPolicySvcImpl;
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Evaluator;
-import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
+import com.sun.identity.monitoring.Agent;
 import com.sun.identity.monitoring.MonitoringUtil;
+import com.sun.identity.monitoring.SsoServerPolicySvcImpl;
 import com.sun.identity.policy.interfaces.Condition;
 import com.sun.identity.policy.interfaces.PolicyListener;
 import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.sm.AttributeSchema;
-import com.sun.identity.sm.ServiceManager;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.ldap.util.DN;
+import com.sun.identity.shared.stats.Stats;
+import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.ServiceManager;
+import org.forgerock.openam.entitlement.PolicyConstants;
+
+import javax.security.auth.Subject;
 import java.security.AccessController;
 import java.security.Principal;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import javax.security.auth.Subject;
-
-import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * The class <code>PolicyEvaluator</code> evaluates policies
@@ -571,7 +572,7 @@ public class PolicyEvaluator {
             DNMapper.orgNameToRealmName(realm) : realm;
         try {
             Application appl = ApplicationManager.getApplication(
-                PrivilegeManager.superAdminSubject,
+                PolicyConstants.SUPER_ADMIN_SUBJECT,
                 realmName, applicationName);
             resourceName = appl.getResourceComparator().canonicalize(
                 resourceName);

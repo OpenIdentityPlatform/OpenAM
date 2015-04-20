@@ -33,6 +33,7 @@ import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.entitlement.constraints.ConstraintValidator;
 import org.forgerock.openam.entitlement.service.ApplicationService;
@@ -55,11 +56,11 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
     /**
      * Debug for Policy Administration Point classes
      */
-    public static final Debug debug = Debug.getInstance("Entitlement");
+    public static final Debug debug = PolicyConstants.DEBUG;
 
     //REF: make configurable
     private static final Pattern PRIVILEGE_NAME_PATTERN = Pattern.compile("[a-zA-Z0-9\\- _]*");
-    public static final Subject superAdminSubject = new Subject();
+    public static final Subject superAdminSubject = PolicyConstants.SUPER_ADMIN_SUBJECT;
 
     private String realm;
     private Subject adminSubject;

@@ -31,15 +31,21 @@
 
 package com.sun.identity.entitlement.opensso;
 
+import static com.sun.identity.entitlement.EntitlementException.INVALID_PROPERTY_VALUE_UNKNOWN_VALUE;
+import static com.sun.identity.entitlement.EntitlementException.POLICY_CLASS_CAST_EXCEPTION;
+import static com.sun.identity.entitlement.EntitlementException.POLICY_CLASS_NOT_ACCESSIBLE;
+import static com.sun.identity.entitlement.EntitlementException.POLICY_CLASS_NOT_INSTANTIABLE;
+import static com.sun.identity.entitlement.EntitlementException.UNKNOWN_POLICY_CLASS;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.ConditionDecision;
 import com.sun.identity.entitlement.EntitlementConditionAdaptor;
 import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.interfaces.Condition;
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,8 +57,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
-import static com.sun.identity.entitlement.EntitlementException.*;
 
 /**
  * This condition wraps all OpenAM policy conditions.
@@ -122,7 +126,7 @@ public class PolicyCondition extends  EntitlementConditionAdaptor {
             this.className = jo.optString("className");
             this.properties = getProperties((JSONObject)jo.opt("properties"));
         } catch (JSONException e) {
-            PrivilegeManager.debug.error("PolicyCondition.setState", e);
+            PolicyConstants.DEBUG.error("PolicyCondition.setState", e);
         }
     }
 
@@ -157,7 +161,7 @@ public class PolicyCondition extends  EntitlementConditionAdaptor {
             jo.put("properties", properties);
             return jo.toString(2);
         } catch (JSONException ex) {
-            PrivilegeManager.debug.error("PolicyCondition.getState", ex);
+            PolicyConstants.DEBUG.error("PolicyCondition.getState", ex);
         }
         return "";
     }

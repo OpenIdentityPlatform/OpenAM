@@ -34,7 +34,6 @@ import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.IPrivilege;
 import com.sun.identity.entitlement.Privilege;
-import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.ReferralPrivilege;
 import com.sun.identity.entitlement.ReferredApplicationManager;
 import com.sun.identity.entitlement.ResourceSaveIndexes;
@@ -52,6 +51,11 @@ import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import org.forgerock.openam.entitlement.PolicyConstants;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import javax.security.auth.Subject;
 import java.security.AccessController;
 import java.text.MessageFormat;
 import java.util.Collections;
@@ -62,9 +66,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import javax.security.auth.Subject;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * This class *talks* to SMS to get the configuration information.
@@ -235,11 +236,11 @@ public class DataStore {
                 policiesPerRealm.put(DNMapper.orgNameToDN(realm), count);
             }
         } catch (NumberFormatException ex) {
-            PrivilegeManager.debug.error("DataStore.updateIndexCount", ex);
+            PolicyConstants.DEBUG.error("DataStore.updateIndexCount", ex);
         } catch (SMSException ex) {
-            PrivilegeManager.debug.error("DataStore.updateIndexCount", ex);
+            PolicyConstants.DEBUG.error("DataStore.updateIndexCount", ex);
         } catch (SSOException ex) {
-            PrivilegeManager.debug.error("DataStore.updateIndexCount", ex);
+            PolicyConstants.DEBUG.error("DataStore.updateIndexCount", ex);
         } finally {
             countRWLock.writeLock().unlock();
         }
@@ -262,11 +263,11 @@ public class DataStore {
                     }
                 }
             } catch (NumberFormatException ex) {
-                PrivilegeManager.debug.error("DataStore.getIndexCount", ex);
+                PolicyConstants.DEBUG.error("DataStore.getIndexCount", ex);
             } catch (SMSException ex) {
-                PrivilegeManager.debug.error("DataStore.getIndexCount", ex);
+                PolicyConstants.DEBUG.error("DataStore.getIndexCount", ex);
             } catch (SSOException ex) {
-                PrivilegeManager.debug.error("DataStore.getIndexCount", ex);
+                PolicyConstants.DEBUG.error("DataStore.getIndexCount", ex);
             }
         }
         return count;
@@ -918,12 +919,12 @@ public class DataStore {
         String filter = getFilter(indexes, subjectIndexes, bSubTree);
         String baseDN = getSearchBaseDN(realm, null);
 
-        if (PrivilegeManager.debug.messageEnabled()) {
-            PrivilegeManager.debug.message(
+        if (PolicyConstants.DEBUG.messageEnabled()) {
+            PolicyConstants.DEBUG.message(
                 "[PolicyEval] DataStore.searchPrivileges");
-            PrivilegeManager.debug.message(
+            PolicyConstants.DEBUG.message(
                 "[PolicyEval] search filter: " + filter);
-            PrivilegeManager.debug.message(
+            PolicyConstants.DEBUG.message(
                 "[PolicyEval] search DN: " + baseDN);
         }
 
@@ -984,12 +985,12 @@ public class DataStore {
         String filter = getFilter(indexes, null, bSubTree);
         String baseDN = getSearchBaseDN(realm, REFERRAL_STORE);
 
-        if (PrivilegeManager.debug.messageEnabled()) {
-            PrivilegeManager.debug.message(
+        if (PolicyConstants.DEBUG.messageEnabled()) {
+            PolicyConstants.DEBUG.message(
                 "[PolicyEval] DataStore.searchReferral");
-            PrivilegeManager.debug.message(
+            PolicyConstants.DEBUG.message(
                 "[PolicyEval] search filter: " + filter);
-            PrivilegeManager.debug.message(
+            PolicyConstants.DEBUG.message(
                 "[PolicyEval] search DN: " + baseDN);
         }
 
@@ -1111,7 +1112,7 @@ public class DataStore {
     }
 
     private SSOToken getSSOToken(Subject subject) {
-        if (subject == PrivilegeManager.superAdminSubject) {
+        if (subject == PolicyConstants.SUPER_ADMIN_SUBJECT) {
             return adminToken;
         }
         return SubjectUtils.getSSOToken(subject);

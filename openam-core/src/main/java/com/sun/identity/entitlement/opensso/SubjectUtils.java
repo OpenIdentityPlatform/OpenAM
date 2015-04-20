@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: SubjectUtils.java,v 1.1 2009/08/19 05:40:36 veiming Exp $
+ *
+ * Portions Copyrighted 2015 ForgeRock AS
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -30,14 +32,15 @@ package com.sun.identity.entitlement.opensso;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.internal.server.AuthSPrincipal;
-import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
+import org.forgerock.openam.entitlement.PolicyConstants;
+
+import javax.security.auth.Subject;
 import java.security.AccessController;
 import java.security.Principal;
 import java.util.HashSet;
 import java.util.Set;
-import javax.security.auth.Subject;
 
 public class SubjectUtils {
     private SubjectUtils() {
@@ -60,7 +63,7 @@ public class SubjectUtils {
             return new Subject(false, userPrincipals, new HashSet(),
                 privateCred);
         } catch (SSOException ex) {
-            PrivilegeManager.debug.error("SubjectUtils.createSubject", ex);
+            PolicyConstants.DEBUG.error("SubjectUtils.createSubject", ex);
             return null;
         }
     }

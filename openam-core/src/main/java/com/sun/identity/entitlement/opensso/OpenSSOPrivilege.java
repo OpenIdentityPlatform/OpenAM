@@ -31,15 +31,22 @@
 package com.sun.identity.entitlement.opensso;
 
 import static com.iplanet.am.util.SystemProperties.isServerMode;
+
 import com.sun.identity.entitlement.ConditionDecision;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
-import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.PrivilegeType;
 import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.session.util.RestrictedTokenAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.entitlement.PolicyConstants;
+import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import javax.security.auth.Subject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,11 +54,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.security.auth.Subject;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  *
@@ -110,7 +112,7 @@ public class OpenSSOPrivilege extends Privilege {
                                 }
                             });
         } catch (Exception ex) {
-            PrivilegeManager.debug.error("OpenSSOPrivilege.evaluate", ex);
+            PolicyConstants.DEBUG.error("OpenSSOPrivilege.evaluate", ex);
             results = new ArrayList<Entitlement>(0);
         }
         
@@ -152,8 +154,8 @@ public class OpenSSOPrivilege extends Privilege {
                 subject, applicationName, resourceName, actionNames,
                 environment, recursive);
 
-            if (PrivilegeManager.debug.messageEnabled()) {
-                PrivilegeManager.debug.message(
+            if (PolicyConstants.DEBUG.messageEnabled()) {
+                PolicyConstants.DEBUG.message(
                     "[PolicyEval] OpenSSOPrivilege.evaluate: resources=" +
                     resources.toString());
             }

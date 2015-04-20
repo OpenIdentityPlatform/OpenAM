@@ -111,7 +111,7 @@ public class ConstraintValidatorImplTest {
     }
 
     @Test(expectedExceptions = ConstraintFailureException.class,
-            expectedExceptionsMessageRegExp = "Invalid value DELETE defined for property actionValues")
+            expectedExceptionsMessageRegExp = "Invalid value DELETE for property actionValues")
     public void throwsExceptionWhenActionsFail() throws ConstraintFailureException {
         // Given
         ResourceType resourceType = ResourceType
@@ -180,7 +180,7 @@ public class ConstraintValidatorImplTest {
     }
 
     @Test(expectedExceptions = ConstraintFailureException.class,
-            expectedExceptionsMessageRegExp = "Invalid value fail://uri:blah/goodbye defined for property resources")
+            expectedExceptionsMessageRegExp = "Invalid value fail://uri:blah/goodbye for property resources")
     public void throwsExceptionWhenResourcesFail() throws ConstraintFailureException {
         // Given
         ResourceType resourceType = ResourceType

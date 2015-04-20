@@ -24,7 +24,7 @@
  *
  * $Id: NotificationServlet.java,v 1.2 2010/01/20 17:01:36 veiming Exp $
  *
- * Portions Copyrighted 2012-2014 ForgeRock AS.
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -32,16 +32,16 @@ package com.sun.identity.entitlement.opensso;
 import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeIndexStore;
-import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.ReferredApplicationManager;
+import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.utils.IOUtils;
 
-import java.io.IOException;
-import java.io.Writer;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.Writer;
 
 /**
  * Handles notification request for privilege changes.
@@ -94,7 +94,7 @@ public class NotificationServlet extends HttpServlet {
             writer.write("200");
             writer.flush();
         } catch (IOException ex) {
-            PrivilegeManager.debug.error("NotificationServlet.handleRequest " + ex.getMessage(), ex);
+            PolicyConstants.DEBUG.error("NotificationServlet.handleRequest " + ex.getMessage(), ex);
         } finally {
             IOUtils.closeIfNotNull(writer);
         }
@@ -117,7 +117,7 @@ public class NotificationServlet extends HttpServlet {
         String realm = req.getParameter(ATTR_REALM_NAME);
 
         PrivilegeIndexStore pis = PrivilegeIndexStore.getInstance(
-            PrivilegeManager.superAdminSubject, realm);
+            PolicyConstants.SUPER_ADMIN_SUBJECT, realm);
         try {
             pis.delete(privilegeName, false);
         } catch (EntitlementException e) {
@@ -133,7 +133,7 @@ public class NotificationServlet extends HttpServlet {
         ReferredApplicationManager.getInstance().clearCache();
 
         PrivilegeIndexStore pis = PrivilegeIndexStore.getInstance(
-            PrivilegeManager.superAdminSubject, realm);
+                PolicyConstants.SUPER_ADMIN_SUBJECT, realm);
         try {
             pis.deleteReferral(referralName, false);
         } catch (EntitlementException e) {

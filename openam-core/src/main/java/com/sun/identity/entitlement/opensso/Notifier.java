@@ -23,10 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: Notifier.java,v 1.3 2010/01/07 00:19:11 veiming Exp $
- */
-
-/*
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ *
+ * Portions Copyrighted 2010-2015 ForgeRock AS
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -37,11 +35,12 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.entitlement.EntitlementThreadPool;
-import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.interfaces.IThreadPool;
 import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.sm.SMSException;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.sm.SMSException;
+import org.forgerock.openam.entitlement.PolicyConstants;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
@@ -124,13 +123,13 @@ public class Notifier implements Runnable {
                 }
             }
         } catch (UnsupportedEncodingException ex) {
-            PrivilegeManager.debug.error("Notifier.notifyChanges", ex);
+            PolicyConstants.DEBUG.error("Notifier.notifyChanges", ex);
         } catch (IOException ex) {
-            PrivilegeManager.debug.error("Notifier.notifyChanges", ex);
+            PolicyConstants.DEBUG.error("Notifier.notifyChanges", ex);
         } catch (SMSException ex) {
-            PrivilegeManager.debug.error("Notifier.notifyChanges", ex);
+            PolicyConstants.DEBUG.error("Notifier.notifyChanges", ex);
         } catch (SSOException ex) {
-            PrivilegeManager.debug.error("DataStore.notifyChanges", ex);
+            PolicyConstants.DEBUG.error("DataStore.notifyChanges", ex);
         }
     }
 
@@ -150,7 +149,7 @@ public class Notifier implements Runnable {
             int status = conn.getResponseCode();
             return (status == HttpURLConnection.HTTP_OK);
         } catch (SocketTimeoutException e) {
-            PrivilegeManager.debug.error("Notifier.post", e);
+            PolicyConstants.DEBUG.error("Notifier.post", e);
             return false;
         } finally {
             if (wr != null) {

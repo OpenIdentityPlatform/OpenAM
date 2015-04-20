@@ -23,10 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: PrivilegeUtils.java,v 1.4 2010/01/07 00:19:11 veiming Exp $
- */
-
-/*
- * Portions Copyrighted 2014 ForgeRock AS
+ *
+ * Portions Copyrighted 2014-2015 ForgeRock AS
  */
 package com.sun.identity.entitlement.opensso;
 
@@ -43,12 +41,10 @@ import com.sun.identity.entitlement.IPrivilege;
 import com.sun.identity.entitlement.OrCondition;
 import com.sun.identity.entitlement.OrSubject;
 import com.sun.identity.entitlement.Privilege;
-import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.ReferralPrivilege;
 import com.sun.identity.entitlement.ResourceAttribute;
 import com.sun.identity.entitlement.StaticAttributes;
 import com.sun.identity.entitlement.UserAttributes;
-import com.sun.identity.entitlement.xacml3.XACMLPrivilegeUtils;
 import com.sun.identity.policy.ActionSchema;
 import com.sun.identity.policy.InvalidNameException;
 import com.sun.identity.policy.NameNotFoundException;
@@ -71,6 +67,7 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.DNMapper;
+import org.forgerock.openam.entitlement.PolicyConstants;
 
 import java.security.AccessController;
 import java.util.Collections;
@@ -97,7 +94,7 @@ public class PrivilegeUtils {
                 AdminTokenAction.getInstance());
             svcTypeManager = new ServiceTypeManager(adminToken);
         } catch (SSOException ex) {
-            PrivilegeManager.debug.error("PrivilegeUtils.<init>", ex);
+            PolicyConstants.DEBUG.error("PrivilegeUtils.<init>", ex);
         }
     }
 
@@ -120,13 +117,8 @@ public class PrivilegeUtils {
         }
 
         Set<IPrivilege> privileges = new HashSet<IPrivilege>();
-        if (policyObject instanceof
-                com.sun.identity.entitlement.xacml3.core.Policy) {
-             Privilege p = XACMLPrivilegeUtils.policyToPrivilege(
-                (com.sun.identity.entitlement.xacml3.core.Policy)policyObject);
-             privileges.add(p);
-        } else if (policyObject instanceof Policy) {
-            policyToPrivileges((Policy) policyObject, privileges);
+        if (policyObject instanceof Policy) {
+            policyToPrivileges((Policy)policyObject, privileges);
         } else {
             String[] param = {policyObject.getClass().getName()};
             throw new EntitlementException(329, param);
@@ -421,11 +413,11 @@ public class PrivilegeUtils {
                 return new PolicySubject(subjectName, className, val, exclusive);
             }
         } catch (ClassNotFoundException e) {
-            PrivilegeManager.debug.error("PrivilegeUtils.mapGenericSubject", e);
+            PolicyConstants.DEBUG.error("PrivilegeUtils.mapGenericSubject", e);
         } catch (InstantiationException e) {
-            PrivilegeManager.debug.error("PrivilegeUtils.mapGenericSubject", e);
+            PolicyConstants.DEBUG.error("PrivilegeUtils.mapGenericSubject", e);
         } catch (IllegalAccessException e) {
-            PrivilegeManager.debug.error("PrivilegeUtils.mapGenericSubject", e);
+            PolicyConstants.DEBUG.error("PrivilegeUtils.mapGenericSubject", e);
         }
         return null;
     }
@@ -471,13 +463,13 @@ public class PrivilegeUtils {
                 return new PolicyCondition((String) nCondition[0], className, props);
             }
         } catch (ClassNotFoundException e) {
-            PrivilegeManager.debug.error(
+            PolicyConstants.DEBUG.error(
                 "PrivilegeUtils.mapGenericCondition", e);
         } catch (InstantiationException e) {
-            PrivilegeManager.debug.error(
+            PolicyConstants.DEBUG.error(
                 "PrivilegeUtils.mapGenericCondition", e);
         } catch (IllegalAccessException e) {
-            PrivilegeManager.debug.error(
+            PolicyConstants.DEBUG.error(
                 "PrivilegeUtils.mapGenericCondition", e);
         }
         return null;
@@ -487,13 +479,7 @@ public class PrivilegeUtils {
         String realm,
         Privilege privilege
     ) throws PolicyException, SSOException, EntitlementException {
-        Object policyObject = null;
-        if (PolicyPrivilegeManager.xacmlPrivilegeEnabled()) {
-            policyObject = XACMLPrivilegeUtils.privilegeToPolicy(privilege);
-        } else {
-             policyObject = privilegeToPolicy(realm, privilege);
-        }
-        return policyObject;
+        return privilegeToPolicy(realm, privilege);
     }
 
     public static Policy referralPrivilegeToPolicy(String realm,
@@ -531,7 +517,7 @@ public class PrivilegeUtils {
 
         for (String appName : map.keySet()) {
             Set<String> res = map.get(appName);
-            Application application = ApplicationManager.getApplication(PrivilegeManager.superAdminSubject,
+            Application application = ApplicationManager.getApplication(PolicyConstants.SUPER_ADMIN_SUBJECT,
                                             realmName, appName);
             if (application == null) {
                 Object[] params = {appName, realm};
@@ -635,7 +621,7 @@ public class PrivilegeUtils {
         String realmName = (DN.isDN(realm)) ? DNMapper.orgNameToRealmName(realm) : realm;
 
         Application application = ApplicationManager.getApplication(
-            PrivilegeManager.superAdminSubject, realmName, appName);
+            PolicyConstants.SUPER_ADMIN_SUBJECT, realmName, appName);
         if (application == null) {
             Object[] params = {appName, realm};
             throw new EntitlementException(105, params);
@@ -971,12 +957,7 @@ public class PrivilegeUtils {
 
     public static String policyToXML(Object policy) throws EntitlementException {
         String xmlString = "";
-        if (policy instanceof com.sun.identity.entitlement.xacml3.core.Policy) {
-            com.sun.identity.entitlement.xacml3.core.Policy xacmlPolicy =
-                    (com.sun.identity.entitlement.xacml3.core.Policy) policy;
-            xmlString = com.sun.identity.entitlement.xacml3.XACMLPrivilegeUtils.toXML(
-                    xacmlPolicy);
-        } else if (policy instanceof com.sun.identity.policy.Policy) {
+        if (policy instanceof com.sun.identity.policy.Policy) {
             xmlString = ((com.sun.identity.policy.Policy) policy).toXML();
         } else {
             String[] param = {policy.getClass().getName()};
@@ -1003,12 +984,7 @@ public class PrivilegeUtils {
 
         //TODO: implement method, objectToPrivileges(Object object)
         Set<IPrivilege> privileges = null;
-        if (policy instanceof com.sun.identity.entitlement.xacml3.core.Policy) {
-            Privilege privilege = XACMLPrivilegeUtils.policyToPrivilege(
-                (com.sun.identity.entitlement.xacml3.core.Policy) policy);
-            privileges = new HashSet<IPrivilege>();
-            privileges.add(privilege);
-        } else if (policy instanceof Policy) {
+        if (policy instanceof Policy) {
              privileges = policyToPrivileges((Policy) policy);
         } else {
             String[] param = {policy.getClass().getName()};

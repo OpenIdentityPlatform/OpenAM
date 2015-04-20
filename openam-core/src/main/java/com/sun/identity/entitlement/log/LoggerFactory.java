@@ -23,12 +23,15 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: LoggerFactory.java,v 1.2 2009/10/22 21:04:36 veiming Exp $
+ *
+ * Portions Copyrighted 2015 ForgeRock AS
  */
 
 package com.sun.identity.entitlement.log;
 
 
-import com.sun.identity.entitlement.PrivilegeManager;
+import org.forgerock.openam.entitlement.PolicyConstants;
+
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -64,11 +67,11 @@ public class LoggerFactory {
             Class clazz = Class.forName(className);
             return (ILoggerProvider) clazz.newInstance();
         } catch (InstantiationException ex) {
-            PrivilegeManager.debug.error("LoggerFactory.<init>", ex);
+            PolicyConstants.DEBUG.error("LoggerFactory.<init>", ex);
         } catch (IllegalAccessException ex) {
-            PrivilegeManager.debug.error("LoggerFactory.<init>", ex);
+            PolicyConstants.DEBUG.error("LoggerFactory.<init>", ex);
         } catch (ClassNotFoundException ex) {
-            PrivilegeManager.debug.error("LoggerFactory.<init>", ex);
+            PolicyConstants.DEBUG.error("LoggerFactory.<init>", ex);
         }
         return null;
     }

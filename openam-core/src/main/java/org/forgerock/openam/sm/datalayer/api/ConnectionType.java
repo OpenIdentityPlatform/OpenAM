@@ -20,7 +20,6 @@ import org.forgerock.openam.cts.impl.CTSAsyncConnectionModule;
 import org.forgerock.openam.cts.impl.CTSConnectionModule;
 import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
 import org.forgerock.openam.cts.reaper.CTSReaper;
-import org.forgerock.openam.entitlement.indextree.IndexTreeService;
 import org.forgerock.openam.sm.SMSConnectionModule;
 import org.forgerock.openam.sm.datalayer.impl.ResourceSetConnectionModule;
 import org.forgerock.openam.sm.datalayer.impl.UmaAuditConnectionModule;
@@ -50,7 +49,7 @@ public enum ConnectionType {
      */
     CTS_REAPER(CTSConnectionModule.class),
     /**
-     * @see IndexTreeService
+     * @see org.forgerock.openam.entitlement.indextree.IndexTreeService
      */
     DATA_LAYER(SMSConnectionModule.class),
     /**

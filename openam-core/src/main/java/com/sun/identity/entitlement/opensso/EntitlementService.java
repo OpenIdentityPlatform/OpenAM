@@ -29,6 +29,8 @@
 
 package com.sun.identity.entitlement.opensso;
 
+import static com.sun.identity.policy.PolicyEvaluator.REALM_DN;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Application;
@@ -37,7 +39,6 @@ import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.entitlement.ApplicationTypeManager;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.interfaces.ISaveIndex;
 import com.sun.identity.entitlement.interfaces.ISearchIndex;
 import com.sun.identity.entitlement.interfaces.ResourceName;
@@ -56,9 +57,11 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import org.forgerock.openam.utils.CollectionUtils;
 
+import javax.security.auth.Subject;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
@@ -66,10 +69,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import javax.security.auth.Subject;
-
-import static com.sun.identity.policy.PolicyEvaluator.REALM_DN;
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.*;
 
 /**
  *
@@ -115,18 +114,18 @@ public class EntitlementService extends EntitlementConfiguration {
      * @return set of attribute values of a given attribute name,
      */
     public Set<String> getConfiguration(String attrName) {
-        return getConfiguration(getAdminToken(), attrName);
+        return getConfiguration(EntitlementUtils.getAdminToken(), attrName);
     }
 
     public static int getConfiguration(String attrName, int defaultValue) {
-        Set<String> values = getConfiguration(getAdminToken(), attrName);
+        Set<String> values = getConfiguration(EntitlementUtils.getAdminToken(), attrName);
         if ((values == null) || values.isEmpty()) {
             return defaultValue;
         }
         try {
             return Integer.parseInt(values.iterator().next());
         } catch (NumberFormatException e) {
-            PrivilegeManager.debug.error(
+            PolicyConstants.DEBUG.error(
                 "EntitlementService.getConfiguration: attribute name=" +
                 attrName, e);
             return defaultValue;
@@ -148,15 +147,15 @@ public class EntitlementService extends EntitlementConfiguration {
                     return as.getDefaultValues();
                 }
             } else {
-                PrivilegeManager.debug.error(
+                PolicyConstants.DEBUG.error(
                     "EntitlementService.getAttributeValues: " +
                     "admin token is missing");
             }
         } catch (SMSException ex) {
-            PrivilegeManager.debug.error(
+            PolicyConstants.DEBUG.error(
                 "EntitlementService.getAttributeValues", ex);
         } catch (SSOException ex) {
-            PrivilegeManager.debug.error(
+            PolicyConstants.DEBUG.error(
                 "EntitlementService.getAttributeValues", ex);
         }
         return Collections.EMPTY_SET;
@@ -174,15 +173,15 @@ public class EntitlementService extends EntitlementConfiguration {
                     as.setDefaultValues(values);
                 }
             } else {
-                PrivilegeManager.debug.error(
+                PolicyConstants.DEBUG.error(
                     "EntitlementService.getAttributeValues: " +
                     "admin token is missing");
             }
         } catch (SMSException ex) {
-            PrivilegeManager.debug.error(
+            PolicyConstants.DEBUG.error(
                 "EntitlementService.setAttributeValues", ex);
         } catch (SSOException ex) {
-            PrivilegeManager.debug.error(
+            PolicyConstants.DEBUG.error(
                 "EntitlementService.setAttributeValues", ex);
         }
     }
@@ -198,7 +197,7 @@ public class EntitlementService extends EntitlementConfiguration {
             SSOToken token = getSSOToken();
 
             if (token == null) {
-                PrivilegeManager.debug.error(
+                PolicyConstants.DEBUG.error(
                     "EntitlementService.getApplicationTypes : "+
                     "admin sso token is absent");
             } else {
@@ -208,20 +207,20 @@ public class EntitlementService extends EntitlementConfiguration {
                 for (String name : names) {
                     ServiceConfig appType = conf.getSubConfig(name);
                     Map<String, Set<String>> data = appType.getAttributes();
-                    results.add(createApplicationType(name, data));
+                    results.add(EntitlementUtils.createApplicationType(name, data));
                 }
             }
         } catch (InstantiationException ex) {
-            PrivilegeManager.debug.error(
+            PolicyConstants.DEBUG.error(
                 "EntitlementService.getApplicationTypes", ex);
         } catch (IllegalAccessException ex) {
-            PrivilegeManager.debug.error(
+            PolicyConstants.DEBUG.error(
                 "EntitlementService.getApplicationTypes", ex);
         } catch (SMSException ex) {
-            PrivilegeManager.debug.error(
+            PolicyConstants.DEBUG.error(
                 "EntitlementService.getApplicationTypes", ex);
         } catch (SSOException ex) {
-            PrivilegeManager.debug.error(
+            PolicyConstants.DEBUG.error(
                 "EntitlementService.getApplicationTypes", ex);
         }
         return results;
@@ -233,7 +232,7 @@ public class EntitlementService extends EntitlementConfiguration {
             SERVICE_NAME, token);
         ServiceConfig globalConfig = mgr.getGlobalConfig(null);
         if (globalConfig != null) {
-            return globalConfig.getSubConfig(APPLICATION_TYPES);
+            return globalConfig.getSubConfig(EntitlementUtils.APPLICATION_TYPES);
         }
         return null;
     }
@@ -247,8 +246,8 @@ public class EntitlementService extends EntitlementConfiguration {
     }
 
     private SSOToken getSSOToken() {
-        return (getAdminSubject() == PrivilegeManager.superAdminSubject) ?
-            getAdminToken() :
+        return (getAdminSubject() == PolicyConstants.SUPER_ADMIN_SUBJECT) ?
+            EntitlementUtils.getAdminToken() :
             SubjectUtils.getSSOToken(getAdminSubject());
     }
 
@@ -301,8 +300,8 @@ public class EntitlementService extends EntitlementConfiguration {
     }
 
     private SSOToken getSSOToken(Subject subject) {
-        if (subject == PrivilegeManager.superAdminSubject) {
-            return getAdminToken();
+        if (subject == PolicyConstants.SUPER_ADMIN_SUBJECT) {
+            return EntitlementUtils.getAdminToken();
         }
         return SubjectUtils.getSSOToken(subject);
     }
@@ -326,7 +325,7 @@ public class EntitlementService extends EntitlementConfiguration {
     }
 
     private static String getApplicationSearchBaseDN(String realm) {
-        Object[] args = {REGISTERED_APPLICATIONS, DNMapper.orgNameToDN(realm)};
+        Object[] args = {EntitlementUtils.REGISTERED_APPLICATIONS, DNMapper.orgNameToDN(realm)};
         return MessageFormat.format(REALM_DN_TEMPLATE, args);
     }
 
@@ -341,17 +340,17 @@ public class EntitlementService extends EntitlementConfiguration {
                 return createApplication(appConfig, name, realm);
             }
         } catch (EntitlementException ex) {
-            PrivilegeManager.debug.error("EntitlementService.getApplication", ex);
+            PolicyConstants.DEBUG.error("EntitlementService.getApplication", ex);
         } catch (ClassCastException ex) {
-            PrivilegeManager.debug.error("EntitlementService.getApplication", ex);
+            PolicyConstants.DEBUG.error("EntitlementService.getApplication", ex);
         } catch (InstantiationException ex) {
-            PrivilegeManager.debug.error("EntitlementService.getApplication", ex);
+            PolicyConstants.DEBUG.error("EntitlementService.getApplication", ex);
         } catch (IllegalAccessException ex) {
-            PrivilegeManager.debug.error("EntitlementService.getApplication", ex);
+            PolicyConstants.DEBUG.error("EntitlementService.getApplication", ex);
         } catch (SMSException ex) {
-            PrivilegeManager.debug.error("EntitlementService.getApplication", ex);
+            PolicyConstants.DEBUG.error("EntitlementService.getApplication", ex);
         } catch (SSOException ex) {
-            PrivilegeManager.debug.error("EntitlementService.getApplication", ex);
+            PolicyConstants.DEBUG.error("EntitlementService.getApplication", ex);
         }
         return null;
     }
@@ -383,17 +382,17 @@ public class EntitlementService extends EntitlementConfiguration {
                 }
             }
         } catch (EntitlementException ex) {
-            PrivilegeManager.debug.error("EntitlementService.getRawApplications", ex);
+            PolicyConstants.DEBUG.error("EntitlementService.getRawApplications", ex);
         } catch (ClassCastException ex) {
-            PrivilegeManager.debug.error("EntitlementService.getRawApplications", ex);
+            PolicyConstants.DEBUG.error("EntitlementService.getRawApplications", ex);
         } catch (InstantiationException ex) {
-            PrivilegeManager.debug.error("EntitlementService.getRawApplications", ex);
+            PolicyConstants.DEBUG.error("EntitlementService.getRawApplications", ex);
         } catch (IllegalAccessException ex) {
-            PrivilegeManager.debug.error("EntitlementService.getRawApplications", ex);
+            PolicyConstants.DEBUG.error("EntitlementService.getRawApplications", ex);
         } catch (SMSException ex) {
-            PrivilegeManager.debug.error("EntitlementService.getRawApplications", ex);
+            PolicyConstants.DEBUG.error("EntitlementService.getRawApplications", ex);
         } catch (SSOException ex) {
-            PrivilegeManager.debug.error("EntitlementService.getRawApplications", ex);
+            PolicyConstants.DEBUG.error("EntitlementService.getRawApplications", ex);
         }
         return results;
     }
@@ -418,17 +417,17 @@ public class EntitlementService extends EntitlementConfiguration {
                 ServiceConfigManager mgr = new ServiceConfigManager(SERVICE_NAME, token);
                 ServiceConfig orgConfig = mgr.getOrganizationConfig(hackRealm, null);
                 if (orgConfig != null) {
-                    return orgConfig.getSubConfig(REGISTERED_APPLICATIONS);
+                    return orgConfig.getSubConfig(EntitlementUtils.REGISTERED_APPLICATIONS);
                 }
             } else {
-                PrivilegeManager.debug.error("EntitlementService.getApplicationConfiguration, admin token is missing");
+                PolicyConstants.DEBUG.error("EntitlementService.getApplicationConfiguration, admin token is missing");
             }
         } catch (ClassCastException ex) {
-            PrivilegeManager.debug.error("EntitlementService.getApplicationConfiguration", ex);
+            PolicyConstants.DEBUG.error("EntitlementService.getApplicationConfiguration", ex);
         } catch (SMSException ex) {
-            PrivilegeManager.debug.error("EntitlementService.getApplicationConfiguration", ex);
+            PolicyConstants.DEBUG.error("EntitlementService.getApplicationConfiguration", ex);
         } catch (SSOException ex) {
-            PrivilegeManager.debug.error("EntitlementService.getApplicationConfiguration", ex);
+            PolicyConstants.DEBUG.error("EntitlementService.getApplicationConfiguration", ex);
         }
         return null;
     }
@@ -438,7 +437,7 @@ public class EntitlementService extends EntitlementConfiguration {
 
         final Map<String, Set<String>> data = conf.getSubConfig(appName).getAttributes();
         final ApplicationType applicationType = ApplicationTypeManager.getAppplicationType(
-                getAdminSubject(), getAttribute(data, APPLICATION_TYPE));
+                getAdminSubject(), EntitlementUtils.getAttribute(data, EntitlementUtils.APPLICATION_TYPE));
         return EntitlementUtils.createApplication(applicationType, realm, appName, data);
     }
 
@@ -466,7 +465,7 @@ public class EntitlementService extends EntitlementConfiguration {
             }
 
             Application appl = ApplicationManager.getApplication(
-                PrivilegeManager.superAdminSubject, realm, applicationName);
+                PolicyConstants.SUPER_ADMIN_SUBJECT, realm, applicationName);
             if (appl != null) {
                 appl.addAttributeNames(names);
             }
@@ -551,7 +550,7 @@ public class EntitlementService extends EntitlementConfiguration {
             token);
         ServiceConfig orgConfig = mgr.getOrganizationConfig(realm, null);
         if (orgConfig != null) {
-            ServiceConfig conf = orgConfig.getSubConfig(REGISTERED_APPLICATIONS);
+            ServiceConfig conf = orgConfig.getSubConfig(EntitlementUtils.REGISTERED_APPLICATIONS);
             if (conf != null) {
                 applConf = conf.getSubConfig(appName);
             }
@@ -566,14 +565,14 @@ public class EntitlementService extends EntitlementConfiguration {
     ) throws EntitlementException {
         Map<String, Set<String>> results = null;
 
-        Map<String, Boolean> actionMap = getActions(data);
+        Map<String, Boolean> actionMap = EntitlementUtils.getActions(data);
         if (!actionMap.keySet().contains(name)) {
-            Set<String> actions = data.get(CONFIG_ACTIONS);
+            Set<String> actions = data.get(EntitlementUtils.CONFIG_ACTIONS);
             Set<String> cloned = new HashSet<String>();
             cloned.addAll(actions);
             cloned.add(name + "=" + defVal.toString());
             results = new HashMap<String, Set<String>>();
-            results.put(CONFIG_ACTIONS, cloned);
+            results.put(EntitlementUtils.CONFIG_ACTIONS, cloned);
         } else {
             Object[] args = {name};
             throw new EntitlementException(222, args);
@@ -657,7 +656,7 @@ public class EntitlementService extends EntitlementConfiguration {
             token);
         ServiceConfig orgConfig = mgr.getOrganizationConfig(realm, null);
         if (orgConfig != null) {
-            return orgConfig.getSubConfig(REGISTERED_APPLICATIONS);
+            return orgConfig.getSubConfig(EntitlementUtils.REGISTERED_APPLICATIONS);
         }
         return null;
     }
@@ -670,13 +669,13 @@ public class EntitlementService extends EntitlementConfiguration {
             token);
         ServiceConfig orgConfig = mgr.getOrganizationConfig(realm, null);
         if (orgConfig != null) {
-            sc = orgConfig.getSubConfig(REGISTERED_APPLICATIONS);
+            sc = orgConfig.getSubConfig(EntitlementUtils.REGISTERED_APPLICATIONS);
         }
 
         if (sc == null) {
-            orgConfig.addSubConfig(REGISTERED_APPLICATIONS, SCHEMA_APPLICATIONS, 0,
+            orgConfig.addSubConfig(EntitlementUtils.REGISTERED_APPLICATIONS, SCHEMA_APPLICATIONS, 0,
                 Collections.EMPTY_MAP);
-            sc = orgConfig.getSubConfig(REGISTERED_APPLICATIONS);
+            sc = orgConfig.getSubConfig(EntitlementUtils.REGISTERED_APPLICATIONS);
         }
         return sc;
     }
@@ -746,7 +745,7 @@ public class EntitlementService extends EntitlementConfiguration {
             if (conf != null) {
                 ServiceConfig sc = conf.getSubConfig(applicationType.getName());
                 if (sc == null) {
-                    conf.addSubConfig(applicationType.getName(), APPLICATION_TYPE, 0,
+                    conf.addSubConfig(applicationType.getName(), EntitlementUtils.APPLICATION_TYPE, 0,
                         getApplicationTypeData(applicationType));
                 } else {
                     sc.setAttributes(getApplicationTypeData(applicationType));
@@ -764,7 +763,7 @@ public class EntitlementService extends EntitlementConfiguration {
     private Map<String, Set<String>> getApplicationTypeData(
         ApplicationType applType) {
         Map<String, Set<String>> data = new HashMap<String, Set<String>>();
-        data.put(CONFIG_ACTIONS, getActionSet(applType.getActions()));
+        data.put(EntitlementUtils.CONFIG_ACTIONS, EntitlementUtils.getActionSet(applType.getActions()));
 
         ISaveIndex sIndex = applType.getSaveIndex();
         String saveIndexClassName = (sIndex != null) ?
@@ -800,12 +799,12 @@ public class EntitlementService extends EntitlementConfiguration {
 
         Set<String> data = new HashSet<String>();
         map.put(SMSEntry.ATTR_KEYVAL, data);
-        data.add(APPLICATION_TYPE + '=' +
+        data.add(EntitlementUtils.APPLICATION_TYPE + '=' +
                 appl.getApplicationType().getName());
         if (appl.getDescription() != null) {
-            data.add(CONFIG_DESCRIPTION + "=" + appl.getDescription());
+            data.add(EntitlementUtils.CONFIG_DESCRIPTION + "=" + appl.getDescription());
         } else {
-            data.add(CONFIG_DESCRIPTION + "=");
+            data.add(EntitlementUtils.CONFIG_DESCRIPTION + "=");
         }
 
         data.add(CONFIG_ENTITLEMENT_COMBINER + "=" +
@@ -863,7 +862,7 @@ public class EntitlementService extends EntitlementConfiguration {
         if (!appl.getResourceTypeUuids().isEmpty()) {
             Set<String> searchableAttributes = new HashSet<String>();
             for (String resourceTypeUuid : appl.getResourceTypeUuids()) {
-                searchableAttributes.add(CONFIG_RESOURCE_TYPE_UUIDS + "=" + resourceTypeUuid);
+                searchableAttributes.add(EntitlementUtils.CONFIG_RESOURCE_TYPE_UUIDS + "=" + resourceTypeUuid);
             }
             map.put(SMSEntry.ATTR_XML_KEYVAL, searchableAttributes);
         }
@@ -921,12 +920,12 @@ public class EntitlementService extends EntitlementConfiguration {
     public Set<String> getSubjectAttributeNames(String application) {
         try {
             Application app = ApplicationManager.getApplication(
-                PrivilegeManager.superAdminSubject, realm, application);
+                PolicyConstants.SUPER_ADMIN_SUBJECT, realm, application);
             if (app != null) {
                 return app.getAttributeNames();
             }
         } catch (EntitlementException ex) {
-            PrivilegeManager.debug.error(
+            PolicyConstants.DEBUG.error(
                 "EntitlementService.getSubjectAttributeNames", ex);
         }
         return Collections.EMPTY_SET;
@@ -955,17 +954,17 @@ public class EntitlementService extends EntitlementConfiguration {
                     return conf.getSubConfigNames();
                 }
             } else {
-                PrivilegeManager.debug.error(
+                PolicyConstants.DEBUG.error(
                     "EntitlementService.getSubjectAttributesCollectorNames: " +
                     "admin sso token is absent");
                 throw new EntitlementException(285);
             }
         } catch (SMSException ex) {
-            PrivilegeManager.debug.error(
+            PolicyConstants.DEBUG.error(
                 "EntitlementService.getSubjectAttributesCollectorNames", ex);
             throw new EntitlementException(286, ex);
         } catch (SSOException ex) {
-            PrivilegeManager.debug.error(
+            PolicyConstants.DEBUG.error(
                 "EntitlementService.getSubjectAttributesCollectorNames", ex);
             throw new EntitlementException(286, ex);
         }
@@ -1032,20 +1031,20 @@ public class EntitlementService extends EntitlementConfiguration {
                     return subConfig.getAttributes();
                 }
             } else {
-                PrivilegeManager.debug.error(
+                PolicyConstants.DEBUG.error(
                 "EntitlementService.getSubjectAttributesCollectorConfiguration:"
                     + "admin sso token is absent");
                 Object[] arg = {name};
                 throw new EntitlementException(287, arg);
             }
         } catch (SMSException ex) {
-            PrivilegeManager.debug.error(
+            PolicyConstants.DEBUG.error(
                 "EntitlementService.getSubjectAttributesCollectorConfiguration",
                 ex);
             Object[] arg = {name};
             throw new EntitlementException(288, arg, ex);
         } catch (SSOException ex) {
-            PrivilegeManager.debug.error(
+            PolicyConstants.DEBUG.error(
                 "EntitlementService.getSubjectAttributesCollectorConfiguration",
                 ex);
             Object[] arg = {name};
@@ -1095,20 +1094,20 @@ public class EntitlementService extends EntitlementConfiguration {
                     }
                 }
             } else {
-                PrivilegeManager.debug.error(
+                PolicyConstants.DEBUG.error(
                 "EntitlementService.setSubjectAttributesCollectorConfiguration:"
                     + "admin sso token is absent");
                 Object[] arg = {name};
                 throw new EntitlementException(289, arg);
             }
         } catch (SMSException ex) {
-            PrivilegeManager.debug.error(
+            PolicyConstants.DEBUG.error(
                 "EntitlementService.setSubjectAttributesCollectorConfiguration",
                 ex);
             Object[] arg = {name};
             throw new EntitlementException(290, arg, ex);
         } catch (SSOException ex) {
-            PrivilegeManager.debug.error(
+            PolicyConstants.DEBUG.error(
                 "EntitlementService.setSubjectAttributesCollectorConfiguration",
                 ex);
             Object[] arg = {name};
@@ -1126,7 +1125,7 @@ public class EntitlementService extends EntitlementConfiguration {
      */
     public boolean hasEntitlementDITs() {
         try {
-            new ServiceSchemaManager(SERVICE_NAME, getAdminToken());
+            new ServiceSchemaManager(SERVICE_NAME, EntitlementUtils.getAdminToken());
             return true;
         } catch (SMSException ex) {
             return false;
@@ -1190,7 +1189,7 @@ public class EntitlementService extends EntitlementConfiguration {
     public void setNetworkMonitorEnabled(boolean enabled) {
         Set<String> values = new HashSet<String>();
         values.add(Boolean.toString(enabled));
-        setConfiguration(getAdminToken(), NETWORK_MONITOR_ENABLED, values);
+        setConfiguration(EntitlementUtils.getAdminToken(), NETWORK_MONITOR_ENABLED, values);
     }
 
     public void reindexApplications() {
@@ -1207,7 +1206,7 @@ public class EntitlementService extends EntitlementConfiguration {
     public boolean doesRealmExist() {
         try {
             OrganizationConfigManager mgr = new OrganizationConfigManager(
-                getAdminToken(), realm);
+                EntitlementUtils.getAdminToken(), realm);
             return true;
         } catch (SMSException ex) {
             return false;
@@ -1220,7 +1219,7 @@ public class EntitlementService extends EntitlementConfiguration {
 
         try {
             OrganizationConfigManager mgr = new OrganizationConfigManager(
-                getAdminToken(), realm);
+                EntitlementUtils.getAdminToken(), realm);
             mgr = mgr.getParentOrgConfigManager();
             String parentRealm = DNMapper.orgNameToRealmName(
                 mgr.getOrganizationName());
@@ -1231,7 +1230,7 @@ public class EntitlementService extends EntitlementConfiguration {
                 results.add(DNMapper.orgNameToRealmName(o));
             }
         } catch (SMSException ex) {
-            PrivilegeManager.debug.error("EntitlementService.getSubRealmNames",
+            PolicyConstants.DEBUG.error("EntitlementService.getSubRealmNames",
                 ex);
             // realm no longer exist
         }
@@ -1272,7 +1271,7 @@ public class EntitlementService extends EntitlementConfiguration {
         try {
             orgConfig = PolicyConfig.getPolicyConfig(orgDN);
         } catch (PolicyException ex) {
-            PrivilegeManager.debug.error("EntitlementService.updateEnvironmentRealmDn: "
+            PolicyConstants.DEBUG.error("EntitlementService.updateEnvironmentRealmDn: "
                     + "can not get policy config for sub-realm : " + subRealm + " org : " + orgDN, ex);
         }
         if (orgConfig != null) {

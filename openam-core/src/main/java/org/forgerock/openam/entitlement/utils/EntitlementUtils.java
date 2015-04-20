@@ -15,7 +15,15 @@
  */
 package org.forgerock.openam.entitlement.utils;
 
-import static com.sun.identity.entitlement.opensso.EntitlementService.*;
+import static com.sun.identity.entitlement.opensso.EntitlementService.APPLICATION_CLASSNAME;
+import static com.sun.identity.entitlement.opensso.EntitlementService.ATTR_NAME_META;
+import static com.sun.identity.entitlement.opensso.EntitlementService.ATTR_NAME_SUBJECT_ATTR_NAMES;
+import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_CONDITIONS;
+import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_ENTITLEMENT_COMBINER;
+import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_RESOURCE_COMP_IMPL;
+import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_SAVE_INDEX_IMPL;
+import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_SEARCH_INDEX_IMPL;
+import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_SUBJECTS;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Application;
@@ -24,10 +32,13 @@ import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.entitlement.ApplicationTypeManager;
 import com.sun.identity.entitlement.DenyOverride;
 import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.PrivilegeManager;
-
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.security.AdminTokenAction;
+import org.forgerock.openam.entitlement.PolicyConstants;
+import org.forgerock.openam.entitlement.ResourceType;
+import org.forgerock.util.Reject;
+
+import javax.security.auth.Subject;
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.Date;
@@ -35,11 +46,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.forgerock.openam.entitlement.ResourceType;
-import org.forgerock.util.Reject;
-
-import javax.security.auth.Subject;
 
 /**
  * Utility methods for managing entitlements.
@@ -348,7 +354,7 @@ public final class EntitlementUtils {
         try {
             return Long.parseLong(getAttribute(data, attributeName));
         } catch (NumberFormatException e) {
-            PrivilegeManager.debug.error("EntitlementService.getDateAttributeAsLong", e);
+            PolicyConstants.DEBUG.error("EntitlementService.getDateAttributeAsLong", e);
             return new Date().getTime();
         }
     }
@@ -368,7 +374,7 @@ public final class EntitlementUtils {
      * @return An SSO token.
      */
     public static SSOToken getSSOToken(Subject subject) {
-        if (subject == PrivilegeManager.superAdminSubject) {
+        if (subject == PolicyConstants.SUPER_ADMIN_SUBJECT) {
             return getAdminToken();
         }
         return SubjectUtils.getSSOToken(subject);
@@ -405,7 +411,7 @@ public final class EntitlementUtils {
         try {
             return Class.forName(name);
         } catch (ClassNotFoundException ex) {
-            PrivilegeManager.debug.error("EntitlementService.getEntitlementCombiner", ex);
+            PolicyConstants.DEBUG.error("EntitlementService.getEntitlementCombiner", ex);
         }
 
         return DenyOverride.class;

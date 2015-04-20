@@ -28,24 +28,21 @@
  */
 package com.sun.identity.policy;
 
-import com.sun.identity.entitlement.opensso.PrivilegeUtils;
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
-import com.iplanet.sso.SSOException;
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.EntitlementConfiguration;
-import com.sun.identity.policy.interfaces.Subject;
-import com.sun.identity.idm.IdUtils;
-import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.IPrivilege;
 import com.sun.identity.entitlement.PrivilegeIndexStore;
-import com.sun.identity.entitlement.PrivilegeManager;
-import com.sun.identity.entitlement.ReferralPrivilege;
-import com.sun.identity.entitlement.ReferralPrivilegeManager;
+import com.sun.identity.entitlement.opensso.PrivilegeUtils;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdUtils;
+import com.sun.identity.policy.interfaces.Subject;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.ldap.util.DN;
@@ -62,21 +59,23 @@ import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceNotFoundException;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.openam.entitlement.PolicyConstants;
+import org.forgerock.openam.shared.concurrency.LockFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+
 import java.io.ByteArrayInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
-import org.forgerock.openam.shared.concurrency.LockFactory;
-import org.w3c.dom.Node;
-import org.w3c.dom.Document;
 
 /**
  * The <code>PolicyManager</code> class manages policies
@@ -1290,7 +1289,7 @@ public final class PolicyManager {
             DNMapper.orgNameToRealmName(realm) :realm;
 
         Application appl = ApplicationManager.getApplication(
-            PrivilegeManager.superAdminSubject, realmName, serviceName);
+            PolicyConstants.SUPER_ADMIN_SUBJECT, realmName, serviceName);
         com.sun.identity.entitlement.interfaces.ResourceName resComp = appl.
             getResourceComparator();
         resourceName = resComp.canonicalize(resourceName);
