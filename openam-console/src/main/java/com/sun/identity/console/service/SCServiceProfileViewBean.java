@@ -140,7 +140,7 @@ public class SCServiceProfileViewBean extends ScriptValidatorViewBean {
                     SMSubConfig conf = (SMSubConfig)iter.next();
                     tblModel.setValue(
                         AMPropertySheetModel.TBL_SUB_CONFIG_DATA_NAME,
-                        conf.getName());
+                        conf.getLocalizedName() == null ? conf.getName() : conf.getLocalizedName());
                     tblModel.setValue(
                         AMPropertySheetModel.TBL_SUB_CONFIG_HREF_NAME,
                         conf.getName());

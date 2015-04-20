@@ -41,7 +41,7 @@ public class ScriptsViewBean extends RealmPropertiesBase implements HasEntitiesT
     public static final String DEFAULT_DISPLAY_URL = "/console/scripts/Scripts.jsp";
 
     public static final String ROOT_REALM = "/";
-    public static final String SCRIPTS_EDITOR = "{0}/scripts/#list{1}";
+    public static final String SCRIPTS_EDITOR = "{0}/scripts/{1}#list";
     public static final String SCRIPTS_REALM = "?realm={0}";
 
     private static final Debug debug = Debug.getInstance("amConsole");

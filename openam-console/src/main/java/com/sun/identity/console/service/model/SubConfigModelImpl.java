@@ -24,6 +24,7 @@
  *
  * $Id: SubConfigModelImpl.java,v 1.3 2008/06/25 05:43:19 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.service.model;
@@ -62,6 +63,7 @@ public class SubConfigModelImpl
     private String serviceName;
     private String parentId;
     private SubConfigPropertyXMLBuilder xmlBuilder;
+    private String displayName;
 
     private static Set SCHEMA_TYPE = new HashSet();
     static {
@@ -87,6 +89,7 @@ public class SubConfigModelImpl
         this.parentId = parentId;
         subConfigMeta = new SubConfigMeta(serviceName, this);
         subConfigMeta.setParentId(parentId);
+        displayName = subConfigMeta.getParentDisplayName();
     }
 
     /** 
@@ -306,5 +309,10 @@ public class SubConfigModelImpl
             }
         }
         return names;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return displayName;
     }
 }

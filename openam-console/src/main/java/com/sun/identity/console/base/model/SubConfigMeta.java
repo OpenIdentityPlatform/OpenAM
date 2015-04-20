@@ -24,19 +24,24 @@
  *
  * $Id: SubConfigMeta.java,v 1.2 2008/06/25 05:42:50 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.base.model;
 
+import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.locale.Locale;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.sm.AttributeSchema;
+import com.sun.identity.sm.SMSUtils;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import com.sun.identity.sm.SMSException;
+import org.forgerock.openam.utils.StringUtils;
+
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -219,6 +224,17 @@ public class SubConfigMeta {
         }
     }
 
+    /**
+     * Get the parent configuration's display name. It will check if the service configuration
+     * has an internationalization key and if it does, the localised name will be returned.
+     * Otherwise the config name itself will be returned.
+     * @return The parent configuration's display name.
+     */
+    public String getParentDisplayName() {
+        String i18nKey =  CollectionHelper.getMapAttr(parentConfig.getAttributes(), SMSUtils.I18N_KEY);
+        return StringUtils.isEmpty(i18nKey) ? parentConfig.getName() : getLocalizedString(i18nKey);
+    }
+
     private void getSupportedGlobalSubSchema() {
         try {
             globalSubSchemaNames = corrSchema.getSubSchemaNames();
@@ -237,9 +253,7 @@ public class SubConfigMeta {
                     if ((i18nKey == null) || (i18nKey.trim().length() == 0)) {
                         i.remove();
                     } else {
-                        mapServiceSchemaNameToL10NName.put(name,
-                            Locale.getString(serviceResourceBundle,
-                                i18nKey, AMModelBase.debug));
+                        mapServiceSchemaNameToL10NName.put(name, getLocalizedString(i18nKey));
                         if (!ss.supportsMultipleConfigurations()) {
                             singleInstanceGlobalSubSchemas.add(name);
                         }
@@ -249,6 +263,10 @@ public class SubConfigMeta {
         } catch (SMSException e) {
             AMModelBase.debug.error("SubConfigMeta.getSupportedGlobalSubSchema" ,e);
         }
+    }
+
+    private String getLocalizedString(String key) {
+        return StringUtils.isEmpty(key) ? null : Locale.getString(serviceResourceBundle, key, AMModelBase.debug);
     }
 
     private void getCorrespondingSchema(String parentId)
@@ -296,8 +314,9 @@ public class SubConfigMeta {
                     if (globalSubSchemaNames.contains(schemaID)) {
                         String displayType = (String)
                             mapServiceSchemaNameToL10NName.get(schemaID);
-                        set.add(new SMSubConfig(
-                            conf.getComponentName(), name, displayType));
+                        String localizedName = getLocalizedString(
+                                CollectionHelper.getMapAttr(conf.getAttributes(), SMSUtils.I18N_KEY));
+                        set.add(new SMSubConfig(conf.getComponentName(), name, displayType, localizedName));
                         if (singleInstanceGlobalSubSchemas.contains(schemaID)) {
                             creatableGlobalSubSchemas.remove(schemaID);
                         }

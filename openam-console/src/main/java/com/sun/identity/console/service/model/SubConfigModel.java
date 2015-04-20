@@ -24,6 +24,7 @@
  *
  * $Id: SubConfigModel.java,v 1.3 2008/06/25 05:43:19 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.service.model;
@@ -151,4 +152,10 @@ public interface SubConfigModel
      * @return a set of possible names of sub configuration.
      */
     Set getSelectableConfigNames(String subSchemaName);
+
+    /**
+     * Get the display name for the sub configuration represented by this model.
+     * @return the sub configuration's display name.
+     */
+    String getDisplayName();
 }

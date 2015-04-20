@@ -24,6 +24,7 @@
  *
  * $Id: SubConfigEditViewBean.java,v 1.2 2008/06/25 05:43:17 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.service;
@@ -157,7 +158,7 @@ public class SubConfigEditViewBean
                     SMSubConfig conf = (SMSubConfig)iter.next();
                     tblModel.setValue(
                         AMPropertySheetModel.TBL_SUB_CONFIG_DATA_NAME,
-                        conf.getName());
+                        conf.getLocalizedName() == null ? conf.getName() : conf.getLocalizedName());
                     tblModel.setValue(
                         AMPropertySheetModel.TBL_SUB_CONFIG_HREF_NAME,
                         conf.getName());
@@ -242,13 +243,8 @@ public class SubConfigEditViewBean
             }
         }
 
-        List parentIds = (List)getPageSessionAttribute(
-            AMServiceProfile.PG_SESSION_SUB_CONFIG_IDS);
-        String parentId = (String)parentIds.get(0);
-        String[] param = {parentId};
         ptModel.setPageTitleText(MessageFormat.format(
-            model.getLocalizedString("page.title.services.edit.subconfig"),
-            (Object[])param));
+            model.getLocalizedString("page.title.services.edit.subconfig"), model.getDisplayName()));
     }
 
     private String getParentId() {

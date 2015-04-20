@@ -38,6 +38,7 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <SubSchema name="scriptContext" inheritance="multiple" resourceName="contexts">
+                    <AttributeSchema name="i18nKey" type="single"/>
                     <AttributeSchema name="languages" type="list" syntax="string" i18nKey="st101">
                         <DefaultValues>
                             <Value>JAVASCRIPT</Value>
@@ -53,6 +54,7 @@
                                      type="single" syntax="script" validator="ScriptValidator" i18nKey="st103">
                     </AttributeSchema>
                     <SubSchema name="engineConfiguration" i18nKey="ec100">
+                        <AttributeSchema name="i18nKey" type="single"/>
                         <AttributeSchema name="serverTimeout"
                                          type="single" syntax="number_range" rangeStart="0"
                                          rangeEnd="2147483647" i18nKey="ec101">
@@ -161,23 +163,40 @@
 
         <Configuration>
             <GlobalConfiguration>
-                <SubConfiguration name="AUTHORIZATION_ENTITLEMENT_CONDITION" id="scriptContext" i18nKey="script-type-01">
+                <SubConfiguration name="AUTHORIZATION_ENTITLEMENT_CONDITION" id="scriptContext" i18nKey="someKey">
+                    <AttributeValuePair>
+                        <Attribute name="i18nKey"/>
+                        <Value>script-type-01</Value>
+                    </AttributeValuePair>
                     <AttributeValuePair>
                         <Attribute name="defaultScript"/>
                         <Value>
                             // Server-side Authorization Entitlement Conditions script
                         </Value>
                     </AttributeValuePair>
-                    <SubConfiguration name="EngineConfiguration" id="engineConfiguration"/>
+                    <SubConfiguration name="engineConfiguration" id="engineConfiguration">
+                        <AttributeValuePair>
+                            <Attribute name="i18nKey"/>
+                            <Value>engine-configuration</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
                 </SubConfiguration>
-                <SubConfiguration name="AUTHENTICATION_SERVER_SIDE" id="scriptContext" i18nKey="script-type-02">
+                <SubConfiguration name="AUTHENTICATION_SERVER_SIDE" id="scriptContext">
+                    <AttributeValuePair>
+                        <Attribute name="i18nKey"/>
+                        <Value>script-type-02</Value>
+                    </AttributeValuePair>
                     <AttributeValuePair>
                         <Attribute name="defaultScript"/>
                         <Value>
                             // Server-side Authentication script
                         </Value>
                     </AttributeValuePair>
-                    <SubConfiguration name="EngineConfiguration" id="engineConfiguration">
+                    <SubConfiguration name="engineConfiguration" id="engineConfiguration">
+                        <AttributeValuePair>
+                            <Attribute name="i18nKey"/>
+                            <Value>engine-configuration</Value>
+                        </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="whiteList"/>
                             <Value>java.lang.Boolean</Value>
@@ -213,7 +232,11 @@
                         </AttributeValuePair>
                     </SubConfiguration>
                 </SubConfiguration>
-                <SubConfiguration name="AUTHENTICATION_CLIENT_SIDE" id="scriptContext" i18nKey="script-type-03">
+                <SubConfiguration name="AUTHENTICATION_CLIENT_SIDE" id="scriptContext">
+                    <AttributeValuePair>
+                        <Attribute name="i18nKey"/>
+                        <Value>script-type-03</Value>
+                    </AttributeValuePair>
                     <AttributeValuePair>
                         <Attribute name="languages"/>
                         <Value>JAVASCRIPT</Value>

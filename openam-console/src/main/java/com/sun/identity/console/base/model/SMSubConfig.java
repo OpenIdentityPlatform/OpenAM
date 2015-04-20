@@ -24,6 +24,7 @@
  *
  * $Id: SMSubConfig.java,v 1.2 2008/06/25 05:42:50 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.base.model;
@@ -39,6 +40,7 @@ public class SMSubConfig
     private String id;
     private String name;
     private String type;
+    private String localizedName;
 
     private SMSubConfig() {
     }
@@ -50,10 +52,22 @@ public class SMSubConfig
      * @param name Name of the sub configuration.
      * @param type Type of the sub configuration.
      */
-    public SMSubConfig(String id, String name, String type) {
+    public SMSubConfig(String id, String name, String type, String localizedName) {
         this.id = id;
         this.name = name;
         this.type = type;
+        this.localizedName = localizedName;
+    }
+
+    /**
+     * Creates an instance of <code>SMSubConfig</code>.
+     *
+     * @param id ID of the sub configuration.
+     * @param name Name of the sub configuration.
+     * @param type Type of the sub configuration.
+     */
+    public SMSubConfig(String id, String name, String type) {
+        this(id, name, type, null);
     }
 
     /**
@@ -81,5 +95,14 @@ public class SMSubConfig
      */
     public String getType() {
         return type;
+    }
+
+    /**
+     * Get the localized name.
+     *
+     * @return The localized name.
+     */
+    public String getLocalizedName() {
+        return localizedName;
     }
 }

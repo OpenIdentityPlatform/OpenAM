@@ -62,6 +62,8 @@ public class SMSUtils {
     public static final String ORG_ATTRIBUTE_VALUE_PAIR =
         "OrganizationAttributeValuePair";
 
+    public static final String I18N_KEY = "i18nKey";
+
     public static final String ORG_CONFIG = "OrganizationConfiguration";
 
     public static final String DYNAMIC_SCHEMA = "Dynamic";
@@ -100,8 +102,6 @@ public class SMSUtils {
 
     protected static final String PROPERTIES_VIEW_BEAN_URL =
         "propertiesViewBeanURL";
-
-    protected static final String I18N_KEY = "i18nKey";
 
     protected static final String REVISION_NUMBER = "revisionNumber";
 
