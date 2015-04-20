@@ -132,8 +132,6 @@ public class ServerConfigMgr {
         "com.iplanet.coreservices.configpath";
     private static boolean isAMSDKConfigured;
     
-    private boolean isLegacy;
-    
     private static ResourceBundle i18n = ResourceBundle.getBundle(
         RESOURCE_BUNDLE_NAME);
     private static Debug debug;
@@ -151,7 +149,6 @@ public class ServerConfigMgr {
     public ServerConfigMgr() throws Exception {
         ssoToken = (SSOToken)AccessController.doPrivileged(
             AdminTokenAction.getInstance());
-        isLegacy = ServerConfiguration.isLegacy();
         isAMSDKConfigured = ServiceManager.isAMSDKConfigured();
         getServerConfigXMLDoc();
     }
@@ -161,15 +158,9 @@ public class ServerConfigMgr {
         InputStream is = null;
         
         try {
-            if (isLegacy) {
-                configFile = getServiceConfigXMLFileLocation();
-                is = new FileInputStream(configFile);
-            } else {
-                String strXML = ServerConfiguration.getServerConfigXML(ssoToken,
-                    SystemProperties.getServerInstanceName());
-                is = new ByteArrayInputStream(strXML.getBytes());
-            }
-            
+            String strXML = ServerConfiguration.getServerConfigXML(ssoToken, SystemProperties.getServerInstanceName());
+            is = new ByteArrayInputStream(strXML.getBytes());
+
             Document document = XMLUtils.getXMLDocument(is);
             if (document == null) {
                 throw (new XMLException(
@@ -206,14 +197,9 @@ public class ServerConfigMgr {
         InputStream is = null;
         
         try {
-            if (isLegacy) {
-                is = new FileInputStream(configFile);
-            } else {
-                String strXML = ServerConfiguration.getServerConfigXML(ssoToken,
-                    SystemProperties.getServerInstanceName());
-                is = new ByteArrayInputStream(strXML.getBytes());
-            }
-            
+            String strXML = ServerConfiguration.getServerConfigXML(ssoToken, SystemProperties.getServerInstanceName());
+            is = new ByteArrayInputStream(strXML.getBytes());
+
             BufferedReader in = new BufferedReader(new InputStreamReader(is));
             String line = in.readLine();
             
@@ -485,9 +471,7 @@ public class ServerConfigMgr {
     public void setAdminUserPassword(String oldPassword, String newPassword)
     throws Exception {
         changePassword(DSConfigMgr.VAL_AUTH_ADMIN, oldPassword, newPassword);
-        if (!isLegacy) {
-            Bootstrap.modifyDSAMEUserPassword(newPassword);
-        }
+        Bootstrap.modifyDSAMEUserPassword(newPassword);
     }
     
     /**
@@ -504,14 +488,7 @@ public class ServerConfigMgr {
     public void save() throws Exception {
         String xml = strXMLDeclarationHdr + SMSSchema.nodeToString(root);
         
-        if (isLegacy) {
-            PrintWriter out = new PrintWriter(new FileOutputStream(configFile));
-            out.print(xml);
-            out.close();
-        } else {
-            ServerConfiguration.setServerConfigXML(ssoToken,
-                SystemProperties.getServerInstanceName(), xml);
-        }
+        ServerConfiguration.setServerConfigXML(ssoToken, SystemProperties.getServerInstanceName(), xml);
     }
     
     /**

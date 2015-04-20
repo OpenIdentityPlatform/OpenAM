@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: AddSiteFailoverURLs.java,v 1.4 2008/09/19 23:36:42 beomsuk Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.cli.serverconfig;
@@ -64,12 +65,6 @@ public class AddSiteFailoverURLs extends ServerConfigBase {
         String[] params = {siteName};
         
         try {
-            if (SiteConfiguration.isLegacy(adminSSOToken)) {
-                outputWriter.printMessage(getResourceString(
-                    "serverconfig-no-supported"));
-                return;
-            }
-            
             writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                 "ATTEMPT_ADD_SITE_FAILOVER_URLS", params);
             if (SiteConfiguration.isSiteExist(adminSSOToken, siteName)) {

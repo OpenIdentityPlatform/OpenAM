@@ -24,10 +24,7 @@
 
    $Id: showServerConfig.jsp,v 1.11 2008/11/25 18:16:57 veiming Exp $
 
---%>
-
-<%--
-   Portions copyright 2010-2014 ForgeRock AS.
+   Portions copyright 2010-2015 ForgeRock AS.
 --%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -198,11 +195,7 @@
         </td>
         <td>
 <%
-        if (!ServerConfiguration.isLegacy(ssoToken)) {
-            out.println("Realm");
-        } else {
-            out.println("Legacy");
-        }
+        out.println("Realm");
 %>
         </td>
         </tr>

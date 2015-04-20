@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: ServerEditViewBeanBase.java,v 1.3 2008/09/11 16:33:16 veiming Exp $
  *
- * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.service;
@@ -215,20 +215,6 @@ public abstract class ServerEditViewBeanBase
         }
         registerChild(TAB_COMMON, CCTabs.class);
     }
-/*
-    void validateTabsModel(ServerSiteModel model, CCTabsModel tabModel) {
-        try {
-            if (!ServerConfiguration.isLegacy(model.getUserSSOToken())) {
-                tabModel.removeNode(tabModel.getNodeById(42));
-            }
-        } catch (SSOException e) {
-            AMModelBase.debug.error(
-                "ServerEditViewBeanBase.validateTabsModel", e);
-        } catch (SMSException e) {
-            AMModelBase.debug.error(
-                "ServerEditViewBeanBase.validateTabsModel", e);
-        }
-    }*/
 
     public boolean beginBtnInheritDisplay(ChildDisplayEvent event) {
         String serverName = (String)getPageSessionAttribute(

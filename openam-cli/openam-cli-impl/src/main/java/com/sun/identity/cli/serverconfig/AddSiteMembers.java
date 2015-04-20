@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: AddSiteMembers.java,v 1.4 2009/06/15 19:20:43 veiming Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.cli.serverconfig;
@@ -62,12 +63,6 @@ public class AddSiteMembers extends ServerConfigBase {
         IOutput outputWriter = getOutputWriter();
         
         try {
-            if (SiteConfiguration.isLegacy(adminSSOToken)) {
-                outputWriter.printMessage(getResourceString(
-                    "serverconfig-no-supported"));
-                return;
-            }
-            
             String[] params = {siteName};
             writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                 "ATTEMPT_ADD_SITE_MEMBERS", params);

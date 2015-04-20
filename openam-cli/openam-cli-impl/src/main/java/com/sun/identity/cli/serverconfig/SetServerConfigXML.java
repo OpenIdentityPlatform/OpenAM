@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: SetServerConfigXML.java,v 1.6 2008/10/30 18:25:03 veiming Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.cli.serverconfig;
@@ -63,12 +64,6 @@ public class SetServerConfigXML extends ServerConfigBase {
         IOutput outputWriter = getOutputWriter();
         
         try {
-            if (ServerConfiguration.isLegacy(adminSSOToken)) {
-                outputWriter.printMessage(getResourceString(
-                    "serverconfig-no-supported"));
-                return;
-            }
-            
             String[] params = {serverName};
             writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                 "ATTEMPT_SET_SERVER_CONFIG_XML", params);

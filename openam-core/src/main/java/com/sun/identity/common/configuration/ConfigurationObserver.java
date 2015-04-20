@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,9 @@
  *
  * $Id: ConfigurationObserver.java,v 1.5 2008/06/25 05:42:27 qcheng Exp $
  *
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  */
-/**
- * Portions Copyrighted 2012 ForgeRock Inc
- */
+
 package com.sun.identity.common.configuration;
 
 import com.iplanet.am.util.SystemProperties;
@@ -73,9 +72,7 @@ public class ConfigurationObserver implements ServiceListener {
     private void createAttributeMapping() {
         // this does not apply client mode because client's property
         // never get store in SMS services
-        if (SystemProperties.isServerMode() &&
-            !ServerConfiguration.isLegacy()
-        ) {
+        if (SystemProperties.isServerMode()) {
             Map attributeMap = SystemProperties.getAttributeMap();
             for (Iterator i = attributeMap.values().iterator(); i.hasNext(); ) {
                 AttributeStruct a = (AttributeStruct)i.next();

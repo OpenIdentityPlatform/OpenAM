@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: SFOConfigValidator.java,v 1.1 2008/11/22 02:41:22 ak138937 Exp $
  *
- */
-
-/**
- * Portions copyright 2013 ForgeRock, Inc.
+ * Portions Copyright 2013-2015 ForgeRock AS.
  */
 
 package com.sun.identity.diagnostic.plugin.services.server;
@@ -111,10 +108,7 @@ public class SFOConfigValidator extends ServerConfigBase {
             ServiceConfigManager scm = new ServiceConfigManager(
                 amSessionService, ssoToken);
             ServiceConfig serviceConfig = scm.getGlobalConfig(null);
-            String subCfgName = (ServerConfiguration.isLegacy(ssoToken)) ?
-                getSessionServerURL() :
-                SiteConfiguration.getSiteIdByURL(ssoToken,
-                getSessionServerURL());
+            String subCfgName = SiteConfiguration.getSiteIdByURL(ssoToken, getSessionServerURL());
             ServiceConfig subConfig = serviceConfig.getSubConfig(subCfgName);            
             String[] params = {getSessionServerURL()};
             if (subConfig != null) {

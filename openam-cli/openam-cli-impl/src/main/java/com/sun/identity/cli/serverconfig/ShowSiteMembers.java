@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: ShowSiteMembers.java,v 1.5 2009/07/07 06:14:12 veiming Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.cli.serverconfig;
@@ -67,13 +68,7 @@ public class ShowSiteMembers extends ServerConfigBase {
         IOutput outputWriter = getOutputWriter();
         
         try {
-            if (SiteConfiguration.isLegacy(adminSSOToken)) {
-                outputWriter.printMessage(getResourceString(
-                    "serverconfig-no-supported"));
-                return;
-            }
-
-            Set members = SiteConfiguration.listServers(adminSSOToken, 
+            Set members = SiteConfiguration.listServers(adminSSOToken,
                 siteName);
             if ((members != null) && !members.isEmpty()) {
                 for (Iterator i = members.iterator(); i.hasNext(); ) {

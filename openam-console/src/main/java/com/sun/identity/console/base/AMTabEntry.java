@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,11 @@
  *
  * $Id: AMTabEntry.java,v 1.3 2008/06/25 05:42:47 qcheng Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.base;
 
-import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.console.base.model.AccessControlModel;
 import com.sun.identity.console.base.model.AMModelBase;
 import com.sun.identity.console.base.model.AMConsoleException;
@@ -380,13 +380,8 @@ public class AMTabEntry {
             Node child = childrenNodes.item(i);
             if (child.getNodeName().equalsIgnoreCase("tab")) {
                 AMTabEntry childTab = new AMTabEntry(child);
-                /// 42 is Site and Server Sub tab
-                if (!ServerConfiguration.isLegacy() ||
-                    (childTab.getID() != 42)
-                ){
-                    childTab.parentNode = this;
-                    children.add(childTab);
-                }
+                childTab.parentNode = this;
+                children.add(childTab);
             }
         }
     }

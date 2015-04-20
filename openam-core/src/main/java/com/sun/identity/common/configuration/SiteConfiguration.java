@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,23 +24,17 @@
  *
  * $Id: SiteConfiguration.java,v 1.12 2010/01/15 18:10:55 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.common.configuration;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.FQDNUrl;
 import com.sun.identity.shared.NormalizedURL;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.ServiceSchemaManager;
 import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.Collections;
@@ -113,20 +107,14 @@ public class SiteConfiguration extends ConfigurationBase {
      */
     public static Set getSiteInfo(SSOToken ssoToken) 
         throws SMSException, SSOException {
-        Set siteInfo = null;
-        
-        if (isLegacy(ssoToken)) {
-            siteInfo = legacyGetSiteInfo(ssoToken);
-        } else {
-            siteInfo = new HashSet();
-            ServiceConfig sc = getRootSiteConfig(ssoToken);
-            if (sc != null) {
-                Set names = sc.getSubConfigNames();
-                
-                for (Iterator i = names.iterator(); i.hasNext(); ) {
-                    String name = (String)i.next();
-                    siteInfo.addAll(getSiteInfo(sc, name));
-                }
+        Set siteInfo = new HashSet();
+        ServiceConfig sc = getRootSiteConfig(ssoToken);
+        if (sc != null) {
+            Set names = sc.getSubConfigNames();
+
+            for (Iterator i = names.iterator(); i.hasNext(); ) {
+                String name = (String)i.next();
+                siteInfo.addAll(getSiteInfo(sc, name));
             }
         }
         return siteInfo;
@@ -175,23 +163,9 @@ public class SiteConfiguration extends ConfigurationBase {
         throws SMSException, SSOException {
         Set sites = new HashSet();
 
-        if (isLegacy(ssoToken)) {
-            Set siteInfo = legacyGetSiteInfo(ssoToken);
-            if ((siteInfo != null) && !siteInfo.isEmpty()) {
-                for (Iterator i = siteInfo.iterator(); i.hasNext(); ) {
-                    String site = (String)i.next();
-                    int idx = site.indexOf('|');
-                    if (idx != -1) {
-                        site = site.substring(0, idx);
-                    }
-                    sites.add(site);
-                }
-            }
-        } else {
-            ServiceConfig sc = getRootSiteConfig(ssoToken);
-            if (sc != null) {
-                sites.addAll(sc.getSubConfigNames("*"));
-            }
+        ServiceConfig sc = getRootSiteConfig(ssoToken);
+        if (sc != null) {
+            sites.addAll(sc.getSubConfigNames("*"));
         }
         return sites;
     }
@@ -212,38 +186,17 @@ public class SiteConfiguration extends ConfigurationBase {
     ) throws SMSException, SSOException, ConfigurationException {
         boolean deleted = false;
         
-        if (isLegacy(ssoToken)) {
-            ServiceSchemaManager sm = new ServiceSchemaManager(
-                Constants.SVC_NAME_PLATFORM, ssoToken);
-            ServiceSchema sc = sm.getGlobalSchema();
-            Map attrs = sc.getAttributeDefaults();
-            String site = siteName + "|";
-            Set sites = (Set)attrs.get(OLD_ATTR_SITE_LIST);
+        ServiceConfig sc = getRootSiteConfig(ssoToken);
 
-            for (Iterator i = sites.iterator(); i.hasNext() && !deleted; ) {
-                String s = (String)i.next();
-                if (s.startsWith(site)) {
-                    i.remove();
-                    deleted = true;
+        if (sc != null) {
+            ServiceConfig cfg = sc.getSubConfig(siteName);
+            if (cfg != null) {
+                Set svrs = listServers(ssoToken, siteName);
+                if ((svrs != null) && !svrs.isEmpty()) {
+                    removeServersFromSite(ssoToken, siteName, svrs);
                 }
-            }
-
-            if (deleted) {
-                sc.setAttributeDefaults(OLD_ATTR_SITE_LIST, sites);
-            }
-        } else {
-            ServiceConfig sc = getRootSiteConfig(ssoToken);
-            
-            if (sc != null) {
-                ServiceConfig cfg = sc.getSubConfig(siteName);
-                if (cfg != null) {
-                    Set svrs = listServers(ssoToken, siteName);
-                    if ((svrs != null) && !svrs.isEmpty()) {
-                        removeServersFromSite(ssoToken, siteName, svrs);
-                    }
-                    sc.removeSubConfig(siteName);
-                    deleted = true;
-                } 
+                sc.removeSubConfig(siteName);
+                deleted = true;
             }
         }
 
@@ -283,27 +236,11 @@ public class SiteConfiguration extends ConfigurationBase {
             }
         }
 
-        if (isLegacy(ssoToken)) {
-            ServiceSchemaManager sm = new ServiceSchemaManager(
-                Constants.SVC_NAME_PLATFORM, ssoToken);
+        ServiceConfig sc = getRootSiteConfig(ssoToken);
+
+        if (sc != null) {
             String siteId = getNextId(ssoToken);
-            ServiceSchema sc = sm.getGlobalSchema();
-            Map attrs = sc.getAttributeDefaults();
-            Set sites = (Set)attrs.get(OLD_ATTR_SITE_LIST);
-            //need to do this because we are getting Collections.EMPTY.SET;
-            if ((sites == null) || sites.isEmpty()) {
-                sites = new HashSet();
-            }
-            sites.add(siteName + "|" + siteId);
-            sc.setAttributeDefaults(OLD_ATTR_SITE_LIST, sites);
-        } else {
-            ServiceConfig sc = getRootSiteConfig(ssoToken);
-            
-            if (sc != null) {
-                String siteId = getNextId(ssoToken);
-                created = createSite(ssoToken, siteName, siteURL, siteId,
-                    secondaryURLs);
-            }
+            created = createSite(ssoToken, siteName, siteURL, siteId, secondaryURLs);
         }
 
         if (created) {
@@ -801,33 +738,9 @@ public class SiteConfiguration extends ConfigurationBase {
         throws SMSException, SSOException, ConfigurationException {
         String siteId = null;
 
-        if (isLegacy(ssoToken)) {
-            Set sites = legacyGetSiteInfo(ssoToken);
-            if ((sites != null) && !sites.isEmpty()) {
-                for (Iterator i = sites.iterator();
-                    i.hasNext() && (siteId == null);
-                ) {
-                    String site = (String)i.next();
-                    int idx = site.indexOf('|');
-                    if (idx != -1) {
-                        String name = site.substring(0, idx);
-                        if (name.equals(siteName)) {
-                            siteId = site.substring(idx+1);
-                            idx = siteId.indexOf('|');
-
-                            if (idx != -1) {
-                                siteId = siteId.substring(0, idx);
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
-            Set siteIds = getSiteConfigurationIds(
-                ssoToken, null, siteName, true);
-            if ((siteIds != null) && !siteIds.isEmpty()) {
-                siteId = (String)siteIds.iterator().next();
-            }
+        Set siteIds = getSiteConfigurationIds(ssoToken, null, siteName, true);
+        if (siteIds != null && !siteIds.isEmpty()) {
+            siteId = (String) siteIds.iterator().next();
         }
 
         if (siteId == null) {

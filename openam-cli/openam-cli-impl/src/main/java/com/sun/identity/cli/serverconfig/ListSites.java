@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: ListSites.java,v 1.4 2008/09/19 23:37:14 beomsuk Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.cli.serverconfig;
@@ -59,12 +60,6 @@ public class ListSites extends ServerConfigBase {
         IOutput outputWriter = getOutputWriter();
         
         try {
-            if (SiteConfiguration.isLegacy(adminSSOToken)) {
-                outputWriter.printMessage(getResourceString(
-                    "serverconfig-no-supported"));
-                return;
-            }
-
             writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                 "ATTEMPT_LIST_SITES", null);
             Set sites = SiteConfiguration.getSites(adminSSOToken);

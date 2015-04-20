@@ -199,7 +199,7 @@ public class AMSetupServlet extends HttpServlet {
         LoginLogoutMapping.setProductInitialized(isConfiguredFlag);
         registerListeners();
         
-        if (isConfiguredFlag && !ServerConfiguration.isLegacy()) { 
+        if (isConfiguredFlag) {
             // this will sync up bootstrap file will serverconfig.xml
             // due startup; and also register the observer.
             ServerConfigXMLObserver.getInstance().update(true);
@@ -600,83 +600,80 @@ public class AMSetupServlet extends HttpServlet {
             registerListeners();
             
             if (isConfiguredFlag) {
-                boolean legacy = ServerConfiguration.isLegacy();
                 String fileBootstrap = getBootstrapLocator();
                 if (fileBootstrap != null) {
                    writeToFileEx(fileBootstrap, basedir);
                 }
 
-                if (!legacy) {
-                    // this will write bootstrap file after configuration is 
-                    // done; and also register the observer.
-                    ServerConfigXMLObserver.getInstance().update(true);
-                    // register our other observers
-                    SMSPropertiesObserver.getInstance().notifyChanges();
-                    DebugPropertiesObserver.getInstance().notifyChanges();
-                    Map<String, Set<String>> mapBootstrap = new HashMap<String, Set<String>>(2);
-                    Set<String> set = new HashSet<String>(2);
+                // this will write bootstrap file after configuration is
+                // done; and also register the observer.
+                ServerConfigXMLObserver.getInstance().update(true);
+                // register our other observers
+                SMSPropertiesObserver.getInstance().notifyChanges();
+                DebugPropertiesObserver.getInstance().notifyChanges();
+                Map<String, Set<String>> mapBootstrap = new HashMap<String, Set<String>>(2);
+                Set<String> set = new HashSet<String>(2);
+                set.add(fileBootstrap);
+                mapBootstrap.put(BOOTSTRAP_FILE_LOC, set);
+
+                if (fileBootstrap == null) {
+                    set.add(getPresetConfigDir());
+                } else {
                     set.add(fileBootstrap);
-                    mapBootstrap.put(BOOTSTRAP_FILE_LOC, set);
-
-                    if (fileBootstrap == null) {
-                        set.add(getPresetConfigDir());
-                    } else {
-                        set.add(fileBootstrap); 
-                    }
-                    // this is to store the bootstrap location
-                    String serverInstanceName = SystemProperties.getServerInstanceName();
-
-                    SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
-                    ServerConfiguration.setServerInstance(adminToken, serverInstanceName, mapBootstrap);
-
-                    // store the ds admin port if we are running in embedded mode
-                    String dataStore = (String) map.get(SetupConstants.CONFIG_VAR_DATA_STORE);
-
-                    if (dataStore.equals(SetupConstants.SMS_EMBED_DATASTORE)) {
-                        String dsAdminPort = (String) map.get(SetupConstants.CONFIG_VAR_DIRECTORY_ADMIN_SERVER_PORT);
-                        Map<String, Set<String>> mapAdminPort = new HashMap<String, Set<String>>(2);
-                        Set<String> set2 = new HashSet<String>(2);
-                        set2.add(dsAdminPort);
-                        mapAdminPort.put(Constants.DS_ADMIN_PORT, set2);
-                        ServerConfiguration.setServerInstance(adminToken, serverInstanceName, mapAdminPort);
-                    }
-
-                    // setup site configuration information
-                    if (siteMap != null && !siteMap.isEmpty()) {
-                        String site = (String) siteMap.get( SetupConstants.LB_SITE_NAME);
-                        String primaryURL = (String) siteMap.get(SetupConstants.LB_PRIMARY_URL);
-                        Boolean isSessionHASFOEnabled = Boolean.valueOf(
-                                (String) siteMap.get(SetupConstants.LB_SESSION_HA_SFO));
-
-                        /* 
-                         * If primary url is null that means we are adding
-                         * to an existing site. we don't need to create it 
-                         * first.
-                         */
-                        if (primaryURL != null && primaryURL.length() > 0) {
-                            Set<String> sites = SiteConfiguration.getSites(adminToken);
-                            if (!sites.contains(site)) {
-                                SiteConfiguration.createSite(adminToken, site, primaryURL, Collections.EMPTY_SET);
-                            }
-                        } 
-
-                        if (!ServerConfiguration.belongToSite(adminToken, serverInstanceName, site)) {
-                            ServerConfiguration.addToSite(adminToken, serverInstanceName, site);
-                        }
-
-                        //configure SFO (enabled/disabled) by creating a subconfiguration for the site
-                        Map<String, Set<String>> values = new HashMap<String, Set<String>>(1);
-                        values.put(CoreTokenConstants.IS_SFO_ENABLED, asSet(isSessionHASFOEnabled.toString()));
-                        createSFOSubConfig(adminToken, site, values);
-                    }
-                    if (EmbeddedOpenDS.isMultiServer(map)) {
-                        // Setup Replication port in SMS for each server
-                        updateReplPortInfo(map);
-                    }
-                    EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-                            SubjectUtils.createSuperAdminSubject(), "/");
-                    ec.reindexApplications();
                 }
+                // this is to store the bootstrap location
+                String serverInstanceName = SystemProperties.getServerInstanceName();
+
+                SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
+                ServerConfiguration.setServerInstance(adminToken, serverInstanceName, mapBootstrap);
+
+                // store the ds admin port if we are running in embedded mode
+                String dataStore = (String) map.get(SetupConstants.CONFIG_VAR_DATA_STORE);
+
+                if (dataStore.equals(SetupConstants.SMS_EMBED_DATASTORE)) {
+                    String dsAdminPort = (String) map.get(SetupConstants.CONFIG_VAR_DIRECTORY_ADMIN_SERVER_PORT);
+                    Map<String, Set<String>> mapAdminPort = new HashMap<String, Set<String>>(2);
+                    Set<String> set2 = new HashSet<String>(2);
+                    set2.add(dsAdminPort);
+                    mapAdminPort.put(Constants.DS_ADMIN_PORT, set2);
+                    ServerConfiguration.setServerInstance(adminToken, serverInstanceName, mapAdminPort);
+                }
+
+                // setup site configuration information
+                if (siteMap != null && !siteMap.isEmpty()) {
+                    String site = (String) siteMap.get( SetupConstants.LB_SITE_NAME);
+                    String primaryURL = (String) siteMap.get(SetupConstants.LB_PRIMARY_URL);
+                    Boolean isSessionHASFOEnabled = Boolean.valueOf(
+                            (String) siteMap.get(SetupConstants.LB_SESSION_HA_SFO));
+
+                    /*
+                     * If primary url is null that means we are adding
+                     * to an existing site. we don't need to create it
+                     * first.
+                     */
+                    if (primaryURL != null && primaryURL.length() > 0) {
+                        Set<String> sites = SiteConfiguration.getSites(adminToken);
+                        if (!sites.contains(site)) {
+                            SiteConfiguration.createSite(adminToken, site, primaryURL, Collections.EMPTY_SET);
+                        }
+                    }
+
+                    if (!ServerConfiguration.belongToSite(adminToken, serverInstanceName, site)) {
+                        ServerConfiguration.addToSite(adminToken, serverInstanceName, site);
+                    }
+
+                    //configure SFO (enabled/disabled) by creating a subconfiguration for the site
+                    Map<String, Set<String>> values = new HashMap<String, Set<String>>(1);
+                    values.put(CoreTokenConstants.IS_SFO_ENABLED, asSet(isSessionHASFOEnabled.toString()));
+                    createSFOSubConfig(adminToken, site, values);
+                }
+                if (EmbeddedOpenDS.isMultiServer(map)) {
+                    // Setup Replication port in SMS for each server
+                    updateReplPortInfo(map);
+                }
+                EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
+                        SubjectUtils.createSuperAdminSubject(), "/");
+                ec.reindexApplications();
             }
         } catch (Exception e) {
             installLog.write("AMSetupServlet.processRequest: error", e);
@@ -899,31 +896,17 @@ public class AMSetupServlet extends HttpServlet {
             Map propAMConfig, Map<String, Object> map) throws SMSException, SSOException, IOException,
             ConfigurationException {
         SetupProgress.reportStart("configurator.progress.configure.server.instance", null);
-        if (ServerConfiguration.isLegacy(adminSSOToken)) {
-            Map<String, Object> mapProp = ServerConfiguration.getDefaultProperties();
-            mapProp.putAll(propAMConfig);
-            appendLegacyProperties(mapProp);
-            Properties tmp = new Properties();
-            tmp.putAll(mapProp);
-            SystemProperties.initializeProperties(tmp, true, false);
-
-            writeToFile(basedir + "/" + SetupConstants.AMCONFIG_PROPERTIES, mapToString(mapProp));
-            writeToFile(basedir + "/serverconfig.xml", strServerConfigXML);
-            String hostname = (String) map.get(SetupConstants.CONFIG_VAR_SERVER_HOST);
-            updatePlatformServerList(serverInstanceName, hostname);
-        } else {
-            try {
-                if (!isDITLoaded) {
-                    ServerConfiguration.createDefaults(adminSSOToken);
-                }
-                if (!isDITLoaded || !ServerConfiguration.isServerInstanceExist(adminSSOToken, serverInstanceName)) {
-                    ServerConfiguration.createServerInstance(adminSSOToken, serverInstanceName,
-                            ServerConfiguration.getPropertiesSet(strAMConfigProperties), strServerConfigXML);
-                }
-            } catch (UnknownPropertyNameException ex) {
-                // ignore, property names are valid because they are
-                // gotten from template.
+        try {
+            if (!isDITLoaded) {
+                ServerConfiguration.createDefaults(adminSSOToken);
             }
+            if (!isDITLoaded || !ServerConfiguration.isServerInstanceExist(adminSSOToken, serverInstanceName)) {
+                ServerConfiguration.createServerInstance(adminSSOToken, serverInstanceName,
+                        ServerConfiguration.getPropertiesSet(strAMConfigProperties), strServerConfigXML);
+            }
+        } catch (UnknownPropertyNameException ex) {
+            // ignore, property names are valid because they are
+            // gotten from template.
         }
         SetupProgress.reportEnd("emb.done", null);
     }

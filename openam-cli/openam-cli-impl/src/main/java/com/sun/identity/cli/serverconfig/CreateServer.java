@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,9 @@
  *
  * $Id: CreateServer.java,v 1.4 2008/10/30 18:25:03 veiming Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.sun.identity.cli.serverconfig;
 
 import com.iplanet.sso.SSOException;
@@ -87,11 +85,6 @@ public class CreateServer extends ServerConfigBase {
         String[] params = {serverName};
 
         try {
-            if (ServerConfiguration.isLegacy(adminSSOToken)) {
-                outputWriter.printMessage(getResourceString(
-                    "serverconfig-no-supported"));
-                return;
-            }
             writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                 "ATTEMPT_CREATE_SERVER", params);
             if (!ServerConfiguration.isServerInstanceExist(

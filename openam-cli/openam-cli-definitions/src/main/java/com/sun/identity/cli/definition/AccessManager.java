@@ -51,7 +51,6 @@ public class AccessManager {
             "missing-attributevalues=attributevalues and datafile options are missing.",
             "missing-choicevalues=choicevalues and datafile options are missing.",
             "attribute-schema-not-exist=Attribute schema {0} did not exist.",
-            "serverconfig-no-supported=This sub command is not supported because platform service is not upgraded.",
             "application-type-invalid=Application Type {0} is invalid.",
             "actions-required=actions attributes are required. Example: get=true",
             "resources-required=resources attributes are required. This defines the resources that are supported by this application.",

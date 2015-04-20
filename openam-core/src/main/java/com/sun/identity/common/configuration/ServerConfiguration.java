@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,9 @@
  *
  * $Id: ServerConfiguration.java,v 1.16 2010/01/15 18:10:55 veiming Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
-/**
- * Portions Copyrighted 2011-2013 ForgeRock Inc
- */
+
 package com.sun.identity.common.configuration;
 
 import com.iplanet.am.util.SystemProperties;
@@ -100,40 +99,34 @@ public class ServerConfiguration extends ConfigurationBase {
      */
     public static Set getServerInfo(SSOToken ssoToken) 
         throws SMSException, SSOException {
-        Set serverInfo = null;
-        
-        if (isLegacy(ssoToken)) {
-            serverInfo = legacyGetServerInfo(ssoToken);
-        } else {
-            serverInfo = new HashSet();
-            ServiceConfig sc = getRootServerConfig(ssoToken);
+        Set serverInfo = new HashSet();
+        ServiceConfig sc = getRootServerConfig(ssoToken);
 
-            if (sc != null) {
-                Set names = sc.getSubConfigNames();
-                for (Iterator i = names.iterator(); i.hasNext(); ) {
-                    String name = (String)i.next();
-                    ServiceConfig cfg = sc.getSubConfig(name);
-                    Map attrs = cfg.getAttributes();
-                    Set setID = (Set)attrs.get(ATTR_SERVER_ID);
-                    String serverId = (String)setID.iterator().next();
+        if (sc != null) {
+            Set names = sc.getSubConfigNames();
+            for (Iterator i = names.iterator(); i.hasNext(); ) {
+                String name = (String)i.next();
+                ServiceConfig cfg = sc.getSubConfig(name);
+                Map attrs = cfg.getAttributes();
+                Set setID = (Set)attrs.get(ATTR_SERVER_ID);
+                String serverId = (String)setID.iterator().next();
 
-                    if (!serverId.equals(DEFAULT_SERVER_ID)) {
-                        Set setSiteId = (Set)attrs.get(ATTR_PARENT_SITE_ID);
-                        
-                        if ((setSiteId != null) && !setSiteId.isEmpty()) {
-                            String siteName =
-                                (String)setSiteId.iterator().next();
-                            Set ids = getSiteConfigurationIds(
-                                ssoToken, null, siteName, false);
-                            StringBuilder buff = new StringBuilder();
-                            for (Iterator it = ids.iterator(); it.hasNext(); ) {
-                                buff.append("|").append((String)it.next());
-                            }
-                            serverInfo.add(name + "|" +  serverId + 
-                                buff.toString());
-                        } else {
-                            serverInfo.add(name + "|" + serverId);
+                if (!serverId.equals(DEFAULT_SERVER_ID)) {
+                    Set setSiteId = (Set)attrs.get(ATTR_PARENT_SITE_ID);
+
+                    if ((setSiteId != null) && !setSiteId.isEmpty()) {
+                        String siteName =
+                            (String)setSiteId.iterator().next();
+                        Set ids = getSiteConfigurationIds(
+                            ssoToken, null, siteName, false);
+                        StringBuilder buff = new StringBuilder();
+                        for (Iterator it = ids.iterator(); it.hasNext(); ) {
+                            buff.append("|").append((String)it.next());
                         }
+                        serverInfo.add(name + "|" +  serverId +
+                            buff.toString());
+                    } else {
+                        serverInfo.add(name + "|" + serverId);
                     }
                 }
             }
@@ -154,26 +147,24 @@ public class ServerConfiguration extends ConfigurationBase {
         throws SMSException, SSOException, IOException {
         Map results = new HashMap();
 
-        if (!isLegacy(ssoToken)) {
-            ServiceConfig sc = getRootServerConfig(ssoToken);
+        ServiceConfig sc = getRootServerConfig(ssoToken);
 
-            if (sc != null) {
-                Set names = sc.getSubConfigNames("*");
-                for (Iterator i = names.iterator(); i.hasNext(); ) {
-                    String name = (String)i.next();
-                    ServiceConfig cfg = sc.getSubConfig(name);
-                    Map attrs = cfg.getAttributes();
-                    Set setID = (Set)attrs.get(ATTR_SERVER_ID);
-                    String serverId = (String)setID.iterator().next();
+        if (sc != null) {
+            Set names = sc.getSubConfigNames("*");
+            for (Iterator i = names.iterator(); i.hasNext(); ) {
+                String name = (String)i.next();
+                ServiceConfig cfg = sc.getSubConfig(name);
+                Map attrs = cfg.getAttributes();
+                Set setID = (Set)attrs.get(ATTR_SERVER_ID);
+                String serverId = (String)setID.iterator().next();
 
-                    if (!serverId.equals(DEFAULT_SERVER_ID)) {
-                        Properties propMap = getProperties(
-                            (Set)attrs.get(ATTR_SERVER_CONFIG));
-                        String cValue = (String)propMap.get(
-                            Constants.PROPERTY_NAME_LB_COOKIE_VALUE);
-                        if ((cValue != null) && (cValue.length() > 0)) {
-                            results.put(serverId, cValue);
-                        }
+                if (!serverId.equals(DEFAULT_SERVER_ID)) {
+                    Properties propMap = getProperties(
+                        (Set)attrs.get(ATTR_SERVER_CONFIG));
+                    String cValue = (String)propMap.get(
+                        Constants.PROPERTY_NAME_LB_COOKIE_VALUE);
+                    if ((cValue != null) && (cValue.length() > 0)) {
+                        results.put(serverId, cValue);
                     }
                 }
             }
@@ -194,26 +185,10 @@ public class ServerConfiguration extends ConfigurationBase {
     public static Set getServers(SSOToken ssoToken) 
         throws SMSException, SSOException {
         Set servers = new HashSet();
-        
-        if (isLegacy(ssoToken)) {
-            Set serverInfo = legacyGetServerInfo(ssoToken);
-            if ((serverInfo != null) && !serverInfo.isEmpty()) {
-                for (Iterator i = serverInfo.iterator(); i.hasNext(); ) {
-                    String server = (String)i.next();
-                    int idx = server.indexOf('|');
-                    if (idx != -1) {
-                        server = server.substring(0, idx);
-                    }
-                    servers.add(server);
-                }
-            }
-        } else {
-            ServiceConfig sc = getRootServerConfig(ssoToken);
-            if (sc != null) {
-                servers.addAll(sc.getSubConfigNames("*"));
-                servers.remove(DEFAULT_SERVER_CONFIG);
-            }
-            
+        ServiceConfig sc = getRootServerConfig(ssoToken);
+        if (sc != null) {
+            servers.addAll(sc.getSubConfigNames("*"));
+            servers.remove(DEFAULT_SERVER_CONFIG);
         }
         return servers;
     }
@@ -269,27 +244,11 @@ public class ServerConfiguration extends ConfigurationBase {
         String serverConfigXML
     ) throws SMSException, SSOException, ConfigurationException,
         UnknownPropertyNameException {
-        if (isLegacy(ssoToken)) {
-            ServiceSchemaManager sm = new ServiceSchemaManager(
-                Constants.SVC_NAME_PLATFORM, ssoToken);
+        ServiceConfig sc = getRootServerConfig(ssoToken);
+        if (sc != null) {
             String serverId = getNextId(ssoToken);
-            ServiceSchema sc = sm.getGlobalSchema();
-            Map attrs = sc.getAttributeDefaults();
-            Set servers = (Set)attrs.get(OLD_ATTR_SERVER_LIST);
-            //need to do this because we are getting Collections.EMPTY.SET;
-            if ((servers == null) || servers.isEmpty()) { 
-                servers = new HashSet();
-            }
-            servers.add(instanceName + "|" + serverId);
-            sc.setAttributeDefaults(OLD_ATTR_SERVER_LIST, servers);
-            updateOrganizationAlias(ssoToken, instanceName, true);
-        } else {
-            ServiceConfig sc = getRootServerConfig(ssoToken);
-            if (sc != null) {
-                String serverId = getNextId(ssoToken);
-                createServerInstance(ssoToken, instanceName, serverId, values,
-                    serverConfigXML);
-            }
+            createServerInstance(ssoToken, instanceName, serverId, values,
+                serverConfigXML);
         }
     }
     
@@ -391,13 +350,11 @@ public class ServerConfiguration extends ConfigurationBase {
         String instanceName
     ) throws SMSException, SSOException {
         String serverId = null;
-        if (!isLegacy(ssoToken)) {
-            ServiceConfig cfg = getServerConfig(ssoToken, instanceName);
-            if (cfg != null) {
-                Map map = cfg.getAttributes();
-                Set set = (Set)map.get(ATTR_SERVER_ID);
-                serverId = (String)set.iterator().next();
-            }
+        ServiceConfig cfg = getServerConfig(ssoToken, instanceName);
+        if (cfg != null) {
+            Map map = cfg.getAttributes();
+            Set set = (Set)map.get(ATTR_SERVER_ID);
+            serverId = (String)set.iterator().next();
         }
         return serverId;
     }
@@ -418,13 +375,11 @@ public class ServerConfiguration extends ConfigurationBase {
         String instanceName
     ) throws SMSException, SSOException {
         String xml = null;
-        if (!isLegacy(ssoToken)) {
-            ServiceConfig cfg = getServerConfig(ssoToken, instanceName);
-            if (cfg != null) {
-                Map map = cfg.getAttributes();
-                Set set = (Set)map.get(ATTR_SERVER_CONFIG_XML);
-                xml = (String)set.iterator().next();
-            }
+        ServiceConfig cfg = getServerConfig(ssoToken, instanceName);
+        if (cfg != null) {
+            Map map = cfg.getAttributes();
+            Set set = (Set)map.get(ATTR_SERVER_CONFIG_XML);
+            xml = (String)set.iterator().next();
         }
         return xml;
     }
@@ -445,15 +400,13 @@ public class ServerConfiguration extends ConfigurationBase {
         String instanceName,
         String xml
     ) throws SMSException, SSOException, ConfigurationException {
-        if (!isLegacy(ssoToken)) {
-            ServiceConfig cfg = getServerConfig(ssoToken, instanceName);
-            if (cfg != null) {
-                Map map = new HashMap(2);
-                Set set = new HashSet(2);
-                set.add(xml);
-                map.put(ATTR_SERVER_CONFIG_XML, set);
-                cfg.setAttributes(map);
-            }
+        ServiceConfig cfg = getServerConfig(ssoToken, instanceName);
+        if (cfg != null) {
+            Map map = new HashMap(2);
+            Set set = new HashSet(2);
+            set.add(xml);
+            map.put(ATTR_SERVER_CONFIG_XML, set);
+            cfg.setAttributes(map);
         }
     }
     
@@ -474,12 +427,10 @@ public class ServerConfiguration extends ConfigurationBase {
         String instanceName
     ) throws SMSException, SSOException, IOException {
         Properties prop = null;
-        if (!isLegacy(ssoToken)) {
-            ServiceConfig cfg = getServerConfig(ssoToken, instanceName);
-            if (cfg != null) {
-                Map map = cfg.getAttributes();
-                prop = getProperties((Set)map.get(ATTR_SERVER_CONFIG));
-            }
+        ServiceConfig cfg = getServerConfig(ssoToken, instanceName);
+        if (cfg != null) {
+            Map map = cfg.getAttributes();
+            prop = getProperties((Set)map.get(ATTR_SERVER_CONFIG));
         }
         return prop;
     }
@@ -523,24 +474,22 @@ public class ServerConfiguration extends ConfigurationBase {
         Map newValues
     ) throws SMSException, SSOException, IOException, ConfigurationException,
         UnknownPropertyNameException {
-        if (!isLegacy(ssoToken)) {
-            ServiceConfig cfg = getServerConfig(ssoToken, instanceName);
-            if (cfg != null) {
-                Map map = cfg.getAttributes();
-                Set existingSet = (Set)map.get(ATTR_SERVER_CONFIG);
-                Set newSet = getPropertiesSet(newValues);
-                try {
-                    validateProperty(ssoToken, newSet);
-                    map.put(ATTR_SERVER_CONFIG,
-                        combineProperties(existingSet, newSet));
-                    cfg.setAttributes(map);
-                } catch (UnknownPropertyNameException e) {
-                    //save the values even if property name is unknown
-                    map.put(ATTR_SERVER_CONFIG,
-                        combineProperties(existingSet, newSet));
-                    cfg.setAttributes(map);
-                    throw e;
-                }
+        ServiceConfig cfg = getServerConfig(ssoToken, instanceName);
+        if (cfg != null) {
+            Map map = cfg.getAttributes();
+            Set existingSet = (Set)map.get(ATTR_SERVER_CONFIG);
+            Set newSet = getPropertiesSet(newValues);
+            try {
+                validateProperty(ssoToken, newSet);
+                map.put(ATTR_SERVER_CONFIG,
+                    combineProperties(existingSet, newSet));
+                cfg.setAttributes(map);
+            } catch (UnknownPropertyNameException e) {
+                //save the values even if property name is unknown
+                map.put(ATTR_SERVER_CONFIG,
+                    combineProperties(existingSet, newSet));
+                cfg.setAttributes(map);
+                throw e;
             }
         }
     }
@@ -581,23 +530,21 @@ public class ServerConfiguration extends ConfigurationBase {
         String instanceName,
         Collection propertyNames
     ) throws SMSException, SSOException, IOException {
-        if (!isLegacy(ssoToken)) {
-            ServiceConfig cfg = getServerConfig(ssoToken, instanceName);
-            if (cfg != null) {
-                Map map = cfg.getAttributes();
-                Set set = (Set)map.get(ATTR_SERVER_CONFIG);
-                Properties properties = getProperties(set);
-                
-                for (Iterator i = properties.keySet().iterator(); i.hasNext(); 
-                ) {
-                    String key = (String)i.next();
-                    if (propertyNames.contains(key)) {
-                        i.remove();
-                    }
+        ServiceConfig cfg = getServerConfig(ssoToken, instanceName);
+        if (cfg != null) {
+            Map map = cfg.getAttributes();
+            Set set = (Set)map.get(ATTR_SERVER_CONFIG);
+            Properties properties = getProperties(set);
+
+            for (Iterator i = properties.keySet().iterator(); i.hasNext();
+            ) {
+                String key = (String)i.next();
+                if (propertyNames.contains(key)) {
+                    i.remove();
                 }
-                map.put(ATTR_SERVER_CONFIG, getPropertiesSet(properties));
-                cfg.setAttributes(map);
             }
+            map.put(ATTR_SERVER_CONFIG, getPropertiesSet(properties));
+            cfg.setAttributes(map);
         }
     }
 
@@ -617,32 +564,11 @@ public class ServerConfiguration extends ConfigurationBase {
     ) throws SMSException, SSOException {
         boolean deleted = false;
         
-        if (isLegacy(ssoToken)) {
-            ServiceSchemaManager sm = new ServiceSchemaManager(
-                Constants.SVC_NAME_PLATFORM, ssoToken);
-            ServiceSchema sc = sm.getGlobalSchema();
-            Map attrs = sc.getAttributeDefaults();
-            String serverInstance = instanceName + "|";
-            Set servers = (Set)attrs.get(OLD_ATTR_SERVER_LIST);
-            
-            for (Iterator i = servers.iterator(); i.hasNext() && !deleted; ) {
-                String s = (String)i.next();
-                if (s.startsWith(serverInstance)) {
-                    i.remove();
-                    deleted = true;
-                }
-            }
-
-            if (deleted) {
-                sc.setAttributeDefaults(OLD_ATTR_SERVER_LIST, servers);
-            }
-        } else {
-            ServiceConfig cfg = getServerConfig(ssoToken, instanceName);
-            if (cfg != null) {
-                ServiceConfig sc = getRootServerConfig(ssoToken);
-                sc.removeSubConfig(instanceName);
-                deleted = true;
-            } 
+        ServiceConfig cfg = getServerConfig(ssoToken, instanceName);
+        if (cfg != null) {
+            ServiceConfig sc = getRootServerConfig(ssoToken);
+            sc.removeSubConfig(instanceName);
+            deleted = true;
         }
 
         return deleted;
@@ -768,10 +694,8 @@ public class ServerConfiguration extends ConfigurationBase {
         Properties prop = null;
 
         try {
-            if (!isLegacy(ssoToken)) {
-                createDefaults(ssoToken);
-                prop = getServerInstance(ssoToken, DEFAULT_SERVER_CONFIG);
-            }
+            createDefaults(ssoToken);
+            prop = getServerInstance(ssoToken, DEFAULT_SERVER_CONFIG);
         } catch (SSOException ex) {
             ex.printStackTrace();
         } catch (IOException ex) {
@@ -891,27 +815,23 @@ public class ServerConfiguration extends ConfigurationBase {
         String instanceName,
         String siteId
     ) throws SMSException, SSOException, ConfigurationException {
-        if (isLegacy(ssoToken)) {
-            legacyManageSite(ssoToken, instanceName, siteId, true);
-        } else {
-            ServiceConfig svr = getServerConfig(ssoToken, instanceName);
+        ServiceConfig svr = getServerConfig(ssoToken, instanceName);
 
-            if (svr != null) {
-                Map attrs = svr.getAttributes();
-                Set setID = (Set)attrs.get(ATTR_SERVER_ID);
-                String serverId = (String)setID.iterator().next();
+        if (svr != null) {
+            Map attrs = svr.getAttributes();
+            Set setID = (Set)attrs.get(ATTR_SERVER_ID);
+            String serverId = (String)setID.iterator().next();
 
-                if (!serverId.equals(DEFAULT_SERVER_ID)) {
-                    Set set = new HashSet(2);
-                    set.add(siteId);
-                    attrs.put(ATTR_PARENT_SITE_ID, set);
-                    svr.setAttributes(attrs);
-                }
-            } else {
-                Object[] param = {instanceName};
-                throw new ConfigurationException("invalid.server.instance",
-                    param);
+            if (!serverId.equals(DEFAULT_SERVER_ID)) {
+                Set set = new HashSet(2);
+                set.add(siteId);
+                attrs.put(ATTR_PARENT_SITE_ID, set);
+                svr.setAttributes(attrs);
             }
+        } else {
+            Object[] param = {instanceName};
+            throw new ConfigurationException("invalid.server.instance",
+                param);
         }
     }
 
@@ -983,53 +903,17 @@ public class ServerConfiguration extends ConfigurationBase {
         String instanceName,
         String siteId
     ) throws SMSException, SSOException {
-        if (isLegacy(ssoToken)) {
-            legacyManageSite(ssoToken, instanceName, siteId, false);
-        } else {
-            ServiceConfig svr = getServerConfig(ssoToken, instanceName);
-            if (svr != null) {
-                Map attrs = svr.getAttributes();
-                Set setID = (Set)attrs.get(ATTR_SERVER_ID);
-                String serverId = (String)setID.iterator().next();
+        ServiceConfig svr = getServerConfig(ssoToken, instanceName);
+        if (svr != null) {
+            Map attrs = svr.getAttributes();
+            Set setID = (Set)attrs.get(ATTR_SERVER_ID);
+            String serverId = (String)setID.iterator().next();
 
-                if (!serverId.equals(DEFAULT_SERVER_ID)) {
-                    attrs.put(ATTR_PARENT_SITE_ID, Collections.emptySet());
-                    svr.setAttributes(attrs);
-                }
+            if (!serverId.equals(DEFAULT_SERVER_ID)) {
+                attrs.put(ATTR_PARENT_SITE_ID, Collections.emptySet());
+                svr.setAttributes(attrs);
             }
         }
-    }
-
-    private static void legacyManageSite(
-        SSOToken ssoToken,
-        String instanceName,
-        String siteId,
-        boolean bAdd
-    ) throws SMSException, SSOException {
-        AttributeSchema as = getLegacyServerAttributeSchema(ssoToken);
-        Set servers = as.getDefaultValues();
-        String target = null;
-
-        for (Iterator i = servers.iterator(); i.hasNext() && (target == null);){
-            String svr = (String)i.next();
-            LegacyServer serverObj = new LegacyServer(svr);
-
-            if (serverObj.name.equals(instanceName)) {
-                if (bAdd) {
-                    serverObj.addSite(target);
-                } else {
-                    serverObj.removeSite(target);
-                }
-
-                target = serverObj.toString();
-                i.remove();
-            }
-        }
-
-        if (target != null) {
-            servers.add(target);
-        }
-        as.setDefaultValues(servers);
     }
 
     /**
@@ -1050,34 +934,9 @@ public class ServerConfiguration extends ConfigurationBase {
     ) throws SMSException, SSOException {
         boolean belong = false;
 
-        if (isLegacy(ssoToken)) {
-            AttributeSchema as = getLegacyServerAttributeSchema(ssoToken);
-            Set servers = as.getDefaultValues();
-            boolean found = false;
-
-            for (Iterator i = servers.iterator(); i.hasNext() && !found; ) {
-                String svr = (String)i.next();
-                LegacyServer serverObj = new LegacyServer(svr);
-
-                if (serverObj.name.equals(instanceName)) {
-                    found = true;
-                    belong = serverObj.belongToSite(siteId);
-                }
-            }
-        } else {
-            String site = getServerSite(ssoToken, instanceName);
-            belong = (site != null) && site.equals(siteId);
-        }
+        String site = getServerSite(ssoToken, instanceName);
+        belong = (site != null) && site.equals(siteId);
         return belong;
-    }
-
-    private static AttributeSchema getLegacyServerAttributeSchema(
-        SSOToken ssoToken
-    ) throws SMSException, SSOException {
-        ServiceSchemaManager scm = new ServiceSchemaManager(
-            Constants.SVC_NAME_PLATFORM, ssoToken);
-        ServiceSchema global = scm.getSchema(SchemaType.GLOBAL);
-        return global.getAttributeSchema(OLD_ATTR_SERVER_LIST);
     }
 
     /**
@@ -1091,30 +950,28 @@ public class ServerConfiguration extends ConfigurationBase {
         String serverName,
         String cloneName
     ) throws SMSException, SSOException, ConfigurationException {
-        if (!isLegacy(ssoToken)) {
-            URL url = null;
-            try {
-                url = new URL(cloneName);
-            } catch (MalformedURLException ex) {
-                String[] param = {cloneName};
-                throw new ConfigurationException("invalid.server.name", param);
-            }
-            
-            ServiceConfig cfg = getServerConfig(ssoToken, serverName);
-            if (cfg != null) {
-                Map map = cfg.getAttributes();
-                
-                ServiceConfig sc = getRootServerConfig(ssoToken);
-                String serverId = getNextId(ssoToken);
-                Set setID = new HashSet(2);
-                setID.add(serverId);
-                map.put(ATTR_SERVER_ID, setID);
-                setProtocolHostPortURI(map, cloneName);
+        URL url = null;
+        try {
+            url = new URL(cloneName);
+        } catch (MalformedURLException ex) {
+            String[] param = {cloneName};
+            throw new ConfigurationException("invalid.server.name", param);
+        }
+
+        ServiceConfig cfg = getServerConfig(ssoToken, serverName);
+        if (cfg != null) {
+            Map map = cfg.getAttributes();
+
+            ServiceConfig sc = getRootServerConfig(ssoToken);
+            String serverId = getNextId(ssoToken);
+            Set setID = new HashSet(2);
+            setID.add(serverId);
+            map.put(ATTR_SERVER_ID, setID);
+            setProtocolHostPortURI(map, cloneName);
 
 
-                sc.addSubConfig(cloneName, SUBSCHEMA_SERVER, 0, map);
-                updateOrganizationAlias(ssoToken, cloneName, true);
-            }
+            sc.addSubConfig(cloneName, SUBSCHEMA_SERVER, 0, map);
+            updateOrganizationAlias(ssoToken, cloneName, true);
         }
     }
 
@@ -1158,33 +1015,31 @@ public class ServerConfiguration extends ConfigurationBase {
         String serverName
     ) throws SMSException, SSOException {
         String xml = null;
-        if (!isLegacy(ssoToken)) {
-            ServiceConfig cfg = getServerConfig(ssoToken, serverName);
-            if (cfg != null) {
-                Map map = cfg.getAttributes();
-                StringBuilder buff = new StringBuilder();
-                
-                buff.append("<ServerConfiguration>\n");
-                for (Iterator i = map.entrySet().iterator(); i.hasNext(); ) {
-                    Map.Entry entry = (Map.Entry)i.next();
-                    
-                    buff.append("<AttributeValuePair>\n");
-                    buff.append("<Attribute name=\"")
-                        .append((String)entry.getKey())
-                        .append("\" />");
-                    for (Iterator it = ((Set)entry.getValue()).iterator();
-                        it.hasNext();
-                    ) {
-                        buff.append("<Value>")
-                            .append(XMLUtils.escapeSpecialCharacters(
-                                (String)it.next()))
-                            .append("</Value>\n");
-                    }
-                    buff.append("</AttributeValuePair>\n");
+        ServiceConfig cfg = getServerConfig(ssoToken, serverName);
+        if (cfg != null) {
+            Map map = cfg.getAttributes();
+            StringBuilder buff = new StringBuilder();
+
+            buff.append("<ServerConfiguration>\n");
+            for (Iterator i = map.entrySet().iterator(); i.hasNext(); ) {
+                Map.Entry entry = (Map.Entry)i.next();
+
+                buff.append("<AttributeValuePair>\n");
+                buff.append("<Attribute name=\"")
+                    .append((String)entry.getKey())
+                    .append("\" />");
+                for (Iterator it = ((Set)entry.getValue()).iterator();
+                    it.hasNext();
+                ) {
+                    buff.append("<Value>")
+                        .append(XMLUtils.escapeSpecialCharacters(
+                            (String)it.next()))
+                        .append("</Value>\n");
                 }
-                buff.append("</ServerConfiguration>\n");
-                xml = buff.toString();
+                buff.append("</AttributeValuePair>\n");
             }
+            buff.append("</ServerConfiguration>\n");
+            xml = buff.toString();
         }
         return xml;
     }
@@ -1201,31 +1056,28 @@ public class ServerConfiguration extends ConfigurationBase {
         String xmlFile
     ) throws SMSException, SSOException, IOException, SAXException,
         ParserConfigurationException, ConfigurationException  {
-        if (!isLegacy(ssoToken)) {
-            
-            try {
-                new URL(serverName);
-            } catch (MalformedURLException ex) {
-                String[] param = {serverName};
-                throw new ConfigurationException("invalid.server.name", param);
-            }
-            ServiceConfig cfg = getServerConfig(ssoToken, serverName);
-            if (cfg == null) {
-                DocumentBuilder builder = XMLUtils.getSafeDocumentBuilder(false);
-                Document document = builder.parse(xmlFile);
-                Element topElement = document.getDocumentElement();
-                Map map = XMLUtils.parseAttributeValuePairTags(
-                    (Node)topElement);
-                
-                ServiceConfig sc = getRootServerConfig(ssoToken);
-                String serverId = getNextId(ssoToken);
-                Set setID = new HashSet(2);
-                setID.add(serverId);
-                map.put(ATTR_SERVER_ID, setID);
+        try {
+            new URL(serverName);
+        } catch (MalformedURLException ex) {
+            String[] param = {serverName};
+            throw new ConfigurationException("invalid.server.name", param);
+        }
+        ServiceConfig cfg = getServerConfig(ssoToken, serverName);
+        if (cfg == null) {
+            DocumentBuilder builder = XMLUtils.getSafeDocumentBuilder(false);
+            Document document = builder.parse(xmlFile);
+            Element topElement = document.getDocumentElement();
+            Map map = XMLUtils.parseAttributeValuePairTags(
+                (Node)topElement);
 
-                sc.addSubConfig(serverName, SUBSCHEMA_SERVER, 0, map);
-                updateOrganizationAlias(ssoToken, serverName, true);
-            }
+            ServiceConfig sc = getRootServerConfig(ssoToken);
+            String serverId = getNextId(ssoToken);
+            Set setID = new HashSet(2);
+            setID.add(serverId);
+            map.put(ATTR_SERVER_ID, setID);
+
+            sc.addSubConfig(serverName, SUBSCHEMA_SERVER, 0, map);
+            updateOrganizationAlias(ssoToken, serverName, true);
         }
     }
 }

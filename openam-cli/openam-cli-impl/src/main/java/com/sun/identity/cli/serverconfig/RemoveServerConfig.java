@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: RemoveServerConfig.java,v 1.4 2008/11/07 20:27:05 veiming Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.cli.serverconfig;
@@ -63,12 +64,6 @@ public class RemoveServerConfig extends ServerConfigBase {
         List propertyNames = rc.getOption(IArgument.PROPERTY_NAMES);
         
         try {
-            if (ServerConfiguration.isLegacy(adminSSOToken)) {
-                outputWriter.printMessage(getResourceString(
-                    "serverconfig-no-supported"));
-                return;
-            }
-
             String[] params = {serverName};
             writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                 "ATTEMPT_REMOVE_SERVER_CONFIG", params);

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,9 @@
  *
  * $Id: GetServerConfigXML.java,v 1.3 2008/09/19 23:37:13 beomsuk Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.sun.identity.cli.serverconfig;
 
 import com.iplanet.sso.SSOException;
@@ -66,12 +64,6 @@ public class GetServerConfigXML extends ServerConfigBase {
         IOutput outputWriter = getOutputWriter();
         
         try {
-            if (ServerConfiguration.isLegacy(adminSSOToken)) {
-                outputWriter.printMessage(getResourceString(
-                    "serverconfig-no-supported"));
-                return;
-            }
-            
             String[] params = {serverName};
             writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                 "ATTEMPT_GET_SERVER_CONFIG_XML", params);

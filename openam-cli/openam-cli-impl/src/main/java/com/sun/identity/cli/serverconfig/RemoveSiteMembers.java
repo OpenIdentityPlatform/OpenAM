@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: RemoveSiteMembers.java,v 1.4 2009/07/07 06:14:12 veiming Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.cli.serverconfig;
@@ -66,12 +67,6 @@ public class RemoveSiteMembers extends ServerConfigBase {
         IOutput outputWriter = getOutputWriter();
         
         try {
-            if (SiteConfiguration.isLegacy(adminSSOToken)) {
-                outputWriter.printMessage(getResourceString(
-                    "serverconfig-no-supported"));
-                return;
-            }
-            
             if (SiteConfiguration.isSiteExist(adminSSOToken, siteName)) {
                 SiteConfiguration.removeServersFromSite(
                     adminSSOToken, siteName, serverNames);

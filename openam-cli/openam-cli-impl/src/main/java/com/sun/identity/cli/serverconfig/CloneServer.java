@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: CloneServer.java,v 1.3 2008/09/19 23:36:42 beomsuk Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.cli.serverconfig;
@@ -66,11 +67,6 @@ public class CloneServer extends ServerConfigBase {
         String[] params = {serverName, cloneServerName};
 
         try {
-            if (ServerConfiguration.isLegacy(adminSSOToken)) {
-                outputWriter.printMessage(getResourceString(
-                    "serverconfig-no-supported"));
-                return;
-            }
             writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                 "ATTEMPT_CLONE_SERVER", params);
             if (ServerConfiguration.isServerInstanceExist(

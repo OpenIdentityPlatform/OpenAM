@@ -358,8 +358,6 @@ public class SessionServiceConfig {
              * site name. hence we need to lookup the site name based on the URL
              */
             String subCfgName =
-                    ServerConfiguration.isLegacy(dsameAdminTokenProvider.getAdminToken()) ?
-                    primaryServerURL :
                     SiteConfiguration.getSiteIdByURL(dsameAdminTokenProvider.getAdminToken(), primaryServerURL);
             ServiceConfig subConfig =
                     subCfgName != null ?

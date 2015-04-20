@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: ListServerConfig.java,v 1.7 2010/01/15 18:10:55 veiming Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.cli.serverconfig;
@@ -65,12 +66,6 @@ public class ListServerConfig extends ServerConfigBase {
         IOutput outputWriter = getOutputWriter();
         
         try {
-            if (ServerConfiguration.isLegacy(adminSSOToken)) {
-                outputWriter.printMessage(getResourceString(
-                    "serverconfig-no-supported"));
-                return;
-            }
-            
             String[] params = {serverName};
             writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                 "ATTEMPT_LIST_SERVER_CONFIG", params);

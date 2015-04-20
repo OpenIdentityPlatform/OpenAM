@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: DeleteServer.java,v 1.3 2008/09/19 23:36:43 beomsuk Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.cli.serverconfig;
@@ -64,12 +65,6 @@ public class DeleteServer extends ServerConfigBase {
         String[] params = {serverName};
 
         try {
-            if (ServerConfiguration.isLegacy(adminSSOToken)) {
-                outputWriter.printMessage(getResourceString(
-                    "serverconfig-no-supported"));
-                return;
-            }
-            
             writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                 "ATTEMPT_DELETE_SERVER", params);
             if (ServerConfiguration.isServerInstanceExist(

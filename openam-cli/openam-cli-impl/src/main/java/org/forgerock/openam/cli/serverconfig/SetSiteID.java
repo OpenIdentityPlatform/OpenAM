@@ -1,7 +1,7 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010 ForgeRock AS. All Rights Reserved
+ * Copyright 2010-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,7 +20,6 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- *
  */
 
 package org.forgerock.openam.cli.serverconfig;
@@ -63,12 +62,6 @@ public class SetSiteID extends ServerConfigBase {
         String[] params = {siteName, siteID};
 
         try {
-            if (SiteConfiguration.isLegacy(adminSSOToken)) {
-                outputWriter.printMessage(getResourceString(
-                    "serverconfig-no-supported"));
-                return;
-            }
-
             writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                 "ATTEMPT_SET_SITE_ID", params);
             if (SiteConfiguration.isSiteExist(adminSSOToken, siteName)) {

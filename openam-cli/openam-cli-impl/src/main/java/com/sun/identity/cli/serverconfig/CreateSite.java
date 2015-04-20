@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: CreateSite.java,v 1.3 2008/09/19 23:36:42 beomsuk Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.cli.serverconfig;
@@ -66,12 +67,6 @@ public class CreateSite extends ServerConfigBase {
         String[] params = {siteName, siteURL};
 
         try {
-            if (SiteConfiguration.isLegacy(adminSSOToken)) {
-                outputWriter.printMessage(getResourceString(
-                    "serverconfig-no-supported"));
-                return;
-            }
-            
             writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                 "ATTEMPT_CREATE_SITE", params);
             if (!SiteConfiguration.isSiteExist(adminSSOToken, siteName)) {

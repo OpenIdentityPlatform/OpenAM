@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: ShowSite.java,v 1.5 2010/01/15 18:10:55 veiming Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.cli.serverconfig;
@@ -64,12 +65,6 @@ public class ShowSite extends ServerConfigBase {
         String[] params = {siteName};
         
         try {
-            if (SiteConfiguration.isLegacy(adminSSOToken)) {
-                outputWriter.printMessage(getResourceString(
-                    "serverconfig-no-supported"));
-                return;
-            }
-
             writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                 "ATTEMPT_SHOW_SITE", params);
             if (SiteConfiguration.isSiteExist(adminSSOToken, siteName)) {
