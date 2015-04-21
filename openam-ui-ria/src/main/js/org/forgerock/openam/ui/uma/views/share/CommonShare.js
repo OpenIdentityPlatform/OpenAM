@@ -246,8 +246,13 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policyCreatedSuccess");
                 self.reset();
             })
-            .fail(function() {
+            .fail(function(response) {
+                if (response.status && response.status === 500) {
+                    permissions.remove(permission);    
+                }
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policyCreatedFail");
+                 
+
             });
         },
 
