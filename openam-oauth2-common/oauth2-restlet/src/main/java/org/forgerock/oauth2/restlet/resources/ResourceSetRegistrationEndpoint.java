@@ -26,6 +26,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.oauth2.core.AccessToken;
+import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
@@ -109,11 +110,26 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
                 getResourceOwnerId(), validator.validate(toMap(entity)));
         OAuth2Request oAuth2Request = requestFactory.create(getRequest());
         ResourceSetStore store = providerSettingsFactory.get(oAuth2Request).getResourceSetStore();
+
+        QueryFilter<String> query = QueryFilter.and(
+                QueryFilter.equalTo(ResourceSetTokenField.NAME, resourceSetDescription.getName()),
+                QueryFilter.equalTo(ResourceSetTokenField.CLIENT_ID, getClientId()),
+                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, getResourceOwnerId()));
+
+        if (!store.query(query).isEmpty()) {
+            getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+            Map<String, Object> response = new HashMap<String, Object>();
+            response.put(OAuth2Constants.Params.ERROR, Status.CLIENT_ERROR_BAD_REQUEST.getReasonPhrase());
+            response.put(OAuth2Constants.Params.ERROR_DESCRIPTION, "A shared item with the name '" +
+                    resourceSetDescription.getName() + "' already exists");
+            return new JsonRepresentation(response);
+        }
+
         store.create(oAuth2Request, resourceSetDescription);
         for (ResourceSetRegistrationListener listener : listeners) {
             listener.resourceSetCreated(oAuth2Request.<String>getParameter("realm"), resourceSetDescription);
         }
-        getResponse().setStatus(new Status(201));
+        getResponse().setStatus(Status.SUCCESS_CREATED);
         return createJsonResponse(resourceSetDescription, false, true);
     }
 

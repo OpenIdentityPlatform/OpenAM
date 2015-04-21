@@ -19,6 +19,7 @@ package org.forgerock.oauth2.restlet.resources;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Mockito.*;
@@ -210,6 +211,38 @@ public class ResourceSetRegistrationEndpointTest {
                 .readValue(response.getText(), Map.class);
         assertThat(responseBody).containsKey("_id");
         verify(listener).resourceSetCreated(anyString(), Matchers.<ResourceSetDescription>anyObject());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void shouldNotCreateExistingResourceSetDescription() throws Exception {
+
+        //Given
+        JsonRepresentation entity = createCreateRequestRepresentation();
+
+        when(store.query(any(QueryFilter.class))).thenReturn(
+                asSet(new ResourceSetDescription("id", "CLIENT_ID", "RESOURCE_OWNER_ID", RESOURCE_SET_DESCRIPTION_CONTENT.asMap())));
+
+        noConditions();
+
+        //When
+        Representation result = endpoint.createResourceSet(entity);
+
+        //Then
+        ArgumentCaptor<QueryFilter> queryCaptor = ArgumentCaptor.forClass(QueryFilter.class);
+        verify(store).query(queryCaptor.capture());
+        String queryString = queryCaptor.getValue().toString();
+        assertThat(queryString)
+                .contains("name eq \"NAME\"")
+                .contains("clientId eq \"CLIENT_ID\"")
+                .contains("resourceOwnerId eq \"RESOURCE_OWNER_ID\"")
+                .doesNotContain(" or ");
+
+        verify(response).setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+
+        assertThat(result).isInstanceOf(JsonRepresentation.class);
+        assertThat(((JsonRepresentation) result).getJsonObject().get("error")).isEqualTo("Bad Request");
+        assertThat(((JsonRepresentation) result).getJsonObject().getString("error_description")).contains("'NAME' already exists");
     }
 
     @Test
