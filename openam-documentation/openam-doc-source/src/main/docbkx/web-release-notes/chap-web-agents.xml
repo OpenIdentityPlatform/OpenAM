@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012-2015 ForgeRock AS
+  !      Copyright 2012-2015 ForgeRock AS.
   !    
 -->
 <chapter xml:id='chap-web-agents'
@@ -371,9 +371,9 @@
      <listitem>
       <para>
        <link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4629" xlink:show="new">OPENAM-4629</link>
-       introduces two net settings. The first is
-       <literal>com.forgerock.agents.init.retry.wait</literal>, which
-       sets the wait time (in seconds) between retries.
+       introduces two new settings. The first is
+       <literal>com.forgerock.agents.init.retry.max</literal>, which
+       sets the maximum number of consecutive agent initialization retries.
        Default (not set) value is 0.
       </para>
       <para>
