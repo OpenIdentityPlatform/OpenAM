@@ -64,10 +64,10 @@ public class JwtAttributeMapper implements AttributeMapper<JwtClaimsSet> {
     /**
      * {@inheritDoc}
      */
-    public Map<String, Set<String>> getAttributes(Map<String, String> localToJwtAttributeMapping,
+    public Map<String, Set<String>> getAttributes(Map<String, String> jwtToLocalAttributeMapping,
                                                                     JwtClaimsSet jwtClaimsSet) {
         Map<String, Set<String>> lookupAttributes = new HashMap<String, Set<String>>();
-        if (localToJwtAttributeMapping == null || jwtClaimsSet == null) {
+        if (jwtToLocalAttributeMapping == null || jwtClaimsSet == null) {
             return lookupAttributes;
         }
         /*
@@ -81,7 +81,7 @@ public class JwtAttributeMapper implements AttributeMapper<JwtClaimsSet> {
         nor the localToJwtAttributeMapping contains duplicate entries.
         Just to be sure, I will log an error if I encounter this situation, in case any of the above invariants are violated.
          */
-        for (Map.Entry<String, String> entry : localToJwtAttributeMapping.entrySet()) {
+        for (Map.Entry<String, String> entry : jwtToLocalAttributeMapping.entrySet()) {
             String jwtName = entry.getKey();
             if (jwtClaimsSet.isDefined(jwtName)) {
                 String localName = entry.getValue();
@@ -95,7 +95,7 @@ public class JwtAttributeMapper implements AttributeMapper<JwtClaimsSet> {
                     lookupAttributes.put(localName, CollectionUtils.asSet(data));
                 } else {
                     logger.error("In JwtAttributeMapper.getAttributes, the " +
-                            "localToJwtAttributeMappings appears to have duplicate entries: " + localToJwtAttributeMapping +
+                            "jwtToLocalAttributeMappings appears to have duplicate entries: " + jwtToLocalAttributeMapping +
                             "; Or possibly the JwtClaimsSet has duplicate entries: " + jwtClaimsSet +
                             ". Will preserve the following existing mappings: " + lookupAttributes);
                 }

@@ -42,21 +42,21 @@ public class OpenIdConnectConfigTest {
         configState.put(OpenIdConnectConfig.CRYPTO_CONTEXT_VALUE_KEY,
                 asSet("https://accounts.google.com/.well-known/openid-configuration"));
         configState.put(OpenIdConnectConfig.PRINCIPAL_MAPPER_CLASS_KEY, asSet(PRINCIPAL_MAPPER));
-        configState.put(OpenIdConnectConfig.LOCAL_TO_JWK_ATTRIBUTE_MAPPINGS_KEY, asOrderedSet("id=sub"));
+        configState.put(OpenIdConnectConfig.JWK_TO_LOCAL_ATTRIBUTE_MAPPINGS_KEY, asOrderedSet("id=sub"));
     }
 
     @Test
     public void testAttributeConversion() {
         OpenIdConnectConfig config = new OpenIdConnectConfig(configState);
-        assertThat(config.getLocalToJwkAttributeMappings().get("id")).isEqualTo("sub");
+        assertThat(config.getJwkToLocalAttributeMappings().get("id")).isEqualTo("sub");
     }
 
     @Test
     public void testDuplicateMappingEntries() {
-        configState.get(OpenIdConnectConfig.LOCAL_TO_JWK_ATTRIBUTE_MAPPINGS_KEY).add("id=bobo");
+        configState.get(OpenIdConnectConfig.JWK_TO_LOCAL_ATTRIBUTE_MAPPINGS_KEY).add("id=bobo");
         OpenIdConnectConfig config = new OpenIdConnectConfig(configState);
-        assertThat(config.getLocalToJwkAttributeMappings()).isNotNull().hasSize(1);
-        assertThat(config.getLocalToJwkAttributeMappings().get("id")).isEqualTo("sub");
+        assertThat(config.getJwkToLocalAttributeMappings()).isNotNull().hasSize(1);
+        assertThat(config.getJwkToLocalAttributeMappings().get("id")).isEqualTo("sub");
     }
 
     @Test

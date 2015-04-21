@@ -88,15 +88,15 @@
                     </DefaultValues>
                 </AttributeSchema>
 
-                <AttributeSchema name="openam-auth-openidconnect-local-to-jwt-attribute-mappings"
+                <AttributeSchema name="openam-auth-openidconnect-jwt-to-local-attribute-mappings"
                                  type="list"
                                  syntax="string"
                                  validator="RequiredValueValidator"
-                                 i18nKey="local_to_jwt_attr_mappings"
-                                 resourceName="ldapToJwtAttributeMappings">
+                                 i18nKey="jwt_to_local_attr_mappings"
+                                 resourceName="jwtToLdapAttributeMappings">
                     <DefaultValues>
-                        <Value>uid=sub</Value>
-                        <Value>mail=email</Value>
+                        <Value>sub=uid</Value>
+                        <Value>email=mail</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -185,15 +185,15 @@
                         </DefaultValues>
                     </AttributeSchema>
 
-                    <AttributeSchema name="openam-auth-openidconnect-local-to-jwt-attribute-mappings"
+                    <AttributeSchema name="openam-auth-openidconnect-jwt-to-local-attribute-mappings"
                                      type="list"
                                      syntax="string"
                                      validator="RequiredValueValidator"
-                                     i18nKey="local_to_jwt_attr_mappings"
-                                     resourceName="attributeMappings">
+                                     i18nKey="jwt_to_local_attr_mappings"
+                                     resourceName="jwtToLdapAttributeMappings">
                         <DefaultValues>
-                            <Value>uid=sub</Value>
-                            <Value>mail=email</Value>
+                            <Value>sub=uid</Value>
+                            <Value>email=mail</Value>
                         </DefaultValues>
                     </AttributeSchema>
 

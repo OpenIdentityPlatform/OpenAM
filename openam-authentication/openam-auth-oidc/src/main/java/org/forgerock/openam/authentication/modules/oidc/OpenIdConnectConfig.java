@@ -34,7 +34,7 @@ class OpenIdConnectConfig extends JwtHandlerConfig {
     static final String HEADER_NAME_KEY = "openam-auth-openidconnect-header-name";
     static final String PRINCIPAL_MAPPER_CLASS_KEY = "openam-auth-openidconnect-principal-mapper-class";
     static final String ACCOUNT_PROVIDER_CLASS_KEY = "openam-auth-openidconnect-account-provider-class";
-    static final String LOCAL_TO_JWK_ATTRIBUTE_MAPPINGS_KEY = "openam-auth-openidconnect-local-to-jwt-attribute-mappings";
+    static final String JWK_TO_LOCAL_ATTRIBUTE_MAPPINGS_KEY = "openam-auth-openidconnect-jwt-to-local-attribute-mappings";
     static final String AUDIENCE_NAME_KEY = "openam-auth-openidconnect-audience-name";
     static final String ACCEPTED_AUTHORIZED_PARTIES_KEY = "openam-auth-openidconnect-accepted-authorized-parties";
 
@@ -55,7 +55,7 @@ class OpenIdConnectConfig extends JwtHandlerConfig {
 
     private final String headerName;
     private final String principalMapperClass;
-    private final Map<String, String> localToJwkAttributeMappings;
+    private final Map<String, String> jwkToLocalAttributeMappings;
     private final String audienceName;
     private final Set<String> acceptedAuthorizedParties;
     private final String accountProviderClass;
@@ -65,7 +65,7 @@ class OpenIdConnectConfig extends JwtHandlerConfig {
         headerName = CollectionHelper.getMapAttr(options, HEADER_NAME_KEY);
         principalMapperClass = CollectionHelper.getMapAttr(options, PRINCIPAL_MAPPER_CLASS_KEY);
         accountProviderClass = CollectionHelper.getMapAttr(options, ACCOUNT_PROVIDER_CLASS_KEY);
-        Set<String> configuredLocalToJwkAttributeMappings = (Set<String>)options.get(LOCAL_TO_JWK_ATTRIBUTE_MAPPINGS_KEY);
+        Set<String> configuredJwkToLocalAttributeMappings = (Set<String>)options.get(JWK_TO_LOCAL_ATTRIBUTE_MAPPINGS_KEY);
         audienceName = CollectionHelper.getMapAttr(options, AUDIENCE_NAME_KEY);
         acceptedAuthorizedParties = (Set<String>)options.get(ACCEPTED_AUTHORIZED_PARTIES_KEY);
         Reject.ifNull(headerName, HEADER_NAME_KEY + " must be set in LoginModule options.");
@@ -73,9 +73,9 @@ class OpenIdConnectConfig extends JwtHandlerConfig {
         Reject.ifNull(cryptoContextType, CRYPTO_CONTEXT_TYPE_KEY + " must be set in LoginModule options.");
         Reject.ifNull(cryptoContextValue, CRYPTO_CONTEXT_VALUE_KEY + " must be set in LoginModule options.");
         Reject.ifNull(principalMapperClass, PRINCIPAL_MAPPER_CLASS_KEY + " must be set in LoginModule options.");
-        Reject.ifNull(configuredLocalToJwkAttributeMappings, LOCAL_TO_JWK_ATTRIBUTE_MAPPINGS_KEY + " must be set in LoginModule options.");
-        Reject.ifTrue(configuredLocalToJwkAttributeMappings.isEmpty(), LOCAL_TO_JWK_ATTRIBUTE_MAPPINGS_KEY + " must contain some valid mappings.");
-        localToJwkAttributeMappings = MappingUtils.parseMappings(configuredLocalToJwkAttributeMappings);
+        Reject.ifNull(configuredJwkToLocalAttributeMappings, JWK_TO_LOCAL_ATTRIBUTE_MAPPINGS_KEY + " must be set in LoginModule options.");
+        Reject.ifTrue(configuredJwkToLocalAttributeMappings.isEmpty(), JWK_TO_LOCAL_ATTRIBUTE_MAPPINGS_KEY + " must contain some valid mappings.");
+        jwkToLocalAttributeMappings = MappingUtils.parseMappings(configuredJwkToLocalAttributeMappings);
     }
 
     public String getHeaderName() {
@@ -90,8 +90,8 @@ class OpenIdConnectConfig extends JwtHandlerConfig {
         return accountProviderClass;
     }
 
-    public Map<String, String> getLocalToJwkAttributeMappings() {
-        return localToJwkAttributeMappings;
+    public Map<String, String> getJwkToLocalAttributeMappings() {
+        return jwkToLocalAttributeMappings;
     }
 
     public String getAudienceName() {
