@@ -1,4 +1,4 @@
-/**
+/*
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
 * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,6 @@
 *
 * $Id: IdServicesImpl.java,v 1.61 2010/01/20 01:08:36 goodearth Exp $
 *
-*/
-
-/*
  * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.idm.server;
@@ -1870,69 +1867,49 @@ public class IdServicesImpl implements IdServices {
        }
    }
 
-   public Set getAssignedServices(SSOToken token, IdType type, String name,
-           Map mapOfServiceNamesAndOCs, String amOrgName, String amsdkDN)
-           throws IdRepoException, SSOException {
+   public Set<String> getAssignedServices(SSOToken token, IdType type, String name, Map mapOfServiceNamesAndOCs,
+               String amOrgName, String amsdkDN) throws IdRepoException, SSOException {
        IdRepoException origEx = null;
 
        // Check permission first. If allowed then proceed, else the
        // checkPermission method throws an "402" exception.
        checkPermission(token, amOrgName, name, null, IdOperation.READ, type);
        // Get the list of plugins that support the service operation.
-       Set configuredPluginClasses = idrepoCache.getIdRepoPlugins(amOrgName, 
-           IdOperation.SERVICE, type);
-       if ((configuredPluginClasses == null) || 
-           configuredPluginClasses.isEmpty()) {
-           if (ServiceManager.getBaseDN().equalsIgnoreCase(amOrgName)
-                   && (type.equals(IdType.REALM))) {
-               return (configuredPluginClasses);
-           } else {
-               throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "301", 
-                       null);
+       Set<IdRepo> configuredPluginClasses = idrepoCache.getIdRepoPlugins(amOrgName, IdOperation.SERVICE, type);
+       if (configuredPluginClasses == null || configuredPluginClasses.isEmpty()) {
+           if (type.equals(IdType.REALM)) {
+               return Collections.emptySet();
            }
        }
 
-       Iterator it = configuredPluginClasses.iterator();
        int noOfSuccess = configuredPluginClasses.size();
-       IdRepo idRepo = null;
-       Set resultsSet = new HashSet();
-       while (it.hasNext()) {
-           IdRepo repo = (IdRepo) it.next();
+       Set<String> resultsSet = new HashSet<String>();
+       for (IdRepo repo : configuredPluginClasses) {
            try {
-               Set services = null;
-               if (repo.getClass().getName().equals(IdConstants.AMSDK_PLUGIN)
-                       && amsdkDN != null) {
-                   services = repo.getAssignedServices(token, type, amsdkDN,
-                           mapOfServiceNamesAndOCs);
+               Set<String> services;
+               if (repo.getClass().getName().equals(IdConstants.AMSDK_PLUGIN) && amsdkDN != null) {
+                   services = repo.getAssignedServices(token, type, amsdkDN, mapOfServiceNamesAndOCs);
                } else {
-                   services = repo.getAssignedServices(token, type, name,
-                           mapOfServiceNamesAndOCs);
+                   services = repo.getAssignedServices(token, type, name, mapOfServiceNamesAndOCs);
                }
                if (services != null && !services.isEmpty()) {
                    resultsSet.addAll(services);
                }
            } catch (IdRepoUnsupportedOpException ide) {
-               if (idRepo != null && DEBUG.messageEnabled()) {
-                   DEBUG.message(
-                       "IdServicesImpl.getAssignedServices: "
-                       + "Services not supported for repository "
-                       + repo.getClass().getName() + " :: "
-                       + ide.getMessage());
+               if (DEBUG.messageEnabled()) {
+                   DEBUG.message("IdServicesImpl.getAssignedServices: Services not supported for repository "
+                           + repo.getClass().getName() + " :: " + ide.getMessage());
                }
                noOfSuccess--;
-               origEx = (origEx == null) ? ide :origEx;
+               origEx = origEx == null ? ide :origEx;
            } catch (IdRepoFatalException idf) {
                // fatal ..throw it all the way up
-               DEBUG.error("IdServicesImpl.getAssignedServices: " +
-                   "Fatal Exception ", idf);
+               DEBUG.error("IdServicesImpl.getAssignedServices: Fatal Exception ", idf);
                throw idf;
            } catch (IdRepoException ide) {
-               if (idRepo != null && DEBUG.warningEnabled()) {
-                   DEBUG.warning("IdServicesImpl.getAssignedServices: "
-                       + "Unable to get services for identity "
-                       + "in the following repository "
-                       + idRepo.getClass().getName() + " :: "
-                       + ide.getMessage());
+               if (DEBUG.warningEnabled()) {
+                   DEBUG.warning("IdServicesImpl.getAssignedServices: Unable to get services for identity in the "
+                           + "following repository " + repo.getClass().getName() + " :: " + ide.getMessage());
                }
                noOfSuccess--;
                origEx = (origEx == null) ? ide :origEx;
@@ -1940,16 +1917,13 @@ public class IdServicesImpl implements IdServices {
        }
        if (noOfSuccess == 0) {
            if (DEBUG.warningEnabled()) {
-               DEBUG.warning("IdServicesImpl.getAssignedServices: "
-                   + "Unable to get assigned services for identity "
-                   + type.getName() + "::" + name
-                   + " in any configured data store", origEx);
+               DEBUG.warning("IdServicesImpl.getAssignedServices: Unable to get assigned services for identity "
+                       + type.getName() + "::" + name + " in any configured data store", origEx);
            }
            throw origEx;
        } else {
            return resultsSet;
        }
-
    }
 
    public void assignService(SSOToken token, IdType type, String name,
