@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.authz.filter;
@@ -54,6 +54,7 @@ public class RestAuthorizationDispatcherFilter implements Filter {
     private static final String INIT_PARAM_AGENTS_AUTHZ_CONFIGURATOR = "agentsAuthzConfigurator";
     private static final String INIT_PARAM_SERVER_INFO_AUTHZ_CONFIGURATOR = "serverInfoAuthzConfigurator";
     private static final String INIT_PARAM_SESSION_AUTHZ_CONFIGURATOR = "sessionAuthzConfigurator";
+    private static final String INIT_PARAM_DASHBOARD_AUTHZ_CONFIGURATOR = "dashboardAuthzConfigurator";
 
     private final RestDispatcher restDispatcher;
     private final AuthZFilter authZFilterGlobal;
@@ -65,6 +66,7 @@ public class RestAuthorizationDispatcherFilter implements Filter {
     private String agentsAuthzConfiguratorClassName;
     private String serverInfoAuthzConfiguratorClassName;
     private String sessionAuthzConfiguratorClassName;
+    private String dashboardAuthzConfiguratorClassName;
 
     /**
      * Constructs an instance of the RestAuthorizationDispatcherFilter.
@@ -100,14 +102,17 @@ public class RestAuthorizationDispatcherFilter implements Filter {
         serverInfoAuthzConfiguratorClassName =
                 filterConfig.getInitParameter(INIT_PARAM_SERVER_INFO_AUTHZ_CONFIGURATOR);
         sessionAuthzConfiguratorClassName = filterConfig.getInitParameter(INIT_PARAM_SESSION_AUTHZ_CONFIGURATOR);
+        dashboardAuthzConfiguratorClassName = filterConfig.getInitParameter(INIT_PARAM_DASHBOARD_AUTHZ_CONFIGURATOR);
 
         if (realmsAuthzConfiguratorClassName == null || usersAuthzConfiguratorClassName == null
                 || groupsAuthzConfiguratorClassName == null || agentsAuthzConfiguratorClassName == null
-                || serverInfoAuthzConfiguratorClassName == null || sessionAuthzConfiguratorClassName == null) {
+                || serverInfoAuthzConfiguratorClassName == null || sessionAuthzConfiguratorClassName == null
+                || dashboardAuthzConfiguratorClassName == null) {
             String message = INIT_PARAM_REALMS_AUTHZ_CONFIGURATOR  + ", "
                     + INIT_PARAM_USERS_AUTHZ_CONFIGURATOR + ", " + INIT_PARAM_GROUPS_AUTHZ_CONFIGURATOR + ","
-                    + INIT_PARAM_AGENTS_AUTHZ_CONFIGURATOR + ", " + INIT_PARAM_SERVER_INFO_AUTHZ_CONFIGURATOR
-                    + " and " + INIT_PARAM_SESSION_AUTHZ_CONFIGURATOR + " init params must be set!";
+                    + INIT_PARAM_AGENTS_AUTHZ_CONFIGURATOR + ", " + INIT_PARAM_SERVER_INFO_AUTHZ_CONFIGURATOR + ", " 
+                    + INIT_PARAM_SESSION_AUTHZ_CONFIGURATOR + " and " + INIT_PARAM_DASHBOARD_AUTHZ_CONFIGURATOR 
+                    + " init params must be set!";
             DEBUG.error(message);
             throw new ServletException(message);
         }
@@ -149,6 +154,8 @@ public class RestAuthorizationDispatcherFilter implements Filter {
                 authorize(serverInfoAuthzConfiguratorClassName, request, servletResponse, chain);
             } else if (RestDispatcher.SESSIONS.equalsIgnoreCase(endpoint)) {
                 authorize(sessionAuthzConfiguratorClassName, request, servletResponse, chain);
+            } else if (RestDispatcher.DASHBOARD.equalsIgnoreCase(endpoint)) {
+                authorize(dashboardAuthzConfiguratorClassName, request, servletResponse, chain);
             }
         } catch (NotFoundException e) {
             // Endpoint not found so cannot perform any authorization

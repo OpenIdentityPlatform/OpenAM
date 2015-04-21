@@ -121,6 +121,10 @@
             <param-name>sessionAuthzConfigurator</param-name>
             <param-value>org.forgerock.openam.authz.filter.session.SessionResourceAuthZConfigurator</param-value>
         </init-param>
+        <init-param>
+            <param-name>dashboardAuthzConfigurator</param-name>
+            <param-value>org.forgerock.openam.authz.filter.PassThroughAuthorizationConfigurator</param-value>
+        </init-param>
     </filter>
 
     <!-- filter declaration -->
