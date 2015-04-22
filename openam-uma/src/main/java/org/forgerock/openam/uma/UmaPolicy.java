@@ -48,7 +48,10 @@ public class UmaPolicy {
      * @param policy The UMA policy in JSON format.
      * @return The UMA policy ID.
      */
-    public static String idOf(JsonValue policy) {
+    public static String idOf(JsonValue policy) throws BadRequestException {
+        if (!policy.isDefined(POLICY_ID_KEY)) {
+            throw new BadRequestException("Missing required field: " + POLICY_ID_KEY);
+        }
         return policy.get(POLICY_ID_KEY).asString();
     }
 

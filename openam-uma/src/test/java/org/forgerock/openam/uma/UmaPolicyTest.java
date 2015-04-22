@@ -102,19 +102,31 @@ public class UmaPolicyTest {
                 field("resources", array("uma://POLICY_ID")),
                 field("actionValues", object(field("SCOPE_B", true))),
                 field("subject", object(
-                                field("type", "OR"),
-                                field("subjects", array(
-                                                object(
-                                                        field("type", "JwtClaim"),
-                                                        field("claimName", "sub"),
-                                                        field("claimValue", "SUBJECT_ONE")
-                                                )))
+                        field("type", "OR"),
+                        field("subjects", array(
+                                object(
+                                        field("type", "JwtClaim"),
+                                        field("claimName", "sub"),
+                                        field("claimValue", "SUBJECT_ONE")
+                                )))
                 ))
         ));
     }
 
+    @Test(expectedExceptions = BadRequestException.class)
+    public void shouldFailForMissingIdOfPolicy() throws Exception {
+
+        //Given
+        JsonValue policy = json(object());
+
+        //When
+        String policyId = UmaPolicy.idOf(policy);
+
+        //Then - exception
+    }
+
     @Test
-    public void shouldGetIdOfPolicy() {
+    public void shouldGetIdOfPolicy() throws Exception {
 
         //Given
         JsonValue policy = createUmaPolicyJson();
