@@ -11,12 +11,15 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-15 ForgeRock AS.
  */
 
 package org.forgerock.openidconnect;
 
+import java.net.URI;
 import org.forgerock.oauth2.core.ClientRegistration;
+import org.forgerock.oauth2.core.OAuth2Jwt;
+import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 
 /**
  * Models an OpenId Connect client registration in the OAuth2 provider.
@@ -31,4 +34,32 @@ public interface OpenIdConnectClientRegistration extends ClientRegistration {
      * @return The OpenId token signed response algorithm.
      */
     String getIDTokenSignedResponseAlgorithm();
+
+    /**
+     * Gets the token_endpoint_auth_method configured for this client.
+     */
+    String getTokenEndpointAuthMethod();
+
+    /**
+     * Gets the subject type of this client. PAIRWISE or PUBLIC.
+     */
+    String getSubjectType();
+
+    /**
+     * Verifies that the supplied jwt is signed by this client.
+     */
+    boolean verifyJwtIdentity(OAuth2Jwt jwt);
+
+    /**
+     * Gets the subject identifier uri.
+     */
+    URI getSectorIdentifierUri();
+
+    /**
+     * Retrieve the sub value, appropriate for the client subject type, or null
+     * if there are issues with its formation.
+     */
+    String getSubValue(String id, OAuth2ProviderSettings providerSettings);
+
+
 }

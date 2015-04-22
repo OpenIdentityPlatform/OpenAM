@@ -16,16 +16,14 @@
 
 package org.forgerock.oauth2.core;
 
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.oauth2.core.OAuth2Constants;
-import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.*;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import static org.forgerock.oauth2.core.Utils.isEmpty;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 
 /**
  * Models a OAuth2 access token.
@@ -89,7 +87,7 @@ public class AccessToken extends JsonValue implements IntrospectableToken, Token
         if (!Utils.isEmpty(refreshTokenId)) {
             setRefreshTokenId(refreshTokenId);
         }
-        setTokenType("Bearer");
+        setTokenType(OAuth2Constants.Bearer.BEARER);
         setTokenName(tokenName);
         setGrantType(grantType);
         setNonce(nonce);
@@ -101,7 +99,7 @@ public class AccessToken extends JsonValue implements IntrospectableToken, Token
      * @param id The token id.
      */
     protected void setId(String id) {
-        put(OAuth2Constants.CoreTokenParams.ID, id);
+        put(ID, id);
     }
 
     /**
@@ -110,7 +108,7 @@ public class AccessToken extends JsonValue implements IntrospectableToken, Token
      * @param authorizationCode The authorization code.
      */
     protected void setAuthorizationCode(String authorizationCode) {
-        put(OAuth2Constants.CoreTokenParams.PARENT, authorizationCode);
+        put(PARENT, authorizationCode);
     }
 
     /**
@@ -119,7 +117,7 @@ public class AccessToken extends JsonValue implements IntrospectableToken, Token
      * @param resourceOwnerId The resource owner's id.
      */
     protected void setResourceOwnerId(String resourceOwnerId) {
-        put(OAuth2Constants.CoreTokenParams.USERNAME, resourceOwnerId);
+        put(USERNAME, resourceOwnerId);
     }
 
     /**
@@ -128,7 +126,7 @@ public class AccessToken extends JsonValue implements IntrospectableToken, Token
      * @param clientId The client's id.
      */
     protected void setClientId(String clientId) {
-        put(OAuth2Constants.CoreTokenParams.CLIENT_ID, clientId);
+        put(CLIENT_ID, clientId);
     }
 
     /**
@@ -137,7 +135,7 @@ public class AccessToken extends JsonValue implements IntrospectableToken, Token
      * @param redirectUri The redirect uri.
      */
     protected void setRedirectUri(String redirectUri) {
-        put(OAuth2Constants.CoreTokenParams.REDIRECT_URI, redirectUri);
+        put(REDIRECT_URI, redirectUri);
     }
 
     /**
@@ -146,7 +144,7 @@ public class AccessToken extends JsonValue implements IntrospectableToken, Token
      * @param scope The scope.
      */
     protected void setScope(Set<String> scope) {
-        put(OAuth2Constants.CoreTokenParams.SCOPE, scope);
+        put(SCOPE, scope);
     }
 
     /**
@@ -155,7 +153,7 @@ public class AccessToken extends JsonValue implements IntrospectableToken, Token
      * @param expiryTime The expiry time.
      */
     protected void setExpiryTime(long expiryTime) {
-        put(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, expiryTime);
+        put(EXPIRE_TIME, expiryTime);
     }
 
     /**
@@ -164,7 +162,7 @@ public class AccessToken extends JsonValue implements IntrospectableToken, Token
      * @param refreshTokenId The refresh token id.
      */
     protected void setRefreshTokenId(String refreshTokenId) {
-        put(OAuth2Constants.CoreTokenParams.REFRESH_TOKEN, refreshTokenId);
+        put(REFRESH_TOKEN, refreshTokenId);
     }
 
     /**
@@ -173,7 +171,7 @@ public class AccessToken extends JsonValue implements IntrospectableToken, Token
      * @param tokenType The token type.
      */
     protected void setTokenType(String tokenType) {
-        put(OAuth2Constants.CoreTokenParams.TOKEN_TYPE, tokenType);
+        put(TOKEN_TYPE, tokenType);
     }
 
     /**
@@ -182,7 +180,7 @@ public class AccessToken extends JsonValue implements IntrospectableToken, Token
      * @param tokenName The token name.
      */
     protected void setTokenName(String tokenName) {
-        put(OAuth2Constants.CoreTokenParams.TOKEN_NAME, tokenName);
+        put(TOKEN_NAME, tokenName);
     }
 
     /**
@@ -209,7 +207,7 @@ public class AccessToken extends JsonValue implements IntrospectableToken, Token
      * @return The scope.
      */
     public Set<String> getScope() {
-        final Set<String> scope = (Set<String>) get(OAuth2Constants.CoreTokenParams.SCOPE).getObject();
+        final Set<String> scope = (Set<String>) get(SCOPE).getObject();
         if (!Utils.isEmpty(scope)) {
             return scope;
         }
@@ -222,8 +220,8 @@ public class AccessToken extends JsonValue implements IntrospectableToken, Token
      * @return The client's id.
      */
     public String getClientId() {
-        if (isDefined(OAuth2Constants.CoreTokenParams.CLIENT_ID)) {
-            return get(OAuth2Constants.CoreTokenParams.CLIENT_ID).asString();
+        if (isDefined(CLIENT_ID)) {
+            return get(CLIENT_ID).asString();
         }
         return null;
     }
@@ -255,8 +253,8 @@ public class AccessToken extends JsonValue implements IntrospectableToken, Token
      * @return The resource owner's id.
      */
     public String getResourceOwnerId() {
-        if (isDefined(OAuth2Constants.CoreTokenParams.USERNAME)) {
-            return get(OAuth2Constants.CoreTokenParams.USERNAME).asString();
+        if (isDefined(USERNAME)) {
+            return get(USERNAME).asString();
         }
         return null;
     }
@@ -275,8 +273,8 @@ public class AccessToken extends JsonValue implements IntrospectableToken, Token
      * {@inheritDoc}
      */
     public String getTokenName() {
-        if (isDefined(OAuth2Constants.CoreTokenParams.TOKEN_NAME)) {
-            return get(OAuth2Constants.CoreTokenParams.TOKEN_NAME).asString();
+        if (isDefined(TOKEN_NAME)) {
+            return get(TOKEN_NAME).asString();
         }
         return null;
     }
@@ -299,13 +297,26 @@ public class AccessToken extends JsonValue implements IntrospectableToken, Token
     }
 
     /**
+     * Gets the requested claims associated w/ this access token.
+     *
+     * @return Requested claims (JSON as a String).
+     */
+    public String getClaims() {
+        if (isDefined(OAuth2Constants.Custom.CLAIMS)) {
+            return (String) get(OAuth2Constants.Custom.CLAIMS).asSet().iterator().next();
+        }
+
+        return null;
+    }
+
+    /**
      * Gets the expiry time.
      *
      * @return The Expiry time.
      */
     public long getExpiryTime() {
-        if (isDefined(OAuth2Constants.CoreTokenParams.EXPIRE_TIME)) {
-            return get(OAuth2Constants.CoreTokenParams.EXPIRE_TIME).asLong();
+        if (isDefined(EXPIRE_TIME)) {
+            return get(EXPIRE_TIME).asLong();
         }
         return 0;
     }
@@ -316,8 +327,8 @@ public class AccessToken extends JsonValue implements IntrospectableToken, Token
      * @return The token type.
      */
     public String getTokenType() {
-        if (isDefined(OAuth2Constants.CoreTokenParams.TOKEN_TYPE)) {
-            return get(OAuth2Constants.CoreTokenParams.TOKEN_TYPE).asString();
+        if (isDefined(TOKEN_TYPE)) {
+            return get(TOKEN_TYPE).asString();
         }
         return null;
     }
@@ -362,8 +373,8 @@ public class AccessToken extends JsonValue implements IntrospectableToken, Token
     public Map<String, Object> toMap() {
         final Map<String, Object> tokenMap = new HashMap<String, Object>();
         tokenMap.put(getResourceString(OAuth2Constants.Params.ACCESS_TOKEN), getTokenId());
-        tokenMap.put(getResourceString(OAuth2Constants.CoreTokenParams.TOKEN_TYPE), getTokenType());
-        tokenMap.put(getResourceString(OAuth2Constants.CoreTokenParams.EXPIRE_TIME),
+        tokenMap.put(getResourceString(TOKEN_TYPE), getTokenType());
+        tokenMap.put(getResourceString(EXPIRE_TIME),
                 (getExpiryTime() - System.currentTimeMillis()) / 1000);
         tokenMap.putAll(extraData);
         return tokenMap;
@@ -374,11 +385,11 @@ public class AccessToken extends JsonValue implements IntrospectableToken, Token
      */
     public Map<String, Object> getTokenInfo() {
         Map<String, Object> tokenInfo = new HashMap<String, Object>();
-        tokenInfo.put(getResourceString(OAuth2Constants.CoreTokenParams.ID), getTokenId());
-        tokenInfo.put(getResourceString(OAuth2Constants.CoreTokenParams.TOKEN_TYPE), getTokenType());
-        tokenInfo.put(getResourceString(OAuth2Constants.CoreTokenParams.EXPIRE_TIME),
+        tokenInfo.put(getResourceString(ID), getTokenId());
+        tokenInfo.put(getResourceString(TOKEN_TYPE), getTokenType());
+        tokenInfo.put(getResourceString(EXPIRE_TIME),
                 (getExpiryTime() - System.currentTimeMillis())/1000);
-        tokenInfo.put(getResourceString(OAuth2Constants.CoreTokenParams.SCOPE), getScope());
+        tokenInfo.put(getResourceString(SCOPE), getScope());
         tokenInfo.put(getResourceString(OAuth2Constants.Params.GRANT_TYPE), getGrantType());
         return tokenInfo;
     }

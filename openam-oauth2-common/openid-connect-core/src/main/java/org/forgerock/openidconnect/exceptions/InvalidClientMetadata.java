@@ -31,4 +31,11 @@ public class InvalidClientMetadata extends OAuth2Exception {
     public InvalidClientMetadata() {
         super(400, "invalid_client_metadata", "The request contains invalid metadata.");
     }
+
+    /**
+     * Constructs a new InvalidClientMetadata exception with the passed-in mesage.
+     */
+    public InvalidClientMetadata(String msg) {
+        super(400, "invalid_client_metadata", msg);
+    }
 }

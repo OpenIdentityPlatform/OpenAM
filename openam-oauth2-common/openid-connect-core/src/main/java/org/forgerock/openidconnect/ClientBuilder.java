@@ -42,6 +42,14 @@ public class ClientBuilder {
     private String clientSecret;
     private List<String> responseTypes;
     private List<String> contacts;
+    private Long defaultMaxAge;
+    private Boolean defaultMaxAgeEnabled;
+    private String tokenEndpointAuthMethod;
+    private String jwks;
+    private String jwksUri;
+    private String x509;
+    private String selector;
+    private String sectorIdentifierUri;
 
     /**
      * Sets the client id of the OAuth2Client.
@@ -215,6 +223,86 @@ public class ClientBuilder {
     }
 
     /**
+     * Sets the default max age on the OAuth2Client.
+     *
+     * @param defaultMaxAge The default max age, in seconds.
+     */
+    public ClientBuilder setDefaultMaxAge(Long defaultMaxAge) {
+        this.defaultMaxAge = defaultMaxAge;
+        return this;
+    }
+
+    /**
+     * Sets whether to enforce the default max age.
+     *
+     * @param defaultMaxAgeEnabled Whether to enforce the default max age.
+     */
+    public ClientBuilder setDefaultMaxAgeEnabled(Boolean defaultMaxAgeEnabled) {
+        this.defaultMaxAgeEnabled = defaultMaxAgeEnabled;
+        return this;
+    }
+
+    /**
+     * Sets the token endpoint auth method value.
+     *
+     * @param tokenEndpointAuthMethod  token endpoint auth method this client uses.
+     */
+    public ClientBuilder setTokenEndpointAuthMethod(String tokenEndpointAuthMethod) {
+        this.tokenEndpointAuthMethod = tokenEndpointAuthMethod;
+        return this;
+    }
+
+    /**
+     * Sets the JWKs value.
+     *
+     * @param jwks jwks containing valid public keys.
+     */
+    public ClientBuilder setJwks(String jwks) {
+        this.jwks = jwks;
+        return this;
+    }
+
+    /**
+     * Sets the JWKs URI value.
+     *
+     * @param jwksUri URL containing JWKs of valid public keys.
+     */
+    public ClientBuilder setJwksUri(String jwksUri) {
+        this.jwksUri = jwksUri;
+        return this;
+    }
+
+    /**
+     * Sets the X509 value.
+     *
+     * @param x509 Public key certificate.
+     */
+    public ClientBuilder setX509(String x509) {
+        this.x509 = x509;
+        return this;
+    }
+
+    /**
+     * Sets the public key selector.
+     *
+     * @param selector Which of the public key types to use.
+     */
+    public ClientBuilder setPublicKeySelector(String selector) {
+        this.selector = selector;
+        return this;
+    }
+
+    /**
+     * Sets the sector identifier uri.
+     *
+     * @return selector identifier uri to be used when pairwise.
+     */
+    public ClientBuilder setSectorIdentifierUri(String sectorIdentifierUri) {
+        this.sectorIdentifierUri = sectorIdentifierUri;
+        return this;
+    }
+
+    /**
      * Creates the OAuth2 Client.
      *
      * @return The OAuth2 Client.
@@ -222,6 +310,8 @@ public class ClientBuilder {
     public Client createClient() {
         return new Client(clientID, clientType, redirectionURIs, allowedGrantScopes, defaultGrantScopes, displayName,
                 displayDescription, clientName, subjectType, idTokenSignedResponseAlgorithm, postLogoutRedirectionURIs,
-                accessToken, clientSessionURI,applicationType, clientSecret, responseTypes, contacts);
+                accessToken, clientSessionURI, applicationType, clientSecret, responseTypes, contacts, defaultMaxAge,
+                defaultMaxAgeEnabled, tokenEndpointAuthMethod, jwks, jwksUri, x509, selector, sectorIdentifierUri);
     }
+
 }

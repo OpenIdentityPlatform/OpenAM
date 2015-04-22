@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -33,9 +33,11 @@ public interface ResourceOwnerConsentVerifier {
      *
      * @param consentSaved {@code true} if the resource owner has previously saved consent.
      * @param request The OAuth2 request.
+     * @param registration The client's registration information, used to determine where to error if necessary.
      * @return {@code true} if the resource owner has saved consent and it can be used.
      * @throws ResourceOwnerConsentRequiredException If the OpenID Connect prompt parameter enforces that the resource
      *          owner is not asked for consent, but the resource owners consent has not been previously stored.
      */
-    boolean verify(boolean consentSaved, OAuth2Request request) throws ResourceOwnerConsentRequiredException;
+    boolean verify(boolean consentSaved, OAuth2Request request, ClientRegistration registration)
+            throws ResourceOwnerConsentRequiredException;
 }

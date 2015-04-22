@@ -11,10 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
+
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+import static org.forgerock.oauth2.core.Utils.*;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -23,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.inject.Singleton;
-import static org.forgerock.oauth2.core.Utils.splitResponseType;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
@@ -60,10 +62,12 @@ public class AuthorizationTokenIssuer {
      */
     public AuthorizationToken issueTokens(OAuth2Request request, ClientRegistration clientRegistration,
             ResourceOwner resourceOwner, Set<String> authorizationScope, OAuth2ProviderSettings providerSettings)
-            throws InvalidClientException, UnsupportedResponseTypeException, ServerException, InvalidScopeException, NotFoundException {
+            throws InvalidClientException, UnsupportedResponseTypeException, ServerException, InvalidScopeException,
+            NotFoundException {
 
         //issue tokens
-        final Set<String> requestedResponseTypes = splitResponseType(request.<String>getParameter("response_type"));
+        final Set<String> requestedResponseTypes =
+                splitResponseType(request.<String>getParameter(RESPONSE_TYPE));
         if (Utils.isEmpty(requestedResponseTypes)) {
             logger.debug("Response type is not supported");
             throw new UnsupportedResponseTypeException("Response type is not supported");
@@ -75,16 +79,16 @@ public class AuthorizationTokenIssuer {
         final Map<String, ResponseTypeHandler> allowedResponseTypes = providerSettings.getAllowedResponseTypes();
 
         final String tokenType = clientRegistration.getAccessTokenType();
-        final String resourceOwnerId = resourceOwner.getId();
         final String clientId = clientRegistration.getClientId();
-        final String redirectUri = request.getParameter("redirect_uri");
-        final String nonce = request.getParameter("nonce");
+        final String redirectUri = request.getParameter(REDIRECT_URI);
+        final String nonce = request.getParameter(OAuth2Constants.Custom.NONCE);
 
         final Map<String, Token> tokens = new HashMap<String, Token>();
         boolean returnAsFragment = false;
 
         final List<String> sortedResponseTypes =
-                Utils.asSortedList(requestedResponseTypes, new KeyStringComparator("id_token"));
+                Utils.asSortedList(requestedResponseTypes,
+                        new KeyStringComparator(OAuth2Constants.JWTTokenParams.ID_TOKEN));
 
         for (final String responseType : sortedResponseTypes) {
 
@@ -95,7 +99,7 @@ public class AuthorizationTokenIssuer {
             final ResponseTypeHandler responseTypeHandler = allowedResponseTypes.get(responseType);
 
             final Map.Entry<String, Token> token = responseTypeHandler.handle(tokenType, validatedScope,
-                    resourceOwnerId, clientId, redirectUri, nonce, request);
+                    resourceOwner, clientId, redirectUri, nonce, request);
 
             if (token != null) {
 
@@ -133,10 +137,10 @@ public class AuthorizationTokenIssuer {
         }
 
         // Always echo scope back to the requester even if identical - consistent with access_token endpoint.
-        tokenMap.put("scope", Utils.joinScope(validatedScope));
+        tokenMap.put(SCOPE, Utils.joinScope(validatedScope));
 
-        if (request.getParameter("state") != null) {
-            tokenMap.put("state", request.<String>getParameter("state"));
+        if (request.getParameter(STATE) != null) {
+            tokenMap.put(STATE, request.<String>getParameter(STATE));
         }
 
         return new AuthorizationToken(tokenMap, returnAsFragment);
@@ -160,7 +164,7 @@ public class AuthorizationTokenIssuer {
                 tokenMap.put(entry.getKey(), entry.getValue().getTokenId());
             }
             //if access token add extra fields
-            if (entry.getValue().getTokenName().equalsIgnoreCase("access_token")) {
+            if (entry.getValue().getTokenName().equalsIgnoreCase(ACCESS_TOKEN)) {
                 for (final Map.Entry<String, Object> entryInMap : token.entrySet()) {
                     if (!tokenMap.containsKey(entryInMap.getKey())) {
                         tokenMap.put(entryInMap.getKey(), entryInMap.getValue().toString());

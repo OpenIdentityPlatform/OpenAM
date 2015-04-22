@@ -11,21 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
-
-import com.sun.identity.idm.AMIdentity;
-import org.forgerock.oauth2.core.PEMDecoder;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 
 import static org.fest.assertions.Assertions.*;
 import static org.fest.assertions.MapAssert.*;
@@ -33,15 +22,28 @@ import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2Client.*;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 import static org.mockito.Mockito.*;
 
+import com.sun.identity.idm.AMIdentity;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverService;
+import org.forgerock.oauth2.core.PEMDecoder;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
 public class OpenAMClientRegistrationTest {
 
     private AMIdentity amIdentity;
     private OpenAMClientRegistration clientRegistration;
+    private OpenIdResolverService mockResolver;
 
     @BeforeMethod
     public void setup() throws Exception {
         amIdentity = mock(AMIdentity.class);
-        clientRegistration = new OpenAMClientRegistration(amIdentity, new PEMDecoder());
+        mockResolver = mock(OpenIdResolverService.class);
+        clientRegistration = new OpenAMClientRegistration(amIdentity, new PEMDecoder(), mockResolver);
     }
 
     @Test

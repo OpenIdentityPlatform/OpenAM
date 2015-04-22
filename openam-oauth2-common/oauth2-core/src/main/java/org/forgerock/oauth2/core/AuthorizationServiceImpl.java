@@ -11,11 +11,20 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
 
+import static org.forgerock.oauth2.core.OAuth2Constants.Custom.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import javax.inject.Inject;
 import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InteractionRequiredException;
@@ -32,16 +41,6 @@ import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.Custom.*;
 
 /**
  * Handles authorization requests from OAuth2 clients to the OAuth2 provider to grant authorization for a specific
@@ -112,7 +111,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
                 clientRegistration.getClientId(), validatedScope);
 
         //plugin point
-        final boolean haveConsent = consentVerifier.verify(consentSaved, request);
+        final boolean haveConsent = consentVerifier.verify(consentSaved, request, clientRegistration);
 
         if (!haveConsent) {
             String localeParameter = request.getParameter(LOCALE);

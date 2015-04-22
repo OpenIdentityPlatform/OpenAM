@@ -11,11 +11,17 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
 
+import static org.forgerock.oauth2.core.AccessTokenVerifier.*;
+
+import java.util.HashMap;
+import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.ExpiredTokenException;
@@ -26,14 +32,6 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.forgerock.oauth2.core.AccessTokenVerifier.HEADER;
-import static org.forgerock.oauth2.core.AccessTokenVerifier.QUERY_PARAM;
 
 /**
  * Service to return the full information of a OAuth2 token.
@@ -53,6 +51,8 @@ public class TokenInfoServiceImpl implements TokenInfoService {
      *
      * @param tokenStore An instance of the TokenStore.
      * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
+     * @param headerTokenVerifier Basic HTTP access token verification.
+     * @param queryTokenVerifier Query string access token verification.
      */
     @Inject
     public TokenInfoServiceImpl(TokenStore tokenStore, OAuth2ProviderSettingsFactory providerSettingsFactory,

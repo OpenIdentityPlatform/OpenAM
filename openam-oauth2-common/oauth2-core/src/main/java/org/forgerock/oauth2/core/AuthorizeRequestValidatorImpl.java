@@ -11,11 +11,16 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
 
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+import static org.forgerock.oauth2.core.Utils.*;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
@@ -23,12 +28,6 @@ import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
 import org.forgerock.util.Reject;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import static org.forgerock.oauth2.core.Utils.isEmpty;
-import static org.forgerock.oauth2.core.Utils.splitResponseType;
 
 /**
  * Implementation of the request validator for the OAuth2 authorize endpoint.
@@ -67,15 +66,15 @@ public class AuthorizeRequestValidatorImpl implements AuthorizeRequestValidator 
     public void validateRequest(OAuth2Request request) throws InvalidClientException, InvalidRequestException,
             RedirectUriMismatchException, UnsupportedResponseTypeException, ServerException, NotFoundException {
 
-        Reject.ifTrue(isEmpty(request.<String>getParameter("client_id")), "Missing parameter, 'client_id'");
-        Reject.ifTrue(isEmpty(request.<String>getParameter("response_type")), "Missing parameter, 'response_type'");
+        Reject.ifTrue(isEmpty(request.<String>getParameter(CLIENT_ID)), "Missing parameter, 'client_id'");
+        Reject.ifTrue(isEmpty(request.<String>getParameter(RESPONSE_TYPE)), "Missing parameter, 'response_type'");
 
         final ClientRegistration clientRegistration = clientRegistrationStore.get(request.<String>getParameter("client_id"),
                 request);
 
-        redirectUriValidator.validate(clientRegistration, request.<String>getParameter("redirect_uri"));
+        redirectUriValidator.validate(clientRegistration, request.<String>getParameter(REDIRECT_URI));
 
         responseTypeValidator.validate(clientRegistration,
-                splitResponseType(request.<String>getParameter("response_type")), providerSettingsFactory.get(request));
+                splitResponseType(request.<String>getParameter(RESPONSE_TYPE)), providerSettingsFactory.get(request));
     }
 }

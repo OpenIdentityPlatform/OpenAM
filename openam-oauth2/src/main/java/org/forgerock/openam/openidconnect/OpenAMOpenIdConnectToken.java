@@ -16,12 +16,12 @@
 
 package org.forgerock.openam.openidconnect;
 
-import org.forgerock.oauth2.core.OAuth2Constants;
-import static org.forgerock.oauth2.core.Utils.isEmpty;
-import org.forgerock.openidconnect.OpenIdConnectToken;
+import static org.forgerock.oauth2.core.Utils.*;
 
 import java.security.KeyPair;
 import java.util.List;
+import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.openidconnect.OpenIdConnectToken;
 
 /**
  * Models an OpenAM OpenId Connect Token.
@@ -55,7 +55,8 @@ public class OpenAMOpenIdConnectToken extends OpenIdConnectToken {
     public OpenAMOpenIdConnectToken(String kid, byte[] clientSecret, KeyPair keyPair, String algorithm, String iss,
             String sub, String aud, String azp, long exp, long iat, long authTime, String nonce, String ops,
             String atHash, String cHash, String acr, List<String> amr, String realm) {
-        super(kid, clientSecret, keyPair, algorithm, iss, sub, aud, azp, exp, iat, authTime, nonce, ops, atHash, cHash, acr, amr);
+        super(kid, clientSecret, keyPair, algorithm, iss, sub, aud, azp, exp, iat, authTime,
+                nonce, ops, atHash, cHash, acr, amr);
         setRealm(realm);
     }
 

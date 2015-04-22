@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openidconnect;
@@ -74,9 +74,11 @@ public class UserInfoServiceImpl implements UserInfoService {
         AccessTokenVerifier.TokenState headerToken = headerTokenVerifier.verify(request);
         AccessTokenVerifier.TokenState formToken = formTokenVerifier.verify(request);
         if (!headerToken.isValid() && !formToken.isValid()) {
+            logger.debug("No access token provided for this request.");
             throw new InvalidTokenException();
         }
         if (headerToken.isValid() && formToken.isValid()) {
+            logger.debug("Access token provided in both form and header.");
             throw new ServerException("Access Token cannot be provided in both form and header");
         }
 

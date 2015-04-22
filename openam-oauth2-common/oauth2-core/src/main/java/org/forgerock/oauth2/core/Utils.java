@@ -11,10 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
+
+import static org.forgerock.oauth2.core.OAuth2Constants.AuthorizationEndpoint.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,13 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import static org.forgerock.oauth2.core.OAuth2Constants.AuthorizationEndpoint.ID_TOKEN;
-import static org.forgerock.oauth2.core.OAuth2Constants.AuthorizationEndpoint.TOKEN;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.OPENID;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.RESPONSE_TYPE;
 import org.forgerock.oauth2.core.OAuth2Constants.UrlLocation;
-import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.FRAGMENT;
-import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.QUERY;
 
 /**
  * Utility class containing common utility functions.

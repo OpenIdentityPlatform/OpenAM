@@ -17,6 +17,7 @@
 package org.forgerock.openidconnect;
 
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.ResourceOwner;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
@@ -34,7 +35,7 @@ public interface OpenIdConnectTokenStore extends TokenStore {
     /**
      * Creates an OpenId Connect token and stores it in the OpenId Connect Provider's store.
      *
-     * @param resourceOwnerId The resource owner's id.
+     * @param resourceOwner The resource owner.
      * @param clientId The client's id.
      * @param authorizationParty The authorization party.
      * @param nonce The nonce.
@@ -46,6 +47,8 @@ public interface OpenIdConnectTokenStore extends TokenStore {
      *          authenticated.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
-    OpenIdConnectToken createOpenIDToken(String resourceOwnerId, String clientId, String authorizationParty,
-            String nonce, String ops, OAuth2Request request) throws ServerException, InvalidClientException, NotFoundException;
+    OpenIdConnectToken createOpenIDToken(ResourceOwner resourceOwner, String clientId,
+            String authorizationParty, String nonce, String ops, OAuth2Request request)
+            throws ServerException, InvalidClientException, NotFoundException;
 }
+

@@ -16,14 +16,12 @@
 
 package org.forgerock.oauth2.core;
 
-import org.forgerock.oauth2.core.exceptions.BadRequestException;
+import java.util.Set;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.json.fluent.JsonValue;
-
-import java.util.Set;
 
 /**
  * Interface for a Token Store which the OAuth2 Provider will implement.
@@ -38,7 +36,7 @@ public interface TokenStore {
      * Creates an Authorization Code and stores it in the OAuth2 Provider's store.
      *
      * @param scope The requested scope.
-     * @param resourceOwnerId The resource owner's id.
+     * @param resourceOwner The resource owner.
      * @param clientId The client's id.
      * @param redirectUri The redirect uri.
      * @param nonce The nonce.
@@ -47,8 +45,9 @@ public interface TokenStore {
      * @throws ServerException If any internal server error occurs.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
-    AuthorizationCode createAuthorizationCode(Set<String> scope, String resourceOwnerId, String clientId,
-            String redirectUri, String nonce, OAuth2Request request) throws ServerException, NotFoundException;
+    AuthorizationCode createAuthorizationCode(Set<String> scope, ResourceOwner resourceOwner,
+            String clientId, String redirectUri, String nonce, OAuth2Request request) throws ServerException,
+            NotFoundException;
 
     /**
      * Creates an Access Token and stores it in the OAuth2 Provider's store.
@@ -62,21 +61,23 @@ public interface TokenStore {
      * @param scope The requested scope.
      * @param refreshToken The refresh token. May be {@code null}.
      * @param nonce The nonce.
+     * @param claims Additional claims requested (for id_token or userinfo).
      * @param request The OAuth2 request.
      * @return An Access Token.
      * @throws ServerException If any internal server error occurs.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
     AccessToken createAccessToken(String grantType, String accessTokenType, String authorizationCode,
-            String resourceOwnerId, String clientId, String redirectUri, Set<String> scope, RefreshToken refreshToken,
-            String nonce, OAuth2Request request) throws ServerException, NotFoundException;
+            String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
+            RefreshToken refreshToken, String nonce, String claims, OAuth2Request request)
+            throws ServerException, NotFoundException;
 
     /**
      * Creates a Refresh Token and stores it in the OAuth2 Provider's store.
      *
      * @param grantType The OAuth2 Grant Type.
      * @param clientId The client's id.
-     * @param resourceOwnerId The resource owner's id.
+     * @param resourceOwnerId The resource owner's Id.
      * @param redirectUri The redirect uri.
      * @param scope The requested scope.
      * @param request The OAuth2 request.
@@ -84,8 +85,9 @@ public interface TokenStore {
      * @throws ServerException If any internal server error occurs.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
-    RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId, String redirectUri,
-            Set<String> scope, OAuth2Request request) throws ServerException, NotFoundException;
+    RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId,
+            String redirectUri, Set<String> scope, OAuth2Request request)
+            throws ServerException, NotFoundException;
 
     /**
      * Creates an Authorization Code and stores it in the OAuth2 Provider's store.
@@ -105,6 +107,20 @@ public interface TokenStore {
      * @param authorizationCode The authorization code.
      */
     void updateAuthorizationCode(AuthorizationCode authorizationCode);
+
+    /**
+     * Updates an Access Token.
+     *
+     * @param accessToken The access token.
+     */
+    void updateAccessToken(AccessToken accessToken);
+
+    /**
+     * Updates a Refresh Token.
+     *
+     * @param refreshToken The refresh token.
+     */
+    void updateRefreshToken(RefreshToken refreshToken);
 
     /**
      * Deletes an Authorization Code from the OAuth2 Provider's store.

@@ -16,16 +16,15 @@
 
 package org.forgerock.openam.oauth2;
 
-import org.forgerock.oauth2.core.RefreshToken;
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.oauth2.core.OAuth2Constants;
-import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
+import static org.forgerock.oauth2.core.Utils.*;
 
 import java.util.Collections;
 import java.util.ResourceBundle;
 import java.util.Set;
-
-import static org.forgerock.oauth2.core.Utils.stringToSet;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.RefreshToken;
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 
 /**
  * Models a OpenAM OAuth2 Refresh Token.
@@ -62,11 +61,29 @@ public class OpenAMRefreshToken extends RefreshToken {
      * @param realm The realm.
      */
     public OpenAMRefreshToken(String id, String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
-            long expiryTime, String tokenType, String tokenName, String grantType, String realm, String authModules,
-            String acr) {
+            long expiryTime, String tokenType, String tokenName, String grantType, String realm,
+            String authModules, String acr) {
         super(id, resourceOwnerId, clientId, redirectUri, scope, expiryTime, tokenType, tokenName, grantType,
                 authModules, acr);
         setRealm(realm);
+    }
+
+    /**
+     * Sets the requested claims.
+     *
+     * @param claims Requested claims
+     */
+    protected void setClaims(String claims) {
+        setStringProperty(OAuth2Constants.Custom.CLAIMS, claims);
+    }
+
+    /**
+     * Gets the requested claims.
+     *
+     * @return The claims.
+     */
+    public String getClaims() {
+        return getStringProperty(OAuth2Constants.Custom.CLAIMS);
     }
 
     /**

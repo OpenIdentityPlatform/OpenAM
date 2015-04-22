@@ -81,7 +81,7 @@ public class PasswordCredentialsGrantTypeHandlerTest {
                 eq(request))).willReturn(validatedScope);
         given(providerSettings.issueRefreshTokens()).willReturn(false);
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
-                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), eq(request)))
+                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), anyString(), eq(request)))
                 .willReturn(accessToken);
 
         //When
@@ -137,7 +137,7 @@ public class PasswordCredentialsGrantTypeHandlerTest {
                 eq(request))).willReturn(refreshToken);
         given(refreshToken.getTokenId()).willReturn("REFRESH_TOKEN_ID");
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
-                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), eq(request)))
+                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), anyString(), eq(request)))
                 .willReturn(accessToken);
 
         //When
@@ -170,7 +170,7 @@ public class PasswordCredentialsGrantTypeHandlerTest {
                 eq(request))).willReturn(validatedScope);
         given(providerSettings.issueRefreshTokens()).willReturn(false);
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
-                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), eq(request)))
+                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), anyString(), eq(request)))
                 .willReturn(accessToken);
 
         //When

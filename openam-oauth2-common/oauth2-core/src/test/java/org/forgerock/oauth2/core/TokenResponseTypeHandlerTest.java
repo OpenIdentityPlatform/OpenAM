@@ -11,22 +11,20 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
 
-import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.mock;
+import static org.testng.Assert.*;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.testng.Assert.assertEquals;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * @since 12.0.0
@@ -53,19 +51,20 @@ public class TokenResponseTypeHandlerTest {
         String tokenType = "TOKEN_TYPE";
         String authorizationCode = null;
         Set<String> scope = new HashSet<String>();
-        String resourceOwnerId = "RESOURCE_OWNER_ID";
+        ResourceOwner resourceOwner = mock(ResourceOwner.class);
         String clientId = "CLIENT_ID";
         String redirectUri = "REDIRECT_URI";
+        String claims = null;
         RefreshToken refreshToken = null;
         String nonce = "NONCE";
         OAuth2Request request = mock(OAuth2Request.class);
         AccessToken accessToken = mock(AccessToken.class);
 
-        given(tokenStore.createAccessToken(grantType, tokenType, authorizationCode, resourceOwnerId, clientId,
-                redirectUri, scope, refreshToken, nonce, request)).willReturn(accessToken);
+        given(tokenStore.createAccessToken(grantType, tokenType, authorizationCode, resourceOwner.getId(), clientId,
+                redirectUri, scope, refreshToken, nonce, claims, request)).willReturn(accessToken);
 
         //When
-        final Map.Entry<String, Token> tokenEntry = responseTypeHandler.handle(tokenType, scope, resourceOwnerId,
+        final Map.Entry<String, Token> tokenEntry = responseTypeHandler.handle(tokenType, scope, resourceOwner,
                 clientId, redirectUri, nonce, request);
 
         //Then

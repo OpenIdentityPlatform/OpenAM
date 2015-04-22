@@ -55,10 +55,21 @@ import com.sun.identity.sm.ServiceSchemaManager;
 public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
 
     public static final Map<String, String> ALGORITHM_NAMES = new HashMap<String, String>();
+    public static final Set<String> DEFAULT_CLAIMS = new HashSet<String>();
+
     static {
         ALGORITHM_NAMES.put(JwsAlgorithm.HS256.getAlgorithm(), JwsAlgorithm.HS256.name());
         ALGORITHM_NAMES.put(JwsAlgorithm.HS384.getAlgorithm(), JwsAlgorithm.HS384.name());
         ALGORITHM_NAMES.put(JwsAlgorithm.HS512.getAlgorithm(), JwsAlgorithm.HS512.name());
+
+        DEFAULT_CLAIMS.add("email");
+        DEFAULT_CLAIMS.add("address");
+        DEFAULT_CLAIMS.add("phone_number");
+        DEFAULT_CLAIMS.add("given_name");
+        DEFAULT_CLAIMS.add("zoneinfo");
+        DEFAULT_CLAIMS.add("family_name");
+        DEFAULT_CLAIMS.add("locale");
+        DEFAULT_CLAIMS.add("name");
     }
 
     private static final String REPORT_DATA = "%REPORT_DATA%";
@@ -108,7 +119,9 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
 
                 if (isProviderRelyingOnDefaults(withoutDefaults, withoutValidators)) {
                     attributesToUpdate.put(realm, withoutValidators);
-                } else if(shouldUpgradeAlgorithmName(withoutDefaults)) {
+                } else if (shouldUpgradeClaims(withDefaults)) {
+                    attributesToUpdate.put(realm, withoutValidators);
+                } else if (shouldUpgradeAlgorithmName(withoutDefaults)) {
                     attributesToUpdate.put(realm, null);
                 }
             }
@@ -116,6 +129,12 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
             DEBUG.error("An error occurred while trying to look for upgradable OAuth2 Providers.", e);
             throw new UpgradeException("Unable to retrieve OAuth2 Providers.", e);
         }
+    }
+
+    private boolean shouldUpgradeClaims(Map<String, Set<String>> attributes) {
+        final Set<String> scopes = attributes.get(SUPPORTED_SCOPES);
+
+        return scopes == null || scopes.isEmpty();
     }
 
     private boolean isProviderRelyingOnDefaults(Map<String, Set<String>> withoutDefaults,
@@ -151,6 +170,7 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
                     attributes = serviceConfig.getAttributesWithoutDefaults();
                 }
                 renameAlgorithms(attributes);
+                sortScopes(attributes);
                 serviceConfig.setAttributes(attributes);
                 UpgradeProgress.reportEnd("upgrade.success");
             }
@@ -158,6 +178,18 @@ public class UpgradeOAuth2ProviderStep extends AbstractUpgradeStep {
             UpgradeProgress.reportEnd("upgrade.failed");
             DEBUG.error("An error occurred while trying to upgrade an OAuth2 Provider", e);
             throw new UpgradeException("Unable to upgrade OAuth2 Providers.", e);
+        }
+
+    }
+
+    private void sortScopes(Map<String, Set<String>> attributes) {
+
+        final Set<String> scopes = attributes.get(SUPPORTED_SCOPES);
+        final Set<String> claims = attributes.get(SUPPORTED_CLAIMS);
+
+        if (scopes == null || scopes.isEmpty()) {
+            attributes.put(SUPPORTED_SCOPES, claims);
+            attributes.put(SUPPORTED_CLAIMS, DEFAULT_CLAIMS);
         }
 
     }

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -30,8 +30,7 @@ public class NoneResponseTypeHandler implements ResponseTypeHandler {
      * {@inheritDoc}
      */
     public Map.Entry<String, Token> handle(String tokenType, Set<String> scope,
-                                           String resourceOwnerId, String clientId, String redirectUri, String nonce,
-                                           OAuth2Request request) {
+            ResourceOwner resourceOwner, String clientId, String redirectUri, String nonce, OAuth2Request request) {
         return null;
     }
 

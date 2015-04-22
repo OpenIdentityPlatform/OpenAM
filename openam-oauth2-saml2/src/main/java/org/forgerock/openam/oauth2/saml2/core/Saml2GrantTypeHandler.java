@@ -16,6 +16,10 @@
 
 package org.forgerock.openam.oauth2.saml2.core;
 
+import static org.forgerock.oauth2.core.OAuth2Constants.Bearer.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.SCOPE;
+import static org.forgerock.oauth2.core.Utils.*;
+
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml2.assertion.Assertion;
 import com.sun.identity.saml2.assertion.AssertionFactory;
@@ -26,6 +30,10 @@ import com.sun.identity.saml2.assertion.Subject;
 import com.sun.identity.saml2.assertion.SubjectConfirmation;
 import com.sun.identity.saml2.assertion.SubjectConfirmationData;
 import com.sun.identity.saml2.common.SAML2Exception;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import javax.inject.Inject;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
@@ -51,15 +59,6 @@ import org.restlet.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-
-import static org.forgerock.oauth2.core.Utils.isEmpty;
-import static org.forgerock.oauth2.core.Utils.joinScope;
-import static org.forgerock.oauth2.core.Utils.splitScope;
-
 /**
  * @since 12.0.0
  */
@@ -82,7 +81,7 @@ public class Saml2GrantTypeHandler extends GrantTypeHandler {
     public AccessToken handle(OAuth2Request request) throws InvalidGrantException, InvalidClientException,
             ClientAuthenticationFailedException, InvalidRequestException, ServerException, InvalidScopeException, NotFoundException {
 
-        String clientId = request.getParameter("client_id");
+        String clientId = request.getParameter(OAuth2Constants.Params.CLIENT_ID);
         Reject.ifTrue(isEmpty(clientId), "Missing parameter, 'client_id'");
 
         final ClientRegistration clientRegistration = clientRegistrationStore.get(clientId, request);
@@ -118,20 +117,29 @@ public class Saml2GrantTypeHandler extends GrantTypeHandler {
         logger.trace("Assertion is valid");
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
-        final String grantType = request.getParameter("grant_type");
-        final Set<String> scope = splitScope(request.<String>getParameter("scope"));
+        final String validatedClaims = providerSettings.validateRequestedClaims(
+                (String) request.getParameter(OAuth2Constants.Custom.CLAIMS));
+        final String grantType = request.getParameter(OAuth2Constants.Params.GRANT_TYPE);
+        final Set<String> scope = splitScope(request.<String>getParameter(OAuth2Constants.Params.SCOPE));
         final Set<String> validatedScope = providerSettings.validateAccessTokenScope(clientRegistration, scope,
                 request);
         logger.trace("Granting scope: " + validatedScope.toString());
 
         logger.trace("Creating token with data: " + clientRegistration.getAccessTokenType() + "\n"
-                + validatedScope.toString() + "\n" + normaliseRealm(request.<String>getParameter("realm")) + "\n"
+                + validatedScope.toString() + "\n"
+                + normaliseRealm(request.<String>getParameter(OAuth2Constants.Params.REALM)) + "\n"
                 + assertionObject.getSubject().getNameID().getValue() + "\n" + clientRegistration.getClientId());
 
-        final AccessToken accessToken = tokenStore.createAccessToken(grantType, "Bearer", null,
+        final AccessToken accessToken = tokenStore.createAccessToken(grantType, BEARER, null,
                 assertionObject.getSubject().getNameID().getValue(), clientRegistration.getClientId(), null,
-                validatedScope, null, null, request);
+                validatedScope, null, null, validatedClaims, request);
         logger.trace("Token created: " + accessToken.toString());
+
+        if (!validatedScope.isEmpty()) {
+            accessToken.add(SCOPE, joinScope(validatedScope));
+        }
+
+        tokenStore.updateAccessToken(accessToken);
 
         return accessToken;
     }

@@ -16,22 +16,25 @@
 
 package org.forgerock.oauth2.core;
 
-import org.forgerock.oauth2.core.exceptions.ExpiredTokenException;
-import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
-import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
-import org.mockito.Matchers;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.anySetOf;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.testng.Assert.*;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
-import static org.testng.Assert.assertEquals;
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
+import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.mockito.Matchers;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * @since 12.0.0
@@ -205,7 +208,7 @@ public class AccessTokenServiceImplTest {
         given(providerSettings.validateRefreshTokenScope(eq(clientRegistration), anySetOf(String.class),
                 anySetOf(String.class), eq(request))).willReturn(validatedScope);
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyString(), anySetOf(String.class), eq(refreshToken), anyString(), eq(request)))
+                anyString(), anySetOf(String.class), eq(refreshToken), anyString(), anyString(), eq(request)))
                 .willReturn(accessToken);
 
         //When
@@ -237,7 +240,7 @@ public class AccessTokenServiceImplTest {
         given(providerSettings.validateRefreshTokenScope(eq(clientRegistration), anySetOf(String.class),
                 anySetOf(String.class), eq(request))).willReturn(validatedScope);
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyString(), anySetOf(String.class), eq(refreshToken), anyString(), eq(request)))
+                anyString(), anySetOf(String.class), eq(refreshToken), anyString(), anyString(), eq(request)))
                 .willReturn(accessToken);
 
         //When
@@ -280,7 +283,7 @@ public class AccessTokenServiceImplTest {
         given(newRefreshToken.getTokenId()).willReturn(newRefreshTokenId);
 
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyString(), anySetOf(String.class), eq(newRefreshToken), anyString(), eq(request)))
+                anyString(), anySetOf(String.class), eq(newRefreshToken), anyString(), anyString(), eq(request)))
                 .willReturn(accessToken);
 
         //When

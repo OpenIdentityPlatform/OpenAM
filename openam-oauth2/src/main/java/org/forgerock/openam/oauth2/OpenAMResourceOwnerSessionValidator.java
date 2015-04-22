@@ -11,18 +11,23 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
 
+import static com.sun.identity.shared.DateUtils.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.Custom.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.*;
 import static org.forgerock.oauth2.core.Utils.*;
+import static org.forgerock.openidconnect.Client.*;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
@@ -30,6 +35,7 @@ import com.sun.identity.shared.debug.Debug;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.AccessController;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
@@ -44,13 +50,19 @@ import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.ResourceOwner;
 import org.forgerock.oauth2.core.ResourceOwnerSessionValidator;
+import org.forgerock.oauth2.core.Utils;
 import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
+import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.InteractionRequiredException;
+import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.LoginRequiredException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
+import org.forgerock.openidconnect.Client;
 import org.forgerock.openidconnect.OpenIdPrompt;
 import org.owasp.esapi.errors.EncodingException;
 import org.restlet.Request;
@@ -70,13 +82,18 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
     private static final Debug logger = Debug.getInstance("OAuth2Provider");
     private final SSOTokenManager ssoTokenManager;
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
+    private final OpenAMClientDAO clientDAO;
+    private final ClientCredentialsReader clientCredentialsReader;
 
     @Inject
     public OpenAMResourceOwnerSessionValidator(SSOTokenManager ssoTokenManager,
-                                               OAuth2ProviderSettingsFactory providerSettingsFactory) {
-
+                                               OAuth2ProviderSettingsFactory providerSettingsFactory,
+                                               OpenAMClientDAO clientDAO,
+                                               ClientCredentialsReader clientCredentialsReader) {
         this.ssoTokenManager = ssoTokenManager;
         this.providerSettingsFactory = providerSettingsFactory;
+        this.clientDAO = clientDAO;
+        this.clientCredentialsReader = clientCredentialsReader;
     }
 
 
@@ -103,38 +120,52 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
         }
 
         try {
+            if (token == null) {
+                token = ssoTokenManager.createSSOToken(request.getSession());
+            }
+        } catch (SSOException e) {
+            logger.warning("Error authenticating user against OpenAM: ", e);
+        }
+
+        try {
             if (token != null) {
                 if (openIdPrompt.containsLogin()) {
-                    try {
-                        ssoTokenManager.destroyToken(token);
-                    } catch (SSOException e) {
-                        logger.error("Error destroying SSOToken: ", e);
-                    }
-                    throw authenticationRequired(request);
+                    throw authenticationRequired(request, token);
                 }
 
                 try {
+                    final long authTime = stringToDate(token.getProperty(ISAuthConstants.AUTH_INSTANT)).getTime();
+
+                    if (isPastMaxAge(getMaxAge(request), authTime)) {
+                        alterMaxAge(request);
+                        throw authenticationRequired(request, token);
+                    }
+
                     final AMIdentity id = IdUtils.getIdentity(
                             AccessController.doPrivileged(AdminTokenAction.getInstance()),
                             token.getProperty(Constants.UNIVERSAL_IDENTIFIER));
 
-                    final String acrValuesStr = request.getParameter(OAuth2Constants.Params.ACR_VALUES);
+                    final String acrValuesStr = request.getParameter(ACR_VALUES);
                     if (acrValuesStr != null) {
                         setCurrentAcr(token, request, acrValuesStr);
                     }
 
-                    return new OpenAMResourceOwner(token.getProperty("UserToken"), id);
-                } catch (SSOException e) {
-                    logger.error("Error authenticating user against OpenAM: ", e);
-                    throw new LoginRequiredException();
-                } catch (IdRepoException e) {
+                    return new OpenAMResourceOwner(token.getProperty(ISAuthConstants.USER_TOKEN), id, authTime);
+
+                } catch (Exception e) { //Exception as chance of MANY exception types here.
                     logger.error("Error authenticating user against OpenAM: ", e);
                     throw new LoginRequiredException();
                 }
             } else {
                 if (openIdPrompt.containsNone()) {
                     logger.error("Not pre-authenticated and prompt parameter equals none.");
-                    throw new InteractionRequiredException();
+                    if (request.getParameter(OAuth2Constants.Params.RESPONSE_TYPE) != null) {
+                        throw new InteractionRequiredException(Utils.isOpenIdConnectFragmentErrorType(splitResponseType(
+                                        request.<String>getParameter(RESPONSE_TYPE))) ? FRAGMENT : QUERY);
+
+                    } else {
+                        throw new InteractionRequiredException();
+                    }
                 } else {
                     throw authenticationRequired(request);
                 }
@@ -147,12 +178,66 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
     }
 
     /**
+     * After we are sent to authN we will come back to authZ, next time make sure
+     * we don't fail to max_age again (in case it's only a few seconds),
+     * otherwise we'll loop forever and ever...
+     */
+    private void alterMaxAge(OAuth2Request req) {
+        final Request request = req.getRequest();
+        Form query = request.getResourceRef().getQueryAsForm();
+        Parameter param = query.getFirst(MAX_AGE);
+        if (param == null) {
+            param = new Parameter(MAX_AGE, CONFIRMED_MAX_AGE);
+            query.add(param);
+        } else {
+            param.setValue(CONFIRMED_MAX_AGE);
+        }
+
+        request.getResourceRef().setQuery(query.getQueryString());
+    }
+
+    /**
+     * maxAge in seconds, authTime in miliseconds, maxAge not in play if set to -1.
+     */
+    private boolean isPastMaxAge(long maxAge, long authTime) throws SSOException {
+        return maxAge > -1 && maxAge <= System.currentTimeMillis() - authTime;
+    }
+
+    /**
+     * Returns the max_age, set either as a client default (if enabled) or by request in ms, or -1 if not used.
+     */
+    private long getMaxAge(OAuth2Request request)
+            throws URISyntaxException, AccessDeniedException, ServerException,
+            NotFoundException, EncodingException, UnauthorizedClientException, ResourceOwnerAuthenticationRequired,
+            SSOException, ParseException, ClientAuthenticationFailedException, InvalidClientException, InvalidRequestException {
+
+        final ClientCredentials clientCredentials = clientCredentialsReader.extractCredentials(request, null);
+
+        final String maxAgeStr = request.getParameter(MAX_AGE);
+        long maxAge = -1;
+
+        if (maxAgeStr != null) { //max_age is in seconds
+            maxAge = Long.valueOf(maxAgeStr);
+            if (maxAge < MIN_DEFAULT_MAX_AGE) { //default to the minimum default to avoid infinite redirects
+                maxAge = MIN_DEFAULT_MAX_AGE;
+            }
+        } else { //default_max_age is also in seconds
+            Client client = clientDAO.read(clientCredentials.getClientId(), request);
+            if (client.getDefaultMaxAgeEnabled()) {
+                maxAge = client.getDefaultMaxAge();
+            }
+        }
+
+        return maxAge * 1000; //return as ms
+    }
+
+    /**
      * If the user is already logged in when the OAuth2 request comes in with an acr_values parameter, we
      * look to see if they've already matched one. If they have, we set the acr value on the request.
      */
     private void setCurrentAcr(SSOToken token, OAuth2Request request, String acrValuesStr)
             throws NotFoundException, ServerException, SSOException {
-        String serviceUsed = token.getProperty("Service");
+        String serviceUsed = token.getProperty(ISAuthConstants.SERVICE);
         Set<String> acrValues = new HashSet<String>(Arrays.asList(acrValuesStr.split("\\s+")));
         OAuth2ProviderSettings settings = providerSettingsFactory.get(request);
         Map<String, AuthenticationMethod> acrMap = settings.getAcrMapping();
@@ -164,7 +249,17 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
                 }
             }
         }
+    }
 
+    private ResourceOwnerAuthenticationRequired authenticationRequired(OAuth2Request request, SSOToken token)
+            throws URISyntaxException, AccessDeniedException, ServerException, NotFoundException, EncodingException {
+        try {
+            ssoTokenManager.destroyToken(token);
+        } catch (SSOException e) {
+            logger.error("Error destroying SSOToken: ", e);
+        }
+
+        return authenticationRequired(request);
     }
 
     private ResourceOwnerAuthenticationRequired authenticationRequired(OAuth2Request request)
@@ -175,17 +270,17 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
         final URI authURI = new URI(authURL);
         final Reference loginRef = new Reference(authURI);
 
-        final String acrValuesStr = request.getParameter(OAuth2Constants.Params.ACR_VALUES);
+        final String acrValuesStr = request.getParameter(ACR_VALUES);
         final String realm = request.getParameter(OAuth2Constants.Custom.REALM);
-        final String moduleName = request.getParameter(OAuth2Constants.Custom.MODULE);
-        final String serviceName = request.getParameter(OAuth2Constants.Custom.SERVICE);
-        final String locale = request.getParameter(OAuth2Constants.Custom.LOCALE);
+        final String moduleName = request.getParameter(MODULE);
+        final String serviceName = request.getParameter(SERVICE);
+        final String locale = request.getParameter(LOCALE);
 
         if (!isEmpty(realm)) {
             loginRef.addQueryParameter(OAuth2Constants.Custom.REALM, realm);
         }
         if (!isEmpty(locale)) {
-            loginRef.addQueryParameter(OAuth2Constants.Custom.LOCALE, locale);
+            loginRef.addQueryParameter(LOCALE, locale);
         }
 
         // Prefer standard acr_values, then module, then service
@@ -198,14 +293,14 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
                 req.getResourceRef().addQueryParameter(OAuth2Constants.JWTTokenParams.ACR, chosen.acr);
             }
         } else if (!isEmpty(moduleName)) {
-            loginRef.addQueryParameter(OAuth2Constants.Custom.MODULE, moduleName);
+            loginRef.addQueryParameter(MODULE, moduleName);
         } else if (!isEmpty(serviceName)) {
-            loginRef.addQueryParameter(OAuth2Constants.Custom.SERVICE, serviceName);
+            loginRef.addQueryParameter(SERVICE, serviceName);
         }
 
         removeLoginPrompt(req);
 
-        loginRef.addQueryParameter(OAuth2Constants.Custom.GOTO, req.getResourceRef().toString());
+        loginRef.addQueryParameter(GOTO, req.getResourceRef().toString());
 
         return new ResourceOwnerAuthenticationRequired(loginRef.toUri());
     }
@@ -264,7 +359,7 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
      */
     private void removeLoginPrompt(Request req) {
         Form query = req.getResourceRef().getQueryAsForm();
-        Parameter param = query.getFirst(OAuth2Constants.Custom.PROMPT);
+        Parameter param = query.getFirst(PROMPT);
         if (param != null && param.getSecond() != null) {
             String newValue = param.getSecond().toLowerCase().replace(OpenIdPrompt.PROMPT_LOGIN, "").trim();
             param.setSecond(newValue);

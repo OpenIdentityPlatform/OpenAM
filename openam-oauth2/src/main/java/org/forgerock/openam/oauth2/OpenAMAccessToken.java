@@ -11,22 +11,24 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 20142-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
 
-import org.forgerock.oauth2.core.AccessToken;
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.oauth2.core.OAuth2Constants;
-import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.*;
+import static org.forgerock.oauth2.core.Utils.*;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
-
-import static org.forgerock.oauth2.core.Utils.stringToSet;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.oauth2.core.AccessToken;
+import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.StringUtils;
 
 /**
  * Models a OpenAM OAuth2 access token.
@@ -62,25 +64,34 @@ public class OpenAMAccessToken extends AccessToken {
     /**
      * Constructs a new OpenAMAccessToken.
      *
-     * @param id The token id.
+     * @param id                The token id.
      * @param authorizationCode The authorization code.
-     * @param resourceOwnerId The resource owner's id.
-     * @param clientId The client's id.
-     * @param redirectUri The redirect uri.
-     * @param scope The scope.
-     * @param expiryTime The expiry time.
-     * @param refreshTokenId The refresh token id.
-     * @param tokenName The token name.
-     * @param grantType The grant type.
-     * @param nonce The nonce.
-     * @param realm The realm.
+     * @param resourceOwnerId   The resource owner's id.
+     * @param clientId          The client's id.
+     * @param redirectUri       The redirect uri.
+     * @param scope             The scope.
+     * @param expiryTime        The expiry time.
+     * @param refreshTokenId    The refresh token id.
+     * @param tokenName         The token name.
+     * @param grantType         The grant type.
+     * @param nonce             The nonce.
+     * @param realm             The realm.
+     * @param claims            The requested claims.
      */
     public OpenAMAccessToken(String id, String authorizationCode, String resourceOwnerId, String clientId,
-            String redirectUri, Set<String> scope, long expiryTime, String refreshTokenId, String tokenName,
-            String grantType, String nonce, String realm) {
+                             String redirectUri, Set<String> scope, long expiryTime, String refreshTokenId,
+                             String tokenName, String grantType, String nonce, String realm, String claims) {
         super(id, authorizationCode, resourceOwnerId, clientId, redirectUri, scope, expiryTime, refreshTokenId,
                 tokenName, grantType, nonce);
         setRealm(realm);
+
+        if (!StringUtils.isBlank(claims)) {
+            setClaims(claims);
+        }
+    }
+
+    public void setClaims(String claims) {
+        put(OAuth2Constants.Custom.CLAIMS, CollectionUtils.asSet(claims));
     }
 
     /**
@@ -88,7 +99,7 @@ public class OpenAMAccessToken extends AccessToken {
      */
     @Override
     protected void setId(String id) {
-        put(OAuth2Constants.CoreTokenParams.ID, stringToSet(id));
+        put(ID, stringToSet(id));
     }
 
     /**
@@ -96,7 +107,7 @@ public class OpenAMAccessToken extends AccessToken {
      */
     @Override
     protected void setAuthorizationCode(String authorizationCode) {
-        put(OAuth2Constants.CoreTokenParams.PARENT, stringToSet(authorizationCode));
+        put(PARENT, stringToSet(authorizationCode));
     }
 
     /**
@@ -104,7 +115,7 @@ public class OpenAMAccessToken extends AccessToken {
      */
     @Override
     protected void setResourceOwnerId(String resourceOwnerId) {
-        put(OAuth2Constants.CoreTokenParams.USERNAME, stringToSet(resourceOwnerId));
+        put(USERNAME, stringToSet(resourceOwnerId));
     }
 
     /**
@@ -112,7 +123,7 @@ public class OpenAMAccessToken extends AccessToken {
      */
     @Override
     protected void setClientId(String clientId) {
-        put(OAuth2Constants.CoreTokenParams.CLIENT_ID, stringToSet(clientId));
+        put(CLIENT_ID, stringToSet(clientId));
     }
 
     /**
@@ -120,7 +131,7 @@ public class OpenAMAccessToken extends AccessToken {
      */
     @Override
     protected void setRedirectUri(String redirectUri) {
-        put(OAuth2Constants.CoreTokenParams.REDIRECT_URI, stringToSet(redirectUri));
+        put(REDIRECT_URI, stringToSet(redirectUri));
     }
 
     /**
@@ -128,7 +139,7 @@ public class OpenAMAccessToken extends AccessToken {
      */
     @Override
     protected void setScope(Set<String> scope) {
-        put(OAuth2Constants.CoreTokenParams.SCOPE, scope);
+        put(SCOPE, scope);
     }
 
     /**
@@ -136,7 +147,7 @@ public class OpenAMAccessToken extends AccessToken {
      */
     @Override
     protected void setExpiryTime(long expiryTime) {
-        put(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, stringToSet(String.valueOf(expiryTime)));
+        put(EXPIRE_TIME, stringToSet(String.valueOf(expiryTime)));
     }
 
     /**
@@ -144,7 +155,7 @@ public class OpenAMAccessToken extends AccessToken {
      */
     @Override
     protected void setRefreshTokenId(String refreshToken) {
-        put(OAuth2Constants.CoreTokenParams.REFRESH_TOKEN, stringToSet(refreshToken));
+        put(REFRESH_TOKEN, stringToSet(refreshToken));
     }
 
     /**
@@ -152,7 +163,7 @@ public class OpenAMAccessToken extends AccessToken {
      */
     @Override
     protected void setTokenType(String tokenType) {
-        put(OAuth2Constants.CoreTokenParams.TOKEN_TYPE, stringToSet(tokenType));
+        put(TOKEN_TYPE, stringToSet(tokenType));
     }
 
     /**
@@ -160,7 +171,7 @@ public class OpenAMAccessToken extends AccessToken {
      */
     @Override
     protected void setTokenName(String tokenName) {
-        put(OAuth2Constants.CoreTokenParams.TOKEN_NAME, stringToSet(tokenName));
+        put(TOKEN_NAME, stringToSet(tokenName));
     }
 
     /**
@@ -188,9 +199,9 @@ public class OpenAMAccessToken extends AccessToken {
      */
     private void setRealm(final String realm) {
         if (realm == null || realm.isEmpty()) {
-            this.put(OAuth2Constants.CoreTokenParams.REALM, stringToSet("/"));
+            this.put(REALM, stringToSet("/"));
         } else {
-            this.put(OAuth2Constants.CoreTokenParams.REALM, stringToSet(realm));
+            this.put(REALM, stringToSet(realm));
         }
     }
 
@@ -207,7 +218,7 @@ public class OpenAMAccessToken extends AccessToken {
      */
     @Override
     public Set<String> getScope() {
-        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.SCOPE);
+        final Set<String> value = getParameter(SCOPE);
         if (value != null && !value.isEmpty()) {
             return value;
         }
@@ -219,7 +230,7 @@ public class OpenAMAccessToken extends AccessToken {
      */
     @Override
     public String getClientId() {
-        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.CLIENT_ID);
+        final Set<String> value = getParameter(CLIENT_ID);
         if (value != null && !value.isEmpty()) {
             return value.iterator().next();
         }
@@ -243,7 +254,7 @@ public class OpenAMAccessToken extends AccessToken {
      */
     @Override
     public String getResourceOwnerId() {
-        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.USERNAME);
+        final Set<String> value = getParameter(USERNAME);
         if (value != null && !value.isEmpty()) {
             return value.iterator().next();
         }
@@ -255,7 +266,7 @@ public class OpenAMAccessToken extends AccessToken {
      */
     @Override
     public String getTokenId() {
-        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.ID);
+        final Set<String> value = getParameter(ID);
         if (value != null && !value.isEmpty()) {
             return value.iterator().next();
         }
@@ -280,7 +291,7 @@ public class OpenAMAccessToken extends AccessToken {
      */
     @Override
     public String getTokenName() {
-        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.TOKEN_NAME);
+        final Set<String> value = getParameter(TOKEN_NAME);
         if (value != null && !value.isEmpty()) {
             return value.iterator().next();
         }
@@ -292,7 +303,7 @@ public class OpenAMAccessToken extends AccessToken {
      */
     @Override
     public long getExpiryTime() {
-        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.EXPIRE_TIME);
+        final Set<String> value = getParameter(EXPIRE_TIME);
         if (value != null && !value.isEmpty()) {
             return Long.parseLong(value.iterator().next());
         }
@@ -304,7 +315,7 @@ public class OpenAMAccessToken extends AccessToken {
      */
     @Override
     public String getTokenType() {
-        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.TOKEN_TYPE);
+        final Set<String> value = getParameter(TOKEN_TYPE);
         if (value != null && !value.isEmpty()) {
             return value.iterator().next();
         }
@@ -343,7 +354,8 @@ public class OpenAMAccessToken extends AccessToken {
     @Override
     public Map<String, Object> getTokenInfo() {
         final Map<String, Object> tokenInfo = super.getTokenInfo();
-        tokenInfo.put(getResourceString(OAuth2Constants.CoreTokenParams.REALM), getRealm());
+        tokenInfo.put(getResourceString(REALM), getRealm());
         return tokenInfo;
     }
+
 }

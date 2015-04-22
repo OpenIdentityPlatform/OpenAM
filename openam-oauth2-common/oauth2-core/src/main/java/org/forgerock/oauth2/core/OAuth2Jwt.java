@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -74,13 +74,16 @@ public class OAuth2Jwt {
         if (isSignatureValid == null) {
             isSignatureValid = jwt.verify(signingHandler);
         }
-        return isSignatureValid &&
-                contains("iss", "sub", "aud", "exp") &&
+        return isSignatureValid && isContentValid();
+    }
+
+    public boolean isContentValid() {
+
+        return contains("iss", "sub", "aud", "exp") &&
                 !isExpiryUnreasonable() &&
                 !isExpired() &&
                 !isNowBeforeNbf() &&
                 !isIssuedAtUnreasonable();
-        //FIXME: also check if the JWT has been replayed? http://self-issued.info/docs/draft-ietf-oauth-jwt-bearer.html Section 3 point 7
     }
 
     private boolean contains(String... keys) {
@@ -127,5 +130,12 @@ public class OAuth2Jwt {
      */
     public String getSubject() {
         return jwt.getClaimsSet().getSubject();
+    }
+
+    /**
+     * Gets the Signed JWT.
+     */
+    public SignedJwt getSignedJwt() {
+        return jwt;
     }
 }

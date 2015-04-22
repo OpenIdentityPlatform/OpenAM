@@ -15,16 +15,15 @@
  */
 package org.forgerock.openam.upgrade.helpers;
 
+import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2ProviderService.*;
+import static org.forgerock.openam.upgrade.steps.UpgradeOAuth2ProviderStep.*;
+
 import com.sun.identity.sm.AbstractUpgradeHelper;
 import com.sun.identity.sm.AttributeSchemaImpl;
-import org.forgerock.json.jose.jws.JwsAlgorithm;
-import org.forgerock.openam.upgrade.UpgradeException;
-
 import java.util.HashSet;
 import java.util.Set;
-
-import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2ProviderService.*;
-import static org.forgerock.openam.upgrade.steps.UpgradeOAuth2ProviderStep.ALGORITHM_NAMES;
+import org.forgerock.json.jose.jws.JwsAlgorithm;
+import org.forgerock.openam.upgrade.UpgradeException;
 
 /**
  * This upgrade helper is used to add new default values to the OAuth2 Provider schema.
@@ -36,6 +35,8 @@ public class OAuth2ProviderUpgradeHelper extends AbstractUpgradeHelper {
     public OAuth2ProviderUpgradeHelper() {
         attributes.add(ID_TOKEN_SIGNING_ALGORITHMS);
         attributes.add(JKWS_URI);
+        attributes.add(SUPPORTED_CLAIMS);
+        attributes.add(OIDC_CLAIMS_EXTENSION_SCRIPT);
     }
 
     @Override
@@ -53,6 +54,16 @@ public class OAuth2ProviderUpgradeHelper extends AbstractUpgradeHelper {
             }
         } else if (JKWS_URI.equals(newAttr.getName()) && !oldAttr.getType().equals(newAttr.getType())) {
             return newAttr;
+        } else if (SUPPORTED_CLAIMS.equals(newAttr.getName())) {
+            final Set<String> oldClaims = oldAttr.getDefaultValues();
+            final Set<String> newClaims = newAttr.getDefaultValues();
+            if (!oldClaims.equals(newClaims)) {
+                return updateDefaultValues(oldAttr, newAttr.getDefaultValues());
+            }
+        } else if (OIDC_CLAIMS_EXTENSION_SCRIPT.equals(newAttr.getName())) {
+            if (!oldAttr.getDefaultValues().equals(newAttr.getDefaultValues())) {
+                return updateDefaultValues(oldAttr, newAttr.getDefaultValues());
+            }
         }
 
         return null;

@@ -11,10 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core.exceptions;
+
+import org.forgerock.oauth2.core.OAuth2Constants;
 
 /**
  * Thrown when the OpenID connect prompt parameter enforces that the resource owner is not asked to authenticate, but
@@ -29,5 +31,15 @@ public class InteractionRequiredException extends OAuth2Exception {
      */
     public InteractionRequiredException() {
         super(400, "interaction_required", "The request requires some interaction that is not allowed.");
+    }
+
+    /**
+     * Constructs a new InteractionRequiredException with the specified message.
+     *
+     * @param parameterLocation Indicates the location of the parameters in the URL.
+     */
+    public InteractionRequiredException(final OAuth2Constants.UrlLocation parameterLocation) {
+        super(400, "interaction_required", "The request requires some interaction that is not allowed.",
+                parameterLocation);
     }
 }

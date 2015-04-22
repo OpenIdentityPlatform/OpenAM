@@ -16,18 +16,19 @@
 
 package org.forgerock.oauth2.core;
 
-import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
+import static org.forgerock.oauth2.core.OAuth2Constants.Bearer.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+
+import java.util.List;
+import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Implementation of the GrantTypeHandler for the OAuth2 Client Credentials grant.
@@ -68,20 +69,24 @@ public class ClientCredentialsGrantTypeHandler extends GrantTypeHandler {
             requestValidator.validateRequest(request, clientRegistration);
         }
 
-        final Set<String> scope = Utils.splitScope(request.<String>getParameter("scope"));
+        final Set<String> scope = Utils.splitScope(request.<String>getParameter(SCOPE));
         final Set<String> validatedScope = providerSettings.validateAccessTokenScope(clientRegistration, scope,
                 request);
-        final String grantType = request.getParameter("grant_type");
+        final String validatedClaims = providerSettings.validateRequestedClaims(
+                (String) request.getParameter(OAuth2Constants.Custom.CLAIMS));
+        final String grantType = request.getParameter(GRANT_TYPE);
 
-        final AccessToken accessToken = tokenStore.createAccessToken(grantType, "Bearer", null,
-                clientRegistration.getClientId(), clientRegistration.getClientId(), null, validatedScope, null, null,
-                request);
+        final AccessToken accessToken = tokenStore.createAccessToken(grantType, BEARER, null,
+                clientRegistration.getClientId(), clientRegistration.getClientId(), null, validatedScope,
+                null, null, validatedClaims, request);
 
         providerSettings.additionalDataToReturnFromTokenEndpoint(accessToken, request);
 
         if (validatedScope != null && !validatedScope.isEmpty()) {
-            accessToken.addExtraData("scope", Utils.joinScope(validatedScope));
+            accessToken.addExtraData(SCOPE, Utils.joinScope(validatedScope));
         }
+
+        tokenStore.updateAccessToken(accessToken);
 
         return accessToken;
 

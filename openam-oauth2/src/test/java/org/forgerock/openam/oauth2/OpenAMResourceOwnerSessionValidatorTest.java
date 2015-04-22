@@ -11,15 +11,25 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
+
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.testng.Assert.*;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.AuthContext;
+import java.net.URI;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 import org.forgerock.oauth2.core.AuthenticationMethod;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
@@ -31,17 +41,6 @@ import org.restlet.Request;
 import org.restlet.data.Reference;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import javax.servlet.http.HttpServletRequest;
-import java.net.URI;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.testng.Assert.*;
 
 /**
  * @since 12.0.0
@@ -58,6 +57,8 @@ public class OpenAMResourceOwnerSessionValidatorTest {
     private OAuth2Request mockOAuth2Request;
     private Request restletRequest;
     private HttpServletRequest mockHttpServletRequest;
+    private OpenAMClientDAO mockClientDAO;
+    private ClientCredentialsReader mockClientCredentialsReader;
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -67,6 +68,8 @@ public class OpenAMResourceOwnerSessionValidatorTest {
         mockOAuth2Request = mock(OAuth2Request.class);
         restletRequest = new Request();
         mockHttpServletRequest = mock(HttpServletRequest.class);
+        mockClientDAO = mock(OpenAMClientDAO.class);
+        mockClientCredentialsReader = mock(ClientCredentialsReader.class);
 
         given(mockOAuth2Request.getParameter("realm")).willReturn("");
         given(mockOAuth2Request.getParameter("locale")).willReturn("");
@@ -80,7 +83,8 @@ public class OpenAMResourceOwnerSessionValidatorTest {
         given(mockHttpServletRequest.getServerPort()).willReturn(8080);
 
         resourceOwnerSessionValidator =
-                new OpenAMResourceOwnerSessionValidator(mockSSOTokenManager, mockProviderSettingsFactory) {
+                new OpenAMResourceOwnerSessionValidator(mockSSOTokenManager, mockProviderSettingsFactory,
+                        mockClientDAO, mockClientCredentialsReader) {
             @Override
             HttpServletRequest getHttpServletRequest(Request req) {
                 return mockHttpServletRequest;

@@ -74,6 +74,11 @@
             <artifactId>org.restlet</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>forgerock-jaspi-openid-connect-module</artifactId>
+        </dependency>
+
         <!-- Test Dependencies -->
         <dependency>
             <groupId>org.easytesting</groupId>
@@ -116,6 +121,7 @@
     </dependencies>
 
     <build>
+        <testResources><testResource><directory>src/main/groovy</directory></testResource></testResources>
         <plugins>
             <plugin>
                 <groupId>org.forgerock.maven.plugins</groupId>

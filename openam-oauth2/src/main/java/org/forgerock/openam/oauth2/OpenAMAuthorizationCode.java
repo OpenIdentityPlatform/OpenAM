@@ -11,22 +11,23 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
 
-import org.forgerock.oauth2.core.AuthorizationCode;
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.oauth2.core.OAuth2Constants;
-import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.*;
+import static org.forgerock.oauth2.core.Utils.*;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
-
-import static org.forgerock.oauth2.core.Utils.stringToSet;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.oauth2.core.AuthorizationCode;
+import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
+import org.forgerock.openam.utils.CollectionUtils;
 
 /**
  * Models a OpenAm OAuth2 Authorization Code.
@@ -61,10 +62,30 @@ public class OpenAMAuthorizationCode extends AuthorizationCode {
      * @param authModules The list of auth modules used.
      */
     OpenAMAuthorizationCode(String code, String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
-            long expiryTime, String nonce, String realm, String authModules, String acr, String ssoTokenId) {
+                            String claims, long expiryTime, String nonce, String realm, String authModules, String acr,
+                            String ssoTokenId) {
         super(code, resourceOwnerId, clientId, redirectUri, scope, expiryTime, nonce, authModules, acr);
         setRealm(realm);
         setSsoTokenId(ssoTokenId);
+        setClaims(claims);
+    }
+
+    /**
+     * Sets the requested claims.
+     *
+     * @param claims The requested claims.
+     */
+    protected void setClaims(String claims) {
+        put(OAuth2Constants.Custom.CLAIMS, CollectionUtils.asSet(claims));
+    }
+
+    /**
+     * Returns the requested claims.
+     *
+     * @return The requested claims.
+     */
+    public String getClaims() {
+        return getStringProperty(OAuth2Constants.Custom.CLAIMS);
     }
 
     /**
@@ -72,7 +93,7 @@ public class OpenAMAuthorizationCode extends AuthorizationCode {
      */
     @Override
     protected void setScope(Set<String> scope) {
-        put(OAuth2Constants.CoreTokenParams.SCOPE, scope);
+        put(SCOPE, scope);
     }
 
     /**
@@ -80,7 +101,7 @@ public class OpenAMAuthorizationCode extends AuthorizationCode {
      */
     @Override
     protected void setExpiryTime(long expiryTime) {
-        put(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, stringToSet(String.valueOf(expiryTime)));
+        put(EXPIRE_TIME, stringToSet(String.valueOf(expiryTime)));
     }
 
     /**
@@ -91,7 +112,7 @@ public class OpenAMAuthorizationCode extends AuthorizationCode {
      * @param realm The realm.
      */
     private void setRealm(String realm) {
-        setStringProperty(OAuth2Constants.CoreTokenParams.REALM, realm == null || realm.isEmpty() ? "/" : realm);
+        setStringProperty(REALM, realm == null || realm.isEmpty() ? "/" : realm);
     }
 
     /**
@@ -108,7 +129,7 @@ public class OpenAMAuthorizationCode extends AuthorizationCode {
      */
     @Override
     public void setIssued() {
-        this.put(OAuth2Constants.CoreTokenParams.ISSUED, stringToSet("true"));
+        this.put(ISSUED, stringToSet("true"));
     }
 
     /**
@@ -117,7 +138,7 @@ public class OpenAMAuthorizationCode extends AuthorizationCode {
      * @return The realm.
      */
     public String getRealm() {
-        return getStringProperty(OAuth2Constants.CoreTokenParams.REALM);
+        return getStringProperty(REALM);
     }
 
     /**
@@ -126,7 +147,7 @@ public class OpenAMAuthorizationCode extends AuthorizationCode {
     @Override
     public Map<String, Object> getTokenInfo() {
         final Map<String, Object> tokenInfo = super.getTokenInfo();
-        tokenInfo.put(RESOURCE_BUNDLE.getString(OAuth2Constants.CoreTokenParams.REALM), getRealm());
+        tokenInfo.put(RESOURCE_BUNDLE.getString(REALM), getRealm());
         return tokenInfo;
     }
 
@@ -135,7 +156,7 @@ public class OpenAMAuthorizationCode extends AuthorizationCode {
      */
     @Override
     public long getExpiryTime() {
-        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.EXPIRE_TIME);
+        final Set<String> value = getParameter(EXPIRE_TIME);
         if (value != null && !value.isEmpty()) {
             return Long.parseLong(value.iterator().next());
         }
@@ -147,7 +168,7 @@ public class OpenAMAuthorizationCode extends AuthorizationCode {
      */
     @Override
     public Set<String> getScope() {
-        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.SCOPE);
+        final Set<String> value = getParameter(SCOPE);
         if (value != null && !value.isEmpty()) {
             return value;
         }
@@ -159,11 +180,9 @@ public class OpenAMAuthorizationCode extends AuthorizationCode {
      */
     @Override
     public boolean isIssued() {
-        if (getParameter(OAuth2Constants.CoreTokenParams.ISSUED) != null) {
-            return Boolean.parseBoolean(getParameter(OAuth2Constants.CoreTokenParams.ISSUED).iterator().next());
-        } else {
-            return false;
-        }
+        Set<String> issued = getParameter(ISSUED);
+
+        return issued != null && Boolean.parseBoolean(issued.iterator().next());
     }
 
     /**

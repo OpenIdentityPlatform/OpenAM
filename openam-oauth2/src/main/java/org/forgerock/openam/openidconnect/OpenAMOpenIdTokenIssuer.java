@@ -16,13 +16,13 @@
 
 package org.forgerock.openam.openidconnect;
 
+import javax.inject.Inject;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.ResourceOwnerSessionValidator;
+import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.openidconnect.OpenIDTokenIssuer;
 import org.forgerock.openidconnect.OpenIdConnectTokenStore;
-import org.forgerock.openam.utils.OpenAMSettings;
-
-import javax.inject.Inject;
 
 /**
  * Issues OpenId Connect tokens and stores them in the OpenID Connect Token Store, when an access token is required
@@ -41,8 +41,9 @@ public class OpenAMOpenIdTokenIssuer extends OpenIDTokenIssuer {
      * @param openAMSettings An instance of the OpenAMSettings.
      */
     @Inject
-    public OpenAMOpenIdTokenIssuer(OpenIdConnectTokenStore tokenStore, OpenAMSettings openAMSettings) {
-        super(tokenStore);
+    public OpenAMOpenIdTokenIssuer(OpenIdConnectTokenStore tokenStore, OpenAMSettings openAMSettings,
+                                   ResourceOwnerSessionValidator resourceOwnerSessionValidator) {
+        super(tokenStore, resourceOwnerSessionValidator);
         this.openAMSettings = openAMSettings;
     }
 

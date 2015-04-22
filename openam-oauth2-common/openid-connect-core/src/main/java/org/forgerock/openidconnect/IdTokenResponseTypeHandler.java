@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.ResourceOwner;
 import org.forgerock.oauth2.core.ResponseTypeHandler;
 import org.forgerock.oauth2.core.Token;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
@@ -52,12 +53,13 @@ public abstract class IdTokenResponseTypeHandler implements ResponseTypeHandler 
     /**
      * {@inheritDoc}
      */
+    @Override
     public Map.Entry<String, Token> handle(String tokenType, Set<String> scope,
-                                           String resourceOwnerId, String clientId, String redirectUri, String nonce,
-                                           OAuth2Request request) throws ServerException, InvalidClientException, NotFoundException {
+             ResourceOwner resourceOwner, String clientId, String redirectUri, String nonce, OAuth2Request request)
+            throws ServerException, InvalidClientException, NotFoundException {
 
-        final OpenIdConnectToken openIDToken = tokenStore.createOpenIDToken(resourceOwnerId, clientId,
-                clientId, nonce, getOps(request), request);
+        final OpenIdConnectToken openIDToken = tokenStore.createOpenIDToken(resourceOwner,
+                clientId, clientId, nonce, getOps(request), request);
 
         return new AbstractMap.SimpleEntry<String, Token>("id_token", openIDToken);
     }

@@ -16,8 +16,12 @@
 
 package org.forgerock.oauth2.core;
 
-import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
-import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import static org.forgerock.oauth2.core.OAuth2Constants.Bearer.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+import static org.forgerock.oauth2.core.Utils.*;
+
+import java.util.Set;
+import javax.inject.Inject;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
@@ -26,11 +30,6 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
-
-import javax.inject.Inject;
-import java.util.Set;
-
-import static org.forgerock.oauth2.core.Utils.joinScope;
 
 /**
  * Implementation of the JwtBearerGrantTypeHandler for the JWT Bearer grant.
@@ -54,26 +53,31 @@ public class JwtBearerGrantTypeHandler extends GrantTypeHandler {
             InvalidRequestException, InvalidGrantException, InvalidCodeException,
             ServerException, UnauthorizedClientException, InvalidScopeException, NotFoundException {
 
-        final String jwtParameter = request.getParameter("assertion");
+        final String jwtParameter = request.getParameter(OAuth2Constants.SAML20.ASSERTION);
         final OAuth2Jwt jwt = OAuth2Jwt.create(jwtParameter);
 
-        if (!jwt.isValid(clientRegistration.getClientJwtSigningHandler())) {
+        if (!clientRegistration.verifyJwtIdentity(jwt)) {
             throw new InvalidGrantException();
         }
 
-        final String redirectUri = request.getParameter("redirect_uri");
-        final String grantType = request.getParameter("grant_type");
+        final String redirectUri = request.getParameter(REDIRECT_URI);
+        final String grantType = request.getParameter(GRANT_TYPE);
 
-        Set<String> scopes = Utils.splitScope(request.<String>getParameter("scope"));
+        Set<String> scopes = Utils.splitScope(request.<String>getParameter(SCOPE));
         Set<String> authorizationScope = providerSettings.validateAccessTokenScope(clientRegistration, scopes, request);
 
-        final AccessToken accessToken = tokenStore.createAccessToken(grantType, "Bearer", null,
-                jwt.getSubject(), clientRegistration.getClientId(), redirectUri, authorizationScope, null,
-                null, request);
+        final String validatedClaims = providerSettings.validateRequestedClaims(
+                (String) request.getParameter(OAuth2Constants.Custom.CLAIMS));
+
+        final AccessToken accessToken = tokenStore.createAccessToken(grantType, BEARER, null,
+                jwt.getSubject(), clientRegistration.getClientId(), redirectUri, authorizationScope,
+                null, null, validatedClaims, request);
 
         if (authorizationScope != null && !authorizationScope.isEmpty()) {
-            accessToken.addExtraData("scope", joinScope(authorizationScope));
+            accessToken.addExtraData(SCOPE, joinScope(authorizationScope));
         }
+
+        tokenStore.updateAccessToken(accessToken);
 
         return accessToken;
     }

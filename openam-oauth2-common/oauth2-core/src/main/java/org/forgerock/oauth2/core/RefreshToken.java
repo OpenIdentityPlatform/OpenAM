@@ -58,7 +58,8 @@ public class RefreshToken extends JsonValue implements IntrospectableToken, Toke
      * @param grantType The grant type.
      */
     public RefreshToken(String id, String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
-            long expiryTime, String tokenType, String tokenName, String grantType, String authModules, String acr) {
+                        long expiryTime, String tokenType, String tokenName, String grantType, String authModules,
+            String acr) {
         super(new HashMap<String, Object>());
         setTokenId(id);
         setResourceOwnerId(resourceOwnerId);

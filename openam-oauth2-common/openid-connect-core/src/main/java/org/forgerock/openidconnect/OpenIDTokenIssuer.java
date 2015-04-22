@@ -16,20 +16,23 @@
 
 package org.forgerock.openidconnect;
 
-import org.forgerock.oauth2.core.AccessToken;
-import org.forgerock.oauth2.core.OAuth2Request;
-import org.forgerock.oauth2.core.exceptions.InvalidClientException;
-import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.json.jose.jws.SignedJwt;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
 import java.security.SignatureException;
 import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Set;
+import javax.inject.Inject;
+import org.forgerock.json.jose.jws.SignedJwt;
+import org.forgerock.oauth2.core.AccessToken;
+import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.ResourceOwner;
+import org.forgerock.oauth2.core.ResourceOwnerSessionValidator;
+import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
+import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
+import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Issues OpenId Connect tokens and stores them in the OpenID Connect Token Store, when an access token is required
@@ -41,6 +44,7 @@ public class OpenIDTokenIssuer {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final OpenIdConnectTokenStore tokenStore;
+    private final ResourceOwnerSessionValidator resourceOwnerSessionValidator;
 
     /**
      * Constructs a new OpenIDTokenIssuer.
@@ -48,8 +52,10 @@ public class OpenIDTokenIssuer {
      * @param tokenStore An instance of the OpenIdConnectTokenStore.
      */
     @Inject
-    public OpenIDTokenIssuer(OpenIdConnectTokenStore tokenStore) {
+    public OpenIDTokenIssuer(OpenIdConnectTokenStore tokenStore,
+                             ResourceOwnerSessionValidator resourceOwnerSessionValidator) {
         this.tokenStore = tokenStore;
+        this.resourceOwnerSessionValidator = resourceOwnerSessionValidator;
     }
 
     /**
@@ -67,24 +73,33 @@ public class OpenIDTokenIssuer {
             throws ServerException, InvalidClientException, NotFoundException {
 
         final Set<String> scope = accessToken.getScope();
-        if (scope != null && scope.contains("openid")) {
-            final String nonce = accessToken.getNonce();
-            final OpenIdConnectToken openIdToken = tokenStore.createOpenIDToken(
-                    accessToken.getResourceOwnerId(),
-                    accessToken.getClientId(),
-                    accessToken.getClientId(),
-                    nonce,
-                    getOps(accessToken, request),
-                    request);
-            final SignedJwt signedJwt;
+        if (scope != null && scope.contains(OAuth2Constants.Params.OPENID)) {
+
+            final ResourceOwner resourceOwner;
             try {
-                signedJwt = openIdToken.sign();
+                request.setSession(accessToken.getSessionId());
+
+                resourceOwner = resourceOwnerSessionValidator.validate(request);
+
+                final String nonce = accessToken.getNonce();
+                final OpenIdConnectToken openIdToken = tokenStore.createOpenIDToken(
+                        resourceOwner,
+                        accessToken.getClientId(),
+                        accessToken.getClientId(),
+                        nonce,
+                        getOps(accessToken, request),
+                        request);
+                final SignedJwt signedJwt = openIdToken.sign();
+                return new AbstractMap.SimpleEntry<String, String>(
+                        OAuth2Constants.JWTTokenParams.ID_TOKEN, signedJwt.build());
             } catch (SignatureException e) {
                 logger.error("Unable to sign JWT", e);
                 throw new ServerException("Cant sign JWT");
+            } catch (OAuth2Exception e) {
+                logger.error("User must be authenticated to issue ID tokens.", e);
+                throw new ServerException("User must be authenticated to issue ID tokens.");
             }
 
-            return new AbstractMap.SimpleEntry<String, String>("id_token", signedJwt.build());
         }
 
         return null;

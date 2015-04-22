@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.oauth2.legacy;
 
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.*;
+
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.ResourceOwner;
 import org.forgerock.oauth2.core.ResponseTypeHandler;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.openam.oauth2.CookieExtractor;
@@ -53,18 +56,17 @@ public class LegacyResponseTypeHandler implements ResponseTypeHandler {
     }
 
     public Map.Entry<String, org.forgerock.oauth2.core.Token> handle(
-            String tokenType, Set<String> scope, String resourceOwnerId, String clientId, String redirectUri,
-            String nonce, OAuth2Request request) throws NotFoundException {
+            String tokenType, Set<String> scope, ResourceOwner resourceOwner, String clientId,
+            String redirectUri, String nonce, OAuth2Request request) throws NotFoundException {
 
         final Map<String, Object> data = new HashMap<String, Object>();
-        data.put(OAuth2Constants.CoreTokenParams.TOKEN_TYPE, tokenType);
-        data.put(OAuth2Constants.CoreTokenParams.SCOPE, scope);
-        data.put(OAuth2Constants.CoreTokenParams.USERNAME, resourceOwnerId);
-        data.put(OAuth2Constants.CoreTokenParams.CLIENT_ID, clientId);
-        data.put(OAuth2Constants.CoreTokenParams.REDIRECT_URI, redirectUri);
+        data.put(TOKEN_TYPE, tokenType);
+        data.put(SCOPE, scope);
+        data.put(USERNAME, resourceOwner.getId());
+        data.put(CLIENT_ID, clientId);
+        data.put(REDIRECT_URI, redirectUri);
         data.put(OAuth2Constants.Custom.NONCE, nonce);
-
-        data.put(OAuth2Constants.CoreTokenParams.REALM, realm);
+        data.put(REALM, realm);
 
         final HttpServletRequest req = ServletUtils.getRequest(request.<Request>getRequest());
         data.put(OAuth2Constants.Custom.SSO_TOKEN_ID, cookieExtractor.extract(req, ssoCookieName));

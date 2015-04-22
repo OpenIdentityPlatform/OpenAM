@@ -11,16 +11,20 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
 
-import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
-import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequired;
-import org.mockito.Matchers;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anySetOf;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.testng.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,10 +32,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-
-import static org.mockito.Mockito.*;
-import static org.mockito.BDDMockito.*;
-import static org.testng.Assert.assertEquals;
+import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
+import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequired;
+import org.mockito.Matchers;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * @since 12.0.0
@@ -82,7 +87,7 @@ public class AuthorizationServiceImplTest {
         given(providerSettings.validateAuthorizationScope(eq(clientRegistration), anySetOf(String.class), eq(request)))
                 .willReturn(validatedScope);
         given(providerSettings.isConsentSaved(eq(resourceOwner), anyString(), eq(validatedScope))).willReturn(false);
-        given(resourceOwnerConsentVerifier.verify(anyBoolean(), eq(request))).willReturn(false);
+        given(resourceOwnerConsentVerifier.verify(anyBoolean(), eq(request), eq(clientRegistration))).willReturn(false);
 
         //When
         authorizationService.authorize(request);
@@ -105,7 +110,7 @@ public class AuthorizationServiceImplTest {
         given(providerSettings.validateAuthorizationScope(eq(clientRegistration), anySetOf(String.class), eq(request)))
                 .willReturn(validatedScope);
         given(providerSettings.isConsentSaved(eq(resourceOwner), anyString(), eq(validatedScope))).willReturn(false);
-        given(resourceOwnerConsentVerifier.verify(anyBoolean(), eq(request))).willReturn(true);
+        given(resourceOwnerConsentVerifier.verify(anyBoolean(), eq(request), eq(clientRegistration))).willReturn(true);
 
         //When
         authorizationService.authorize(request);

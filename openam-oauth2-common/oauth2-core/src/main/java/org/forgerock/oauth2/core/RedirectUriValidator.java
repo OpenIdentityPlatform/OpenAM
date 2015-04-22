@@ -11,17 +11,16 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
 
-import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
-import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
+import static org.forgerock.oauth2.core.Utils.*;
 
 import java.net.URI;
-
-import static org.forgerock.oauth2.core.Utils.isEmpty;
+import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 
 /**
  * Validates that the redirect uri on the request matches against the client's registered redirect uris.

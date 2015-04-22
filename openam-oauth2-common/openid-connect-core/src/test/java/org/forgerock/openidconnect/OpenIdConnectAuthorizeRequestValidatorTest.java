@@ -16,6 +16,12 @@
 
 package org.forgerock.openidconnect;
 
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.testng.Assert.*;
+
+import java.util.Collections;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.OAuth2Constants;
@@ -23,18 +29,9 @@ import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
-import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.util.Collections;
-
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
 
 /**
  * @since 12.0.0
@@ -62,6 +59,7 @@ public class OpenIdConnectAuthorizeRequestValidatorTest {
         given(request.getParameter("client_id")).willReturn("CLIENT_ID");
         given(request.getParameter("scope")).willReturn("openid");
         given(request.getParameter("prompt")).willReturn("consent");
+        given(request.getParameter("nonce")).willReturn("12345");
 
         //When
         requestValidator.validateRequest(request);
@@ -77,6 +75,7 @@ public class OpenIdConnectAuthorizeRequestValidatorTest {
         given(request.getParameter("client_id")).willReturn("CLIENT_ID");
         given(request.getParameter("scope")).willReturn("openid");
         given(request.getParameter("prompt")).willReturn("select_account");
+        given(request.getParameter("nonce")).willReturn("12345");
 
         //When
         requestValidator.validateRequest(request);
@@ -136,6 +135,22 @@ public class OpenIdConnectAuthorizeRequestValidatorTest {
             //Then
             assertEquals(e.getParameterLocation(), OAuth2Constants.UrlLocation.QUERY);
         }
+    }
+
+    @Test (expectedExceptions = InvalidRequestException.class)
+    public void validateShouldFailNonceCheck() throws Exception {
+
+        //Given
+        OAuth2Request request = mock(OAuth2Request.class);
+        given(clientRegistration.getAllowedScopes()).willReturn(Collections.singleton("openid"));
+
+        given(request.getParameter("client_id")).willReturn("CLIENT_ID");
+        given(request.getParameter("scope")).willReturn("openid");
+        given(request.getParameter("response_type")).willReturn("id_token");
+
+        //when
+        requestValidator.validateRequest(request);
+
     }
 
 }

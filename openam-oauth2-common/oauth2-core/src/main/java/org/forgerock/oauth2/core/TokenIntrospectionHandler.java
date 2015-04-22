@@ -32,9 +32,10 @@ public interface TokenIntrospectionHandler {
      * @param tokenId The ID of the token.
      * @param request The OAuth 2.0 request.
      * @param clientId The OAuth 2.0 client making the request.
-     * @return The introspected represenation.
+     * @return The introspected representation.
      */
-    JsonValue introspect(OAuth2Request request, String clientId, String tokenType, String tokenId) throws ServerException, NotFoundException;
+    JsonValue introspect(OAuth2Request request, String clientId, String tokenType, String tokenId)
+            throws ServerException, NotFoundException;
 
     /**
      * The priority of the handler. A lower value will be used first.

@@ -80,7 +80,7 @@ public class ClientCredentialsGrantTypeHandlerTest {
         given(providerSettings.validateAccessTokenScope(eq(clientRegistration), anySetOf(String.class),
                 eq(request))).willReturn(validatedScope);
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
-                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), eq(request)))
+                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), anyString(), eq(request)))
                 .willReturn(accessToken);
 
         //When
@@ -108,7 +108,7 @@ public class ClientCredentialsGrantTypeHandlerTest {
                 anySetOf(String.class), eq(request))).willReturn(validatedScope);
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
-                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), eq(request)))
+                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), anyString(), eq(request)))
                 .willReturn(accessToken);
 
         //When

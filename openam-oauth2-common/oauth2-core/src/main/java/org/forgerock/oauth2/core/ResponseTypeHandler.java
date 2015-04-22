@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -37,7 +37,7 @@ public interface ResponseTypeHandler {
      *
      * @param tokenType The type of the token.
      * @param scope The requested scope.
-     * @param resourceOwnerId The resource owner's id.
+     * @param resourceOwner The resource owner.
      * @param clientId The client's id.
      * @param redirectUri The redirect uri.
      * @param nonce The nonce.
@@ -48,8 +48,9 @@ public interface ResponseTypeHandler {
      *          authenticated.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
-    Map.Entry<String, Token> handle(String tokenType, Set<String> scope, String resourceOwnerId, String clientId,
-            String redirectUri, String nonce, OAuth2Request request) throws ServerException, InvalidClientException, NotFoundException;
+    Map.Entry<String, Token> handle(String tokenType, Set<String> scope, ResourceOwner resourceOwner,
+                                    String clientId, String redirectUri, String nonce, OAuth2Request request)
+            throws ServerException, InvalidClientException, NotFoundException;
 
     /**
      * Returns the location in which the token should be returned, {@link UrlLocation}.

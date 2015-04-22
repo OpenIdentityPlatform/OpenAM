@@ -16,29 +16,28 @@
 
 package org.forgerock.oauth2.core;
 
-import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
-import org.forgerock.oauth2.core.exceptions.InvalidClientException;
-import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
-import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
-import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
-import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
-import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.mockito.Matchers;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.anySetOf;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.testng.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static org.mockito.Mockito.*;
-import static org.mockito.BDDMockito.*;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
+import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
+import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.mockito.Matchers;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * @since 12.0.0
@@ -217,7 +216,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         given(tokenStore.createRefreshToken(anyString(), anyString(), anyString(), anyString(), anySetOf(String.class),
                 eq(request))).willReturn(refreshToken);
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
-                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), eq(request)))
+                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), anyString(), eq(request)))
                 .willReturn(accessToken);
         given(providerSettings.validateAccessTokenScope(eq(clientRegistration), anySetOf(String.class), eq(request)))
                 .willReturn(validatedScope);
@@ -258,7 +257,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         given(authorizationCode.getExpiryTime()).willReturn(System.currentTimeMillis() + 100);
         given(providerSettings.issueRefreshTokens()).willReturn(false);
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
-                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), eq(request)))
+                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), anyString(), eq(request)))
                 .willReturn(accessToken);
         given(providerSettings.validateAccessTokenScope(eq(clientRegistration), anySetOf(String.class), eq(request)))
                 .willReturn(validatedScope);
@@ -309,7 +308,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         given(authorizationCode.getExpiryTime()).willReturn(System.currentTimeMillis() + 100);
         given(providerSettings.issueRefreshTokens()).willReturn(false);
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
-                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), eq(request)))
+                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), anyString(), eq(request)))
                 .willAnswer(new Answer<Object>() {
                     public Object answer(InvocationOnMock invocation) throws Throwable {
                         while(holder.value < 2) {
@@ -384,7 +383,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         given(authorizationCode.getExpiryTime()).willReturn(System.currentTimeMillis() + 100);
         given(providerSettings.issueRefreshTokens()).willReturn(false);
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
-                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), eq(request)))
+                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), anyString(), eq(request)))
                 .willReturn(accessToken);
         given(authorizationCode.getScope()).willReturn(validatedScope);
 

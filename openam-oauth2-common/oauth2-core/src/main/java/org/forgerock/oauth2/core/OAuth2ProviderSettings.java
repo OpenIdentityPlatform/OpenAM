@@ -16,18 +16,18 @@
 
 package org.forgerock.oauth2.core;
 
+import java.security.KeyPair;
+import java.util.Map;
+import java.util.Set;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
 import org.forgerock.oauth2.resources.ResourceSetStore;
-
-import java.security.KeyPair;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Models all of the possible settings the OAuth2 provider can have and that can be configured.
@@ -100,7 +100,7 @@ public interface OAuth2ProviderSettings {
             Set<String> tokenScope, OAuth2Request request) throws ServerException, InvalidScopeException;
 
     /**
-     * Gets the resource owners information based on an issued access token.
+     * Gets the resource owners information based on an issued access token or request.
      *
      * @param token The access token.
      * @param request The OAuth2 request.
@@ -225,12 +225,28 @@ public interface OAuth2ProviderSettings {
     Set<String> getResourceOwnerAuthenticatedAttributes() throws ServerException;
 
     /**
-     * Gets the OpenID connect claims with the OAuth2 provider supports.
+     * Gets the supported claims for this provider.
      *
      * @return A {@code Set} of the supported claims.
      * @throws ServerException If any internal server error occurs.
      */
     Set<String> getSupportedClaims() throws ServerException;
+
+    /**
+     * Gets the supported scopes for this provider.
+     *
+     * @return A {@code Set} of the supported scopes.
+     * @throws ServerException If any internal server error occurs.
+     */
+    Set<String> getSupportedScopes() throws ServerException;
+
+    /**
+     * Gets the default set of scopes to give a client registering with this provider.
+     *
+     * @return A {@code Set} of the default scopes.
+     * @throws ServerException If any internal server error occurs.
+     */
+    Set<String> getDefaultScopes() throws ServerException;
 
     /**
      * Gets the algorithms that the OAuth2 provider supports for signing OpenID tokens.
@@ -241,7 +257,7 @@ public interface OAuth2ProviderSettings {
     Set<String> getSupportedIDTokenSigningAlgorithms() throws ServerException;
 
     /**
-     * Gets the supported version of the OpenID Connect specfication.
+     * Gets the supported version of the OpenID Connect specification.
      *
      * @return The OpenID Connect version.
      */
@@ -375,12 +391,6 @@ public interface OAuth2ProviderSettings {
     boolean exists();
 
     /**
-     * The mappings of user profile attributes to id repo attributes.
-     * @return A map of attributes.
-     */
-    Map<String,Object> getUserProfileScopeMappings();
-
-    /**
      * Returns the default URL for this provider's token introspection endpoint.
      * @return The URL.
      */
@@ -407,4 +417,25 @@ public interface OAuth2ProviderSettings {
      */
     ResourceSetStore getResourceSetStore();
 
+    /**
+     * Returns whether this provider supports claims requested via 'claims' parameter.
+     *
+     * @return true or false.
+     */
+    boolean getClaimsParameterSupported() throws ServerException;
+
+    /**
+     * Validates that the requested claims are appropriate to be requested by the given client.
+     */
+    String validateRequestedClaims(String requestedClaims) throws InvalidRequestException, ServerException;
+
+    /**
+     * Returns the token_endpoint_auth_methods available for clients to register (and subsequently auth) using.
+     */
+    Set<String> getEndpointAuthMethodsSupported();
+
+    /**
+     * Returns the salt to use for hashing sub values upon pairwise requests.
+     */
+    String getHashSalt() throws ServerException;
 }

@@ -17,10 +17,14 @@
 
 package org.forgerock.openam.openidconnect;
 
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.CLIENT_ID;
+import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.CLIENT_SECRET;
 
-import com.sun.identity.shared.validation.URLValidator;
 import com.sun.identity.shared.validation.ValidationException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,6 +35,8 @@ import java.util.Set;
 import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.forgerock.json.fluent.JsonException;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.fluent.JsonValueException;
 import org.forgerock.oauth2.core.AccessToken;
@@ -47,6 +53,8 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
+import org.forgerock.openam.oauth2.validation.OpenIDConnectURLValidator;
+import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.openidconnect.Client;
 import org.forgerock.openidconnect.ClientBuilder;
 import org.forgerock.openidconnect.ClientDAO;
@@ -70,14 +78,14 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
     private static final String REGISTRATION_CLIENT_URI = "registration_client_uri";
     private static final String ISSUED_AT = "client_id_issued_at";
     private static final String EXPIRES_AT = "client_secret_expires_at";
-    private static final String OPENID_SCOPE = "openid";
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final ClientDAO clientDAO;
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final AccessTokenVerifier tokenVerifier;
     private final TokenStore tokenStore;
-    private final URLValidator urlValidator;
+    private final OpenIDConnectURLValidator urlValidator;
+    private final ObjectMapper mapper = new ObjectMapper();
 
     /**
      * Constructs a new OpenAMOpenIdConnectClientRegistrationService.
@@ -91,7 +99,8 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
     @Inject
     OpenAMOpenIdConnectClientRegistrationService(ClientDAO clientDAO,
                                                  OAuth2ProviderSettingsFactory providerSettingsFactory,
-                                                 AccessTokenVerifier tokenVerifier, TokenStore tokenStore, URLValidator urlValidator) {
+                                                 AccessTokenVerifier tokenVerifier, TokenStore tokenStore,
+                                                 OpenIDConnectURLValidator urlValidator) {
         this.clientDAO = clientDAO;
         this.providerSettingsFactory = providerSettingsFactory;
         this.tokenVerifier = tokenVerifier;
@@ -129,6 +138,58 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
         ClientBuilder clientBuilder = new ClientBuilder();
         try {
 
+            boolean jwks = false;
+
+            if (input.get(JWKS.getType()).asString() != null) {
+                jwks = true;
+
+                try {
+                    JsonValueBuilder.toJsonValue(input.get(JWKS.getType()).asString());
+                } catch (JsonException e) {
+                    throw new InvalidClientMetadata("jwks must be valid JSON.");
+                }
+
+                clientBuilder.setJwks(input.get(JWKS.getType()).asString());
+                clientBuilder.setPublicKeySelector(Client.PublicKeySelector.JWKS.getType());
+            }
+
+            if (input.get(JWKS_URI.getType()).asString() != null) {
+                if (jwks) { //allowed to set either jwks or jwks_uri but not both
+                    throw new InvalidClientMetadata("Must define either jwks or jwks_uri, not both.");
+                }
+                jwks = true;
+
+                try {
+                    new URL(input.get(JWKS_URI.getType()).asString());
+                } catch (MalformedURLException e) {
+                    throw new InvalidClientMetadata("jwks_uri must be a valid URL.");
+                }
+
+                clientBuilder.setJwksUri(input.get(JWKS_URI.getType()).asString());
+                clientBuilder.setPublicKeySelector(Client.PublicKeySelector.JWKS_URI.getType());
+            }
+
+            //not spec-defined, this is OpenAM proprietary
+            if (input.get(X509.getType()).asString() != null) {
+                clientBuilder.setX509(input.get(X509.getType()).asString());
+            }
+
+            //drop to this if neither other are set
+            if (!jwks) {
+                clientBuilder.setPublicKeySelector(Client.PublicKeySelector.X509.getType());
+            }
+
+            if (input.get(TOKEN_ENDPOINT_AUTH_METHOD.getType()).asString() != null) {
+                if (Client.TokenEndpointAuthMethod.fromString(
+                        input.get(TOKEN_ENDPOINT_AUTH_METHOD.getType()).asString()) == null) {
+                    logger.error("Invalid token_endpoint_auth_method requested.");
+                    throw new InvalidClientMetadata("Invalid token_endpoint_auth_method requested.");
+                }
+                clientBuilder.setTokenEndpointAuthMethod(input.get(TOKEN_ENDPOINT_AUTH_METHOD.getType()).asString());
+            } else {
+                clientBuilder.setTokenEndpointAuthMethod(Client.TokenEndpointAuthMethod.CLIENT_SECRET_BASIC.getType());
+            }
+
             if (input.get(CLIENT_ID.getType()).asString() != null) {
                 clientBuilder.setClientID(input.get(CLIENT_ID.getType()).asString());
             } else {
@@ -146,14 +207,24 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
                     clientBuilder.setClientType(input.get(CLIENT_TYPE.getType()).asString());
                 } else {
                     logger.error("Invalid client_type requested.");
-                    throw new InvalidClientMetadata();
+                    throw new InvalidClientMetadata("Invalid client_type requested");
                 }
             } else {
                 clientBuilder.setClientType(Client.ClientType.CONFIDENTIAL.getType());
             }
 
+            if (input.get(DEFAULT_MAX_AGE.getType()).asLong() != null) {
+                clientBuilder.setDefaultMaxAge(input.get(DEFAULT_MAX_AGE.getType()).asLong());
+                clientBuilder.setDefaultMaxAgeEnabled(true);
+            } else {
+                clientBuilder.setDefaultMaxAge(Client.MIN_DEFAULT_MAX_AGE);
+                clientBuilder.setDefaultMaxAgeEnabled(false);
+            }
+
+            List<String> redirectUris = new ArrayList<String>();
+
             if (input.get(REDIRECT_URIS.getType()).asList() != null) {
-                List<String> redirectUris = input.get(REDIRECT_URIS.getType()).asList(String.class);
+                redirectUris = input.get(REDIRECT_URIS.getType()).asList(String.class);
                 boolean isValidUris = true;
                 for (String redirectUri : redirectUris) {
                     try {
@@ -169,30 +240,47 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
                 clientBuilder.setRedirectionURIs(redirectUris);
             }
 
-            List<String> scopes = input.get(SCOPES.getType()).asList(String.class);
-            if (scopes != null) {
-                if (containsAllCaseInsensitive(providerSettings.getSupportedClaims(), scopes)) {
-                    if (!scopes.contains(OPENID_SCOPE)) {
-                        scopes = new ArrayList<String>(scopes);
-                        scopes.add(OPENID_SCOPE);
+            if (input.get(SECTOR_IDENTIFIER_URI.getType()).asString() != null) {
+                try {
+                    URL sectorIdentifier = new URL(input.get(SECTOR_IDENTIFIER_URI.getType()).asString());
+                    List<String> response = mapper.readValue(sectorIdentifier, List.class);
+
+                    if (!response.containsAll(redirectUris)) {
+                        logger.error("Request_uris not included in sector_identifier_uri.");
+                        throw new InvalidClientMetadata();
                     }
-                    clientBuilder.setAllowedGrantScopes(scopes);
-                } else {
-                    logger.error("Invalid scopes requested.");
-                    throw new InvalidClientMetadata();
+                } catch (Exception e) {
+                    logger.error("Invalid sector_identifier_uri requested.");
+                    throw new InvalidClientMetadata("Invalid sector_identifier_uri requested.");
                 }
-            } else {
-                scopes = new ArrayList<String>(1);
-                scopes.add(OPENID_SCOPE);
-                clientBuilder.setAllowedGrantScopes(scopes);
+                clientBuilder.setSectorIdentifierUri(input.get(SECTOR_IDENTIFIER_URI.getType()).asString());
             }
+
+            List<String> scopes = input.get(SCOPES.getType()).asList(String.class);
+            if (scopes != null && !scopes.isEmpty()) {
+                if (!containsAllCaseInsensitive(providerSettings.getSupportedScopes(), scopes)) {
+                    logger.error("Invalid scopes requested.");
+                    throw new InvalidClientMetadata("Invalid scopes requested");
+                }
+            } else { //if nothing requested, fall back to provider defaults
+                scopes = new ArrayList<String>();
+                scopes.addAll(providerSettings.getDefaultScopes());
+            }
+
+            //regardless, we add openid
+            if (!scopes.contains(OPENID)) {
+                scopes = new ArrayList<String>(scopes);
+                scopes.add(OPENID);
+            }
+
+            clientBuilder.setAllowedGrantScopes(scopes);
 
             List<String> defaultScopes = input.get(DEFAULT_SCOPES.getType()).asList(String.class);
             if (defaultScopes != null) {
-                if (containsAllCaseInsensitive(providerSettings.getSupportedClaims(), defaultScopes)) {
+                if (containsAllCaseInsensitive(providerSettings.getSupportedScopes(), defaultScopes)) {
                     clientBuilder.setDefaultGrantScopes(defaultScopes);
                 } else {
-                    throw new InvalidClientMetadata();
+                    throw new InvalidClientMetadata("Invalid default scopes requested.");
                 }
             }
 
@@ -205,11 +293,11 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
             }
 
             if (input.get(SUBJECT_TYPE.getType()).asString() != null) {
-                if (Client.SubjectType.fromString(input.get(SUBJECT_TYPE.getType()).asString()) != null) {
-                    clientBuilder.setSubjectType(Client.SubjectType.PUBLIC.getType());
+                if (providerSettings.getSupportedSubjectTypes().contains(input.get(SUBJECT_TYPE.getType()).asString())) {
+                    clientBuilder.setSubjectType(input.get(SUBJECT_TYPE.getType()).asString());
                 } else {
                     logger.error("Invalid subject_type requested.");
-                    throw new InvalidClientMetadata();
+                    throw new InvalidClientMetadata("Invalid subject_type requested");
                 }
             } else {
                 clientBuilder.setSubjectType(Client.SubjectType.PUBLIC.getType());
@@ -222,7 +310,7 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
                             .asString());
                 } else {
                     logger.error("Unsupported id_token_response_signed_alg requested.");
-                    throw new InvalidClientMetadata();
+                    throw new InvalidClientMetadata("Unsupported id_token_response_signed_alg requested.");
                 }
             } else {
                 clientBuilder.setIdTokenSignedResponseAlgorithm(ID_TOKEN_SIGNED_RESPONSE_ALG_DEFAULT);
@@ -248,7 +336,7 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
                     clientBuilder.setApplicationType(Client.ApplicationType.WEB.getType());
                 } else {
                     logger.error("Invalid application_type requested.");
-                    throw new InvalidClientMetadata();
+                    throw new InvalidClientMetadata("Invalid application_type requested.");
                 }
             } else {
                 clientBuilder.setApplicationType(DEFAULT_APPLICATION_TYPE);
@@ -268,7 +356,7 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
                     clientBuilder.setResponseTypes(clientResponseTypeList);
                 } else {
                     logger.error("Invalid response_types requested.");
-                    throw new InvalidClientMetadata();
+                    throw new InvalidClientMetadata("Invalid response_types requested.");
                 }
             } else {
                 List<String> defaultResponseTypes = new ArrayList<String>();
@@ -326,7 +414,7 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
     private String createRegistrationAccessToken(Client client, OAuth2Request request) throws ServerException, NotFoundException {
         final AccessToken rat = tokenStore.createAccessToken(
                 null,                           // Grant type
-                "Bearer",                       // Access Token Type
+                OAuth2Constants.Bearer.BEARER,  // Access Token Type
                 null,                           // Authorization Code
                 client.getClientID(),           // Resource Owner ID
                 client.getClientID(),           // Client ID
@@ -334,6 +422,7 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
                 Collections.<String>emptySet(), // Scopes
                 null,                           // Refresh Token
                 null,                           // Nonce
+                null,                           // Claims
                 request);                       // Request
         return rat.getTokenId();
     }

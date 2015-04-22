@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.openidconnect;
 
+import static org.forgerock.oauth2.core.OAuth2Constants.JWTTokenParams.*;
+
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.nio.charset.Charset;
@@ -72,7 +74,8 @@ public class CheckSessionImpl implements CheckSession {
         signingManager = InjectorHolder.getInstance(SigningManager.class);
         clientRegistrationStore = InjectorHolder.getInstance(ClientRegistrationStore.class);
         cts = InjectorHolder.getInstance(CTSPersistentStore.class);
-        tokenAdapter = InjectorHolder.getInstance(Key.get(new TypeLiteral<TokenAdapter<JsonValue>>() { }, Names.named(OAuth2Constants.CoreTokenParams.OAUTH_TOKEN_ADAPTER)));
+        tokenAdapter = InjectorHolder.getInstance(Key.get(new TypeLiteral<TokenAdapter<JsonValue>>() { },
+                Names.named(OAuth2Constants.CoreTokenParams.OAUTH_TOKEN_ADAPTER)));
     }
 
     /**
@@ -113,7 +116,7 @@ public class CheckSessionImpl implements CheckSession {
     private ClientRegistration getClientRegistration(Jwt jwt) throws InvalidClientException {
 
         List<String> clients = jwt.getClaimsSet().getAudience();
-        final String realm = (String)jwt.getClaimsSet().getClaim("realm");
+        final String realm = (String)jwt.getClaimsSet().getClaim(REALM);
         if (clients != null && !clients.isEmpty()) {
             String client = clients.iterator().next();
 
@@ -123,7 +126,7 @@ public class CheckSessionImpl implements CheckSession {
                 }
 
                 public <T> T getParameter(String name) {
-                    if ("realm".equals(name)) {
+                    if (REALM.equals(name)) {
                         return (T) realm;
                     }
                     throw new UnsupportedOperationException();
@@ -172,12 +175,12 @@ public class CheckSessionImpl implements CheckSession {
                 return false;
             }
 
-            String opsId = (String) jwt.getClaimsSet().getClaim(OAuth2Constants.JWTTokenParams.OPS);
+            String opsId = (String) jwt.getClaimsSet().getClaim(OPS);
             if (opsId == null) {
-                opsId = (String) jwt.getClaimsSet().getClaim(OAuth2Constants.JWTTokenParams.LEGACY_OPS);
+                opsId = (String) jwt.getClaimsSet().getClaim(LEGACY_OPS);
             }
             JsonValue idTokenUserSessionToken = tokenAdapter.fromToken(cts.read(opsId));
-            String sessionId = idTokenUserSessionToken.get(OAuth2Constants.JWTTokenParams.LEGACY_OPS).asString();
+            String sessionId = idTokenUserSessionToken.get(LEGACY_OPS).asString();
 
             SSOToken ssoToken = ssoTokenManager.createSSOToken(sessionId);
             return ssoTokenManager.isValidToken(ssoToken);
@@ -208,8 +211,8 @@ public class CheckSessionImpl implements CheckSession {
             }
         }
 
-        if (map != null && map.containsKey("id_token")){
-            String id_token = map.get("id_token");
+        if (map != null && map.containsKey(ID_TOKEN)){
+            String id_token = map.get(ID_TOKEN);
 
             JwtReconstruction jwtReconstruction = new JwtReconstruction();
             return jwtReconstruction.reconstructJwt(id_token, SignedJwt.class);

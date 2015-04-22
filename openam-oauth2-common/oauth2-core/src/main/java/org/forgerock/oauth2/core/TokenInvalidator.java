@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -61,7 +61,7 @@ public class TokenInvalidator {
                 Set<String> idSet = entry.get(OAuth2Constants.CoreTokenParams.ID);
                 Set<String> tokenNameSet = entry.get(OAuth2Constants.CoreTokenParams.TOKEN_NAME);
                 Set<String> refreshTokenSet = entry.get(OAuth2Constants.CoreTokenParams.REFRESH_TOKEN);
-                String refreshTokenID = null;
+                String refreshTokenID;
                 if (idSet != null && !idSet.isEmpty() && tokenNameSet != null && !tokenNameSet.isEmpty()) {
                     String entryID = idSet.iterator().next();
                     String type = tokenNameSet.iterator().next();

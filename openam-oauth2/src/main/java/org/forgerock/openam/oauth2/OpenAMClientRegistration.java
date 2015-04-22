@@ -11,23 +11,25 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
 
+import com.iplanet.sso.SSOException;
 import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.guava.common.annotations.VisibleForTesting;
-import org.forgerock.json.jose.jws.SigningManager;
-import org.forgerock.json.jose.jws.handlers.SigningHandler;
-import org.forgerock.oauth2.core.ClientType;
-import org.forgerock.oauth2.core.OAuth2Constants;
-import org.forgerock.oauth2.core.PEMDecoder;
-import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
-import org.restlet.Request;
-
+import com.sun.identity.shared.encode.Base64;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.security.Key;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -38,10 +40,27 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import org.forgerock.guava.common.annotations.VisibleForTesting;
+import org.forgerock.jaspi.modules.openid.exceptions.FailedToLoadJWKException;
+import org.forgerock.jaspi.modules.openid.exceptions.OpenIdConnectVerificationException;
+import org.forgerock.jaspi.modules.openid.helpers.JWKSetParser;
+import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverService;
+import org.forgerock.json.jose.jwk.JWKSet;
+import org.forgerock.json.jose.jws.SigningManager;
+import org.forgerock.oauth2.core.ClientType;
+import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.OAuth2Jwt;
+import org.forgerock.oauth2.core.OAuth2ProviderSettings;
+import org.forgerock.oauth2.core.PEMDecoder;
+import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.openidconnect.Client;
+import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
+import org.restlet.Request;
 
 /**
  * Models an OpenAM OAuth2 and OpenId Connect client registration in the OAuth2 provider.
- *
  *
  * @since 12.0.0
  */
@@ -52,6 +71,9 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
     private final AMIdentity amIdentity;
     private final SigningManager signingManager = new SigningManager();
     private final PEMDecoder pemDecoder;
+    private final OpenIdResolverService resolverService;
+    private final MessageDigest digest;
+
 
     /**
      * Constructs a new OpenAMClientRegistration.
@@ -59,16 +81,23 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
      * @param amIdentity The client's identity.
      * @param pemDecoder A {@code PEMDecoder} instance.
      */
-    OpenAMClientRegistration(AMIdentity amIdentity, PEMDecoder pemDecoder) {
+    OpenAMClientRegistration(AMIdentity amIdentity, PEMDecoder pemDecoder, OpenIdResolverService resolverService)
+            throws InvalidClientException {
         this.amIdentity = amIdentity;
         this.pemDecoder = pemDecoder;
+        this.resolverService = resolverService;
+        try {
+            this.digest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            throw new InvalidClientException("SHA-256 algorithm MessageDigest not available");
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     public Set<URI> getRedirectUris() {
-        Set<URI> redirectionURIs = null;
+        Set<URI> redirectionURIs;
         try {
             Set<String> redirectionURIsSet = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.REDIRECT_URI);
             redirectionURIsSet = convertAttributeValues(redirectionURIsSet);
@@ -312,7 +341,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
      * {@inheritDoc}
      */
     public String getClientSessionURI() {
-        Set<String> set = null;
+        Set<String> set;
         try {
             set = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.CLIENT_SESSION_URI);
         } catch (Exception e) {
@@ -321,29 +350,6 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
                     "Unable to get "+ OAuth2Constants.OAuth2Client.CLIENT_SESSION_URI +" from repository");
         }
         return set.iterator().next();
-    }
-
-    @Override
-    public SigningHandler getClientJwtSigningHandler() {
-
-        try {
-            Set<String> set = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.CLIENT_JWT_PUBLIC_KEY);
-
-            if (set == null || set.isEmpty()) {
-                throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
-                        "No Client Bearer Jwt Public key certificate set");
-            }
-
-            String encodedCert = set.iterator().next();
-            X509Certificate certificate = pemDecoder.decodeX509Certificate(encodedCert);
-
-            return signingManager.newRsaSigningHandler(certificate.getPublicKey());
-
-        } catch (Exception e) {
-            logger.error("Unable to get Client Bearer Jwt Public key from repository", e);
-            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
-                    "Unable to get Client Bearer Jwt Public key from repository");
-        }
     }
 
     /**
@@ -398,4 +404,235 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         }
         return null;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getTokenEndpointAuthMethod() {
+        final String tokenEndpointAuthMethod;
+        Set<String> authMethodSet;
+        try {
+            authMethodSet = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.TOKEN_ENDPOINT_AUTH_METHOD);
+        } catch (Exception e) {
+            logger.error("Unable to get "+ OAuth2Constants.OAuth2Client.TOKEN_ENDPOINT_AUTH_METHOD +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.TOKEN_ENDPOINT_AUTH_METHOD +" from repository");
+        }
+
+        if (authMethodSet.iterator().hasNext()){
+            tokenEndpointAuthMethod = authMethodSet.iterator().next();
+        } else { //default to client_secret_basic
+            tokenEndpointAuthMethod = Client.TokenEndpointAuthMethod.CLIENT_SECRET_BASIC.getType();
+        }
+
+        return tokenEndpointAuthMethod;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getSubjectType() {
+        final String subjectType;
+        Set<String> subjectTypeSet;
+        try {
+            subjectTypeSet = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.SUBJECT_TYPE);
+        } catch (Exception e) {
+            logger.error("Unable to get "+ OAuth2Constants.OAuth2Client.SUBJECT_TYPE +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.SUBJECT_TYPE +" from repository");
+        }
+
+        if (subjectTypeSet.iterator().hasNext()){
+            subjectType = subjectTypeSet.iterator().next();
+        } else { //default to public
+            subjectType = Client.SubjectType.PUBLIC.getType();
+        }
+
+        return subjectType;
+    }
+
+    @Override
+    public boolean verifyJwtIdentity(OAuth2Jwt jwt) {
+
+        try {
+            switch (getClientPublicKeySelector()) {
+                case JWKS:
+                    return byJWKs(jwt);
+                case JWKS_URI:
+                    return byJWKsURI(jwt);
+                default:
+                    return byX509Key(jwt);
+            }
+        } catch (Exception e) {
+            logger.error("Unable to get Client Bearer Jwt Public key from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get Client Bearer Jwt Public key from repository");
+        }
+    }
+
+    private boolean byJWKs(OAuth2Jwt jwt) throws IdRepoException, SSOException,
+            MalformedURLException, FailedToLoadJWKException {
+        Set<String> set = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.JWKS);
+
+        if (set == null || set.isEmpty()) {
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "No Client Bearer JWKs_URI set.");
+        }
+
+        final String jwkSetStr = set.iterator().next();
+        final JWKSet jwkSet = new JWKSet(JsonValueBuilder.toJsonValue(jwkSetStr));
+        final JWKSetParser setParser = new JWKSetParser(0, 0); //0 values as not using for inet comms
+
+        final Map<String, Key> jwkMap = setParser.jwkSetToMap(jwkSet);
+
+        final Key key = jwkMap.get(jwt.getSignedJwt().getHeader().getKeyId());
+
+        return key != null && jwt.isValid(signingManager.newRsaSigningHandler(key));
+    }
+
+    private boolean byJWKsURI(OAuth2Jwt jwt) throws IdRepoException, SSOException, MalformedURLException {
+        final Set<String> set = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.JWKS_URI);
+
+        if (set == null || set.isEmpty()) {
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "No Client Bearer JWKs_URI set.");
+        }
+
+        final String url = set.iterator().next();
+
+        try {
+            if (resolverService.getResolverForIssuer(jwt.getSignedJwt().getClaimsSet().getIssuer()) == null) {
+                boolean success =
+                        resolverService.configureResolverWithJWK(jwt.getSignedJwt().getClaimsSet().getIssuer(),
+                                new URL(url));
+                if (!success) {
+                    throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                            "Unable to configure internal JWK resolver service.");
+                }
+            }
+
+            resolverService.getResolverForIssuer(
+                    jwt.getSignedJwt().getClaimsSet().getIssuer()).validateIdentity(jwt.getSignedJwt());
+        } catch (OpenIdConnectVerificationException e) {
+            return false;
+        }
+
+        return jwt.isContentValid();
+
+    }
+
+    private boolean byX509Key(OAuth2Jwt jwt) throws IdRepoException, SSOException, CertificateException {
+
+        Set<String> set = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.CLIENT_JWT_PUBLIC_KEY);
+
+        if (set == null || set.isEmpty()) {
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "No Client Bearer Jwt Public key certificate set");
+        }
+
+        String encodedCert = set.iterator().next();
+        X509Certificate certificate = pemDecoder.decodeX509Certificate(encodedCert);
+
+        return jwt.isValid(signingManager.newRsaSigningHandler(certificate.getPublicKey()));
+    }
+
+    /**
+     * Returns which of the possible selector types has been chosen by the client as
+     * the location for their public key.
+     *
+     * @return the client public key selector
+     */
+    private Client.PublicKeySelector getClientPublicKeySelector() {
+        Set<String> set;
+        try {
+            set = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.PUBLIC_KEY_SELECTOR);
+        } catch (SSOException e) {
+            logger.error("Unable to get " + OAuth2Constants.OAuth2Client.PUBLIC_KEY_SELECTOR + " from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.PUBLIC_KEY_SELECTOR +" from repository");
+        } catch (IdRepoException e) {
+            logger.error("Unable to get " + OAuth2Constants.OAuth2Client.PUBLIC_KEY_SELECTOR + " from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.PUBLIC_KEY_SELECTOR +" from repository");
+        }
+        return Client.PublicKeySelector.fromString(set.iterator().next());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public URI getSectorIdentifierUri() {
+        final Set<String> set;
+        try {
+            set = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.SECTOR_IDENTIFIER_URI);
+
+            if (set.iterator().hasNext()){
+                return new URI(set.iterator().next());
+            }
+
+        } catch (SSOException e) {
+            logger.error("Unable to get " + OAuth2Constants.OAuth2Client.SECTOR_IDENTIFIER_URI + " from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.SECTOR_IDENTIFIER_URI +" from repository");
+        } catch (IdRepoException e) {
+            logger.error("Unable to get " + OAuth2Constants.OAuth2Client.SECTOR_IDENTIFIER_URI + " from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.SECTOR_IDENTIFIER_URI +" from repository");
+        } catch (URISyntaxException e) {
+            logger.error("Unable to get " + OAuth2Constants.OAuth2Client.SECTOR_IDENTIFIER_URI + " from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.SECTOR_IDENTIFIER_URI +" from repository");
+        }
+
+        return null;
+    }
+
+    public String getSubValue(String id, OAuth2ProviderSettings providerSettings) {
+        if (Client.SubjectType.fromString(getSubjectType()) == Client.SubjectType.PAIRWISE) {
+
+            final String host;
+
+            //get redirect_uris
+            if (getSectorIdentifierUri() != null) {
+                host = getSectorIdentifierUri().getHost();
+            } else if (getRedirectUris().size() != 1 && containsMultipleRedirectUriHosts(getRedirectUris())) {
+                logger.message("Must configure sector identifier uri when multiple redirect uris are specified.");
+                return null;
+            } else {
+                host = getRedirectUris().iterator().next().getHost();
+            }
+            return subValueFromHost(host, id, providerSettings);
+        } else {
+            return id;
+        }
+    }
+
+    private String subValueFromHost(String host, String resourceOwnerId, OAuth2ProviderSettings providerSettings) {
+        try {
+            final String concat = host + resourceOwnerId + providerSettings.getHashSalt();
+            byte[] hash = digest.digest(concat.getBytes("UTF-8"));
+            return Base64.encode(hash);
+        } catch (UnsupportedEncodingException e) {
+            logger.message("Unable to encrypt the sub value for user.");
+            return null;
+        } catch (ServerException e) {
+            logger.message("Unable to encrypt the sub value for user.");
+            return null;
+        }
+    }
+
+    private boolean containsMultipleRedirectUriHosts(Set<URI> redirectUris) {
+        String host = redirectUris.iterator().next().getHost();
+        for (URI uri : redirectUris) {
+            if (!uri.getHost().equals(host)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+
 }

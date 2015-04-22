@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -29,4 +29,11 @@ public interface ResourceOwner {
      * @return The resource owner id.
      */
     String getId();
+
+    /**
+     * Gets the time at which the user last performed an active auth, in seconds.
+     *
+     * @return The authentication time in seconds.
+     */
+    long getAuthTime();
 }

@@ -11,23 +11,20 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
 
-import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.mock;
+import static org.testng.Assert.*;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import static org.mockito.Mockito.*;
-import static org.mockito.BDDMockito.*;
-import static org.testng.Assert.assertEquals;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * @since 12.0.0
@@ -52,18 +49,18 @@ public class AuthorizationCodeResponseTypeHandlerTest {
         //Given
         String tokenType = "TOKEN_TYPE";
         Set<String> scope = new HashSet<String>();
-        String resourceOwnerId = "RESOURCE_OWNER_ID";
+        ResourceOwner resourceOwner = mock(ResourceOwner.class);
         String clientId = "CLIENT_ID";
         String redirectUri = "REDIRECT_URI";
         String nonce = "NONCE";
         OAuth2Request request = mock(OAuth2Request.class);
         AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
 
-        given(tokenStore.createAuthorizationCode(scope, resourceOwnerId, clientId, redirectUri, nonce, request))
+        given(tokenStore.createAuthorizationCode(scope, resourceOwner, clientId, redirectUri, nonce, request))
                 .willReturn(authorizationCode);
 
         //When
-        final Map.Entry<String, Token> tokenEntry = responseTypeHandler.handle(tokenType, scope, resourceOwnerId,
+        final Map.Entry<String, Token> tokenEntry = responseTypeHandler.handle(tokenType, scope, resourceOwner,
                 clientId, redirectUri, nonce, request);
 
         //Then

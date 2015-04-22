@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.openidconnect;
 
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import org.forgerock.json.fluent.JsonValue;
@@ -59,7 +61,8 @@ public class OpenAMOpenIDConnectProvider implements OpenIDConnectProvider {
      */
     @Inject
     public OpenAMOpenIDConnectProvider(SSOTokenManager tokenManager, IdentityManager identityManager,
-            CTSPersistentStore cts, @Named(OAuth2Constants.CoreTokenParams.OAUTH_TOKEN_ADAPTER) TokenAdapter<JsonValue> tokenAdapter) {
+            CTSPersistentStore cts, @Named(OAuth2Constants.CoreTokenParams.OAUTH_TOKEN_ADAPTER)
+            TokenAdapter<JsonValue> tokenAdapter) {
         this.tokenManager = tokenManager;
         this.identityManager = identityManager;
         this.cts = cts;
@@ -71,7 +74,8 @@ public class OpenAMOpenIDConnectProvider implements OpenIDConnectProvider {
      */
     public boolean isUserValid(String userId, OAuth2Request request) {
         try {
-            identityManager.getResourceOwnerIdentity(userId, request.<String>getParameter("realm"));
+            identityManager.getResourceOwnerIdentity(userId,
+                    request.<String>getParameter(REALM));
         } catch (Exception e) {
             return false;
         }

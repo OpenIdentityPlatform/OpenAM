@@ -16,12 +16,12 @@
 
 package org.forgerock.openidconnect;
 
-import org.forgerock.oauth2.core.OAuth2Constants;
+import javax.inject.Singleton;
+import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.ResourceOwnerConsentVerifier;
+import org.forgerock.oauth2.core.Utils;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequiredException;
-
-import javax.inject.Singleton;
 
 /**
  * Verifier for determining whether a resource owner has saved its consent for the authorization grant, taking into
@@ -35,11 +35,12 @@ public class OpenIdResourceOwnerConsentVerifier implements ResourceOwnerConsentV
     /**
      * {@inheritDoc}
      */
-    public boolean verify(boolean consentSaved, OAuth2Request request) throws ResourceOwnerConsentRequiredException {
+    public boolean verify(boolean consentSaved, OAuth2Request request,
+                          ClientRegistration registration) throws ResourceOwnerConsentRequiredException {
         final OpenIdPrompt prompt = new OpenIdPrompt(request);
 
         if (prompt.containsNone() && !consentSaved) {
-            throw new ResourceOwnerConsentRequiredException();
+            throw new ResourceOwnerConsentRequiredException(Utils.getRequiredUrlLocation(request, registration));
         }
 
         return consentSaved && !prompt.containsConsent();

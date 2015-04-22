@@ -16,7 +16,15 @@
 
 package org.forgerock.openam.oauth2;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.forgerock.json.fluent.JsonValue.*;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+
 import com.iplanet.sso.SSOTokenManager;
+import java.util.Collections;
+import java.util.concurrent.ConcurrentHashMap;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
@@ -31,15 +39,6 @@ import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
 import org.restlet.Request;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.util.Collections;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.forgerock.json.fluent.JsonValue.*;
-import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 
 public class OpenAMTokenStoreTest {
 
@@ -143,7 +142,7 @@ public class OpenAMTokenStoreTest {
         doThrow(NotFoundException.class).when(providerSettingsFactory).get(request);
 
         //When
-        openAMtokenStore.createAccessToken(null, null, null, null, null, null, null, null, null, request);
+        openAMtokenStore.createAccessToken(null, null, null, null, null, null, null, null, null, null, request);
 
         //Then
         //Expected NotFoundException

@@ -11,12 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
-
-import org.forgerock.json.jose.jws.handlers.SigningHandler;
 
 import java.net.URI;
 import java.util.Locale;
@@ -118,10 +116,12 @@ public interface ClientRegistration {
     String getClientSessionURI();
 
     /**
-     * Gets the {@link SigningHandler} for verifying the signature of the clients JWT as either a grant type or client
-     * authentication.
-     *
-     * @return The {@code SigningHandler}.
+     * Gets the subject type of this client. PAIRWISE or PUBLIC.
      */
-    SigningHandler getClientJwtSigningHandler();
+    String getSubjectType();
+
+    /**
+     * Verifies that the supplied jwt is signed by this client.
+     */
+    boolean verifyJwtIdentity(OAuth2Jwt jwt);
 }

@@ -11,12 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
 
 import com.sun.identity.idm.AMIdentity;
+import java.util.concurrent.TimeUnit;
 import org.forgerock.oauth2.core.ResourceOwner;
 
 /**
@@ -28,23 +29,45 @@ public class OpenAMResourceOwner implements ResourceOwner {
 
     private final String id;
     private final AMIdentity amIdentity;
+    private final long authTime;
+
+    /**
+     * Constructs a new OpenAMResourceOwner with their authTime set to now.
+     *
+     * @param id The resource owner's id.
+     * @param amIdentity The resource owner's identity.
+     */
+    OpenAMResourceOwner(String id, AMIdentity amIdentity) {
+        this(id, amIdentity, System.currentTimeMillis());
+    }
 
     /**
      * Constructs a new OpenAMResourceOwner.
      *
      * @param id The resource owner's id.
      * @param amIdentity The resource owner's identity.
+     * @param authTime Time the resource owner authenticated, in ms.
      */
-    OpenAMResourceOwner(String id, AMIdentity amIdentity) {
+    OpenAMResourceOwner(String id, AMIdentity amIdentity, long authTime) {
         this.id = id;
         this.amIdentity = amIdentity;
+        this.authTime = TimeUnit.MILLISECONDS.toSeconds(authTime);
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getId() {
         return id;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getAuthTime() {
+        return authTime;
     }
 
     /**

@@ -16,21 +16,20 @@
 
 package org.forgerock.openam.oauth2;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.forgerock.openam.utils.CollectionUtils.asSet;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.fest.assertions.Assertions.*;
+import static org.forgerock.openam.utils.CollectionUtils.*;
+import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.openam.scripting.ScriptEvaluator;
+import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -40,16 +39,18 @@ public class OpenAMScopeValidatorTest {
     private OAuth2Request request;
     private OAuth2ProviderSettings providerSettings;
     private ClientRegistration client;
+    private OpenIdConnectClientRegistrationStore clientRegistrationStore;
 
     @BeforeMethod
     public void setup() throws Exception {
         client = mock(ClientRegistration.class);
         request = mock(OAuth2Request.class);
         providerSettings = mock(OAuth2ProviderSettings.class);
+        clientRegistrationStore = mock(OpenIdConnectClientRegistrationStore.class);
         OAuth2ProviderSettingsFactory factory = mock(OAuth2ProviderSettingsFactory.class);
         when(factory.get(request)).thenReturn(providerSettings);
         ScriptEvaluator scriptEvaluator = mock(ScriptEvaluator.class);
-        this.validator = new OpenAMScopeValidator(null, null, factory, null, scriptEvaluator);
+        this.validator = new OpenAMScopeValidator(null, null, factory, null, scriptEvaluator, clientRegistrationStore);
     }
 
     @Test

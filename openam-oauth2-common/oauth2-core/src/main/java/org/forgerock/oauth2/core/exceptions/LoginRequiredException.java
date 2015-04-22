@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core.exceptions;
@@ -28,5 +28,12 @@ public class LoginRequiredException extends OAuth2Exception {
      */
     public LoginRequiredException() {
         super(400, "login_required", "The request requires login.");
+    }
+
+    /**
+     * Constructs a new LoginRequiredException with a specified message.
+     */
+    public LoginRequiredException(String message) {
+        super(400, "login_required", message);
     }
 }

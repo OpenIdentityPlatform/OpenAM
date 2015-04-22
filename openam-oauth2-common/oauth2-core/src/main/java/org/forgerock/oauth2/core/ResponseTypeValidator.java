@@ -11,23 +11,22 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
 
+import static org.forgerock.oauth2.core.OAuth2Constants.AuthorizationEndpoint.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.*;
+
+import java.util.Map;
+import java.util.Set;
+import javax.inject.Singleton;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Singleton;
-import java.util.Map;
-import java.util.Set;
-
-import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation;
-import static org.forgerock.oauth2.core.OAuth2Constants.AuthorizationEndpoint.*;
 
 /**
  * Validates that the requested response types are valid and are allowed by the OAuth2 Provider and client registration.
@@ -68,8 +67,20 @@ public class ResponseTypeValidator {
             throw new UnsupportedResponseTypeException("Response type is not supported.", urlLocation);
         }
 
+        //requested response type comes in as 'id_token token' (for example) and split into 'id_token' and 'token'
+        //provider response types are as 'id_token token', 'token', 'id_token' - those with spaces must be split
+        //and compared in any order. A provider must specify all response types for a client in one string.
         final Set<String> clientAllowedResponseTypes = clientRegistration.getAllowedResponseTypes();
-        if (!clientAllowedResponseTypes.containsAll(requestedResponseTypes)) {
+        boolean cleared = false;
+        for (String clientAllowedResponseType : clientAllowedResponseTypes) {
+            if (Utils.splitResponseType(clientAllowedResponseType).containsAll(requestedResponseTypes) &&
+                    Utils.splitResponseType(clientAllowedResponseType).size() == requestedResponseTypes.size()) {
+                cleared = true;
+                break;
+            }
+        }
+
+        if (!cleared) {
             throw new UnsupportedResponseTypeException("Client does not support this response type.", urlLocation);
         }
 

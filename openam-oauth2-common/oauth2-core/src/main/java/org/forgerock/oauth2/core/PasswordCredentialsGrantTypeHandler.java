@@ -16,7 +16,13 @@
 
 package org.forgerock.oauth2.core;
 
-import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
+import static org.forgerock.oauth2.core.OAuth2Constants.Bearer.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+
+import java.util.List;
+import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
@@ -24,14 +30,8 @@ import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
-import org.forgerock.oauth2.core.OAuth2Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Implementation of the GrantTypeHandler for the OAuth2 Password Credentials grant.
@@ -84,30 +84,39 @@ public class PasswordCredentialsGrantTypeHandler extends GrantTypeHandler {
             throw new InvalidGrantException();
         }
 
-        final Set<String> scope = Utils.splitScope(request.<String>getParameter("scope"));
+        final Set<String> scope = Utils.splitScope(request.<String>getParameter(SCOPE));
         final Set<String> validatedScope = providerSettings.validateAccessTokenScope(clientRegistration, scope,
                 request);
-        final String grantType = request.getParameter("grant_type");
+
+        final String validatedClaims = providerSettings.validateRequestedClaims(
+                (String) request.getParameter(OAuth2Constants.Custom.CLAIMS));
+
+        final String grantType = request.getParameter(GRANT_TYPE);
 
         RefreshToken refreshToken = null;
         if (providerSettings.issueRefreshTokens()) {
             refreshToken = tokenStore.createRefreshToken(grantType, clientRegistration.getClientId(),
                     resourceOwner.getId(), null, validatedScope, request);
+
+            refreshToken.setStringProperty(OAuth2Constants.Custom.CLAIMS, validatedClaims);
+            tokenStore.updateRefreshToken(refreshToken);
         }
 
-        final AccessToken accessToken = tokenStore.createAccessToken(grantType, "Bearer", null,
-                resourceOwner.getId(), clientRegistration.getClientId(), null, validatedScope, refreshToken, null,
-                request);
+        final AccessToken accessToken = tokenStore.createAccessToken(grantType, BEARER, null,
+                resourceOwner.getId(), clientRegistration.getClientId(), null, validatedScope,
+                refreshToken, null, validatedClaims, request);
 
         if (refreshToken != null) {
-            accessToken.addExtraData(OAuth2Constants.Params.REFRESH_TOKEN, refreshToken.getTokenId());
+            accessToken.addExtraData(REFRESH_TOKEN, refreshToken.getTokenId());
         }
 
         providerSettings.additionalDataToReturnFromTokenEndpoint(accessToken, request);
 
         if (validatedScope != null && !validatedScope.isEmpty()) {
-            accessToken.addExtraData("scope", Utils.joinScope(validatedScope));
+            accessToken.addExtraData(SCOPE, Utils.joinScope(validatedScope));
         }
+
+        tokenStore.updateAccessToken(accessToken);
 
         return accessToken;
     }

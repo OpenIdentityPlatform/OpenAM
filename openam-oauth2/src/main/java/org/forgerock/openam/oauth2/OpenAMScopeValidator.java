@@ -16,17 +16,26 @@
 
 package org.forgerock.openam.oauth2;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.OPENID;
-import static org.forgerock.oauth2.core.OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.TokenEndpoint.*;
+import static org.forgerock.oauth2.core.Utils.*;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.script.Bindings;
-import javax.script.ScriptException;
-import javax.script.SimpleBindings;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
+import com.iplanet.am.sdk.AMHashMap;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.AMIdentityRepository;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdSearchControl;
+import com.sun.identity.idm.IdSearchResults;
+import com.sun.identity.idm.IdType;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.SMSException;
 import java.security.AccessController;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -38,21 +47,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
-import com.iplanet.am.sdk.AMHashMap;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.AMIdentityRepository;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdSearchControl;
-import com.sun.identity.idm.IdSearchResults;
-import com.sun.identity.idm.IdType;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.datastruct.CollectionHelper;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSException;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.script.Bindings;
+import javax.script.ScriptException;
+import javax.script.SimpleBindings;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.OAuth2Constants;
@@ -72,7 +74,13 @@ import org.forgerock.openam.scripting.ScriptObject;
 import org.forgerock.openam.scripting.SupportedScriptingLanguage;
 import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.openam.utils.OpenAMSettingsImpl;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openidconnect.OpenIDTokenIssuer;
+import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
+import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.restlet.Request;
 import org.restlet.ext.servlet.ServletUtils;
 
@@ -97,6 +105,7 @@ public class OpenAMScopeValidator implements ScopeValidator {
     private final OpenIDTokenIssuer openIDTokenIssuer;
     private final OpenAMSettings openAMSettings;
     private final ScriptEvaluator scriptEvaluator;
+    private final OpenIdConnectClientRegistrationStore clientRegistrationStore;
 
     /**
      * Constructs a new OpenAMScopeValidator.
@@ -106,16 +115,19 @@ public class OpenAMScopeValidator implements ScopeValidator {
      * @param providerSettingsFactory An instance of the CTSPersistentStore.
      * @param openAMSettings An instance of the OpenAMSettings.
      * @param scriptEvaluator An instance of the OIDC Claims ScriptEvaluator.
+     * @param clientRegistrationStore An instance of the OpenIdConnectClientRegistrationStore.
      */
     @Inject
     public OpenAMScopeValidator(IdentityManager identityManager, OpenIDTokenIssuer openIDTokenIssuer,
             OAuth2ProviderSettingsFactory providerSettingsFactory, OpenAMSettings openAMSettings,
-            @Named(ScriptedConfigurator.SCRIPT_EVALUATOR_NAME) ScriptEvaluator scriptEvaluator) {
+            @Named(ScriptedConfigurator.SCRIPT_EVALUATOR_NAME) ScriptEvaluator scriptEvaluator,
+            OpenIdConnectClientRegistrationStore clientRegistrationStore) {
         this.identityManager = identityManager;
         this.openIDTokenIssuer = openIDTokenIssuer;
         this.providerSettingsFactory = providerSettingsFactory;
         this.openAMSettings = openAMSettings;
         this.scriptEvaluator = scriptEvaluator;
+        this.clientRegistrationStore = clientRegistrationStore;
     }
 
     /**
@@ -171,24 +183,53 @@ public class OpenAMScopeValidator implements ScopeValidator {
     public Map<String, Object> getUserInfo(AccessToken token, OAuth2Request request)
             throws UnauthorizedClientException, NotFoundException {
 
-        Set<String> scopes = token.getScope();
         Map<String, Object> response = new HashMap<String, Object>();
-        AMIdentity id = identityManager.getResourceOwnerIdentity(token.getResourceOwnerId(), token.getRealm());
-
-        response.put(OAuth2Constants.JWTTokenParams.SUB, token.getResourceOwnerId());
-        response.put(OAuth2Constants.JWTTokenParams.UPDATED_AT, getUpdatedAt(token.getResourceOwnerId(),
-                token.getRealm(), request));
-
         Bindings scriptVariables = new SimpleBindings();
-        scriptVariables.put("logger", logger);
-        scriptVariables.put("claims", response);
-        scriptVariables.put("accessToken", token);
-        scriptVariables.put("session", getUsersSession(request));
-        scriptVariables.put("identity", id);
-        scriptVariables.put("scopes", scopes);
+        SSOToken ssoToken = getUsersSession(request);
+        String realm;
+        Set<String> scopes;
+        AMIdentity id;
+        OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+        Map<String, Set<String>> requestedClaimsValues = gatherRequestedClaims(providerSettings, request, token);
 
         try {
-            ScriptObject script = getOIDCClaimsExtensionScript(token.getRealm());
+            if (token != null) {
+
+                OpenIdConnectClientRegistration clientRegistration;
+                try {
+                    clientRegistration = clientRegistrationStore.get(token.getClientId(), request);
+                } catch (InvalidClientException e) {
+                    logger.message("Unable to retrieve client from store.");
+                    throw new NotFoundException("No valid client registration found.");
+                }
+                final String subId = clientRegistration.getSubValue(token.getResourceOwnerId(), providerSettings);
+
+                realm = token.getRealm(); //data comes from token when we have one
+                scopes = token.getScope();
+                id = identityManager.getResourceOwnerIdentity(token.getResourceOwnerId(), realm);
+
+                response.put(OAuth2Constants.JWTTokenParams.SUB, subId);
+
+                //todo: figure out why this was here
+                //response.put(OAuth2Constants.JWTTokenParams.UPDATED_AT, getUpdatedAt(token.getResourceOwnerId(),
+                //  token.getRealm(), request));
+            } else {
+                //otherwise we're simply reading claims into the id_token, so grab it from the request/ssoToken
+                realm = DNMapper.orgNameToRealmName(ssoToken.getProperty(ISAuthConstants.ORGANIZATION));
+                id = identityManager.getResourceOwnerIdentity(ssoToken.getProperty(ISAuthConstants.USER_ID), realm);
+                String scopeStr = request.getParameter(OAuth2Constants.Params.SCOPE);
+                scopes = splitScope(scopeStr);
+            }
+
+            scriptVariables.put(OAuth2Constants.ScriptParams.SCOPES, scopes);
+            scriptVariables.put(OAuth2Constants.ScriptParams.IDENTITY, id);
+            scriptVariables.put(OAuth2Constants.ScriptParams.LOGGER, logger);
+            scriptVariables.put(OAuth2Constants.ScriptParams.CLAIMS, response);
+            scriptVariables.put(OAuth2Constants.ScriptParams.ACCESS_TOKEN, token);
+            scriptVariables.put(OAuth2Constants.ScriptParams.SESSION, ssoToken);
+            scriptVariables.put(OAuth2Constants.ScriptParams.REQUESTED_CLAIMS, requestedClaimsValues);
+
+            ScriptObject script = getOIDCClaimsExtensionScript(realm);
             try {
                 return scriptEvaluator.evaluateScript(script, scriptVariables);
             } catch (ScriptException e) {
@@ -198,7 +239,80 @@ public class OpenAMScopeValidator implements ScopeValidator {
         } catch (ServerException e) {
             //API does not allow ServerExceptions to be thrown!
             throw new NotFoundException(e.getMessage());
+        } catch (SSOException e) {
+            throw new NotFoundException(e.getMessage());
         }
+    }
+
+    private Map<String, Set<String>> gatherRequestedClaims(OAuth2ProviderSettings providerSettings,
+                                                           OAuth2Request request, AccessToken token) {
+        Request req = request.getRequest();
+
+        if (token != null) { //claims are in the extra data in the AccessToken
+            String claimsJson = token.getClaims();
+            if (req.getResourceRef().getLastSegment().equals(OAuth2Constants.UserinfoEndpoint.USERINFO)) {
+                return gatherRequestedClaims(providerSettings, claimsJson, OAuth2Constants.UserinfoEndpoint.USERINFO);
+            } else {
+                return gatherRequestedClaims(providerSettings, claimsJson, OAuth2Constants.JWTTokenParams.ID_TOKEN);
+            }
+        } else {
+            String json = request.getParameter(OAuth2Constants.Custom.CLAIMS);
+            return gatherRequestedClaims(providerSettings, json, OAuth2Constants.JWTTokenParams.ID_TOKEN);
+        }
+    }
+
+
+    /**
+     * Generates a map for the claims specifically requested as per Section 5.5 of the spec.
+     * Ends up mapping requested claims against a set of their optional values (empty if
+     * claim is requested but no suggested/required values given).
+     */
+    private Map<String, Set<String>> gatherRequestedClaims(OAuth2ProviderSettings providerSettings,
+                                                           String claimsJson, String objectName) {
+
+        final Map<String, Set<String>> requestedClaims = new HashMap<String, Set<String>>();
+
+        try {
+            if (providerSettings.getClaimsParameterSupported() && claimsJson != null) {
+                try {
+                    final JSONObject claimsObject = new JSONObject(claimsJson);
+
+                    JSONObject subClaimsRequest = claimsObject.getJSONObject(objectName);
+                    Iterator<String> it = subClaimsRequest.keys();
+                    while (it.hasNext()) {
+                        final String keyName = it.next();
+
+                        JSONObject optObj = subClaimsRequest.optJSONObject(keyName);
+                        final HashSet<String> options = new HashSet<String>();
+
+                        if (optObj != null) {
+                            final JSONArray optArray = optObj.optJSONArray(OAuth2Constants.Params.VALUES);
+
+                            if (optArray != null) {
+                                for (int i = 0; i < optArray.length(); i++) {
+                                    options.add(optArray.getString(i));
+                                }
+                            }
+
+                            final String value = optObj.optString(OAuth2Constants.Params.VALUE);
+                            if (!StringUtils.isBlank(value)) {
+                                options.add(value);
+                            }
+                        }
+
+                        requestedClaims.put(keyName, options);
+
+                    }
+                } catch (JSONException e) {
+                    //ignorable
+                }
+            }
+        } catch (ServerException e) {
+            logger.message("Requested Claims Supported not set.");
+        }
+
+        return requestedClaims;
+
     }
 
     /**
@@ -226,7 +340,7 @@ public class OpenAMScopeValidator implements ScopeValidator {
             try {
                 ssoToken = SSOTokenManager.getInstance().createSSOToken(sessionId);
             } catch (SSOException e) {
-                logger.warning("Session Id is not valid");
+                logger.message("Session Id is not valid");
             }
         }
         return ssoToken;
@@ -273,7 +387,8 @@ public class OpenAMScopeValidator implements ScopeValidator {
 
         final String resourceOwner = accessToken.getResourceOwnerId();
         final String clientId = accessToken.getClientId();
-        final String realm = ((OpenAMAccessToken) accessToken).getRealm();
+        final String realm = accessToken.getRealm();
+
         AMIdentity id = null;
         try {
             if (clientId != null && CLIENT_CREDENTIALS.equals(accessToken.getGrantType()) ) {
@@ -333,14 +448,13 @@ public class OpenAMScopeValidator implements ScopeValidator {
     private String getUpdatedAt(String username, String realm, OAuth2Request request) throws NotFoundException {
         try {
             final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
-            String modifyTimestampAttributeName = null;
-            String createdTimestampAttributeName = null;
+            String modifyTimestampAttributeName;
+            String createdTimestampAttributeName;
             try {
                 modifyTimestampAttributeName = providerSettings.getModifiedTimestampAttributeName();
                 createdTimestampAttributeName = providerSettings.getCreatedTimestampAttributeName();
             } catch (ServerException e) {
-                logger.error("Unable to read last modified attribute from datastore",
-                        e);
+                logger.error("Unable to read last modified attribute from datastore", e);
                 return DEFAULT_TIMESTAMP;
             }
 

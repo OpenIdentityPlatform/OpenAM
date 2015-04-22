@@ -250,17 +250,22 @@
                         <Value></Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <!--
+
                 <AttributeSchema
                         name="forgerock-oauth2-provider-supported-scopes"
                         type="list"
                         syntax="string"
+                        resourceName="supportedScopes"
                         i18nKey="a108">
                     <DefaultValues>
                         <Value>openid</Value>
+                        <Value>profile</Value>
+                        <Value>email</Value>
+                        <Value>address</Value>
+                        <Value>phone</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                -->
+
                 <AttributeSchema
                         name="forgerock-oauth2-provider-jkws-uri"
                         type="single"
@@ -304,6 +309,24 @@
                         resourceName="supportedClaims"
                         i18nKey="a112">
                     <DefaultValues>
+                        <Value>email</Value>
+                        <Value>address</Value>
+                        <Value>phone_number</Value>
+                        <Value>given_name</Value>
+                        <Value>zoneinfo</Value>
+                        <Value>family_name</Value>
+                        <Value>locale</Value>
+                        <Value>name</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema
+                        name="forgerock-oauth2-provider-default-scopes"
+                        type="list"
+                        syntax="string"
+                        resourceName="defaultScopes"
+                        i18nKey="a122">
+                    <DefaultValues>
                         <Value>openid</Value>
                         <Value>profile</Value>
                         <Value>email</Value>
@@ -331,6 +354,30 @@
                                  i18nKey="a114">
                     <DefaultValues>
                         <Value>test</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="forgerock-oauth2-provider-claims-parameter-supported"
+                                 type="single"
+                                 syntax="boolean"
+                                 resourceName="claimsParameterSupported"
+                                 i18nKey="a123">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="forgerock-oauth2-provider-hash-salt"
+                                 type="single"
+                                 syntax="string"
+                                 resourceName="hashSalt"
+                                 i18nKey="a124">
+                    <DefaultValues>
+                        <Value>changeme</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -425,7 +472,6 @@
                         <Value>createTimestamp</Value>
                     </DefaultValues>
                 </AttributeSchema>
-
             </Organization>
         </Schema>
     </Service>

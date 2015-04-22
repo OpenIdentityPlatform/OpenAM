@@ -16,19 +16,10 @@
 
 package org.forgerock.openam.oauth2.guice;
 
-import static com.google.inject.name.Names.named;
+import static com.google.inject.name.Names.*;
 import static org.forgerock.oauth2.core.AccessTokenVerifier.*;
-import static org.forgerock.openam.rest.service.RestletUtils.wrap;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
+import static org.forgerock.oauth2.core.OAuth2Constants.TokenEndpoint.*;
+import static org.forgerock.openam.rest.service.RestletUtils.*;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
@@ -39,7 +30,18 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverService;
+import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverServiceImpl;
 import org.forgerock.oauth2.core.AccessTokenService;
 import org.forgerock.oauth2.core.AccessTokenServiceImpl;
 import org.forgerock.oauth2.core.AccessTokenVerifier;
@@ -98,17 +100,19 @@ import org.forgerock.openam.oauth2.resources.OpenAMResourceSetStore;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.oauth2.saml2.core.Saml2GrantTypeHandler;
 import org.forgerock.openam.oauth2.scripting.ScriptedConfigurator;
+import org.forgerock.openam.oauth2.validation.OpenIDConnectURLValidator;
+import org.forgerock.openam.openidconnect.OpenAMOpenIDConnectProvider;
+import org.forgerock.openam.openidconnect.OpenAMOpenIdConnectClientRegistrationService;
+import org.forgerock.openam.openidconnect.OpenAMOpenIdTokenIssuer;
 import org.forgerock.openam.scripting.ScriptEngineConfiguration;
 import org.forgerock.openam.scripting.ScriptEvaluator;
 import org.forgerock.openam.scripting.StandardScriptEngineManager;
 import org.forgerock.openam.scripting.StandardScriptEvaluator;
 import org.forgerock.openam.scripting.ThreadPoolScriptEvaluator;
 import org.forgerock.openam.sm.datalayer.utils.ThreadSafeTokenIdGenerator;
-import org.forgerock.openam.openidconnect.OpenAMOpenIDConnectProvider;
-import org.forgerock.openam.openidconnect.OpenAMOpenIdConnectClientRegistrationService;
-import org.forgerock.openam.openidconnect.OpenAMOpenIdTokenIssuer;
 import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.openam.utils.OpenAMSettingsImpl;
+import org.forgerock.openidconnect.ClaimsParameterValidator;
 import org.forgerock.openidconnect.ClientDAO;
 import org.forgerock.openidconnect.OpenIDConnectProvider;
 import org.forgerock.openidconnect.OpenIDTokenIssuer;
@@ -117,6 +121,7 @@ import org.forgerock.openidconnect.OpenIdConnectClientRegistrationService;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
 import org.forgerock.openidconnect.OpenIdConnectTokenStore;
 import org.forgerock.openidconnect.OpenIdResourceOwnerConsentVerifier;
+import org.forgerock.openidconnect.SubjectTypeValidator;
 import org.forgerock.openidconnect.UserInfoService;
 import org.forgerock.openidconnect.UserInfoServiceImpl;
 import org.forgerock.openidconnect.restlet.LoginHintHook;
@@ -164,7 +169,6 @@ public class OAuth2GuiceModule extends AbstractModule {
                         OAuth2Constants.OAuth2ProviderService.VERSION);
             }
         });
-
         bind(OpenIDTokenIssuer.class).to(OpenAMOpenIdTokenIssuer.class);
 
         final Multibinder<AuthorizeRequestValidator> authorizeRequestValidators =
@@ -172,6 +176,8 @@ public class OAuth2GuiceModule extends AbstractModule {
 
         authorizeRequestValidators.addBinding().to(AuthorizeRequestValidatorImpl.class);
         authorizeRequestValidators.addBinding().to(OpenIdConnectAuthorizeRequestValidator.class);
+        authorizeRequestValidators.addBinding().to(ClaimsParameterValidator.class);
+        authorizeRequestValidators.addBinding().to(SubjectTypeValidator.class);
 
         final Multibinder<AuthorizationCodeRequestValidator> authorizationCodeRequestValidators =
                 Multibinder.newSetBinder(binder(), AuthorizationCodeRequestValidator.class);
@@ -187,10 +193,10 @@ public class OAuth2GuiceModule extends AbstractModule {
 
         final MapBinder<String, GrantTypeHandler> grantTypeHandlers =
                 MapBinder.newMapBinder(binder(), String.class, GrantTypeHandler.class);
-        grantTypeHandlers.addBinding("client_credentials").to(ClientCredentialsGrantTypeHandler.class);
-        grantTypeHandlers.addBinding("password").to(PasswordCredentialsGrantTypeHandler.class);
-        grantTypeHandlers.addBinding("authorization_code").to(AuthorizationCodeGrantTypeHandler.class);
-        grantTypeHandlers.addBinding(OAuth2Constants.TokenEndpoint.JWT_BEARER).to(JwtBearerGrantTypeHandler.class);
+        grantTypeHandlers.addBinding(CLIENT_CREDENTIALS).to(ClientCredentialsGrantTypeHandler.class);
+        grantTypeHandlers.addBinding(PASSWORD).to(PasswordCredentialsGrantTypeHandler.class);
+        grantTypeHandlers.addBinding(AUTHORIZATION_CODE).to(AuthorizationCodeGrantTypeHandler.class);
+        grantTypeHandlers.addBinding(JWT_BEARER).to(JwtBearerGrantTypeHandler.class);
         grantTypeHandlers.addBinding(OAuth2Constants.TokenEndpoint.SAML2_BEARER).to(Saml2GrantTypeHandler.class);
 
         final Multibinder<AuthorizeRequestHook> authorizeRequestHooks = Multibinder.newSetBinder(
@@ -215,6 +221,15 @@ public class OAuth2GuiceModule extends AbstractModule {
 
         bind(Key.get(StandardScriptEngineManager.class, Names.named(ScriptedConfigurator.SCRIPT_EVALUATOR_NAME)))
                 .toInstance(new StandardScriptEngineManager());
+
+        bind(OpenIDConnectURLValidator.class).toInstance(OpenIDConnectURLValidator.getInstance());
+    }
+
+    @Provides
+    @Singleton
+    @Named(OAuth2Constants.Custom.JWK_RESOLVER)
+    OpenIdResolverService getOpenIdResolverService() {
+        return new OpenIdResolverServiceImpl(3000, 3000);
     }
 
     /**

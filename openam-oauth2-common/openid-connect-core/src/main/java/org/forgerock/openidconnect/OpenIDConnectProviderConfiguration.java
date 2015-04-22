@@ -60,8 +60,7 @@ public class OpenIDConnectProviderConfiguration {
      *          or the OAuth2 provider.
      * @throws ServerException If any internal server error occurs.
      */
-    public JsonValue getConfiguration(OAuth2Request request) throws UnsupportedResponseTypeException, ServerException,
-            OAuth2Exception {
+    public JsonValue getConfiguration(OAuth2Request request) throws OAuth2Exception {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
 
@@ -76,13 +75,15 @@ public class OpenIDConnectProviderConfiguration {
         configuration.put("jwks_uri", providerSettings.getJWKSUri());
         configuration.put("registration_endpoint", providerSettings.getClientRegistrationEndpoint());
         configuration.put("claims_supported", providerSettings.getSupportedClaims());
-    //    configuration.put("scopes_supported", providerSettings.getSupportedScopes());
+        configuration.put("scopes_supported", providerSettings.getSupportedScopes());
         configuration.put("response_types_supported",
                 getResponseTypes(providerSettings.getAllowedResponseTypes().keySet()));
         configuration.put("subject_types_supported", providerSettings.getSupportedSubjectTypes());
         configuration.put("id_token_signing_alg_values_supported",
                 providerSettings.getSupportedIDTokenSigningAlgorithms());
         configuration.put("acr_values_supported", providerSettings.getAcrMapping().keySet());
+        configuration.put("claims_parameter_supported", providerSettings.getClaimsParameterSupported());
+        configuration.put("token_endpoint_auth_methods_supported", providerSettings.getEndpointAuthMethodsSupported());
 
         return new JsonValue(configuration);
     }

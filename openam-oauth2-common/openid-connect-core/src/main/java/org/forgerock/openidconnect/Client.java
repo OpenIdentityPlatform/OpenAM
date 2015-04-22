@@ -11,21 +11,21 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014-15 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openidconnect;
-
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.oauth2.core.OAuth2Constants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.openam.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Models a OAuth2 Client.
@@ -35,6 +35,10 @@ import java.util.Set;
 public class Client extends JsonValue {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
+
+    public static final long MIN_DEFAULT_MAX_AGE = 1;
+    //set param to this after max_age check, necessary in case default_max_age is 1.
+    public static final String CONFIRMED_MAX_AGE = "60";
 
     /**
      * Stores the possible OAuth2Client types.
@@ -96,7 +100,7 @@ public class Client extends JsonValue {
     /**
      * Stores a Client SubjectType.
      * 
-     * @since 12.0.0
+     * @since 13.0.0
      */
     public enum SubjectType {
         /** Pairwise Subject Type. */
@@ -200,30 +204,147 @@ public class Client extends JsonValue {
     }
 
     /**
+     * Stores a token endpoint auth method type.
+     *
+     * @since 13.0.0
+     */
+    public enum TokenEndpointAuthMethod {
+        /** Client secret post type. */
+        CLIENT_SECRET_POST("client_secret_post"),
+        /** Client secret basic type. */
+        CLIENT_SECRET_BASIC("client_secret_basic"),
+        /** Client secret post type. */
+     //   CLIENT_SECRET_JWT("client_secret_jwt"), todo uncomment as we add suppot
+        /** Client secret basic type. */
+        PRIVATE_KEY_JWT("private_key_jwt");
+        /** None type. */
+     //   NONE("none");
+
+        private String type;
+
+        /**
+         * Constructs a new Token Endpoint Auth Method type.
+         *
+         * @param type The type of token endpoint auth method.
+         */
+        TokenEndpointAuthMethod(String type) {
+            this.type = type;
+        }
+
+        /**
+         * Gets the client token endpoint auth method type.
+         *
+         * @return The client application type.
+         */
+        public String getType() {
+            return this.type;
+        }
+
+        /**
+         * Translates a string into a token endpoint auth method type.
+         *
+         * @param type The string to translate into a token endpoint auth method.
+         * @return An application type if found, else {@code null}.
+         */
+        public static TokenEndpointAuthMethod fromString(String type) {
+            if (type != null) {
+                for (TokenEndpointAuthMethod authMethod : TokenEndpointAuthMethod.values()) {
+                    if (type.equalsIgnoreCase(authMethod.type)) {
+                        return authMethod;
+                    }
+                }
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Stores the selected public key locator for this client.
+     *
+     * @since 13.0.0
+     */
+    public enum PublicKeySelector {
+        /** JWKs URI */
+        JWKS_URI("jwks_uri"),
+        /** JWKs */
+        JWKS("jwks"),
+        /** X509 */
+        X509("x509");
+
+        private String type;
+
+        /**
+         * Constructs a new Token Endpoint Auth Method type.
+         *
+         * @param type The type of token endpoint auth method.
+         */
+        PublicKeySelector(String type) {
+            this.type = type;
+        }
+
+        /**
+         * Gets the client token endpoint auth method type.
+         *
+         * @return The client application type.
+         */
+        public String getType() {
+            return this.type;
+        }
+
+        /**
+         * Translates a string into a token endpoint auth method type.
+         *
+         * @param type The string to translate into a token endpoint auth method.
+         * @return An application type if found, else {@code null}.
+         */
+        public static PublicKeySelector fromString(String type) {
+            if (type != null) {
+                for (PublicKeySelector keySelector : PublicKeySelector.values()) {
+                    if (type.equalsIgnoreCase(keySelector.type)) {
+                        return keySelector;
+                    }
+                }
+            }
+            return null;
+        }
+    }
+
+    /**
      * Creates a OAuth2Client.
-     *  @param clientID The client id of the client.
-     * @param clientType The client type of the client.
-     * @param redirectionURIs The redirection uris of the client.
-     * @param allowedGrantScopes The allowed scopes of the client.
-     * @param defaultGrantScopes The default scopes of the client.
-     * @param displayName The display name of the client
-     * @param displayDescription The client description of the client.
-     * @param clientName The client name of the client.
-     * @param subjectType The subject type of the client.
+     *
+     * @param clientID                       The client id of the client.
+     * @param clientType                     The client type of the client.
+     * @param redirectionURIs                The redirection uris of the client.
+     * @param allowedGrantScopes             The allowed scopes of the client.
+     * @param defaultGrantScopes             The default scopes of the client.
+     * @param displayName                    The display name of the client
+     * @param displayDescription             The client description of the client.
+     * @param clientName                     The client name of the client.
+     * @param subjectType                    The subject type of the client.
      * @param idTokenSignedResponseAlgorithm The id token signed response algorithm of the client.
-     * @param postLogoutRedirectionURIs The post logout redirect URIs of the client.
-     * @param accessToken The registration access token of the client.
-     * @param clientSessionURI The client session uri of the client.
-     * @param applicationType The application type of the client.
-     * @param clientSecret The client secret of the client.
-     * @param responseTypes the response types of the client.
-     * @param contacts The contact information for the client (can be null).
+     * @param postLogoutRedirectionURIs      The post logout redirect URIs of the client.
+     * @param accessToken                    The registration access token of the client.
+     * @param clientSessionURI               The client session uri of the client.
+     * @param applicationType                The application type of the client.
+     * @param clientSecret                   The client secret of the client.
+     * @param responseTypes                  The response types of the client.
+     * @param contacts                       The contact information for the client (can be null).
+     * @param defaultMaxAge                  The default maximum age a session can be when authorizing, in seconds.
+     * @param defaultMaxAgeEnabled           Whether we enforce the defaultMaxAge parameter or not.
+     * @param tokenEndpointAuthMethod        The token endpoint's authentication method.
+     * @param jwks                           The client's public key jwks.
+     * @param jwksUri                        The client's public key jwks_uri.
+     * @param x509                           The client's public key x509.
+     * @param selector                       Selector for the public key format.
+     * @param sectorIdUri                    Client's sector ID Uri.
      */
     public Client(String clientID, String clientType, List<String> redirectionURIs, List<String> allowedGrantScopes,
                   List<String> defaultGrantScopes, List<String> displayName, List<String> displayDescription,
                   String clientName, String subjectType, String idTokenSignedResponseAlgorithm,
                   List<String> postLogoutRedirectionURIs, String accessToken, String clientSessionURI, String applicationType,
-                  String clientSecret, List<String> responseTypes, List<String> contacts) {
+                  String clientSecret, List<String> responseTypes, List<String> contacts, Long defaultMaxAge,
+                  Boolean defaultMaxAgeEnabled, String tokenEndpointAuthMethod, String jwks,
+                  String jwksUri, String x509, String selector, String sectorIdUri) {
         super(new HashMap<String, Object>());
         setAccessToken(accessToken);
         setAllowedGrantScopes(allowedGrantScopes);
@@ -242,6 +363,78 @@ public class Client extends JsonValue {
         setClientSecret(clientSecret);
         setResponseTypes(responseTypes);
         setContacts(contacts);
+        setDefaultMaxAge(defaultMaxAge);
+        setDefaultMaxAgeEnabled(defaultMaxAgeEnabled);
+        setTokenEndpointAuthMethod(tokenEndpointAuthMethod);
+        setJwks(jwks);
+        setJwksUri(jwksUri);
+        setX509(x509);
+        setKeySelector(selector);
+        setSectorIdUri(sectorIdUri);
+    }
+
+    /**
+     * Sets JWKs for this client.
+     */
+    private void setJwks(String jwks) {
+        if (!StringUtils.isBlank(jwks)) {
+            put(OAuth2Constants.ShortClientAttributeNames.JWKS.getType(), jwks);
+        }
+    }
+
+    /**
+     * Gets JWKs for this client.
+     */
+    public String getJwks() {
+        return get(OAuth2Constants.ShortClientAttributeNames.JWKS.getType()).asString();
+    }
+
+    /**
+     * Gets JWKs_URI for this client.
+     */
+    public String getJwksUri() {
+        return get(OAuth2Constants.ShortClientAttributeNames.JWKS_URI.getType()).asString();
+    }
+
+    /**
+     * Gets X509 certificate for this client.
+     */
+    public String getX509() {
+        return get(OAuth2Constants.ShortClientAttributeNames.X509.getType()).asString();
+    }
+
+    /**
+     * Returns the key selector for this client.
+     */
+    public String getKeySelector() {
+        return get(OAuth2Constants.ShortClientAttributeNames.PUBLIC_KEY_SELECTOR.getType()).asString();
+    }
+
+    /**
+     * JWKs_URI for this client.
+     */
+    private void setJwksUri(String jwksUri) {
+        if (!StringUtils.isBlank(jwksUri)) {
+            put(OAuth2Constants.ShortClientAttributeNames.JWKS_URI.getType(), jwksUri);
+        }
+    }
+
+    /**
+     * X590 certificate w/ public key for this client.
+     */
+    private void setX509(String x509) {
+        if (!StringUtils.isBlank(x509)) {
+            put(OAuth2Constants.ShortClientAttributeNames.X509.getType(), x509);
+        }
+    }
+
+    /**
+     * Sets which of the public key types this client uses.
+     */
+    private void setKeySelector(String selector) {
+        if (!StringUtils.isBlank(selector)) {
+            put(OAuth2Constants.ShortClientAttributeNames.PUBLIC_KEY_SELECTOR.getType(), selector);
+        }
     }
 
     /**
@@ -254,12 +447,30 @@ public class Client extends JsonValue {
     }
 
     /**
+     * Gets the default max age of the OAuth2Client.
+     *
+     * @return the default max age.
+     */
+    public Long getDefaultMaxAge() {
+        return get(OAuth2Constants.ShortClientAttributeNames.DEFAULT_MAX_AGE.getType()).asLong();
+    }
+
+    /**
+     * Gets whether the max age value is enforced.
+     *
+     * @return true if enforced, false otherwise.
+     */
+    public Boolean getDefaultMaxAgeEnabled() {
+        return get(OAuth2Constants.ShortClientAttributeNames.DEFAULT_MAX_AGE_ENABLED.getType()).asBoolean();
+    }
+
+    /**
      * Sets the client id of the OAuth2Client.
      *
      * @param clientID The client id.
      */
     public void setClientID(String clientID) {
-        if (clientID != null && !clientID.isEmpty()) {
+        if (!StringUtils.isBlank(clientID)) {
             put(OAuth2Constants.ShortClientAttributeNames.CLIENT_ID.getType(), clientID);
         }
     }
@@ -330,6 +541,26 @@ public class Client extends JsonValue {
     public void setRedirectionURIs(List<String> redirectionURIs) {
         if (redirectionURIs != null && !redirectionURIs.isEmpty()) {
             put(OAuth2Constants.ShortClientAttributeNames.REDIRECT_URIS.getType(), redirectionURIs);
+        }
+    }
+
+    /**
+     * Sets the sector id uri.
+     */
+    public void setSectorIdUri(String sectorIdUri) {
+        if (!StringUtils.isBlank(sectorIdUri)) {
+            put(OAuth2Constants.ShortClientAttributeNames.SECTOR_IDENTIFIER_URI.getType(), sectorIdUri);
+        }
+    }
+
+    /**
+     * Returns the sector id uri for this client if set.
+     */
+    public String getSectorIdUri() {
+        if (get(OAuth2Constants.ShortClientAttributeNames.SECTOR_IDENTIFIER_URI.getType()).asString() != null) {
+            return get(OAuth2Constants.ShortClientAttributeNames.SECTOR_IDENTIFIER_URI.getType()).asString();
+        } else {
+            return null;
         }
     }
 
@@ -453,13 +684,13 @@ public class Client extends JsonValue {
      * @param clientName The client name.
      */
     public void setClientName(String clientName) {
-        if (clientName != null && !clientName.isEmpty()) {
+        if (StringUtils.isBlank(clientName)) {
             put(OAuth2Constants.ShortClientAttributeNames.CLIENT_NAME.getType(), clientName);
         }
     }
 
     /**
-     * Gets the subject type of the OAuth2Client. If the subject type is {@code null}, {@code null} is returned.
+     * Gets the subject type of the OAuth2Client.
      *
      * @return The subject type.
      */
@@ -473,7 +704,7 @@ public class Client extends JsonValue {
      * @param subjectType The subject type.
      */
     public void setSubjectType(String subjectType) {
-        if (subjectType != null && !subjectType.isEmpty()) {
+        if (!StringUtils.isBlank(subjectType)) {
             put(OAuth2Constants.ShortClientAttributeNames.SUBJECT_TYPE.getType(), subjectType);
         }
     }
@@ -638,6 +869,51 @@ public class Client extends JsonValue {
     public void setResponseTypes(List<String> responseTypes) {
         if (responseTypes != null && !responseTypes.isEmpty()) {
             put(OAuth2Constants.ShortClientAttributeNames.RESPONSE_TYPES.getType(), responseTypes);
+        }
+    }
+
+    /**
+     * Sets whether the default max age value is to be utilised.
+     *
+     * @param defaultMaxAgeEnabled The default max age.
+     */
+    public void setDefaultMaxAgeEnabled(Boolean defaultMaxAgeEnabled) {
+        if (defaultMaxAgeEnabled != null) {
+            put(OAuth2Constants.ShortClientAttributeNames.DEFAULT_MAX_AGE_ENABLED.getType(), defaultMaxAgeEnabled);
+        }
+    }
+
+    /**
+     * Gets the token endpoint auth method.
+     *
+     * @return The token endpoint auth method.
+     */
+    public TokenEndpointAuthMethod getTokenEndpointAuthMethod() {
+        return TokenEndpointAuthMethod.fromString(
+                get(OAuth2Constants.ShortClientAttributeNames.TOKEN_ENDPOINT_AUTH_METHOD.getType()).asString());
+    }
+
+    /**
+     * Sets the token endpoint auth method.
+     *
+     * @param tokenEndpointAuthMethod the token endpoint auth method to use.
+     */
+    public void setTokenEndpointAuthMethod(String tokenEndpointAuthMethod) {
+        put(OAuth2Constants.ShortClientAttributeNames.TOKEN_ENDPOINT_AUTH_METHOD.getType(),
+                tokenEndpointAuthMethod);
+    }
+
+    /**
+     * Sets the default max age of the OAuth2Client. Minimum enforced value of 60.
+     *
+     * @param defaultMaxAge The default max age.
+     */
+    public void setDefaultMaxAge(Long defaultMaxAge) {
+        if (defaultMaxAge != null) {
+            if (defaultMaxAge < MIN_DEFAULT_MAX_AGE) {
+                defaultMaxAge = MIN_DEFAULT_MAX_AGE;
+            }
+            put(OAuth2Constants.ShortClientAttributeNames.DEFAULT_MAX_AGE.getType(), defaultMaxAge);
         }
     }
 

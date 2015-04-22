@@ -39,6 +39,8 @@ public class URLValidator
 {
     private static URLValidator instance = new URLValidator();
 
+    public final static String ERROR_CODE = "errorCode3";
+
     private URLValidator() {
     }
 
@@ -54,13 +56,13 @@ public class URLValidator
     protected void performValidation(String strData)
         throws ValidationException {
         if ((strData == null) || (strData.trim().length() == 0)) {
-            throw new ValidationException(resourceBundleName, "errorCode3"); 
+            throw new ValidationException(resourceBundleName, ERROR_CODE);
         }
 
         try {
             new URL(strData);
         } catch (MalformedURLException e) {
-            throw new ValidationException(resourceBundleName, "errorCode3"); 
+            throw new ValidationException(resourceBundleName, ERROR_CODE);
         }
     }
 }

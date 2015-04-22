@@ -16,6 +16,14 @@
 
 package org.forgerock.oauth2.core;
 
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+import static org.forgerock.oauth2.core.Utils.*;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import javax.inject.Inject;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.ExpiredTokenException;
@@ -31,16 +39,6 @@ import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.util.Reject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
-import static org.forgerock.oauth2.core.Utils.isEmpty;
-import static org.forgerock.oauth2.core.Utils.joinScope;
-import static org.forgerock.oauth2.core.Utils.splitScope;
 
 /**
  * Handles access token requests from OAuth2 clients to the OAuth2 provider to grant access tokens for the requested
@@ -80,7 +78,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
     public AccessToken requestAccessToken(OAuth2Request request) throws RedirectUriMismatchException,
             InvalidClientException, InvalidRequestException, ClientAuthenticationFailedException, InvalidCodeException,
             InvalidGrantException, ServerException, UnauthorizedClientException, InvalidScopeException, NotFoundException {
-        final String grantType = request.getParameter("grant_type");
+        final String grantType = request.getParameter(GRANT_TYPE);
         final GrantTypeHandler grantTypeHandler = grantTypeHandlers.get(grantType);
         if (grantTypeHandler == null) {
             throw new InvalidGrantException("Unknown Grant Type, " + grantType);
@@ -95,13 +93,13 @@ public class AccessTokenServiceImpl implements AccessTokenService {
             InvalidClientException, InvalidRequestException, BadRequestException, ServerException,
             ExpiredTokenException, InvalidGrantException, InvalidScopeException, NotFoundException {
 
-        Reject.ifTrue(isEmpty(request.<String>getParameter("refresh_token")), "Missing parameter, 'refresh_token'");
+        Reject.ifTrue(isEmpty(request.<String>getParameter(REFRESH_TOKEN)), "Missing parameter, 'refresh_token'");
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final ClientRegistration clientRegistration = clientAuthenticator.authenticate(request,
                 providerSettings.getTokenEndpoint());
 
-        final String tokenId = request.getParameter("refresh_token");
+        final String tokenId = request.getParameter(REFRESH_TOKEN);
         final RefreshToken refreshToken = tokenStore.readRefreshToken(request, tokenId);
 
         if (refreshToken == null) {
@@ -119,8 +117,8 @@ public class AccessTokenServiceImpl implements AccessTokenService {
             throw new InvalidGrantException("grant is invalid");
         }
 
-        final Set<String> scope = splitScope(request.<String>getParameter("scope"));
-        final String grantType = request.getParameter("grant_type");
+        final Set<String> scope = splitScope(request.<String>getParameter(SCOPE));
+        final String grantType = request.getParameter(GRANT_TYPE);
 
         final Set<String> tokenScope;
         if (refreshToken.getScope() != null) {
@@ -133,25 +131,34 @@ public class AccessTokenServiceImpl implements AccessTokenService {
                 Collections.unmodifiableSet(scope), Collections.unmodifiableSet(tokenScope),
                 request);
 
+        final String validatedClaims = providerSettings.validateRequestedClaims(
+                refreshToken.getStringProperty(OAuth2Constants.Custom.CLAIMS));
+
         RefreshToken newRefreshToken = null;
         if (providerSettings.issueRefreshTokensOnRefreshingToken()) {
             newRefreshToken = tokenStore.createRefreshToken(grantType, clientRegistration.getClientId(),
                     refreshToken.getResourceOwnerId(), refreshToken.getRedirectUri(), refreshToken.getScope(), request);
+
+            if (validatedClaims != null) {
+                newRefreshToken.setStringProperty(OAuth2Constants.Custom.CLAIMS, validatedClaims);
+            }
+
             tokenStore.deleteRefreshToken(refreshToken.getTokenId());
         }
 
-        final AccessToken accessToken = tokenStore.createAccessToken(grantType, "Bearer", null,
+        final AccessToken accessToken = tokenStore.createAccessToken(grantType, OAuth2Constants.Bearer.BEARER, null,
                 refreshToken.getResourceOwnerId(), clientRegistration.getClientId(), refreshToken.getRedirectUri(),
-                validatedScope, newRefreshToken == null ? refreshToken : newRefreshToken, null, request);
+                validatedScope, newRefreshToken == null ? refreshToken : newRefreshToken,
+                null, validatedClaims, request);
 
         if (newRefreshToken != null) {
-            accessToken.addExtraData("refresh_token", newRefreshToken.getTokenId());
+            accessToken.addExtraData(REFRESH_TOKEN, newRefreshToken.getTokenId());
         }
 
         providerSettings.additionalDataToReturnFromTokenEndpoint(accessToken, request);
 
         if (validatedScope != null && !validatedScope.isEmpty()) {
-            accessToken.addExtraData("scope", joinScope(validatedScope));
+            accessToken.addExtraData(SCOPE, joinScope(validatedScope));
         }
 
         return accessToken;

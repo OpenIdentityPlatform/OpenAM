@@ -11,11 +11,17 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-15 ForgeRock AS.
  */
 
 package org.forgerock.openidconnect;
 
+import static org.forgerock.oauth2.core.OAuth2Constants.Custom.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.*;
+
+import java.util.Set;
+import javax.inject.Inject;
 import org.forgerock.oauth2.core.AuthorizeRequestValidator;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
@@ -26,13 +32,6 @@ import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.util.Reject;
-
-import javax.inject.Inject;
-
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.*;
-
-import java.util.Set;
 
 /**
  * Implementation of the AuthorizeRequestValidator for OpenID Connect request validation.
@@ -70,6 +69,15 @@ public class OpenIdConnectAuthorizeRequestValidator implements AuthorizeRequestV
         }
     }
 
+    private void validateNonce(OAuth2Request request, Set<String> responseTypes) throws InvalidRequestException {
+        // Core Spec 3.2.2.1, 3.3.2.11, etc
+        if (!(responseTypes.size() == 1 && responseTypes.contains(CODE))) {
+            if (request.getParameter(NONCE) == null) {
+                throw new InvalidRequestException("Missing required parameter nonce from request", FRAGMENT);
+            }
+        }
+    }
+
     private void validateOpenIdScope(OAuth2Request request) throws InvalidClientException, InvalidRequestException,
             InvalidScopeException {
         final ClientRegistration clientRegistration = clientRegistrationStore.get(
@@ -82,6 +90,9 @@ public class OpenIdConnectAuthorizeRequestValidator implements AuthorizeRequestV
                 throw new InvalidRequestException("Missing expected scope=openid from request",
                         Utils.isOpenIdConnectFragmentErrorType(responseTypes) ? FRAGMENT : QUERY);
             }
+
+            validateNonce(request, responseTypes);
+
         }
     }
 }

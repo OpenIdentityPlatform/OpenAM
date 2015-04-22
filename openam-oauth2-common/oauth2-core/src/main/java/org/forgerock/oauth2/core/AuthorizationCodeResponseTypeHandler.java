@@ -11,19 +11,18 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
 
-import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.oauth2.core.exceptions.ServerException;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
+import org.forgerock.oauth2.core.exceptions.ServerException;
 
 /**
  * Implementation of the ResponseTypeHandler for handling authorization code response types.
@@ -49,12 +48,13 @@ public class AuthorizationCodeResponseTypeHandler implements ResponseTypeHandler
      * {@inheritDoc}
      */
     public Map.Entry<String, Token> handle(String tokenType, Set<String> scope,
-                                           String resourceOwnerId, String clientId, String redirectUri, String nonce,
-                                           OAuth2Request request) throws ServerException, NotFoundException {
+                                           ResourceOwner resourceOwner, String clientId, String redirectUri,
+                                           String nonce, OAuth2Request request)
+            throws ServerException, NotFoundException {
 
-        final AuthorizationCode authorizationCode = tokenStore.createAuthorizationCode(scope, resourceOwnerId, clientId,
-                redirectUri, nonce, request);
-        return new AbstractMap.SimpleEntry<String, Token>("code", authorizationCode);
+        final AuthorizationCode authorizationCode = tokenStore.createAuthorizationCode(scope, resourceOwner,
+                clientId, redirectUri, nonce, request);
+        return new AbstractMap.SimpleEntry<String, Token>(OAuth2Constants.Params.CODE, authorizationCode);
     }
 
     /**
