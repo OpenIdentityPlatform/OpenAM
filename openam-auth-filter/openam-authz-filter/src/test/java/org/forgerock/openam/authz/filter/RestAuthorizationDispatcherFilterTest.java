@@ -60,6 +60,7 @@ public class RestAuthorizationDispatcherFilterTest {
         initParams.put("agentsAuthzConfigurator", PassthroughAuthzClass.class.getName());
         initParams.put("serverInfoAuthzConfigurator", PassthroughAuthzClass.class.getName());
         initParams.put("sessionAuthzConfigurator", SessionResourceAuthZClass.class.getName());
+        initParams.put("dashboardAuthzConfigurator", PassthroughAuthzClass.class.getName());
         INIT_PARAMS = Collections.unmodifiableMap(initParams);
     }
 
