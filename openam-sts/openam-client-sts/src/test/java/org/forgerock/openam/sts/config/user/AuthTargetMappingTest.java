@@ -11,21 +11,20 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.config.user;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.ws.security.message.token.UsernameToken;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.TokenTypeId;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -53,8 +52,8 @@ public class AuthTargetMappingTest {
                 .addMapping(TokenType.USERNAME, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, USERNAME)
                 .build();
         assertEquals(mapping1, mapping2);
-        assertEquals(USERNAME, mapping1.getAuthTargetMapping(UsernameToken.class).getAuthIndexValue());
-        assertEquals(AMSTSConstants.AUTH_INDEX_TYPE_MODULE, mapping1.getAuthTargetMapping(UsernameToken.class).getAuthIndexType());
+        assertEquals(USERNAME, mapping1.getAuthTargetMapping(TokenType.USERNAME).getAuthIndexValue());
+        assertEquals(AMSTSConstants.AUTH_INDEX_TYPE_MODULE, mapping1.getAuthTargetMapping(TokenType.USERNAME).getAuthIndexType());
 
 
         AuthTargetMapping mapping3 = AuthTargetMapping
@@ -68,8 +67,8 @@ public class AuthTargetMappingTest {
                 .addMapping(TokenType.USERNAME, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, USERNAME, buildContext())
                 .build();
         assertEquals(mapping3, mapping4);
-        assertEquals(X509, mapping3.getAuthTargetMapping(X509Certificate[].class).getAuthIndexValue());
-        assertEquals(AMSTSConstants.AUTH_INDEX_TYPE_MODULE, mapping3.getAuthTargetMapping(UsernameToken.class).getAuthIndexType());
+        assertEquals(X509, mapping3.getAuthTargetMapping(TokenType.X509).getAuthIndexValue());
+        assertEquals(AMSTSConstants.AUTH_INDEX_TYPE_MODULE, mapping3.getAuthTargetMapping(TokenType.USERNAME).getAuthIndexType());
 
         AuthTargetMapping mapping5 = AuthTargetMapping
                 .builder()
@@ -111,20 +110,25 @@ public class AuthTargetMappingTest {
                 .addMapping(TokenType.X509, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509)
                 .build();
         AuthTargetMapping.AuthTarget at1 = new AuthTargetMapping.AuthTarget(AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509);
-        assertEquals(mapping1.getAuthTargetMapping(X509Certificate[].class), at1);
-        assertEquals(X509, mapping1.getAuthTargetMapping(X509Certificate[].class).getAuthIndexValue());
-        assertEquals(AMSTSConstants.AUTH_INDEX_TYPE_MODULE, mapping1.getAuthTargetMapping(X509Certificate[].class).getAuthIndexType());
+        assertEquals(mapping1.getAuthTargetMapping(TokenType.X509), at1);
+        assertEquals(X509, mapping1.getAuthTargetMapping(TokenType.X509).getAuthIndexValue());
+        assertEquals(AMSTSConstants.AUTH_INDEX_TYPE_MODULE, mapping1.getAuthTargetMapping(TokenType.X509).getAuthIndexType());
 
         AuthTargetMapping mapping2 = AuthTargetMapping
                 .builder()
                 .addMapping(TokenType.USERNAME, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, USERNAME)
                 .build();
         AuthTargetMapping.AuthTarget at2 = new AuthTargetMapping.AuthTarget(AMSTSConstants.AUTH_INDEX_TYPE_MODULE, USERNAME);
-        assertEquals(mapping2.getAuthTargetMapping(UsernameToken.class), at2);
-        assertEquals(mapping2.getAuthTargetMapping(UsernameToken.class).getAuthIndexType(), at2.getAuthIndexType());
-        assertEquals(mapping2.getAuthTargetMapping(UsernameToken.class).getAuthIndexValue(), at2.getAuthIndexValue());
+        assertEquals(mapping2.getAuthTargetMapping(TokenType.USERNAME), at2);
+        assertEquals(mapping2.getAuthTargetMapping(TokenType.USERNAME).getAuthIndexType(), at2.getAuthIndexType());
+        assertEquals(mapping2.getAuthTargetMapping(TokenType.USERNAME).getAuthIndexValue(), at2.getAuthIndexValue());
 
-        assertNull(mapping2.getAuthTargetMapping(String.class));
+        assertNull(mapping2.getAuthTargetMapping(new TokenTypeId() {
+            @Override
+            public String getId() {
+                return "duh";
+            }
+        }));
 
     }
 

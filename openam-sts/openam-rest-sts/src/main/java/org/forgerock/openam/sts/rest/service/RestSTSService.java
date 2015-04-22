@@ -11,12 +11,11 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.rest.service;
 
-import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.BadRequestException;
@@ -81,12 +80,6 @@ public class RestSTSService implements SingletonResourceProvider {
                  */
                 logger.error("AMSTSException caught in the RestSTSService: " + e, e);
                 handler.handleError(ResourceException.getException(e.getCode(), e.getMessage(), e));
-            } catch (STSException e) {
-                /*
-                RuntimeException thrown by the CXF-STS engine
-                 */
-                logger.error("Unexpected: STSException caught in the RestSTSService: " + e, e);
-                handler.handleError(new InternalServerErrorException(e.getMessage()));
             } catch (Exception e) {
                 logger.error("Unexpected: Exception caught in the RestSTSService: " + e, e);
                 handler.handleError(new InternalServerErrorException(e.getMessage()));

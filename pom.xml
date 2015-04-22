@@ -133,9 +133,6 @@
         <forgerock.guice.version>1.1.0-SNAPSHOT</forgerock.guice.version>
         <slf4j.version>1.7.5</slf4j.version>
         <santuario.xmlsec.version>1.5.6</santuario.xmlsec.version>
-        <cxf.version>2.7.8</cxf.version>
-        <!-- Same version as required by cxf-rt-ws-security. 2.x release introduced major changes -->
-        <wss4j.version>1.6.13</wss4j.version>
         <click.version>2.3.0</click.version>
         <commons-beanutils.version>1.8.3</commons-beanutils.version>
         <commons-codec.version>1.6</commons-codec.version>
@@ -1843,47 +1840,12 @@
             </dependency>
 
             <!--
-              required by the STS
+              required by the STS and SAML libraries
               -->
             <dependency>
                 <groupId>org.apache.santuario</groupId>
                 <artifactId>xmlsec</artifactId>
                 <version>${santuario.xmlsec.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf.services.sts</groupId>
-                <artifactId>cxf-services-sts-core</artifactId>
-                <version>${cxf.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-frontend-jaxws</artifactId>
-                <version>${cxf.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-transports-http</artifactId>
-                <version>${cxf.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-bindings-soap</artifactId>
-                <version>${cxf.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-transports-http-jetty</artifactId>
-                <version>${cxf.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-ws-policy</artifactId>
-                <version>${cxf.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-ws-security</artifactId>
-                <version>${cxf.version}</version>
             </dependency>
 
             <!-- Test dependency -->

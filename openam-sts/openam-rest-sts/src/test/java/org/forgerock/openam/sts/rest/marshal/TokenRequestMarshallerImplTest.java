@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.rest.marshal;
@@ -19,34 +19,28 @@ package org.forgerock.openam.sts.rest.marshal;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Provides;
-import com.google.inject.TypeLiteral;
-import com.sun.identity.shared.encode.Base64;
-import org.apache.cxf.sts.request.ReceivedToken;
-import org.apache.cxf.ws.security.sts.provider.model.secext.BinarySecurityTokenType;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenMarshalException;
-import org.forgerock.openam.sts.XMLUtilities;
-import org.forgerock.openam.sts.XMLUtilitiesImpl;
-import org.forgerock.openam.sts.XmlMarshaller;
+import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.TokenTypeId;
 import org.forgerock.openam.sts.rest.service.RestSTSServiceHttpServletContext;
+import org.forgerock.openam.sts.rest.token.provider.RestTokenProviderParameters;
+import org.forgerock.openam.sts.rest.token.provider.Saml2TokenCreationState;
+import org.forgerock.openam.sts.rest.token.validator.RestTokenValidatorParameters;
 import org.forgerock.openam.sts.service.invocation.ProofTokenState;
 import org.forgerock.openam.sts.service.invocation.SAML2TokenState;
 import org.forgerock.openam.sts.service.invocation.X509TokenState;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
-import org.forgerock.openam.sts.token.model.OpenAMSessionTokenMarshaller;
-import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
-import org.forgerock.openam.sts.token.model.OpenIdConnectIdTokenMarshaller;
+import org.forgerock.openam.sts.token.model.RestUsernameToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.cert.CertificateException;
@@ -60,8 +54,6 @@ import static org.forgerock.json.fluent.JsonValue.json;
 import static org.forgerock.json.fluent.JsonValue.object;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNull;
 import static org.mockito.Mockito.*;
 
 public class TokenRequestMarshallerImplTest {
@@ -70,10 +62,7 @@ public class TokenRequestMarshallerImplTest {
 
         @Override
         protected void configure() {
-            bind(new TypeLiteral<XmlMarshaller<OpenAMSessionToken>>(){}).to(OpenAMSessionTokenMarshaller.class);
-            bind(new TypeLiteral<XmlMarshaller<OpenIdConnectIdToken>>(){}).to(OpenIdConnectIdTokenMarshaller.class);
             bind(TokenRequestMarshaller.class).to(TokenRequestMarshallerImpl.class);
-            bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
         }
 
         @Provides
@@ -94,35 +83,6 @@ public class TokenRequestMarshallerImplTest {
             return Collections.EMPTY_SET;
         }
 
-        @Provides
-        @Named(AMSTSConstants.CREST_VERSION_AUTHN_SERVICE)
-        String getCrestVersionAuthNService() {
-            return "protocol=1.0, resource=1.0";
-        }
-
-        @Provides
-        @Named(AMSTSConstants.CREST_VERSION_SESSION_SERVICE)
-        String getCrestVersionSessionService() {
-            return "protocol=1.0, resource=1.0";
-        }
-
-        @Provides
-        @Named(AMSTSConstants.CREST_VERSION_USERS_SERVICE)
-        String getCrestVersionUsersService() {
-            return "protocol=1.0, resource=1.0";
-        }
-
-        @Provides
-        @Named(AMSTSConstants.CREST_VERSION_TOKEN_GEN_SERVICE)
-        String getCrestVersionTokenGenService() {
-            return "protocol=1.0, resource=1.0";
-        }
-
-        @Provides
-        @Singleton
-        AMSTSConstants.STSType getSTSType() {
-            return AMSTSConstants.STSType.REST;
-        }
     }
 
     @BeforeTest
@@ -131,50 +91,23 @@ public class TokenRequestMarshallerImplTest {
     }
 
     @Test
-    public void marshallUsernameToken() throws TokenMarshalException {
+    public void marshallUsernameToken() throws TokenMarshalException, UnsupportedEncodingException {
         JsonValue jsonUnt = json(object(field("token_type", "USERNAME"),
                 field("username", "bobo"), field("password", "cornholio")));
-        ReceivedToken token = tokenMarshaller.marshallInputToken(jsonUnt, null, null);
-        assertTrue(token.isUsernameToken());
-        assertFalse(token.isBinarySecurityToken());
-        assertFalse(token.isDOMElement());
-        assertTrue("bobo".equals(token.getPrincipal().getName()));
+        RestTokenValidatorParameters<?> params = tokenMarshaller.buildTokenValidatorParameters(jsonUnt, null, null);
+        assertEquals(TokenType.USERNAME.getId(), params.getId());
+        assertEquals("bobo".getBytes(AMSTSConstants.UTF_8_CHARSET_ID), ((RestUsernameToken)params.getInputToken()).getUsername());
     }
 
     @Test
     public void marshallOpenAMToken() throws TokenMarshalException {
         JsonValue jsonOpenAM = json(object(field("token_type", "OPENAM"),
                 field("session_id", "super_random")));
-        ReceivedToken token = tokenMarshaller.marshallInputToken(jsonOpenAM, null, null);
-        assertFalse(token.isUsernameToken());
-        assertFalse(token.isBinarySecurityToken());
-        assertTrue(token.isDOMElement());
-        assertNull(token.getPrincipal());
+        RestTokenValidatorParameters<?> params = tokenMarshaller.buildTokenValidatorParameters(jsonOpenAM, null, null);
+        assertTrue(TokenType.OPENAM.getId().equals(params.getId()));
+        assertTrue("super_random".equals(((OpenAMSessionToken) params.getInputToken()).getSessionId()));
     }
 
-    @Test
-    public void testMarshalSubjectConfirmation() throws TokenMarshalException {
-        SAML2TokenState tokenState = SAML2TokenState.builder()
-                .saml2SubjectConfirmation(SAML2SubjectConfirmation.BEARER)
-                .build();
-        assertEquals(SAML2SubjectConfirmation.BEARER, tokenMarshaller.getSubjectConfirmation(tokenState.toJson()));
-    }
-
-    @Test
-    public void testMarshalDegradedSubjectConfirmation() throws TokenMarshalException {
-        JsonValue json = json(object(field(SAML2TokenState.SUBJECT_CONFIRMATION, SAML2SubjectConfirmation.BEARER.name())));
-        assertEquals(SAML2SubjectConfirmation.BEARER, tokenMarshaller.getSubjectConfirmation(json));
-    }
-
-    @Test
-    public void testMarshalProofTokenState() throws Exception {
-        ProofTokenState proofTokenState = ProofTokenState.builder().x509Certificate(getCertificate()).build();
-        SAML2TokenState tokenState = SAML2TokenState.builder()
-                .saml2SubjectConfirmation(SAML2SubjectConfirmation.HOLDER_OF_KEY)
-                .proofTokenState(proofTokenState)
-                .build();
-        assertEquals(proofTokenState, tokenMarshaller.getProofTokenState(tokenState.toJson()));
-    }
 
     @Test
     public void testX509CertificateTokenMarshalling() throws Exception {
@@ -184,20 +117,40 @@ public class TokenRequestMarshallerImplTest {
         X509Certificate certificate = getCertificate();
         X509Certificate[] certificates = new X509Certificate[] {certificate};
         when(mockServletRequest.getAttribute("javax.servlet.request.X509Certificate")).thenReturn(certificates);
-        ReceivedToken receivedToken = tokenMarshaller.marshallInputToken(new X509TokenState().toJson(), null, mockServletContext);
-        X509Certificate roundTripCert = marshalBinarySecurityTokenToCertArray((BinarySecurityTokenType)receivedToken.getToken());
-        assertEquals(certificate.getEncoded(), roundTripCert.getEncoded());
+        RestTokenValidatorParameters<X509Certificate[]> params = (RestTokenValidatorParameters<X509Certificate[]>)
+                tokenMarshaller.buildTokenValidatorParameters(new X509TokenState().toJson(), null, mockServletContext);
+        assertEquals(certificate.getEncoded(), (params.getInputToken()[0].getEncoded()));
     }
 
-    private X509Certificate marshalBinarySecurityTokenToCertArray(BinarySecurityTokenType binarySecurityType)
-            throws CertificateException, UnsupportedEncodingException {
-        return (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(
-                    new ByteArrayInputStream(Base64.decode(binarySecurityType.getValue().getBytes(AMSTSConstants.UTF_8_CHARSET_ID))));
+    @Test
+    public void testBuildProviderParametersUsernameToken() throws TokenMarshalException, UnsupportedEncodingException {
+        JsonValue jsonUnt = json(object(field("token_type", "USERNAME"),
+                field("username", "bobo"), field("password", "cornholio")));
+        JsonValue saml2Output =
+                SAML2TokenState.builder().saml2SubjectConfirmation(SAML2SubjectConfirmation.BEARER).build().toJson();
+        RestTokenProviderParameters<? extends TokenTypeId> params =
+                tokenMarshaller.buildTokenProviderParameters(TokenType.USERNAME, jsonUnt, TokenType.SAML2, saml2Output);
+        assertEquals(TokenType.SAML2.getId(), params.getTokenCreationState().getId());
     }
 
-    private String getEncodedCertificate() throws IOException, CertificateException {
-        return Base64.encode(getCertificate().getEncoded());
+    @Test
+    public void testBuildProviderParametersOpenAMSaml2HoK() throws TokenMarshalException, IOException, CertificateException {
+        JsonValue jsonOpenAM = json(object(field("token_type", "OPENAM"),
+                field("session_id", "super_random")));
+        X509Certificate certificate = getCertificate();
+        JsonValue saml2Output =
+                SAML2TokenState.builder()
+                        .saml2SubjectConfirmation(SAML2SubjectConfirmation.HOLDER_OF_KEY)
+                        .proofTokenState(ProofTokenState.builder().x509Certificate(certificate).build())
+                        .build()
+                        .toJson();
+        RestTokenProviderParameters<? extends TokenTypeId> params =
+                tokenMarshaller.buildTokenProviderParameters(TokenType.OPENAM, jsonOpenAM, TokenType.SAML2, saml2Output);
+        assertEquals(TokenType.SAML2.getId(), params.getTokenCreationState().getId());
+        assertEquals(certificate.getEncoded(),
+                ((Saml2TokenCreationState)params.getTokenCreationState()).getProofTokenState().getX509Certificate().getEncoded());
     }
+
     private X509Certificate getCertificate() throws IOException, CertificateException {
         return (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(getClass().getResourceAsStream("/cert.jks"));
     }

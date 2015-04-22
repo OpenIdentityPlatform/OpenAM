@@ -264,7 +264,7 @@ public class AMSTSConstants {
     the Trusted Remote Hosts value to something other than none, and specifying the header name which will reference the
     client's x509 certificate. This header name must be configured in the AuthTargetMapping
      */
-    public static final String X509_TOKEN_AUTH_TARGET_HEADER_KEY = "x509_token_token_auth_target_header_key";
+    public static final String X509_TOKEN_AUTH_TARGET_HEADER_KEY = "x509_token_auth_target_header_key";
     /*
     This value is used to key the SAML2SubjectConfirmation instance in additionalProperties Map<String, Object> encapsulated
     in the TokenProviderParameters so that the AMSAMLTokenProvider

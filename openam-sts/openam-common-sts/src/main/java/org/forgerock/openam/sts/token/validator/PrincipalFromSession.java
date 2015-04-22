@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.sts.token.validator;
@@ -29,5 +29,11 @@ import java.security.Principal;
  * resource to achieve this mapping.
  */
 public interface PrincipalFromSession {
+    /**
+     *
+     * @param sessionId The OpenAM session id returned from successful authentication
+     * @return the Principal corresponding to this OpenAM session id
+     * @throws TokenValidationException if no valid Principal can be obtained from the specified session id.
+     */
     Principal getPrincipalFromSession(String sessionId) throws TokenValidationException;
 }

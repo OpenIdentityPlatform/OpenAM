@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.service.invocation;
@@ -55,6 +55,8 @@ import static org.forgerock.json.fluent.JsonValue.object;
 public class ProofTokenState {
     public static class ProofTokenStateBuilder {
         private X509Certificate certificate;
+
+        private ProofTokenStateBuilder() {}
 
         public ProofTokenStateBuilder x509Certificate(X509Certificate certificate) {
             this.certificate = certificate;

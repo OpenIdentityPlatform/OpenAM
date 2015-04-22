@@ -26,22 +26,20 @@ import org.apache.ws.security.message.token.UsernameToken;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.STSInitializationException;
+import org.forgerock.openam.sts.TokenTypeId;
 import org.forgerock.openam.sts.XMLUtilities;
-import org.forgerock.openam.sts.XmlMarshaller;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProvider;
-import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
 import org.forgerock.openam.sts.soap.token.provider.SoapSamlTokenProvider;
 import org.forgerock.openam.sts.soap.token.provider.XmlTokenAuthnContextMapper;
-import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
 import org.forgerock.openam.sts.token.provider.AMSessionInvalidator;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
-import org.forgerock.openam.sts.token.validator.AMTokenValidator;
+import org.forgerock.openam.sts.soap.token.validator.SoapAMTokenValidator;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
 import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
-import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
-import org.forgerock.openam.sts.token.validator.wss.OpenAMWSSUsernameTokenValidator;
+import org.forgerock.openam.sts.token.validator.AuthenticationHandler;
+import org.forgerock.openam.sts.soap.token.validator.wss.OpenAMWSSUsernameTokenValidator;
 import org.slf4j.Logger;
 
 /**
@@ -56,10 +54,8 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
     private final String realm;
     private final XMLUtilities xmlUtilities;
     private final XmlTokenAuthnContextMapper xmlTokenAuthnContextMapper;
-    private final XmlMarshaller<OpenAMSessionToken> amSessionTokenXmlMarshaller;
     private final Provider<AMSessionInvalidator> amSessionInvalidatorProvider;
     private final SoapSTSAccessTokenProvider soapSTSAccessTokenProvider;
-    private final SoapSTSInstanceConfig soapSTSInstanceConfig;
     private final AuthenticationHandler<UsernameToken> usernameTokenAuthenticationHandler;
     private final Logger logger;
 
@@ -76,10 +72,8 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
             @Named (AMSTSConstants.REALM) String realm,
             XMLUtilities xmlUtilities,
             XmlTokenAuthnContextMapper xmlTokenAuthnContextMapper,
-            XmlMarshaller<OpenAMSessionToken> amSessionTokenXmlMarshaller,
             Provider<AMSessionInvalidator> amSessionInvalidatorProvider,
             SoapSTSAccessTokenProvider soapSTSAccessTokenProvider,
-            SoapSTSInstanceConfig soapSTSInstanceConfig,
             AuthenticationHandler<UsernameToken> usernameTokenAuthenticationHandler,
             Logger logger) {
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
@@ -89,10 +83,8 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
         this.realm = realm;
         this.xmlUtilities = xmlUtilities;
         this.xmlTokenAuthnContextMapper = xmlTokenAuthnContextMapper;
-        this.amSessionTokenXmlMarshaller = amSessionTokenXmlMarshaller;
         this.amSessionInvalidatorProvider = amSessionInvalidatorProvider;
         this.soapSTSAccessTokenProvider = soapSTSAccessTokenProvider;
-        this.soapSTSInstanceConfig = soapSTSInstanceConfig;
         this.usernameTokenAuthenticationHandler = usernameTokenAuthenticationHandler;
         this.logger = logger;
     }
@@ -118,8 +110,8 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
 
     /**
      *
-     * @param issuedTokenType
-     * @return
+     * @param issuedTokenType the type of token to be created
+     * @return a TokenProvider implementation which can create the specified token type
      * @throws STSInitializationException
      */
     @Override
@@ -133,7 +125,6 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
                     .realm(realm)
                     .xmlUtilities(xmlUtilities)
                     .authnContextMapper(xmlTokenAuthnContextMapper)
-                    .amSessionTokenXmlMarshaller(amSessionTokenXmlMarshaller)
                     .soapSTSAccessTokenProvider(soapSTSAccessTokenProvider)
                     .logger(logger)
                     .build();
@@ -142,8 +133,8 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
                 "getTokenProviderForTransformOperation. OutputTokenType: " + issuedTokenType);
     }
 
-    private AMTokenValidator buildAMTokenValidator(ValidationInvocationContext validationInvocationContext, boolean invalidateAMSession) {
-        return new AMTokenValidator(threadLocalAMTokenCache, principalFromSession, validationInvocationContext,
+    private SoapAMTokenValidator buildAMTokenValidator(ValidationInvocationContext validationInvocationContext, boolean invalidateAMSession) {
+        return new SoapAMTokenValidator(threadLocalAMTokenCache, principalFromSession, validationInvocationContext,
                 invalidateAMSession, logger);
     }
 
@@ -152,7 +143,7 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
         org.apache.cxf.sts.token.validator.UsernameTokenValidator validator =
                 new org.apache.cxf.sts.token.validator.UsernameTokenValidator();
         validator.setValidator(new OpenAMWSSUsernameTokenValidator(usernameTokenAuthenticationHandler,
-                validationInvocationContext, invalidateAMSession, logger));
+                threadLocalAMTokenCache, validationInvocationContext, invalidateAMSession, logger));
         return validator;
     }
 }

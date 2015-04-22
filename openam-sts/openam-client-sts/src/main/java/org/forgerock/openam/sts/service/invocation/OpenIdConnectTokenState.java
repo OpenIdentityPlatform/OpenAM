@@ -11,24 +11,33 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.service.invocation;
 
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenMarshalException;
-import org.forgerock.openam.sts.XMLUtilitiesImpl;
+import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
-import org.forgerock.openam.sts.token.model.OpenIdConnectIdTokenMarshaller;
 import org.forgerock.util.Reject;
 
+import static org.forgerock.json.fluent.JsonValue.field;
+import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.fluent.JsonValue.object;
+
 /**
- * Class encapsulating an OpenIdConnect jws string. Simply delegates to the corresponding model class and marshalling functionality.
+ * Class encapsulating an OpenIdConnect jws string, and will emit json which includes state necessary to act as the input_token_state
+ * in the RestSTSServiceInvocationState - i.e. the jws string, and a AMSTSConstants.TOKEN_TYPE_KEY field corresponding to
+ * TokenType.OPENIDCONNECT.name().
  */
 public class OpenIdConnectTokenState {
     public static class OpenIdConnectTokenStateBuilder {
         private String tokenValue;
+
+        private OpenIdConnectTokenStateBuilder() {}
 
         public OpenIdConnectTokenStateBuilder tokenValue(String tokenValue) {
             this.tokenValue = tokenValue;
@@ -79,11 +88,19 @@ public class OpenIdConnectTokenState {
     }
 
     public JsonValue toJson() throws TokenMarshalException {
-        return new OpenIdConnectIdTokenMarshaller(new XMLUtilitiesImpl()).toJson(openIdConnectIdToken);
+        return json(object(
+                field(AMSTSConstants.TOKEN_TYPE_KEY, TokenType.OPENIDCONNECT.name()),
+                field(AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_KEY, openIdConnectIdToken.getTokenValue())));
     }
 
     public static OpenIdConnectTokenState fromJson(JsonValue jsonValue) throws TokenMarshalException {
-        OpenIdConnectIdToken idToken = new OpenIdConnectIdTokenMarshaller(new XMLUtilitiesImpl()).fromJson(jsonValue);
-        return OpenIdConnectTokenState.builder().tokenValue(idToken.getTokenValue()).build();
+        try {
+            return OpenIdConnectTokenState.builder()
+                    .tokenValue(jsonValue.get(AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_KEY).asString())
+                    .build();
+        } catch (NullPointerException e) {
+            throw new TokenMarshalException(ResourceException.BAD_REQUEST, AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_KEY +
+                    " not set in json: " + jsonValue.toString(), e);
+        }
     }
 }

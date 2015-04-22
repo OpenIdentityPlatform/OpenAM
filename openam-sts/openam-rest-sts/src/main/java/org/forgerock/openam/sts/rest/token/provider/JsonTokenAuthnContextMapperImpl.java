@@ -11,14 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.rest.token.provider;
-
-import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.TokenTypeId;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
@@ -34,20 +33,21 @@ public class JsonTokenAuthnContextMapperImpl implements JsonTokenAuthnContextMap
         this.logger = logger;
     }
 
-    public String getAuthnContext(TokenType inputTokenType, JsonValue inputToken) {
-        switch (inputTokenType) {
-            case OPENAM:
-                return SAML2Constants.AUTH_CONTEXT_CLASS_REF_PREVIOUS_SESSION;
-            case USERNAME:
-                return SAML2Constants.AUTH_CONTEXT_CLASS_REF_PASSWORD_PROTECTED_TRANSPORT;
-            case OPENIDCONNECT:
-                return SAML2Constants.AUTH_CONTEXT_CLASS_REF_PASSWORD_PROTECTED_TRANSPORT;
-            case X509:
-                return SAML2Constants.AUTH_CONTEXT_CLASS_REF_X509;
-            default:
-                logger.error("Unexpected TokenType passed to JsonTokenAuthnContextMapperImpl: " + inputTokenType + "; returning " +
-                        SAML2Constants.AUTH_CONTEXT_CLASS_REF_UNSPECIFIED);
-                return SAML2Constants.AUTH_CONTEXT_CLASS_REF_UNSPECIFIED;
+    @Override
+    public String getAuthnContext(TokenTypeId inputTokenType, JsonValue inputToken) {
+        if (TokenType.OPENAM.getId().equals(inputTokenType.getId())) {
+            return JsonTokenAuthnContextMapper.AUTHN_CONTEXT_CLASS_REF_PREVIOUS_SESSION;
+        } else if (TokenType.USERNAME.getId().equals(inputTokenType.getId())) {
+            return JsonTokenAuthnContextMapper.AUTHN_CONTEXT_CLASS_REF_PASSWORD_PROTECTED_TRANSPORT;
+        } else if (TokenType.OPENIDCONNECT.getId().equals(inputTokenType.getId())) {
+            return JsonTokenAuthnContextMapper.AUTHN_CONTEXT_CLASS_REF_PASSWORD_PROTECTED_TRANSPORT;
+        } else if (TokenType.X509.getId().equals(inputTokenType.getId())) {
+            return JsonTokenAuthnContextMapper.AUTHN_CONTEXT_CLASS_REF_X509;
+        } else {
+            //TODO: when I support custom token types,(AME-6554) this is also part of the contract
+            logger.error("Unexpected TokenType passed to JsonTokenAuthnContextMapperImpl: " + inputTokenType + "; returning " +
+                    JsonTokenAuthnContextMapper.AUTHN_CONTEXT_CLASS_REF_UNSPECIFIED);
+            return JsonTokenAuthnContextMapper.AUTHN_CONTEXT_CLASS_REF_UNSPECIFIED;
         }
     }
 }

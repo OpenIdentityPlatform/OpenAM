@@ -16,7 +16,6 @@
 
 package org.forgerock.openam.sts.soap.token.validator.wss;
 
-import com.google.inject.Inject;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.validate.Credential;
@@ -24,8 +23,11 @@ import org.apache.ws.security.validate.SignatureTrustValidator;
 
 import java.security.cert.X509Certificate;
 
+import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.TokenValidationException;
+import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
-import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
+import org.forgerock.openam.sts.token.validator.AuthenticationHandler;
 import org.slf4j.Logger;
 
 /**
@@ -50,6 +52,7 @@ import org.slf4j.Logger;
  */
 public class SoapCertificateTokenValidator extends SignatureTrustValidator {
     private final AuthenticationHandler<X509Certificate[]> authenticationHandler;
+    private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
     private final ValidationInvocationContext validationInvocationContext;
     private final boolean invalidateAMSession;
     private final Logger logger;
@@ -58,8 +61,10 @@ public class SoapCertificateTokenValidator extends SignatureTrustValidator {
     No @Inject - instances created by the WSSValidatorFactoryImpl.
      */
     public SoapCertificateTokenValidator(AuthenticationHandler<X509Certificate[]> authenticationHandler,
+                                         ThreadLocalAMTokenCache threadLocalAMTokenCache,
                                          ValidationInvocationContext validationInvocationContext, boolean invalidateAMSession, Logger logger) {
         this.authenticationHandler = authenticationHandler;
+        this.threadLocalAMTokenCache = threadLocalAMTokenCache;
         this.validationInvocationContext = validationInvocationContext;
         this.invalidateAMSession = invalidateAMSession;
         this.logger = logger;
@@ -75,11 +80,13 @@ public class SoapCertificateTokenValidator extends SignatureTrustValidator {
          */
         Credential localCredential = super.validate(credential, data);
         try {
-            authenticationHandler.authenticate(data, credential.getCertificates(), validationInvocationContext, invalidateAMSession);
+            final String sessionId = authenticationHandler.authenticate(credential.getCertificates(), TokenType.X509);
+            threadLocalAMTokenCache.cacheSessionIdForContext(validationInvocationContext, sessionId, invalidateAMSession);
             return credential;
-        } catch (Exception e) {
+        } catch (TokenValidationException e) {
             logger.error("Exception caught authenticating X509Certificate with OpenAM: " + e, e);
             throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION, e.getMessage());
         }
     }
+
 }

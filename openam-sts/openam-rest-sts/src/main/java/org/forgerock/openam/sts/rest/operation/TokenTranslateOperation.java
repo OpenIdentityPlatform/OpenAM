@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.rest.operation;
@@ -27,8 +27,8 @@ import org.forgerock.openam.sts.service.invocation.RestSTSServiceInvocationState
 /**
  * This class is the analogue to the Token{Issue/Validate/Renew/Cancel}Operation instances plugged-into the CXF-STS.
  * It is a 'top-level' operation, invoked directly by the implementation of the RestSTS.validateToken method.
- * It may be that other 'top-level' interfaces will be defined, corresponding to the {Issue/Validate/Renew/Cancel}
- * operations of the WS-Trust STS.
+ * It may be that other 'top-level' interfaces will be defined, corresponding to resful analogues of the
+ * {Issue/Validate/Renew/Cancel} operations defined in WS-Trust.
  */
 public interface TokenTranslateOperation {
     /**

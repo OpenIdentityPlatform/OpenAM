@@ -30,7 +30,6 @@ import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.message.token.BinarySecurity;
-import org.apache.ws.security.message.token.UsernameToken;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.AMSTSRuntimeException;
@@ -38,12 +37,10 @@ import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.XMLUtilities;
-import org.forgerock.openam.sts.XmlMarshaller;
 import org.forgerock.openam.sts.service.invocation.ProofTokenState;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProvider;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
-import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
 import org.forgerock.openam.sts.token.provider.AMSessionInvalidator;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
 import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
@@ -66,7 +63,6 @@ public class SoapSamlTokenProvider implements TokenProvider {
         private String realm;
         private XMLUtilities xmlUtilities;
         private XmlTokenAuthnContextMapper authnContextMapper;
-        private XmlMarshaller<OpenAMSessionToken> amSessionTokenXmlMarshaller;
         private SoapSTSAccessTokenProvider soapSTSAccessTokenProvider;
         private Logger logger;
 
@@ -105,11 +101,6 @@ public class SoapSamlTokenProvider implements TokenProvider {
             return this;
         }
 
-        public SoapSamlTokenProviderBuilder amSessionTokenXmlMarshaller(XmlMarshaller<OpenAMSessionToken> amSessionTokenXmlMarshaller) {
-            this.amSessionTokenXmlMarshaller = amSessionTokenXmlMarshaller;
-            return this;
-        }
-
         public SoapSamlTokenProviderBuilder soapSTSAccessTokenProvider(SoapSTSAccessTokenProvider soapSTSAccessTokenProvider) {
             this.soapSTSAccessTokenProvider = soapSTSAccessTokenProvider;
             return this;
@@ -132,7 +123,6 @@ public class SoapSamlTokenProvider implements TokenProvider {
     private final String realm;
     private final XMLUtilities xmlUtilities;
     private final XmlTokenAuthnContextMapper authnContextMapper;
-    private final XmlMarshaller<OpenAMSessionToken> amSessionTokenXmlMarshaller;
     private final SoapSTSAccessTokenProvider soapSTSAccessTokenProvider;
     private final Logger logger;
 
@@ -147,7 +137,6 @@ public class SoapSamlTokenProvider implements TokenProvider {
         this.realm = builder.realm;
         this.xmlUtilities = builder.xmlUtilities;
         this.authnContextMapper = builder.authnContextMapper;
-        this.amSessionTokenXmlMarshaller = builder.amSessionTokenXmlMarshaller;
         this.soapSTSAccessTokenProvider = builder.soapSTSAccessTokenProvider;
         this.logger = builder.logger;
     }
@@ -515,55 +504,21 @@ public class SoapSamlTokenProvider implements TokenProvider {
         }
     }
 
+    /**
+     * This method is called to obtain the authN context class ref for the input token if the SoapSamlTokenProvider is
+     * being called in the context of either the validate or renew operations. The renew operation is currently not
+     * bound, and nor is the validate operation. This will occur as part of AME-5869. It probably only makes sense to
+     * validate and/or renew tokens issued by the STS, which limits them to SAML2 assertions (currently) and oidc id
+     * tokens (possibly, in the future). For now, because I am not doing token transformations via the validate operation,
+     * and the renew operation is currently not bound, I will simply throw an exception from this method. TODO: revisit
+     * as part of AME-5869.
+     * @param receivedToken
+     * @return
+     */
     private String getAuthnContextClassRefForReceivedToken(ReceivedToken receivedToken) {
-        /*
-            The set of input tokens we support is currently limited to:
-                1. UNTs
-            2. OpenAM tokens - will be represented as a DOM Element
-
-            When we support X509 Certificates, a new branch has to be added here. Not sure whether a X509Cert is represented
-            as a JAXBElement or a DOM Element. See ReceivedToken for details.
-         */
-        if (receivedToken.isUsernameToken()) {
-            if (receivedToken.getToken() instanceof UsernameToken) {
-                return authnContextMapper.getAuthnContext(TokenType.USERNAME, ((UsernameToken)receivedToken.getToken()).getElement());
-            } else {
-                String message = "Unexpected type for a ReceivedToken which reports that it is a UsernameToken: the type: "
-                        + receivedToken.getToken().getClass().getCanonicalName() + "; The actual token: " + receivedToken.getToken();
-                logger.error(message);
-                throw new AMSTSRuntimeException(ResourceException.NOT_SUPPORTED, message);
-            }
-        } else if (receivedToken.isDOMElement()) {
-                /*
-                Right now, this can only mean we are dealing with an OpenAMSession token. Attempt to marshal with
-                the amSessionTokenXmlMarshaller, just to be sure.
-                 */
-            Element tokenElement = (Element)receivedToken.getToken();
-            try {
-                amSessionTokenXmlMarshaller.fromXml(tokenElement);
-                return authnContextMapper.getAuthnContext(TokenType.OPENAM, tokenElement);
-            } catch (TokenMarshalException e) {
-                    /*
-                    Note it seems that we could enter this branch because the CXF-STS does not distinguish token validators
-                    for status validation, and token validators for the input in a transformation operation. Thus if a
-                    deployed STS instance supports a set of token validation operations which is a superset of the input
-                    set in token transformation operations, then this branch could be entered.
-                    TODO: see of this contingency could be obviated by distinguishing the status validators from the
-                    transformation validators.
-                     */
-                String message = "Unexpected state in SoapSamlTokenProivder#getAuthnContextClassRef: the ReceivedToken" +
-                        " in the validateTarget is a DOM Element, but cannot be marshaled to an OpenAM Session token. " +
-                        " This means that the validate operation is being invoked with an unsupported token type. " +
-                        "The token element " + tokenElement;
-                logger.error(message);
-                throw new AMSTSRuntimeException(ResourceException.BAD_REQUEST, message);
-            }
-        } else {
-            String message = "Unexpected validateTarget token in SoapSamlTokenProvider#getAuthnContextClassRef - " +
-                    "the token is neither a DOM Element or a UNT. The token: " + receivedToken.getToken();
-            logger.error(message);
-            throw new AMSTSRuntimeException(ResourceException.NOT_SUPPORTED, message);
-        }
+        String message = "Illegal state: getAuthnContextClassRefForReceivedToken was called, this should not occur!";
+        logger.error(message);
+        throw new AMSTSRuntimeException(ResourceException.INTERNAL_ERROR, message);
     }
 
     private String getAssertion(String authnContextClassRef, SAML2SubjectConfirmation subjectConfirmation,

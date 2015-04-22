@@ -21,7 +21,6 @@ import com.google.inject.Guice;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
-import org.apache.ws.security.message.token.UsernameToken;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.DefaultHttpURLConnectionFactory;
 import org.forgerock.openam.sts.HttpURLConnectionFactory;
@@ -29,9 +28,9 @@ import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XMLUtilitiesImpl;
-import org.forgerock.openam.sts.XmlMarshaller;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.config.user.TokenTransformConfig;
+import org.forgerock.openam.sts.rest.token.validator.disp.RestUsernameTokenAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.AMTokenParser;
 import org.forgerock.openam.sts.token.AMTokenParserImpl;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
@@ -39,21 +38,20 @@ import org.forgerock.openam.sts.token.ThreadLocalAMTokenCacheImpl;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
-import org.forgerock.openam.sts.token.model.OpenIdConnectIdTokenMarshaller;
 import org.forgerock.openam.sts.rest.token.provider.JsonTokenAuthnContextMapper;
 import org.forgerock.openam.sts.rest.token.provider.JsonTokenAuthnContextMapperImpl;
+import org.forgerock.openam.sts.token.model.RestUsernameToken;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumerImpl;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSessionImpl;
-import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
-import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandlerImpl;
-import org.forgerock.openam.sts.token.validator.wss.disp.CertificateAuthenticationRequestDispatcher;
-import org.forgerock.openam.sts.token.validator.wss.disp.OpenIdConnectAuthenticationRequestDispatcher;
-import org.forgerock.openam.sts.token.validator.wss.disp.TokenAuthenticationRequestDispatcher;
-import org.forgerock.openam.sts.token.validator.wss.disp.UsernameTokenAuthenticationRequestDispatcher;
-import org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProvider;
-import org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProviderImpl;
+import org.forgerock.openam.sts.token.validator.AuthenticationHandler;
+import org.forgerock.openam.sts.token.validator.AuthenticationHandlerImpl;
+import org.forgerock.openam.sts.token.validator.disp.CertificateAuthenticationRequestDispatcher;
+import org.forgerock.openam.sts.rest.token.validator.disp.OpenIdConnectAuthenticationRequestDispatcher;
+import org.forgerock.openam.sts.token.validator.disp.TokenAuthenticationRequestDispatcher;
+import org.forgerock.openam.sts.token.validator.url.AuthenticationUrlProvider;
+import org.forgerock.openam.sts.token.validator.url.AuthenticationUrlProviderImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeTest;
@@ -92,15 +90,14 @@ public class TokenTransformFactoryImplTest {
                     .to(new TypeLiteral<AuthenticationHandlerImpl<X509Certificate[]>>() {
                     });
 
-            bind(new TypeLiteral<TokenAuthenticationRequestDispatcher<UsernameToken>>(){})
-                    .to(UsernameTokenAuthenticationRequestDispatcher.class);
-            bind(new TypeLiteral<AuthenticationHandler<UsernameToken>>(){})
-                    .to(new TypeLiteral<AuthenticationHandlerImpl<UsernameToken>>() {
+            bind(new TypeLiteral<TokenAuthenticationRequestDispatcher<RestUsernameToken>>(){})
+                    .to(RestUsernameTokenAuthenticationRequestDispatcher.class);
+            bind(new TypeLiteral<AuthenticationHandler<RestUsernameToken>>(){})
+                    .to(new TypeLiteral<AuthenticationHandlerImpl<RestUsernameToken>>() {
                     });
             bind(AuthenticationUrlProvider.class)
                     .to(AuthenticationUrlProviderImpl.class);
             bind(AMTokenParser.class).to(AMTokenParserImpl.class);
-            bind(new TypeLiteral<XmlMarshaller<OpenIdConnectIdToken>>(){}).to(OpenIdConnectIdTokenMarshaller.class);
             bind(TokenGenerationServiceConsumer.class).to(TokenGenerationServiceConsumerImpl.class);
             bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
             bind(JsonTokenAuthnContextMapper.class).to(JsonTokenAuthnContextMapperImpl.class);

@@ -43,7 +43,6 @@ import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XMLUtilitiesImpl;
-import org.forgerock.openam.sts.XmlMarshaller;
 import org.forgerock.openam.sts.soap.STSEndpoint;
 import org.forgerock.openam.sts.soap.SoapSTSCallbackHandler;
 import org.forgerock.openam.sts.soap.config.user.TokenValidationConfig;
@@ -58,8 +57,6 @@ import org.forgerock.openam.sts.token.AMTokenParser;
 import org.forgerock.openam.sts.token.AMTokenParserImpl;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
-import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
-import org.forgerock.openam.sts.token.model.OpenAMSessionTokenMarshaller;
 import org.forgerock.openam.sts.soap.token.provider.XmlTokenAuthnContextMapper;
 import org.forgerock.openam.sts.soap.token.provider.XmlTokenAuthnContextMapperImpl;
 import org.forgerock.openam.sts.token.provider.AMSessionInvalidator;
@@ -67,17 +64,17 @@ import org.forgerock.openam.sts.token.provider.AMSessionInvalidatorImpl;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumerImpl;
 import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
-import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
-import org.forgerock.openam.sts.token.validator.wss.disp.CertificateAuthenticationRequestDispatcher;
-import org.forgerock.openam.sts.token.validator.wss.disp.TokenAuthenticationRequestDispatcher;
-import org.forgerock.openam.sts.token.validator.wss.disp.UsernameTokenAuthenticationRequestDispatcher;
+import org.forgerock.openam.sts.token.validator.AuthenticationHandler;
+import org.forgerock.openam.sts.token.validator.disp.CertificateAuthenticationRequestDispatcher;
+import org.forgerock.openam.sts.token.validator.disp.TokenAuthenticationRequestDispatcher;
+import org.forgerock.openam.sts.soap.token.validator.disp.SoapUsernameTokenAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.AMSTSConstants;
 
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
-import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandlerImpl;
-import org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProviderImpl;
-import org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProvider;
+import org.forgerock.openam.sts.token.validator.AuthenticationHandlerImpl;
+import org.forgerock.openam.sts.token.validator.url.AuthenticationUrlProviderImpl;
+import org.forgerock.openam.sts.token.validator.url.AuthenticationUrlProvider;
 
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -114,7 +111,7 @@ public class SoapSTSInstanceModule extends AbstractModule {
                 .to(AuthenticationUrlProviderImpl.class);
 
         bind(new TypeLiteral<TokenAuthenticationRequestDispatcher<UsernameToken>>(){})
-                .to(UsernameTokenAuthenticationRequestDispatcher.class);
+                .to(SoapUsernameTokenAuthenticationRequestDispatcher.class);
         bind(new TypeLiteral<AuthenticationHandler<UsernameToken>>(){})
                 .to(new TypeLiteral<AuthenticationHandlerImpl<UsernameToken>>() {});
 
@@ -123,10 +120,6 @@ public class SoapSTSInstanceModule extends AbstractModule {
         bind(new TypeLiteral<AuthenticationHandler<X509Certificate[]>>() {})
                 .to(new TypeLiteral<AuthenticationHandlerImpl<X509Certificate[]>>() {});
 
-        /*
-        bind the class that can issue XML Element instances encapsulating an OpenAM session Id.
-         */
-        bind(new TypeLiteral<XmlMarshaller<OpenAMSessionToken>>(){}).to(OpenAMSessionTokenMarshaller.class);
 
         //binding all of the Providers of the various sorts of operations
         bind(TokenOperationFactory.class).to(TokenOperationFactoryImpl.class).in(Scopes.SINGLETON);
@@ -157,11 +150,6 @@ public class SoapSTSInstanceModule extends AbstractModule {
         directly.
          */
         bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
-
-        /*
-        Bind the XmlMarhsaller for marshalling OpenAMSessionTokens to/from xml.
-         */
-        bind(new TypeLiteral<XmlMarshaller<OpenAMSessionToken>>(){}).to(OpenAMSessionTokenMarshaller.class);
 
         /*
         Bind the class responsible for producing HttpURLConnectionWrapper instances, and the HttpURLConnectionFactory it consumes
@@ -425,7 +413,7 @@ public class SoapSTSInstanceModule extends AbstractModule {
     }
 
     /*
-    Required by the TokenDelegationHandlersProvider, and by the TokenOperationFactoryImpl.
+    Required by the TokenDelegationHandlersProvider.
      */
     @Provides
     SoapSTSInstanceConfig getStsInstanceConfig() {

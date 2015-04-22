@@ -52,18 +52,6 @@
             <artifactId>openam-rest</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-ws-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf.services.sts</groupId>
-            <artifactId>cxf-services-sts-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.santuario</groupId>
-            <artifactId>xmlsec</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
             <classifier>no_aop</classifier>
@@ -96,19 +84,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
-        <!--
-        Right now, I toggle between deploying this as a
-        stand-alone .war, and as integrated in the openam .war
-        file. When deploying standalone, I want the jdk14 logger,
-        and when deploying in openam, I want the openam-slf4j
-        logger.
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-jdk14</artifactId>
-            <version>1.7.6</version>
-        </dependency>
-        -->
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-slf4j</artifactId>

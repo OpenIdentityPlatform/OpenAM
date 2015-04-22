@@ -19,9 +19,9 @@ package org.forgerock.openam.sts.soap.token.validator.wss;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.validate.Validator;
 import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
-import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
-import org.forgerock.openam.sts.token.validator.wss.OpenAMWSSUsernameTokenValidator;
+import org.forgerock.openam.sts.token.validator.AuthenticationHandler;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
@@ -33,13 +33,17 @@ import java.security.cert.X509Certificate;
 public class WSSValidatorFactoryImpl implements WSSValidatorFactory {
     private final AuthenticationHandler<UsernameToken> usernameTokenAuthenticationHandler;
     private final AuthenticationHandler<X509Certificate[]> certificateAuthenticationHandler;
+    private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
     private final Logger logger;
 
     @Inject
     WSSValidatorFactoryImpl(AuthenticationHandler<UsernameToken> usernameTokenAuthenticationHandler,
-                            AuthenticationHandler<X509Certificate[]> certificateAuthenticationHandler, Logger logger) {
+                            AuthenticationHandler<X509Certificate[]> certificateAuthenticationHandler,
+                            ThreadLocalAMTokenCache threadLocalAMTokenCache,
+                            Logger logger) {
         this.usernameTokenAuthenticationHandler = usernameTokenAuthenticationHandler;
         this.certificateAuthenticationHandler = certificateAuthenticationHandler;
+        this.threadLocalAMTokenCache = threadLocalAMTokenCache;
         this.logger = logger;
     }
 
@@ -48,10 +52,10 @@ public class WSSValidatorFactoryImpl implements WSSValidatorFactory {
                                   boolean invalidateInterimOpenAMSession) {
         switch (tokenType) {
             case USERNAME:
-                return new OpenAMWSSUsernameTokenValidator(usernameTokenAuthenticationHandler,
+                return new OpenAMWSSUsernameTokenValidator(usernameTokenAuthenticationHandler, threadLocalAMTokenCache,
                         validationInvocationContext, invalidateInterimOpenAMSession, logger);
             case X509:
-                return new SoapCertificateTokenValidator(certificateAuthenticationHandler,
+                return new SoapCertificateTokenValidator(certificateAuthenticationHandler, threadLocalAMTokenCache,
                         validationInvocationContext, invalidateInterimOpenAMSession, logger);
             default:
                 throw new IllegalArgumentException("SecurityPolicy validation for specified token type, "

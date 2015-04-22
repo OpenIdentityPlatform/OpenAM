@@ -34,7 +34,6 @@ import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
-import org.forgerock.openam.sts.XmlMarshaller;
 import org.forgerock.openam.sts.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProvider;
 import org.forgerock.openam.sts.soap.config.user.SoapDeploymentConfig;
@@ -48,8 +47,6 @@ import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCacheImpl;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
-import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
-import org.forgerock.openam.sts.token.model.OpenAMSessionTokenMarshaller;
 import org.forgerock.openam.sts.token.provider.AMSessionInvalidator;
 import org.forgerock.openam.sts.token.provider.AMSessionInvalidatorImpl;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
@@ -57,13 +54,13 @@ import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumerImp
 import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSessionImpl;
 import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
-import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
-import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandlerImpl;
-import org.forgerock.openam.sts.token.validator.wss.OpenAMWSSUsernameTokenValidator;
-import org.forgerock.openam.sts.token.validator.wss.disp.TokenAuthenticationRequestDispatcher;
-import org.forgerock.openam.sts.token.validator.wss.disp.UsernameTokenAuthenticationRequestDispatcher;
-import org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProvider;
-import org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProviderImpl;
+import org.forgerock.openam.sts.token.validator.AuthenticationHandler;
+import org.forgerock.openam.sts.token.validator.AuthenticationHandlerImpl;
+import org.forgerock.openam.sts.soap.token.validator.wss.OpenAMWSSUsernameTokenValidator;
+import org.forgerock.openam.sts.token.validator.disp.TokenAuthenticationRequestDispatcher;
+import org.forgerock.openam.sts.soap.token.validator.disp.SoapUsernameTokenAuthenticationRequestDispatcher;
+import org.forgerock.openam.sts.token.validator.url.AuthenticationUrlProvider;
+import org.forgerock.openam.sts.token.validator.url.AuthenticationUrlProviderImpl;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
@@ -86,13 +83,11 @@ public class TokenOperationFactoryImplTest {
         @Override
         protected void configure() {
             bind(ThreadLocalAMTokenCache.class).to(ThreadLocalAMTokenCacheImpl.class);
-            bind(new TypeLiteral<XmlMarshaller<OpenAMSessionToken>>(){}).to(OpenAMSessionTokenMarshaller.class);
-
             bind(AuthenticationUrlProvider.class)
                     .to(AuthenticationUrlProviderImpl.class);
 
             bind(new TypeLiteral<TokenAuthenticationRequestDispatcher<UsernameToken>>(){})
-                    .to(UsernameTokenAuthenticationRequestDispatcher.class);
+                    .to(SoapUsernameTokenAuthenticationRequestDispatcher.class);
 
             bind(new TypeLiteral<AuthenticationHandler<UsernameToken>>(){})
                     .to(new TypeLiteral<AuthenticationHandlerImpl<UsernameToken>>() {
@@ -105,7 +100,6 @@ public class TokenOperationFactoryImplTest {
             bind(TokenGenerationServiceConsumer.class).to(TokenGenerationServiceConsumerImpl.class);
             bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
             bind(XmlTokenAuthnContextMapper.class).to(XmlTokenAuthnContextMapperImpl.class);
-            bind(new TypeLiteral<XmlMarshaller<OpenAMSessionToken>>(){}).to(OpenAMSessionTokenMarshaller.class);
             bind(SoapSTSAccessTokenProvider.class).toInstance(mock(SoapSTSAccessTokenProvider.class));
             bind(HttpURLConnectionFactory.class).to(DefaultHttpURLConnectionFactory.class);
             bind(HttpURLConnectionWrapperFactory.class);
@@ -152,9 +146,10 @@ public class TokenOperationFactoryImplTest {
         @Inject
         OpenAMWSSUsernameTokenValidator getWssUsernameTokenValidator(
                 AuthenticationHandler<UsernameToken> authenticationHandler,
+                ThreadLocalAMTokenCache threadLocalAMTokenCache,
                 Logger logger) {
-            return new OpenAMWSSUsernameTokenValidator(authenticationHandler, ValidationInvocationContext.SOAP_SECURITY_POLICY,
-                    true, logger);
+            return new OpenAMWSSUsernameTokenValidator(authenticationHandler, threadLocalAMTokenCache,
+                    ValidationInvocationContext.SOAP_SECURITY_POLICY, true, logger);
         }
 
         @Provides

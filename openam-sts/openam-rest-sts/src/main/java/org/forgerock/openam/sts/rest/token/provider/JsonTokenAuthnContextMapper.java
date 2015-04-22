@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.sts.rest.token.provider;
 
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.TokenTypeId;
 
 /**
  * Defines the functionality which maps a TokenType to a SAML2 AuthnContext value (see section 2.7.2.2
@@ -25,10 +25,22 @@ import org.forgerock.openam.sts.TokenType;
  * be sent to the TokenGenerationService for inclusion in the AuthnStatement of the issued assertion. It specifies
  * the manner in which the subject was authenticated. In the context of token transformation, the validated input
  * token will determine the AuthnContext specified in the TokenGenerationService invocation. This interface defines
- * the contract for this mapping.
+ * the contract for this mapping. It also defines a set of standard values used by the default authn context mapper.
  *
  */
 public interface JsonTokenAuthnContextMapper {
+    public static final String AUTHN_CONTEXT_CLASS_REF_PASSWORD_PROTECTED_TRANSPORT =
+            "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport";
+
+    public static final String AUTHN_CONTEXT_CLASS_REF_PREVIOUS_SESSION =
+            "urn:oasis:names:tc:SAML:2.0:ac:classes:PreviousSession";
+
+    public static final String AUTHN_CONTEXT_CLASS_REF_X509 =
+            "urn:oasis:names:tc:SAML:2.0:ac:classes:X509";
+
+    public static final String AUTHN_CONTEXT_CLASS_REF_UNSPECIFIED =
+            "urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified";
+
     /**
      * Returns the AuthnContext value corresponding to the TokenType inputToken.
      * @param inputTokenType The TokenType validated as part of the token transformation
@@ -38,5 +50,5 @@ public interface JsonTokenAuthnContextMapper {
      * @return A valid AuthnContext value, as defined here:
      * http://docs.oasis-open.org/security/saml/v2.0/saml-authn-context-2.0-os.pdf
      */
-    String getAuthnContext(TokenType inputTokenType, JsonValue inputToken);
+    String getAuthnContext(TokenTypeId inputTokenType, JsonValue inputToken);
 }

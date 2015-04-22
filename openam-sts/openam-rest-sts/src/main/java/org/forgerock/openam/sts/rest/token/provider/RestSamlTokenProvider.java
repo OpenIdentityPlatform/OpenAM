@@ -11,23 +11,16 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.rest.token.provider;
 
-import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.security.AdminTokenAction;
-import org.apache.cxf.sts.token.provider.TokenProvider;
-import org.apache.cxf.sts.token.provider.TokenProviderParameters;
-import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.AMSTSRuntimeException;
 import org.forgerock.openam.sts.TokenCreationException;
-import org.forgerock.openam.sts.TokenType;
-import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.service.invocation.ProofTokenState;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
@@ -36,32 +29,25 @@ import org.forgerock.openam.sts.token.provider.AMSessionInvalidator;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
 import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
 import org.slf4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import java.security.AccessController;
-import java.util.Map;
+
+import static org.forgerock.json.fluent.JsonValue.field;
+import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.fluent.JsonValue.object;
 
 /**
- * This encapsulates logic to both create a SAML token, and to invalidate the interim OpenAM session object
+ * This encapsulates logic to both create a SAML2 token, and to invalidate the interim OpenAM session object
  * generated from the preceding TokenValidation operation if the TokenTransform has been configured to invalidate
- * the interim OpenAM sessions generated from token validation. Note that thus the AMSessionInvalidator can be null.
+ * the interim OpenAM sessions generated from token validation.
  *
- * Note that this class may be a candidate for being moved to the common module, but the manner in which it pulls
- * SubjectConfirmation method specific data out of the additionalProperties in the TokenProviderParameters might not
- * work in the SOAP STS - this is TBD.
- *
- * See the TokenTranslateOperationImpl#buildTokenProviderParameters for details on how the additional state necessary
- * for issuing assertions of the various SubjectConfirmationMethod types are constituted in the additionalProperties
- * Map<String, Object> encapsulated in the TokenProviderParameters.
  */
-public class RestSamlTokenProvider implements TokenProvider {
+public class RestSamlTokenProvider implements RestTokenProvider<Saml2TokenCreationState> {
     private final TokenGenerationServiceConsumer tokenGenerationServiceConsumer;
     private final AMSessionInvalidator amSessionInvalidator;
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
     private final String stsInstanceId;
     private final String realm;
-    private final XMLUtilities xmlUtilities;
     private final JsonTokenAuthnContextMapper authnContextMapper;
     private final ValidationInvocationContext validationInvocationContext;
     private final Logger logger;
@@ -74,7 +60,6 @@ public class RestSamlTokenProvider implements TokenProvider {
                                ThreadLocalAMTokenCache threadLocalAMTokenCache,
                                String stsInstanceId,
                                String realm,
-                               XMLUtilities xmlUtilities,
                                JsonTokenAuthnContextMapper authnContextMapper,
                                ValidationInvocationContext validationInvocationContext,
                                Logger logger) {
@@ -83,57 +68,21 @@ public class RestSamlTokenProvider implements TokenProvider {
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
         this.stsInstanceId = stsInstanceId;
         this.realm = realm;
-        this.xmlUtilities = xmlUtilities;
         this.authnContextMapper = authnContextMapper;
         this.validationInvocationContext = validationInvocationContext;
         this.logger = logger;
     }
 
-    /*
-    The String tokenType passed here is obtained from the tokenType field of the TokenRequirements set in the
-    TokenProviderParameters. This value is set in the TokenTranslateOperationImpl by calling calling name() on the
-    specified desired TokenType.
-     */
     @Override
-    public boolean canHandleToken(String tokenType) {
-        return canHandleToken(tokenType, null);
-    }
-
-    @Override
-    public boolean canHandleToken(String tokenType, String realm) {
-        return TokenType.SAML2.name().equals(tokenType);
-    }
-
-    @Override
-    public TokenProviderResponse createToken(TokenProviderParameters tokenParameters) {
+    public JsonValue createToken(RestTokenProviderParameters<Saml2TokenCreationState> tokenParameters) throws TokenCreationException {
         try {
-            final TokenProviderResponse tokenProviderResponse = new TokenProviderResponse();
-            final Map<String, Object> additionalProperties = tokenParameters.getAdditionalProperties();
-            final Object subjectConfirmationObject = additionalProperties.get(AMSTSConstants.SAML2_SUBJECT_CONFIRMATION_KEY);
-            if (!(subjectConfirmationObject instanceof SAML2SubjectConfirmation)) {
-                throw new AMSTSRuntimeException(ResourceException.INTERNAL_ERROR,
-                        "No entry in additionalProperties in TokenProviderParameters corresponding to key "
-                                + AMSTSConstants.SAML2_SUBJECT_CONFIRMATION_KEY);
-            }
-            final SAML2SubjectConfirmation subjectConfirmation = (SAML2SubjectConfirmation) subjectConfirmationObject;
-            final String authNContextClassRef = getAuthnContextClassRef(additionalProperties);
-            String assertion;
-            try {
-                assertion = getAssertion(authNContextClassRef, subjectConfirmation, additionalProperties);
-            } catch (TokenCreationException e) {
-                throw new AMSTSRuntimeException(e.getCode(), e.getMessage(), e);
-            }
-            Document assertionDocument = xmlUtilities.stringToDocumentConversion(assertion);
-            if (assertionDocument ==  null) {
-                logger.error("Could not turn assertion string returned from TokenGenerationService into DOM Document. " +
-                        "The assertion string: " + assertion);
-                throw new AMSTSRuntimeException(ResourceException.INTERNAL_ERROR,
-                        "Could not turn assertion string returned from TokenGenerationService into DOM Document.");
-            }
-            final Element assertionElement = assertionDocument.getDocumentElement();
-            tokenProviderResponse.setToken(assertionElement);
-            tokenProviderResponse.setTokenId(assertionElement.getAttributeNS(null, SAML2Constants.ID));
-            return tokenProviderResponse;
+            Saml2TokenCreationState saml2TokenCreationState = tokenParameters.getTokenCreationState();
+
+            final String authNContextClassRef = authnContextMapper.getAuthnContext(tokenParameters.getInputTokenType(),
+                    tokenParameters.getInputToken());
+            final String assertion = getAssertion(authNContextClassRef, saml2TokenCreationState.getSubjectConfirmation(),
+                        saml2TokenCreationState.getProofTokenState());
+            return json(object(field(AMSTSConstants.ISSUED_TOKEN, assertion)));
         } finally {
             try {
                 amSessionInvalidator.invalidateAMSessions(threadLocalAMTokenCache.getToBeInvalidatedAMSessionIds());
@@ -148,30 +97,12 @@ public class RestSamlTokenProvider implements TokenProvider {
         }
     }
 
-    private String getAuthnContextClassRef(Map<String, Object> additionalProperties) {
-        final Object tokenTypeObject = additionalProperties.get(AMSTSConstants.VALIDATED_TOKEN_TYPE_KEY);
-        if (!(tokenTypeObject instanceof TokenType)) {
-            throw new AMSTSRuntimeException(ResourceException.INTERNAL_ERROR,
-                    "No entry in additionalProperties in TokenProviderParameters corresponding to key "
-                            + AMSTSConstants.VALIDATED_TOKEN_TYPE_KEY);
-        }
-        final TokenType validatedTokenType = (TokenType)tokenTypeObject;
-
-        final Object tokenObject = additionalProperties.get(AMSTSConstants.INPUT_TOKEN_STATE_KEY);
-        if (!(tokenObject instanceof JsonValue)) {
-            throw new AMSTSRuntimeException(ResourceException.INTERNAL_ERROR,
-                    "No entry in additionalProperties in TokenProviderParameters corresponding to key "
-                            + AMSTSConstants.INPUT_TOKEN_STATE_KEY);
-        }
-        return authnContextMapper.getAuthnContext(validatedTokenType, (JsonValue)tokenObject);
-    }
-
     /*
     Throw TokenCreationException as threadLocalAMTokenCache.getAMToken throws a TokenCreationException. Let caller above
     map that to an AMSTSRuntimeException.
      */
     private String getAssertion(String authnContextClassRef, SAML2SubjectConfirmation subjectConfirmation,
-                                Map<String, Object> additionalProperties) throws TokenCreationException {
+                                ProofTokenState proofTokenState) throws TokenCreationException {
         switch (subjectConfirmation) {
             case BEARER:
                 return tokenGenerationServiceConsumer.getSAML2BearerAssertion(
@@ -186,15 +117,9 @@ public class RestSamlTokenProvider implements TokenProvider {
                         threadLocalAMTokenCache.getSessionIdForContext(validationInvocationContext),
                         stsInstanceId, realm, authnContextClassRef, getAdminToken());
             case HOLDER_OF_KEY:
-                Object proofTokenStateObject = additionalProperties.get(AMSTSConstants.PROOF_TOKEN_STATE_KEY);
-                if (!(proofTokenStateObject instanceof ProofTokenState)) {
-                    throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
-                            "No ProofTokenState entry in additionalProperties map in TokenProvideProperties for "
-                                    + AMSTSConstants.PROOF_TOKEN_STATE_KEY);
-                }
                 return tokenGenerationServiceConsumer.getSAML2HolderOfKeyAssertion(
                         threadLocalAMTokenCache.getSessionIdForContext(validationInvocationContext),
-                        stsInstanceId, realm, authnContextClassRef, (ProofTokenState)proofTokenStateObject, getAdminToken());
+                        stsInstanceId, realm, authnContextClassRef, proofTokenState, getAdminToken());
         }
         throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
                 "Unexpected SAML2SubjectConfirmation in AMSAMLTokenProvider: " + subjectConfirmation);

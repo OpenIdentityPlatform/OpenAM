@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.service.invocation;
@@ -35,6 +35,8 @@ public class RestSTSServiceInvocationState {
         private JsonValue inputTokenState;
         private JsonValue outputTokenState;
 
+        private RestSTSServiceInvocationStateBuilder() {}
+
         public RestSTSServiceInvocationStateBuilder inputTokenState(JsonValue inputTokenState) {
             this.inputTokenState = inputTokenState;
             return this;
@@ -48,7 +50,6 @@ public class RestSTSServiceInvocationState {
         public RestSTSServiceInvocationState build() throws TokenMarshalException {
             return new RestSTSServiceInvocationState(this);
         }
-
     }
 
     private final JsonValue inputTokenState;

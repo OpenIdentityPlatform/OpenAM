@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.tokengeneration.saml2.xmlsig;
@@ -24,7 +24,7 @@ import java.security.cert.X509Certificate;
 /**
  * This interface expresses the concerns related to obtaining the STS-instance-specific X509Certificate and PrivateKey
  * instances necessary to sign SAML2 assertions. Unlike the existing com.sun.identity.saml.xmlsig.KeyProvider interface,
- * and its primary implementation, the AMKeyProvider, this KeyProvider cannot be initialized by fileystem-resident
+ * and its primary implementation, the AMKeyProvider, this KeyProvider cannot be initialized by filesystem-resident
  * configuration files, but via STS KeystoreConfig instances. Also its PrivateKeys will not be 'protected' by the Crypt
  * class' encryption scheme, as these key passwords will be stored in LDAP.
  */

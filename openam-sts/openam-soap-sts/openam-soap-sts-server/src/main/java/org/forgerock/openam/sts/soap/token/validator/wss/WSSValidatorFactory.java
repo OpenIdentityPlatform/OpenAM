@@ -23,7 +23,7 @@ import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
 /**
  * Defines the functionality necessary to produce instances of the org.apache.ws.security.validate.Validator instances
  * necessary to perform validation of the SupportingTokens specified in the SecurityPolicy bindings protecting soap-sts
- * instances. This will produce Validators necessary to validate x509, UNT, and SAML2 assertions. It will not produce
+ * instances. This will produce Validators necessary to validate x509 and UNT assertions. It will not produce
  * the Validators used to validate OpenAM tokens, as this is done via custom interceptor providers registered with the
  * CXF bus (non-standard tokens must be supported in this fashion).
  */
@@ -37,6 +37,6 @@ public interface WSSValidatorFactory {
      * @throws java.lang.IllegalArgumentException If the specified TokenType is not supported. Currently supported
      * TokenTypes are USERNAME and X509
      */
-    public Validator getValidator(TokenType tokenType, ValidationInvocationContext validationInvocationContext,
+    Validator getValidator(TokenType tokenType, ValidationInvocationContext validationInvocationContext,
                                   boolean invalidateInterimOpenAMSession) throws IllegalArgumentException;
 }

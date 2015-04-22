@@ -11,19 +11,27 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.service.invocation;
 
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenMarshalException;
+import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
-import org.forgerock.openam.sts.token.model.OpenAMSessionTokenMarshaller;
 import org.forgerock.util.Reject;
 
+import static org.forgerock.json.fluent.JsonValue.field;
+import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.fluent.JsonValue.object;
+
 /**
- * Class encapsulating an OpenAM sessionId. Simply delegates to the corresponding model class and marshalling functionality.
+ * Class encapsulating an OpenAM sessionId, and will emit json which includes state necessary to act as the input_token_state
+ * in the RestSTSServiceInvocationState - i.e. the OpenAM session id, and a AMSTSConstants.TOKEN_TYPE_KEY field corresponding to
+ * TokenType.OPENAM.name().
  */
 public class OpenAMTokenState {
     public static class OpenAMTokenStateBuilder {
@@ -78,11 +86,28 @@ public class OpenAMTokenState {
     }
 
     public JsonValue toJson() throws TokenMarshalException {
-        return new OpenAMSessionTokenMarshaller().toJson(openAMSessionToken);
+        return json(object(
+                field(AMSTSConstants.TOKEN_TYPE_KEY, TokenType.OPENAM.name()),
+                field(AMSTSConstants.AM_SESSION_TOKEN_SESSION_ID, openAMSessionToken.getSessionId())));
     }
 
     public static OpenAMTokenState fromJson(JsonValue jsonValue) throws TokenMarshalException {
-        OpenAMSessionToken sessionToken = new OpenAMSessionTokenMarshaller().fromJson(jsonValue);
-        return OpenAMTokenState.builder().sessionId(sessionToken.getSessionId()).build();
+        if (!jsonValue.get(AMSTSConstants.TOKEN_TYPE_KEY).isString() ||
+                !TokenType.OPENAM.name().equals(jsonValue.get(AMSTSConstants.TOKEN_TYPE_KEY).asString())) {
+            throw new TokenMarshalException(ResourceException.INTERNAL_ERROR, "passed-in jsonValue does not have " +
+                    AMSTSConstants.TOKEN_TYPE_KEY + " field which matches the OpenAM token type: " + jsonValue);
+        }
+        final JsonValue jsonSessionId = jsonValue.get(AMSTSConstants.AM_SESSION_TOKEN_SESSION_ID);
+        if (jsonSessionId.isNull()) {
+            throw new TokenMarshalException(ResourceException.INTERNAL_ERROR, "passed-in jsonValue does not have " +
+                    AMSTSConstants.AM_SESSION_TOKEN_SESSION_ID + " field: " + jsonValue);
+        }
+        final String sessionId = jsonSessionId.asString();
+        if (sessionId.isEmpty()) {
+            throw new TokenMarshalException(ResourceException.INTERNAL_ERROR, "passed-in jsonValue does not have a non-empty " +
+                    AMSTSConstants.AM_SESSION_TOKEN_SESSION_ID + " field: " + jsonValue);
+
+        }
+        return OpenAMTokenState.builder().sessionId(sessionId).build();
     }
 }

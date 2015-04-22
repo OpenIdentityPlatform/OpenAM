@@ -126,7 +126,7 @@
                     <DefaultValues>
                         <Value>USERNAME|service|ldapService</Value>
                         <Value>OPENIDCONNECT|module|oidc|oidc_id_token_auth_target_header_key=oidc_id_token</Value>
-                        <Value>X509|module|cert_module|x509_token_token_auth_target_header_key=client_cert</Value>
+                        <Value>X509|module|cert_module|x509_token_auth_target_header_key=client_cert</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="deployment-offloaded-two-way-tls-header-key"
@@ -363,7 +363,7 @@
                         <DefaultValues>
                             <Value>USERNAME|service|ldapService</Value>
                             <Value>OPENIDCONNECT|module|oidc|oidc_id_token_auth_target_header_key=oidc_id_token</Value>
-                            <Value>X509|module|cert_module|x509_token_token_auth_target_header_key=client_cert</Value>
+                            <Value>X509|module|cert_module|x509_token_auth_target_header_key=client_cert</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="deployment-offloaded-two-way-tls-header-key"

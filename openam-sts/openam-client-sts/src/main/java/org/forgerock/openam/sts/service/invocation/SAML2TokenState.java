@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.service.invocation;
@@ -35,6 +35,8 @@ public class SAML2TokenState {
     public static class SAML2TokenStateBuilder {
         private SAML2SubjectConfirmation subjectConfirmation;
         private ProofTokenState proofTokenState;
+
+        private SAML2TokenStateBuilder() {}
 
         public SAML2TokenStateBuilder saml2SubjectConfirmation(SAML2SubjectConfirmation subjectConfirmation) {
             this.subjectConfirmation = subjectConfirmation;

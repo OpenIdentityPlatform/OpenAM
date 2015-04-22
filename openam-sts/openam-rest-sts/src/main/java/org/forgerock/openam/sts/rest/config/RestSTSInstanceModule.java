@@ -28,56 +28,44 @@ import javax.inject.Singleton;
 
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
-import org.apache.cxf.sts.STSPropertiesMBean;
-import org.apache.cxf.sts.StaticSTSProperties;
-import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
-
-import org.apache.cxf.ws.security.tokenstore.TokenStore;
-
-import org.apache.ws.security.message.token.UsernameToken;
 
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.HttpURLConnectionFactory;
 import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
 import org.forgerock.openam.sts.OpenAMHttpURLConnectionFactory;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
-import org.forgerock.openam.sts.JsonMarshaller;
-import org.forgerock.openam.sts.XMLUtilities;
-import org.forgerock.openam.sts.XMLUtilitiesImpl;
-import org.forgerock.openam.sts.XmlMarshaller;
 import org.forgerock.openam.sts.rest.RestSTS;
 import org.forgerock.openam.sts.rest.RestSTSImpl;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
 import org.forgerock.openam.sts.config.user.TokenTransformConfig;
-import org.forgerock.openam.sts.rest.marshal.*;
+import org.forgerock.openam.sts.rest.marshal.TokenRequestMarshaller;
+import org.forgerock.openam.sts.rest.marshal.TokenRequestMarshallerImpl;
 import org.forgerock.openam.sts.rest.operation.TokenTransformFactory;
 import org.forgerock.openam.sts.rest.operation.TokenTransformFactoryImpl;
 import org.forgerock.openam.sts.rest.operation.TokenTranslateOperation;
 import org.forgerock.openam.sts.rest.operation.TokenTranslateOperationImpl;
 import org.forgerock.openam.sts.rest.token.provider.JsonTokenAuthnContextMapperImpl;
+import org.forgerock.openam.sts.rest.token.validator.disp.RestUsernameTokenAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.AMTokenParser;
 import org.forgerock.openam.sts.token.AMTokenParserImpl;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCacheImpl;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
-import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
-import org.forgerock.openam.sts.token.model.OpenAMSessionTokenMarshaller;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
-import org.forgerock.openam.sts.token.model.OpenIdConnectIdTokenMarshaller;
 import org.forgerock.openam.sts.rest.token.provider.JsonTokenAuthnContextMapper;
+import org.forgerock.openam.sts.token.model.RestUsernameToken;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumerImpl;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSessionImpl;
-import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
-import org.forgerock.openam.sts.token.validator.wss.disp.CertificateAuthenticationRequestDispatcher;
-import org.forgerock.openam.sts.token.validator.wss.disp.OpenIdConnectAuthenticationRequestDispatcher;
-import org.forgerock.openam.sts.token.validator.wss.disp.TokenAuthenticationRequestDispatcher;
-import org.forgerock.openam.sts.token.validator.wss.disp.UsernameTokenAuthenticationRequestDispatcher;
-import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandlerImpl;
-import org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProviderImpl;
-import org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProvider;
+import org.forgerock.openam.sts.token.validator.AuthenticationHandler;
+import org.forgerock.openam.sts.token.validator.disp.CertificateAuthenticationRequestDispatcher;
+import org.forgerock.openam.sts.rest.token.validator.disp.OpenIdConnectAuthenticationRequestDispatcher;
+import org.forgerock.openam.sts.token.validator.disp.TokenAuthenticationRequestDispatcher;
+import org.forgerock.openam.sts.token.validator.AuthenticationHandlerImpl;
+import org.forgerock.openam.sts.token.validator.url.AuthenticationUrlProviderImpl;
+import org.forgerock.openam.sts.token.validator.url.AuthenticationUrlProvider;
 
 import java.security.cert.X509Certificate;
 import java.util.Set;
@@ -99,25 +87,17 @@ public class RestSTSInstanceModule extends AbstractModule {
     }
 
     public void configure() {
-        /*
-        we want only one instance of the TokenStore shared among all token operations
-        Perhaps this should be a provider - i.e. to leverage the ctor that takes a bus instance? TODO:
-        Do I even want to bind a TokenStore - it seems there only to support SecurityContextTokens, and I don't
-        set it in the TokenValidatorParameters or the TokenProviderParameters. This binding is candidate for removal.
-         */
-        bind(TokenStore.class).to(DefaultInMemoryTokenStore.class).in(Scopes.SINGLETON);
-
         bind(ThreadLocalAMTokenCache.class).to(ThreadLocalAMTokenCacheImpl.class).in(Scopes.SINGLETON);
 
 
         bind(AuthenticationUrlProvider.class)
                 .to(AuthenticationUrlProviderImpl.class);
 
-        bind(new TypeLiteral<TokenAuthenticationRequestDispatcher<UsernameToken>>(){})
-                .to(UsernameTokenAuthenticationRequestDispatcher.class);
+        bind(new TypeLiteral<TokenAuthenticationRequestDispatcher<RestUsernameToken>>(){})
+                .to(RestUsernameTokenAuthenticationRequestDispatcher.class);
 
-        bind(new TypeLiteral<AuthenticationHandler<UsernameToken>>(){})
-                .to(new TypeLiteral<AuthenticationHandlerImpl<UsernameToken>>() {});
+        bind(new TypeLiteral<AuthenticationHandler<RestUsernameToken>>(){})
+                .to(new TypeLiteral<AuthenticationHandlerImpl<RestUsernameToken>>() {});
 
         bind(new TypeLiteral<TokenAuthenticationRequestDispatcher<OpenIdConnectIdToken>>(){})
                 .to(OpenIdConnectAuthenticationRequestDispatcher.class);
@@ -127,31 +107,21 @@ public class RestSTSInstanceModule extends AbstractModule {
 
         bind(new TypeLiteral<TokenAuthenticationRequestDispatcher<X509Certificate[]>>(){})
                 .to(CertificateAuthenticationRequestDispatcher.class);
-        bind(new TypeLiteral<AuthenticationHandler<X509Certificate[]>>() {})
+
+        bind(new TypeLiteral<AuthenticationHandler<X509Certificate[]>>(){})
                 .to(new TypeLiteral<AuthenticationHandlerImpl<X509Certificate[]>>() {});
 
 
-        bind(WebServiceContextFactory.class).to(CrestWebServiceContextFactoryImpl.class);
         bind(TokenRequestMarshaller.class).to(TokenRequestMarshallerImpl.class);
-        bind(TokenResponseMarshaller.class).to(TokenResponseMarshallerImpl.class);
         bind(TokenTransformFactory.class).to(TokenTransformFactoryImpl.class);
         bind(TokenTranslateOperation.class).to(TokenTranslateOperationImpl.class);
         bind(AMTokenParser.class).to(AMTokenParserImpl.class);
         bind(PrincipalFromSession.class).to(PrincipalFromSessionImpl.class);
 
         bind(RestSTS.class).to(RestSTSImpl.class);
-
-        /*
-        bind the class that can issue XML Element instances encapsulating an OpenAM session Id.
-         */
-        bind(new TypeLiteral<XmlMarshaller<OpenAMSessionToken>>(){}).to(OpenAMSessionTokenMarshaller.class);
-        bind(new TypeLiteral<XmlMarshaller<OpenIdConnectIdToken>>(){}).to(OpenIdConnectIdTokenMarshaller.class);
-        bind(new TypeLiteral<JsonMarshaller<OpenIdConnectIdToken>>(){}).to(OpenIdConnectIdTokenMarshaller.class);
-
         bind(UrlConstituentCatenator.class).to(UrlConstituentCatenatorImpl.class);
 
         bind(TokenGenerationServiceConsumer.class).to(TokenGenerationServiceConsumerImpl.class);
-        bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
 
         /*
         Bind the class responsible for producing HttpURLConnectionWrapper instances, and the HttpURLConnectionFactory
@@ -159,22 +129,6 @@ public class RestSTSInstanceModule extends AbstractModule {
          */
         bind(HttpURLConnectionFactory.class).to(OpenAMHttpURLConnectionFactory.class).in(Scopes.SINGLETON);
         bind(HttpURLConnectionWrapperFactory.class).in(Scopes.SINGLETON);
-    }
-
-    /**
-     * This method will provide the instance of the STSPropertiesMBean necessary both for the STS proper, and for the
-     * CXF interceptor-set which enforces the SecurityPolicy bindings.
-     *
-     * It should be a singleton because this same instance is shared by all of the token operation instances, as well as
-     * by the CXF interceptor-set
-     */
-    @Provides
-    @Singleton
-    @Inject
-    STSPropertiesMBean getSTSProperties(Logger logger) {
-        StaticSTSProperties stsProperties = new StaticSTSProperties();
-        stsProperties.setIssuer(stsInstanceConfig.getIssuerName());
-        return stsProperties;
     }
 
     /*
@@ -365,7 +319,7 @@ public class RestSTSInstanceModule extends AbstractModule {
      * type, and the OpenAM instance is deployed in a TLS-offloaded-environment, the TLS-offload-engines will be able
      * to provide the client's certificate, validated by a two-way-TLS handshake, to the rest-sts instance via a
      * header value only if the ip address of the host of the TLS-offload-engine is specified in the list below.
-     * @return
+     * @return the set of Strings corresponding to the ip addresses of the deployment's TLS-offload-engines
      */
     @Provides
     @Named(AMSTSConstants.TLS_OFFLOAD_ENGINE_HOSTS)

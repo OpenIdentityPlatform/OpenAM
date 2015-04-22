@@ -11,17 +11,17 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.sts.rest.operation;
 
-import org.apache.cxf.sts.token.provider.TokenProviderParameters;
-import org.apache.cxf.sts.token.provider.TokenProviderResponse;
-import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.TokenCreationException;
-import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.TokenTypeId;
 import org.forgerock.openam.sts.TokenValidationException;
+import org.forgerock.openam.sts.rest.token.provider.RestTokenProviderParameters;
+import org.forgerock.openam.sts.rest.token.validator.RestTokenValidatorParameters;
 
 /**
  * This interface defines a specific token transformation. A set of TokenTransform instance will be injected into each
@@ -34,8 +34,26 @@ import org.forgerock.openam.sts.TokenValidationException;
  * Instances of this interface will be maintained in a Set in the TokenTranslateOperation, so their equals and
  * hashCode methods must be overridden correctly.
  */
-public interface TokenTransform {
-    boolean isTransformSupported(TokenType inputTokenType, TokenType outputTokenType);
-    TokenProviderResponse transformToken(TokenValidatorParameters validatorParameters, TokenProviderParameters providerParameters)
-            throws TokenValidationException, TokenCreationException;
+public interface TokenTransform<I, O extends TokenTypeId> {
+    /**
+     * The TokenTranslateOperationImpl maintains a set of these instances, one corresponding to each of the supported
+     * token transforms. When a token translation invocation arrives, this method is used on the {@code Set<TokenTransform>}
+     * to determine which instance to invoke to realize the token transformation.
+     * @param inputTokenType the input token type in the token transformation
+     * @param outputTokenType the output token type in the token transformation
+     * @return whether or not this particular TokenTransform instance can support the specified translation
+     */
+    boolean isTransformSupported(TokenTypeId inputTokenType, TokenTypeId outputTokenType);
+
+    /**
+     * transforms the input token type specified in the RestTokenValidatorParameters into the output token specified by
+     * the RestTokenProviderParameters
+     * @param validatorParameters the state necessary to perform token validation
+     * @param providerParameters the state necessary to generate the output token
+     * @return the json representation of the generated token
+     * @throws TokenValidationException if the input token could not be validated
+     * @throws TokenCreationException if the output token could not be generated
+     */
+    JsonValue transformToken(RestTokenValidatorParameters<I> validatorParameters,
+                             RestTokenProviderParameters<O> providerParameters) throws TokenValidationException, TokenCreationException;
 }

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.token.model;
@@ -21,8 +21,7 @@ import org.forgerock.util.Reject;
 /**
  * This class represents an OpenID Connect ID Token. The tokenValue is the base64Url encoded representation of the
  * jws or jwt ID Token. This class will serve as a type specifier for the generic types required in the AuthenticationHandler
- * and TokenAuthenticationRequestDispatcher, and contain classes to marshal to/from json and XML, as required by the
- * SOAP and REST STS.
+ * and TokenAuthenticationRequestDispatcher.
  */
 public class OpenIdConnectIdToken {
     private final String tokenValue;

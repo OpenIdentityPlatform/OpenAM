@@ -37,7 +37,7 @@ import java.security.cert.X509Certificate;
  * from server to client are encrypted with the client's public key.
  * 3. org.apache.ws.security.WSPasswordCallback instances, with USERNAME_TOKEN usage, to provide the password set in
  * the UsernameTokens created to consume soap-sts instances protected by SecurityPolicy bindings specifying
- * UsernameToken SupportingTokens. Will provide the password corresponding to the usernameTokenUsername parameter above.
+ * UsernameToken SupportingTokens. Will provide the password corresponding to the usernameTokenUsername parameter below.
  *
  * Most soap-sts consumers will only use a subset of this functionality, but this CallbackHandler is provided as an
  * example of how to satisfy the various Callback scenarios.

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.service.invocation;
@@ -21,6 +21,7 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.token.model.RestUsernameToken;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
@@ -30,12 +31,16 @@ import static org.forgerock.json.fluent.JsonValue.json;
 import static org.forgerock.json.fluent.JsonValue.object;
 
 /**
- * Contains state corresponding to a UsernameToken
+ * Contains state corresponding to a UsernameToken and will emit json which includes state necessary to act as the
+ * input_token_state in the RestSTSServiceInvocationState - i.e. the username and password state, and a
+ * AMSTSConstants.TOKEN_TYPE_KEY field corresponding to TokenType.USERNAME.name().
  */
 public class UsernameTokenState {
     public static class UsernameTokenStateBuilder {
         private byte[] username;
         private byte[] password;
+
+        private UsernameTokenStateBuilder() {}
 
         public UsernameTokenStateBuilder username(byte[] username) {
             this.username = username;
@@ -51,22 +56,16 @@ public class UsernameTokenState {
             return new UsernameTokenState(this);
         }
     }
-
-    private static final String USERNAME = "username";
-    private static final String PASSWORD = "password";
-
-    private final byte[] username;
-    private final byte[] password;
+    private final RestUsernameToken restUsernameToken;
 
     private UsernameTokenState(UsernameTokenStateBuilder builder) throws TokenMarshalException {
-        username = builder.username;
-        password = builder.password;
-        if (username == null) {
+        if (builder.username == null) {
             throw new TokenMarshalException(ResourceException.BAD_REQUEST, "Username must be specified.");
         }
-        if (password == null) {
+        if (builder.password == null) {
             throw new TokenMarshalException(ResourceException.BAD_REQUEST, "Password must be specified.");
         }
+        restUsernameToken = new RestUsernameToken(builder.username, builder.password);
     }
 
     public static UsernameTokenStateBuilder builder() {
@@ -74,19 +73,19 @@ public class UsernameTokenState {
     }
 
     public byte[] getUsername() {
-        return username;
+        return restUsernameToken.getUsername();
     }
 
     public byte[] getPassword() {
-        return password;
+        return restUsernameToken.getPassword();
     }
 
     public JsonValue toJson() throws TokenMarshalException {
         try {
             return json(object(
                     field(AMSTSConstants.TOKEN_TYPE_KEY, TokenType.USERNAME.name()),
-                    field(USERNAME, new String(username, AMSTSConstants.UTF_8_CHARSET_ID)),
-                    field(PASSWORD, new String(password, AMSTSConstants.UTF_8_CHARSET_ID))));
+                    field(AMSTSConstants.USERNAME_TOKEN_USERNAME, new String(restUsernameToken.getUsername(), AMSTSConstants.UTF_8_CHARSET_ID)),
+                    field(AMSTSConstants.USERNAME_TOKEN_PASSWORD, new String(restUsernameToken.getPassword(), AMSTSConstants.UTF_8_CHARSET_ID))));
         } catch (UnsupportedEncodingException e) {
             throw new TokenMarshalException(ResourceException.BAD_REQUEST, "Unsupported charset marshalling toJson: " + e);
         }
@@ -95,8 +94,8 @@ public class UsernameTokenState {
     public static UsernameTokenState fromJson(JsonValue jsonValue) throws TokenMarshalException{
         try {
             return UsernameTokenState.builder()
-                    .password(jsonValue.get(PASSWORD).asString().getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
-                    .username(jsonValue.get(USERNAME).asString().getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
+                    .password(jsonValue.get(AMSTSConstants.USERNAME_TOKEN_PASSWORD).asString().getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
+                    .username(jsonValue.get(AMSTSConstants.USERNAME_TOKEN_USERNAME).asString().getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                     .build();
         } catch (UnsupportedEncodingException e) {
             throw new TokenMarshalException(ResourceException.BAD_REQUEST, "Unsupported charset marshalling fromJson: " + e);
@@ -121,8 +120,8 @@ public class UsernameTokenState {
     public boolean equals(Object other) {
         if (other instanceof UsernameTokenState) {
             UsernameTokenState otherState = (UsernameTokenState)other;
-            return Arrays.equals(username, otherState.getUsername()) &&
-                    Arrays.equals(password, otherState.getPassword());
+            return Arrays.equals(restUsernameToken.getUsername(), otherState.getUsername()) &&
+                    Arrays.equals(restUsernameToken.getPassword(), otherState.getPassword());
         }
         return false;
     }

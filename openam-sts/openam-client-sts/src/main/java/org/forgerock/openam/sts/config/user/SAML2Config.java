@@ -11,12 +11,11 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions Copyrighted [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS. All rights reserved.
+* Copyright 2014-2015 ForgeRock AS.
 */
 
 package org.forgerock.openam.sts.config.user;
 
-import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.forgerock.guava.common.base.Objects;
 import org.forgerock.json.fluent.JsonValue;
@@ -38,27 +37,30 @@ import static org.forgerock.json.fluent.JsonValue.json;
 import static org.forgerock.json.fluent.JsonValue.object;
 
 /**
+ * Encapsulates the configuration state necessary to produce SAML2 assertions.
+ *
+ * Each published rest-sts instance will encapsulate state to allow it to issue saml2 assertions for a single
+ * SP. Thus the spEntityId, and spAcsUrl (the url of the SP's assertion consumer service) are specified in this class.
+ * The signatureAlias corresponds to the IDP's signing key, and the encryptionKeyAlias could correspond to the SP's
+ * public key corresponding to the key used to encrypt the symmetric key used to encrypt assertion elements.
+ *
  * TODO: Ambiguity in the context of setting the customAttributeStatementsProviderClassName
  * and the customAttributeMapperClassName. As it currently stands, the customAttributeStatementsProvider will be passed
  * an instance of the customAttributeMapper if both are specified. The usual case will simply to set the customAttributeMapper,
  * as this allows custom attributes to be set in the AttributeStatement.
  *
  * TODO: do I want a name-qualifier in addition to a nameIdFormat?
- *
- * Currently, each published rest-sts instance will encapsulate state to allow it to issue saml2 assertions for a single
- * SP. Thus the spEntityId, and spAcsUrl (the url of the SP's assertion consumer service) are specified in this class.
- * The signatureAlias corresponds to the IDP's signing
- * key, and the encryptionKeyAlias could correspond to the SP's public key corresponding to the key used to encrypt the
- * symmetric key used to encrypt assertion elements.
  */
 public class SAML2Config {
     private static final String EQUALS = "=";
     public static class SAML2ConfigBuilder {
         /*
-        use the ws-security constant, instead of the SAML2Constants defined in openam-federation, as this dependency
+        Cannot use the SAML2Constants defined in openam-federation, as this dependency
         introduces a dependency on openam-core, which pulls the ws-* dependencies into the soap-sts, which I don't want.
+        Also can't use the SAML2Constants in wss4j, as I don't want this dependency in the rest-sts (as it depends upon
+        SAML2Config). Just define the value here.
          */
-        private String nameIdFormat = SAML2Constants.NAMEID_FORMAT_UNSPECIFIED;
+        private String nameIdFormat = "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified";
         private Map<String, String> attributeMap;
         private long tokenLifetimeInSeconds = 60 * 10; //default token lifetime is 10 minutes
         private String customConditionsProviderClassName;
@@ -89,6 +91,7 @@ public class SAML2Config {
          */
         private String encryptionKeyAlias;
 
+        private SAML2ConfigBuilder() {}
 
         public SAML2ConfigBuilder nameIdFormat(String nameIdFormat) {
             //TODO - test to see if it matches one of the allowed values?

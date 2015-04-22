@@ -11,14 +11,26 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts;
 
 /**
- * This enum represents the types of transformed tokens.
+ * This enum represents the types of transformed tokens. Implements the TokenTypeId interface so that end-users can
+ * plug-in custom token transformations.
  */
-public enum TokenType {
-    SAML2, USERNAME, OPENAM, OPENIDCONNECT, X509
+public enum TokenType implements TokenTypeId {
+    SAML2, USERNAME, OPENAM, OPENIDCONNECT, X509;
+
+    private final String id;
+
+    private TokenType() {
+        this.id = name();
+    }
+
+    @Override
+    public String getId() {
+        return id;
+    }
 }

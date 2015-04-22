@@ -16,7 +16,6 @@
 
 package org.forgerock.openam.sts.soap.config.user;
 
-import org.apache.cxf.common.util.CollectionUtils;
 import org.forgerock.guava.common.base.Objects;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.DeploymentPathNormalizationImpl;
@@ -26,6 +25,7 @@ import org.forgerock.openam.sts.config.user.DeploymentConfig;
 import org.forgerock.openam.sts.config.user.SAML2Config;
 import org.forgerock.openam.sts.config.user.STSInstanceConfig;
 import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.util.Reject;
 
 import java.util.ArrayList;
