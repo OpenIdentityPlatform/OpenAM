@@ -22,14 +22,42 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define*/
+ /*global $ _ define*/
 define("org/forgerock/openam/ui/console/views/Settings", [
-  "org/forgerock/commons/ui/common/main/AbstractView"
-], function(AbstractView) {
+  "org/forgerock/commons/ui/common/main/AbstractView",
+  "org/forgerock/openam/ui/console/views/ComponentBuilder"
+], function(AbstractView, ComponentBuilder) {
     var Settings = AbstractView.extend({
         template: "templates/console/views/Settings.html",
         render: function(args, callback) {
             var self = this;
+
+            // $.post('/openam/json/realm-config/authentication?_action=template')
+            $.post('/openam/json/global-config/services/uma?_action=template')
+            // $.post('/openam/json/global-config/authentication/modules/hotp?_action=template')
+            .done(function(data) {
+                var withDefaultsOmitted = _.omit(data._schema.properties, 'defaults'),
+                    withIdsInArray = _.map(withDefaultsOmitted, function(value, key) {
+                        value._id = key;
+                        value._initial = data[key];
+                        return value;
+                    }),
+                    sorted = _.sortBy(withIdsInArray, 'order'),
+                    components = sorted.map(function(propery) {
+                        return ComponentBuilder.create(propery.type, _.omit(propery, 'type'));
+                    }),
+                    wraps = $("<div/>");
+                    _.forEach(components, function(component) {
+                      wraps.append(component);
+                    });
+
+                self.parentRender(function() {
+                    self.$el.find(".container div:last-child").append(wraps);
+                });
+            })
+            .fail(function() {
+                // TODO: Add failure condition
+            });
 
             self.parentRender(function() {
                 if (callback) { callback();}
