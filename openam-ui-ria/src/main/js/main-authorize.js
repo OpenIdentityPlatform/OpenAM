@@ -61,7 +61,7 @@ require([
     window.$ = $;
     window._ = _;
 
-    conf.globalData = { auth: { realm : window.realm } };
+    conf.globalData = { auth: { subRealm : window.realm } };
 
     themeManager.getTheme().then(function(){
         spinner.hideSpinner();
