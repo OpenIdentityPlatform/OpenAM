@@ -24,7 +24,7 @@
  *
  * $Id: IDPProxyUtil.java,v 1.18 2009/11/20 21:41:16 exu Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.profile;
@@ -870,6 +870,7 @@ public class IDPProxyUtil {
            SAML2Utils.debug.message("Proxy to: " + location); 
        }    
        String relayState = (String) infoMap.get(SAML2Constants.RELAY_STATE); 
+       logoutRes.setDestination(XMLUtils.escapeSpecialCharacters(location));
        LogoutUtil.sendSLOResponse(response, request, logoutRes,
            location, relayState, "/", entityID, 
            SAML2Constants.IDP_ROLE,
