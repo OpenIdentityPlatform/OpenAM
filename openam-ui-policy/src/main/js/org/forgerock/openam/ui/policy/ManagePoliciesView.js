@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,11 +22,6 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/**
- * @author Aleanora Kaladzinskaya
- * @author Eugenia Sergueeva
- */
-
 /*global window, define, $, _, document, console, sessionStorage */
 
 define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
@@ -38,7 +33,7 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/util/RealmHelper"
+    "org/forgerock/openam/ui/common/util/RealmHelper"
 ], function (AbstractView, GenericGridView, uiUtils, router, policyDelegate, eventManager, constants, conf, RealmHelper) {
     var ManagePoliciesView = AbstractView.extend({
         baseTemplate: 'templates/policy/BaseTemplate.html',

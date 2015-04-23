@@ -27,7 +27,7 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
-    "org/forgerock/commons/ui/common/util/RealmHelper"
+    "org/forgerock/openam/ui/common/util/RealmHelper"
 ], function (conf, constants, AbstractDelegate, RealmHelper) {
     var obj = new AbstractDelegate(constants.host + "/" + constants.context + "/json");
 

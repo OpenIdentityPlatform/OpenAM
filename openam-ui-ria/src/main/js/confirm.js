@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2011-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -29,7 +29,7 @@ require.config({
         "doTimeout":  "libs/jquery.ba-dotimeout-1.0-min",
         "form2js":    "libs/form2js-2.0",
         "handlebars": "libs/handlebars-1.3.0-min",
-        "jquery":     "libs/jquery-2.1.1-min",
+        "jquery":     "libs/jquery-1.11.1-min",
         "js2form":    "libs/js2form-2.0",
         "i18next":    "libs/i18next-1.7.3-min",
         "moment":     "libs/moment-2.8.1-min",

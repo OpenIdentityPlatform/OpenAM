@@ -22,8 +22,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global _ define*/
-define('org/forgerock/commons/ui/common/util/RealmHelper', [
+/*global _ define, window*/
+define('org/forgerock/openam/ui/common/util/RealmHelper', [
     'org/forgerock/commons/ui/common/util/UIUtils'
 ], function(UIUtils) {
     /**
@@ -55,7 +55,19 @@ define('org/forgerock/commons/ui/common/util/RealmHelper', [
      * @returns Override realm AS IS (no slash modification) (e.g. <code>/</code> or <code>/realm1</code>)
      */
     obj.getOverrideRealm = function() {
-        return UIUtils.convertQueryParametersToJSON(UIUtils.getURIQueryString()).realm;
+        var params = UIUtils.convertQueryParametersToJSON(obj.getURIQueryString()) || {};
+        return params.realm;
+    };
+
+    // Copied in from ForgeRock UI Commons due to backporting of realm logic
+    /**
+     * Returns the query string from the URI
+     * @returns {String} Unescaped query string or empty string if no query string was found
+     */
+    obj.getURIQueryString = function() {
+        var queryString = window.location.search;
+
+        return queryString.substr(1, queryString.length);
     };
 
     return obj;
