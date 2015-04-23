@@ -48,8 +48,11 @@ define("org/forgerock/openam/ui/policy/common/GenericGridView", [
             return "<span data-selection='" + rowObject.name + "' class='icon-checkbox-unchecked' tabindex='0' ></span>";
         },
 
-        render: function (options, callback) {
-            var self = this, storedItems, dateRangeFilter;
+        render: function (data, options, callback) {
+            _.extend(this.data, data);
+
+            var storedItems,
+                dateRangeFilter;
 
             this.element = options.element;
             this.template = options.tpl;

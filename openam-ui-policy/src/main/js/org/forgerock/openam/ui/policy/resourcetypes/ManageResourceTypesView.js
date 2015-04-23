@@ -52,7 +52,7 @@ define("org/forgerock/openam/ui/policy/resourcetypes/ManageResourceTypesView", [
             this.parentRender(function () {
                 this.subrealm = this.data.realm !== "/" ? this.data.realm : "";
                 this.resTypesGridView = new GenericGridView();
-                this.resTypesGridView.render({
+                this.resTypesGridView.render(this.data, {
                     rowUid: 'uuid',
                     element: '#manageResTypes',
                     tpl: 'templates/policy/resourcetypes/ManageResourceTypesGridTemplate.html',

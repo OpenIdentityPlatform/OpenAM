@@ -42,7 +42,6 @@ define("org/forgerock/openam/ui/policy/applications/EditApplicationView", [
     var EditApplicationView = AbstractEditView.extend({
         template: "templates/policy/applications/EditApplicationTemplate.html",
         reviewTemplate: "templates/policy/applications/ReviewApplicationStepTemplate.html",
-        data: {},
         APPLICATION_TYPE: "iPlanetAMWebAgentService",
         validationFields: ["name", "resourceTypeUuids"],
 
@@ -115,6 +114,8 @@ define("org/forgerock/openam/ui/policy/applications/EditApplicationView", [
         },
 
         selectResourceType: function (item) {
+            if (!item) { return; }
+
             this.moveSelected(item, this.resourceTypesListView, this.resourceTypesListSelectedView);
 
             // todo for now two RTs in the same realm are not allowed to have the same name, but the following should be changed to use UUIDs, not names
@@ -125,6 +126,8 @@ define("org/forgerock/openam/ui/policy/applications/EditApplicationView", [
         },
 
         deselectResourceType: function (item) {
+            if (!item) { return; }
+
             this.resourceTypesListView.emptyFilter();
             this.moveSelected(item, this.resourceTypesListSelectedView, this.resourceTypesListView);
 

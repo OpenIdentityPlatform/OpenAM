@@ -38,8 +38,8 @@ define([
     "org/forgerock/openam/ui/policy/applications/ManageApplicationsView",
     "org/forgerock/openam/ui/policy/policies/ManagePoliciesView",
     "org/forgerock/openam/ui/policy/common/ActionsView",
-    "org/forgerock/openam/ui/policy/policies/attributes/ResponseAttrsStaticView",
-    "org/forgerock/openam/ui/policy/policies/attributes/ResponseAttrsUserView",
+    "org/forgerock/openam/ui/policy/policies/attributes/StaticResponseAttributesView",
+    "org/forgerock/openam/ui/policy/policies/attributes/SubjectResponseAttributesView",
     "org/forgerock/openam/ui/policy/policies/ResourcesView",
     "org/forgerock/openam/ui/policy/resources/CreatedResourcesView",
     "org/forgerock/openam/ui/policy/common/StripedListView",
@@ -47,7 +47,7 @@ define([
     "org/forgerock/openam/ui/policy/resourcetypes/ResourceTypePatternsView",
     "org/forgerock/openam/ui/policy/resourcetypes/ResourceTypeActionsView",
     "org/forgerock/openam/ui/policy/resourcetypes/ManageResourceTypesView"
-], function (eventManager, constants, RealmHelper, conf, router, loginHelper, uiUtils, policyDelegate, editAppView, editPolicyView, manageAppsView, policyListView, actionsView, ResponseAttrsStaticView, responseAttrsUserView, policyResourcesView, createdResourcesView,
+], function (eventManager, constants, RealmHelper, conf, router, loginHelper, uiUtils, policyDelegate, editAppView, editPolicyView, manageAppsView, policyListView, actionsView, StaticResponseAttributesView, SubjectResponseAttributesView, policyResourcesView, createdResourcesView,
              StripedList, editResourceTypeView, resTypePatternsView, resTypeActionsView, manageResTypesView) {
     return {
         executeAll: function (server) {
@@ -333,7 +333,7 @@ define([
 
                         allUserAttributes = _.sortBy(allUserAttributes.result);
 
-                        editPolicyView.staticAttrsView = new ResponseAttrsStaticView();
+                        editPolicyView.staticAttrsView = new StaticResponseAttributesView();
                         editPolicyView.staticAttrsView.render(editPolicyView.data.entity, staticAttributes, '#staticAttrs', function () {
 
                             var editing = editPolicyView.staticAttrsView.$el.find('.editing'),
@@ -392,8 +392,8 @@ define([
                             QUnit.ok(!_.find(editPolicyView.staticAttrsView.data.items, { propertyName: "incompleteKey" }), "Static attributes with no value can't be added");
                         });
 
-                        responseAttrsUserView.render([userAttributes, allUserAttributes], function () {
-                            QUnit.equal(responseAttrsUserView.$el.find('.selectize-input').find('.item').length, userAttributes.length, 'User attributes are selected correctly');
+                        SubjectResponseAttributesView.render([userAttributes, allUserAttributes], function () {
+                            QUnit.equal(SubjectResponseAttributesView.$el.find('.selectize-input').find('.item').length, userAttributes.length, 'User attributes are selected correctly');
                         });
                     });
 

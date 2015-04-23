@@ -39,19 +39,22 @@ define("org/forgerock/openam/ui/policy/policies/ResourcesView", [
         noBaseTemplate: true,
 
         render: function (data, callback) {
+            _.extend(this.data, data);
+
             this.parentRender(function () {
                 var d1 = $.Deferred(), d2 = $.Deferred(); // fire callback after both views are rendered
 
                 this.availablePatternsView = new StripedList();
                 this.availablePatternsView.render({
+                    entity: this.data.entity,
                     title: $.t('policy.common.availablePatterns'),
-                    items: data.options.availablePatterns,
+                    items: this.data.options.availablePatterns,
                     clickItem: this.addPattern.bind(this)
                 }, '#patterns', function () {
                     d1.resolve();
                 });
 
-                createdResources.render(data, function () {
+                createdResources.render(this.data, function () {
                     d2.resolve();
                 });
 

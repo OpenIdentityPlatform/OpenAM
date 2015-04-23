@@ -28,10 +28,10 @@
 
 /*global window, define, $, _, document, console*/
 
-define("org/forgerock/openam/ui/policy/policies/attributes/ResponseAttrsUserView", [
+define("org/forgerock/openam/ui/policy/policies/attributes/SubjectResponseAttributesView", [
     "org/forgerock/commons/ui/common/main/AbstractView"
 ], function (AbstractView) {
-    var ResponseAttrsUserView = AbstractView.extend({
+    var SubjectResponseAttributesView = AbstractView.extend({
         element: "#userAttrs",
         template: "templates/policy/policies/attributes/ResponseAttrsUser.html",
         noBaseTemplate: true,
@@ -64,11 +64,12 @@ define("org/forgerock/openam/ui/policy/policies/attributes/ResponseAttrsUserView
 
         getAttrs: function () {
             var data = [],
-                attr;
+                attr,
+                self = this;
 
             _.each(this.data.selectedUserAttributes, function (value) {
                 attr = {};
-                attr.type = this.attrType;
+                attr.type = self.attrType;
                 attr.propertyName = value.propertyName || value;
                 data.push(attr);
             });
@@ -100,5 +101,5 @@ define("org/forgerock/openam/ui/policy/policies/attributes/ResponseAttrsUserView
         }
     });
 
-    return new ResponseAttrsUserView();
+    return new SubjectResponseAttributesView();
 });

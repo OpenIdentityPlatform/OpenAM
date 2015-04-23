@@ -28,19 +28,20 @@
 
 /*global window, define, $, _, document, console */
 
-define("org/forgerock/openam/ui/policy/policies/attributes/ResponseAttrsStaticView", [
+define("org/forgerock/openam/ui/policy/policies/attributes/StaticResponseAttributesView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/policy/common/StripedListEditingView"
 ], function (AbstractView, StripedListEditingView) {
 
-    function ResponseAttrsStaticView() {
+    function StaticResponseAttributesView() {
     }
 
-    ResponseAttrsStaticView.prototype = new StripedListEditingView();
+    StaticResponseAttributesView.prototype = new StripedListEditingView();
 
-    ResponseAttrsStaticView.prototype.render = function (entity, staticAttributes, el, callback) {
+    StaticResponseAttributesView.prototype.render = function (entity, staticAttributes, el, callback) {
         this.data = {};
         this.entity = entity;
+        this.attrType = 'Static';
 
         this.data.items = this.splitAttrs(staticAttributes);
         this.data.items = _.sortBy(this.data.items, 'propertyName');
@@ -51,7 +52,7 @@ define("org/forgerock/openam/ui/policy/policies/attributes/ResponseAttrsStaticVi
         this.baseRender(this.data, "templates/policy/policies/attributes/ResponseAttrsStatic.html", el, callback);
     };
 
-    ResponseAttrsStaticView.prototype.getPendingItem = function (e) {
+    StaticResponseAttributesView.prototype.getPendingItem = function (e) {
         var editing = this.$el.find('.editing'),
             key = editing.find('[data-attr-add-key]'),
             val = editing.find('[data-attr-add-val]'),
@@ -63,7 +64,7 @@ define("org/forgerock/openam/ui/policy/policies/attributes/ResponseAttrsStaticVi
         return attr;
     };
 
-    ResponseAttrsStaticView.prototype.isValid = function (e) {
+    StaticResponseAttributesView.prototype.isValid = function (e) {
         var editing = this.$el.find('.editing'),
             key = editing.find('[data-attr-add-key]'),
             val = editing.find('[data-attr-add-val]');
@@ -73,11 +74,11 @@ define("org/forgerock/openam/ui/policy/policies/attributes/ResponseAttrsStaticVi
         });
     };
 
-    ResponseAttrsStaticView.prototype.isExistingItem = function (itemPending, itemFromCollection) {
+    StaticResponseAttributesView.prototype.isExistingItem = function (itemPending, itemFromCollection) {
         return itemFromCollection.propertyName === itemPending.propertyName && itemFromCollection.propertyValues === itemPending.propertyValues;
     };
 
-    ResponseAttrsStaticView.prototype.getCollectionWithout = function (e) {
+    StaticResponseAttributesView.prototype.getCollectionWithout = function (e) {
         var data = $(e.currentTarget).parent().data(),
             key = data.attrKey.toString(),
             val = data.attrVal.toString();
@@ -85,7 +86,7 @@ define("org/forgerock/openam/ui/policy/policies/attributes/ResponseAttrsStaticVi
         return _.without(this.data.items, _.findWhere(this.data.items, {propertyName: key, propertyValues: val}));
     };
 
-    ResponseAttrsStaticView.prototype.splitAttrs = function (attrs) {
+    StaticResponseAttributesView.prototype.splitAttrs = function (attrs) {
         var data = [],
             prop,
             i,
@@ -95,7 +96,7 @@ define("org/forgerock/openam/ui/policy/policies/attributes/ResponseAttrsStaticVi
             if (attrs.hasOwnProperty(prop)) {
                 for (i = 0, length = attrs[prop].propertyValues.length; i < length; i++) {
                     data.push({
-                        "type": "Static",
+                        "type": this.attrType,
                         "propertyName": attrs[prop].propertyName,
                         "propertyValues": attrs[prop].propertyValues[i]
                     });
@@ -106,7 +107,7 @@ define("org/forgerock/openam/ui/policy/policies/attributes/ResponseAttrsStaticVi
         return data;
     };
 
-    ResponseAttrsStaticView.prototype.getCombinedAttrs = function () {
+    StaticResponseAttributesView.prototype.getCombinedAttrs = function () {
         var data = [],
             groupedByName = _.groupBy(this.data.items, function (attribute) {
                 return attribute.propertyName;
@@ -117,7 +118,7 @@ define("org/forgerock/openam/ui/policy/policies/attributes/ResponseAttrsStaticVi
             self = this;
 
         _.each(groupedByName, function (value, key) {
-            attribute = {type: "User" };
+            attribute = {type: self.attrType};
             attribute.propertyName = key;
             attribute.propertyValues = [];
             for (i = 0, length = value.length; i < length; i++) {
@@ -129,7 +130,7 @@ define("org/forgerock/openam/ui/policy/policies/attributes/ResponseAttrsStaticVi
         return data;
     };
 
-    ResponseAttrsStaticView.prototype.checkedRequired = function (e) {
+    StaticResponseAttributesView.prototype.checkedRequired = function (e) {
         var inputs = $(e.currentTarget).parent().find('input'),
             required = false;
 
@@ -142,5 +143,5 @@ define("org/forgerock/openam/ui/policy/policies/attributes/ResponseAttrsStaticVi
         inputs.prop('required', required);
     };
 
-    return ResponseAttrsStaticView;
+    return StaticResponseAttributesView;
 });

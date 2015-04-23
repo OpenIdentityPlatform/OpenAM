@@ -44,8 +44,8 @@ define([
     "./policies/ManagePoliciesView",
     "./policies/EditPolicyView",
 
-    "./policies/attributes/ResponseAttrsStaticView",
-    "./policies/attributes/ResponseAttrsUserView",
+    "./policies/attributes/StaticResponseAttributesView",
+    "./policies/attributes/StaticResponseAttributesView",
 
     "./policies/conditions/ManageRulesView",
     "./policies/conditions/ManageSubjectsView",

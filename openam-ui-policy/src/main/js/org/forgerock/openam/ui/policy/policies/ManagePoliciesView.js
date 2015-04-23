@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -72,7 +72,7 @@ define("org/forgerock/openam/ui/policy/policies/ManagePoliciesView", [
                 });
 
                 this.policyGridView = new GenericGridView();
-                this.policyGridView.render({
+                this.policyGridView.render(this.data, {
                     rowUid: 'name',
                     element: '#managePolicies',
                     tpl: 'templates/policy/policies/ManagePoliciesGridTemplate.html',
@@ -84,7 +84,7 @@ define("org/forgerock/openam/ui/policy/policies/ManagePoliciesView", [
 
                 if (this.data.referralsEnabled) {
                     this.refGridView = new GenericGridView();
-                    this.refGridView.render({
+                    this.refGridView.render(this.data, {
                         rowUid: 'name',
                         element: '#manageRefs',
                         tpl: 'templates/policy/referrals/ManageReferralsGridTemplate.html',

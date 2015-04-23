@@ -35,8 +35,8 @@ define("org/forgerock/openam/ui/policy/policies/EditPolicyView", [
     "org/forgerock/openam/ui/policy/delegates/PolicyDelegate",
     "org/forgerock/openam/ui/policy/common/ActionsView",
     "org/forgerock/openam/ui/policy/policies/ResourcesView",
-    "org/forgerock/openam/ui/policy/policies/attributes/ResponseAttrsStaticView",
-    "org/forgerock/openam/ui/policy/policies/attributes/ResponseAttrsUserView",
+    "org/forgerock/openam/ui/policy/policies/attributes/StaticResponseAttributesView",
+    "org/forgerock/openam/ui/policy/policies/attributes/SubjectResponseAttributesView",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/components/Accordion",
@@ -45,12 +45,12 @@ define("org/forgerock/openam/ui/policy/policies/EditPolicyView", [
     "org/forgerock/openam/ui/policy/policies/conditions/ManageEnvironmentsView",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router"
-], function (AbstractEditView, reviewInfoView, policyDelegate, actionsView, resourcesView, ResponseAttrsStaticView, responseAttrsUserView,
-             uiUtils, constants, Accordion, messager, manageSubjects, manageEnvironments, eventManager, router) {
+], function (AbstractEditView, reviewInfoView, policyDelegate, actionsView, resourcesView, StaticResponseAttributesView,
+             SubjectResponseAttributesView, uiUtils, constants, Accordion, messager, manageSubjects, manageEnvironments,
+             eventManager, router) {
     var EditPolicyView = AbstractEditView.extend({
         template: "templates/policy/policies/EditPolicyTemplate.html",
         reviewTemplate: "templates/policy/policies/ReviewPolicyStepTemplate.html",
-        data: {},
         validationFields: ["name", "resources"],
 
         render: function (args, callback) {
@@ -65,7 +65,7 @@ define("org/forgerock/openam/ui/policy/policies/EditPolicyView", [
                 allUserAttributesPromise =  policyDelegate.getAllUserAttributes(),
                 resourceTypesPromise =      policyDelegate.listResourceTypes();
 
-            this.events['change #availableResTypes'] = this.selectResourceType;
+            this.events['change #availableResTypes'] = this.changeResourceType;
 
             $.when(policyPromise, appPromise, allSubjectsPromise, allEnvironmentsPromise, allUserAttributesPromise, resourceTypesPromise)
                 .done(function (policy, app, allSubjects, allEnvironments, allUserAttributes, resourceTypes) {
@@ -124,10 +124,10 @@ define("org/forgerock/openam/ui/policy/policies/EditPolicyView", [
                     actionsView.render(data);
                     resourcesView.render(data);
 
-                    self.staticAttrsView = new ResponseAttrsStaticView();
+                    self.staticAttrsView = new StaticResponseAttributesView();
                     self.staticAttrsView.render(data.entity, staticAttributes, '#staticAttrs');
 
-                    responseAttrsUserView.render([userAttributes, allUserAttributes]);
+                    SubjectResponseAttributesView.render([userAttributes, allUserAttributes]);
 
                     self.prepareInfoReview();
                     self.validateThenRenderReview();
@@ -150,7 +150,7 @@ define("org/forgerock/openam/ui/policy/policies/EditPolicyView", [
             return availableActions;
         },
 
-        selectResourceType: function (e) {
+        changeResourceType: function (e) {
             this.data.entity.resourceTypeUuid = e.target.value;
 
             var resourceType = _.findWhere(this.data.options.availableResourceTypes, {uuid: e.target.value});
@@ -193,10 +193,10 @@ define("org/forgerock/openam/ui/policy/policies/EditPolicyView", [
 
         prepareInfoReview: function(){
             this.data.combinedStaticAttrs = this.staticAttrsView.getCombinedAttrs();
-            this.data.userAttrs =           responseAttrsUserView.getAttrs();
-            this.data.responseAttrs =       this.data.combinedStaticAttrs.concat(this.data.userAttrs);
-            this.data.subjectString =       JSON.stringify(this.data.entity.subject, null, 2);
-            this.data.environmentString =   JSON.stringify(this.data.entity.condition, null, 2);
+            this.data.userAttrs = SubjectResponseAttributesView.getAttrs();
+            this.data.responseAttrs = this.data.combinedStaticAttrs.concat(this.data.userAttrs);
+            this.data.subjectString = JSON.stringify(this.data.entity.subject, null, 2);
+            this.data.environmentString = JSON.stringify(this.data.entity.condition, null, 2);
         },
 
         submitForm: function () {
@@ -212,7 +212,7 @@ define("org/forgerock/openam/ui/policy/policies/EditPolicyView", [
             });
 
             persistedPolicy.actionValues = persistedPolicy.actions;
-            persistedPolicy.resourceAttributes = _.union(this.staticAttrsView.getCombinedAttrs(), responseAttrsUserView.getAttrs());
+            persistedPolicy.resourceAttributes = _.union(this.staticAttrsView.getCombinedAttrs(), SubjectResponseAttributesView.getAttrs());
 
             if (this.data.entityName) {
                 policyDelegate.updatePolicy(this.data.entityName, persistedPolicy)

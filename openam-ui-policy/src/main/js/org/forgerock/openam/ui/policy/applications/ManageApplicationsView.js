@@ -56,7 +56,7 @@ define("org/forgerock/openam/ui/policy/applications/ManageApplicationsView", [
 
             this.parentRender(function () {
                 this.appGridView = new GenericGridView();
-                this.appGridView.render({
+                this.appGridView.render(this.data, {
                     rowUid: 'name',
                     element: '#manageApps',
                     tpl: 'templates/policy/applications/ManageAppsGridTemplate.html',
