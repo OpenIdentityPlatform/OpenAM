@@ -28,13 +28,19 @@
  */
 package com.sun.identity.sm;
 
+import java.security.AccessController;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.iplanet.sso.SSOException;
 import com.sun.identity.common.CaseInsensitiveHashMap;
+import com.sun.identity.security.AdminTokenAction;
+import org.forgerock.openam.utils.StringUtils;
 
 public class SMSUtils {
 
@@ -481,5 +487,82 @@ public class SMSUtils {
             }
         }
         return subset;
+    }
+
+    /**
+     * Walk the schema tree from the given service schema to find a dynamic validator with the given name. The search
+     * will end as soon as the attribute describing the validator is found.
+     *
+     * @param serviceSchema The service schema from which to star the search.
+     * @param validatorName The name of the validator to look for.
+     * @param validators Then list to add the validators to.
+     * @return A list of dynamic validators.
+     * @throws SSOException, SMSException If the schema could not be read.
+     */
+    public static void findDynamicValidators(ServiceSchema serviceSchema, String validatorName,
+                                             List<Class<DynamicAttributeValidator>> validators)
+            throws SSOException, SMSException {
+
+        if (serviceSchema == null || validatorName == null) {
+            return;
+        }
+
+        @SuppressWarnings("unchecked")
+        Set<AttributeSchema> attributeSchemas = serviceSchema.getAttributeSchemas();
+        for (AttributeSchema schema : attributeSchemas) {
+            if (schema.getType() == AttributeSchema.Type.VALIDATOR && validatorName.equals(schema.getName())) {
+                @SuppressWarnings("unchecked")
+                final Set<String> validatorClassNames = schema.getDefaultValues();
+                for (String validatorClassName : validatorClassNames) {
+                    try {
+                        final Class clazz = Class.forName(validatorClassName);
+                        if (DynamicAttributeValidator.class.isAssignableFrom(clazz)) {
+                            validators.add(clazz);
+                        }
+                    } catch(ClassNotFoundException e) {
+                        SMSEntry.debug.error("SMSUtils: Validator class not found: " + validatorClassName, e);
+                    }
+                }
+                if (!validators.isEmpty()) {
+                    break;
+                }
+            }
+        }
+
+        if (validators.isEmpty()) {
+            @SuppressWarnings("unchecked")
+            Set<String> schemaNames = serviceSchema.getSubSchemaNames();
+            for (String schemaName : schemaNames) {
+                findDynamicValidators(serviceSchema.getSubSchema(schemaName), validatorName, validators);
+            }
+        }
+    }
+
+    /**
+     * Retrieve a list of dynamic validators with the given name for a specific service.
+     *
+     * @param serviceName The name of the service to search through.
+     * @param validatorName The name of the attribute in which the validators were specified.
+     * @return A list of {@link DynamicAttributeValidator}s associated with the given attribute or
+     * an empty list if none were found.
+     * @throws SSOException, SMSException If the schema could not be read.
+     */
+    public static List<Class<DynamicAttributeValidator>> findDynamicValidators(String serviceName, String validatorName)
+            throws SSOException, SMSException {
+
+        List<Class<DynamicAttributeValidator>> validators = new ArrayList<Class<DynamicAttributeValidator>>();
+
+        if (StringUtils.isBlank(validatorName) || "no".equalsIgnoreCase(validatorName)) {
+            return validators;
+        }
+
+        ServiceSchemaManager ssm = new ServiceSchemaManager(serviceName,
+                AccessController.doPrivileged(AdminTokenAction.getInstance()));
+        findDynamicValidators(ssm.getSchema(SchemaType.GLOBAL), validatorName, validators);
+        if (validators.isEmpty()) {
+            findDynamicValidators(ssm.getSchema(SchemaType.ORGANIZATION), validatorName, validators);
+        }
+
+        return validators;
     }
 }

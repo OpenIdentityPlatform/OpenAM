@@ -46,14 +46,17 @@ import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 
-public abstract class AMServiceProfileViewBeanBase
-    extends AMPrimaryMastHeadViewBean
-{
+public abstract class AMServiceProfileViewBeanBase extends DynamicRequestViewBean {
     private static final String PGTITLE = "pgtitle";
     public static final String SERVICE_NAME = "serviceName";
     public static final String PROPERTY_ATTRIBUTE = "propertyAttributes";
@@ -317,32 +320,45 @@ public abstract class AMServiceProfileViewBeanBase
     protected void onBeforeResetProfile() {
     }
 
-    /**
-     * Handles link type attribute schema request.
-     *
-     * @param event Request invocation event.
-     */
-    public void handleDynLinkRequest(RequestInvocationEvent event) {
+    @Override
+    protected void handleDynamicLinkRequest(String attributeName) {
         submitCycle = true;
-        RequestContext requestContext = getRequestContext();
-        HttpServletRequest req = requestContext.getRequest();
-        String attrName = req.getParameter("attrname");
-
         AMServiceProfileModel model = (AMServiceProfileModel)getModel();
 
         if (model != null) {
             try {
-                String url = appendPgSession(
-                    model.getPropertiesViewBean(attrName));
-                requestContext.getResponse().sendRedirect(url);
+                String url = appendPgSession(model.getPropertiesViewBean(attributeName));
+                getRequestContext().getResponse().sendRedirect(url);
             } catch (IOException e) {
-                setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error",
-                    e.getMessage());
+                setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
                 forwardTo();
             }
         } else {
             forwardTo();
         }
+    }
+
+    @Override
+    protected void handleDynamicValidationRequest(String attributeName) {
+        // Not used here and not required for all sub classes
+    }
+
+    @Override
+    protected Map<String, Set<String>> getAttributeValueMap() {
+        if (propertySheetModel == null) {
+            return Collections.emptyMap();
+        }
+        Map<String, Set<String>> convertedValueMap = new HashMap<String, Set<String>>();
+        @SuppressWarnings("unchecked")
+        Map<String, Object[]> attributeValueMap = propertySheetModel.getAttributeValueMap();
+        for (Map.Entry<String, Object[]> entry : attributeValueMap.entrySet()) {
+            Set<String> valueSet = new HashSet<String>();
+            Object[] objectValues = entry.getValue();
+            String[] stringValues = Arrays.copyOf(objectValues, objectValues.length, String[].class);
+            Collections.addAll(valueSet, stringValues);
+            convertedValueMap.put(entry.getKey(), valueSet);
+        }
+        return convertedValueMap;
     }
 
     protected Map getAttributeValues() {

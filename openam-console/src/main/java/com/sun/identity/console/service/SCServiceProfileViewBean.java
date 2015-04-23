@@ -39,12 +39,12 @@ import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
+import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.util.AMAuthUtils;
 import com.sun.identity.console.base.AMPropertySheet;
 import com.sun.identity.console.base.AMServiceProfile;
-import com.sun.identity.console.base.ScriptValidatorViewBean;
+import com.sun.identity.console.base.AMServiceProfileViewBeanBase;
 import com.sun.identity.console.base.model.AMAdminConstants;
-import com.sun.identity.console.base.model.AMAdminUtils;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.base.model.AMPropertySheetModel;
@@ -55,16 +55,16 @@ import com.sun.identity.console.service.model.SubConfigModel;
 import com.sun.identity.console.service.model.SubConfigModelImpl;
 import com.sun.identity.console.service.model.SubSchemaModel;
 import com.sun.identity.console.service.model.SubSchemaModelImpl;
-import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.DynamicAttributeValidator;
 import com.sun.identity.sm.SMSEntry;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.ServiceSchemaManager;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SMSUtils;
 import com.sun.web.ui.model.CCActionTableModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.html.CCRadioButton;
 import com.sun.web.ui.view.table.CCActionTable;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -72,14 +72,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
 
-public class SCServiceProfileViewBean extends ScriptValidatorViewBean {
+public class SCServiceProfileViewBean extends AMServiceProfileViewBeanBase {
     public static final String DEFAULT_DISPLAY_URL =
         "/console/service/SCServiceProfile.jsp";
     public static final String PAGE_NAME = "SCServiceProfile";
+    private static final String SCRIPT_VALIDATOR = "ScriptValidator";
 
-    private static final String validatorAttributeName = "ScriptValidator";
     private boolean populatedSubConfigTable;
 
     /**
@@ -190,8 +189,6 @@ public class SCServiceProfileViewBean extends ScriptValidatorViewBean {
                 disableButton(AMPropertySheetModel.TBL_SUB_CONFIG_BUTTON_ADD, !canCreate);
             }
         }
-        final AMPropertySheet propertySheet = (AMPropertySheet) getChild(PROPERTY_ATTRIBUTE);
-        Map<String, Set<String>> valueMap = unpersistedValueMap;
 
         if (serviceName.equals("iPlanetAMAuthHTTPBasicService")) {
             CCRadioButton radio = (CCRadioButton) getChild("iplanet-am-auth-http-basic-module-configured");
@@ -206,15 +203,12 @@ public class SCServiceProfileViewBean extends ScriptValidatorViewBean {
                     }
                 }
             }
-        } else if (serviceName.equals("iPlanetAMAuthDeviceIdMatchService")
-                || serviceName.equals("iPlanetAMAuthScriptedService")) {
-            // If this is not a dynamic request the UI is set with persisted values
-            if (!dynamicRequest) {
-                valueMap = model.getAttributeValues();
-            }
-            if (valueMap != null) {
-                propertySheet.setAttributeValues(valueMap, model);
-            }
+        }
+
+        // If this is a dynamic request the UI is set with unsaved attribute values
+        AMPropertySheet propertySheet = (AMPropertySheet) getChild(PROPERTY_ATTRIBUTE);
+        if (dynamicRequest) {
+            propertySheet.setAttributeValues(unsavedAttributeValues, model);
         }
     }
 
@@ -401,32 +395,23 @@ public class SCServiceProfileViewBean extends ScriptValidatorViewBean {
         return false;
     }
 
-    /**
-     * Retrieve the validators specified for the attribute, invoke their
-     * validate methods and display the validation messages if any are present.
-     * 
-     * @param attributeName The name of the attribute for which the validation should be done.
-     */
+    @Override
     protected void handleDynamicValidationRequest(String attributeName) {
-
         try {
-            ServiceSchemaManager serviceSchemaManager = new ServiceSchemaManager(serviceName,
-                    AMAdminUtils.getSuperAdminSSOToken());
-            ServiceSchema organizationSchema = serviceSchemaManager.getOrganizationSchema();
-            AttributeSchema attributeSchema = organizationSchema.getAttributeSchema(validatorAttributeName);
-            Set<?> defaultValues = attributeSchema.getDefaultValues();
-            final Iterator<?> javaClasses = defaultValues.iterator();
-            final List<DynamicAttributeValidator> validatorList = new ArrayList<DynamicAttributeValidator>();
-            while (javaClasses.hasNext()) {
-                final String javaClass = (String) javaClasses.next();
-                final Class<?> clazz = Class.forName(javaClass);
-                if (DynamicAttributeValidator.class.isAssignableFrom(clazz)) {
-                    validatorList.add((DynamicAttributeValidator) clazz.newInstance());
-                }
-            }
-            validateScript(attributeName, "", validatorList);
-
-        } catch (Exception e) {
+            List<Class<DynamicAttributeValidator>> validators =
+                    SMSUtils.findDynamicValidators(serviceName, SCRIPT_VALIDATOR);
+            performValidation(attributeName, ((AMServiceProfileModel)getModel()).getPageTitle(), validators);
+        } catch (SSOException e) {
+            debug.error("Failed to perform dynamic validation", e);
+            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
+        } catch (SMSException e) {
+            debug.error("Failed to perform dynamic validation", e);
+            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
+        } catch (InstantiationException e) {
+            debug.error("Failed to perform dynamic validation", e);
+            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
+        } catch (IllegalAccessException e) {
+            debug.error("Failed to perform dynamic validation", e);
             setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
         }
         forwardTo();

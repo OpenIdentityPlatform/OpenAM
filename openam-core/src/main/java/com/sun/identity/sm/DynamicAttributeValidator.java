@@ -11,11 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.sm;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,7 +41,8 @@ public interface DynamicAttributeValidator {
 
     /**
      * Retrieve the validation message. This will only be called when validation failed.
+     * @param locale The language in which the message is required.
      * @return A message that describes the failure.
      */
-    public String getValidationMessage();
+    public String getValidationMessage(Locale locale);
 }

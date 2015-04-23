@@ -38,6 +38,12 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <SubSchema name="scriptContext" inheritance="multiple" resourceName="contexts">
+                    <AttributeSchema name="ScriptValidator" type="validator" syntax="string">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.scripting.DefaultScriptValidator</Value>
+                            <Value>com.sun.identity.sm.RequiredValueValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                     <AttributeSchema name="i18nKey" type="single"/>
                     <AttributeSchema name="languages" type="list" syntax="string" i18nKey="st101">
                         <DefaultValues>
@@ -163,7 +169,7 @@
 
         <Configuration>
             <GlobalConfiguration>
-                <SubConfiguration name="AUTHORIZATION_ENTITLEMENT_CONDITION" id="scriptContext" i18nKey="someKey">
+                <SubConfiguration name="AUTHORIZATION_ENTITLEMENT_CONDITION" id="scriptContext">
                     <AttributeValuePair>
                         <Attribute name="i18nKey"/>
                         <Value>script-type-01</Value>

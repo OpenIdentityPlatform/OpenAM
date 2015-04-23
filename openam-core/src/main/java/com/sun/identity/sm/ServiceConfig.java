@@ -586,19 +586,6 @@ public class ServiceConfig {
     }
 
     /**
-     * Retrieve a list of dynamic validators for a specific attribute from the {@link ServiceSchemaImpl}.
-     *
-     * @param attributeName The name of the attribute for which the validators were specified.
-     * @return A list of {@link DynamicAttributeValidator}s associated with the given attribute or
-     * an empty list if none were found.
-     * @throws SMSException If the validator class can not be instantiated.
-     * @throws InvalidAttributeNameException If the attribute is null or can not be found.
-     */
-    public List<DynamicAttributeValidator> getDynamicValidators(String attributeName) throws SMSException {
-        return ss.getDynamicPluginValidators(attributeName);
-    }
-
-    /**
      * Removes a configuration parameter from the service configuration.
      * 
      * @param attrName

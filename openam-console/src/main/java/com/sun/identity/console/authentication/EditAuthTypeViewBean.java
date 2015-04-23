@@ -39,24 +39,27 @@ import com.iplanet.jato.RequestManager;
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
+import com.iplanet.sso.SSOException;
+import com.sun.identity.console.authentication.model.AuthProfileModelImpl;
 import com.sun.identity.console.authentication.model.AuthPropertiesModel;
 import com.sun.identity.console.authentication.model.AuthPropertiesModelImpl;
-import com.sun.identity.console.authentication.model.AuthProfileModelImpl;
 import com.sun.identity.console.base.AMPropertySheet;
 import com.sun.identity.console.base.AMServiceProfile;
-import com.sun.identity.console.base.ScriptValidatorViewBean;
+import com.sun.identity.console.base.AMServiceProfileViewBeanBase;
 import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.sm.DynamicAttributeValidator;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SMSUtils;
 import com.sun.web.ui.view.alert.CCAlert;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
 
-public class EditAuthTypeViewBean extends ScriptValidatorViewBean {
+public class EditAuthTypeViewBean extends AMServiceProfileViewBeanBase {
 
     public static final String DEFAULT_DISPLAY_URL = "/console/authentication/EditAuthType.jsp";
     public static final String SERVICE_TYPE = "authServiceType";
@@ -92,20 +95,24 @@ public class EditAuthTypeViewBean extends ScriptValidatorViewBean {
         }
     }
 
-    /**
-     * Retrieve the validators specified for the attribute, invoke their validate methods
-     * and display the validation messages if any are present.
-     * 
-     * @param attributeName The name of the attribute for which the validation should be done.
-     */
+    @Override
     protected void handleDynamicValidationRequest(String attributeName) {
         try {
-            final String instance = (String) getPageSessionAttribute(SERVICE_TYPE);
-            final List<DynamicAttributeValidator> validatorList = getAuthModel().getDynamicValidators(instance,
-                    attributeName);
-            validateScript(attributeName, instance,  validatorList);
-
-        } catch (Exception e) {
+            String instance = (String) getPageSessionAttribute(SERVICE_TYPE);
+            List<Class<DynamicAttributeValidator>> validators =
+                    SMSUtils.findDynamicValidators(serviceName, "ScriptValidator");
+            performValidation(attributeName, instance, validators);
+        } catch (SSOException e) {
+            debug.error("Failed to perform dynamic validation", e);
+            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
+        } catch (SMSException e) {
+            debug.error("Failed to perform dynamic validation", e);
+            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
+        } catch (InstantiationException e) {
+            debug.error("Failed to perform dynamic validation", e);
+            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
+        } catch (IllegalAccessException e) {
+            debug.error("Failed to perform dynamic validation", e);
             setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
         }
         forwardTo();
@@ -122,7 +129,7 @@ public class EditAuthTypeViewBean extends ScriptValidatorViewBean {
         final AuthPropertiesModel model = getAuthModel();
         final String instance = (String) getPageSessionAttribute(SERVICE_TYPE);
         final AMPropertySheet propertySheet = (AMPropertySheet) getChild(PROPERTY_ATTRIBUTE);
-        Map valueMap = unpersistedValueMap;
+        Map valueMap = unsavedAttributeValues;
 
         if (model != null && propertySheet != null) {
             // If this is not a dynamic request the UI is set with persisted values

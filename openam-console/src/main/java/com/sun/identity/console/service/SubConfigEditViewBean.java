@@ -34,10 +34,11 @@ import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
-import com.sun.identity.console.base.AMPrimaryMastHeadViewBean;
+import com.iplanet.sso.SSOException;
 import com.sun.identity.console.base.AMPostViewBean;
 import com.sun.identity.console.base.AMPropertySheet;
 import com.sun.identity.console.base.AMServiceProfile;
+import com.sun.identity.console.base.DynamicRequestViewBean;
 import com.sun.identity.console.base.model.AMAdminUtils;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModel;
@@ -46,13 +47,18 @@ import com.sun.identity.console.base.model.SMSubConfig;
 import com.sun.identity.console.components.view.html.SerializedField;
 import com.sun.identity.console.service.model.SubConfigModel;
 import com.sun.identity.console.service.model.SubConfigModelImpl;
+import com.sun.identity.sm.DynamicAttributeValidator;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SMSUtils;
 import com.sun.web.ui.model.CCActionTableModel;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import com.sun.web.ui.view.table.CCActionTable;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -60,20 +66,20 @@ import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
-public class SubConfigEditViewBean
-    extends AMPrimaryMastHeadViewBean
-{
+public class SubConfigEditViewBean extends DynamicRequestViewBean {
+
     public static final String DEFAULT_DISPLAY_URL =
         "/console/service/SubConfigEdit.jsp";
     private static final String PGTITLE_TWO_BTNS = "pgtitleTwoBtns";
     private static final String PROPERTY_ATTRIBUTE = "propertyAttributes";
-    private static final String ATTR_SUBCONFIG_NAME = "tfSubConfigName";
 
     private CCPageTitleModel ptModel;
     private AMPropertySheetModel propertySheetModel;
     private boolean init;
     private boolean submitCycle;
     private boolean populatedSubConfigTable;
+
+    protected String serviceName;
 
     /**
      * Creates a view to prompt user for services to be added to realm.
@@ -88,6 +94,7 @@ public class SubConfigEditViewBean
             String serviceName = (String)getPageSessionAttribute(
                 AMServiceProfile.SERVICE_NAME);
             if ((serviceName != null) && (serviceName.trim().length() > 0)) {
+                this.serviceName = serviceName;
                 super.initialize();
                 createPageTitleModel();
                 createPropertyModel();
@@ -222,8 +229,12 @@ public class SubConfigEditViewBean
             propertySheetModel.clear();
 
             try {
-                ps.setAttributeValues(
-                    model.getSubConfigAttributeValues(), model);
+                // If this is a dynamic request the UI is set with unsaved attribute values
+                if (dynamicRequest) {
+                    ps.setAttributeValues(unsavedAttributeValues, model);
+                } else {
+                    ps.setAttributeValues(model.getSubConfigAttributeValues(), model);
+                }
             } catch (AMConsoleException a) {
                 setInlineAlertMessage(CCAlert.TYPE_WARNING,
                     "message.warning", "noproperties.message");
@@ -352,8 +363,7 @@ public class SubConfigEditViewBean
     }
 
     private void addViewBeanClassToPageSession() {
-        ArrayList urls = (ArrayList)getPageSessionAttribute(
-            AMServiceProfile.PG_SESSION_PROFILE_VIEWBEANS);
+        ArrayList urls = (ArrayList)getPageSessionAttribute(AMServiceProfile.PG_SESSION_PROFILE_VIEWBEANS);
         if (urls == null) {
             urls = new ArrayList();
             setPageSessionAttribute(
@@ -414,8 +424,7 @@ public class SubConfigEditViewBean
     public void handleTblSubConfigHrefNameRequest(RequestInvocationEvent event){
         String configName = (String)getDisplayFieldValue(
             AMPropertySheetModel.TBL_SUB_CONFIG_HREF_NAME);
-        ArrayList subConfigNames = (ArrayList)getPageSessionAttribute(
-            AMServiceProfile.PG_SESSION_SUB_CONFIG_IDS);
+        ArrayList subConfigNames = (ArrayList)getPageSessionAttribute(AMServiceProfile.PG_SESSION_SUB_CONFIG_IDS);
         if (subConfigNames == null) {
             subConfigNames = new ArrayList();
             subConfigNames.add("/");
@@ -438,6 +447,47 @@ public class SubConfigEditViewBean
 
     protected boolean startPageTrail() {
         return false;
+    }
+
+    @Override
+    protected void handleDynamicValidationRequest(String attributeName) {
+        try {
+            List<Class<DynamicAttributeValidator>> validators =
+                    SMSUtils.findDynamicValidators(serviceName, "ScriptValidator");
+            performValidation(attributeName, ((SubConfigModel)getModel()).getDisplayName(), validators);
+        } catch (SSOException e) {
+            debug.error("Failed to perform dynamic validation", e);
+            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
+        } catch (SMSException e) {
+            debug.error("Failed to perform dynamic validation", e);
+            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
+        } catch (InstantiationException e) {
+            debug.error("Failed to perform dynamic validation", e);
+            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
+        } catch (IllegalAccessException e) {
+            debug.error("Failed to perform dynamic validation", e);
+            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
+        }
+        forwardTo();
+    }
+
+    @Override
+    protected void handleDynamicLinkRequest(String attributeName) {
+        // Not used in this class
+    }
+
+    @Override
+    protected Map<String, Set<String>> getAttributeValueMap() {
+        try {
+            SubConfigModel model = (SubConfigModel)getModel();
+            AMPropertySheet ps = (AMPropertySheet)getChild(PROPERTY_ATTRIBUTE);
+            return ps.getAttributeValues(model.getSubConfigAttributeValues().keySet());
+        } catch (AMConsoleException e) {
+            debug.error("Could not retrieve attribute values", e);
+        } catch (ModelControlException e) {
+            debug.error("Could not retrieve attribute values", e);
+        }
+        return Collections.emptyMap();
     }
 
 }

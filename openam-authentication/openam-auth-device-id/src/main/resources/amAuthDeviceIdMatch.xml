@@ -44,7 +44,7 @@
                                  type="validator"
                                  syntax="string">
                     <DefaultValues>
-                        <Value>org.forgerock.openam.authentication.modules.scripted.ScriptValidator</Value>
+                        <Value>org.forgerock.openam.authentication.modules.scripted.AuthenticationScriptValidator</Value>
                         <Value>com.sun.identity.sm.RequiredValueValidator</Value>
                     </DefaultValues>
                 </AttributeSchema>
@@ -114,7 +114,7 @@
                                      type="validator"
                                      syntax="string">
                         <DefaultValues>
-                            <Value>org.forgerock.openam.authentication.modules.scripted.ScriptValidator</Value>
+                            <Value>org.forgerock.openam.authentication.modules.scripted.AuthenticationScriptValidator</Value>
                             <Value>com.sun.identity.sm.RequiredValueValidator</Value>
                         </DefaultValues>
                     </AttributeSchema>

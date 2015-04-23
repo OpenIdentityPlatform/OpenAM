@@ -27,16 +27,14 @@
  */
 
 /**
- * Portions Copyright 2014 ForgeRock AS
+ * Portions Copyright 2014-2015 ForgeRock AS
  */
 
 package com.sun.identity.console.authentication.model;
 
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModel;
-import com.sun.identity.sm.DynamicAttributeValidator;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -95,15 +93,4 @@ public interface AuthPropertiesModel extends AMModel
      */
     boolean hasAuthAttributes(String type);
 
-    /**
-     * Retrieve a list of dynamic validators for a specific attribute.
-     *
-     * @param instance The name of the authentication instance.
-     * @param attributeName The name of the attribute for which the validators were specified.
-     * @return A list of {@link DynamicAttributeValidator}s associated with the given attribute or
-     * an empty list if none were found.
-     * @throws AMConsoleException If a Service Management related error occurs, the validator class
-     * can not be instantiated, the attribute is null or the attribute can not be found.
-     */
-    List<DynamicAttributeValidator> getDynamicValidators(String instance, String attributeName) throws AMConsoleException;
 }

@@ -27,16 +27,18 @@
  */
 
 /*
- * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2013-2014 Nomura Research Institute, Ltd
  */
 
 package com.sun.identity.console.property;
 
+import com.iplanet.sso.SSOException;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.DynamicAttributeValidator;
+import com.sun.identity.sm.SMSUtils;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
@@ -50,7 +52,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -133,10 +134,8 @@ public abstract class PropertyXMLBuilderBase
     protected boolean allAttributesReadonly;
     protected String currentRealm;
 
-    private static final String NO_VALIDATOR = "no";
     private static final String VALIDATE_LABEL = "label.validate";
     private static final String UPLOAD_LABEL = "label.upload";
-    private final Set<String> dynamicValidatorsFound = new HashSet<String>();
 
     static String getTagClassName(AttributeSchema as) {
         String tagClassName = null;
@@ -1122,46 +1121,14 @@ public abstract class PropertyXMLBuilderBase
      * @return True if a validator was found.
      */
     private boolean hasDynamicValidator(AttributeSchema as) {
-        final String validatorName = as.getValidator();
-
-        if (validatorName != null && !validatorName.trim().isEmpty()
-                && !NO_VALIDATOR.equalsIgnoreCase(validatorName)
-                && !dynamicValidatorsFound.contains(validatorName)) {
-
-            final List<AttributeSchema> validatorSchemaList = new ArrayList<AttributeSchema>();
-            try {
-                final ServiceSchema serviceSchema = svcSchemaManager.getSchema(SchemaType.ORGANIZATION);
-                if (serviceSchema != null) {
-                    final Iterator ssNames = serviceSchema.getSubSchemaNames().iterator();
-                    while (ssNames.hasNext()) {
-                        final ServiceSchema subSchema = serviceSchema.getSubSchema((String) ssNames.next());
-                        final AttributeSchema validatorSchema = subSchema.getAttributeSchema(validatorName);
-                        if (validatorSchema != null) {
-                            validatorSchemaList.add(validatorSchema);
-                        }
-                    }
-                }
-            } catch (SMSException smse) {
-                debug.warning("PropertyXMLBuilderBase.hasDynamicValidator " + smse.getMessage());
-            }
-
-            for (AttributeSchema validatorSchema : validatorSchemaList) {
-                final Iterator defaultValueIterator = validatorSchema.getDefaultValues().iterator();
-                while (defaultValueIterator.hasNext()) {
-                    final String javaClassName = (String)defaultValueIterator.next();
-                    try {
-                        final Class clazz = Class.forName(javaClassName);
-                        if (DynamicAttributeValidator.class.isAssignableFrom(clazz)) {
-                            dynamicValidatorsFound.add(validatorName);
-                            break;
-                        }
-                    } catch(ClassNotFoundException cnfe) {
-                        debug.warning("PropertyXMLBuilderBase.hasDynamicValidator " + cnfe.getMessage());
-                    }
-                }
-            }
+        try {
+            return !SMSUtils.findDynamicValidators(serviceName, as.getValidator()).isEmpty();
+        } catch (SSOException e) {
+            debug.error("PropertyXMLBuilderBase.hasDynamicValidator failed.", e);
+        } catch (SMSException e) {
+            debug.error("PropertyXMLBuilderBase.hasDynamicValidator failed.", e);
         }
-        return dynamicValidatorsFound.contains(validatorName);
+        return false;
     }
     
     protected void buildSchemaTypeXML(

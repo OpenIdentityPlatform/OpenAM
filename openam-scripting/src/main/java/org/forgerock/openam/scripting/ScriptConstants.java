@@ -55,11 +55,15 @@ public final class ScriptConstants {
     public static final String BLACK_LIST = "blackList";
     public static final String USE_SECURITY_MANAGER = "useSecurityManager";
     public static final String ENGINE_CONFIGURATION = "EngineConfiguration";
+    public static final String DEFAULT_LANGUAGE = "defaultLanguage";
 
     public static final int DEFAULT_CORE_THREADS = 10;
     public static final int DEFAULT_MAX_THREADS = 10;
     public static final int DEFAULT_QUEUE_SIZE = 10;
     public static final long DEFAULT_IDLE_TIMEOUT_SECONDS = 60l; // Seconds
+
+    public static final String SCRIPT_ERROR_MESSAGE = "validation-error-message";
+    public static final String SCRIPT_ERROR_DETAIL = "validation-error-detail";
 
     /**
      * The context in which a script will be used.
