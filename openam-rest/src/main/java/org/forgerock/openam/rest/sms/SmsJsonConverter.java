@@ -18,6 +18,7 @@ package org.forgerock.openam.rest.sms;
 
 import com.sun.identity.common.configuration.MapValueParser;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchema;
@@ -41,6 +42,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -110,6 +112,8 @@ public class SmsJsonConverter {
             attributeSchemaConverter = new DoubleAttributeSchemaValue();
         } else if (isInteger(syntax)) {
             attributeSchemaConverter = new IntegerAttributeSchemaValue();
+        } else if (isScript(syntax)) {
+            attributeSchemaConverter = new ScriptAttributeSchemaValue();
         } else {
             attributeSchemaConverter = new StringAttributeSchemaValue();
         }
@@ -232,6 +236,10 @@ public class SmsJsonConverter {
     private boolean isDouble(AttributeSchema.Syntax syntax) {
         return syntax.equals(AttributeSchema.Syntax.DECIMAL) || syntax.equals(AttributeSchema.Syntax
                 .DECIMAL_NUMBER) || syntax.equals(AttributeSchema.Syntax.DECIMAL_RANGE);
+    }
+
+    private boolean isScript(AttributeSchema.Syntax syntax) {
+        return syntax.equals(AttributeSchema.Syntax.SCRIPT);
     }
 
     /**
@@ -440,6 +448,22 @@ public class SmsJsonConverter {
         @Override
         public String fromJson(Object json) {
             return Integer.toString((Integer) json);
+        }
+    }
+
+    private static class ScriptAttributeSchemaValue implements AttributeSchemaConverter {
+        @Override
+        public Object toJson(String value) {
+            try {
+                return Base64.encode(value.getBytes("UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                throw new IllegalStateException("Script encoding failed", e);
+            }
+        }
+
+        @Override
+        public String fromJson(Object json) {
+            return Base64.decodeAsUTF8String((String)json);
         }
     }
 }
