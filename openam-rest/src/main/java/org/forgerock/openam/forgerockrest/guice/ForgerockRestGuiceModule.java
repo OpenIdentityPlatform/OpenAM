@@ -19,10 +19,12 @@ package org.forgerock.openam.forgerockrest.guice;
 import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.*;
 import static org.forgerock.openam.uma.UmaConstants.*;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -74,6 +76,7 @@ import org.forgerock.openam.rest.sms.SmsGlobalSingletonProvider;
 import org.forgerock.openam.rest.sms.SmsGlobalSingletonProviderFactory;
 import org.forgerock.openam.rest.sms.SmsRequestHandler;
 import org.forgerock.openam.rest.sms.SmsRequestHandlerFactory;
+import org.forgerock.openam.rest.sms.SmsServerPropertiesResource;
 import org.forgerock.openam.rest.sms.SmsSingletonProvider;
 import org.forgerock.openam.rest.sms.SmsSingletonProviderFactory;
 import org.forgerock.openam.rest.uma.UmaIdRepoCreationListener;
@@ -314,6 +317,24 @@ public class ForgerockRestGuiceModule extends AbstractModule {
         definitions.put("evaluateTree", evaluateDefinition);
 
         return definitions;
+    }
+
+    @Provides
+    @Singleton
+    @Named("ServerAttributeSyntax")
+    public Properties getServerAttributeSyntax() throws IOException {
+        Properties syntaxProperties = new Properties();
+        syntaxProperties.load(getClass().getClassLoader().getResourceAsStream("validserverconfig.properties"));
+        return syntaxProperties;
+    }
+
+    @Provides
+    @Singleton
+    @Named("ServerAttributeTitles")
+    public Properties getServerAttributeTitles() throws IOException {
+        Properties titleProperties = new Properties();
+        titleProperties.load(getClass().getClassLoader().getResourceAsStream("amConsole.properties"));
+        return titleProperties;
     }
 
     /**

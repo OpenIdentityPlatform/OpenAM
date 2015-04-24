@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.RoutingMode;
+import org.forgerock.json.resource.SingletonResourceProvider;
 import org.forgerock.json.resource.VersionSelector;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.restlet.AccessTokenFlowFinder;
@@ -69,6 +70,7 @@ import org.forgerock.openam.rest.scripting.ScriptResource;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openam.rest.service.ServiceRouter;
 import org.forgerock.openam.rest.sms.SmsRequestHandlerFactory;
+import org.forgerock.openam.rest.sms.SmsServerPropertiesResource;
 import org.forgerock.openam.rest.uma.UmaConfigurationResource;
 import org.forgerock.openam.rest.uma.UmaPolicyResource;
 import org.forgerock.openam.rest.uma.UmaPolicyResourceAuthzFilter;
@@ -298,6 +300,10 @@ public class RestEndpoints {
         rootRealmRouter.route("/global-config")
                 .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
                 .forVersion("1.0").to(RoutingMode.STARTS_WITH, smsRequestHandlerFactory.create(SchemaType.GLOBAL));
+
+        rootRealmRouter.route("/global-config/servers/{serverName}/properties/{tab}")
+                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .forVersion("1.0").to(InjectorHolder.getInstance(SmsServerPropertiesResource.class));
 
         VersionBehaviourConfigListener.bindToServiceConfigManager(rootRealmRouter);
         VersionBehaviourConfigListener.bindToServiceConfigManager(dynamicRealmRouter);
