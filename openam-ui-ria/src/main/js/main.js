@@ -25,12 +25,12 @@
 /*global require, define, window */
 require.config({
     paths: {
-        "backbone":            "libs/backbone-1.1.2-min",
-        "backbone.paginator":  "libs/backbone-paginator.min",
+        "backbone"           : "libs/backbone-1.1.2-min",
+        "backbone.paginator" : "libs/backbone-paginator.min",
         "backbone-relational": "libs/backbone-relational",
 
-        "backgrid":           "libs/backgrid.min",
-        "backgrid.filter":    "libs/backgrid-filter.min",
+        "backgrid"          : "libs/backgrid.min",
+        "backgrid.filter"   : "libs/backgrid-filter.min",
         "backgrid.paginator": "libs/backgrid-paginator.min",
 
         "bootstrap"       : "libs/bootstrap.min",
@@ -42,7 +42,7 @@ require.config({
         "i18next"         : "libs/i18next-1.7.3-min",
         "jquery"          : "libs/jquery-2.1.1-min",
         "js2form"         : "libs/js2form-2.0",
-        "jsonEditor"      : "libs/jsoneditor.min",
+        "jsonEditor"      : "libs/jsoneditor-0.7.9-min",
         "moment"          : "libs/moment-2.8.1-min",
         "qrcode"          : "libs/qrcode-1.0.0-min",
         "selectize"       : "libs/selectize-0.11.2-min",
