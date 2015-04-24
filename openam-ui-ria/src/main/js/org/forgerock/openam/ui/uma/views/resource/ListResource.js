@@ -25,18 +25,19 @@
 /*global define, $, _, Backgrid, Backbone*/
 
 define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
-    "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/uma/delegates/UMADelegate",
-    "org/forgerock/openam/ui/uma/util/BackgridUtils",
     "backgrid",
+    "org/forgerock/openam/ui/uma/util/BackgridUtils",
     "bootstrap-dialog",
-    "org/forgerock/openam/ui/common/util/RealmHelper"
-], function(MessageManager, AbstractView, Configuration, EventManager, Router, Constants, UMADelegate, BackgridUtils, Backgrid, BootstrapDialog, RealmHelper) {
+    "org/forgerock/openam/ui/uma/views/share/CommonShare",
+    "org/forgerock/commons/ui/common/main/Configuration",
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/components/Messages",
+    "org/forgerock/openam/ui/common/util/RealmHelper",
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/openam/ui/uma/delegates/UMADelegate"
+], function(AbstractView, Backgrid, BackgridUtils, BootstrapDialog, CommonShare, Configuration, Constants, EventManager, MessageManager, RealmHelper, Router, UMADelegate) {
 
     var ListResource = AbstractView.extend({
         template: "templates/uma/views/resource/ListResource.html",
@@ -149,15 +150,12 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
                         className: "icon-share",
                         events: { "click": "share" },
                         share: function(e) {
-                            self.data.currentResourceSetId = this.model.get('_id');
-
-                            EventManager.sendEvent(Constants.EVENT_SHOW_DIALOG,{
-                                route: Router.configuration.routes.dialogShare,
-                                noViewChange: true
-                            });
+                            var shareView = new CommonShare();
+                            shareView.data.currentResourceSetId = this.model.get('_id');
+                            shareView.renderDialog();
                         },
                         render: function () {
-                            this.$el.attr({"title": "Share the resource"});
+                            this.$el.attr({"title": $.t("uma.share.shareResource")});
                             this.delegateEvents();
                             return this;
                         }

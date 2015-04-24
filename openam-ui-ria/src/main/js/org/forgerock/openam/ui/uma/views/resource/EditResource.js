@@ -33,9 +33,9 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
     'org/forgerock/commons/ui/common/main/Router',
     'org/forgerock/commons/ui/common/util/UIUtils',
     'org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy',
-    'org/forgerock/openam/ui/uma/views/share/BootstrapModalShare',
+    'org/forgerock/openam/ui/uma/views/share/CommonShare',
     'bootstrap-dialog'
-], function(Messages, AbstractView, Backgrid, BackgridUtils, Constants, EventManager, Router, UIUtils, UMAResourceSetWithPolicy, BootstrapModalShare, BootstrapDialog) {
+], function(Messages, AbstractView, Backgrid, BackgridUtils, Constants, EventManager, Router, UIUtils, UMAResourceSetWithPolicy, CommonShare, BootstrapDialog) {
     var EditResource = AbstractView.extend({
         initialize: function(options) {
             this.model = null;
@@ -86,8 +86,9 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
             });
         },
         onShare: function() {
-            BootstrapModalShare.data.currentResourceSetId = this.model.id;
-            BootstrapModalShare.render();        
+            var shareView = new CommonShare();
+            shareView.data.currentResourceSetId = this.model.id;
+            shareView.renderDialog();
         },
         render: function(args, callback) {
             var collection, grid, id = null, options, paginator, RevokeCell, SelectizeCell, self = this;

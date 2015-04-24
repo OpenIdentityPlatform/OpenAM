@@ -27,15 +27,15 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "backgrid",
     "org/forgerock/openam/ui/uma/util/BackgridUtils",
+    "bootstrap-dialog",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/openam/ui/uma/views/share/ShareCounter",
     'org/forgerock/openam/ui/uma/models/UMAPolicy',
     'org/forgerock/openam/ui/uma/models/UMAPolicyPermission',
     'org/forgerock/openam/ui/uma/models/UMAPolicyPermissionScope',
-    'org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy',
-    "org/forgerock/openam/ui/uma/models/User"
-], function(AbstractView, Backgrid, BackgridUtils, Constants, EventManager, ShareCounter, UMAPolicy, UMAPolicyPermission, UMAPolicyPermissionScope, UMAResourceSetWithPolicy, User) {
+    'org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy'
+], function(AbstractView, Backgrid, BackgridUtils, BootstrapDialog, Constants, EventManager, ShareCounter, UMAPolicy, UMAPolicyPermission, UMAPolicyPermissionScope, UMAResourceSetWithPolicy) {
     var CommonShare = AbstractView.extend({
         initialize: function(options) {
             this.parentModel = null;
@@ -79,6 +79,29 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
             }
 
             return syncRequired;
+        },
+
+        renderDialog: function(callback) {
+            var self = this,
+                data = {},
+                args = {
+                    type: BootstrapDialog.TYPE_DEFAULT,
+                    title: $.t("uma.share.shareResource"),
+                    size: BootstrapDialog.SIZE_WIDE,
+                    cssClass: "shareDialog",
+                    buttons: [{
+                        label: $.t("common.form.done"),
+                        cssClass: "btn-primary",
+                        action: function(dialog){
+                            dialog.close();
+                        }
+                    }],
+                    onshow: function(dialog){
+                        self.element = dialog.$modalBody;
+                        self.render([self.data.currentResourceSetId, self.data.dialog], callback);
+                    }
+                };
+            BootstrapDialog.show(args);
         },
 
         render: function(args, callback) {

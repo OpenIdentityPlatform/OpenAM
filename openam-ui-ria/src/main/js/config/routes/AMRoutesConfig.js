@@ -92,13 +92,6 @@ define("config/routes/AMRoutesConfig", [
             pattern: "uma/resources/",
             role: "ui-user"
         },
-        "dialogShare": {
-            base: "editResource",
-            dialog: "org/forgerock/openam/ui/uma/views/share/DialogShare",
-            role: "ui-user",
-            url: /^uma\/resources\/$/,
-            pattern: "uma/resources/"
-        },
         "editResource": {
             view: "org/forgerock/openam/ui/uma/views/resource/EditResource",
             url: /^uma\/resources\/(.*?)(?:\/){0,1}$/,
@@ -111,13 +104,7 @@ define("config/routes/AMRoutesConfig", [
             defaults: [""],
             role: "ui-user",
             pattern: "uma/resources/"
-        },/*
-        "listSubject": {
-            view: "org/forgerock/openam/ui/uma/views/subject/SubjectListView",
-            url: /^uma\/resources\/(.+?)\/(users)\//,
-            role: "ui-user",
-            pattern: "uma/resources/?/users/"
-        },*/
+        },
         "baseShare": {
             view: "org/forgerock/openam/ui/uma/views/share/BaseShare",
             url: /^uma\/share\/(.*?)(?:\/){0,1}$/,
@@ -125,6 +112,13 @@ define("config/routes/AMRoutesConfig", [
             defaults: [""],
             role: "ui-user"
         },
+        /*
+        "listSubject": {
+            view: "org/forgerock/openam/ui/uma/views/subject/SubjectListView",
+            url: /^uma\/resources\/(.+?)\/(users)\//,
+            role: "ui-user",
+            pattern: "uma/resources/?/users/"
+        },*/
         "listHistory": {
             view: "org/forgerock/openam/ui/uma/views/history/ListHistory",
             role: "ui-user",

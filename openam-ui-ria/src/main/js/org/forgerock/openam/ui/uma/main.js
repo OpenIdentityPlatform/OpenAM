@@ -37,6 +37,5 @@ define([
     "./views/resource/ListResource",
     "./views/share/BaseShare",
     "./views/share/CommonShare",
-    "./views/share/DialogShare",
     "./views/share/ShareCounter"
 ]);

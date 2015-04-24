@@ -46,8 +46,7 @@ define("config/AppConfiguration", [
                         UserProfileView : "org/forgerock/commons/ui/user/profile/UserProfileView",
                         LoginDialog : "org/forgerock/openam/ui/user/login/RESTLoginDialog",
                         RegisterView : "org/forgerock/openam/ui/user/profile/RegisterView",
-                        ChangeSecurityDataDialog : "org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog",
-                        DialogShare : "org/forgerock/openam/ui/uma/views/share/DialogShare"
+                        ChangeSecurityDataDialog : "org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog"
                     }
                 },
                 {

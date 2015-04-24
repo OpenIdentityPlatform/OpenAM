@@ -24,10 +24,6 @@
 
 /*global define, require, window, _*/
 
-/**
- * @author Halina Shabuldayeva
- */
-
 define("config/process/AMConfig", [
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",

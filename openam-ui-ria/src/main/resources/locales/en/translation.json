@@ -398,6 +398,7 @@
             }
         },
         "share": {
+            "shareResource": "Share the resource",
             "people": "Add or select people to share your resource with",
             "permission": "Select Permission",
             "share": "Share",

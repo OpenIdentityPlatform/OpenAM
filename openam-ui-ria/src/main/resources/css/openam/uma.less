@@ -141,7 +141,7 @@ span.item-button-panel {
 
 .selectize-control.multi .selectize-input {
 
-    padding: 6px 5px 2px 5px;
+    padding: 5px;
     margin: 5px 0 0 0;
     border-radius: 0;
     border-top-color: #b7b7b7;
@@ -183,10 +183,10 @@ html .selectize-dropdown .optgroup-header{
 
     .selectize-control.multi .selectize-input > div {
         &:hover, &.active{
-                background: #A4CAE7;
-                color: #095390;
-                border: 1px solid #90A7BA;
-                cursor: auto;
+            background: #A4CAE7;
+            color: #095390;
+            border: 1px solid #90A7BA;
+            cursor: auto;
         }
     }
 
@@ -201,7 +201,7 @@ html .selectize-dropdown .optgroup-header{
 
 
 .selectize-control.single .selectize-input{
-    padding:6px 5px 2px 5px;
+    padding:5px;
     border-radius: 0;
 }
 
@@ -250,7 +250,7 @@ body, .modal-open {
         }
     }
     img {
-    float: left;
+        float: left;
     }
 }
 
@@ -294,8 +294,7 @@ body, .modal-open {
         float:right;
     }
 
-
-    .backgrid{
+    .backgrid {
 
         .string-cell, .uri-cell, .email-cell,  .string-cell.editor input[type=text],  .uri-cell.editor input[type=text], .email-cell.editor input[type=text], .datetime-cell {
             text-align: left;
@@ -487,15 +486,14 @@ body, .modal-open {
     }
 
     #footerShare{
-        margin: 15px -10px -20px -10px;
+        margin: 5px -15px -15px;
         border-top: 1px solid rgb(213, 213, 213);
         padding: 15px;
-        padding-bottom: 0px;
         background-color: #eee;
         border-radius: 0 0 5px 5px;
         #footerNav{
 
-            margin: 18px 0 0;
+            margin: 9px 0;
             font-size: 13px;
             line-height: 13px;
             a {
@@ -519,6 +517,7 @@ body, .modal-open {
 
         #footerActions {
             float:right;
+            margin-bottom: 0px;
         }
 
         #footerNav {
@@ -595,10 +594,6 @@ body, .modal-open {
     opacity: 0.5;
 }
 
-#dialogs #footerShare {
-    margin: 15px -15px -15px -15px;
-}
-
 .border-circle-32 {
     height: 32px;
     border-radius: 21px;
@@ -609,6 +604,14 @@ body, .modal-open {
 
 @media (min-width: 768px) {
     #subNavBar .nav-subnav > li.active > a:after {
-      border-bottom: 6px solid #eee;
+        border-bottom: 6px solid #eee;
+    }
+}
+
+.shareDialog {
+    .modal-footer {
+        position: relative;
+        margin-top: -65px;
+        float: right;
     }
 }
