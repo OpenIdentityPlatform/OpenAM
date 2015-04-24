@@ -108,6 +108,17 @@ define("config/process/AMConfig", [
             processDescription: function(event, ChangeSecurityDataDialog) {
                 ChangeSecurityDataDialog.show(event);
             }
+        },
+        {
+            startEvent: Constants.EVENT_RETURN_TO_AM_CONSOLE,
+            description: "",
+            dependencies: [
+                "org/forgerock/commons/ui/common/main/Configuration"
+            ],
+            processDescription: function (event, conf) {
+                var subRealm = conf.globalData.auth.subRealm || "/";
+                window.location.href = "/" + Constants.context + "/realm/RMRealm?RMRealm.tblDataActionHref=" + encodeURIComponent(subRealm);
+            }
         }
 
     ];

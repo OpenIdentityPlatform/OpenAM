@@ -1,0 +1,60 @@
+<div class="back-bar">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li><a href="{{consolePath}}">Console</a></li>
+            <li><a href="#console/realm">{{realm}}</a></li>
+            <li><a href="#console/realms/authentication/">Authentication</a></li>
+            <li class="active">Module</li>
+            <li class="pull-right back-button"><i class="fa fa-angle-left "></i> <a href="#console/realms/authentication/"> back</a></li>
+        </ol>
+    </div>
+</div>
+<div class="container">
+    <div class="page-header clearfix">
+        <span class="header-icon pull-left"><i class="fa fa-cubes"></i></span>
+      	<h4 class="page-type">Module_type</h4>
+        <h1>{{name}}</h1>
+  	</div>
+
+    <div class="console-tabs">
+        <div class=" tab-menu">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="active"><a href="#standard" role="tab"  data-toggle="tab" aria-expanded="true">Standard</a></li>
+                <li><a href="#advanced" role="tab" data-toggle="tab" aria-expanded="false">Advanced</a></li>
+            </ul>
+        </div>
+
+        <div class="tab-content clearfix">
+
+            <div role="tabpanel" class="tab-pane active" id="standard">
+                <div class="tab-pane-body">
+                    <div class="panel-body">
+                        <!-- page content here -->
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div role="tabpanel" class="tab-pane" id="advanced">
+                <div class="tab-pane-body">
+                    <div class="panel-body">
+                        <!-- page content here -->
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="tab-pane-footer clearfix">
+                <div class="pull-right">
+                    <button class="btn btn-default btn-sm" type="button">Cancel</button>
+                    <input id="addEditConnector" name="addEditButton" class="btn btn-primary btn-sm" type="button" value="Save">
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
