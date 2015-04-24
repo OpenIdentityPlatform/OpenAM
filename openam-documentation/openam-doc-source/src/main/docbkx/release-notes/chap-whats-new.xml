@@ -61,7 +61,7 @@
      >
      <citetitle>To Update OpenAM From 11.0</citetitle>
     </link>
-    .
+
    </para>
 
    <para>
@@ -96,44 +96,22 @@
   <title>Security Advisories</title>
 
   <para>
-   Security advisories have been issued for the OpenAM Core Server
-   and Server Only components and are present in versions of OpenAM
-   including 12.0.0, 11.0.x, 10.1.0-Xpress, 10.0.x, 9.x and possibly previous
-   versions.
-  </para>
-  <para>
-   These advisories provide guidance on how to ensure your deployments can be
-   secured. Workarounds or patches are available for all of the issues, which
-   are also included in the 11.0.3 release.
+   ForgeRock issues security advisories in collaboration with our customers and
+   the open source community to address any security vulnerabilities transparently
+   and rapidly. ForgeRock's security advisory policy governs the process on
+   how security issues are submitted, received, and evaluated as well as the
+   timeline for the issuance of security advisories and patches.
   </para>
 
   <para>
-   The maximum severity of issues in this advisory is "Critical".
-   Deployers should take immediate steps as outlined in the advisory and
-   apply the relevant update(s) at the earliest opportunity.
-  </para>
+   For more information on ForgeRock's security advisory policy, click the
+   following link:
+   </para>
   <para>
-   The recommendation is to upgrade to OpenAM 11.0.3 or deploy the relevant
-   patches. Alternatively,
-   patch bundles are available for the following versions:
-  </para>
-  <itemizedlist>
-   <listitem>
-    <para>10.0.2</para>
-   </listitem>
-   <listitem>
-    <para>11.0.2</para>
-   </listitem>
-  </itemizedlist>
-  <para>
-   Customers can obtain these patch bundles from
-   <link xlink:href="https://backstage.forgerock.com/#!/login" xlink:show="new">
-    Backstage</link>.
-   Community members without a current subscription can request patches for
-   <literal>Critical</literal>
-   issues by contacting
-   <link xlink:href="https://info@forgerock.com" xlink:show="new">
-    info@forgerock.com</link>.
+   <link
+    xlink:href="http://www.forgerock.com/services/security-policy/"
+    xlink:show="new"
+    >http://www.forgerock.com/services/security-policy/</link>
   </para>
 
   <para>The following security fixes have been included in this release:
