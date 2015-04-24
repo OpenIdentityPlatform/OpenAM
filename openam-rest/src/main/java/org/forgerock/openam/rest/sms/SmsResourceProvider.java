@@ -223,6 +223,19 @@ abstract class SmsResourceProvider {
                 addType(result, path + attributePath, attribute);
                 result.addPermissive(new JsonPointer(path + attributePath + "/title"),
                         i18n.getString(i18NKey));
+
+                StringBuilder description = new StringBuilder();
+                if (i18n.containsKey(i18NKey + ".help")) {
+                    description.append(i18n.getString(i18NKey + ".help"));
+                }
+                if (i18n.containsKey(i18NKey + ".help.txt")) {
+                    if (description.length() > 0) {
+                        description.append("<br><br>");
+                    }
+                    description.append(i18n.getString(i18NKey + ".help.txt"));
+                }
+
+                result.addPermissive(new JsonPointer(path + attributePath + "/description"), description.toString());
                 result.addPermissive(new JsonPointer(path + attributePath + "/order"), i18NKey);
             }
         }
