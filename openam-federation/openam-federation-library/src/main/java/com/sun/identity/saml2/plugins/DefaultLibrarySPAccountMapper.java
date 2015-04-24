@@ -24,10 +24,7 @@
  *
  * $Id: DefaultLibrarySPAccountMapper.java,v 1.12 2009/03/12 20:34:45 huacui Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 package com.sun.identity.saml2.plugins;
 
@@ -61,8 +58,7 @@ import com.sun.identity.saml2.key.KeyUtil;
  * Custom implementations may extend from this class to override some
  * of these implementations if they choose to do so.
  */
-public class DefaultLibrarySPAccountMapper extends DefaultAccountMapper 
-       implements SPAccountMapper {
+public class DefaultLibrarySPAccountMapper extends DefaultAccountMapper implements SPAccountMapper {
 
     private PrivateKey decryptionKey = null;
 
@@ -190,7 +186,7 @@ public class DefaultLibrarySPAccountMapper extends DefaultAccountMapper
     protected String getTransientUser(String realm, String entityID) {
 
         return getAttribute(realm, entityID,
-                 SAML2Constants.TRANSIENT_FED_USER);
+                SAML2Constants.TRANSIENT_FED_USER);
     }
 
     private boolean useNameIDAsSPUserID(String realm, String entityID) {
@@ -209,20 +205,11 @@ public class DefaultLibrarySPAccountMapper extends DefaultAccountMapper
      * @param assertion <code>Assertion</code> from the identity provider.
      * @return auto federation mapped user from the assertion
      *         auto federation <code>AttributeStatement</code>.
-     *         null if the statement does not have the auto federation 
-     *         attribute.
+     *         if the statement does not have the auto federation attribute then the NameID value will be used if
+     *         use NameID as SP user ID is enabled, otherwise null.
      */ 
     protected String getAutoFedUser(String realm, String entityID, Assertion assertion, String decryptedNameID)
             throws SAML2Exception {
-
-        List<AttributeStatement> attributeStatements = assertion.getAttributeStatements();
-        if(attributeStatements == null || attributeStatements.isEmpty()) {
-           if(debug.messageEnabled()) { 
-              debug.message("DefaultLibrarySPAccountMapper.getAutoFedUser: " +
-              "Assertion does not have attribute statements.");
-           }
-           return null;
-        }
 
         if (!isAutoFedEnabled(realm, entityID)) {
             if (debug.messageEnabled()) {
@@ -230,101 +217,110 @@ public class DefaultLibrarySPAccountMapper extends DefaultAccountMapper
             }
             return null;
         }
-       
-        String autoFedAttribute = getAttribute(realm, entityID,
-               SAML2Constants.AUTO_FED_ATTRIBUTE);
 
-        if(autoFedAttribute == null || autoFedAttribute.length() == 0) {
-           if(debug.messageEnabled()) { 
-              debug.message("DefaultLibrarySPAccountMapper.getAutoFedUser: " +
-              "Auto federation attribute is not configured.");
-           }
-           return null;
+        String autoFedAttribute = getAttribute(realm, entityID, SAML2Constants.AUTO_FED_ATTRIBUTE);
+        if (autoFedAttribute == null || autoFedAttribute.isEmpty()) {
+            debug.error("DefaultLibrarySPAccountMapper.getAutoFedUser: " +
+                        "Auto federation is enabled but the auto federation attribute is not configured.");
+            return null;
         }
-        
+
+        if (debug.messageEnabled()) {
+            debug.message("DefaultLibrarySPAccountMapper.getAutoFedUser: Auto federation attribute is set to: "
+                    + autoFedAttribute);
+        }
+
         Set<String> autoFedAttributeValue = null;
-        for (AttributeStatement statement : attributeStatements) {
-            autoFedAttributeValue = getAttribute(statement, autoFedAttribute, realm, entityID);
-            if (autoFedAttributeValue != null && !autoFedAttributeValue.isEmpty()) {
-                break;
+        List<AttributeStatement> attributeStatements = assertion.getAttributeStatements();
+        if (attributeStatements == null || attributeStatements.isEmpty()) {
+            if (debug.messageEnabled()) {
+                debug.message("DefaultLibrarySPAccountMapper.getAutoFedUser: " +
+                        "Assertion does not have any attribute statements.");
+            }
+        } else {
+            for (AttributeStatement statement : attributeStatements) {
+                autoFedAttributeValue = getAttribute(statement, autoFedAttribute, realm, entityID);
+                if (autoFedAttributeValue != null && !autoFedAttributeValue.isEmpty()) {
+                    if (debug.messageEnabled()) {
+                        debug.message("DefaultLibrarySPAccountMapper.getAutoFedUser: " +
+                                "Found auto federation attribute value in Assertion: " + autoFedAttributeValue);
+                    }
+                    break;
+                }
             }
         }
 
         if (autoFedAttributeValue == null || autoFedAttributeValue.isEmpty()) {
             if (debug.messageEnabled()) {
-                debug.message("DefaultLibrarySPAccountMapper.getAutoFedUser: Auto federation attribute is not specified "
-                        + "as an attribute.");
+                debug.message("DefaultLibrarySPAccountMapper.getAutoFedUser: Auto federation attribute is not specified"
+                        + " as an attribute.");
             }
             if (!useNameIDAsSPUserID(realm, entityID)) {
+                if (debug.messageEnabled()) {
+                    debug.message("DefaultLibrarySPAccountMapper.getAutoFedUser: NameID as SP UserID was not enabled "
+                            + " and auto federation attribute " + autoFedAttribute + " was not found in the Assertion");
+                }
                 return null;
             } else {
                 if (debug.messageEnabled()) {
-                    debug.message("DefaultLibrarySPAccountMapper.getAutoFedUser: Trying now to autofederate with nameID, "
-                            + "nameID =" + decryptedNameID);
+                    debug.message("DefaultLibrarySPAccountMapper.getAutoFedUser: Trying now to autofederate with nameID"
+                            + ", nameID =" + decryptedNameID);
                 }
                 autoFedAttributeValue = new HashSet<String>(1);
                 autoFedAttributeValue.add(decryptedNameID);
             }
         }
 
-        DefaultSPAttributeMapper attributeMapper = 
-                   new DefaultSPAttributeMapper();
-        Map attributeMap = attributeMapper.getConfigAttributeMap(
-                   realm, entityID, SP);
-        if(attributeMap == null || attributeMap.isEmpty()) {
+        String autoFedMapAttribute = null;
+        DefaultSPAttributeMapper attributeMapper = new DefaultSPAttributeMapper();
+        Map<String, String> attributeMap = attributeMapper.getConfigAttributeMap(realm, entityID, SP);
+        if (attributeMap == null || attributeMap.isEmpty()) {
            if(debug.messageEnabled()) {
-              debug.message("DefaultLibrarySPAccountMapper.getAutoFedUser: " +
-              "attribute map is not configured.");
+              debug.message("DefaultLibrarySPAccountMapper.getAutoFedUser: attribute map is not configured.");
            }
+        } else {
+            autoFedMapAttribute = attributeMap.get(autoFedAttribute);
         }
 
-        String autoFedMapAttribute = (String)attributeMap.get(autoFedAttribute);
-
-        if(autoFedMapAttribute == null) {
-           if(debug.messageEnabled()) {
-              debug.message("DefaultLibrarySPAccountMapper.getAutoFedUser: " +
-              "Auto federation attribute map is not specified in config.");
+        if (autoFedMapAttribute == null) {
+           if (debug.messageEnabled()) {
+               debug.message("DefaultLibrarySPAccountMapper.getAutoFedUser: " +
+                       "Auto federation attribute map is not specified in config.");
            }
            // assume it is the same as the auto fed attribute name 
            autoFedMapAttribute = autoFedAttribute;
         }
 
         try {
-            Map map = new HashMap();
+            Map<String, Set<String>> map = new HashMap<String, Set<String>>(1);
             map.put(autoFedMapAttribute, autoFedAttributeValue);
 
-            if(debug.messageEnabled()) {
-               debug.message("DefaultLibrarySPAccountMapper.getAutoFedUser: " +
-               "Search map: " + map);
+            if (debug.messageEnabled()) {
+                debug.message("DefaultLibrarySPAccountMapper.getAutoFedUser: Search map: " + map);
             }
 
             String userId = dsProvider.getUserID(realm, map); 
-            if (userId != null && userId.length() != 0) {
+            if (userId != null && !userId.isEmpty()) {
                 return userId;
             } else {
                 // check dynamic profile creation or ignore profile, if enabled,
                 // return auto-federation attribute value as uid 
                 if (isDynamicalOrIgnoredProfile(realm)) {
-                    if(debug.messageEnabled()) {
-                        debug.message(
-                            "DefaultLibrarySPAccountMapper: dynamical user " +
-                            "creation or ignore profile enabled : uid=" 
-                            + autoFedAttributeValue); 
+                    if (debug.messageEnabled()) {
+                        debug.message("DefaultLibrarySPAccountMapper: dynamical user creation or ignore profile " +
+                                "enabled : uid=" + autoFedAttributeValue);
                     }
                     // return the first value as uid
-                    return (String) autoFedAttributeValue.
-                           iterator().next();
+                    return autoFedAttributeValue.iterator().next();
                 }
             } 
         } catch (DataStoreProviderException dse) {
-
-            if(debug.warningEnabled()) {
-               debug.warning("DefaultLibrarySPAccountMapper.getAutoFedUser: " +
-               "Datastore provider exception", dse);
+            if (debug.warningEnabled()) {
+                debug.warning("DefaultLibrarySPAccountMapper.getAutoFedUser: Datastore provider exception", dse);
             }
         }
-        return null;
 
+        return null;
     }
 
     /**
