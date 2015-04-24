@@ -41,6 +41,7 @@ require.config({
         "i18next"         : "libs/i18next-1.7.3-min",
         "jquery"          : "libs/jquery-2.1.1-min",
         "js2form"         : "libs/js2form-2.0",
+        "jsonEditor"      : "libs/jsoneditor.min",
         "moment"          : "libs/moment-2.8.1-min",
         "qrcode"          : "libs/qrcode-1.0.0-min",
         "selectize"       : "libs/selectize-0.11.2-min",
@@ -98,6 +99,9 @@ require.config({
         "js2form": {
             exports: "js2form"
         },
+        "jsonEditor": {
+            exports: "JSONEditor"
+        },
         "moment": {
             exports: "moment"
         },
@@ -132,6 +136,7 @@ require([
     "backgrid",
     "form2js",
     "js2form",
+    "jsonEditor",
     "spin",
     "xdate",
     "moment",
