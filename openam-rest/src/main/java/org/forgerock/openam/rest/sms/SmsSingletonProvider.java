@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
 
@@ -246,7 +245,7 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
                 sections.addAll(Arrays.asList(sectionOrder.split("\\s+")));
             }
             addAttributeSchema(result, "/_schema/properties/dynamic/", dynamicSchema, sections, attributeSectionMap,
-                    console, serviceType);
+                    console, serviceType, context);
         }
         return result;
     }

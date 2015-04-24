@@ -359,13 +359,34 @@ public class AttributeSchema {
      * Returns the possible choice values for the attribute if the attribute
      * type is either <code>SINGLE_CHOICE</code> or
      * <code>MULTIPLE_CHOICE</code>, for the given environment parameters.
-     * 
+     *
      * @param envParams
      *            Map of environment parameter to a set of values
      * @return set of possible choice values
      */
     public String[] getChoiceValues(Map envParams) {
         return (as.getChoiceValues(envParams));
+    }
+
+    /**
+     * Returns the possible choice values for the attribute if the attribute
+     * type is either <code>SINGLE_CHOICE</code> or
+     * <code>MULTIPLE_CHOICE</code>, for the given environment parameters,
+     * along with the values' i18n keys.
+     *
+     * @param envParams
+     *            Map of environment parameter to a set of values
+     * @return Map of value to i18n key.
+     */
+    public Map getChoiceValuesMap(Map envParams) {
+        return as.getChoiceValuesMap(envParams);
+    }
+
+    /**
+     * Indicates whether this AttributeSchema has choice values defined.
+     */
+    public boolean hasChoiceValues() {
+        return as.hasChoiceValues();
     }
 
     /**

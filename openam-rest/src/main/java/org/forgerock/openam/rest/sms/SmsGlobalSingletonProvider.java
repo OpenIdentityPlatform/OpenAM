@@ -117,7 +117,7 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
                 sections.addAll(Arrays.asList(sectionOrder.split("\\s+")));
             }
             addAttributeSchema(result, "/_schema/properties/defaults/", organizationSchema, sections,
-                    attributeSectionMap, console, serviceType);
+                    attributeSectionMap, console, serviceType, context);
         }
         return result;
     }

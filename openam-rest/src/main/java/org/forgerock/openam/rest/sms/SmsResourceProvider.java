@@ -17,8 +17,7 @@
 package org.forgerock.openam.rest.sms;
 
 import static com.sun.identity.sm.AttributeSchema.Syntax.*;
-import static org.forgerock.json.fluent.JsonValue.field;
-import static org.forgerock.json.fluent.JsonValue.object;
+import static org.forgerock.json.fluent.JsonValue.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,15 +35,6 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.AttributeSchema;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.SchemaType;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceSchema;
 import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -56,6 +46,17 @@ import org.forgerock.json.resource.ServerContext;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.StringUtils;
+
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.AttributeSchema;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SchemaType;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceSchema;
 
 /**
  * A base class for resource providers for the REST SMS services - provides common utility methods for
@@ -194,13 +195,13 @@ abstract class SmsResourceProvider {
             sections.addAll(Arrays.asList(sectionOrder.split("\\s+")));
         }
 
-        addAttributeSchema(result, "/_schema/properties/", schema, sections, attributeSectionMap, console, serviceType);
+        addAttributeSchema(result, "/_schema/properties/", schema, sections, attributeSectionMap, console, serviceType, context);
 
         return result;
     }
 
     protected void addAttributeSchema(JsonValue result, String path, ServiceSchema schema, List<String> sections,
-            Map<String, String> attributeSectionMap, ResourceBundle console, String serviceType) {
+            Map<String, String> attributeSectionMap, ResourceBundle console, String serviceType, ServerContext context) {
 
         ResourceBundle i18n = ResourceBundle.getBundle(schema.getI18NFileName());
         NumberFormat sectionFormat = new DecimalFormat("00");
@@ -220,7 +221,6 @@ abstract class SmsResourceProvider {
                     result.putPermissive(new JsonPointer(path + section + "/order"),
                             "z" + sectionFormat.format(sections.indexOf(section)));
                 }
-                addType(result, path + attributePath, attribute);
                 result.addPermissive(new JsonPointer(path + attributePath + "/title"),
                         i18n.getString(i18NKey));
 
@@ -237,6 +237,7 @@ abstract class SmsResourceProvider {
 
                 result.addPermissive(new JsonPointer(path + attributePath + "/description"), description.toString());
                 result.addPermissive(new JsonPointer(path + attributePath + "/order"), i18NKey);
+                addType(result, path + attributePath, attribute, i18n, context);
             }
         }
     }
@@ -249,25 +250,73 @@ abstract class SmsResourceProvider {
         }
     }
 
-    private void addType(JsonValue result, String pointer, AttributeSchema attribute) {
-        String type;
-        if (attribute.getType() == AttributeSchema.Type.LIST && (
+    private void addType(JsonValue result, String pointer, AttributeSchema attribute, ResourceBundle i18n, ServerContext context) {
+        String type = null;
+        AttributeSchema.Type attributeType = attribute.getType();
+        AttributeSchema.Syntax syntax = attribute.getSyntax();
+        if (attributeType == AttributeSchema.Type.LIST && (
                 attribute.getUIType() == AttributeSchema.UIType.GLOBALMAPLIST ||
                 attribute.getUIType() == AttributeSchema.UIType.MAPLIST)) {
             type = "object";
+            JsonValue fieldType = json(object());
+            if (attribute.hasChoiceValues()) {
+                addEnumChoices(fieldType, attribute, i18n, context);
+            } else {
+                fieldType.add("type", "string");
+            }
             result.addPermissive(new JsonPointer(pointer + "/patternProperties"),
-                    object(field(".*", object(field("type", "string")))));
-        } else if (attribute.getType() == AttributeSchema.Type.LIST) {
+                    object(field(".*", fieldType.getObject())));
+        } else if (attributeType == AttributeSchema.Type.LIST) {
             type = "array";
-            result.addPermissive(new JsonPointer(pointer + "/items"), object(field("type", "string")));
-        } else if (attribute.getSyntax() == BOOLEAN) {
+            if (attribute.hasChoiceValues()) {
+                result.addPermissive(new JsonPointer(pointer + "/items"), object());
+                addEnumChoices(result.get(new JsonPointer(pointer + "/items")), attribute, i18n, context);
+            } else {
+                result.addPermissive(new JsonPointer(pointer + "/items"), object(field("type", "string")));
+            }
+        } else if (attributeType.equals(AttributeSchema.Type.MULTIPLE_CHOICE)) {
+            type = "array";
+            result.addPermissive(new JsonPointer(pointer + "/items"), object());
+            addEnumChoices(result.get(new JsonPointer(pointer + "/items")), attribute, i18n, context);
+        } else if (attributeType.equals(AttributeSchema.Type.SINGLE_CHOICE)) {
+            addEnumChoices(result.get(new JsonPointer(pointer)), attribute, i18n, context);
+        } else {
+            type = getTypeFromSyntax(syntax);
+        }
+        if (type != null) {
+            result.addPermissive(new JsonPointer(pointer + "/type"), type);
+        }
+    }
+
+    private void addEnumChoices(JsonValue jsonValue, AttributeSchema attribute, ResourceBundle i18n,
+            ServerContext context) {
+        List<String> values = new ArrayList<String>();
+        List<String> descriptions = new ArrayList<String>();
+        Map environment = type == SchemaType.GLOBAL ? Collections.emptyMap() :
+                Collections.singletonMap(Constants.ORGANIZATION_NAME, realmFor(context));
+        Map<String, String> valuesMap = attribute.getChoiceValuesMap(environment);
+        for (Map.Entry<String, String> value : valuesMap.entrySet()) {
+            values.add(value.getKey());
+            if (i18n.containsKey(value.getValue())) {
+                descriptions.add(i18n.getString(value.getValue()));
+            } else {
+                descriptions.add(value.getKey());
+            }
+        }
+        jsonValue.add("enum", values);
+        jsonValue.putPermissive(new JsonPointer("options/enum_titles"), descriptions);
+    }
+
+    private String getTypeFromSyntax(AttributeSchema.Syntax syntax) {
+        String type;
+        if (syntax == BOOLEAN) {
             type = "boolean";
-        } else if (NUMBER_SYNTAXES.contains(attribute.getSyntax())) {
+        } else if (NUMBER_SYNTAXES.contains(syntax)) {
             type = "number";
         } else {
             type = "string";
         }
-        result.addPermissive(new JsonPointer(pointer + "/type"), type);
+        return type;
     }
 
     protected HashMap<String, String> getAttributeNameToSection(ServiceSchema schema) {

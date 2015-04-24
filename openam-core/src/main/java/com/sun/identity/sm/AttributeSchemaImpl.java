@@ -110,6 +110,8 @@ public class AttributeSchemaImpl {
 
     boolean isSearchable;
 
+    private boolean hasChoiceValues;
+
     /**
      * Constructor used by ServiceSchema to instantiate AttributeSchema objects.
      */
@@ -324,6 +326,13 @@ public class AttributeSchemaImpl {
             choiceValues = choiceObject.getChoiceValues();
         }
         return ((String) choiceValues.get(cValue));
+    }
+
+    /**
+     * Indicates whether this AttributeSchema has choice values configured.
+     */
+    boolean hasChoiceValues() {
+        return hasChoiceValues;
     }
 
     /**
@@ -583,6 +592,7 @@ public class AttributeSchemaImpl {
             Node choiceValueNode = XMLUtils.getChildNode(n,
                     SMSUtils.ATTRIBUTE_CHOICE_VALUES_ELEMENT);
             if (choiceValueNode != null) {
+                hasChoiceValues = true;
                 // If the sub-element ChoiceValuesClassName, use it
                 Node cvClassName = XMLUtils.getChildNode(choiceValueNode,
                         SMSUtils.ATTRIBUTE_CHOICE_CLASS);
