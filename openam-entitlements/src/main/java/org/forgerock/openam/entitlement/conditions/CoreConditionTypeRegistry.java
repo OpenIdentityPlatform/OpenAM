@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.conditions;
@@ -31,6 +31,7 @@ import org.forgerock.openam.entitlement.conditions.environment.LDAPFilterConditi
 import org.forgerock.openam.entitlement.conditions.environment.LEAuthLevelCondition;
 import org.forgerock.openam.entitlement.conditions.environment.OAuth2ScopeCondition;
 import org.forgerock.openam.entitlement.conditions.environment.ResourceEnvIPCondition;
+import org.forgerock.openam.entitlement.conditions.environment.ScriptCondition;
 import org.forgerock.openam.entitlement.conditions.environment.SessionCondition;
 import org.forgerock.openam.entitlement.conditions.environment.SessionPropertyCondition;
 import org.forgerock.openam.entitlement.conditions.environment.SimpleTimeCondition;
@@ -83,6 +84,7 @@ public class CoreConditionTypeRegistry implements ConditionTypeRegistry {
         conditions.add(IPv4Condition.class);
         conditions.add(IPv6Condition.class);
         conditions.add(LDAPFilterCondition.class);
+        conditions.add(ScriptCondition.class);
 
         return conditions;
     }

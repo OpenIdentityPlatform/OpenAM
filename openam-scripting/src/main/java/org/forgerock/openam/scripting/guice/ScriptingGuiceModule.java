@@ -16,7 +16,8 @@
 
 package org.forgerock.openam.scripting.guice;
 
-import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.*;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHENTICATION_SERVER_SIDE;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHORIZATION_ENTITLEMENT_CONDITION;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
@@ -24,6 +25,7 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
 import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.http.client.RestletHttpClient;
 import org.forgerock.openam.scripting.ScriptEngineConfiguration;
 import org.forgerock.openam.scripting.ScriptEngineConfigurator;
 import org.forgerock.openam.scripting.ScriptEvaluator;
@@ -31,10 +33,12 @@ import org.forgerock.openam.scripting.ScriptValidator;
 import org.forgerock.openam.scripting.StandardScriptEngineManager;
 import org.forgerock.openam.scripting.StandardScriptEvaluator;
 import org.forgerock.openam.scripting.StandardScriptValidator;
+import org.forgerock.openam.scripting.SupportedScriptingLanguage;
 import org.forgerock.openam.scripting.ThreadPoolScriptEvaluator;
 import org.forgerock.openam.scripting.datastore.ScriptConfigurationDataStore;
 import org.forgerock.openam.scripting.datastore.ScriptingDataStore;
 import org.forgerock.openam.scripting.datastore.ScriptingDataStoreFactory;
+import org.forgerock.openam.scripting.http.JavaScriptHttpClient;
 import org.forgerock.openam.scripting.service.ScriptConfiguration;
 import org.forgerock.openam.scripting.service.ScriptConfigurationService;
 import org.forgerock.openam.scripting.service.ScriptingService;
@@ -80,6 +84,14 @@ public class ScriptingGuiceModule extends AbstractModule {
         bind(StandardScriptEngineManager.class)
                 .annotatedWith(Names.named(AUTHORIZATION_ENTITLEMENT_CONDITION.name()))
                 .toInstance(new StandardScriptEngineManager());
+
+        bind(RestletHttpClient.class)
+                .annotatedWith(Names.named(SupportedScriptingLanguage.JAVASCRIPT.name()))
+                .to(JavaScriptHttpClient.class);
+
+        bind(RestletHttpClient.class)
+                .annotatedWith(Names.named(SupportedScriptingLanguage.GROOVY.name()))
+                .to(JavaScriptHttpClient.class);
     }
 
     /**

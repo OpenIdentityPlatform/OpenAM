@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.scripting;
@@ -49,6 +49,17 @@ public final class ScriptObject {
         this.script = script;
         this.language = language;
         this.bindings = bindings;
+    }
+
+    /**
+     * Constructs a script object with the given name, script body and language.
+     *
+     * @param name the name of the script.
+     * @param script the script itself.
+     * @param language the language that the script is written in.
+     */
+    public ScriptObject(final String name, final String script, final ScriptingLanguage language) {
+        this(name, script, language, null);
     }
 
     /**

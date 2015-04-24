@@ -15,22 +15,20 @@
  */
 package org.forgerock.openam.authentication.modules.scripted;
 
-import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
+import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
-import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.client.RestletHttpClient;
-import org.forgerock.openam.authentication.modules.scripted.http.GroovyHttpClient;
 import org.forgerock.http.client.request.HttpClientRequest;
 import org.forgerock.http.client.request.HttpClientRequestFactory;
-import org.forgerock.openam.authentication.modules.scripted.http.JavaScriptHttpClient;
 import org.forgerock.openam.scripting.ScriptEvaluator;
 import org.forgerock.openam.scripting.ScriptObject;
 import org.forgerock.openam.scripting.SupportedScriptingLanguage;
@@ -42,7 +40,6 @@ import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.login.LoginException;
 import java.security.Principal;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -192,13 +189,11 @@ public class Scripted extends AMLoginModule {
     private RestletHttpClient getHttpClient() {
         SupportedScriptingLanguage scriptType = getScriptType();
 
-        if(scriptType.equals(SupportedScriptingLanguage.JAVASCRIPT)) {
-            return InjectorHolder.getInstance(JavaScriptHttpClient.class);
-        } else if(scriptType.equals(SupportedScriptingLanguage.GROOVY)){
-            return InjectorHolder.getInstance(GroovyHttpClient.class);
+        if (scriptType == null) {
+            return null;
         }
 
-        return null;
+        return InjectorHolder.getInstance(Key.get(RestletHttpClient.class, Names.named(scriptType.name())));
     }
 
     private HttpClientRequest getHttpRequest() {

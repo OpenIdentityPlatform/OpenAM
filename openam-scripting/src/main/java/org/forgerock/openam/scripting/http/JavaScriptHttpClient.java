@@ -11,13 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2010-2014 ForgeRock AS.
  */
-
-/*
- * Portions Copyrighted 2010-2014 ForgeRock AS.
- */
-package org.forgerock.openam.authentication.modules.scripted.http;
+package org.forgerock.openam.scripting.http;
 
 import org.forgerock.http.client.RestletHttpClient;
 import org.forgerock.http.client.response.HttpClientResponse;

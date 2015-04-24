@@ -129,6 +129,7 @@ public class EntitlementException extends Exception {
     public static final int AT_LEAST_ONE_OF_TIME_PROPS_SHOULD_BE_DEFINED = 740;
     public static final int PAIR_PROPERTY_NOT_DEFINED = 741;
     public static final int END_IP_BEFORE_START_IP = 750;
+    public static final int INVALID_SCRIPT_ID = 760;
 
     public static final int PROPERTY_IS_NOT_AN_INTEGER = 800;
     public static final int PROPERTY_IS_NOT_A_SET = 801;
