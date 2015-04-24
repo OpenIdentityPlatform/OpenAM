@@ -1,3 +1,18 @@
+/*
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2015 ForgeRock AS.
+ */
 package org.forgerock.openam.forgerockrest.entitlements;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -608,7 +623,7 @@ public class ResourceTypesResourceTest {
         verify(queryHandler, times(1)).handleResult(resultCaptor.capture());
         QueryResult result = resultCaptor.getValue();
 
-        assertThat(result.getRemainingPagedResults()).isEqualTo(-1);
+        assertThat(result.getRemainingPagedResults()).isEqualTo(0);
     }
 
    @Test
@@ -618,8 +633,9 @@ public class ResourceTypesResourceTest {
         QueryResultHandler queryHandler = mock(QueryResultHandler.class);
 
         final int firstPageSize = 2;
-        Map<String, Map<String, Set<String>>> resourceTypes = new HashMap<String, Map<String, Set<String>>>();
+        final int pageOffset = 0;
         final int resultSize = 10;
+        Map<String, Map<String, Set<String>>> resourceTypes = new HashMap<String, Map<String, Set<String>>>();
         for (int i = 0; i < resultSize; i++) {
            resourceTypes.put(UUID.randomUUID().toString(), rawData);
         }
@@ -627,6 +643,8 @@ public class ResourceTypesResourceTest {
         when(resourceTypeService.getResourceTypesData(any(Subject.class), anyString())).thenReturn(resourceTypes);
         when(resourceTypeService.getResourceType(any(Subject.class), anyString(), anyString())).thenReturn
                (EntitlementUtils.resourceTypeFromMap(UUID.randomUUID().toString(), rawData));
+        when(queryRequest.getPagedResultsOffset()).thenReturn(pageOffset);
+        when(queryRequest.getPageSize()).thenReturn(firstPageSize);
 
         Answer<Boolean> onlyFirstPage = new Answer<Boolean>() {
             int count = 0;
@@ -645,13 +663,59 @@ public class ResourceTypesResourceTest {
         //then
         verify(queryHandler, times(0)).handleError(any(ResourceException.class));
 
-        verify(queryHandler, times(resultSize)).handleResource(any(Resource.class));
+        verify(queryHandler, times(firstPageSize)).handleResource(any(Resource.class));
 
         ArgumentCaptor<QueryResult> resultCaptor = ArgumentCaptor.forClass(QueryResult.class);
         verify(queryHandler, times(1)).handleResult(resultCaptor.capture());
         QueryResult result = resultCaptor.getValue();
 
-        assertThat(result.getRemainingPagedResults()).isEqualTo(-1);
+        assertThat(result.getRemainingPagedResults()).isEqualTo(resultSize - firstPageSize);
+    }
+
+    @Test
+    public void shouldHandleQueryPageLargerThanResults() throws EntitlementException {
+        //given
+        QueryRequest queryRequest = mock(QueryRequest.class);
+        QueryResultHandler queryHandler = mock(QueryResultHandler.class);
+
+        final int lastPageSize = 5;
+        final int pageOffset = 10;
+        final int resultSize = 11;
+        Map<String, Map<String, Set<String>>> resourceTypes = new HashMap<String, Map<String, Set<String>>>();
+        for (int i = 0; i < resultSize; i++) {
+            resourceTypes.put(UUID.randomUUID().toString(), rawData);
+        }
+
+        when(resourceTypeService.getResourceTypesData(any(Subject.class), anyString())).thenReturn(resourceTypes);
+        when(resourceTypeService.getResourceType(any(Subject.class), anyString(), anyString())).thenReturn
+                (EntitlementUtils.resourceTypeFromMap(UUID.randomUUID().toString(), rawData));
+        when(queryRequest.getPagedResultsOffset()).thenReturn(pageOffset);
+        when(queryRequest.getPageSize()).thenReturn(lastPageSize);
+
+        Answer<Boolean> onlyFirstPage = new Answer<Boolean>() {
+            int count = pageOffset;
+
+            @Override
+            public Boolean answer(InvocationOnMock invocationOnMock) throws Throwable {
+                return count++ < resultSize;
+            }
+        };
+
+        when(queryHandler.handleResource(any(Resource.class))).thenAnswer(onlyFirstPage);
+
+        //when
+        resourceTypesResource.queryCollection(mockServerContext, queryRequest, queryHandler);
+
+        //then
+        verify(queryHandler, times(0)).handleError(any(ResourceException.class));
+
+        verify(queryHandler, times(resultSize - pageOffset)).handleResource(any(Resource.class));
+
+        ArgumentCaptor<QueryResult> resultCaptor = ArgumentCaptor.forClass(QueryResult.class);
+        verify(queryHandler, times(1)).handleResult(resultCaptor.capture());
+        QueryResult result = resultCaptor.getValue();
+
+        assertThat(result.getRemainingPagedResults()).isEqualTo(0);
     }
 
 

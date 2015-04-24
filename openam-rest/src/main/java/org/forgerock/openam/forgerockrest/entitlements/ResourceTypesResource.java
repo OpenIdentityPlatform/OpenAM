@@ -288,7 +288,9 @@ public class ResourceTypesResource extends RealmAwareResource {
                         String.valueOf(resourceType.hashCode()),
                         new JsonResourceType(resourceType).toJsonValue()));
             }
-            handler.handleResult(new QueryResult());
+            int remaining = request.getPageSize() == 0 ? 0 :
+                    filterResults.size() - (request.getPagedResultsOffset() + request.getPageSize());
+            handler.handleResult(new QueryResult(request.getPagedResultsCookie(), remaining < 0 ? 0 : remaining));
         } catch (EntitlementException ee) {
             if (logger.errorEnabled()) {
                 logger.error("ResourceTypesResource :: QUERY by "
