@@ -19,8 +19,9 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Advanc
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
-    "jsonEditor"
-], function(AbstractView, Configuration, Constants, JSONEditor) {
+    "jsonEditor",
+    "org/forgerock/openam/ui/admin/delegates/SMSDelegate"
+], function(AbstractView, Configuration, Constants, JSONEditor, SMSDelegate) {
     var AdvancedSettings = AbstractView.extend({
         template: "templates/admin/views/console/realms/authentication/AdvancedSettingsTemplate.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
@@ -33,26 +34,43 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Advanc
             this.data.name = args[0];
             this.data.consolePath = Constants.CONSOLE_PATH;
 
-            // $.post('/openam/json/realm-config/authentication?_action=template')
-            $.post('/openam/json/global-config/services/uma?_action=template')
-            // $.post('/openam/json/global-config/authentication/modules/hotp?_action=template')
+            SMSDelegate.getRealmAuthentication()
             .done(function(data) {
-                data = self.sanitize(data);
+                self.data.sms = self.sanitize(data);
 
-                var wraps = $("<div/>").get(0),
-                    schema = data._schema,
-                    editor = new JSONEditor(wraps, {
-                        disable_collapse: true,
-                        disable_edit_json: true,
-                        disable_properties: true,
-                        iconlib: "fontawesome4",
-                        schema: schema,
-                        theme: 'bootstrap3'
-                    });
-                editor.setValue(_.omit(data, '_schema'));
+                var withIdsInArray = _.map(self.data.sms._schema.properties, function(value, key) {
+                        value._id = key;
+                        return value;
+                    }),
+                    sorted = _.sortBy(withIdsInArray, 'propertyOrder');
+
+                self.data.tabs = sorted;
 
                 self.parentRender(function() {
-                    self.$el.find("#putItHere").append(wraps);
+                    self.$el.find("ul.nav.nav-tabs a").click(function(event) {
+                      // FIXME: Improve these two lines
+                      $("div.panel-body").empty();
+                      $("div.tab-pane").show();
+
+                      var id = $(event.target).attr('href').slice(1),
+                          schema = self.data.sms._schema.properties[id],
+                          element = $("div.panel-body").get(0),
+                          editor = new JSONEditor(element, {
+                              disable_collapse: true,
+                              disable_edit_json: true,
+                              disable_properties: true,
+                              iconlib: "fontawesome4",
+                              schema: schema,
+                              theme: 'bootstrap3'
+                          });
+
+                      // Pick from the initial values only the keys we're using
+                      editor.setValue(_.pick(self.data.sms, _.keys(schema.properties)));
+                    });
+
+                    if (callback) {
+                        callback();
+                    }
                 });
             })
             .fail(function() {
@@ -60,8 +78,9 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Advanc
             });
         },
         sanitize: function(data) {
-            data._schema.title = "Authentication Core Settings";
-            data._schema.type = "object";
+            // CHANGED: Not required for this feed, but still needed later
+            // data._schema.title = "Authentication Core Settings";
+            // data._schema.type = "object";
 
             data._schema.properties = _.omit(data._schema.properties, 'defaults');
 
