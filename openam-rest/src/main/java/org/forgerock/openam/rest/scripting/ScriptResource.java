@@ -40,12 +40,18 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.entitlements.RealmAwareResource;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
+import org.forgerock.openam.scripting.ScriptError;
 import org.forgerock.openam.scripting.ScriptException;
+import org.forgerock.openam.scripting.ScriptObject;
+import org.forgerock.openam.scripting.ScriptValidator;
+import org.forgerock.openam.scripting.SupportedScriptingLanguage;
 import org.forgerock.openam.scripting.service.ScriptConfiguration;
 import org.forgerock.openam.scripting.service.ScriptingServiceFactory;
 import org.slf4j.Logger;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -58,6 +64,7 @@ public class ScriptResource extends RealmAwareResource {
     private final Logger logger;
     private final ScriptingServiceFactory<ScriptConfiguration> serviceFactory;
     private final ExceptionMappingHandler<ScriptException, ResourceException> exceptionMappingHandler;
+    private final ScriptValidator scriptValidator;
 
     /**
      * Creates an instance of the {@code ScriptResource}.
@@ -68,15 +75,46 @@ public class ScriptResource extends RealmAwareResource {
     @Inject
     public ScriptResource(@Named("ScriptLogger") Logger logger,
                           ScriptingServiceFactory<ScriptConfiguration> scriptConfigService,
-                          ExceptionMappingHandler<ScriptException, ResourceException> exceptionMappingHandler) {
+                          ExceptionMappingHandler<ScriptException, ResourceException> exceptionMappingHandler,
+                          ScriptValidator scriptValidator) {
         this.logger = logger;
         this.serviceFactory = scriptConfigService;
         this.exceptionMappingHandler = exceptionMappingHandler;
+        this.scriptValidator = scriptValidator;
     }
 
     @Override
     public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> resultHandler) {
-        resultHandler.handleError(new NotSupportedException());
+        if ("validate".equals(request.getAction())) {
+            try {
+                JsonValue json = request.getContent();
+                SupportedScriptingLanguage language = getLanguageFromString(json.get(SCRIPT_LANGUAGE).asString());
+                String script = json.get(SCRIPT_TEXT).asString();
+                if (script == null) {
+                    throw new ScriptException(ScriptErrorCode.MISSING_SCRIPT);
+                }
+
+                List<ScriptError> scriptErrorList = scriptValidator.validateScript(new ScriptObject(EMPTY,
+                        Base64.decodeAsUTF8String(script), language, null));
+                if (scriptErrorList.isEmpty()) {
+                    resultHandler.handleResult(json(object(field("success", true))));
+                    return;
+                }
+
+                Set<Object> errors = new HashSet<>();
+                for (ScriptError error : scriptErrorList) {
+                    errors.add(object(
+                            field("line", error.getLineNumber()),
+                            field("column", error.getColumnNumber()),
+                            field("message", error.getMessage())));
+                }
+                resultHandler.handleResult(json(object(field("success", false), field("errors", errors))));
+            } catch (ScriptException se) {
+                resultHandler.handleError(exceptionMappingHandler.handleError(context, request, se));
+            }
+        } else {
+            resultHandler.handleError(new NotSupportedException());
+        }
     }
 
     @Override

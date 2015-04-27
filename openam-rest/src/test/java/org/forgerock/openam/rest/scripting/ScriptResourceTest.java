@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.rest.scripting;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.fluent.JsonValue.*;
 import static org.forgerock.openam.scripting.ScriptConstants.*;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHORIZATION_ENTITLEMENT_CONDITION;
@@ -22,13 +23,12 @@ import static org.forgerock.openam.scripting.SupportedScriptingLanguage.GROOVY;
 import static org.forgerock.openam.scripting.SupportedScriptingLanguage.JAVASCRIPT;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.testng.AssertJUnit.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sun.identity.shared.encode.Base64;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.QueryFilter;
@@ -43,9 +43,12 @@ import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.scripting.ScriptException;
+import org.forgerock.openam.scripting.StandardScriptEngineManager;
+import org.forgerock.openam.scripting.StandardScriptValidator;
 import org.forgerock.openam.scripting.service.ScriptConfiguration;
 import org.forgerock.openam.scripting.service.ScriptingService;
 import org.forgerock.openam.scripting.service.ScriptingServiceFactory;
+import org.mockito.ArgumentCaptor;
 import org.slf4j.Logger;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -142,7 +145,8 @@ public class ScriptResourceTest {
         ScriptingServiceFactory<ScriptConfiguration> serviceFactory = mock(ScriptingServiceFactory.class);
         when(serviceFactory.create(any(Subject.class), anyString())).thenReturn(scriptingService);
         ExceptionMappingHandler<ScriptException, ResourceException> errorHandler = new ScriptExceptionMappingHandler();
-        scriptResource = new ScriptResource(logger, serviceFactory, errorHandler);
+        scriptResource = new ScriptResource(logger, serviceFactory, errorHandler,
+                new StandardScriptValidator(new StandardScriptEngineManager()));
 
         serverContext = mock(ServerContext.class);
     }
@@ -151,12 +155,9 @@ public class ScriptResourceTest {
     public void shouldCreateScriptConfigurationWithoutError() throws ScriptException {
         // given
         MockResultHandler<Resource> resultHandler = new MockResultHandler<Resource>();
-        JsonValue requestJson = json(object(
-                field(SCRIPT_NAME, "MyJavaScript"),
-                field(SCRIPT_DESCRIPTION, "A test script configuration"),
-                field(SCRIPT_TEXT, encodeScript),
-                field(SCRIPT_LANGUAGE, "JAVASCRIPT"),
-                field(SCRIPT_CONTEXT, "AUTHORIZATION_ENTITLEMENT_CONDITION")));
+        JsonValue requestJson = json(object(field(SCRIPT_NAME, "MyJavaScript"), field(SCRIPT_DESCRIPTION,
+                "A test script configuration"), field(SCRIPT_TEXT, encodeScript), field(SCRIPT_LANGUAGE,
+                "JAVASCRIPT"), field(SCRIPT_CONTEXT, "AUTHORIZATION_ENTITLEMENT_CONDITION")));
         CreateRequest createRequest = mock(CreateRequest.class);
         when(createRequest.getContent()).thenReturn(requestJson);
 
@@ -515,5 +516,135 @@ public class ScriptResourceTest {
         for (Resource resource : resources) {
             assertThat(resource.getContent().get(SCRIPT_NAME).asString()).endsWith(String.valueOf(count++));
         }
+    }
+
+    private ActionRequest prepareActionRequestForValidate(String script, String language, String action) {
+        String encodeScript = Base64.encode(script.getBytes());
+        JsonValue requestJson = json(object(
+                field(SCRIPT_TEXT, encodeScript),
+                field(SCRIPT_LANGUAGE, language)));
+        ActionRequest actionRequest = mock(ActionRequest.class);
+        when(actionRequest.getContent()).thenReturn(requestJson);
+        when(actionRequest.getAction()).thenReturn(action);
+        return actionRequest;
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void shouldPassScriptValidation() {
+        // given
+        ResultHandler<JsonValue> resultHandler = mock(ResultHandler.class);
+        ActionRequest request = prepareActionRequestForValidate("var a = 123;var b = 456;", "JAVASCRIPT", "validate");
+
+        // when
+        scriptResource.actionCollection(serverContext, request, resultHandler);
+
+        // then
+        verify(resultHandler, times(0)).handleError(any(ResourceException.class));
+
+        ArgumentCaptor<JsonValue> resultCaptor = ArgumentCaptor.forClass(JsonValue.class);
+        verify(resultHandler, times(1)).handleResult(resultCaptor.capture());
+        assertThat(resultCaptor.getValue().get("success").asBoolean()).isEqualTo(true);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void shouldFailScriptValidationWithOneError() {
+        // given
+        ResultHandler<JsonValue> resultHandler = mock(ResultHandler.class);
+        ActionRequest request = prepareActionRequestForValidate(
+                "var a = 123;var b = 456; =VALIDATION SHOULD FAIL=", "JAVASCRIPT", "validate");
+
+        // when
+        scriptResource.actionCollection(serverContext, request, resultHandler);
+
+        // then
+        verify(resultHandler, times(0)).handleError(any(ResourceException.class));
+
+        ArgumentCaptor<JsonValue> resultCaptor = ArgumentCaptor.forClass(JsonValue.class);
+        verify(resultHandler, times(1)).handleResult(resultCaptor.capture());
+        assertThat(resultCaptor.getValue().get("success").asBoolean()).isEqualTo(false);
+        assertThat(resultCaptor.getValue().get("errors").get("line")).isNotNull();
+        assertThat(resultCaptor.getValue().get("errors").get("column")).isNotNull();
+        assertThat(resultCaptor.getValue().get("errors").get("message")).isNotNull();
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void shouldReturnErrorWhenLanguageNotRecognised() {
+        // given
+        ResultHandler<JsonValue> resultHandler = mock(ResultHandler.class);
+        ActionRequest request = prepareActionRequestForValidate("var a = 123;var b = 456;", "INVALID_LANG", "validate");
+
+        // when
+        scriptResource.actionCollection(serverContext, request, resultHandler);
+
+        // then
+        verify(resultHandler, times(0)).handleResult(any(JsonValue.class));
+
+        ArgumentCaptor<ResourceException> resultCaptor = ArgumentCaptor.forClass(ResourceException.class);
+        verify(resultHandler, times(1)).handleError(resultCaptor.capture());
+        assertThat(resultCaptor.getValue().getCode()).isEqualTo(ResourceException.BAD_REQUEST);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void shouldReturnErrorWhenActionNotRecognised() {
+        // given
+        ResultHandler<JsonValue> resultHandler = mock(ResultHandler.class);
+        ActionRequest request = prepareActionRequestForValidate("var a = 123;var b = 456;", "JAVASCRIPT", "invalid_action");
+
+        // when
+        scriptResource.actionCollection(serverContext, request, resultHandler);
+
+        // then
+        verify(resultHandler, times(0)).handleResult(any(JsonValue.class));
+
+        ArgumentCaptor<ResourceException> resultCaptor = ArgumentCaptor.forClass(ResourceException.class);
+        verify(resultHandler, times(1)).handleError(resultCaptor.capture());
+        assertThat(resultCaptor.getValue().getCode()).isEqualTo(ResourceException.NOT_SUPPORTED);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void shouldReturnErrorWhenNoLanguageSpecified() {
+        // given
+        ResultHandler<JsonValue> resultHandler = mock(ResultHandler.class);
+        String encodeScript = Base64.encode("var a = 123;var b = 456;".getBytes());
+        JsonValue requestJson = json(object(field(SCRIPT_TEXT, encodeScript)));
+        ActionRequest request = mock(ActionRequest.class);
+        when(request.getContent()).thenReturn(requestJson);
+        when(request.getAction()).thenReturn("validate");
+
+        // when
+        scriptResource.actionCollection(serverContext, request, resultHandler);
+
+        // then
+        verify(resultHandler, times(0)).handleResult(any(JsonValue.class));
+
+        ArgumentCaptor<ResourceException> resultCaptor = ArgumentCaptor.forClass(ResourceException.class);
+        verify(resultHandler, times(1)).handleError(resultCaptor.capture());
+        assertThat(resultCaptor.getValue().getCode()).isEqualTo(ResourceException.BAD_REQUEST);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void shouldReturnErrorWhenNoScriptSpecified() {
+        // given
+        ResultHandler<JsonValue> resultHandler = mock(ResultHandler.class);
+        JsonValue requestJson = json(object(field(SCRIPT_LANGUAGE, "JAVASCRIPT")));
+        ActionRequest request = mock(ActionRequest.class);
+        when(request.getContent()).thenReturn(requestJson);
+        when(request.getAction()).thenReturn("validate");
+
+        // when
+        scriptResource.actionCollection(serverContext, request, resultHandler);
+
+        // then
+        verify(resultHandler, times(0)).handleResult(any(JsonValue.class));
+
+        ArgumentCaptor<ResourceException> resultCaptor = ArgumentCaptor.forClass(ResourceException.class);
+        verify(resultHandler, times(1)).handleError(resultCaptor.capture());
+        assertThat(resultCaptor.getValue().getCode()).isEqualTo(ResourceException.BAD_REQUEST);
     }
 }
