@@ -99,7 +99,8 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
     /**
      * Constructor.
      */
-    public PrivilegeManager(final ApplicationServiceFactory applicationServiceFactory, final ResourceTypeService resourceTypeService, final ConstraintValidator validator) {
+    public PrivilegeManager(final ApplicationServiceFactory applicationServiceFactory,
+                            final ResourceTypeService resourceTypeService, final ConstraintValidator validator) {
         this.applicationServiceFactory = applicationServiceFactory;
         this.resourceTypeService = resourceTypeService;
         this.validator = validator;

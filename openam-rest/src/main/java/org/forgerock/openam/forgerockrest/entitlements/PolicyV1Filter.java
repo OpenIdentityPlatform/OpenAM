@@ -103,46 +103,23 @@ public class PolicyV1Filter implements Filter {
      *         a request handler representing the remainder of the filter chain
      */
     @Override
-    public void filterCreate(final ServerContext context, final CreateRequest request,
-                             final ResultHandler<Resource> handler, final RequestHandler next) {
-
-        final JsonValue jsonValue = request.getContent();
-        final String applicationName = jsonValue.get("applicationName").asString();
-
-        if (applicationName == null) {
-            handler.handleError(ResourceException
-                    .getException(ResourceException.BAD_REQUEST, "Invalid application name defined in request"));
-            return;
-        }
-
-        final Subject callingSubject = contextHelper.getSubject(context);
-        final String realm = contextHelper.getRealm(context);
-
+    public void filterCreate(ServerContext context, CreateRequest request,
+                             ResultHandler<Resource> handler, RequestHandler next) {
         try {
-            final ApplicationService applicationService = applicationServiceFactory.create(callingSubject, realm);
-            final Application application = applicationService.getApplication(applicationName);
+            final JsonValue jsonValue = request.getContent();
+            final Subject callingSubject = contextHelper.getSubject(context);
+            final String realm = contextHelper.getRealm(context);
 
-            if (application == null) {
-                handler.handleError(ResourceException
-                        .getException(ResourceException.BAD_REQUEST, "Unable to find application " + applicationName));
-                return;
-            }
-
-            if (application.getResourceTypeUuids().size() != 1) {
-                handler.handleError(ResourceException
-                        .getException(ResourceException.BAD_REQUEST,
-                                "Cannot create policy under an application with more than " +
-                                        "one resource type using version 1.0 of this endpoint"));
-                return;
-            }
-
-            // Retrieve the resource type from the applications single resource type.
-            final String resourceTypeUuid = application.getResourceTypeUuids().iterator().next();
-            jsonValue.put(RESOURCE_TYPE_UUID, resourceTypeUuid);
+            retrieveResourceType(jsonValue, callingSubject, realm);
 
         } catch (EntitlementException eE) {
             debug.error("Error filtering policy create CREST request", eE);
             handler.handleError(resourceErrorHandler.handleError(context, request, eE));
+            return;
+        } catch (ResourceException rE) {
+            debug.error("Error filtering policy create CREST request", rE);
+            handler.handleError(rE);
+            return;
         }
 
         next.handleCreate(context, request, new TransformationHandler(handler));
@@ -164,8 +141,69 @@ public class PolicyV1Filter implements Filter {
     @Override
     public void filterUpdate(ServerContext context, UpdateRequest request,
                              ResultHandler<Resource> handler, RequestHandler next) {
-        // Forward onto next handler.
+        try {
+            final JsonValue jsonValue = request.getContent();
+            final Subject callingSubject = contextHelper.getSubject(context);
+            final String realm = contextHelper.getRealm(context);
+
+            retrieveResourceType(jsonValue, callingSubject, realm);
+
+        } catch (EntitlementException eE) {
+            debug.error("Error filtering policy create CREST request", eE);
+            handler.handleError(resourceErrorHandler.handleError(context, request, eE));
+            return;
+        } catch (ResourceException rE) {
+            debug.error("Error filtering policy create CREST request", rE);
+            handler.handleError(rE);
+            return;
+        }
+
         next.handleUpdate(context, request, new TransformationHandler(handler));
+    }
+
+    /**
+     * Retrieves the resource type Id from the containing application
+     * and sets it within the policies' JSON representation.
+     *
+     * @param jsonValue
+     *         the policies' JSON representation
+     * @param callingSubject
+     *         the calling subject
+     * @param realm
+     *         the realm
+     *
+     * @throws EntitlementException
+     *         should some policy error occur
+     * @throws ResourceException
+     *         should some violation occur that doesn't satisfy policy v1.0
+     */
+    private void retrieveResourceType(JsonValue jsonValue, Subject callingSubject, String realm) throws EntitlementException, ResourceException {
+
+        final String applicationName = jsonValue.get("applicationName").asString();
+
+        if (applicationName == null) {
+            throw ResourceException
+                    .getException(ResourceException.BAD_REQUEST, "Invalid application name defined in request");
+        }
+
+        final ApplicationService applicationService = applicationServiceFactory.create(callingSubject, realm);
+        final Application application = applicationService.getApplication(applicationName);
+
+        if (application == null) {
+            throw ResourceException
+                    .getException(ResourceException.BAD_REQUEST, "Unable to find application " + applicationName);
+        }
+
+        if (application.getResourceTypeUuids().size() != 1) {
+            throw ResourceException
+                    .getException(ResourceException.BAD_REQUEST,
+                            "Cannot create policy under an application with more than " +
+                                    "one resource type using version 1.0 of this endpoint");
+        }
+
+        // Retrieve the resource type from the applications single resource type.
+        final String resourceTypeUuid = application.getResourceTypeUuids().iterator().next();
+        jsonValue.put(RESOURCE_TYPE_UUID, resourceTypeUuid);
     }
 
     /**

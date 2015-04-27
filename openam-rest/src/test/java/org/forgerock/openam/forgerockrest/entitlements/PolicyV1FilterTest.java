@@ -134,7 +134,7 @@ public class PolicyV1FilterTest {
         Application application = mock(Application.class);
         given(applicationService.getApplication("testApp")).willReturn(application);
 
-        Set<String> resourceTypeUUIDs = new HashSet<String>(CollectionUtils.asSet("abc-def-hij"));
+        Set<String> resourceTypeUUIDs = new HashSet<>(CollectionUtils.asSet("abc-def-hij"));
         given(application.getResourceTypeUuids()).willReturn(resourceTypeUUIDs);
 
         // When
@@ -212,7 +212,7 @@ public class PolicyV1FilterTest {
         Application application = mock(Application.class);
         given(applicationService.getApplication("testApp")).willReturn(application);
 
-        Set<String> resourceTypeUUIDs = new HashSet<String>(CollectionUtils.asSet("abc-def-hij", "123-456-789"));
+        Set<String> resourceTypeUUIDs = new HashSet<>(CollectionUtils.asSet("abc-def-hij", "123-456-789"));
         given(application.getResourceTypeUuids()).willReturn(resourceTypeUUIDs);
 
         // When
@@ -227,18 +227,33 @@ public class PolicyV1FilterTest {
     }
 
     /**
-     * Verify that update requests are forwarded on and that the response is tailored to represent v1.0 policy.
+     * Verifies that the appropriate resource type is associated with the policy being updated.
      */
     @Test
-    public void forwardOnUpdate() {
+    public void resourceTypeAssociationOnUpdate() throws Exception {
         // Given
+        given(contextHelper.getRealm(context)).willReturn("/abc");
+        given(contextHelper.getSubject(context)).willReturn(subject);
+
         UpdateRequest updateRequest = mock(UpdateRequest.class);
+        JsonValue jsonValue = json(object(field("applicationName", "testApp")));
+        given(updateRequest.getContent()).willReturn(jsonValue);
+
+        given(applicationServiceFactory.create(subject, "/abc")).willReturn(applicationService);
+        Application application = mock(Application.class);
+        given(applicationService.getApplication("testApp")).willReturn(application);
+
+        Set<String> resourceTypeUUIDs = new HashSet<>(CollectionUtils.asSet("abc-def-hij"));
+        given(application.getResourceTypeUuids()).willReturn(resourceTypeUUIDs);
 
         // When
         filter.filterUpdate(context, updateRequest, resourceResultHandler, requestHandler);
 
         // Then
+        verify(applicationServiceFactory).create(subject, "/abc");
+        verify(applicationService).getApplication("testApp");
         verify(requestHandler).handleUpdate(eq(context), eq(updateRequest), resourceResultHandlerCaptor.capture());
+        assertThat(jsonValue.get("resourceTypeUuid").asString()).isEqualTo("abc-def-hij");
 
         // Now exercise the internal static result handler.
         exerciseTransformationHandler(resourceResultHandlerCaptor.getValue());
