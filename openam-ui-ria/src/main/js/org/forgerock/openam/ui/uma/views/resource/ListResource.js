@@ -60,9 +60,9 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
                         dialog.enableButtons(false);
                         dialog.getButton("btnOk").text($.t("common.form.working"));
                         UMADelegate.revokeAllResources().done(function() {
-                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "revokeAllResourcesSuccess");
+                            EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "revokeAllResourcesSuccess");
                         }).fail(function(error) {
-                        MessageManager.messages.addMessage({ message: JSON.parse(error.responseText).message, type: "error"});
+                            MessageManager.messages.addMessage({ message: JSON.parse(error.responseText).message, type: "error"});
                         }).always(function() {
                             dialog.close();
                     });
@@ -147,12 +147,11 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
                     name: "share",
                     label: "",
                     cell: Backgrid.Cell.extend({
-                        className: "icon-share",
+                        className: "fa fa-share-alt",
                         events: { "click": "share" },
                         share: function(e) {
                             var shareView = new CommonShare();
-                            shareView.data.currentResourceSetId = this.model.get('_id');
-                            shareView.renderDialog();
+                            shareView.renderDialog(this.model.get('_id'));
                         },
                         render: function () {
                             this.$el.attr({"title": $.t("uma.share.shareResource")});

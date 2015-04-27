@@ -40,7 +40,7 @@ define( "org/forgerock/openam/ui/uma/views/share/BaseShare", [
             self.shareView.noBaseTemplate = true;
             self.parentRender(function(){
                 self.data.resourceSet = {};
-                self.shareView.render([args], callback);
+                self.shareView.render(args, callback);
             }, callback);
         }
 

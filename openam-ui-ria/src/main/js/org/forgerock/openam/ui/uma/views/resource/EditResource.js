@@ -87,8 +87,7 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
         },
         onShare: function() {
             var shareView = new CommonShare();
-            shareView.data.currentResourceSetId = this.model.id;
-            shareView.renderDialog();
+            shareView.renderDialog(this.model.id);
         },
         render: function(args, callback) {
             var collection, grid, id = null, options, paginator, RevokeCell, SelectizeCell, self = this;
@@ -110,7 +109,9 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
              * FIXME: Ideally the data needs to the be whole model, but I'm told it's also global so we're
              * copying in just the attributes I need ATM
              */
+            this.data = {};
             this.data.name = this.model.get('name');
+            this.data.icon = this.model.get('icon_uri');
 
             // FIXME: Re-enable filtering and pagination
             //     UserPoliciesCollection = Backbone.PageableCollection.extend({
@@ -245,6 +246,9 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
                 self.$el.find("#backgridContainer").append(grid.render().el);
                 // FIXME: Re-enable filtering and pagination
                 // self.$el.find("#paginationContainer").append(paginator.render().el);
+                self.$el.find("#umaShareImage img").error(function () {
+                    $(this).parent().addClass('no-image');
+                });
             });
         },
         syncModel: function(id) {

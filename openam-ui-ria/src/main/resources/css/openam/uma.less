@@ -89,9 +89,9 @@ span.item-button-panel {
 
     > span {
         opacity:0.5;
-        transition:opacity 200ms linear;
+        .transition(opacity, 200ms, linear);
 
-        &.icon-checkmark {
+        &.fa-check {
             display:none;
         }
 
@@ -102,10 +102,6 @@ span.item-button-panel {
     }
 }
 
-
-.content-bg {
-    padding: 20px 10px;
-}
 
 .policy-header {
     padding:0 0 30px;
@@ -137,47 +133,39 @@ span.item-button-panel {
     }
 }
 
-
-
 .selectize-control.multi .selectize-input {
 
-    padding: 5px;
-    margin: 5px 0 0 0;
-    border-radius: 0;
-    border-top-color: #b7b7b7;
-    border-left-color: #b7b7b7;
 
-    &.has-items{
-        padding: 3px 15px 0px 3px;
+    &.has-items {
+      padding-left: 5px;
+      padding-right: 5px;
     }
 
-}
+     > div {
+         cursor: pointer;
+         margin: 0 2px 2px 0;
+         padding: 1px 5px 0;
+         background: #A4CAE7;
+         color: #095390;
+         border: 1px solid #90A7BA;
+         border-radius: 2px;
 
-.selectize-input > input {
-    margin: 0 5px 0 5px !important;
-}
-
-
-html .selectize-dropdown .optgroup-header{
-    font-weight:bold;
-    color:#80b7ab;
-}
-
-.selectize-control.multi .selectize-input > div {
-    cursor: pointer;
-    margin: 0 2px 2px 0;
-    padding: 1px 5px 0;
-    background: #A4CAE7;
-    color: #095390;
-    border: 1px solid #90A7BA;
-    border-radius: 2px;
-
-    &:hover, &.active{
-        background: #EFB6BE;
-        border: 1px solid #DD7785;
-        color: #CA3232;
+         &:hover, &.active{
+             background: #EFB6BE;
+             border: 1px solid #DD7785;
+             color: #CA3232;
+         }
     }
 }
+
+.selectize-dropdown-content > div{
+    border-top: 1px solid #eee;
+
+    &:first-of-type{
+        border-top:none;
+    }
+}
+
 
 .backgrid-readonly{
 
@@ -200,22 +188,8 @@ html .selectize-dropdown .optgroup-header{
 
 
 
-.selectize-control.single .selectize-input{
-    padding:5px;
-    border-radius: 0;
-}
-
-
-.selectize-dropdown-content > div{
-    border-top: 1px solid #eee;
-
-    &:first-of-type{
-        border-top:none;
-    }
-}
-
 #lastFSlash, select {
-    transition:opacity 300ms linear;
+    .transition(opacity, 300ms, linear);
     &.fade{
         opacity:0;
     }
@@ -237,62 +211,45 @@ body, .modal-open {
     }
 }
 
-.modal-header {
-    background-color:@cell-hover-color;
-}
 
-.page-header {
-    h1 {
-        .fa {
-            color: #9AA2A6;
-            font-size: 20px;
-            vertical-align: middle;
+#umaShareImage.header-icon {
+    display:block;
+    position:relative;
+    background-color:transparent;
+    .transition(background-color, 200ms, linear);
+
+    // If this img fails to load the class no-image is added to #umaShareImage
+    img {
+        width: 64px;
+        height: 64px;
+        border-radius: 32px;
+        overflow: hidden;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    &.no-image{
+        background-color:#519387;
+        img {
+            display:none;
         }
     }
-    img {
-        float: left;
-    }
 }
 
+
 #uma {
+
+
     input[type="text"]:invalid:required, input[type="text"].invalid {
         .invalid-background;
-        transition: background-color 200ms linear;
-    }
-
-    #selectUser {
-        width: 370px;
-        margin: 0 15px 10px 0;
-    }
-
-    #selectPermission {
-        min-width:370px;
-        margin: 0 15px 10px 0;
+        .transition(background-color, 200ms, linear);
     }
 
     #resourceList {
         margin-bottom:30px;
     }
 
-    input.button {
-        padding-top: 5px;
-        padding-bottom: 5px;
-        margin: 26px 0 0 0;
-    }
-
-    label {
-        display: block;
-        padding: 0 0 4px 2px;
-        color: grey;
-    }
-
-    .panel-body {
-        padding: 5px 20px;
-    }
-
-    .template-cell a {
-        float:right;
-    }
 
     .backgrid {
 
@@ -300,12 +257,18 @@ body, .modal-open {
             text-align: left;
         }
 
+        .template-cell a {
+            float:right;
+        }
+
         td.uri-cell{
 
             // TODO: BOOTSTRAP: Removed due to build issues. Will need re-adding
-            //.transition(background, 0.1s);
+            .transition(background, 0.1s);
             &:hover{
                 background-color: @cell-hover-color;
+                border-bottom-color: @cell-hover-color;
+
                 cursor:pointer;
                 a {
                     color:#f7f7f7;
@@ -314,10 +277,15 @@ body, .modal-open {
 
         }
 
-        td:not(.uri-cell) a {
+        td a:hover{
+            text-decoration: none;
+        }
+        td:not(.uri-cell) a:hover {
             // Adds the click event to the td so that the entire cell is clickable so underline not needed
             text-decoration: underline;
         }
+
+
 
         th {
             text-align: left;
@@ -336,7 +304,6 @@ body, .modal-open {
                 float: left;
                 color: @text-base-color;
                 font-size: 14px;
-
             }
 
             &.sortable a {
@@ -361,12 +328,13 @@ body, .modal-open {
                 padding: 8px 8px;
                 vertical-align: middle;
 
-                &.icon-share {
+                &.fa-share-alt {
                     font-size:14px;
                     text-align:right;
 
                     &:hover {
                         color: @cell-hover-color;
+                        cursor:pointer;
                     }
                 }
             }
@@ -391,7 +359,7 @@ body, .modal-open {
         tbody tr.unsaved-changes {
 
             background-color:#fff;
-            transition: background 0.2s linear;
+            .transition(background, 0.2s, linear);
 
             .backgrid-revoke-cell {
                 #revoke {
@@ -436,7 +404,7 @@ body, .modal-open {
 
         width: 64px;
 
-        [class^="icon-"], [class*=" icon-"] {
+        [class^="fa-"], [class*=" fa-"] {
             font-size: 12px;
             padding: 13px 10px 13px 10px;
 
@@ -459,89 +427,19 @@ body, .modal-open {
 
     }
 
-    .search {
-
-    }
-
-    .selectize-control.multi .selectize-input, .selectize-control.single .selectize-input{
-        margin: 5px 0 0 0;
-    }
-
-
-    span.tooltips:hover span, span.tooltips:focus span {
-        width: 200px;
-        margin-left: -100px;
-    }
-
-    span.tooltips span {
-
-        color: #d7e9f8;
-        background-color: @table-base-color;
-        padding: 6px 5px;
-        background-image: -webkit-linear-gradient(top, lighten(@table-base-color, 10%), @table-base-color);
-    }
-
-    span.tooltips span:after {
-        border-top: 8px solid @table-base-color;
-    }
-
-    #footerShare{
-        margin: 5px -15px -15px;
-        border-top: 1px solid rgb(213, 213, 213);
-        padding: 15px;
-        background-color: #eee;
-        border-radius: 0 0 5px 5px;
-        #footerNav{
-
-            margin: 9px 0;
-            font-size: 13px;
-            line-height: 13px;
-            a {
-                text-decoration:none
-            }
-
-            #shareCounter {
-                display: inline-block;
-                color: grey;
-                border-left: 2px solid grey;
-                padding-left: 11px;
-                margin-left: 10px;
-            }
-
-            .icon-users, .icon-user, .icon-cog, .icon-lock{
-                font-size:13px;
-                padding-right:3px;
-                cursor:auto;
-            }
-        }
-
-        #footerActions {
-            float:right;
-            margin-bottom: 0px;
-        }
-
-        #footerNav {
-            float:left;
-        }
-    }
-
     #advancedView {
         overflow:hidden;
         max-height:0;
         opacity:0;
-        transition:max-height 500ms ease-out, opacity 500ms ease-in-out ;
+        transition: opacity 500ms ease-in-out ;
         border-bottom:none;
     }
 
-    #selectAuthentication{
-        width:200px;
-        background-color:#ddd;
-        display:none;
-        margin-right:20px;
-        height:59px;
-    }
-
     &.advanced-mode{
+
+        #shareCounter, #shareCounterContainer{
+            display:none;
+        }
 
         #advancedView{
             max-height:500px;
@@ -549,69 +447,9 @@ body, .modal-open {
             transition:max-height 500ms ease-out, opacity 500ms ease-in-out ;
         }
 
-        #selectAuthentication{
-            display:block;
-            clear:left;
-        }
-
-    }
-
-}
-
-/* new submenu style */
-#menu {
-    .menu {
-        margin:0 0 15px 0;
-    }
-}
-
-.content {
-    padding: 0px 10px;
-}
-
-.submenubar {
-    clear: both;
-    border: none;
-    margin: 0 5px 0;
-
-    li a {
-        text-decoration:none;
-        color: #777;
-    }
-
-    a:hover, .active a{
-        border-radius: 0;
-        background-color: transparent;
-        color: #80b7ab;
-
-        &:focus{
-            box-shadow:none;
-        }
     }
 }
 
 #dialog-background.show {
     opacity: 0.5;
-}
-
-.border-circle-32 {
-    height: 32px;
-    border-radius: 21px;
-    margin: 0 10px 0 0;
-    width: 32px;
-    overflow: hidden;
-}
-
-@media (min-width: 768px) {
-    #subNavBar .nav-subnav > li.active > a:after {
-        border-bottom: 6px solid #eee;
-    }
-}
-
-.shareDialog {
-    .modal-footer {
-        position: relative;
-        margin-top: -65px;
-        float: right;
-    }
 }

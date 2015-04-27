@@ -1,5 +1,13 @@
 <div class='container'>
-    <div class='page-header'>
+    <div class="page-header">
+        <span id="umaShareImage" class="header-icon pull-left">
+            {{#if icon}}
+            <img title="{{ name }}" src="{{ icon }}" />
+            {{else}}
+            <i class="fa fa-share-alt"></i>
+            {{/if}}
+        </span>
+        <h4 class="page-type">{{t "uma.resources.show.resource"}}</h4>
         <div class="pull-right">
             <button id="share" type="button" class="btn btn-primary">
                 <i class="fa fa-share-alt"></i>
@@ -10,7 +18,7 @@
                 {{t "uma.resources.show.revokeAll"}}
             </button>
         </div>
-        <h1>{{t "uma.resources.show.resource"}}: <span>{{name}}</span> <i class="fa fa-question-circle" data-toggle="tooltip" title="{{t "uma.resources.show.subtitle"}}"></i></h1>
+        <h1>{{ name }} <i class="fa fa-question-circle" data-toggle="tooltip" title="{{t "uma.resources.show.subtitle"}}"></i></h1>
     </div>
 
     <div id="uma">

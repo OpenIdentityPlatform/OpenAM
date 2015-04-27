@@ -49,11 +49,11 @@ define("org/forgerock/openam/ui/uma/views/share/ShareCounter", [
         },
 
         getShareIcon: function(count) {
-            var shareIcon = 'lock';
+            var shareIcon = 'fa fa-lock';
             if (count === 1){
-                shareIcon = 'user';
+                shareIcon = 'fa fa-user';
             } else if (count > 1){
-                shareIcon = 'users';
+                shareIcon = 'fa fa-users';
             }
             return shareIcon;
         }

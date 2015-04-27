@@ -55,6 +55,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
             console.error('Unrecoverable load failure UMAResourceSetWithPolicy. ' +
                            response.responseJSON.code + ' (' + response.responseJSON.reason + ') ' +
                            response.responseJSON.message);
+            // TODO : Fire and event message
         },
         onParentModelSync: function(model, response) {
             // Hardwire the policyID into the policy as it's ID
@@ -81,27 +82,34 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
             return syncRequired;
         },
 
-        renderDialog: function(callback) {
+        renderDialog: function(args, callback) {
             var self = this,
+                $div = $('<div></div>'),
                 data = {},
-                args = {
+                options = {
                     type: BootstrapDialog.TYPE_DEFAULT,
                     title: $.t("uma.share.shareResource"),
                     size: BootstrapDialog.SIZE_WIDE,
                     cssClass: "shareDialog",
+                    message: $div,
                     buttons: [{
-                        label: $.t("common.form.done"),
-                        cssClass: "btn-primary",
+                        label: $.t("common.form.close"),
+                        cssClass: "btn-default",
                         action: function(dialog){
                             dialog.close();
                         }
                     }],
                     onshow: function(dialog){
-                        self.element = dialog.$modalBody;
-                        self.render([self.data.currentResourceSetId, self.data.dialog], callback);
+                        self.element = $div;
+                        self.render(args, callback);
+                    },
+
+                    onshown: function(dialog){
+                        self.renderShareCounter(callback);
                     }
                 };
-            BootstrapDialog.show(args);
+
+            BootstrapDialog.show(options);
         },
 
         render: function(args, callback) {
@@ -111,7 +119,6 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
 
             // FIXME: Resolve unknown issue with args appearing as an Array
             if(args instanceof Array) {
-                this.data.dialog = args[1]; // This needs a tidyup. I am passing in true as the second args[1] to indicate the parent is a dialog
                 args = args[0];
             }
 
@@ -126,10 +133,10 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
             if (this.syncParentModel(args)) {
                 return;
             }
-
+            this.data = {};
             this.data.name = this.parentModel.get('name');
-            this.data.scopes = this.parentModel.get('scopes').toJSON();
             this.data.icon = this.parentModel.get('icon_uri');
+            this.data.scopes = this.parentModel.get('scopes').toJSON();
             collection = this.parentModel.get('policy').get('permissions');
             this.data.permissions = collection.toJSON();
 
@@ -172,8 +179,8 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
                 self.renderPermissionOptions();
                 self.renderShareCounter(callback);
                 self.$el.find("#advancedView").append(grid.render().el);
-                self.$el.find(".page-header img").error(function () { 
-                    $(this).hide(); 
+                self.$el.find("#umaShareImage img").error(function () {
+                    $(this).parent().addClass('no-image');
                 });
             });
         },
@@ -271,18 +278,16 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
             })
             .fail(function(response) {
                 if (response.status && response.status === 500) {
-                    permissions.remove(permission);    
+                    permissions.remove(permission);
                 }
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policyCreatedFail");
-                 
-
             });
         },
 
         renderShareCounter: function(callback){
             var policy = this.parentModel.get('policy'),
                 permissionCount = policy ? policy.get('permissions').length : 0;
-                ShareCounter.render(permissionCount, callback);
+            ShareCounter.render(permissionCount, callback);
         },
 
         onToggleAdvanced: function(event) {

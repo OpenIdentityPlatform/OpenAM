@@ -1,24 +1,39 @@
-
 <div class="page-header">
-    {{#if icon}}
-        <img title="{{ name }}" src="{{ icon }}" alt="Image not found" class="float-left border-circle-32"/>
-    {{/if}}
+    <span id="umaShareImage" class="header-icon pull-left fa fa-file-image-o">
+        {{#if icon}}
+        <img title="{{ name }}" src="{{ icon }}"/>
+        {{else}}
+        <i class="fa fa-share-alt"></i>
+        {{/if}}
+    </span>
+    <h4 class="page-type">{{t 'uma.share.share' }}</h4>
     <h1>{{ name }}</h1>
 </div>
 
 <div id="uma">
 
-    <div class="clearfix" >
+    <div class="panel panel-default">
+      <div class="panel-body" >
 
-        <div id="advancedView" class="form-group"></div>
 
-        {{#if notFound}}
-        <div class="striped-list" id="resourceList">
+    <div id="shareCounterContainer" class="alert alert-info" role="alert">
+        <div class="media" id="shareCounter">&nbsp;</div>
+    </div>
+
+
+    <div id="advancedView" class="form-group"></div>
+
+    {{#if notFound}}
+    <div class="col-sm-12">
+        <div class="striped-list " id="resourceList">
             <ul><li class="highlight-warning">{{t 'uma.share.notSpecifiedResource'}}</li></ul>
         </div>
-        {{else}}
-        <div id="selectUser" class="form-group">
-            <span class="help-block">{{t 'uma.share.people'}}</span>
+    </div>
+    {{else}}
+
+    <div class="row ">
+        <div id="selectUser" class="form-group col-sm-6">
+            <label>{{t 'uma.share.people'}}</label>
             <select placeholder="{{t 'common.form.startTypingToSearch'}}">
                 <option disabled selected value>{{t 'common.form.pleaseSelect'}}</option>
                 {{#each permissions}}
@@ -26,8 +41,8 @@
                 {{/each}}
             </select>
         </div>
-        <div id="selectPermission" class="form-group">
-            <span class="help-block">{{t 'uma.share.permission'}}</span>
+        <div id="selectPermission" class="form-group col-sm-6">
+            <label>{{t 'uma.share.permission'}}</label>
             <select multiple class="selectize">
                 <option disabled selected value>{{t 'common.form.pleaseSelect'}}</option>
                 {{#each scopes}}
@@ -35,22 +50,19 @@
                 {{/each}}
             </select>
         </div>
-
-        <!--<div id="selectAuthentication" class="float-left">
-            <label>Authentication method</label>
-        </div>-->
-
-        <div class="form-group">
-            <input type="button" value="{{t 'uma.share.share'}}" id="shareButton" class=" btn btn-primary" disabled/>
-        </div>
-        {{/if}}
     </div>
 
-    <div id="footerShare" class="form-group clearfix">
-        <div id="footerNav" class="form-group">
-            <a href="#" id="toggleAdvanced" ><span class="icon-cog"></span>{{t 'uma.share.advanced'}}</a>
-            <div id="shareCounter"></div>
-        </div>
+    <!--<div id="selectAuthentication" class="float-left">
+    <label>Authentication method</label>
+    </div>-->
+
+    <div class="clearfix pull-right">
+        <a href="#" id="toggleAdvanced" role="button" class="btn btn-default"><i class="fa fa-cog"></i> {{t 'uma.share.advanced'}}</a>
+        <input type="button" value="{{t 'uma.share.share'}}" id="shareButton" class="btn btn-primary" disabled/>
     </div>
+    {{/if}}
+
+</div>
+</div>
 
 </div>
