@@ -1,41 +1,27 @@
-/**
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
- * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
- *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
- *
- * You can obtain a copy of the License at
- * https://opensso.dev.java.net/public/CDDLv1.0.html or
- * opensso/legal/CDDLv1.0.txt
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at opensso/legal/CDDLv1.0.txt.
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
- *
- * $Id: LDAP.java,v 1.17 2010/01/25 22:09:16 qcheng Exp $
- *
- */
-
 /*
- * Portions Copyrighted 2010-2014 ForgeRock AS, Inc.
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2014-2015 ForgeRock AS.
  */
-package org.forgerock.openam.authentication.modules.scripted;
+package org.forgerock.openam.scripting.api;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.scripting.ScriptConstants;
 import org.forgerock.openam.utils.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,9 +30,11 @@ import java.util.Set;
 /**
  * A wrapper class to limit an authentication script's exposure to a AmIdentity object
  */
-class ScriptedIdentity {
+public class ScriptedIdentity {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptConstants.LOGGER_NAME);
+
     private final AMIdentity amIdentity;
-    private static final Debug DEBUG = Debug.getInstance("ScriptedIdentity");
 
     /**
      * The constructor for the <code>ScriptedIdentity</code> object
@@ -65,9 +53,9 @@ class ScriptedIdentity {
         try {
             return amIdentity.getAttribute(attributeName);
         } catch (IdRepoException e) {
-            DEBUG.message("Exception trying to get attribute", e);
+            LOGGER.warn("Exception trying to get attribute", e);
         } catch (SSOException e) {
-            DEBUG.message("SSO Exception", e);
+            LOGGER.warn("SSO Exception", e);
         }
 
         return null;
@@ -86,9 +74,9 @@ class ScriptedIdentity {
         try {
             amIdentity.setAttributes(attributes);
         } catch (IdRepoException e) {
-            DEBUG.message("Exception trying to set attribute", e);
+            LOGGER.warn("Exception trying to set attribute", e);
         } catch (SSOException e) {
-            DEBUG.message("SSO Exception", e);
+            LOGGER.warn("SSO Exception", e);
         }
     }
 
@@ -97,9 +85,9 @@ class ScriptedIdentity {
         try {
             currentAttributeValues = amIdentity.getAttribute(attributeName);
         } catch (IdRepoException e) {
-            DEBUG.message("Attribute '" + attributeName + "' doesn't currently exist. Creating new attribute..");
+            LOGGER.warn("Attribute '" + attributeName + "' doesn't currently exist. Creating new attribute..");
         } catch (SSOException e) {
-            DEBUG.message("SSO Exception", e);
+            LOGGER.warn("SSO Exception", e);
         }
 
         if(currentAttributeValues == null) {
@@ -117,9 +105,10 @@ class ScriptedIdentity {
         try {
             amIdentity.store();
         } catch (IdRepoException e) {
-            DEBUG.message("Exception persisting attribute", e);
+            LOGGER.warn("Exception persisting attribute", e);
         } catch (SSOException e) {
-            DEBUG.message("Exception persisting attribute", e);
+            LOGGER.warn("Exception persisting attribute", e);
         }
     }
+
 }

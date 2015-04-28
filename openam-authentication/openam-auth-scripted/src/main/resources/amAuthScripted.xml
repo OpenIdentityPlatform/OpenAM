@@ -96,8 +96,9 @@
                         <Value>java.util.TreeSet</Value>
                         <Value>com.sun.identity.shared.debug.Debug</Value>
                         <Value>org.forgerock.openam.authentication.modules.scripted.*</Value>
-                        <Value>org.forgerock.openam.scripting.http.GroovyHttpClient</Value>
-                        <Value>org.forgerock.openam.scripting.http.JavaScriptHttpClient</Value>
+                        <Value>org.forgerock.openam.scripting.api.http.GroovyHttpClient</Value>
+                        <Value>org.forgerock.openam.scripting.api.http.JavaScriptHttpClient</Value>
+                        <Value>org.forgerock.openam.scripting.api.ScriptedIdentity</Value>
                         <Value>org.forgerock.http.client.*</Value>
                         <Value>groovy.json.JsonSlurper</Value>
                     </DefaultValues>

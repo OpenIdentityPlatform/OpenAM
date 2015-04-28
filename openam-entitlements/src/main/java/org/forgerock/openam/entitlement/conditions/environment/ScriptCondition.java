@@ -21,21 +21,27 @@ import static org.forgerock.json.fluent.JsonValue.object;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.ConditionDecision;
 import com.sun.identity.entitlement.EntitlementConditionAdaptor;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
+import com.sun.identity.idm.IdRepoException;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.client.RestletHttpClient;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.scripting.ScriptConstants.ScriptContext;
 import org.forgerock.openam.scripting.ScriptEvaluator;
 import org.forgerock.openam.scripting.ScriptException;
 import org.forgerock.openam.scripting.ScriptObject;
 import org.forgerock.openam.scripting.SupportedScriptingLanguage;
+import org.forgerock.openam.scripting.api.ScriptedIdentity;
+import org.forgerock.openam.scripting.api.ScriptedSession;
 import org.forgerock.openam.scripting.service.ScriptConfiguration;
 import org.forgerock.openam.scripting.service.ScriptingService;
 import org.forgerock.openam.scripting.service.ScriptingServiceFactory;
@@ -62,6 +68,8 @@ public class ScriptCondition extends EntitlementConditionAdaptor {
     private final ScriptingServiceFactory<ScriptConfiguration> scriptingServiceFactory;
     private final ScriptEvaluator evaluator;
 
+    private final CoreWrapper coreWrapper;
+
     private String scriptId;
 
     public ScriptCondition() {
@@ -69,6 +77,7 @@ public class ScriptCondition extends EntitlementConditionAdaptor {
                 Key.get(new TypeLiteral<ScriptingServiceFactory<ScriptConfiguration>>() {}));
         evaluator = InjectorHolder.getInstance(
                 Key.get(ScriptEvaluator.class, Names.named(ScriptContext.AUTHORIZATION_ENTITLEMENT_CONDITION.name())));
+        coreWrapper = InjectorHolder.getInstance(CoreWrapper.class);
     }
 
     @Override
@@ -120,13 +129,21 @@ public class ScriptCondition extends EntitlementConditionAdaptor {
             scriptVariables.put("httpClient", getHttpClient(configuration.getLanguage()));
             scriptVariables.put("authorised", Boolean.FALSE);
 
+            SSOToken ssoToken = SubjectUtils.getSSOToken(subject);
+
+            if (ssoToken != null) {
+                // If a token is present include the corresponding identity and session objects.
+                scriptVariables.put("identity", new ScriptedIdentity(coreWrapper.getIdentity(ssoToken)));
+                scriptVariables.put("session", new ScriptedSession(ssoToken));
+            }
+
             evaluator.evaluateScript(script, scriptVariables);
 
             boolean authorised = (Boolean)scriptVariables.get("authorised");
             return new ConditionDecision(authorised, Collections.<String, Set<String>>emptyMap());
 
-        } catch (ScriptException | javax.script.ScriptException sE) {
-            throw new EntitlementException(EntitlementException.CONDITION_EVALUTATION_FAILED, sE);
+        } catch (ScriptException | javax.script.ScriptException | IdRepoException | SSOException ex) {
+            throw new EntitlementException(EntitlementException.CONDITION_EVALUTATION_FAILED, ex);
         }
     }
 

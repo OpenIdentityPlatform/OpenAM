@@ -13,14 +13,12 @@
  *
  * Copyright 2010-2014 ForgeRock AS.
  */
-package org.forgerock.openam.scripting.http;
+package org.forgerock.openam.scripting.api.http;
 
 import org.forgerock.http.client.RestletHttpClient;
 import org.forgerock.http.client.response.HttpClientResponse;
 
 import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 

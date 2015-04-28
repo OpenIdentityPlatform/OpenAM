@@ -65,6 +65,8 @@ public final class ScriptConstants {
     public static final String SCRIPT_ERROR_MESSAGE = "validation-error-message";
     public static final String SCRIPT_ERROR_DETAIL = "validation-error-detail";
 
+    public static final String LOGGER_NAME = "Scripting";
+
     /**
      * The context in which a script will be used.
      */

@@ -26,6 +26,7 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.http.client.RestletHttpClient;
+import org.forgerock.openam.scripting.ScriptConstants;
 import org.forgerock.openam.scripting.ScriptEngineConfiguration;
 import org.forgerock.openam.scripting.ScriptEngineConfigurator;
 import org.forgerock.openam.scripting.ScriptEvaluator;
@@ -38,7 +39,7 @@ import org.forgerock.openam.scripting.ThreadPoolScriptEvaluator;
 import org.forgerock.openam.scripting.datastore.ScriptConfigurationDataStore;
 import org.forgerock.openam.scripting.datastore.ScriptingDataStore;
 import org.forgerock.openam.scripting.datastore.ScriptingDataStoreFactory;
-import org.forgerock.openam.scripting.http.JavaScriptHttpClient;
+import org.forgerock.openam.scripting.api.http.JavaScriptHttpClient;
 import org.forgerock.openam.scripting.service.ScriptConfiguration;
 import org.forgerock.openam.scripting.service.ScriptConfigurationService;
 import org.forgerock.openam.scripting.service.ScriptingService;
@@ -65,7 +66,8 @@ public class ScriptingGuiceModule extends AbstractModule {
     protected void configure() {
         bind(ScriptValidator.class).to(StandardScriptValidator.class);
 
-        bind(Logger.class).annotatedWith(Names.named("ScriptLogger")).toInstance(LoggerFactory.getLogger("Scripting"));
+        bind(Logger.class).annotatedWith(Names.named("ScriptLogger"))
+                .toInstance(LoggerFactory.getLogger(ScriptConstants.LOGGER_NAME));
 
         install(new FactoryModuleBuilder()
                 .implement(new TypeLiteral<ScriptingService<ScriptConfiguration>>() {},

@@ -18,16 +18,22 @@ package org.forgerock.openam.entitlement.conditions.environment;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.verify;
+import static org.mockito.Mockito.mock;
 
 import com.google.inject.Binder;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.ConditionDecision;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.util.AuthSPrincipal;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
 import org.forgerock.guice.core.GuiceTestCase;
 import org.forgerock.guice.core.InjectorConfiguration;
 import org.forgerock.http.client.RestletHttpClient;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.scripting.ScriptConstants;
 import org.forgerock.openam.scripting.ScriptConstants.ScriptContext;
@@ -70,6 +76,8 @@ public class ScriptConditionTest extends GuiceTestCase {
     private ScriptEvaluator scriptEvaluator;
     @Mock
     private RestletHttpClient restletHttpClient;
+    @Mock
+    private CoreWrapper coreWrapper;
     @Captor
     private ArgumentCaptor<Bindings> bindingsCaptor;
     @Captor
@@ -107,6 +115,10 @@ public class ScriptConditionTest extends GuiceTestCase {
                 .annotatedWith(Names
                         .named(SupportedScriptingLanguage.JAVASCRIPT.name()))
                 .toInstance(restletHttpClient);
+
+        binder
+                .bind(CoreWrapper.class)
+                .toInstance(coreWrapper);
     }
 
     @Test
@@ -141,9 +153,12 @@ public class ScriptConditionTest extends GuiceTestCase {
     }
 
     @Test
-    public void successfulEvaluation() throws EntitlementException, ScriptException, javax.script.ScriptException {
+    public void successfulEvaluation()
+            throws EntitlementException, ScriptException, javax.script.ScriptException, IdRepoException, SSOException {
         // Given
         Subject subject = new Subject();
+        SSOToken token = mock(SSOToken.class);
+        subject.getPrivateCredentials().add(token);
         subject.getPrincipals().add(new AuthSPrincipal("user"));
         Map<String, Set<String>> env = new HashMap<>();
 
@@ -158,6 +173,7 @@ public class ScriptConditionTest extends GuiceTestCase {
                 .setScript("some-script-here")
                 .build();
         given(scriptingService.get("123-456-789")).willReturn(configuration);
+        given(coreWrapper.getIdentity(token)).willReturn(mock(AMIdentity.class));
 
         // When
         scriptCondition.setScriptId("123-456-789");
