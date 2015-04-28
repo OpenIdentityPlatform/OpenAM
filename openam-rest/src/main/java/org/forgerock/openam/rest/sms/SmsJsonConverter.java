@@ -22,6 +22,7 @@ import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchema;
+import org.apache.commons.lang.StringUtils;
 import org.forgerock.guava.common.collect.BiMap;
 import org.forgerock.guava.common.collect.HashBiMap;
 import org.forgerock.json.fluent.JsonException;
@@ -299,8 +300,8 @@ public class SmsJsonConverter {
     }
 
     private boolean shouldBeIgnored(String attributeName) {
-        return (schema.getAttributeSchema(attributeName).getI18NKey() == null || hiddenAttributeNames.contains
-                (attributeName));
+        return StringUtils.isBlank(schema.getAttributeSchema(attributeName).getI18NKey()) || hiddenAttributeNames.contains
+                (attributeName);
     }
 
     private AttributeSchemaConverter getAttributeConverter(String attributeName) {
