@@ -59,7 +59,9 @@ public class JwtSessionMapperConfig {
 
         // Configure signing algorithm and parameters
 
-        JwsAlgorithm signingAlgorithm = JwsAlgorithm.valueOf(CollectionHelper.getMapAttr(attrs, SIGNING_ALGORITHM));
+        String signingAlgorithmValue = CollectionHelper.getMapAttr(attrs, SIGNING_ALGORITHM);
+        JwsAlgorithm signingAlgorithm = signingAlgorithmValue == null ? JwsAlgorithm.NONE :
+                JwsAlgorithm.valueOf(signingAlgorithmValue);
         switch (signingAlgorithm) {
 
             case RS256:
