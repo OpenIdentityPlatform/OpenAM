@@ -1816,6 +1816,15 @@
                         </DefaultValues>
                     </AttributeSchema>
 
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-memberurl"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a2025">
+                        <DefaultValues>
+                            <Value>memberUrl</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-people-container-name"
                         type="single"
                         syntax="string"
