@@ -965,7 +965,7 @@
                             <Value>Session</Value>
                             <Value>SessionProperty</Value>
                             <Value>SimpleTime</Value>
-                            <Value>Script</Value>                                                                           s
+                            <Value>Script</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="entitlementCombiner" />
