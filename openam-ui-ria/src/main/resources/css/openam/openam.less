@@ -101,3 +101,51 @@
          -o-transition: @arguments;
             transition: @arguments;
 }
+
+// json-editor
+div[data-schemaid] {
+    > h3 {
+        display: none;
+    }
+
+    .well {
+        background: none;
+        border: none;
+        box-shadow: none;
+    }
+
+    .help-block {
+      max-height: 10em;
+      text-overflow: ellipsis;
+      transition: max-height 0.5s;
+      overflow: hidden;
+      padding-left: 5px;
+      padding-right: 5px;
+      margin-top: 15px;
+    }
+
+    .help-block:hover {
+        background-color: #eee;
+        cursor: pointer;
+    }
+
+    .help-block-collapsed {
+        max-height: 1.5em;
+
+        &:before {
+            content: "See more"; // TODO: i18n
+            float: right;
+            color: #519387;
+            cursor: pointer;
+        }
+    }
+
+    .help-block-expanded {
+        &:before {
+            content: "Hide"; // TODO: i18n
+            float: right;
+            color: #519387;
+            cursor: pointer;
+        }
+    }
+}

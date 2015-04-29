@@ -19,9 +19,9 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Advanc
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
-    "jsonEditor",
+    "org/forgerock/openam/ui/admin/utils/FormBuilder",
     "org/forgerock/openam/ui/admin/delegates/SMSDelegate"
-], function(AbstractView, Configuration, Constants, JSONEditor, SMSDelegate) {
+], function(AbstractView, Configuration, Constants, FormBuilder, SMSDelegate) {
     var AdvancedSettings = AbstractView.extend({
         template: "templates/admin/views/console/realms/authentication/AdvancedSettingsTemplate.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
@@ -36,37 +36,22 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Advanc
 
             SMSDelegate.getRealmAuthentication()
             .done(function(data) {
-                self.data.sms = self.sanitize(data);
-
-                var withIdsInArray = _.map(self.data.sms._schema.properties, function(value, key) {
-                        value._id = key;
-                        return value;
-                    }),
-                    sorted = _.sortBy(withIdsInArray, 'propertyOrder');
-
-                self.data.tabs = sorted;
+                self.data.sms = data;
 
                 self.parentRender(function() {
-                    self.$el.find("ul.nav.nav-tabs a").click(function(event) {
-                      // FIXME: Improve these two lines
-                      $("div.panel-body").empty();
-                      $("div.tab-pane").show();
+                    self.$el.find("div.tab-pane").show(); // FIXME: To remove
 
-                      var id = $(event.target).attr('href').slice(1),
-                          schema = self.data.sms._schema.properties[id],
-                          element = $("div.panel-body").get(0),
-                          editor = new JSONEditor(element, {
-                              disable_collapse: true,
-                              disable_edit_json: true,
-                              disable_properties: true,
-                              iconlib: "fontawesome4",
-                              schema: schema,
-                              theme: 'bootstrap3'
-                          });
+                    self.$el.find("ul.nav.nav-tabs a").on('show.bs.tab', function(event) {
+                        self.$el.find("div.panel-body").empty(); // FIXME: Improve
 
-                      // Pick from the initial values only the keys we're using
-                      editor.setValue(_.pick(self.data.sms, _.keys(schema.properties)));
+                        var id = $(event.target).attr('href').slice(1),
+                            schema = self.data.sms.schema.properties[id],
+                            element = $("div.panel-body").get(0);
+
+                        FormBuilder.build(element, schema, self.data.sms.values);
                     });
+
+                    self.$el.find('ul.nav a:first').tab('show');
 
                     if (callback) {
                         callback();
@@ -76,21 +61,6 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Advanc
             .fail(function() {
                 // TODO: Add failure condition
             });
-        },
-        sanitize: function(data) {
-            // CHANGED: Not required for this feed, but still needed later
-            // data._schema.title = "Authentication Core Settings";
-            // data._schema.type = "object";
-
-            data._schema.properties = _.omit(data._schema.properties, 'defaults');
-
-            _.forEach(data._schema.properties, function(property) {
-                // TODO Sometimes property.propertyOrder will be property.order, will have to account for this
-                property.propertyOrder = parseInt(property.order.slice(1), 10);
-                delete property.order;
-            });
-
-            return data;
         }
     });
 

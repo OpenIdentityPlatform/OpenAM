@@ -15,25 +15,26 @@
  */
 
 /*global define, $, _*/
-
 define("org/forgerock/openam/ui/admin/views/console/realms/Authentication", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "bootstrap-dialog",
     "org/forgerock/commons/ui/common/main/Configuration",
+    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/openam/ui/admin/utils/FormBuilder",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/commons/ui/common/util/Constants"
-], function(AbstractView, BootstrapDialog, Configuration, EventManager, Router, Constants) {
-
+    "org/forgerock/openam/ui/admin/delegates/SMSDelegate"
+], function(AbstractView, BootstrapDialog, Configuration, Constants, EventManager, FormBuilder, Router, SMSDelegate) {
     var Authentication = AbstractView.extend({
         template: "templates/admin/views/console/realms/AuthenticationTemplate.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
         events: {
-
             'click #addModule': 'addModule',
-            'click #addChain':  'addChain'
+            'click #addChain':  'addChain',
+            'show.bs.tab #settingsTab': 'renderTabSettings',
+            'show.bs.tab #chainsTab':   'renderTabChains',
+            'show.bs.tab #modulesTab':  'renderTabModules'
         },
-
         addChain: function(e) {
             e.preventDefault();
             // This is mock code, please swap out
@@ -47,7 +48,6 @@ define("org/forgerock/openam/ui/admin/views/console/realms/Authentication", [
                     label: "Next",
                     cssClass: "btn-primary",
                     action: function(dialog) {
-
                         // on success
                         dialog.close();
                         Router.navigate( href + $('#newName').val(), { trigger: true });
@@ -61,7 +61,6 @@ define("org/forgerock/openam/ui/admin/views/console/realms/Authentication", [
                     }
                 }]
             });
-
         },
 
         addModule: function(e) {
@@ -90,22 +89,58 @@ define("org/forgerock/openam/ui/admin/views/console/realms/Authentication", [
                     }
                 }]
             });
-
         },
-
 
         editChain: function(e) {
             e.preventDefault();
             Router.navigate( '#console/chaining/', {trigger: true});
         },
 
-
         render: function(args, callback) {
+            var self = this;
+
             this.data.realm = Configuration.globalData.auth.subRealm || "Top level Realm";
             this.data.consolePath = Constants.CONSOLE_PATH;
-            this.parentRender();
-        }
 
+            this.parentRender(function() {
+                self.$el.find('#settingsTab').tab('show');
+
+                if(callback) {
+                    callback();
+                }
+            });
+        },
+        renderTabSettings: function(event) {
+            var self = this;
+
+            SMSDelegate.getRealmAuthentication()
+            .done(function(data) {
+                FormBuilder.build(self.$el.find('#tabSettings .col-md-6:first').get(0), {
+                    type: 'object',
+                    properties: {
+                        adminAuthModule: data.schema.properties["null"].properties.adminAuthModule,
+                        loginSuccessUrl: data.schema.properties.postauthprocess.properties.loginSuccessUrl
+
+                    }
+                }, data.values);
+
+                FormBuilder.build(self.$el.find('#tabSettings .col-md-6:last').get(0), {
+                    type: 'object',
+                    properties: {
+                        adminAuthModule: data.schema.properties["null"].properties.adminAuthModule
+                    }
+                }, data.values);
+            })
+            .fail(function() {
+                // TODO: Add failure condition
+            });
+        },
+        renderTabChains: function(event) {
+            // Not Implemented
+        },
+        renderTabModules: function(event) {
+            // Not Implemented
+        }
     });
 
     return new Authentication();

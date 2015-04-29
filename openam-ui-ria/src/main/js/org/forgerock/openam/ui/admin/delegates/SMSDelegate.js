@@ -14,7 +14,7 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global define*/
+/*global $ _ define*/
 define("org/forgerock/openam/ui/admin/delegates/SMSDelegate", [
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants"
@@ -22,10 +22,46 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegate", [
     var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/");
 
     obj.getRealmAuthentication = function(username, policyId, permissions) {
-      return obj.serviceCall({
-          url: "realm-config/authentication?_action=template",
-          type: "POST"
+      var deferred = new $.Deferred(),
+          url = "realm-config/authentication",
+          schemaPromise = obj.serviceCall({
+              url: url + "?_action=template",
+              type: "POST"
+          }).done(obj.sanitize),
+          valuesPromise = obj.serviceCall({
+              url: url
+          });
+
+      $.when(schemaPromise, valuesPromise).done(function(schemaData, valuesData) {
+          deferred.resolve({
+              schema: obj.sanitizeSchema(schemaData[0]._schema),
+              values: valuesData[0]
+          });
       });
+
+      return deferred;
+    };
+
+    obj.sanitizeSchema = function(schema) {
+        // Filter out 'defaults'
+        schema.properties = _.omit(schema.properties, 'defaults');
+
+        // Translate order into propertyOrder
+        _.forEach(schema.properties, function(property) {
+            if(property.hasOwnProperty("order")) {
+                console.error('Property still using "order" and not "propertyOrder"');
+                property.propertyOrder = parseInt(property.order.slice(1), 10);
+            }
+            delete property.order;
+        });
+
+        // Create ordered array
+        schema.orderedProperties = _.sortBy(_.map(schema.properties, function(value, key) {
+            value._id = key;
+            return value;
+        }), 'propertyOrder');
+
+        return schema;
     };
 
     return obj;

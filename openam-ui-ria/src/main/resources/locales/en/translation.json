@@ -461,5 +461,17 @@
             "title": "Apps",
             "subtitle": "..."
         }
+    },
+    "console": {
+        "authentication": {
+            "advancedSettings": {
+                "revert": "Revert",
+                "saveChanges": "Save Changes"
+            },
+            "settings": {
+                "advancedSettings": "Advanced Settings",
+                "saveChanges": "Save Changes"
+            }
+        }
     }
 }

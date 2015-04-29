@@ -17,6 +17,8 @@
 /*global define*/
 
 define([
+    "./delegates/SMSDelegate",
+    "./utils/FormBuilder",
     "./views/console/realms/Authentication",
     "./views/console/realms/authentication/AdvancedSettings",
     "./views/console/realms/authentication/Chains",
