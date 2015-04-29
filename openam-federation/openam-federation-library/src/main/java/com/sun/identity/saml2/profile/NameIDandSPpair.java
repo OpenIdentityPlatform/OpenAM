@@ -24,24 +24,27 @@
  *
  * $Id: NameIDandSPpair.java,v 1.3 2008/06/25 05:47:54 qcheng Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 package com.sun.identity.saml2.profile;
 
 import com.sun.identity.saml2.assertion.NameID;
 import java.io.Serializable;
+
 /**
  * This class represents a pair of <code>NameID</code> and its 
  * corresponding <code>SPEntityID</code>.
  */
-
 public class NameIDandSPpair implements Serializable {
 
     private NameID nameID = null;
     private String spEntityID = null;
+
+    /**
+     * Default constructor for deserialization.
+     */
+    public NameIDandSPpair() {
+    }
 
     /**
      * Constructor for a <code>NameIDandSPpair</code>.
@@ -49,7 +52,7 @@ public class NameIDandSPpair implements Serializable {
      * @param nameID the <code>NameID</code> object 
      * @param spEntityID the <code>SPEntityID</code> 
      */ 
-    public NameIDandSPpair( NameID nameID, String spEntityID) {
+    public NameIDandSPpair(NameID nameID, String spEntityID) {
         this.nameID = nameID;
         this.spEntityID = spEntityID;
     }
