@@ -18,10 +18,13 @@ package org.forgerock.openam.rest.sms;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.setup.SetupConstants;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import org.apache.commons.io.IOUtils;
 import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -52,11 +55,16 @@ import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.forgerock.json.fluent.JsonValue.*;
 
@@ -66,11 +74,15 @@ import static org.forgerock.json.fluent.JsonValue.*;
 public class SmsServerPropertiesResource implements SingletonResourceProvider {
 
     private static final String SERVER_DEFAULT_NAME = "server-default";
-    public static final String SERVER_CONFIG_KEY = "serverconfig";
     public static final String SCHEMA_NAME = "com-sun-identity-servers";
+    public static final String AM_CONSOLE_CONFIG_XML = "amConsoleConfig.xml";
     private static Properties syntax;
     private static Properties titles;
-    private static Map<String, String> syntaxRawToReal = new HashMap<String, String>();
+    private static Map<String, String> syntaxRawToReal = new HashMap<>();
+    //the schema: tabName -> sections -> attributes -> options
+    private static Map<String, Map<String, Map<String, Set<String>>>> schema = new HashMap<>();
+    //this list is to enable us to distinguish which attributes are in the "advanced" tab
+    private static List<String> allAttributeNamesInNamedTabs = new ArrayList<>();
 
     private final Debug logger;
 
@@ -85,10 +97,50 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
 
     @Inject
     public SmsServerPropertiesResource(@Named("ServerAttributeSyntax") Properties syntaxProperties, @Named
-            ("ServerAttributeTitles") Properties titleProperties, @Named("frRest") Debug logger) {
+            ("ServerAttributeTitles") Properties titleProperties, @Named("frRest")
+            Debug logger) {
         this.syntax = syntaxProperties;
         this.titles = titleProperties;
         this.logger = logger;
+
+        Set<String> tabNames = getTabNames();
+
+        for (String tabName : tabNames) {
+            try {
+                Document propertySheet = getPropertySheet(tabName);
+                Map<String, Set<String>> options = getOptions(propertySheet, tabName);
+                List<String> sectionNames = getSectionNames(propertySheet);
+
+                LinkedHashMap<String, Map<String, Set<String>>> sections = new LinkedHashMap<>();
+                for (String sectionName : sectionNames) {
+                    LinkedHashMap<String, Set<String>> section = new LinkedHashMap<>();
+                    List<String> attributeNames = getAttributeNamesForSection(sectionName, propertySheet);
+                    for (String attributeName : attributeNames) {
+                        section.put(attributeName, options.get(attributeName));
+                        allAttributeNamesInNamedTabs.add(attributeName);
+                    }
+                    sections.put(sectionName, section);
+                }
+
+                schema.put(tabName, sections);
+            } catch (ParserConfigurationException | IOException | XPathExpressionException | SAXException e) {
+                logger.error("Error reading property sheet for tab " + tabName, e);
+            }
+        }
+    }
+
+    private Set<String> getTabNames() {
+        Set<String> tabNames = new HashSet<>();
+        try {
+            String result = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(AM_CONSOLE_CONFIG_XML));
+            Matcher matcher = Pattern.compile(".*ServerEdit(.*)ViewBean.*").matcher(result);
+            while (matcher.find()) {
+                tabNames.add(matcher.group(1).toLowerCase());
+            }
+        } catch (IOException e) {
+            logger.error("Error tab names", e);
+        }
+        return tabNames;
     }
 
     @Override
@@ -111,21 +163,24 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
 
         try {
             Document propertySheet = getPropertySheet(tabName);
-            Map<String, Set<String>> options = getOptions(propertySheet);
-            Set<String> sectionNames = getSectionNames(propertySheet);
+            Set<String> sectionNames = getSections(tabName).keySet();
 
+            int sectionIndex = 0;
             for (String sectionName : sectionNames) {
                 final String sectionPath = "/_schema/properties/" + sectionName;
                 result.putPermissive(new JsonPointer(sectionPath + "/title"), titles.getProperty(sectionName));
-                Set<String> attributeNamesForSection = getDefaultValueNamesForSection(sectionName, propertySheet);
+                result.putPermissive(new JsonPointer(sectionPath + "/propertyOrder"), sectionIndex++);
+                List<String> attributeNamesForSection = getAttributeNamesForSection(sectionName, propertySheet);
+                int attributeIndex = 0;
                 for (String attributeName : attributeNamesForSection) {
                     final String path = sectionPath + "/" + attributeName;
                     String typeRealValue = syntaxRawToReal.get(syntax.getProperty(attributeName));
 
                     if (typeRealValue == null) {
-                        if (options.get(attributeName) != null) {
+                        final Set<String> attributeOptions = getSections(tabName).get(sectionName).get(attributeName);
+                        if (attributeOptions != null) {
                             result.putPermissive(new JsonPointer(path + "/type/enum"),
-                                    options.get(attributeName).toArray());
+                                    attributeOptions.toArray());
                         }
                     } else if (typeRealValue.equals("on,off")) {
                         result.putPermissive(new JsonPointer(path + "/type/enum"), new String[]{"on", "off"});
@@ -134,21 +189,26 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
                     }
 
                     result.putPermissive(new JsonPointer(path + "/title"), titles.get("amconfig." + attributeName));
+                    result.putPermissive(new JsonPointer(path + "/propertyOrder"), attributeIndex++);
                 }
             }
-        } catch (IOException e) {
-            logger.error("Error reading property sheet for tab " + tabName, e);
-        } catch (ParserConfigurationException e) {
-            logger.error("Error reading property sheet for tab " + tabName, e);
-        } catch (SAXException e) {
-            logger.error("Error reading property sheet for tab " + tabName, e);
-        } catch (XPathExpressionException e) {
+        } catch (IOException | ParserConfigurationException | SAXException | XPathExpressionException |
+                BadRequestException e) {
             logger.error("Error reading property sheet for tab " + tabName, e);
         }
 
         return result;
     }
 
+    private Map<String, Map<String, Set<String>>> getSections(String tabName) throws BadRequestException {
+        tabName = tabName.toLowerCase();
+        if (schema.get(tabName) != null) {
+            return schema.get(tabName);
+        }
+
+        throw new BadRequestException("Unknown tab name" + tabName);
+
+    }
 
     private Properties getAttributes(ServiceConfig serverConfig) throws IOException, SMSException, SSOException {
         Set<String> rawValues = (Set<String>) serverConfig.getAttributes().get("serverconfig");
@@ -164,22 +224,23 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
         return properties;
     }
 
-    private HashSet<String> getDefaultValueNames(Document propertySheet) throws ParserConfigurationException, SAXException,
+    private List<String> getDefaultValueNames(String tabName) throws ParserConfigurationException, SAXException,
             IOException,
             XPathExpressionException {
+        Document propertySheet = getPropertySheet(tabName);
         return getValues("/propertysheet/section/property/cc/@name", propertySheet);
     }
 
-    HashSet<String> getDefaultValueNamesForSection(String sectionName, Document propertySheet) throws
+    List<String> getAttributeNamesForSection(String sectionName, Document propertySheet) throws
             ParserConfigurationException,
             SAXException,
             IOException, XPathExpressionException {
         return getValues("/propertysheet/section[@defaultValue='" + sectionName + "']/property/cc/@name", propertySheet);
     }
 
-    private HashSet<String> getValues(String expression, Document propertySheet) throws XPathExpressionException {
+    private List<String> getValues(String expression, Document propertySheet) throws XPathExpressionException {
         XPath xPath = XPathFactory.newInstance().newXPath();
-        HashSet<String> defaultValueNames = new HashSet<String>();
+        List<String> defaultValueNames = new ArrayList<>();
         NodeList defaultValues = (NodeList) xPath.compile(expression).evaluate(propertySheet, XPathConstants.NODESET);
         for (int i = 0; i < defaultValues.getLength(); i++) {
             String nodeValue = defaultValues.item(i).getNodeValue().replace('-', '.');
@@ -191,12 +252,12 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
         return defaultValueNames;
     }
 
-    private HashSet<String> getSectionNames(Document propertySheet) throws ParserConfigurationException, SAXException,
+    private List<String> getSectionNames(Document propertySheet) throws ParserConfigurationException, SAXException,
             IOException,
             XPathExpressionException {
         XPath xPath = XPathFactory.newInstance().newXPath();
         String expression = "//propertysheet/section/@defaultValue";
-        HashSet<String> sectionNames = new HashSet<String>();
+        List<String> sectionNames = new ArrayList<>();
         NodeList defaultValues = (NodeList) xPath.compile(expression).evaluate(propertySheet, XPathConstants.NODESET);
         for (int i = 0; i < defaultValues.getLength(); i++) {
             final String nodeValue = defaultValues.item(i).getNodeValue();
@@ -206,17 +267,17 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
         return sectionNames;
     }
 
-    private Map<String, Set<String>> getOptions(Document propertySheet) {
-        Map<String, Set<String>> radioOptions = new HashMap<String, Set<String>>();
+    private Map<String, Set<String>> getOptions(Document propertySheet, String tabName) {
+        Map<String, Set<String>> radioOptions = new HashMap<>();
         try {
             XPath xPath = XPathFactory.newInstance().newXPath();
 
-            Set<String> attributeNamesForTab = getDefaultValueNames(propertySheet);
+            List<String> attributeNamesForTab = getDefaultValueNames(tabName);
             for (String defaultValueName : attributeNamesForTab) {
                 String convertedName = "csc".concat(defaultValueName.replace('.', '-'));
                 String expression = "//propertysheet/section/property/cc[@name='" + convertedName + "']/option/@value";
                 NodeList optionsList = (NodeList) xPath.compile(expression).evaluate(propertySheet, XPathConstants.NODESET);
-                HashSet<String> options = new HashSet<String>();
+                Set<String> options = new HashSet<>();
                 for (int i = 0; i < optionsList.getLength(); i++) {
                     options.add(optionsList.item(i).getNodeValue());
                 }
@@ -225,13 +286,7 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
                     radioOptions.put(defaultValueName, options);
                 }
             }
-        } catch (ParserConfigurationException e) {
-            logger.error("Error reading property sheet", e);
-        } catch (SAXException e) {
-            logger.error("Error reading property sheet", e);
-        } catch (IOException e) {
-            logger.error("Error reading property sheet", e);
-        } catch (XPathExpressionException e) {
+        } catch (ParserConfigurationException | SAXException | IOException | XPathExpressionException e) {
             logger.error("Error reading property sheet", e);
         }
         return radioOptions;
@@ -289,36 +344,43 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
         Map<String, String> uriVariables = getUriTemplateVariables(serverContext);
 
         final String tabName = getTabName(uriVariables);
+
         if (tabName == null) {
             resultHandler.handleError(new BadRequestException("Tab name not specified."));
+            return;
         }
 
         final String serverName = getServerName(uriVariables);
         if (serverName == null) {
             resultHandler.handleError(new BadRequestException("Server name not specified."));
+            return;
         }
 
         try {
-            Document propertySheet = getPropertySheet(tabName);
-
             ServiceConfigManager scm = getServiceConfigManager(serverContext);
             ServiceConfig serverConfigs = getServerConfigs(scm);
 
             Properties defaultAttributes = getAttributes(serverConfigs.getSubConfig(SERVER_DEFAULT_NAME));
-            final ServiceConfig subConfig = serverConfigs.getSubConfig(serverName);
+            final ServiceConfig serverConfig = serverConfigs.getSubConfig(serverName);
 
-            if (subConfig == null) {
+            if (serverConfig == null) {
                 resultHandler.handleError(new BadRequestException("Unknown Server " + serverName));
                 return;
             }
 
-            Properties serverSpecificAttributes = getAttributes(subConfig);
+            Properties serverSpecificAttributes = getAttributes(serverConfig);
             Map<String, String> defaultSection = new HashMap<String, String>();
 
             JsonValue value = json(object(
                     field("default", defaultSection)));
 
-            Set<String> attributeNamesForTab = getDefaultValueNames(propertySheet);
+            List<String> attributeNamesForTab;
+            if (tabName.equalsIgnoreCase("advanced")) {
+                attributeNamesForTab = getAdvancedTabAttributeNames(serverConfig);
+            } else {
+                attributeNamesForTab = getDefaultValueNames(tabName);
+            }
+
             for (String attributeName : attributeNamesForTab) {
                 final String defaultAttribute = (String) defaultAttributes.get(attributeName);
                 if (defaultAttribute != null) {
@@ -333,19 +395,34 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
 
             resultHandler.handleResult(new Resource(serverName + "/properties/" + tabName, String.valueOf(value
                     .hashCode()), value));
-        } catch (SMSException e) {
-            logger.error("Error reading property sheet for tab " + tabName, e);
-        } catch (SSOException e) {
-            logger.error("Error reading property sheet for tab " + tabName, e);
-        } catch (ParserConfigurationException e) {
-            logger.error("Error reading property sheet for tab " + tabName, e);
-        } catch (SAXException e) {
-            logger.error("Error reading property sheet for tab " + tabName, e);
-        } catch (IOException e) {
-            logger.error("Error reading property sheet for tab " + tabName, e);
-        } catch (XPathExpressionException e) {
+            return;
+        } catch (SMSException | SSOException | ParserConfigurationException | SAXException | IOException
+                | XPathExpressionException e) {
             logger.error("Error reading property sheet for tab " + tabName, e);
         }
+
+        resultHandler.handleError(new BadRequestException("Error reading properties file for " + tabName));
+    }
+
+    private List<String> getAdvancedTabAttributeNames(ServiceConfig serverConfig) {
+        List<String> attributeNamesForTab;
+        Set<String> allAttributeNames = (Set<String>) serverConfig.getAttributes().get("serverconfig");
+
+        attributeNamesForTab = new ArrayList<>();
+        for (String attributeRawValue : allAttributeNames) {
+            String attributeName = attributeRawValue.split("=")[0];
+            if (!allAttributeNamesInNamedTabs.contains(attributeName)) {
+                attributeNamesForTab.add(attributeName);
+            }
+        }
+
+        attributeNamesForTab.remove(Constants.AM_SERVER_PROTOCOL);
+        attributeNamesForTab.remove(Constants.AM_SERVER_HOST);
+        attributeNamesForTab.remove(Constants.AM_SERVER_PORT);
+        attributeNamesForTab.remove(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
+        attributeNamesForTab.remove(Constants.SERVER_MODE);
+        attributeNamesForTab.remove(SetupConstants.AMC_OVERRIDE_PROPERTY);
+        return attributeNamesForTab;
     }
 
     private Map<String, String> getUriTemplateVariables(ServerContext serverContext) {
@@ -400,12 +477,15 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
             allAttributes.put("serverconfig", newAttributes);
             serverConfig.setAttributes(allAttributes);
 
-            resultHandler.handleResult(new Resource(tabName, String.valueOf(jsonValue.get("/content")),
-                    jsonValue));
+            resultHandler.handleResult(new Resource(tabName, String.valueOf(jsonValue.hashCode()),
+                    jsonValue.get("/content")));
+            return;
         } catch (SSOException e) {
             logger.error("Error getting SSOToken", e);
         } catch (SMSException e) {
             logger.error("Error getting service config manager", e);
         }
+
+        resultHandler.handleError(new BadRequestException("Error updating values for " + tabName));
     }
 }

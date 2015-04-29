@@ -218,7 +218,7 @@ abstract class SmsResourceProvider {
 
                     result.putPermissive(new JsonPointer(path + section + "/title"),
                             getConsoleString(console, sectionLabel));
-                    result.putPermissive(new JsonPointer(path + section + "/order"),
+                    result.putPermissive(new JsonPointer(path + section + "/propertyOrder"),
                             "z" + sectionFormat.format(sections.indexOf(section)));
                 }
                 result.addPermissive(new JsonPointer(path + attributePath + "/title"),
@@ -236,7 +236,7 @@ abstract class SmsResourceProvider {
                 }
 
                 result.addPermissive(new JsonPointer(path + attributePath + "/description"), description.toString());
-                result.addPermissive(new JsonPointer(path + attributePath + "/order"), i18NKey);
+                result.addPermissive(new JsonPointer(path + attributePath + "/propertyOrder"), i18NKey);
                 addType(result, path + attributePath, attribute, i18n, context);
             }
         }
