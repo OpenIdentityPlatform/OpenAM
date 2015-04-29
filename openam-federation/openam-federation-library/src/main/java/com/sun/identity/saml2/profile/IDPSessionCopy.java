@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: IDPSessionCopy.java,v 1.3 2009/05/06 19:48:34 madan_ranganath Exp $
  *
- */
-
-/**
- * Portions copyright 2013 ForgeRock AS
+ * Portions copyright 2013-2015 ForgeRock AS.
  */
 package com.sun.identity.saml2.profile;
 
@@ -60,6 +57,12 @@ public class IDPSessionCopy implements Serializable {
     private String metaAlias = null;
 
     /**
+     * Default constructor for deserialization.
+     */
+    public IDPSessionCopy() {
+    }
+
+    /**
      * Constructor for a <code>IDPSessionCopy</code>
      *
      * @param ssoToken the <code>SSO Token</code> corresponding 
@@ -69,7 +72,7 @@ public class IDPSessionCopy implements Serializable {
         this.ssoTokenID = ssoToken;
         nameIDandSPpairs = new ArrayList<NameIDandSPpair>();
     }
-    
+
     public IDPSessionCopy(IDPSession idpSession) {
         try {
             SessionProvider sessionProvider = SessionManager.getProvider();
