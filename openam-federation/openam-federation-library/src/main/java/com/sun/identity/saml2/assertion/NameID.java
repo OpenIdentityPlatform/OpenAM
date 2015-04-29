@@ -24,14 +24,15 @@
  *
  * $Id: NameID.java,v 1.2 2008/06/25 05:47:41 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
-
 package com.sun.identity.saml2.assertion;
 
 import java.security.Key;
 
+import com.sun.identity.saml2.assertion.impl.NameIDImpl;
 import com.sun.identity.saml2.common.SAML2Exception;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
 
 /**
  *  The <code>NameID</code> is used in various SAML assertion constructs
@@ -40,6 +41,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
  *
  *  @supported.all.api  
  */
+@JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS, defaultImpl = NameIDImpl.class)
 public interface NameID extends NameIDType {
     /**
      * Returns an <code>EncryptedID</code> object.
