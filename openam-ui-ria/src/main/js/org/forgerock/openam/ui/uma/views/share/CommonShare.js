@@ -34,9 +34,23 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
     'org/forgerock/openam/ui/uma/models/UMAPolicy',
     'org/forgerock/openam/ui/uma/models/UMAPolicyPermission',
     'org/forgerock/openam/ui/uma/models/UMAPolicyPermissionScope',
-    'org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy'
-], function(AbstractView, Backgrid, BackgridUtils, BootstrapDialog, Constants, EventManager, ShareCounter, UMAPolicy, UMAPolicyPermission, UMAPolicyPermissionScope, UMAResourceSetWithPolicy) {
-    var CommonShare = AbstractView.extend({
+    'org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy',
+    'org/forgerock/openam/ui/common/util/RealmHelper'
+], function(AbstractView, Backgrid, BackgridUtils, BootstrapDialog, Constants, EventManager, ShareCounter, UMAPolicy, UMAPolicyPermission, UMAPolicyPermissionScope, UMAResourceSetWithPolicy, RealmHelper) {
+
+    var CommonShare,
+        realmRegex = /[?&]realm=/,
+        resourcesetsRegex = /\/json\/users\/[^\/]+\/uma\/policies/,
+        policyRegex = /\/json\/users\/[^\/]+\/oauth2\/resourcesets/;
+
+    $.ajaxPrefilter(function(options) {
+        if ((resourcesetsRegex.test(options.url) || policyRegex.test(options.url)) && !realmRegex.test(options.url) &&
+                RealmHelper.getOverrideRealm()) {
+            options.url = RealmHelper.decorateURLWithOverrideRealm(options.url);
+        }
+    });
+
+    CommonShare = AbstractView.extend({
         initialize: function(options) {
             this.parentModel = null;
         },
@@ -73,7 +87,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
             if(syncRequired) {
                 this.stopListening(this.parentModel);
 
-                this.parentModel = UMAResourceSetWithPolicy.findOrCreate( { _id: id} );
+                this.parentModel = UMAResourceSetWithPolicy.findOrCreate({ _id: id });
                 this.listenTo(this.parentModel, 'sync', this.onParentModelSync);
                 this.listenTo(this.parentModel, 'error', this.onParentModelError);
                 this.parentModel.fetch();
