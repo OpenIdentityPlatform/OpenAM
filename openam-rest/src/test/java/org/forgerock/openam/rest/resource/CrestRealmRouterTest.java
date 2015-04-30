@@ -132,6 +132,10 @@ public class CrestRealmRouterTest {
                 {"alias.example.com", "", null, "/otherRealm"},
                 //http://openam.example.com:8080/openam/json/users/demo?realm=/realm
                 {"openam.example.com", "", "/realm", "/realm"},
+                //http://openam.example.com:8080/openam/json/users/demo?realm=/
+                {"openam.example.com", "", "/", "/"},
+                //http://openam.example.com:8080/openam/json/users/demo?realm=/
+                {"openam.example.com", "/realm", "/", "/"},
                 //http://openam.example.com:8080/openam/json/users/demo?realm=/realmAlias
                 {"openam.example.com", "", "/realmAlias", "/realm"},
                 //http://openam.example.com:8080/openam/json/realm/users/demo
@@ -143,6 +147,8 @@ public class CrestRealmRouterTest {
                 {"alias.example.com", "nextRealm", null, "/otherRealm/nextRealm"},
                 //http://alias.example.com:8080/openam/json/nextRealm/users/demo?realm=overrideRealm
                 {"alias.example.com", "nextRealm", "overrideRealm", "/overrideRealm"},
+                //http://alias.example.com:8080/openam/json/nextRealm/users/demo?realm=/
+                {"alias.example.com", "nextRealm", "/", "/"},
         };
     }
 
