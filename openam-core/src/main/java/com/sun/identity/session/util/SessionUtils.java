@@ -27,7 +27,8 @@
  */
 
 /*
- * Portions Copyrighted 2013-2015 ForgeRock, Inc.
+ * Portions Copyrighted 2013-2015 ForgeRock, AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 package com.sun.identity.session.util;
 
@@ -67,6 +68,7 @@ import java.util.Vector;
 import javax.servlet.http.HttpServletRequest;
 
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.utils.ClientUtils;
 
 /**
  * This class Implements utility methods for handling HTTP Session.
@@ -126,17 +128,7 @@ public class SessionUtils {
      * @exception Exception
      */
     public static InetAddress getClientAddress(HttpServletRequest servletRequest) throws Exception {
-
-        InetAddress remoteClient = InetAddress.getByName(servletRequest
-                .getRemoteAddr());
-
-        if (isTrustedSource(remoteClient)) {
-            String proxyHeader = servletRequest.getHeader(httpClientIPHeader);
-            if (proxyHeader != null) {
-                remoteClient = InetAddress.getByName(proxyHeader);
-            }
-        }
-        return remoteClient;
+        return InetAddress.getByName(ClientUtils.getClientIPAddress(servletRequest));
     }
 
     /* build the trust source set*/
