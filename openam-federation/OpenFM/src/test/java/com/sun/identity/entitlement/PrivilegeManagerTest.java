@@ -396,7 +396,7 @@ public class PrivilegeManagerTest {
             SubjectUtils.createSubject(adminToken));
 
         Set<SearchFilter> psf = new HashSet<SearchFilter>();
-        psf.add(new SearchFilter(Privilege.NAME_ATTRIBUTE, "*"));
+        psf.add(new SearchFilter(Privilege.NAME_SEARCH_ATTRIBUTE, "*"));
         Set privilegeNames = prm.searchNames(psf);
         if (!privilegeNames.contains(PRIVILEGE_NAME)) {
               throw new Exception(
@@ -405,7 +405,7 @@ public class PrivilegeManagerTest {
         }
 
         psf = new HashSet<SearchFilter>();
-        psf.add(new SearchFilter(Privilege.DESCRIPTION_ATTRIBUTE,
+        psf.add(new SearchFilter(Privilege.DESCRIPTION_SEARCH_ATTRIBUTE,
             PRIVILEGE_DESC));
         privilegeNames = prm.searchNames(psf);
         if (!privilegeNames.contains(PRIVILEGE_NAME)) {

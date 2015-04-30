@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: ApplicationFilterTest.java,v 1.2 2009/12/07 19:46:50 veiming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -140,7 +140,7 @@ public class ApplicationFilterTest {
         Subject userSubject = SubjectUtils.createSubject(userToken);
 
         Set<SearchFilter> filters = new HashSet<SearchFilter>();
-        filters.add(new SearchFilter(Application.NAME_ATTRIBUTE,
+        filters.add(new SearchFilter(Application.NAME_SEARCH_ATTRIBUTE,
             "ApplicationFilterTes*"));
         Set<String> names = ApplicationManager.search(userSubject, "/",
             filters);
@@ -150,7 +150,7 @@ public class ApplicationFilterTest {
         }
 
         filters.clear();
-        filters.add(new SearchFilter(Application.NAME_ATTRIBUTE, "4rwrwr*"));
+        filters.add(new SearchFilter(Application.NAME_SEARCH_ATTRIBUTE, "4rwrwr*"));
         
         names = ApplicationManager.search(userSubject, "/", filters);
         if (!names.isEmpty()) {

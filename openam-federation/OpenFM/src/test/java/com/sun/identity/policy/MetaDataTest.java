@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -24,13 +24,14 @@
  *
  * $Id: MetaDataTest.java,v 1.3 2009/10/14 03:18:42 veiming Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.policy;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.entitlement.util.SearchFilter;
@@ -127,7 +128,7 @@ public class MetaDataTest {
     ) throws Exception {
         Set<SearchFilter> filter =
             new HashSet<SearchFilter>();
-        filter.add(new SearchFilter("creationdate", value, operator));
+        filter.add(new SearchFilter(Privilege.CREATION_DATE_SEARCH_ATTRIBUTE, value, operator));
         Set<String> privilegeNames = privilegMgr.searchNames(filter);
 
         if (!containCheckOnly) {

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.entitlements;
@@ -19,6 +19,7 @@ package org.forgerock.openam.forgerockrest.entitlements;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
+import com.sun.identity.entitlement.util.SearchAttribute;
 import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.shared.DateUtils;
 import org.forgerock.json.resource.QueryFilter;
@@ -51,6 +52,9 @@ public class PrivilegePolicyStoreTest {
     private static final String STRING_ATTRIBUTE = "stringAttribute";
     private static final String DATE_ATTRIBUTE = "dateAttribute";
     private static final String NUMERIC_ATTRIBUTE = "numberAttribute";
+    private static final SearchAttribute STRING_SEARCH_ATTRIBUTE = new SearchAttribute(STRING_ATTRIBUTE, "ou");
+    private static final SearchAttribute DATE_SEARCH_ATTRIBUTE = new SearchAttribute(DATE_ATTRIBUTE, "ou");
+    private static final SearchAttribute NUMERIC_SEARCH_ATTRIBUTE = new SearchAttribute("numberAttribute", "ou");
 
     private PrivilegeManager mockManager;
     private PrivilegePolicyStore testStore;
@@ -70,9 +74,9 @@ public class PrivilegePolicyStoreTest {
         mockManager = mock(PrivilegeManager.class);
 
         Map<String, QueryAttribute> queryAttributes = new HashMap<String, QueryAttribute>();
-        queryAttributes.put(STRING_ATTRIBUTE, new QueryAttribute(AttributeType.STRING, STRING_ATTRIBUTE));
-        queryAttributes.put(NUMERIC_ATTRIBUTE, new QueryAttribute(AttributeType.NUMBER, NUMERIC_ATTRIBUTE));
-        queryAttributes.put(DATE_ATTRIBUTE, new QueryAttribute(AttributeType.TIMESTAMP, DATE_ATTRIBUTE));
+        queryAttributes.put(STRING_ATTRIBUTE, new QueryAttribute(AttributeType.STRING, STRING_SEARCH_ATTRIBUTE));
+        queryAttributes.put(NUMERIC_ATTRIBUTE, new QueryAttribute(AttributeType.NUMBER, NUMERIC_SEARCH_ATTRIBUTE));
+        queryAttributes.put(DATE_ATTRIBUTE, new QueryAttribute(AttributeType.TIMESTAMP, DATE_SEARCH_ATTRIBUTE));
 
         testStore = new PrivilegePolicyStore(mockManager, queryAttributes);
     }
@@ -181,7 +185,7 @@ public class PrivilegePolicyStoreTest {
         testStore.query(request);
 
         // Then
-        verify(mockManager).search(singleton(new SearchFilter(STRING_ATTRIBUTE, value)));
+        verify(mockManager).search(singleton(new SearchFilter(STRING_SEARCH_ATTRIBUTE, value)));
     }
 
     @DataProvider(name = "SupportedQueryOperators")
@@ -207,7 +211,7 @@ public class PrivilegePolicyStoreTest {
 
         // Then
         verify(mockManager).search(singleton(
-                new SearchFilter(NUMERIC_ATTRIBUTE, value, expectedOperator)));
+                new SearchFilter(NUMERIC_SEARCH_ATTRIBUTE, value, expectedOperator)));
     }
 
     @DataProvider(name = "UnsupportedOperators")
@@ -253,7 +257,7 @@ public class PrivilegePolicyStoreTest {
         // Then
         // Date should be converted into a time-stamp long value
         verify(mockManager).search(
-                singleton(new SearchFilter(DATE_ATTRIBUTE, value.getTime(), expectedOperator)));
+                singleton(new SearchFilter(DATE_SEARCH_ATTRIBUTE, value.getTime(), expectedOperator)));
     }
 
     @Test(expectedExceptions = EntitlementException.class, expectedExceptionsMessageRegExp = ".*not supported.*")
@@ -281,8 +285,8 @@ public class PrivilegePolicyStoreTest {
 
         // Then
         verify(mockManager).search(
-                asSet(new SearchFilter(STRING_ATTRIBUTE, value1),
-                        new SearchFilter(STRING_ATTRIBUTE, value2)));
+                asSet(new SearchFilter(STRING_SEARCH_ATTRIBUTE, value1),
+                        new SearchFilter(STRING_SEARCH_ATTRIBUTE, value2)));
     }
 
     @Test(expectedExceptions = EntitlementException.class, expectedExceptionsMessageRegExp = ".*'Or' not supported.*")

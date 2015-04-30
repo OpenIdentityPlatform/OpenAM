@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: ApplicationMetaData.java,v 1.1 2009/09/25 05:52:56 veiming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
@@ -115,7 +115,7 @@ public class ApplicationMetaData {
         }
 
         Set<SearchFilter> filters = new HashSet<SearchFilter>();
-        filters.add(new SearchFilter(Application.NAME_ATTRIBUTE, APPL_NAME));
+        filters.add(new SearchFilter(Application.NAME_SEARCH_ATTRIBUTE, APPL_NAME));
         Set<String> results = ApplicationManager.search(
             adminSubject, "/", filters);
         if (!results.contains(APPL_NAME)) {

@@ -421,14 +421,14 @@ public class ForgerockRestGuiceModule extends AbstractModule {
         public Map<String, QueryAttribute> get() {
             final Map<String, QueryAttribute> attributes = new HashMap<String, QueryAttribute>();
 
-            attributes.put("name", new QueryAttribute(STRING, Privilege.NAME_ATTRIBUTE));
-            attributes.put("description", new QueryAttribute(STRING, Privilege.DESCRIPTION_ATTRIBUTE));
-            attributes.put("applicationName", new QueryAttribute(STRING, Privilege.APPLICATION_ATTRIBUTE));
-            attributes.put("createdBy", new QueryAttribute(STRING, Privilege.CREATED_BY_ATTRIBUTE));
-            attributes.put("creationDate", new QueryAttribute(TIMESTAMP, Privilege.CREATION_DATE_ATTRIBUTE));
-            attributes.put("lastModifiedBy", new QueryAttribute(STRING, Privilege.LAST_MODIFIED_BY_ATTRIBUTE));
-            attributes.put("lastModifiedDate", new QueryAttribute(TIMESTAMP, Privilege.LAST_MODIFIED_DATE_ATTRIBUTE));
-            attributes.put("resourceTypeUuid", new QueryAttribute(STRING, Privilege.RESOURCE_TYPE_UUID_ATTRIBUTE));
+            attributes.put("name", new QueryAttribute(STRING, Privilege.NAME_SEARCH_ATTRIBUTE));
+            attributes.put("description", new QueryAttribute(STRING, Privilege.DESCRIPTION_SEARCH_ATTRIBUTE));
+            attributes.put("applicationName", new QueryAttribute(STRING, Privilege.APPLICATION_SEARCH_ATTRIBUTE));
+            attributes.put("createdBy", new QueryAttribute(STRING, Privilege.CREATED_BY_SEARCH_ATTRIBUTE));
+            attributes.put("creationDate", new QueryAttribute(TIMESTAMP, Privilege.CREATION_DATE_SEARCH_ATTRIBUTE));
+            attributes.put("lastModifiedBy", new QueryAttribute(STRING, Privilege.LAST_MODIFIED_BY_SEARCH_ATTRIBUTE));
+            attributes.put("lastModifiedDate", new QueryAttribute(TIMESTAMP, Privilege.LAST_MODIFIED_DATE_SEARCH_ATTRIBUTE));
+            attributes.put("resourceTypeUuid", new QueryAttribute(STRING, Privilege.RESOURCE_TYPE_UUID_SEARCH_ATTRIBUTE));
 
             return attributes;
         }
@@ -442,12 +442,12 @@ public class ForgerockRestGuiceModule extends AbstractModule {
         public Map<String, QueryAttribute> get() {
             final Map<String, QueryAttribute> attributes = new HashMap<String, QueryAttribute>();
 
-            attributes.put("name", new QueryAttribute(STRING, Application.NAME_ATTRIBUTE));
-            attributes.put("description", new QueryAttribute(STRING, Application.DESCRIPTION_ATTRIBUTE));
-            attributes.put("createdBy", new QueryAttribute(STRING, Application.CREATED_BY_ATTRIBUTE));
-            attributes.put("creationDate", new QueryAttribute(TIMESTAMP, Application.CREATION_DATE_ATTRIBUTE));
-            attributes.put("lastModifiedBy", new QueryAttribute(STRING, Application.LAST_MODIFIED_BY_ATTRIBUTE));
-            attributes.put("lastModifiedDate", new QueryAttribute(TIMESTAMP, Application.LAST_MODIFIED_DATE_ATTRIBUTE));
+            attributes.put("name", new QueryAttribute(STRING, Application.NAME_SEARCH_ATTRIBUTE));
+            attributes.put("description", new QueryAttribute(STRING, Application.DESCRIPTION_SEARCH_ATTRIBUTE));
+            attributes.put("createdBy", new QueryAttribute(STRING, Application.CREATED_BY_SEARCH_ATTRIBUTE));
+            attributes.put("creationDate", new QueryAttribute(TIMESTAMP, Application.CREATION_DATE_SEARCH_ATTRIBUTE));
+            attributes.put("lastModifiedBy", new QueryAttribute(STRING, Application.LAST_MODIFIED_BY_SEARCH_ATTRIBUTE));
+            attributes.put("lastModifiedDate", new QueryAttribute(TIMESTAMP, Application.LAST_MODIFIED_DATE_SEARCH_ATTRIBUTE));
 
             return attributes;
         }

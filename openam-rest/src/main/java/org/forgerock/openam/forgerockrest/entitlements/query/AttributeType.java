@@ -11,11 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.entitlements.query;
 
+import com.sun.identity.entitlement.util.SearchAttribute;
 import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.shared.DateUtils;
 
@@ -30,7 +31,7 @@ import java.util.Date;
 public enum AttributeType {
     STRING {
         @Override
-        public SearchFilter getFilter(String field, SearchFilter.Operator operator, Object value) {
+        public SearchFilter getFilter(SearchAttribute field, SearchFilter.Operator operator, Object value) {
             if (operator != SearchFilter.Operator.EQUALS_OPERATOR) {
                 throw new UnsupportedOperationException("Only equality supported for string attributes");
             }
@@ -39,7 +40,7 @@ public enum AttributeType {
     },
     NUMBER {
         @Override
-        public SearchFilter getFilter(String field, SearchFilter.Operator operator, Object value) {
+        public SearchFilter getFilter(SearchAttribute field, SearchFilter.Operator operator, Object value) {
             try {
                 return new SearchFilter(field, ((Number) value).longValue(), operator);
             } catch (ClassCastException ex) {
@@ -49,7 +50,7 @@ public enum AttributeType {
     },
     TIMESTAMP {
         @Override
-        public SearchFilter getFilter(String field, SearchFilter.Operator operator, Object value) {
+        public SearchFilter getFilter(SearchAttribute field, SearchFilter.Operator operator, Object value) {
             try {
                 Date timestamp = DateUtils.stringToDate(value.toString());
                 return new SearchFilter(field, timestamp.getTime(), operator);
@@ -70,5 +71,5 @@ public enum AttributeType {
      * @throws UnsupportedOperationException if the operator is invalid for this attribute type.
      * @throws IllegalArgumentException if the value is not of a type that this attribute can handle.
      */
-    public abstract SearchFilter getFilter(String field, SearchFilter.Operator operator, Object value);
+    public abstract SearchFilter getFilter(SearchAttribute field, SearchFilter.Operator operator, Object value);
 }

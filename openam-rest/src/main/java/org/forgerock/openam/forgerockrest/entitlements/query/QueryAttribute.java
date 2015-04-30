@@ -11,11 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock, AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.entitlements.query;
 
+import com.sun.identity.entitlement.util.SearchAttribute;
 import com.sun.identity.entitlement.util.SearchFilter;
 import org.forgerock.util.Reject;
 
@@ -26,12 +27,12 @@ import org.forgerock.util.Reject;
  */
 public final class QueryAttribute {
     private final AttributeType type;
-    private final String attributeName;
+    private final SearchAttribute attribute;
 
-    public QueryAttribute(AttributeType type, String attributeName) {
-        Reject.ifNull(type, attributeName);
+    public QueryAttribute(AttributeType type, SearchAttribute attribute) {
+        Reject.ifNull(type, attribute);
         this.type = type;
-        this.attributeName = attributeName;
+        this.attribute = attribute;
     }
 
     /**
@@ -45,6 +46,6 @@ public final class QueryAttribute {
      */
     public SearchFilter getFilter(SearchFilter.Operator operator, Object value) {
         Reject.ifNull(operator, value);
-        return type.getFilter(attributeName, operator, value);
+        return type.getFilter(attribute, operator, value);
     }
 }

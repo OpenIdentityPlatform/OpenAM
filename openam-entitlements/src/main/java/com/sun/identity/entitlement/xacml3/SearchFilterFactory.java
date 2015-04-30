@@ -11,12 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package com.sun.identity.entitlement.xacml3;
 
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
+import com.sun.identity.entitlement.util.SearchAttribute;
 import com.sun.identity.entitlement.util.SearchFilter;
 
 import java.util.HashMap;
@@ -60,14 +61,42 @@ public class SearchFilterFactory {
 
         if (isAttributeNumeric(name)) { // The < and > operators only apply to numeric attributes
             try {
-                return new SearchFilter(name, Long.parseLong(value), operator);
+                return new SearchFilter(getSearchAttribute(name), Long.parseLong(value), operator);
             } catch (NumberFormatException e) {
                 throw new EntitlementException(
                         INVALID_SEARCH_FILTER,
                         new Object[]{"Invalid value for attribute", name, value});
             }
         } else { // Everything else is assumed to be equals.
-            return new SearchFilter(name, value);
+            return new SearchFilter(getSearchAttribute(name), value);
+        }
+    }
+
+    /**
+     * Get the SearchAttribute instance for the specified policy attribute name.
+     * @param attributeName The name of the policy attribubte
+     * @return The SearchAttribute instance, as required by {@link SearchFilter}.
+     */
+    public static SearchAttribute getSearchAttribute(String attributeName) {
+        switch(attributeName) {
+            case Privilege.NAME_ATTRIBUTE:
+                return Privilege.NAME_SEARCH_ATTRIBUTE;
+            case Privilege.DESCRIPTION_ATTRIBUTE:
+                return Privilege.DESCRIPTION_SEARCH_ATTRIBUTE;
+            case Privilege.APPLICATION_ATTRIBUTE:
+                return Privilege.APPLICATION_SEARCH_ATTRIBUTE;
+            case Privilege.CREATED_BY_ATTRIBUTE:
+                return Privilege.CREATED_BY_SEARCH_ATTRIBUTE;
+            case Privilege.CREATION_DATE_ATTRIBUTE:
+                return Privilege.CREATION_DATE_SEARCH_ATTRIBUTE;
+            case Privilege.LAST_MODIFIED_BY_ATTRIBUTE:
+                return Privilege.LAST_MODIFIED_BY_SEARCH_ATTRIBUTE;
+            case Privilege.LAST_MODIFIED_DATE_ATTRIBUTE:
+                return Privilege.LAST_MODIFIED_DATE_SEARCH_ATTRIBUTE;
+            case Privilege.RESOURCE_TYPE_UUID_ATTRIBUTE:
+                return Privilege.RESOURCE_TYPE_UUID_SEARCH_ATTRIBUTE;
+            default:
+                return new SearchAttribute(attributeName, "ou");
         }
     }
 

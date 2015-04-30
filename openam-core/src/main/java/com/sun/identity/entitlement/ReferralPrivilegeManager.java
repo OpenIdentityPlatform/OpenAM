@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: ReferralPrivilegeManager.java,v 1.7 2010/01/20 17:01:35 veiming Exp $
  *
- * Portions Copyrighted 2012-2015 ForgeRock AS
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
@@ -112,7 +112,7 @@ public class ReferralPrivilegeManager implements IPrivilegeManager<ReferralPrivi
      */
     @Override
     public boolean canFindByName(String name) throws EntitlementException {
-        SearchFilter filter = new SearchFilter("name", name);
+        SearchFilter filter = new SearchFilter(Privilege.NAME_SEARCH_ATTRIBUTE, name);
         return !searchNames(asSet(filter)).isEmpty();
     }
 

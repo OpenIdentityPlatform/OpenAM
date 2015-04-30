@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -24,13 +24,15 @@
  *
  * $Id: Application.java,v 1.7 2010/01/08 22:20:47 veiming Exp $
  *
- * Portions copyright 2013-2015 ForgeRock, Inc.
+ * Portions copyright 2013-2015 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
 import com.sun.identity.entitlement.interfaces.ISaveIndex;
 import com.sun.identity.entitlement.interfaces.ISearchIndex;
 import com.sun.identity.entitlement.interfaces.ResourceName;
+import com.sun.identity.entitlement.util.SearchAttribute;
+
 import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.util.Reject;
@@ -51,9 +53,19 @@ public class Application implements Cloneable {
     public static final String CREATED_BY_ATTRIBUTE = "createdby";
 
     /**
+     * Created by search attribute
+     */
+    public static final SearchAttribute CREATED_BY_SEARCH_ATTRIBUTE = new SearchAttribute(CREATED_BY_ATTRIBUTE, "ou");
+
+    /**
      * Last modified by index key
      */
     public static final String LAST_MODIFIED_BY_ATTRIBUTE = "lastmodifiedby";
+
+    /**
+     * Last modified by search attribute
+     */
+    public static final SearchAttribute LAST_MODIFIED_BY_SEARCH_ATTRIBUTE = new SearchAttribute(LAST_MODIFIED_BY_ATTRIBUTE, "ou");
 
     /**
      * Creation date index key
@@ -61,20 +73,41 @@ public class Application implements Cloneable {
     public static final String CREATION_DATE_ATTRIBUTE = "creationdate";
 
     /**
+     * Creation date search attribute
+     */
+    public static final SearchAttribute CREATION_DATE_SEARCH_ATTRIBUTE = new SearchAttribute(CREATION_DATE_ATTRIBUTE, "ou");
+
+    /**
      * Last modified date index key
      */
     public static final String LAST_MODIFIED_DATE_ATTRIBUTE =
-        "lastmodifieddate";
+            "lastmodifieddate";
 
     /**
-     * Name search attribute name,
+     * Last modified date search attribute
+     */
+    public static final SearchAttribute LAST_MODIFIED_DATE_SEARCH_ATTRIBUTE =
+            new SearchAttribute(LAST_MODIFIED_DATE_ATTRIBUTE, "ou");
+
+    /**
+     * Name attribute name,
      */
     public static final String NAME_ATTRIBUTE = "name";
 
     /**
-     * Description search attribute name,
+     * Name search attribute
+     */
+    public static final SearchAttribute NAME_SEARCH_ATTRIBUTE = new SearchAttribute(NAME_ATTRIBUTE, "ou");
+
+    /**
+     * Description attribute name,
      */
     public static final String DESCRIPTION_ATTRIBUTE = "description";
+
+    /**
+     * Description search attribute
+     */
+    public static final SearchAttribute DESCRIPTION_SEARCH_ATTRIBUTE = new SearchAttribute(DESCRIPTION_ATTRIBUTE, "ou");
 
     private static final int LEN_CREATED_BY_ATTRIBUTE =
         CREATED_BY_ATTRIBUTE.length();

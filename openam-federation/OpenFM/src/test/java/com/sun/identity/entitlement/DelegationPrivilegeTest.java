@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: DelegationPrivilegeTest.java,v 1.5 2009/12/17 18:03:51 veiming Exp $
  *
- * Portions Copyrighted 2015 ForgeRock AS
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -141,7 +141,7 @@ public class DelegationPrivilegeTest {
 
         Set<SearchFilter> filters = new HashSet<SearchFilter>();
         String privilegeName = testParams.get("DELEGATE_PRIVILEGE_NAME");
-        filters.add(new SearchFilter(Privilege.NAME_ATTRIBUTE, privilegeName));
+        filters.add(new SearchFilter(Privilege.NAME_SEARCH_ATTRIBUTE, privilegeName));
 
         Set<String> names = mgr.search(filters);
         if ((names == null) || names.isEmpty()) {
@@ -166,7 +166,7 @@ public class DelegationPrivilegeTest {
 
         Set<SearchFilter> filters = new HashSet<SearchFilter>();
         String privilegeName = testParams.get("DELEGATE_PRIVILEGE_NAME");
-        filters.add(new SearchFilter(Privilege.NAME_ATTRIBUTE, privilegeName));
+        filters.add(new SearchFilter(Privilege.NAME_SEARCH_ATTRIBUTE, privilegeName));
         Set<String> privilegeNames = mgr.search(filters);
 
         if ((privilegeNames != null) && !privilegeNames.isEmpty()) {

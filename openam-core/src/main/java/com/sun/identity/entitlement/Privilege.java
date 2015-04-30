@@ -29,8 +29,11 @@
 
 package com.sun.identity.entitlement;
 
+import com.sun.identity.entitlement.util.SearchAttribute;
 import com.sun.identity.shared.JSONUtils;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import com.sun.identity.sm.SMSEntry;
+
 import org.forgerock.openam.entitlement.CachingEntitlementCondition;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.json.JSONArray;
@@ -68,9 +71,19 @@ public abstract class Privilege implements IPrivilege {
     public static final String APPLICATION_ATTRIBUTE = "application";
 
     /**
+     * application search attribute
+     */
+    public static final SearchAttribute APPLICATION_SEARCH_ATTRIBUTE = new SearchAttribute(APPLICATION_ATTRIBUTE, "ou");
+
+    /**
      * Created by index key
      */
     public static final String CREATED_BY_ATTRIBUTE = "createdby";
+
+    /**
+     * Created by search attribute
+     */
+    public static final SearchAttribute CREATED_BY_SEARCH_ATTRIBUTE = new SearchAttribute(CREATED_BY_ATTRIBUTE, "ou");
 
     /**
      * Last modified by index key
@@ -78,25 +91,49 @@ public abstract class Privilege implements IPrivilege {
     public static final String LAST_MODIFIED_BY_ATTRIBUTE = "lastmodifiedby";
 
     /**
+     * Last modified by search attribute
+     */
+    public static final SearchAttribute LAST_MODIFIED_BY_SEARCH_ATTRIBUTE = new SearchAttribute(LAST_MODIFIED_BY_ATTRIBUTE, "ou");
+
+    /**
      * Creation date index key
      */
     public static final String CREATION_DATE_ATTRIBUTE = "creationdate";
 
     /**
-     * Last modified date index key
+     * Creation date index key
      */
-    public static final String LAST_MODIFIED_DATE_ATTRIBUTE =
-        "lastmodifieddate";
+    public static final SearchAttribute CREATION_DATE_SEARCH_ATTRIBUTE = new SearchAttribute(CREATION_DATE_ATTRIBUTE, "ou");
 
     /**
-     * Name search attribute name,
+     * Last modified date index key
+     */
+    public static final String LAST_MODIFIED_DATE_ATTRIBUTE = "lastmodifieddate";
+
+    /**
+     * Last modified date index key
+     */
+    public static final SearchAttribute LAST_MODIFIED_DATE_SEARCH_ATTRIBUTE = new SearchAttribute(LAST_MODIFIED_DATE_ATTRIBUTE, "ou");
+
+    /**
+     * Name attribute name,
      */
     public static final String NAME_ATTRIBUTE = "name";
+
+    /**
+     * Name search attribute
+     */
+    public static final SearchAttribute NAME_SEARCH_ATTRIBUTE = new SearchAttribute(NAME_ATTRIBUTE, "ou");
 
     /**
      * Resource type uuid reference.
      */
     public static final String RESOURCE_TYPE_UUID_ATTRIBUTE = "resourceTypeUuid";
+
+    /**
+     * Resource type uuid reference.
+     */
+    public static final SearchAttribute RESOURCE_TYPE_UUID_SEARCH_ATTRIBUTE = new SearchAttribute(RESOURCE_TYPE_UUID_ATTRIBUTE, SMSEntry.ATTR_XML_KEYVAL);
 
     /**
      * Macro used in resource name
@@ -109,9 +146,14 @@ public abstract class Privilege implements IPrivilege {
     public static final String RESOURCE_MACRO_ATTRIBUTE = "$ATTR";
 
     /**
-     * Privilege description search attribute name,
+     * Privilege description attribute name,
      */
     public static final String DESCRIPTION_ATTRIBUTE = "description";
+
+    /**
+     * Privilege description search attribute name,
+     */
+    public static final SearchAttribute DESCRIPTION_SEARCH_ATTRIBUTE = new SearchAttribute(DESCRIPTION_ATTRIBUTE, "ou");
 
     private static Class<? extends Privilege> privilegeClass;
     public static final NoSubject NOT_SUBJECT = new NoSubject();

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: ApplicationDelegationTest.java,v 1.2 2009/11/12 18:37:39 veiming Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -232,7 +232,7 @@ public class ApplicationDelegationTest {
 
         Set<SearchFilter> filter = new HashSet<SearchFilter>();
         filter.add(new SearchFilter(
-            Privilege.NAME_ATTRIBUTE, PRIVILEGE_NAME + "*"));
+            Privilege.NAME_SEARCH_ATTRIBUTE, PRIVILEGE_NAME + "*"));
         PrivilegeManager pm = PrivilegeManager.getInstance("/",
             testUserSubject);
         Set<String> names = pm.searchNames(filter);

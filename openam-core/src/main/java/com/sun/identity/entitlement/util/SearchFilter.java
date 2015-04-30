@@ -23,10 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: SearchFilter.java,v 1.2 2009/10/14 03:18:41 veiming Exp $
- */
-
-/*
- * Portions Copyrighted 2014 ForgeRock AS.
+ *
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.util;
@@ -45,7 +43,7 @@ public class SearchFilter {
         GREATER_THAN_OR_EQUAL_OPERATOR
     }
 
-    private String attrName;
+    private SearchAttribute attribute;
     private String value;
     private long longValue;
     private Operator operator;
@@ -53,13 +51,13 @@ public class SearchFilter {
     /**
      * Constructor.
      *
-     * @param attrName Attribute name.
+     * @param attribute Attribute details.
      * <code>CREATED_BY_ATTRIBUTE, LAST_MODIFIED_BY_ATTRIBUTE,
      * CREATION_DATE_ATTRIBUTE, LAST_MODIFIED_DATE_ATTRIBUTE</code>.
      * @param value Search filter.
      */
-    public SearchFilter(String attrName, String value) {
-        this.attrName = attrName;
+    public SearchFilter(SearchAttribute attribute, String value) {
+        this.attribute = attribute;
         this.value = value;
         this.operator = Operator.EQUALS_OPERATOR;
     }
@@ -67,7 +65,7 @@ public class SearchFilter {
     /**
      * Constructor.
      *
-     * @param attrName Attribute name
+     * @param attribute Attribute details
      * <code>CREATED_BY_ATTRIBUTE, LAST_MODIFIED_BY_ATTRIBUTE,
      * CREATION_DATE_ATTRIBUTE, LAST_MODIFIED_DATE_ATTRIBUTE</code>.
      * @param value Search filter.
@@ -78,8 +76,8 @@ public class SearchFilter {
      * <li>SearchFilter.GREATER_THAN_OPERATOR</li>
      * </ul>
      */
-    public SearchFilter(String attrName, long value, Operator operator) {
-        this.attrName = attrName;
+    public SearchFilter(SearchAttribute attribute, long value, Operator operator) {
+        this.attribute = attribute;
         this.longValue = value;
         this.operator = operator;
     }
@@ -90,7 +88,7 @@ public class SearchFilter {
      * @return filter name.
      */
     public String getName() {
-        return attrName;
+        return attribute.getAttributeName();
     }
 
     /**
@@ -127,7 +125,7 @@ public class SearchFilter {
      */
     public String getFilter() {
         if (value != null) {
-            return "(ou=" + attrName + "=" + value +")";
+            return "(" + attribute.toFilter("=") + "=" + value +")";
         }
 
         /*
@@ -139,20 +137,20 @@ public class SearchFilter {
          * Also, since LDAP does not support < or > natively, we need to invert >= and <=.
          */
 
-        String attrValue = Long.toString(longValue) + "=" + attrName;
+        String attrValue = Long.toString(longValue) + "=" + attribute.getAttributeName();
 
         switch (operator) {
             case LESS_THAN_OPERATOR:
-                return "(!(ou>=|" + attrValue + "))";
+                return "(!(" + attribute.getLdapAttribute() + ">=|" + attrValue + "))";
             case LESS_THAN_OR_EQUAL_OPERATOR:
-                return "(ou<=" + attrValue + ")";
+                return "(" + attribute.getLdapAttribute() + "<=" + attrValue + ")";
             case GREATER_THAN_OPERATOR:
-                return "(!(ou<=" + attrValue + "))";
+                return "(!(" + attribute.getLdapAttribute() + "<=" + attrValue + "))";
             case GREATER_THAN_OR_EQUAL_OPERATOR:
-                return "(ou>=|" + attrValue + ")";
+                return "(" + attribute.getLdapAttribute() + ">=|" + attrValue + ")";
             case EQUALS_OPERATOR:
             default:
-                return "(ou=" + attrValue + ")";
+                return "(" + attribute.getLdapAttribute() + "=" + attrValue + ")";
         }
     }
 
@@ -168,7 +166,7 @@ public class SearchFilter {
         SearchFilter that = (SearchFilter) o;
 
         return longValue == that.longValue
-                && !(attrName != null ? !attrName.equals(that.attrName) : that.attrName != null)
+                && !(attribute != null ? !attribute.equals(that.attribute) : that.attribute != null)
                 && operator == that.operator
                 && !(value != null ? !value.equals(that.value) : that.value != null);
 
@@ -176,7 +174,7 @@ public class SearchFilter {
 
     @Override
     public int hashCode() {
-        int result = attrName != null ? attrName.hashCode() : 0;
+        int result = attribute != null ? attribute.hashCode() : 0;
         result = 31 * result + (value != null ? value.hashCode() : 0);
         result = 31 * result + (int) (longValue ^ (longValue >>> 32));
         result = 31 * result + (operator != null ? operator.hashCode() : 0);

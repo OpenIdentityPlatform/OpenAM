@@ -18,6 +18,7 @@ package org.forgerock.openam.forgerockrest.entitlements;
 
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.util.SearchAttribute;
 import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.shared.DateUtils;
 import com.sun.identity.shared.debug.Debug;
@@ -111,9 +112,9 @@ public class ApplicationsResourceTest {
         applicationWrapper = mock(ApplicationWrapper.class);
 
         queryAttributes = new HashMap<String, QueryAttribute>();
-        queryAttributes.put(STRING_ATTRIBUTE, new QueryAttribute(AttributeType.STRING, STRING_ATTRIBUTE));
-        queryAttributes.put(NUMERIC_ATTRIBUTE, new QueryAttribute(AttributeType.NUMBER, NUMERIC_ATTRIBUTE));
-        queryAttributes.put(DATE_ATTRIBUTE, new QueryAttribute(AttributeType.TIMESTAMP, DATE_ATTRIBUTE));
+        queryAttributes.put(STRING_ATTRIBUTE, new QueryAttribute(AttributeType.STRING, new SearchAttribute(STRING_ATTRIBUTE, "ou")));
+        queryAttributes.put(NUMERIC_ATTRIBUTE, new QueryAttribute(AttributeType.NUMBER, new SearchAttribute(NUMERIC_ATTRIBUTE, "ou")));
+        queryAttributes.put(DATE_ATTRIBUTE, new QueryAttribute(AttributeType.TIMESTAMP, new SearchAttribute(DATE_ATTRIBUTE, "ou")));
 
         applicationsResource = new ApplicationsResource(
                 debug, applicationManagerWrapper, applicationTypeManagerWrapper, queryAttributes, resourceErrorHandler) {
@@ -1143,7 +1144,7 @@ public class ApplicationsResourceTest {
         applicationsResource.query(request, subject, "/abc");
 
         // Then
-        SearchFilter searchFilter = new SearchFilter(STRING_ATTRIBUTE, value);
+        SearchFilter searchFilter = new SearchFilter(new SearchAttribute(STRING_ATTRIBUTE, "ou"), value);
         verify(applicationManagerWrapper).search(eq(subject), eq("/abc"), eq(asSet(searchFilter)));
     }
 
@@ -1170,7 +1171,7 @@ public class ApplicationsResourceTest {
         applicationsResource.query(request, subject, "/abc");
 
         // Then
-        SearchFilter searchFilter = new SearchFilter(NUMERIC_ATTRIBUTE, value, expectedOperator);
+        SearchFilter searchFilter = new SearchFilter(new SearchAttribute(NUMERIC_ATTRIBUTE, "ou"), value, expectedOperator);
         verify(applicationManagerWrapper).search(eq(subject), eq("/abc"), eq(asSet(searchFilter)));
     }
 
@@ -1221,7 +1222,7 @@ public class ApplicationsResourceTest {
 
         // Then
         // Date should be converted into a time-stamp long value
-        SearchFilter searchFilter = new SearchFilter(DATE_ATTRIBUTE, value.getTime(), expectedOperator);
+        SearchFilter searchFilter = new SearchFilter(new SearchAttribute(DATE_ATTRIBUTE, "ou"), value.getTime(), expectedOperator);
         verify(applicationManagerWrapper).search(eq(subject), eq("/abc"), eq(asSet(searchFilter)));
     }
 
@@ -1251,8 +1252,8 @@ public class ApplicationsResourceTest {
         applicationsResource.query(request, subject, "/abc");
 
         // Then
-        SearchFilter searchFilter1 = new SearchFilter(STRING_ATTRIBUTE, value1);
-        SearchFilter searchFilter2 = new SearchFilter(STRING_ATTRIBUTE, value2);
+        SearchFilter searchFilter1 = new SearchFilter(new SearchAttribute(STRING_ATTRIBUTE, "ou"), value1);
+        SearchFilter searchFilter2 = new SearchFilter(new SearchAttribute(STRING_ATTRIBUTE, "ou"), value2);
         verify(applicationManagerWrapper).search(eq(subject), eq("/abc"), eq(asSet(searchFilter1, searchFilter2)));
     }
 

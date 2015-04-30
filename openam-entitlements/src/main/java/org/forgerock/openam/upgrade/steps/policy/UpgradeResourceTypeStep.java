@@ -349,7 +349,7 @@ public class UpgradeResourceTypeStep extends AbstractEntitlementUpgradeStep {
     private void upgradePrivileges(PrivilegeManager pm, String appName, String resourceTypeUUID)
             throws UpgradeException {
 
-        final SearchFilter searchFilter = new SearchFilter(APPLICATION, appName);
+        final SearchFilter searchFilter = new SearchFilter(Privilege.APPLICATION_SEARCH_ATTRIBUTE, appName);
         try {
             final List<Privilege> privileges = pm.search(Collections.singleton(searchFilter));
             for (Privilege privilege : privileges) {

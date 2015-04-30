@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
@@ -102,27 +102,27 @@ public class ApplicationManagerTest {
     }
 
     private SearchFilter nameFilter(String name) {
-        return new SearchFilter(NAME_ATTRIBUTE, name);
+        return new SearchFilter(NAME_SEARCH_ATTRIBUTE, name);
     }
 
     private SearchFilter descriptionFilter(String description) {
-        return new SearchFilter(DESCRIPTION_ATTRIBUTE, description);
+        return new SearchFilter(DESCRIPTION_SEARCH_ATTRIBUTE, description);
     }
 
     private SearchFilter createdByFilter(String description) {
-        return new SearchFilter(CREATED_BY_ATTRIBUTE, description);
+        return new SearchFilter(CREATED_BY_SEARCH_ATTRIBUTE, description);
     }
 
     private SearchFilter creationDateFilter(long date, SearchFilter.Operator filterOperator) {
-        return new SearchFilter(CREATION_DATE_ATTRIBUTE, date, filterOperator);
+        return new SearchFilter(CREATION_DATE_SEARCH_ATTRIBUTE, date, filterOperator);
     }
 
     private SearchFilter lastModifiedByFilter(String description) {
-        return new SearchFilter(LAST_MODIFIED_BY_ATTRIBUTE, description);
+        return new SearchFilter(LAST_MODIFIED_BY_SEARCH_ATTRIBUTE, description);
     }
 
     private SearchFilter lastModifiedDateFilter(long date, SearchFilter.Operator filterOperator) {
-        return new SearchFilter(LAST_MODIFIED_DATE_ATTRIBUTE, date, filterOperator);
+        return new SearchFilter(LAST_MODIFIED_DATE_SEARCH_ATTRIBUTE, date, filterOperator);
     }
 
 }

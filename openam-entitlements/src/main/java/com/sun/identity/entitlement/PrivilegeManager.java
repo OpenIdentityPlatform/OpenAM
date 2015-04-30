@@ -135,7 +135,7 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
      */
     @Override
     public boolean canFindByName(String name) throws EntitlementException {
-        SearchFilter filter = new SearchFilter("name", name);
+        SearchFilter filter = new SearchFilter(Privilege.NAME_SEARCH_ATTRIBUTE, name);
         return !searchNames(asSet(filter)).isEmpty();
     }
 

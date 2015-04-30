@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: PrivilegeResource.java,v 1.5 2009/12/15 00:44:19 veiming Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.rest;
@@ -33,6 +33,8 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.util.SearchFilter;
+import com.sun.identity.entitlement.xacml3.SearchFilterFactory;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -239,7 +241,7 @@ public class PrivilegeResource extends ResourceBase {
             if ((attrName.equals(Privilege.LAST_MODIFIED_DATE_ATTRIBUTE)) ||
                 (attrName.equals(Privilege.CREATION_DATE_ATTRIBUTE))) {
                 try {
-                    sf = new SearchFilter(attrName,
+                    sf = new SearchFilter(SearchFilterFactory.getSearchAttribute(attrName),
                         Long.parseLong(f.substring(idx + 1)),
                         SearchFilter.Operator.EQUALS_OPERATOR);
                 } catch (NumberFormatException e) {
@@ -247,7 +249,7 @@ public class PrivilegeResource extends ResourceBase {
                     throw new EntitlementException(328, param);
                 }
             } else {
-                sf = new SearchFilter(attrName, f.substring(idx + 1));
+                sf = new SearchFilter(SearchFilterFactory.getSearchAttribute(attrName), f.substring(idx + 1));
             }
         }
         return sf;
@@ -263,7 +265,7 @@ public class PrivilegeResource extends ResourceBase {
             if ((attrName.equals(Privilege.LAST_MODIFIED_DATE_ATTRIBUTE)) ||
                 (attrName.equals(Privilege.CREATION_DATE_ATTRIBUTE))) {
                 try {
-                    sf = new SearchFilter(attrName,
+                    sf = new SearchFilter(SearchFilterFactory.getSearchAttribute(attrName),
                         Long.parseLong(f.substring(idx + 1)),
                         SearchFilter.Operator.EQUALS_OPERATOR);
                 } catch (NumberFormatException e) {
