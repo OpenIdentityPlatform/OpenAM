@@ -19,26 +19,43 @@ package com.sun.identity.entitlement.util;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.forgerock.util.Reject;
 
+/**
+ * A representation of a policy attribute that can be searched for. Policy framework attributes are stored
+ * in LDAP attributes, so have an LDAP attribute name as well as a policy attribute name.
+ */
 public class SearchAttribute {
 
     private final String attributeName;
     private final String ldapAttribute;
 
+    /**
+     * Create a new searchable attribute.
+     * @param attributeName The name of the policy framework attribute.
+     * @param ldapAttribute The name of the LDAP attribute that attribute will be stored in.
+     */
     public SearchAttribute(String attributeName, String ldapAttribute) {
         Reject.ifNull(attributeName, ldapAttribute);
         this.attributeName = attributeName;
         this.ldapAttribute = ldapAttribute;
     }
 
-
+    /**
+     * Get the LDAP attribute name.
+     */
     public String getLdapAttribute() {
         return ldapAttribute;
     }
 
+    /**
+     * Get the policy framework attribute name.
+     */
     public String getAttributeName() {
         return attributeName;
     }
 
+    /**
+     * Join the LDAP attribute and policy attribute together with an operator.
+     */
     public String toFilter(String operator) {
         return ldapAttribute + operator + attributeName;
     }
