@@ -40,7 +40,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import static com.sun.identity.entitlement.EntitlementException.CONDITION_EVALUTATION_FAILED;
+import static com.sun.identity.entitlement.EntitlementException.CONDITION_EVALUATION_FAILED;
 import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.VALUE_CASE_INSENSITIVE;
 
 /**
@@ -192,7 +192,7 @@ public class SessionPropertyCondition extends EntitlementConditionAdaptor {
                     allowed = false;
                 } catch (SSOException e) {
                     debug.error("Condition evaluation failed", e);
-                    throw new EntitlementException(CONDITION_EVALUTATION_FAILED, e);
+                    throw new EntitlementException(CONDITION_EVALUATION_FAILED, e);
                 }
 
             }

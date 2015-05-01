@@ -116,7 +116,7 @@ public class EntitlementException extends Exception {
     public static final int CLIENT_IP_EMPTY = 437;
     public static final int RESOURCE_ENV_NOT_KNOWN = 438;
 
-    public static final int CONDITION_EVALUTATION_FAILED = 510;
+    public static final int CONDITION_EVALUATION_FAILED = 510;
 
     public static final int INVALID_OAUTH2_SCOPE = 700;
     public static final int AUTH_LEVEL_NOT_INTEGER = 710;

@@ -41,7 +41,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static com.sun.identity.entitlement.EntitlementException.CONDITION_EVALUTATION_FAILED;
+import static com.sun.identity.entitlement.EntitlementException.CONDITION_EVALUATION_FAILED;
 import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.*;
 
 /**
@@ -269,7 +269,7 @@ public class AuthSchemeCondition extends EntitlementConditionAdaptor {
         try {
             token.setProperty(key, value);
         } catch (SSOException e) {
-            throw new EntitlementException(CONDITION_EVALUTATION_FAILED, e);
+            throw new EntitlementException(CONDITION_EVALUATION_FAILED, e);
         }
     }
 
@@ -330,7 +330,7 @@ public class AuthSchemeCondition extends EntitlementConditionAdaptor {
             return idleTimesoutAtMillis;
         } catch (SSOException e) {
             debug.error("AuthSchemeCondition: Condition evaluation failed", e);
-            throw new EntitlementException(CONDITION_EVALUTATION_FAILED, e);
+            throw new EntitlementException(CONDITION_EVALUATION_FAILED, e);
         }
     }
 

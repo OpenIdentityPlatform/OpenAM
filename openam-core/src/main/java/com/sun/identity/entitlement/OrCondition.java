@@ -23,14 +23,14 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: OrCondition.java,v 1.2 2009/09/05 00:24:04 veiming Exp $
- */
-
-/**
- * Portions Copyrighted 2014 ForgeRock AS.
+ *
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
-import java.util.Collections;
+import org.forgerock.openam.utils.CollectionUtils;
+
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
@@ -61,19 +61,6 @@ public class OrCondition extends LogicalCondition {
     }
 
     /**
-     * Constructor for providing {@link EntitlementCondition}s and
-     *
-     *
-     * @param eConditions Wrapped {@link EntitlementCondition}(s).
-     * @param pConditionName Subject name as used in OpenAM policy, this is relevant only when
-     *                       UserECondition was created from OpenAM Policy Condition.
-     */
-    public OrCondition(Set<EntitlementCondition> eConditions, String pConditionName) {
-        super(eConditions, pConditionName);
-    }
-
-
-    /**
      * Evaluates this {@link ConditionDecision}'s {@link EntitlementCondition}s to determine the correct
      * decision to return - if any of the {@link EntitlementCondition}s are true, the returned decision is
      * satisfied and has no advices.
@@ -87,25 +74,35 @@ public class OrCondition extends LogicalCondition {
      */
     public ConditionDecision evaluate(String realm, Subject subject, String resourceName,
                                       Map<String, Set<String>> environment) throws EntitlementException {
-        final Set<EntitlementCondition> eConditions = getEConditions();
 
-        if (eConditions == null || eConditions.isEmpty()) {
-            return new ConditionDecision(true, Collections.<String, Set<String>>emptyMap());
+        final Set<EntitlementCondition> conditions = getEConditions();
+
+        if (CollectionUtils.isEmpty(conditions)) {
+            return ConditionDecision
+                    .newSuccessBuilder()
+                    .build();
         }
 
-        final ConditionDecision decision = new ConditionDecision(false,  Collections.<String, Set<String>>emptyMap());
+        Map<String, Set<String>> advices = new HashMap<>();
+        Map<String, Set<String>> responseAttributes = new HashMap<>();
 
-        for (EntitlementCondition ec : eConditions) {
-            ConditionDecision d = ec.evaluate(realm, subject, resourceName, environment);
-            decision.addAdvices(d);
+        for (EntitlementCondition condition : conditions) {
 
-            if (d.isSatisfied()) {
-                decision.setSatisfied(true);
-                decision.clearAdvices(); //ensure we don't send back advice from unmet conditions
-                return decision;
+            ConditionDecision decision = condition.evaluate(realm, subject, resourceName, environment);
+            advices.putAll(decision.getAdvices());
+            responseAttributes.putAll(decision.getResponseAttributes());
+
+            if (decision.isSatisfied()) {
+                return ConditionDecision
+                        .newSuccessBuilder()
+                        .setResponseAttributes(responseAttributes)
+                        .build();
             }
         }
 
-        return decision;
+        return ConditionDecision
+                .newFailureBuilder()
+                .setAdvices(advices)
+                .build();
     }
 }

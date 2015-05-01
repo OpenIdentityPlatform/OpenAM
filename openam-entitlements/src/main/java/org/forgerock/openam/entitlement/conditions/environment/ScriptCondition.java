@@ -52,7 +52,7 @@ import javax.script.Bindings;
 import javax.script.SimpleBindings;
 import javax.security.auth.Subject;
 import java.io.IOException;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -121,11 +121,14 @@ public class ScriptCondition extends EntitlementConditionAdaptor {
             ScriptObject script = new ScriptObject(
                     configuration.getName(), configuration.getScript(), configuration.getLanguage());
 
+            Map<String, Set<String>> responseAttributes = new HashMap<>();
+
             Bindings scriptVariables = new SimpleBindings();
             scriptVariables.put("logger", PolicyConstants.DEBUG);
             scriptVariables.put("username", SubjectUtils.getPrincipalId(subject));
             scriptVariables.put("resourceURI", resourceName);
             scriptVariables.put("environment", environment);
+            scriptVariables.put("responseAttributes", responseAttributes);
             scriptVariables.put("httpClient", getHttpClient(configuration.getLanguage()));
             scriptVariables.put("authorised", Boolean.FALSE);
 
@@ -138,12 +141,15 @@ public class ScriptCondition extends EntitlementConditionAdaptor {
             }
 
             evaluator.evaluateScript(script, scriptVariables);
-
             boolean authorised = (Boolean)scriptVariables.get("authorised");
-            return new ConditionDecision(authorised, Collections.<String, Set<String>>emptyMap());
+
+            return ConditionDecision
+                    .newBuilder(authorised)
+                    .setResponseAttributes(responseAttributes)
+                    .build();
 
         } catch (ScriptException | javax.script.ScriptException | IdRepoException | SSOException ex) {
-            throw new EntitlementException(EntitlementException.CONDITION_EVALUTATION_FAILED, ex);
+            throw new EntitlementException(EntitlementException.CONDITION_EVALUATION_FAILED, ex);
         }
     }
 

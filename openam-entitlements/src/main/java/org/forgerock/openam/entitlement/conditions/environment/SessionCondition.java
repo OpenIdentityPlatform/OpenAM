@@ -40,7 +40,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static com.sun.identity.entitlement.EntitlementException.CONDITION_EVALUTATION_FAILED;
+import static com.sun.identity.entitlement.EntitlementException.CONDITION_EVALUATION_FAILED;
 import static com.sun.identity.entitlement.EntitlementException.UNABLE_TO_PARSE_SSOTOKEN_AUTHINSTANT;
 
 /**
@@ -150,7 +150,7 @@ public class SessionCondition extends EntitlementConditionAdaptor {
             } catch (ParseException e) {
                 throw new EntitlementException(UNABLE_TO_PARSE_SSOTOKEN_AUTHINSTANT, e);
             } catch (SSOException e) {
-                throw new EntitlementException(CONDITION_EVALUTATION_FAILED, e);
+                throw new EntitlementException(CONDITION_EVALUATION_FAILED, e);
             }
         }
 

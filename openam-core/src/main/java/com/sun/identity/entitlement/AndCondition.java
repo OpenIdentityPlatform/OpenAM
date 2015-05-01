@@ -23,13 +23,17 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: AndCondition.java,v 1.3 2010/01/12 21:29:58 veiming Exp $
+ *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
-import java.util.Collections;
+import org.forgerock.openam.utils.CollectionUtils;
+
+import javax.security.auth.Subject;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import javax.security.auth.Subject;
 
 /**
  * <code>EntitlementCondition</code> wrapper on a set of
@@ -37,7 +41,7 @@ import javax.security.auth.Subject;
  * boolean OR logic Membership is of <code>AndCondition</code> is satisfied
  * if the user is a member of any of the wrapped
  * <code>EntitlementCondition</code>.
-  */
+ */
 public class AndCondition extends LogicalCondition {
     /**
      * Constructs <code>AndCondition</code>
@@ -56,21 +60,6 @@ public class AndCondition extends LogicalCondition {
     }
 
     /**
-     * Constructs <code>AndCondition</code>.
-     *
-     * @param eConditions wrapped <code>EntitlementCondition</code>(s)
-     * @param pConditionName subject name as used in OpenAM policy,
-     * this is relevant only when UserECondition was created from
-     * OpenAM policy Condition
-     */
-    public AndCondition(
-        Set<EntitlementCondition> eConditions,
-        String pConditionName
-    ) {
-        super(eConditions, pConditionName);
-    }
-    
-    /**
      * Returns <code>ConditionDecision</code> of
      * <code>EntitlementCondition</code> evaluation
      *
@@ -82,26 +71,38 @@ public class AndCondition extends LogicalCondition {
      * <code>EntitlementCondition</code> evaluation
      * @throws EntitlementException if error occurs.
      */
-    public ConditionDecision evaluate(
-        String realm,
-        Subject subject,
-        String resourceName,
-        Map<String, Set<String>> environment
-    ) throws EntitlementException {
-        ConditionDecision decision = new ConditionDecision(
-            true, Collections.EMPTY_MAP);
-        Set<EntitlementCondition> eConditions = getEConditions();
-        boolean satisfied = true;
+    public ConditionDecision evaluate(String realm, Subject subject, String resourceName,
+                                      Map<String, Set<String>> environment) throws EntitlementException {
 
-        if ((eConditions != null) && !eConditions.isEmpty()) {
-            for (EntitlementCondition ec : eConditions) {
-                ConditionDecision d = ec.evaluate(realm, subject, resourceName,
-                    environment);
-                decision.addAdvices(d);
-                satisfied &= d.isSatisfied();
+        Set<EntitlementCondition> conditions = getEConditions();
+
+        if (CollectionUtils.isEmpty(conditions)) {
+            return ConditionDecision
+                    .newSuccessBuilder()
+                    .build();
+        }
+
+        Map<String, Set<String>> advices = new HashMap<>();
+        Map<String, Set<String>> responseAttributes = new HashMap<>();
+
+        for (EntitlementCondition condition : conditions) {
+
+            ConditionDecision decision = condition.evaluate(realm, subject, resourceName, environment);
+            advices.putAll(decision.getAdvices());
+            responseAttributes.putAll(decision.getResponseAttributes());
+
+            if (!decision.isSatisfied()) {
+                return ConditionDecision
+                        .newFailureBuilder()
+                        .setAdvices(advices)
+                        .build();
             }
         }
-        decision.setSatisfied(satisfied);
-        return decision;
+
+        return ConditionDecision
+                .newSuccessBuilder()
+                .setResponseAttributes(responseAttributes)
+                .build();
     }
+
 }

@@ -24,8 +24,8 @@
  *
  * $Id: RestrictedTokenAction.java,v 1.2 2008/06/25 05:43:59 qcheng Exp $
  *
+ * Portions copyright 2015 ForgeRock AS.
  */
-
 package com.sun.identity.session.util;
 
 /**
@@ -34,7 +34,7 @@ package com.sun.identity.session.util;
  * token restriction checking
  */
 
-public interface RestrictedTokenAction {
+public interface RestrictedTokenAction<T> {
     /**
      * Perform an arbitrary action which involves a restricted token in a
      * context provided by RestrictedTokenContext.doUsing()
@@ -44,5 +44,5 @@ public interface RestrictedTokenAction {
      * @throws Exception
      *             an exceptional condition has occured
      */
-    public Object run() throws Exception;
+    public T run() throws Exception;
 }

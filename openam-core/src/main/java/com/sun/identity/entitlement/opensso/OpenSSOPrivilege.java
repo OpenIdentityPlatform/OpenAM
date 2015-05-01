@@ -37,6 +37,7 @@ import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeType;
+import com.sun.identity.entitlement.SubjectDecision;
 import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.session.util.RestrictedTokenAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
@@ -48,16 +49,15 @@ import org.json.JSONObject;
 
 import javax.security.auth.Subject;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
  *
- * 
+ *
  */
 public class OpenSSOPrivilege extends Privilege {
 
@@ -82,114 +82,136 @@ public class OpenSSOPrivilege extends Privilege {
 
     @Override
     public List<Entitlement> evaluate(
-        final Subject adminSubject,
-        final String realm,
-        final Subject subject,
-        final String applicationName,
-        final String normalisedResourceName,
-        final String requestedResourceName,
-        final Set<String> actionNames,
-        final Map<String, Set<String>> environment,
-        final boolean recursive,
-        final Object context
+            final Subject adminSubject,
+            final String realm,
+            final Subject subject,
+            final String applicationName,
+            final String normalisedResourceName,
+            final String requestedResourceName,
+            final Set<String> actionNames,
+            final Map<String, Set<String>> environment,
+            final boolean recursive,
+            final Object context
     ) throws EntitlementException {
-        List<Entitlement> results = null;
-        
         try {
-            results = (List<Entitlement>) RestrictedTokenContext.doUsing(context,
-                            new RestrictedTokenAction() {
-                                public Object run() throws Exception {
-                                    return internalEvaluate(
-                                                    adminSubject,
-                                                    realm,
-                                                    subject,
-                                                    applicationName,
-                                                    normalisedResourceName,
-                                                    actionNames,
-                                                    environment,
-                                                    recursive
-                                            );
-                                }
-                            });
+            return RestrictedTokenContext.doUsing(context,
+                    new RestrictedTokenAction<List<Entitlement>>() {
+
+                        @Override
+                        public List<Entitlement> run() throws Exception {
+                            long startTime = System.currentTimeMillis();
+
+                            List<Entitlement> entitlements = internalEvaluate(
+                                    adminSubject, realm, subject, applicationName,
+                                    normalisedResourceName, actionNames, environment, recursive);
+
+                            if (MonitoringUtil.isRunning()) {
+                                long duration = System.currentTimeMillis() - startTime;
+                                policyMonitor.addEvaluation(policyName, duration, realm,
+                                        applicationName, normalisedResourceName, subject);
+                            }
+
+                            return entitlements;
+                        }
+
+                    });
         } catch (Exception ex) {
             PolicyConstants.DEBUG.error("OpenSSOPrivilege.evaluate", ex);
-            results = new ArrayList<Entitlement>(0);
         }
-        
-        return results;
+
+        return Collections.emptyList();
     }
 
     private List<Entitlement> internalEvaluate(
-        Subject adminSubject,
-        String realm,
-        Subject subject,
-        String applicationName,
-        String resourceName,
-        Set<String> actionNames,
-        Map<String, Set<String>> environment,
-        boolean recursive
-    ) throws EntitlementException {
+            Subject adminSubject, String realm, Subject subject, String applicationName,
+            String resourceName, Set<String> actionNames, Map<String, Set<String>> environment,
+            boolean recursive) throws EntitlementException {
 
-        final long startTime = System.currentTimeMillis();
-
-        List<Entitlement> results = new ArrayList<Entitlement>();
-        Set<ConditionDecision> decisions = new HashSet();
+        Entitlement originalEntitlement = getEntitlement();
 
         if (!isActive()) {
-            Entitlement origE = getEntitlement();
-            Entitlement e = new Entitlement(origE.getApplicationName(),
-                origE.getResourceName(), Collections.EMPTY_SET);
-            results.add(e);
-            return results;
+            Entitlement entitlement = new Entitlement(originalEntitlement.getApplicationName(),
+                    originalEntitlement.getResourceName(), Collections.<String>emptySet());
+            return Arrays.asList(entitlement);
         }
 
-        Map<String, Set<String>> advices = new HashMap<String, Set<String>>();
-        if (doesSubjectMatch(adminSubject, realm, advices, subject,
-            resourceName, environment) &&
-            doesConditionMatch(realm, advices, subject, resourceName,
-            environment, decisions)
-            ) {
-            Entitlement origE = getEntitlement();
-            Set<String> resources = origE.evaluate(adminSubject, realm,
-                subject, applicationName, resourceName, actionNames,
-                environment, recursive);
+        // First evaluate subject conditions.
+        SubjectDecision subjectDecision = doesSubjectMatch(adminSubject, realm, subject, resourceName, environment);
 
-            if (PolicyConstants.DEBUG.messageEnabled()) {
-                PolicyConstants.DEBUG.message(
-                    "[PolicyEval] OpenSSOPrivilege.evaluate: resources=" +
-                    resources.toString());
-            }
-            for (String r : resources) {
-                Entitlement e = new Entitlement(origE.getApplicationName(),
-                    r, origE.getActionValues());
-                e.setAttributes(getAttributes(adminSubject, realm, subject,
-                    resourceName, environment));
-                e.setAdvices(advices);
-                e.setTTL(getLowestDecisionTTL(decisions));
-                results.add(e);
-            }
-        } else {
-            Entitlement origE = getEntitlement();
-            Entitlement e = new Entitlement(origE.getApplicationName(),
-                origE.getResourceName(), Collections.EMPTY_SET);
-            e.setAdvices(advices);
-            e.setTTL(getLowestDecisionTTL(decisions));
-            results.add(e);
+        if (!subjectDecision.isSatisfied()) {
+            Entitlement entitlement = new Entitlement(originalEntitlement.getApplicationName(),
+                    originalEntitlement.getResourceName(), Collections.<String>emptySet());
+            entitlement.setAdvices(subjectDecision.getAdvices());
+            return Arrays.asList(entitlement);
         }
 
-        final long duration = System.currentTimeMillis() - startTime;
+        // Second evaluate environment conditions.
+        ConditionDecision conditionDecision = doesConditionMatch(realm, subject, resourceName, environment);
 
-        if (MonitoringUtil.isRunning()) {
-            policyMonitor.addEvaluation(policyName, duration, realm, applicationName, resourceName, subject);
+        if (!conditionDecision.isSatisfied()) {
+            Entitlement entitlement = new Entitlement(originalEntitlement.getApplicationName(),
+                    originalEntitlement.getResourceName(), Collections.<String>emptySet());
+            entitlement.setAdvices(conditionDecision.getAdvices());
+            entitlement.setTTL(conditionDecision.getTimeToLive());
+            return Arrays.asList(entitlement);
+        }
+
+        // Finally verify the resource.
+        Set<String> matchedResources = originalEntitlement.evaluate(
+                adminSubject, realm, subject, applicationName, resourceName, actionNames, environment, recursive);
+
+        if (PolicyConstants.DEBUG.messageEnabled()) {
+            PolicyConstants.DEBUG.message("[PolicyEval] OpenSSOPrivilege.evaluate: resources=" + matchedResources);
+        }
+
+        // Retrieve the collection of response attributes base on the resource.
+        Map<String, Set<String>> attributes = getAttributes(adminSubject, realm, subject, resourceName, environment);
+        squashMaps(attributes, conditionDecision.getResponseAttributes());
+
+        List<Entitlement> results = new ArrayList<>();
+
+        for (String matchedResource : matchedResources) {
+            Entitlement entitlement = new Entitlement(originalEntitlement.getApplicationName(),
+                    matchedResource, originalEntitlement.getActionValues());
+            entitlement.setAdvices(conditionDecision.getAdvices());
+            entitlement.setAttributes(attributes);
+            entitlement.setTTL(conditionDecision.getTimeToLive());
+            results.add(entitlement);
         }
 
         return results;
     }
 
-     /**
+    /**
+     * Squashes the second map into the first, merging sets with common keys.
+     *
+     * @param firstMap
+     *         first map
+     * @param secondMap
+     *         second map
+     */
+    private void squashMaps(Map<String, Set<String>> firstMap, Map<String, Set<String>> secondMap) {
+        if (firstMap.isEmpty()) {
+            firstMap.putAll(secondMap);
+            return;
+        }
+
+        for (Map.Entry<String, Set<String>> entry : secondMap.entrySet()) {
+            if (firstMap.containsKey(entry.getKey())) {
+                firstMap.get(entry.getKey()).addAll(entry.getValue());
+            } else {
+                firstMap.put(entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
+    /**
      * Returns JSONObject mapping of  the object
+     *
      * @return JSONObject mapping of  the object
-     * @throws JSONException if can not map to JSONObject
+     *
+     * @throws JSONException
+     *         if can not map to JSONObject
      */
     @Override
     public JSONObject toJSONObject() throws JSONException {
@@ -207,7 +229,8 @@ public class OpenSSOPrivilege extends Privilege {
     /**
      * Sets policy name.
      *
-     * @param policyName Policy name.
+     * @param policyName
+     *         Policy name.
      */
     public void setPolicyName(String policyName) {
         this.policyName = policyName;
@@ -222,15 +245,4 @@ public class OpenSSOPrivilege extends Privilege {
         return this.policyName;
     }
 
-    protected long getLowestDecisionTTL(Set<ConditionDecision> decisions) {
-        long minTTL = Long.MAX_VALUE;
-
-        for (ConditionDecision decision : decisions) {
-            if (minTTL > decision.getTimeToLive()) {
-                minTTL = decision.getTimeToLive();
-            }
-        }
-
-        return minTTL;
-    }
 }

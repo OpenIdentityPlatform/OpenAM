@@ -21,7 +21,7 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.ConditionDecision;
 import com.sun.identity.entitlement.EntitlementConditionAdaptor;
 import com.sun.identity.entitlement.EntitlementException;
-import static com.sun.identity.entitlement.EntitlementException.CONDITION_EVALUTATION_FAILED;
+import static com.sun.identity.entitlement.EntitlementException.CONDITION_EVALUATION_FAILED;
 import static com.sun.identity.entitlement.EntitlementException.END_IP_BEFORE_START_IP;
 import static com.sun.identity.entitlement.EntitlementException.INVALID_PROPERTY_VALUE;
 import static com.sun.identity.entitlement.EntitlementException.IP_CONDITION_CONFIGURATION_REQUIRED;
@@ -387,7 +387,7 @@ abstract class IPvXCondition<T extends Comparable<T>> extends EntitlementConditi
                     return ipAddress.getHostAddress();
                 }
             } catch (SSOException e) {
-                throw new EntitlementException(CONDITION_EVALUTATION_FAILED, e);
+                throw new EntitlementException(CONDITION_EVALUATION_FAILED, e);
             }
         }
         return null;

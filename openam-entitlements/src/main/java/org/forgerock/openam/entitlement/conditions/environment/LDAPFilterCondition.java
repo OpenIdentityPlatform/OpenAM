@@ -19,7 +19,7 @@
 
 package org.forgerock.openam.entitlement.conditions.environment;
 
-import static com.sun.identity.entitlement.EntitlementException.CONDITION_EVALUTATION_FAILED;
+import static com.sun.identity.entitlement.EntitlementException.CONDITION_EVALUATION_FAILED;
 import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.LDAP_FILTER;
 
 import javax.security.auth.Subject;
@@ -37,7 +37,6 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.policy.PolicyException;
 import com.sun.identity.shared.debug.Debug;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -92,9 +91,9 @@ public class LDAPFilterCondition extends EntitlementConditionAdaptor {
             com.sun.identity.policy.ConditionDecision decision = condition.getConditionDecision(token, env);
             return new ConditionDecision(decision.isAllowed(), decision.getAdvices(), decision.getTimeToLive());
         } catch (PolicyException e) {
-            throw new EntitlementException(CONDITION_EVALUTATION_FAILED, e);
+            throw new EntitlementException(CONDITION_EVALUATION_FAILED, e);
         } catch (SSOException e) {
-            throw new EntitlementException(CONDITION_EVALUTATION_FAILED, e);
+            throw new EntitlementException(CONDITION_EVALUATION_FAILED, e);
         }
     }
 

@@ -211,7 +211,7 @@ public class AMIdentityMembershipCondition extends EntitlementConditionAdaptor {
                     throw new EntitlementException(AM_ID_SUBJECT_MEMBERSHIP_EVALUATION_ERROR, args);
                 } catch (SSOException e) {
                     debug.error("AMIdentityMembershipCondition: Condition evaluation failed", e);
-                    throw new EntitlementException(CONDITION_EVALUTATION_FAILED, e);
+                    throw new EntitlementException(CONDITION_EVALUATION_FAILED, e);
                 }
             }
         }

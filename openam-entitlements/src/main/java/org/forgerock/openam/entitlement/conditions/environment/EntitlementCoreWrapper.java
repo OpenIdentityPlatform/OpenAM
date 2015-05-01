@@ -11,12 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.conditions.environment;
 
-import static com.sun.identity.entitlement.EntitlementException.CONDITION_EVALUTATION_FAILED;
+import static com.sun.identity.entitlement.EntitlementException.CONDITION_EVALUATION_FAILED;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -39,7 +39,7 @@ public class EntitlementCoreWrapper {
         try {
             return AMAuthUtils.getRealmQualifiedAuthenticatedServices(token);
         } catch (SSOException e) {
-            throw new EntitlementException(CONDITION_EVALUTATION_FAILED, e);
+            throw new EntitlementException(CONDITION_EVALUATION_FAILED, e);
         }
     }
 
@@ -55,7 +55,7 @@ public class EntitlementCoreWrapper {
         try {
             return AMAuthUtils.getAuthenticatedRealms(token);
         } catch (SSOException e) {
-            throw new EntitlementException(CONDITION_EVALUTATION_FAILED, e);
+            throw new EntitlementException(CONDITION_EVALUATION_FAILED, e);
         }
     }
 
@@ -71,7 +71,7 @@ public class EntitlementCoreWrapper {
         try {
             return AMAuthUtils.getRealmQualifiedAuthenticatedSchemes(token);
         } catch (SSOException e) {
-            throw new EntitlementException(CONDITION_EVALUTATION_FAILED, e);
+            throw new EntitlementException(CONDITION_EVALUATION_FAILED, e);
         }
     }
 
@@ -87,7 +87,7 @@ public class EntitlementCoreWrapper {
         try {
             return AMAuthUtils.getAuthenticatedSchemes(token);
         } catch (SSOException e) {
-            throw new EntitlementException(CONDITION_EVALUTATION_FAILED, e);
+            throw new EntitlementException(CONDITION_EVALUATION_FAILED, e);
         }
     }
 }

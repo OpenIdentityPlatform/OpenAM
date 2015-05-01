@@ -24,12 +24,8 @@
  *
  * $Id: RestrictedTokenContext.java,v 1.4 2008/06/25 05:43:59 qcheng Exp $
  *
+ * Portions copyright 2010-2015 ForgeRock AS.
  */
-
-/*
- * Portions Copyrighted [2010] [ForgeRock AS]
- */
-
 package com.sun.identity.session.util;
 
 import java.io.ByteArrayInputStream;
@@ -78,7 +74,7 @@ public class RestrictedTokenContext {
      * @return object
      * @throws Exception if the there was an error.
      */
-    public static Object doUsing(Object context, RestrictedTokenAction action)
+    public static <T> T doUsing(Object context, RestrictedTokenAction<T> action)
             throws Exception {
         Object savedContext = currentContext.get();
         try {

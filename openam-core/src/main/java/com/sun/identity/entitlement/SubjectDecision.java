@@ -24,7 +24,7 @@
  *
  * $Id: SubjectDecision.java,v 1.2 2009/12/22 18:00:25 veiming Exp $
  *
- * Portions copyright 2010-2014 ForgeRock AS.
+ * Portions copyright 2010-2015 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
@@ -66,7 +66,7 @@ public class SubjectDecision {
      *
      * @return advices of <code>ConditionDecision</code>.
      */
-    Map<String, Set<String>> getAdvices() {
+    public Map<String, Set<String>> getAdvices() {
         return advices;
     }
 }

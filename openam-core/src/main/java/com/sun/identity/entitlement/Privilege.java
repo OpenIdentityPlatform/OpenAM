@@ -655,78 +655,58 @@ public abstract class Privilege implements IPrivilege {
         return code;
     }
 
-    protected boolean doesSubjectMatch(
+    protected SubjectDecision doesSubjectMatch(
         Subject adminSubject,
         String realm,
-        Map<String, Set<String>> resultAdvices,
         Subject subject,
         String resourceName,
         Map<String, Set<String>> environment
     ) throws EntitlementException {
-        boolean result = true;
+        SubjectDecision decision;
+
         if (getSubject() != null) {
-            SubjectAttributesManager mgr =
-                SubjectAttributesManager.getInstance(adminSubject, realm);
-            SubjectDecision sDecision = getSubject().evaluate(realm,
-                mgr, subject, resourceName, environment);
-            if (!sDecision.isSatisfied()) {
-                Map<String, Set<String>> advices = sDecision.getAdvices();
-                if (advices != null) {
-                    resultAdvices.putAll(advices);
-                }
-                result = false;
-            }
+            SubjectAttributesManager mgr = SubjectAttributesManager.getInstance(adminSubject, realm);
+            decision = getSubject().evaluate(realm, mgr, subject, resourceName, environment);
+        } else {
+            decision = new SubjectDecision(true, Collections.<String, Set<String>>emptyMap());
         }
 
         if (PolicyConstants.DEBUG.messageEnabled()) {
-            if (result) {
-                PolicyConstants.DEBUG.message(
-                    "[PolicyEval] Privilege.doesSubjectMatch: true");
+            if (decision.isSatisfied()) {
+                PolicyConstants.DEBUG.message("[PolicyEval] Privilege.doesSubjectMatch: true");
             } else {
-                PolicyConstants.DEBUG.message(
-                    "[PolicyEval] Privilege.doesSubjectMatch: false");
-                PolicyConstants.DEBUG.message("[PolicyEval] Advices: " +
-                    resultAdvices.toString());
+                PolicyConstants.DEBUG.message("[PolicyEval] Privilege.doesSubjectMatch: false");
+                PolicyConstants.DEBUG.message("[PolicyEval] Advices: " + decision.getAdvices());
             }
         }
-        return result;
+        return decision;
     }
 
-    protected boolean doesConditionMatch(
+    protected ConditionDecision doesConditionMatch(
         String realm,
-        Map<String, Set<String>> resultAdvices,
         Subject subject,
         String resourceName,
-        Map<String, Set<String>> environment,
-        Set decisions
+        Map<String, Set<String>> environment
     ) throws EntitlementException {
-        boolean result = true;
+        ConditionDecision decision;
 
         if (eCondition != null) {
             EntitlementCondition cachedCondition = new CachingEntitlementCondition(eCondition);
-            ConditionDecision decision = cachedCondition.evaluate(realm,
-                subject, resourceName, environment);
-            Map<String, Set<String>> advices = decision.getAdvices();
-            if (advices != null) {
-                resultAdvices.putAll(advices);
-            }
-            result = decision.isSatisfied();
-            decisions.add(decision);
+            decision = cachedCondition.evaluate(realm, subject, resourceName, environment);
+        } else {
+            decision = ConditionDecision.newSuccessBuilder().build();
         }
 
         if (PolicyConstants.DEBUG.messageEnabled()) {
-            if (result) {
-                PolicyConstants.DEBUG.message(
-                    "[PolicyEval] Privilege.doesConditionMatch: true");
+            if (decision.isSatisfied()) {
+                PolicyConstants.DEBUG.message("[PolicyEval] Privilege.doesConditionMatch: true");
             } else {
-                PolicyConstants.DEBUG.message(
-                    "[PolicyEval] Privilege.doesConditionMatch: false");
-                PolicyConstants.DEBUG.message("[PolicyEval] Advices: " +
-                    resultAdvices.toString());
+                PolicyConstants.DEBUG.message("[PolicyEval] Privilege.doesConditionMatch: false");
+                PolicyConstants.DEBUG.message("[PolicyEval] Advices: " + decision.getAdvices());
             }
         }
 
-        return result;
+        return decision;
     }
     
     /**
@@ -880,11 +860,9 @@ public abstract class Privilege implements IPrivilege {
         String realm, Subject subject, String resourceName,
         Map<String, Set<String>> environment
     ) throws EntitlementException {
-        Map<String, Set<String>> result = null;
+        Map<String, Set<String>> result = new HashMap<>();
 
         if ((eResourceAttributes != null) && !eResourceAttributes.isEmpty()) {
-            result = new HashMap<String, Set<String>>();
-
             for (ResourceAttribute e : eResourceAttributes) {
                 Map<String, Set<String>> values = e.evaluate(adminSubject,
                     realm, subject, resourceName, environment);
