@@ -1047,6 +1047,7 @@
                             <Value>devicePrintProfiles</Value>
                             <Value>modifyTimestamp</Value>
                             <Value>createTimestamp</Value>
+                            <Value>oath2faEnabled</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -1703,6 +1704,7 @@
                             <Value>devicePrintProfiles</Value>
                             <Value>modifyTimestamp</Value>
                             <Value>createTimestamp</Value>
+                            <Value>oath2faEnabled</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -2236,6 +2238,7 @@
                             <Value>devicePrintProfiles</Value>
                             <Value>modifyTimestamp</Value>
                             <Value>createTimestamp</Value>
+                            <Value>oath2faEnabled</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -2755,6 +2758,7 @@
                             <Value>devicePrintProfiles</Value>
                             <Value>modifyTimestamp</Value>
                             <Value>createTimestamp</Value>
+                            <Value>oath2faEnabled</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -3276,6 +3280,7 @@
                             <Value>devicePrintProfiles</Value>
                             <Value>modifyTimestamp</Value>
                             <Value>createTimestamp</Value>
+                            <Value>oath2faEnabled</Value>
                         </DefaultValues>
                     </AttributeSchema>
 

@@ -36,7 +36,7 @@ objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.127 NAME 'sunIdentityServerLibertyPPSer
 objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.148 NAME 'sunFMSAML2NameIdentifier' DESC 'SAML 2.0 name identifier objectclass' SUP top AUXILIARY MAY ( sun-fm-saml2-nameid-infokey $ sun-fm-saml2-nameid-info ) X-ORIGIN 'OpenSSO' )
 objectClasses: ( 2.16.840.1.113730.3.2.176 NAME 'iplanet-am-user-service' DESC 'User Service OC' SUP top AUXILIARY MAY ( iplanet-am-user-auth-modules $ iplanet-am-user-login-status $ iplanet-am-user-admin-start-dn $ iplanet-am-user-auth-config $ iplanet-am-user-alias-list $ iplanet-am-user-success-url $ iplanet-am-user-failure-url $ iplanet-am-user-password-reset-options $ iplanet-am-user-password-reset-question-answer $ iplanet-am-user-password-reset-force-reset $ sunIdentityMSISDNNumber ) X-ORIGIN 'OpenSSO' )
 objectClasses: ( 2.16.840.1.113730.3.2.184 NAME 'iplanet-am-managed-person' DESC 'Managed Person OC' SUP top AUXILIARY MAY ( iplanet-am-user-account-life ) X-ORIGIN 'OpenSSO' )
-objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.23 NAME 'iplanet-am-auth-configuration-service' DESC 'Authentication Configuration Service OC' SUP top AUXILIARY MAY ( iplanet-am-auth-configuration $ iplanet-am-auth-login-success-url $ iplanet-am-auth-login-failure-url $ iplanet-am-auth-post-login-process-class ) X-ORIGIN 'OpenSSO' )
+objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.23 NAME 'iplanet-am-auth-configuration-service' DESC 'Authentication Configuration Service OC' SUP top AUXILIARY MAY ( iplanet-am-auth-configuration $ iplanet-am-auth-login-success-url $ iplanet-am-auth-login-failure-url $ iplanet-am-auth-post-login-process-class $ oath2faEnabled ) X-ORIGIN 'OpenSSO' )
 objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.118 NAME 'sunAMAuthAccountLockout' DESC 'Invalid Login Attempts Object Class' SUP top AUXILIARY MAY ( sunAMAuthInvalidAttemptsData ) X-ORIGIN 'OpenSSO' )
 -
 delete: attributeTypes
@@ -109,3 +109,4 @@ attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.861 NAME 'sunIdentityServerPPEncryptKe
 attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.862 NAME 'sunIdentityServerPPEmergencyContact' DESC 'Liberty PP EmergencyContact' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
 attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.989 NAME 'sun-fm-saml2-nameid-infokey' DESC 'SAML 2.0 Name Identifier Information Key' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
 attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.990 NAME 'sun-fm-saml2-nameid-info' DESC 'SAML 2.0 Name Identifier Information' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.2.1.131 NAME 'oath2faEnabled' DESC 'Indicator for enabling of OATH 2FA' SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 X-ORIGIN 'OpenSSO' )

@@ -16,6 +16,11 @@
 
 package org.forgerock.openam.upgrade;
 
+import com.google.inject.Key;
+import com.sun.identity.setup.AMSetupServlet;
+import com.sun.identity.setup.EmbeddedOpenDS;
+import com.sun.identity.setup.SetupConstants;
+import com.sun.identity.shared.debug.Debug;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -24,11 +29,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.impl.CTSDataLayerConfiguration;
-import org.forgerock.openam.cts.impl.LDAPConfig;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
@@ -44,12 +47,6 @@ import org.forgerock.opendj.ldif.ChangeRecordReader;
 import org.forgerock.opendj.ldif.ChangeRecordWriter;
 import org.forgerock.opendj.ldif.ConnectionChangeRecordWriter;
 import org.forgerock.opendj.ldif.LDIFChangeRecordReader;
-
-import com.google.inject.Key;
-import com.sun.identity.setup.AMSetupServlet;
-import com.sun.identity.setup.EmbeddedOpenDS;
-import com.sun.identity.setup.SetupConstants;
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * This class is aiming to upgrade the content of the configuration store. The possible changes may involve directory
@@ -71,6 +68,7 @@ public class DirectoryContentUpgrader {
     private static final Debug DEBUG = Debug.getInstance("amUpgrade");
     private static final String DASHBOARD_OC = "forgerock-am-dashboard-service";
     private static final String DEVICE_PRINT_OC = "devicePrintProfilesContainer";
+    private static final String OATH2FAENABLED = "oath2faEnabled";
     private final List<Upgrader> upgraders = new ArrayList<Upgrader>();
     private final ConnectionFactory<Connection> connFactory;
     private final String baseDir;
@@ -99,6 +97,7 @@ public class DirectoryContentUpgrader {
             upgraders.add(new AddDevicePrintSchema());
             upgraders.add(new AddUmaAuditSchema());
             upgraders.add(new AddResourceSetsSchema());
+            upgraders.add(new OATH2FASchema());
         }
         Connection conn = null;
         try {
@@ -283,6 +282,20 @@ public class DirectoryContentUpgrader {
         public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
             return !entryExists(conn, CTSDataLayerConfiguration.getTokenRootDN(DN.valueOf(baseDN)));
         }
+    }
+
+    private class OATH2FASchema implements Upgrader {
+
+        @Override
+        public String getLDIFPath() {
+            return "/WEB-INF/template/ldif/opendj/oath_2fa.ldif";
+        }
+
+        @Override
+        public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
+            return !schema.hasAttributeType(OATH2FAENABLED);
+        }
+
     }
 
     private class CreateCTSIndexes implements Upgrader {

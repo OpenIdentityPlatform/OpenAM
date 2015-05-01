@@ -104,6 +104,11 @@ changetype: modify
 add: attributeTypes
 attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.62 NAME 'iplanet-am-auth-configuration' DESC 'Authentication Configuration' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
 
+dn: CN=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.36733.2.2.1.131 NAME 'oath2faEnabled' DESC 'Indicator for enabling of OATH 2FA' SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 )
+
 dn: cn=schema
 changetype: modify
 add: attributeTypes
@@ -177,7 +182,7 @@ objectClasses: ( 2.16.840.1.113730.3.2.176 NAME 'iplanet-am-user-service' DESC '
 dn: cn=schema
 changetype: modify
 add: objectClasses
-objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.23 NAME 'iplanet-am-auth-configuration-service' DESC 'Authentication Configuration Service OC' SUP top AUXILIARY MAY ( iplanet-am-auth-configuration $ iplanet-am-auth-login-success-url $ iplanet-am-auth-login-failure-url $ iplanet-am-auth-post-login-process-class ) )
+objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.23 NAME 'iplanet-am-auth-configuration-service' DESC 'Authentication Configuration Service OC' SUP top AUXILIARY MAY ( iplanet-am-auth-configuration $ iplanet-am-auth-login-success-url $ iplanet-am-auth-login-failure-url $ iplanet-am-auth-post-login-process-class $ oath2faEnabled ) )
 
 dn: cn=schema
 changetype: modify

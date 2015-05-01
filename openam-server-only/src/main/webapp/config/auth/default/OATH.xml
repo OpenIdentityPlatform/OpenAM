@@ -1,27 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
- DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- 
- Copyright © 2012 ForgeRock Inc. All rights reserved.
- 
- The contents of this file are subject to the terms
- of the Common Development and Distribution License
- (the License). You may not use this file except in
- compliance with the License.
- 
- You can obtain a copy of the License at
- http://forgerock.org/license/CDDLv1.0.html
- See the License for the specific language governing
- permission and limitations under the License.
- 
- When distributing Covered Code, include this CDDL
- Header Notice in each file and include the License file
- at http://forgerock.org/license/CDDLv1.0.html
- If applicable, add the following below the CDDL Header,
- with the fields enclosed by brackets [] replaced by
- your own identifying information:
- "Portions Copyrighted 2012 ForgeRock AS"
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+
+  Copyright 2012-2015 ForgeRock AS.
  -->
 
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
@@ -29,7 +21,31 @@
 
 
 <ModuleProperties moduleName="OATH" version="1.0">
-    <Callbacks length="2" order="1" timeout="120" header="Two Factor Authentication - 2nd factor">
+    <!-- For determining which we are -->
+    <Callbacks length="0" order="1" timeout="120" header="Two Factor Authentication - 2nd factor">
+    </Callbacks>
+
+    <!-- For when we're optional -->
+    <Callbacks length="2" order="2" timeout="120" header="Two Factor Authentication - 2nd factor">
+        <PasswordCallback>
+            <Prompt>Enter verification code:</Prompt>
+        </PasswordCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>Submit</Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value>Register device</Value>
+                </OptionValue>
+                <OptionValue>
+                    <Value>Skip 2FA</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    <!-- For when we're not optional -->
+    <Callbacks length="2" order="3" timeout="120" header="Two Factor Authentication - 2nd factor">
         <PasswordCallback>
             <Prompt>Enter verification code:</Prompt>
         </PasswordCallback>
@@ -44,7 +60,7 @@
             </OptionValues>
         </ConfirmationCallback>
     </Callbacks>
-    <Callbacks length="3" order="2" timeout="120" header="Register your device with OpenAM">
+    <Callbacks length="3" order="4" timeout="120" header="Register your device with OpenAM">
         <TextOutputCallback>
             Scan the barcode image below with the ForgeRock Authenticator App. Once registered click the button to
             enter your verification code and login.
