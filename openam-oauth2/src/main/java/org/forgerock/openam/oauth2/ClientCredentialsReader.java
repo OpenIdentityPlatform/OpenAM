@@ -19,6 +19,7 @@ import static org.forgerock.oauth2.core.OAuth2Constants.JwtProfile.*;
 import static org.forgerock.openidconnect.Client.TokenEndpointAuthMethod.*;
 
 import com.sun.identity.shared.debug.Debug;
+import java.util.Set;
 import javax.inject.Inject;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.OAuth2Constants;
@@ -104,12 +105,13 @@ public class ClientCredentialsReader {
         }
 
         final OpenIdConnectClientRegistration cr = clientRegistrationStore.get(client.getClientId(), request);
+        final Set<String> scopes = cr.getAllowedScopes();
 
         //if we're accessing the token endpoint, check we're authenticating using the appropriate method
-        if (req.getResourceRef().getLastSegment().equals(OAuth2Constants.Params.ACCESS_TOKEN)) {
-            if (!cr.getTokenEndpointAuthMethod().equals(method.getType())) {
-                throw new InvalidClientException("Invalid authentication method for accessing this endpoint.");
-            }
+        if (scopes.contains(OAuth2Constants.Params.OPENID)
+                && req.getResourceRef().getLastSegment().equals(OAuth2Constants.Params.ACCESS_TOKEN)
+                && !cr.getTokenEndpointAuthMethod().equals(method.getType())) {
+                    throw new InvalidClientException("Invalid authentication method for accessing this endpoint.");
         }
 
         return client;
