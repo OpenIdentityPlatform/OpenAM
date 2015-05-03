@@ -271,6 +271,18 @@ public class AMLoginContext {
         }
         parseLoginParams(loginParamsMap);
 
+        if (authContext.getOrgDN() != null && !authContext.getOrgDN().isEmpty()) {
+            orgDN = authContext.getOrgDN();
+            loginState.setQualifiedOrgDN(orgDN);
+        } else {
+            orgDN = loginState.getOrgDN();
+        }
+        clientType = loginState.getClientType();
+        if (debug.messageEnabled()) {
+            debug.message("orgDN : " + orgDN);
+            debug.message("clientType : " + clientType);
+        }
+
         String moduleClassName = null;
         if (indexType == AuthContext.IndexType.MODULE_INSTANCE
                 && !loginState.getEnableModuleBasedAuth() && !indexName.equals(
@@ -294,21 +306,6 @@ public class AMLoginContext {
                 throw new AuthLoginException(bundleName,
                         AMAuthErrorCode.MODULE_BASED_AUTH_NOT_ALLOWED, null);
             }
-        }
-
-        
-        if ((authContext.getOrgDN() != null) && 
-            ((authContext.getOrgDN()).length() != 0)){
-            this.orgDN = authContext.getOrgDN();
-            loginState.setQualifiedOrgDN(this.orgDN);
-        } else {
-            this.orgDN = loginState.getOrgDN();
-        }
-        clientType = loginState.getClientType();
-
-        if (debug.messageEnabled()) {
-            debug.message("orgDN : " + orgDN);
-            debug.message("clientType : " + clientType);
         }
         
         AuthContext.IndexType prevIndexType = loginState.getIndexType();
