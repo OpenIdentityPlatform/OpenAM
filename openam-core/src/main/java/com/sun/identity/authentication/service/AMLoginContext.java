@@ -274,6 +274,21 @@ public class AMLoginContext {
         parseLoginParams(loginParamsMap);
 
         /*
+         * Copy orgDN and clientType values from LoginState
+         */
+        if (authContext.getOrgDN() != null && !authContext.getOrgDN().isEmpty()) {
+            orgDN = authContext.getOrgDN();
+            loginState.setQualifiedOrgDN(orgDN);
+        } else {
+            orgDN = loginState.getOrgDN();
+        }
+        clientType = loginState.getClientType();
+        if (debug.messageEnabled()) {
+            debug.message("orgDN : " + orgDN);
+            debug.message("clientType : " + clientType);
+        }
+
+        /*
          * Throw an exception if module-based authentication is disabled and an authentication module other
          * than APPLICATION_MODULE or FEDERATION_MODULE is explicitly requested.
          */
@@ -292,21 +307,6 @@ public class AMLoginContext {
             if (moduleClassName != null && !moduleClassName.equalsIgnoreCase(ISAuthConstants.FEDERATION_MODULE)) {
                 throwExceptionIfModuleBasedAuthenticationDisabled();
             }
-        }
-
-        /*
-         * Copy orgDN and clientType values from LoginState
-         */
-        if ((authContext.getOrgDN() != null) && ((authContext.getOrgDN()).length() != 0)) {
-            this.orgDN = authContext.getOrgDN();
-            loginState.setQualifiedOrgDN(this.orgDN);
-        } else {
-            this.orgDN = loginState.getOrgDN();
-        }
-        clientType = loginState.getClientType();
-        if (debug.messageEnabled()) {
-            debug.message("orgDN : " + orgDN);
-            debug.message("clientType : " + clientType);
         }
 
         /*
