@@ -21,39 +21,41 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegate", [
 ], function(AbstractDelegate, Constants) {
     var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/");
 
-    obj.getRealmAuthentication = function(username, policyId, permissions) {
-      var deferred = new $.Deferred(),
-          url = "realm-config/authentication",
-          schemaPromise = obj.serviceCall({
-              url: url + "?_action=template",
-              type: "POST"
-          }).done(obj.sanitize),
-          valuesPromise = obj.serviceCall({
-              url: url
-          });
+    obj.Realm = {
+        Authentication: {
+            get: function() {
+                var url = "realm-config/authentication",
+                    schemaPromise = obj.serviceCall({
+                        url: url + "?_action=template",
+                        type: "POST"
+                    }).done(obj.sanitize),
+                    valuesPromise = obj.serviceCall({
+                        url: url
+                    });
 
-      $.when(schemaPromise, valuesPromise).done(function(schemaData, valuesData) {
-          deferred.resolve({
-              schema: obj.sanitizeSchema(schemaData[0]._schema),
-              values: valuesData[0]
-          });
-      });
-
-      return deferred;
+                return $.when(schemaPromise, valuesPromise).then(function(schemaData, valuesData) {
+                    return {
+                        schema: obj.sanitizeSchema(schemaData[0]._schema),
+                        values: valuesData[0]
+                    };
+                });
+            },
+            save: function(data) {
+                return obj.serviceCall({
+                    url: "realm-config/authentication",
+                    type: "PUT",
+                    data: JSON.stringify(data)
+                });
+            }
+        }
     };
 
     obj.sanitizeSchema = function(schema) {
         // Filter out 'defaults'
         schema.properties = _.omit(schema.properties, 'defaults');
 
-        // Translate order into propertyOrder
-        _.forEach(schema.properties, function(property) {
-            if(property.hasOwnProperty("order")) {
-                console.error('Property still using "order" and not "propertyOrder"');
-                property.propertyOrder = parseInt(property.order.slice(1), 10);
-            }
-            delete property.order;
-        });
+        // Recursively transforms propertyOrder attribute to int
+        _.forEach(schema.properties, obj.propertyOrderTransform);
 
         // Create ordered array
         schema.orderedProperties = _.sortBy(_.map(schema.properties, function(value, key) {
@@ -62,6 +64,16 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegate", [
         }), 'propertyOrder');
 
         return schema;
+    };
+
+    obj.propertyOrderTransform = function(property) {
+        if(property.hasOwnProperty('propertyOrder')) {
+            property.propertyOrder = parseInt(property.propertyOrder.slice(1), 10);
+        }
+
+        if(property.type === "object") {
+            _.forEach(property.properties, obj.propertyOrderTransform);
+        }
     };
 
     return obj;

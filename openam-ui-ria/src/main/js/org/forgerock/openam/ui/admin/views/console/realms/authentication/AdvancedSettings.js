@@ -19,13 +19,18 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Advanc
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/admin/utils/FormBuilder",
+    "org/forgerock/openam/ui/admin/models/Form",
+    "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/openam/ui/admin/delegates/SMSDelegate"
-], function(AbstractView, Configuration, Constants, FormBuilder, SMSDelegate) {
+], function(AbstractView, Configuration, Constants, Form, FormHelper, SMSDelegate) {
     var AdvancedSettings = AbstractView.extend({
         template: "templates/admin/views/console/realms/authentication/AdvancedSettingsTemplate.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
-        events: {},
+        events: {
+            'click #revert': 'revert',
+            'click #saveChanges': 'save',
+            'show.bs.tab ul.nav.nav-tabs a': 'renderTab'
+        },
 
         render: function(args, callback) {
             var self = this;
@@ -34,23 +39,12 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Advanc
             this.data.name = args[0];
             this.data.consolePath = Constants.CONSOLE_PATH;
 
-            SMSDelegate.getRealmAuthentication()
+            SMSDelegate.Realm.Authentication.get()
             .done(function(data) {
-                self.data.sms = data;
+                self.data.formData = data;
 
                 self.parentRender(function() {
                     self.$el.find("div.tab-pane").show(); // FIXME: To remove
-
-                    self.$el.find("ul.nav.nav-tabs a").on('show.bs.tab', function(event) {
-                        self.$el.find("div.panel-body").empty(); // FIXME: Improve
-
-                        var id = $(event.target).attr('href').slice(1),
-                            schema = self.data.sms.schema.properties[id],
-                            element = $("div.panel-body").get(0);
-
-                        FormBuilder.build(element, schema, self.data.sms.values);
-                    });
-
                     self.$el.find('ul.nav a:first').tab('show');
 
                     if (callback) {
@@ -61,6 +55,23 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Advanc
             .fail(function() {
                 // TODO: Add failure condition
             });
+        },
+        renderTab: function(event) {
+            this.$el.find("div.panel-body").empty(); // FIXME: Improve
+
+            var id = $(event.target).attr('href').slice(1),
+                schema = this.data.formData.schema.properties[id],
+                element = $("div.panel-body").get(0);
+
+            this.data.form = new Form(element, schema, this.data.formData.values);
+        },
+        revert: function() {
+            this.data.form.reset();
+        },
+        save: function(event) {
+            var promise = SMSDelegate.Realm.Authentication.save(this.data.form.data());
+
+            FormHelper.bindSavePromiseToElement(promise, event.target);
         }
     });
 

@@ -21,19 +21,19 @@ define("org/forgerock/openam/ui/admin/views/console/realms/Authentication", [
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/openam/ui/admin/utils/FormBuilder",
+    "org/forgerock/openam/ui/admin/models/Form",
+    "org/forgerock/openam/ui/admin/models/FormCollection",
+    "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/admin/delegates/SMSDelegate"
-], function(AbstractView, BootstrapDialog, Configuration, Constants, EventManager, FormBuilder, Router, SMSDelegate) {
+], function(AbstractView, BootstrapDialog, Configuration, Constants, EventManager, Form, FormCollection, FormHelper, Router, SMSDelegate) {
     var Authentication = AbstractView.extend({
         template: "templates/admin/views/console/realms/AuthenticationTemplate.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
         events: {
-            'click #addModule': 'addModule',
-            'click #addChain':  'addChain',
-            'show.bs.tab #settingsTab': 'renderTabSettings',
-            'show.bs.tab #chainsTab':   'renderTabChains',
-            'show.bs.tab #modulesTab':  'renderTabModules'
+            'click #addModule':   'addModule',
+            'click #addChain':    'addChain',
+            'click #saveChanges': 'save'
         },
         addChain: function(e) {
             e.preventDefault();
@@ -103,43 +103,47 @@ define("org/forgerock/openam/ui/admin/views/console/realms/Authentication", [
             this.data.consolePath = Constants.CONSOLE_PATH;
 
             this.parentRender(function() {
-                self.$el.find('#settingsTab').tab('show');
+                self.renderSettingsTab();
 
                 if(callback) {
                     callback();
                 }
             });
         },
-        renderTabSettings: function(event) {
+        renderSettingsTab: function() {
             var self = this;
 
-            SMSDelegate.getRealmAuthentication()
+            SMSDelegate.Realm.Authentication.get()
             .done(function(data) {
-                FormBuilder.build(self.$el.find('#tabSettings .col-md-6:first').get(0), {
+                self.data.form = new FormCollection();
+                self.data.form.add(new Form(self.$el.find('#settings .col-md-6:first').get(0), {
                     type: 'object',
                     properties: {
                         adminAuthModule: data.schema.properties["null"].properties.adminAuthModule,
                         loginSuccessUrl: data.schema.properties.postauthprocess.properties.loginSuccessUrl
-
                     }
-                }, data.values);
-
-                FormBuilder.build(self.$el.find('#tabSettings .col-md-6:last').get(0), {
+                }, data.values));
+                self.data.form.add(new Form(self.$el.find('#settings .col-md-6:last').get(0), {
                     type: 'object',
                     properties: {
-                        adminAuthModule: data.schema.properties["null"].properties.adminAuthModule
+                        orgConfig: data.schema.properties["null"].properties.orgConfig
                     }
-                }, data.values);
+                }, data.values));
             })
             .fail(function() {
                 // TODO: Add failure condition
             });
         },
-        renderTabChains: function(event) {
+        renderChainsTab: function(event) {
             // Not Implemented
         },
-        renderTabModules: function(event) {
+        renderModulesTab: function(event) {
             // Not Implemented
+        },
+        save: function(event) {
+            var promise = SMSDelegate.Realm.Authentication.save(this.data.form.data());
+
+            FormHelper.bindSavePromiseToElement(promise, event.target);
         }
     });
 

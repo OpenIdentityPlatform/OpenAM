@@ -19,7 +19,7 @@
     <div class="console-tabs">
         <div class="tab-menu">
             <ul class="nav nav-tabs" role="tablist">
-                {{#each sms.schema.orderedProperties}}
+                {{#each formData.schema.orderedProperties}}
                     <li><a href="#{{this._id}}" role="tab" data-toggle="tab" aria-expanded="false">{{this.title}}</a></li>
                 {{/each}}
             </ul>
@@ -35,8 +35,8 @@
 
             <div class="tab-pane-footer clearfix">
                 <div class="pull-right">
-                    <button class="btn btn-default btn-sm" type="button">{{t "console.authentication.advancedSettings.revert"}}</button>
-                    <input class="btn btn-primary btn-sm" type="button" value="{{t 'console.authentication.advancedSettings.saveChanges'}}">
+                    <button id="revert" class="btn btn-default" type="button">{{t "console.authentication.advancedSettings.revert"}}</button>
+                    <button id="saveChanges" class="btn btn-primary" type="button">{{t 'console.authentication.advancedSettings.saveChanges'}}</button>
                 </div>
             </div>
         </div>

@@ -14,15 +14,27 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global define*/
+/*global _ define*/
+define('org/forgerock/openam/ui/admin/models/FormCollection', [], function() {
+    var obj = function FormCollection() {
+        this.forms = [];
+    };
 
-define([
-    "./delegates/SMSDelegate",
-    "./models/Form",
-    "./models/FormCollection",
-    "./utils/FormHelper",
-    "./views/console/realms/Authentication",
-    "./views/console/realms/authentication/AdvancedSettings",
-    "./views/console/realms/authentication/Chains",
-    "./views/console/realms/authentication/Module"
-]);
+    obj.prototype.add = function(form) {
+        this.forms.push(form);
+    };
+
+    obj.prototype.data = function() {
+        return _.reduce(this.forms, function(merged, form) {
+            return _.merge(merged, form.data());
+        }, this.forms[0].data());
+    };
+
+    obj.prototype.reset = function() {
+        _.each(this.forms, function(form) {
+            form.reset();
+        });
+    };
+
+    return obj;
+});

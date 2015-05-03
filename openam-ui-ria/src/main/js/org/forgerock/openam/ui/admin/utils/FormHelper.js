@@ -15,34 +15,36 @@
  */
 
 /*global $ _ define*/
-define("org/forgerock/openam/ui/admin/utils/FormBuilder", [
+define("org/forgerock/openam/ui/admin/utils/FormHelper", [
     "jsonEditor"
 ], function(JSONEditor) {
     var obj = {};
 
-    obj.build = function(element, schema, values) {
-      var editor = new JSONEditor(element, {
-          disable_collapse: true,
-          disable_edit_json: true,
-          disable_properties: true,
-          iconlib: "fontawesome4",
-          schema: schema,
-          theme: 'bootstrap3'
-      });
-      editor.setValue(_.pick(values, _.keys(schema.properties)));
+    obj.bindSavePromiseToElement = function(promise, element) {
+        element = $(element);
 
-      element = $(element);
+        var originalText = element.text();
 
-      element.find('div[data-schematype="array"] p').addClass('help-block');
+        element.prop('disabled', true)
+        .text('')
+        .prepend($('<span class="fa fa-refresh fa-spin"/>'));
 
-      element.find('.help-block').addClass('help-block-collapsed');
-      element.find('.help-block').click(function(event) {
-          if(event.target === this) {
-              $(event.target).toggleClass('help-block-collapsed help-block-expanded');
-          }
-      });
-
-      return editor;
+        promise.always(function() {
+            element.prop('disabled', false)
+            .text(' ' + originalText);
+        })
+        .done(function() {
+            element.prepend($('<span class="fa fa-check"/>'));
+        })
+        .fail(function() {
+            element.prepend($('<span class="fa fa-cross"/>'));
+        })
+        .always(function() {
+            _.delay(function() {
+                element.empty()
+                .text(originalText);
+            }, 2000);
+        });
     };
 
     return obj;
