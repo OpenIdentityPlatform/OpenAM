@@ -24,11 +24,9 @@
  *
  * $Id: PolicyModelImpl.java,v 1.6 2009/09/18 00:08:22 veiming Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 
 package com.sun.identity.console.policy.model;
 
@@ -150,11 +148,24 @@ public class PolicyModelImpl
      * @return cached policy object.
      * @throws AMConsoleException if policy object cannot be located.
      */
-    public CachedPolicy getCachedPolicy(String cacheID)
-        throws AMConsoleException
-    {
+    public CachedPolicy getCachedPolicy(String cacheID) throws AMConsoleException {
         PolicyCache cache = PolicyCache.getInstance();
         return cache.getPolicy(getUserSSOToken(), cacheID);
+    }
+
+    /**
+     * Removes a policy from the policy cache.
+     * 
+     * @param cacheID Cache ID.
+     * @throws AMConsoleException if policy object cannot be removed from PolicyCache.
+     */
+    public void removeCachedPolicy(String cacheID) throws AMConsoleException {
+        try {
+           PolicyCache cache = PolicyCache.getInstance();
+           cache.removePolicy(getUserSSOToken(), cacheID);
+        } catch (Exception e) {
+            throw new AMConsoleException(getErrorString(e));
+        }
     }
 
     /**
@@ -215,6 +226,49 @@ public class PolicyModelImpl
         }
     }
 
+    /**
+     * Updates the PolicyCache with an existing policy 
+     *
+     * @param cacheID key to locate the cached policy.
+     * @param policy CachedPolicy Object.
+     * @throws AMConsoleException if policy cannot be updated in the policyCache.
+     */
+    public void updatePolicyCache(String cacheID, CachedPolicy policy) throws AMConsoleException {
+        try {
+            PolicyCache cache = PolicyCache.getInstance();
+            cache.setPolicy(getUserSSOToken(), cacheID, policy);
+        } catch (Exception e) {
+            throw new AMConsoleException(getErrorString(e));
+        }
+    }
+
+    /**
+     * Returns the policy object.
+     *
+     * @param realmName Name of realm.
+     * @param policyName Name of policy.
+     * @return Policy Object.
+     * @throws AMConsoleException if policy cannot be cached.
+     */
+    public Policy getPolicy(String realmName, String policyName) throws AMConsoleException {
+        try {
+            PolicyManager policyManager = getPolicyManager(realmName);
+            Policy policy = policyManager.getPolicy(policyName);
+            return policy;
+        } catch (InvalidFormatException e) {
+            throw new AMConsoleException(getErrorString(e));
+        } catch (InvalidNameException e) {
+            throw new AMConsoleException(getErrorString(e));
+        } catch (NoPermissionException e) {
+            throw new AMConsoleException(getErrorString(e));
+        } catch (NameNotFoundException e) {
+            throw new AMConsoleException(getErrorString(e));
+        } catch (PolicyException e) {
+            throw new AMConsoleException(getErrorString(e));
+        } catch (SSOException e) {
+            throw new AMConsoleException(getErrorString(e));
+        }
+    }
 
     /**
      * Returns policy names that are under a realm.
@@ -1873,9 +1927,7 @@ public class PolicyModelImpl
 
     public boolean isPolicyActive(String realmName, String policyName)
     throws AMConsoleException {
-        String policyID = cachePolicy(realmName, policyName);
-        CachedPolicy cachedPolicy = getCachedPolicy(policyID);
-        Policy policy = cachedPolicy.getPolicy();
+        Policy policy = getPolicy(realmName, policyName);
 
         return policy.isActive();
     }
@@ -1883,9 +1935,7 @@ public class PolicyModelImpl
     public Set getProtectedResourceNames(String realmName, String policyName)
         throws AMConsoleException {
         Set resourceNames = new HashSet();
-        String policyID = cachePolicy(realmName, policyName);
-        CachedPolicy cachedPolicy = getCachedPolicy(policyID);
-        Policy policy = cachedPolicy.getPolicy();
+        Policy policy = getPolicy(realmName, policyName);
         Set ruleNames = policy.getRuleNames();
 
         if ((ruleNames != null) && !ruleNames.isEmpty()) {

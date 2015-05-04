@@ -24,6 +24,7 @@
  *
  * $Id: PolicyNormalAddViewBean.java,v 1.2 2008/06/25 05:43:03 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.policy;
@@ -64,8 +65,16 @@ public class PolicyNormalAddViewBean
      * @param event Request invocation event
      */
     public void handleButton2Request(RequestInvocationEvent event) {
-        backTrail();
-        forwardToPolicyViewBean();
+        String cacheID = (String) getPageSessionAttribute(ProfileViewBeanBase.PG_SESSION_POLICY_CACHE_ID);
+        PolicyModel model = (PolicyModel) getModel();
+        try {
+            model.removeCachedPolicy(cacheID);
+            backTrail();
+            forwardToPolicyViewBean();
+        } catch (AMConsoleException e) {
+            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
+            forwardTo();
+        }
     }
 
     /**

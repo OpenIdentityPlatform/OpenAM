@@ -24,11 +24,9 @@
  *
  * $Id: PolicyCache.java,v 1.2 2008/06/25 05:43:07 qcheng Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted 2011 ForgeRock AS
- */
 package com.sun.identity.console.policy.model;
 
 import com.sun.identity.console.base.model.AMConsoleException;
@@ -53,7 +51,7 @@ public class PolicyCache
     implements SSOTokenListener
 {        
     private static PolicyCache instance = new PolicyCache();
-    private Map mapTokenIDs = new HashMap(100);
+    private Map<String, Map<String, CachedPolicy>> mapTokenIDs = new HashMap(100);
 
     /**
      * The generated random string is used to cache policy object when
@@ -86,15 +84,12 @@ public class PolicyCache
         if (policy != null) {
             try {
                 String key = token.getTokenID().toString();
-
                 synchronized(mapTokenIDs) {
-                    Map map = (Map) mapTokenIDs.get(key);
-
+                    Map<String, CachedPolicy> map = mapTokenIDs.get(key);
                     if (map == null) {
                         map = new HashMap(10);
                         token.addSSOTokenListener(this);
                     }
-
                     randomStr = getRandomString();
                     map.put(randomStr, policy);
                     mapTokenIDs.put(key, map);
@@ -104,7 +99,6 @@ public class PolicyCache
                 randomStr = "";
             }
         }
-
         return randomStr;
     }
 
@@ -121,13 +115,11 @@ public class PolicyCache
                 String key = token.getTokenID().toString();
 
                 synchronized(mapTokenIDs) {
-                    Map map = (Map)mapTokenIDs.get(key);
-
+                    Map<String, CachedPolicy> map = mapTokenIDs.get(key);
                     if (map == null) {
                         map = new HashMap(10);
                         token.addSSOTokenListener(this);
                     }
-
                     map.put(cachedID, policy);
                     mapTokenIDs.put(key, map);
                 }
@@ -145,22 +137,17 @@ public class PolicyCache
      * @return policy Policy object.
      * @throws AMConsoleException if policy object cannot be located.
      */
-    public CachedPolicy getPolicy(SSOToken token, String cacheID)
-        throws AMConsoleException
-    {
+    public CachedPolicy getPolicy(SSOToken token, String cacheID) throws AMConsoleException {
         CachedPolicy policy = null;
         String key = token.getTokenID().toString();
-        Map map = (Map) mapTokenIDs.get(key);
-
+        Map<String,CachedPolicy> map = mapTokenIDs.get(key);
         if (map != null) {
-            policy = (CachedPolicy) map.get(cacheID);
+            policy = map.get(cacheID);
         }
-
         if (policy == null) {
             throw new 
                 AMConsoleException("Cannot locate cached policy " + cacheID);
         }
-
         return policy;
     }
 
@@ -187,6 +174,28 @@ public class PolicyCache
     }
 
     /**
+     * Removes the cache entry from the policycache for a given single sign on token and cacheID. 
+     *
+     * @param token single sign on token.
+     * @param cacheID key to locate the policy.
+     */
+     public void removePolicy(SSOToken token, String cacheID) {
+        String key = token.getTokenID().toString();
+        synchronized(mapTokenIDs) {
+           Map<String, CachedPolicy> map = mapTokenIDs.get(key);
+           if (map != null) {
+               map.remove(cacheID);
+               if (map.isEmpty()) {
+                   mapTokenIDs.remove(key);
+                   if (AMModelBase.debug.messageEnabled()) {
+                       AMModelBase.debug.warning("PolicyCache.removedPolicy, " + key);
+                   }
+               }
+           }
+         }
+     }
+
+    /**
      * Clears all cached policy of a given single sign on token ID
      *
      * @param tokenID single sign on token ID
@@ -198,9 +207,8 @@ public class PolicyCache
         synchronized(mapTokenIDs) {
             removed = (mapTokenIDs.remove(key) != null);
         }
-
         if (removed && AMModelBase.debug.messageEnabled()) {
-            AMModelBase.debug.warning("PolicyCache.clearAllPolicies," + key);
+            AMModelBase.debug.warning("PolicyCache.clearAllPolicies, " + key);
         }
     }
 

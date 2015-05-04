@@ -24,11 +24,9 @@
  *
  * $Id: PolicyModel.java,v 1.2 2008/06/25 05:43:07 qcheng Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 
 package com.sun.identity.console.policy.model;
 
@@ -595,4 +593,30 @@ public interface PolicyModel
      */
     Set getRealmNames(String base, String filter)
         throws AMConsoleException;
+
+    /**
+     * Returns the policy object.
+     *
+     * @param realmName Name of realm.
+     * @param policyName Name of policy.
+     * @return Policy Object.
+     * @throws AMConsoleException if policy cannot be obtained.
+     */
+    Policy getPolicy(String realmName, String policyName) throws AMConsoleException;
+   
+    /**
+     *
+     * @param cacheID Cache ID.
+     * @throws AMConsoleException if policy object cannot be removed from PolicyCache.
+     */
+    void removeCachedPolicy(String cacheID) throws AMConsoleException;
+
+    /**
+     * Caches an existing policy. Updates the PolicyCache with a policy 
+     *
+     * @param cacheID Name of cache.
+     * @param policy CachedPolicy Object.
+     * @throws AMConsoleException if policy cannot be updated in the PolicyCache.
+     */
+    void updatePolicyCache(String cacheID, CachedPolicy policy) throws AMConsoleException;
 }
