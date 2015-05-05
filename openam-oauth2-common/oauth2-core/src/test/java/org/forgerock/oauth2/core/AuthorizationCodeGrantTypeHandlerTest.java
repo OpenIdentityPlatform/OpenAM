@@ -16,26 +16,21 @@
 
 package org.forgerock.oauth2.core;
 
-import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.anySetOf;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.testng.Assert.*;
+import static org.assertj.core.api.Assertions.fail;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
+import static org.testng.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.mockito.Matchers;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -108,7 +103,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         try {
             //When
             grantTypeHandler.handle(request);
-            fail();
+            fail("Expected exception as authorization code has already been issued");
         } catch (InvalidGrantException e) {
             //Then
             verify(requestValidator).validateRequest(request, clientRegistration);
@@ -274,91 +269,6 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         verify(providerSettings).additionalDataToReturnFromTokenEndpoint(accessToken, request);
         verify(accessToken, never()).addExtraData(eq("scope"), anyString());
         assertEquals(actualAccessToken, accessToken);
-    }
-
-    @Test
-    public void shouldHandleOneAccessTokenRequestPerCodeAtATime() throws Exception {
-
-        //Given
-        final OAuth2Request request = mock(OAuth2Request.class);
-        given(request.getParameter("code")).willReturn("abc123");
-        ClientRegistration clientRegistration = mock(ClientRegistration.class);
-        final AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
-        final AccessToken accessToken = mock(AccessToken.class);
-        Set<String> validatedScope = new HashSet<String>();
-
-        given(providerSettings.getTokenEndpoint()).willReturn("Token Endpoint");
-        given(clientAuthenticator.authenticate(request, "Token Endpoint")).willReturn(clientRegistration);
-        given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
-        final Holder holder = new Holder();
-        given(tokenStore.readAuthorizationCode(eq(request), anyString())).willAnswer(new Answer<Object>() {
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                holder.value++;
-                return authorizationCode;
-            }
-        });
-        given(authorizationCode.isIssued()).willAnswer(new Answer<Boolean>() {
-            public Boolean answer(InvocationOnMock invocation) throws Throwable {
-                return holder.value > 1;
-            }
-        });
-        given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
-        given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
-        given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
-        given(authorizationCode.getExpiryTime()).willReturn(System.currentTimeMillis() + 100);
-        given(providerSettings.issueRefreshTokens()).willReturn(false);
-        given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
-                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), anyString(), eq(request)))
-                .willAnswer(new Answer<Object>() {
-                    public Object answer(InvocationOnMock invocation) throws Throwable {
-                        while(holder.value < 2) {
-                            Thread.sleep(100);
-                        }
-                        Thread.sleep(100);
-                        return accessToken;
-                    }
-                });
-        given(providerSettings.validateAccessTokenScope(eq(clientRegistration), anySetOf(String.class), eq(request)))
-                .willReturn(validatedScope);
-
-        // When/Then
-        Thread thread1 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    AccessToken actualAccessToken = grantTypeHandler.handle(request);
-                    assertEquals(actualAccessToken, accessToken);
-                } catch (Exception e) {
-                    holder.thread1Failure = new AssertionError("First thread should succeed");
-                }
-            }
-        });
-        thread1.start();
-
-        Thread thread2 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    grantTypeHandler.handle(request);
-                    holder.thread1Failure = new AssertionError("Second thread should have already issued authorization code");
-                } catch (InvalidGrantException e) {
-                    // pass
-                } catch (Exception e) {
-                    holder.thread1Failure = new AssertionError("Wrong exception");
-                }
-            }
-        });
-        thread2.start();
-
-        thread1.join();
-        thread2.join();
-
-        if (holder.thread1Failure != null) {
-            fail(holder.thread1Failure.getMessage());
-        }
-        if (holder.thread2Failure != null) {
-            fail(holder.thread2Failure.getMessage());
-        }
     }
 
     @Test
