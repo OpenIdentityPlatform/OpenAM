@@ -144,7 +144,7 @@ public class SoapSTSInstanceStateServiceListenerTest {
                         .build();
 
         SoapSTSInstanceConfig.SoapSTSInstanceConfigBuilderBase<?> builder = SoapSTSInstanceConfig.builder();
-        builder.addTokenValidationConfiguration(TokenType.OPENAM, false);
+        builder.addSecurityPolicyTokenValidationConfiguration(TokenType.OPENAM, false);
         builder.addIssueTokenType(TokenType.SAML2);
         return  builder
                 .deploymentConfig(deploymentConfig)

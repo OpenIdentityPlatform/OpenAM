@@ -353,7 +353,7 @@ public class SoapSamlTokenProvider implements TokenProvider {
             String tokenString = xmlUtilities.documentToStringConversion(tokenElement);
             if ((tokenString != null)  && tokenString.contains(QNameConstants.USERNAME_TOKEN.getLocalPart())) {
                 return TokenType.USERNAME;
-            } else if ((tokenString != null)  && tokenString.contains("X509")) { //TODO: clean up - use globally-defined constant, or refactor with wss4j migration
+            } else if ((tokenString != null)  && tokenString.contains("X509")) {
                 return TokenType.X509;
             } else {
                 logger.error("Unexpected state in parseTokenTypeFromDelegatedReceivedToken: dealing with a token element, " +
@@ -417,11 +417,11 @@ public class SoapSamlTokenProvider implements TokenProvider {
             final List<WSSecurityEngineResult> engineResults = handlerResult.getResults();
 
             for (WSSecurityEngineResult engineResult : engineResults) {
-                final Element supportingTokenElement = parseSupportingTokenElementFromWSSecurityEngineResult(engineResult);
-                if (supportingTokenElement != null) {
+                final Object supportingTokenObject = parseSupportingTokenObjectFromWSSecurityEngineResult(engineResult);
+                if (supportingTokenObject != null) {
                     final TokenType tokenType = parseTokenTypeFromWSSecurityEngineResult(engineResult);
                     if (tokenType != null) {
-                        return authnContextMapper.getAuthnContext(tokenType, supportingTokenElement);
+                        return authnContextMapper.getAuthnContext(tokenType, supportingTokenObject);
                     }
                 }
             }
@@ -454,8 +454,8 @@ public class SoapSamlTokenProvider implements TokenProvider {
         return builder.toString();
     }
 
-    private Element parseSupportingTokenElementFromWSSecurityEngineResult(WSSecurityEngineResult engineResult) {
-    /*
+    private Object parseSupportingTokenObjectFromWSSecurityEngineResult(WSSecurityEngineResult engineResult) {
+        /*
         There are multiple WSSecurityEngineResult instances (5) generated for a successful invocation of e.g. a UNT
         over the asymmetric binding: two for the client's cert (one as a BinarySecurityToken representation of the client's
         cert, and one with more generic information about this cert), one for the server's cert, one for a timestamp, and
@@ -464,21 +464,32 @@ public class SoapSamlTokenProvider implements TokenProvider {
         to the actual identity-asserting SupportingToken asserted by the caller, rather than the various tokens which
         serve to protect this identity token.
 
-        Note that this method will return null unless it can obtain an Element corresponding to the the SupportingToken asserting
+        Note that this method will return null unless it can obtain an Object corresponding to the the SupportingToken asserting
         the client's identity.
-    */
-        final Element tokenElement =
-                (Element) engineResult.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
-        if (tokenElement != null) {
-            final Object validatedObject = engineResult.get(WSSecurityEngineResult.TAG_VALIDATED_TOKEN);
-            if ((validatedObject != null) && (validatedObject instanceof Boolean)) {
-                if ((Boolean)validatedObject) {
-                    /*
-                    The TAG_ACTION is used by the various validators to indicate the action to which this result corresponds.
-                    Exclude Timestamp actions. See classes on org.apache.ws.security.processor class for details.
-                     */
-                    if (((Integer)engineResult.get(WSSecurityEngineResult.TAG_ACTION) & WSConstants.TS) != WSConstants.TS) {
+        Also note that if we are dealing with a client identity asserted via x509 (either asymmetric or symmetric, via
+        the SecurityPolicy-Examples 2.2.2 or 2.2.4 (respectively)), or via two-way TLS, we will return a X509Certificate[].
+
+        Note also that this method is not entirely 'deterministic' - i.e. the manner in which wss4j represents the results
+        of successful SecurityPolicy validation is neither particularly elegant or transparent, and thus not entirely
+        understood (by me),  so this method will of necessity be shaped by 'design-by-debugger' - to try to achieve a
+        viable path for all of the to-be-validated token types.
+        */
+        final Object validatedObject = engineResult.get(WSSecurityEngineResult.TAG_VALIDATED_TOKEN);
+        if ((validatedObject != null) && (validatedObject instanceof Boolean)) {
+            if ((Boolean)validatedObject) {
+                /*
+                The TAG_ACTION is used by the various validators to indicate the action to which this result corresponds.
+                Exclude Timestamp actions. See classes on org.apache.ws.security.processor class for details.
+                 */
+                if (((Integer)engineResult.get(WSSecurityEngineResult.TAG_ACTION) & WSConstants.TS) != WSConstants.TS) {
+                    final Element tokenElement =
+                            (Element) engineResult.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
+                    if (tokenElement != null) {
                         return tokenElement;
+                    }
+                    final X509Certificate[] certificates = (X509Certificate[])engineResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
+                    if (certificates != null) {
+                        return certificates;
                     }
                 }
             }

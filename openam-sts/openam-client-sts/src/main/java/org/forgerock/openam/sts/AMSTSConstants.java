@@ -42,13 +42,17 @@ public class AMSTSConstants {
     public static final QName UT_ASYMMETRIC_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "ut_asymmetric_sts_service_port");
     public static final QName UT_TRANSPORT_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "ut_transport_sts_service");
     public static final QName UT_TRANSPORT_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "ut_transport_sts_service_port");
-    public static final QName SYMMETRIC_ENDORSING_CERT_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "symmetric_endorsing_cert_sts_service");
-    public static final QName SYMMETRIC_ENDORSING_CERT_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "symmetric_endorsing_cert_sts_service_port");
 
     public static final QName AM_TRANSPORT_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "am_transport_sts_service");
     public static final QName AM_TRANSPORT_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "am_transport_sts_service_port");
     public static final QName AM_BARE_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "am_bare_sts_service");
     public static final QName AM_BARE_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "am_bare_sts_service_port");
+
+
+    public static final QName X509_ASYMMETRIC_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "x509_asymmetric_sts_service");
+    public static final QName X509_ASYMMETRIC_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "x509_asymmetric_sts_service_port");
+    public static final QName X509_SYMMETRIC_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "x509_symmetric_sts_service");
+    public static final QName X509_SYMMETRIC_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "x509_symmetric_sts_service_port");
 
     /*
     Used in conjunction with com.google.inject.Names.named to distinguish e.g. a Provider of the token types for

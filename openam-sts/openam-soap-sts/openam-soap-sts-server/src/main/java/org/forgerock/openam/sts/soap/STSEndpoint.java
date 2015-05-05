@@ -19,8 +19,6 @@ package org.forgerock.openam.sts.soap;
 import com.google.inject.Inject;
 import org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider;
 import org.apache.cxf.ws.security.sts.provider.operation.IssueOperation;
-import org.apache.cxf.ws.security.sts.provider.operation.RenewOperation;
-import org.apache.cxf.ws.security.sts.provider.operation.ValidateOperation;
 
 /**
  * An instance of this class is created for each STS instance. An instance of this class is set as the bean published via
@@ -33,8 +31,8 @@ public class STSEndpoint extends SecurityTokenServiceProvider {
     as part of calling the ctor below, we need to propagate the exception.
      */
     @Inject
-    public STSEndpoint(IssueOperation issueOperation,
-                       ValidateOperation validateOperation/*,
+    public STSEndpoint(IssueOperation issueOperation/*,
+                       ValidateOperation validateOperation,
                        RenewOperation renewOperation*/) throws Exception {
         /*
         I'm never setting the issueSingle operation. The IssueOperation above also implements the IssueSingle interface -
@@ -45,7 +43,7 @@ public class STSEndpoint extends SecurityTokenServiceProvider {
         need to confirm...
          */
         setIssueOperation(issueOperation);
-        setValidateOperation(validateOperation);
+//        setValidateOperation(validateOperation);
 //        setRenewOperation(renewOperation);
     }
 }

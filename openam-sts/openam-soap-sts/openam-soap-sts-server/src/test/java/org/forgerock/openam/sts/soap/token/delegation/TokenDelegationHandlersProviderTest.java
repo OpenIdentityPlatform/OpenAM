@@ -24,7 +24,6 @@ import org.forgerock.openam.sts.soap.config.user.SoapDelegationConfig;
 import org.forgerock.openam.sts.soap.config.user.SoapDeploymentConfig;
 import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
 import org.forgerock.openam.sts.soap.config.user.SoapSTSKeystoreConfig;
-import org.forgerock.openam.sts.soap.config.user.TokenValidationConfig;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.slf4j.Logger;
 import org.testng.annotations.Test;
@@ -82,7 +81,7 @@ public class TokenDelegationHandlersProviderTest {
                         .authTargetMapping(mapping)
                         .build();
 
-        SoapSTSKeystoreConfig keystoreConfig = null;
+        SoapSTSKeystoreConfig keystoreConfig;
         keystoreConfig =
                 SoapSTSKeystoreConfig.builder()
                         .keystoreFileName("stsstore.jks")
@@ -94,7 +93,7 @@ public class TokenDelegationHandlersProviderTest {
                         .build();
 
         SoapSTSInstanceConfig.SoapSTSInstanceConfigBuilderBase<?> builder = SoapSTSInstanceConfig.builder();
-        builder.addTokenValidationConfiguration(TokenType.OPENAM, false);
+        builder.addSecurityPolicyTokenValidationConfiguration(TokenType.OPENAM, false);
         builder.addIssueTokenType(TokenType.SAML2);
         Map<String,String> attributeMap = new HashMap<String, String>();
         attributeMap.put("mail", "email");

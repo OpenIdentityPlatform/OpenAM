@@ -104,7 +104,7 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
             return buildUsernameTokenValidator(validationInvocationContext, invalidateAMSession);
         } else {
             throw new STSInitializationException(ResourceException.BAD_REQUEST, "In TokenOperationFactory, unknown " +
-                    "TokenType provided to obtain status TokenValidator: " + validatedTokenType);
+                    "TokenType provided to obtain TokenValidator: " + validatedTokenType);
         }
     }
 

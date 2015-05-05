@@ -167,8 +167,8 @@ public class SoapSTSInstancePublisherImplTest {
                             .build();
 
         SoapSTSInstanceConfig.SoapSTSInstanceConfigBuilderBase<?> builder = SoapSTSInstanceConfig.builder();
-        builder.addTokenValidationConfiguration(TokenType.OPENAM, false);
-        builder.addTokenValidationConfiguration(TokenType.USERNAME, true);
+        builder.addSecurityPolicyTokenValidationConfiguration(TokenType.OPENAM, false);
+        builder.addSecurityPolicyTokenValidationConfiguration(TokenType.USERNAME, true);
 
         builder.addIssueTokenType(TokenType.SAML2);
         Map<String,String> attributeMap = new HashMap<String, String>();

@@ -83,6 +83,28 @@ public class EndpointSpecification {
                 AMSTSConstants.AM_BARE_STS_SERVICE);
     }
 
+    /**
+     * @return an EndpointSpecification instance specifying service and port QNames corresponding to section 2.2.4 of
+     * the WS-SecurityPolicy-Examples specification:
+     * http://docs.oasis-open.org/ws-sx/security-policy/examples/ws-sp-usecases-examples.html#_Toc274723250
+     */
+    public static EndpointSpecification  x509Symmetric() {
+        return new EndpointSpecification(
+                AMSTSConstants.X509_SYMMETRIC_STS_SERVICE_PORT,
+                AMSTSConstants.X509_SYMMETRIC_STS_SERVICE);
+    }
+
+    /**
+     * @return an EndpointSpecification instance specifying service and port QNames corresponding to section 2.2.2 of
+     * the WS-SecurityPolicy-Examples specification:
+     * http://docs.oasis-open.org/ws-sx/security-policy/examples/ws-sp-usecases-examples.html#_Toc274723247
+     */
+    public static EndpointSpecification x509Asymmetric() {
+        return new EndpointSpecification(
+                AMSTSConstants.X509_ASYMMETRIC_STS_SERVICE_PORT,
+                AMSTSConstants.X509_ASYMMETRIC_STS_SERVICE);
+    }
+
     @Override
     public boolean equals(Object other) {
         if (this ==  other) {

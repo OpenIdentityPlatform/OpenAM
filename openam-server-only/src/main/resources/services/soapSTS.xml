@@ -41,7 +41,7 @@
                     </DefaultValues>
                 </AttributeSchema>
 
-                <AttributeSchema name="validated-token-config"
+                <AttributeSchema name="security-policy-validated-token-config"
                                  type="list"
                                  syntax="string"
                                  validator="RequiredValueValidator"
@@ -61,6 +61,8 @@
                         <ChoiceValue i18nKey="ut_asymmetric_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}ut_asymmetric_sts_service</ChoiceValue>
                         <ChoiceValue i18nKey="ut_transport_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}ut_transport_sts_service</ChoiceValue>
                         <ChoiceValue i18nKey="am_transport_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}am_transport_sts_service</ChoiceValue>
+                        <ChoiceValue i18nKey="x509_asymmetric_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}x509_asymmetric_sts_service</ChoiceValue>
+                        <ChoiceValue i18nKey="x509_symmetric_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}x509_symmetric_sts_service</ChoiceValue>
                         <ChoiceValue i18nKey="am_bare_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}am_bare_sts_service</ChoiceValue>
                         <ChoiceValue i18nKey="custom_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}custom_service_name</ChoiceValue>
                     </ChoiceValues>
@@ -78,6 +80,8 @@
                         <ChoiceValue i18nKey="ut_asymmetric_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}ut_asymmetric_sts_service_port</ChoiceValue>
                         <ChoiceValue i18nKey="ut_transport_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}ut_transport_sts_service_port</ChoiceValue>
                         <ChoiceValue i18nKey="am_transport_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}am_transport_sts_service_port</ChoiceValue>
+                        <ChoiceValue i18nKey="x509_asymmetric_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}x509_asymmetric_sts_service_port</ChoiceValue>
+                        <ChoiceValue i18nKey="x509_symmetric_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}x509_symmetric_sts_service_port</ChoiceValue>
                         <ChoiceValue i18nKey="am_bare_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}am_bare_sts_service_port</ChoiceValue>
                         <ChoiceValue i18nKey="custom_service_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}custom_service_port</ChoiceValue>
                     </ChoiceValues>
@@ -96,7 +100,8 @@
                         <ChoiceValue i18nKey="ut_asymmetric_wsdl">sts_ut_asymmetric.wsdl</ChoiceValue>
                         <ChoiceValue i18nKey="openam_transport_wsdl">sts_am_transport.wsdl</ChoiceValue>
                         <ChoiceValue i18nKey="openam_bare_wsdl">sts_am_bare.wsdl</ChoiceValue>
-                        <ChoiceValue i18nKey="x509">sts_x509.wsdl</ChoiceValue>
+                        <ChoiceValue i18nKey="x509_asymmetric_wsdl">sts_x509_asymmetric.wsdl</ChoiceValue>
+                        <ChoiceValue i18nKey="x509_symmetric_wsdl">sts_x509_symmetric.wsdl</ChoiceValue>
                         <ChoiceValue i18nKey="custom_wsdl_file">custom_wsdl_file</ChoiceValue>
                     </ChoiceValues>
                 </AttributeSchema>
@@ -278,7 +283,7 @@
                         </DefaultValues>
                     </AttributeSchema>
 
-                    <AttributeSchema name="validated-token-config"
+                    <AttributeSchema name="security-policy-validated-token-config"
                                      type="list"
                                      syntax="string"
                                      validator="RequiredValueValidator"
@@ -298,6 +303,8 @@
                             <ChoiceValue i18nKey="ut_asymmetric_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}ut_asymmetric_sts_service</ChoiceValue>
                             <ChoiceValue i18nKey="ut_transport_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}ut_transport_sts_service</ChoiceValue>
                             <ChoiceValue i18nKey="am_transport_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}am_transport_sts_service</ChoiceValue>
+                            <ChoiceValue i18nKey="x509_asymmetric_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}x509_asymmetric_sts_service</ChoiceValue>
+                            <ChoiceValue i18nKey="x509_symmetric_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}x509_symmetric_sts_service</ChoiceValue>
                             <ChoiceValue i18nKey="am_bare_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}am_bare_sts_service</ChoiceValue>
                             <ChoiceValue i18nKey="custom_service_name">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}custom_service_name</ChoiceValue>
                         </ChoiceValues>
@@ -315,6 +322,8 @@
                             <ChoiceValue i18nKey="ut_asymmetric_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}ut_asymmetric_sts_service_port</ChoiceValue>
                             <ChoiceValue i18nKey="ut_transport_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}ut_transport_sts_service_port</ChoiceValue>
                             <ChoiceValue i18nKey="am_transport_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}am_transport_sts_service_port</ChoiceValue>
+                            <ChoiceValue i18nKey="x509_asymmetric_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}x509_asymmetric_sts_service_port</ChoiceValue>
+                            <ChoiceValue i18nKey="x509_symmetric_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}x509_symmetric_sts_service_port</ChoiceValue>
                             <ChoiceValue i18nKey="am_bare_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}am_bare_sts_service_port</ChoiceValue>
                             <ChoiceValue i18nKey="custom_service_port">{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}custom_service_port</ChoiceValue>
                         </ChoiceValues>
@@ -333,7 +342,8 @@
                             <ChoiceValue i18nKey="ut_asymmetric_wsdl">sts_ut_asymmetric.wsdl</ChoiceValue>
                             <ChoiceValue i18nKey="openam_transport_wsdl">sts_am_transport.wsdl</ChoiceValue>
                             <ChoiceValue i18nKey="openam_bare_wsdl">sts_am_bare.wsdl</ChoiceValue>
-                            <ChoiceValue i18nKey="x509">sts_x509.wsdl</ChoiceValue>
+                            <ChoiceValue i18nKey="x509_asymmetric_wsdl">sts_x509_asymmetric.wsdl</ChoiceValue>
+                            <ChoiceValue i18nKey="x509_symmetric_wsdl">sts_x509_symmetric.wsdl</ChoiceValue>
                             <ChoiceValue i18nKey="custom_wsdl_file">custom_wsdl_file</ChoiceValue>
                         </ChoiceValues>
                     </AttributeSchema>

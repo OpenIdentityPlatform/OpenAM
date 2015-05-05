@@ -141,7 +141,7 @@ public class SoapSTSInstanceStateProviderTest {
 
         return  SoapSTSInstanceConfig.builder()
                 .addIssueTokenType(TokenType.SAML2)
-                .addTokenValidationConfiguration(TokenType.OPENAM, false)
+                .addSecurityPolicyTokenValidationConfiguration(TokenType.OPENAM, false)
                 .deploymentConfig(deploymentConfig)
                 .soapSTSKeystoreConfig(keystoreConfig)
                 .issuerName("Cornholio")

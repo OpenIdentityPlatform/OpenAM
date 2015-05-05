@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.token.validator.disp;
@@ -36,9 +36,9 @@ import org.slf4j.Logger;
 import javax.inject.Named;
 
 /**
- * Class which encapsulates knowledge as to how to post a x509 certificate to the OpenAM REST authN context. This class
- * will initiate the authN process to receive the json callback with a placeholder for an X509Certificate, and set this
- * reference, and return the json callback state.
+ * Class which encapsulates knowledge as to how to post a x509 certificate to the OpenAM REST authN context. It will
+ * consume the Cert module in 'portal' mode, where the Cert module expects to find the end-user certificate in a
+ * specified Http header, a header key specified in the AuthTargetMapping for a TokenTypeId of X509.
  */
 public class CertificateAuthenticationRequestDispatcher implements TokenAuthenticationRequestDispatcher<X509Certificate[]> {
     private final String crestVersionAuthNService;
@@ -58,9 +58,8 @@ public class CertificateAuthenticationRequestDispatcher implements TokenAuthenti
     public String dispatch(URL url, AuthTargetMapping.AuthTarget target, X509Certificate[] certificates) throws TokenValidationException {
         /*
         The common practice in the cxf-sts and wss4j is just to use the first element in the array, as this is the leaf
-        cert, and all others correspond to CAs, which will be in the targeted destination's trust store. TODO: this should
-        be revisited when OPENAM-4597 is fixed. Need to look at the Cert module to determine how multiple certificates are
-        demarcated in http headers - just multiple values in a http header
+        cert, and all others correspond to CAs, which will be in the targeted destination's trust store. And this dispatcher
+        consumes the Cert module in portal mode, which accepts only a leaf cert. See OPENAM-5923 and CR-6843 for additional info.
          */
         if (certificates.length > 1) {
             StringBuilder stringBuilder = new StringBuilder("Dealing with more than a single certificate. Their DNs:");

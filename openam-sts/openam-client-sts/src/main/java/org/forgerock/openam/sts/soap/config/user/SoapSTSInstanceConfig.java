@@ -18,6 +18,7 @@ package org.forgerock.openam.sts.soap.config.user;
 
 import org.forgerock.guava.common.base.Objects;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.DeploymentPathNormalizationImpl;
 import org.forgerock.openam.sts.MapMarshallUtils;
 import org.forgerock.openam.sts.TokenType;
@@ -28,12 +29,12 @@ import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.util.Reject;
 
+import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,14 +53,14 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
     The following three names correspond to entries defined in soapSTS.xml
      */
     static final String ISSUE_TOKEN_TYPES = "issued-token-types";
-    static final String VALIDATED_TOKEN_CONFIG = "validated-token-config";
+    static final String VALIDATED_TOKEN_CONFIG = "security-policy-validated-token-config";
     static final String DELEGATION_RELATIONSHIP_SUPPORTED = "delegation-relationship-supported";
 
     public abstract static class SoapSTSInstanceConfigBuilderBase <T extends SoapSTSInstanceConfigBuilderBase<T>>
             extends STSInstanceConfig.STSInstanceConfigBuilderBase<T>  {
         private Set<TokenType> issueTokenTypes;
 
-        private Set<TokenValidationConfig> validatedTokenConfiguration;
+        private Set<TokenValidationConfig> securityPolicyValidatedTokenConfiguration;
 
         private SoapDeploymentConfig deploymentConfig;
         private SoapSTSKeystoreConfig keystoreConfig;
@@ -73,7 +74,7 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
 
         private SoapSTSInstanceConfigBuilderBase() {
             issueTokenTypes = new HashSet<TokenType>();
-            validatedTokenConfiguration = new HashSet<TokenValidationConfig>();
+            securityPolicyValidatedTokenConfiguration = new HashSet<TokenValidationConfig>();
         }
 
         public T deploymentConfig(SoapDeploymentConfig deploymentConfig) {
@@ -81,13 +82,13 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
             return self();
         }
 
-        public T addTokenValidationConfiguration(TokenType validatedTokenType, boolean invalidateInterimOpenAMSession) {
-            validatedTokenConfiguration.add(new TokenValidationConfig(validatedTokenType, invalidateInterimOpenAMSession));
+        public T addSecurityPolicyTokenValidationConfiguration(TokenType validatedTokenType, boolean invalidateInterimOpenAMSession) {
+            securityPolicyValidatedTokenConfiguration.add(new TokenValidationConfig(validatedTokenType, invalidateInterimOpenAMSession));
             return self();
         }
 
-        public T setValidatedTokenConfiguration(Set<TokenValidationConfig> validatedTokenConfiguration) {
-            this.validatedTokenConfiguration.addAll(validatedTokenConfiguration);
+        public T setSecurityPolicyValidatedTokenConfiguration(Set<TokenValidationConfig> securityPolicyValidatedTokenConfiguration) {
+            this.securityPolicyValidatedTokenConfiguration.addAll(securityPolicyValidatedTokenConfiguration);
             return self();
         }
 
@@ -136,10 +137,12 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
     and configuration state must specify whether the interim OpenAM session should be invalidated once the target token
     is generated. The SoapDelegationConfig encapsulates the Set of TokenValidationConfig instances which define the
     validators plugged-into the Issue operation to handle ActAs/OnBehalf of tokens, and the configuration state below will
-    handle the token validators plugged-in to validate the SupportingTokens specified in the SecurityPolicy bindings, as
-    well as the tokens validated by the WS-Trust defined VALIDATE operation.
+    handle the token validators plugged-in to validate the SupportingTokens specified in the SecurityPolicy bindings.
+    TODO: when AME-5869 is addressed, a distinct set of TokenValidationConfig will be created to define the CXF TokenValidators
+    which should be plugged-in to support the Validate operation. This set will almost certainly be limited to the assertions
+    issued by the STS.
      */
-    private final Set<TokenValidationConfig> validatedTokenConfiguration;
+    private final Set<TokenValidationConfig> securityPolicyValidatedTokenConfiguration;
 
     private final SoapDeploymentConfig deploymentConfig;
     private final SoapSTSKeystoreConfig keystoreConfig;
@@ -156,8 +159,8 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         this.deploymentConfig = builder.deploymentConfig;
         this.keystoreConfig = builder.keystoreConfig;
         this.delegationRelationshipsSupported = builder.delegationRelationshipsSupported;
-        this.validatedTokenConfiguration = (builder.validatedTokenConfiguration != null) ?
-                Collections.unmodifiableSet(builder.validatedTokenConfiguration) : Collections.<TokenValidationConfig>emptySet();
+        this.securityPolicyValidatedTokenConfiguration = (builder.securityPolicyValidatedTokenConfiguration != null) ?
+                Collections.unmodifiableSet(builder.securityPolicyValidatedTokenConfiguration) : Collections.<TokenValidationConfig>emptySet();
         this.soapDelegationConfig = builder.soapDelegationConfig;
         //Keystore config can be null if we are dealing with an unprotected SecurityPolicy binding, or just the transport binding
         //not sure if the SecurityPolicy validator for the transport binding needs any crypto context, or if it just confirms container. TODO
@@ -170,8 +173,8 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         /*
         Input token verification must be configured, either via the SoapDelegationConfig, or via the ValidatedTokenConfiguration.
          */
-        if (CollectionUtils.isEmpty(validatedTokenConfiguration) && !delegationRelationshipsSupported) {
-            throw new IllegalStateException("Either the validatedTokenConfiguration must be specified to configure " +
+        if (CollectionUtils.isEmpty(securityPolicyValidatedTokenConfiguration) && !delegationRelationshipsSupported) {
+            throw new IllegalStateException("Either the securityPolicyValidatedTokenConfiguration must be specified to configure " +
                     "TokenValidators enforcing SecurityPolicy bindings, or token delegation relationships must be supported.");
         }
         if (this.saml2Config == null) {
@@ -186,6 +189,40 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
             throw new IllegalStateException("If the soap STS instance is configured to support delegation relationship, the " +
                     "SoapDelegationConfig instance must be non-null.");
         }
+        /*
+        If a SecurityPolicy binding is specified which demands that caller state is asserted via x509 tokens, and there
+        is no X509 TokenType entry in the securityPolicyValidatedTokenConfiguration, an error will be thrown, as the presence of an
+        X509 TokenType in the securityPolicyValidatedTokenConfiguration determines the deployment of the wss.SoapCertificateTokenValidator,
+        which will dispatch the presented x509 certificate to OpenAM, a necessary step to obtain the OpenAM session id which
+        will be the basis of subject identity in tokens created by the TokenGenerationService.
+        Note that specifying a X509 TokenType entry in the securityPolicyValidatedTokenConfiguration will insure that any client-presented
+        x509 certificate (e.g. via any asymmetric binding) will be dispatched to OpenAM for verification, instead of being
+        verified by consulting the local TrustStore.
+         */
+        if (areSTSClientsAssertedViaX509() && !isX509TokenValidatorPresent()) {
+            throw new IllegalStateException("Configured STS instance does not specify a X509 TokenType in the " +
+                    "securityPolicyValidatedTokenConfiguration, yet is to be deployed with a .wsdl which mandates the assertion of " +
+                    "caller identity via x509 certificates.");
+        }
+    }
+
+    /**
+     *
+     * @return true if the sts callers assert their identity via x509 tokens via one of the pre-defined .wsdl files which
+     * mandate client x509-certificate presentation.
+     */
+    private boolean areSTSClientsAssertedViaX509() {
+        final QName serviceName = deploymentConfig.getService();
+        return (AMSTSConstants.X509_ASYMMETRIC_STS_SERVICE.equals(serviceName) || AMSTSConstants.X509_SYMMETRIC_STS_SERVICE.equals(serviceName));
+    }
+
+    private boolean isX509TokenValidatorPresent() {
+        for (TokenValidationConfig validationConfig : securityPolicyValidatedTokenConfiguration) {
+            if (TokenType.X509.equals(validationConfig.getValidatedTokenType())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static SoapSTSInstanceConfigBuilder builder() {
@@ -200,8 +237,8 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         return issueTokenTypes;
     }
 
-    public Set<TokenValidationConfig> getValidatedTokenConfiguration() {
-        return validatedTokenConfiguration;
+    public Set<TokenValidationConfig> getSecurityPolicyValidatedTokenConfiguration() {
+        return securityPolicyValidatedTokenConfiguration;
     }
 
     public SoapSTSKeystoreConfig getKeystoreConfig() {
@@ -242,7 +279,7 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         sb.append('\t').append("KeyStoreConfig: ").append(keystoreConfig != null ? keystoreConfig : null).append('\n');
         sb.append('\t').append("issuerName: ").append(issuerName).append('\n');
         sb.append('\t').append("issueTokenTypes: ").append(issueTokenTypes).append('\n');
-        sb.append('\t').append("validatedTokenConfiguration: ").append(validatedTokenConfiguration).append('\n');
+        sb.append('\t').append("securityPolicyValidatedTokenConfiguration: ").append(securityPolicyValidatedTokenConfiguration).append('\n');
         sb.append('\t').append("deploymentConfig: ").append(deploymentConfig).append('\n');
         sb.append('\t').append("delegationRelationshipsSupported: ").append(delegationRelationshipsSupported).append('\n');
         sb.append('\t').append("soapDelegationConfig: ").append(soapDelegationConfig).append('\n');
@@ -259,7 +296,7 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
                     Objects.equal(keystoreConfig, otherConfig.getKeystoreConfig()) &&
                     deploymentConfig.equals(otherConfig.getDeploymentConfig()) &&
                     Objects.equal(issueTokenTypes, otherConfig.getIssueTokenTypes()) &&
-                    Objects.equal(validatedTokenConfiguration, otherConfig.getValidatedTokenConfiguration());
+                    Objects.equal(securityPolicyValidatedTokenConfiguration, otherConfig.getSecurityPolicyValidatedTokenConfiguration());
         }
         return false;
     }
@@ -279,9 +316,8 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
 
         JsonValue validatedTokenConfiguration = new JsonValue(new ArrayList<Object>());
         List<Object> translationList = validatedTokenConfiguration.asList();
-        Iterator<TokenValidationConfig> iter = this.validatedTokenConfiguration.iterator();
-        while (iter.hasNext()) {
-            translationList.add(iter.next().toJson());
+        for (TokenValidationConfig tokenValidationConfig : securityPolicyValidatedTokenConfiguration) {
+            translationList.add(tokenValidationConfig.toJson());
         }
         baseValue.add(VALIDATED_TOKEN_CONFIG, validatedTokenConfiguration);
 
@@ -291,9 +327,8 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         if (issueTokenTypes != null) {
             JsonValue issueTokens = new JsonValue(new HashSet<String>());
             Collection<String> issueCollection = issueTokens.asCollection(String.class);
-            Iterator<TokenType> tokenTypeIter = issueTokenTypes.iterator();
-            while (tokenTypeIter.hasNext()) {
-                issueCollection.add(tokenTypeIter.next().name());
+            for (TokenType tokenType :issueTokenTypes) {
+                issueCollection.add(tokenType.name());
             }
             baseValue.add(ISSUE_TOKEN_TYPES, issueTokens);
         }
@@ -328,19 +363,17 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
                         + validatedTokenConfiguration.asString());
             }
             Set<TokenValidationConfig> validationConfigs = new HashSet<TokenValidationConfig>();
-            Iterator<Object> iter = validatedTokenConfiguration.asList().iterator();
-            while (iter.hasNext()) {
-                validationConfigs.add(TokenValidationConfig.fromJson(new JsonValue(iter.next())));
+            for (Object obj : validatedTokenConfiguration.asList()) {
+                validationConfigs.add(TokenValidationConfig.fromJson(new JsonValue(obj)));
             }
-            builder.setValidatedTokenConfiguration(validationConfigs);
+            builder.setSecurityPolicyValidatedTokenConfiguration(validationConfigs);
         }
 
         builder.soapSTSKeystoreConfig(SoapSTSKeystoreConfig.fromJson(json.get(SOAP_KEYSTORE_CONFIG)));
 
         if (!json.get(ISSUE_TOKEN_TYPES).isNull()) {
-            Iterator iter = json.get(ISSUE_TOKEN_TYPES).asCollection().iterator();
-            while (iter.hasNext()) {
-                builder.addIssueTokenType(TokenType.valueOf(iter.next().toString()));
+            for (Object obj : json.get(ISSUE_TOKEN_TYPES).asCollection()) {
+                builder.addIssueTokenType(TokenType.valueOf(obj.toString()));
             }
         }
 
@@ -374,11 +407,11 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         then add each of the TokenTransformConfig instances in the supportTokenTranslationsSet to a Set<String>, obtaining
         a string representation for each TokenTransformConfig instance, and adding it to the Set<String>
          */
-        if (validatedTokenConfiguration != null) {
+        if (securityPolicyValidatedTokenConfiguration != null) {
             interimMap.remove(VALIDATED_TOKEN_CONFIG);
             Set<String> validatedTokenConfig = new HashSet<String>();
             interimMap.put(VALIDATED_TOKEN_CONFIG, validatedTokenConfig);
-            for (TokenValidationConfig tvc : validatedTokenConfiguration) {
+            for (TokenValidationConfig tvc : securityPolicyValidatedTokenConfiguration) {
                 validatedTokenConfig.add(tvc.toSMSString());
             }
         }

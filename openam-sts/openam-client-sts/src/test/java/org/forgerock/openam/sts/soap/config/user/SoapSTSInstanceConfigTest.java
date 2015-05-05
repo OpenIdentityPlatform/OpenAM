@@ -41,7 +41,6 @@ import static org.testng.Assert.assertTrue;
 public class SoapSTSInstanceConfigTest {
     private static final boolean WITH_KEYSTORE_CONFIG = true;
     private static final boolean WITH_VALIDATE_CONFIG = true;
-    private static final boolean WITH_ISSUE_OPERATION = true;
     private static final boolean DELEGATION_VALIDATORS_SPECIFIED = true;
     private static final boolean CUSTOM_DELEGATION_HANDLER = true;
 
@@ -284,6 +283,23 @@ public class SoapSTSInstanceConfigTest {
         assertTrue(fileContent.contains(SoapSTSInstanceConfig.ISSUE_TOKEN_TYPES));
         assertTrue(fileContent.contains(SoapSTSInstanceConfig.VALIDATED_TOKEN_CONFIG));
         assertTrue(fileContent.contains(SoapSTSInstanceConfig.DELEGATION_RELATIONSHIP_SUPPORTED));
+
+        assertTrue(fileContent.contains(AMSTSConstants.UT_ASYMMETRIC_STS_SERVICE.toString()));
+        assertTrue(fileContent.contains(AMSTSConstants.UT_SYMMETRIC_STS_SERVICE.toString()));
+        assertTrue(fileContent.contains(AMSTSConstants.UT_TRANSPORT_STS_SERVICE.toString()));
+        assertTrue(fileContent.contains(AMSTSConstants.UT_ASYMMETRIC_STS_SERVICE_PORT.toString()));
+        assertTrue(fileContent.contains(AMSTSConstants.UT_SYMMETRIC_STS_SERVICE_PORT.toString()));
+        assertTrue(fileContent.contains(AMSTSConstants.UT_TRANSPORT_STS_SERVICE_PORT.toString()));
+
+        assertTrue(fileContent.contains(AMSTSConstants.X509_ASYMMETRIC_STS_SERVICE.toString()));
+        assertTrue(fileContent.contains(AMSTSConstants.X509_SYMMETRIC_STS_SERVICE.toString()));
+        assertTrue(fileContent.contains(AMSTSConstants.X509_ASYMMETRIC_STS_SERVICE_PORT.toString()));
+        assertTrue(fileContent.contains(AMSTSConstants.X509_SYMMETRIC_STS_SERVICE_PORT.toString()));
+
+        assertTrue(fileContent.contains(AMSTSConstants.AM_TRANSPORT_STS_SERVICE.toString()));
+        assertTrue(fileContent.contains(AMSTSConstants.AM_TRANSPORT_STS_SERVICE_PORT.toString()));
+        assertTrue(fileContent.contains(AMSTSConstants.AM_BARE_STS_SERVICE.toString()));
+        assertTrue(fileContent.contains(AMSTSConstants.AM_BARE_STS_SERVICE_PORT.toString()));
     }
 
     private SoapSTSInstanceConfig createInstanceConfig(String uriElement, String amDeploymentUrl,
@@ -321,9 +337,9 @@ public class SoapSTSInstanceConfigTest {
 
         SoapSTSInstanceConfig.SoapSTSInstanceConfigBuilderBase<?> builder = SoapSTSInstanceConfig.builder();
         if (withValidationConfig) {
-            builder.addTokenValidationConfiguration(TokenType.OPENAM, false);
-            builder.addTokenValidationConfiguration(TokenType.USERNAME, true);
-            builder.addTokenValidationConfiguration(TokenType.X509, true);
+            builder.addSecurityPolicyTokenValidationConfiguration(TokenType.OPENAM, false);
+            builder.addSecurityPolicyTokenValidationConfiguration(TokenType.USERNAME, true);
+            builder.addSecurityPolicyTokenValidationConfiguration(TokenType.X509, true);
         }
         builder.addIssueTokenType(TokenType.SAML2);
         Map<String,String> attributeMap = new HashMap<String, String>();

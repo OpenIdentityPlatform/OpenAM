@@ -98,6 +98,11 @@ public class SoapDelegationConfigTest {
         assertEquals(sdc1, SoapDelegationConfig.marshalFromAttributeMap(sdc1.marshalToAttributeMap()));
     }
 
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void testInvalidDelegationConfig() {
+        buildX509BasedSoapDelegationConfig();
+    }
+
     private SoapDelegationConfig buildSoapDelegationConfig(boolean withDelegationTokenTypes, boolean withCustomDelegationHandlers) {
         SoapDelegationConfig.SoapDelegationConfigBuilder builder = SoapDelegationConfig.builder();
         if (withDelegationTokenTypes) {
@@ -112,4 +117,9 @@ public class SoapDelegationConfigTest {
         return builder.build();
     }
 
+    private SoapDelegationConfig buildX509BasedSoapDelegationConfig() {
+        return SoapDelegationConfig.builder()
+                .addValidatedDelegationTokenType(TokenType.X509, true)
+                .build();
+    }
 }

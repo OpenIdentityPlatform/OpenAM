@@ -19,10 +19,10 @@ package org.forgerock.openam.sts.soap.token.validator.wss;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.validate.Credential;
-import org.apache.ws.security.validate.SignatureTrustValidator;
 
 import java.security.cert.X509Certificate;
 
+import org.apache.ws.security.validate.Validator;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
@@ -32,25 +32,21 @@ import org.slf4j.Logger;
 
 /**
  * This class extends the Apache WSS4j TokenValidator deployed by Apache CXF to validate x509 tokens presented as part
- * of consuming an STS instance protected by SecurityPolicy bindings specifying an x509 SupportingToken. This class will
- * integrate this validation with OpenAM by consuming the OpenAM REST authN functionality.
- *
- * This validation functionality will only augment the existing CXF validation functionality to determine whether the
- * included certs are present in the OpenAM LDAP certificate store.
- *
- * In the soap-sts, the validity of the caller asserting its identity via presenting a x509 cert
- * (SecurityPolicyExamples 2.2.1 and 2.2.2) will be insured because messages sent to the caller will be encrypted using the
- * caller's public key. In this case, only trust needs to be established - something which this class, by virtue of
- * extending the SignatureTrustValidator, provides. It may be a configuration option whether this class should
- * consume the OpenAM Certificate module, so that the additional invocation against the OpenAM Certificate module, performed
- * by the AuthenticationHandler<X509Certificate>, should be performed. The bottom line is that this class will be
+ * of consuming an STS instance protected by SecurityPolicy bindings specifying an x509 Certificate which serves to
+ * identify the client (examples  2.2.2, and 2.2.4 of http://docs.oasis-open.org/ws-sx/security-policy/examples/ws-sp-usecases-examples.html)
+ * In these cases, the presented x509Certificate[] must be validated with OpenAM so that an OpenAM session token can
+ * be generated as the basis of the identity asserted in a generated token. In other words, if the SecurityPolicy binding
+ * is the UNT over the asymmetric binding (sts_ut_asymmetric.wsdl), then the SignatureTrustValidator will be invoked
+ * to insure that the client-presented certificate is valid, not revoked (optionally), and trusted. I don't want to hook
+ * in the OpenAM Cert module in this case, as I don't need an OpenAM session id, and the KeyStore state deployed with the
+ * STS instance is sufficient for the default signature trust validation.
+ * This class will be
  * plugged-in as the SecurityConstants.SIGNATURE_TRUST_VALIDATOR only when X509 tokens are specified in the TokenValidationConfig
  * of the SoapSTSInstanceConfig of the published soap-sts instance. Otherwise, the SignatureTrustValidator will be
  * plugged-in as a cxf default. So this class will only be plugged-in when Certificate validation should be explicitly
- * dispatched to OpenAM and the Cert module. An open question is whether the validate functionality of the SignatureTrustValidator
- * needs to be invoked in order to enforce the symmetric and asymmetric bindings.
+ * dispatched to OpenAM and the Cert module.
  */
-public class SoapCertificateTokenValidator extends SignatureTrustValidator {
+public class SoapCertificateTokenValidator implements Validator {
     private final AuthenticationHandler<X509Certificate[]> authenticationHandler;
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
     private final ValidationInvocationContext validationInvocationContext;
@@ -72,13 +68,6 @@ public class SoapCertificateTokenValidator extends SignatureTrustValidator {
 
     @Override
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
-        /*
-        TODO: this method will only be entered when X509 tokens are specified in the TokenValidationConfig of the published
-        soap-sts instance. An open question is whether the super.validate method must be invoked in order to enforce the
-        symmetric and asymmetric bindings. If so, the ctor for this class would have to take state to determine whether
-        the soap-sts was deployed with a symmetric or asymmetric binding, so that super.validate could be called.
-         */
-        Credential localCredential = super.validate(credential, data);
         try {
             final String sessionId = authenticationHandler.authenticate(credential.getCertificates(), TokenType.X509);
             threadLocalAMTokenCache.cacheSessionIdForContext(validationInvocationContext, sessionId, invalidateAMSession);
@@ -88,5 +77,4 @@ public class SoapCertificateTokenValidator extends SignatureTrustValidator {
             throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION, e.getMessage());
         }
     }
-
 }

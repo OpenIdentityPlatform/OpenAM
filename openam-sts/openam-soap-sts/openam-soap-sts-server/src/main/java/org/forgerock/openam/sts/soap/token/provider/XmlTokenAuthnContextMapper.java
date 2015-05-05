@@ -36,7 +36,9 @@ public interface XmlTokenAuthnContextMapper {
      *                   mandated by the SecurityPolicy bindings protecting the STS. This state can be used by custom
      *                   implementations of this interface to make more elaborate decisions regarding the returned
      *                   AuthnContext class reference. Note that the Object will be an xml Element, or one of the
-     *                   types defined in the org.apache.cxf.ws.security.sts.provider.model.secext package.
+     *                   types defined in the org.apache.cxf.ws.security.sts.provider.model.secext package. It could also
+     *                   be a java.security.cert.X509Certificate[] in case the caller is asserted via
+     *                   X509.
      * @return A valid AuthnContext value, as defined here:
      * http://docs.oasis-open.org/security/saml/v2.0/saml-authn-context-2.0-os.pdf
      */

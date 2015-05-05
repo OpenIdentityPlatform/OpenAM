@@ -26,8 +26,8 @@
 
     <wsdl:import location="ws-trust-1.4-service.wsdl"	namespace="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"/>
 
-    <wsdl:binding name="certificate_token_symmetric_endorsing_policy" type="wstrust:STS">
-        <wsp:PolicyReference URI="#certificate_token_symmetric_endorsing_policy" />
+    <wsdl:binding name="x509_token_symmetric_policy" type="wstrust:STS">
+        <wsp:PolicyReference URI="#x509_token_symmetric_policy" />
         <soap:binding style="document"
                       transport="http://schemas.xmlsoap.org/soap/http" />
         <wsdl:operation name="Issue">
@@ -117,7 +117,7 @@
     </wsdl:binding>
 
     <!-- 2.2.4 (WSS1.1) Mutual Authentication with X.509 Certificates, Sign, Encrypt -->
-    <wsp:Policy wsu:Id="certificate_token_symmetric_endorsing_policy">
+    <wsp:Policy wsu:Id="x509_token_symmetric_policy">
         <wsp:ExactlyOne>
             <wsp:All>
                 <sp:SymmetricBinding>
@@ -197,8 +197,8 @@
         </wsp:ExactlyOne>
     </wsp:Policy>
 
-    <wsdl:service name="symmetric_endorsing_cert_sts_service">
-        <wsdl:port name="symmetric_endorsing_cert_sts_service_port" binding="tns:certificate_token_symmetric_endorsing_policy">
+    <wsdl:service name="x509_symmetric_sts_service">
+        <wsdl:port name="x509_symmetric_sts_service_port" binding="tns:x509_token_symmetric_policy">
             <soap:address location=""/>
         </wsdl:port>
     </wsdl:service>

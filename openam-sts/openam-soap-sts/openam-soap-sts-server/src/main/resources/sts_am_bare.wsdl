@@ -105,32 +105,6 @@
         </sp:SupportingTokens>
     </wsp:Policy>
 
-    <wsp:Policy wsu:Id="signed_body_input_policy">
-        <wsp:ExactlyOne>
-            <wsp:All>
-                <sp:SignedParts>
-                    <sp:Body/>
-                </sp:SignedParts>
-                <!--    <sp:EncryptedParts>
-                        <sp:Body/>
-                    </sp:EncryptedParts> -->
-            </wsp:All>
-        </wsp:ExactlyOne>
-    </wsp:Policy>
-
-    <wsp:Policy wsu:Id="signed_body_output_policy">
-        <wsp:ExactlyOne>
-            <wsp:All>
-                <sp:SignedParts>
-                    <sp:Body/>
-                </sp:SignedParts>
-                <!--    <sp:EncryptedParts>
-                        <sp:Body/>
-                    </sp:EncryptedParts> -->
-            </wsp:All>
-        </wsp:ExactlyOne>
-    </wsp:Policy>
-
     <wsdl:service name="am_bare_sts_service">
         <wsdl:port name="am_bare_sts_service_port" binding="tns:am_token_bare_binding">
             <soap:address location=""/>

@@ -122,6 +122,17 @@ public class SoapDelegationConfig {
             throw new IllegalStateException("At least one of the validatedDelegatedTokenConfiguration or customDelegationTokenHandler " +
                     "collections must be non-empty!");
         }
+        /*
+        Throw an exception if x509 tokens are specified to be validated as delegated token types, as x509 certificates
+        are an adequate representation of a subject's identity only when proof of ownership of the associated private
+        key is demonstrated, which is not possible when x509 certificates are simply presented in the ActAs/OnBehalfOf
+        element in a RequestSecurityToken request.
+         */
+        for (TokenValidationConfig validationConfig : validatedDelegatedTokenConfiguration) {
+            if (TokenType.X509.equals(validationConfig.getValidatedTokenType())) {
+                throw new IllegalStateException("X509 tokens are not supported as delegated token types.");
+            }
+        }
     }
 
     public Set<TokenValidationConfig> getValidatedDelegatedTokenConfiguration() {

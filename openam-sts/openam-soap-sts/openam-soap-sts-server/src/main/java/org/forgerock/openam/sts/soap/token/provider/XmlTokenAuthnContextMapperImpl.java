@@ -33,6 +33,8 @@ public class XmlTokenAuthnContextMapperImpl implements XmlTokenAuthnContextMappe
         this.logger = logger;
     }
     public String getAuthnContext(TokenType inputTokenType, Object inputToken) {
+        logger.debug("In XmlTokenAuthnContextMapperImpl, the type of the inputToken: "
+                + (inputToken != null ? inputToken.getClass().getCanonicalName() : null));
         switch (inputTokenType) {
             case OPENAM:
                 return SAML2Constants.AUTH_CONTEXT_CLASS_REF_PREVIOUS_SESSION;

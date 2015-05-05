@@ -31,7 +31,6 @@ import org.apache.cxf.sts.token.delegation.TokenDelegationHandler;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider;
 import org.apache.cxf.ws.security.sts.provider.operation.IssueOperation;
-import org.apache.cxf.ws.security.sts.provider.operation.ValidateOperation;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
@@ -49,7 +48,6 @@ import org.forgerock.openam.sts.soap.config.user.TokenValidationConfig;
 import org.forgerock.openam.sts.soap.token.config.TokenIssueOperationProvider;
 import org.forgerock.openam.sts.soap.token.config.TokenOperationFactory;
 import org.forgerock.openam.sts.soap.token.config.TokenOperationFactoryImpl;
-import org.forgerock.openam.sts.soap.token.config.TokenValidateOperationProvider;
 import org.forgerock.openam.sts.soap.token.delegation.TokenDelegationHandlersProvider;
 import org.forgerock.openam.sts.soap.token.validator.wss.WSSValidatorFactory;
 import org.forgerock.openam.sts.soap.token.validator.wss.WSSValidatorFactoryImpl;
@@ -124,8 +122,8 @@ public class SoapSTSInstanceModule extends AbstractModule {
         //binding all of the Providers of the various sorts of operations
         bind(TokenOperationFactory.class).to(TokenOperationFactoryImpl.class).in(Scopes.SINGLETON);
         bind(IssueOperation.class).toProvider(TokenIssueOperationProvider.class);
-        bind(ValidateOperation.class).toProvider(TokenValidateOperationProvider.class);
-        //TODO: don't bind renewal - renewal will be designed as part of AME-5878
+        //TODO: don't bind renewal and validate operations - validate and renewal will be designed as part of AME-5878
+//        bind(ValidateOperation.class).toProvider(TokenValidateOperationProvider.class);
 //        bind(RenewOperation.class).toProvider(TokenRenewOperationProvider.class);
 
         /*
@@ -225,7 +223,7 @@ public class SoapSTSInstanceModule extends AbstractModule {
      specified for this sts instance. These configurations are achieved by plugging-in object instances corresponding to
      specific keys in the webServicesProperties map.
      Note that the set of TokenValidators plugged-in to handle the authN of the SupportingTokens defined in any SecurityPolicy
-     bindings will be determined by the SoapSTSInstanceConfig#getValidatedTokenConfiguration. Note however, that the
+     bindings will be determined by the SoapSTSInstanceConfig#getSecurityPolicyValidatedTokenConfiguration. Note however, that the
      cxf/wss4j support for plugging-in custom assertions requires that the context validating the OpenAM session tokens
      must be plugged-in at the bus level, which happens globally for all soap-sts instances for a given realm. See
      SoapSTSLifecycleImpl#registerCustomPolicyInterceptors for details. This means that the OPENAM tokens will not be
@@ -234,7 +232,7 @@ public class SoapSTSInstanceModule extends AbstractModule {
     private void processSecurityPolicyTokenValidatorConfiguration(Map<String, Object> webServiceProperties,
                                                                   WSSValidatorFactory wssValidatorFactory,
                                                                   Logger logger) throws WSSecurityException {
-        for (TokenValidationConfig tokenValidationConfig : stsInstanceConfig.getValidatedTokenConfiguration())  {
+        for (TokenValidationConfig tokenValidationConfig : stsInstanceConfig.getSecurityPolicyValidatedTokenConfiguration())  {
             TokenType tokenType = tokenValidationConfig.getValidatedTokenType();
             switch (tokenType) {
                 case USERNAME:
@@ -245,11 +243,11 @@ public class SoapSTSInstanceModule extends AbstractModule {
                                                             tokenValidationConfig.invalidateInterimOpenAMSession()));
                     break;
                 case X509:
-                //    webServiceProperties.put(SecurityConstants.SIGNATURE_TOKEN_VALIDATOR,
-                //            wssValidatorFactory.getValidator(
-                //                    TokenType.X509,
-                //                    ValidationInvocationContext.SOAP_SECURITY_POLICY,
-                //                    tokenValidationConfig.invalidateInterimOpenAMSession()));
+                    webServiceProperties.put(SecurityConstants.SIGNATURE_TOKEN_VALIDATOR,
+                            wssValidatorFactory.getValidator(
+                                    TokenType.X509,
+                                    ValidationInvocationContext.SOAP_SECURITY_POLICY,
+                                    tokenValidationConfig.invalidateInterimOpenAMSession()));
                     break;
                 case OPENAM:
                     //OPENAM session tokens are handled by the PolicyInterceptors registered with the cxf bus.
@@ -391,11 +389,11 @@ public class SoapSTSInstanceModule extends AbstractModule {
 
     /*
     Provides the TokenValidationConfig instances which determine which TokenValidators will be plugged-in to validate
-    the SupportingTokens specified in SecurityPolicy bindings, and the tokens validated as part of the VALIDATE operation.
+    tokens presented as part of SecurityPolicy binding enforcement.
      */
     @Provides
     Set<TokenValidationConfig> getTokenValidationConfig() {
-        return stsInstanceConfig.getValidatedTokenConfiguration();
+        return stsInstanceConfig.getSecurityPolicyValidatedTokenConfiguration();
     }
 
     /*
