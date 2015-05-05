@@ -86,27 +86,7 @@ do
 done
 
 CLASSPATH=""
-CLASSPATH="$CLASSPATH:lib/opendj-server-${opendj.server.version}.jar"
-CLASSPATH="$CLASSPATH:lib/forgerock-util-${commons.forgerock-util.version}.jar"
-CLASSPATH="$CLASSPATH:lib/json-${json.version}.jar"
-CLASSPATH="$CLASSPATH:lib/xalan-${xalan.version}.jar"
-CLASSPATH="$CLASSPATH:lib/xercesImpl-${xercesj.version}.jar"
-CLASSPATH="$CLASSPATH:lib/xml-apis-${xercesj.version}.jar"
-CLASSPATH="$CLASSPATH:lib/xmlsec-${santuario.xmlsec.version}.jar"
-CLASSPATH="$CLASSPATH:lib/openam-core-${project.version}.jar"
-CLASSPATH="$CLASSPATH:lib/openam-entitlements-${project.version}.jar"
-CLASSPATH="$CLASSPATH:lib/openam-shared-${project.version}.jar"
-CLASSPATH="$CLASSPATH:lib/openam-dtd-schema-${project.version}.jar"
-CLASSPATH="$CLASSPATH:lib/openam-rest-${project.version}.jar"
-CLASSPATH="$CLASSPATH:lib/openam-license-manager-cli-${project.version}.jar"
-CLASSPATH="$CLASSPATH:lib/openam-license-core-${project.version}.jar"
-CLASSPATH="$CLASSPATH:lib/forgerock-guice-core-${forgerock.guice.version}.jar"
-CLASSPATH="$CLASSPATH:lib/guice-${guice.version}-no_aop.jar"
-CLASSPATH="$CLASSPATH:lib/guice-assistedinject-${guice.version}.jar"
-CLASSPATH="$CLASSPATH:lib/commons-lang-${commons-lang.version}.jar"
-CLASSPATH="$CLASSPATH:lib/javax.inject-${javax.inject.version}.jar"
-CLASSPATH="$CLASSPATH:lib/slf4j-api-${slf4j.version}.jar"
-CLASSPATH="$CLASSPATH:lib/slf4j-nop-${slf4j.version}.jar"
+CLASSPATH="$CLASSPATH:${unix.setup.classpath}"
 CLASSPATH="$CLASSPATH:resources"
 
 $JAVA_HOME/bin/java -D"load.config=yes" -D"help.print=$help_print" \

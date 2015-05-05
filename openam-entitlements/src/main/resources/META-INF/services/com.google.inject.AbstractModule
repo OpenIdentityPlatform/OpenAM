@@ -13,4 +13,3 @@
 #
 # Copyright 2015 ForgeRock AS.
 #
-org.forgerock.openam.entitlement.guice.EntitlementGuiceModule

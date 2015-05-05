@@ -11,7 +11,8 @@
 # Header, with the fields enclosed by brackets [] replaced by your own identifying
 # information: "Portions copyright [year] [name of copyright owner]".
 #
-# Copyright 2014 ForgeRock AS.
+# Copyright 2014-2015 ForgeRock AS.
 #
+org.forgerock.openam.entitlement.guice.EntitlementGuiceModule
 org.forgerock.openam.core.guice.CoreGuiceModule
 org.forgerock.openam.core.guice.DataLayerGuiceModule

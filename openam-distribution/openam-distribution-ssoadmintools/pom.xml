@@ -2,7 +2,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
+* Copyright (c) 2011-2015 ForgeRock AS. All Rights Reserved
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -39,6 +39,10 @@
     </description>
     <artifactId>openam-distribution-ssoadmintools</artifactId>
     <packaging>pom</packaging>
+    <properties>
+        <setupArtifactIDs>opendj-server,forgerock-util,json,xalan,xercesImpl,xml-apis,xmlsec,openam-core,openam-entitlements,openam-shared,openam-dtd-schema,openam-rest,openam-license-manager-cli,openam-license-core,forgerock-guice-core,guice,guice-assistedinject,commons-lang,javax.inject,slf4j-api,slf4j-nop</setupArtifactIDs>
+    </properties>
+
 
     <!-- Build -->
     <build>
@@ -48,6 +52,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.10</version>
                 <executions>
                     <execution>
                         <id>Copy license</id>
@@ -67,6 +72,34 @@
                                     <destFileName>license.txt</destFileName>
                                 </artifactItem>
                             </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>Unix setup classpath</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>build-classpath</goal>
+                        </goals>
+                        <configuration>
+                            <fileSeparator>/</fileSeparator>
+                            <pathSeparator>:</pathSeparator>
+                            <prefix>lib</prefix>
+                            <includeArtifactIds>${setupArtifactIDs}</includeArtifactIds>
+                            <outputProperty>unix.setup.classpath</outputProperty>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>Windows setup classpath</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>build-classpath</goal>
+                        </goals>
+                        <configuration>
+                            <fileSeparator>\</fileSeparator>
+                            <pathSeparator>;</pathSeparator>
+                            <prefix>lib</prefix>
+                            <includeArtifactIds>${setupArtifactIDs}</includeArtifactIds>
+                            <outputProperty>windows.setup.classpath</outputProperty>
                         </configuration>
                     </execution>
                 </executions>
