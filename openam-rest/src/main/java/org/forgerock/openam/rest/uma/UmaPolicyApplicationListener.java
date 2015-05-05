@@ -219,9 +219,13 @@ public class UmaPolicyApplicationListener implements IdEventListener {
     }
 
     private boolean isResourceServer(AMIdentity identity) throws IdRepoException, SSOException {
-        for (String scope : getScopes(getIdentityAttributes(identity))) {
-            if (scope.endsWith("uma_protection")) {
-                return true;
+
+        Set<String> scopes = getScopes(getIdentityAttributes(identity));
+        if (scopes != null) {
+            for (String scope : scopes) {
+                if (scope.endsWith("uma_protection")) {
+                    return true;
+                }
             }
         }
         return false;
