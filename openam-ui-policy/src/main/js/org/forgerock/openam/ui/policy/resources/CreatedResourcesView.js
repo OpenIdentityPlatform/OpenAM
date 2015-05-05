@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,28 +22,24 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/**
- * @author Eugenia Sergueeva
- */
-
-/*global window, define, $, _, document, console */
+/*global window, define, $, _ */
 
 define("org/forgerock/openam/ui/policy/resources/CreatedResourcesView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants"
-], function (AbstractView,eventManager,constants) {
+], function (AbstractView, EventManager, Constants) {
 
     var CreatedResourcesView = AbstractView.extend({
         element: "#resourcesList",
         template: "templates/policy/resources/CreatedResourcesTemplate.html",
         noBaseTemplate: true,
         events: {
-            'click .icon-plus': 'addResource',
-            'keyup .icon-plus': 'addResource',
-            'keyup .editing input:last-of-type': 'addResource',
-            'click .icon-close ': 'deleteResource',
-            'keyup .icon-close ': 'deleteResource'
+            'click .fa-plus': 'addResource',
+            'keyup .fa-plus': 'addResource',
+            'keyup .editing input': 'addResource',
+            'click .fa-close': 'deleteResource',
+            'keyup .fa-close': 'deleteResource'
         },
 
         render: function (args, callback) {
@@ -60,7 +56,7 @@ define("org/forgerock/openam/ui/policy/resources/CreatedResourcesView", [
             this.parentRender(function () {
 
                 delete self.data.options.justAdded;
-                self.flashDomItem( self.$el.find('.highlight-good'), 'highlight-good' );
+                self.flashDomItem( self.$el.find('.text-success'), 'text-success' );
 
                 self.$el.find('.editing').find('input').autosizeInput({space:19});
                 self.$el.find('.editing').find('input:eq(0)').focus().select();
@@ -100,8 +96,8 @@ define("org/forgerock/openam/ui/policy/resources/CreatedResourcesView", [
                 duplicateIndex = -1;
 
             if( this.validate(inputs) === false){
-                eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidResource");
-                this.flashDomItem( this.$el.find('.editing'), 'invalid' );
+                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidResource");
+                this.flashDomItem( this.$el.find('.editing'), 'text-danger' );
                 return;
             }
 
@@ -121,8 +117,8 @@ define("org/forgerock/openam/ui/policy/resources/CreatedResourcesView", [
             duplicateIndex = _.indexOf(this.data.entity.resources, resource);
 
             if ( duplicateIndex >= 0 ) {
-                eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "duplicateResource");
-                this.flashDomItem( this.$el.find('#createdResources ul li:eq('+duplicateIndex+')'), 'highlight-warning' );
+                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "duplicateResource");
+                this.flashDomItem( this.$el.find('#createdResources ul li:eq('+duplicateIndex+')'), 'text-danger' );
             } else {
                 this.data.entity.resources.push(resource);
                 this.data.options.justAdded = resource;

@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,11 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/**
- * @author Eugenia Sergueeva
- */
-
-/*global window, define, $, _, document, console */
+/*global window, define, $, _ */
 
 define("org/forgerock/openam/ui/policy/policies/attributes/StaticResponseAttributesView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
@@ -49,13 +45,13 @@ define("org/forgerock/openam/ui/policy/policies/attributes/StaticResponseAttribu
         this.events['change input'] = this.checkedRequired.bind(this);
         this.events['keyup input'] = this.checkedRequired.bind(this);
 
-        this.baseRender(this.data, "templates/policy/policies/attributes/ResponseAttrsStatic.html", el, callback);
+        this.baseRender(this.data, "templates/policy/policies/attributes/StaticAttributesTemplate.html", el, callback);
     };
 
     StaticResponseAttributesView.prototype.getPendingItem = function (e) {
         var editing = this.$el.find('.editing'),
-            key = editing.find('[data-attr-add-key]'),
-            val = editing.find('[data-attr-add-val]'),
+            key = editing.find('[data-attr-key]'),
+            val = editing.find('[data-attr-val]'),
             attr = {};
 
         attr.propertyName = key.val();
@@ -66,8 +62,8 @@ define("org/forgerock/openam/ui/policy/policies/attributes/StaticResponseAttribu
 
     StaticResponseAttributesView.prototype.isValid = function (e) {
         var editing = this.$el.find('.editing'),
-            key = editing.find('[data-attr-add-key]'),
-            val = editing.find('[data-attr-add-val]');
+            key = editing.find('[data-attr-key]'),
+            val = editing.find('[data-attr-val]');
 
         return _.every([key, val], function (input) {
             return input.val() !== '' && input[0].checkValidity();

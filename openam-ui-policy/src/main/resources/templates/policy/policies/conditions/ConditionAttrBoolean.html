@@ -1,5 +1,10 @@
 <label data-title="{{title}}">{{t i18nKey}}</label>
-<ul class="buttonControl">
-    <li><a data-val="true"  class="button {{#equals selected true}}selected{{/equals}}" tabindex="0">{{t "common.form.true"}}</a></li>
-    <li><a data-val="false" class="button {{#equals selected false}}selected{{/equals}}" tabindex="0">{{t "common.form.false"}}</a></li>
-</ul>
+
+<div class="btn-group">
+    <a data-val="true" role="button" class="btn btn-default {{#equals selected true}} btn-primary {{/equals}} ">
+        {{t "common.form.true"}}
+    </a>
+    <a data-val="false" role="button" class="btn btn-default {{#equals selected false}} btn-primary {{/equals}} ">
+        {{t "common.form.false"}}
+    </a>
+</div>

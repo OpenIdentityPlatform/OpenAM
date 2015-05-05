@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2015 ForgeRock AS. All rights reserved.
+ * Copyright 2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,22 +22,18 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/**
- * @author Eugenia Sergueeva
- */
-
-/*global window, define, $ _, document, console */
+/*global window, define, $ _ */
 
 define("org/forgerock/openam/ui/policy/common/StripedListView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/UIUtils"
-], function (AbstractView, uiUtils) {
+], function (AbstractView, UIUtils) {
     return AbstractView.extend({
         noBaseTemplate: true,
         template: 'templates/policy/common/StripedListWrapperTemplate.html',
         events: {
-            'click .striped-list-item': 'clickItem',
-            'keyup .striped-list-item': 'clickItem',
+            'click .list-group-item': 'clickItem',
+            'keyup .list-group-item': 'clickItem',
             'click .striped-list-filter': 'filterItems',
             'keyup .striped-list-filter': 'filterItems'
         },
@@ -46,6 +42,10 @@ define("org/forgerock/openam/ui/policy/common/StripedListView", [
             this.data = data;
             this.element = el;
             this.items = data.items ? _.clone(data.items).sort() : [];
+
+            if (!this.data.itemTpl) {
+                this.data.itemTpl = "templates/policy/common/StripedListItemTemplate.html";
+            }
 
             this.parentRender(function () {
                 this.renderItems();
@@ -56,12 +56,9 @@ define("org/forgerock/openam/ui/policy/common/StripedListView", [
             });
         },
 
-        renderItems: function (data) {
-            _.extend(this.data, data);
-
+        renderItems: function () {
             this.data.items = this.filter ? this.getFilteredItems() : this.getAllItems();
-
-            this.$el.find('.striped-list-items').html(uiUtils.fillTemplateWithData("templates/policy/common/StripedListTemplate.html", this.data));
+            this.$el.find('.list-group').html(UIUtils.fillTemplateWithData(this.data.itemTpl, this.data));
         },
 
         clickItem: function (e) {
@@ -80,13 +77,19 @@ define("org/forgerock/openam/ui/policy/common/StripedListView", [
                 }
             }
 
-            if (this.data.created && !$(e.target).is('.icon-close')) {
+            if ((this.data.created && !$(e.target).is('.fa-close')) ||
+                $(e.target).is('.radio-inline') ||
+                $(e.target).parents('.radio-inline').length) {
                 return;
             }
 
             var target = $(e.currentTarget),
                 li = target.is('li') ? target : target.parents('li'),
                 item = li.data('listItem');
+
+            if (!item) {
+                return;
+            }
 
             if (this.data.clickItem) {
                 this.data.clickItem(item);

@@ -1,64 +1,95 @@
-<div class="content-bg">
-    <div class="policy-header">
-        <a href="#apps/" class="button float-right" id="backButton">{{t "common.form.cancel"}}</a>
-        {{#if entity.name}}
-        <h1>{{t "policy.editApplications.editApplication"}}: <span>{{entity.name}}</span></h1>
-        {{else}}
-        <h1>{{t "policy.editApplications.title"}}</h1>
-        {{/if}}
-        <h2><span>{{t "policy.common.realm"}}:</span> {{policyEditorRealmUrlHelper entity.realm}}</h2>
+<div class="container">
+    <div class="page-header">
+        <h1>
+            {{#if entity.name}}
+            {{t "policy.editApplications.editApplication"}}: <strong>{{entity.name}}</strong>
+            {{else}}
+            {{t "policy.editApplications.title"}}
+            {{/if}}
+
+            <a class="pull-right btn btn-default" href="#apps/" role="button">{{t 'common.form.cancel'}}</a>
+        </h1>
+
+        <small>{{t "policy.common.realm"}}: {{policyEditorRealmUrlHelper entity.realm}}</small>
     </div>
 
-    <div class="policy-content">
-        <p>{{t "policy.editApplications.description"}}</p>
+    <p>{{t "policy.editApplications.description"}}</p>
 
-        <form class="form">
-            <div class="accordion">
+    <form class="form-horizontal" role="form">
+        <div class="panel-group accordion" id="accordion" role="tablist" aria-multiselectable="true">
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="stepOne">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                            {{t "policy.editApplications.step1"}}
+                        </a>
+                        <span class="help-link" data-help-key="app.nameAndDescription"></span>
+                    </h4>
+                </div>
+                <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="stepOne">
+                    <div class="panel-body">
+                        <div class="form-group clearfix">
+                            <label class="col-sm-2 control-label">{{t "policy.common.name"}}</label>
 
-                <h1 class="accordion-header" tabindex="0">
-                    {{t "policy.editApplications.step1"}}
-                    <span class="help-link" data-help-key="app.nameAndDescription"></span>
-                </h1>
-                <section class="accordion-step clearfix">
+                            <div class="col-sm-8">
+                                <input type="text" id="appName" class="form-control" value="{{entity.name}}" data-field="name"
+                                       placeholder="{{t 'common.form.validation.required'}}" name="entityName" autofocus required>
+                            </div>
+                        </div>
 
-                    <div class="clearfix">
-                        <div class="group-field-block col2 ">
-                            <label class="prop-name" for="appName">{{t "policy.common.name"}}</label>
-                            <input class="prop-val" id="appName" name="entityName" type="text" value="{{entity.name}}" data-field="name" placeholder="{{t 'common.form.validation.required'}}" required autofocus/>
+                        <div class="form-group clearfix">
+                            <label class="col-sm-2 control-label" for="appDescription">{{t "policy.common.description"}}</label>
+
+                            <div class="col-sm-8">
+                                <textarea class="form-control" id="appDescription" data-field="description">{{entity.description}}</textarea>
+                            </div>
+                        </div>
+
+                        <input type="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton" class="btn btn-primary pull-right btn-acc-step"/>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="stepTwo">
+                    <h4 class="panel-title">
+                        <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            {{t "policy.editApplications.step2"}}
+                        </a>
+                        <span class="help-link" data-help-key="app.resources"></span>
+                    </h4>
+                </div>
+                <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="stepTwo">
+                    <div class="panel-body">
+                        <p class="helper-text">{{t "policy.resourceTypes.addResourceTypes"}}</p>
+
+                        <div class="row">
+                            <div id="availableResTypes" class="col-sm-6"></div>
+                            <div id="selectedResTypes" class="col-sm-6"></div>
+                        </div>
+
+                        <input type="button" class="btn btn-primary pull-right btn-acc-step" value="{{t 'policy.common.buttons.next'}}" name="nextButton"/>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="stepThree">
+                    <h4 class="panel-title">
+                        <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            {{t "policy.editApplications.step3"}}
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="stepThree">
+                    <div class="panel-body">
+                        <div id="reviewInfo" class="clearfix"></div>
+
+                        <div class="pull-right">
+                            <a class="btn btn-default btn-acc-step" href="#apps/" role="button">{{t 'common.form.cancel'}}</a>
+                            <input type="button" name="submitForm" value="{{t 'common.form.save'}}" class="btn btn-primary btn-acc-step"/>
                         </div>
                     </div>
-
-                    <div class="group-field-block">
-                        <label class="prop-name" for="appDescription">{{t "policy.common.descriptionOptional"}}</label>
-                        <textarea class="prop-val" id="appDescription" data-field="description">{{entity.description}}</textarea>
-                    </div>
-                    <input type="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton" class="button"/>
-
-                </section>
-
-                <h1 class="accordion-header" tabindex="0">
-                    {{t "policy.editApplications.step2"}}
-                    <span class="help-link" data-help-key="app.resources"></span>
-                </h1>
-                <section class="accordion-step clearfix">
-                    <p>{{t "policy.resourceTypes.addResourceTypes"}}</p>
-
-                    <div class="clearfix">
-                        <div class="col2"><div id="availableResTypes"></div></div>
-                        <div class="col2"><div id="selectedResTypes"></div></div>
-                    </div>
-
-                    <input type="button" class="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton"/>
-                </section>
-
-                <h1 class="accordion-header" tabindex="0">{{t "policy.editApplications.step3"}}</h1>
-                <section class="accordion-step clearfix">
-
-                    <div id="reviewInfo" class="clearfix"></div>
-                    <input type="button" class="button" value="{{t 'policy.common.buttons.finish'}}" name="submitForm"/>
-
-                </section>
+                </div>
             </div>
-        </form>
-    </div>
+        </div>
+    </form>
 </div>

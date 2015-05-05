@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2015 ForgeRock AS. All rights reserved.
+ * Copyright 2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,11 +22,6 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/**
- * @author JKigwana
- * @author Eugenia Sergueeva
- */
-
 /*global window, define, $, _ */
 
 define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrTimeZoneView", [
@@ -37,7 +32,7 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrTimeZone
         DEFAULT_TIME_ZONE: 'GMT',
 
         render: function (data, element, callback) {
-            this.initBasic(data, element, 'float-left');
+            this.initBasic(data, element, 'pull-left');
 
             _.extend(this.data, {defaultTimeZone: this.DEFAULT_TIME_ZONE});
 

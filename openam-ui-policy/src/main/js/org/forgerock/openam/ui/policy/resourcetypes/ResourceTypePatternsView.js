@@ -49,7 +49,7 @@ define("org/forgerock/openam/ui/policy/resourcetypes/ResourceTypePatternsView", 
 
     ResourceTypePatternsView.prototype.getPendingItem = function (e) {
         var editing = this.$el.find('.editing');
-        return editing.find('[data-attr-add]').val().toString();
+        return editing.find('.form-control').val().toString();
     };
 
     ResourceTypePatternsView.prototype.isValid = function (e) {

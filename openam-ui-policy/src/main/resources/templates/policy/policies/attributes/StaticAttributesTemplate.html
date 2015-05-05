@@ -1,0 +1,22 @@
+<div class="list-table created-items">
+    <h5 class="list-group-header">{{t "policy.common.staticAttributes"}}</h5>
+
+    <ul class="list-group">
+        {{#if items}}
+        {{#each items}}
+        <li data-attr-key="{{propertyName}}" data-attr-val="{{propertyValues}}" class="list-group-item {{#equals this ../../options.justAdded}}text-success{{/equals}}">
+            <span class="key">{{propertyName}}:</span>{{propertyValues}}
+            <span tabindex="0" class="fa fa-close pull-right"></span>
+        </li>
+        {{/each}}
+        {{else}}
+        <li class="list-group-item">{{t "policy.common.noStaticAttributes"}}</li>
+        {{/if}}
+
+        <li class="list-group-item editing clearfix form-inline">
+            <input type="text" class="form-control" placeholder="{{t 'policy.common.key'}}" data-attr-key />
+            <input type="text" class="form-control" placeholder="{{t 'policy.common.value'}}" data-attr-val />
+            <span tabindex="0" class="fa fa-plus pull-right"></span>
+        </li>
+    </ul>
+</div>

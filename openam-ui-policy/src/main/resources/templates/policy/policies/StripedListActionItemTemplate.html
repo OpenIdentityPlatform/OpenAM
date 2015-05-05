@@ -1,0 +1,21 @@
+{{#if items}}
+{{#each items}}
+    <li {{#unless ../created}}tabindex="0"{{/unless}} class="list-group-item" data-list-item="{{this.action}}" {{#if ../created}}data-item-selected="true"{{/if}}>
+        {{this.action}}
+
+        <span  {{#if ../created}}tabindex="0"{{/if}} class="fa {{#if ../created}}fa-close {{else}} fa-chevron-right {{/if}} pull-right"></span>
+
+        <div class="pull-right radio-group action-permissions">
+            <label class="radio-inline">
+                <input name="{{this.action}}Permission" type="radio" value="true" {{#if this.value}}checked{{/if}}> {{t "policy.actions.allow"}}
+            </label>
+
+            <label class="radio-inline">
+                <input name="{{this.action}}Permission" type="radio" value="false" {{#unless this.value}}checked{{/unless}}> {{t "policy.actions.deny"}}
+            </label>
+        </div>
+    </li>
+{{/each}}
+{{else}}
+<li class="list-group-item text-info">{{t "policy.stripedList.noItems"}}</li>
+{{/if}}

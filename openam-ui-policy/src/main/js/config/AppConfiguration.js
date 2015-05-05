@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014-2015 ForgeRock AS. All Rights Reserved
+ * Copyright 2014-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -24,7 +24,9 @@
 
 /*global define*/
 
-define("config/AppConfiguration", function () {
+define("config/AppConfiguration", [
+    "org/forgerock/commons/ui/common/util/Constants"
+], function (Constants) {
     return {
         moduleDefinition: [
             {
@@ -90,17 +92,34 @@ define("config/AppConfiguration", function () {
                 moduleClass: "org/forgerock/commons/ui/common/components/Navigation",
                 configuration: {
                     links: {
-                        admin: {
-                            urls: {
-                                applications: {
-                                    url: "#apps/",
-                                    name: "config.AppConfiguration.Navigation.links.applications",
-                                    inactive: false
+                        "admin": {
+                            "role": "ui-admin",
+                            "urls": {
+                                "policies": {
+                                    "baseUrl":"/",
+                                    "url": "#apps/",
+                                    "icon": "fa fa-briefcase",
+                                    "name": "config.AppConfiguration.Navigation.links.policyEditor",
+                                    "urls": {
+                                        "applications": {
+                                            "url": "#apps/",
+                                            "name": "config.AppConfiguration.Navigation.links.applications"
+                                        },
+                                        "resourceTypes": {
+                                            "url": "#resourceTypes/",
+                                            "name": "config.AppConfiguration.Navigation.links.resourceTypes"
+                                        }
+                                    }
                                 },
-                                resourceTypes: {
-                                    url: "#resourceTypes/",
-                                    name: "config.AppConfiguration.Navigation.links.resourceTypes",
-                                    inactive: false
+                                "scripts": {
+                                    "event": Constants.EVENT_GO_TO_SCRIPTS_EDITOR,
+                                    "name": "config.AppConfiguration.Navigation.links.scriptsEditor",
+                                    "icon": "fa fa-code"
+                                },
+                                "console": {
+                                    "event": Constants.EVENT_RETURN_TO_AM_CONSOLE,
+                                    "name": "config.AppConfiguration.Navigation.links.console",
+                                    "icon": "fa fa-cubes"
                                 }
                             }
                         }
@@ -125,12 +144,17 @@ define("config/AppConfiguration", function () {
                         "templates/policy/policies/conditions/ConditionAttrTimeZone.html",
                         "templates/policy/policies/conditions/ListItem.html",
                         "templates/policy/policies/conditions/LegacyListItem.html",
-                        "templates/policy/applications/ManageAppsGridCellActionsTemplate.html",
-                        "templates/policy/applications/ManageAppsGridActionsTemplate.html",
-                        "templates/policy/policies/ManagePoliciesGridActionsTemplate.html",
+                        "templates/policy/policies/StripedListActionItemTemplate.html",
+                        "templates/policy/policies/PoliciesListGridActionsTemplate.html",
+
+                        "templates/policy/applications/AppsListGridCellActionsTemplate.html",
+                        "templates/policy/applications/AppsListGridActionsTemplate.html",
+
                         "templates/policy/referrals/ManageReferralsGridActionsTemplate.html",
-                        "templates/policy/resourcetypes/ManageResourceTypesGridActionsTemplate.html",
-                        "templates/policy/common/StripedListTemplate.html"
+
+                        "templates/policy/resourcetypes/ResourceTypesListGridActionsTemplate.html",
+
+                        "templates/policy/common/StripedListItemTemplate.html"
                     ]
                 }
             },
@@ -152,32 +176,6 @@ define("config/AppConfiguration", function () {
                     loader: [
                         {"validators": "config/validators/CommonValidators"}
                     ]
-                }
-            },
-            {
-                moduleClass: "org/forgerock/commons/ui/common/components/Navigation",
-                configuration: {
-                    links: {
-                        admin: {
-                            urls: {
-                                applications: {
-                                    url: "#apps/",
-                                    name: "config.AppConfiguration.Navigation.links.applications",
-                                    inactive: false
-                                },
-                                resourceTypes: {
-                                    url: "#resourceTypes/",
-                                    name: "config.AppConfiguration.Navigation.links.resourceTypes",
-                                    inactive: false
-                                }
-                            }
-                        },
-                        "user" : {
-                            "urls": {
-
-                            }
-                        }
-                    }
                 }
             }
         ],

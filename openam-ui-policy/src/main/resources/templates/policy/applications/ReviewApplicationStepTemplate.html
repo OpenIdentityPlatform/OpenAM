@@ -1,55 +1,66 @@
-<p>{{t "policy.summaryReview.applicationDescription"}}</p>
-<p>{{#if advancedMode}}{{t "policy.summaryReview.advancedTrue"}}{{else}}{{t "policy.summaryReview.advancedFalse"}}{{/if}}</p>
-
-
+<p>{{t "policy.summaryReview.switchView"}}</p>
 
 {{! The IDs are used for testing }}
-<div class="col2">
+<div class="form-group">
+    <div class="col-sm-6">
+        <div class="panel panel-default review-panel {{#equals '' entity.name}}panel-danger{{/equals}} {{#if options.invalidName}}panel-danger{{/if}} {{#if options.incorrectName}}panel-danger{{/if}}" tabindex="0">
 
-    <div class="review-row clearfix{{#equals '' entity.name}} invalid{{/equals}}{{#if options.invalidName}} invalid{{/if}}{{#if options.incorrectName}} invalid{{/if}}" tabindex="0" >
-        <h2>{{t "policy.common.name"}}</h2>
-        {{#unless advancedMode}}
-            {{#if entity.name}}
-                {{#unless options.invalidName}}<span class="icon-arrow-down2"></span>{{/unless}}
-            {{/if}}
-        {{/unless}}
-        <div class="advanced-mode">
-            <p id="reviewName" {{#unless entity.name}} class="invalid"{{/unless}}>
-            {{#if options.incorrectName}}
-                {{t "policy.summaryReview.invalidName"}}
-            {{else}}
-                {{#if entity.name}}
-                    {{entity.name}}
-                {{else}}
-                    {{t "policy.summaryReview.noName"}}
-                {{/if}}
-            {{/if}}
-            </p>
-            {{#if entity.description}}
-            <h2>{{t "policy.common.description"}}</h2>
-            <p id="reviewDesc">{{entity.description}}</p>
-            {{/if}}
+            <div class="panel-body">
+                <div class="panel-collapse">
+                    <div class="panel-heading" data-toggle="collapse" data-target="#reviewNamePanel">
+                        <h4 class="panel-title">{{t "policy.common.name"}}</h4>
+                    </div>
+
+                    <div id="reviewNamePanel" class="collapse {{#if advancedMode}}in{{/if}} {{#equals '' entity.name}}in{{/equals}} {{#if options.invalidName}}in{{/if}} {{#if options.incorrectName}}in{{/if}}">
+                        <h5 class="review-title">{{t "policy.common.name"}}</h5>
+
+                        <p id="reviewName" class="review-text {{#unless entity.name}} text-danger {{/unless}}">
+                            {{#if options.incorrectName}}
+                            {{t "policy.summaryReview.invalidName"}}
+                            {{else}}
+                            {{#if entity.name}}
+                            {{entity.name}}
+                            {{else}}
+                            {{t "policy.summaryReview.noName"}}
+                            {{/if}}
+                            {{/if}}
+                        </p>
+
+                        <h5 class="review-title">{{t "policy.common.description"}}</h5>
+                        <p id="reviewDesc" class="review-text">
+                            {{#if entity.description}}
+                            {{entity.description}}
+                            {{else}}
+                            {{t "policy.summaryReview.noDescription"}}
+                            {{/if}}
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-</div>
+    <div class="col-sm-6">
+        <div class="panel panel-default review-panel clearfix {{#if options.invalidResource}}panel-danger{{/if}} {{#unless entity.resourceTypeUuids}}panel-danger{{/unless}}" tabindex="0">
+            <div class="panel-body">
+                <div class="panel-collapse">
+                    <div class="panel-heading" data-toggle="collapse" data-target="#reviewRTPanel">
+                        <h4 class="panel-title">{{t "policy.common.resourceTypes"}}</h4>
+                    </div>
 
-<div class="col2">
-    <div class="review-row clearfix{{#if options.invalidResource}} invalid{{/if}}{{#unless entity.resourceTypeUuids}} invalid{{/unless}}" tabindex="0" >
-        <h2>{{t "policy.common.resourceTypes"}}</h2>
-        {{#unless advancedMode}}
-        {{#if entity.resourceTypeUuids}} <span class="icon-arrow-down2"></span>{{else}} <span class="advanced-empty-msg">({{t "policy.common.empty"}})</span>{{/if}}
-        {{/unless}}
-        <div class="advanced-mode">
-            {{#if entity.resourceTypeUuids}}
-            <ul id="reviewRes">
-                {{#each options.selectedResourceTypeNames}}
-                <li{{#equals this ../../options.invalidResource}} class="invalid"{{/equals}}>{{this}}</li>
-                {{/each}}
-            </ul>
-            {{else}}
-            <p class="invalid">{{t "policy.common.noResourceTypes"}}</p>
-            {{/if}}
+                    <div id="reviewRTPanel" class="collapse {{#if advancedMode}}in{{/if}} {{#if options.invalidResource}}in{{/if}} {{#unless entity.resourceTypeUuids}}in{{/unless}}">
+                        {{#if entity.resourceTypeUuids}}
+                        <ul id="reviewRes" class="review-text">
+                            {{#each options.selectedResourceTypeNames}}
+                            <li {{#equals this ../../options.invalidResource}} class="text-danger"{{/equals}}>{{this}}</li>
+                            {{/each}}
+                        </ul>
+                        {{else}}
+                        <p class="text-danger review-text">{{t "policy.common.noResourceTypes"}}</p>
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

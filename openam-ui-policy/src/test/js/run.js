@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014-2015 ForgeRock AS. All Rights Reserved
+ * Copyright 2014-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -28,17 +28,17 @@ define([
     "jquery",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "../test/tests/policy"
-], function ($, constants, eventManager, policyTests) {
-    return function (server) {
-        eventManager.registerListener(constants.EVENT_APP_INTIALIZED, function () {
+    "../test/tests/editor"
+], function ($, Constants, EventManager, EditorMocks) {
+    return function () {
+        EventManager.registerListener(Constants.EVENT_APP_INTIALIZED, function () {
             $.doTimeout = function (name, time, func) {
                 func(); // run the function immediately rather than delayed.
             };
 
             require("ThemeManager").getTheme().then(function () {
                 QUnit.start();
-                policyTests.executeAll(server);
+                EditorMocks.executeAll();
             });
         });
     }

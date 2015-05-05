@@ -1,7 +1,7 @@
-/** 
+/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 ForgeRock AS. All rights reserved.
+ * Copyright 2011-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -30,127 +30,75 @@
 define("ThemeManager", [
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Configuration"
-], function(constants,conf) {
-    
+], function (Constants, Configuration) {
     var obj = {},
-        themeCSSPromise,
-        themeConfigPromise;
+        themePromise;
 
-    obj.loadThemeCSS = function(theme){
+    obj.loadThemeCSS = function (theme) {
+        var head = $('head');
+        head.find('link[href*=less]').remove();
+        head.find('link[href*=favicon]').remove();
 
-        if (themeCSSPromise === undefined) {
-            $('head').find('link[href*=less]').remove();
-            $('head').find('link[href*=favicon]').remove();
-            
-            $("<link/>", {
-                rel: "stylesheet/less",
-                type: "text/css",
-                href: theme.path + "css/styles.less"
-             }).appendTo("head");
+        $("<link/>", {
+            rel: "stylesheet/less",
+            type: "text/css",
+            href: theme.path + "css/styles.less"
+        }).appendTo("head");
 
-            $("<link/>", {
-                rel: "icon",
-                type: "image/x-icon",
-                href: theme.path + theme.icon
-             }).appendTo("head");
-            
-            $("<link/>", {
-                rel: "shortcut icon",
-                type: "image/x-icon",
-                href: theme.path + theme.icon
-             }).appendTo("head");
-            
-            themeCSSPromise = $.ajax({
-                url: constants.LESS_VERSION,
-                dataType: "script",
-                cache:true,
-                error: function (request, status, error) {
-                    console.log(request.responseText);
-                }
-              });
-        }
+        $("<link/>", {
+            rel: "icon",
+            type: "image/x-icon",
+            href: theme.path + theme.icon
+        }).appendTo("head");
 
-        return themeCSSPromise;
+        $("<link/>", {
+            rel: "shortcut icon",
+            type: "image/x-icon",
+            href: theme.path + theme.icon
+        }).appendTo("head");
+
+        return $.ajax({
+            url: Constants.LESS_VERSION,
+            dataType: "script",
+            cache: true,
+            error: function (request, status, error) {
+                console.log(request.responseText);
+            }
+        });
     };
-    
-    obj.loadThemeConfig = function(){
-        if (themeConfigPromise === undefined) {
-            themeConfigPromise = $.getJSON(constants.THEME_CONFIG_PATH);
-        }
-        return themeConfigPromise;
-    };
-    
-    obj.getTheme = function(){
-        var theme = {},
-            newLessVars = {},
-            themeName, prom, defaultTheme ;
-        
-        //find out if the theme has changed
-        if(conf.globalData.theme && obj.mapRealmToTheme() === conf.globalData.theme.name){
-            //no change so use the existing theme
-            prom = $.Deferred();
-            prom.resolve(conf.globalData.theme);
+
+    obj.loadThemeConfig = function () {
+        var prom = $.Deferred();
+        //check to see if the config file has been loaded already
+        //if so use what is already there if not load it
+        if (Configuration.globalData.themeConfig) {
+            prom.resolve(Configuration.globalData.themeConfig);
             return prom;
         } else {
-            return obj.loadThemeConfig().then(function(themeConfig){
-                obj.data = themeConfig;
-                conf.globalData.themeConfig = themeConfig;
-                themeName = obj.mapRealmToTheme();
+            return $.getJSON(Constants.THEME_CONFIG_PATH);
+        }
+    };
 
-                theme = _.reject(obj.data.themes,function(t){return t.name !== themeName;})[0];
-                
-                if (theme.name !== 'default' && theme.path === '') {
-                    defaultTheme = _.reject(obj.data.themes,function(t){return t.name !== 'default';})[0];
-                    theme = $.extend(true,{}, defaultTheme, theme);
-                }
-                
-                return obj.loadThemeCSS(theme).then(function(){
-                    _.each(theme.settings.lessVars, function (value, key) {
+    obj.getTheme = function () {
+        if (themePromise === undefined) {
+            themePromise = obj.loadThemeConfig().then(function (themeConfig) {
+                var newLessVars = {};
+
+                Configuration.globalData.theme = themeConfig;
+                //the following line is needed to align commons code with idm
+                themeConfig.path = "";
+                return obj.loadThemeCSS(themeConfig).then(function () {
+                    _.each(themeConfig.settings.lessVars, function (value, key) {
                         newLessVars['@' + key] = value;
                     });
                     less.modifyVars(newLessVars);
-                    
-                    conf.globalData.theme = theme;
-                    
-                    return theme;
-                });
 
+                    return themeConfig;
+                });
             });
         }
+        return themePromise;
     };
-    
-    obj.mapRealmToTheme = function(){
-        var testString, 
-            theme = "default";
-        if(conf.globalData.auth.realm && conf.globalData.auth.realm.substring(1).length !== 0){
-            testString = conf.globalData.auth.realm.substring(1);
-        }
-        else{
-            testString = document.domain;
-        }
-        
-        _.each(obj.data.themes,function(t){
-            _.each(t.realms,function(r){
-                if(t.regex){
-                    var patt = new RegExp(r);
-                    if(patt.test(testString)){
-                        theme = t.name;
-                        return false;
-                    }
-                }
-                else{
-                    if(r === testString){
-                        theme = t.name;
-                        return false;
-                    }
-                }
-                    
-            });
-        });
-        
-        return theme;
-    };
-    
-    
+
     return obj;
 });

@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -38,10 +38,10 @@ define([
     "./common/GenericGridView",
     "./common/AbstractEditView",
 
-    "./applications/ManageApplicationsView",
+    "./applications/ApplicationsListView",
     "./applications/EditApplicationView",
 
-    "./policies/ManagePoliciesView",
+    "./policies/PoliciesListView",
     "./policies/EditPolicyView",
 
     "./policies/attributes/StaticResponseAttributesView",
@@ -56,7 +56,7 @@ define([
     "./policies/conditions/OperatorRulesView",
 
     "./resourcetypes/EditResourceTypeView",
-    "./resourcetypes/ManageResourceTypesView",
+    "./resourcetypes/ResourceTypesListView",
 
     "./referrals/EditReferralView",
     "./referrals/SelectRealmsView"

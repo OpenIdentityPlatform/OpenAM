@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
+ * Copyright 2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -36,16 +36,14 @@ define("org/forgerock/openam/ui/policy/common/GenericGridView", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/components/Messages"
-], function (AbstractView, uiUtils, dateUtil, router, constants, eventManager, messages) {
+], function (AbstractView, UIUtils, DateUtil, Router, Constants, EventManager, Messages) {
+
     var GenericGridView = AbstractView.extend({
         noBaseTemplate: true,
 
-        checkBox: '[class*="icon-checkbox"]',
-        checkBoxCheckedClass: 'icon-checkbox-checked',
-        checkBoxUncheckedClass: 'icon-checkbox-unchecked',
-
+        checkBox: '[type="checkbox"]',
         checkBoxFormatter: function (cellvalue, options, rowObject) {
-            return "<span data-selection='" + rowObject.name + "' class='icon-checkbox-unchecked' tabindex='0' ></span>";
+            return "<input type='checkbox' data-selection='" + rowObject.name + "' tabindex='0' />";
         },
 
         render: function (data, options, callback) {
@@ -62,7 +60,7 @@ define("org/forgerock/openam/ui/policy/common/GenericGridView", [
             this.data[this.gridId] = {};
 
             this.actionsTpl = options.actionsTpl;
-            this.storageKey = constants.OPENAM_STORAGE_KEY_PREFIX + options.additionalOptions.storageKey;
+            this.storageKey = Constants.OPENAM_STORAGE_KEY_PREFIX + options.additionalOptions.storageKey;
 
             storedItems = JSON.parse(sessionStorage.getItem(this.storageKey));
             this.selectedItems = storedItems ? storedItems : [];
@@ -77,7 +75,7 @@ define("org/forgerock/openam/ui/policy/common/GenericGridView", [
 
             this.parentRender(function () {
                 this.actions = this.$el.find('.global-actions');
-                this.grid = uiUtils.buildJQGrid(this, options.gridId, options.initOptions, options.additionalOptions, callback);
+                this.grid = UIUtils.buildJQGrid(this, options.gridId, options.initOptions, options.additionalOptions, callback);
 
                 if (options.additionalOptions.callback) {
                     options.additionalOptions.callback.apply(this);
@@ -94,15 +92,15 @@ define("org/forgerock/openam/ui/policy/common/GenericGridView", [
         onRowSelect: function (rowid, status, e) {
             var $target = $(e.target),
                 $chB = $target.is(this.checkBox) ? $target : $target.find(this.checkBox),
-                checked = $chB.hasClass(this.checkBoxCheckedClass);
+                checked = $chB.is(':checked');
 
             if (!checked) {
-                $chB.removeClass(this.checkBoxUncheckedClass).addClass(this.checkBoxCheckedClass);
+                $chB.prop('checked', true);
                 this.selectedItems.push(this.data[this.gridId].result[rowid - 1][this.rowUid]);
                 $target.closest('tr').addClass("highlight");
                 this.grid.find('tr[id=' + rowid + ']').addClass("highlight");
             } else {
-                $chB.removeClass(this.checkBoxCheckedClass).addClass(this.checkBoxUncheckedClass);
+                $chB.prop('checked', false);
                 this.selectedItems = _.without(this.selectedItems, this.data[this.gridId].result[rowid - 1][this.rowUid]);
                 this.grid.jqGrid('resetSelection', rowid);
                 $target.closest('tr').removeClass("highlight");
@@ -118,7 +116,7 @@ define("org/forgerock/openam/ui/policy/common/GenericGridView", [
             if (this.selectedItems.length) {
                 if (_.contains(this.selectedItems, rowdata[this.rowUid])) {
                     var tr = this.grid.find('tr[id=' + rowid + ']');
-                    tr.find(this.checkBox).removeClass(this.checkBoxUncheckedClass).addClass(this.checkBoxCheckedClass);
+                    tr.find(this.checkBox).prop('checked', true);
                     tr.addClass("highlight");
                 }
             }
@@ -132,10 +130,10 @@ define("org/forgerock/openam/ui/policy/common/GenericGridView", [
                     self.handleItemsDelete();
                 })
                 .done(function () {
-                    eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, 'deleteSuccess');
+                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, 'deleteSuccess');
                 })
                 .fail(function (xhr) {
-                    messages.messages.addMessage({message: xhr.responseJSON.message, type: 'error'});
+                    Messages.messages.addMessage({message: xhr.responseJSON.message, type: 'error'});
                 });
         },
 
@@ -148,7 +146,7 @@ define("org/forgerock/openam/ui/policy/common/GenericGridView", [
 
         reloadGlobalActionsTemplate: function () {
             this.data[this.gridId].selected = this.selectedItems.length;
-            this.actions.html(uiUtils.fillTemplateWithData(this.actionsTpl, this.data));
+            this.actions.html(UIUtils.fillTemplateWithData(this.actionsTpl, this.data));
         },
 
         isCheckBoxCellSelected: function (e) {
@@ -178,7 +176,7 @@ define("org/forgerock/openam/ui/policy/common/GenericGridView", [
                         filter += ' AND ';
                     }
                     filterDataToDate = new Date(postedData[element]);
-                    if (dateUtil.isDateValid(filterDataToDate)) {
+                    if (DateUtil.isDateValid(filterDataToDate)) {
                         nextDay = new Date( filterDataToDate.getTime() + 24 * 60 * 60 * 1000 );
                         filter = filter.concat(element, ' gt ', filterDataToDate.getTime().toString(), ' AND ',  element, ' lt ', nextDay.getTime().toString());
                     } else {

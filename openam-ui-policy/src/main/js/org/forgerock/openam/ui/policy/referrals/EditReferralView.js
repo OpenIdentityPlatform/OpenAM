@@ -22,11 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/**
- * @author JKigwana
- */
-
-/*global window, define, $, _, document, console */
+/*global window, define, $, _, console */
 
 define("org/forgerock/openam/ui/policy/referrals/EditReferralView", [
     "org/forgerock/openam/ui/policy/common/AbstractEditView",
@@ -36,12 +32,11 @@ define("org/forgerock/openam/ui/policy/referrals/EditReferralView", [
     "org/forgerock/openam/ui/policy/referrals/SelectRealmsView",
     "org/forgerock/openam/ui/policy/delegates/PolicyDelegate",
     "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/openam/ui/common/components/Accordion",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/components/Messages"
-], function (AbstractEditView, createdResources, StripedList, reviewInfoView, selectRealmsView, policyDelegate, uiUtils, Accordion, constants, eventManager, router, messager) {
+], function (AbstractEditView, createdResources, StripedList, reviewInfoView, selectRealmsView, policyDelegate, uiUtils, constants, eventManager, router, messager) {
     var EditReferralView = AbstractEditView.extend({
         template: "templates/policy/referrals/EditReferralTemplate.html",
         reviewTemplate: "templates/policy/referrals/ReviewReferralStepTemplate.html",

@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,29 +22,26 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/**
- * @author Eugenia Sergueeva
- */
-
 /*global window, define, $, _ */
 
 define("org/forgerock/openam/ui/policy/common/HelpLinkView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration"
-], function (AbstractView, conf) {
+], function (AbstractView, Configuration) {
     var HelpLinkView = AbstractView.extend({
         noBaseTemplate: true,
         template: 'templates/policy/common/HelpLinkTemplate.html',
 
         events: {
-            'click .icon-info': 'openDocumentation',
-            'keyup .icon-info': 'openDocumentation'
+            'click .fa-question': 'openDocumentation',
+            'keyup .fa-question': 'openDocumentation'
         },
 
         render: function ($el, customText, callback) {
             this.data.customText = customText ? customText : '';
 
-            var documentation = conf.globalData.policyEditor && conf.globalData.policyEditor.documentation ? conf.globalData.policyEditor.documentation : {},
+            var documentation = Configuration.globalData.policyEditor && Configuration.globalData.policyEditor.documentation ?
+                    Configuration.globalData.policyEditor.documentation : {},
                 key = $el.data('help-key');
 
             this.element = $el;
@@ -56,6 +53,9 @@ define("org/forgerock/openam/ui/policy/common/HelpLinkView", [
 
             if (this.url || this.data.customText) {
                 this.parentRender(function () {
+
+                    this.$el.find('.fa[data-toggle="popover"]').popover();
+
                     if (callback) {
                         callback();
                     }

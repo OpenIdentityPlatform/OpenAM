@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,10 +20,6 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- */
-
-/**
- * @author Eugenia Sergueeva
  */
 
 /*global define*/
@@ -92,6 +88,10 @@ define("config/messages/PolicyMessages", [], function () {
         },
         "duplicateItem": {
             msg: "config.messages.PolicyMessages.duplicateItem",
+            type: "error"
+        },
+        "invalidItem": {
+            msg: "config.messages.PolicyMessages.invalidItem",
             type: "error"
         },
         "unableToPersistPolicy": {

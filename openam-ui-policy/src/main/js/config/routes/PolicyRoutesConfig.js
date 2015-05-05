@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014-2015 ForgeRock AS. All Rights Reserved
+ * Copyright 2014-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -24,12 +24,10 @@
 
 /*global define*/
 
-define("config/routes/PolicyRoutesConfig", [
-    "org/forgerock/commons/ui/common/util/Constants"
-],function (constants) {
+define("config/routes/PolicyRoutesConfig", function () {
     return {
         "manageApps": {
-            view: "org/forgerock/openam/ui/policy/applications/ManageApplicationsView",
+            view: "org/forgerock/openam/ui/policy/applications/ApplicationsListView",
             url: "apps/",
             role: "ui-admin"
         },
@@ -41,13 +39,13 @@ define("config/routes/PolicyRoutesConfig", [
             pattern: "app/?"
         },
         "managePolicies": {
-            view: "org/forgerock/openam/ui/policy/policies/ManagePoliciesView",
+            view: "org/forgerock/openam/ui/policy/policies/PoliciesListView",
             url: /^app\/(.+?)\/(policies)\//,
             role: "ui-admin",
             pattern: "app/?/policies/"
         },
         "manageReferrals": {
-            view: "org/forgerock/openam/ui/policy/policies/ManagePoliciesView",
+            view: "org/forgerock/openam/ui/policy/policies/PoliciesListView",
             url: /^app\/(.+?)\/(referrals)\//,
             role: "ui-admin",
             pattern: "app/?/referrals/"
@@ -67,7 +65,7 @@ define("config/routes/PolicyRoutesConfig", [
             pattern: "app/?/referral/?"
         },
         "manageResourceTypes": {
-            view: "org/forgerock/openam/ui/policy/resourcetypes/ManageResourceTypesView",
+            view: "org/forgerock/openam/ui/policy/resourcetypes/ResourceTypesListView",
             url: "resourceTypes/",
             role: "ui-admin"
         },
@@ -77,10 +75,6 @@ define("config/routes/PolicyRoutesConfig", [
             defaults: [""],
             role: "ui-admin",
             pattern: "resourceType/?"
-        },
-        "amConsole": {
-            url: "console",
-            event: constants.EVENT_RETURN_TO_AM_CONSOLE
         }
     };
 });

@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2015 ForgeRock AS. All rights reserved.
+ * Copyright 2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,11 +22,6 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/**
- * @author JKigwana
- * @author Eugenia Sergueeva
- */
-
 /*global window, define, $, _ */
 
 define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrBooleanView", [
@@ -38,8 +33,8 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrBooleanV
         render: function (data, element, callback) {
             this.initBasic(data, element, 'field-float-pattern data-obj button-field');
 
-            this.events['click .buttonControl a.button'] = _.bind(this.buttonControlClick, this);
-            this.events['keyup .buttonControl a.button'] = _.bind(this.buttonControlClick, this);
+            this.events['click .btn'] = _.bind(this.buttonControlClick, this);
+            this.events['keyup .btn'] = _.bind(this.buttonControlClick, this);
 
             this.parentRender(function () {
                 if (callback) {
@@ -54,12 +49,12 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrBooleanV
             }
 
             var $target = $(e.currentTarget),
-                buttonControl = $target.closest('ul.buttonControl'),
+                buttonControl = $target.closest('.btn-group'),
                 label = buttonControl.prev('label').data().title;
 
             this.data.itemData[label] = $target.data('val');
-            buttonControl.find('li a').removeClass('selected');
-            $target.addClass('selected');
+            buttonControl.find('.btn').removeClass('btn-primary');
+            $target.addClass('btn-primary');
         }
     });
 

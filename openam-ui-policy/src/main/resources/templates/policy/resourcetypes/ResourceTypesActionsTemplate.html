@@ -1,36 +1,43 @@
-<p>{{t "policy.editResourceType.addActions"}}</p>
+<div class="list-table created-items">
+    <h5 class="list-group-header">{{t "policy.common.actions"}}</h5>
 
-<div class="striped-list created-items">
-    <h3>{{t "policy.common.actions"}}</h3>
-    <ul>
+    <ul class="list-group">
         {{#if items}}
         {{#each items}}
-        <li {{#equals this ../../options.justAdded}}class="highlight-good"{{/equals}} data-item-name="{{name}}">
-        <span tabindex="0" class="icon-close float-right"></span>
-        <span class="float-right radio-btn-set">
-                <span class='{{#if value}} icon-radio-checked {{/if}} {{#unless value}} icon-radio-unchecked {{/unless}}' tabindex='0' data-action-permission="true"></span>
-                <span class="action-permission">{{t "policy.actions.allow"}}</span>
-                <span class='{{#unless value}} icon-radio-checked {{/unless}} {{#if value}} icon-radio-unchecked {{/if}}' tabindex='0' data-action-permission="false"></span>
-                <span class="action-permission">{{t "policy.actions.deny"}}</span>
-            </span>
-        <span class="key">{{name}}</span>
+        <li class="{{#equals this ../../options.justAdded}}text-success{{/equals}} list-group-item" data-item-name="{{name}}">
+            {{name}}
+
+            <span tabindex="0" class="fa fa-close pull-right"></span>
+
+            <div class="pull-right radio-group">
+                <label class="radio-inline">
+                    <input name="{{name}}Permission" type="radio" value="true" {{#if value}}checked{{/if}}> {{t "policy.actions.allow"}}
+                </label>
+
+                <label class="radio-inline">
+                    <input name="{{name}}Permission" type="radio" value="false" {{#unless value}}checked{{/unless}}> {{t "policy.actions.deny"}}
+                </label>
+            </div>
         </li>
         {{/each}}
         {{else}}
-        <li class="disabled">{{t "policy.common.noActions"}}</li>
+        <li class="list-group-item text-danger">{{t "policy.common.noActions"}}</li>
         {{/if}}
 
-        <li class="editing clearfix" data-item-name>
-            <input type="text" placeholder="{{t 'policy.actions.addNew'}}" data-attr-add-key />
+        <li class="editing clearfix list-group-item form-inline" data-item-name>
+            <input class="form-control" type="text" placeholder="{{t 'policy.actions.addNew'}}" />
 
-            <span tabindex="0" class="icon-plus float-right"></span>
+            <span tabindex="0" class="fa fa-plus pull-right"></span>
 
-            <span class="float-right radio-btn-set">
-                <span class='icon-radio-checked' tabindex='0' data-action-permission="true" data-attr-add-val></span>
-                <span class="action-permission">{{t "policy.actions.allow"}}</span>
-                <span class='icon-radio-unchecked' tabindex='0' data-action-permission="false" data-attr-add-val></span>
-                <span class="action-permission">{{t "policy.actions.deny"}}</span>
-            </span>
+            <div class="pull-right radio-group">
+                <label class="radio-inline">
+                    <input name="pending" type="radio" value="true" checked> {{t "policy.actions.allow"}}
+                </label>
+
+                <label class="radio-inline">
+                    <input name="pending" type="radio" value="false"> {{t "policy.actions.deny"}}
+                </label>
+            </div>
         </li>
     </ul>
 </div>

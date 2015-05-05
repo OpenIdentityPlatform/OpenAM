@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2015 ForgeRock AS. All rights reserved.
+ * Copyright 2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,26 +22,22 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/**
- * @author Eugenia Sergueeva
- */
-
-/*global window, define, $, _, document, console */
+/*global window, define, $, _ */
 
 define("org/forgerock/openam/ui/policy/common/StripedListEditingView", [
     "org/forgerock/commons/ui/common/main/AbstractView" ,
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants"
-], function (AbstractView, eventManager, constants) {
+], function (AbstractView, EventManager, Constants) {
     return AbstractView.extend({
         noBaseTemplate: true,
 
         events: {
-            'click .icon-plus': 'addItem',
-            'keyup .icon-plus': 'addItem',
-            'keyup .editing input:last-of-type': 'addItem',
-            'click .icon-close ': 'deleteItem',
-            'keyup .icon-close ': 'deleteItem'
+            'click .fa-plus': 'addItem',
+            'keyup .fa-plus': 'addItem',
+            'keyup .editing input': 'addItem',
+            'click .fa-close ': 'deleteItem',
+            'keyup .fa-close ': 'deleteItem'
         },
 
         baseRender: function (data, tpl, el, callback) {
@@ -59,7 +55,7 @@ define("org/forgerock/openam/ui/policy/common/StripedListEditingView", [
 
                 delete this.data.options.justAdded;
 
-                this.flashDomItem(this.$el.find('.highlight-good'), 'highlight-good');
+                this.flashDomItem(this.$el.find('.text-success'), 'text-success');
 
                 if (callback) {
                     callback();
@@ -78,6 +74,8 @@ define("org/forgerock/openam/ui/policy/common/StripedListEditingView", [
                 self = this;
 
             if (!this.isValid(e)) { // provide child implementation
+                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidItem");
+                this.flashDomItem(this.$el.find('.editing'), 'text-danger');
                 return;
             }
 
@@ -92,8 +90,8 @@ define("org/forgerock/openam/ui/policy/common/StripedListEditingView", [
             });
 
             if (duplicateIndex >= 0) {
-                eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "duplicateItem");
-                this.flashDomItem(this.$el.find('.striped-list ul li:eq(' + duplicateIndex + ')'), 'highlight-warning');
+                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "duplicateItem");
+                this.flashDomItem(this.$el.find('.list-group-item:eq(' + duplicateIndex + ')'), 'text-danger');
             } else {
                 this.data.items.push(pending);
                 this.data.options.justAdded = pending;

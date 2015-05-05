@@ -1,17 +1,20 @@
-<p>{{t "policy.addResources.resourceDescription"}}</p>
-<div class="striped-list created-items" id="createdResources">
-    <h3>{{t "policy.common.resources"}}</h3>
-    <ul>
+<div class="list-table created-items" id="createdResources">
+    <h5 class="list-group-header">{{t "policy.common.resources"}}</h5>
+    <ul class="list-group">
     {{#if entity.resources}}
         {{#each entity.resources}}
-        <li data-resource="{{this}}" {{#equals this ../../options.invalidResource}} class="invalid"{{/equals}}{{#equals this ../../options.justAdded}}class="highlight-good"{{/equals}} >{{this}}<span tabindex="0" class="icon-close float-right"></span></li>
+        <li data-resource="{{this}}" class="{{#equals this ../../options.invalidResource}} text-danger {{/equals}}{{#equals this ../../options.justAdded}} text-success {{/equals}} list-group-item">
+            {{this}}<span tabindex="0" class="fa fa-close pull-right"></span>
+        </li>
         {{/each}}
     {{else}}
-        <li class="invalid">{{t "policy.common.noResources"}}</li>
+        <li class="list-group-item text-danger">{{t "policy.common.noResources"}}</li>
     {{/if}}
 
     {{#if options.newPattern}}
-        <li class="editing clearfix" data-resource="{{options.newPattern}}">{{policyEditorResourceHelper}}<span tabindex="0" class="icon-plus float-right"></span></li>
+        <li class="list-group-item editing form-inline" data-resource="{{options.newPattern}}">
+            {{policyEditorResourceHelper}}<span tabindex="0" class="fa fa-plus pull-right"></span>
+        </li>
     {{/if}}
 
     </ul>

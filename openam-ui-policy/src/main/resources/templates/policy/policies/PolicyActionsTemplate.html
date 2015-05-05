@@ -1,0 +1,8 @@
+{{#if entity.resourceTypeUuid}}
+<div class="col-sm-6" id="availableActions"></div>
+<div class="col-sm-6" id="selectedActions"></div>
+{{else}}
+<div class="alert alert-info" role="alert">
+    {{t "policy.editPolicies.noResourceTypeNoActions"}}
+</div>
+{{/if}}

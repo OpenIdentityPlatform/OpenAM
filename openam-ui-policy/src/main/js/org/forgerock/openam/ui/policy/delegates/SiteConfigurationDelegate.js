@@ -28,15 +28,15 @@ define("org/forgerock/openam/ui/policy/delegates/SiteConfigurationDelegate", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/UIUtils",
+    "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/AbstractDelegate"
-], function(constants, conf, eventManager, uiUtils, AbstractDelegate) {
+], function(constants, conf, eventManager, Router, AbstractDelegate) {
     var obj = new AbstractDelegate('');
 
     obj.getConfiguration = function(successCallback, errorCallback) {
         console.info("Getting configuration");
 
-        var urlParams = uiUtils.convertCurrentUrlToJSON().params,
+        var urlParams = Router.convertCurrentUrlToJSON().params,
             configuration = {lang: "en"};
         if (urlParams) {
             conf.globalData.auth.realm = urlParams.realm;

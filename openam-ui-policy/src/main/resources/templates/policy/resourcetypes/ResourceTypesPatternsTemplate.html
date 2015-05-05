@@ -1,22 +1,21 @@
-<p>{{t "policy.editResourceType.specifyPatterns"}}</p>
+<div class="list-table created-items">
+    <h5 class="list-group-header">{{t "policy.common.patterns"}}</h5>
 
-<div class="striped-list created-items">
-    <h3>{{t "policy.common.patterns"}}</h3>
-    <ul>
+    <ul class="list-group">
         {{#if items}}
         {{#each items}}
-        <li {{#equals this ../../options.justAdded}}class="highlight-good"{{/equals}} data-item-name="{{this}}">
-        <span tabindex="0" class="icon-close float-right"></span>
-        <span class="key">{{this}}</span>
+        <li class="{{#equals this ../../options.justAdded}}text-success{{/equals}} list-group-item" data-item-name="{{this}}">
+            <span tabindex="0" class="fa fa-close pull-right"></span>
+            <span class="key">{{this}}</span>
         </li>
         {{/each}}
         {{else}}
-        <li class="disabled">{{t "policy.common.noPatterns"}}</li>
+        <li class="list-group-item text-danger">{{t "policy.common.noPatterns"}}</li>
         {{/if}}
 
-        <li class="editing clearfix" data-item-name>
-            <input type="text" placeholder="{{t 'policy.editResourceType.addNewPattern'}}" data-attr-add />
-            <span tabindex="0" class="icon-plus float-right"></span>
+        <li class="editing list-group-item form-inline" data-item-name>
+            <input class="form-control" type="text" placeholder="{{t 'policy.editResourceType.addNewPattern'}}" />
+            <span tabindex="0" class="fa fa-plus pull-right"></span>
         </li>
     </ul>
 </div>

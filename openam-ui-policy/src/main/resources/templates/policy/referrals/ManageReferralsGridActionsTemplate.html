@@ -1,2 +1,6 @@
-<a href="#app/{{encodeURIComponent appName}}/referral/" class="button float-left">{{t "policy.manageReferrals.add"}}</a>
-<a class="button {{#unless refs.selected}} inactive {{/unless}}" id="deleteRef">{{t "policy.common.buttons.deleteSelected"}}{{#if refs.selected}} ({{refs.selected}}) {{/if}}</a>
+<a href="#app/{{encodeURIComponent appName}}/referral/" class="btn btn-primary">
+    <span class="fa fa-plus"></span> {{t "policy.manageReferrals.add"}}
+</a>
+<a class="btn btn-danger {{#unless refs.selected}} disabled {{/unless}}" id="deleteRef">
+    <span class="fa fa-close"></span> {{t "policy.common.buttons.deleteSelected"}}{{#if refs.selected}} ({{refs.selected}}) {{/if}}
+</a>

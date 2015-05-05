@@ -1,11 +1,10 @@
-{{#if entity.resourceTypeUuid}}
-<div class="clearfix policy-resources">
-    <div class="col2">
-        <p>{{t "policy.editPolicies.selectPattern"}}</p>
-        <div id="patterns"></div>
+<div class="{{#if entity.resourceTypeUuid}} row {{else}} col-sm-12 {{/if}} form-group">
+    {{#if entity.resourceTypeUuid}}
+    <div class="col-sm-6" id="patterns"></div>
+    <div class="col-sm-6" id="resourcesList"></div>
+    {{else}}
+    <div class="alert alert-danger" role="alert">
+        {{t "policy.editPolicies.selectResourceTypeHelper"}}
     </div>
-    <div class="col2">
-        <div id="resourcesList"></div>
-    </div>
+    {{/if}}
 </div>
-{{/if}}

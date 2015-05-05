@@ -1,57 +1,92 @@
-<div class="content-bg">
-    <div class="policy-header">
-        <a href="#resourceTypes/" class="button float-right" id="backButton">{{t "common.form.cancel"}}</a>
-        {{#if entity.name}}
-            <h1>{{t "policy.editResourceType.edit"}}: <span>{{entity.name}}</span></h1>
-        {{else}}
-            <h1>{{t "policy.editResourceType.create"}}</h1>
-        {{/if}}
-        <h2><span>{{t "policy.common.realm"}}:</span> {{policyEditorRealmUrlHelper realm}}</h2>
+<div class="container">
+    <div class="page-header">
+        <h1>
+            {{#if entity.name}}
+            {{t "policy.editResourceType.edit"}}: <strong>{{entity.name}}</strong>
+            {{else}}
+            {{t "policy.editResourceType.create"}}
+            {{/if}}
+
+            <a class="pull-right btn btn-default" href="#resourceTypes/" role="button">{{t 'common.form.cancel'}}</a>
+        </h1>
+
+        <small>{{t "policy.common.realm"}}: {{policyEditorRealmUrlHelper realm}}</small>
     </div>
 
-    <div class="policy-content">
-        <form class="form">
-            <div class="accordion">
+    <p>{{t "policy.editResourceType.description"}}</p>
 
-                <h1 class="accordion-header" tabindex="0">{{t "policy.editResourceType.step1"}}<span class="help-link" data-help-key="resourceType.nameAndDescription"></span></h1>
-                <section class="accordion-step clearfix">
-                    <div class="group-field-block">
-                        <label class="prop-name" for="resTypeName">{{t "policy.common.name"}}</label>
-                        <input class="prop-val" id="resTypeName" type="text" value="{{entity.name}}" data-field="name" placeholder="{{t 'common.form.validation.required'}}" required autofocus/>
-                    </div>
+    <form class="form-horizontal" role="form">
+        <div class="panel-group accordion" id="accordion" role="tablist" aria-multiselectable="true">
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="stepOne">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                            {{t "policy.editResourceType.step1"}}
+                        </a>
+                        <span class="help-link" data-help-key="resourceType.nameAndDescription"></span>
+                    </h4>
+                </div>
+                <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="stepOne">
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="resTypeName">{{t "policy.common.name"}}</label>
 
-                    <div class="group-field-block">
-                        <label class="prop-name" for="resTypeDescription">{{t "policy.common.descriptionOptional"}}</label>
-                        <textarea class="prop-val" id="resTypeDescription" data-field="description">{{entity.description}}</textarea>
-                    </div>
-
-                    <input type="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton" class="button"/>
-                </section>
-
-                <h1 class="accordion-header" tabindex="0">{{t "policy.editResourceType.step2"}}<span class="help-link" data-help-key="resourceType.patternAndActions"></span></h1>
-                <section class="accordion-step clearfix">
-
-
-                    <div class="clearfix">
-                        <div class="col2 col-with-padding">
-                            <div id="resTypePatterns"></div>
+                            <div class="col-sm-8">
+                                <input type="text" id="resTypeName" class="form-control" value="{{entity.name}}" data-field="name" placeholder="{{t 'common.form.validation.required'}}" name="entityName" autofocus required>
+                            </div>
                         </div>
 
-                        <div class="col2 col-with-padding">
-                            <div id="resTypeActions"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="resTypeDescription">{{t "policy.common.description"}}</label>
+
+                            <div class="col-sm-8">
+                                <textarea class="form-control" id="resTypeDescription" data-field="description">{{entity.description}}</textarea>
+                            </div>
                         </div>
+
+                        <input type="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton" class="btn btn-primary pull-right btn-acc-step"/>
                     </div>
-
-
-                    <input type="button" class="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton"/>
-                </section>
-
-                <h1 class="accordion-header" tabindex="0">{{t "policy.editResourceType.step3"}}</h1>
-                <section class="accordion-step clearfix">
-                    <div id="reviewInfo" class="clearfix"></div>
-                    <input type="button" class="button" value="{{t 'policy.common.buttons.finish'}}" name="submitForm"/>
-                </section>
+                </div>
             </div>
-        </form>
-    </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="stepTwo">
+                    <h4 class="panel-title">
+                        <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            {{t "policy.editResourceType.step2"}}
+                        </a>
+                        <span class="help-link" data-help-key="resourceType.patternAndActions"></span>
+                    </h4>
+                </div>
+                <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="stepTwo">
+                    <div class="panel-body">
+                        <div class="col-sm-6" id="resTypePatterns"></div>
+                        <div class="col-sm-6" id="resTypeActions"></div>
+
+                        <input type="button" class="btn btn-primary pull-right btn-acc-step" value="{{t 'policy.common.buttons.next'}}" name="nextButton"/>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="stepThree">
+                    <h4 class="panel-title">
+                        <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            {{t "policy.editResourceType.step3"}}
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="stepThree">
+                    <div class="panel-body">
+
+                        <div id="reviewInfo" class="clearfix"></div>
+
+                        <div class="pull-right">
+                            <a class="btn btn-default btn-acc-step" href="#resourceTypes/" role="button">{{t 'common.form.cancel'}}</a>
+                            <input type="button" name="submitForm" value="{{t 'common.form.save'}}" class="btn btn-primary btn-acc-step"/>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>

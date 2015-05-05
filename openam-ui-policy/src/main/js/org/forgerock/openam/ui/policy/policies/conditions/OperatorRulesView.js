@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,19 +22,12 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/**
- * @author JKigwana
- */
-
-/*global window, define, $, _, document, console */
+/*global window, define, $, _ */
 
 define("org/forgerock/openam/ui/policy/policies/conditions/OperatorRulesView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/main/Configuration"
-], function(AbstractView, uiUtils, eventManager, constants, conf) {
+    "org/forgerock/commons/ui/common/util/UIUtils"
+], function(AbstractView, UIUtils) {
     var OperatorRulesView = AbstractView.extend({
 
         noBaseTemplate: true,
@@ -62,7 +55,7 @@ define("org/forgerock/openam/ui/policy/policies/conditions/OperatorRulesView", [
             });
 
             this.setElement(element);
-            this.$el.append(uiUtils.fillTemplateWithData("templates/policy/policies/conditions/OperatorRulesTemplate.html", this.data));
+            this.$el.append(UIUtils.fillTemplateWithData("templates/policy/policies/conditions/OperatorRulesTemplate.html", this.data));
 
             this.setElement('#operator' + itemID);
             this.select = this.$el.find("select");
@@ -71,6 +64,8 @@ define("org/forgerock/openam/ui/policy/policies/conditions/OperatorRulesView", [
             this.select.focus().trigger("change");
             this.$el.data('logical',true);
             this.dropbox = this.$el.find('.dropbox');
+
+            this.$el.find('.fa[data-toggle="popover"]').popover();
 
             if (callback) {callback();}
         },
@@ -123,23 +118,6 @@ define("org/forgerock/openam/ui/policy/policies/conditions/OperatorRulesView", [
                 select.children().prop('disabled', false);
             }
         }
-
-        // TODO...
-        /*toggleClose: function(e){
-            e.stopPropagation();
-            var button = $(e.currentTarget),
-                dropbox = button.parent().parent().children('.dropbox');
-
-            if(button.hasClass('icon-folder-open')){
-                button.removeClass('icon-folder-open').addClass('icon-folder');
-                dropbox.addClass('closed');
-            }else{
-                button.addClass('icon-folder-open').removeClass('icon-folder');
-                dropbox.removeClass('closed');
-            }
-        }*/
-
-
     });
 
 

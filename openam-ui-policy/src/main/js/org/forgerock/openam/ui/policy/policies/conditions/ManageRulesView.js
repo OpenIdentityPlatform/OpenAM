@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,11 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
- /**
- * @author JKigwana
- */
-
-/*global window, define, $, _, document, console */
+/*global window, define, $, _, console */
 
 define( "org/forgerock/openam/ui/policy/policies/conditions/ManageRulesView", [
         "org/forgerock/commons/ui/common/main/AbstractView",
@@ -44,11 +40,14 @@ define( "org/forgerock/openam/ui/policy/policies/conditions/ManageRulesView", [
         template: "templates/policy/policies/conditions/ManageRulesTemplate.html",
         noBaseTemplate: true,
         events: {
-            'click  a#addCondition:not(.inactive)':   'addCondition',
-            'click  a#addOperator:not(.inactive)':    'addOperator',
-            'click  a#clear:not(.inactive)':          'onClear',
-            'click  .operator > .item-button-panel > .icon-remove' : 'onDelete',
-            'keyup  .operator > .item-button-panel > .icon-remove' : 'onDelete'
+            'click  #addCondition:not(.disabled)': 'addCondition',
+            'keyup  #addCondition:not(.disabled)': 'addCondition',
+            'click  #addOperator:not(.disabled)': 'addOperator',
+            'keyup  #addOperator:not(.disabled)': 'addOperator',
+            'click  #clear:not(.disabled)': 'onClear',
+            'keyup  #clear:not(.disabled)': 'onClear',
+            'click  .operator > .item-button-panel > .fa-trash-o': 'onDelete',
+            'keyup  .operator > .item-button-panel > .fa-trash-o': 'onDelete'
         },
         types: {
             ENVIRONMENT: 'environmentType',
@@ -244,17 +243,13 @@ define( "org/forgerock/openam/ui/policy/policies/conditions/ManageRulesView", [
 
                 },
 
-                isValidTarget: function(item, container) {
+                isValidTarget: function (item, container) {
+                    var notValid = (container.items.length > 0 &&
+                        container.target.parent().data().itemData &&
+                        container.target.parent().data().itemData[self.property]) ||
+                        item.hasClass('editing-disabled');
 
-                    if ( container.items.length > 0 &&
-                         container.target.parent().data().itemData &&
-                         container.target.parent().data().itemData[self.property]
-                    ) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-
+                    return !notValid;
                 },
 
                 serialize: function ($parent, $children, parentIsContainer) {
@@ -289,37 +284,54 @@ define( "org/forgerock/openam/ui/policy/policies/conditions/ManageRulesView", [
 
         },
 
-        editStart: function(item) {
+        editStart: function (item) {
 
-           $('body').addClass('editing');
-           var self = this,
-               editRuleView = self.getNewRule(),
-               properties = self.getProperties();
-               editRuleView.render( properties, null, self.pickUpItem, self.idCount, item.data().itemData );
+            $('body').addClass('editing');
+            var self = this,
+                editRuleView = self.getNewRule(),
+                properties = self.getProperties(),
+                disabledConditions;
+            editRuleView.render(properties, null, self.pickUpItem, self.idCount, item.data().itemData);
 
-           self.idCount++;
+            self.idCount++;
 
-           editRuleView.$el.addClass('editing');
-           item.before(editRuleView.$el) ;
-           self.onClear();
+            editRuleView.$el.addClass('editing');
+            item.before(editRuleView.$el);
+            self.onClear();
 
-           editRuleView.$el.find('select#selection').focus();
+            this.setInactive(this.buttons.addCondition, true);
+            this.setInactive(this.buttons.addOperator, true);
+
+            disabledConditions = this.$el.find('.rule, .operator').not('.editing');
+            disabledConditions.addClass('editing-disabled');
+            disabledConditions.find('> select').prop('disabled', true);
+
+            editRuleView.$el.find('select#selection').focus();
         },
 
         editStop: function(item) {
             $('body').removeClass('editing');
 
             var editRuleView = $.extend( false, item, this.getNewRule() ),
-                properties = this.getProperties();
-                editRuleView.createListItem( properties,  item);
+                properties = this.getProperties(),
+                disabledConditions;
+
+            editRuleView.createListItem(properties, item);
 
             item.next().remove();
             this.save();
+
+            this.setInactive(this.buttons.clearBtn, false);
+            this.setInactive(this.buttons.addCondition, false);
+            this.setInactive(this.buttons.addOperator, false);
+
+            disabledConditions = this.$el.find('.rule, .operator').not('.editing');
+            disabledConditions.removeClass('editing-disabled');
+            disabledConditions.find('> select').prop('disabled', false);
         },
 
-        setInactive: function(button, state) {
-            if (state) { button.addClass('inactive'); }
-            else { button.removeClass('inactive'); }
+        setInactive: function (button, state) {
+            button.toggleClass('disabled', state);
         },
 
         showHint:function(state){
@@ -327,7 +339,14 @@ define( "org/forgerock/openam/ui/policy/policies/conditions/ManageRulesView", [
         },
 
         onClear: function(e) {
-            if(e) { e.preventDefault();}
+            if (e) {
+                e.preventDefault();
+
+                if (e.type === 'keyup' && e.keyCode !== 13) {
+                    return;
+                }
+            }
+
             this.pickUpItem.children().remove();
             this.setInactive(this.buttons.clearBtn, true);
             this.setInactive(this.buttons.addCondition, false);
@@ -337,6 +356,11 @@ define( "org/forgerock/openam/ui/policy/policies/conditions/ManageRulesView", [
 
         addOperator: function(e) {
             e.preventDefault();
+
+            if (e.type === 'keyup' && e.keyCode !== 13) {
+                return;
+            }
+
             this.pickUpItem.children().remove();
             this.setInactive(this.buttons.clearBtn, false);
             this.setInactive(this.buttons.addCondition, false);
@@ -351,6 +375,11 @@ define( "org/forgerock/openam/ui/policy/policies/conditions/ManageRulesView", [
 
         addCondition: function(e) {
             e.preventDefault();
+
+            if (e.type === 'keyup' && e.keyCode !== 13) {
+                return;
+            }
+
             this.pickUpItem.children().remove();
             this.setInactive(this.buttons.clearBtn, false);
             this.setInactive(this.buttons.addCondition, true);
@@ -379,9 +408,17 @@ define( "org/forgerock/openam/ui/policy/policies/conditions/ManageRulesView", [
         },
 
         toggleEditing: function(e){
-            if (e.type === 'keyup' && e.keyCode !== 13) { return;}
+            if (e.type === 'keyup' && e.keyCode !== 13) {
+                return;
+            }
+
             var item = $(e.currentTarget).closest('li');
-            if (item.hasClass('editing') ) {
+
+            if (item.hasClass('editing-disabled')) {
+                return;
+            }
+
+            if (item.hasClass('editing')) {
                 item.removeClass('editing');
                 this.editStop(item);
             } else {

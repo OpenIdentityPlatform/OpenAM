@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -55,15 +55,15 @@ define("org/forgerock/openam/ui/policy/common/Utils", [
                     // dont add link on last/current realm
                     if (index < list.length-1) {
                         title = $.t("policy.common.viewAllApplications") +' > '+ realm;
-                        result += '<span class="realm icon-arrow-right2"></span>'+
+                        result += '<span class="realm fa fa-chevron-right"></span>'+
                             '<a title="'+ title +'" href="'+ baseSplit[0] +'?realm=/'+ realmStr +'">'+ realm + '</a>';
                     } else {
-                        result += '<span class="realm icon-arrow-right2"></span>' + realm;
+                        result += '<span class="realm fa fa-chevron-right"></span>' + realm;
                     }
 
                 });
             } else {
-                result = '<span class="realm icon-arrow-right2"></span>' + result.replace(/\//g, '<span class="realm icon-arrow-right2"></span>');
+                result = '<span class="realm fa fa-chevron-right"></span>' + result.replace(/\//g, '<span class="realm fa fa-chevron-right"></span>');
             }
         }
 
@@ -79,8 +79,8 @@ define("org/forgerock/openam/ui/policy/common/Utils", [
 
     Handlebars.registerHelper('policyEditorResourceHelper', function () {
         var result = this.options.newPattern.replace('-*-', '̂');
-        result = result.replace(/\*/g, '<input required type="text" value="*" placeholder="*" />');
-        result = result.replace('̂', '<input required type="text" value="-*-" placeholder="-*-" pattern="[^\/]+" />');
+        result = result.replace(/\*/g, '<input class="form-control" required type="text" value="*" placeholder="*" />');
+        result = result.replace('̂', '<input class="form-control" required type="text" value="-*-" placeholder="-*-" pattern="[^\/]+" />');
 
         return new Handlebars.SafeString(result);
     });
@@ -88,7 +88,7 @@ define("org/forgerock/openam/ui/policy/common/Utils", [
     Handlebars.registerHelper('policyEditorRealmHelper', function (string) {
         var result = string.slice(1);
         if (result.length > 0) {
-            result = '<span class="realm icon-arrow-right2"></span>' + result.replace(/\//g, '<span class="realm icon-arrow-right2"></span>');
+            result = '<span class="realm fa fa-chevron-right"></span>' + result.replace(/\//g, '<span class="realm fa fa-chevron-right"></span>');
         }
         return new Handlebars.SafeString('<span class="realm toplevel">/</span>' + result);
     });

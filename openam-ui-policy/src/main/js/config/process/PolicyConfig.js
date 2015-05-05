@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -27,32 +27,42 @@
 define("config/process/PolicyConfig", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager"
-], function (constants, eventManager) {
+], function (Constants, EventManager) {
     var obj = [
         {
-            startEvent: constants.EVENT_HANDLE_DEFAULT_ROUTE,
+            startEvent: Constants.EVENT_HANDLE_DEFAULT_ROUTE,
             description: "",
             dependencies: [
                 "org/forgerock/commons/ui/common/main/Router"
             ],
             processDescription: function (event, router) {
-                eventManager.sendEvent(constants.EVENT_CHANGE_VIEW, {route: router.configuration.routes.manageApps});
+                EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {route: router.configuration.routes.manageApps});
             }
         },
         {
-            startEvent: constants.EVENT_RETURN_TO_AM_CONSOLE,
+            startEvent: Constants.EVENT_RETURN_TO_AM_CONSOLE,
             description: "",
             dependencies: [
                 "org/forgerock/commons/ui/common/main/Configuration"
             ],
             processDescription: function (event, conf) {
                 var realm = conf.globalData.auth.realm;
-                window.location.href = "/" + constants.context + "/realm/RMRealm?RMRealm.tblDataActionHref=" +
-                        encodeURIComponent(realm);
+                window.location.href = "/" + Constants.context + "/realm/RMRealm?RMRealm.tblDataActionHref=" + encodeURIComponent(realm);
             }
         },
         {
-            startEvent: constants.EVENT_UNAUTHORIZED,
+            startEvent: Constants.EVENT_GO_TO_SCRIPTS_EDITOR,
+            description: "",
+            dependencies: [
+                "org/forgerock/commons/ui/common/main/Configuration"
+            ],
+            processDescription: function (event, conf) {
+                var realm = conf.globalData.auth.realm !== '/' ? '?realm=' + conf.globalData.auth.realm : '';
+                window.location.href = "/" + Constants.context + "/scripts" + realm + "#list";
+            }
+        },
+        {
+            startEvent: Constants.EVENT_UNAUTHORIZED,
             override: true,
             description: "",
             dependencies: [
@@ -80,9 +90,8 @@ define("config/process/PolicyConfig", [
 
                 if(!conf.loggedUser) {
                     saveGotoURL();
-                    eventManager.sendEvent(constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true});
-                    eventManager.sendEvent(constants.EVENT_CHANGE_VIEW, {route: router.configuration.routes.login });
-                    return;
+                    EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true});
+                    EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {route: router.configuration.routes.login });
                 } else {
                     viewManager.showDialog(router.configuration.routes.loginDialog.dialog);
                 }

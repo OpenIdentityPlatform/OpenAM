@@ -1,0 +1,12 @@
+<h5 class="list-group-header">{{t "policy.common.subjectAttributes"}}</h5>
+
+{{#if allUserAttributes}}
+<select multiple id="avaliableUserAttributes" class="selectize">
+    <option disabled selected value="">{{t "policy.responseAttributes.subjectAttributesPlaceholder"}}</option>
+    {{#each allUserAttributes}}
+    <option {{#if selected}}selected{{/if}} value="{{propertyName}}">{{propertyName}}</option>
+    {{/each}}
+</select>
+{{else}}
+{{t "policy.common.noSubjectAttributes"}}
+{{/if}}

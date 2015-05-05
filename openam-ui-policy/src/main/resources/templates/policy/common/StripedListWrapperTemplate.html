@@ -1,9 +1,9 @@
-<div class="striped-list striped-list-with-actions{{#if created}} created-items {{/if}}{{#if filter}} striped-list-filterable {{/if}} {{#if cssClass}} {{cssClass}} {{/if}}">
-    <h3>{{title}}</h3>
+<div class="list-table {{#if created}} created-items {{/if}} {{#if cssClass}} {{cssClass}} {{/if}}">
+    <h5 class="list-group-header">{{title}}</h5>
 
     {{#if filter}}
-    <input tabindex="0" placeholder="{{t 'policy.stripedList.filterPlaceholder'}}" class="striped-list-filter">
+    <input tabindex="0" placeholder="{{t 'policy.stripedList.filterPlaceholder'}}" class="form-control striped-list-filter">
     {{/if}}
 
-    <ul class="striped-list-items"></ul>
+    <ul class="list-group"></ul>
 </div>

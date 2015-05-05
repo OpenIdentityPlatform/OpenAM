@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,18 +22,14 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/**
- * @author Julian Kigwana
- */
-
-/*global window, define, $, _, document, console*/
+/*global window, define, $, _*/
 
 define("org/forgerock/openam/ui/policy/policies/attributes/SubjectResponseAttributesView", [
     "org/forgerock/commons/ui/common/main/AbstractView"
 ], function (AbstractView) {
     var SubjectResponseAttributesView = AbstractView.extend({
         element: "#userAttrs",
-        template: "templates/policy/policies/attributes/ResponseAttrsUser.html",
+        template: "templates/policy/policies/attributes/SubjectAttributesTemplate.html",
         noBaseTemplate: true,
         attrType: "User",
 

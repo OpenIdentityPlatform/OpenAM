@@ -22,25 +22,19 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/**
- * @author Eugenia Sergueeva
- */
-
-/*global window, define, $, _, document, console */
+/*global window, define, $, _, console */
 
 define("org/forgerock/openam/ui/policy/resourcetypes/EditResourceTypeView", [
     "org/forgerock/openam/ui/policy/common/AbstractEditView",
-    "org/forgerock/openam/ui/policy/common/ReviewInfoView",
     "org/forgerock/openam/ui/policy/delegates/PolicyDelegate",
     "org/forgerock/openam/ui/policy/resourcetypes/ResourceTypePatternsView",
     "org/forgerock/openam/ui/policy/resourcetypes/ResourceTypeActionsView",
-    "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/openam/ui/common/components/Accordion",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router"
-], function (AbstractEditView, reviewInfoView, policyDelegate, ResourceTypePatternsView, ResourceTypeActionsView, uiUtils, Accordion, constants, conf, eventManager, router) {
+], function (AbstractEditView, PolicyDelegate, ResourceTypePatternsView, ResourceTypeActionsView, Constants,
+             Configuration, EventManager, Router) {
     var EditResourceTypeView = AbstractEditView.extend({
         template: "templates/policy/resourcetypes/EditResourceTypeTemplate.html",
         reviewTemplate: "templates/policy/resourcetypes/ReviewResourceTypeStepTemplate.html",
@@ -57,7 +51,7 @@ define("org/forgerock/openam/ui/policy/resourcetypes/EditResourceTypeView", [
 
                 data.entity = resourceType || {};
                 data.uuid = uuid;
-                data.realm = conf.globalData.auth.realm;
+                data.realm = Configuration.globalData.auth.realm;
 
                 data.actions = [];
                 _.each(data.entity.actions, function (v, k) {
@@ -97,7 +91,7 @@ define("org/forgerock/openam/ui/policy/resourcetypes/EditResourceTypeView", [
                 rType = null;
 
             if (uuid) {
-                policyDelegate.getResourceType(uuid).done(function (rType) {
+                PolicyDelegate.getResourceType(uuid).done(function (rType) {
                     d.resolve(rType);
                 });
             } else {
@@ -111,19 +105,19 @@ define("org/forgerock/openam/ui/policy/resourcetypes/EditResourceTypeView", [
             var resType = this.data.entity;
 
             if (this.data.uuid) {
-                policyDelegate.updateResourceType(resType)
+                PolicyDelegate.updateResourceType(resType)
                     .done(function (e) {
-                        router.routeTo(router.configuration.routes.manageResourceTypes, {args: [], trigger: true});
-                        eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "resourceTypeUpdated");
+                        Router.routeTo(Router.configuration.routes.manageResourceTypes, {args: [], trigger: true});
+                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "resourceTypeUpdated");
                     })
                     .fail(function (e) {
                         // todo
                     });
             } else {
-                policyDelegate.createResourceType(resType)
+                PolicyDelegate.createResourceType(resType)
                     .done(function (e) {
-                        router.routeTo(router.configuration.routes.manageResourceTypes, {args: [], trigger: true});
-                        eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "resourceTypeCreated");
+                        Router.routeTo(Router.configuration.routes.manageResourceTypes, {args: [], trigger: true});
+                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "resourceTypeCreated");
                     })
                     .fail(function (e) {
                         // todo

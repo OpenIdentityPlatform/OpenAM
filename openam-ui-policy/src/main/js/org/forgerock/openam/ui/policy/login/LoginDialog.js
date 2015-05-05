@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -25,40 +25,41 @@
 /*global window, define, $*/
 
 define("org/forgerock/openam/ui/policy/login/LoginDialog", [
+    "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
+    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/commons/ui/common/util/Constants"
-], function(conf, uiUtils, constants) {
-
-    var newDialog,
-        closeDialog = function() {
-            newDialog.remove();
-        },
-        LoginDialog = {
+    "bootstrap-dialog"
+], function(AbstractView, Configuration, Constants, UIUtils, BootstrapDialog) {
+    var LoginDialog = AbstractView.extend({
             template: "templates/policy/login/LoginDialog.html",
             data : {
-                reauthUrl: constants.host + "/"+ constants.context + "?goto=" + encodeURIComponent(window.location.href)
+                reauthUrl: Constants.host + "/"+ Constants.context + "?goto=" + encodeURIComponent(window.location.href)
             },
-            close: closeDialog,
             render: function () {
-                var _this = this;
+                var self = this,
+                    options = {
+                        type: BootstrapDialog.TYPE_DEFAULT,
+                        title: $.t("policy.common.sessionExpired"),
+                        buttons: [{
+                            label: $.t("common.form.close"),
+                            cssClass: "btn-primary",
+                            action: function(dialog) {
+                                dialog.close();
+                            }
+                        }]
+                    };
 
-                newDialog = $("<div>");
+                UIUtils.fillTemplateWithData(self.template, self.data, function(template){
+                    options.message = function(dialog) {
+                        return $(template);
+                    };
 
-                $("#dialogs").append(newDialog);
-                newDialog.dialog({
-                    title: $.t("policy.common.sessionExpired"),
-                    autoOpen: true,
-                    open: function () {
-                        uiUtils.renderTemplate(_this.template, $(this), _this.data, function () {
-                            delete conf.globalData.authorizationFailurePending;
-                        });
-                    },
-                    close: closeDialog
+                    BootstrapDialog.show(options);
                 });
             }
-        };
+        });
 
-    return LoginDialog;
+    return new LoginDialog();
 
 });

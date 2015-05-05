@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,11 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/**
- * @author Eugenia Sergueeva
- */
-
-/*global window, define, $, _, document, console, sessionStorage */
+/*global define, $, _, sessionStorage */
 
 define("org/forgerock/openam/ui/policy/common/ReviewInfoView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
@@ -35,8 +31,7 @@ define("org/forgerock/openam/ui/policy/common/ReviewInfoView", [
     var ReviewInfoView = AbstractView.extend({
         noBaseTemplate: true,
         events: {
-            'click #toggleAdvanced': 'toggleAdvancedView',
-            'click .icon-arrow-down2': 'toggleAdvancedView'
+            'click #toggleAdvanced': 'toggleAdvancedView'
         },
 
         render: function (args, callback, element, template) {
@@ -44,10 +39,6 @@ define("org/forgerock/openam/ui/policy/common/ReviewInfoView", [
             this.template = template;
 
             _.extend(this.data, args);
-
-            this.data.actionsSelected = _.find(this.data.entity.actions, function (action) {
-                return action.selected === true;
-            });
 
             this.storageKey = constants.OPENAM_STORAGE_KEY_PREFIX + 'review-advanced-mode';
             this.data.advancedMode = !!JSON.parse(sessionStorage.getItem(this.storageKey));
@@ -57,16 +48,9 @@ define("org/forgerock/openam/ui/policy/common/ReviewInfoView", [
 
         renderParent: function (callback) {
             this.parentRender(function () {
-                var reviewItems;
-                if (this.data.advancedMode) {
-                    reviewItems = this.$el.find('.advanced-mode');
-                    reviewItems.removeClass('hidden');
-                } else {
-                    reviewItems = this.$el.find('.advanced-mode').filter(function () {
-                        return !$(this).parent().hasClass('invalid');
-                    });
-                    reviewItems.addClass('hidden');
-                }
+                this.toggleAll();
+
+                this.$el.find('#toggleAdvanced').text(this.data.advancedMode ? $.t('policy.summaryReview.minimized') : $.t('policy.summaryReview.maximized'));
 
                 if (callback) {
                     callback();
@@ -76,11 +60,23 @@ define("org/forgerock/openam/ui/policy/common/ReviewInfoView", [
         },
 
         toggleAdvancedView: function (e) {
-            e.stopPropagation();
             e.preventDefault();
+
             this.data.advancedMode = !this.data.advancedMode;
             sessionStorage.setItem(this.storageKey, this.data.advancedMode);
-            this.renderParent();
+
+            $(e.target).text(this.data.advancedMode ? $.t('policy.summaryReview.minimized') : $.t('policy.summaryReview.maximized'));
+
+            this.toggleAll();
+        },
+
+        toggleAll: function () {
+            var reviewItems = this.$el.find('.review-panel:not(.panel-danger)'),
+                toggle = this.data.advancedMode ? 'show' : 'hide';
+
+            _.each(reviewItems, function (reviewItem) {
+                $(reviewItem).find('.collapse').collapse(toggle);
+            });
         }
     });
 

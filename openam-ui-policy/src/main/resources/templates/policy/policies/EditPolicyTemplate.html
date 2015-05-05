@@ -1,115 +1,181 @@
-<div class="content-bg">
-    <div class="policy-header">
-        <a href="#app/{{encodeURIComponent entity.applicationName}}/policies/" id="cancelButton" class="button float-right">{{t "common.form.cancel"}}</a>
-        {{#if entity.name}}
-        <h1>{{t "policy.editPolicies.editPolicy"}}<span>: {{entity.name}}</span></h1>
-        {{else}}
-        <h1>{{t "policy.editPolicies.title"}}</h1>
-        {{/if}}
-        <h2><span>{{t "policy.common.realm"}}:</span> {{policyEditorRealmUrlHelper options.realm}}</h2>
-        <h2><span>{{t "policy.common.application"}}:</span> <a title="{{t 'policy.editApplications.editApplication'}}" href='#app/{{encodeURIComponent entity.applicationName}}'>{{entity.applicationName}}</a></h2>
+<div class="container">
+    <div class="page-header">
+        <h1>
+            {{#if entity.name}}
+            {{t "policy.editPolicies.editPolicy"}}: <strong>{{entity.name}}</strong>
+            {{else}}
+            {{t "policy.editPolicies.title"}}
+            {{/if}}
 
+            <a class="pull-right btn btn-default" href="#app/{{encodeURIComponent entity.applicationName}}/policies/" role="button">{{t 'common.form.cancel'}}</a>
+        </h1>
+
+        <small>{{t "policy.common.realm"}}: {{policyEditorRealmUrlHelper options.realm}}</small>
+
+        <small>{{t "policy.common.application"}}:
+            <a title="{{t 'policy.editApplications.editApplication'}}" href='#app/{{encodeURIComponent entity.applicationName}}'>
+                {{entity.applicationName}}
+            </a>
+        </small>
     </div>
 
-    <div class="policy-content">
-        <p>{{t "policy.editPolicies.description"}}</p>
-        <form class="form">
+    <p>{{t "policy.editPolicies.description"}}</p>
 
-            <div id="policy-steps" class="accordion">
+    <form class="form-horizontal" role="form">
+        <div class="panel-group accordion" id="accordion" role="tablist" aria-multiselectable="true">
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="stepOne">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                            {{t "policy.editPolicies.step1"}}
+                        </a>
+                        <span class="help-link" data-help-key="policy.nameAndDescription"></span>
+                    </h4>
+                </div>
+                <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="stepOne">
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="policyName">{{t "policy.common.name"}}</label>
 
-                <h1 class="accordion-header" tabindex="0">
-                    {{t "policy.editPolicies.step1"}}
-                    <span class="help-link" data-help-key="policy.nameAndDescription"></span>
-                </h1>
-                <section class="accordion-step clearfix">
+                            <div class="col-sm-8">
+                                <input class="form-control" id="policyName" name="entityName" type="text"
+                                       value="{{entity.name}}" data-field="name" autofocus required
+                                       placeholder="{{t 'common.form.validation.required'}}"/>
+                            </div>
+                        </div>
 
-                    <div class="group-field-block">
-                        <label class="short" for="policyName">{{t "policy.common.name"}}</label>
-                        <input class="prop-val" id="policyName" name="entityName" type="text" value="{{entity.name}}" data-field="name" autofocus required placeholder="{{t 'common.form.validation.required'}}"/>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="description">{{t "policy.common.description"}}</label>
+
+                            <div class="col-sm-8">
+                                <textarea class="form-control" id="description" data-field="description">{{policy.common.description}}</textarea>
+                            </div>
+                        </div>
+
+                        <input type="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton" class="btn btn-primary pull-right btn-acc-step"/>
                     </div>
-                    <div class="group-field-block">
-                        <label class="short" for="description">{{t "policy.common.descriptionOptional"}}</label>
-                        <textarea class="prop-val" id="description" data-field="description">{{policy.common.description}}</textarea>
-                    </div>
-                    <input class="button" type="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton">
-
-                </section>
-                <h1 class="accordion-header" tabindex="0">
-                    {{t "policy.editPolicies.step2"}}
-                    <span class="help-link" data-help-key="policy.resources"></span>
-                </h1>
-                <section class="accordion-step clearfix">
-                    <p>{{t "policy.editPolicies.selectResourceTypeHelper"}}</p>
-
-                    {{#if options.availableResourceTypes}}
-                    <select id="availableResTypes">
-                        <option value="">{{t "policy.editPolicies.selectResourceType"}}</option>
-                        {{#each options.availableResourceTypes}}
-                        <option {{#equals this.uuid ../entity.resourceTypeUuid}}selected{{/equals}} value="{{this.uuid}}">{{this.name}}</option>
-                        {{/each}}
-                    </select>
-                    {{else}}
-                    {{t "policy.common.noResourceTypesAvailable"}}
-                    {{/if}}
-
-                    <div id="editResources"></div>
-                    <input class="button" type="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton">
-                </section>
-
-                <h1 class="accordion-header" tabindex="0">
-                    {{t "policy.editPolicies.step3"}}
-                    <span class="help-link" data-help-key="policy.actions"></span>
-                </h1>
-                <section class="accordion-step clearfix">
-                    <div id="actions"></div>
-                    <input class="button" type="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton">
-                </section>
-
-                <h1 class="accordion-header" tabindex="0">
-                    {{t "policy.editPolicies.step4"}}
-                    <span class="help-link" data-help-key="policy.subjectConditions"></span>
-                </h1>
-                <section class="accordion-step clearfix">
-
-                    <div id="subjectContainer" class="clearfix"></div>
-                    <input class="button" type="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton">
-
-                </section>
-
-                <h1 class="accordion-header" tabindex="0">
-                    {{t "policy.editPolicies.step5"}}
-                    <span class="help-link" data-help-key="policy.environmentConditions"></span>
-                </h1>
-                <section class="accordion-step clearfix">
-
-                    <div id="environmentContainer" class="clearfix"></div>
-                    <input class="button" type="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton">
-
-                </section>
-
-                <h1 class="accordion-header" tabindex="0">
-                    {{t "policy.editPolicies.step6"}}
-                    <span class="help-link" data-help-key="policy.resourceAttributes"></span>
-                </h1>
-                <section class="accordion-step clearfix">
-
-                    <div class="clearfix">
-                        <div class="col2" id="userAttrs"></div>
-                        <div class="col2" id="staticAttrs"></div>
-                    </div>
-
-                    <input class="button" type="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton">
-
-                </section>
-
-                <h1 class="accordion-header" tabindex="0">{{t "policy.editPolicies.step7"}}</h1>
-                <section class="accordion-step clearfix">
-
-                    <div id="reviewInfo" class="clearfix"></div>
-                    <input class="button" type="button" value="{{t 'policy.common.buttons.finish'}}" name="submitForm">
-
-                </section>
+                </div>
             </div>
-        </form>
-    </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="stepTwo">
+                    <h4 class="panel-title">
+                        <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            {{t "policy.editPolicies.step2"}}
+                        </a>
+                        <span class="help-link" data-help-key="policy.resources"></span>
+                    </h4>
+                </div>
+                <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="stepTwo">
+                    <div class="panel-body">
+                        {{#if options.availableResourceTypes}}
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="availableResTypes">{{t "policy.common.resourceTypes"}}</label>
+                            <div class="col-sm-8">
+                                <select id="availableResTypes" class="form-control">
+                                    <option value="">{{t "policy.editPolicies.selectResourceType"}}</option>
+                                    {{#each options.availableResourceTypes}}
+                                    <option {{#equals this.uuid ../entity.resourceTypeUuid}}selected{{/equals}} value="{{this.uuid}}">{{this.name}}</option>
+                                    {{/each}}
+                                </select>
+                            </div>
+                        </div>
+                        {{else}}
+                        <div class="alert alert-danger" role="alert">
+                            {{t "policy.common.noResourceTypesAvailable"}}
+                        </div>
+                        {{/if}}
+
+                        <div id="editResources"></div>
+                        <input type="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton" class="btn btn-primary pull-right btn-acc-step"/>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="stepThree">
+                    <h4 class="panel-title">
+                        <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            {{t "policy.editPolicies.step3"}}
+                        </a>
+                        <span class="help-link" data-help-key="policy.actions"></span>
+                    </h4>
+                </div>
+                <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="stepThree">
+                    <div class="panel-body">
+                        <div id="actions" class="clearfix"></div>
+                        <input type="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton" class="btn btn-primary pull-right btn-acc-step"/>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="stepFour">
+                    <h4 class="panel-title">
+                        <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                            {{t "policy.editPolicies.step4"}}
+                        </a>
+                        <span class="help-link" data-help-key="policy.subjectConditions"></span>
+                    </h4>
+                </div>
+                <div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="stepFour">
+                    <div class="panel-body">
+                        <div id="subjectContainer" class="clearfix"></div>
+                        <input type="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton" class="btn btn-primary pull-right btn-acc-step"/>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="stepFive">
+                    <h4 class="panel-title">
+                        <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                            {{t "policy.editPolicies.step5"}}
+                        </a>
+                        <span class="help-link" data-help-key="policy.environmentConditions"></span>
+                    </h4>
+                </div>
+                <div id="collapseFive" class="panel-collapse collapse" role="tabpanel" aria-labelledby="stepFive">
+                    <div class="panel-body">
+                        <div id="environmentContainer" class="clearfix"></div>
+                        <input type="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton" class="btn btn-primary pull-right btn-acc-step"/>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="stepSix">
+                    <h4 class="panel-title">
+                        <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                            {{t "policy.editPolicies.step6"}}
+                        </a>
+                        <span class="help-link" data-help-key="policy.resourceAttributes"></span>
+                    </h4>
+                </div>
+                <div id="collapseSix" class="panel-collapse collapse" role="tabpanel" aria-labelledby="stepSix">
+                    <div class="panel-body">
+                        <div class="clearfix">
+                            <div class="col-sm-6 list-table" id="userAttrs"></div>
+                            <div class="col-sm-6" id="staticAttrs"></div>
+                        </div>
+                        <input type="button" value="{{t 'policy.common.buttons.next'}}" name="nextButton" class="btn btn-primary pull-right btn-acc-step"/>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="stepSeven">
+                    <h4 class="panel-title">
+                        <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
+                            {{t "policy.editPolicies.step7"}}
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseSeven" class="panel-collapse collapse" role="tabpanel" aria-labelledby="stepSeven">
+                    <div class="panel-body">
+                        <div id="reviewInfo" class="clearfix"></div>
+
+                        <div class="pull-right">
+                            <a class="btn btn-default btn-acc-step" href="#app/{{encodeURIComponent entity.applicationName}}/policies/" role="button">{{t 'common.form.cancel'}}</a>
+                            <input type="button" name="submitForm" value="{{t 'common.form.save'}}" class="btn btn-primary btn-acc-step"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>

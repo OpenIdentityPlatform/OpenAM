@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2015 ForgeRock AS. All rights reserved.
+ * Copyright 2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,11 +22,6 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/**
- * @author JKigwana
- * @author Eugenia Sergueeva
- */
-
 /*global window, define, $, _ */
 
 define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrBaseView", [
@@ -43,7 +38,7 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrBaseView
         },
 
         initBasic: function (data, el, cssClasses) {
-            var elWrapper = $('<div class="condition-attr ' + cssClasses + '"></div>');
+            var elWrapper = $('<div class="condition-attr form-inline ' + cssClasses + '"></div>');
             el.append(elWrapper);
 
             this.data = data;
@@ -73,7 +68,7 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrBaseView
         },
 
         populateInputGroup: function (target) {
-            var group = target.closest('div.input-group'),
+            var group = target.closest('.attr-group'),
                 inputs = group.find(':input'),
                 populated = _.find(inputs, function (el) {
                     return el.value !== '';

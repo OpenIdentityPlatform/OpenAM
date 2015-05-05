@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,12 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/**
- * @author JKigwana
- * @author Eugenia Sergueeva
- */
-
-/*global window, define, $, _, document, console, Handlebars */
+/*global window, define, $, _, console, Handlebars */
 
 define("org/forgerock/openam/ui/policy/policies/conditions/EditEnvironmentView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
@@ -80,6 +75,8 @@ define("org/forgerock/openam/ui/policy/policies/conditions/EditEnvironmentView",
             }
 
             this.$el.find('select#selection').focus();
+
+            this.$el.find('.fa[data-toggle="popover"]').popover();
 
             if (callback) {
                 callback();

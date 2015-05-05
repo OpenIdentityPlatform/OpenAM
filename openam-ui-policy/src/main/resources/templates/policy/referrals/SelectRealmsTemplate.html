@@ -4,18 +4,18 @@
     <ul>
         {{#if entity.realms}}
         {{#each entity.realms}}
-        <li data-realm="{{this}}" {{#equals this ../../options.justAdded}}class="highlight-good"{{/equals}}>
+        <li data-realm="{{this}}" {{#equals this ../../options.justAdded}}class="text-success"{{/equals}}>
             {{policyEditorRealmHelper this}}
-            <span tabindex="0" class="icon-close float-right"></span>
+            <span tabindex="0" class="icon-close pull-right"></span>
         </li>
         {{/each}}
         {{else}}
-        <li class="invalid">{{t "policy.common.noRealms"}}</li>
+        <li class="text-danger">{{t "policy.common.noRealms"}}</li>
         {{/if}}
 
         {{#if options.selectableRealms}}
         <li class="editing clearfix">
-            <span tabindex="0" class="icon-plus float-right"></span>
+            <span tabindex="0" class="icon-plus pull-right"></span>
             <div id="selectableRealmContainer">
             <select id="selectableRealms" placeholder="{{t 'policy.editReferrals.selectRealmsPlaceholder'}}">
                 <option disabled selected value="">{{t "policy.editReferrals.selectRealmsPlaceholder"}}</option>

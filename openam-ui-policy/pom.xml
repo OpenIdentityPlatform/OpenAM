@@ -2,7 +2,7 @@
 <!--
   ~ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   ~
-  ~ Copyright (c) 2014 ForgeRock AS. All Rights Reserved
+  ~ Copyright 2014-2015 ForgeRock AS.
   ~
   ~ The contents of this file are subject to the terms
   ~ of the Common Development and Distribution License
@@ -43,7 +43,7 @@
             <groupId>org.forgerock.commons.ui</groupId>
             <artifactId>forgerock-ui-commons</artifactId>
             <type>zip</type>
-            <version>1.1.12-SNAPSHOT</version>
+            <version>${forgerock-ui.version}</version>
             <classifier>www</classifier>
         </dependency>
         <dependency>
@@ -95,6 +95,13 @@
             <classifier>min</classifier>
             <type>js</type>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>jsoneditor</artifactId>
+            <version>0.7.9</version>
+            <classifier>min</classifier>
+            <type>js</type>
+        </dependency>
     </dependencies>
 
     <build>
@@ -109,26 +116,24 @@
 
         <plugins>
             <plugin>
-               <groupId>org.codehaus.mojo</groupId>
-               <artifactId>jslint-maven-plugin</artifactId>
-               <configuration>
-                   <disallowInsecureCharsInRegExp>false</disallowInsecureCharsInRegExp>
-                   <assumeConsoleAlertEtc>true</assumeConsoleAlertEtc>
-                   <excludes>
-                       <exclude>**/libs/*.js</exclude>
-                       <exclude>**/libs/i18n/*.js</exclude>
-                       <exclude>**/*Test.js</exclude>
-                   </excludes>
-               </configuration>
-               <executions>
-                   <execution>
-                       <phase>package</phase>
-                       <goals>
-                           <goal>jslint</goal>
-                       </goals>
-                   </execution>
-               </executions>
-           </plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jslint-maven-plugin</artifactId>
+                <configuration>
+                    <disallowInsecureCharsInRegExp>false</disallowInsecureCharsInRegExp>
+                    <assumeConsoleAlertEtc>true</assumeConsoleAlertEtc>
+                    <excludes>
+                        <exclude>**/libs/**</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jslint</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -157,7 +162,7 @@
                                 <artifactItem>
                                     <groupId>org.forgerock.commons.ui</groupId>
                                     <artifactId>forgerock-ui-commons</artifactId>
-                                    <version>1.1.12-SNAPSHOT</version>
+                                    <version>${forgerock-ui.version}</version>
                                     <type>zip</type>
                                     <classifier>www</classifier>
                                 </artifactItem>
@@ -172,7 +177,9 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/dependency/libs</outputDirectory>
-                            <includeArtifactIds>jquery-sortable,jquery.jqGrid,ui.multiselect,selectize,jquery-nestingSortable,jquery-ui</includeArtifactIds>
+                            <includeArtifactIds>
+                                jquery-sortable,jquery.jqGrid,ui.multiselect,selectize,jquery-nestingSortable,jquery-ui,jsoneditor
+                            </includeArtifactIds>
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>

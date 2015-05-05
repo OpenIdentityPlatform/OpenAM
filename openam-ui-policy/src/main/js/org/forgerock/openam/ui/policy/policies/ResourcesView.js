@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2015 ForgeRock AS. All rights reserved.
+ * Copyright 2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -32,7 +32,7 @@ define("org/forgerock/openam/ui/policy/policies/ResourcesView", [
     "org/forgerock/commons/ui/common/main/AbstractView" ,
     "org/forgerock/openam/ui/policy/common/StripedListView",
     "org/forgerock/openam/ui/policy/resources/CreatedResourcesView"
-], function (AbstractView, StripedList, createdResources) {
+], function (AbstractView, StripedList, CreatedResourcesView) {
     var ResourcesView = AbstractView.extend({
         element: "#editResources",
         template: "templates/policy/policies/ResourcesStepTemplate.html",
@@ -54,7 +54,7 @@ define("org/forgerock/openam/ui/policy/policies/ResourcesView", [
                     d1.resolve();
                 });
 
-                createdResources.render(this.data, function () {
+                CreatedResourcesView.render(this.data, function () {
                     d2.resolve();
                 });
 
@@ -66,7 +66,7 @@ define("org/forgerock/openam/ui/policy/policies/ResourcesView", [
 
         addPattern: function (item) {
             this.data.options.newPattern = item;
-            createdResources.render(this.data);
+            CreatedResourcesView.render(this.data);
         }
     });
 

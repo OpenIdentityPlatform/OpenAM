@@ -1,8 +1,8 @@
 <li class="rule clearfix invalid-rule" id="environment_{{itemID}}" tabindex="0" >
 
 	<span class="item-button-panel">
-		<span tabindex="0" class="icon-pencil"></span>
-		<span tabindex="0" class="icon-remove"></span>
+		<span tabindex="0" class="fa fa-pencil"></span>
+		<span tabindex="0" class="fa fa-trash-o"></span>
 	</span>
 
 	<div class="item-data">
@@ -12,7 +12,7 @@
 				<div class="help-link"></div>
 			</div>
 
-			<select id="selection" class="placeholdertext" tabindex="0" >
+			<select id="selection" class="form-control">
 				<option value="" selected disabled >{{t "policy.common.select"}}</option>
 				{{#conditions}}
                 <option value="{{title}}" {{#equals title 'Policy'}}hidden{{/equals}}>{{i18nKey}}</option>
@@ -22,7 +22,7 @@
     </div>
 
 	<span class="item-button-panel">
-		<span tabindex="0" class="icon-checkmark"></span>
+		<span tabindex="0" class="fa fa-check"></span>
 	</span>
 
 </li>

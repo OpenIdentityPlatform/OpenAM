@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -32,7 +32,7 @@ define("org/forgerock/openam/ui/policy/referrals/SelectRealmsView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants"
-], function (AbstractView,  eventManager, constants) {
+], function (AbstractView, EventManager, Constants) {
     var SelectRealmsView = AbstractView.extend({
         element: "#selectRealms",
         template: "templates/policy/referrals/SelectRealmsTemplate.html",
@@ -55,7 +55,7 @@ define("org/forgerock/openam/ui/policy/referrals/SelectRealmsView", [
             this.parentRender(function () {
 
                 delete self.data.options.justAdded;
-                self.flashDomItem( self.$el.find('.highlight-good'), 'highlight-good');
+                self.flashDomItem( self.$el.find('.text-success'), 'text-success');
 
                 self.$el.find('#selectableRealms').selectize({
                     create: false
@@ -97,8 +97,8 @@ define("org/forgerock/openam/ui/policy/referrals/SelectRealmsView", [
             duplicateIndex = _.indexOf(this.data.entity.realms, newRealm);
 
             if ( duplicateIndex >= 0 ) {
-                eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "duplicateRealm");
-                this.flashDomItem( this.$el.find('#selectedRealms ul li:eq('+duplicateIndex+')'), 'highlight-warning' );
+                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "duplicateRealm");
+                this.flashDomItem( this.$el.find('#selectedRealms ul li:eq('+duplicateIndex+')'), 'text-danger' );
             } else {
                 this.data.entity.realms.push(newRealm);
                 this.data.options.justAdded = newRealm;

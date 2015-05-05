@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2015 ForgeRock AS. All rights reserved.
+ * Copyright 2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -44,8 +44,8 @@ define("org/forgerock/openam/ui/policy/resourcetypes/ResourceTypeActionsView", [
 
         this.data.items = actions || [];
 
-        this.events['click [class*=icon-radio-]'] = this.toggleRadio.bind(this);
-        this.events['keyup [class*=icon-radio-]'] = this.toggleRadio.bind(this);
+        this.events['click .radio-inline'] = this.toggleRadio.bind(this);
+        this.events['keyup .radio-inline'] = this.toggleRadio.bind(this);
 
         this.baseRender(this.data, "templates/policy/resourcetypes/ResourceTypesActionsTemplate.html", el, callback);
     };
@@ -54,32 +54,20 @@ define("org/forgerock/openam/ui/policy/resourcetypes/ResourceTypeActionsView", [
         var target = $(e.target),
             permitted,
             actionName,
-            parent,
-            secondRadio;
-
-        if (target.hasClass('icon-radio-checked')) {
-            return;
-        }
+            parent;
 
         parent = target.parents('li');
 
-        permitted = target.data('action-permission');
+        permitted = target.val() || target.find('input').val();
         actionName = parent.data('item-name').toString();
 
         if (!actionName) {
-            secondRadio = parent.find('.icon-radio-checked');
-            secondRadio.removeClass('icon-radio-checked');
-            secondRadio.addClass('icon-radio-unchecked');
-
-            target.removeClass('icon-radio-unchecked');
-            target.addClass('icon-radio-checked');
-
             return;
         }
 
         _.find(this.data.items,function (action) {
             return action.name === actionName;
-        }).value = permitted;
+        }).value = (permitted === 'true');
 
         this.updateEntity();
 
@@ -88,12 +76,12 @@ define("org/forgerock/openam/ui/policy/resourcetypes/ResourceTypeActionsView", [
 
     ResourceTypeActionsView.prototype.getPendingItem = function (e) {
         var editing = this.$el.find('.editing'),
-            key = editing.find('[data-attr-add-key]'),
-            val = editing.find('.icon-radio-checked[data-attr-add-val]'),
+            key = editing.find('.form-control'),
+            input = editing.find('input:checked'),
             action = {};
 
         action.name = key.val();
-        action.value = val.data('action-permission');
+        action.value = input.val() === 'true';
 
         return action;
     };

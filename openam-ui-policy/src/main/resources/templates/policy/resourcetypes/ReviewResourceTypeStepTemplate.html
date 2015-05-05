@@ -1,67 +1,79 @@
-<p>{{t "policy.summaryReview.resourceTypeDescription"}}</p>
-<p>{{#if advancedMode}}{{t "policy.summaryReview.advancedTrue"}}{{else}}{{t "policy.summaryReview.advancedFalse"}}{{/if}}</p>
+<p>{{t "policy.summaryReview.switchView"}}</p>
 
 {{! The IDs are used for testing }}
-<div class="col2">
-    <div class="review-row clearfix{{#equals '' entity.name}} invalid{{/equals}}{{#if options.invalidName}} invalid{{/if}}" tabindex="0" >
-        <h2>{{t "policy.common.name"}}</h2>
-        {{#unless advancedMode}}
-            {{#if entity.name}}
-                {{#unless options.invalidName}}
-                    <span class="icon-arrow-down2"></span>
-                {{/unless}}
-            {{/if}}
-        {{/unless}}
-        <div class="advanced-mode">
-            <p id="reviewName"{{#unless entity.name}} class="invalid"{{/unless}}>{{#if entity.name}}{{entity.name}}{{else}}{{t "policy.summaryReview.noName"}}{{/if}}</p>
-            {{#if entity.description}}
-                <h2>{{t "policy.common.description"}}</h2>
-                <p id="reviewDesc">{{entity.description}}</p>
-            {{/if}}
+
+<div class="form-group">
+    <div class="col-sm-6">
+        <div class="panel panel-default review-panel {{#equals '' entity.name}}panel-danger{{/equals}} {{#if options.invalidName}}panel-danger{{/if}}" tabindex="0">
+            <div class="panel-body">
+                <div class="panel-collapse">
+                    <div class="panel-heading" data-toggle="collapse" data-target="#reviewNamePanel">
+                        <h4 class="panel-title">{{t "policy.common.name"}}</h4>
+                    </div>
+
+                    <div id="reviewNamePanel" class="collapse {{#if advancedMode}}in{{/if}} {{#equals '' entity.name}}in{{/equals}} {{#if options.invalidName}}in{{/if}}">
+                        <h5 class="review-title">{{t "policy.common.name"}}</h5>
+                        <p id="reviewName" class="review-text {{#unless entity.name}}text-danger{{/unless}}">
+                            {{#if entity.name}}
+                            {{entity.name}}
+                            {{else}}
+                            {{t "policy.summaryReview.noName"}}
+                            {{/if}}
+                        </p>
+
+                        <h5 class="review-title">{{t "policy.common.description"}}</h5>
+                        <p id="reviewDesc" class="review-text">
+                            {{#if entity.description}}
+                            {{entity.description}}
+                            {{else}}
+                            {{t "policy.summaryReview.noDescription"}}
+                            {{/if}}
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="col2">
-    <div class="review-row clearfix {{#unless entity.patterns}}invalid{{/unless}} {{#unless entity.actions}}invalid{{/unless}}" tabindex="0" >
-        <h2>{{t "policy.common.patterns"}}</h2>
-        {{#unless advancedMode}}
-            {{#if entity.patterns}}
-                <span class="icon-arrow-down2"></span>
-            {{else}}
-                <span class="advanced-empty-msg">({{t "policy.common.empty"}})</span>
-            {{/if}}
-        {{/unless}}
-        <div class="advanced-mode">
-            {{#if entity.patterns}}
-            <ul id="reviewPatterns">
-                {{#each entity.patterns}}
-                <li>{{this}}</li>
-                {{/each}}
-            </ul>
-            {{else}}
-            <p class="invalid">{{t "policy.common.noPatterns"}}</p>
-            {{/if}}
-        </div>
+    <div class="col-sm-6">
+        <div class="panel panel-default review-panel {{#unless entity.patterns}}panel-danger{{/unless}} {{#unless entity.actions}}panel-danger{{/unless}}" tabindex="0">
+            <div class="panel-body">
+                <div class="panel-collapse">
+                    <div class="panel-heading" data-toggle="collapse" data-target="#reviewPatternsPanel">
+                        <h4 class="panel-title">{{t "policy.common.patternsActions"}}</h4>
+                    </div>
 
-        <h2>{{t "policy.common.actions"}}</h2>
-        {{#unless advancedMode}}
-            {{#if entity.actions}}
-                <span class="icon-arrow-down2"></span>
-            {{else}}
-                <span class="advanced-empty-msg">({{t "policy.common.empty"}})</span>
-            {{/if}}
-        {{/unless}}
-        <div class="advanced-mode">
-            {{#if entity.actions}}
-                <ul id="reviewActions">
-                    {{#each entity.actions}}
-                    <li><span>{{@key}}:</span>{{#if this}} {{t "policy.actions.allowed"}} {{else}} {{t "policy.actions.denied"}} {{/if}}</li>
-                    {{/each}}
-                </ul>
-            {{else}}
-                <p class="invalid">{{t "policy.common.noActions"}}</p>
-            {{/if}}
+                    <div id="reviewPatternsPanel" class="collapse {{#if advancedMode}}in{{/if}} {{#unless entity.patterns}}in{{/unless}} {{#unless entity.actions}}in{{/unless}}">
+                        <h5 class="review-title">{{t "policy.common.patterns"}}</h5>
+                        {{#if entity.patterns}}
+                        <ul id="reviewPatterns" class="review-text">
+                            {{#each entity.patterns}}
+                            <li>{{this}}</li>
+                            {{/each}}
+                        </ul>
+                        {{else}}
+                        <p class="review-text text-danger">{{t "policy.common.noPatterns"}}</p>
+                        {{/if}}
+
+                        <h5 class="review-title">{{t "policy.common.actions"}}</h5>
+                        {{#if entity.actions}}
+                        <ul id="reviewActions" class="review-text">
+                            {{#each entity.actions}}
+                            <li>
+                                <span>{{@key}}:</span>
+                                {{#if this}} {{t "policy.actions.allowed"}}
+                                {{else}}
+                                {{t "policy.actions.denied"}}
+                                {{/if}}
+                            </li>
+                            {{/each}}
+                        </ul>
+                        {{else}}
+                        <p class="review-text text-danger">{{t "policy.common.noActions"}}</p>
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

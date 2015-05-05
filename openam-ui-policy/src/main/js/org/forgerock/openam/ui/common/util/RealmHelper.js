@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2015 ForgeRock AS. All rights reserved.
+ * Copyright 2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -24,8 +24,8 @@
 
 /*global _ define*/
 define('org/forgerock/commons/ui/common/util/RealmHelper', [
-    'org/forgerock/commons/ui/common/util/UIUtils'
-], function(UIUtils) {
+    "org/forgerock/commons/ui/common/main/Router"
+], function(Router) {
     /**
      * @exports org/forgerock/openam/ui/common/util/RealmHelper
      */
@@ -55,7 +55,7 @@ define('org/forgerock/commons/ui/common/util/RealmHelper', [
      * @returns Override realm AS IS (no slash modification) (e.g. <code>/</code> or <code>/realm1</code>)
      */
     obj.getOverrideRealm = function() {
-        return UIUtils.convertQueryParametersToJSON(UIUtils.getURIQueryString()).realm;
+        return Router.convertQueryParametersToJSON(Router.getURIQueryString()).realm;
     };
 
     return obj;

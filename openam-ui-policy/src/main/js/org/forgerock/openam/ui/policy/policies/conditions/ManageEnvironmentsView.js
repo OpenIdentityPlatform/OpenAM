@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,11 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/**
- * @author JKigwana
- */
-
-/*global window, define, $, _, document, console */
+/*global window, define, $, _ */
 
 define( "org/forgerock/openam/ui/policy/policies/conditions/ManageEnvironmentsView", [
     "org/forgerock/openam/ui/policy/policies/conditions/ManageRulesView",
@@ -37,17 +33,17 @@ define( "org/forgerock/openam/ui/policy/policies/conditions/ManageEnvironmentsVi
         element: "#environmentContainer",
         envEvents: {
 
-            'change .environment-area .operator select' : 'onSelect',
-            'mousedown #operatorEnv_0 li.rule:not(.editing)'  : 'setFocus',
-            'mousedown #operatorEnv_0 li.operator:not(.editing)' : 'setFocus',
+            'change .environment-area .operator select': 'onSelect',
+            'mousedown #operatorEnv_0 li.rule:not(.editing)': 'setFocus',
+            'mousedown #operatorEnv_0 li.operator:not(.editing)': 'setFocus',
 
-            'click    #operatorEnv_0 .rule > .item-button-panel > .icon-remove' :    'onDelete',
-            'keyup    #operatorEnv_0 .rule > .item-button-panel > .icon-remove' :    'onDelete',
-            'click    #operatorEnv_0 .rule > .item-button-panel > .icon-pencil' :    'toggleEditing',
-            'keyup    #operatorEnv_0 .rule > .item-button-panel > .icon-pencil' :    'toggleEditing',
-            'click    #operatorEnv_0 .rule > .item-button-panel > .icon-checkmark' : 'toggleEditing',
-            'keyup    #operatorEnv_0 .rule > .item-button-panel > .icon-checkmark' : 'toggleEditing',
-            'dblclick #operatorEnv_0 li.rule:not(.legacy-condition)' :               'toggleEditing'
+            'click    #operatorEnv_0 .rule > .item-button-panel > .fa-trash-o': 'onDelete',
+            'keyup    #operatorEnv_0 .rule > .item-button-panel > .fa-trash-o': 'onDelete',
+            'click    #operatorEnv_0 .rule > .item-button-panel > .fa-pencil': 'toggleEditing',
+            'keyup    #operatorEnv_0 .rule > .item-button-panel > .fa-pencil': 'toggleEditing',
+            'click    #operatorEnv_0 .rule > .item-button-panel > .fa-check': 'toggleEditing',
+            'keyup    #operatorEnv_0 .rule > .item-button-panel > .fa-check': 'toggleEditing',
+            'dblclick #operatorEnv_0 li.rule:not(.legacy-condition)': 'toggleEditing'
         },
         data: {},
         buttons:{},

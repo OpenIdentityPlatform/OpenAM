@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,42 +22,29 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/**
- * @author Aleanora Kaladzinskaya
- * @author Eugenia Sergueeva
- */
-
-/*global window, define, $, _, document, console */
+/*global window, define, $, _ */
 
 define("org/forgerock/openam/ui/policy/common/AbstractEditView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/policy/common/ReviewInfoView",
     "org/forgerock/openam/ui/common/components/Accordion",
     "org/forgerock/openam/ui/policy/common/HelpLinkView"
-], function (AbstractView, reviewInfoView, Accordion, HelpLink) {
+], function (AbstractView, ReviewInfoView, Accordion, HelpLink) {
     var AbstractEditView = AbstractView.extend({
-        baseTemplate: "templates/policy/BaseTemplate.html",
+
         events: {
-            'click input[name=nextButton]': 'openNextStep',
             'click input[name=submitForm]': 'submitForm',
-            'click .review-row': 'reviewRowClick',
-            'keyup .review-row': 'reviewRowClick'
+            'click .review-panel': 'reviewRowClick',
+            'keyup .review-panel': 'reviewRowClick'
         },
 
         initAccordion: function () {
-            var self = this,
-                options = {};
+            var self = this;
 
-            if (this.data.entity.name) {
-                options.active = this.$el.find('.accordion > section').length - 1;
-            } else {
-                options.disabled = true;
-            }
+            this.accordion = new Accordion(this, '#accordion');
 
-            this.accordion = new Accordion(this.$el.find('.accordion'), options);
-
-            this.accordion.on('beforeChange', function (e, index) {
-                if (index === this.$sections.length-1) {
+            this.accordion.on('show.bs.collapse', function (e) {
+                if ($(self.accordion.panels).index(e.target) === self.accordion.panels.length - 1) {
                     self.updateFields();
                     self.validateThenRenderReview();
                 }
@@ -72,9 +59,9 @@ define("org/forgerock/openam/ui/policy/common/AbstractEditView", [
             });
         },
 
-        validateThenRenderReview: function(){
+        validateThenRenderReview: function () {
             this.data.options.invalidEntity = this.validate();
-            reviewInfoView.render(this.data, null, this.$el.find('#reviewInfo'), this.reviewTemplate);
+            ReviewInfoView.render(this.data, null, this.$el.find('#reviewInfo'), this.reviewTemplate);
         },
 
         validate: function () {
@@ -83,40 +70,39 @@ define("org/forgerock/openam/ui/policy/common/AbstractEditView", [
                 invalid = false;
 
             // entities that are stored in LDAP can't start with '#'. http://www.jguru.com/faq/view.jsp?EID=113588
-            if(entity.name && entity.name.startsWith('#')){
+            if (entity.name && entity.name.startsWith('#')) {
                 invalid = true;
-                this.$el.find('input[name=entityName]').addClass('invalid');
+                this.$el.find('input[name=entityName]').parents('.form-group').addClass('has-error');
             } else {
-                this.$el.find('input[name=entityName]').removeClass('invalid');
+                this.$el.find('input[name=entityName]').parents('.form-group').removeClass('has-error');
             }
 
             this.data.options.incorrectName = invalid;
 
-            _.each(this.validationFields, function(field){
-                if(entity[field] === undefined || entity[field].length === 0 ){
+            _.each(this.validationFields, function (field) {
+                if (entity[field] === undefined || entity[field] === null || entity[field].length === 0) {
                     invalid = true;
                     return;
                 }
             });
 
-            this.$el.find('input[name=submitForm]').prop('disabled', invalid );
+            this.$el.find('input[name=submitForm]').prop('disabled', invalid);
         },
 
-        openNextStep: function (e) {
-            this.accordion.setActive(this.accordion.getActive() + 1);
-        },
+        reviewRowClick: function (e) {
+            if (e.type === 'keyup' && e.keyCode !== 13) {
+                return;
+            }
 
-        reviewRowClick:function (e) {
-            if (e.type === 'keyup' && e.keyCode !== 13) { return;}
-            var reviewRows = this.$el.find('.review-row'),
+            var reviewRows = this.$el.find('.review-panel'),
                 targetIndex = -1;
-                _.find(reviewRows, function(reviewRow, index){
-                    if(reviewRow === e.currentTarget){
-                        targetIndex = index;
-                    }
-                });
+            _.find(reviewRows, function (reviewRow, index) {
+                if (reviewRow === e.currentTarget) {
+                    targetIndex = index;
+                }
+            });
 
-            this.accordion.setActive(targetIndex);
+            this.accordion.show(targetIndex);
         }
 
     });
