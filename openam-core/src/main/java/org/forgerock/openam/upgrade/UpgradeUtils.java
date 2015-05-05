@@ -24,7 +24,7 @@
  *
  * $Id: UpgradeUtils.java,v 1.18 2009/09/30 17:35:24 goodearth Exp $
  *
- * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package org.forgerock.openam.upgrade;
 
@@ -339,6 +339,20 @@ public class UpgradeUtils {
             return false;
         }
         return expectedVersion.equals(Integer.valueOf(parsedVersion[0]));
+    }
+
+    /**
+     * Checks to see if the currently installed OpenAM version is less than the specified version.
+     * @param expectedVersion The version to test for.
+     * @param notParsed The value to return if the current version cannot be parsed.
+     */
+    public static boolean isCurrentVersionLessThan(int expectedVersion, boolean notParsed) {
+        String[] parsedVersion = parseVersion(getCurrentVersion());
+        if (parsedVersion == null) {
+            //unable to determine current version, we can't tell if it matches the expected.
+            return notParsed;
+        }
+        return Integer.valueOf(parsedVersion[0]).intValue() < expectedVersion;
     }
 
     private static String[] parseVersion(String version) {
@@ -2095,7 +2109,7 @@ public class UpgradeUtils {
         try {
             ServerConfiguration.createServerInstance(
                     ssoToken, serverInstance,
-                    serverId, values,serverConfigXML);
+                    serverId, values, serverConfigXML);
         } catch (UnknownPropertyNameException uce) {
             //throw new UpgradeException("Unknwon property ");
         } catch (ConfigurationException ce) {
@@ -3584,7 +3598,7 @@ public class UpgradeUtils {
        boolean isValidServer = true;
        try {
             LDAPConnection ldapConn = new LDAPConnection();
-            ldapConn.connect(dsHost,new Integer(dsPort).intValue());
+            ldapConn.connect(dsHost, new Integer(dsPort).intValue());
             ldapConn.disconnect();
         } catch (LDAPException lde) {
             isValidServer =false;

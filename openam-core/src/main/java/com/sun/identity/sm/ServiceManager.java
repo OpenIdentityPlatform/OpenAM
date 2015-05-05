@@ -97,7 +97,7 @@ public class ServiceManager {
     protected static final String REALM_ENTRY = "ou=" + SERVICE_VERSION
             + ",ou=" + REALM_SERVICE + "," + serviceDN;
 
-    protected static final String PLATFORM_SERVICE = "iPlanetAMPlatformService";
+    public static final String PLATFORM_SERVICE = "iPlanetAMPlatformService";
 
     protected static final String ATTR_SERVER_LIST = 
         "iplanet-am-platform-server-list";

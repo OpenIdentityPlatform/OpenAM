@@ -142,7 +142,7 @@ public class SMSUtils {
 
     protected static final String PLUGIN_CONFIG_ORG_NAME = "organizationName";
 
-    protected static final String SCHEMA_ATTRIBUTE = "AttributeSchema";
+    public static final String SCHEMA_ATTRIBUTE = "AttributeSchema";
 
     protected static final String ATTRIBUTE_VALUE_PAIR = "AttributeValuePair";
 

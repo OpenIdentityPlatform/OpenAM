@@ -39,7 +39,10 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
+
+import org.forgerock.util.promise.Function;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -330,7 +333,8 @@ public class ServiceSchemaManager {
     }
 
     /**
-     * Returns the service's resource name for CREST representation.
+     * Returns the service's resource name for CREST representation, or the
+     * service name if a resource name is not defined.
      * @supported.api
      */
     public String getResourceName() {
@@ -875,6 +879,13 @@ public class ServiceSchemaManager {
     	CachedSMSEntry smsEntry = ssm.getCachedSMSEntry();
         SMSSchema smsSchema = new SMSSchema(document);
         smsEntry.writeXMLSchema(token, smsSchema.getSchema());
+    }
+
+    public <E extends Exception> void modifySchema(Function<Document, Boolean, E> modifier) throws E, SMSException, SSOException {
+        Document schema = getDocumentCopy();
+        if (modifier.apply(schema)) {
+            replaceSchema(schema);
+        }
     }
     
     private void validate() {

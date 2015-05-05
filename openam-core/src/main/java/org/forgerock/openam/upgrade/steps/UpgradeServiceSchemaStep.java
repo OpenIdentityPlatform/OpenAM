@@ -89,7 +89,6 @@ public class UpgradeServiceSchemaStep extends AbstractUpgradeStep {
     private static final String NEW_SCHEMAS = "%NEW_SCHEMAS%";
     private static final String NEW_SUB_SCHEMAS = "%NEW_SUB_SCHEMAS%";
     private static final String DELETED_SERVICES = "%DELETED_SERVICES%";
-    private final List<String> serviceNames = new ArrayList<String>();
     private final List<NewServiceWrapper> addedServices = new ArrayList<NewServiceWrapper>();
     private final Map<String, Set<SchemaUpgradeWrapper>> modifiedSchemas =
             new HashMap<String, Set<SchemaUpgradeWrapper>>();
@@ -113,10 +112,6 @@ public class UpgradeServiceSchemaStep extends AbstractUpgradeStep {
 
     @Override
     public void initialize() throws UpgradeException {
-        serviceNames.addAll(UpgradeUtils.getPropertyValues(SetupConstants.PROPERTY_FILENAME,
-                SetupConstants.SERVICE_NAMES));
-//        Map map = ServicesDefaultValues.getDefaultValues();
-        Map<String, Document> newServiceDefinitions = new HashMap<String, Document>();
         String basedir = SystemProperties.get(SystemProperties.CONFIG_PATH);
         String dirXML = basedir + File.separator + "config" + File.separator + "xml";
 
@@ -130,43 +125,7 @@ public class UpgradeServiceSchemaStep extends AbstractUpgradeStep {
             }
         }
 
-        ServicesDefaultValues.setServiceConfigValues(getUpgradeHttpServletRequest(basedir));
-
-        for (String serviceFileName : serviceNames) {
-            boolean tagswap = true;
-
-            if (serviceFileName.startsWith("*")) {
-                serviceFileName = serviceFileName.substring(1);
-                tagswap = false;
-            }
-
-            String strXML = null;
-
-            try {
-                strXML = IOUtils.readStream(getClass().getClassLoader().getResourceAsStream(serviceFileName));
-            } catch (IOException ioe) {
-                DEBUG.error("unable to load services file: " + serviceFileName, ioe);
-                throw new UpgradeException(ioe);
-            }
-
-            // This string 'content' is to avoid plain text password
-            // in the files copied to the config/xml directory.
-//            String content = strXML;
-//
-//            if (tagswap) {
-//                content = StringUtils.strReplaceAll(content,
-//                        "@UM_DS_DIRMGRPASSWD@", "********");
-//                content = ServicesDefaultValues.tagSwap(content, true);
-//            }
-            if (tagswap) {
-                strXML = ServicesDefaultValues.tagSwap(strXML, true);
-            }
-
-            Document serviceSchema = fetchDocumentSchema(strXML, getAdminToken());
-
-            newServiceDefinitions.put(UpgradeUtils.getServiceName(serviceSchema), serviceSchema);
-        }
-
+        Map<String, Document> newServiceDefinitions = UpgradeServiceUtils.getServiceDefinitions(getAdminToken());
         diffServiceVersions(newServiceDefinitions, getAdminToken());
     }
 
@@ -227,21 +186,6 @@ public class UpgradeServiceSchemaStep extends AbstractUpgradeStep {
         }
 
         return toDelete;
-    }
-
-    private Document fetchDocumentSchema(String xmlContent, SSOToken adminToken)
-            throws UpgradeException {
-        InputStream serviceStream = null;
-        Document doc = null;
-
-        try {
-            serviceStream = new ByteArrayInputStream(xmlContent.getBytes());
-            doc = UpgradeUtils.parseServiceFile(serviceStream, adminToken);
-        } finally {
-            IOUtils.closeIfNotNull(serviceStream);
-        }
-
-        return doc;
     }
 
     @Override
@@ -529,41 +473,6 @@ public class UpgradeServiceSchemaStep extends AbstractUpgradeStep {
         }
 
         return buffer.toString();
-    }
-
-    private IHttpServletRequest getUpgradeHttpServletRequest(String basedir) throws UpgradeException {
-        // need to reinitialize the tag swap property map with original install params
-        IHttpServletRequest requestFromFile = new UpgradeHttpServletRequest(basedir);
-
-        try {
-            Properties foo = ServerConfiguration.getServerInstance(getAdminToken(), WebtopNaming.getLocalServer());
-            requestFromFile.addParameter(SetupConstants.CONFIG_VAR_ENCRYPTION_KEY, foo.getProperty(Constants.ENC_PWD_PROPERTY));
-
-            String dbOption = (String) requestFromFile.getParameterMap().get(SetupConstants.CONFIG_VAR_DATA_STORE);
-            boolean embedded = dbOption.equals(SetupConstants.SMS_EMBED_DATASTORE);
-
-            if (!embedded) {
-                setUserAndPassword(requestFromFile, basedir);
-            }
-        } catch (Exception ex) {
-            DEBUG.error("Unable to initialise services defaults", ex);
-            throw new UpgradeException("Unable to initialise services defaults: " + ex.getMessage());
-        }
-
-        return requestFromFile;
-    }
-
-    private void setUserAndPassword(IHttpServletRequest requestFromFile, String basedir) throws UpgradeException {
-        try {
-            BootstrapData bootStrap = new BootstrapData(basedir);
-            Map<String, String> data = bootStrap.getDataAsMap(0);
-            requestFromFile.addParameter(SetupConstants.CONFIG_VAR_DS_MGR_DN, data.get(BootstrapData.DS_MGR));
-            requestFromFile.addParameter(SetupConstants.CONFIG_VAR_DS_MGR_PWD,
-                    JCECrypt.decode(data.get(BootstrapData.DS_PWD)));
-        } catch (IOException ioe) {
-            DEBUG.error("Unable to load directory user/password from bootstrap file", ioe);
-            throw new UpgradeException("Unable to load bootstrap file: " + ioe.getMessage());
-        }
     }
 
     private enum ServiceModification {
