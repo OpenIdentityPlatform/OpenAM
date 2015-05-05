@@ -275,15 +275,19 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
         save: function() {
             var self = this,
                 permissions = this.parentModel.get('policy').get("permissions"),
-                subject = this.$el.find('#selectUser select')[0].selectize.getValue(),
+                subjects = this.$el.find('#selectUser select')[0].selectize.getValue(),
                 scopes = _.each(this.$el.find('#selectPermission select')[0].selectize.getValue(), function(scope) {
                     return UMAPolicyPermissionScope.find({ id: scope });
                 }),
-                permission = UMAPolicyPermission.findOrCreate({
+                newPermissions = [];
+            _.forEach(subjects, function(subject) {
+                var permission = UMAPolicyPermission.findOrCreate({
                     subject: subject,
                     scopes: scopes
                 });
-            permissions.add(permission);
+                permissions.add(permission);
+                newPermissions.push(permission);
+            });
 
             this.parentModel.get('policy').save()
             .done(function(response) {
@@ -292,7 +296,9 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
             })
             .fail(function(response) {
                 if (response.status && response.status === 500) {
-                    permissions.remove(permission);
+                    _.forEach(newPermissions, function(permission) {
+                        permissions.remove(permission);
+                    });
                 }
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policyCreatedFail");
             });

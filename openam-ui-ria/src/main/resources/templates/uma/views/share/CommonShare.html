@@ -34,7 +34,7 @@
     <div class="row ">
         <div id="selectUser" class="form-group col-sm-6">
             <label>{{t 'uma.share.people'}}</label>
-            <select placeholder="{{t 'common.form.startTypingToSearch'}}">
+            <select multiple class="selectize" placeholder="{{t 'common.form.startTypingToSearch'}}">
                 <option disabled selected value>{{t 'common.form.pleaseSelect'}}</option>
                 {{#each permissions}}
                 <option value="{{subject}}">{{subject}}</option>
