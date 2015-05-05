@@ -53,6 +53,8 @@ import java.util.Vector;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.security.SecurityDebug;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import org.forgerock.openam.utils.StringUtils;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -68,8 +70,11 @@ public class AMCertPath {
     private static CertPathValidator cpv = null;
     private CertStore store = null; //GuardedBy("AMCertPath.class")
     private static Debug debug = SecurityDebug.debug;
-    private static boolean OCSPCheck = false; //GuardedBy("AMCertPath.class")
-    
+    private static final String OCSP_ENABLE = "ocsp.enable";
+    private static final String OCSP_RESPONDER_URL = "ocsp.responderURL";
+    private static final String TRUE = "true";
+    private static final String FALSE = "false";
+
     static {
     	try {
     	    cf= CertificateFactory.getInstance("X509");
@@ -117,6 +122,14 @@ public class AMCertPath {
         2. even if a non-static CertPathValidator instance were obtained in this method, each instance references
         the ocsp-related properties in the Security class. Thus the state set in Security.setProperty("ocsp.enable", true/false)
         will affect all CertPathValidator instances.
+        Note that despite the synchronized block, the fact that static Security properties are being set and referenced
+        exposes the code below to data races in the context of these Security properties. Currently, Security.setProperties
+        is not being called from anywhere in the OpenAM code base. If this were to change, and the "ocsp.enable" property
+        were manipulated, the OCSP-based checking below would be susceptible to data races. There does not seem to
+        be an alternative however: the section on PKIXParameters here:
+        http://docs.oracle.com/javase/6/docs/technotes/guides/security/certpath/CertPathProgGuide.html#Introduction
+        mentions setting PKIXCertPathChecker implementations to do CRL or OCSP based checking, but there is no remove
+        method, and the state returned from getCertPathCheckers is immutable.
          */
         synchronized(AMCertPath.class) {
             if (debug.messageEnabled()) {
@@ -138,26 +151,32 @@ public class AMCertPath {
                     debug.message("AMCertPath.verify: ocspEnabled ---> " + ocspEnabled);
                 }
 
+                pkixparams.setRevocationEnabled(crlEnabled || ocspEnabled);
                 if (ocspEnabled) {
-                    if (!OCSPCheck) {
-                        Security.setProperty("ocsp.enable", "true");
-                        final String responderURLString = getResponderURLString();
-                        if (responderURLString != null && responderURLString.trim().length() != 0) {
-                            Security.setProperty("ocsp.responderURL", responderURLString);
+                    final String responderURLString = getResponderURLString();
+                    if (!StringUtils.isBlank(responderURLString)) {
+                        Security.setProperty(OCSP_ENABLE, TRUE);
+                        Security.setProperty(OCSP_RESPONDER_URL, responderURLString);
+                        if (debug.messageEnabled()) {
+                            debug.message("AMCertPath.verify: pkixparams.setRevocationEnabled "
+                                    + "set to true, and ocsp.enabled set to true with a OCSP responder url of " + responderURLString);
                         }
-                        OCSPCheck = true;
-                    }
-                    // If setRevocationEnabled is not set to true,
-                    // OCSP validation is not performed by JCE
-                    pkixparams.setRevocationEnabled(true);
-                    if (debug.messageEnabled()) {
-                        debug.message("AMCertPath.verify: pkixparams.setRevocationEnabled "
-                                + "set to TRUE");
+                    } else {
+                        //OCSP revocation checking not configured properly. Disable the check if crl-based checking not enabled
+                        pkixparams.setRevocationEnabled(crlEnabled);
+                        Security.setProperty(OCSP_ENABLE, FALSE);
+                        debug.error("AMCertPath.verify: OCSP is enabled, but the " +
+                                "com.sun.identity.authentication.ocsp.responder.url property does not specify a OCSP " +
+                                "responder. OCSP checking will NOT be performed.");
                     }
                 } else {
-                    pkixparams.setRevocationEnabled(crlEnabled);
+                    //the Security properties are static - if we are doing crl validation, insure that the property
+                    //is not present which will toggle OCSP checking.
+                    Security.setProperty(OCSP_ENABLE, FALSE);
+                    if (debug.messageEnabled()) {
+                        debug.message("AMCertPath.verify: pkixparams Security property ocsp.enabled set to false.");
+                    }
                 }
-
 
                 if (store != null) {
                     pkixparams.addCertStore(store);

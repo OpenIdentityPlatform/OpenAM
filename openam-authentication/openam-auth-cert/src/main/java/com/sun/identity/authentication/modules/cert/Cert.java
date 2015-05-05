@@ -413,7 +413,8 @@ public class Cert extends AMLoginModule {
                             "noURLCertAuth", null);
                     }
 
-                    thecert = getPortalStyleCert(servletRequest); 
+                    thecert = getPortalStyleCert(servletRequest);
+                    allCerts = new X509Certificate[] { thecert };
                 } else {
                     if (debug.messageEnabled()) {
                         debug.message("Certificate: got all certs from " + 
