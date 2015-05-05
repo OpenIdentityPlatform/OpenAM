@@ -2591,7 +2591,13 @@ public class IdServicesImpl implements IdServices {
                    resultMap.put((String) reverseMap.get(curr), attrMap
                            .get(curr));
                } else {
-                   resultMap.put(curr, attrMap.get(curr));
+                   // Only add unmapped attributes to resultMap 
+                   // if there wasn't an attribute mapped with the same name already 
+                   if (!resultMap.containsKey(curr)) {
+                       DEBUG.message("IdServicesImpl.reverseMapAttributeNames(): "
+                               + "adding unmapped attribute " + curr);
+                       resultMap.put(curr, attrMap.get(curr));
+                   }
                }
            }
        }
