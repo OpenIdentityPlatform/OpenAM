@@ -788,17 +788,24 @@ body.editing {
         color: #2a2f32;
     }
 
-    .selectize-control.multi .selectize-input {
-        margin-top: 16px;
-        padding: 5px 15px 6px;
-        border-radius: 4px;
-        -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
-        box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
-        border-color: #ccc;
-
-        &.has-items {
-           padding: 2px 8px 0;
+    .selectize-control.multi, .selectize-control.single {
+        .selectize-input {
+            margin-top: 16px;
+            padding: 5px 15px 6px;
+            border-radius: 4px;
+            -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+            box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+            border-color: #ccc;
         }
+    }
+
+    .selectize-control.multi .selectize-input.has-items {
+        padding: 2px 8px 0;
+    }
+
+    .selectize-control.single .selectize-input:after {
+        right: 6px;
+        margin-top: -3px;
     }
 
     .btn-group {

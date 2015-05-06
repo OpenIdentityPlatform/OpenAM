@@ -178,16 +178,13 @@ define("org/forgerock/openam/ui/policy/policies/conditions/EditEnvironmentView",
 
             if (itemData.type === "SimpleTime") {
                 attributesWrapper = '<div class="clearfix clear-left" id="conditionAttrTimeDate"></div>';
-
                 new TimeAttr().render({itemData: itemData}, itemDataEl);
                 new DayAttr().render({itemData: itemData}, itemDataEl);
                 new DateAttr().render({itemData: itemData}, itemDataEl);
                 new TimeZoneAttr().render({itemData: itemData}, itemDataEl);
-
-                this.$el.find(attributesSelector).wrapAll(attributesWrapper);
             } else if (schema.title === self.SCRIPT_RESOURCE) {
-                // FIXME will change title, i18nKey after scripted condition endpoint iplemented
-                new ArrayAttr().render({itemData: itemData, hiddenData: undefined, data: itemData.scripts, title: 'scripts', i18nKey: self.i18n.condition.key + schema.title + self.i18n.condition.props + 'scripts', dataSource: 'scripts'}, itemDataEl);
+                attributesWrapper = '<div class="no-float"></div>';
+                new ArrayAttr().render({itemData: itemData, data: [itemData.scriptId], title: 'scriptId', i18nKey: self.i18n.condition.key + schema.title + self.i18n.condition.props + 'scriptId', dataSource: 'scripts'}, itemDataEl);
             } else {
                 attributesWrapper = '<div class="no-float"></div>';
 
@@ -213,9 +210,8 @@ define("org/forgerock/openam/ui/policy/policies/conditions/EditEnvironmentView",
                             break;
                     }
                 });
-
-                this.$el.find(attributesSelector).wrapAll(attributesWrapper);
             }
+            this.$el.find(attributesSelector).wrapAll(attributesWrapper);
         },
 
         setDefaultJsonValues: function (schema) {

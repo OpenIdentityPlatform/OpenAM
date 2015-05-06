@@ -91,9 +91,6 @@ define("org/forgerock/openam/ui/policy/policies/EditPolicyView", [
                 data.options.availableEnvironments = _.findByValues(allEnvironments[0].result, 'title', app[0].conditions);
                 data.options.availableSubjects =     _.findByValues(allSubjects[0].result, 'title', app[0].subjects);
 
-                // FIXME. temporary code until not added support of script condition type on sever side
-                data.options.availableEnvironments.push({title: 'Script', logical: false, config: {type: "object", properties: {scripts: { items: { type: "string"}, type: "array"} } } });
-
                 availableResourceTypes = _.filter(resourceTypes[0].result, function (item) {
                     return _.contains(app[0].resourceTypeUuids, item.uuid);
                 });
@@ -229,9 +226,12 @@ define("org/forgerock/openam/ui/policy/policies/EditPolicyView", [
         },
 
         errorHandler: function (e) {
-
-            var obj = { message: JSON.parse(e.responseText).message, type: "error"},
+            var obj = { message: '', type: "error"},
                 invalidResourceText = "Invalid Resource";
+
+            if (e.responseText) {
+                obj.message = JSON.parse(e.responseText).message;
+            }
 
             if (e.status === 500) {
 

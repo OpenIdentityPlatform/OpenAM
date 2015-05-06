@@ -598,8 +598,7 @@
             "Script": {
                 "title": "Script",
                 "props": {
-                    "scripts": "Script Name",
-                    "properties": "Properties"
+                    "scriptId": "Script Name"
                 },
                 "placeholder": "Select from scripts"
             },

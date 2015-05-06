@@ -36,11 +36,12 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrArrayVie
     var ConditionAttrArrayView = ConditionAttrBaseView.extend({
         template: 'templates/policy/policies/conditions/ConditionAttrArray.html',
         MIN_QUERY_LENGTH: 1,
-        SCRIPT_TYPE: 'scripts', // FIXME: update after support script conditions
+        SCRIPT_TYPE: 'scriptId',
         IDENTITY_PLACEHOLDER: 'policy.subjectTypes.Identity.placeholder',
         SCRIPT_PLACEHOLDER: 'policy.conditionTypes.Script.placeholder',
 
         render: function (data, element, callback) {
+            data.multiple = data.title !== this.SCRIPT_TYPE;
             this.initBasic(data, element, 'field-float-selectize data-obj');
 
             this.parentRender(function () {
@@ -64,6 +65,7 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrArrayVie
                                 placeholder: $.t(view.SCRIPT_PLACEHOLDER),
                                 create: false,
                                 preload: true,
+                                maxItems: 1,
                                 sortField: 'value',
                                 load: function (query, callback) {
                                     view.loadFromDataSource.call(this, item, callback);
@@ -71,7 +73,7 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrArrayVie
                                 onChange: function (value) {
                                     title = this.$input.parent().find('label')[0].dataset.title;
                                     itemData = view.data.itemData;
-                                    itemData[title] = value ? value : [];
+                                    itemData[title] = value ? value : '';
                                 }
                             });
                         } else {
