@@ -12,7 +12,7 @@
   Header, with the fields enclosed by brackets [] replaced by your own identifying
   information: "Portions Copyrighted [year] [name of copyright owner]".
 
-  Copyright 2011-2013 ForgeRock AS. All rights reserved.
+  Copyright 2011-2015 ForgeRock AS. All rights reserved.
 -->
 <!--
   Portions Copyrighted 2013 Syntegrity.
@@ -49,21 +49,10 @@
             <outputDirectory>js</outputDirectory>
             <destName>require-jquery.js</destName>
         </file>
+        <file>
+        <source>${project.build.directory}/minified/js/jquery.js</source>
+        <outputDirectory>js</outputDirectory>
+        <destName>jquery-amd-min.js</destName>
+        </file>
     </files>
-    <dependencySets>
-        <dependencySet>
-            <includes>
-                <include>org.codehaus.mojo:jquery-amd</include>
-            </includes>
-            <outputDirectory>/js</outputDirectory>
-            <outputFileNameMapping>jquery-amd-min.js</outputFileNameMapping>
-        </dependencySet>
-        <dependencySet>
-            <includes>
-                <include>org.codehaus.mojo:jquery-amd</include>
-            </includes>
-            <outputDirectory>/js/org/codehaus/mojo/jquery-amd/1.7.1-alpha-1</outputDirectory>
-            <outputFileNameMapping>jquery-amd-1.7.1-alpha-1.js</outputFileNameMapping>
-        </dependencySet>
-    </dependencySets>
 </assembly>

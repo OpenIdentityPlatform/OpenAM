@@ -25,7 +25,7 @@
  */
 /*
  * Portions Copyrighted 2013 Syntegrity.
- * Portions Copyrighted 2013 ForgeRock Inc.
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 
 ({
@@ -38,7 +38,8 @@
             excludeShallow: [
                 "requirejs/order/1.0.8/order-1.0.8-min",
                 "swfobject/swfobject/2.2/swfobject-2.2-min",
-                "org/codehaus/mojo/jquery-amd/1.7.1-alpha-1/jquery-amd-1.7.1-alpha-1"
+                "org/codehaus/mojo/jquery-amd/1.7.1-alpha-1/jquery-amd-1.7.1-alpha-1",
+                "jquery"
             ]
         }
     ]
