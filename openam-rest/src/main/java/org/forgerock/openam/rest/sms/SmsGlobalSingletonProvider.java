@@ -105,8 +105,8 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
     }
 
     @Override
-    protected JsonValue createTemplate(ServerContext context) {
-        JsonValue result = super.createTemplate(context);
+    protected JsonValue createSchema(ServerContext context) {
+        JsonValue result = super.createSchema(context);
         if (organizationSchema != null) {
             Map<String, String> attributeSectionMap = getAttributeNameToSection(organizationSchema);
             ResourceBundle console = ResourceBundle.getBundle("amConsole");
@@ -116,7 +116,7 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
             if (StringUtils.isNotEmpty(sectionOrder)) {
                 sections.addAll(Arrays.asList(sectionOrder.split("\\s+")));
             }
-            addAttributeSchema(result, "/_schema/properties/defaults/", organizationSchema, sections,
+            addAttributeSchema(result, "/properties/defaults/", organizationSchema, sections,
                     attributeSectionMap, console, serviceType, context);
         }
         return result;

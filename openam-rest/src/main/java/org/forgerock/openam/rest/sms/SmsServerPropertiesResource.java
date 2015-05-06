@@ -77,8 +77,8 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
     public static final String SERVER_CONFIG = "serverconfig";
     private static final String SERVER_DEFAULT_NAME = "server-default";
     private static Map<String, String> syntaxRawToReal = new HashMap<>();
-    private static JsonValue defaultTemplate;
-    private static JsonValue nonDefaultTemplate;
+    private static JsonValue defaultSchema;
+    private static JsonValue nonDefaultSchema;
 
 
     //this list is to enable us to distinguish which attributes are in the "advanced" tab
@@ -101,12 +101,12 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
     public SmsServerPropertiesResource(@Named("ServerAttributeSyntax") Properties syntaxProperties, @Named
             ("ServerAttributeTitles") Properties titleProperties, @Named("frRest") Debug logger) {
         this.logger = logger;
-        defaultTemplate = getTemplate(syntaxProperties, titleProperties, true);
-        nonDefaultTemplate = getTemplate(syntaxProperties, titleProperties, false);
+        defaultSchema = getSchema(syntaxProperties, titleProperties, true);
+        nonDefaultSchema = getSchema(syntaxProperties, titleProperties, false);
     }
 
 
-    private JsonValue getTemplate(Properties syntaxProperties, Properties titleProperties, boolean isDefault) {
+    private JsonValue getSchema(Properties syntaxProperties, Properties titleProperties, boolean isDefault) {
         JsonValue template = json(object());
         for (String tabName : getTabNames()) {
             try {
@@ -117,7 +117,7 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
 
                 int sectionOrder = 0;
                 for (String sectionName : sectionNames) {
-                    final String sectionPath = "/_schema/properties/" + sectionName;
+                    final String sectionPath = "/properties/" + sectionName;
                     template.putPermissive(new JsonPointer(sectionPath + "/title"), titleProperties.getProperty(sectionName));
                     template.putPermissive(new JsonPointer(sectionPath + "/propertyOrder"), sectionOrder++);
 
@@ -216,7 +216,7 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
 
     @Override
     public void actionInstance(ServerContext serverContext, ActionRequest actionRequest, ResultHandler<JsonValue> resultHandler) {
-        if (actionRequest.getAction().equals("template")) {
+        if (actionRequest.getAction().equals("schema")) {
             Map<String, String> uriVariables = getUriTemplateVariables(serverContext);
 
             final String serverName = uriVariables.get("serverName").toLowerCase();
@@ -239,14 +239,14 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
                 resultHandler.handleError(new BadRequestException("Tab name not specified."));
             }
 
-            JsonValue template;
+            JsonValue schema;
             if (serverName.equals(SERVER_DEFAULT_NAME)) {
-                template = defaultTemplate;
+                schema = defaultSchema;
             } else {
-                template = nonDefaultTemplate;
+                schema = nonDefaultSchema;
             }
 
-            resultHandler.handleResult(template);
+            resultHandler.handleResult(schema);
         } else {
             resultHandler.handleError(new NotSupportedException("Action not supported: " + actionRequest.getAction()));
         }

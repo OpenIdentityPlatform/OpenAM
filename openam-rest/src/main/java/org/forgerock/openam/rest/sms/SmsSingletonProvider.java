@@ -233,8 +233,8 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
     }
 
     @Override
-    protected JsonValue createTemplate(ServerContext context) {
-        JsonValue result = super.createTemplate(context);
+    protected JsonValue createSchema(ServerContext context) {
+        JsonValue result = super.createSchema(context);
         if (dynamicSchema != null) {
             Map<String, String> attributeSectionMap = getAttributeNameToSection(dynamicSchema);
             ResourceBundle console = ResourceBundle.getBundle("amConsole");
@@ -244,7 +244,7 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
             if (StringUtils.isNotEmpty(sectionOrder)) {
                 sections.addAll(Arrays.asList(sectionOrder.split("\\s+")));
             }
-            addAttributeSchema(result, "/_schema/properties/dynamic/", dynamicSchema, sections, attributeSectionMap,
+            addAttributeSchema(result, "/properties/dynamic/", dynamicSchema, sections, attributeSectionMap,
                     console, serviceType, context);
         }
         return result;

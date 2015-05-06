@@ -175,27 +175,28 @@ abstract class SmsResourceProvider {
 
     protected void handleAction(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
         if (request.getAction().equals("template")) {
-            handler.handleResult(createTemplate(context));
+            handler.handleResult(converter.toJson(schema.getAttributeDefaults()));
+        } else if ("schema".equals(request.getAction())) {
+            handler.handleResult(createSchema(context));
         } else {
             handler.handleError(new NotSupportedException("Action not supported: " + request.getAction()));
         }
     }
 
-    protected JsonValue createTemplate(ServerContext context) {
-        Map attrs = schema.getAttributeDefaults();
-        JsonValue result = converter.toJson(attrs);
+    protected JsonValue createSchema(ServerContext context) {
+        JsonValue result = json(object());
 
         Map<String, String> attributeSectionMap = getAttributeNameToSection(schema);
         ResourceBundle console = ResourceBundle.getBundle("amConsole");
         String serviceType = schema.getServiceType().getType();
 
         String sectionOrder = getConsoleString(console, "sections." + serviceName + "." + serviceType);
-        List<String> sections = new ArrayList<String>();
+        List<String> sections = new ArrayList<>();
         if (StringUtils.isNotEmpty(sectionOrder)) {
             sections.addAll(Arrays.asList(sectionOrder.split("\\s+")));
         }
 
-        addAttributeSchema(result, "/_schema/properties/", schema, sections, attributeSectionMap, console, serviceType, context);
+        addAttributeSchema(result, "/properties/", schema, sections, attributeSectionMap, console, serviceType, context);
 
         return result;
     }
