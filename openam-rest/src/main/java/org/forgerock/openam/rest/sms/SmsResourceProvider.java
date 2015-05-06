@@ -270,15 +270,15 @@ abstract class SmsResourceProvider {
                     object(field(".*", fieldType.getObject())));
         } else if (attributeType == AttributeSchema.Type.LIST) {
             type = "array";
+            result.addPermissive(new JsonPointer(pointer + "/items"),
+                    object(field("type", getTypeFromSyntax(attribute.getSyntax()))));
             if (attribute.hasChoiceValues()) {
-                result.addPermissive(new JsonPointer(pointer + "/items"), object());
                 addEnumChoices(result.get(new JsonPointer(pointer + "/items")), attribute, i18n, context);
-            } else {
-                result.addPermissive(new JsonPointer(pointer + "/items"), object(field("type", "string")));
             }
         } else if (attributeType.equals(AttributeSchema.Type.MULTIPLE_CHOICE)) {
             type = "array";
-            result.addPermissive(new JsonPointer(pointer + "/items"), object());
+            result.addPermissive(new JsonPointer(pointer + "/items"),
+                    object(field("type", getTypeFromSyntax(attribute.getSyntax()))));
             addEnumChoices(result.get(new JsonPointer(pointer + "/items")), attribute, i18n, context);
         } else if (attributeType.equals(AttributeSchema.Type.SINGLE_CHOICE)) {
             addEnumChoices(result.get(new JsonPointer(pointer)), attribute, i18n, context);
