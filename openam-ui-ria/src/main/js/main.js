@@ -45,7 +45,7 @@ require.config({
         "jsonEditor"      : "libs/jsoneditor-0.7.9-min",
         "moment"          : "libs/moment-2.8.1-min",
         "qrcode"          : "libs/qrcode-1.0.0-min",
-        "selectize"       : "libs/selectize-0.11.2-min",
+        "selectize"       : "libs/selectize-0.12.1-min",
         "sortable"        : "libs/jquery-nestingSortable-0.9.12",
         "spin"            : "libs/spin-2.0.1-min",
         "underscore"      : "libs/lodash-2.4.1-min",

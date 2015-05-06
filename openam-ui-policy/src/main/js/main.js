@@ -43,7 +43,7 @@ require.config({
         "js2form": "libs/js2form-2.0",
         "moment": "libs/moment-2.8.1-min",
         "multiselect": "libs/ui.multiselect-0.3",
-        "selectize": "libs/selectize-0.11.2-min",
+        "selectize": "libs/selectize-0.12.1-min",
         "sortable": "libs/jquery-nestingSortable-0.9.12",
         "spin": "libs/spin-2.0.1-min",
         "underscore": "libs/lodash-2.4.1-min",
