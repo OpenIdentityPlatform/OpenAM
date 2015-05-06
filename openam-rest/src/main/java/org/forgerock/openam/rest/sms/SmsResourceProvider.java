@@ -237,6 +237,7 @@ abstract class SmsResourceProvider {
 
                 result.addPermissive(new JsonPointer(path + attributePath + "/description"), description.toString());
                 result.addPermissive(new JsonPointer(path + attributePath + "/propertyOrder"), i18NKey);
+                result.addPermissive(new JsonPointer(path + attributePath + "/required"), !attribute.isOptional());
                 addType(result, path + attributePath, attribute, i18n, context);
             }
         }
