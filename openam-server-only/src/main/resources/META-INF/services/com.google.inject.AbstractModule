@@ -16,3 +16,4 @@
 org.forgerock.openam.entitlement.guice.EntitlementGuiceModule
 org.forgerock.openam.core.guice.CoreGuiceModule
 org.forgerock.openam.core.guice.DataLayerGuiceModule
+org.forgerock.openam.scripting.guice.ScriptingGuiceModule
