@@ -25,12 +25,12 @@
  */
 /*
  * Portions Copyrighted 2013 Syntegrity.
- * Portions Copyrighted 2013 ForgeRock Inc.
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 
 /*global $, define */
 
-define("org/forgerock/libwrappers/JQueryWrapper",["!org/codehaus/mojo/jquery-amd/1.7.1-alpha-1/jquery-amd-1.7.1-alpha-1"],
+define("org/forgerock/libwrappers/JQueryWrapper",["!jquery"],
         function(jq) {
     return $;
 });
