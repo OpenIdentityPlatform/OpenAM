@@ -117,8 +117,8 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
 
                 int sectionOrder = 0;
                 for (String sectionName : sectionNames) {
-                    final String sectionPath = "/properties/" + sectionName;
-                    template.putPermissive(new JsonPointer(sectionPath + "/title"), titleProperties.getProperty(sectionName));
+                    final String sectionPath = "/properties/" + tabName + "/" + sectionName;
+                            template.putPermissive(new JsonPointer(sectionPath + "/title"), titleProperties.getProperty(sectionName));
                     template.putPermissive(new JsonPointer(sectionPath + "/propertyOrder"), sectionOrder++);
 
                     int attributeOrder = 0;
@@ -237,9 +237,22 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
             final String tabName = getTabName(uriVariables);
             if (tabName == null) {
                 resultHandler.handleError(new BadRequestException("Tab name not specified."));
+                return;
             }
 
             JsonValue schema;
+            final JsonPointer tabPointer = new JsonPointer("_schema/properties/" + tabName);
+            if (serverName.equals(SERVER_DEFAULT_NAME)) {
+                schema = defaultSchema.get(tabPointer);
+            } else {
+                schema = nonDefaultSchema.get(tabPointer);
+            }
+
+            if (schema == null) {
+                resultHandler.handleError(new BadRequestException("Unknown tab: " + tabName));
+                return;
+            }
+
             if (serverName.equals(SERVER_DEFAULT_NAME)) {
                 schema = defaultSchema;
             } else {
