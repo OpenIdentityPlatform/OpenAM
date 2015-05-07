@@ -26,7 +26,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegate", [
             get: function() {
                 var url = "realm-config/authentication",
                     schemaPromise = obj.serviceCall({
-                        url: url + "?_action=template",
+                        url: url + "?_action=schema",
                         type: "POST"
                     }).done(obj.sanitize),
                     valuesPromise = obj.serviceCall({
@@ -35,7 +35,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegate", [
 
                 return $.when(schemaPromise, valuesPromise).then(function(schemaData, valuesData) {
                     return {
-                        schema: obj.sanitizeSchema(schemaData[0]._schema),
+                        schema: obj.sanitizeSchema(schemaData[0]),
                         values: valuesData[0]
                     };
                 });
@@ -51,9 +51,6 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegate", [
     };
 
     obj.sanitizeSchema = function(schema) {
-        // Filter out 'defaults'
-        schema.properties = _.omit(schema.properties, 'defaults');
-
         // Recursively transforms propertyOrder attribute to int
         _.forEach(schema.properties, obj.propertyOrderTransform);
 

@@ -34,10 +34,10 @@ define("org/forgerock/openam/ui/admin/utils/FormHelper", [
             .text(' ' + originalText);
         })
         .done(function() {
-            element.prepend($('<span class="fa fa-check"/>'));
+            element.prepend($('<span class="fa fa-check fa-fw"/>'));
         })
         .fail(function() {
-            element.prepend($('<span class="fa fa-cross"/>'));
+            element.prepend($('<span class="fa fa-times fa-fw"/>'));
         })
         .always(function() {
             _.delay(function() {

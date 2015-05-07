@@ -119,14 +119,14 @@ define("org/forgerock/openam/ui/admin/views/console/realms/Authentication", [
                 self.data.form.add(new Form(self.$el.find('#settings .col-md-6:first').get(0), {
                     type: 'object',
                     properties: {
-                        adminAuthModule: data.schema.properties["null"].properties.adminAuthModule,
+                        adminAuthModule: data.schema.properties.core.properties.adminAuthModule,
                         loginSuccessUrl: data.schema.properties.postauthprocess.properties.loginSuccessUrl
                     }
                 }, data.values));
                 self.data.form.add(new Form(self.$el.find('#settings .col-md-6:last').get(0), {
                     type: 'object',
                     properties: {
-                        orgConfig: data.schema.properties["null"].properties.orgConfig
+                        orgConfig: data.schema.properties.core.properties.orgConfig
                     }
                 }, data.values));
             })
