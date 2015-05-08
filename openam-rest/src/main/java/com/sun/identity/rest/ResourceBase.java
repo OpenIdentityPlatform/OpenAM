@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -20,32 +20,31 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: ResourceBase.java,v 1.4 2009/11/25 18:09:51 veiming Exp $
+ *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.rest;
 
-import com.sun.identity.coretoken.CoreTokenException;
-import com.sun.identity.entitlement.Entitlement;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.PrivilegeManager;
-import com.sun.identity.entitlement.util.AuthSPrincipal;
-import java.security.Principal;
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
-import org.json.JSONObject;
+import java.security.Principal;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import com.sun.identity.coretoken.CoreTokenException;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.PrivilegeManager;
+import com.sun.identity.entitlement.util.AuthSPrincipal;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 public abstract class ResourceBase {
     public static final String STATUS_CODE = "statusCode";
@@ -75,34 +74,6 @@ public abstract class ResourceBase {
     protected Subject getSubject(HttpServletRequest request) 
         throws RestException {
         return RestServiceManager.getInstance().getAuthZSubject(request);
-    }
-
-    protected Map<String, Set<String>> getMap(List<String> list) {
-        Map<String, Set<String>> env = new HashMap<String, Set<String>>();
-
-        if ((list != null) && !list.isEmpty()) {
-            for (String l : list) {
-                if (l.contains("=")) {
-                    String[] cond = l.split("=", 2);
-                    Set<String> set = env.get(cond[0]);
-
-                    if (set == null) {
-                        set = new HashSet<String>();
-                        env.put(cond[0], set);
-                    }
-
-                    set.add(cond[1]);
-                }
-            }
-        }
-        
-        return env;
-    }
-
-    protected Entitlement toEntitlement(String resource, String action) {
-        Set<String> set = new HashSet<String>();
-        set.add(action);
-        return new Entitlement(resource, set);
     }
 
     protected Subject toSubject(Principal principal) {
@@ -166,19 +137,6 @@ public abstract class ResourceBase {
         MimeType mimeType
     ) {
         return getWebApplicationException(400, e, mimeType);
-    }
-
-    protected WebApplicationException getWebApplicationException(
-        HttpHeaders headers,
-        int statusCode,
-        int errorCode,
-        Object[] param
-    ) {
-        String localizedMsg = getLocalizedMessage(headers, errorCode);
-        if (param != null) {
-            localizedMsg = MessageFormat.format(localizedMsg, param);
-        }
-        return getWebApplicationException(statusCode, errorCode, localizedMsg);
     }
 
     protected WebApplicationException getWebApplicationException(

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: RestService.java,v 1.1 2009/12/01 02:09:57 veiming Exp $
+ *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.rest;
@@ -31,15 +33,10 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.core.Application;
 
-/**
- *
- * @author dennis
- */
 public class RestService extends Application {
     @Override
     public Set<Class<?>> getClasses() {
         Set<Class<?>> s = new HashSet<Class<?>>();
-        s.add(DecisionResource.class);
         s.add(PrivilegeResource.class);
         s.add(ListenerResource.class);
         s.add(CoreTokenResource.class);
