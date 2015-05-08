@@ -16,8 +16,6 @@
 
 package org.forgerock.openam.errors;
 
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idsvcs.IdServicesException;
 import org.forgerock.json.resource.Context;
 import org.forgerock.json.resource.Request;
 

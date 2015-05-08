@@ -13,12 +13,13 @@
 *
 * Copyright 2015 ForgeRock AS.
 */
+
 package org.forgerock.openam.errors;
 
-import com.sun.identity.idsvcs.AccessDenied;
-import com.sun.identity.idsvcs.GeneralFailure;
-import com.sun.identity.idsvcs.IdServicesException;
-import com.sun.identity.idsvcs.ObjectNotFound;
+import org.forgerock.json.resource.ForbiddenException;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.ResourceException;
 
 /**
  * Used as a reference to IdServiceExceptions.
@@ -40,22 +41,22 @@ public class IdentityServicesException {
      * @param message to use in the case no specific error is found
      * @return a specific IdServicesException
      */
-    public static IdServicesException getIdentityServiceException(int code, String message) {
+    public static ResourceException getException(int code, String message) {
         switch (code) {
             case LDAP_NO_SUCH_OBJECT :
-                return new ObjectNotFound("Object does not exist.");
+                return new NotFoundException("Object does not exist.");
 
             case LDAP_NOT_ALLOWED_ON_RDN :
-                return new AccessDenied("Unable to set attributes for identity.");
+                return new ForbiddenException("Unable to set attributes for identity.");
 
             case GENERAL_ACCESS_DENIED:
-                return new AccessDenied(message);
+                return new ForbiddenException(message);
 
             case GENERAL_OBJECT_NOT_FOUND:
-                return new ObjectNotFound(message);
+                return new NotFoundException(message);
 
             default:
-                return new GeneralFailure(message);
+                return new InternalServerErrorException(message);
         }
     }
 

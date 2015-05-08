@@ -13,41 +13,41 @@
 *
 * Copyright 2015 ForgeRock AS.
 */
+
 package org.forgerock.openam.errors;
 
 import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idsvcs.IdServicesException;
 import org.forgerock.json.resource.Context;
 import org.forgerock.json.resource.Request;
+import org.forgerock.json.resource.ResourceException;
 
 /**
  * To convert from specific Identity Repo (e.g. LDAP) errors into a generic IdServicesError class.
  */
-public class IdentityServicesExceptionMappingHandler
-        implements ExceptionMappingHandler<IdRepoException, IdServicesException> {
+public class IdentityServicesExceptionMappingHandler implements ExceptionMappingHandler<IdRepoException, ResourceException> {
 
     @Override
-    public IdServicesException handleError(Context context, String debug, Request request, IdRepoException error) {
+    public ResourceException handleError(Context context, String debug, Request request, IdRepoException error) {
         return handleError(error);
     }
 
     @Override
-    public IdServicesException handleError(String debug, Request request, IdRepoException error) {
+    public ResourceException handleError(String debug, Request request, IdRepoException error) {
         return handleError(error);
     }
 
     @Override
-    public IdServicesException handleError(Context context, Request request, IdRepoException error) {
+    public ResourceException handleError(Context context, Request request, IdRepoException error) {
         return handleError(error);
     }
 
     @Override
-    public IdServicesException handleError(Request request, IdRepoException error) {
+    public ResourceException handleError(Request request, IdRepoException error) {
         return handleError(error);
     }
 
     @Override
-    public IdServicesException handleError(IdRepoException error) {
+    public ResourceException handleError(IdRepoException error) {
 
         int code;
 
@@ -66,6 +66,6 @@ public class IdentityServicesExceptionMappingHandler
             }
         }
 
-        return IdentityServicesException.getIdentityServiceException(code, error.getMessage());
+        return IdentityServicesException.getException(code, error.getMessage());
     }
 }

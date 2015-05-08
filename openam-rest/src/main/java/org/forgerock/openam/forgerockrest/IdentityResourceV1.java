@@ -25,19 +25,6 @@ import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idsvcs.AccessDenied;
-import com.sun.identity.idsvcs.Attribute;
-import com.sun.identity.idsvcs.CreateResponse;
-import com.sun.identity.idsvcs.DeleteResponse;
-import com.sun.identity.idsvcs.DuplicateObject;
-import com.sun.identity.idsvcs.GeneralFailure;
-import com.sun.identity.idsvcs.IdentityDetails;
-import com.sun.identity.idsvcs.NeedMoreCredentials;
-import com.sun.identity.idsvcs.ObjectNotFound;
-import com.sun.identity.idsvcs.Token;
-import com.sun.identity.idsvcs.TokenExpired;
-import com.sun.identity.idsvcs.UpdateResponse;
-import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
 import com.sun.identity.sm.SMSException;
@@ -59,7 +46,6 @@ import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.json.resource.PermanentException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
@@ -90,10 +76,13 @@ import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -133,6 +122,8 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
     final static String USER_PASSWORD = "userpassword";
     public static final String OLD_PASSWORD = "olduserpassword";
 
+    private final IdentityResourceUtils identityResourceUtils;
+
     private final MailServerLoader mailServerLoader;
 
     private static final Map<String, RestSecurity> REALM_REST_SECURITY_MAP = new ConcurrentHashMap<String, RestSecurity>();
@@ -140,8 +131,9 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
     /**
      * Creates a backend
      */
-    public IdentityResourceV1(String userType, MailServerLoader mailServerLoader) {
-        this(userType, null, null, mailServerLoader);
+    public IdentityResourceV1(String userType, MailServerLoader mailServerLoader,
+            IdentityResourceUtils identityResourceUtils) {
+        this(userType, null, null, mailServerLoader, identityResourceUtils);
     }
 
     /**
@@ -163,11 +155,12 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
 
     // Constructor used for testing...
     IdentityResourceV1(String userType, ServiceConfigManager mailmgr, ServiceConfig mailscm,
-            MailServerLoader mailServerLoader) {
+            MailServerLoader mailServerLoader, IdentityResourceUtils identityResourceUtils) {
         this.userType = userType;
         this.mailmgr = mailmgr;
         this.mailscm = mailscm;
         this.mailServerLoader = mailServerLoader;
+        this.identityResourceUtils = identityResourceUtils;
     }
 
     /**
@@ -328,14 +321,10 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             }
 
             handler.handleResult(result);
-        } catch (BadRequestException be) {
-            debug.error("IdentityResource.createRegistrationEmail: Cannot send email to : " + emailAddress
+        } catch (BadRequestException | NotFoundException be) {
+            debug.warning("IdentityResource.createRegistrationEmail: Cannot send email to : " + emailAddress
                     + be.getMessage());
             handler.handleError(be);
-        } catch (NotFoundException nfe) {
-            debug.error("IdentityResource.createRegistrationEmail: Cannot send email to : " + emailAddress
-                    + nfe.getMessage());
-            handler.handleError(nfe);
         } catch (NotSupportedException nse) {
             debug.error("IdentityResource.createRegistrationEmail: Operation not enabled " + nse.getMessage());
             handler.handleError(nse);
@@ -499,7 +488,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             handler.handleResult(result);
 
         } catch (BadRequestException be){
-            debug.error(METHOD + ": Cannot confirm registration/forgotPassword for : " + hashComponent, be);
+            debug.warning(METHOD + ": Cannot confirm registration/forgotPassword for : " + hashComponent, be);
             handler.handleError(be);
         } catch (Exception e){
             debug.error(METHOD + ": Cannot confirm registration/forgotPassword for : " + hashComponent, e);
@@ -613,6 +602,11 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         }
     }
 
+    SSOToken getSSOToken(String ssoTokenId) throws SSOException {
+        SSOTokenManager mgr = SSOTokenManager.getInstance();
+        return mgr.createSSOToken(ssoTokenId);
+    }
+
     /**
      * Generates the e-mail contents based on the incoming request.
      *
@@ -651,17 +645,15 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             }
 
             // Generate Admin Token
-            Token adminToken = new Token();
-            adminToken.setId(RestUtils.getToken().getTokenID().toString());
+            SSOToken adminToken = getSSOToken(RestUtils.getToken().getTokenID().toString());
 
-            List<Attribute> searchAttributes = getIdentityServicesAttributes(realm);
-            searchAttributes.add(getAttributeFromRequest(jsonBody));
+            Map<String, Set<String>> searchAttributes = getIdentityServicesAttributes(realm);
+            searchAttributes.putAll(getAttributeFromRequest(jsonBody));
 
-            IdentityServicesImpl idsvc = new IdentityServicesImpl();
-            List searchResults = idsvc.search(null, searchAttributes, adminToken);
+            List searchResults = identityResourceUtils.search(null, searchAttributes, adminToken);
 
             if (searchResults.isEmpty()) {
-                throw new ObjectNotFound("User not found");
+                throw new NotFoundException("User not found");
 
             } else if (searchResults.size() > 1) {
                 throw new ConflictException("Multiple users found");
@@ -669,19 +661,20 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             } else {
                 String username = (String) searchResults.get(0);
 
-                IdentityDetails identityDetails = idsvc.read(username, getIdentityServicesAttributes(realm), adminToken);
+                IdentityDetails identityDetails = identityResourceUtils.read(username,
+                        getIdentityServicesAttributes(realm), adminToken);
 
                 String email = null;
                 String uid = null;
-                for (Attribute attribute : identityDetails.getAttributes()) {
-                    String attributeName = attribute.getName();
+                for (Map.Entry<String, Set<String>> attribute : identityDetails.getAttributes().entrySet()) {
+                    String attributeName = attribute.getKey();
                     if (MAIL.equalsIgnoreCase(attributeName)) {
-                        if (attribute.getValues() != null && attribute.getValues().length > 0) {
-                            email = attribute.getValues()[0];
+                        if (attribute.getValue() != null && !attribute.getValue().isEmpty()) {
+                            email = attribute.getValue().iterator().next();
                         }
                     } else if (UNIVERSAL_ID.equalsIgnoreCase(attributeName)) {
-                        if (attribute.getValues() != null && attribute.getValues().length > 0) {
-                            uid = attribute.getValues()[0];
+                        if (attribute.getValue() != null && !attribute.getValue().isEmpty()) {
+                            uid = attribute.getValue().iterator().next();
                         }
                     }
                 }
@@ -745,14 +738,13 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                 }
             }
             handler.handleResult(result);
+        } catch (NotFoundException e) {
+            debug.warning("Could not find user", e);
+            handler.handleError(e);
         } catch (ResourceException re) {
             // Service not available, Neither or both Username/Email provided, User inactive
-            debug.error(re.getMessage(), re);
+            debug.warning(re.getMessage(), re);
             handler.handleError(re);
-        } catch (ObjectNotFound onf) {
-            // User not found
-            debug.error("Could not find user", onf);
-            handler.handleError(ResourceException.getException(ResourceException.NOT_FOUND, "User not found", onf));
         } catch (Exception e) {
             // Intentional - all other errors are considered Internal Error.
             debug.error("Internal error", e);
@@ -760,7 +752,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         }
     }
 
-    private Attribute getAttributeFromRequest(JsonValue jsonBody) throws BadRequestException {
+    private Map<String, Set<String>> getAttributeFromRequest(JsonValue jsonBody) throws BadRequestException {
         String username = jsonBody.get(USERNAME).asString();
         String email = jsonBody.get(EMAIL).asString();
 
@@ -769,11 +761,11 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         }
 
         if (username != null && !username.isEmpty()) {
-            return new Attribute(UNIVERSAL_ID_ABBREV, new String[] {username});
+            return Collections.singletonMap(UNIVERSAL_ID_ABBREV, Collections.singleton(username));
         }
 
         if (email != null && !email.isEmpty()) {
-            return new Attribute(MAIL, new String[] {email});
+            return Collections.singletonMap(MAIL, Collections.singleton(email));
         }
 
         throw new BadRequestException("Username or email not provided in request");
@@ -816,9 +808,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             validateToken(tokenID, realm, username, confirmationId);
 
             // update Identity
-            SSOToken tok = RestUtils.getToken();
-            Token admin = new Token();
-            admin.setId(tok.getTokenID().toString());
+            SSOToken admin = RestUtils.getToken();
 
             // Update instance with new password value
             if (updateInstance(admin, jVal, realm, handler)) {
@@ -856,38 +846,36 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
      * @param handler handles result of operation
      * @return true if the update was successful
      */
-    private boolean updateInstance(Token admin, final JsonValue details, final String realm,
+    private boolean updateInstance(SSOToken admin, final JsonValue details, final String realm,
             final ResultHandler<JsonValue> handler){
         JsonValue jVal = details;
         IdentityDetails newDtls;
-        IdentityServicesImpl idsvc;
         String resourceId = jVal.get(USERNAME).asString();
 
         boolean successfulUpdate = false;
 
         try {
-            idsvc = new IdentityServicesImpl();
             newDtls = jsonValueToIdentityDetails(jVal, realm);
 
-            if (newDtls.getAttributes() == null || newDtls.getAttributes().length < 1) {
+            if (newDtls.getAttributes() == null || newDtls.getAttributes().isEmpty()) {
                 throw new BadRequestException("Illegal arguments: One or more required arguments is null or empty");
             }
 
             newDtls.setName(resourceId);
 
             // update resource with new details
-            UpdateResponse message = idsvc.update(newDtls, admin);
+            identityResourceUtils.update(newDtls, admin);
             debug.message("IdentityResource.updateInstance :: Anonymous UPDATE in realm " + realm + " for " +
                     resourceId);
             // read updated identity back to client
-            IdentityDetails checkIdent = idsvc.read(resourceId, getIdentityServicesAttributes(realm), admin);
+            IdentityDetails checkIdent = identityResourceUtils.read(resourceId, getIdentityServicesAttributes(realm),
+                    admin);
             // handle updated resource
             handler.handleResult(identityDetailsToJsonValue(checkIdent));
             successfulUpdate = true;
-        } catch (final Exception exception) {
-            debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! " +
-                    exception);
-            handler.handleError(new NotFoundException(exception.getMessage(), exception));
+        } catch (ResourceException e) {
+            debug.warning("IdentityResource.updateInstance() :: Cannot UPDATE! " + e);
+            handler.handleError(e);
         }
 
         return successfulUpdate;
@@ -930,9 +918,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             validateToken(tokenID, realm, email, confirmationId);
 
             // create an Identity
-            SSOToken tok = RestUtils.getToken();
-            Token admin = new Token();
-            admin.setId(tok.getTokenID().toString());
+            SSOToken admin = RestUtils.getToken();
             if (createInstance(admin, jVal, realm, handler)) {
 
                 // Only remove the token if the create was successful, errors will be set in the handler.
@@ -950,10 +936,10 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                 }
             }
         } catch (BadRequestException be){
-            debug.error("IdentityResource.anonymousCreate() :: Invalid Parameter " + be);
+            debug.warning("IdentityResource.anonymousCreate() :: Invalid Parameter " + be);
             handler.handleError(be);
         } catch (NotFoundException nfe){
-            debug.error("IdentityResource.anonymousCreate(): Invalid tokenID : " + tokenID);
+            debug.warning("IdentityResource.anonymousCreate(): Invalid tokenID : " + tokenID);
             handler.handleError(nfe);
         } catch (CoreTokenException cte){ // For any unexpected CTS error
             debug.error("IdentityResource.anonymousCreate(): CTS Error : " + cte.getMessage());
@@ -985,7 +971,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
      * @return true if the create was successful
      *
      */
-    private boolean createInstance(Token admin, final JsonValue details, final String realm,
+    private boolean createInstance(SSOToken admin, final JsonValue details, final String realm,
             final ResultHandler<JsonValue> handler) {
 
         JsonValue jVal = details;
@@ -1018,73 +1004,58 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         RealmContext realmContext = context.asContext(RealmContext.class);
         final String realm = realmContext.getResolvedRealm();
 
-        // anyone can create an account add
-        Token admin = new Token();
-        admin.setId(getCookieFromServerContext(context));
+        try {
+            // anyone can create an account add
+            SSOToken admin = getSSOToken(getCookieFromServerContext(context));
 
-        final JsonValue jVal = request.getContent();
-        String resourceId = request.getNewResourceId();
+            final JsonValue jVal = request.getContent();
+            String resourceId = request.getNewResourceId();
 
-        IdentityDetails identity = jsonValueToIdentityDetails(jVal, realm);
-        // check to see if request has included resource ID
-        if(resourceId != null ){
-            if(identity.getName() != null){
-                if(!resourceId.equalsIgnoreCase(identity.getName())){
-                    ResourceException be = new BadRequestException("id in path does not match id in request body");
-                    debug.error("IdentityResource.createInstance() :: Cannot CREATE ", be);
-                    handler.handleError(be);
+            IdentityDetails identity = jsonValueToIdentityDetails(jVal, realm);
+            // check to see if request has included resource ID
+            if (resourceId != null) {
+                if (identity.getName() != null) {
+                    if (!resourceId.equalsIgnoreCase(identity.getName())) {
+                        ResourceException be = new BadRequestException("id in path does not match id in request body");
+                        debug.error("IdentityResource.createInstance() :: Cannot CREATE ", be);
+                        handler.handleError(be);
+                    }
                 }
+                identity.setName(resourceId);
+            } else {
+                resourceId = identity.getName();
             }
-            identity.setName(resourceId);
-        } else {
-            resourceId = identity.getName();
-        }
 
-        IdentityDetails dtls = attemptResourceCreation(handler, realm, admin, identity, resourceId);
+            IdentityDetails dtls = attemptResourceCreation(handler, realm, admin, identity, resourceId);
 
-        if (dtls != null) {
-            String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
-            debug.message("IdentityResource.createInstance :: CREATE of " + resourceId + " in realm " + realm +
-                    " performed by " + principalName);
+            if (dtls != null) {
+                String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+                debug.message("IdentityResource.createInstance :: CREATE of " + resourceId + " in realm " + realm +
+                        " performed by " + principalName);
 
-            Resource resource = new Resource(resourceId, "0", identityDetailsToJsonValue(dtls));
-            handler.handleResult(resource);
+                Resource resource = new Resource(resourceId, "0", identityDetailsToJsonValue(dtls));
+                handler.handleResult(resource);
+            }
+        } catch (SSOException e) {
+            debug.error("IdentityResource.createInstance() :: Cannot CREATE! " + e);
+            handler.handleError(new NotFoundException(e.getMessage(), e));
         }
     }
 
-    private IdentityDetails attemptResourceCreation(ResultHandler<?> handler, String realm, Token admin,
+    private IdentityDetails attemptResourceCreation(ResultHandler<?> handler, String realm, SSOToken admin,
             IdentityDetails identity, String resourceId) {
         IdentityDetails dtls = null;
+
         try {
-            IdentityServicesImpl idsvc = new IdentityServicesImpl();
-            // Create the resource
-            CreateResponse success = idsvc.create(identity, admin);
-            // Read created resource
-            dtls = idsvc.read(resourceId, getIdentityServicesAttributes(realm), admin);
+            identityResourceUtils.create(identity, admin);
+            dtls = identityResourceUtils.read(resourceId, getIdentityServicesAttributes(realm), admin);
             if (debug.messageEnabled()) {
                 debug.message("IdentityResource.createInstance() :: Created " + resourceId + " in realm " + realm +
-                        " by Admin with ID: " + admin.getId());
+                        " by Admin with ID: " + admin.getTokenID().toString());
             }
-        } catch (final ObjectNotFound notFound) {
-            debug.error("IdentityResource.createInstance() :: Cannot READ " +
-                    resourceId + ": Resource cannot be found." + notFound);
-            handler.handleError(new NotFoundException("Resource not found.", notFound));
-        } catch (final DuplicateObject duplicateObject) {
-            debug.error("IdentityResource.createInstance() :: Cannot CREATE " +
-                    resourceId + ": Resource already exists!" + duplicateObject);
-            handler.handleError(new ConflictException("Resource already exists", duplicateObject));
-        } catch (final TokenExpired tokenExpired) {
-            debug.error("IdentityResource.createInstance() :: Cannot CREATE " +
-                    resourceId + ":" + tokenExpired);
-            handler.handleError(new PermanentException(401, "Unauthorized", null));
-        } catch (final NeedMoreCredentials needMoreCredentials) {
-            debug.error("IdentityResource.createInstance() :: Cannot CREATE " +
-                    needMoreCredentials);
-            handler.handleError(new ForbiddenException("Token is not authorized", needMoreCredentials));
-        } catch (final Exception exception) {
-            debug.error("IdentityResource.createInstance() :: Cannot CREATE! " +
-                    exception);
-            handler.handleError(new NotFoundException(exception.getMessage(), exception));
+        } catch (ResourceException e) {
+            debug.warning("IdentityResource.createInstance() :: Cannot CREATE! " + e);
+            handler.handleError(e);
         }
         return dtls;
     }
@@ -1099,21 +1070,19 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         RealmContext realmContext = context.asContext(RealmContext.class);
         final String realm = realmContext.getResolvedRealm();
 
-        Token admin = new Token();
-        admin.setId(getCookieFromServerContext(context));
 
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         Resource resource;
         IdentityDetails dtls;
-        IdentityServicesImpl idsvc = new IdentityServicesImpl();
 
         try {
+            SSOToken admin = getSSOToken(getCookieFromServerContext(context));
 
             // read to see if resource is available to user
-            dtls = idsvc.read(resourceId, getIdentityServicesAttributes(realm), admin);
+            dtls = identityResourceUtils.read(resourceId, getIdentityServicesAttributes(realm), admin);
 
             // delete the resource
-            DeleteResponse success = idsvc.delete(dtls, admin);
+            identityResourceUtils.delete(dtls, admin);
             String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
             debug.message("IdentityResource.deleteInstance :: DELETE of " + resourceId + " in realm " + realm +
                     " performed by " + principalName);
@@ -1122,29 +1091,20 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             resource = new Resource(resourceId, "0", result);
             handler.handleResult(resource);
 
-        } catch (final NeedMoreCredentials ex) {
-            debug.error("IdentityResource.deleteInstance() :: Cannot DELETE " +
-                    resourceId + ": User does not have enough privileges.");
+        } catch (ForbiddenException ex) {
+            debug.warning("IdentityResource.deleteInstance() :: Cannot DELETE " + resourceId
+                    + ": User does not have enough privileges.");
             handler.handleError(new ForbiddenException(resourceId, ex));
-        } catch (final ObjectNotFound notFound) {
-            debug.error("IdentityResource.deleteInstance() :: Cannot DELETE " +
-                    resourceId + ":" + notFound);
+        } catch (NotFoundException notFound) {
+            debug.warning("IdentityResource.deleteInstance() :: Cannot DELETE " + resourceId + ":" + notFound);
             handler.handleError(new NotFoundException("Resource cannot be found.", notFound));
-        } catch (final TokenExpired tokenExpired) {
-            debug.error("IdentityResource.deleteInstance() :: Cannot DELETE " +
-                    resourceId + ":" + tokenExpired);
-            handler.handleError(new PermanentException(401, "Unauthorized", null));
-        } catch (final AccessDenied accessDenied) {
-            debug.error("IdentityResource.deleteInstance() :: Cannot DELETE " +
-                    resourceId + ":" + accessDenied);
-            handler.handleError(new ForbiddenException(accessDenied.getMessage(), accessDenied));
-        } catch (final GeneralFailure generalFailure) {
-            debug.error("IdentityResource.deleteInstance() :: Cannot DELETE " +
-                    generalFailure.getMessage());
-            handler.handleError(new BadRequestException(generalFailure.getMessage(), generalFailure));
-        } catch (final Exception exception) {
-            debug.error("IdentityResource.deleteInstance() :: Cannot DELETE! " +
-                    exception.getMessage());
+        } catch (ResourceException exception) {
+            debug.warning("IdentityResource.deleteInstance() :: Cannot DELETE! " + exception.getMessage());
+            result.put("success", "false");
+            resource = new Resource(resourceId, "0", result);
+            handler.handleResult(resource);
+        } catch (SSOException exception) {
+            debug.error("IdentityResource.deleteInstance() :: Cannot DELETE! " + exception.getMessage());
             result.put("success", "false");
             resource = new Resource(resourceId, "0", result);
             handler.handleResult(resource);
@@ -1162,10 +1122,10 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         try {
             result.put(USERNAME, details.getName());
             result.put("realm", details.getRealm());
-            Attribute[] attrs = details.getAttributes();
+            Map<String, Set<String>> attrs = details.getAttributes();
 
-            for (Attribute aix : attrs) {
-                result.put(aix.getName(), aix.getValues());
+            for (Map.Entry<String, Set<String>>aix : attrs.entrySet()) {
+                result.put(aix.getKey(), aix.getValue());
             }
             return result;
         } catch (final Exception e) {
@@ -1182,7 +1142,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
     private IdentityDetails jsonValueToIdentityDetails(final JsonValue jVal, final String realm) {
 
         IdentityDetails identity = new IdentityDetails();
-        List<Attribute> identityAttrList = new ArrayList();
+        Map<String, Set<String>> identityAttrList = new HashMap<>();
 
         try {
             identity.setType(userType); //set type ex. user
@@ -1193,20 +1153,17 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                 for (String s : jVal.keys()) {
                     JsonValue childValue = jVal.get(s);
                     if (childValue.isString()) {
-                        String[] tArray = {childValue.asString()};
-                        identityAttrList.add(new Attribute(s, tArray));
+                        identityAttrList.put(s, Collections.singleton(childValue.asString()));
                     } else if (childValue.isList()) {
                         ArrayList<String> tList = (ArrayList<String>) childValue.getObject();
-                        String[] tArray = tList.toArray(new String[tList.size()]);
-                        identityAttrList.add(new Attribute(s, tArray));
+                        identityAttrList.put(s, new HashSet<>(tList));
                     }
                 }
             } catch (Exception e) {
                 debug.error("IdentityResource.jsonValueToIdentityDetails() :: " +
                         "Cannot Traverse JsonValue" + e);
             }
-            Attribute[] attr = identityAttrList.toArray(new Attribute[identityAttrList.size()]);
-            identity.setAttributes(attr);
+            identity.setAttributes(identityAttrList);
 
         } catch (final Exception e) {
             debug.error("IdentityResource.jsonValueToIdentityDetails() ::" +
@@ -1236,21 +1193,17 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         RealmContext realmContext = context.asContext(RealmContext.class);
         final String realm = realmContext.getResolvedRealm();
 
-        Token admin = new Token();
-        admin.setId(getCookieFromServerContext(context));
-
-
         String queryFilter;
 
         try {
+            SSOToken admin = getSSOToken(getCookieFromServerContext(context));
             // This will only return 1 user..
             // getQueryFilter() is not implemented yet..returns dummy false value
             queryFilter = request.getQueryId();
             if (queryFilter == null || queryFilter.isEmpty()) {
                 queryFilter = "*";
             }
-            IdentityServicesImpl id = new IdentityServicesImpl();
-            List<String> users = id.search(queryFilter, getIdentityServicesAttributes(realm), admin);
+            List<String> users = identityResourceUtils.search(queryFilter, getIdentityServicesAttributes(realm), admin);
             String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
             debug.message("IdentityResource.queryCollection :: QUERY performed on realm " + realm +
                     " by " + principalName);
@@ -1277,46 +1230,23 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         RealmContext realmContext = context.asContext(RealmContext.class);
         final String realm = realmContext.getResolvedRealm();
 
-        Token admin = new Token();
-        admin.setId(getCookieFromServerContext(context));
-
-        IdentityServicesImpl idsvc;
         IdentityDetails dtls;
         Resource resource;
 
         try {
-            idsvc = new IdentityServicesImpl();
-            dtls = idsvc.read(resourceId, getIdentityServicesAttributes(realm), admin);
+            SSOToken admin = getSSOToken(getCookieFromServerContext(context));
+            dtls = identityResourceUtils.read(resourceId, getIdentityServicesAttributes(realm), admin);
             String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
             debug.message("IdentityResource.readInstance :: READ of " + resourceId + " in realm " + realm +
                     " performed by " + principalName);
             resource = new Resource(resourceId, "0", identityDetailsToJsonValue(dtls));
             handler.handleResult(resource);
-        } catch (final NeedMoreCredentials needMoreCredentials) {
-            debug.error("IdentityResource.readInstance() :: Cannot READ " +
-                    resourceId + ":" + needMoreCredentials);
-            handler.handleError(new ForbiddenException("User does not have enough privileges.", needMoreCredentials));
-        } catch (final ObjectNotFound objectNotFound) {
-            debug.error("IdentityResource.readInstance() :: Cannot READ " +
-                    resourceId + ":" + objectNotFound);
-            handler.handleError(new NotFoundException("Resource cannot be found.", objectNotFound));
-        } catch (final TokenExpired tokenExpired) {
-            debug.error("IdentityResource.readInstance() :: Cannot READ " +
-                    resourceId + ":" + tokenExpired);
-            handler.handleError(new PermanentException(401, "Unauthorized", null));
-        } catch (final AccessDenied accessDenied) {
-            debug.error("IdentityResource.readInstance() :: Cannot READ " +
-                    resourceId + ":" + accessDenied);
-            handler.handleError(new ForbiddenException(accessDenied.getMessage(), accessDenied));
-        } catch (final GeneralFailure generalFailure) {
-            debug.error("IdentityResource.readInstance() :: Cannot READ " +
-                    generalFailure);
-            handler.handleError(new BadRequestException(generalFailure.getMessage(), generalFailure));
-        } catch (final Exception exception) {
-            debug.error("IdentityResource.readInstance() :: Cannot READ! " +
-                    exception);
-            handler.handleError(new NotFoundException(exception.getMessage(), exception));
-
+        } catch (ResourceException e) {
+            debug.warning("IdentityResource.readInstance() :: Cannot READ! " + e);
+            handler.handleError(e);
+        } catch (SSOException e) {
+            debug.error("IdentityResource.readInstance() :: Cannot READ! " + e);
+            handler.handleError(new NotFoundException(e.getMessage(), e));
         }
     }
 
@@ -1324,20 +1254,17 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
     public void updateInstance(final ServerContext context, final String resourceId, final UpdateRequest request,
             final ResultHandler<Resource> handler) {
 
-        Token admin = new Token();
-        admin.setId(getCookieFromServerContext(context));
-
         RealmContext realmContext = context.asContext(RealmContext.class);
         final String realm = realmContext.getResolvedRealm();
 
         final JsonValue jsonValue = request.getContent();
         final String rev = request.getRevision();
         IdentityDetails dtls, newDtls;
-        IdentityServicesImpl idsvc = new IdentityServicesImpl();
         Resource resource;
         try {
+            SSOToken admin = getSSOToken(getCookieFromServerContext(context));
             // Retrieve details about user to be updated
-            dtls = idsvc.read(resourceId, getIdentityServicesAttributes(realm), admin);
+            dtls = identityResourceUtils.read(resourceId, getIdentityServicesAttributes(realm), admin);
 
             //check first if the password is modified as part of the update request, so if necessary, the password can
             //be removed from the IdentityDetails object.
@@ -1367,52 +1294,32 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             newDtls.setName(resourceId);
 
             // update resource with new details
-            UpdateResponse message = idsvc.update(newDtls, admin);
+            identityResourceUtils.update(newDtls, admin);
             // read updated identity back to client
-            IdentityDetails checkIdent = idsvc.read(dtls.getName(), getIdentityServicesAttributes(realm), admin);
+            IdentityDetails checkIdent = identityResourceUtils.read(dtls.getName(),
+                    getIdentityServicesAttributes(realm), admin);
             // handle updated resource
             resource = new Resource(resourceId, "0", identityDetailsToJsonValue(checkIdent));
             handler.handleResult(resource);
-        } catch (final ObjectNotFound onf) {
-            debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! " +
-                    onf);
-            handler.handleError(new NotFoundException("Could not find the resource [ " + resourceId + " ] to update", onf));
-        } catch (final NeedMoreCredentials needMoreCredentials) {
-            debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
-                    resourceId + ":" + needMoreCredentials);
-            handler.handleError(new ForbiddenException("Token is not authorized", needMoreCredentials));
-        } catch (final TokenExpired tokenExpired) {
-            debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
-                    resourceId + ":" + tokenExpired);
-            handler.handleError(new PermanentException(401, "Unauthorized", null));
-        } catch (final AccessDenied accessDenied) {
-            debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
-                    resourceId + ":" + accessDenied);
-            handler.handleError(new ForbiddenException(accessDenied.getMessage(), accessDenied));
-        } catch (final GeneralFailure generalFailure) {
-            debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
-                    generalFailure);
-            handler.handleError(new BadRequestException(generalFailure.getMessage(), generalFailure));
-        } catch (final ResourceException re){
-            debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! "
-                    + resourceId + ":" + re);
+        } catch (NotFoundException e) {
+            debug.warning("IdentityResource.updateInstance() :: Cannot UPDATE! " + e);
+            handler.handleError(new NotFoundException("Could not find the resource [ " + resourceId + " ] to update",
+                    e));
+
+        } catch (ResourceException re) {
+            debug.warning("IdentityResource.updateInstance() :: Cannot UPDATE! " + resourceId + ":" + re);
             handler.handleError(re);
-        } catch (final Exception exception) {
-            debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! " +
-                    exception);
-            handler.handleError(new NotFoundException(exception.getMessage(), exception));
+        } catch (SSOException e) {
+            debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
+                    resourceId + ":" + e);
+            handler.handleError(new ForbiddenException(e.getMessage(), e));
         }
     }
 
-    private List<Attribute> getIdentityServicesAttributes(String realm) {
-
-        final List<Attribute> identityServicesAttributes = new ArrayList<Attribute>();
-
-        String[] userTypeVal = {userType};
-        String[] realmVal = {realm};
-        identityServicesAttributes.add(new Attribute("objecttype", userTypeVal));
-        identityServicesAttributes.add(new Attribute("realm", realmVal));
-
+    private Map<String, Set<String>> getIdentityServicesAttributes(String realm) {
+        Map<String, Set<String>> identityServicesAttributes = new HashMap<>();
+        identityServicesAttributes.put("objecttype", Collections.singleton(userType));
+        identityServicesAttributes.put("realm", Collections.singleton(realm));
         return identityServicesAttributes;
     }
 
@@ -1421,22 +1328,6 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             return URLEncoder.encode(toEncode, "UTF-8").replace("+", "%20");
         } else {
             return toEncode;
-        }
-    }
-
-    /**
-     * Indicates that the requested Token has not been found.
-     */
-    private static class InvalidTokenException extends Throwable {
-        private final String tokenID;
-
-        public InvalidTokenException(String error, String tokenID) {
-            super(error);
-            this.tokenID = tokenID;
-        }
-
-        private String getTokenID() {
-            return tokenID;
         }
     }
 
