@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.core;
@@ -211,6 +211,16 @@ public class CoreWrapper {
      */
     public String convertOrgNameToRealmName(String orgName) {
         return DNMapper.orgNameToRealmName(orgName);
+    }
+
+    /**
+     * Returns realm name in DN format for the provided realm/organization name in "/" separated format.
+     *
+     * @param realm DN format "/" separated realm name of organization name.
+     * @return The realm in DN format.
+     */
+    public String convertRealmNameToOrgName(String realm) {
+        return DNMapper.realmNameToAMSDKName(realm);
     }
 
     /**

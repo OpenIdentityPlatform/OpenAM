@@ -77,6 +77,7 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.servlet.HttpContext;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.exceptions.DeleteFailedException;
@@ -145,8 +146,8 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
      * Creates a backend
      */
     public IdentityResourceV2(String userType, MailServerLoader mailServerLoader,
-            IdentityResourceUtils identityResourceUtils) {
-        this(userType, null, null, mailServerLoader, identityResourceUtils);
+            IdentityResourceUtils identityResourceUtils, CoreWrapper coreWrapper) {
+        this(userType, null, null, mailServerLoader, identityResourceUtils, coreWrapper);
     }
 
     /**
@@ -168,13 +169,14 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
 
     // Constructor used for testing...
     IdentityResourceV2(String userType, ServiceConfigManager mailmgr, ServiceConfig mailscm,
-            MailServerLoader mailServerLoader, IdentityResourceUtils identityResourceUtils) {
+            MailServerLoader mailServerLoader, IdentityResourceUtils identityResourceUtils, CoreWrapper coreWrapper) {
         this.userType = userType;
         this.mailmgr = mailmgr;
         this.mailscm = mailscm;
         this.mailServerLoader = mailServerLoader;
         this.identityResourceUtils = identityResourceUtils;
-        this.identityResourceV1 = new IdentityResourceV1(userType, mailServerLoader, identityResourceUtils);
+        this.identityResourceV1 = new IdentityResourceV1(userType, mailServerLoader, identityResourceUtils,
+                coreWrapper);
     }
 
     /**

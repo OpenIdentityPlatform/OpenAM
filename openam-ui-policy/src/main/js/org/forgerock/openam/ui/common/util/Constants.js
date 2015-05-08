@@ -30,7 +30,6 @@ define("org/forgerock/openam/ui/common/util/Constants", [
     commonConstants.context = location.pathname.substring(1, location.pathname.indexOf('policyEditor') - 1);
     commonConstants.THEME_CONFIG_PATH = 'themeConfig.json';
     commonConstants.CONSOLE_PATH = '/' + commonConstants.context + '/console';
-    commonConstants.CONSOLE_USERS = ['amadmin']; 
     commonConstants.OPENAM_HEADER_PARAM_CUR_PASSWORD = "currentpassword";
     commonConstants.OPENAM_STORAGE_KEY_PREFIX = "FR-OpenAM-";
     commonConstants.EVENT_RETURN_TO_AM_CONSOLE = "EVENT_RETURN_TO_AM_CONSOLE";

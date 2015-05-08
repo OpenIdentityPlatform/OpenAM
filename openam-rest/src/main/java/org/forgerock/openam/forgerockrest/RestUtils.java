@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2014 ForgeRock AS.
+ * Copyright 2012-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest;
@@ -20,25 +20,38 @@ import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.delegation.DelegationEvaluator;
+import com.sun.identity.delegation.DelegationEvaluatorImpl;
+import com.sun.identity.delegation.DelegationException;
+import com.sun.identity.delegation.DelegationPermission;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idsvcs.Token;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceManager;
 import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.dashboard.ServerContextHelper;
+import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.session.SessionURL;
+import org.forgerock.openam.utils.CollectionUtils;
 
 import javax.mail.internet.MimeUtility;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.AccessController;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * A collection of ForgeRock-REST based utility functions.
@@ -73,30 +86,43 @@ final public class RestUtils {
         return ServerContextHelper.getCookieFromServerContext(context);
     }
 
-    static public boolean isAdmin(final ServerContext context){
-
-        Token admin = new Token();
-        admin.setId(getCookieFromServerContext(context));
-        SSOToken ssotok = null;
-        AMIdentity amIdentity = null;
-
+    static boolean isAdmin(ServerContext context) {
+        boolean isAdmin = false;
         try {
-            SSOTokenManager mgr = SSOTokenManager.getInstance();
-            ssotok = mgr.createSSOToken(getCookieFromServerContext(context));
-            amIdentity = new AMIdentity(ssotok);
+            String realm = context.asContext(RealmContext.class).getResolvedRealm();
+            SSOToken userSSOToken = SSOTokenManager.getInstance().createSSOToken(getCookieFromServerContext(context));
 
-            if (!(amIdentity.equals(AdminUserIdHolder.adminUserId))){
-                debug.message("RestUtils.isAdmin: Non-admin user.");
-                return false;
+            // Simple check to see if user is super user and if so dont need to perform delegation check
+            if (SessionUtils.isAdmin(AccessController.doPrivileged(AdminTokenAction.getInstance()), userSSOToken)) {
+                return true;
             }
-            return true;
-        } catch (SSOException e) {
-            debug.error("IdentityResource.idFromSession() :: Cannot retrieve SSO Token: " + e);
-        } catch (IdRepoException ex) {
-            debug.error("IdentityResource.idFromSession() :: Cannot retrieve user from IdRepo" + ex);
+
+            DelegationEvaluator delegationEvaluator = new DelegationEvaluatorImpl();
+            DelegationPermission delegationPermission = new DelegationPermission();
+            delegationPermission.setVersion("*");
+            delegationPermission.setSubConfigName("default");
+            delegationPermission.setOrganizationName(realm);
+            delegationPermission.setActions(CollectionUtils.asSet("READ"));
+
+            for (Iterator i = getServiceNames().iterator(); i.hasNext() && !isAdmin; ) {
+                String name = (String) i.next();
+                delegationPermission.setServiceName(name);
+                isAdmin = delegationEvaluator.isAllowed(userSSOToken, delegationPermission,
+                        Collections.<String, Set<String>>emptyMap());
+            }
+        } catch (DelegationException | SSOException | SMSException e) {
+            debug.error("RestUtils::Failed to determine if user is an admin", e);
         }
-        return false;
+
+        return isAdmin;
     }
+
+    private static Set<String> getServiceNames() throws SMSException, SSOException {
+        SSOToken adminSSOToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
+        ServiceManager sm = new ServiceManager(adminSSOToken);
+        return sm.getServiceNames();
+    }
+
     static public void hasPermission(final ServerContext context) throws SSOException, IdRepoException, ForbiddenException {
         //Checks to see if User is amadmin, currently only amAdmin can access realms
         Token admin = new Token();

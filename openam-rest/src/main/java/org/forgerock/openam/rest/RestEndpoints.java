@@ -203,8 +203,8 @@ public class RestEndpoints {
                 .forVersion("1.0").to(InjectorHolder.getInstance(UmaConfigurationResource.class));
 
         dynamicRealmRouter.route("/users")
-                .forVersion("1.1").to(IdentityResourceV1.class, "UsersResource")
-                .forVersion("2.0").to(IdentityResourceV2.class, "UsersResource");
+                .forVersion("1.2").to(IdentityResourceV1.class, "UsersResource")
+                .forVersion("2.1").to(IdentityResourceV2.class, "UsersResource");
 
         dynamicRealmRouter.route("/groups")
                 .forVersion("1.1").to(IdentityResourceV1.class, "GroupsResource")

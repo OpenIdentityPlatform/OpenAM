@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.forgerockrest;
 
+import static org.forgerock.json.fluent.JsonValue.array;
 import static org.forgerock.openam.forgerockrest.RestUtils.getCookieFromServerContext;
 import static org.forgerock.openam.forgerockrest.RestUtils.isAdmin;
 
@@ -25,6 +26,7 @@ import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
 import com.sun.identity.sm.SMSException;
@@ -56,6 +58,7 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.servlet.HttpContext;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.tokens.CoreTokenField;
@@ -128,12 +131,14 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
 
     private static final Map<String, RestSecurity> REALM_REST_SECURITY_MAP = new ConcurrentHashMap<String, RestSecurity>();
 
+    private final CoreWrapper coreWrapper;
+
     /**
      * Creates a backend
      */
     public IdentityResourceV1(String userType, MailServerLoader mailServerLoader,
-            IdentityResourceUtils identityResourceUtils) {
-        this(userType, null, null, mailServerLoader, identityResourceUtils);
+            IdentityResourceUtils identityResourceUtils, CoreWrapper coreWrapper) {
+        this(userType, null, null, mailServerLoader, identityResourceUtils, coreWrapper);
     }
 
     /**
@@ -155,12 +160,13 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
 
     // Constructor used for testing...
     IdentityResourceV1(String userType, ServiceConfigManager mailmgr, ServiceConfig mailscm,
-            MailServerLoader mailServerLoader, IdentityResourceUtils identityResourceUtils) {
+            MailServerLoader mailServerLoader, IdentityResourceUtils identityResourceUtils, CoreWrapper coreWrapper) {
         this.userType = userType;
         this.mailmgr = mailmgr;
         this.mailscm = mailscm;
         this.mailServerLoader = mailServerLoader;
         this.identityResourceUtils = identityResourceUtils;
+        this.coreWrapper = coreWrapper;
     }
 
     /**
@@ -1239,7 +1245,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
             debug.message("IdentityResource.readInstance :: READ of " + resourceId + " in realm " + realm +
                     " performed by " + principalName);
-            resource = new Resource(resourceId, "0", identityDetailsToJsonValue(dtls));
+            resource = new Resource(resourceId, "0", addRoleInformation(context, resourceId, identityDetailsToJsonValue(dtls)));
             handler.handleResult(resource);
         } catch (ResourceException e) {
             debug.warning("IdentityResource.readInstance() :: Cannot READ! " + e);
@@ -1248,6 +1254,26 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             debug.error("IdentityResource.readInstance() :: Cannot READ! " + e);
             handler.handleError(new NotFoundException(e.getMessage(), e));
         }
+    }
+
+    private JsonValue addRoleInformation(ServerContext context, String resourceId, JsonValue value) {
+        if (isAdmin(context) && authenticatedUserMatchesUserProfile(context, resourceId)) {
+            value.put("roles", array("ui-admin"));
+        }
+        return value;
+    }
+
+    private boolean authenticatedUserMatchesUserProfile(ServerContext context, String resourceId) {
+        try {
+            SSOToken ssoToken = SSOTokenManager.getInstance().createSSOToken(getCookieFromServerContext(context));
+            String requestRealm = coreWrapper.convertRealmNameToOrgName(context.asContext(RealmContext.class)
+                    .getResolvedRealm());
+            return resourceId.equalsIgnoreCase(ssoToken.getProperty("UserId"))
+                    && requestRealm.equals(ssoToken.getProperty(Constants.ORGANIZATION));
+        } catch (SSOException e) {
+            debug.error("IdentityResource::Failed to determine if requesting user is accessing own profile");
+        }
+        return false;
     }
 
     @Override

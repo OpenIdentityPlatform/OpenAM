@@ -37,6 +37,7 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.VersionSelector;
 import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationListener;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
@@ -237,8 +238,9 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV1 getUsersResourceV1(MailServerLoader mailServerLoader,
-            IdentityResourceUtils identityResourceUtils) {
-        return new IdentityResourceV1(IdentityResourceV1.USER_TYPE, mailServerLoader, identityResourceUtils);
+            IdentityResourceUtils identityResourceUtils, CoreWrapper coreWrapper) {
+        return new IdentityResourceV1(IdentityResourceV1.USER_TYPE, mailServerLoader, identityResourceUtils,
+                coreWrapper);
     }
 
     @Provides
@@ -246,8 +248,9 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV1 getGroupsResourceV1(MailServerLoader mailServerLoader,
-            IdentityResourceUtils identityResourceUtils) {
-        return new IdentityResourceV1(IdentityResourceV1.GROUP_TYPE, mailServerLoader, identityResourceUtils);
+            IdentityResourceUtils identityResourceUtils, CoreWrapper coreWrapper) {
+        return new IdentityResourceV1(IdentityResourceV1.GROUP_TYPE, mailServerLoader, identityResourceUtils,
+                coreWrapper);
     }
 
     @Provides
@@ -261,8 +264,9 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV1 getAgentsResourceV1(MailServerLoader mailServerLoader,
-            IdentityResourceUtils identityResourceUtils) {
-        return new IdentityResourceV1(IdentityResourceV1.AGENT_TYPE, mailServerLoader, identityResourceUtils);
+            IdentityResourceUtils identityResourceUtils, CoreWrapper coreWrapper) {
+        return new IdentityResourceV1(IdentityResourceV1.AGENT_TYPE, mailServerLoader, identityResourceUtils,
+                coreWrapper);
     }
 
     @Provides
@@ -270,8 +274,9 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV2 getUsersResource(MailServerLoader mailServerLoader,
-            IdentityResourceUtils identityResourceUtils) {
-        return new IdentityResourceV2(IdentityResourceV2.USER_TYPE, mailServerLoader, identityResourceUtils);
+            IdentityResourceUtils identityResourceUtils, CoreWrapper coreWrapper) {
+        return new IdentityResourceV2(IdentityResourceV2.USER_TYPE, mailServerLoader, identityResourceUtils,
+                coreWrapper);
     }
 
     @Provides
@@ -279,8 +284,9 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV2 getGroupsResource(MailServerLoader mailServerLoader,
-            IdentityResourceUtils identityResourceUtils) {
-        return new IdentityResourceV2(IdentityResourceV2.GROUP_TYPE, mailServerLoader, identityResourceUtils);
+            IdentityResourceUtils identityResourceUtils, CoreWrapper coreWrapper) {
+        return new IdentityResourceV2(IdentityResourceV2.GROUP_TYPE, mailServerLoader, identityResourceUtils,
+                coreWrapper);
     }
 
     @Provides
@@ -288,8 +294,9 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV2 getAgentsResource(MailServerLoader mailServerLoader,
-            IdentityResourceUtils identityResourceUtils) {
-        return new IdentityResourceV2(IdentityResourceV2.AGENT_TYPE, mailServerLoader, identityResourceUtils);
+            IdentityResourceUtils identityResourceUtils, CoreWrapper coreWrapper) {
+        return new IdentityResourceV2(IdentityResourceV2.AGENT_TYPE, mailServerLoader, identityResourceUtils,
+                coreWrapper);
     }
 
     @Provides
