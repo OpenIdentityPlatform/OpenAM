@@ -60,9 +60,13 @@ define([
                 $("#qunit-fixture").append(EditAppView.element);
 
                 EditAppView.render(['iPlanetAMWebAgentService'], function () {
-                    var entity = EditAppView.data.entity;
+                    var entity = EditAppView.data.entity,
+                        activeTabIndex = EditAppView.$el.find('#accordion .panel-collapse.in').parent().index();
 
-                    QUnit.ok(EditAppView.accordion.getActive() === 2, "Last step of accordion is selected");
+                    if (activeTabIndex === -1) {
+                        activeTabIndex = EditAppView.$el.find('#accordion .panel-collapse.collapsing').parent().index();
+                    }
+                    QUnit.ok(activeTabIndex === 2, "Last step of accordion is selected");
                     QUnit.ok(EditAppView.$el.find('h1 > a.btn-default').length, "Back button is available");
 
                     QUnit.ok(EditAppView.$el.find('#appName').val() === entity.name, "Name is set");
@@ -128,8 +132,12 @@ define([
                 $("#qunit-fixture").append(EditAppView.element);
 
                 EditAppView.render([], function () {
+                    var activeTab = EditAppView.$el.find('#accordion .panel-collapse.in');
 
-                    QUnit.ok(EditAppView.accordion.getActive() === 0, "First step of accordion is selected");
+                    if (!activeTab.length) {
+                        activeTab = EditAppView.$el.find('#accordion .panel-collapse.collapsing');
+                    }
+                    QUnit.ok(activeTab.parent().index() === 0, "First step of accordion is selected");
                     QUnit.ok(EditAppView.$el.find('h1 > a.btn-default').length, "Back button is available");
 
                     QUnit.ok(EditAppView.$el.find('#appName').val() === '', "Name is empty");
@@ -238,12 +246,17 @@ define([
 
                 EditPolicyView.render([appName, policyName], function () {
                     var entity = EditPolicyView.data.entity,
-                        options = EditPolicyView.data.options;
+                        options = EditPolicyView.data.options,
+                        activeTab = EditPolicyView.$el.find('#accordion .panel-collapse.in');
+
+                    if (!activeTab.length) {
+                        activeTab = EditPolicyView.$el.find('#accordion .panel-collapse.collapsing');
+                    }
 
                     QUnit.ok(EditPolicyView.validationFields && EditPolicyView.validationFields.length > 0, 'Validation is present');
                     QUnit.equal(EditPolicyView.$el.find('[name="submitForm"]').is(':disabled'), false, 'Submit button is enabled');
 
-                    QUnit.equal(EditPolicyView.accordion.getActive(), 6, "Last step of accordion is selected");
+                    QUnit.equal(activeTab.parent().index(), 6, "Last step of accordion is selected");
                     QUnit.equal(EditPolicyView.$el.find('h1 > a.btn-default').length, 1, "Cancel button is present");
 
                     QUnit.equal(EditPolicyView.$el.find('#policyName').val(), entity.name, "Name is set");
@@ -498,7 +511,7 @@ define([
                         QUnit.equal(EditPolicyView.$el.find('#subjectContainer').find('#addCondition').length, 1, 'Add subject button is present');
                         QUnit.equal(EditPolicyView.$el.find('#subjectContainer').find('#addOperator').length, 1, 'Add operator button is present');
                         QUnit.ok(EditPolicyView.$el.find('#subjectContainer').find('#pickUpItem').empty(), 'Pick up item is empty');
-                        QUnit.ok(EditPolicyView.$el.find('#subjectContainer').find('#clear').hasClass('inactive'), 'Clear button is disabled');
+                        QUnit.ok(EditPolicyView.$el.find('#subjectContainer').find('#clear').hasClass('disabled'), 'Clear button is disabled');
 
                         EditPolicyView.$el.find('#subjectContainer').find('#addCondition').trigger('click');
                         QUnit.ok(EditPolicyView.$el.find('#subjectContainer').find('#pickUpItem').children().length > 0, 'Pick up item is not empty');
@@ -513,7 +526,7 @@ define([
                         QUnit.equal(EditPolicyView.$el.find('#environmentContainer').find('#addCondition').length, 1, 'Add condition button is present');
                         QUnit.equal(EditPolicyView.$el.find('#environmentContainer').find('#addOperator').length, 1, 'Add operator button is present');
                         QUnit.ok(EditPolicyView.$el.find('#environmentContainer').find('#pickUpItem').empty(), 'Pick up item is empty');
-                        QUnit.ok(EditPolicyView.$el.find('#environmentContainer').find('#clear').hasClass('inactive'), 'Clear button is disabled');
+                        QUnit.ok(EditPolicyView.$el.find('#environmentContainer').find('#clear').hasClass('disabled'), 'Clear button is disabled');
 
                         EditPolicyView.$el.find('#environmentContainer').find('#addCondition').trigger('click');
                         QUnit.ok(EditPolicyView.$el.find('#environmentContainer').find('#pickUpItem').children().length > 0, 'Pick up item is not empty');
@@ -534,29 +547,35 @@ define([
                 $("#qunit-fixture").append(EditPolicyView.element);
 
                 EditPolicyView.render(['iPlanetAMWebAgentService'], function () {
-                    QUnit.ok(EditPolicyView.accordion.getActive() === 0, "First step of accordion is selected");
+                    var activeTab = EditPolicyView.$el.find('#accordion .panel-collapse.in');
+
+                    if (!activeTab.length) {
+                        activeTab = EditPolicyView.$el.find('#accordion .panel-collapse.collapsing');
+                    }
+                    QUnit.ok(activeTab.parent().index() === 0, "First step of accordion is selected");
                     QUnit.ok(EditPolicyView.$el.find('h1 a.btn-default').length, "Cancel button is available");
 
                     QUnit.ok(EditPolicyView.$el.find('#policyName').val() === '', "Name is empty");
                     QUnit.ok(EditPolicyView.$el.find('#description').val() === '', "Description is empty");
 
-                    CreatedResourcesView.render(EditPolicyView.data, function () {
-                        var resources = CreatedResourcesView.$el.find('.res-name');
-                        QUnit.ok(resources.length === 0, "No resources present");
+                    PolicyResourcesView.render({}, function () {
+                        CreatedResourcesView.render({}, function () {
+                            var resources = CreatedResourcesView.$el.find('.res-name');
+                            QUnit.ok(resources.length === 0, "No resources present");
+
+                            PolicyActionsView.render(EditPolicyView.data, function () {
+                                QUnit.equal(PolicyActionsView.$el.find('.alert.alert-info').length, 1, 'No actions are available for selection as resource type is not selected');
+
+                                ReviewInfoView.render({}, function () {
+                                    QUnit.ok(EditPolicyView.$el.find('#reviewName').hasClass('text-danger'), 'Name field is marked as invalid');
+                                    QUnit.equal(EditPolicyView.$el.find('#reviewRes').length, 0, 'Resources field is not displayed in review step as it is invalid');
+                                    QUnit.ok(EditPolicyView.$el.find('[name="submitForm"]').is(':disabled'), 'Submit button is disabled');
+
+                                    QUnit.start();
+                                });
+                            });
+                        });
                     });
-
-                    PolicyActionsView.render(EditPolicyView.data, function () {
-                        QUnit.equal(PolicyActionsView.$el.find('.alert.alert-info').length, 1, 'No actions are available for selection as resource type is not selected');
-                    });
-
-                    $('#reviewInfo', EditPolicyView.$el).html(UIUtils.fillTemplateWithData('templates/policy/policies/ReviewPolicyStepTemplate.html', EditPolicyView.data, function () {
-                        // TODO: will fix after https://bugster.forgerock.org/jira/browse/AME-6528
-                        QUnit.ok(EditPolicyView.$el.find('#reviewName').hasClass('text-danger'), 'Name field is marked as invalid');
-                        QUnit.equal(EditPolicyView.$el.find('#reviewRes').length, 0, 'Resources field is not displayed in review step as it is invalid');
-                        QUnit.ok(EditPolicyView.$el.find('[name="submitForm"]').is(':disabled'), 'Submit button is disabled');
-
-                        QUnit.start();
-                    }));
                 });
             });
 
@@ -621,13 +640,18 @@ define([
                     var entity = EditResourceTypeView.data.entity,
                         actions = EditResourceTypeView.data.actions,
                         actionsList = new ResTypeActionsView(),
-                        patternList = new ResTypePatternsView();
+                        patternList = new ResTypePatternsView(),
+                        activeTab = EditResourceTypeView.$el.find('#accordion .panel-collapse.in');
+
+                    if (!activeTab.length) {
+                        activeTab = EditResourceTypeView.$el.find('#accordion .panel-collapse.collapsing');
+                    }
 
                     // Step 1
                     QUnit.ok(EditResourceTypeView.validationFields && EditResourceTypeView.validationFields.length > 0, 'Validation is present');
                     QUnit.equal(EditResourceTypeView.$el.find('[name="submitForm"]').is(':disabled'), false, 'Submit button is enabled');
 
-                    QUnit.equal(EditResourceTypeView.accordion.getActive(), 2, "Last step of accordion is selected");
+                    QUnit.equal(activeTab.parent().index(), 2, "Last step of accordion is selected");
                     QUnit.equal(EditResourceTypeView.$el.find('h1 a.btn-default').length, 1, "Cancel button is present");
 
                     QUnit.equal(EditResourceTypeView.$el.find('#resTypeName').val(), entity.name, "Name is set");
@@ -710,9 +734,14 @@ define([
                     var entity = EditResourceTypeView.data.entity,
                         actions = EditResourceTypeView.data.actions,
                         actionsList = new ResTypeActionsView(),
-                        patternList = new ResTypePatternsView();
+                        patternList = new ResTypePatternsView(),
+                        activeTab = EditResourceTypeView.$el.find('#accordion .panel-collapse.in');
 
-                    QUnit.ok(EditResourceTypeView.accordion.getActive() === 0, "First step of accordion is selected");
+                    if (!activeTab.length) {
+                        activeTab = EditResourceTypeView.$el.find('#accordion .panel-collapse.collapsing');
+                    }
+
+                    QUnit.ok(activeTab.parent().index() === 0, "First step of accordion is selected");
                     QUnit.ok(EditResourceTypeView.$el.find('h1 a.btn-default').length, "Cancel button is available");
 
                     // Step 1
