@@ -36,6 +36,7 @@ import org.forgerock.openam.upgrade.UpgradeUtils;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.policy.Policy;
 import com.sun.identity.policy.PolicyManager;
+import org.forgerock.openam.upgrade.VersionUtils;
 
 /**
  * This upgrade step has been implemented to explicitly handle the case when OpenAM is upgraded from 11.0.0. This is
@@ -62,7 +63,7 @@ public class ResavePoliciesStep extends AbstractUpgradeStep {
 
     public void initialize() throws UpgradeException {
         DEBUG.message("Initializing ResavePoliciesStep");
-        if (UpgradeUtils.isCurrentVersionEqualTo(UpgradeUtils.ELEVEN_VERSION_NUMBER)) {
+        if (VersionUtils.isCurrentVersionEqualTo(UpgradeUtils.ELEVEN_VERSION_NUMBER)) {
             try {
                 for (String realm : getRealmNames()) {
                     PolicyManager pm = new PolicyManager(getAdminToken(), realm);

@@ -140,10 +140,10 @@ import org.forgerock.openam.license.License;
 import org.forgerock.openam.license.LicenseLocator;
 import org.forgerock.openam.license.LicenseSet;
 import org.forgerock.openam.license.ServletContextLicenseLocator;
+import org.forgerock.openam.upgrade.UpgradeDirectoryUtils;
 import org.forgerock.openam.upgrade.OpenDJUpgrader;
 import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.upgrade.UpgradeServices;
-import org.forgerock.openam.upgrade.UpgradeUtils;
+import org.forgerock.openam.upgrade.VersionUtils;
 import org.forgerock.openam.utils.CollectionUtils;
 
 /**
@@ -233,7 +233,7 @@ public class AMSetupServlet extends HttpServlet {
      */  
     static public boolean isCurrentConfigurationValid() {
         if (isConfiguredFlag) {
-            isVersionNewer = UpgradeUtils.isVersionNewer();    
+            isVersionNewer = VersionUtils.isVersionNewer();
         }
         return isConfiguredFlag && !isVersionNewer && !upgradeCompleted;
     } 
@@ -247,7 +247,7 @@ public class AMSetupServlet extends HttpServlet {
      */
     private static void isVersionNewer() {
         if (isConfiguredFlag) {
-            isVersionNewer = UpgradeUtils.isVersionNewer();
+            isVersionNewer = VersionUtils.isVersionNewer();
         }       
     }
 
@@ -300,7 +300,7 @@ public class AMSetupServlet extends HttpServlet {
     
     private static void createOpenDJBackup() {
         try {
-            UpgradeServices.createUpgradeDirectories(getBaseDir());
+            UpgradeDirectoryUtils.createUpgradeDirectories(getBaseDir());
         } catch (UpgradeException ue) {
             Debug.getInstance(SetupConstants.DEBUG_NAME).error("Upgrade cannot create backup directory", ue);
             return;

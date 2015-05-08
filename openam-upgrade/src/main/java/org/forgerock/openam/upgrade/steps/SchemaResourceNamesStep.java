@@ -23,7 +23,6 @@ import java.security.PrivilegedAction;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeSet;
 
 import javax.inject.Inject;
@@ -39,7 +38,7 @@ import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeProgress;
 import org.forgerock.openam.upgrade.UpgradeStepInfo;
-import org.forgerock.openam.upgrade.UpgradeUtils;
+import org.forgerock.openam.upgrade.VersionUtils;
 import org.forgerock.util.promise.Function;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -71,7 +70,7 @@ public class SchemaResourceNamesStep extends AbstractUpgradeStep {
 
     @Override
     public void initialize() throws UpgradeException {
-        if (UpgradeUtils.isCurrentVersionLessThan(AM_13, true)) {
+        if (VersionUtils.isCurrentVersionLessThan(AM_13, true)) {
             Map<String, Document> serviceXmlContent = UpgradeServiceUtils.getServiceDefinitions(getAdminToken());
             serviceModifications = new HashMap<>();
             for (Map.Entry<String, Document> service : serviceXmlContent.entrySet()) {

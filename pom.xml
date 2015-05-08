@@ -374,6 +374,7 @@
         <module>openam-oauth2-saml2</module>
         <module>openam-http-client</module>
         <module>openam-tokens</module>
+        <module>openam-upgrade</module>
     </modules>
 
     <!-- Mailing Lists -->
@@ -1039,6 +1040,11 @@
                 <artifactId>openam-distribution-ssoconfiguratortools</artifactId>
                 <version>${project.version}</version>
                 <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-upgrade</artifactId>
+                <version>${project.version}</version>
             </dependency>
 
             <dependency>

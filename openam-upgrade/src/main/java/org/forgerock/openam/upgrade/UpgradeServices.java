@@ -21,9 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- */
-
-/*
+ *
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 
@@ -40,7 +38,6 @@ import com.sun.identity.password.plugins.PasswordGenerator;
 import com.sun.identity.password.plugins.RandomPasswordGenerator;
 import com.sun.identity.password.ui.model.PWResetException;
 import com.sun.identity.setup.AMSetupServlet;
-import com.sun.identity.setup.AMSetupUtils;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
 import com.sun.identity.sm.ServiceManager;
@@ -84,7 +81,7 @@ public class UpgradeServices {
     private final List<UpgradeStep> upgradeSteps = new ArrayList<UpgradeStep>();
     private final SimpleDateFormat dateFormat;
     private final String createdDate;
-    private final String existingVersion = UpgradeUtils.getCurrentVersion();
+    private final String existingVersion = VersionUtils.getCurrentVersion();
 
     private UpgradeServices() throws UpgradeException {
         dateFormat = new SimpleDateFormat(DATE_FORMAT);
@@ -127,44 +124,6 @@ public class UpgradeServices {
     }
 
     /**
-     * Creates the <code>upgrade</code> and <code>backups</code> folders if they are not already present.
-     *
-     * @param baseDir The base directory of the OpenAM configuration.
-     * @throws UpgradeException If there was an error while creating the necessary directories.
-     */
-    public static void createUpgradeDirectories(String baseDir) throws UpgradeException {
-            String upgradeDir = baseDir + File.separator + "upgrade";
-            String backupDir = baseDir + File.separator + "backups";
-
-            createDirectory(backupDir);
-            createDirectory(upgradeDir);
-    }
-
-    private static void createDirectory(String dirName) throws UpgradeException {
-        File d = new File(dirName);
-
-        if (d.exists() && d.isFile()) {
-            throw new UpgradeException("Directory: " + dirName
-                    + " cannot be created as file of the same name already exists");
-        }
-
-        if (!d.exists()) {
-            if (UpgradeUtils.debug.messageEnabled()) {
-                UpgradeUtils.debug.message("Created directory: " + dirName);
-            }
-
-            if (!d.mkdir()) {
-                throw new UpgradeException("Unable to create directory: " + dirName);
-            }
-        } else if (!d.canWrite()) {
-            // make bootstrap writable if it is not
-            if (!d.setWritable(true)) {
-                throw new UpgradeException("Unable to make " + dirName + " directory writable");
-            }
-        }
-    }
-
-    /**
      * Kick off the upgrade process.
      *
      * @param adminToken A valid admin SSOToken.
@@ -176,7 +135,7 @@ public class UpgradeServices {
             throw new UpgradeException("License terms have not been accepted");
         }
 
-        createUpgradeDirectories(SystemProperties.get(SystemProperties.CONFIG_PATH));
+        UpgradeDirectoryUtils.createUpgradeDirectories(SystemProperties.get(SystemProperties.CONFIG_PATH));
         if (debug.messageEnabled()) {
             debug.message("Upgrade startup.");
         }
@@ -196,7 +155,7 @@ public class UpgradeServices {
         UpgradeProgress.reportStart("upgrade.writingversionfile");
         updateDotVersionFile();
         UpgradeProgress.reportEnd("upgrade.success");
-        
+
         if (debug.messageEnabled()) {
             debug.message("Upgrade complete.");
         }
@@ -274,7 +233,7 @@ public class UpgradeServices {
         tags.put(LF, delimiter);
         tags.put(CREATED_DATE, createdDate);
         tags.put(EXISTING_VERSION, existingVersion);
-        tags.put(NEW_VERSION, UpgradeUtils.getWarFileVersion());
+        tags.put(NEW_VERSION, VersionUtils.getWarFileVersion());
         StringBuilder report = new StringBuilder(tagSwapReport(tags, "report"));
         for (UpgradeStep upgradeStep : upgradeSteps) {
             report.append(upgradeStep.getDetailedReport(delimiter)).append(delimiter);
@@ -390,14 +349,14 @@ public class UpgradeServices {
 
     /**
      * Update the .version file.
-     * 
+     *
      * @throws UpgradeException
      *             If there was an error while updating the .version file.
      */
     private void updateDotVersionFile() throws UpgradeException {
         try {
             String baseDir = SystemProperties.get(SystemProperties.CONFIG_PATH);
-            String version = UpgradeUtils.getWarFileVersion();
+            String version = VersionUtils.getWarFileVersion();
             String dotVersionFilePath = baseDir + "/.version";
             File dotVersionFile = new File(dotVersionFilePath);
             // if does not exist then there has been an error

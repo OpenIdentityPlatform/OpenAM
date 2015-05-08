@@ -789,6 +789,13 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-slf4j</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-upgrade</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>

@@ -15,9 +15,10 @@
  */
 package org.forgerock.openam.upgrade;
 
+import static org.testng.Assert.*;
+
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import static org.testng.Assert.*;
 
 public class UpgradeDetectionTest {
 
@@ -53,6 +54,6 @@ public class UpgradeDetectionTest {
 
     @Test(dataProvider = "versions")
     public void testUpgradeDetectionCorrectness(String currentVersion, String newVersion, boolean result) {
-        assertEquals(UpgradeUtils.isVersionNewer(currentVersion, newVersion), result);
+        assertEquals(VersionUtils.isVersionNewer(currentVersion, newVersion), result);
     }
 }

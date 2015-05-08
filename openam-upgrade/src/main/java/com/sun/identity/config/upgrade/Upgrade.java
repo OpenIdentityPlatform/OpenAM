@@ -35,6 +35,7 @@ import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeProgress;
 import org.forgerock.openam.upgrade.UpgradeServices;
 import org.forgerock.openam.upgrade.UpgradeUtils;
+import org.forgerock.openam.upgrade.VersionUtils;
 
 /**
  * OpenAM upgrade page.
@@ -68,8 +69,8 @@ public class Upgrade extends AjaxPage {
         if (error) {
             addModel("error", true);
         } else {
-            addModel("currentVersion", UpgradeUtils.getCurrentVersion());
-            addModel("newVersion", UpgradeUtils.getWarFileVersion());
+            addModel("currentVersion", VersionUtils.getCurrentVersion());
+            addModel("newVersion", VersionUtils.getWarFileVersion());
             addModel("changelist", upgrade.generateShortUpgradeReport(adminToken, true));
         }
     }

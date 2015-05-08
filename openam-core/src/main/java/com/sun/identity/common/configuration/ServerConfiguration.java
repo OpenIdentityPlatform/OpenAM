@@ -34,14 +34,12 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.setup.SetupConstants;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
-import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.RemoteServiceAttributeValidator;
 import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.ServiceSchemaManager;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -59,7 +57,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
-import org.forgerock.openam.upgrade.UpgradeUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -72,6 +69,7 @@ public class ServerConfiguration extends ConfigurationBase {
     private static final String ATTR_PARENT_SITE_ID = "parentsiteid";
     private static final String ATTR_SERVER_CONFIG = "serverconfig";
     private static final String ATTR_SERVER_CONFIG_XML = "serverconfigxml";
+    private static final Debug DEBUG = Debug.getInstance("amUpgrade");
 
     public static final String SERVER_DEFAULTS = "serverdefaults";
     public static final String DEFAULT_SERVER_ID = "00";
@@ -293,7 +291,7 @@ public class ServerConfiguration extends ConfigurationBase {
         if (res != null) {
             return res.getString(Constants.AM_VERSION);
         } else {
-            UpgradeUtils.debug.error("Unable to determine war file version");
+            DEBUG.error("Unable to determine war file version");
             return null;
         }
     }

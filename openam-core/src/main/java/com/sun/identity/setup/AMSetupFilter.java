@@ -43,7 +43,7 @@ import java.io.IOException;
 
 import com.sun.identity.common.configuration.ConfigurationException;
 import com.sun.identity.shared.Constants;
-import org.forgerock.openam.upgrade.UpgradeUtils;
+import org.forgerock.openam.upgrade.VersionUtils;
 
 /**
  * This filter brings administrator to a configuration page
@@ -90,7 +90,7 @@ public final class AMSetupFilter implements Filter {
                     filterChain.doFilter(httpRequest, httpResponse);
                 }
             } else {
-                if (AMSetupServlet.getBootStrapFile() != null && !UpgradeUtils.isVersionNewer() 
+                if (AMSetupServlet.getBootStrapFile() != null && !VersionUtils.isVersionNewer()
                         && !AMSetupServlet.isUpgradeCompleted()) {
                     String redirectUrl = System.getProperty(Constants.CONFIG_STORE_DOWN_REDIRECT_URL);
                     if (redirectUrl != null && redirectUrl.length() > 0) {

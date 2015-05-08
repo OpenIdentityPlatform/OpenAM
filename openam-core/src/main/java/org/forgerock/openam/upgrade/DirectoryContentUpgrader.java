@@ -38,6 +38,7 @@ import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.EntryNotFoundException;
@@ -143,8 +144,8 @@ public class DirectoryContentUpgrader {
     }
 
     /**
-     * Returns the list of LDIF files that needs to be processed as part of the upgrade. Used by
-     * {@link org.forgerock.openam.upgrade.steps.UpgradeDirectoryContentStep} when generating the upgrade reports.
+     * Returns the list of LDIF files that needs to be processed as part of the upgrade.
+     * Used when generating the upgrade reports.
      *
      * @return The path to the LDIF files that needs to be processed.
      */
@@ -175,7 +176,7 @@ public class DirectoryContentUpgrader {
             //external configstore won't get the indexes during upgrade, and this is safe for embedded
             tags.put("@DB_NAME@", "userRoot");
             String content = AMSetupServlet.readFile(path);
-            String tagSwapped = UpgradeServices.tagSwap(tags, content);
+            String tagSwapped = StringUtils.tagSwap(content, tags);
             reader = new LDIFChangeRecordReader(
                     new ByteArrayInputStream(tagSwapped.getBytes(Charset.forName("UTF-8"))));
             ChangeRecordWriter writer = new ConnectionChangeRecordWriter(conn);

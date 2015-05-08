@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS
  */
 
 package com.sun.identity.config;
@@ -36,7 +36,7 @@ import com.sun.identity.config.util.TemplatedPage;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.EmbeddedOpenDS;
 import org.apache.click.control.ActionLink;
-import org.forgerock.openam.upgrade.UpgradeUtils;
+import org.forgerock.openam.upgrade.VersionUtils;
 
 public class Options extends TemplatedPage {
 
@@ -62,7 +62,7 @@ public class Options extends TemplatedPage {
         addModel( "upgrade", Boolean.valueOf( upgrade ) );
 
         if (upgrade) {
-             addModel("currentVersion", UpgradeUtils.getCurrentVersion());
+             addModel("currentVersion", VersionUtils.getCurrentVersion());
         }
 
         isOpenDS1x = EmbeddedOpenDS.isOpenDSVer1Installed();
@@ -80,15 +80,13 @@ public class Options extends TemplatedPage {
     }
 
     /**
-     * @return boolean If <tt>true</tt>, the options.htm page will be cusotmized for a new installation, otherwise it will be
-     * customized for an upgrade.
+     * @return boolean If <tt>true</tt>, the options.htm page will be customized for a new installation,
+     * otherwise it will be customized for an upgrade.
+     *
+     * Automatic upgrades from 9.5 onwards are supported.
      */
     public boolean isNewInstall() {
-        if (AMSetupServlet.isConfigured() && UpgradeUtils.isVersionNewer()) {
-            return !UpgradeUtils.canUpgrade();
-        } else {
-            return true;
-        }
+        return !(AMSetupServlet.isConfigured() && VersionUtils.isVersionNewer());
     }
 
 }
