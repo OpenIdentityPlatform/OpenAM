@@ -16,7 +16,9 @@
 
 package org.forgerock.openam.oauth2;
 
+import static com.sun.identity.shared.datastruct.CollectionHelper.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2Client.*;
+import static org.forgerock.openidconnect.Client.MIN_DEFAULT_MAX_AGE;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -360,7 +362,6 @@ public class OpenAMClientDAO implements ClientDAO {
         clientBuilder.setRedirectionURIs(new ArrayList<String>(getSetAttribute(clientAttributeMap, REDIRECT_URI)));
         clientBuilder.setPostLogoutRedirectionURIs(new ArrayList<String>(getSetAttribute(clientAttributeMap, POST_LOGOUT_URI)));
         clientBuilder.setResponseTypes(new ArrayList<String>(getSetAttribute(clientAttributeMap, RESPONSE_TYPES)));
-        clientBuilder.setDefaultMaxAge(Long.valueOf(getSingleAttribute(clientAttributeMap, DEFAULT_MAX_AGE)));
         clientBuilder.setDefaultMaxAgeEnabled(Boolean.valueOf(getSingleAttribute(clientAttributeMap, DEFAULT_MAX_AGE_ENABLED)));
         clientBuilder.setTokenEndpointAuthMethod(getSingleAttribute(clientAttributeMap, TOKEN_ENDPOINT_AUTH_METHOD));
         clientBuilder.setSubjectType(getSingleAttribute(clientAttributeMap, SUBJECT_TYPE));
@@ -369,6 +370,7 @@ public class OpenAMClientDAO implements ClientDAO {
         clientBuilder.setJwksUri(getSingleAttribute(clientAttributeMap, JWKS_URI));
         clientBuilder.setX509(getSingleAttribute(clientAttributeMap, CLIENT_JWT_PUBLIC_KEY));
         clientBuilder.setPublicKeySelector(getSingleAttribute(clientAttributeMap, PUBLIC_KEY_SELECTOR));
+        clientBuilder.setDefaultMaxAge(getLongMapAttr(clientAttributeMap, DEFAULT_MAX_AGE, MIN_DEFAULT_MAX_AGE, logger));
 
         return clientBuilder.createClient();
     }
