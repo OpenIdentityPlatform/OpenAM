@@ -405,7 +405,7 @@ public class ForgerockRestGuiceModule extends AbstractModule {
             handlers.put(EntitlementException.APPLICATION_NAME_MISMATCH, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.INVALID_CLASS, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.RESOURCE_TYPE_ALREADY_EXISTS, ResourceException.CONFLICT);
-            handlers.put(EntitlementException.NO_SUCH_RESOURCE_TYPE, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.NO_SUCH_RESOURCE_TYPE, ResourceException.NOT_FOUND);
             handlers.put(EntitlementException.RESOURCE_TYPE_IN_USE, ResourceException.CONFLICT);
             handlers.put(EntitlementException.MISSING_RESOURCE_TYPE_NAME, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.RESOURCE_TYPE_REFERENCED, ResourceException.CONFLICT);
