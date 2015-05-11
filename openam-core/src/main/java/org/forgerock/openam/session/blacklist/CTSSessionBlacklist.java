@@ -40,8 +40,6 @@ import org.forgerock.util.Reject;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.management.ObjectName;
-import java.lang.management.ManagementFactory;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -107,13 +105,6 @@ public final class CTSSessionBlacklist implements SessionBlacklist {
         this.pollTask = new PollTask(scheduler, threadMonitor, serviceConfig.getSessionBlacklistPollInterval(MILLISECONDS));
         this.localServerId = serverConfig.getLocalServerID();
         this.purgeDelayMs = serviceConfig.getSessionBlacklistPurgeDelay(MILLISECONDS);
-
-        try {
-            ObjectName name = new ObjectName(getClass().getPackage().getName() + ":type=" + getClass().getSimpleName());
-            ManagementFactory.getPlatformMBeanServer().registerMBean(this, name);
-        } catch (Exception e) {
-            DEBUG.error("Unable to register MBean", e);
-        }
     }
 
     @Override
