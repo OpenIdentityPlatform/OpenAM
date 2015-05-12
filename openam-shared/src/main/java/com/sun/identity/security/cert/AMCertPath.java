@@ -28,7 +28,7 @@
 
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock AS
+ * Portions Copyrighted 2010-2012, 2014-2015 ForgeRock AS
  */
 package com.sun.identity.security.cert;
 
@@ -146,10 +146,8 @@ public class AMCertPath {
                 Method method = trustMgrClass.getMethod("getKeyStore");
                 KeyStore keystore = (KeyStore) method.invoke(trustMgr);
                 PKIXParameters pkixparams = new PKIXParameters(keystore);
-                if (debug.messageEnabled()) {
-                    debug.message("AMCertPath.verify: crlEnabled ---> " + crlEnabled);
-                    debug.message("AMCertPath.verify: ocspEnabled ---> " + ocspEnabled);
-                }
+                debug.message("AMCertPath.verify: crlEnabled ---> {}", crlEnabled);
+                debug.message("AMCertPath.verify: ocspEnabled ---> {}", ocspEnabled);
 
                 pkixparams.setRevocationEnabled(crlEnabled || ocspEnabled);
                 if (ocspEnabled) {
@@ -157,10 +155,8 @@ public class AMCertPath {
                     if (!StringUtils.isBlank(responderURLString)) {
                         Security.setProperty(OCSP_ENABLE, TRUE);
                         Security.setProperty(OCSP_RESPONDER_URL, responderURLString);
-                        if (debug.messageEnabled()) {
-                            debug.message("AMCertPath.verify: pkixparams.setRevocationEnabled "
-                                    + "set to true, and ocsp.enabled set to true with a OCSP responder url of " + responderURLString);
-                        }
+                        debug.message("AMCertPath.verify: pkixparams.setRevocationEnabled "
+                                + "set to true, and ocsp.enabled set to true with a OCSP responder url of {}", responderURLString);
                     } else {
                         //OCSP revocation checking not configured properly. Disable the check if crl-based checking not enabled
                         pkixparams.setRevocationEnabled(crlEnabled);

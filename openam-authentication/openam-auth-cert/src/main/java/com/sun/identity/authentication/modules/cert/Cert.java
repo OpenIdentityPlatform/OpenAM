@@ -24,7 +24,7 @@
  *
  * $Id: Cert.java,v 1.14 2009/03/13 20:54:42 beomsuk Exp $
  *
- * Portions Copyrighted 2013-2014 ForgeRock AS.
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.modules.cert;
