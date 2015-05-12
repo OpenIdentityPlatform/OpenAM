@@ -24,7 +24,7 @@
 
    $Id: getServerInfo.jsp,v 1.6 2008/09/04 00:34:01 rajeevangal Exp $
 
-   Portions Copyrighted 2010-2014 ForgeRock AS
+   Portions Copyrighted 2010-2015 ForgeRock AS.
 --%>
 
 <%@ page
@@ -133,7 +133,7 @@ import="com.iplanet.am.util.SystemProperties,
         replPortAvailable = "true";
         if (replPort == null) {
             replPortAvailable = "false";
-            replPort = ""+ AMSetupServlet.getUnusedPort("localhost", 50889, 1000);
+            replPort = ""+ AMSetupUtils.getFirstUnusedPort("localhost", 50889, 1000);
         }
 
         adminPort = EmbeddedOpenDS.getAdminPort(dsmgr, JCECrypt.decode(dspwd),
