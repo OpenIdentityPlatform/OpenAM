@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2015 ForgeRock AS. All rights reserved.
+ * Copyright 2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -26,12 +26,20 @@
 
 define("config/messages/ScriptsMessages", [], function () {
     return {
-        "Created": {
+        "scriptCreated": {
             msg: "config.messages.ScriptsMessages.scriptCreated",
             type: "info"
         },
         "scriptUpdated": {
             msg: "config.messages.ScriptsMessages.scriptUpdated",
+            type: "info"
+        },
+        "validationNoLanguage": {
+            msg: "config.messages.ScriptsMessages.validation.noLanguage",
+            type: "info"
+        },
+        "validationNoScript": {
+            msg: "config.messages.ScriptsMessages.validation.noScript",
             type: "info"
         }
     };

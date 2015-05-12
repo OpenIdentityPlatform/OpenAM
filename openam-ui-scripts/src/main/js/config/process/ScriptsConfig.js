@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2015 ForgeRock AS. All rights reserved.
+ * Copyright 2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,21 +22,43 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define*/
+/*global define, window*/
 
 define("config/process/ScriptsConfig", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager"
-], function (constants, eventManager) {
+], function (Constants, EventManager) {
     return [
         {
-            startEvent: constants.EVENT_HANDLE_DEFAULT_ROUTE,
+            startEvent: Constants.EVENT_RETURN_TO_AM_CONSOLE,
+            description: "",
+            dependencies: [
+                "org/forgerock/commons/ui/common/main/Configuration"
+            ],
+            processDescription: function (event, conf) {
+                var realm = conf.globalData.auth.realm;
+                window.location.href = "/" + Constants.context + "/realm/RMRealm?RMRealm.tblDataActionHref=" + encodeURIComponent(realm);
+            }
+        },
+        {
+            startEvent: Constants.EVENT_GO_TO_POLICY_EDITOR,
+            description: "",
+            dependencies: [
+                "org/forgerock/commons/ui/common/main/Configuration"
+            ],
+            processDescription: function (event, conf) {
+                var realm = conf.globalData.auth.realm !== '/' ? '?realm=' + conf.globalData.auth.realm : '';
+                window.location.href = "/" + Constants.context + "/policyEditor" + realm + "#apps/";
+            }
+        },
+        {
+            startEvent: Constants.EVENT_HANDLE_DEFAULT_ROUTE,
             description: "",
             dependencies: [
                 "org/forgerock/commons/ui/common/main/Router"
             ],
             processDescription: function (event, router) {
-                eventManager.sendEvent(constants.EVENT_CHANGE_VIEW, {route: router.configuration.routes.listScripts});
+                EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {route: router.configuration.routes.listScripts});
             }
         }
     ];

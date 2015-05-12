@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2015 ForgeRock AS. All rights reserved.
+ * Copyright 2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,17 +22,16 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global $, define, _, console */
+/*global $, define, _ */
 
 define("org/forgerock/openam/ui/editor/login/SessionDelegate", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/CookieHelper"
-], function (constants, AbstractDelegate, configuration, eventManager, cookieHelper) {
+], function (Constants, AbstractDelegate, Configuration, CookieHelper) {
 
-    var obj = new AbstractDelegate(constants.host + "/" + constants.context + "/json/users");
+    var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/users");
 
     obj.logout = function () {
         return obj.serviceCall({
@@ -40,15 +39,14 @@ define("org/forgerock/openam/ui/editor/login/SessionDelegate", [
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             data: "{}",
             url: "",
-            serviceUrl: constants.host + "/" + constants.context + "/json/sessions?_action=logout",
+            serviceUrl: Constants.host + "/" + Constants.context + "/json/sessions?_action=logout",
             errorsHandlers: {"Bad Request": {status: 400}, "Unauthorized": {status: 401}}
-        })
-            .always(function () {
-                configuration.loggedUser = null;
-                _.each(configuration.globalData.auth.cookieDomains, function (cookieDomain) {
-                    cookieHelper.deleteCookie(configuration.globalData.auth.cookieName, "/", cookieDomain);
-                });
+        }).always(function () {
+            Configuration.loggedUser = null;
+            _.each(Configuration.globalData.auth.cookieDomains, function (cookieDomain) {
+                CookieHelper.deleteCookie(Configuration.globalData.auth.cookieName, "/", cookieDomain);
             });
+        });
     };
 
     /**
@@ -61,9 +59,9 @@ define("org/forgerock/openam/ui/editor/login/SessionDelegate", [
             data: "{}",
             type: "POST",
             success: function (data) {
-                configuration.globalData.auth.successURL = data.successURL;
-                configuration.globalData.auth.fullLoginURL = data.fullLoginURL;
-                successCallback({userid: {id: data.id, realm: data.realm}, username: data.dn, roles: ["ui-admin", "ui-user"] });
+                Configuration.globalData.auth.successURL = data.successURL;
+                Configuration.globalData.auth.fullLoginURL = data.fullLoginURL;
+                successCallback({realm: data.realm, cn: data.id, roles: ["ui-admin", "ui-user"] });
             },
             error: errorCallback,
             errorsHandlers: errorsHandlers

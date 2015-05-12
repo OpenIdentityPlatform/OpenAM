@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2015 ForgeRock AS. All Rights Reserved
+ * Copyright 2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -27,44 +27,47 @@
 define([
     "org/forgerock/openam/ui/editor/views/ScriptListView",
     "org/forgerock/openam/ui/editor/views/EditScriptView"
-], function (scriptListView, editScriptView) {
+], function (ScriptListView, EditScriptView) {
     return {
         executeAll: function () {
 
             asyncTest('Listing existing scripts', function () {
-                scriptListView.element = '<div></div>';
-                $('qunit-fixture').append(scriptListView.$el);
+                ScriptListView.element = '<div></div>';
+                $('#qunit-fixture').append(ScriptListView.$el);
 
-                scriptListView.render([], function () {
-                    equal(scriptListView.$el.find('.backgrid').length, 1, 'Backgrid renders');
+                ScriptListView.render([], function () {
+                    equal(ScriptListView.$el.find('.backgrid').length, 1, 'Backgrid renders');
                     start();
                 });
             });
 
             asyncTest('Create Script', function () {
-                editScriptView.element = '<div></div>';
-                $('qunit-fixture').append(editScriptView.$el);
+                EditScriptView.element = '<div></div>';
+                $('#qunit-fixture').append(EditScriptView.$el);
 
-                editScriptView.render([], function () {
-                    var entity = editScriptView.data.entity;
-                    QUnit.ok(editScriptView.$el.find('input[name="cancel"]').length, "Cancel button is available");
-                    QUnit.ok(editScriptView.$el.find('input[name="save"]').length, "Save button is available");
-                    QUnit.ok(editScriptView.$el.find('#scriptName').val() === '', "Name is empty");
-                    QUnit.ok(editScriptView.$el.find('#scriptCode').val() === '', "Script code is empty");
+                EditScriptView.render([], function () {
+                    QUnit.ok(EditScriptView.$el.find('input[name="cancel"]').length, "Cancel button is available");
+                    QUnit.ok(EditScriptView.$el.find('input[name="save"]').length, "Save button is available");
+
+                    QUnit.ok(EditScriptView.$el.find('#name').val() === '', "Name is empty");
+                    QUnit.ok(EditScriptView.$el.find('#script').val() === '', "Script code is empty");
+                    QUnit.ok(EditScriptView.$el.find('#validation').empty(), 'Validation block is empty');
+
                     start();
                 });
             });
 
             asyncTest('Edit Script', function () {
-                editScriptView.element = '<div></div>';
-                $('qunit-fixture').append(editScriptView.$el);
+                EditScriptView.element = '<div></div>';
+                $('#qunit-fixture').append(EditScriptView.$el);
 
-                editScriptView.render(['53712aa4-0082-4e33-94a4-a6a2475a075f'], function () {
-                    var entity = editScriptView.data.entity;
-                    ok(editScriptView.$el.find('input[name="cancel"]').length, "Cancel button is available");
-                    ok(editScriptView.$el.find('input[name="save"]').length, "Save button is available");
-                    ok(editScriptView.$el.find('#scriptName').val() === entity.name, "Name is set");
-                    ok(editScriptView.$el.find('#scriptCode').val() === (entity.script ? entity.script : ''), "Script code is set");
+                EditScriptView.render(['c20fa877-e9b5-486e-b555-1396ae0d7b76'], function () {
+                    var entity = EditScriptView.data.entity;
+                    ok(EditScriptView.$el.find('#name').val() === entity.name, 'Name is set');
+                    ok(EditScriptView.$el.find('#script').val() === (entity.script ? entity.script : ''), 'Script code is set');
+                    ok(EditScriptView.$el.find('input[name=language]:checked').val() === entity.language, 'Language is set');
+                    ok(EditScriptView.$el.find('input[name=context]:checked').val() === entity.context, 'Context is set');
+
                     start();
                 });
             });

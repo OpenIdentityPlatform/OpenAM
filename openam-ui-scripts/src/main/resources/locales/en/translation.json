@@ -37,13 +37,21 @@
             },
             "ScriptsMessages": {
                 "scriptCreated": "Script created successfully",
-                "scriptUpdated": "Script updated successfully"
+                "scriptUpdated": "Script updated successfully",
+                "validation": {
+                    "noLanguage": "Please select language",
+                    "noScript": "Please upload existing script or create a new one"
+                }
             }
         },
         "AppConfiguration": {
             "Navigation": {
                 "links": {
-                    "openAMConsole": "OpenAM Console"
+                    "applications": "Applications",
+                    "resourceTypes": "Resource Types",
+                    "console": "Console",
+                    "scriptsEditor": "Scripts Editor",
+                    "policyEditor": "Policy Editor"
                 }
             }
         }
@@ -234,7 +242,14 @@
             "context": "Context",
             "script": "Script",
             "upload": "Upload",
-            "validate": "Validate"
+            "validate": "Validate",
+            "validation": {
+                "line": "line",
+                "column": "column",
+                "message": "message",
+                "errors": "This script contains errors:",
+                "noErrors": "No errors found."
+            }
         },
         "list": {
             "title": "Scripts List",

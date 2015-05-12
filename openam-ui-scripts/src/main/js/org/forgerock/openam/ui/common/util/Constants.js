@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2015 ForgeRock AS. All rights reserved.
+ * Copyright 2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -31,6 +31,8 @@ define("org/forgerock/openam/ui/common/util/Constants", [
     commonConstants.context = location.pathname.substring(1, location.pathname.indexOf('scripts') - 1);
     commonConstants.THEME_CONFIG_PATH = 'themeConfig.json';
 
+    commonConstants.EVENT_RETURN_TO_AM_CONSOLE = 'EVENT_RETURN_TO_AM_CONSOLE';
+    commonConstants.EVENT_GO_TO_POLICY_EDITOR  = 'EVENT_GO_TO_POLICY_EDITOR';
 
     return commonConstants;
 });

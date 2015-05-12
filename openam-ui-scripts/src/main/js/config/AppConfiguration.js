@@ -24,7 +24,9 @@
 
 /*global define*/
 
-define("config/AppConfiguration", function () {
+define("config/AppConfiguration", [
+    "org/forgerock/commons/ui/common/util/Constants"
+], function (Constants) {
     return {
         moduleDefinition: [
             {
@@ -93,11 +95,15 @@ define("config/AppConfiguration", function () {
                         "admin": {
                             "role": "ui-admin",
                             "urls": {
-                                "openAMConsole": {
-                                    "url": "#console/",
-                                    "name": "config.AppConfiguration.Navigation.links.openAMConsole",
-                                    "icon": "fa fa-cogs",
-                                    "inactive": false
+                                "policies": {
+                                    "event": Constants.EVENT_GO_TO_POLICY_EDITOR,
+                                    "name": "config.AppConfiguration.Navigation.links.policyEditor",
+                                    "icon": "fa fa-briefcase"
+                                },
+                                "console": {
+                                    "event": Constants.EVENT_RETURN_TO_AM_CONSOLE,
+                                    "name": "config.AppConfiguration.Navigation.links.console",
+                                    "icon": "fa fa-cubes"
                                 }
                             }
                         }
@@ -108,7 +114,8 @@ define("config/AppConfiguration", function () {
                 moduleClass: "org/forgerock/commons/ui/common/util/UIUtils",
                 configuration: {
                     templateUrls: [
-                        "templates/editor/views/ScriptListBtnToolbarTemplate.html"
+                        "templates/editor/views/ScriptListBtnToolbarTemplate.html",
+                        "templates/editor/views/ScriptValidationTemplate.html"
                     ]
                 }
             },

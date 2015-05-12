@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2015 ForgeRock AS. All Rights Reserved
+ * Copyright 2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -26,15 +26,13 @@
 
 define("org/forgerock/openam/ui/editor/login/LoginHelper", [
     "org/forgerock/openam/ui/editor/login/SessionDelegate",
-    "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractConfigurationAware",
-    "org/forgerock/commons/ui/common/main/ServiceInvoker",
     "org/forgerock/commons/ui/common/main/Configuration"
-], function (sessionDelegate, eventManager, constants, AbstractConfigurationAware, serviceInvoker, conf) {
+], function (SessionDelegate, Constants, AbstractConfigurationAware, Configuration) {
     var obj = new AbstractConfigurationAware(),
         reauthenticate = function () {
-            window.location.href = constants.host + "/" + constants.context + "?goto=" + encodeURIComponent(window.location.href);
+            window.location.href = Constants.host + "/"+ Constants.context + "?goto=" + encodeURIComponent(window.location.href);
         };
 
     obj.login = function (params, successCallback, errorCallback) {
@@ -43,13 +41,13 @@ define("org/forgerock/openam/ui/editor/login/LoginHelper", [
 
     obj.logout = function (successCallback) {
         // Do not invoke the successCallback, because we don't want the default forgerock-ui behavior
-        sessionDelegate.logout().always(reauthenticate);
+        SessionDelegate.logout().always(reauthenticate);
     };
 
     obj.getLoggedUser = function (successCallback, errorCallback) {
-        return sessionDelegate.getProfile(function (user) {
-                if (conf.globalData.auth.realm === undefined) {
-                    conf.globalData.auth.realm = user.userid.realm;
+        return SessionDelegate.getProfile(function (user) {
+                if (Configuration.globalData.auth.realm === undefined) {
+                    Configuration.globalData.auth.realm = user.realm;
                 }
                 if (successCallback) {
                     successCallback(user);

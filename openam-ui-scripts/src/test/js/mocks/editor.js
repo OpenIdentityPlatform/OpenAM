@@ -27,6 +27,7 @@ define([
     "text!templates/editor/views/EditScriptTemplate.html",
     "text!templates/editor/views/ScriptListTemplate.html",
     "text!templates/editor/views/ScriptListBtnToolbarTemplate.html",
+    "text!templates/editor/views/ScriptValidationTemplate.html",
     "text!templates/editor/login/LoginDialog.html",
     "text!configuration.json"
 ], function () {
@@ -36,6 +37,7 @@ define([
             "templates/editor/views/EditScriptTemplate.html",
             "templates/editor/views/ScriptListTemplate.html",
             "templates/editor/views/ScriptListBtnToolbarTemplate.html",
+            "templates/editor/views/ScriptValidationTemplate.html",
             "templates/editor/login/LoginDialog.html",
             "configuration.json"
         ],
@@ -86,17 +88,27 @@ define([
                     "Content-API-Version": "protocol=1.0,resource=1.1",
                     "Content-Type": "application/json;charset=UTF-8"
                 },
-                "{\"result\":[{\"uuid\":\"c50d3f33-725f-46fa-9df4-993ce5fc8c03\",\"name\":\"123\",\"script\":\"var qqq = 123\",\"language\":\"JAVASCRIPT\",\"context\":\"AUTHORIZATION_ENTITLEMENT_CONDITION\"},{\"uuid\":\"ae08aa96-51f7-4e2e-8689-6f8753f863f9\",\"name\":\"MyJavaScrip\",\"script\":\"var qqq = 123\",\"language\":\"JAVASCRIPT\",\"context\":\"AUTHORIZATION_ENTITLEMENT_CONDITION\"},{\"uuid\":\"e6fb3464-62ed-4023-b2c0-96a364c55f45\",\"name\":\"qqq\",\"script\":\"var qqq = 123\",\"language\":\"JAVASCRIPT\",\"context\":\"AUTHORIZATION_ENTITLEMENT_CONDITION\"},{\"uuid\":\"a7920e1d-ee93-4628-869a-53cd95ad0cbb\",\"name\":\"test\",\"script\":\"var qqq = 123\",\"language\":\"JAVASCRIPT\",\"context\":\"AUTHORIZATION_ENTITLEMENT_CONDITION\"}],\"resultCount\":4,\"pagedResultsCookie\":null,\"remainingPagedResults\":0}"
+                '{"result":[{"_id":"c20fa877-e9b5-486e-b555-1396ae0d7b76","name":"qqq","description":"null","script":"dmFyIHg9MTs=","language":"GROOVY","context":"AUTHORIZATION_ENTITLEMENT_CONDITION","createdBy":"id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org","creationDate":1430918340590,"lastModifiedBy":"id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org","lastModifiedDate":1431158440665}],"resultCount":1,"pagedResultsCookie":null,"remainingPagedResults":-1}'
             ]
         );
 
         server.respondWith(
             "GET",
-            /\/json\/scripts\/53712aa4-0082-4e33-94a4-a6a2475a075f/,
+            /\/json\/scripts\/c20fa877-e9b5-486e-b555-1396ae0d7b76/,
             [
                 200,
                 { },
-                "{\"uuid\":\"53712aa4-0082-4e33-94a4-a6a2475a075f\",\"name\":\"My JavaScript\",\"script\":\"var a = 123;var b = 456;var c = 765;\",\"language\":\"JAVASCRIPT\",\"context\":\"AUTHORIZATION_ENTITLEMENT_CONDITION\"}"
+                '{"_id":"c20fa877-e9b5-486e-b555-1396ae0d7b76","name":"qqq","description":"null","script":"dmFyIHg9MTs=","language":"GROOVY","context":"AUTHORIZATION_ENTITLEMENT_CONDITION","createdBy":"id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org","creationDate":1430918340590,"lastModifiedBy":"id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org","lastModifiedDate":1431158440665}'
+            ]
+        );
+
+        server.respondWith(
+            "POST",
+            /\/json\/scripts\/\?_action=validate/,
+            [
+                200,
+                { },
+                '{"success":true}'
             ]
         );
     };

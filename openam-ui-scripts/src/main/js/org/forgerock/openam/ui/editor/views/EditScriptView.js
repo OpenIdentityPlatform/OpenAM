@@ -26,10 +26,13 @@
 
 define("org/forgerock/openam/ui/editor/views/EditScriptView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/editor/models/ScriptModel",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/main/EventManager"
-], function (AbstractView, Script, Constants, EventManager) {
+    "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/util/Base64",
+    "org/forgerock/commons/ui/common/util/UIUtils",
+    "org/forgerock/openam/ui/editor/models/ScriptModel",
+    "org/forgerock/openam/ui/editor/delegates/ScriptsDelegate"
+], function (AbstractView, Constants, EventManager, Base64, UIUtils, Script, ScriptsDelegate) {
 
     var EditScriptView = AbstractView.extend({
         initialize: function(options) {
@@ -39,7 +42,10 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
         template: "templates/editor/views/EditScriptTemplate.html",
         data: {},
         events: {
-            'click input[name=save]': 'submitForm'
+            'click #validateScript': 'validateScript',
+            'keyup #validateScript': 'validateScript',
+            'click input[name=save]': 'submitForm',
+            'keyup input[name=save]': 'submitForm'
         },
 
         onModelError: function(model, response) {
@@ -123,7 +129,11 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
             });
         },
 
-        submitForm: function () {
+        submitForm: function (e) {
+            if (e.type === 'keyup' && e.keyCode !== 13) {
+                return;
+            }
+
             var savePromise;
 
             this.updateFields();
@@ -167,6 +177,36 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
             }
 
             return syncRequired;
+        },
+
+        validateScript: function (e) {
+            if (e.type === 'keyup' && e.keyCode !== 13) {
+                return;
+            }
+
+            var scriptText = this.$el.find('#script').val(),
+                language = this.$el.find('input[name=language]:checked'),
+                script,
+                self = this;
+
+            if (scriptText === '') {
+                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "validationNoScript");
+                return;
+            }
+
+            if (language.length === 0) {
+                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "validationNoLanguage");
+                return;
+            }
+
+            script = {
+                script: Base64.encodeUTF8(scriptText),
+                language: language.val()
+            };
+
+            ScriptsDelegate.validateScript(script).done(function (result) {
+                self.$el.find('#validation').html(UIUtils.fillTemplateWithData("templates/editor/views/ScriptValidationTemplate.html", result));
+            });
         }
     });
 

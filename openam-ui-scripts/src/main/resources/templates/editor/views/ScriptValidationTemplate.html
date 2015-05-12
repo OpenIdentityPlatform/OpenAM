@@ -1,0 +1,28 @@
+<div class="alert {{#if success}} alert-success {{else}} alert-danger {{/if}}" role="alert">
+    <div class="media">
+        <button type="button" class="close" data-dismiss="alert">
+            <span aria-hidden="true" class="fa fa-times"></span><span class="sr-only">{{t "common.form.close"}}</span>
+        </button>
+        <div class="media-left" href="#">
+            {{#if success}}
+            <i class="fa fa-check-circle-o"></i>
+            {{else}}
+            <i class="fa fa-exclamation-circle"></i>
+            {{/if}}
+        </div>
+        <div class="media-body">
+            {{#if errors}}
+            {{t "scripts.edit.validation.errors"}}
+            <pre class="validation-error">
+            {{#each errors}}
+               <span class="validation-key">{{t "scripts.edit.validation.line"}}:</span> {{this.line}}
+               <span class="validation-key">{{t "scripts.edit.validation.column"}}:</span> {{this.column}}
+               <span class="validation-key">{{t "scripts.edit.validation.message"}}:</span> {{this.message}}
+            {{/each}}
+            </pre>
+            {{else}}
+            {{t "scripts.edit.validation.noErrors"}}
+            {{/if}}
+        </div>
+    </div>
+</div>

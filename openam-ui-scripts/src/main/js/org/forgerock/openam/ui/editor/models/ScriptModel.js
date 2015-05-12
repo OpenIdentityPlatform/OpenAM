@@ -27,51 +27,54 @@ define("org/forgerock/openam/ui/editor/models/ScriptModel", [
     "backbone",
     "org/forgerock/openam/ui/editor/util/URLHelper",
     "org/forgerock/commons/ui/common/util/Base64"
-], function(Backbone, URLHelper, Base64) {
+], function (Backbone, URLHelper, Base64) {
     return Backbone.Model.extend({
-            idAttribute: '_id',
-            urlRoot: URLHelper.substitute("__api__/scripts"),
-            defaults: function () {
-                return {
-                    _id: null,
-                    name: '',
-                    script: '',
-                    language: '',
-                    context: ''
-                };
-            },
-            validate: function(attrs, options) {
-                // TODO: add other checks
-                if (!attrs.name) {
-                    return 'There is no name';
-                }
+        idAttribute: '_id',
+        urlRoot: URLHelper.substitute("__api__/scripts"),
+        defaults: function () {
+            return {
+                _id: null,
+                name: '',
+                script: '',
+                language: '',
+                context: ''
+            };
+        },
 
-                if (!attrs.script) {
-                    return 'There is no script';
-                }
-            },
-            parse: function(resp, options) {
-                if (resp && resp.script) {
-                    resp.script = Base64.decodeUTF8(resp.script);
-                }
-                return resp;
-            },
-            sync: function(method, model, options) {
-                options.beforeSend = function(xhr) {
-                    xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=1.0");
-                };
-
-                method = method.toLowerCase();
-                if(method === 'create') {
-                    options = options || {};
-                    options.url = this.urlRoot() + '/?_action=create';
-                }
-
-                if (method === 'create' || method === 'update') {
-                    model.set('script', Base64.encodeUTF8( model.get('script') ));
-                }
-
-                return Backbone.Model.prototype.sync.call(this, method, model, options);
+        validate: function (attrs, options) {
+            // TODO: add other checks
+            if (!attrs.name) {
+                return 'There is no name';
             }
+
+            if (!attrs.script) {
+                return 'There is no script';
+            }
+        },
+
+        parse: function (resp, options) {
+            if (resp && resp.script) {
+                resp.script = Base64.decodeUTF8(resp.script);
+            }
+            return resp;
+        },
+
+        sync: function (method, model, options) {
+            options.beforeSend = function (xhr) {
+                xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=1.0");
+            };
+
+            method = method.toLowerCase();
+            if (method === 'create') {
+                options = options || {};
+                options.url = this.urlRoot() + '/?_action=create';
+            }
+
+            if (method === 'create' || method === 'update') {
+                model.set('script', Base64.encodeUTF8(model.get('script')));
+            }
+
+            return Backbone.Model.prototype.sync.call(this, method, model, options);
+        }
     });
 });
