@@ -51,12 +51,6 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.commons.ui.libs</groupId>
-            <artifactId>jquery.qrcode</artifactId>
-            <type>js</type>
-            <classifier>min</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
             <artifactId>selectize</artifactId>
             <version>0.12.1</version>
             <classifier>min</classifier>
