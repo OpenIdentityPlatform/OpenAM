@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2015 ForgeRock AS. All rights reserved.
+ * Copyright 2011-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -125,7 +125,8 @@ require.config({
         "sortable": {
             deps: ["jquery"]
         }
-    }
+    },
+    urlArgs: "v=${version}" // jshint ignore:line
 });
 
 /**
