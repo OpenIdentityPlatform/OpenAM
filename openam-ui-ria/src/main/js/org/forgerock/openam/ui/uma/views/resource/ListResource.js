@@ -28,7 +28,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "backgrid",
     "org/forgerock/openam/ui/uma/util/BackgridUtils",
-    "bootstrap-dialog",
+    "org/forgerock/commons/ui/common/components/BSDialog",
     "org/forgerock/openam/ui/uma/views/share/CommonShare",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
@@ -37,43 +37,39 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
     "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/uma/delegates/UMADelegate"
-], function(AbstractView, Backgrid, BackgridUtils, BootstrapDialog, CommonShare, Configuration, Constants, EventManager, MessageManager, RealmHelper, Router, UMADelegate) {
+], function(AbstractView, Backgrid, BackgridUtils, BSDialog, CommonShare, Configuration, Constants, EventManager, MessageManager, RealmHelper, Router, UMADelegate) {
 
     var ListResource = AbstractView.extend({
         template: "templates/uma/views/resource/ListResource.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
-
         events: {
             'click button#revokeAll:not(.disabled)': 'onRevokeAll'
         },
         onRevokeAll: function() {
-            BootstrapDialog.show({
-                type: BootstrapDialog.TYPE_DANGER,
-                title: $.t("uma.resources.show.revokeAll"),
-                message: $.t("uma.resources.show.revokeAllResourcesMessage"),
-                closable: false,
-                buttons: [{
-                    id: "btnOk",
-                    label: $.t("common.form.ok"),
-                    cssClass: "btn-primary btn-danger",
-                    action: function(dialog) {
-                        dialog.enableButtons(false);
-                        dialog.getButton("btnOk").text($.t("common.form.working"));
-                        UMADelegate.revokeAllResources().done(function() {
-                            EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "revokeAllResourcesSuccess");
-                        }).fail(function(error) {
-                            MessageManager.messages.addMessage({ message: JSON.parse(error.responseText).message, type: "error"});
-                        }).always(function() {
-                            dialog.close();
-                    });
-                    }
-                }, {
-                    label: $.t("common.form.cancel"),
-                    action: function(dialog) {
+            var revokeDialog = new BSDialog();
+            revokeDialog.setTitle($.t("uma.resources.show.revokeAll"));
+            revokeDialog.closable = false;
+            revokeDialog.type = "type-danger";
+            revokeDialog.message = $.t("uma.resources.show.revokeAllResourcesMessage");
+            revokeDialog.actions = [{
+                id: "btnOk",
+                label: $.t("common.form.ok"),
+                cssClass: "btn-primary btn-danger",
+                action: function(dialog) {
+                    dialog.enableButtons(false);
+                    dialog.getButton("btnOk").text($.t("common.form.working"));
+                    UMADelegate.revokeAllResources().done(function() {
+                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "revokeAllResourcesSuccess");
+                    }).fail(function(error) {
+                        MessageManager.messages.addMessage({ message: JSON.parse(error.responseText).message, type: "error"});
+                    }).always(function() {
                         dialog.close();
-                    }
-                }]
-            });
+                    });
+                }
+            },{
+                type: "close"
+            }];
+            revokeDialog.show();
         },
 
         render: function(args, callback) {
