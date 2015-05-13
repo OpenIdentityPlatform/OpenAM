@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.rest.sms;
 
+import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.setup.SetupConstants;
@@ -24,6 +25,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.xml.bind.StringInputStream;
 import org.apache.commons.io.IOUtils;
 import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
@@ -40,6 +42,7 @@ import org.forgerock.json.resource.SingletonResourceProvider;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -75,16 +78,21 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
     public static final String SCHEMA_NAME = "com-sun-identity-servers";
     public static final String AM_CONSOLE_CONFIG_XML = "amConsoleConfig.xml";
     public static final String SERVER_CONFIG = "serverconfig";
+    public static final String NON_DEFAULT = "non-default";
+    public static final String DIRECTORY_CONFIG_XML = "/com/sun/identity/console/propertyServerConfigXML.xml";
+    public static final String DIRECTORY_CONFIGURATION_TAB_NAME = "directoryconfiguration";
+    public static final String ADVANCED_TAB_NAME = "advanced";
     private static final String SERVER_DEFAULT_NAME = "server-default";
+    public static final String SERVER_TABLE_PROPERTY_PREFIX = "amconfig.serverconfig.xml.server.table.column.";
     private static Map<String, String> syntaxRawToReal = new HashMap<>();
     private static JsonValue defaultSchema;
     private static JsonValue nonDefaultSchema;
-
-
+    private static JsonValue directoryConfigSchema;
     //this list is to enable us to distinguish which attributes are in the "advanced" tab
     private static List<String> allAttributeNamesInNamedTabs = new ArrayList<>();
-
-    public static final String NON_DEFAULT = "non-default";
+    private final Debug logger;
+    private DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+    private DocumentBuilder dBuilder;
 
     static {
         syntaxRawToReal.put("true,false", "boolean");
@@ -95,16 +103,67 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
         syntaxRawToReal.put("", "string");
     }
 
-    private final Debug logger;
-
     @Inject
     public SmsServerPropertiesResource(@Named("ServerAttributeSyntax") Properties syntaxProperties, @Named
             ("ServerAttributeTitles") Properties titleProperties, @Named("frRest") Debug logger) {
         this.logger = logger;
         defaultSchema = getSchema(syntaxProperties, titleProperties, true);
         nonDefaultSchema = getSchema(syntaxProperties, titleProperties, false);
+        directoryConfigSchema = getDirectorySchema(titleProperties, logger);
     }
 
+    private JsonValue getDirectorySchema(Properties titleProperties, Debug logger) {
+        try {
+            JsonValue directoryConfigSchema = json(object());
+            dbFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+            dbFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            dBuilder = dbFactory.newDocumentBuilder();
+
+            Document document = dBuilder.parse(getClass().getResourceAsStream(DIRECTORY_CONFIG_XML));
+
+            XPath xPath = XPathFactory.newInstance().newXPath();
+            final String sectionExpression = "//propertysheet/section/@defaultValue";
+            String sectionRawValue = (String) xPath.compile(sectionExpression).evaluate(document, XPathConstants.STRING);
+            String sectionTitle = titleProperties.getProperty(sectionRawValue);
+
+            final String baseExpression = "//propertysheet/section/property/label/@defaultValue";
+            NodeList attributes = (NodeList) xPath.compile(baseExpression).evaluate(document, XPathConstants.NODESET);
+
+            final String path = "/_schema/properties/directoryConfiguration/" + sectionRawValue;
+            directoryConfigSchema.putPermissive(new JsonPointer(path + "/title"), sectionTitle);
+            for (int i = 0; i < attributes.getLength(); i++) {
+                String attributeRawName = attributes.item(i).getNodeValue();
+                String attributePath = path + "/" + attributeRawName;
+                directoryConfigSchema.putPermissive(new JsonPointer(attributePath + "/title"), titleProperties.getProperty(attributeRawName));
+                directoryConfigSchema.putPermissive(new JsonPointer(attributePath + "/propertyOrder"), i);
+                directoryConfigSchema.putPermissive(new JsonPointer(attributePath + "/type"), "string");
+            }
+
+            final String serverPath = path + "/servers";
+            directoryConfigSchema.putPermissive(new JsonPointer(serverPath + "/title"), titleProperties.get("amconfig.serverconfig.xml.server.table.header"));
+            directoryConfigSchema.putPermissive(new JsonPointer(serverPath + "/type"), "array");
+            directoryConfigSchema.putPermissive(new JsonPointer(serverPath + "/items/type"), "object");
+
+            List<String> columnNames = new ArrayList<>();
+            columnNames.add("name");
+            columnNames.add("host");
+            columnNames.add("port");
+            columnNames.add("type");
+
+            for (String columnName : columnNames) {
+                final String attributePath = serverPath + "/items/properties/" + SERVER_TABLE_PROPERTY_PREFIX + columnName;
+                directoryConfigSchema.putPermissive(new JsonPointer(attributePath + "/title"),
+                        titleProperties.getProperty(SERVER_TABLE_PROPERTY_PREFIX + columnName));
+                directoryConfigSchema.putPermissive(new JsonPointer(attributePath + "/type"), "string");
+                directoryConfigSchema.putPermissive(new JsonPointer(attributePath + "/propertyOrder"), columnNames.indexOf(columnName));
+            }
+
+            return directoryConfigSchema;
+        } catch (ParserConfigurationException | SAXException | IOException | XPathExpressionException e) {
+            logger.error("Error creating document builder", e);
+        }
+        return null;
+    }
 
     private JsonValue getSchema(Properties syntaxProperties, Properties titleProperties, boolean isDefault) {
         JsonValue template = json(object());
@@ -117,8 +176,10 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
 
                 int sectionOrder = 0;
                 for (String sectionName : sectionNames) {
+
                     final String sectionPath = "/properties/" + tabName + "/" + sectionName;
-                            template.putPermissive(new JsonPointer(sectionPath + "/title"), titleProperties.getProperty(sectionName));
+                    template.putPermissive(new JsonPointer(sectionPath + "/title"), titleProperties.getProperty(sectionName));
+
                     template.putPermissive(new JsonPointer(sectionPath + "/propertyOrder"), sectionOrder++);
 
                     int attributeOrder = 0;
@@ -231,7 +292,7 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
                     resultHandler.handleError(new BadRequestException("Unknown server: " + serverName));
                 }
             } catch (SSOException | SMSException e) {
-                e.printStackTrace();
+                logger.error("Error getting server config", e);
             }
 
             final String tabName = getTabName(uriVariables);
@@ -242,7 +303,9 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
 
             JsonValue schema;
             final JsonPointer tabPointer = new JsonPointer("_schema/properties/" + tabName);
-            if (serverName.equals(SERVER_DEFAULT_NAME)) {
+            if (DIRECTORY_CONFIGURATION_TAB_NAME.equalsIgnoreCase(tabName)) {
+                schema = directoryConfigSchema;
+            } else if (serverName.equals(SERVER_DEFAULT_NAME)) {
                 schema = defaultSchema.get(tabPointer);
             } else {
                 schema = nonDefaultSchema.get(tabPointer);
@@ -251,12 +314,6 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
             if (schema == null) {
                 resultHandler.handleError(new BadRequestException("Unknown tab: " + tabName));
                 return;
-            }
-
-            if (serverName.equals(SERVER_DEFAULT_NAME)) {
-                schema = defaultSchema;
-            } else {
-                schema = nonDefaultSchema;
             }
 
             resultHandler.handleResult(schema);
@@ -427,30 +484,69 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
             Properties serverSpecificAttributes = getAttributes(serverConfig);
             Map<String, String> defaultSection = new HashMap<>();
 
-            JsonValue value = json(object(
+            JsonValue result = json(object(
                     field("default", defaultSection)));
 
             List<String> attributeNamesForTab;
-            if (tabName.equalsIgnoreCase("advanced")) {
-                attributeNamesForTab = getAdvancedTabAttributeNames(serverConfig);
+            if (tabName.equalsIgnoreCase(DIRECTORY_CONFIGURATION_TAB_NAME)) {
+                InputStream resourceStream = new StringInputStream(getServerConfigXml(serverConfig));
+
+                Document serverXml = dBuilder.parse(resourceStream);
+
+                XPath xPath = XPathFactory.newInstance().newXPath();
+
+                final String baseExpression = "//iPlanetDataAccessLayer/ServerGroup[@name='sms']/";
+                String minConnections = (String) xPath.compile(baseExpression + "@" + DSConfigMgr.MIN_CONN_POOL).evaluate(serverXml, XPathConstants.STRING);
+                String maxConnections = (String) xPath.compile(baseExpression + "@" + DSConfigMgr.MAX_CONN_POOL).evaluate(serverXml, XPathConstants.STRING);
+                String dirDN = (String) xPath.compile(baseExpression + "User/DirDN").evaluate(serverXml, XPathConstants.STRING);
+                String directoryPassword = (String) xPath.compile(baseExpression + "User/DirPassword").evaluate(serverXml, XPathConstants.STRING);
+
+                result.put("minConnections", minConnections);
+                result.put("maxConnections", maxConnections);
+                result.put("dirDN", dirDN);
+                result.put("directoryPassword", directoryPassword);
+
+                NodeList serverNames = (NodeList) xPath.compile(baseExpression + "Server/@name").evaluate
+                        (serverXml, XPathConstants.NODESET);
+
+                for (int i = 0; i < serverNames.getLength(); i++) {
+                    final String directoryServerName = serverNames.item(i).getNodeValue();
+                    final String serverExpression = baseExpression + "Server[@name='" + directoryServerName + "']";
+                    String hostExpression = serverExpression + "/@host";
+                    String portExpression = serverExpression + "/@port";
+                    String typeExpression = serverExpression + "/@type";
+
+                    NodeList serverAttributes = (NodeList) xPath.compile(hostExpression + "|" + portExpression + "|" +
+                            typeExpression).evaluate(serverXml, XPathConstants.NODESET);
+
+                    for (int a = 0; a < serverAttributes.getLength(); a++) {
+                        final Node serverAttribute = serverAttributes.item(a);
+                        result.addPermissive(new JsonPointer("servers/" + directoryServerName + "/" + serverAttribute
+                                .getNodeName()), serverAttribute.getNodeValue());
+                    }
+                }
             } else {
-                attributeNamesForTab = getDefaultValueNames(tabName);
-            }
-
-            for (String attributeName : attributeNamesForTab) {
-                final String defaultAttribute = (String) defaultAttributes.get(attributeName);
-                if (defaultAttribute != null) {
-                    defaultSection.put(attributeName, (String) defaultAttributes.get(attributeName));
+                if (tabName.equalsIgnoreCase(ADVANCED_TAB_NAME)) {
+                    attributeNamesForTab = getAdvancedTabAttributeNames(serverConfig);
+                } else {
+                    attributeNamesForTab = getDefaultValueNames(tabName);
                 }
 
-                final String serverSpecificAttribute = (String) serverSpecificAttributes.get(attributeName);
-                if (serverSpecificAttribute != null) {
-                    value.add(attributeName, serverSpecificAttribute);
+                for (String attributeName : attributeNamesForTab) {
+                    final String defaultAttribute = (String) defaultAttributes.get(attributeName);
+                    if (defaultAttribute != null) {
+                        defaultSection.put(attributeName, (String) defaultAttributes.get(attributeName));
+                    }
+
+                    final String serverSpecificAttribute = (String) serverSpecificAttributes.get(attributeName);
+                    if (serverSpecificAttribute != null) {
+                        result.add(attributeName, serverSpecificAttribute);
+                    }
                 }
             }
 
-            resultHandler.handleResult(new Resource(serverName + "/properties/" + tabName, String.valueOf(value
-                    .hashCode()), value));
+            resultHandler.handleResult(new Resource(serverName + "/properties/" + tabName, String.valueOf(result
+                    .hashCode()), result));
             return;
         } catch (SMSException | SSOException | ParserConfigurationException | SAXException | IOException
                 | XPathExpressionException e) {
@@ -458,6 +554,11 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
         }
 
         resultHandler.handleError(new BadRequestException("Error reading properties file for " + tabName));
+    }
+
+    private String getServerConfigXml(ServiceConfig serverConfig) {
+        return (String) ((Set) serverConfig.getAttributes().get("serverconfigxml"))
+                .iterator().next();
     }
 
     private List<String> getAdvancedTabAttributeNames(ServiceConfig serverConfig) {
