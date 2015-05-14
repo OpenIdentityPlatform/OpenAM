@@ -194,7 +194,8 @@ public final class AMSetupUtils {
             connection = openConnection(serverUrl + "/getServerInfo.jsp");
             writeToConnection(connection, "IDToken1=" + URLEncoder.encode(userId, "UTF-8")
                     + "&IDToken2=" + URLEncoder.encode(password, "UTF-8"));
-            return BootstrapData.queryStringToMap(readFromConnection(connection));
+            // Remove any additional /n's from the result, often seen at the beginning of the response.
+            return BootstrapData.queryStringToMap(readFromConnection(connection).replace("\n", ""));
         } catch (IllegalArgumentException e) {
             debug.warning("AMSetupUtils.getRemoteServerInfo()", e);
             throw newConfigurationException("702");
