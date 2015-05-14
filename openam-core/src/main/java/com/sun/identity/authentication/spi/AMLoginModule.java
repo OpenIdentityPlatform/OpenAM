@@ -1522,23 +1522,6 @@ public abstract class AMLoginModule implements LoginModule {
         }
         return orgMap;
     }
-    
-    /**
-     * Checks if persistent cookie is on.
-     *
-     * @return <code>true</code> if persistent cookie is set.
-     * @supported.api
-     */
-    public boolean getPersistentCookieOn() {
-        // get login state for this authentication session
-        if (loginState == null) {
-            loginState = getLoginState();
-            if (loginState == null) {
-                return false;
-            }
-        }
-        return loginState.getPersistentCookieMode();
-    }
 
     /**
      * Checks if dynamic profile creation is enabled.
@@ -1554,35 +1537,6 @@ public abstract class AMLoginModule implements LoginModule {
             }
         }
         return loginState.isDynamicProfileCreationEnabled();
-    }
-    
-    /**
-     * Attempts to set the Persistent Cookie for this session.  Can be called
-     * from any state in the authentication module.  It will return whether
-     * "Core Authentication" will add the persistent cookie (name is specified
-     * in the <code>/etc/opt/SUNWam/config/AMConfig.properties</code>:
-     * <code>com.iplanet.am.pcookie.name</code> property)
-     *
-     * @return <code>true</code> when setting is successful, <code>false</code>
-     *         if the persistent cookie mode attribute is not set for the
-     *         organization.
-     * @supported.api
-     */
-    public boolean setPersistentCookieOn() {
-        // get login state for this authentication session
-        if (loginState == null) {
-            loginState = getLoginState();
-            if (loginState == null) {
-                return false;
-            }
-        }
-        
-        if (!loginState.getPersistentCookieMode()) {
-            return false;
-        }
-        
-        loginState.setPersistentCookieOn();
-        return true;
     }
     
     /**

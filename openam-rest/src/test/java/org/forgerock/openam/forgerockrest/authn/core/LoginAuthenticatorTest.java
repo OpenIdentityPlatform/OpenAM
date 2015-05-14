@@ -150,7 +150,7 @@ public class LoginAuthenticatorTest {
         LoginProcess loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);
 
         //Then
-        verify(authContextLocalWrapper).login(AuthContext.IndexType.RESOURCE, "INDEX_VALUE", false, envMap, null);
+        verify(authContextLocalWrapper).login(AuthContext.IndexType.RESOURCE, "INDEX_VALUE", envMap, null);
         verify(coreServicesWrapper).getAuthContext(eq(request), eq((HttpServletResponse) null), (SessionID) anyObject(),
                 eq(false), eq(false));
         assertNotNull(loginProcess);

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: AuthExceptionViewBean.java,v 1.8 2008/12/24 01:41:51 ericow Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 
@@ -194,32 +195,12 @@ public class AuthExceptionViewBean extends AuthViewBeanBase {
                 if (cookieDomainSet.isEmpty()) {
                     cookie = AuthUtils.getLogoutCookie(ac, null);
                     response.addCookie(cookie);
-                    // clear Persistent Cookie
-                    if (AuthUtils.getPersistentCookieMode(ac)) {
-                        cookie = AuthUtils.clearPersistentCookie(null, ac);
-                        if (exDebug.messageEnabled()) {
-                            exDebug.message(
-                              "Clearing persistent cookie: null cookie domain");
-                            exDebug.message("Persistent cookie: " + cookie);
-                        }
-                        response.addCookie(cookie);
-                    }
                 } else {
                     Iterator iter = cookieDomainSet.iterator();
                     while (iter.hasNext()) {
                         cookieDomain = (String)iter.next();
                         cookie = AuthUtils.getLogoutCookie(ac, cookieDomain);
                         response.addCookie(cookie);
-                        // clear Persistent Cookie
-                        if (AuthUtils.getPersistentCookieMode(ac)) {
-                            cookie = AuthUtils.clearPersistentCookie(cookieDomain, ac);
-                            if (exDebug.messageEnabled()) {
-                                exDebug.message("Clearing persistent cookie: "
-                                + cookieDomain);
-                                exDebug.message("Persistent cookie: " + cookie);
-                            }
-                            response.addCookie(cookie);
-                        }
                     }
                 }
                 AuthUtils.clearlbCookie(request, response);

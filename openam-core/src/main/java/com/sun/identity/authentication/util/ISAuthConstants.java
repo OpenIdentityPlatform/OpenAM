@@ -341,12 +341,6 @@ public interface ISAuthConstants {
     public static final String DYNAMIC_PROFILE = AUTH_ATTR_PREFIX
             + "dynamic-profile-creation";
 
-    public static final String PERSISTENT_COOKIE_MODE = AUTH_ATTR_PREFIX
-            + "persistent-cookie-mode";
-
-    public static final String PERSISTENT_COOKIE_TIME = AUTH_ATTR_PREFIX
-            + "persistent-cookie-time";
-
     public static final String AUTH_ALLOWED_MODULES = AUTH_ATTR_PREFIX
             + "allowed-modules";
 
@@ -448,13 +442,6 @@ public interface ISAuthConstants {
      */
 
     public static final String AUTH_BUNDLE_NAME = "amAuth";
-
-    /**
-     * invalidate PCookie
-     */
-    public static final String PCOOKIE = "iPSPCookie";
-
-    public static final String INVALID_PCOOKIE = "inPersistentCookie";
 
     /**
      * Default Values
@@ -688,14 +675,4 @@ public interface ISAuthConstants {
     
     // Property name for user password attribute
     public static final String ATTR_USER_PASSWORD = "userpassword";
-    
-    /**
-     * Property name for persistent cookie auth level.
-     */
-    public static final String PCOOKIE_AUTH_LEVEL = "openam-auth-pcookie-auth-level";
-
-    /**
-     * The AuthType string for persistent cookie based logins.
-     */
-    public static final String PCOOKIE_AUTH_TYPE = "PCookie";
 }

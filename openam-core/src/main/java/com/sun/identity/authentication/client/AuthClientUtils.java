@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: AuthClientUtils.java,v 1.40 2010/01/22 03:31:01 222713 Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 package com.sun.identity.authentication.client;
 
@@ -163,8 +163,6 @@ public class AuthClientUtils {
     private static String distAuthCookieName=
         SystemProperties.get(Constants.AM_DIST_AUTH_COOKIE_NAME,
         ISAuthConstants.DIST_AUTH_COOKIE_NAME);
-    private static String persistentCookieName=
-        SystemProperties.get(Constants.AM_PCOOKIE_NAME);
     private static String serviceURI = getServiceURI() + "/UI/Login";
     private static boolean setCookieToAllDomains = true;
 
@@ -601,13 +599,13 @@ public class AuthClientUtils {
             if (!domains.isEmpty()) {
                 for (Iterator it = domains.iterator(); it.hasNext(); ) {
                     String domain = (String)it.next();
-                    Cookie cookie = createPersistentCookie(
+                    Cookie cookie = createCookie(
                             cookieName, "LOGOUT", 0, domain);
                     response.addCookie(cookie);
                 }
             } else {
                 response.addCookie(
-                        createPersistentCookie(cookieName, "LOGOUT", 0, null));
+                        createCookie(cookieName, "LOGOUT", 0, null));
             }
         }
     }          
@@ -1311,10 +1309,6 @@ public class AuthClientUtils {
         return (cookieName);
     }
 
-    public static String getPersistentCookieName() {
-        return (persistentCookieName);
-    }
-
     public static String getlbCookieName() {
         String loadBalanceCookieName = null;
         if (SystemProperties.isServerMode()) {
@@ -1926,9 +1920,8 @@ public class AuthClientUtils {
         return (cookieSet);
     }
 
-    /*create Persistent Cookie */
-    public static Cookie createPersistentCookie(String name, String value,
-        int maxAge, String cookieDomain) {
+    public static Cookie createCookie(String name, String value,
+            int maxAge, String cookieDomain) {
 
         Cookie pCookie = CookieUtils.newCookie(name, value, "/", cookieDomain);
         if (maxAge >= 0) {
@@ -1950,9 +1943,9 @@ public class AuthClientUtils {
             }
             String cookieName = getlbCookieName();
             String cookieValue = getlbCookieValue();
-            lbCookie = 
-                createPersistentCookie(
-                    cookieName, cookieValue, -1, cookieDomain);
+            lbCookie =
+                    createCookie(
+                            cookieName, cookieValue, -1, cookieDomain);
             return (lbCookie);
         } catch (Exception e) {
             utilDebug.message("Unable to create Load Balance Cookie");
@@ -2884,13 +2877,13 @@ public class AuthClientUtils {
                 for (Iterator it = domains.iterator(); it.hasNext(); ) {
                     String domain = (String)it.next();
                     Cookie cookie =
-                        createPersistentCookie(cookieName, "LOGOUT", 0, domain);
+                            createCookie(cookieName, "LOGOUT", 0, domain);
                     response.addCookie(cookie);
                     utilDebug.message("In clear server Cookie added cookie");
                 }
             } else {
                 response.addCookie(
-                    createPersistentCookie(cookieName, "LOGOUT", 0, null));
+                        createCookie(cookieName, "LOGOUT", 0, null));
                 utilDebug.message("In clear server added cookie no domain");
             }
         }

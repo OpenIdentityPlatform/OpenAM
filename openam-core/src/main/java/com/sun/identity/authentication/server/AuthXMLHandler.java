@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: AuthXMLHandler.java,v 1.20 2009/04/29 18:07:03 qcheng Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2010-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 package com.sun.identity.authentication.server;
 
@@ -469,11 +466,9 @@ public class AuthXMLHandler implements RequestHandler {
                         if (debug.messageEnabled()) {
                             debug.message("locale is : " + locale);
                         }
-                        authContext.login(indexType,indexName, false, 
-                            envMap, locale);
+                        authContext.login(indexType,indexName, envMap, locale);
                     } else {
-                        authContext.login(indexType,indexName, false, 
-                            envMap, null);
+                        authContext.login(indexType,indexName, envMap, null);
                     }
                     //setServletRequest(servletRequest,authContext);
                     processRequirements(xml, authContext,authResponse, params,

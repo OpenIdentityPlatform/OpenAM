@@ -69,7 +69,6 @@ import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 import java.security.AccessController;
-import java.security.Principal;
 import java.text.MessageFormat;
 import java.util.Hashtable;
 import java.util.Map;
@@ -116,7 +115,6 @@ public class AMLoginContext {
     private IndexType indexType;
     private String indexName;
     private String clientType;
-    private boolean pCookieMode = false;
     private String lockoutMsg = null;
     private Set<String> moduleSet = null;
     private String sid = null;
@@ -1214,10 +1212,6 @@ public class AMLoginContext {
             //principal = (Principal) loginParamsMap.get("principal");
             //password = (char[]) loginParamsMap.get("password");
             subject = (Subject) loginParamsMap.get("subject");
-            Boolean pCookieObject = (Boolean) loginParamsMap.get("pCookieMode");
-            if (pCookieObject != null) {
-                pCookieMode = pCookieObject.booleanValue();
-            }
 
             String locale = (String) loginParamsMap.get("locale");
             if (StringUtils.isNotEmpty(locale)) {
@@ -1426,12 +1420,6 @@ public class AMLoginContext {
         }
 
         loginState.setAuthModuleName(moduleName);
-
-        // set username
-
-        if ((indexType == IndexType.USER) && (pCookieMode)) {
-            loginState.setToken(indexName);
-        }
     }
 
     /* check if user exists and is enabled if not return
@@ -1732,7 +1720,7 @@ public class AMLoginContext {
                                 ", orgDN from query string: " + newOrgDN);
                     }
                     if (normOrgDN != null) {
-                        if (!normOrgDN.equals(newOrgDN) && !pCookieMode) {
+                        if (!normOrgDN.equals(newOrgDN)) {
                             loginStatus.setStatus(LoginStatus.AUTH_RESET);
                             loginState.setErrorCode(AMAuthErrorCode.AUTH_ERROR);
                             setErrorMsgAndTemplate();
@@ -1810,10 +1798,7 @@ public class AMLoginContext {
             } else {
                 ignoreProfile = true;
             }
-            if (pCookieMode) {
-                processPCookieMode(userValid);
-                return true;
-            } else if ((!userValid) && (!ignoreProfile)) {
+            if ((!userValid) && (!ignoreProfile)) {
                 debug.message("User is not active");
                 loginState.logFailed(bundle.getString("userInactive"), "USERINACTIVE");
                 /* The user based authentication errors should not be different
@@ -1870,78 +1855,6 @@ public class AMLoginContext {
          * IndexType not processed by this method
          */
         return false;
-    }
-
-    /* do required processing for persistent cookie */
-    void processPCookieMode(boolean userValid) throws AuthLoginException {
-
-        // check if user account has expired
-
-        if (!loginState.ignoreProfile()) {
-            if (!userValid) {
-                if (debug.messageEnabled()) {
-                    debug.message("user is not valid");
-                }
-                loginState.setErrorCode(AMAuthErrorCode.AUTH_USER_INACTIVE);
-                setErrorMsgAndTemplate();
-                loginStatus.setStatus(LoginStatus.AUTH_FAILED);
-                throw new AuthLoginException(BUNDLE_NAME, AMAuthErrorCode.AUTH_USER_INACTIVE, null);
-            }
-            AMAccountLockout amAccountLockout = new AMAccountLockout(loginState);
-            boolean accountLocked = amAccountLockout.isLockedOut();
-            if (accountLocked) {
-                loginState.logFailed(bundle.getString("lockOut"), "LOCKEDOUT");
-                loginState.setErrorCode(AMAuthErrorCode.AUTH_USER_LOCKED);
-                setErrorMsgAndTemplate();
-                loginStatus.setStatus(LoginStatus.AUTH_FAILED);
-                throw new AuthLoginException(BUNDLE_NAME, AMAuthErrorCode.AUTH_USER_LOCKED, null);
-            }
-            boolean accountExpired = amAccountLockout.isAccountExpired();
-            if (accountExpired) {
-                loginState.logFailed(bundle.getString("accountExpired"), "ACCOUNTEXPIRED");
-                loginState.setErrorCode(AMAuthErrorCode.AUTH_ACCOUNT_EXPIRED);
-                setErrorMsgAndTemplate();
-                loginStatus.setStatus(LoginStatus.AUTH_FAILED);
-                throw new AuthLoginException(BUNDLE_NAME, AMAuthErrorCode.AUTH_ACCOUNT_EXPIRED, null);
-            }
-        }
-        if (loginState.ignoreProfile()) {
-            try {
-                loginState.populateDefaultUserAttributes();
-                loginState.setUserName(indexName);
-            } catch (Exception e) {
-                debug.message("Error get default attributes " , e);
-                setAuthError(AMAuthErrorCode.AUTH_ERROR, "loginFailed");
-                throw new AuthLoginException(BUNDLE_NAME, AMAuthErrorCode.AUTH_ERROR, null);
-            }
-        }
-        // if pCookie is valid and if sessionUpgrade case
-        // then don't update loginState and activate session
-        // just return to continue with normal auth process.
-        if (loginState.isSessionUpgrade()) {
-            loginState.setPCookieUserName(indexName);
-            return;
-        }
-
-        updateLoginState(indexType, indexName, configName, orgDN);
-        Subject subject = new Subject();
-        Principal userPrincipal = new UserPrincipal(indexName);
-        subject.getPrincipals().add(userPrincipal);
-        if (debug.messageEnabled()) {
-            debug.message("Subject is.. :" + subject);
-        }
-        //activate session
-        try {
-            loginState.activateSession(subject, authContext);
-            loginState.updateSessionForFailover();
-            loginState.logSuccess();
-        } catch (Exception e) {
-            debug.message("Error activating session ");
-            setAuthError(AMAuthErrorCode.AUTH_ERROR, "loginFailed");
-            throw new AuthLoginException(BUNDLE_NAME, AMAuthErrorCode.AUTH_ERROR, null);
-        }
-        loginStatus.setStatus(LoginStatus.AUTH_SUCCESS);
-        debug.message("login success");
     }
 
     /* set sid and loginState */

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn.core;
@@ -59,12 +59,11 @@ public interface AuthenticationContext {
      *
      * @param indexType The authentication index type.
      * @param indexValue The authentication index value.
-     * @param pCookieMode True if persistent cookie exists, otherwise false.
      * @param envMap The environment map, only applicable when the authentication index type is RESOURCE.
      * @param locale The locale to use in the authentication process.
      * @throws com.sun.identity.authentication.spi.AuthLoginException If a problem occurred during login.
      */
-    void login(AuthContext.IndexType indexType, String indexValue, boolean pCookieMode, Map<String, Set<String>> envMap,
+    void login(AuthContext.IndexType indexType, String indexValue, Map<String, Set<String>> envMap,
                String locale) throws AuthLoginException;
 
     /**

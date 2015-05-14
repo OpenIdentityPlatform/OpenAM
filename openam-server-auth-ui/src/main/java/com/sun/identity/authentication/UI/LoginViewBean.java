@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: LoginViewBean.java,v 1.28 2009/11/25 11:58:53 manish_rustagi Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  * Portions Copyrighted 2012 Nomura Research Institute, Ltd
  */
 package com.sun.identity.authentication.UI;
@@ -215,8 +212,6 @@ public class LoginViewBean extends AuthViewBeanBase {
             return new StaticTextField(this, HTML_TITLE_SELFREGERROR, "");
         } else if (name.equals(HTML_TITLE_DISCLAIMER)) {
             return new StaticTextField(this, HTML_TITLE_DISCLAIMER, "");
-        } else if (name.equals(HTML_TITLE_INVALIDPCOOKIEUID)) {
-            return new StaticTextField(this, HTML_TITLE_INVALIDPCOOKIEUID, "");
         } else if (name.equals(HTML_TITLE_INVALIDPASSWORD)) {
             return new StaticTextField(this, HTML_TITLE_INVALIDPASSWORD, "");
         } else if (name.equals(HTML_TITLE_INVALIDDOMAIN)) {
@@ -795,8 +790,6 @@ public class LoginViewBean extends AuthViewBeanBase {
                 rb.getString("htmlTitle_SelfRegError"));
             setDisplayFieldValue(HTML_TITLE_DISCLAIMER,
                 rb.getString("htmlTitle_Disclaimer"));
-            setDisplayFieldValue(HTML_TITLE_INVALIDPCOOKIEUID,
-                rb.getString("htmlTitle_InvalidPCookieUID"));
             setDisplayFieldValue(HTML_TITLE_INVALIDPASSWORD,
                 rb.getString("htmlTitle_InvalidPassword"));
             setDisplayFieldValue(HTML_TITLE_INVALIDDOMAIN,
@@ -893,13 +886,6 @@ public class LoginViewBean extends AuthViewBeanBase {
             prepareLoginParams();
         }
         
-        // if pCookie exists and valid and not a session upgrade
-        // case return.
-        if (!AuthUtils.newSessionArgExists(reqDataHash) && isPersistentCookieValid()
-        && (!AuthUtils.isSessionUpgrade(ac)))  {
-            return;
-        }
-        
         if (loginDebug.messageEnabled()) {
             loginDebug.message("Login Parameters : IndexType = " + 
                 indexType + " IndexName = " + indexName);
@@ -908,7 +894,7 @@ public class LoginViewBean extends AuthViewBeanBase {
         try {
             if ( indexType != null ) {
                 if (indexType.equals(AuthContext.IndexType.RESOURCE)) {
-                    ac.login(indexType, indexName, false, envMap, null);
+                    ac.login(indexType, indexName, envMap, null);
                 } else {
                     ac.login(indexType, indexName);
                 }
@@ -1036,14 +1022,6 @@ public class LoginViewBean extends AuthViewBeanBase {
                 if (ac.getStatus() == AuthContext.Status.SUCCESS) {
                     LoginSuccess = true;
                     ResultVal = rb.getString("authentication.successful");
-                    
-                    if (AuthUtils.getPersistentCookieMode(ac) &&
-                                                // create new persistent cookie
-                        AuthUtils.isPersistentCookieOn(ac) &&
-                        AuthUtils.isCookieSupported(ac)
-                    ) {
-                        addPersistentCookie();
-                    }
                     
                     /*
                      * redirect to 'goto' parameter or SPI hook or default
@@ -1410,16 +1388,6 @@ public class LoginViewBean extends AuthViewBeanBase {
                         LoginSuccess = true;
                         ResultVal = rb.getString("authentication.successful");
                         
-                        // set persistant cookie
-                        if (AuthUtils.isCookieSupported(ac) &&
-                            AuthUtils.isPersistentCookieOn(ac) &&
-                                                    //iPSPCookie value in URL
-                            AuthUtils.getPersistentCookieMode(ac)
-                                        //persistent cookie setting in profile
-                        ) {
-                            addPersistentCookie();
-                        }
-                        
                         /*
                          * redirect to 'goto' parameter or SPI hook or default
                          * redirect URL.
@@ -1775,103 +1743,6 @@ public class LoginViewBean extends AuthViewBeanBase {
                 }	 
             }	 
         }	 
-    }
-
-    // Method to check if Persistent exist and use it to login to DSAME
-    private boolean isPersistentCookieValid() {
-        if (loginDebug.messageEnabled()) {
-            loginDebug.message("PCOOKIE setting in profile "
-            + AuthUtils.getPersistentCookieMode(ac));
-            loginDebug.message("PCOOKIE setting in URL "
-            + AuthUtils.isPersistentCookieOn(ac));
-        }
-
-        // persistent cookie setting in profile
-        if (AuthUtils.getPersistentCookieMode(ac)) {
-            String userName = AuthUtils.searchPersistentCookie(ac);
-            
-            if  (userName!=null) {  // persistent cookie exist!
-                if (loginDebug.messageEnabled()) {
-                    loginDebug.message("Username is " + userName);
-                }
-                // try login with the PCookie
-                try {
-                    ac.login(AuthContext.IndexType.USER, userName, true);
-                    // if came here and session upgrade
-                    // case then return
-                    if (AuthUtils.isSessionUpgrade(ac)) {
-                        return true;
-                    }
-                    if (ac.getStatus() == AuthContext.Status.SUCCESS) {
-                        LoginSuccess = true;
-                        ResultVal = rb.getString("authentication.successful");
-                        redirect_url = AuthUtils.getLoginSuccessURL(ac);
-                        loginDebug.message(
-                            "Session activate by persistent cookie!");
-                        addPersistentCookie();
-                        return true;
-                    }
-                } catch (Exception e) {  // clear the invalid PCookie
-                    String cookieDomain = null;
-                    Set cookieDomainSet =
-                            AuthClientUtils.getCookieDomainsForReq(request);
-
-                    // No cookie domain specified in profile
-                    if (cookieDomainSet.isEmpty()) {
-                        try {
-                            cookie = AuthUtils.clearPersistentCookie(null, ac);
-                            response.addCookie(cookie);
-                        } catch (Exception ee) {
-                            loginDebug.message("Could not set Persistent Cookie!");
-                        }
-                    } else {
-                        Iterator iter = cookieDomainSet.iterator();
-                        while (iter.hasNext()) {
-                            cookieDomain = (String)iter.next();
-                            Cookie cookie = AuthUtils.clearPersistentCookie(
-                                cookieDomain, ac);
-                            response.addCookie(cookie);
-                        }
-                    }
-                    handleAuthLoginException(null);
-                }
-            }
-        }
-        return false;
-    }
-    
-    // Method to add persistent cookie
-    private void addPersistentCookie() {
-        String cookieDomain = null;
-        Set cookieDomainSet = AuthClientUtils.getCookieDomainsForReq(request);
-        if (cookieDomainSet.isEmpty()) { //No cookie domain specified in profile
-            try {
-                cookie = AuthUtils.createPersistentCookie(ac, null);
-                if (loginDebug.messageEnabled()) {
-                    loginDebug.message("cookie for new request : "
-                    + cookie.toString());
-                    loginDebug.message("Cookie domain is null.");
-                }
-                CookieUtils.addCookieToResponse(response, cookie);
-            } catch (Exception e) {
-                loginDebug.message("Could not set Persistent Cookie!");
-            }
-        } else {
-            Iterator iter = cookieDomainSet.iterator();
-            try {
-                while (iter.hasNext()) {
-                    cookieDomain = (String)iter.next();
-                    cookie = AuthUtils.createPersistentCookie(ac, cookieDomain);
-                    if (loginDebug.messageEnabled()) {
-                        loginDebug.message("cookie for new request : "
-                        + cookie.toString());
-                    }
-                    CookieUtils.addCookieToResponse(response, cookie);
-                }
-            } catch (Exception e) {
-                loginDebug.message("Could not set Persistent Cookie!");
-            }
-        }
     }
     
     // get error template, message as well as error code.
@@ -2417,8 +2288,6 @@ public class LoginViewBean extends AuthViewBeanBase {
     /** Default parameter name of html title for disclaimer */
     public static final String HTML_TITLE_DISCLAIMER = "htmlTitle_Disclaimer";
     /** Default parameter name of html title for invalid cookie id */
-    public static final String HTML_TITLE_INVALIDPCOOKIEUID =
-        "htmlTitle_InvalidPCookieUID";
     /** Default parameter name of html title for invalid password */
     public static final String HTML_TITLE_INVALIDPASSWORD =
         "htmlTitle_InvalidPassword";

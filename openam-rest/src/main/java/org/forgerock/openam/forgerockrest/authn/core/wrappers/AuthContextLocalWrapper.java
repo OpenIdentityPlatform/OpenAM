@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn.core.wrappers;
@@ -77,9 +77,9 @@ public class AuthContextLocalWrapper implements AuthenticationContext {
      * {@inheritDoc}
      */
     @Override
-    public void login(AuthContext.IndexType indexType, String indexValue, boolean pCookieMode,
+    public void login(AuthContext.IndexType indexType, String indexValue,
             Map<String, Set<String>> envMap, String locale) throws AuthLoginException {
-        authContextLocal.login(indexType, indexValue, pCookieMode, envMap, locale);
+        authContextLocal.login(indexType, indexValue, envMap, locale);
     }
 
     /**

@@ -185,28 +185,6 @@
                                  i18nKey="a105"
                                  resourceName="defaultRole">
                 </AttributeSchema>
-                <AttributeSchema name="iplanet-am-auth-persistent-cookie-mode"
-                                 type="single"
-                                 syntax="boolean"
-                                 i18nKey="a108"
-                                 resourceName="persistentCookieMode">
-                    <BooleanValues>
-                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-                    </BooleanValues>
-                    <DefaultValues>
-                        <Value>false</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-                <AttributeSchema name="iplanet-am-auth-persistent-cookie-time"
-                                 type="single"
-                                 syntax="number"
-                                 i18nKey="a109"
-                                 resourceName="persistentCookieMaxTime">
-                    <DefaultValues>
-                        <Value>2147483</Value>
-                    </DefaultValues>
-                </AttributeSchema>
                 <AttributeSchema name="sunEnableModuleBasedAuth"
                                  type="single"
                                  syntax="boolean"
@@ -494,15 +472,6 @@
                                  type="list"
                                  syntax="string"
                                  i18nKey="">
-                </AttributeSchema>
-                <AttributeSchema name="openam-auth-pcookie-auth-level"
-                                 type="single"
-                                 syntax="string"
-                                 i18nKey="a153"
-                                 resourceName="persistentCookieAuthLevel">
-                    <DefaultValues>
-                        <Value>0</Value>
-                    </DefaultValues>
                 </AttributeSchema>
             </Organization>
         </Schema>

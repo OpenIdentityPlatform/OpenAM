@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: AuthContext.java,v 1.25 2009/11/21 01:12:59 qcheng Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2010-2015 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 package com.sun.identity.authentication;
 
@@ -386,7 +383,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      * @supported.api
      */
     public void login() throws AuthLoginException {
-        login(null, null, null, false, null, null, null);
+        login(null, null, null, null, null, null);
     }
 
     /**
@@ -418,27 +415,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      */
     public void login(IndexType type, String indexName)
             throws AuthLoginException {
-        login(type, indexName, null, false, null, null, null);
-    }
-    
-    /**
-     * Starts the login process for the given <code>AuthContext</code> object
-     * identified by the index type and index name.
-     * The <code>IndexType</code> defines the possible kinds of "objects"
-     * or "resources" for which an authentication can
-     * be performed. Currently supported index types are
-     * users, roles, services (or application), levels, resources and mechanism.
-     * The <code>pCookieMode</code> indicates that a persistent cookie exists
-     * for this request.
-     *
-     * @param type authentication index type.
-     * @param indexName authentication index name.
-     * @param pCookieMode <code>true</code> if persistent Cookie exists.
-     * @exception AuthLoginException if an error occurred during login
-     */
-    public void login(IndexType type, String indexName, boolean pCookieMode)
-            throws AuthLoginException {
-        login(type, indexName, null, pCookieMode, null, null, null);
+        login(type, indexName, null, null, null, null);
     }
     
     /**
@@ -458,7 +435,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      */
     public void login(IndexType type, String indexName, String locale)
             throws AuthLoginException {
-        login(type, indexName, null, false, null, locale);
+        login(type, indexName, null, null, locale);
     }
 
     /**
@@ -490,7 +467,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      */
     public SSOToken login(IndexType type, String indexName, Callback[] userInfo)
             throws AuthLoginException {
-        login(type, indexName, null, false, null, null, null);
+        login(type, indexName, null, null, null, null);
         
         SSOToken ssoToken = null;
         Callback[] callbacks = null;
@@ -549,7 +526,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      */
     public void login(IndexType indexType, String indexName, String[] params)
             throws AuthLoginException {
-        login(indexType, indexName, params, false, null, null, null);
+        login(indexType, indexName, params, null, null, null);
     }
 
     public void login(IndexType indexType,
@@ -558,7 +535,7 @@ public class AuthContext extends Object implements java.io.Serializable {
                       HttpServletRequest request,
                       HttpServletResponse response)
             throws AuthLoginException {
-        login(indexType, indexName, params, false, null, request, response);
+        login(indexType, indexName, params, null, request, response);
     }
     
     /**
@@ -592,33 +569,22 @@ public class AuthContext extends Object implements java.io.Serializable {
     public void login(IndexType indexType, String indexName, 
         String[] params, Map envMap)
             throws AuthLoginException {
-        login(indexType, indexName, params, false, envMap, null, null);
-    }
-
-    public void login(IndexType indexType,
-                      String indexName,
-                      String[] params,
-                      Map envMap,
-                      HttpServletRequest request,
-                      HttpServletResponse response)
-            throws AuthLoginException {
-        login(indexType, indexName, params, false, envMap, request, response);
+        login(indexType, indexName, params, envMap, null, null);
     }
     
-    private void login(
+    public void login(
         IndexType indexType,
         String indexName,
         String[] params,
-        boolean pCookie,
         Map envMap,
         HttpServletRequest request,
         HttpServletResponse response
     ) throws AuthLoginException {
         if (clientLocale == null) {
-            login(indexType, indexName, params, pCookie, envMap, null, request, response);
+            login(indexType, indexName, params, envMap, null, request, response);
         } else {
             String localeStr = clientLocale.toString();
-            login(indexType, indexName, params, pCookie, envMap, localeStr, request, response);
+            login(indexType, indexName, params, envMap, localeStr, request, response);
         }
     }
 
@@ -626,18 +592,16 @@ public class AuthContext extends Object implements java.io.Serializable {
         IndexType indexType,
         String indexName,
         String[] params,
-        boolean pCookie,
         Map envMap,
         String locale
     ) throws AuthLoginException {
-        login(indexType, indexName, params, false, envMap, locale, null, null);
+        login(indexType, indexName, params, envMap, locale, null, null);
     }
 
     private void login(
         IndexType indexType,
         String indexName,
         String[] params,
-        boolean pCookie,
         Map envMap,
         String locale,
         HttpServletRequest request,
@@ -671,7 +635,7 @@ public class AuthContext extends Object implements java.io.Serializable {
             	    authDebug.message("AuthContext.login : runLogin against "
             		    + authServiceURL);
             	}
-                runLogin(indexType, indexName, params, pCookie, envMap, locale,
+                runLogin(indexType, indexName, params, envMap, locale,
                         request, response);
                 return;
             }
@@ -706,7 +670,7 @@ public class AuthContext extends Object implements java.io.Serializable {
                 e.hasMoreElements(); ) {
                     authServiceURL = (URL)e.nextElement();
                     try {
-                        runLogin(indexType, indexName, params, pCookie, 
+                        runLogin(indexType, indexName, params,
                             envMap, locale, request, response);
                         return;
                     } catch (AuthLoginException ex) {
@@ -730,7 +694,6 @@ public class AuthContext extends Object implements java.io.Serializable {
         IndexType indexType,
         String indexName,
         String[] params,
-        boolean pCookie,
         Map envMap,
         String locale,
         HttpServletRequest request,
@@ -777,7 +740,7 @@ public class AuthContext extends Object implements java.io.Serializable {
                 if (hostName != null) {
                     acLocal.getLoginState().setClient(hostName);
                 }
-                acLocal.login(indexType, indexName, pCookie, envMap, locale);
+                acLocal.login(indexType, indexName, envMap, locale);
             } catch (AuthException e) {
                 throw new AuthLoginException(e);
             }
@@ -796,7 +759,7 @@ public class AuthContext extends Object implements java.io.Serializable {
             }
         }
         // Run Login
-        runRemoteLogin(indexType, indexName, params, pCookie, envMap, locale,
+        runRemoteLogin(indexType, indexName, params, envMap, locale,
                 request, response);
         // reset the retry count
         retryRunLogin = DEFAULT_RETRY_COUNT;
@@ -831,7 +794,7 @@ public class AuthContext extends Object implements java.io.Serializable {
                 throw loginException;
             }
             // Re-try login process with AuthIdentifier
-            runRemoteLogin(indexType, indexName, params, pCookie, 
+            runRemoteLogin(indexType, indexName, params,
                 envMap, locale, request, response);
             // reset the retry count
             retryRunLogin = DEFAULT_RETRY_COUNT;
@@ -843,7 +806,7 @@ public class AuthContext extends Object implements java.io.Serializable {
         }
     }
 
-    private void runRemoteLogin(IndexType indexType, String indexName, String[] params, boolean pCookie, Map envMap,
+    private void runRemoteLogin(IndexType indexType, String indexName, String[] params, Map envMap,
             String locale, HttpServletRequest req, HttpServletResponse res) throws AuthLoginException {
         try {
             String xmlString;
@@ -1038,7 +1001,7 @@ public class AuthContext extends Object implements java.io.Serializable {
 
                 // reset as we are starting again
                 loginStatus = Status.IN_PROGRESS;
-                runRemoteLogin(indexType, indexName, params, pCookie, envMap, locale, req,  res);
+                runRemoteLogin(indexType, indexName, params, envMap, locale, req,  res);
             }
         } catch (AuthLoginException le) {
             // Login has failed

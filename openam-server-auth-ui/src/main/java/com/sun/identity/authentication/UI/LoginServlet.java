@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,8 +24,9 @@
  *
  * $Id: LoginServlet.java,v 1.9 2009/02/18 03:38:42 222713 Exp $
  *
- * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
+
 package com.sun.identity.authentication.UI;
 
 import com.iplanet.am.util.SystemProperties;
@@ -42,10 +43,7 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.L10NMessageImpl;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.RequestDispatcher;
@@ -316,10 +314,10 @@ extends com.sun.identity.authentication.UI.AuthenticationServletBase {
             String authCookieName = AuthUtils.getAuthCookieName();
             Set<String> domains = (Set<String>) AuthUtils.getCookieDomains();
             if (domains == null || domains.isEmpty()) {
-                response.addCookie(AuthUtils.createPersistentCookie(authCookieName, "LOGOUT", 0, null));
+                response.addCookie(AuthUtils.createCookie(authCookieName, "LOGOUT", 0, null));
             } else {
                 for (String domain : domains) {
-                    response.addCookie(AuthUtils.createPersistentCookie(authCookieName, "LOGOUT", 0, domain));
+                    response.addCookie(AuthUtils.createCookie(authCookieName, "LOGOUT", 0, domain));
                     if (debug.messageEnabled()) {
                         debug.message("LoginServlet reset Auth Cookie in domain: " + domain);
                     }

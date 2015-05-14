@@ -139,7 +139,7 @@ public class LoginAuthenticator {
 
         if (indexType != null && indexType.equals(AuthIndexType.RESOURCE)) {
             Map<String, Set<String>> envMap = coreServicesWrapper.getEnvMap(request);
-            authContext.login(indexType.getIndexType(), indexValue, false, envMap, null);
+            authContext.login(indexType.getIndexType(), indexValue, envMap, null);
         } else if (indexType != null && indexType.getIndexType() != null) {
             authContext.login(indexType.getIndexType(), indexValue);
         } else {

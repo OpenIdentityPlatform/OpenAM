@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: LoginViewBean.java,v 1.37 2009/11/11 12:22:32 bhavnab Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.distUI;
@@ -221,8 +221,6 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
             return new StaticTextField(this, HTML_TITLE_SELFREGERROR, "");
         } else if (name.equals(HTML_TITLE_DISCLAIMER)) {
             return new StaticTextField(this, HTML_TITLE_DISCLAIMER, "");
-        } else if (name.equals(HTML_TITLE_INVALIDPCOOKIEUID)) {
-            return new StaticTextField(this, HTML_TITLE_INVALIDPCOOKIEUID, "");
         } else if (name.equals(HTML_TITLE_INVALIDPASSWORD)) {
             return new StaticTextField(this, HTML_TITLE_INVALIDPASSWORD, "");
         } else if (name.equals(HTML_TITLE_INVALIDDOMAIN)) {
@@ -622,8 +620,6 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                 rb.getString("htmlTitle_SelfRegError"));
             setDisplayFieldValue(HTML_TITLE_DISCLAIMER,
                 rb.getString("htmlTitle_Disclaimer"));
-            setDisplayFieldValue(HTML_TITLE_INVALIDPCOOKIEUID,
-                rb.getString("htmlTitle_InvalidPCookieUID"));
             setDisplayFieldValue(HTML_TITLE_INVALIDPASSWORD,
                 rb.getString("htmlTitle_InvalidPassword"));
             setDisplayFieldValue(HTML_TITLE_INVALIDDOMAIN,
@@ -2268,9 +2264,6 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
     = "htmlTitle_SelfRegError";
     /** Default parameter name of html title for disclaimer */
     public static final String HTML_TITLE_DISCLAIMER = "htmlTitle_Disclaimer";
-    /** Default parameter name of html title for invalid cookie id */
-    public static final String HTML_TITLE_INVALIDPCOOKIEUID
-    = "htmlTitle_InvalidPCookieUID";
     /** Default parameter name of html title for invalid password */
     public static final String HTML_TITLE_INVALIDPASSWORD
     = "htmlTitle_InvalidPassword";
