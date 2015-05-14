@@ -69,6 +69,7 @@ public class DirectoryContentUpgrader {
     private static final Debug DEBUG = Debug.getInstance("amUpgrade");
     private static final String DASHBOARD_OC = "forgerock-am-dashboard-service";
     private static final String DEVICE_PRINT_OC = "devicePrintProfilesContainer";
+    private static final String OATH_DEVICE_OC = "oathDeviceProfilesContainer";
     private static final String OATH2FAENABLED = "oath2faEnabled";
     private final List<Upgrader> upgraders = new ArrayList<Upgrader>();
     private final ConnectionFactory<Connection> connFactory;
@@ -98,6 +99,7 @@ public class DirectoryContentUpgrader {
             upgraders.add(new AddDevicePrintSchema());
             upgraders.add(new AddUmaAuditSchema());
             upgraders.add(new AddResourceSetsSchema());
+            upgraders.add(new AddOATHDeviceSchema());
             upgraders.add(new OATH2FASchema());
         }
         Connection conn = null;
@@ -363,6 +365,19 @@ public class DirectoryContentUpgrader {
         @Override
         public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
             return !schema.hasObjectClass("resource_sets");
+        }
+    }
+
+    private class AddOATHDeviceSchema implements Upgrader {
+
+        @Override
+        public String getLDIFPath() {
+            return "/WEB-INF/template/ldif/opendj/opendj_oathdevices.ldif";
+        }
+
+        @Override
+        public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
+            return !schema.hasObjectClass(OATH_DEVICE_OC);
         }
     }
 }

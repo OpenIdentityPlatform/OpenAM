@@ -951,6 +951,7 @@
                             <Value>sunFMSAML2NameIdentifier</Value>
                             <Value>forgerock-am-dashboard-service</Value>
                             <Value>devicePrintProfilesContainer</Value>
+                            <Value>oathDeviceProfilesContainer</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -1047,6 +1048,7 @@
                             <Value>devicePrintProfiles</Value>
                             <Value>modifyTimestamp</Value>
                             <Value>createTimestamp</Value>
+                            <Value>oathDeviceProfiles</Value>
                             <Value>oath2faEnabled</Value>
                         </DefaultValues>
                     </AttributeSchema>
@@ -1609,6 +1611,7 @@
                             <Value>sunFMSAML2NameIdentifier</Value>
                             <Value>forgerock-am-dashboard-service</Value>
                             <Value>devicePrintProfilesContainer</Value>
+                            <Value>oathDeviceProfilesContainer</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -1704,6 +1707,7 @@
                             <Value>devicePrintProfiles</Value>
                             <Value>modifyTimestamp</Value>
                             <Value>createTimestamp</Value>
+                            <Value>oathDeviceProfiles</Value>
                             <Value>oath2faEnabled</Value>
                         </DefaultValues>
                     </AttributeSchema>
@@ -2143,6 +2147,7 @@
                             <Value>sunFMSAML2NameIdentifier</Value>
                             <Value>forgerock-am-dashboard-service</Value>
                             <Value>devicePrintProfilesContainer</Value>
+                            <Value>oathDeviceProfilesContainer</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -2238,6 +2243,7 @@
                             <Value>devicePrintProfiles</Value>
                             <Value>modifyTimestamp</Value>
                             <Value>createTimestamp</Value>
+                            <Value>oathDeviceProfiles</Value>
                             <Value>oath2faEnabled</Value>
                         </DefaultValues>
                     </AttributeSchema>
@@ -2758,6 +2764,7 @@
                             <Value>devicePrintProfiles</Value>
                             <Value>modifyTimestamp</Value>
                             <Value>createTimestamp</Value>
+                            <Value>oathDeviceProfiles</Value>
                             <Value>oath2faEnabled</Value>
                         </DefaultValues>
                     </AttributeSchema>
@@ -3188,6 +3195,7 @@
                             <Value>user</Value>
                             <Value>forgerock-am-dashboard-service</Value>
                             <Value>devicePrintProfilesContainer</Value>
+                            <Value>oathDeviceProfilesContainer</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -3280,6 +3288,7 @@
                             <Value>devicePrintProfiles</Value>
                             <Value>modifyTimestamp</Value>
                             <Value>createTimestamp</Value>
+                            <Value>oathDeviceProfiles</Value>
                             <Value>oath2faEnabled</Value>
                         </DefaultValues>
                     </AttributeSchema>
