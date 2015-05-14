@@ -307,12 +307,10 @@ public class SubjectAttributesManager {
     /**
      * Returns available subject attribute names.
      *
-     * @return a set of available subject attribute names or null if not found
-     * @throws EntitlementException if available subject attribute names
-     * cannot be returned.
+     * @return a set of available subject attribute names or empty CaseInsensitiveHashSet if not found.
+     * @throws EntitlementException if available subject attribute names cannot be returned.
      */
-    public Set<String> getAvailableSubjectAttributeNames()
-        throws EntitlementException{
+    public Set<String> getAvailableSubjectAttributeNames() throws EntitlementException {
 
         return attrCollector.getAvailableSubjectAttributeNames();
     }

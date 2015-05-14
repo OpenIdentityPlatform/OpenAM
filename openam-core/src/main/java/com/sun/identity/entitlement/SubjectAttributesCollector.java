@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: SubjectAttributesCollector.java,v 1.1 2009/08/19 05:40:33 veiming Exp $
+ *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -100,7 +102,7 @@ public interface SubjectAttributesCollector {
     /**
      * Returns available subject attribute names.
      *
-     * @return a set of available subject attribute names or null if not found
+     * @return a set of available subject attribute names or empty CaseInsensitiveHashSet if not found
      */
     public Set<String> getAvailableSubjectAttributeNames()
         throws EntitlementException;
