@@ -81,6 +81,7 @@ import com.sun.identity.saml2.jaxb.metadata.SingleSignOnServiceElement;
 import com.sun.identity.saml2.plugins.SAML2ServiceProviderAdapter;
 import com.sun.identity.saml2.protocol.IDPList;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
+import org.forgerock.openam.utils.StringUtils;
 import org.w3c.dom.Element;
 
 /**
@@ -839,41 +840,37 @@ public class IDPProxyUtil {
         } 
    }
    
-   public static  void sendProxyLogoutResponse(
+   public static void sendProxyLogoutResponse(
        HttpServletResponse response,
        HttpServletRequest request,
        String originatingRequestID,
-       Map infoMap,
+       Map<String, String> infoMap,
        String remoteEntity,
-       String binding)
-       throws SAML2Exception
-   {  
-       String entityID = (String) infoMap.get("entityid"); 
-       if (entityID == null || entityID.equals("")) {
-           throw new SAML2Exception(
-           SAML2Utils.bundle.getString("nullIDPEntityID")); 
+       String binding) throws SAML2Exception {
+
+       String entityID = infoMap.get("entityid");
+       if (StringUtils.isEmpty(entityID)) {
+           throw new SAML2Exception(SAML2Utils.bundle.getString("nullIDPEntityID"));
        }    
        if (SAML2Utils.debug.messageEnabled()) {
-           SAML2Utils.debug.message("Proxy IDP EntityID=" +
-               entityID);
+           SAML2Utils.debug.message("Proxy IDP EntityID=" + entityID);
        }     
-       //TODO: need to take realm from infoMap   
-       LogoutResponse logoutRes = LogoutUtil.generateResponse(
-           null, originatingRequestID,
-           SAML2Utils.createIssuer(entityID),
-           "/", SAML2Constants.IDP_ROLE,
-           remoteEntity);
-       String location = IDPSingleLogout.getSingleLogoutLocation(
-           remoteEntity,"/", SAML2Constants.HTTP_REDIRECT);
-       if (SAML2Utils.debug.messageEnabled()) {
-           SAML2Utils.debug.message("Proxy to: " + location); 
+       String realm = infoMap.get(SAML2Constants.REALM);
+       if (StringUtils.isEmpty(realm)) {
+           realm = "/";
        }
-       logoutRes.setDestination(XMLUtils.escapeSpecialCharacters(location));
-       String relayState = (String) infoMap.get(SAML2Constants.RELAY_STATE); 
-       LogoutUtil.sendSLOResponse(response, request, logoutRes,
-           location, relayState, "/", entityID, 
-           SAML2Constants.IDP_ROLE,
-           remoteEntity, binding);       
+       if (SAML2Utils.debug.messageEnabled()) {
+            SAML2Utils.debug.message("Proxy IDP Realm=" + realm);
+       }
+       LogoutResponse logoutRes = LogoutUtil.generateResponse(null, originatingRequestID,
+               SAML2Utils.createIssuer(entityID), realm, SAML2Constants.IDP_ROLE, remoteEntity);
+       String location = IDPSingleLogout.getSingleLogoutLocation(remoteEntity, realm, SAML2Constants.HTTP_REDIRECT);
+       if (SAML2Utils.debug.messageEnabled()) {
+            SAML2Utils.debug.message("Proxy to: " + location);
+       }
+       String relayState = infoMap.get(SAML2Constants.RELAY_STATE);
+       LogoutUtil.sendSLOResponse(response, request, logoutRes, location, relayState, realm, entityID,
+               SAML2Constants.IDP_ROLE, remoteEntity, binding);
    }  
    
     public static void sendProxyLogoutRequestSOAP(
@@ -1007,67 +1004,52 @@ public class IDPProxyUtil {
         String location,
         String spEntityID, 
         String idpEntityID,
-        String binding)  
-       throws SAML2Exception
-   {
-        try { 
-            Object tmpsession = sessionProvider.getSession(request);
-            String tokenID = sessionProvider.getSessionID(tmpsession); 
-            String metaAlias =
-                SAML2MetaUtils.getMetaAliasByUri(request.getRequestURI());
-            String realm = SAML2Utils.
-                getRealm(SAML2MetaUtils.getRealmByMetaAlias(metaAlias));
-            String logoutAll = request.getParameter(SAML2Constants.LOGOUT_ALL);
-            HashMap paramsMap = new HashMap();
-            IDPSSOConfigElement config = sm.getIDPSSOConfig(
-                "/", spEntityID);
-            paramsMap.put("metaAlias", config.getMetaAlias()); 
-            paramsMap.put(SAML2Constants.ROLE, SAML2Constants.IDP_ROLE);
-            paramsMap.put(SAML2Constants.BINDING, 
-                SAML2Constants.HTTP_REDIRECT);
-            paramsMap.put("Destination", 
-                request.getParameter("Destination"));
-            paramsMap.put("Consent", request.getParameter("Consent"));
-            paramsMap.put("Extension", request.getParameter("Extension"));
-      
-            Map logoutResponseMap =  new HashMap(); 
-            if (logoutResponse != null) {
-                logoutResponseMap.put("LogoutResponse", logoutResponse);
-            }
-            if (location != null && !location.equals("")) {
-               logoutResponseMap.put("Location", location); 
-            }
-            if (spEntityID != null && !spEntityID.equals("")) {
-                logoutResponseMap.put("spEntityID", spEntityID); 
-            } 
-            if (idpEntityID != null && !idpEntityID.equals("")) {
-                logoutResponseMap.put("idpEntityID", idpEntityID); 
-            }
-            paramsMap.put("LogoutMap", logoutResponseMap); 
-        
-            if (logoutAll != null) {
-                paramsMap.put(SAML2Constants.LOGOUT_ALL, logoutAll);
-            }
+        String binding,
+        String realm) throws SAML2Exception {
 
-            IDPSingleLogout.initiateLogoutRequest(request,response, out,
-                binding,paramsMap);
-            
-            /*TODO: 
-            if (binding.equalsIgnoreCase(SAML2Constants.SOAP)) {
-            if (RelayState != null) {
-                response.sendRedirect(RelayState);
-            } else {
-                %>
-                <jsp:forward
-                    page="/saml2/jsp/default.jsp?message=idpSloSuccess" />
-                <%
-            }
-            }  
-            */              
-        } catch (SessionException se) {
-            SAML2Utils.debug.error(
-                "sendIDPInitProxyLogoutRequest: ", se);
-        } 
+        String logoutAll = request.getParameter(SAML2Constants.LOGOUT_ALL);
+        HashMap paramsMap = new HashMap();
+        IDPSSOConfigElement config = sm.getIDPSSOConfig(realm, spEntityID);
+        paramsMap.put("metaAlias", config.getMetaAlias());
+        paramsMap.put(SAML2Constants.ROLE, SAML2Constants.IDP_ROLE);
+        paramsMap.put(SAML2Constants.BINDING, SAML2Constants.HTTP_REDIRECT);
+        paramsMap.put("Destination", request.getParameter("Destination"));
+        paramsMap.put("Consent", request.getParameter("Consent"));
+        paramsMap.put("Extension", request.getParameter("Extension"));
+
+        Map logoutResponseMap =  new HashMap();
+        if (logoutResponse != null) {
+            logoutResponseMap.put("LogoutResponse", logoutResponse);
+        }
+        if (location != null && !location.equals("")) {
+           logoutResponseMap.put("Location", location);
+        }
+        if (spEntityID != null && !spEntityID.equals("")) {
+            logoutResponseMap.put("spEntityID", spEntityID);
+        }
+        if (idpEntityID != null && !idpEntityID.equals("")) {
+            logoutResponseMap.put("idpEntityID", idpEntityID);
+        }
+        paramsMap.put("LogoutMap", logoutResponseMap);
+
+        if (logoutAll != null) {
+            paramsMap.put(SAML2Constants.LOGOUT_ALL, logoutAll);
+        }
+
+        IDPSingleLogout.initiateLogoutRequest(request, response, out, binding, paramsMap);
+
+        /*TODO:
+        if (binding.equalsIgnoreCase(SAML2Constants.SOAP)) {
+        if (RelayState != null) {
+            response.sendRedirect(RelayState);
+        } else {
+            %>
+            <jsp:forward
+                page="/saml2/jsp/default.jsp?message=idpSloSuccess" />
+            <%
+        }
+        }
+        */
    }
     
    public static List getSPSessionPartners(HttpServletRequest request) 

@@ -24,7 +24,7 @@
 
    $Id: spSingleLogoutRedirect.jsp,v 1.14 2009/06/17 03:10:28 exu Exp $
 
-   Portions Copyrighted 2013-2014 ForgeRock AS.
+   Portions Copyrighted 2013-2015 ForgeRock AS.
 --%>
 
 <%@ page import="com.sun.identity.sae.api.SecureAttrs" %>
@@ -109,10 +109,9 @@
          * @throws SAML2Exception if error processing
          *          <code>LogoutResponse</code>.
          */
-          Map infoMap = 
-              SPSingleLogout.processLogoutResponse(request,response,
-              samlResponse, relayState);
-          String inRes = (String) infoMap.get("inResponseTo"); 
+          Map<String, String> infoMap =
+              SPSingleLogout.processLogoutResponse(request, response, samlResponse, relayState);
+          String inRes = infoMap.get("inResponseTo");
           LogoutRequest origLogoutRequest = (LogoutRequest) 
               IDPCache.proxySPLogoutReqCache.get(inRes); 
           if (origLogoutRequest != null && !origLogoutRequest.equals("")) {

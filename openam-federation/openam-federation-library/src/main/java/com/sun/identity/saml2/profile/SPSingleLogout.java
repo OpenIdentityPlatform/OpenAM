@@ -24,7 +24,7 @@
  *
  * $Id: SPSingleLogout.java,v 1.29 2009/11/24 21:53:28 madan_ranganath Exp $
  *
- * Portions Copyrighted 2013-2014 ForgeRock AS.
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.profile;
@@ -497,7 +497,7 @@ public class SPSingleLogout {
      * @throws SessionException if error processing
      *          <code>LogoutResponse</code>.
      */
-    public static Map processLogoutResponse(
+    public static Map<String, String> processLogoutResponse(
         HttpServletRequest request,
         HttpServletResponse response,
         String samlResponse,
@@ -591,8 +591,9 @@ public class SPSingleLogout {
             debug.message(method + "idpEntityID : " + idpEntityID);
             debug.message(method + "spEntityID : " + spEntityID);
         }
-        Map infoMap = new HashMap(); 
-        infoMap.put("entityid", spEntityID);  
+        Map<String, String> infoMap = new HashMap<String, String>();
+        infoMap.put("entityid", spEntityID);
+        infoMap.put(SAML2Constants.REALM, realm);
  
         if (needToVerify) {
             boolean valid = false;
@@ -923,7 +924,7 @@ public class SPSingleLogout {
             logoutRespon.setDestination(XMLUtils.escapeSpecialCharacters(
                 location));
             IDPProxyUtil.sendIDPInitProxyLogoutRequest(request, response, out,
-                 logoutRespon, location, spEntityID, idpEntityID, binding);
+                 logoutRespon, location, spEntityID, idpEntityID, binding, realm);
         } else {
             LogoutResponse logoutRes = processLogoutRequest(
                 logoutReq, spEntityID, realm,
