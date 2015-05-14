@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-2015 ForgeRock AS.
 */
 package org.forgerock.openam.forgerockrest.entitlements;
 
@@ -85,16 +85,13 @@ public class SubjectAttributesResourceV1 extends RealmAwareResource {
     @Override
     public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
         final Subject mySubject = getContextSubject(context);
-
         if (mySubject == null) {
             debug.error("SubjectAttributesResource :: QUERY : Unknown Subject");
             handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
             return;
         }
-
         final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(mySubject);
         final SubjectAttributesManager manager = getSubjectAttributesManager(mySubject, getRealm(context));
-
         final Set<String> attributes;
         try {
             attributes = manager.getAvailableSubjectAttributeNames();
@@ -104,14 +101,9 @@ public class SubjectAttributesResourceV1 extends RealmAwareResource {
             handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
             return;
         }
-
-        if (attributes.size() > 0) {
-            for (String attr : attributes) {
-                handler.handleResource(new Resource(attr,
-                    Long.toString(System.currentTimeMillis()), JsonValue.json(attr)));
-            }
+        for (String attr : attributes) {
+            handler.handleResource(new Resource(attr, Long.toString(System.currentTimeMillis()), JsonValue.json(attr)));
         }
-
         handler.handleResult(new QueryResult(null, 0));
     }
 

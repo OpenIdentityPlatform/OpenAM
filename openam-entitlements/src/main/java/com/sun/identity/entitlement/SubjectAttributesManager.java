@@ -24,7 +24,7 @@
  *
  * $Id: SubjectAttributesManager.java,v 1.3 2009/09/24 22:37:43 hengming Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -306,13 +306,10 @@ public class SubjectAttributesManager {
     /**
      * Returns available subject attribute names.
      *
-     * @return a set of available subject attribute names or null if not found
-     * @throws EntitlementException if available subject attribute names
-     * cannot be returned.
+     * @return a set of available subject attribute names or empty CaseInsensitiveHashSet if not found.
+     * @throws EntitlementException if available subject attribute names cannot be returned.
      */
-    public Set<String> getAvailableSubjectAttributeNames()
-        throws EntitlementException{
-
+    public Set<String> getAvailableSubjectAttributeNames() throws EntitlementException{
         return attrCollector.getAvailableSubjectAttributeNames();
     }
 
