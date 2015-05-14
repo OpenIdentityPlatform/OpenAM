@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: OpenSSOSubjectAttributesCollector.java,v 1.3 2009/09/24 22:38:21 hengming Exp $
+ *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -241,40 +243,23 @@ public class OpenSSOSubjectAttributesCollector
         }
     }
 
-    /**
-     * Returns available subject attribute names.
-     *
-     * @return a set of available subject attribute names or null if not found
-     */
-    public Set<String> getAvailableSubjectAttributeNames()
-        throws EntitlementException {
-
+    public Set<String> getAvailableSubjectAttributeNames() throws EntitlementException {
+        CaseInsensitiveHashSet result = new CaseInsensitiveHashSet();
         try {
-            ServiceConfig sc = idRepoServiceConfigManager.getOrganizationConfig(
-                realm, null);
-            if (sc == null) {
-                return null;
-            }
-            Set subConfigNames = sc.getSubConfigNames();
-            if ((subConfigNames == null) || (subConfigNames.isEmpty())) {
-                return null;
-            }
-
-            CaseInsensitiveHashSet result = null;
-
-            for(Iterator iter = subConfigNames.iterator(); iter.hasNext();) {
-                String idRepoName = (String) iter.next();
-                ServiceConfig reposc = sc.getSubConfig(idRepoName);
-                Map attrMap = reposc.getAttributesForRead();
-                Set userAttrs = (Set)attrMap.get(LDAPv3Config_USER_ATTR);
-                if ((userAttrs != null) && (!userAttrs.isEmpty())) {
-                    if (result == null) {
-                        result = new CaseInsensitiveHashSet();
+            ServiceConfig sc = idRepoServiceConfigManager.getOrganizationConfig(realm, null);
+            if (sc != null) {
+                Set<String> subConfigNames = sc.getSubConfigNames();
+                if (subConfigNames != null)  {
+                    for (String idRepoName : subConfigNames) {
+                        ServiceConfig reposc = sc.getSubConfig(idRepoName);
+                        Map<String, Set<String>> attrMap = reposc.getAttributesForRead();
+                        Set<String> userAttrs = attrMap.get(LDAPv3Config_USER_ATTR);
+                        if ((userAttrs != null) && !userAttrs.isEmpty()) {
+                            result.addAll(userAttrs);
+                        }
                     }
-                    result.addAll(userAttrs);
                 }
             }
-
             return result;
         } catch (SMSException e) {
             throw new EntitlementException(602, e);
