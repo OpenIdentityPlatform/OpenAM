@@ -24,7 +24,7 @@
 
    $Id: spSingleLogoutPOST.jsp,v 1.8 2009/06/24 23:05:31 mrudulahg Exp $
 
-   Portions Copyrighted 2013-2014 ForgeRock AS
+   Portions Copyrighted 2013-2015 ForgeRock AS.
 --%>
 
 
@@ -102,10 +102,9 @@
          * @throws SAML2Exception if error processing
          *          <code>LogoutResponse</code>.
          */
-          Map infoMap = 
-              SPSingleLogout.processLogoutResponse(request,response,
-              samlResponse, relayState);
-          String inRes = (String) infoMap.get("inResponseTo"); 
+          Map<String, String> infoMap =
+                  SPSingleLogout.processLogoutResponse(request, response, samlResponse, relayState);
+          String inRes = infoMap.get("inResponseTo");
           LogoutRequest origLogoutRequest = (LogoutRequest) 
               IDPCache.proxySPLogoutReqCache.get(inRes); 
           if (origLogoutRequest != null && !origLogoutRequest.equals("")) {
