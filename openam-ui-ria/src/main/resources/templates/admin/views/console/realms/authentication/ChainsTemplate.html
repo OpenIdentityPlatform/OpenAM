@@ -1,22 +1,34 @@
-<div class="back-bar">
-    <div class="container">
-        <ol class="breadcrumb">
-            <li><a href="{{consolePath}}">Console</a></li>
-            <li><a href="#console/realm">{{realm}}</a></li>
-            <li><a href="#console/realms/authentication/">Authentication</a></li>
-            <li class="active">Chains</li>
-            <li class="pull-right back-button"><i class="fa fa-angle-left"></i> <a href="#console/realms/authentication/"> Back</a></li>
-        </ol>
+<div class="tab-pane-body">
+    <div class="panel-body">
+        <p class="panel-description">OpenAM uses authentication chains to control the authentication flow the user. Use this section to add, configure or remove the realms set of authentication chains.</p>
+        <table class="table table-hover table-striped">
+            <thead>
+                <tr>
+                    <th class="col-md-1">Select</th>
+                    <th class="col-md-9"/>
+                    <th class="col-md-2"/>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each this}}
+                <tr>
+                    <td><input data-chain-name="{{_id}}" type="checkbox"/></td>
+                    <td>{{_id}}</td>
+                    <td>
+                        <div class="pull-right">
+                            <button type="button" class="btn btn-transparent"><i class="fa fa-pencil"></i></button>
+                            <button type="button" class="btn btn-transparent" data-chain-name="{{_id}}"><i class="fa fa-close"></i></button>
+                        </div>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
     </div>
 </div>
-<div class="container">
-
-    <div class="page-header clearfix">
-        <span class="header-icon pull-left"><i class="fa fa-link"></i></span>
-      	<h4 class="page-type">Chains</h4>
-        <h1>{{name}}</h1>
-  	</div>
-
-    <!-- content here  -->
-
+<div class="tab-pane-footer clearfix">
+    <div class="pull-right">
+        <button class="btn btn-sm btn-default" disabled id="deleteChains" type="button">Delete</button>
+        <a href="#console/realms/authentication/chains/" id="addChain" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> Add Chain</a>
+    </div>
 </div>

@@ -142,28 +142,28 @@ define("config/routes/AMRoutesConfig", [
 
         // Console
         "authentication": {
-            view: "org/forgerock/openam/ui/admin/views/console/realms/Authentication",
+            view: "org/forgerock/openam/ui/admin/views/console/realms/authentication/Authentication",
             url: /^console\/realms\/authentication/,
             pattern: "console/realms/authentication/",
             role: "ui-user"
         },
         "advancedSettings": {
-            view: "org/forgerock/openam/ui/admin/views/console/realms/authentication/AdvancedSettings",
+            view: "org/forgerock/openam/ui/admin/views/console/realms/authentication/advanced/AdvancedSettings",
             url: /^console\/realms\/authentication\/advanced/,
             pattern: "console/realms/authentication/advanced/",
             role: "ui-user"
         },
         "chains": {
-            view: "org/forgerock/openam/ui/admin/views/console/realms/authentication/Chains",
+            view: "org/forgerock/openam/ui/admin/views/console/realms/authentication/chains/Chains",
             url: /^console\/realms\/authentication\/chains\/(.*?)(?:\/){0,1}$/,
             pattern: "console/realms/authentication/chains/?",
             defaults: [""],
             role: "ui-user"
         },
         "module": {
-            view: "org/forgerock/openam/ui/admin/views/console/realms/authentication/Module",
-            url: /^console\/realms\/authentication\/module\/(.*?)(?:\/){0,1}$/,
-            pattern: "console/realms/authentication/module/?",
+            view: "org/forgerock/openam/ui/admin/views/console/realms/authentication/modules/Modules",
+            url: /^console\/realms\/authentication\/modules\/(.*?)(?:\/){0,1}$/,
+            pattern: "console/realms/authentication/modules/?",
             defaults: [""],
             role: "ui-user"
         },

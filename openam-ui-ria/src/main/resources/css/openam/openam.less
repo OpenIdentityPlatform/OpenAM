@@ -102,6 +102,21 @@
             transition: @arguments;
 }
 
+.btn-transparent {
+    background: none;
+    border-color:transparent;
+    &:hover{
+        background:none;
+        border-color:transparent;
+        color:#3f7269;
+    }
+    &:focus{
+        outline:none;
+        box-shadow:none;
+        color:#3f7269;
+    }
+}
+
 // json-editor
 div[data-schemaid] {
     > h3 {

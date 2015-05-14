@@ -16,7 +16,7 @@
 
 /*global define, $, _*/
 
-define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Chains", [
+define("org/forgerock/openam/ui/admin/views/console/realms/authentication/chains/Chains", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",

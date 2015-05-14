@@ -21,32 +21,53 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegate", [
 ], function(AbstractDelegate, Constants) {
     var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/");
 
-    obj.Realm = {
-        Authentication: {
-            get: function() {
-                var url = "realm-config/authentication",
-                    schemaPromise = obj.serviceCall({
-                        url: url + "?_action=schema",
-                        type: "POST"
-                    }).done(obj.sanitize),
-                    valuesPromise = obj.serviceCall({
-                        url: url
-                    });
+    obj.RealmAuthentication = {
+        get: function() {
+            var url = "realm-config/authentication",
+                schemaPromise = obj.serviceCall({
+                    url: url + "?_action=schema",
+                    type: "POST"
+                }).done(obj.sanitize),
+                valuesPromise = obj.serviceCall({
+                    url: url
+                });
 
-                return $.when(schemaPromise, valuesPromise).then(function(schemaData, valuesData) {
-                    return {
-                        schema: obj.sanitizeSchema(schemaData[0]),
-                        values: valuesData[0]
-                    };
+            return $.when(schemaPromise, valuesPromise).then(function(schemaData, valuesData) {
+                return {
+                    schema: obj.sanitizeSchema(schemaData[0]),
+                    values: valuesData[0]
+                };
+            });
+        },
+        save: function(data) {
+            return obj.serviceCall({
+                url: "realm-config/authentication",
+                type: "PUT",
+                data: JSON.stringify(data)
+            });
+        }
+    };
+
+    obj.RealmAuthenticationChains = {
+        get: function() {
+            var promise = obj.serviceCall({
+                    url: "realm-config/authentication/chains?_queryFilter=true"
                 });
-            },
-            save: function(data) {
-                return obj.serviceCall({
-                    url: "realm-config/authentication",
-                    type: "PUT",
-                    data: JSON.stringify(data)
-                });
-            }
+
+            return $.when(promise).then(function(valuesData) {
+                return {
+                    values: valuesData
+                };
+            });
+        }
+    };
+
+    obj.RealmAuthenticationChain = {
+        remove: function(name) {
+            return obj.serviceCall({
+                url: 'realm-config/authentication/chains/' + name,
+                type: 'DELETE'
+            });
         }
     };
 

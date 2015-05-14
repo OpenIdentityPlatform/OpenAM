@@ -15,14 +15,13 @@
  */
 
 /*global define*/
-
 define([
     "./delegates/SMSDelegate",
     "./models/Form",
     "./models/FormCollection",
     "./utils/FormHelper",
-    "./views/console/realms/Authentication",
-    "./views/console/realms/authentication/AdvancedSettings",
-    "./views/console/realms/authentication/Chains",
-    "./views/console/realms/authentication/Module"
+    "./views/console/realms/authentication/Authentication",
+    "./views/console/realms/authentication/advanced/AdvancedSettings",
+    "./views/console/realms/authentication/chains/Chains",
+    "./views/console/realms/authentication/modules/Modules"
 ]);

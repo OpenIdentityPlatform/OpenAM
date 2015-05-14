@@ -15,7 +15,7 @@
  */
 
 /*global define, $, _*/
-define("org/forgerock/openam/ui/admin/views/console/realms/authentication/AdvancedSettings", [
+define("org/forgerock/openam/ui/admin/views/console/realms/authentication/advanced/AdvancedSettings", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
@@ -31,6 +31,7 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Advanc
             'click #saveChanges': 'save',
             'show.bs.tab ul.nav.nav-tabs a': 'renderTab'
         },
+        data: {},
 
         render: function(args, callback) {
             var self = this;
@@ -39,7 +40,7 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Advanc
             this.data.name = args[0];
             this.data.consolePath = Constants.CONSOLE_PATH;
 
-            SMSDelegate.Realm.Authentication.get()
+            SMSDelegate.RealmAuthentication.get()
             .done(function(data) {
                 self.data.formData = data;
 
@@ -69,7 +70,7 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Advanc
             this.data.form.reset();
         },
         save: function(event) {
-            var promise = SMSDelegate.Realm.Authentication.save(this.data.form.data());
+            var promise = SMSDelegate.RealmAuthentication.save(this.data.form.data());
 
             FormHelper.bindSavePromiseToElement(promise, event.target);
         }

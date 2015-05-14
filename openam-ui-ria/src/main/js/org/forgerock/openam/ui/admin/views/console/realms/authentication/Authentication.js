@@ -15,7 +15,7 @@
  */
 
 /*global define, $, _*/
-define("org/forgerock/openam/ui/admin/views/console/realms/Authentication", [
+define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authentication", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "bootstrap-dialog",
     "org/forgerock/commons/ui/common/main/Configuration",
@@ -25,15 +25,29 @@ define("org/forgerock/openam/ui/admin/views/console/realms/Authentication", [
     "org/forgerock/openam/ui/admin/models/FormCollection",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/openam/ui/admin/delegates/SMSDelegate"
-], function(AbstractView, BootstrapDialog, Configuration, Constants, EventManager, Form, FormCollection, FormHelper, Router, SMSDelegate) {
+    "org/forgerock/openam/ui/admin/delegates/SMSDelegate",
+    "org/forgerock/commons/ui/common/util/UIUtils"
+], function(AbstractView, BootstrapDialog, Configuration, Constants, EventManager, Form, FormCollection, FormHelper, Router, SMSDelegate, UIUtils) {
     var Authentication = AbstractView.extend({
-        template: "templates/admin/views/console/realms/AuthenticationTemplate.html",
+        template: "templates/admin/views/console/realms/authentication/AuthenticationTemplate.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
         events: {
-            'click #addModule':   'addModule',
-            'click #addChain':    'addChain',
-            'click #saveChanges': 'save'
+            // Tabs
+            'show.bs.tab a[href="#settings"]': 'renderSettingsTab',
+            'show.bs.tab a[href="#chains"]':   'renderChainsTab',
+            'show.bs.tab a[href="#modules"]':  'renderModulesTab',
+            // Settings
+            'click #saveChanges': 'save',
+            // Chains
+            'change input[data-chain-name]': 'chainSelected',
+            'click button[data-chain-name]': 'deleteChain',
+            'click #deleteChains'          : 'deleteChains',
+            'click #addChain':               'addChain',
+            // Modules
+            'click #addModule':   'addModule'
+        },
+        data: {
+            rows: []
         },
         addChain: function(e) {
             e.preventDefault();
@@ -62,7 +76,39 @@ define("org/forgerock/openam/ui/admin/views/console/realms/Authentication", [
                 }]
             });
         },
+        chainSelected: function(event) {
+            var hasChainsSelected = $('input[type=checkbox]').is(':checked');
+            $('#deleteChains').prop('disabled', !hasChainsSelected);
+        },
+        deleteChain: function(event) {
+            var self = this,
+                chainName = $(event.currentTarget).attr('data-chain-name');
 
+            SMSDelegate.RealmAuthenticationChain.remove(chainName)
+            .done(function(data) {
+                self.renderChainsTab();
+            })
+            .fail(function() {
+                // TODO: Add failure condition
+            });
+        },
+        deleteChains: function() {
+            var self = this,
+                chainNames = $('input[type=checkbox]:checked').toArray().map(function(element) {
+                    return $(element).attr('data-chain-name');
+                }),
+                promises = chainNames.map(function(name) {
+                    return SMSDelegate.RealmAuthenticationChain.remove(name);
+                });
+
+            $.when(promises)
+            .done(function(data) {
+                self.renderChainsTab();
+            })
+            .fail(function() {
+                // TODO: Add failure condition
+            });
+        },
         addModule: function(e) {
             e.preventDefault();
             // This is mock code, please swap out
@@ -110,38 +156,62 @@ define("org/forgerock/openam/ui/admin/views/console/realms/Authentication", [
                 }
             });
         },
-        renderSettingsTab: function() {
+        renderSettingsTab: function(event) {
             var self = this;
 
-            SMSDelegate.Realm.Authentication.get()
+            SMSDelegate.RealmAuthentication.get()
             .done(function(data) {
-                self.data.form = new FormCollection();
-                self.data.form.add(new Form(self.$el.find('#settings .col-md-6:first').get(0), {
-                    type: 'object',
-                    properties: {
-                        adminAuthModule: data.schema.properties.core.properties.adminAuthModule,
-                        loginSuccessUrl: data.schema.properties.postauthprocess.properties.loginSuccessUrl
-                    }
-                }, data.values));
-                self.data.form.add(new Form(self.$el.find('#settings .col-md-6:last').get(0), {
-                    type: 'object',
-                    properties: {
-                        orgConfig: data.schema.properties.core.properties.orgConfig
-                    }
-                }, data.values));
+                UIUtils.fillTemplateWithData("templates/admin/views/console/realms/authentication/SettingsTemplate.html", data.values.result, function(html) {
+                    self.$el.find('#settings').html(html);
+
+                    self.data.form = new FormCollection();
+                    self.data.form.add(new Form(self.$el.find('#settings .col-md-6:first').get(0), {
+                        type: 'object',
+                        properties: {
+                            adminAuthModule: data.schema.properties.core.properties.adminAuthModule,
+                            loginSuccessUrl: data.schema.properties.postauthprocess.properties.loginSuccessUrl
+                        }
+                    }, data.values));
+                    self.data.form.add(new Form(self.$el.find('#settings .col-md-6:last').get(0), {
+                        type: 'object',
+                        properties: {
+                            orgConfig: data.schema.properties.core.properties.orgConfig
+                        }
+                    }, data.values));
+                });
             })
             .fail(function() {
                 // TODO: Add failure condition
             });
         },
         renderChainsTab: function(event) {
-            // Not Implemented
+            var self = this;
+
+            SMSDelegate.RealmAuthenticationChains.get()
+            .done(function(data) {
+                UIUtils.fillTemplateWithData("templates/admin/views/console/realms/authentication/ChainsTemplate.html", data.values.result, function(html) {
+                    self.$el.find('#chains').html(html);
+                });
+            })
+            .fail(function() {
+                // TODO: Add failure condition
+            });
         },
         renderModulesTab: function(event) {
-            // Not Implemented
+            var self = this;
+
+            SMSDelegate.RealmAuthenticationChains.get()
+            .done(function(data) {
+                UIUtils.fillTemplateWithData("templates/admin/views/console/realms/authentication/ModulesTemplate.html", data.values.result, function(html) {
+                    self.$el.find('#modules').html(html);
+                });
+            })
+            .fail(function() {
+                // TODO: Add failure condition
+            });
         },
         save: function(event) {
-            var promise = SMSDelegate.Realm.Authentication.save(this.data.form.data());
+            var promise = SMSDelegate.RealmAuthentication.save(this.data.form.data());
 
             FormHelper.bindSavePromiseToElement(promise, event.target);
         }
