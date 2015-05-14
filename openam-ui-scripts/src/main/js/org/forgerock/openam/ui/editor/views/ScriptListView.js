@@ -30,11 +30,12 @@ define("org/forgerock/openam/ui/editor/views/ScriptListView", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/openam/ui/common/util/URLHelper",
     "org/forgerock/commons/ui/common/main/Router",
     "backgrid",
     "org/forgerock/openam/ui/editor/util/BackgridUtils",
     "org/forgerock/openam/ui/editor/models/ScriptModel"
-], function (AbstractView, conf, eventManager, uiUtils, constants, router, Backgrid, BackgridUtils, Script) {
+], function (AbstractView, conf, eventManager, uiUtils, constants, URLHelper, router, Backgrid, BackgridUtils, Script) {
 
     var ScriptListView = AbstractView.extend({
         template: "templates/editor/views/ScriptListTemplate.html",
@@ -44,13 +45,12 @@ define("org/forgerock/openam/ui/editor/views/ScriptListView", [
                 columns,
                 grid,
                 paginator,
-                Scripts,
-                realm = conf.globalData.auth.realm !== "/" ? conf.globalData.auth.realm : "";
+                Scripts;
 
             this.data.selectedUUIDs = [];
 
             Scripts = Backbone.PageableCollection.extend({
-                url: "/" + constants.context + "/json" + realm + "/scripts",
+                url: URLHelper.substitute("__api__/scripts"),
                 model: Script,
                 queryParams: {
                     _queryFilter: BackgridUtils.queryFilter,
@@ -133,9 +133,9 @@ define("org/forgerock/openam/ui/editor/views/ScriptListView", [
 
         onRowSelect: function (model, selected) {
             if (selected) {
-                this.data.selectedUUIDs.push(model.attributes.uuid);
+                this.data.selectedUUIDs.push(model.attributes._id);
             } else {
-                this.data.selectedUUIDs = _.without(this.data.selectedUUIDs, model.attributes.uuid);
+                this.data.selectedUUIDs = _.without(this.data.selectedUUIDs, model.attributes._id);
             }
 
             this.renderToolbar();

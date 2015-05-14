@@ -147,8 +147,8 @@ define("config/AppConfiguration", [
                         "templates/policy/policies/StripedListActionItemTemplate.html",
                         "templates/policy/policies/PoliciesListGridActionsTemplate.html",
 
-                        "templates/policy/applications/AppsListGridCellActionsTemplate.html",
-                        "templates/policy/applications/AppsListGridActionsTemplate.html",
+                        "templates/policy/applications/ApplicationsListActionsCellTemplate.html",
+                        "templates/policy/applications/ApplicationsListToolbarTemplate.html",
 
                         "templates/policy/referrals/ManageReferralsGridActionsTemplate.html",
 

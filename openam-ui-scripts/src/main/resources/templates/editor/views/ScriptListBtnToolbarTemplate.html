@@ -3,5 +3,5 @@
 </a>
 
 <a href="#list" class="btn btn-danger" {{#unless selectedUUIDs}} disabled {{/unless}}>
-    <span class="fa fa-close"></span> {{t "scripts.list.deleteSelected"}}
+    <span class="fa fa-close"></span> {{t "scripts.list.deleteSelected"}} {{#if selectedUUIDs}}({{selectedUUIDs.length}}){{/if}}
 </a>

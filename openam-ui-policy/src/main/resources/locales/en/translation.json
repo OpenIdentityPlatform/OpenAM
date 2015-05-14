@@ -345,12 +345,16 @@
             "tooltip": "Click to read more (opens in new tab)"
         },
 
-        "manageApplications": {
-            "add": "Add New Application",
-            "importPolicies": "Import Policies",
-            "exportPolicies": "Export All Policies",
-            "title": "Applications",
-            "description": "Applications act as a template for Policies, and group Policies together for easier management.<br>To create an Application, click Add New Application. To edit an Application, click the Edit Application icon. To view the Policies within an Application, click the Application name. To delete an Application, select it, and then click Delete Selected."
+        "applications": {
+            "list": {
+                "add": "Add New Application",
+                "importPolicies": "Import Policies",
+                "exportPolicies": "Export All Policies",
+                "title": "Applications",
+                "grid": ["Edit", "Name", "Description", "Resource Types"],
+                "filterBy": "Filter by __value__",
+                "noResults": "No results to display"
+            }
         },
 
         "editApplications": {

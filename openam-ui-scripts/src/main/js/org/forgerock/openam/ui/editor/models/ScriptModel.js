@@ -25,7 +25,7 @@
 /*global define*/
 define("org/forgerock/openam/ui/editor/models/ScriptModel", [
     "backbone",
-    "org/forgerock/openam/ui/editor/util/URLHelper",
+    "org/forgerock/openam/ui/common/util/URLHelper",
     "org/forgerock/commons/ui/common/util/Base64"
 ], function (Backbone, URLHelper, Base64) {
     return Backbone.Model.extend({

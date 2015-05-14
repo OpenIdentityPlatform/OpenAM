@@ -35,14 +35,28 @@
     thead th {
         vertical-align: top;
         text-align: left;
+        border-width: 2px;
+        padding: 0 15px 8px;
 
         .form-search {
             margin: 5px 0 0 0;
+
+            input[type=search] {
+                padding-left: 25px;
+            }
         }
     }
 
     tbody {
         tr {
+            &:nth-child(2n) {
+                background-color: #fff;
+            }
+
+            &:hover, &:focus {
+                cursor: pointer;
+            }
+
             &.selected {
                 background-color: #d9edf7;
             }
@@ -55,10 +69,16 @@
                 }
             }
 
-            td.editor {
-                padding: 4px 5px;
-                outline: inherit;
-                background-color: inherit;
+            td {
+                padding: 8px 15px;
+
+                &.select-row-cell {
+                    width: 42px;
+                }
+
+                &.template-cell {
+                    width: 61px;
+                }
             }
         }
     }

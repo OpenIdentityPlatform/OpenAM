@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014-2015 ForgeRock AS. All Rights Reserved
+ * Copyright 2014-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -27,7 +27,7 @@ define("org/forgerock/openam/ui/policy/delegates/PolicyDelegate", [
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
-    "org/forgerock/commons/ui/common/util/RealmHelper"
+    "org/forgerock/openam/ui/common/util/RealmHelper"
 ], function (conf, constants, AbstractDelegate, RealmHelper) {
     var obj = new AbstractDelegate(constants.host + "/" + constants.context + "/json");
 
@@ -70,15 +70,6 @@ define("org/forgerock/openam/ui/policy/delegates/PolicyDelegate", [
             headers: {"Accept-API-Version": "protocol=1.0,resource=2.0"},
             type: "POST",
             data: JSON.stringify(data),
-            errorsHandlers: obj.ERROR_HANDLERS
-        });
-    };
-
-    obj.deleteApplication = function (name) {
-        return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm("/applications/" + encodeURIComponent(name)),
-            headers: {"Accept-API-Version": "protocol=1.0,resource=2.0"},
-            type: "DELETE",
             errorsHandlers: obj.ERROR_HANDLERS
         });
     };

@@ -22,23 +22,25 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/**
- * @author Eugenia Sergueeva
- */
-
-/*global define, $, _, sessionStorage, FileReader */
+/*global define, $, _, sessionStorage, FileReader, Backgrid, Backbone */
 
 define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
+    "backgrid",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/policy/common/GenericGridView",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/components/Messages",
+    "org/forgerock/openam/ui/common/util/URLHelper",
+    "org/forgerock/openam/ui/common/util/RealmHelper",
+    "org/forgerock/openam/ui/policy/common/GenericGridView",
     "org/forgerock/openam/ui/policy/delegates/PolicyDelegate",
-    "org/forgerock/commons/ui/common/util/RealmHelper"
-], function (AbstractView, GenericGridView, UIUtils, Router, Constants, Configuration, EventManager, PolicyDelegate, RealmHelper) {
+    "org/forgerock/openam/ui/policy/applications/ApplicationModel",
+    "org/forgerock/openam/ui/policy/util/BackgridUtils"
+], function (Backgrid, AbstractView, UIUtils, Router, Constants, Configuration, EventManager, Messages, URLHelper,
+             RealmHelper, GenericGridView, PolicyDelegate, ApplicationModel, BackgridUtils) {
 
     var ApplicationsListView = AbstractView.extend({
         template: "templates/policy/applications/ApplicationsListTemplate.html",
@@ -52,16 +54,128 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
         },
 
         render: function (args, callback) {
-            var self = this;
+            var self = this,
+                Apps,
+                columns,
+                grid,
+                paginator,
+                ClickableRow;
+
             this.data.realm = Configuration.globalData.auth.realm;
+            this.data.selectedApplications = [];
+
+            Apps = Backbone.PageableCollection.extend({
+                url: URLHelper.substitute("__api__/applications"),
+                model: ApplicationModel,
+                queryParams: {
+                    _queryFilter: BackgridUtils.queryFilter,
+                    pageSize: null,  // todo implement pagination
+                    _pagedResultsOffset: null //todo implement pagination
+                },
+
+                parseRecords: BackgridUtils.parseRecords,
+                sync: BackgridUtils.sync
+            });
+
+            ClickableRow = Backgrid.Row.extend({
+                events: {
+                    "click": "onClick"
+                },
+
+                onClick: function (e) {
+                    var $target = $(e.target);
+
+                    if ($target.is('a') || $target.is('input') || $target.parents('.select-row-cell').length === 1 ||
+                        $target.parents('.template-cell').length === 1) {
+                        return;
+                    }
+
+                    Router.routeTo(Router.configuration.routes.managePolicies, {args: [encodeURIComponent(this.model.id)], trigger: true});
+                }
+            });
+
+            columns = [
+                {
+                    name: "",
+                    cell: "select-row",
+                    headerCell: "select-all"
+                },
+                {
+                    name: "",
+                    label: $.t("policy.applications.list.grid.0"),
+                    cell: BackgridUtils.TemplateCell.extend({
+                        template: "templates/policy/applications/ApplicationsListActionsCellTemplate.html"
+                    }),
+                    editable: false
+                },
+                {
+                    name: "name",
+                    label: $.t("policy.applications.list.grid.1"),
+                    cell: BackgridUtils.UriExtCell,
+                    headerCell: BackgridUtils.FilterHeaderCell,
+                    href: function (rawValue, formattedValue, model) {
+                        return "#app/" + encodeURIComponent(model.id);
+                    },
+                    editable: false
+                },
+                {
+                    name: "description",
+                    label: $.t("policy.applications.list.grid.2"),
+                    cell: "string",
+                    headerCell: BackgridUtils.FilterHeaderCell,
+                    editable: false
+                },
+                {
+                    name: "resourceTypeUuids",
+                    label: $.t("policy.applications.list.grid.3"),
+                    cell: "string",
+                    headerCell: BackgridUtils.FilterHeaderCell,
+                    editable: false
+                }
+
+                // TODO: add other columns
+            ];
+
+            self.data.applications = new Apps();
+
+            self.data.applications.on("backgrid:selected", function (model, selected) {
+                self.onRowSelect(model, selected);
+            });
+
+            grid = new Backgrid.Grid({
+                columns: columns,
+                row: ClickableRow,
+                collection: self.data.applications,
+                emptyText: $.t("policy.applications.list.noResults")
+            });
+
+            paginator = new Backgrid.Extension.Paginator({
+                collection: self.data.applications,
+                windowSize: 3
+            });
 
             this.parentRender(function () {
+                this.renderToolbar();
+
+                this.$el.find("#backgridContainer").append(grid.render().el);
+                this.$el.find("#paginationContainer").append(paginator.render().el);
+
+                this.data.applications.fetch({reset: true}).done(function (xhr) {
+                    self.$el.find('.fa[data-toggle="popover"]').popover();
+
+                    if (callback) {
+                        callback();
+                    }
+                });
+
+
+                /*
                 this.appGridView = new GenericGridView();
                 this.appGridView.render(this.data, {
                     rowUid: 'name',
                     element: '#manageApps',
                     tpl: 'templates/policy/applications/AppsListGridTemplate.html',
-                    actionsTpl: 'templates/policy/applications/AppsListGridActionsTemplate.html',
+                    actionsTpl: 'templates/policy/applications/ApplicationsListToolbarTemplate.html',
                     gridId: 'apps',
                     initOptions: this.getGridInitOptions(),
                     additionalOptions: this.getGridAdditionalOptions()
@@ -71,13 +185,33 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
                         callback();
                     }
                 });
+                */
             });
         },
 
+        onRowSelect: function (model, selected) {
+            if (selected) {
+                this.data.selectedApplications.push(model.id);
+            } else {
+                this.data.selectedApplications = _.without(this.data.selectedApplications, model.id);
+            }
+
+            this.renderToolbar();
+        },
+
+        renderToolbar: function () {
+            this.$el.find('#gridToolbar').html(UIUtils.fillTemplateWithData("templates/policy/applications/ApplicationsListToolbarTemplate.html", this.data));
+        },
+
+        editApplication: function (e) {
+            Router.routeTo(Router.configuration.routes.editApp, {args: [encodeURIComponent($(e.target).data('appName'))], trigger: true});
+        },
+
+        /*
         getGridInitOptions: function () {
             var self = this,
                 actionsFormatter = function (cellVal, options, rowObject) {
-                    return UIUtils.fillTemplateWithData("templates/policy/applications/AppsListGridCellActionsTemplate.html", rowObject);
+                    return UIUtils.fillTemplateWithData("templates/policy/applications/ApplicationsListActionsCellTemplate.html", rowObject);
                 },
                 datePick = function (elem) {
                     return self.appGridView.datePicker(self.appGridView, elem);
@@ -141,10 +275,6 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
             };
         },
 
-        editApplication: function (e) {
-            Router.routeTo(Router.configuration.routes.editApp, {args: [this.getAppName(e)], trigger: true});
-        },
-
         viewPolicies: function (e) {
             Router.routeTo(Router.configuration.routes.managePolicies, {args: [this.getAppName(e)], trigger: true});
         },
@@ -173,6 +303,7 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
 
             return returnList;
         },
+        */
 
         deleteApplications: function (e) {
             e.preventDefault();
@@ -181,12 +312,31 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
                 return;
             }
 
-            var self = this, i, promises = [];
+            var self = this,
+                i = 0,
+                app,
+                onAppDestroy = function () {
+                    self.data.selectedApplications = [];
+                    self.data.applications.fetch({reset: true});
+                    self.renderToolbar();
+                },
+                onSuccess = function (model, response, options) {
+                    onAppDestroy();
+                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, 'deleteSuccess');
+                },
+                onError = function (model, response, options) {
+                    onAppDestroy();
+                    Messages.messages.addMessage({message: response.responseJSON.message, type: 'error'});
+                };
 
-            for (i = 0; i < this.appGridView.selectedItems.length; i++) {
-                promises.push(PolicyDelegate.deleteApplication(self.appGridView.selectedItems[i]));
+            for (; i < this.data.selectedApplications.length; i++) {
+                app = this.data.applications.get(this.data.selectedApplications[i]);
+
+                app.destroy({
+                    success: onSuccess,
+                    error: onError
+                });
             }
-            this.appGridView.deleteItems(e, promises);
         },
 
         startImportPolicies: function () {

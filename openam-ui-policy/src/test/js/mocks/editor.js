@@ -31,8 +31,8 @@ define([
     "text!templates/policy/login/LoginDialog.html",
 
     "text!templates/policy/applications/EditApplicationTemplate.html",
-    "text!templates/policy/applications/AppsListGridActionsTemplate.html",
-    "text!templates/policy/applications/AppsListGridCellActionsTemplate.html",
+    "text!templates/policy/applications/ApplicationsListToolbarTemplate.html",
+    "text!templates/policy/applications/ApplicationsListActionsCellTemplate.html",
     "text!templates/policy/applications/AppsListGridTemplate.html",
     "text!templates/policy/applications/ApplicationsListTemplate.html",
     "text!templates/policy/applications/ReviewApplicationStepTemplate.html",
@@ -94,8 +94,8 @@ define([
             "templates/policy/login/LoginDialog.html",
 
             "templates/policy/applications/EditApplicationTemplate.html",
-            "templates/policy/applications/AppsListGridActionsTemplate.html",
-            "templates/policy/applications/AppsListGridCellActionsTemplate.html",
+            "templates/policy/applications/ApplicationsListToolbarTemplate.html",
+            "templates/policy/applications/ApplicationsListActionsCellTemplate.html",
             "templates/policy/applications/AppsListGridTemplate.html",
             "templates/policy/applications/ApplicationsListTemplate.html",
             "templates/policy/applications/ReviewApplicationStepTemplate.html",

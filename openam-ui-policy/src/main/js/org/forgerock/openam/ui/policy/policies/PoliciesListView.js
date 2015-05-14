@@ -22,11 +22,6 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/**
- * @author Aleanora Kaladzinskaya
- * @author Eugenia Sergueeva
- */
-
 /*global window, define, $, _, document, console, sessionStorage */
 
 define("org/forgerock/openam/ui/policy/policies/PoliciesListView", [
@@ -38,7 +33,7 @@ define("org/forgerock/openam/ui/policy/policies/PoliciesListView", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/util/RealmHelper"
+    "org/forgerock/openam/ui/common/util/RealmHelper"
 ], function (AbstractView, GenericGridView, UIUtils, Router, PolicyDelegate, EventManager, Constants, Conf, RealmHelper) {
     var PoliciesListView = AbstractView.extend({
         template: "templates/policy/policies/PoliciesListTemplate.html",

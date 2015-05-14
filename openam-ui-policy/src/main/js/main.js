@@ -27,9 +27,18 @@
 require.config({
     paths: {
         "autosizeInput": "libs/jquery.autosize.input.min",
-        "backbone": "libs/backbone-1.1.2-min",
+
+        "backbone"           : "libs/backbone-1.1.2-min",
+        "backbone.paginator" : "libs/backbone-paginator.min",
+
+        "backgrid"          : "libs/backgrid.min",
+        "backgrid.filter"   : "libs/backgrid-filter.min",
+        "backgrid.paginator": "libs/backgrid-paginator.min",
+        "backgrid.selectall": "libs/backgrid-select-all.min",
+
         "bootstrap": "libs/bootstrap.min",
         "bootstrap-dialog": "libs/bootstrap-dialog.min",
+
         "clockPicker": "libs/jquery-clockpicker.0.0.7.min",
         "doTimeout": "libs/jquery.ba-dotimeout-1.0-min",
         "form2js": "libs/form2js-2.0",
@@ -48,6 +57,7 @@ require.config({
         "spin": "libs/spin-2.0.1-min",
         "underscore": "libs/lodash-2.4.1-min",
         "xdate": "libs/xdate-0.8-min",
+
         "ThemeManager": "org/forgerock/openam/ui/common/util/ThemeManager",
         "UserDelegate": "org/forgerock/openam/ui/user/delegates/UserDelegate"
     },
@@ -60,6 +70,22 @@ require.config({
         "backbone": {
             deps: ["underscore"],
             exports: "Backbone"
+        },
+        "backbone.paginator": {
+            deps: ["backbone"]
+        },
+        "backgrid": {
+            deps: ["jquery", "underscore", "backbone"],
+            exports: "Backgrid"
+        },
+        "backgrid.filter": {
+            deps: ["backgrid"]
+        },
+        "backgrid.paginator": {
+            deps: ["backgrid", "backbone.paginator"]
+        },
+        "backgrid.selectall": {
+            deps: ["backgrid"]
         },
         "bootstrap": {
             deps: ["jquery"]
@@ -130,7 +156,17 @@ require([
     "jquery",
     "underscore",
     "backbone",
+    "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/util/Constants",
+    "backbone.paginator",
+    "backgrid",
+    "backgrid.paginator",
+    "backgrid.filter",
+    "backgrid.selectall",
+    "bootstrap",
+    "bootstrap-dialog",
     "form2js",
+    "jsonEditor",
     "js2form",
     "spin",
     "xdate",
@@ -146,17 +182,12 @@ require([
     "autosizeInput",
     "selectize",
     "org/forgerock/commons/ui/common/main/i18nManager",
-    "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/main/EventManager",
-    "jsonEditor",
-    "bootstrap",
-    "bootstrap-dialog",
     "org/forgerock/commons/ui/common/main",
     "org/forgerock/openam/ui/common/main",
     "org/forgerock/openam/ui/policy/main",
     "ThemeManager",
     "config/main"
-], function ($, _, Backbone, form2js, js2form, spin, xdate, moment, doTimeout, Handlebars, i18n, sortable, jqueryui, multiselect, jqgrid, clockPicker, autosizeInput, selectize, i18nManager, constants, eventManager) {
+], function ($, _, Backbone, EventManager, Constants) {
 
     // Helpers for the code that hasn't been properly migrated to require these as explicit dependencies:
     window.$ = $;
@@ -166,11 +197,11 @@ require([
     // necessary for requests initiated outside of the frameworks (such as via jqGrid)
     $(document).ajaxError(function (event, jqxhr, settings, thrownError) {
         if (jqxhr && jqxhr.responseJSON && jqxhr.responseJSON.code === 401 && settings.contentType !== "application/json") {
-            eventManager.sendEvent(constants.EVENT_UNAUTHORIZED);
+            EventManager.sendEvent(Constants.EVENT_UNAUTHORIZED);
         }
     });
 
-    eventManager.sendEvent(constants.EVENT_DEPENDECIES_LOADED);
+    EventManager.sendEvent(Constants.EVENT_DEPENDECIES_LOADED);
 
     JSONEditor.defaults.options.theme = 'bootstrap3';
     JSONEditor.defaults.options.iconlib = "fontawesome4";

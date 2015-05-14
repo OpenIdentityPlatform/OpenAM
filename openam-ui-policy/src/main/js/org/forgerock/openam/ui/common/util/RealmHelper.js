@@ -23,7 +23,7 @@
  */
 
 /*global _ define*/
-define('org/forgerock/commons/ui/common/util/RealmHelper', [
+define('org/forgerock/openam/ui/common/util/RealmHelper', [
     "org/forgerock/commons/ui/common/main/Router"
 ], function(Router) {
     /**
