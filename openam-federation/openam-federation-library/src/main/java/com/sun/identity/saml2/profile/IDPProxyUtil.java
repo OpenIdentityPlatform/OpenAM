@@ -868,6 +868,7 @@ public class IDPProxyUtil {
        if (SAML2Utils.debug.messageEnabled()) {
             SAML2Utils.debug.message("Proxy to: " + location);
        }
+       logoutRes.setDestination(XMLUtils.escapeSpecialCharacters(location));
        String relayState = infoMap.get(SAML2Constants.RELAY_STATE);
        LogoutUtil.sendSLOResponse(response, request, logoutRes, location, relayState, realm, entityID,
                SAML2Constants.IDP_ROLE, remoteEntity, binding);
