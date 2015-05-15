@@ -27,7 +27,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "backgrid",
     "org/forgerock/openam/ui/uma/util/BackgridUtils",
-    "bootstrap-dialog",
+    "org/forgerock/commons/ui/common/components/BSDialog",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/openam/ui/uma/views/share/ShareCounter",
@@ -36,7 +36,7 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
     'org/forgerock/openam/ui/uma/models/UMAPolicyPermissionScope',
     'org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy',
     'org/forgerock/openam/ui/common/util/RealmHelper'
-], function(AbstractView, Backgrid, BackgridUtils, BootstrapDialog, Constants, EventManager, ShareCounter, UMAPolicy, UMAPolicyPermission, UMAPolicyPermissionScope, UMAResourceSetWithPolicy, RealmHelper) {
+], function(AbstractView, Backgrid, BackgridUtils, BSDialog, Constants, EventManager, ShareCounter, UMAPolicy, UMAPolicyPermission, UMAPolicyPermissionScope, UMAResourceSetWithPolicy, RealmHelper) {
 
     var CommonShare,
         realmRegex = /[?&]realm=/,
@@ -99,31 +99,24 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
         renderDialog: function(args, callback) {
             var self = this,
                 $div = $('<div></div>'),
-                data = {},
-                options = {
-                    type: BootstrapDialog.TYPE_DEFAULT,
-                    title: $.t("uma.share.shareResource"),
-                    size: BootstrapDialog.SIZE_WIDE,
-                    cssClass: "shareDialog",
-                    message: $div,
-                    buttons: [{
-                        label: $.t("common.form.close"),
-                        cssClass: "btn-default",
-                        action: function(dialog){
-                            dialog.close();
-                        }
-                    }],
-                    onshow: function(dialog){
-                        self.element = $div;
-                        self.render(args, callback);
-                    },
-
-                    onshown: function(dialog){
-                        self.renderShareCounter(callback);
-                    }
-                };
-
-            BootstrapDialog.show(options);
+                shareDialog = new BSDialog();
+            shareDialog.setTitle($.t("uma.share.shareResource"));
+            shareDialog.contentTemplate = this.template;
+            shareDialog.message = $div;
+            shareDialog.closable = false;
+            shareDialog.size = "size-wide";
+            shareDialog.cssClass = "shareDialog";
+            shareDialog.actions = [{
+                type: "close"
+            }];
+            shareDialog.onshow = function(dialog){
+                self.element = $div;
+                self.render(args);
+            };
+            shareDialog.onshown = function(dialog){
+                self.renderShareCounter(callback);
+            };
+            shareDialog.show();
         },
 
         render: function(args, callback) {
