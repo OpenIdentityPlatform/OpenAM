@@ -30,7 +30,6 @@ import com.sun.identity.entitlement.xacml3.XACMLExportImport;
 import com.sun.identity.entitlement.xacml3.XACMLExportImport.ImportStep;
 import com.sun.identity.entitlement.xacml3.XACMLPrivilegeUtils;
 import com.sun.identity.entitlement.xacml3.core.PolicySet;
-import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.forgerockrest.utils.RestLog;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
@@ -55,6 +54,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -65,9 +65,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import static org.forgerock.json.resource.ResourceException.BAD_REQUEST;
-import static org.forgerock.json.resource.ResourceException.INTERNAL_ERROR;
-import static org.forgerock.json.resource.ResourceException.FORBIDDEN;
+import static org.forgerock.json.resource.ResourceException.*;
 
 /**
  * Provides XACML based services
@@ -83,7 +81,7 @@ public class XacmlService extends ServerResource {
     private static final String ROOT_REALM = "/";
 
     private final XACMLExportImport importExport;
-    private final AdminTokenAction admin;
+    private final PrivilegedAction<SSOToken> admin;
     private final Debug debug;
     private final RestLog restLog;
     private final DelegationEvaluator evaluator;
@@ -97,7 +95,7 @@ public class XacmlService extends ServerResource {
      */
     @Inject
     public XacmlService(XACMLExportImport importExport,
-                        AdminTokenAction adminTokenAction,
+            PrivilegedAction<SSOToken> adminTokenAction,
                         @Named("frRest") Debug debug,
                         RestLog restLog,
                         DelegationEvaluator evaluator) {
