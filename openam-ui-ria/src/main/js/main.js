@@ -35,7 +35,7 @@ require.config({
 
         "bootstrap"        : "libs/bootstrap.min",
         "bootstrap-dialog" : "libs/bootstrap-dialog.min",
-        "bootstrap-tabdrop": "libs/bootstrap-tabdrop",
+        "bootstrap-tabdrop": "libs/bootstrap-tabdrop-1.0",
 
         "doTimeout"       : "libs/jquery.ba-dotimeout-1.0-min",
         "form2js"         : "libs/form2js-2.0",
@@ -141,7 +141,7 @@ require.config({
  * Loads all application on start, so each module will be available to
  * required synchronously
  */
-require([
+require([ 
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "jquery",
