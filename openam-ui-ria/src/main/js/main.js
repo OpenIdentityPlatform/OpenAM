@@ -33,8 +33,8 @@ require.config({
         "backgrid.filter"   : "libs/backgrid-filter.min",
         "backgrid.paginator": "libs/backgrid-paginator.min",
 
-        "bootstrap"        : "libs/bootstrap.min",
-        "bootstrap-dialog" : "libs/bootstrap-dialog.min",
+        "bootstrap"         : "libs/bootstrap-3.3.4-custom",
+        "bootstrap-dialog"  : "libs/bootstrap-dialog-1.34.4-min",
         "bootstrap-tabdrop": "libs/bootstrap-tabdrop-1.0",
 
         "doTimeout"       : "libs/jquery.ba-dotimeout-1.0-min",

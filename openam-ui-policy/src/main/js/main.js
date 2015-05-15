@@ -36,8 +36,8 @@ require.config({
         "backgrid.paginator": "libs/backgrid-paginator.min",
         "backgrid.selectall": "libs/backgrid-select-all.min",
 
-        "bootstrap": "libs/bootstrap.min",
-        "bootstrap-dialog": "libs/bootstrap-dialog.min",
+        "bootstrap"         : "libs/bootstrap-3.3.4-custom",
+        "bootstrap-dialog"  : "libs/bootstrap-dialog-1.34.4-min",
 
         "clockPicker": "libs/jquery-clockpicker.0.0.7.min",
         "doTimeout": "libs/jquery.ba-dotimeout-1.0-min",
