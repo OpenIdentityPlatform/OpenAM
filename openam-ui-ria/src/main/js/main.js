@@ -33,8 +33,9 @@ require.config({
         "backgrid.filter"   : "libs/backgrid-filter.min",
         "backgrid.paginator": "libs/backgrid-paginator.min",
 
-        "bootstrap"       : "libs/bootstrap.min",
-        "bootstrap-dialog": "libs/bootstrap-dialog.min",
+        "bootstrap"        : "libs/bootstrap.min",
+        "bootstrap-dialog" : "libs/bootstrap-dialog.min",
+        "bootstrap-tabdrop": "libs/bootstrap-tabdrop",
 
         "doTimeout"       : "libs/jquery.ba-dotimeout-1.0-min",
         "form2js"         : "libs/form2js-2.0",
@@ -42,7 +43,7 @@ require.config({
         "i18next"         : "libs/i18next-1.7.3-min",
         "jquery"          : "libs/jquery-2.1.1-min",
         "js2form"         : "libs/js2form-2.0",
-        "jsonEditor"      : "libs/jsoneditor-0.7.9-min",
+        "jsonEditor"      : "libs/jsoneditor-custom",
         "moment"          : "libs/moment-2.8.1-min",
         "qrcode"          : "libs/qrcode-1.0.0-min",
         "selectize"       : "libs/selectize-0.12.1-min",
@@ -50,6 +51,8 @@ require.config({
         "spin"            : "libs/spin-2.0.1-min",
         "underscore"      : "libs/lodash-2.4.1-min",
         "xdate"           : "libs/xdate-0.8-min",
+
+        "jsonEditorTheme"  : "org/forgerock/openam/ui/admin/utils/JsonEditorTheme",
 
         "ThemeManager": "org/forgerock/openam/ui/common/util/ThemeManager",
         "UserDelegate": "org/forgerock/openam/ui/user/delegates/UserDelegate"
@@ -83,7 +86,9 @@ require.config({
         "bootstrap-dialog": {
             deps: ["jquery", "underscore", "backbone", "bootstrap"]
         },
-
+        "bootstrap-tabdrop": {
+            deps: ["jquery", "bootstrap"]
+        },
         "doTimeout": {
             deps: ["jquery"],
             exports: "doTimeout"
@@ -103,6 +108,9 @@ require.config({
         },
         "jsonEditor": {
             exports: "JSONEditor"
+        },
+        "jsonEditorTheme": {
+            deps: ["jsonEditor"]
         },
         "moment": {
             exports: "moment"
@@ -143,6 +151,7 @@ require([
     "form2js",
     "js2form",
     "jsonEditor",
+    "jsonEditorTheme",
     "spin",
     "xdate",
     "moment",
@@ -165,6 +174,7 @@ require([
     "backgrid.filter",
     "bootstrap",
     "bootstrap-dialog",
+    "bootstrap-tabdrop",
     "org/forgerock/openam/ui/uma/main",
     "org/forgerock/openam/ui/admin/main",
     "sortable",

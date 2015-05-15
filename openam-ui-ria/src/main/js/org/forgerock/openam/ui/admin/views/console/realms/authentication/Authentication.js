@@ -22,27 +22,26 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authen
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/openam/ui/admin/models/Form",
-    "org/forgerock/openam/ui/admin/models/FormCollection",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/admin/delegates/SMSDelegate",
     "org/forgerock/commons/ui/common/util/UIUtils"
-], function(AbstractView, BootstrapDialog, Configuration, Constants, EventManager, Form, FormCollection, FormHelper, Router, SMSDelegate, UIUtils) {
+], function(AbstractView, BootstrapDialog, Configuration, Constants, EventManager, Form, FormHelper, Router, SMSDelegate, UIUtils) {
     var Authentication = AbstractView.extend({
         template: "templates/admin/views/console/realms/authentication/AuthenticationTemplate.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
         events: {
             // Tabs
             'show.bs.tab a[href="#settings"]': 'renderSettingsTab',
-            'show.bs.tab a[href="#chains"]':   'renderChainsTab',
-            'show.bs.tab a[href="#modules"]':  'renderModulesTab',
+            'show.bs.tab a[href="#chains"]'  : 'renderChainsTab',
+            'show.bs.tab a[href="#modules"]' : 'renderModulesTab',
             // Settings
             'click #saveChanges': 'save',
             // Chains
             'change input[data-chain-name]': 'chainSelected',
             'click button[data-chain-name]': 'deleteChain',
             'click #deleteChains'          : 'deleteChains',
-            'click #addChain':               'addChain',
+            'click #addChain'              : 'addChain',
             // Modules
             'click #addModule':   'addModule'
         },
@@ -163,21 +162,15 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authen
             .done(function(data) {
                 UIUtils.fillTemplateWithData("templates/admin/views/console/realms/authentication/SettingsTemplate.html", data.values.result, function(html) {
                     self.$el.find('#settings').html(html);
-
-                    self.data.form = new FormCollection();
-                    self.data.form.add(new Form(self.$el.find('#settings .col-md-6:first').get(0), {
+                    self.data.form = new Form(self.$el.find('#settings .panel-body').get(0), {
                         type: 'object',
                         properties: {
                             adminAuthModule: data.schema.properties.core.properties.adminAuthModule,
-                            loginSuccessUrl: data.schema.properties.postauthprocess.properties.loginSuccessUrl
-                        }
-                    }, data.values));
-                    self.data.form.add(new Form(self.$el.find('#settings .col-md-6:last').get(0), {
-                        type: 'object',
-                        properties: {
+                            loginSuccessUrl: data.schema.properties.postauthprocess.properties.loginSuccessUrl,
                             orgConfig: data.schema.properties.core.properties.orgConfig
                         }
-                    }, data.values));
+                    }, data.values);
+
                 });
             })
             .fail(function() {

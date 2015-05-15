@@ -15,6 +15,62 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
+
+
+/* Helpers */
+
+/* Candidate for Commons */
+ .wordwrap{
+    white-space: initial;
+    word-wrap: break-word;
+    word-break: break-word;
+ }
+
+ /* Candidate for Commons */
+ .ellipsis{
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+ }
+
+ /* Candidate for Commons */
+ .btn-transparent {
+     background: none;
+     border-color:transparent;
+     &:hover{
+         background:none;
+         border-color:transparent;
+         color:#519387;
+     }
+     &:focus{
+         outline:none;
+         box-shadow:none;
+         color:#3f7269;
+     }
+ }
+
+ /* Candidate for Commons */
+ .transition(@property: all, @duration:.5s, @easing:ease, @delay:0s){
+     -webkit-transition: @arguments;
+        -moz-transition: @arguments;
+         -ms-transition: @arguments;
+          -o-transition: @arguments;
+             transition: @arguments;
+ }
+
+ /* Candidate for Commons */
+ .popover{
+     max-width: 500px;
+
+     .popover-title {
+         background-color: #519387;
+         border-bottom: 1px solid #488378;
+         color: white;
+         font-weight: normal;
+     }
+ }
+
+
  .page-header {
 
      margin: 40px 0 20px;
@@ -92,75 +148,4 @@
 
 .modal-dialog .modal-body .page-header {
     margin: 0 0 20px;
-}
-
-.transition(@property: all, @duration:.5s, @easing:ease, @delay:0s){
-    -webkit-transition: @arguments;
-       -moz-transition: @arguments;
-        -ms-transition: @arguments;
-         -o-transition: @arguments;
-            transition: @arguments;
-}
-
-.btn-transparent {
-    background: none;
-    border-color:transparent;
-    &:hover{
-        background:none;
-        border-color:transparent;
-        color:#3f7269;
-    }
-    &:focus{
-        outline:none;
-        box-shadow:none;
-        color:#3f7269;
-    }
-}
-
-// json-editor
-div[data-schemaid] {
-    > h3 {
-        display: none;
-    }
-
-    .well {
-        background: none;
-        border: none;
-        box-shadow: none;
-    }
-
-    .help-block {
-      max-height: 10em;
-      text-overflow: ellipsis;
-      transition: max-height 0.5s;
-      overflow: hidden;
-      padding-left: 5px;
-      padding-right: 5px;
-      margin-top: 10px;
-    }
-
-    .help-block:hover {
-        background-color: #eee;
-        cursor: pointer;
-    }
-
-    .help-block-collapsed {
-        max-height: 1.5em;
-
-        &:before {
-            content: "See more"; // TODO: i18n
-            float: right;
-            color: #519387;
-            cursor: pointer;
-        }
-    }
-
-    .help-block-expanded {
-        &:before {
-            content: "Hide"; // TODO: i18n
-            float: right;
-            color: #519387;
-            cursor: pointer;
-        }
-    }
 }

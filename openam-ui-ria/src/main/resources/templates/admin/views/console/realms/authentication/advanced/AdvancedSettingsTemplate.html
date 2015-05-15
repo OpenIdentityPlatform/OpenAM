@@ -16,11 +16,13 @@
         <h1>Advanced Settings</h1>
   	</div>
 
+
+
     <div class="console-tabs">
         <div class="tab-menu">
             <ul class="nav nav-tabs" role="tablist">
                 {{#each formData.schema.orderedProperties}}
-                    <li><a href="#{{this._id}}" role="tab" data-toggle="tab" aria-expanded="false">{{this.title}}</a></li>
+                <li><a href="#{{this._id}}" role="tab" data-toggle="tab" aria-expanded="false">{{this.title}}</a></li>
                 {{/each}}
             </ul>
         </div>
@@ -28,8 +30,7 @@
         <div class="tab-content clearfix">
             <div role="tabpanel" class="tab-pane" id="{{this._id}}">
                 <div class="tab-pane-body">
-                    <div class="panel-body">
-                    </div>
+                    <div class="panel-body"></div>
                 </div>
             </div>
 

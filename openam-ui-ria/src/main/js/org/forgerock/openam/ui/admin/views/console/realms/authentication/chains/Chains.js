@@ -25,7 +25,7 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/chains
 ], function(AbstractView, Configuration, EventManager, Router, Constants) {
 
     var Chains = AbstractView.extend({
-        template: "templates/admin/views/console/realms/authentication/ChainsTemplate.html",
+        template: "templates/admin/views/console/realms/authentication/chains/ChainsTemplate.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
         events: {},
 

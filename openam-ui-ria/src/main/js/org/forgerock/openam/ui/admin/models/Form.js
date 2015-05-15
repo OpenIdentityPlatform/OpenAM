@@ -16,12 +16,15 @@
 
 /*global _ $ define*/
 define('org/forgerock/openam/ui/admin/models/Form', [
-    'jsonEditor'
-], function(JSONEditor) {
+    'jsonEditor',
+    'org/forgerock/openam/ui/admin/utils/JsonEditorTheme'
+], function(JSONEditor, JsonEditorTheme) {
     var obj = function Form(element, schema, values) {
         this.element = element;
         this.schema = schema;
         this.values = values;
+
+        JSONEditor.defaults.themes.openam = JsonEditorTheme.getTheme(6, 4);
 
         this.editor = new JSONEditor(element, {
             disable_collapse: true,
@@ -29,18 +32,24 @@ define('org/forgerock/openam/ui/admin/models/Form', [
             disable_properties: true,
             iconlib: "fontawesome4",
             schema: schema,
-            theme: 'bootstrap3'
+            theme: "openam"
         });
 
-        element = $(element);
+        $(element).find('.help-block').hide().each( function(){
+            var group = $(this).parent(),
+                button = $('<button class="btn btn-default info-button" type="button"><i class="fa fa-info-circle"></i></button>');
 
-        element.find('div[data-schematype="array"] p').addClass('help-block');
+            $(group).append(button);
 
-        element.find('.help-block').addClass('help-block-collapsed')
-        .click(function(event) {
-            if(event.target === this) {
-                $(event.target).toggleClass('help-block-collapsed help-block-expanded');
-            }
+            button.popover({
+                container: '#content',
+                html: true,
+                placement: 'auto top',
+                trigger: 'focus',
+                content: this.innerHTML,
+                title: group.find( "label:first-of-type" ).text()
+            });
+
         });
 
         this.reset();

@@ -25,7 +25,7 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/module
 ], function(AbstractView, Configuration, EventManager, Router, Constants) {
 
     var Module = AbstractView.extend({
-        template: "templates/admin/views/console/realms/authentication/ModuleTemplate.html",
+        template: "templates/admin/views/console/realms/authentication/modules/ModuleTemplate.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
         events: {},
 

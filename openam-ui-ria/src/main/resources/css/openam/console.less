@@ -80,3 +80,42 @@
 .table > tbody > tr > td {
     vertical-align: middle;
 }
+
+// json-editor
+div[data-schemaid] {
+
+    > h3 {
+        display: none;
+    }
+
+    .well {
+        background: none;
+        border: none;
+        box-shadow: none;
+    }
+
+    .info-button {
+
+        margin-left: -15px;
+        background-color:transparent;
+        border-color:transparent;
+
+        &:hover{
+            background-color:transparent;
+            border-color:transparent;
+            color:#3f7269;
+        }
+
+        &:focus{
+            outline:none;
+            box-shadow:none;
+            color:#3f7269;
+        }
+
+    }
+
+    .selectize-control {
+        margin-bottom: -5px;
+    }
+
+}

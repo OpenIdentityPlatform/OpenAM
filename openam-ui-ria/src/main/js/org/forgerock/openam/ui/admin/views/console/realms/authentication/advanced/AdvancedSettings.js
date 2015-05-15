@@ -24,7 +24,7 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/advanc
     "org/forgerock/openam/ui/admin/delegates/SMSDelegate"
 ], function(AbstractView, Configuration, Constants, Form, FormHelper, SMSDelegate) {
     var AdvancedSettings = AbstractView.extend({
-        template: "templates/admin/views/console/realms/authentication/AdvancedSettingsTemplate.html",
+        template: "templates/admin/views/console/realms/authentication/advanced/AdvancedSettingsTemplate.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
         events: {
             'click #revert': 'revert',
@@ -47,6 +47,8 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/advanc
                 self.parentRender(function() {
                     self.$el.find("div.tab-pane").show(); // FIXME: To remove
                     self.$el.find('ul.nav a:first').tab('show');
+
+                    self.$el.find('.console-tabs .nav-tabs').tabdrop();
 
                     if (callback) {
                         callback();
