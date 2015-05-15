@@ -2,9 +2,9 @@
     <div class="page-header">
         <h1>
             {{#if entity.name}}
-            {{t "policy.editResourceType.edit"}}: <strong>{{entity.name}}</strong>
+            {{t "policy.resourceTypes.edit.edit"}}: <strong>{{entity.name}}</strong>
             {{else}}
-            {{t "policy.editResourceType.create"}}
+            {{t "policy.resourceTypes.edit.create"}}
             {{/if}}
 
             <a class="pull-right btn btn-default" href="#resourceTypes/" role="button">{{t 'common.form.cancel'}}</a>
@@ -13,7 +13,7 @@
         <small>{{t "policy.common.realm"}}: {{policyEditorRealmUrlHelper realm}}</small>
     </div>
 
-    <p>{{t "policy.editResourceType.description"}}</p>
+    <p>{{t "policy.resourceTypes.edit.description"}}</p>
 
     <form class="form-horizontal" role="form">
         <div class="panel-group accordion" id="accordion" role="tablist" aria-multiselectable="true">
@@ -21,7 +21,7 @@
                 <div class="panel-heading" role="tab" id="stepOne">
                     <h4 class="panel-title">
                         <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                            {{t "policy.editResourceType.step1"}}
+                            {{t "policy.resourceTypes.edit.step1"}}
                         </a>
                         <span class="help-link" data-help-key="resourceType.nameAndDescription"></span>
                     </h4>
@@ -52,7 +52,7 @@
                 <div class="panel-heading" role="tab" id="stepTwo">
                     <h4 class="panel-title">
                         <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                            {{t "policy.editResourceType.step2"}}
+                            {{t "policy.resourceTypes.edit.step2"}}
                         </a>
                         <span class="help-link" data-help-key="resourceType.patternAndActions"></span>
                     </h4>
@@ -70,7 +70,7 @@
                 <div class="panel-heading" role="tab" id="stepThree">
                     <h4 class="panel-title">
                         <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                            {{t "policy.editResourceType.step3"}}
+                            {{t "policy.resourceTypes.edit.step3"}}
                         </a>
                     </h4>
                 </div>

@@ -1,0 +1,8 @@
+<a href="#resourceType/" class="btn btn-primary">
+    <span class="fa fa-plus"></span> {{t "policy.resourceTypes.list.add"}}
+</a>
+
+<a class="btn btn-danger {{#unless selectedResourceTypes}} disabled {{/unless}}" id="deleteResTypes">
+    <span class="fa fa-close"></span> {{t "policy.common.buttons.deleteSelected"}}
+    {{#if selectedResourceTypes}} ({{selectedResourceTypes.length}}) {{/if}}
+</a>

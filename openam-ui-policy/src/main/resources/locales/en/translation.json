@@ -354,17 +354,21 @@
                 "grid": ["Edit", "Name", "Description", "Resource Types"],
                 "filterBy": "Filter by __value__",
                 "noResults": "No results to display"
+            },
+            "edit": {
+                "editApplication": "Edit Application",
+                "title": "Create Application",
+                "description": "To configure an application, begin with Step 1 and progress through to Step 3. Modifications can be made after the application has been created.",
+                "step1": "Step 1: Name the Application",
+                "step2": "Step 2: Specify Resource Types",
+                "step3": "Step 3: Review Configuration and Finish",
+                "viewPolicies": "View Policies",
+                "resourceTypes": {
+                    "addResourceTypes": "Use the drop down list or start typing to add resource types.",
+                    "availableResourceTypes": "Available Resource Types",
+                    "selectedResourceTypes": "Selected Resource Types"
+                }
             }
-        },
-
-        "editApplications": {
-            "editApplication": "Edit Application",
-            "title": "Create Application",
-            "description": "To configure an application, begin with Step 1 and progress through to Step 3. Modifications can be made after the application has been created.",
-            "step1": "Step 1: Name the Application",
-            "step2": "Step 2: Specify Resource Types",
-            "step3": "Step 3: Review Configuration and Finish",
-            "viewPolicies": "View Policies"
         },
 
         "managePolicies": {
@@ -413,25 +417,23 @@
 
         },
 
-        "manageResourceTypes": {
-            "title": "Resource Types",
-            "add":"Add New Resource Type"
-        },
-
-        "editResourceType": {
-            "description": "To configure a resource type, begin with Step 1 and progress through to Step 3. Modifications can be made after the resource type has been created.",
-            "edit": "Edit Resource Type",
-            "create": "Create Resource Type",
-            "step1": "Step 1: Name the Resource Type",
-            "step2": "Step 2: Specify Patterns and Actions",
-            "step3": "Step 3: Review Configuration and Finish",
-            "addNewPattern": "Add new pattern"
-        },
-
-        "resourceTypes": {
-            "addResourceTypes": "Use the drop down list or start typing to add resource types.",
-            "availableResourceTypes": "Available Resource Types",
-            "selectedResourceTypes": "Selected Resource Types"
+        "resourceTypes":{
+            "list": {
+                "add": "Add New Resource Type",
+                "title": "Resource Types",
+                "grid": ["Name", "Description", "Patterns", "Actions"],
+                "filterBy": "Filter by __value__",
+                "noResults": "No results to display"
+            },
+            "edit": {
+                "description": "To configure a resource type, begin with Step 1 and progress through to Step 3. Modifications can be made after the resource type has been created.",
+                "edit": "Edit Resource Type",
+                "create": "Create Resource Type",
+                "step1": "Step 1: Name the Resource Type",
+                "step2": "Step 2: Specify Patterns and Actions",
+                "step3": "Step 3: Review Configuration and Finish",
+                "addNewPattern": "Add new pattern"
+            }
         },
 
         "actions": {

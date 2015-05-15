@@ -675,14 +675,6 @@ input[type="text"]:invalid:required, input[type="text"].invalid, select:invalid:
     margin-top:-300px;
 }
 
-.global-actions {
-    margin: 20px 0 0 0;
-
-    .btn {
-        margin-right: 3px;
-    }
-}
-
 // TODO: used only on referrals page, can be removed
 #selectableRealmContainer{
     padding: 0 30px 0 0px;
@@ -1268,56 +1260,6 @@ body.editing {
     -webkit-box-shadow: none;
 }
 
-/* Backgrid */
-.backgrid {
-    thead th {
-        vertical-align: top;
-        text-align: left;
-        border-width: 2px;
-        padding: 0 15px 8px;
-
-        .form-search {
-            margin: 5px 0 0 0;
-
-            input[type=search] {
-                padding-left: 25px;
-            }
-        }
-    }
-
-    tbody {
-        tr {
-            &:nth-child(2n) {
-                background-color: #fff;
-            }
-
-            &:hover, &:focus {
-                cursor: pointer;
-            }
-
-            &.selected {
-                background-color: #d9edf7;
-            }
-
-            &.empty {
-                background-color: #d9edf7;
-                td {
-                    display: table-cell;
-                    color: #31708f;
-                }
-            }
-
-            td {
-                padding: 8px 15px;
-
-                &.select-row-cell {
-                    width: 42px;
-                }
-
-                &.template-cell {
-                    width: 61px;
-                }
-            }
-        }
-    }
+.multiple-columns {
+    .multi-column-layout(2, 10px);
 }

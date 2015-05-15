@@ -22,12 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/**
- * @author Eugenia Sergueeva
- * @author Pavel Shapovalov
- */
-
-/*global define, $, _ */
+/*global define, $, _, Backgrid, Backbone */
 
 define("org/forgerock/openam/ui/policy/resourcetypes/ResourceTypesListView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
@@ -36,8 +31,16 @@ define("org/forgerock/openam/ui/policy/resourcetypes/ResourceTypesListView", [
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/openam/ui/policy/delegates/PolicyDelegate"
-], function (AbstractView, GenericGridView, UIUtils, Router, Constants, Configuration, PolicyDelegate) {
+    "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/components/Messages",
+    "org/forgerock/openam/ui/common/util/URLHelper",
+    "org/forgerock/openam/ui/common/util/RealmHelper",
+    "org/forgerock/openam/ui/policy/delegates/PolicyDelegate",
+    "org/forgerock/openam/ui/policy/resourcetypes/ResourceTypeModel",
+    "org/forgerock/openam/ui/policy/util/BackgridUtils"
+], function (AbstractView, GenericGridView, UIUtils, Router, Constants, Configuration, EventManager, Messages, URLHelper,
+             RealmHelper, PolicyDelegate, ResourceTypeModel, BackgridUtils) {
+
     var ResourceTypesListView = AbstractView.extend({
         template: "templates/policy/resourcetypes/ResourceTypesListTemplate.html",
         events: {
@@ -45,81 +48,126 @@ define("org/forgerock/openam/ui/policy/resourcetypes/ResourceTypesListView", [
         },
 
         render: function (args, callback) {
+            var self = this,
+                ResourceTypes,
+                columns,
+                grid,
+                paginator,
+                ClickableRow;
+
             this.data.realm = Configuration.globalData.auth.realm;
+            this.data.selectedResourceTypes = [];
+
+            ResourceTypes = Backbone.PageableCollection.extend({
+                url: URLHelper.substitute("__api__/resourcetypes"),
+                model: ResourceTypeModel,
+                queryParams: {
+                    _queryFilter: BackgridUtils.queryFilter,
+                    pageSize: null,  // todo implement pagination
+                    _pagedResultsOffset: null //todo implement pagination
+                },
+
+                parseRecords: BackgridUtils.parseRecords,
+                sync: function (method, model, options) {
+                    options.beforeSend = function (xhr) {
+                        xhr.setRequestHeader('Accept-API-Version', 'protocol=1.0,resource=1.0');
+                    };
+                    return BackgridUtils.sync(method, model, options);
+                }
+            });
+
+            ClickableRow = BackgridUtils.ClickableRow.extend({
+                callback: function (e) {
+                    var $target = $(e.target);
+
+                    if ($target.is('input') || $target.parents('.select-row-cell').length === 1) {
+                        return;
+                    }
+                    Router.routeTo(Router.configuration.routes.editResourceType, {args: [this.model.id], trigger: true});
+                }
+            });
+
+            columns = [
+                {
+                    name: "",
+                    cell: "select-row",
+                    headerCell: "select-all"
+                },
+                {
+                    name: "name",
+                    label: $.t("policy.resourceTypes.list.grid.0"),
+                    cell: "string",
+                    headerCell: BackgridUtils.FilterHeaderCell,
+                    editable: false
+                },
+                {
+                    name: "description",
+                    label: $.t("policy.resourceTypes.list.grid.1"),
+                    cell: "string",
+                    headerCell: BackgridUtils.FilterHeaderCell,
+                    editable: false
+                },
+                {
+                    name: "patterns",
+                    label: $.t("policy.resourceTypes.list.grid.2"),
+                    cell: BackgridUtils.ArrayCell,
+                    headerCell: BackgridUtils.FilterHeaderCell,
+                    editable: false
+                },
+                {
+                    name: "actions",
+                    label: $.t("policy.resourceTypes.list.grid.3"),
+                    cell: BackgridUtils.ObjectCell,
+                    headerCell: BackgridUtils.FilterHeaderCell,
+                    editable: false
+                }
+            ];
+
+            self.data.resourceTypes = new ResourceTypes();
+
+            self.data.resourceTypes.on("backgrid:selected", function (model, selected) {
+                self.onRowSelect(model, selected);
+            });
+
+            grid = new Backgrid.Grid({
+                columns: columns,
+                row: ClickableRow,
+                collection: self.data.resourceTypes,
+                emptyText: $.t("policy.resourceTypes.list.noResults")
+            });
+
+            paginator = new Backgrid.Extension.Paginator({
+                collection: self.data.resourceTypes,
+                windowSize: 3
+            });
 
             this.parentRender(function () {
-                this.subrealm = this.data.realm !== "/" ? this.data.realm : "";
-                this.resTypesGridView = new GenericGridView();
-                this.resTypesGridView.render(this.data, {
-                    rowUid: 'uuid',
-                    element: '#manageResTypes',
-                    tpl: 'templates/policy/resourcetypes/ResourceTypesListGridTemplate.html',
-                    actionsTpl: 'templates/policy/resourcetypes/ResourceTypesListGridActionsTemplate.html',
-                    gridId: 'resTypes',
-                    initOptions: this.getGridInitOptions(),
-                    additionalOptions: this.getGridAdditionalOptions()
-                }, callback);
+                this.renderToolbar();
+
+                this.$el.find("#backgridContainer").append(grid.render().el);
+                this.$el.find("#paginationContainer").append(paginator.render().el);
+
+                this.data.resourceTypes.fetch({reset: true}).done(function (xhr) {
+                    if (callback) {
+                        callback();
+                    }
+                });
             });
         },
 
-        getGridInitOptions: function () {
-            var self = this;
+        onRowSelect: function (model, selected) {
+            if (selected) {
+                this.data.selectedResourceTypes.push(model.id);
+            } else {
+                this.data.selectedResourceTypes = _.without(this.data.selectedResourceTypes, model.id);
+            }
 
-            return {
-                url: '/' + Constants.context + '/json' + this.subrealm + '/resourcetypes',
-                colNames: ['', 'Name', 'Description', 'Level', 'Pattern', 'Actions', 'uuid'],
-                colModel: [
-                    {name: 'iconChB', width: 40, sortable: false, formatter: this.resTypesGridView.checkBoxFormatter, frozen: true, title: false, search: false, hidedlg: true},
-                    {name: 'name', width: 240, frozen: true, hidedlg: true},
-                    {name: 'description', width: 232, sortable: false},
-                    {name: 'level', width: 240, hidden: true},
-                    {name: 'patterns', width: 231, sortable: false, formatter: UIUtils.commonJQGridFormatters.arrayFormatter},
-                    {name: 'actions', width: 150, sortable: false, search: false, formatter: UIUtils.commonJQGridFormatters.objectFormatter},
-                    {name: 'uuid', hidden: true, hidedlg: true}
-                ],
-                beforeSelectRow: function (rowId, e) {
-                    var checkBoxCellSelected = self.resTypesGridView.isCheckBoxCellSelected(e);
-                    if (!checkBoxCellSelected) {
-                        self.editResourceType(e);
-                    }
-                    return checkBoxCellSelected;
-                },
-                onSelectRow: function (rowid, status, e) {
-                    self.resTypesGridView.onRowSelect(rowid, status, e);
-                },
-                sortname: 'name',
-                autowidth: true,
-                shrinkToFit: false,
-                pager: '#resTypesPager'
-            };
+            this.renderToolbar();
         },
 
-        getGridAdditionalOptions: function () {
-            var self = this;
-            return {
-                search: true,
-                columnChooserOptions: {
-                    width: 501,
-                    height: 230
-                },
-                storageKey: 'PE-mng-restypes-sel-' + this.data.realm,
-                // TODO: completely remove serializeGridData() from here once AME-4925 is ready.
-                serializeGridData: function (postedData) {
-                    var colNames = _.pluck($(this).jqGrid('getGridParam', 'colModel'), 'name');
-                    return self.resTypesGridView.serializeDataToFilter(postedData, colNames);
-                },
-                callback: function () {
-                    self.resTypesGridView.grid.on('jqGridAfterInsertRow', function (e, rowid, rowdata) {
-                        self.resTypesGridView.selectRow(e, rowid, rowdata);
-                    });
-                    self.resTypesGridView.grid.jqGrid('setFrozenColumns');
-                }
-            };
-        },
-
-        editResourceType: function (e) {
-            var uuid = this.resTypesGridView.data.resTypes.result[this.resTypesGridView.getSelectedRowId(e) - 1].uuid;
-            Router.routeTo(Router.configuration.routes.editResourceType, {args: [uuid], trigger: true});
+        renderToolbar: function () {
+            this.$el.find('#gridToolbar').html(UIUtils.fillTemplateWithData(
+                "templates/policy/resourcetypes/ResourceTypesListToolbarTemplate.html", this.data));
         },
 
         deleteResourceTypes: function (e) {
@@ -129,12 +177,31 @@ define("org/forgerock/openam/ui/policy/resourcetypes/ResourceTypesListView", [
                 return;
             }
 
-            var self = this, i, length, promises = [];
-            for (i = 0, length = this.resTypesGridView.selectedItems.length; i < length; i++) {
-                promises.push(PolicyDelegate.deleteResourceType(self.resTypesGridView.selectedItems[i]));
-            }
+            var self = this,
+                i = 0,
+                app,
+                onAppDestroy = function () {
+                    self.data.selectedResourceTypes = [];
+                    self.data.resourceTypes.fetch({reset: true});
+                    self.renderToolbar();
+                },
+                onSuccess = function (model, response, options) {
+                    onAppDestroy();
+                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, 'deleteSuccess');
+                },
+                onError = function (model, response, options) {
+                    onAppDestroy();
+                    Messages.messages.addMessage({message: response.responseJSON.message, type: 'error'});
+                };
 
-            this.resTypesGridView.deleteItems(e, promises);
+            for (; i < this.data.selectedResourceTypes.length; i++) {
+                app = this.data.resourceTypes.get(this.data.selectedResourceTypes[i]);
+
+                app.destroy({
+                    success: onSuccess,
+                    error: onError
+                });
+            }
         }
     });
 

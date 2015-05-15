@@ -79,7 +79,7 @@ define([
                     EditAppView.resourceTypesListView = new StripedList();
                     EditAppView.resourceTypesListView.render({
                         items: availableNames,
-                        title: $.t('policy.resourceTypes.availableResourceTypes'),
+                        title: $.t('policy.applications.edit.resourceTypes.availableResourceTypes'),
                         filter: true,
                         clickItem: EditAppView.selectResourceType.bind(EditAppView)
                     }, '<div></div>', function () {
@@ -87,7 +87,7 @@ define([
                         EditAppView.resourceTypesListSelectedView = new StripedList();
                         EditAppView.resourceTypesListSelectedView.render({
                             items: EditAppView.data.options.selectedResourceTypeNames,
-                            title: $.t('policy.resourceTypes.selectedResourceTypes'),
+                            title: $.t('policy.applications.edit.resourceTypes.selectedResourceTypes'),
                             created: true,
                             clickItem: EditAppView.deselectResourceType.bind(EditAppView)
                         }, '<div></div>', function () {
@@ -149,7 +149,7 @@ define([
                     EditAppView.resourceTypesListView = new StripedList();
                     EditAppView.resourceTypesListView.render({
                         items: availableNames,
-                        title: $.t('policy.resourceTypes.availableResourceTypes'),
+                        title: $.t('policy.applications.edit.resourceTypes.availableResourceTypes'),
                         filter: true,
                         clickItem: EditAppView.selectResourceType.bind(EditAppView)
                     }, '<div></div>', function () {
@@ -157,7 +157,7 @@ define([
                         EditAppView.resourceTypesListSelectedView = new StripedList();
                         EditAppView.resourceTypesListSelectedView.render({
                             items: EditAppView.data.options.selectedResourceTypeNames,
-                            title: $.t('policy.resourceTypes.selectedResourceTypes'),
+                            title: $.t('policy.applications.edit.resourceTypes.selectedResourceTypes'),
                             created: true,
                             clickItem: EditAppView.deselectResourceType.bind(EditAppView)
                         }, '<div></div>', function () {

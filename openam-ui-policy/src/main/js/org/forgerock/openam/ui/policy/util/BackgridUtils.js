@@ -66,6 +66,60 @@ define("org/forgerock/openam/ui/policy/util/BackgridUtils", [
         }
     });
 
+    // TODO: candidate for commons
+    obj.ObjectCell = Backgrid.Cell.extend({
+        className: 'object-formatter-cell',
+
+        render: function () {
+            this.$el.empty();
+
+            var object = this.model.get(this.column.attributes.name),
+                result = '<div class="multiple-columns"><dl class="dl-horizontal">',
+                prop;
+
+            for (prop in object) {
+                if (_.isString(object[prop])) {
+                    result += '<dt>' + prop + '</dt><dd>' + object[prop] + '</dd>';
+                } else {
+                    result += '<dt>' + prop + '</dt><dd>' + JSON.stringify(object[prop]) + '</dd>';
+                }
+            }
+            result += '</dl></div>';
+
+            this.$el.append(result);
+
+            this.delegateEvents();
+            return this;
+        }
+    });
+
+    // TODO: candidate for commons
+    obj.ArrayCell = Backgrid.Cell.extend({
+        className: 'array-formatter-cell',
+
+        render: function () {
+            this.$el.empty();
+
+            var arrayVal = this.model.get(this.column.attributes.name),
+                result = '<ul>',
+                i = 0;
+
+            for (; i < arrayVal.length; i++) {
+                if (_.isString(arrayVal[i])){
+                    result += '<li>' + arrayVal[i] + '</li>';
+                } else{
+                    result += '<li>' + JSON.stringify(arrayVal[i]) + '</li>';
+                }
+            }
+            result += '</ul>';
+
+            this.$el.append(result);
+
+            this.delegateEvents();
+            return this;
+        }
+    });
+
     // TODO: candidate for commons, placeholder is the only difference with UMA
     obj.FilterHeaderCell = Backgrid.HeaderCell.extend({
         className: 'filter-header-cell', // todo
@@ -107,11 +161,31 @@ define("org/forgerock/openam/ui/policy/util/BackgridUtils", [
         });
 
         options.data = params.join('&');
-        options.beforeSend = function (xhr) {
-            xhr.setRequestHeader('Accept-API-Version', 'protocol=1.0,resource=2.0');
-        };
+
         return Backbone.sync(method, model, options);
     };
+
+    /**
+     * Clickable Row
+     * <p>
+     * You must extend this row and specify a "callback" attribute e.g.
+     * <p>
+     * MyRow = BackgridUtils.ClickableRow.extend({
+     *     callback: myCallback
+     * });
+     */
+    //TODO: commons candidate
+    obj.ClickableRow = Backgrid.Row.extend({
+        events: {
+            "click": "onClick"
+        },
+
+        onClick: function (e) {
+            if (this.callback) {
+                this.callback(e);
+            }
+        }
+    });
 
     // TODO: candidate for commons, have not changed it, using UMA version
     obj.parseRecords = function (data, options) {

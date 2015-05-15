@@ -68,28 +68,28 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
                 url: URLHelper.substitute("__api__/applications"),
                 model: ApplicationModel,
                 queryParams: {
-                    _queryFilter: BackgridUtils.queryFilter,
+                    _queryFilter: self.getDefaultFilter,
                     pageSize: null,  // todo implement pagination
                     _pagedResultsOffset: null //todo implement pagination
                 },
 
                 parseRecords: BackgridUtils.parseRecords,
-                sync: BackgridUtils.sync
+                sync: function (method, model, options) {
+                    options.beforeSend = function (xhr) {
+                        xhr.setRequestHeader('Accept-API-Version', 'protocol=1.0,resource=2.0');
+                    };
+                    return BackgridUtils.sync(method, model, options);
+                }
             });
 
-            ClickableRow = Backgrid.Row.extend({
-                events: {
-                    "click": "onClick"
-                },
-
-                onClick: function (e) {
+            ClickableRow = BackgridUtils.ClickableRow.extend({
+                callback: function (e) {
                     var $target = $(e.target);
 
                     if ($target.is('a') || $target.is('input') || $target.parents('.select-row-cell').length === 1 ||
                         $target.parents('.template-cell').length === 1) {
                         return;
                     }
-
                     Router.routeTo(Router.configuration.routes.managePolicies, {args: [encodeURIComponent(this.model.id)], trigger: true});
                 }
             });
@@ -128,7 +128,7 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
                 {
                     name: "resourceTypeUuids",
                     label: $.t("policy.applications.list.grid.3"),
-                    cell: "string",
+                    cell: BackgridUtils.ArrayCell,
                     headerCell: BackgridUtils.FilterHeaderCell,
                     editable: false
                 }
@@ -167,25 +167,6 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
                         callback();
                     }
                 });
-
-
-                /*
-                this.appGridView = new GenericGridView();
-                this.appGridView.render(this.data, {
-                    rowUid: 'name',
-                    element: '#manageApps',
-                    tpl: 'templates/policy/applications/AppsListGridTemplate.html',
-                    actionsTpl: 'templates/policy/applications/ApplicationsListToolbarTemplate.html',
-                    gridId: 'apps',
-                    initOptions: this.getGridInitOptions(),
-                    additionalOptions: this.getGridAdditionalOptions()
-                }, function(){
-                    self.$el.find('.fa[data-toggle="popover"]').popover();
-                    if (callback) {
-                        callback();
-                    }
-                });
-                */
             });
         },
 
@@ -207,82 +188,6 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
             Router.routeTo(Router.configuration.routes.editApp, {args: [encodeURIComponent($(e.target).data('appName'))], trigger: true});
         },
 
-        /*
-        getGridInitOptions: function () {
-            var self = this,
-                actionsFormatter = function (cellVal, options, rowObject) {
-                    return UIUtils.fillTemplateWithData("templates/policy/applications/ApplicationsListActionsCellTemplate.html", rowObject);
-                },
-                datePick = function (elem) {
-                    return self.appGridView.datePicker(self.appGridView, elem);
-                };
-
-            return {
-                url: RealmHelper.decorateURLWithOverrideRealm('/' + Constants.context + '/json/applications'),
-                colNames: ['', 'Edit', 'Name', 'Description', 'Application Base', 'Author', 'Created', 'Last Modified'],
-                colModel: [
-                    {name: 'iconChB', width: 40, sortable: false, formatter: this.appGridView.checkBoxFormatter, frozen: true, title: false, search: false, hidedlg: true},
-                    {name: 'tableActions', width: 65, sortable: false, formatter: actionsFormatter, frozen: true, search: false, hidedlg: true},
-                    {name: 'name', width: 262, frozen: true, hidedlg: true, searchoptions: {sopt: ['gt', 'lt', 'ge', 'le', 'eq']}},
-                    {name: 'description', width: 263, sortable: false, searchoptions: {sopt: ['gt', 'lt', 'ge', 'le', 'eq']}},
-                    {name: 'resources', width: 263, sortable: false, search: false, formatter: UIUtils.commonJQGridFormatters.arrayFormatter},
-                    {name: 'createdBy', width: 250, hidden: true},
-                    {name: 'creationDate', width: 150, index: 'creationDate', formatter: UIUtils.commonJQGridFormatters.dateFormatter, hidden: true, searchoptions: {searchhidden: true, dataInit: datePick, sopt: ['gt', 'lt', 'ge', 'le', 'eq']}},
-                    {name: 'lastModifiedDate', width: 150, index: 'lastModifiedDate', formatter: UIUtils.commonJQGridFormatters.dateFormatter, hidden: true, searchoptions: {searchhidden: true, dataInit: datePick, sopt: ['gt', 'lt', 'ge', 'le', 'eq']}}
-                ],
-                beforeSelectRow: function (rowId, e) {
-                    var checkBoxCellSelected = self.appGridView.isCheckBoxCellSelected(e);
-                    if (!checkBoxCellSelected && !$(e.target).hasClass('fa-pencil')) {
-                        self.viewPolicies(e);
-                    }
-                    return checkBoxCellSelected;
-                },
-                onSelectRow: function (rowid, status, e) {
-                    self.appGridView.onRowSelect(rowid, status, e);
-                },
-                search: true,
-                sortname: 'name',
-                autowidth: true,
-                shrinkToFit: false,
-                pager: '#appsPager'
-            };
-        },
-
-        getGridAdditionalOptions: function () {
-            var self = this;
-
-            return {
-                search: true,
-                searchFilter: this.getDefaultFilter(),
-                columnChooserOptions: {
-                    width: 501,
-                    height: 180
-                },
-                storageKey: 'PE-mng-apps-sel-' + this.data.realm,
-                apiVersion: 'protocol=1.0,resource=2.0',
-                // TODO: completely remove serializeGridData() from here once AME-4925 is ready.
-                serializeGridData: function (postedData) {
-                    var colNames = _.pluck($(this).jqGrid('getGridParam', 'colModel'), 'name');
-                    return self.appGridView.serializeDataToFilter(postedData, colNames);
-                },
-                callback: function () {
-                    self.appGridView.grid.on('jqGridAfterInsertRow', function (e, rowid, rowdata) {
-                        self.appGridView.selectRow(e, rowid, rowdata);
-                    });
-
-                    self.appGridView.grid.jqGrid('setFrozenColumns');
-                }
-            };
-        },
-
-        viewPolicies: function (e) {
-            Router.routeTo(Router.configuration.routes.managePolicies, {args: [this.getAppName(e)], trigger: true});
-        },
-
-        getAppName: function (e) {
-            return this.appGridView.grid.getRowData(this.appGridView.getSelectedRowId(e)).name;
-        },
-
         getDefaultFilter: function () {
             var exceptions = '',
                 defaultApplications,
@@ -298,12 +203,11 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
             }
 
             _.each(exceptions, function (string) {
-                returnList.push({field: 'name', op: 'eq', val: '^(?!' + string + '$).*'});
+                returnList.push('name+eq+"^(?!' + string + '$).*"');
             });
 
-            return returnList;
+            return returnList.join('+AND+');
         },
-        */
 
         deleteApplications: function (e) {
             e.preventDefault();

@@ -25,10 +25,9 @@
 /*global define Backgrid, Backbone, _, $*/
 
 define("org/forgerock/openam/ui/editor/util/BackgridUtils", [
-    "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/main/Router",
     "backgrid"
-], function (uiUtils, router, Backgrid) {
+], function (Router, Backgrid) {
     var obj = {};
 
     // todo: candidate for commons, have not changed it, using UMA version
@@ -60,7 +59,7 @@ define("org/forgerock/openam/ui/editor/util/BackgridUtils", [
         gotoUrl: function (e) {
             e.preventDefault();
             var href = $(e.currentTarget).data('href');
-            router.navigate(href, {trigger: true});
+            Router.navigate(href, {trigger: true});
         }
     });
 

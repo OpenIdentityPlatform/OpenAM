@@ -94,7 +94,7 @@ define("org/forgerock/openam/ui/policy/applications/EditApplicationView", [
             this.resourceTypesListView = new StripedList();
             this.resourceTypesListView.render({
                 items: availableNames,
-                title: $.t('policy.resourceTypes.availableResourceTypes'),
+                title: $.t('policy.applications.edit.resourceTypes.availableResourceTypes'),
                 filter: true,
                 clickItem: this.selectResourceType.bind(this)
             }, '#availableResTypes');
@@ -102,7 +102,7 @@ define("org/forgerock/openam/ui/policy/applications/EditApplicationView", [
             this.resourceTypesListSelectedView = new StripedList();
             this.resourceTypesListSelectedView.render({
                 items: this.data.options.selectedResourceTypeNames,
-                title: $.t('policy.resourceTypes.selectedResourceTypes'),
+                title: $.t('policy.applications.edit.resourceTypes.selectedResourceTypes'),
                 created: true,
                 clickItem: this.deselectResourceType.bind(this)
             }, '#selectedResTypes');

@@ -33,7 +33,6 @@ define([
     "text!templates/policy/applications/EditApplicationTemplate.html",
     "text!templates/policy/applications/ApplicationsListToolbarTemplate.html",
     "text!templates/policy/applications/ApplicationsListActionsCellTemplate.html",
-    "text!templates/policy/applications/AppsListGridTemplate.html",
     "text!templates/policy/applications/ApplicationsListTemplate.html",
     "text!templates/policy/applications/ReviewApplicationStepTemplate.html",
 
@@ -75,8 +74,7 @@ define([
     "text!templates/policy/resources/CreatedResourcesTemplate.html",
 
     "text!templates/policy/resourcetypes/EditResourceTypeTemplate.html",
-    "text!templates/policy/resourcetypes/ResourceTypesListGridActionsTemplate.html",
-    "text!templates/policy/resourcetypes/ResourceTypesListGridTemplate.html",
+    "text!templates/policy/resourcetypes/ResourceTypesListToolbarTemplate.html",
     "text!templates/policy/resourcetypes/ResourceTypesListTemplate.html",
     "text!templates/policy/resourcetypes/ResourceTypesActionsTemplate.html",
     "text!templates/policy/resourcetypes/ResourceTypesPatternsTemplate.html",
@@ -96,7 +94,6 @@ define([
             "templates/policy/applications/EditApplicationTemplate.html",
             "templates/policy/applications/ApplicationsListToolbarTemplate.html",
             "templates/policy/applications/ApplicationsListActionsCellTemplate.html",
-            "templates/policy/applications/AppsListGridTemplate.html",
             "templates/policy/applications/ApplicationsListTemplate.html",
             "templates/policy/applications/ReviewApplicationStepTemplate.html",
 
@@ -138,8 +135,7 @@ define([
             "templates/policy/resources/CreatedResourcesTemplate.html",
 
             "templates/policy/resourcetypes/EditResourceTypeTemplate.html",
-            "templates/policy/resourcetypes/ResourceTypesListGridActionsTemplate.html",
-            "templates/policy/resourcetypes/ResourceTypesListGridTemplate.html",
+            "templates/policy/resourcetypes/ResourceTypesListToolbarTemplate.html",
             "templates/policy/resourcetypes/ResourceTypesListTemplate.html",
             "templates/policy/resourcetypes/ResourceTypesActionsTemplate.html",
             "templates/policy/resourcetypes/ResourceTypesPatternsTemplate.html",

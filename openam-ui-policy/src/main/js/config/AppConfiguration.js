@@ -152,7 +152,7 @@ define("config/AppConfiguration", [
 
                         "templates/policy/referrals/ManageReferralsGridActionsTemplate.html",
 
-                        "templates/policy/resourcetypes/ResourceTypesListGridActionsTemplate.html",
+                        "templates/policy/resourcetypes/ResourceTypesListToolbarTemplate.html",
 
                         "templates/policy/common/StripedListItemTemplate.html"
                     ]
