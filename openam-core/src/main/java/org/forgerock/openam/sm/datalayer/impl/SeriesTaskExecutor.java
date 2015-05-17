@@ -29,7 +29,9 @@ import javax.inject.Named;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.impl.queue.QueueSelector;
 import org.forgerock.openam.cts.impl.queue.config.CTSQueueConfiguration;
+import org.forgerock.openam.shared.audit.context.AbstractAuditRequestContextPropagatingDecorator;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
+import org.forgerock.openam.shared.audit.context.AuditRequestContext;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.QueueTimeoutException;
@@ -37,6 +39,7 @@ import org.forgerock.openam.sm.datalayer.api.Task;
 import org.forgerock.openam.sm.datalayer.api.TaskExecutor;
 
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
 
 /**
  * The SeriesTaskExecutor is an executor that allows parallel processing of tasks, while guaranteeing that tasks on a
@@ -172,7 +175,7 @@ public class SeriesTaskExecutor implements TaskExecutor {
     private void offer(BlockingQueue<Task> queue, Task task) throws QueueTimeoutException {
         try {
             debug("Queuing Task {0}", task.toString());
-            if (!queue.offer(task, configuration.getQueueTimeout(), TimeUnit.SECONDS)) {
+            if (!queue.offer(wrap(task), configuration.getQueueTimeout(), TimeUnit.SECONDS)) {
                 throw new QueueTimeoutException(task);
             }
         } catch (InterruptedException e) {
@@ -185,6 +188,36 @@ public class SeriesTaskExecutor implements TaskExecutor {
         if (debug.messageEnabled()) {
             debug.message(MessageFormat.format(
                     CoreTokenConstants.DEBUG_ASYNC_HEADER + format, args));
+        }
+    }
+
+    Task wrap(Task task) {
+        return new AuditRequestContextPropagatingTask(task);
+    }
+
+    /**
+     * <code>Task</code> Decorator that propagates thread local {@link AuditRequestContext} to worker thread.
+     */
+    // As there may be another implementation of TaskExecutor that transfers tasks between threads,
+    // it may be a better idea to put this wrapper logic into DataLayerConnectionModule#configure
+    // by creating a decorator for TaskExecutor that wraps Tasks submitted to TaskExecutor#execute
+    static class AuditRequestContextPropagatingTask
+            extends AbstractAuditRequestContextPropagatingDecorator implements Task {
+
+        private final Task delegate;
+
+        AuditRequestContextPropagatingTask(Task delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public <T> void execute(T connection, TokenStorageAdapter<T> adapter) throws DataLayerException {
+            setContext();
+            try {
+                delegate.execute(connection, adapter);
+            } finally {
+                revertContext();
+            }
         }
     }
 

@@ -11,10 +11,17 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.scripting;
+
+import static org.fest.assertions.Assertions.assertThat;
+import static org.forgerock.openam.scripting.StandardScriptEvaluatorTest.getGroovyScript;
+import static org.forgerock.openam.scripting.StandardScriptEvaluatorTest.getJavascript;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import java.util.List;
 import java.util.concurrent.AbstractExecutorService;
@@ -26,15 +33,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import javax.script.Bindings;
 import javax.script.SimpleBindings;
-import static org.fest.assertions.Assertions.assertThat;
-import static org.forgerock.openam.scripting.StandardScriptEvaluatorTest.getGroovyScript;
-import static org.forgerock.openam.scripting.StandardScriptEvaluatorTest.getJavascript;
+
+import org.forgerock.openam.shared.audit.context.ConfigurableExecutorService;
+import org.forgerock.openam.shared.audit.context.AuditRequestContextPropagatingExecutorService;
 import org.forgerock.util.thread.ExecutorServiceFactory;
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.thread.listener.ShutdownManager;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -131,6 +135,30 @@ public class ThreadPoolScriptEvaluatorTest {
     }
 
     @Test
+    public void shouldReconfigureConfigurableExecutorService() throws Exception {
+        // Given
+        // Configure thread pool with core = max = 1 threads
+        final ThreadPoolExecutor threadPool = new ThreadPoolExecutor(1, 1, 1, TimeUnit.MINUTES,
+                new LinkedBlockingQueue<Runnable>());
+        final ConfigurableExecutorService configurableExecutorService =
+                new AuditRequestContextPropagatingExecutorService(threadPool);
+        testEvaluator = new ThreadPoolScriptEvaluator(scriptEngineManager, configurableExecutorService, mockEvaluator);
+        final int newCoreSize = 50;
+        final int newMaxSize = 100;
+        final ScriptEngineConfiguration newConfiguration = ScriptEngineConfiguration.builder()
+                .withThreadPoolCoreSize(newCoreSize)
+                .withThreadPoolMaxSize(newMaxSize)
+                .build();
+
+        // When
+        scriptEngineManager.setConfiguration(newConfiguration);
+
+        // Then
+        assertThat(threadPool.getCorePoolSize()).isEqualTo(newCoreSize);
+        assertThat(threadPool.getMaximumPoolSize()).isEqualTo(newMaxSize);
+    }
+
+    @Test
     public void shouldDelegateToConfiguredScriptEvaluator() throws Exception {
 
         testEvaluator = new ThreadPoolScriptEvaluator(scriptEngineManager,
@@ -211,4 +239,5 @@ public class ThreadPoolScriptEvaluatorTest {
             });
         }
     }
+
 }

@@ -11,11 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.scripting;
 
+import org.forgerock.openam.shared.audit.context.ConfigurableExecutorService;
+import org.forgerock.openam.shared.audit.context.ExecutorServiceConfigurator;
 import org.forgerock.util.Reject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,34 +133,53 @@ public final class ThreadPoolScriptEvaluator implements ScriptEvaluator {
 
         @Override
         public void onConfigurationChange(final ScriptEngineConfiguration newConfiguration) {
-            try {
-                // This may throw a ClassCastException if implementation changes - handled below
-                final ThreadPoolExecutor threadPool = (ThreadPoolExecutor) executorService;
 
-                if (threadPool.getCorePoolSize() != newConfiguration.getThreadPoolCoreSize() ||
-                    threadPool.getMaximumPoolSize() != newConfiguration.getThreadPoolMaxSize() ||
-                    threadPool.getKeepAliveTime(TimeUnit.SECONDS) != newConfiguration.getThreadPoolIdleTimeoutSeconds())
+            ExecutorServiceConfigurator delegateConfigurator = getDelegateConfigurator(executorService);
+
+            if (delegateConfigurator == null) {
+                LOGGER.warn("Unable to reconfigure script evaluation thread pool - pool is not reconfigurable");
+                return;
+            }
+
+            try {
+
+                if (delegateConfigurator.getCorePoolSize() != newConfiguration.getThreadPoolCoreSize() ||
+                    delegateConfigurator.getMaximumPoolSize() != newConfiguration.getThreadPoolMaxSize() ||
+                    delegateConfigurator.getKeepAliveTime(TimeUnit.SECONDS) != newConfiguration.getThreadPoolIdleTimeoutSeconds())
                 {
 
                     LOGGER.debug("Reconfiguring script evaluation thread pool. " +
                                     "Core pool size: old=%d, new=%d. " +
                                     "Max pool size: old=%d, new=%d. " +
                                     "Idle timeout (seconds): old=%d, new=%d.",
-                            threadPool.getCorePoolSize(), newConfiguration.getThreadPoolCoreSize(),
-                            threadPool.getMaximumPoolSize(), newConfiguration.getThreadPoolMaxSize(),
-                            threadPool.getKeepAliveTime(TimeUnit.SECONDS),
+                            delegateConfigurator.getCorePoolSize(), newConfiguration.getThreadPoolCoreSize(),
+                            delegateConfigurator.getMaximumPoolSize(), newConfiguration.getThreadPoolMaxSize(),
+                            delegateConfigurator.getKeepAliveTime(TimeUnit.SECONDS),
                             newConfiguration.getThreadPoolIdleTimeoutSeconds());
 
-                    threadPool.setCorePoolSize(newConfiguration.getThreadPoolCoreSize());
-                    threadPool.setMaximumPoolSize(newConfiguration.getThreadPoolMaxSize());
-                    threadPool.setKeepAliveTime(newConfiguration.getThreadPoolIdleTimeoutSeconds(), TimeUnit.SECONDS);
+                    delegateConfigurator.setCorePoolSize(newConfiguration.getThreadPoolCoreSize());
+                    delegateConfigurator.setMaximumPoolSize(newConfiguration.getThreadPoolMaxSize());
+                    delegateConfigurator.setKeepAliveTime(newConfiguration.getThreadPoolIdleTimeoutSeconds(), TimeUnit.SECONDS);
                 }
 
-            } catch (ClassCastException ex) {
-                LOGGER.warn("Unable to reconfigure script evaluation thread pool - pool is not reconfigurable");
             } catch (IllegalArgumentException ex) {
                 LOGGER.error("Attempt to configure script evaluation thread pool with invalid parameters", ex);
             }
+        }
+
+        private ExecutorServiceConfigurator getDelegateConfigurator(ExecutorService executorService) {
+
+            if (executorService instanceof ThreadPoolExecutor) {
+                return new ExecutorServiceConfigurator((ThreadPoolExecutor) executorService);
+
+            } else if (executorService instanceof ConfigurableExecutorService) {
+                ConfigurableExecutorService configurableExecutorService = (ConfigurableExecutorService) executorService;
+                if (configurableExecutorService.isConfigurable()) {
+                    return configurableExecutorService.getConfigurator();
+                }
+            }
+
+            return null;
         }
     }
 

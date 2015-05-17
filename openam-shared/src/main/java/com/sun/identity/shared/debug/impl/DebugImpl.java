@@ -38,6 +38,7 @@ import com.sun.identity.shared.debug.IDebug;
 import com.sun.identity.shared.debug.file.DebugFile;
 import com.sun.identity.shared.debug.file.DebugFileProvider;
 import com.sun.identity.shared.debug.file.impl.StdDebugFile;
+import org.forgerock.openam.shared.audit.context.AuditRequestContext;
 import org.forgerock.openam.utils.IOUtils;
 
 import java.io.IOException;
@@ -234,8 +235,10 @@ public class DebugImpl implements IDebug {
     private void record(String msg, Throwable th) {
 
         StringBuilder prefix = new StringBuilder();
-        prefix.append(debugName).append(":").append(this.dateFormat.format(new Date())).append(": ").append(Thread
-                .currentThread().toString());
+        prefix.append(debugName)
+                .append(":").append(this.dateFormat.format(new Date()))
+                .append(": ").append(Thread.currentThread().toString())
+                .append(": TransactionId[").append(AuditRequestContext.getTransactionIdValue()).append("]");
 
         writeIt(prefix.toString(), msg, th);
     }

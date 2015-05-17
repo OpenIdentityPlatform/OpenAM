@@ -137,9 +137,17 @@
             <param-value>org.forgerock.openam.forgerockrest.utils.XMLResourceExceptionHandler</param-value>
         </init-param>
     </filter>
+    <filter>
+        <filter-name>AuditContextFilter</filter-name>
+        <filter-class>org.forgerock.openam.audit.AuditContextFilter</filter-class>
+    </filter>
 
     <!-- filter declaration -->
 
+    <filter-mapping>
+        <filter-name>AuditContextFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
     <filter-mapping>
         <filter-name>amSetupFilter</filter-name>
         <url-pattern>/*</url-pattern>

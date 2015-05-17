@@ -25,10 +25,14 @@
  * $Id: ThreadPool.java,v 1.10 2008/10/04 00:11:46 arviranga Exp $
  *
  */
+/**
+ * Portions Copyrighted 2015 ForgeRock AS.
+ */
 
 package com.iplanet.am.util;
 
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.shared.audit.context.AuditRequestContextPropagatingRunnable;
 
 /**
  * <p>
@@ -153,7 +157,7 @@ public class ThreadPool {
                     throw new ThreadPoolException(poolName + 
                         " thread pool's task queue is full.");
                 } else {
-                    taskList.add(task);
+                    taskList.add(wrap(task));
                 }
             }
             else{
@@ -161,8 +165,12 @@ public class ThreadPool {
             }
         }
         if ((t != null) && (task != null)) {
-            t.runTask(task);
+            t.runTask(wrap(task));
         }
+    }
+
+    private Runnable wrap(Runnable delegate) {
+        return new AuditRequestContextPropagatingRunnable(delegate);
     }
 
     protected synchronized void deductCurrentThreadCount(){

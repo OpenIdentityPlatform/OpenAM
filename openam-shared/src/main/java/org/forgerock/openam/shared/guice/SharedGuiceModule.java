@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.shared.guice;
 
@@ -20,6 +20,7 @@ import com.google.inject.Provides;
 import com.google.inject.name.Names;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.openam.shared.audit.context.AuditRequestContextPropagatingExecutorServiceFactory;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
 import org.forgerock.util.thread.ExecutorServiceFactory;
 import org.forgerock.util.thread.listener.ShutdownManager;
@@ -42,13 +43,16 @@ public class SharedGuiceModule extends AbstractModule {
 
     @Provides @Inject
     ExecutorServiceFactory provideExecutorServiceFactory(ShutdownManager manager) {
-        return new ExecutorServiceFactory(manager);
+        return new AuditRequestContextPropagatingExecutorServiceFactory(manager);
     }
 
     @Provides @Inject @Singleton
     ThreadMonitor provideThreadMonitor(ExecutorServiceFactory factory,
                                               ShutdownManager wrapper,
                                               @Named(DEBUG_THREAD_MANAGER) Debug debug) {
-        return new ThreadMonitor(factory.createCachedThreadPool(DEBUG_THREAD_MANAGER), wrapper, debug);
+        return new ThreadMonitor(
+                factory.createCachedThreadPool(DEBUG_THREAD_MANAGER),
+                wrapper,
+                debug);
     }
 }
