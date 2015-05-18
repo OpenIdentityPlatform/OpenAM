@@ -75,11 +75,13 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegate", [
                 _.each(chainsData[0].result, function(obj) {
 
                     if (obj._id === valuesData[0].adminAuthModule) {
-                        obj.active = { adminAuthModule: true };
+                        obj.active = obj.active || {};
+                        obj.active.adminAuthModule = true;
                     }
 
                     if (obj._id === valuesData[0].orgConfig ) {
-                        obj.active = { orgConfig: true };
+                        obj.active = obj.active || {};
+                        obj.active.orgConfig = true;
                     }
 
                 });
