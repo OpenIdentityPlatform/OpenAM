@@ -191,7 +191,7 @@ public class RestEndpointManagerImpl implements RestEndpointManager {
 
             boolean isInVariable = false;
             int elementStart = 0;
-            builder.append("(");
+            builder.append(".*(");
             for (int i = 0; i < t.length(); i++) {
                 final char c = t.charAt(i);
                 if (isInVariable) {
