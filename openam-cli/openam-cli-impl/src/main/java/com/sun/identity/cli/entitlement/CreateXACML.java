@@ -68,7 +68,7 @@ import java.util.List;
  * Converts access policies read from XACML XML into Entitlement Framework Privileges
  * and then imports these into the specified realm.
  */
-public class ImportXACML extends AuthenticatedCommand {
+public class CreateXACML extends AuthenticatedCommand {
 
     /**
      * Services the command line request to import XACML.
@@ -122,11 +122,11 @@ public class ImportXACML extends AuthenticatedCommand {
 
             importSteps = xacmlExportImport.importXacml(realm, xacmlInputStream, adminSubject, isDryRun());
         } catch (EntitlementException e) {
-            debugError("ImportXACML.handleRequest", e);
+            debugError("CreateXACML.handleRequest", e);
             logException(realm, e);
             throw new CLIException(e, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         } catch (SMSException e) {
-            debugError("ImportXACML.handleRequest", e);
+            debugError("CreateXACML.handleRequest", e);
             logException(realm, e);
             throw new CLIException(e, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         }
@@ -183,7 +183,7 @@ public class ImportXACML extends AuthenticatedCommand {
         EntitlementConfiguration ec = EntitlementConfiguration.getInstance(adminSubject, "/");
         if (!ec.migratedToEntitlementService()) {
             String[] args = {realm, "ANY", "create-xacml not supported in  legacy policy mode"};
-            debugError("ImportXACML.handleRequest(): create-xacml not supported in  legacy policy mode");
+            debugError("CreateXACML.handleRequest(): create-xacml not supported in  legacy policy mode");
             writeLog(LOG_ERROR, INFO, "FAILED_CREATE_POLICY_IN_REALM", args);
             throw new CLIException(getResourceString("create-xacml-not-supported-in-legacy-policy-mode"),
                     ExitCodes.REQUEST_CANNOT_BE_PROCESSED,
@@ -204,7 +204,7 @@ public class ImportXACML extends AuthenticatedCommand {
             try {
                 inputStream = new FileInputStream(datafile);
             } catch (FileNotFoundException e) {
-                debugError("ImportXACML.handleRequest", e);
+                debugError("CreateXACML.handleRequest", e);
                 logException(realm, e);
                 throw new CLIException(e, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
             }
@@ -236,11 +236,11 @@ public class ImportXACML extends AuthenticatedCommand {
             fout = new FileOutputStream(getOutfileName(), true); // appending to be consistent with ListXACML
             pwout = new PrintWriter(fout, true);
         } catch (FileNotFoundException e) {
-            debugError("ImportXACML.writeToOutputFile", e);
+            debugError("CreateXACML.writeToOutputFile", e);
             IOUtils.closeIfNotNull(fout);
             throw new CLIException(e, ExitCodes.IO_EXCEPTION);
         } catch (SecurityException e) {
-            debugError("ImportXACML.writeToOutputFile", e);
+            debugError("CreateXACML.writeToOutputFile", e);
             IOUtils.closeIfNotNull(fout);
             throw new CLIException(e, ExitCodes.IO_EXCEPTION);
         }

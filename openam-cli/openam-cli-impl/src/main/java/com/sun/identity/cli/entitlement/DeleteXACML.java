@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,13 +22,15 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: RealmDeletePolicy.java,v 1.4 2008/10/31 16:18:39 veiming Exp $
+ * $Id: DeleteXACML.java,v 1.1 2009/11/25 18:54:08 dillidorai Exp $
+ *
+ * Portions Copyrighted 2014-2015 ForgeRock AS
  */
 
-package com.sun.identity.cli.realm;
+package com.sun.identity.cli.entitlement;
 
-import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+
 import com.sun.identity.cli.AttributeValues;
 import com.sun.identity.cli.AuthenticatedCommand;
 import com.sun.identity.cli.CLIException;
@@ -37,18 +39,24 @@ import com.sun.identity.cli.IArgument;
 import com.sun.identity.cli.IOutput;
 import com.sun.identity.cli.LogWriter;
 import com.sun.identity.cli.RequestContext;
-import com.sun.identity.policy.PolicyException;
-import com.sun.identity.policy.PolicyManager;
+
+import com.sun.identity.entitlement.EntitlementConfiguration;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.PrivilegeManager;
+import com.sun.identity.entitlement.opensso.SubjectUtils;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 
+import javax.security.auth.Subject;
+
 /**
  * Deletes policies in a realm.
  */
-public class RealmDeletePolicy extends AuthenticatedCommand {
+public class DeleteXACML extends AuthenticatedCommand {
     static final String ARGUMENT_POLICY_NAMES = "policynames";
     /**
      * Services a Commandline Request.
@@ -57,11 +65,32 @@ public class RealmDeletePolicy extends AuthenticatedCommand {
      * @throws CLIException if the request cannot serviced.
      */
     public void handleRequest(RequestContext rc) 
-        throws CLIException {
+            throws CLIException {
         super.handleRequest(rc);
         ldapLogin();
+
         SSOToken adminSSOToken = getAdminSSOToken();
+        Subject adminSubject = SubjectUtils.createSubject(adminSSOToken);
         String realm = getStringOptionValue(IArgument.REALM_NAME);
+
+        // FIXME: change to use entitlementService.xacmlPrivilegEnabled()
+        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
+            adminSubject, "/");
+        if(!ec.migratedToEntitlementService()) {
+            String[] args = {realm, "ANY", 
+                    "list-xacml not supported in  legacy policy mode"};
+            debugError("DeleteXACML.handleRequest(): "
+                    + "delete-xacml not supported in  legacy policy mode");
+            writeLog(LogWriter.LOG_ERROR, Level.INFO,
+                "FAILED_DELETE_POLICY_IN_REALM", 
+                args);
+            throw new CLIException(
+                getResourceString( 
+                    "delete-xacml-not-supported-in-legacy-policy-mode"), 
+                ExitCodes.REQUEST_CANNOT_BE_PROCESSED,
+                "delete-xacml");
+        }
+
         List policyNames = (List)rc.getOption(ARGUMENT_POLICY_NAMES);
         String file = getStringOptionValue(IArgument.FILE);
         if (policyNames == null) {
@@ -81,7 +110,7 @@ public class RealmDeletePolicy extends AuthenticatedCommand {
         String currentPolicyName = null;
 
         try {
-            PolicyManager pm = new PolicyManager(adminSSOToken, realm);
+            PrivilegeManager pm = PrivilegeManager.getInstance(realm, adminSubject);
             String[] params = new String[2];
             params[0] = realm;
 
@@ -90,7 +119,7 @@ public class RealmDeletePolicy extends AuthenticatedCommand {
                 params[1] = currentPolicyName;
                 writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                     "ATTEMPT_DELETE_POLICY_IN_REALM", params);
-                pm.removePolicy(currentPolicyName);
+                pm.remove(currentPolicyName);
                 writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                     "SUCCEED_DELETE_POLICY_IN_REALM", params);
             }
@@ -99,15 +128,9 @@ public class RealmDeletePolicy extends AuthenticatedCommand {
             outputWriter.printlnMessage(MessageFormat.format(
                 getResourceString("delete-policy-in-realm-succeed"), 
                     (Object[])arg));
-        } catch (PolicyException e) {
+        } catch (EntitlementException e) {
             String[] args = {realm, currentPolicyName, e.getMessage()};
-            debugError("RealmDeletePolicy.handleRequest", e);
-            writeLog(LogWriter.LOG_ERROR, Level.INFO,
-                "FAILED_DELETE_POLICY_IN_REALM", args);
-            throw new CLIException(e ,ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
-        } catch (SSOException e) {
-            String[] args = {realm, currentPolicyName, e.getMessage()};
-            debugError("RealmDeletePolicy.handleRequest", e);
+            debugError("DeleteXACML.handleRequest", e);
             writeLog(LogWriter.LOG_ERROR, Level.INFO,
                 "FAILED_DELETE_POLICY_IN_REALM", args);
             throw new CLIException(e ,ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
