@@ -59,6 +59,35 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegate", [
                     values: valuesData
                 };
             });
+        },
+
+        getWithDefaults: function() {
+            var url = "realm-config/authentication",
+                chainsPromise = obj.serviceCall({
+                    url: url + "/chains?_queryFilter=true"
+                }),
+                valuesPromise = obj.serviceCall({
+                    url: url
+                });
+
+            return $.when(chainsPromise, valuesPromise).then(function(chainsData, valuesData) {
+
+                _.each(chainsData[0].result, function(obj) {
+
+                    if (obj._id === valuesData[0].adminAuthModule) {
+                        obj.active = { adminAuthModule: true };
+                    }
+
+                    if (obj._id === valuesData[0].orgConfig ) {
+                        obj.active = { orgConfig: true };
+                    }
+
+                });
+
+                return {
+                    values: chainsData[0]
+                };
+            });
         }
     };
 

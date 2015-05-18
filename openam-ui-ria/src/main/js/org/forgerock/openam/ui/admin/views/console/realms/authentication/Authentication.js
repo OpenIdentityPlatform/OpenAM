@@ -17,7 +17,7 @@
 /*global define, $, _*/
 define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authentication", [
     "org/forgerock/commons/ui/common/main/AbstractView",
-    'org/forgerock/commons/ui/common/components/BSDialog',
+    "bootstrap-dialog",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -26,7 +26,7 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authen
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/admin/delegates/SMSDelegate",
     "org/forgerock/commons/ui/common/util/UIUtils"
-], function(AbstractView, BSDialog, Configuration, Constants, EventManager, Form, FormHelper, Router, SMSDelegate, UIUtils) {
+], function(AbstractView, BootstrapDialog, Configuration, Constants, EventManager, Form, FormHelper, Router, SMSDelegate, UIUtils) {
     var Authentication = AbstractView.extend({
         template: "templates/admin/views/console/realms/authentication/AuthenticationTemplate.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
@@ -38,10 +38,11 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authen
             // Settings
             'click #saveChanges': 'save',
             // Chains
-            'change input[data-chain-name]': 'chainSelected',
-            'click button[data-chain-name]': 'deleteChain',
-            'click #deleteChains'          : 'deleteChains',
-            'click #addChain'              : 'addChain',
+            'change #chains input[data-chain-name]' : 'chainSelected',
+            'click  #chains button[data-active]'    : 'warningBeforeDeleteChain',
+            'click  #chains button[data-chain-name]:not([data-active])': 'deleteChain',
+            'click  #chains #deleteChains'          : 'deleteChains',
+            'click  #chains #addChain'              : 'addChain',
             // Modules
             'click #addModule':   'addModule'
         },
@@ -50,36 +51,61 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authen
         },
         addChain: function(e) {
             e.preventDefault();
+            var href = $(e.currentTarget).attr('href');
+            BootstrapDialog.show({
+                title: "Enter the chain name",
+                message: '<p>Some helpful text here explaining that you need to name your chain before you can configure it</p><br/><input type="text" id="newName" class="form-control" placeholder="Enter Name"  value="">',
+                buttons: [{
+                    label: $.t("common.form.next"),
+                    cssClass: "btn-primary",
+                    action: function(dialog) {
+                        dialog.close();
+                        //TODO Check name first.
+                        Router.navigate( href + dialog.getModalBody().find('#newName').val(), { trigger: true });
+                    }
+                },{
+                    label: $.t("common.form.cancel"),
+                    action: function(dialog) {
+                        dialog.close();
+                    }
+                }]
+            });
+        },
+        addModule: function(e) {
+            e.preventDefault();
             // This is mock code, please swap out
-            var href = $(e.currentTarget).attr('href'),
-                chainName = '',
-                addChainDialog;
+            var href = $(e.currentTarget).attr('href');
 
-            addChainDialog = new BSDialog();
-            addChainDialog.setTitle('Enter the chain name');
-            addChainDialog.closable = true;
-            addChainDialog.type = "type-default";
-            addChainDialog.message = '<p>Some helpful text here explaining that you need to name your chain before you can configure it</p><br/><input type="text" id="newName" class="form-control" placeholder="Enter Name"  value="">';
-            addChainDialog.actions = [{
-                label: $.t("common.form.next"),
-                cssClass: "btn-primary",
-                action: function(dialog) {
-                    // on success
-                    dialog.close();
-                    Router.navigate( href + $('#newName').val(), { trigger: true });
-                    // on failure - display error, dont close the dialog.
-                }
-            },{
-                label: $.t("common.form.cancel"),
-                action: function(dialog) {
-                    dialog.close();
-                }
-            }];
-            addChainDialog.show();
+            BootstrapDialog.show({
+                title: $.t("console.authentication.modules.addModuleDialogTitle"),
+                message: '<label>Name</label> <input type="text" id="newModuleNme" class="form-control" placeholder=""  value=""> <br/> <label>Type</label> <select class="form-control">  <option disabled selected>Select Module type</option> <option>Active Directory</option> <option>Adaptive Risk </option> <option>Anonymous</option> <option>Certificate</option> <option>Data Store</option> <option>Device Id (Match)</option> <option>Device Id (Save)</option> <option>Federation</option> <option>HOTP</option> <option>HTTP Basic</option> <option>JDBC</option> <option>LDAP</option> <option>Membership</option> <option>MSISDN</option> <option>OATH</option> <option>OAuth 2.0 / OpenID Connect</option> <option>OpenID Connect id_token bearer</option> <option>Persistent Cookie</option> <option>RADIUS</option> <option>SAE</option> <option>Scripted Module</option> <option>Windows Desktop SSO</option> <option>Windows NT</option> <option>WSSAuth</option> </select>',
+                buttons: [{
+                    label: $.t("common.form.next"),
+                    cssClass: "btn-primary",
+                    action: function(dialog) {
+                        dialog.close();
+                        //TODO Check name first.
+                        Router.navigate( href + dialog.getModalBody().find('#newModuleNme').val(), { trigger: true });
+                    }
+                },{
+                    label: $.t("common.form.cancel"),
+                    action: function(dialog) {
+                        dialog.close();
+                    }
+                }]
+            });
         },
         chainSelected: function(event) {
-            var hasChainsSelected = $('input[type=checkbox]').is(':checked');
-            $('#deleteChains').prop('disabled', !hasChainsSelected);
+            var hasChainsSelected = this.$el.find('#chains input[type=checkbox]').is(':checked'),
+                row = $(event.currentTarget).closest('tr'),
+                checked = $(event.currentTarget).is(':checked');
+
+            this.$el.find('#deleteChains').prop('disabled', !hasChainsSelected);
+            if (checked) {
+                row.addClass('selected');
+            } else {
+                row.removeClass('selected');
+            }
         },
         deleteChain: function(event) {
             var self = this,
@@ -95,7 +121,7 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authen
         },
         deleteChains: function() {
             var self = this,
-                chainNames = $('input[type=checkbox]:checked').toArray().map(function(element) {
+                chainNames = self.$el.find('#chains input[type=checkbox]:checked').toArray().map(function(element) {
                     return $(element).attr('data-chain-name');
                 }),
                 promises = chainNames.map(function(name) {
@@ -110,40 +136,10 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authen
                 // TODO: Add failure condition
             });
         },
-        addModule: function(e) {
-            e.preventDefault();
-            // This is mock code, please swap out
-            var href = $(e.currentTarget).attr('href'),
-                addModuleDialog;
-
-            addModuleDialog = new BSDialog();
-            addModuleDialog.setTitle($.t("console.authentication.modules.addModuleDialogTitle"));
-            addModuleDialog.closable = true;
-            addModuleDialog.type = "type-default";
-            addModuleDialog.message = '<label>Name</label> <input type="text" id="newModuleNme" class="form-control" placeholder=""  value=""> <br/> <label>Type</label> <select class="form-control">  <option disabled selected>Select Module type</option> <option>Active Directory</option> <option>Adaptive Risk </option> <option>Anonymous</option> <option>Certificate</option> <option>Data Store</option> <option>Device Id (Match)</option> <option>Device Id (Save)</option> <option>Federation</option> <option>HOTP</option> <option>HTTP Basic</option> <option>JDBC</option> <option>LDAP</option> <option>Membership</option> <option>MSISDN</option> <option>OATH</option> <option>OAuth 2.0 / OpenID Connect</option> <option>OpenID Connect id_token bearer</option> <option>Persistent Cookie</option> <option>RADIUS</option> <option>SAE</option> <option>Scripted Module</option> <option>Windows Desktop SSO</option> <option>Windows NT</option> <option>WSSAuth</option> </select>';
-            addModuleDialog.actions = [{
-                label: $.t("common.form.next"),
-                cssClass: "btn-primary",
-                action: function(dialog) {
-                    // on success
-                    dialog.close();
-                    Router.navigate( href + $('#newModuleNme').val(), { trigger: true });
-                    // on failure - display error, dont close the dialog.
-                }
-            },{
-                label: $.t("common.form.cancel"),
-                action: function(dialog) {
-                    dialog.close();
-                }
-            }];
-            addModuleDialog.show();
-        },
-
         editChain: function(e) {
             e.preventDefault();
             Router.navigate( '#console/chaining/', {trigger: true});
         },
-
         render: function(args, callback) {
             var self = this;
 
@@ -181,16 +177,29 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authen
             });
         },
         renderChainsTab: function(event) {
-            var self = this;
-            SMSDelegate.RealmAuthenticationChains.get()
+            var self = this,
+                sortedChains = [];
+
+            SMSDelegate.RealmAuthenticationChains.getWithDefaults()
             .done(function(data) {
-                UIUtils.fillTemplateWithData("templates/admin/views/console/realms/authentication/ChainsTemplate.html", data.values.result, function(html) {
+
+                _.each(data.values.result, function(obj) {
+                    // Add default chains to top of list.
+                    if ( obj.active) {
+                        sortedChains.unshift(obj);
+                    } else {
+                        sortedChains.push(obj);
+                    }
+                });
+
+                UIUtils.fillTemplateWithData("templates/admin/views/console/realms/authentication/ChainsTemplate.html", sortedChains, function(html) {
                     self.$el.find('#chains').html(html);
                 });
             })
             .fail(function() {
                 // TODO: Add failure condition
             });
+
         },
         renderModulesTab: function(event) {
             var self = this;
@@ -209,6 +218,28 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authen
             var promise = SMSDelegate.RealmAuthentication.save(this.data.form.data());
 
             FormHelper.bindSavePromiseToElement(promise, event.target);
+        },
+        warningBeforeDeleteChain: function(event) {
+            var self = this,
+                chainName = $(event.currentTarget).attr('data-chain-name');
+
+            BootstrapDialog.show({
+                title: "Delete " + chainName,
+                type: BootstrapDialog.TYPE_DANGER,
+                message: '<p>This chain is being used as one of the default chains. Deleting may result in locking out the administors or the users.</p><p>Are you sure you want to continue?</p>',
+                buttons: [{
+                    label: "Delete",
+                    cssClass: "btn-danger",
+                    action: function(dialog) {
+                        self.deleteChain(event);
+                    }
+                }, {
+                    label: "Cancel",
+                    action: function(dialog) {
+                        dialog.close();
+                    }
+                }]
+            });
         }
     });
 

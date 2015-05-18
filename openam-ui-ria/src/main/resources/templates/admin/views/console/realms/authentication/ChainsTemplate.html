@@ -1,10 +1,10 @@
 <div class="tab-pane-body">
     <div class="panel-body">
-        <p class="panel-description">OpenAM uses authentication chains to control the authentication flow the user. Use this section to add, configure or remove the realms set of authentication chains.</p>
+        <p class="panel-description">{{t 'console.authentication.chains.description'}}</p>
         <table class="table table-hover table-striped">
             <thead>
                 <tr>
-                    <th class="col-md-1">Select</th>
+                    <th class="col-md-1">{{t 'common.form.select'}}</th>
                     <th class="col-md-9"/>
                     <th class="col-md-2"/>
                 </tr>
@@ -12,12 +12,15 @@
             <tbody>
                 {{#each this}}
                 <tr>
-                    <td><input data-chain-name="{{_id}}" type="checkbox"/></td>
-                    <td>{{_id}}</td>
+                    <td><input data-chain-name="{{_id}}" type="checkbox" {{#if active}}disabled{{/if}}/></td>
+                    <td>{{_id}} {{#if active}}
+                        <div class="active-config">{{#if active.adminAuthModule}}{{t 'console.authentication.chains.defaultAdminAuthConfiguration'}} {{#if active.orgConfig}}/ {{/if}}{{/if}}{{#if active.orgConfig}}{{t 'console.authentication.chains.defaultOrgAuthConfiguration'}} {{/if}}</div>{{/if}}</td>
                     <td>
                         <div class="pull-right">
                             <button type="button" class="btn btn-transparent"><i class="fa fa-pencil"></i></button>
-                            <button type="button" class="btn btn-transparent" data-chain-name="{{_id}}"><i class="fa fa-close"></i></button>
+                            <button type="button" class="btn btn-transparent" data-chain-name="{{_id}}" {{#if active}}data-active="true"{{/if}}>
+                                <i class="fa fa-close"></i>
+                            </button>
                         </div>
                     </td>
                 </tr>
@@ -28,7 +31,7 @@
 </div>
 <div class="tab-pane-footer clearfix">
     <div class="pull-right">
-        <button class="btn btn-sm btn-default" disabled id="deleteChains" type="button">Delete</button>
-        <a href="#console/realms/authentication/chains/" id="addChain" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> Add Chain</a>
+        <button class="btn btn-sm btn-default" disabled id="deleteChains" type="button">{{t 'common.form.delete'}}</button>
+        <a href="#console/realms/authentication/chains/" id="addChain" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> {{t 'console.authentication.chains.action'}}</a>
     </div>
 </div>
