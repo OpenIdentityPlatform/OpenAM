@@ -217,6 +217,7 @@
             "home" : "Home",
             "start" : "Start",
             "continue" : "Continue",
+            "next" : "Next",
             "back" : "Back",
             "delete" : "Delete",
             "details" : "Details",
@@ -471,6 +472,12 @@
             "settings": {
                 "advancedSettings": "Advanced Settings",
                 "saveChanges": "Save Changes"
+            },
+            "modules": {
+                "description" : "OpenAM uses authentication modules to identify the user. Normally authentication modules are associated with an authentication chain. Each realm has a default authentication chain that will be used to authenticate users. This section is used to add, configure or remove authentication module available for authentication into this realm.",
+                "addModuleDialogTitle" : "Create new Module", 
+                "addModule": "Add Module",
+                "deleteModule": "Delete"    
             }
         }
     }
