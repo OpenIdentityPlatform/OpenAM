@@ -1039,6 +1039,9 @@ public class Session extends GeneralTaskRunnable {
      * @param sid Session ID.
      */
     public static void removeSID(SessionID sid) {
+        if(sid == null || sid.isNull()){
+            return;
+        }
         Session session = readSession(sid);
         if (session != null) {
 
