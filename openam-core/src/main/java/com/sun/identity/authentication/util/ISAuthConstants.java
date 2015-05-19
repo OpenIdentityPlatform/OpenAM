@@ -675,4 +675,8 @@ public interface ISAuthConstants {
     
     // Property name for user password attribute
     public static final String ATTR_USER_PASSWORD = "userpassword";
+
+    //Property name for forcing two factor auth
+    public static final String TWO_FACTOR_AUTH_MANDATORY = "forgerockTwoFactorAuthMandatory";
+
 }

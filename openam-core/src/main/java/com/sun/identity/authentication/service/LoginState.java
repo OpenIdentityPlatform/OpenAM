@@ -28,6 +28,10 @@
  */
 package com.sun.identity.authentication.service;
 
+import static java.util.Collections.*;
+import static org.forgerock.openam.session.SessionConstants.*;
+import static org.forgerock.openam.utils.CollectionUtils.*;
+
 import com.iplanet.am.sdk.AMException;
 import com.iplanet.am.sdk.AMObject;
 import com.iplanet.am.sdk.AMStoreConnection;
@@ -75,16 +79,6 @@ import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceManager;
-import org.forgerock.openam.authentication.service.DefaultSessionPropertyUpgrader;
-import org.forgerock.openam.authentication.service.SessionPropertyUpgrader;
-import org.forgerock.openam.utils.ClientUtils;
-
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.net.InetAddress;
 import java.security.AccessController;
 import java.security.NoSuchAlgorithmException;
@@ -103,10 +97,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-
-import static java.util.Collections.unmodifiableSet;
-import static org.forgerock.openam.session.SessionConstants.*;
-import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.forgerock.openam.authentication.service.DefaultSessionPropertyUpgrader;
+import org.forgerock.openam.authentication.service.SessionPropertyUpgrader;
+import org.forgerock.openam.utils.ClientUtils;
 
 /**
  * This class maintains the User's login state information from the time user
@@ -174,6 +173,7 @@ public class LoginState {
 
     }
 
+    private boolean mandatory2fa;
     private boolean userIDGeneratorEnabled;
     private String userIDGeneratorClassName;
     private boolean loginFailureLockoutMode = false;
@@ -786,6 +786,11 @@ public class LoginState {
                     attrs, ISAuthConstants.USERNAME_GENERATOR);
             if (tmp != null) {
                 setUserIDGeneratorEnabled(Boolean.valueOf(tmp));
+            }
+
+            tmp = CollectionHelper.getMapAttr(attrs, ISAuthConstants.TWO_FACTOR_AUTH_MANDATORY);
+            if (tmp != null) {
+                setMandatory2FAValue(tmp);
             }
 
             setUserIDGeneratorClassName(CollectionHelper.getMapAttr(
@@ -6043,6 +6048,10 @@ public class LoginState {
         this.loginLockoutAttrName = loginLockoutAttrName;
     }
 
+    public void setMandatory2FAValue(final String mandatory2FAValue) {
+        this.mandatory2fa = Boolean.parseBoolean(mandatory2FAValue);
+    }
+
     public void setLoginLockoutAttrValue(final String loginLockoutAttrValue) {
         this.loginLockoutAttrValue = loginLockoutAttrValue;
     }
@@ -6073,6 +6082,10 @@ public class LoginState {
 
     public void setFailureTokenId(final String failureTokenId) {
         this.failureTokenId = failureTokenId;
+    }
+
+    public boolean is2faMandatory() {
+        return mandatory2fa;
     }
 
     /**

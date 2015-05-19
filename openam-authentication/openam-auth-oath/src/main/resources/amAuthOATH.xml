@@ -123,19 +123,6 @@
                     </DefaultValues>
                 </AttributeSchema>
 
-                <AttributeSchema name="iplanet-am-auth-oath-is-optional"
-                                 type="single"
-                                 syntax="boolean"
-                                 i18nKey="a512"
-                                 resourceName="oathIsOptional">
-                    <ChoiceValues>
-                        <ChoiceValue i18nKey="true">True</ChoiceValue>
-                        <ChoiceValue i18nKey="false">False</ChoiceValue>
-                    </ChoiceValues>
-                    <DefaultValues>
-                        <Value>False</Value>
-                    </DefaultValues>
-                </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-oath-add-checksum"
                                  type="single_choice"
                                  syntax="string"
@@ -261,20 +248,6 @@
                                      resourceName="oathSkippableAttrName">
                         <DefaultValues>
                             <Value>oath2faEnabled</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema name="iplanet-am-auth-oath-is-optional"
-                                     type="single"
-                                     syntax="boolean"
-                                     i18nKey="a512"
-                                     resourceName="oathIsOptional">
-                        <ChoiceValues>
-                            <ChoiceValue i18nKey="true">True</ChoiceValue>
-                            <ChoiceValue i18nKey="false">False</ChoiceValue>
-                        </ChoiceValues>
-                        <DefaultValues>
-                            <Value>False</Value>
                         </DefaultValues>
                     </AttributeSchema>
 

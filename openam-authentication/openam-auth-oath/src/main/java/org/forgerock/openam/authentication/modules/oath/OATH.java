@@ -76,8 +76,6 @@ public class OATH extends AMLoginModule {
             "iplanet-am-auth-oath-hotp-counter-attribute";
     private static final String USER_OATH_ACTIVATED_ATTRIBUTE_NAME =
             "iplanet-am-auth-oath-skippable-attr-name";
-    private static final String IS_OPTIONAL_NAME =
-            "iplanet-am-auth-oath-is-optional";
     private static final String TRUNCATION_OFFSET =
             "iplanet-am-auth-oath-truncation-offset";
     private static final String CHECKSUM = "iplanet-am-auth-oath-add-checksum";
@@ -191,18 +189,19 @@ public class OATH extends AMLoginModule {
                 minSecretKeyLength = 0; //Default value has been delete, set to 0
             }
 
+            this.skippableAttrName = CollectionHelper.getMapAttr(options, USER_OATH_ACTIVATED_ATTRIBUTE_NAME);
+
             this.secretKeyAttrName = CollectionHelper.getMapAttr(
                     options, SECRET_KEY_ATTRIBUTE_NAME);
             this.windowSize = Integer.parseInt(CollectionHelper.getMapAttr(
                     options, WINDOW_SIZE));
             this.counterAttrName = CollectionHelper.getMapAttr(
                     options, COUNTER_ATTRIBUTE_NAME);
-            this.skippableAttrName = CollectionHelper.getMapAttr(
-                    options, USER_OATH_ACTIVATED_ATTRIBUTE_NAME);
             this.truncationOffset = Integer.parseInt(
                     CollectionHelper.getMapAttr(options, TRUNCATION_OFFSET));
-            this.isOptional =
-                    Boolean.parseBoolean(CollectionHelper.getMapAttr(options, IS_OPTIONAL_NAME));
+
+            this.isOptional = !getLoginState("OATH").is2faMandatory();
+
             this.totpTimeStep = Integer.parseInt(
                     CollectionHelper.getMapAttr(options, TOTP_TIME_STEP));
             this.totpStepsInWindow = Integer.parseInt(

@@ -18,11 +18,15 @@ package org.forgerock.openam.forgerockrest;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceConfig;
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import org.forgerock.openam.utils.CollectionUtils;
 
+/**
+ * Static utilities for attribute retrieval/setting for the provided
+ * service config.
+ */
 public class ServiceConfigUtils {
 
     private static Debug debug = Debug.getInstance("frRest");
@@ -56,18 +60,15 @@ public class ServiceConfigUtils {
     public static String getStringAttribute(ServiceConfig serviceConfig, String attributeName) {
         Map<String, Set<String>> attributes = serviceConfig.getAttributes();
         Set<String> attribute = attributes.get(attributeName);
-        if (attribute != null && !attribute.isEmpty()) {
-            return attribute.iterator().next();
-        } else {
-            return null;
-        }
+
+        return CollectionUtils.getFirstItem(attribute, null);
     }
 
     public static Set<String> getSetAttribute(ServiceConfig serviceConfig, String attributeName) {
         Map<String, Set<String>> attributes = serviceConfig.getAttributes();
-        Set attribute = (Set)attributes.get(attributeName);
+        Set attribute = (Set) attributes.get(attributeName);
         if (attribute == null) {
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         } else {
             return attribute;
         }

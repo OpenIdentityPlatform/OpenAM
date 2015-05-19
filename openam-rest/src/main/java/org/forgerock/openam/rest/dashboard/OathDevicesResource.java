@@ -11,24 +11,24 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
- * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Copyright 2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest.dashboard;
 
-import javax.inject.Singleton;
+import javax.inject.Inject;
 
 /**
- * Dao for handling the retrieval and saving of a user's trusted devices.
+ * A user devices resource for OATH authentication devices.
  *
- * @since 12.0.0
+ * @since 13.0.0
+ * @see UserDevicesResource
  */
-@Singleton
-public class TrustedDevicesDao extends UserDevicesDao {
+public class OathDevicesResource extends TwoFADevicesResource<OathDevicesDao> {
 
-    public TrustedDevicesDao() {
-        super("devicePrintProfiles");
-   }
+    @Inject
+    public OathDevicesResource(OathDevicesDao dao) {
+        super(dao);
+    }
 
 }

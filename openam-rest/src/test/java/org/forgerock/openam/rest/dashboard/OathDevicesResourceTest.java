@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest.dashboard;
@@ -20,7 +20,6 @@ import static org.fest.assertions.Assertions.*;
 import static org.forgerock.json.fluent.JsonValue.*;
 import static org.forgerock.json.resource.Resources.*;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -38,34 +37,29 @@ import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.RootContext;
 import org.forgerock.json.resource.ServerContext;
-import org.forgerock.openam.rest.resource.RealmContext;
-import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class TrustedDevicesResourceTest {
+public class OathDevicesResourceTest {
 
-    private TrustedDevicesResource resource;
+    private OathDevicesResource resource;
 
-    private TrustedDevicesDao dao;
+    private OathDevicesDao dao;
 
     @BeforeMethod
     public void setUp() {
 
-        dao = mock(TrustedDevicesDao.class);
+        dao = mock(OathDevicesDao.class);
 
-        resource = new TrustedDevicesResource(dao);
+        resource = new OathDevicesResource(dao);
     }
 
     private Context ctx() {
-        SSOTokenContext ssoTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(ssoTokenContext);
-        ServerContext serverContext = new ServerContext(realmContext);
-
-        return serverContext;
+        return new ServerContext(new RootContext());
     }
 
     @Test
@@ -75,7 +69,7 @@ public class TrustedDevicesResourceTest {
         QueryRequest request = Requests.newQueryRequest("");
         Connection connection = newInternalConnection(newCollection(resource));
         QueryResultHandler handler = mock(QueryResultHandler.class);
-        List<JsonValue> devices = new ArrayList<>();
+        List<JsonValue> devices = new ArrayList<JsonValue>();
         devices.add(json(object(field("name", "NAME_1"), field("lastSelectedDate", new Date().getTime()))));
         devices.add(json(object(field("name", "NAME_2"), field("lastSelectedDate", new Date().getTime() + 1000))));
 

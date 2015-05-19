@@ -44,7 +44,6 @@ public class RestSecurity {
     private RestSecurityConfiguration restSecurityConfiguration;
 
     private final static String TWO_FACTOR_AUTH_ENABLED = "forgerockRESTSecurityTwoFactorAuthEnabled";
-    private final static String TWO_FACTOR_AUTH_MANDATORY = "forgerockRESTSecurityTwoFactorAuthMandatory";
     private final static String SELF_REGISTRATION = "forgerockRESTSecuritySelfRegistrationEnabled";
     private final static String SELF_REG_CONFIRMATION_URL = "forgerockRESTSecuritySelfRegConfirmationUrl";
     private final static String FORGOT_PASSWORD = "forgerockRESTSecurityForgotPasswordEnabled";
@@ -119,13 +118,11 @@ public class RestSecurity {
         final Set<String> protectedUserAttributes;
         final String successfulUserRegistrationDestination;
         final Boolean twoFactorAuthEnabled;
-        final Boolean twoFactorAuthMandatory;
 
         private RestSecurityConfiguration(Long selfRegTokenLifeTime, String selfRegistrationConfirmationUrl,
                 Long forgotPasswordLifeTime, String forgotPasswordConfirmationUrl, Boolean selfRegistration,
                 Boolean forgotPassword, Set<String> protectedUserAttributes,
-                String successfulUserRegistrationDestination, Boolean twoFactorAuthEnabled,
-                Boolean twoFactorAuthMandatory) {
+                String successfulUserRegistrationDestination, Boolean twoFactorAuthEnabled) {
             this.selfRegTokenLifeTime = selfRegTokenLifeTime;
             this.selfRegistrationConfirmationUrl = selfRegistrationConfirmationUrl;
             this.forgotPasswordTokenLifeTime = forgotPasswordLifeTime;
@@ -135,7 +132,6 @@ public class RestSecurity {
             this.protectedUserAttributes = protectedUserAttributes;
             this.successfulUserRegistrationDestination = successfulUserRegistrationDestination;
             this.twoFactorAuthEnabled = twoFactorAuthEnabled;
-            this.twoFactorAuthMandatory = twoFactorAuthMandatory;
         }
     }
 
@@ -151,7 +147,6 @@ public class RestSecurity {
             Set<String> protectedUserAttributes = ServiceConfigUtils.getSetAttribute(serviceConfig, PROTECTED_USER_ATTRIBUTES);
             String successfulUserRegistrationDestination = ServiceConfigUtils.getStringAttribute(serviceConfig, SUCCESSFUL_USER_REGISTRATION_DESTINATION);
             Boolean twoFactorAuthEnabled = ServiceConfigUtils.getBooleanAttribute(serviceConfig, TWO_FACTOR_AUTH_ENABLED);
-            Boolean twoFactorAuthMandatory = ServiceConfigUtils.getBooleanAttribute(serviceConfig, TWO_FACTOR_AUTH_MANDATORY);
             RestSecurityConfiguration newRestSecuritySettings = new RestSecurityConfiguration(
                     selfRegTokLifeTime,
                     selfRegistrationConfirmationUrl,
@@ -161,8 +156,7 @@ public class RestSecurity {
                     forgotPassword,
                     protectedUserAttributes,
                     successfulUserRegistrationDestination,
-                    twoFactorAuthEnabled,
-                    twoFactorAuthMandatory);
+                    twoFactorAuthEnabled);
 
             setProviderConfig(newRestSecuritySettings);
             if (debug.messageEnabled()) {
@@ -202,16 +196,6 @@ public class RestSecurity {
             return restSecurityConfiguration.twoFactorAuthEnabled;
         } else {
             String message = "RestSecurity::Unable to get provider setting for : " + TWO_FACTOR_AUTH_ENABLED;
-            debug.error(message);
-            throw new ServiceNotFoundException(message);
-        }
-    }
-
-    public boolean isTwoFactorAuthMandatory() throws ServiceNotFoundException {
-        if ((restSecurityConfiguration != null) && (restSecurityConfiguration.twoFactorAuthMandatory != null)) {
-            return restSecurityConfiguration.twoFactorAuthMandatory;
-        } else {
-            String message = "RestSecurity::Unable to get provider setting for : " + TWO_FACTOR_AUTH_MANDATORY;
             debug.error(message);
             throw new ServiceNotFoundException(message);
         }

@@ -473,6 +473,20 @@
                                  syntax="string"
                                  i18nKey="">
                 </AttributeSchema>
+                <AttributeSchema name="forgerockTwoFactorAuthMandatory"
+                                 type="single"
+                                 syntax="boolean"
+                                 validator="RequiredValueValidator"
+                                 resourceName="twoFactorRequired"
+                                 i18nKey="a158">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
             </Organization>
         </Schema>
         <Configuration>

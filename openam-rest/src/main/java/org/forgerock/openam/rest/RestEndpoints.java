@@ -17,14 +17,15 @@ package org.forgerock.openam.rest;
 
 import static org.forgerock.openam.rest.service.RestletUtils.*;
 
+import com.google.inject.Key;
+import com.google.inject.name.Names;
+import com.sun.identity.sm.InvalidRealmNameManager;
+import com.sun.identity.sm.SchemaType;
 import java.util.Set;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.RoutingMode;
-import org.forgerock.json.resource.SingletonResourceProvider;
 import org.forgerock.json.resource.VersionSelector;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.restlet.AccessTokenFlowFinder;
@@ -55,9 +56,14 @@ import org.forgerock.openam.forgerockrest.entitlements.SubjectAttributesResource
 import org.forgerock.openam.forgerockrest.entitlements.SubjectTypesResource;
 import org.forgerock.openam.forgerockrest.server.ServerInfoResource;
 import org.forgerock.openam.forgerockrest.session.SessionResource;
-import org.forgerock.openam.rest.authz.*;
+import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
+import org.forgerock.openam.rest.authz.CoreTokenResourceAuthzModule;
+import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
+import org.forgerock.openam.rest.authz.ResourceOwnerOrSuperUserAuthzModule;
+import org.forgerock.openam.rest.authz.SessionResourceAuthzModule;
 import org.forgerock.openam.rest.dashboard.DashboardResource;
 import org.forgerock.openam.rest.dashboard.TrustedDevicesResource;
+import org.forgerock.openam.rest.dashboard.OathDevicesResource;
 import org.forgerock.openam.rest.fluent.FluentRealmRouter;
 import org.forgerock.openam.rest.fluent.FluentRoute;
 import org.forgerock.openam.rest.fluent.FluentRouter;
@@ -84,11 +90,6 @@ import org.forgerock.openidconnect.restlet.OpenIDConnectJWKEndpoint;
 import org.forgerock.openidconnect.restlet.UserInfo;
 import org.restlet.Restlet;
 import org.restlet.routing.Router;
-
-import com.google.inject.Key;
-import com.google.inject.name.Names;
-import com.sun.identity.sm.InvalidRealmNameManager;
-import com.sun.identity.sm.SchemaType;
 
 /**
  * Singleton class which contains both the routers for CREST resources and Restlet service endpoints.
@@ -216,6 +217,9 @@ public class RestEndpoints {
 
         dynamicRealmRouter.route("/users/{user}/devices/trusted")
                 .forVersion("1.0").to(TrustedDevicesResource.class);
+
+        dynamicRealmRouter.route("/users/{user}/devices/2fa/oath")
+                .forVersion("1.0").to(OathDevicesResource.class);
 
         dynamicRealmRouter.route("/users/{user}/oauth2/resourcesets")
                 .through(ResourceOwnerOrSuperUserAuthzModule.class, ResourceOwnerOrSuperUserAuthzModule.NAME)

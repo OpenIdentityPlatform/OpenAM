@@ -21,11 +21,10 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
+import java.security.AccessController;
+import javax.inject.Inject;
 import org.forgerock.openam.forgerockrest.ServiceConfigUtils;
 import org.forgerock.openam.rest.DefaultVersionBehaviour;
-
-import javax.inject.Inject;
-import java.security.AccessController;
 
 /**
  * A {@code ServiceListener} to listen for changes to the default version behaviour configuration and update a

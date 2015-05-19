@@ -19,17 +19,34 @@ package org.forgerock.openam.forgerockrest.guice;
 import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.*;
 import static org.forgerock.openam.uma.UmaConstants.*;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Provider;
+import com.google.inject.Provides;
+import com.google.inject.TypeLiteral;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.service.SessionService;
+import com.sun.identity.delegation.DelegationEvaluator;
+import com.sun.identity.delegation.DelegationEvaluatorImpl;
+import com.sun.identity.entitlement.Application;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.Privilege;
+import com.sun.identity.entitlement.PrivilegeManager;
+import com.sun.identity.entitlement.opensso.PolicyPrivilegeManager;
+import com.sun.identity.idm.IdRepoCreationListener;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.RequestType;
@@ -78,38 +95,18 @@ import org.forgerock.openam.rest.sms.SmsGlobalSingletonProvider;
 import org.forgerock.openam.rest.sms.SmsGlobalSingletonProviderFactory;
 import org.forgerock.openam.rest.sms.SmsRequestHandler;
 import org.forgerock.openam.rest.sms.SmsRequestHandlerFactory;
-import org.forgerock.openam.rest.sms.SmsServerPropertiesResource;
 import org.forgerock.openam.rest.sms.SmsSingletonProvider;
 import org.forgerock.openam.rest.sms.SmsSingletonProviderFactory;
 import org.forgerock.openam.rest.uma.UmaIdRepoCreationListener;
 import org.forgerock.openam.rest.uma.UmaPolicyServiceImpl;
 import org.forgerock.openam.rest.uma.UmaResourceSetRegistrationListener;
 import org.forgerock.openam.scripting.ScriptException;
+import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.openam.uma.UmaPolicyService;
 import org.forgerock.openam.utils.AMKeyProvider;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.SignatureUtil;
 import org.restlet.routing.Router;
-
-import com.google.inject.AbstractModule;
-import com.google.inject.Provider;
-import com.google.inject.Provides;
-import com.google.inject.TypeLiteral;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
-import com.google.inject.multibindings.Multibinder;
-import com.google.inject.name.Names;
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.service.SessionService;
-import com.sun.identity.delegation.DelegationEvaluator;
-import com.sun.identity.delegation.DelegationEvaluatorImpl;
-import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.Privilege;
-import com.sun.identity.entitlement.PrivilegeManager;
-import com.sun.identity.entitlement.opensso.PolicyPrivilegeManager;
-import com.sun.identity.idm.IdRepoCreationListener;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * Guice Module for configuring bindings for the AuthenticationRestService classes.
@@ -238,9 +235,10 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV1 getUsersResourceV1(MailServerLoader mailServerLoader,
-            IdentityResourceUtils identityResourceUtils, CoreWrapper coreWrapper) {
+            IdentityResourceUtils identityResourceUtils, CoreWrapper coreWrapper,
+            RestSecurityProvider restSecurityProvider) {
         return new IdentityResourceV1(IdentityResourceV1.USER_TYPE, mailServerLoader, identityResourceUtils,
-                coreWrapper);
+                coreWrapper, restSecurityProvider);
     }
 
     @Provides
@@ -248,9 +246,10 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV1 getGroupsResourceV1(MailServerLoader mailServerLoader,
-            IdentityResourceUtils identityResourceUtils, CoreWrapper coreWrapper) {
+            IdentityResourceUtils identityResourceUtils, CoreWrapper coreWrapper,
+            RestSecurityProvider restSecurityProvider) {
         return new IdentityResourceV1(IdentityResourceV1.GROUP_TYPE, mailServerLoader, identityResourceUtils,
-                coreWrapper);
+                coreWrapper, restSecurityProvider);
     }
 
     @Provides
@@ -264,9 +263,10 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV1 getAgentsResourceV1(MailServerLoader mailServerLoader,
-            IdentityResourceUtils identityResourceUtils, CoreWrapper coreWrapper) {
+            IdentityResourceUtils identityResourceUtils, CoreWrapper coreWrapper,
+            RestSecurityProvider restSecurityProvider) {
         return new IdentityResourceV1(IdentityResourceV1.AGENT_TYPE, mailServerLoader, identityResourceUtils,
-                coreWrapper);
+                coreWrapper, restSecurityProvider);
     }
 
     @Provides
@@ -274,9 +274,10 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV2 getUsersResource(MailServerLoader mailServerLoader,
-            IdentityResourceUtils identityResourceUtils, CoreWrapper coreWrapper) {
+            IdentityResourceUtils identityResourceUtils, CoreWrapper coreWrapper,
+            RestSecurityProvider restSecurityProvider) {
         return new IdentityResourceV2(IdentityResourceV2.USER_TYPE, mailServerLoader, identityResourceUtils,
-                coreWrapper);
+                coreWrapper, restSecurityProvider);
     }
 
     @Provides
@@ -284,9 +285,10 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV2 getGroupsResource(MailServerLoader mailServerLoader,
-            IdentityResourceUtils identityResourceUtils, CoreWrapper coreWrapper) {
+            IdentityResourceUtils identityResourceUtils, CoreWrapper coreWrapper,
+            RestSecurityProvider restSecurityProvider) {
         return new IdentityResourceV2(IdentityResourceV2.GROUP_TYPE, mailServerLoader, identityResourceUtils,
-                coreWrapper);
+                coreWrapper, restSecurityProvider);
     }
 
     @Provides
@@ -294,9 +296,10 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV2 getAgentsResource(MailServerLoader mailServerLoader,
-            IdentityResourceUtils identityResourceUtils, CoreWrapper coreWrapper) {
+            IdentityResourceUtils identityResourceUtils, CoreWrapper coreWrapper,
+            RestSecurityProvider restSecurityProvider) {
         return new IdentityResourceV2(IdentityResourceV2.AGENT_TYPE, mailServerLoader, identityResourceUtils,
-                coreWrapper);
+                coreWrapper, restSecurityProvider);
     }
 
     @Provides

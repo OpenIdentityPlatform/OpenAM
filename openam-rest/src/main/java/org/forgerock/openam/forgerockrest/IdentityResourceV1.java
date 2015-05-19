@@ -15,9 +15,8 @@
  */
 package org.forgerock.openam.forgerockrest;
 
-import static org.forgerock.json.fluent.JsonValue.array;
-import static org.forgerock.openam.forgerockrest.RestUtils.getCookieFromServerContext;
-import static org.forgerock.openam.forgerockrest.RestUtils.isAdmin;
+import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.openam.forgerockrest.RestUtils.*;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
@@ -33,6 +32,19 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceNotFoundException;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.mail.MessagingException;
 import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
@@ -60,33 +72,20 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.cts.CTSPersistentStore;
-import org.forgerock.openam.tokens.TokenType;
-import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.exceptions.DeleteFailedException;
 import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.services.RestSecurity;
+import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.openam.services.email.MailServer;
 import org.forgerock.openam.services.email.MailServerImpl;
+import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.openam.tokens.TokenType;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openam.utils.TimeUtils;
 import org.forgerock.util.Reject;
-
-import javax.mail.MessagingException;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A simple {@code Map} based collection resource provider.
@@ -121,15 +120,13 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
     final static String EMAIL = "email";
     final static String TOKEN_ID = "tokenId";
     final static String CONFIRMATION_ID = "confirmationId";
-    final static String CURRENT_PASSWORD = "currentpassword";
-    final static String USER_PASSWORD = "userpassword";
     public static final String OLD_PASSWORD = "olduserpassword";
 
     private final IdentityResourceUtils identityResourceUtils;
 
-    private final MailServerLoader mailServerLoader;
+    private final RestSecurityProvider restSecurityProvider;
 
-    private static final Map<String, RestSecurity> REALM_REST_SECURITY_MAP = new ConcurrentHashMap<String, RestSecurity>();
+    private final MailServerLoader mailServerLoader;
 
     private final CoreWrapper coreWrapper;
 
@@ -137,8 +134,9 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
      * Creates a backend
      */
     public IdentityResourceV1(String userType, MailServerLoader mailServerLoader,
-            IdentityResourceUtils identityResourceUtils, CoreWrapper coreWrapper) {
-        this(userType, null, null, mailServerLoader, identityResourceUtils, coreWrapper);
+            IdentityResourceUtils identityResourceUtils, CoreWrapper coreWrapper,
+            RestSecurityProvider restSecurityProvider) {
+        this(userType, null, null, mailServerLoader, identityResourceUtils, coreWrapper, restSecurityProvider);
     }
 
     /**
@@ -160,13 +158,15 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
 
     // Constructor used for testing...
     IdentityResourceV1(String userType, ServiceConfigManager mailmgr, ServiceConfig mailscm,
-            MailServerLoader mailServerLoader, IdentityResourceUtils identityResourceUtils, CoreWrapper coreWrapper) {
+            MailServerLoader mailServerLoader, IdentityResourceUtils identityResourceUtils, CoreWrapper coreWrapper,
+            RestSecurityProvider restSecurityProvider) {
         this.userType = userType;
         this.mailmgr = mailmgr;
         this.mailscm = mailscm;
         this.mailServerLoader = mailServerLoader;
         this.identityResourceUtils = identityResourceUtils;
         this.coreWrapper = coreWrapper;
+        this.restSecurityProvider = restSecurityProvider;
     }
 
     /**
@@ -214,7 +214,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
      * @return random string
      */
     static private String generateTokenID(String resource) {
-        if (isNullOrEmpty(resource)) {
+        if (StringUtils.isBlank(resource)) {
             return null;
         }
         return Hash.hash(resource + RandomStringUtils.randomAlphanumeric(32));
@@ -234,7 +234,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         Calendar ttl = Calendar.getInstance();
         org.forgerock.openam.cts.api.tokens.Token ctsToken = new org.forgerock.openam.cts.api.tokens.Token(
                 generateTokenID(resource), TokenType.REST);
-        if (!isNullOrEmpty(userId)) {
+        if (!StringUtils.isBlank(userId)) {
             ctsToken.setUserId(userId);
         }
         ctsToken.setAttribute(CoreTokenField.STRING_ONE, realmName);
@@ -282,7 +282,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
 
             // Get the email address provided from registration page
             emailAddress = jVal.get(EMAIL).asString();
-            if (isNullOrEmpty(emailAddress)){
+            if (StringUtils.isBlank(emailAddress)){
                 throw new BadRequestException("Email not provided");
             }
 
@@ -306,7 +306,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             // Build Confirmation URL
             String confURL = restSecurity.getSelfRegistrationConfirmationUrl();
             StringBuilder confURLBuilder = new StringBuilder(100);
-            if (isNullOrEmpty(confURL)) {
+            if (StringUtils.isBlank(confURL)) {
                 confURLBuilder.append(deploymentURL.append("/json/confirmation/register").toString());
             } else {
                 confURLBuilder.append(confURL);
@@ -391,7 +391,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
 
         try {
             // Check if subject has not  been included
-            if (isNullOrEmpty(subject)){
+            if (StringUtils.isBlank(subject)){
                 // Use default email service subject
                 subject = mailattrs.get(MAIL_SUBJECT).iterator().next();
             }
@@ -403,7 +403,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         }
         try {
             // Check if Custom Message has been included
-            if (isNullOrEmpty(message)){
+            if (StringUtils.isBlank(message)){
                 // Use default email service message
                 message = mailattrs.get(MAIL_MESSAGE).iterator().next();
             }
@@ -452,28 +452,28 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             email = jVal.get(EMAIL).asString();
             username = jVal.get(USERNAME).asString();
 
-            if (isNullOrEmpty(confirmationId)) {
+            if (StringUtils.isBlank(confirmationId)) {
 
                 if (debug.errorEnabled()) {
                     debug.error(METHOD + ": Bad Request - confirmationId not found in request.");
                 }
                 throw new BadRequestException("confirmationId not provided");
             }
-            if (isNullOrEmpty(email) && !isNullOrEmpty(username)) {
+            if (StringUtils.isBlank(email) && !StringUtils.isBlank(username)) {
                 hashComponent = username;
                 hashComponentAttr = USERNAME;
             }
-            if (!isNullOrEmpty(email) && isNullOrEmpty(username)) {
+            if (!StringUtils.isBlank(email) && StringUtils.isBlank(username)) {
                 hashComponent = email;
                 hashComponentAttr = EMAIL;
             }
-            if (isNullOrEmpty(hashComponent)) {
+            if (StringUtils.isBlank(hashComponent)) {
                 if (debug.errorEnabled()) {
                     debug.error(METHOD + ": Bad Request - hashcomponent not found in request.");
                 }
                 throw new BadRequestException("Required information not provided");
             }
-            if (isNullOrEmpty(tokenID)) {
+            if (StringUtils.isBlank(tokenID)) {
                 if (debug.errorEnabled()) {
                     debug.error(METHOD + ": Bad Request - tokenID not found in request.");
                 }
@@ -558,7 +558,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
         final String realm = realmContext.getResolvedRealm();
-        RestSecurity restSecurity = getRestSecurity(realm);
+        RestSecurity restSecurity = restSecurityProvider.get(realm);
 
         final String action = request.getAction();
         if (action.equalsIgnoreCase("idFromSession")) {
@@ -1298,9 +1298,9 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                 for (String attrName : jsonValue.keys()) {
                     if ("userpassword".equalsIgnoreCase(attrName)) {
                         String newPassword = jsonValue.get(attrName).asString();
-                        if (!isNullOrEmpty(newPassword)) {
+                        if (!StringUtils.isBlank(newPassword)) {
                             String oldPassword = RestUtils.getMimeHeaderValue(context, OLD_PASSWORD);
-                            if (isNullOrEmpty(oldPassword)) {
+                            if (StringUtils.isBlank(oldPassword)) {
                                 throw new BadRequestException("The old password is missing from the request");
                             }
                             //This is an end-user trying to change the password, so let's change the password by
@@ -1356,25 +1356,4 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             return toEncode;
         }
     }
-
-    /**
-     * Retrieve cached realm's RestSecurity instance
-     **/
-    private RestSecurity getRestSecurity(String realm) {
-        RestSecurity restSecurity = REALM_REST_SECURITY_MAP.get(realm);
-        if (restSecurity == null) {
-            synchronized(REALM_REST_SECURITY_MAP) {
-                restSecurity = REALM_REST_SECURITY_MAP.get(realm);
-                if (restSecurity == null) {
-                    restSecurity = new RestSecurity(realm);
-                    REALM_REST_SECURITY_MAP.put(realm, restSecurity);
-                }
-            }
-        }
-        return restSecurity;
-    }
-
-    private static boolean isNullOrEmpty(final String value) {
-       return value == null || value.isEmpty();
-   }
 }

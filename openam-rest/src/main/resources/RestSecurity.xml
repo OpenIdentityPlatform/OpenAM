@@ -36,34 +36,6 @@
                 i18nKey="forgerock-restSecurity-service-description">
 
             <Organization>
-                <AttributeSchema name="forgerockRESTSecurityTwoFactorAuthEnabled"
-                                 type="single"
-                                 syntax="boolean"
-                                 validator="RequiredValueValidator"
-                                 resourceName="twoFactorEnabled"
-                                 i18nKey="a100">
-                    <BooleanValues>
-                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-                    </BooleanValues>
-                    <DefaultValues>
-                        <Value>false</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-                <AttributeSchema name="forgerockRESTSecurityTwoFactorAuthMandatory"
-                                 type="single"
-                                 syntax="boolean"
-                                 validator="RequiredValueValidator"
-                                 resourceName="twoFactorRequired"
-                                 i18nKey="a100a">
-                    <BooleanValues>
-                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-                    </BooleanValues>
-                    <DefaultValues>
-                        <Value>false</Value>
-                    </DefaultValues>
-                </AttributeSchema>
                 <AttributeSchema name="forgerockRESTSecuritySelfRegistrationEnabled"
                                  type="single"
                                  syntax="boolean"

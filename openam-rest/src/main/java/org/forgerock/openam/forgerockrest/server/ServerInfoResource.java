@@ -31,6 +31,14 @@ import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import java.net.URI;
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
@@ -51,15 +59,7 @@ import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.ServiceConfigUtils;
 import org.forgerock.openam.forgerockrest.entitlements.RealmAwareResource;
 import org.forgerock.openam.services.RestSecurity;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.net.URI;
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
+import org.forgerock.openam.services.RestSecurityProvider;
 
 /**
  * Represents Server Information that can be queried via a REST interface.
@@ -69,13 +69,16 @@ import java.util.Set;
 public class ServerInfoResource extends RealmAwareResource {
 
     private final Debug debug;
+    private final RestSecurityProvider restSecurityProvider;
 
     private final static String COOKIE_DOMAINS = "cookieDomains";
     private final static String ALL_SERVER_INFO = "*";
 
     @Inject
-    public ServerInfoResource(@Named("frRest") Debug debug) {
+    public ServerInfoResource(@Named("frRest") Debug debug,
+                              RestSecurityProvider restSecurityProvider) {
         this.debug = debug;
+        this.restSecurityProvider = restSecurityProvider;
     }
 
     private final MapValueParser nameValueParser = new MapValueParser();
@@ -118,7 +121,7 @@ public class ServerInfoResource extends RealmAwareResource {
         Set<String> cookieDomains;
         Set<String> protectedUserAttributes;
         Resource resource;
-        RestSecurity restSecurity = new RestSecurity(realm);
+        RestSecurity restSecurity = restSecurityProvider.get(realm);
 
         //added for the XUI to be able to understand its locale to request the appropriate translations to cache
         ISLocaleContext locale = new ISLocaleContext();
@@ -132,8 +135,6 @@ public class ServerInfoResource extends RealmAwareResource {
             result.put("protectedUserAttributes", protectedUserAttributes);
             result.put("cookieName", SystemProperties.get(Constants.AM_COOKIE_NAME, "iPlanetDirectoryPro"));
             result.put("secureCookie", CookieUtils.isCookieSecure());
-            result.put("twoFactorAuthEnabled", String.valueOf(restSecurity.isTwoFactorAuthEnabled()));
-            result.put("twoFactorAuthMandatory", String.valueOf(restSecurity.isTwoFactorAuthMandatory()));
             result.put("forgotPassword", String.valueOf(restSecurity.isForgotPassword()));
             result.put("selfRegistration", String.valueOf(restSecurity.isSelfRegistration()));
             result.put("lang", locale.getLocale().getLanguage());
