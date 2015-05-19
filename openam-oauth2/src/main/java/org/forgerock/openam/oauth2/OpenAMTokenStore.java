@@ -62,6 +62,7 @@ import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openam.cts.api.fields.OAuthTokenField;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.oauth2.OAuth2AuditLogger;
 import org.forgerock.openam.openidconnect.OpenAMOpenIdConnectToken;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
@@ -83,6 +84,7 @@ import org.restlet.ext.servlet.ServletUtils;
 public class OpenAMTokenStore implements OpenIdConnectTokenStore {
 
     private final Debug logger = Debug.getInstance("OAuth2Provider");
+    private final OAuth2AuditLogger auditLogger;
     private final OAuthTokenStore tokenStore;
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final OpenIdConnectClientRegistrationStore clientRegistrationStore;
@@ -97,17 +99,21 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
      * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
      * @param clientRegistrationStore An instance of the OpenIdConnectClientRegistrationStore.
      * @param realmNormaliser An instance of the RealmNormaliser.
+     * @param ssoTokenManager An instance of the SSOTokenManager
+     * @param cookieExtractor An instance of the CookieExtractor
+     * @param auditLogger An instance of OAuth2AuditLogger
      */
     @Inject
     public OpenAMTokenStore(OAuthTokenStore tokenStore, OAuth2ProviderSettingsFactory providerSettingsFactory,
             OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
-            SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor) {
+            SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor, OAuth2AuditLogger auditLogger) {
         this.tokenStore = tokenStore;
         this.providerSettingsFactory = providerSettingsFactory;
         this.clientRegistrationStore = clientRegistrationStore;
         this.realmNormaliser = realmNormaliser;
         this.ssoTokenManager = ssoTokenManager;
         this.cookieExtractor = cookieExtractor;
+        this.auditLogger = auditLogger;
     }
 
     /**
@@ -415,7 +421,6 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final String id = UUID.randomUUID().toString();
         final long expiryTime = (providerSettings.getAccessTokenLifetime() * 1000) + System.currentTimeMillis();
-
         final AccessToken accessToken;
         if (refreshToken == null) {
             accessToken = new OpenAMAccessToken(id, authorizationCode, resourceOwnerId, clientId, redirectUri,
@@ -426,18 +431,23 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
                     scope, expiryTime, refreshToken.getTokenId(), OAuth2Constants.Token.OAUTH_ACCESS_TOKEN, grantType,
                     nonce, realmNormaliser.normalise(request.<String>getParameter(REALM)), claims);
         }
-
         try {
             tokenStore.create(accessToken);
+            if (auditLogger.isAuditLogEnabled()) {
+                String[] obs = {"CREATED_TOKEN", accessToken.toString()};
+                auditLogger.logAccessMessage("CREATED_TOKEN", obs, null);
+            }
         } catch (CoreTokenException e) {
             if (logger.errorEnabled()) {
                 logger.error("Could not create token in CTS: " + e.getMessage());
             }
+            if (auditLogger.isAuditLogEnabled()) {
+                String[] obs = {"FAILED_CREATE_TOKEN", accessToken.toString()};
+                auditLogger.logErrorMessage("FAILED_CREATE_TOKEN", obs, null);
+            }
             throw new ServerException("Could not create token in CTS: " + e.getMessage());
         }
-
         request.setToken(AccessToken.class, accessToken);
-
         return accessToken;
     }
 
