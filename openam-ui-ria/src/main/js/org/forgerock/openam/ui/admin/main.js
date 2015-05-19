@@ -20,6 +20,7 @@ define([
     "./models/Form",
     "./models/FormCollection",
     "./utils/FormHelper",
+    "./utils/JsonEditorTheme",
     "./views/console/realms/authentication/Authentication",
     "./views/console/realms/authentication/advanced/AdvancedSettings",
     "./views/console/realms/authentication/chains/Chains",

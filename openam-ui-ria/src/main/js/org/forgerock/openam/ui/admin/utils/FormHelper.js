@@ -15,6 +15,7 @@
  */
 
 /*global $ _ define*/
+
 define("org/forgerock/openam/ui/admin/utils/FormHelper", [
     "jsonEditor"
 ], function(JSONEditor) {

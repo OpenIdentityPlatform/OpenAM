@@ -52,8 +52,6 @@ require.config({
         "underscore"      : "libs/lodash-2.4.1-min",
         "xdate"           : "libs/xdate-0.8-min",
 
-        "jsonEditorTheme"  : "org/forgerock/openam/ui/admin/utils/JsonEditorTheme",
-
         "ThemeManager": "org/forgerock/openam/ui/common/util/ThemeManager",
         "UserDelegate": "org/forgerock/openam/ui/user/delegates/UserDelegate"
     },
@@ -109,9 +107,6 @@ require.config({
         "jsonEditor": {
             exports: "JSONEditor"
         },
-        "jsonEditorTheme": {
-            deps: ["jsonEditor"]
-        },
         "moment": {
             exports: "moment"
         },
@@ -141,7 +136,7 @@ require.config({
  * Loads all application on start, so each module will be available to
  * required synchronously
  */
-require([ 
+require([
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "jquery",
@@ -151,7 +146,6 @@ require([
     "form2js",
     "js2form",
     "jsonEditor",
-    "jsonEditorTheme",
     "spin",
     "xdate",
     "moment",
