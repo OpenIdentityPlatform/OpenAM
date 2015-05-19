@@ -32,6 +32,10 @@ public final class OathDeviceSettings {
     private String checksumDigit;
     private String truncationOffset;
 
+    public OathDeviceSettings() {
+        //Empty no-arg constructor for Jackson usage, due to presence of non-default constructor.
+    }
+
     /**
      * @param sharedSecret The device's shared secret. Non-null value.
      * @param deviceName An arbitrary identifier for the device. Non-null value.
@@ -161,19 +165,34 @@ public final class OathDeviceSettings {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         OathDeviceSettings that = (OathDeviceSettings) o;
 
-        if (checksumDigit != null ? !checksumDigit.equals(that.checksumDigit) : that.checksumDigit != null)
+        if (checksumDigit != null ? !checksumDigit.equals(that.checksumDigit) : that.checksumDigit != null) {
             return false;
-        if (!counter.equals(that.counter)) return false;
-        if (!deviceName.equals(that.deviceName)) return false;
-        if (!lastLogin.equals(that.lastLogin)) return false;
-        if (!sharedSecret.equals(that.sharedSecret)) return false;
-        if (truncationOffset != null ? !truncationOffset.equals(that.truncationOffset) : that.truncationOffset != null)
+        }
+        if (!counter.equals(that.counter)) {
             return false;
+        }
+        if (!deviceName.equals(that.deviceName)) {
+            return false;
+        }
+        if (!lastLogin.equals(that.lastLogin)) {
+            return false;
+        }
+        if (!sharedSecret.equals(that.sharedSecret)) {
+            return false;
+        }
+        if (truncationOffset != null ? !truncationOffset.equals(that.truncationOffset) : that.truncationOffset
+                != null) {
+            return false;
+        }
 
         return true;
     }
