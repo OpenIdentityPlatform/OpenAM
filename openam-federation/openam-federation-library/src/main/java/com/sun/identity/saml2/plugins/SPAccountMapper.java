@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,29 +24,22 @@
  *
  * $Id: SPAccountMapper.java,v 1.5 2008/08/19 19:11:15 veiming Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
-
 package com.sun.identity.saml2.plugins;
 
+import com.sun.identity.saml2.assertion.Assertion;
 import com.sun.identity.saml2.common.SAML2Exception;
+import com.sun.identity.saml2.protocol.ManageNameIDRequest;
 
 /**
- * The interface <code>SPAccountMapper</code> is used to identify the
- * local identities that maps the <code>SAML</code> protocol objects such as
- * <code>Assertion</code>, <code>ManageNameIDRequest</code> etc.
- * This mapper interface is used to map the identities only at the
- * <code>SAMLAssertionConsumer</code>, in other words,
- * <code>ServiceProvider</code> version of the <code>SAML</code> provider. 
- * The implementation of this interface will be used by the <code>SAML</code>
- * framework to retrieve the user identity information for the consumption
- * of generating a user session, or manage the user account information while
- * handling the <code>SAML</code> protocols and it is <code>pluggable</code>
- * through local configuration in the <code>SAML2</code> plugin.
+ * The interface <code>SPAccountMapper</code> is used to identify the local identities that maps the <code>SAML</code>
+ * protocol objects such as <code>Assertion</code>, <code>ManageNameIDRequest</code> etc.
+ * This mapper interface is used to map the identities only at the <code>SAML Service Provider</code>.
+ * The implementation of this interface will be used by the <code>SAML</code> framework to retrieve the user identity
+ * information for the consumption of generating a user session, or manage the user account information while handling
+ * the <code>SAML</code> protocols and it is pluggable through local configuration in the <code>SAML2</code> plugin.
  *
- * The implementation of this interface may need to consider the
- * deployment of the SAML v2 plugin for example on the OpenAM
- * platform.
  * @see com.sun.identity.saml2.plugins.IDPAccountMapper
  *
  * @supported.all.api
@@ -54,44 +47,30 @@ import com.sun.identity.saml2.common.SAML2Exception;
 public interface SPAccountMapper {
 
     /**
-     * Returns the user's disntinguished name or the universal ID for the 
-     * corresponding  <code>SAML</code> <code>Assertion</code>. This method
-     * will be invoked by the <code>SAML</code> framework while processing
-     * the <code>Assertion</code> and retrieves the identity information. 
+     * Returns the user's distinguished name or the universal ID for the corresponding <code>SAML Assertion</code>. This
+     * method will be invoked by the <code>SAML</code> framework while processing the <code>Assertion</code> and
+     * retrieves the identity information.
      *
-     * @param assertion <code>SAML</code> <code>Assertion</code> that needs
-     *        to be mapped to the user.
+     * @param assertion <code>SAML Assertion</code> that needs to be mapped to the user.
      * @param hostEntityID <code>EntityID</code> of the hosted provider.
-     * @param realm realm or the organization name that may be used to find
-     *        the user information.
-     * @return user's disntinguished name or the universal ID.
-     * @exception SAML2Exception if any failure.
+     * @param realm Realm or the organization name that may be used to find the user information.
+     * @return User's distinguished name or the universal ID.
+     * @throws SAML2Exception If there was any failure.
      */
-    public java.lang.String getIdentity(
-        com.sun.identity.saml2.assertion.Assertion assertion,
-        java.lang.String hostEntityID,
-        java.lang.String realm
-    ) throws SAML2Exception;
+    public String getIdentity(Assertion assertion, String hostEntityID, String realm) throws SAML2Exception;
 
 
     /**
-     * Returns the user's disntinguished name or the universal ID for the 
-     * corresponding  <code>SAML</code> <code>ManageNameIDRequest</code>.
-     * This method will be invoked by the <code>SAML</code> framework for
-     * retrieving the user identity while processing the
-     * <code>ManageIDRequest</code>. 
-     * @param manageNameIDRequest <code>SAML</code> 
-     *     <code>ManageNameIDRequest</code> that needs to be mapped to the user.
+     * Returns the user's distinguished name or the universal ID for the corresponding
+     * <code>SAML ManageNameIDRequest</code>. This method will be invoked by the <code>SAML</code> framework for
+     * retrieving the user identity while processing the <code>ManageIDRequest</code>.
+     *
+     * @param manageNameIDRequest <code>SAML ManageNameIDRequest</code> that needs to be mapped to the user.
      * @param hostEntityID <code>EntityID</code> of the hosted provider.
-     * @param realm realm or the organization name that may be used to find
-     *        the user information.
-     * @return user's disntinguished name or the universal ID.
-     * @exception SAML2Exception if any failure.
+     * @param realm Realm or the organization name that may be used to find the user information.
+     * @return User's distinguished name or the universal ID.
+     * @throws SAML2Exception If there was any failure.
      */
-    public java.lang.String getIdentity(
-        com.sun.identity.saml2.protocol.ManageNameIDRequest manageNameIDRequest,
-        java.lang.String hostEntityID,
-        java.lang.String realm
-    ) throws SAML2Exception;
-
+    public String getIdentity(ManageNameIDRequest manageNameIDRequest, String hostEntityID, String realm)
+            throws SAML2Exception;
 }

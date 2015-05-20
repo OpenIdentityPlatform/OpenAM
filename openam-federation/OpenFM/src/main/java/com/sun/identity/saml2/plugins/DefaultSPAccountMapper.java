@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,38 +24,35 @@
  *
  * $Id: DefaultSPAccountMapper.java,v 1.3 2008/07/08 23:03:34 hengming Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
-
 package com.sun.identity.saml2.plugins;
 
 /**
- * This class <code>DefaultSPAccountMapper</code> is the default 
- * implementation of the <code>DefaultLibrarySPAccountMapper</code> that is used
- * to map the <code>SAML</code> protocol objects to the user accounts.
- * at the <code>ServiceProvider</code> side of SAML v2 plugin.
- * Custom implementations may extend from this class to override some
- * of these implementations if they choose to do so.
+ * This class <code>DefaultSPAccountMapper</code> is the default implementation of the
+ * <code>DefaultLibrarySPAccountMapper</code> that is used to map the <code>SAML</code> protocol objects to the user
+ * accounts at the <code>ServiceProvider</code> side of SAML v2 plugin.
+ * Custom implementations may extend from this class to override some of these implementations if they choose to do so.
  */
 public class DefaultSPAccountMapper extends DefaultLibrarySPAccountMapper {
 
-     /**
-      * Default constructor
-      */
-     public DefaultSPAccountMapper() {
-         super();
-         debug.message("DefaultSPAccountMapper.constructor: ");
-     }
+    /**
+     * Default constructor
+     */
+    public DefaultSPAccountMapper() {
+        super();
+        debug.message("DefaultSPAccountMapper.constructor: ");
+    }
 
     /**
      * Checks if dynamical profile creation or ignore profile is enabled.
-     * @param realm realm to check the dynamical profile creation attributes.
-     * @return true if dynamical profile creation or ignore profile is enabled,
-     * false otherwise.
+     *
+     * @param realm Realm to check the dynamical profile creation attributes.
+     * @return <code>true</code> if dynamical profile creation or ignore profile is enabled, <code>false</code>
+     * otherwise.
      */
+    @Override
     protected boolean isDynamicalOrIgnoredProfile(String realm) {
-
         return SAML2PluginsUtils.isDynamicalOrIgnoredProfile(realm);
     }
-
 }
