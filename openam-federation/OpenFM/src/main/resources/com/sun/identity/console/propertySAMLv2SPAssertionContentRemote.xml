@@ -24,9 +24,7 @@
 
    $Id: propertySAMLv2SPAssertionContentRemote.xml,v 1.6 2008/08/05 22:24:13 babysunil Exp $
 
--->
-<!--
-   Portions Copyrighted 2010 ForgeRock AS
+   Portions Copyrighted 2010-2015 ForgeRock AS.
 -->
 
 <!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
@@ -186,7 +184,7 @@
                            labelFor="spDoNotWriteFederationInfo" />
                     <cc name="spDoNotWriteFederationInfo"
                         tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" />
-                    <fieldhelp name="helpspDoNotWriteFederationInfo" defaultValue="samlv2sp.attribute.help.spDoNotWriteFederationInfo" />
+                    <fieldhelp name="helpspDoNotWriteFederationInfo" defaultValue="samlv2sp.attribute.help.remote.spDoNotWriteFederationInfo" />
         </property>
     </section>
     <section name="auth" defaultValue="samlv2idp.provider.section.title.basicauth" >

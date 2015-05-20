@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: SAMLv2ModelImpl.java,v 1.45 2009/11/24 21:48:40 madan_ranganath Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.federation.model;
@@ -35,6 +32,8 @@ package com.sun.identity.console.federation.model;
 import com.sun.identity.console.base.model.AMAdminUtils;
 import com.sun.identity.console.base.model.AMConsoleException;
 import javax.servlet.http.HttpServletRequest;
+
+import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.jaxb.metadata.EntityDescriptorElement;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.saml2.meta.SAML2MetaSecurityUtils;
@@ -124,6 +123,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         extendedMetaIdpMap.put(IDP_MNI_RESP_SIGN, Collections.EMPTY_SET);
         extendedMetaIdpMap.put(ASSERT_EFFECT_TIME, Collections.EMPTY_SET);
         extendedMetaIdpMap.put(IDP_ACCT_MAPPER, Collections.EMPTY_SET);
+        extendedMetaIdpMap.put(SAML2Constants.IDP_DISABLE_NAMEID_PERSISTENCE, Collections.EMPTY_SET);
         extendedMetaIdpMap.put(IDP_AUTHN_CONTEXT_MAPPER, 
                 Collections.EMPTY_SET);
         extendedMetaIdpMap.put(IDP_AUTHN_CONTEXT_CLASS_REF_MAPPING,
@@ -277,6 +277,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         extendedAPMetaIdpMap.put(IDP_AUTO_FED_ENABLED, Collections.EMPTY_SET);
         extendedAPMetaIdpMap.put(IDP_AUTO_FED_ATTR, Collections.EMPTY_SET);
         extendedAPMetaIdpMap.put(IDP_ACCT_MAPPER, Collections.EMPTY_SET);
+        extendedAPMetaIdpMap.put(SAML2Constants.IDP_DISABLE_NAMEID_PERSISTENCE, Collections.EMPTY_SET);
         extendedAPMetaIdpMap.put(AUTH_URL, Collections.EMPTY_SET);
         extendedAPMetaIdpMap.put(RP_URL, Collections.EMPTY_SET);
         extendedAPMetaIdpMap.put(APP_LOGOUT_URL, Collections.EMPTY_SET);

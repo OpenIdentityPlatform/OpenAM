@@ -149,6 +149,31 @@ public class DefaultIDPAccountMapper extends DefaultAccountMapper implements IDP
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * This implementation first checks whether NameID persistence has been completely disabled at the IdP level
+     * (idpDisableNameIDPersistence setting), and if not, it will look at the SP configuration as well
+     * (spDoNotWriteFederationInfo setting).
+     *
+     * @param realm {@inheritDoc}
+     * @param hostEntityID {@inheritDoc}
+     * @param remoteEntityID {@inheritDoc}
+     * @param nameIDFormat {@inheritDoc}
+     * @return {@inheritDoc}
+     */
+    @Override
+    public boolean shouldPersistNameIDFormat(String realm, String hostEntityID, String remoteEntityID,
+            String nameIDFormat) {
+        final boolean disableNameIDPersistence = Boolean.parseBoolean(SAML2Utils.getAttributeValueFromSSOConfig(realm,
+                hostEntityID, SAML2Constants.IDP_ROLE, SAML2Constants.IDP_DISABLE_NAMEID_PERSISTENCE));
+        if (disableNameIDPersistence) {
+            return false;
+        }
+        return !Boolean.parseBoolean(SAML2Utils.getAttributeValueFromSSOConfig(realm, remoteEntityID,
+                SAML2Constants.SP_ROLE, SAML2Constants.SP_DO_NOT_WRITE_FEDERATION_INFO));
+    }
+
     protected String getNameIDValueFromUserProfile(String realm, String hostEntityID, String userID,
                 String nameIDFormat) {
         String nameIDValue = null;

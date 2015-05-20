@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -969,9 +969,8 @@ public class IDPSSOUtil {
         int notBeforeSkewTime = getNotBeforeSkewTime(realm, idpEntityID);
 
         // get the subject element
-        NewBoolean isNewFederation = new NewBoolean();
         Subject subject = getSubject(session, authnReq, acsURL,
-                nameIDFormat, isNewFederation, realm, idpEntityID,
+                nameIDFormat, realm, idpEntityID,
                 recipientEntityID, effectiveTime, affiliationID);
 
         // register (spEntityID, nameID) with the sso token
@@ -982,32 +981,25 @@ public class IDPSSOUtil {
         } else {
             spEntityID = recipientEntityID;
         }
-        NameIDandSPpair pair = new NameIDandSPpair(
-                (NameID) subject.getNameID(), spEntityID);
+        NameIDandSPpair pair = new NameIDandSPpair(subject.getNameID(), spEntityID);
 
         synchronized (IDPCache.idpSessionsByIndices) {
-            List list = (List) idpSession.getNameIDandSPpairs();
-            if (isNewFederation.getValue()) { // new federation case
+            List<NameIDandSPpair> list = idpSession.getNameIDandSPpairs();
+            String id;
+            if (authnReq != null) {
+                id = authnReq.getIssuer().getValue();
+            } else {
+                id = spEntityID;
+            }
+            boolean found = false;
+            for (NameIDandSPpair nameIDandSPpair : list) {
+                if (nameIDandSPpair.getSPEntityID().equals(id)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
                 list.add(pair);
-            } else {  // existing federation case
-                String id = null;
-                if (authnReq != null) {
-                    id = authnReq.getIssuer().getValue();
-                } else {
-                    id = spEntityID;
-                }
-                int n = list.size();
-                NameIDandSPpair p = null;
-                for (int i = 0; i < n; i++) {
-                    p = (NameIDandSPpair) list.get(i);
-                    if (p.getSPEntityID().equals(id)) {
-                        break;
-                    }
-                    p = null;
-                }
-                if (p == null) {
-                    list.add(pair);
-                }
             }
         }
 
@@ -1402,8 +1394,6 @@ public class IDPSSOUtil {
      * @param authnReq          the <code>AuthnRequest</code> object
      * @param acsURL            the <code>ACS</code> service <code>url</code>
      * @param nameIDFormat      the <code>NameIDFormat</code>
-     * @param isNewFederation   a returned flag from which the caller
-     *                          knows if this is a new federation case
      * @param realm             The realm name
      * @param idpEntityID       the entity id of the identity provider
      * @param recipientEntityID the entity id of the response recipient
@@ -1417,7 +1407,6 @@ public class IDPSSOUtil {
                                       AuthnRequest authnReq,
                                       String acsURL,
                                       String nameIDFormat,
-                                      NewBoolean isNewFederation,
                                       String realm,
                                       String idpEntityID,
                                       String recipientEntityID,
@@ -1505,87 +1494,63 @@ public class IDPSSOUtil {
                     "metaDataError"));
         }
 
-        nameIDFormat = SAML2Utils.verifyNameIDFormat(nameIDFormat, spsso,
-                idpsso);
+        nameIDFormat = SAML2Utils.verifyNameIDFormat(nameIDFormat, spsso, idpsso);
+        boolean isTransient = SAML2Constants.NAMEID_TRANSIENT_FORMAT.equals(nameIDFormat);
+        boolean isPersistent = SAML2Constants.PERSISTENT.equals(nameIDFormat);
 
-        // Even if the user profile is set to ignore, we must attempt to persist
-        // if the NameIDFormat is set to persistent.
-        if (ignoreProfile && SAML2Constants.PERSISTENT.equals(nameIDFormat)) {
-            ignoreProfile = false;
-            SAML2Utils.debug.warning(classMethod
-                    + "ignoreProfile was true but NameIDFormat is Persistent => setting ignoreProfile to false");
-        }
-
-        NameIDInfo nameIDInfo = null;
+        NameIDInfo nameIDInfo;
         NameID nameID = null;
-        boolean isTransient = nameIDFormat.equals(
-                SAML2Constants.NAMEID_TRANSIENT_FORMAT);
+        IDPAccountMapper idpAccountMapper = SAML2Utils.getIDPAccountMapper(realm, idpEntityID);
+
+        //Use-cases for NameID persistence:
+        //* persistent NameID -> The NameID MUST be stored
+        //* transient NameID -> The NameID MUST NOT be stored
+        //* ignored user profile mode -> The NameID CANNOT be stored
+        //* for any other cases -> The NameID MAY be stored based on customizable logic
+        boolean shouldPersistNameID = isPersistent || (!isTransient && !ignoreProfile
+                && idpAccountMapper.shouldPersistNameIDFormat(realm, idpEntityID, remoteEntityID, nameIDFormat));
+
         if (!isTransient) {
-            String userID = null;
+            String userID;
             try {
                 userID = sessionProvider.getPrincipalName(session);
             } catch (SessionException se) {
-                SAML2Utils.debug.error(classMethod +
-                        "Unable to get principal name from the session.", se);
-                throw new SAML2Exception(
-                        SAML2Utils.bundle.getString("invalidSSOToken"));
+                SAML2Utils.debug.error(classMethod + "Unable to get principal name from the session.", se);
+                throw new SAML2Exception(SAML2Utils.bundle.getString("invalidSSOToken"));
             }
 
-            if (!ignoreProfile) {
-                nameIDInfo = AccountUtils.getAccountFederation(userID,
-                        idpEntityID, remoteEntityID);
-            }
+            if (isPersistent || shouldPersistNameID) {
+                nameIDInfo = AccountUtils.getAccountFederation(userID, idpEntityID, remoteEntityID);
 
-            if (nameIDInfo != null) {
-                nameID = nameIDInfo.getNameID();
+                if (nameIDInfo != null) {
+                    nameID = nameIDInfo.getNameID();
 
-                if (nameIDFormat.equals(nameID.getFormat())) {
-                    // existing federation
-                    isNewFederation.setValue(false);
-                } else {
-                    AccountUtils.removeAccountFederation(nameIDInfo, userID);
-                    DoManageNameID.removeIDPFedSession(remoteEntityID,
-                            nameID.getValue());
-                    nameID = null;
+                    if (!nameIDFormat.equals(nameID.getFormat())) {
+                        AccountUtils.removeAccountFederation(nameIDInfo, userID);
+                        DoManageNameID.removeIDPFedSession(remoteEntityID, nameID.getValue());
+                        nameID = null;
+                    }
                 }
             }
         }
 
         if (nameID == null) {
-            if (!allowCreate &&
-                    nameIDFormat.equals(SAML2Constants.PERSISTENT)) {
-                throw new SAML2InvalidNameIDPolicyException(
-                        SAML2Utils.bundle.getString("cannotCreateNameID"));
+            if (!allowCreate && isPersistent) {
+                throw new SAML2InvalidNameIDPolicyException(SAML2Utils.bundle.getString("cannotCreateNameID"));
             }
 
-            IDPAccountMapper idpAccountMapper =
-                    SAML2Utils.getIDPAccountMapper(realm, idpEntityID);
             nameID = idpAccountMapper.getNameID(session, idpEntityID, spNameQualifier, realm, nameIDFormat);
 
-            // If the IdP has received a request from a remote SP for which it has
-            // been configured not to persist the Federation if unspecified NameID
-            // Format has been set
-            boolean spDoNotWriteFedInfoInIdP = isSPDoNotWriteFedInfoInIdP(realm,
-                    remoteEntityID, metaManager) &&
-                    SAML2Constants.UNSPECIFIED.equals(nameIDFormat);
-            boolean writeFedInfo = !ignoreProfile && !isTransient && !spDoNotWriteFedInfoInIdP;
-            SAML2Utils.debug.message(classMethod + " writeFedInfo = " + writeFedInfo);
-
-            if (writeFedInfo && allowCreate) {
-                // write federation info the into persistent datastore
+            SAML2Utils.debug.message(classMethod + " shouldPersistNameID = " + shouldPersistNameID);
+            if (shouldPersistNameID && allowCreate) {
+                // write federation info into the persistent datastore
                 if (SAML2Utils.isDualRole(idpEntityID, realm)) {
-                    nameIDInfo = new NameIDInfo(idpEntityID, remoteEntityID,
-                            nameID, SAML2Constants.DUAL_ROLE, false);
+                    nameIDInfo = new NameIDInfo(idpEntityID, remoteEntityID, nameID, SAML2Constants.DUAL_ROLE, false);
                 } else {
-                    nameIDInfo = new NameIDInfo(idpEntityID, remoteEntityID,
-                            nameID, SAML2Constants.IDP_ROLE, isAffiliation);
+                    nameIDInfo = new NameIDInfo(idpEntityID, remoteEntityID, nameID, SAML2Constants.IDP_ROLE,
+                            isAffiliation);
                 }
                 AccountUtils.setAccountFederation(nameIDInfo, userName);
-            }
-            if (writeFedInfo) {
-                isNewFederation.setValue(true);
-            } else {
-                isNewFederation.setValue(false);
             }
         }
 
@@ -2910,86 +2875,6 @@ public class IDPSSOUtil {
     static SAML2IdentityProviderAdapter getIDPAdapterClass(String realm, String idpEntityID)
             throws SAML2Exception {
         return SAML2Utils.getIDPAdapterClass(realm, idpEntityID);
-    }
-
-    /**
-     * Returns  <code>true</code> or <code>false</code>
-     * depending if the flag  spDoNotWriteFederationInfo is set in the
-     * SP Extended metadata
-     *
-     * @param realm       the realm name
-     * @param spEntityID  the entity id of the Service Provider
-     * @param metaManager the SAML2MetaMAnager used to read the extendede metadata
-     * @return the <code>true/false</code>
-     * @throws SAML2Exception if the operation is not successful
-     */
-    private static Boolean isSPDoNotWriteFedInfoInIdP(
-            String realm, String spEntityID, SAML2MetaManager metaManager)
-            throws SAML2Exception {
-        String methodName = "isSPDoNotWriteFedInfoInIdp";
-
-        Boolean isSPDoNotWriteFedInfoEnabled = false;
-        SAML2Utils.debug.message("IDPSSOUtil." + methodName + "Entering");
-
-        try {
-            String SPDoNotWriteFedInfo = getAttributeValueFromSPSSOConfig(realm,
-                    spEntityID, metaManager,
-                    SAML2Constants.SP_DO_NOT_WRITE_FEDERATION_INFO);
-
-            if (SPDoNotWriteFedInfo != null && !SPDoNotWriteFedInfo.isEmpty()) {
-                SAML2Utils.debug.message("IDPSSOUtil." + methodName +
-                        ": SPDoNotWriteFedInfo is: " + SPDoNotWriteFedInfo);
-                isSPDoNotWriteFedInfoEnabled = SPDoNotWriteFedInfo.equalsIgnoreCase("true");
-            } else {
-                SAML2Utils.debug.message("IDPSSOUtil." + methodName +
-                        ": SPDoNotWriteFedInfo is: not configured");
-                isSPDoNotWriteFedInfoEnabled = false;
-            }
-        } catch (Exception ex) {
-            SAML2Utils.debug.error("IDPSSOUtil." + methodName +
-                    "Unable to get the spDoNotWriteFedInfo flag.", ex);
-            throw new SAML2Exception(ex);
-        }
-
-        return isSPDoNotWriteFedInfoEnabled;
-    }
-
-    /**
-     * Retrieves attribute value for a given attribute name from
-     * <code>SPSSOConfig</code>.
-     *
-     * @param orgName      realm or organization name the service provider resides in
-     * @param hostEntityId hosted service provider's Entity ID.
-     * @param sm           <code>SAML2MetaManager</code> instance to perform meta
-     *                     operations.
-     * @param attrName     name of the attribute whose value ot be retrived.
-     * @return value of the attribute; or <code>null</code> if the attribute
-     *         if not configured, or an error occured in the process.
-     */
-    private static String getAttributeValueFromSPSSOConfig(String orgName,
-                                                           String hostEntityId,
-                                                           SAML2MetaManager sm,
-                                                           String attrName) {
-        String result = null;
-        try {
-            SPSSOConfigElement config = sm.getSPSSOConfig(orgName,
-                    hostEntityId);
-            if (config == null) {
-                return null;
-            }
-            Map attrs = SAML2MetaUtils.getAttributes(config);
-            List value = (List) attrs.get(attrName);
-            if (value != null && value.size() != 0) {
-                result = ((String) value.iterator().next()).trim();
-            }
-        } catch (SAML2MetaException sme) {
-            if (SAML2Utils.debug.messageEnabled()) {
-                SAML2Utils.debug.message("IDPSSOUtil.getAttributeValueFromSPSSO"
-                        + " Config:", sme);
-            }
-            result = null;
-        }
-        return result;
     }
 
     /**

@@ -90,4 +90,17 @@ public interface IDPAccountMapper {
      */
     public String getIdentity(NameID nameID, String hostEntityID, String remoteEntityID, String realm)
             throws SAML2Exception;
+
+    /**
+     * Tells whether the provided NameID-Format should be persisted in the user data store or not.
+     *
+     * @param realm The hosted IdP's realm.
+     * @param hostEntityID The hosted IdP's entityID.
+     * @param remoteEntityID The remote SP's entityID.
+     * @param nameIDFormat The non-transient, non-persistent NameID-Format in question.
+     * @return <code>true</code> if the provided NameID-Format should be persisted in the user data store,
+     * <code>false</code> otherwise.
+     */
+    public boolean shouldPersistNameIDFormat(String realm, String hostEntityID, String remoteEntityID,
+            String nameIDFormat);
 }

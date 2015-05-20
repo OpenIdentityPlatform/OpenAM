@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: SPACSUtils.java,v 1.48 2009/11/20 21:41:16 exu Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 package com.sun.identity.saml2.profile;
 
@@ -50,6 +50,7 @@ import javax.xml.soap.SOAPConnection;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
+import com.sun.identity.plugin.datastore.DataStoreProviderException;
 import com.sun.identity.saml2.common.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -1169,7 +1170,9 @@ public class SPACSUtils {
             }
         }
 
-        boolean ignoreProfile = false;
+        boolean isTransient = SAML2Constants.NAMEID_TRANSIENT_FORMAT.equals(nameIDFormat);
+        boolean isPersistent = SAML2Constants.PERSISTENT.equals(nameIDFormat);
+        boolean ignoreProfile;
         String existUserName = null;
         SessionProvider sessionProvider = null;
         try {
@@ -1196,15 +1199,36 @@ public class SPACSUtils {
                 throw se2;
             }
         }
-        String userName;
+
+        String remoteHostId = authnAssertion.getIssuer().getValue();
+        String userName = null;
+        boolean isNewAccountLink = false;
+        boolean shouldPersistNameID = isPersistent || (!isTransient && !ignoreProfile
+                && acctMapper.shouldPersistNameIDFormat(realm, hostEntityId, remoteHostId, nameIDFormat));
         try {
-            userName = acctMapper.getIdentity(
-                authnAssertion, hostEntityId, realm);
+            if (shouldPersistNameID) {
+                if (SAML2Utils.debug.messageEnabled()) {
+                    SAML2Utils.debug.message(classMethod + "querying data store for existing federation links: realm = "
+                            + realm + " hostEntityID = " + hostEntityId + " remoteEntityID = " + remoteHostId);
+                }
+
+                try {
+                    userName = SAML2Utils.getDataStoreProvider().getUserID(realm, SAML2Utils.getNameIDKeyMap(
+                            nameId, hostEntityId, remoteHostId, realm, SAML2Constants.SP_ROLE));
+                } catch (DataStoreProviderException dse) {
+                    SAML2Utils.debug.error(classMethod + "DataStoreProviderException whilst retrieving NameID " +
+                            "information", dse);
+                    throw new SAML2Exception(dse.getMessage());
+                }
+            }
+            if (userName == null) {
+                userName = acctMapper.getIdentity(authnAssertion, hostEntityId, realm);
+                isNewAccountLink = true;
+            }
         } catch (SAML2Exception se) {
             // invoke SPAdapter for failure
-            invokeSPAdapterForSSOFailure(hostEntityId, realm,
-                request, response, smap, respInfo, 
-                SAML2ServiceProviderAdapter.SSO_FAILED_NO_USER_MAPPING, se);
+            invokeSPAdapterForSSOFailure(hostEntityId, realm, request, response, smap, respInfo,
+                    SAML2ServiceProviderAdapter.SSO_FAILED_NO_USER_MAPPING, se);
             throw se;
         }
         if (userName == null) {
@@ -1215,10 +1239,8 @@ public class SPACSUtils {
                 classMethod + "process: userName =[" + userName + "]");
         }
         List attrs = null;
-        String remoteHostId = null;
         for (Iterator it = assertions.iterator(); it.hasNext(); ) {
             Assertion assertion = (Assertion)it.next();
-            remoteHostId = assertion.getIssuer().getValue();
             List origAttrs = getSAMLAttributes(assertion,
                  needAttributeEncrypted,
                  decryptionKey);
@@ -1257,26 +1279,7 @@ public class SPACSUtils {
                 SAML2Utils.bundle.getString("noUserMapping"));
         }
 
-        // Even if the user profile is set to ignore, we must attempt to persist
-        // if the NameIDFormat is set to persistent.
-        if (ignoreProfile && SAML2Constants.PERSISTENT.equals(nameIDFormat)) {
-            ignoreProfile = false;
-            SAML2Utils.debug.warning(classMethod
-                + "ignoreProfile was true but NameIDFormat is Persistent => setting ignoreProfile to false");        }
-
-        boolean isTransient = SAML2Constants.NAMEID_TRANSIENT_FORMAT.equals(
-            nameId.getFormat());
-        boolean spDoNotWriteFedInfo = isSPDoNotWriteFedInfo(realm, hostEntityId, metaManager) &&
-                SAML2Constants.UNSPECIFIED.equals(nameId.getFormat());
-        boolean writeFedInfo = ( (!ignoreProfile && !isTransient && !spDoNotWriteFedInfo) &&
-                (!SAML2Utils.isFedInfoExists(
-                    userName, hostEntityId, remoteHostId, nameId)));
-            // TODO: check if this few lines are needed
-            /*
-                DN dnObject = new DN(userName);
-                String [] array = dnObject.explodeDN(true);
-                userName = array[0];
-            */
+        boolean writeFedInfo = isNewAccountLink && shouldPersistNameID;
 
         if (SAML2Utils.debug.messageEnabled()) {
             SAML2Utils.debug.message(
@@ -2089,49 +2092,6 @@ public class SPACSUtils {
         }
         return createMapForFedlet(respInfo, realRedirectUrl, hostEntityId); 
     }
-
-     /**
-     * Returns  <code>true</code> or <code>false</code>
-     * depending if the flag  spDoNotWriteFederationInfo is set in the
-     * SP Extended metadata
-     *
-     * @param realm the realm name
-     * @param spEntityID the entity id of the Service Provider
-     * @param metaManager the SAML2MetaMAnager used to read the extendede metadata
-     * @return the <code>true/false</code>
-     * @exception SAML2Exception if the operation is not successful
-     */
-    private static Boolean isSPDoNotWriteFedInfo(
-                                 String realm, String spEntityID, SAML2MetaManager metaManager)
-        throws SAML2Exception {
-        String methodName = "isSPDoNotWriteFedInfo";
-
-        Boolean isSPDoNotWriteFedInfoEnabled = false;
-        SAML2SDKUtils.debug.message("SPACSUtils." + methodName + "Entering");
-
-        try {
-            String SPDoNotWriteFedInfo = getAttributeValueFromSPSSOConfig(realm,
-                    spEntityID, metaManager,
-                    SAML2Constants.SP_DO_NOT_WRITE_FEDERATION_INFO);
-
-            if (SPDoNotWriteFedInfo != null && !SPDoNotWriteFedInfo.isEmpty()) {
-                SAML2SDKUtils.debug.message("SPACSUtils." + methodName +
-                        ": SPDoNotWriteFedInfo is: " +  SPDoNotWriteFedInfo);
-                isSPDoNotWriteFedInfoEnabled = SPDoNotWriteFedInfo.equalsIgnoreCase("true");
-            } else {
-                SAML2SDKUtils.debug.message("SPACSUtils." + methodName +
-                        ": SPDoNotWriteFedInfo is: not configured");
-                isSPDoNotWriteFedInfoEnabled = false;
-            }
-        } catch (Exception ex) {
-            SAML2Utils.debug.error(methodName +
-                "Unable to get the SPDoNotWriteFedInfo flag.", ex);
-            throw new SAML2Exception(ex);
-        }
-
-        return isSPDoNotWriteFedInfoEnabled ;
-    }
-
 
     private static Map createMapForFedlet(
         ResponseInfo respInfo, String relayUrl, String hostedEntityId) {
