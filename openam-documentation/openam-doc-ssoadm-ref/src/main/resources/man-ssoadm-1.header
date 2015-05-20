@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2015 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
 <refentry xml:id='ssoadm-1'
@@ -305,6 +305,7 @@
     <listitem><para><link linkend="ssoadm-export-svc-cfg"><command>export-svc-cfg</command></link></para></listitem>
     <listitem><para><link linkend="ssoadm-get-attr-defs"><command>get-attr-defs</command></link></para></listitem>
     <listitem><para><link linkend="ssoadm-get-revision-number"><command>get-revision-number</command></link></para></listitem>
+    <listitem><para><link linkend="ssoadm-get-sub-cfg"><command>get-sub-cfg</command></link></para></listitem>
     <listitem><para><link linkend="ssoadm-import-svc-cfg"><command>import-svc-cfg</command></link></para></listitem>
     <listitem><para><link linkend="ssoadm-remove-attr-choicevals"><command>remove-attr-choicevals</command></link></para></listitem>
     <listitem><para><link linkend="ssoadm-remove-attr-defs"><command>remove-attr-defs</command></link></para></listitem>
