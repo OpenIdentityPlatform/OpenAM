@@ -92,9 +92,9 @@ public class OpenAMRefreshToken extends RefreshToken {
      */
     private void setRealm(String realm) {
         if (realm == null || realm.isEmpty()) {
-            this.put(OAuth2Constants.CoreTokenParams.REALM, stringToSet("/"));
+            this.setStringProperty(OAuth2Constants.CoreTokenParams.REALM, "/");
         } else {
-            this.put(OAuth2Constants.CoreTokenParams.REALM, stringToSet(realm));
+            this.setStringProperty(OAuth2Constants.CoreTokenParams.REALM, realm);
         }
     }
 
@@ -102,7 +102,7 @@ public class OpenAMRefreshToken extends RefreshToken {
      * Gets the realm.
      */
     public String getRealm() {
-        return this.get(OAuth2Constants.CoreTokenParams.REALM).asString();
+        return this.getStringProperty(OAuth2Constants.CoreTokenParams.REALM);
     }
 
     /**
