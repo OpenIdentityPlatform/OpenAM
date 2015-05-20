@@ -40,14 +40,12 @@ import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
-import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.adapters.TokenAdapter;
-import org.forgerock.openam.oauth2.OpenAMSettings;
+import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.openidconnect.CheckSession;
-import org.restlet.Request;
 
 /**
  * Defines what is needed to do the OpenID Connect check session endpoint.

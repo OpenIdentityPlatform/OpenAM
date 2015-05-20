@@ -14,7 +14,7 @@
  * Copyright 2014 ForgeRock AS.
  */
 
-package org.forgerock.openam.oauth2;
+package org.forgerock.openam.utils;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.sm.SMSException;
@@ -105,4 +105,9 @@ public interface OpenAMSettings {
      * @return The SSO Cookie name.
      */
     String getSSOCookieName();
+
+    /**
+     * Whether there is realm config for the service
+     */
+    boolean hasConfig(String realm) throws SSOException, SMSException;
 }

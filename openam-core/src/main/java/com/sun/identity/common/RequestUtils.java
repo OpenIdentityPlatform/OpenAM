@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,8 @@
  *
  * $Id: RequestUtils.java,v 1.5 2008/08/19 19:09:00 veiming Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
+ *
  */
 
 package com.sun.identity.common;
@@ -43,7 +45,7 @@ import com.iplanet.am.util.SystemProperties;
 public class RequestUtils {
 
     // the debug file name
-    private static final String debugName = "amRequestUtils";
+    public static final String debugName = "amRequestUtils";
 
     // the resource bundle name
     private static final String bundleName = "amCommonUtils";

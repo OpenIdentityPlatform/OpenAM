@@ -16,20 +16,21 @@
 
 package org.forgerock.openidconnect.restlet;
 
+import java.util.Map;
+import javax.inject.Inject;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.restlet.ExceptionHandler;
 import org.forgerock.oauth2.restlet.OAuth2RestletException;
+import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openidconnect.OpenIDConnectProviderDiscovery;
 import org.restlet.Request;
 import org.restlet.ext.json.JsonRepresentation;
+import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
-
-import javax.inject.Inject;
-import java.util.Map;
 
 /**
  * Handles requests to the OpenId Connect discovery endpoint.
@@ -41,6 +42,7 @@ public class OpenIDConnectDiscovery extends ServerResource {
     private final OAuth2RequestFactory<Request> requestFactory;
     private final OpenIDConnectProviderDiscovery providerDiscovery;
     private final ExceptionHandler exceptionHandler;
+    private final BaseURLProviderFactory baseUrlProviderFactory;
 
     /**
      * Constructs a new OpenIDConnectDiscovery.
@@ -51,10 +53,12 @@ public class OpenIDConnectDiscovery extends ServerResource {
      */
     @Inject
     public OpenIDConnectDiscovery(OAuth2RequestFactory<Request> requestFactory,
-            OpenIDConnectProviderDiscovery providerDiscovery, ExceptionHandler exceptionHandler) {
+            OpenIDConnectProviderDiscovery providerDiscovery, ExceptionHandler exceptionHandler,
+            BaseURLProviderFactory baseUrlProviderFactory) {
         this.requestFactory = requestFactory;
         this.providerDiscovery = providerDiscovery;
         this.exceptionHandler = exceptionHandler;
+        this.baseUrlProviderFactory = baseUrlProviderFactory;
     }
 
     /**
@@ -69,12 +73,13 @@ public class OpenIDConnectDiscovery extends ServerResource {
         final OAuth2Request request = requestFactory.create(getRequest());
         final String resource = request.getParameter("resource");
         final String rel = request.getParameter("rel");
+        final String realm = request.getParameter("realm");
 
         try {
-            final String deploymentUrl = getRequest().getHostRef().toString() + "/"
-                    + getRequest().getResourceRef().getSegments().get(0);
-            final Map<String, Object> response = providerDiscovery.discover(resource, rel,
-                    deploymentUrl, request);
+            final String deploymentUrl =
+                    baseUrlProviderFactory.get(realm).getURL(ServletUtils.getRequest(getRequest()));
+
+            final Map<String, Object> response = providerDiscovery.discover(resource, rel, deploymentUrl, request);
 
             return new JsonRepresentation(response);
 

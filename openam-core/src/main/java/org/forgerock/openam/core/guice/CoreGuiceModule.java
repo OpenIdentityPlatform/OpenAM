@@ -91,6 +91,7 @@ import org.forgerock.util.thread.ExecutorServiceFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.servlet.ServletContext;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.concurrent.ExecutorService;
@@ -340,6 +341,12 @@ public class CoreGuiceModule extends AbstractModule {
             // Provider used over bind(..).getInstance(..) to enforce a lazy loading approach.
             return AdminTokenAction.getInstance();
         }
+    }
+
+    // provides our stored servlet context to classes which require it
+    @Provides @Named(ServletContextCache.CONTEXT_REFERENCE)
+    ServletContext getServletContext() {
+        return ServletContextCache.getStoredContext();
     }
 
     /**

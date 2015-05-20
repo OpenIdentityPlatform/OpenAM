@@ -14,7 +14,7 @@
  * Copyright 2014-2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.oauth2;
+package org.forgerock.openam.utils;
 
 import com.google.inject.assistedinject.Assisted;
 import com.iplanet.am.util.SystemProperties;
@@ -83,7 +83,7 @@ public class OpenAMSettingsImpl implements OpenAMSettings {
         return attributes.get(attributeName);
     }
 
-    protected boolean hasConfig(String realm) throws SSOException, SMSException {
+    public boolean hasConfig(String realm) throws SSOException, SMSException {
         return getServiceConfig(realm).exists();
     }
 

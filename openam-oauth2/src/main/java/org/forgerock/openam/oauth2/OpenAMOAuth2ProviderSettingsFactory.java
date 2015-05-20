@@ -19,13 +19,14 @@ package org.forgerock.openam.oauth2;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
-import org.forgerock.oauth2.core.PEMDecoder;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.openam.rest.service.RestletRealmRouter;
+import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.restlet.Request;
+import org.restlet.ext.servlet.ServletUtils;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,38 +41,30 @@ public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettin
     private final Map<String, OAuth2ProviderSettings> providerSettingsMap = new HashMap<String, OAuth2ProviderSettings>();
     private final RealmNormaliser realmNormaliser;
     private final CookieExtractor cookieExtractor;
-    private final PEMDecoder pemDecoder;
+    private final BaseURLProviderFactory baseURLProviderFactory;
 
     /**
-     * Contructs a new OpenAMOAuth2ProviderSettingsFactory.
+     * Constructs a new OpenAMOAuth2ProviderSettingsFactory.
      *
      * @param realmNormaliser An instance of the RealmNormaliser.
      * @param cookieExtractor An instance of the CookieExtractor.
-     * @param pemDecoder An instance of the PEMDecoder.
      */
     @Inject
     public OpenAMOAuth2ProviderSettingsFactory(RealmNormaliser realmNormaliser, CookieExtractor cookieExtractor,
-            PEMDecoder pemDecoder) {
+            BaseURLProviderFactory baseURLProviderFactory) {
         this.realmNormaliser = realmNormaliser;
         this.cookieExtractor = cookieExtractor;
-        this.pemDecoder = pemDecoder;
+        this.baseURLProviderFactory = baseURLProviderFactory;
     }
 
     /**
      * {@inheritDoc}
      */
     public OAuth2ProviderSettings get(OAuth2Request request) throws NotFoundException {
-        final String realm = request.getParameter("realm");
-        final Request req = request.getRequest();
-        String urlPattern = (String) req.getAttributes().get(RestletRealmRouter.REALM_URL);
-        if (urlPattern.endsWith("/")) {
-            urlPattern = urlPattern.substring(0, urlPattern.length() - 1);
-        }
-        String queryRealm = req.getResourceRef().getQueryAsForm().getFirstValue("realm");
-        if (queryRealm != null && !"/".equals(queryRealm) && urlPattern.endsWith("/oauth2")) {
-            urlPattern += realmNormaliser.normalise(queryRealm);
-        }
-        return getInstance(realmNormaliser.normalise(realm), urlPattern);
+        final String realm = realmNormaliser.normalise(request.<String>getParameter("realm"));
+        final HttpServletRequest req = ServletUtils.getRequest(request.<Request>getRequest());
+        String baseUrlPattern = baseURLProviderFactory.get(realm).getURL(req);
+        return getInstance(realm, baseUrlPattern);
     }
 
     /**
@@ -97,7 +90,7 @@ public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettin
         synchronized (providerSettingsMap) {
             OAuth2ProviderSettings providerSettings = providerSettingsMap.get(realm);
             if (providerSettings == null) {
-                providerSettings = new OpenAMOAuth2ProviderSettings(realm, deploymentUrl, cookieExtractor, pemDecoder);
+                providerSettings = new OpenAMOAuth2ProviderSettings(realm, deploymentUrl, cookieExtractor);
                 if (providerSettings.exists()) {
                     providerSettingsMap.put(realm, providerSettings);
                 } else {
