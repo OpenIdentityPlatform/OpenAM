@@ -28,14 +28,14 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
     'org/forgerock/commons/ui/common/main/AbstractView',
     'backgrid',
     'org/forgerock/openam/ui/uma/util/BackgridUtils',
-    'org/forgerock/commons/ui/common/components/BSDialog',
+    'bootstrap-dialog',
     'org/forgerock/openam/ui/uma/views/share/CommonShare',
     'org/forgerock/commons/ui/common/util/Constants',
     'org/forgerock/commons/ui/common/main/EventManager',
     'org/forgerock/commons/ui/common/main/Router',
     'org/forgerock/commons/ui/common/util/UIUtils',
     'org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy'
-], function(Messages, AbstractView, Backgrid, BackgridUtils, BSDialog, CommonShare, Constants, EventManager, Router, UIUtils, UMAResourceSetWithPolicy) {
+], function(Messages, AbstractView, Backgrid, BackgridUtils, BootstrapDialog, CommonShare, Constants, EventManager, Router, UIUtils, UMAResourceSetWithPolicy) {
     var EditResource = AbstractView.extend({
         initialize: function(options) {
             this.model = null;
@@ -55,32 +55,35 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
             this.render();
         },
         onRevokeAll: function() {
-            var self = this,
-                revokeDialog = new BSDialog();
-            revokeDialog.setTitle(self.model.get('name'));
-            revokeDialog.closable = false;
-            revokeDialog.type = "type-danger";
-            revokeDialog.message = $.t("uma.resources.show.revokeAllMessage");
-            revokeDialog.actions = [{
-                id: "btnOk",
-                label: $.t("common.form.ok"),
-                cssClass: "btn-primary btn-danger",
-                action: function(dialog) {
-                    dialog.enableButtons(false);
-                    dialog.getButton("btnOk").text($.t("common.form.working"));
-                    self.model.get('policy').destroy().done(function (response) {
-                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "revokeAllPoliciesSuccess");
-                        self.render();
-                    }).fail(function (error) {
-                        Messages.messages.addMessage({ message: JSON.parse(error.responseText).message, type: "error"});
-                    }).always(function() {
+            var self = this;
+            BootstrapDialog.show({
+                type: BootstrapDialog.TYPE_DANGER,
+                title: self.model.get('name'),
+                message: $.t("uma.resources.show.revokeAllMessage"),
+                closable: false,
+                buttons: [{
+                    id: "btnOk",
+                    label: $.t("common.form.ok"),
+                    cssClass: "btn-primary btn-danger",
+                    action: function(dialog) {
+                        dialog.enableButtons(false);
+                        dialog.getButton("btnOk").text($.t("common.form.working"));
+                        self.model.get('policy').destroy().done(function (response) {
+                            EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "revokeAllPoliciesSuccess");
+                            self.render();
+                        }).fail(function (error) {
+                            Messages.messages.addMessage({ message: JSON.parse(error.responseText).message, type: "error"});
+                        }).always(function() {
+                            dialog.close();
+                        });
+                    }
+                }, {
+                    label: $.t("common.form.cancel"),
+                    action: function(dialog) {
                         dialog.close();
-                    });
-                }
-            },{
-                type: "close"
-            }];
-            revokeDialog.show();
+                    }
+                }]
+            });
         },
         onShare: function() {
             var shareView = new CommonShare();
