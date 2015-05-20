@@ -38,8 +38,6 @@
             "PolicyMessages": {
                 "applicationCreated": "Application created successfully",
                 "applicationUpdated": "Application updated successfully",
-                "referralCreated": "Referral created successfully",
-                "referralUpdated": "Referral updated successfully",
                 "deleteSuccess": "Deleted successfully",
                 "deleteFail": "Failed to delete",
                 "policyCreated": "Policy created successfully",
@@ -371,50 +369,31 @@
             }
         },
 
-        "managePolicies": {
-            "policies": "Policies",
-            "add": "Add New Policy",
-            "description": "Policies define the rules used to determine whether to grant or deny access to a resource.<br>To create a Policy, click Add New Policy. To edit a Policy, click the Policy name. To delete a Policy, select it, and then click Delete Selected."
-        },
-
-        "editPolicies": {
-            "editPolicy": "Edit Policy",
-            "title": "Create Policy",
-            "description": "To configure a policy, begin with Step 1 and progress through to Step 7. Modifications can be made after the policy has been created.",
-            "step1": "Step 1: Name the Policy",
-            "step2": "Step 2: Specify Resources",
-            "step3": "Step 3: Select Actions",
-            "step4": "Step 4: Define Subject Conditions",
-            "step5": "Step 5: Define Environment Conditions",
-            "step6": "Step 6: Specify Response Attributes",
-            "step7": "Step 7: Review Configuration and Finish",
-            "deleteLogical": "Deleting will also remove any child objects",
-            "manageRulesDescription": "To define rules, click the Condition or Logical buttons above, enter the relevant options, and then drag the block into place in the rule set above. Each block can be configured both before and after is has been moved. Only rules inside the rule set section will be included in the created policy. To edit a Condition, click the pencil icon, or double-click the item.",
-            "logical": "Logical",
-            "selectResourceTypeHelper": "In order to define resources please select resource type first.",
-            "selectResourceType" : "Select Resource Type",
-            "noResourceTypeNoActions": "In order to select actions please select resource type first."
-        },
-
-        "manageReferrals": {
-            "referrals": "Referrals",
-            "add": "Add New Referral",
-            "description": "Referrals enable Applications and Policies to exist in different Realms, and redirect requests to those Realms as required.<br>To create a Referral, click Add New Referral. To edit a Referral, click the Referral name. To delete a Referral, select it, and then click Delete Selected.",
-            "andReferrals": "&amp; Referrals"
-        },
-
-        "editReferrals": {
-            "editReferral": "Edit Referral",
-            "title": "Create Referral",
-            "description": "To configure a Referral, begin with Step 1 and progress through Step 4. Modifications can be made after the Referral has been created.",
-            "step1": "Step 1: Name the Referral",
-            "step2": "Step 2: Specify Resources",
-            "step3": "Step 3: Select Realms",
-            "step4": "Step 4: Review Configuration and Finish",
-            "selectRealmsDescription": "Referrals can only redirect to a sibling or child Realm. Select a Realm in the Available realms field, and then click the Add button. To remove a Realm, click the Delete button.",
-            "selectRealmsPlaceholder": "Available realms...",
-            "noAvailableRealms": "There are no sibling or child realms available for selection."
-
+        "policies": {
+            "list": {
+                "policies": "Policies",
+                "grid": ["Name", "Description", "Resources", "Actions"],
+                "add": "Add New Policy",
+                "noResults": "No results to display"
+            },
+            "edit": {
+                "editPolicy": "Edit Policy",
+                "title": "Create Policy",
+                "description": "To configure a policy, begin with Step 1 and progress through to Step 7. Modifications can be made after the policy has been created.",
+                "step1": "Step 1: Name the Policy",
+                "step2": "Step 2: Specify Resources",
+                "step3": "Step 3: Select Actions",
+                "step4": "Step 4: Define Subject Conditions",
+                "step5": "Step 5: Define Environment Conditions",
+                "step6": "Step 6: Specify Response Attributes",
+                "step7": "Step 7: Review Configuration and Finish",
+                "deleteLogical": "Deleting will also remove any child objects",
+                "manageRulesDescription": "To define rules, click the Condition or Logical buttons above, enter the relevant options, and then drag the block into place in the rule set above. Each block can be configured both before and after is has been moved. Only rules inside the rule set section will be included in the created policy. To edit a Condition, click the pencil icon, or double-click the item.",
+                "logical": "Logical",
+                "selectResourceTypeHelper": "In order to define resources please select resource type first.",
+                "selectResourceType" : "Select Resource Type",
+                "noResourceTypeNoActions": "In order to select actions please select resource type first."
+            }
         },
 
         "resourceTypes":{

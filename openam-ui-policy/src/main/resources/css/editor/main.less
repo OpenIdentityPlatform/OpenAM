@@ -54,35 +54,7 @@
     }
 }
 
-.tab-content {
-    margin-bottom: 20px;
-}
-
-.tab-pane {
-    background-color: #fff;
-}
-
 /* Jquery-UI overrides */
-
-html body .ui-jqgrid tr.ui-widget-content{
-    box-shadow:none;
-}
-
-.ui-widget-content {
-    border-color: #bbb;
-}
-
-.ui-jqgrid tr.ui-widget-content {
-
-    border: 0;
-
-    &.jqgrow td {
-        padding: 5px 10px 4px;
-        font-size: 13px;
-        line-height: 18px;
-    }
-}
-
 .ui-autocomplete {
     max-height: 200px;
     overflow-y: auto;
@@ -410,211 +382,7 @@ html body .ui-jqgrid tr.ui-widget-content{
     }
 }
 
-.ui-jqgrid {
-    cursor: pointer;
-    margin: 15px 0 0 0;
-
-    &.ui-widget-content {
-      border: 0;
-      background: @background-color;
-      box-shadow: none;
-    }
-
-    .ui-state-default, .ui-widget-content .ui-state-default {
-      background: @background-color;
-    }
-
-    .ui-jqgrid-htable {
-
-        .ui-search-toolbar {
-            th {
-                height: 30px;
-                padding: 0;
-                vertical-align: top;
-            }
-
-            .ui-search-table {
-                .ui-search-clear a {
-                    margin-left: -30px;
-                }
-
-                .ui-search-input {
-                    & > input {
-                        height: 26px;
-                        margin: 0;
-                    }
-                }
-            }
-        }
-
-        .ui-th-column:hover {
-            color: #5a646d;
-        }
-    }
-
-    span.item-button-panel {
-        > span {
-            font-size: 16px;
-            padding: 0 3px;
-        }
-    }
-
-    tr.ui-widget-content {
-        background: @background-color;
-        box-shadow: none;
-        td {
-            vertical-align: middle;
-        }
-    }
-
-    th[id*="_cb"] {
-        display: none;
-    }
-
-    div.frozen-div.ui-state-default.ui-jqgrid-hdiv {
-        border-bottom: 0;
-    }
-
-    div.ui-jqgrid-bdiv {
-
-        tr:last-of-type {
-            td {
-                border-bottom: 0;
-            }
-        }
-
-        &.frozen-bdiv {
-            td {
-                padding-top: 3px;
-                padding-bottom: 2px;
-            }
-        }
-    }
-
-    tr.jqgrow {
-
-        td[aria-describedby*="_iconChB"] {
-            text-align: center;
-            color: #A6A6A6;
-            span {
-                font-size: 16px;
-                background-color: white;
-                &:hover, &:focus {
-                    color: #777;
-                    box-shadow:none;
-                }
-            }
-        }
-
-        td{
-            dl, dt, dd {
-                display:block;
-                margin:0;
-                padding:0;
-            }
-            dd {
-                margin-left:70px;
-                .wordwrap;
-                &:after {
-                    content:' ';
-                    white-space:pre;
-                }
-            }
-            dt {
-                min-width: 70px;
-                float: left;
-                clear: left;
-                font-weight: bold;
-                &:after {
-                    content:' ';
-                }
-            }
-            dd {
-
-            }
-            dd:after {
-                content:' ';
-            }
-        }
-
-        td[aria-describedby*="_name"], td[aria-describedby*="_resources"],
-        td[aria-describedby*="_resourceAttributes"], td[aria-describedby*="_subject"],
-        td[aria-describedby*="_resources"] li,
-        td[aria-describedby*="_resourceAttributes"] li, td[aria-describedby*="_subject"] li,
-        td[aria-describedby*="_patterns"] li{
-            .ellipsis;
-        }
-
-        td[aria-describedby*="_createdBy"], td[aria-describedby*="_lastModifiedBy"], td[aria-describedby*="_description"]{
-            .wordwrap;
-        }
-
-        td[aria-describedby*="_name"]{
-            font-weight:bold;
-            white-space: initial;
-        }
-
-        td[aria-describedby*="_tableActions"] {
-            overflow: visible;
-            white-space: normal;
-            text-align: center;
-        }
-
-        &.ui-state-hover {
-            border-color: rgba(0, 0, 0, 0.2);
-            background: #d5d5d5;
-            color: inherit;
-        }
-
-        &.ui-state-highlight, &.highlight {
-            background: #D7E9F8;
-            border-color: rgba(0, 0, 0, 0.2);
-            color: darken(#D7E9F8,50%);
-
-            td[aria-describedby*="_iconChB"] span {
-                color: darken(#D7E9F8,50%);
-                opacity:0.5;
-                &:hover, &:focus {
-                    opacity:1;
-                }
-            }
-
-            span.item-button-panel > span{
-                color:darken(#D7E9F8,50%);
-            }
-        }
-
-    }
-}
-
-/* search dialog */
-.ui-jqdialog#searchmodfbox_apps, .ui-jqdialog#searchmodfbox_policies {
-    width: 750px;
-    min-width: 750px;
-
-    select, input.input-elm {
-        margin: 3px;
-    }
-
-    input.add-rule {
-        margin-left: 5px;
-    }
-
-    input.delete-rule {
-        margin-left: 26px;
-    }
-}
-
-th.ui-state-default.ui-th-column {
-    border: 0;
-    background: inherit;
-}
-
-[id*='gview_'] .frozen-bdiv {
-    overflow: visible !important;
-    height: auto !important;
-}
-
+//TODO: needed?
 .ui-multiselect {
     .remove-all, .add-all {
         float: right;
@@ -673,20 +441,6 @@ input[type="text"]:invalid:required, input[type="text"].invalid, select:invalid:
 
 .ui-state-default .ui-element .dragged{
     margin-top:-300px;
-}
-
-// TODO: used only on referrals page, can be removed
-#selectableRealmContainer{
-    padding: 0 30px 0 0px;
-    margin: 4px 0 0 3px;
-}
-
-// TODO: used only on referrals page, can be removed
-#lastFSlash, select {
-    transition:opacity 300ms linear;
-    &.fade{
-        opacity:0;
-    }
 }
 
 .nav .nav-tabs {
@@ -963,7 +717,6 @@ body.editing {
     }
 
     ol.condition-management-group {
-
 
         li {
             display: block;

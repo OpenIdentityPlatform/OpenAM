@@ -145,12 +145,10 @@ define("config/AppConfiguration", [
                         "templates/policy/policies/conditions/ListItem.html",
                         "templates/policy/policies/conditions/LegacyListItem.html",
                         "templates/policy/policies/StripedListActionItemTemplate.html",
-                        "templates/policy/policies/PoliciesListGridActionsTemplate.html",
+                        "templates/policy/policies/PoliciesListToolbarTemplate.html",
 
                         "templates/policy/applications/ApplicationsListActionsCellTemplate.html",
                         "templates/policy/applications/ApplicationsListToolbarTemplate.html",
-
-                        "templates/policy/referrals/ManageReferralsGridActionsTemplate.html",
 
                         "templates/policy/resourcetypes/ResourceTypesListToolbarTemplate.html",
 

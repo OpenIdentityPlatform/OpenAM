@@ -44,25 +44,12 @@ define("config/routes/PolicyRoutesConfig", function () {
             role: "ui-admin",
             pattern: "app/?/policies/"
         },
-        "manageReferrals": {
-            view: "org/forgerock/openam/ui/policy/policies/PoliciesListView",
-            url: /^app\/(.+?)\/(referrals)\//,
-            role: "ui-admin",
-            pattern: "app/?/referrals/"
-        },
         "editPolicy": {
             view: "org/forgerock/openam/ui/policy/policies/EditPolicyView",
             url: /^app\/(.+?)\/policy\/(.*?)(?:\/){0,1}$/,
             defaults: ["", ""],
             role: "ui-admin",
             pattern: "app/?/policy/?"
-        },
-        "editReferral": {
-            view: "org/forgerock/openam/ui/policy/referrals/EditReferralView",
-            url: /^app\/(.+?)\/referral\/(.*?)(?:\/){0,1}$/,
-            defaults: ["", ""],
-            role: "ui-admin",
-            pattern: "app/?/referral/?"
         },
         "manageResourceTypes": {
             view: "org/forgerock/openam/ui/policy/resourcetypes/ResourceTypesListView",

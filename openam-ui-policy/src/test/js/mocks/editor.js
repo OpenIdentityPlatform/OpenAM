@@ -56,20 +56,13 @@ define([
     "text!templates/policy/policies/conditions/OperatorRulesTemplate.html",
 
     "text!templates/policy/policies/EditPolicyTemplate.html",
-    "text!templates/policy/policies/PoliciesListGridActionsTemplate.html",
-    "text!templates/policy/policies/PoliciesListGridTemplate.html",
+    "text!templates/policy/policies/PoliciesListToolbarTemplate.html",
     "text!templates/policy/policies/PoliciesListTemplate.html",
     "text!templates/policy/policies/ReviewPolicyStepTemplate.html",
     "text!templates/policy/policies/PoliciesListHeaderTemplate.html",
     "text!templates/policy/policies/ResourcesStepTemplate.html",
     "text!templates/policy/policies/PolicyActionsTemplate.html",
     "text!templates/policy/policies/StripedListActionItemTemplate.html",
-
-    "text!templates/policy/referrals/EditReferralTemplate.html",
-    "text!templates/policy/referrals/ManageReferralsGridActionsTemplate.html",
-    "text!templates/policy/referrals/ManageReferralsGridTemplate.html",
-    "text!templates/policy/referrals/ReviewReferralStepTemplate.html",
-    "text!templates/policy/referrals/SelectRealmsTemplate.html",
 
     "text!templates/policy/resources/CreatedResourcesTemplate.html",
 
@@ -117,20 +110,13 @@ define([
             "templates/policy/policies/conditions/OperatorRulesTemplate.html",
 
             "templates/policy/policies/EditPolicyTemplate.html",
-            "templates/policy/policies/PoliciesListGridActionsTemplate.html",
-            "templates/policy/policies/PoliciesListGridTemplate.html",
+            "templates/policy/policies/PoliciesListToolbarTemplate.html",
             "templates/policy/policies/PoliciesListTemplate.html",
             "templates/policy/policies/ReviewPolicyStepTemplate.html",
             "templates/policy/policies/PoliciesListHeaderTemplate.html",
             "templates/policy/policies/ResourcesStepTemplate.html",
             "templates/policy/policies/PolicyActionsTemplate.html",
             "templates/policy/policies/StripedListActionItemTemplate.html",
-
-            "templates/policy/referrals/EditReferralTemplate.html",
-            "templates/policy/referrals/ManageReferralsGridActionsTemplate.html",
-            "templates/policy/referrals/ManageReferralsGridTemplate.html",
-            "templates/policy/referrals/ReviewReferralStepTemplate.html",
-            "templates/policy/referrals/SelectRealmsTemplate.html",
 
             "templates/policy/resources/CreatedResourcesTemplate.html",
 

@@ -22,12 +22,12 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define Backgrid, Backbone, _, $*/
+/*global define Backbone, _, $*/
 
 define("org/forgerock/openam/ui/editor/util/BackgridUtils", [
-    "org/forgerock/commons/ui/common/main/Router",
-    "backgrid"
-], function (Router, Backgrid) {
+    "backgrid",
+    "org/forgerock/commons/ui/common/main/Router"
+], function (Backgrid, Router) {
     var obj = {};
 
     // todo: candidate for commons, have not changed it, using UMA version
@@ -77,6 +77,28 @@ define("org/forgerock/openam/ui/editor/util/BackgridUtils", [
             obj.FilterHeaderCell.__super__.render.apply(this);
             this.$el.append(filter.render().el);
             return this;
+        }
+    });
+
+    /**
+     * Clickable Row
+     * <p>
+     * You must extend this row and specify a "callback" attribute e.g.
+     * <p>
+     * MyRow = BackgridUtils.ClickableRow.extend({
+     *     callback: myCallback
+     * });
+     */
+        //TODO: commons candidate
+    obj.ClickableRow = Backgrid.Row.extend({
+        events: {
+            "click": "onClick"
+        },
+
+        onClick: function (e) {
+            if (this.callback) {
+                this.callback(e);
+            }
         }
     });
 

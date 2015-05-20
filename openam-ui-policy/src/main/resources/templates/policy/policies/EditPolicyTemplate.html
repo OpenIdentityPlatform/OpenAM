@@ -2,9 +2,9 @@
     <div class="page-header">
         <h1>
             {{#if entity.name}}
-            {{t "policy.editPolicies.editPolicy"}}: <strong>{{entity.name}}</strong>
+            {{t "policy.policies.edit.editPolicy"}}: <strong>{{entity.name}}</strong>
             {{else}}
-            {{t "policy.editPolicies.title"}}
+            {{t "policy.policies.edit.title"}}
             {{/if}}
 
             <a class="pull-right btn btn-default" href="#app/{{encodeURIComponent entity.applicationName}}/policies/" role="button">{{t 'common.form.cancel'}}</a>
@@ -19,7 +19,7 @@
         </small>
     </div>
 
-    <p>{{t "policy.editPolicies.description"}}</p>
+    <p>{{t "policy.policies.edit.description"}}</p>
 
     <form class="form-horizontal" role="form">
         <div class="panel-group accordion" id="accordion" role="tablist" aria-multiselectable="true">
@@ -27,7 +27,7 @@
                 <div class="panel-heading" role="tab" id="stepOne">
                     <h4 class="panel-title">
                         <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                            {{t "policy.editPolicies.step1"}}
+                            {{t "policy.policies.edit.step1"}}
                         </a>
                         <span class="help-link" data-help-key="policy.nameAndDescription"></span>
                     </h4>
@@ -60,7 +60,7 @@
                 <div class="panel-heading" role="tab" id="stepTwo">
                     <h4 class="panel-title">
                         <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                            {{t "policy.editPolicies.step2"}}
+                            {{t "policy.policies.edit.step2"}}
                         </a>
                         <span class="help-link" data-help-key="policy.resources"></span>
                     </h4>
@@ -72,7 +72,7 @@
                             <label class="col-sm-2 control-label" for="availableResTypes">{{t "policy.common.resourceTypes"}}</label>
                             <div class="col-sm-8">
                                 <select id="availableResTypes" class="form-control">
-                                    <option value="">{{t "policy.editPolicies.selectResourceType"}}</option>
+                                    <option value="">{{t "policy.policies.edit.selectResourceType"}}</option>
                                     {{#each options.availableResourceTypes}}
                                     <option {{#equals this.uuid ../entity.resourceTypeUuid}}selected{{/equals}} value="{{this.uuid}}">{{this.name}}</option>
                                     {{/each}}
@@ -94,7 +94,7 @@
                 <div class="panel-heading" role="tab" id="stepThree">
                     <h4 class="panel-title">
                         <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                            {{t "policy.editPolicies.step3"}}
+                            {{t "policy.policies.edit.step3"}}
                         </a>
                         <span class="help-link" data-help-key="policy.actions"></span>
                     </h4>
@@ -110,7 +110,7 @@
                 <div class="panel-heading" role="tab" id="stepFour">
                     <h4 class="panel-title">
                         <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-                            {{t "policy.editPolicies.step4"}}
+                            {{t "policy.policies.edit.step4"}}
                         </a>
                         <span class="help-link" data-help-key="policy.subjectConditions"></span>
                     </h4>
@@ -126,7 +126,7 @@
                 <div class="panel-heading" role="tab" id="stepFive">
                     <h4 class="panel-title">
                         <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
-                            {{t "policy.editPolicies.step5"}}
+                            {{t "policy.policies.edit.step5"}}
                         </a>
                         <span class="help-link" data-help-key="policy.environmentConditions"></span>
                     </h4>
@@ -142,7 +142,7 @@
                 <div class="panel-heading" role="tab" id="stepSix">
                     <h4 class="panel-title">
                         <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
-                            {{t "policy.editPolicies.step6"}}
+                            {{t "policy.policies.edit.step6"}}
                         </a>
                         <span class="help-link" data-help-key="policy.resourceAttributes"></span>
                     </h4>
@@ -161,7 +161,7 @@
                 <div class="panel-heading" role="tab" id="stepSeven">
                     <h4 class="panel-title">
                         <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
-                            {{t "policy.editPolicies.step7"}}
+                            {{t "policy.policies.edit.step7"}}
                         </a>
                     </h4>
                 </div>

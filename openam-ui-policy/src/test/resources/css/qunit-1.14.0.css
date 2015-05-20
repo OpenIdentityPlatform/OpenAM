@@ -235,15 +235,3 @@
 	width: 1000px;
 	height: 1000px;
 }
-
-/** hiding injected jqgrid warnings and popups */
-
-.ui-jqdialog{
-	display:none;
-}
-
-html .ui-widget-content{
-	max-width: 0;
-	max-height: 0;
-	overflow: hidden;
-}

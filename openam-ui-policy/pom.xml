@@ -83,13 +83,6 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.commons.ui.libs</groupId>
-            <artifactId>jquery.jqGrid</artifactId>
-            <version>4.5.4</version>
-            <classifier>min</classifier>
-            <type>js</type>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
             <artifactId>selectize</artifactId>
             <version>0.12.1</version>
             <classifier>min</classifier>
@@ -178,7 +171,7 @@
                         <configuration>
                             <outputDirectory>${project.build.directory}/dependency/libs</outputDirectory>
                             <includeArtifactIds>
-                                jquery-sortable,jquery.jqGrid,ui.multiselect,selectize,jquery-nestingSortable,jquery-ui,jsoneditor
+                                jquery-sortable,ui.multiselect,selectize,jquery-nestingSortable,jquery-ui,jsoneditor
                             </includeArtifactIds>
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>false</overWriteSnapshots>

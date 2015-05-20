@@ -46,7 +46,6 @@ require.config({
         "i18nGrid": "libs/i18n/grid.locale-en",
         "i18next": "libs/i18next-1.7.3-min",
         "jsonEditor": "libs/jsoneditor-0.7.9-min",
-        "jqgrid": "libs/jquery.jqGrid-4.5.4-min",
         "jquery": "libs/jquery-2.1.1-min",
         "jqueryui": "libs/jquery-ui-1.11.1-min",
         "js2form": "libs/js2form-2.0",
@@ -120,9 +119,6 @@ require.config({
         "js2form": {
             exports: "js2form"
         },
-        "jqgrid": {
-            deps: ["jquery", "jqueryui", "i18nGrid", "multiselect"]
-        },
         "jqueryui": {
             deps: ["jquery"],
             exports: "jqueryui"
@@ -177,7 +173,6 @@ require([
     "sortable",
     "jqueryui",
     "multiselect",
-    "jqgrid",
     "clockPicker",
     "autosizeInput",
     "selectize",
@@ -194,7 +189,7 @@ require([
     window._ = _;
     window.Backbone = Backbone;
 
-    // necessary for requests initiated outside of the frameworks (such as via jqGrid)
+    // necessary for requests initiated outside of the frameworks
     $(document).ajaxError(function (event, jqxhr, settings, thrownError) {
         if (jqxhr && jqxhr.responseJSON && jqxhr.responseJSON.code === 401 && settings.contentType !== "application/json") {
             EventManager.sendEvent(Constants.EVENT_UNAUTHORIZED);

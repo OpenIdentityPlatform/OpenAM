@@ -17,10 +17,13 @@
 /*global define Backgrid, Backbone, _, $*/
 
 define("org/forgerock/openam/ui/policy/util/BackgridUtils", [
-    "org/forgerock/commons/ui/common/util/UIUtils",
+    "org/forgerock/commons/ui/common/components/Messages",
+    "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/util/UIUtils",
     "backgrid"
-], function (UIUtils, Router, Backgrid) {
+], function (Messages, EventManager, Router, Constants, UIUtils, Backgrid) {
     var obj = {};
 
     // TODO: the difference between this implementation and the one used for UMA is that here the cell is not clickable
@@ -138,14 +141,21 @@ define("org/forgerock/openam/ui/policy/util/BackgridUtils", [
     });
 
     // TODO: candidate for commons, have not changed it, using UMA version
-    obj.queryFilter = function () {
-        var params = [];
+    obj.queryFilter = function (customFilters) {
+        var params = [],
+            i = 0;
+
+        customFilters = customFilters || [];
+
         _.each(this.state.filters, function (filter) {
             if (filter.query() !== '') {
                 // todo: No server side support for 'co' ATM, this is effectively an 'eq'
                 params.push(filter.name + '+co+' + encodeURIComponent('"' + filter.query() + '"'));
             }
         });
+
+        params = params.concat(customFilters);
+
         return params.length === 0 || params.join('+AND+');
     };
 
@@ -190,6 +200,60 @@ define("org/forgerock/openam/ui/policy/util/BackgridUtils", [
     // TODO: candidate for commons, have not changed it, using UMA version
     obj.parseRecords = function (data, options) {
         return data.result;
+    };
+
+    //TODO: move this to another file
+    obj.deleteRecords = function(e, view) {
+        e.preventDefault();
+
+        if ($(e.target).hasClass('inactive')) {
+            return;
+        }
+
+        var data = view.data,
+            i = 0,
+            item,
+            onDestroy = function () {
+                data.selectedItems = [];
+                data.items.fetch({reset: true});
+                UIUtils.fillTemplateWithData(view.toolbarTemplate, data, function (tpl) {
+                    view.$el.find(view.toolbarTemplateID).html(tpl);
+                });
+            },
+            onSuccess = function (model, response, options) {
+                onDestroy();
+                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, 'deleteSuccess');
+            },
+            onError = function (model, response, options) {
+                onDestroy();
+                Messages.messages.addMessage({message: response.responseJSON.message, type: 'error'});
+            };
+
+        for (; i < data.selectedItems.length; i++) {
+            item = data.items.get(data.selectedItems[i]);
+
+            item.destroy({
+                success: onSuccess,
+                error: onError
+            });
+        }
+    };
+
+    //TODO: move this to another file
+    obj.onRowSelect = function (view, model, selected) {
+        var data = view.data;
+
+        if (selected) {
+            if (!_.contains(data.selectedItems, model.id)) {
+                data.selectedItems.push(model.id);
+            }
+        } else {
+            data.selectedItems = _.without(data.selectedItems, model.id);
+        }
+
+        UIUtils.fillTemplateWithData(view.toolbarTemplate, data, function (tpl) {
+            view.$el.find(view.toolbarTemplateID).html(tpl);
+        });
     };
 
     return obj;

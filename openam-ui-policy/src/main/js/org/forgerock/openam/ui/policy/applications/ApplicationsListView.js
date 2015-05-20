@@ -22,28 +22,27 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define, $, _, sessionStorage, FileReader, Backgrid, Backbone */
+/*global define, $, _, FileReader, Backbone */
 
 define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
     "backgrid",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/components/Messages",
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/common/util/URLHelper",
-    "org/forgerock/openam/ui/common/util/RealmHelper",
-    "org/forgerock/openam/ui/policy/common/GenericGridView",
     "org/forgerock/openam/ui/policy/delegates/PolicyDelegate",
     "org/forgerock/openam/ui/policy/applications/ApplicationModel",
     "org/forgerock/openam/ui/policy/util/BackgridUtils"
-], function (Backgrid, AbstractView, UIUtils, Router, Constants, Configuration, EventManager, Messages, URLHelper,
-             RealmHelper, GenericGridView, PolicyDelegate, ApplicationModel, BackgridUtils) {
+], function (Backgrid, AbstractView, Configuration, EventManager, Router, Constants, UIUtils, URLHelper, PolicyDelegate,
+             ApplicationModel, BackgridUtils) {
 
     var ApplicationsListView = AbstractView.extend({
-        template: "templates/policy/applications/ApplicationsListTemplate.html",
+        template: 'templates/policy/applications/ApplicationsListTemplate.html',
+        toolbarTemplate: 'templates/policy/applications/ApplicationsListToolbarTemplate.html',
+        toolbarTemplateID: '#gridToolbar',
 
         events: {
             'click .fa-pencil': 'editApplication',
@@ -62,7 +61,7 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
                 ClickableRow;
 
             this.data.realm = Configuration.globalData.auth.realm;
-            this.data.selectedApplications = [];
+            this.data.selectedItems = [];
 
             Apps = Backbone.PageableCollection.extend({
                 url: URLHelper.substitute("__api__/applications"),
@@ -86,7 +85,7 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
                 callback: function (e) {
                     var $target = $(e.target);
 
-                    if ($target.is('a') || $target.is('input') || $target.parents('.select-row-cell').length === 1 ||
+                    if ($target.is('a') || $target.is('input') || $target.is('.select-row-cell') ||
                         $target.parents('.template-cell').length === 1) {
                         return;
                     }
@@ -132,35 +131,36 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
                     headerCell: BackgridUtils.FilterHeaderCell,
                     editable: false
                 }
-
                 // TODO: add other columns
             ];
 
-            self.data.applications = new Apps();
+            self.data.items = new Apps();
 
-            self.data.applications.on("backgrid:selected", function (model, selected) {
-                self.onRowSelect(model, selected);
+            self.data.items.on("backgrid:selected", function (model, selected) {
+                BackgridUtils.onRowSelect(self, model, selected);
             });
 
             grid = new Backgrid.Grid({
                 columns: columns,
                 row: ClickableRow,
-                collection: self.data.applications,
+                collection: self.data.items,
                 emptyText: $.t("policy.applications.list.noResults")
             });
 
             paginator = new Backgrid.Extension.Paginator({
-                collection: self.data.applications,
+                collection: self.data.items,
                 windowSize: 3
             });
 
             this.parentRender(function () {
-                this.renderToolbar();
+                UIUtils.fillTemplateWithData(this.toolbarTemplate, this.data, function (tpl) {
+                    self.$el.find(self.toolbarTemplateID).html(tpl);
+                });
 
                 this.$el.find("#backgridContainer").append(grid.render().el);
                 this.$el.find("#paginationContainer").append(paginator.render().el);
 
-                this.data.applications.fetch({reset: true}).done(function (xhr) {
+                this.data.items.fetch({reset: true}).done(function (xhr) {
                     self.$el.find('.fa[data-toggle="popover"]').popover();
 
                     if (callback) {
@@ -170,22 +170,9 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
             });
         },
 
-        onRowSelect: function (model, selected) {
-            if (selected) {
-                this.data.selectedApplications.push(model.id);
-            } else {
-                this.data.selectedApplications = _.without(this.data.selectedApplications, model.id);
-            }
-
-            this.renderToolbar();
-        },
-
-        renderToolbar: function () {
-            this.$el.find('#gridToolbar').html(UIUtils.fillTemplateWithData("templates/policy/applications/ApplicationsListToolbarTemplate.html", this.data));
-        },
-
         editApplication: function (e) {
-            Router.routeTo(Router.configuration.routes.editApp, {args: [encodeURIComponent($(e.target).data('appName'))], trigger: true});
+            Router.routeTo(Router.configuration.routes.editApp, {args: [encodeURIComponent($(e.target).data('appName'))],
+                trigger: true});
         },
 
         getDefaultFilter: function () {
@@ -210,37 +197,7 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
         },
 
         deleteApplications: function (e) {
-            e.preventDefault();
-
-            if ($(e.target).hasClass('inactive')) {
-                return;
-            }
-
-            var self = this,
-                i = 0,
-                app,
-                onAppDestroy = function () {
-                    self.data.selectedApplications = [];
-                    self.data.applications.fetch({reset: true});
-                    self.renderToolbar();
-                },
-                onSuccess = function (model, response, options) {
-                    onAppDestroy();
-                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, 'deleteSuccess');
-                },
-                onError = function (model, response, options) {
-                    onAppDestroy();
-                    Messages.messages.addMessage({message: response.responseJSON.message, type: 'error'});
-                };
-
-            for (; i < this.data.selectedApplications.length; i++) {
-                app = this.data.applications.get(this.data.selectedApplications[i]);
-
-                app.destroy({
-                    success: onSuccess,
-                    error: onError
-                });
-            }
+            BackgridUtils.deleteRecords(e, this);
         },
 
         startImportPolicies: function () {
@@ -260,7 +217,8 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
                         index = message ? message.indexOf(applicationNotFoundInRealm) : -1;
 
                     if (index > -1) {
-                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, {key: "policiesImportFailed", applicationName: message.slice(0, index)});
+                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, {key: "policiesImportFailed",
+                            applicationName: message.slice(0, index)});
                     } else {
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policiesUploadFailed");
                     }

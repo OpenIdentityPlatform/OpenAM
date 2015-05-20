@@ -22,11 +22,6 @@
                     "environmentConditions": "",
                     "resourceAttributes": ""
                 },
-                "referral": {
-                    "name": "",
-                    "resources": "",
-                    "realms": ""
-                },
                 "resourceType": {
                     "nameAndDescription": "",
                     "patternAndActions": ""

@@ -1,30 +1,16 @@
 <div class="container">
     <div class="page-header">
-        <a href="#apps/" class="pull-right btn btn-default" id="backToApps" role="button">{{t 'common.form.back'}}</a>
-        <h1><strong>{{appName}}</strong>: {{t "policy.managePolicies.policies"}}{{#if referralsEnabled}} {{t "policy.manageReferrals.andReferrals"}}{{/if}}</h1>
+        <h1>
+            <strong>{{appName}}</strong>: {{t "policy.policies.list.policies"}}
+            <a class="pull-right btn btn-default" href="#app/{{encodeURIComponent appName}}" role="button">{{t 'common.form.back'}}</a>
+        </h1>
+
         <small>{{t "policy.common.realm"}}: {{policyEditorRealmUrlHelper realm}}</small>
         <small id="appNameHeader"></small>
     </div>
 
-    <ul class="nav nav-tabs" role="tablist">
-        <li class="active"><a role="tab" href="#">{{t "policy.managePolicies.policies"}}</a></li>
-        {{#if referralsEnabled}}<li><a role="tab" href="#">{{t "policy.manageReferrals.referrals"}}</a></li>{{/if}}
-    </ul>
-    <div class="tab-content">
-        <div id="tab1" class="tab-pane active" role="tabpanel">
-            <div class="panel-body">
-                <p>{{t "policy.managePolicies.description"}}</p>
-                <div id="managePolicies"></div>
-            </div>
-        </div>
+    <div class="btn-toolbar" id="gridToolbar" role="toolbar" aria-label="toolbar"></div>
 
-        {{#if referralsEnabled}}
-        <div id="tab2" class="tab-pane" role="tabpanel">
-            <div class="panel-body">
-                <p>{{t "policy.manageReferrals.description"}}</p>
-                <div id="manageRefs"></div>
-            </div>
-        </div>
-        {{/if}}
-    </div>
+    <div id="backgridContainer"></div>
+    <div id="paginationContainer"></div>
 </div>

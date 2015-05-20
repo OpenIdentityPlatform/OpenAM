@@ -122,49 +122,6 @@ define("org/forgerock/openam/ui/policy/delegates/PolicyDelegate", [
         });
     };
 
-    obj.deletePolicy = function (name) {
-        return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm("/policies/" + encodeURIComponent(name)),
-            headers: {"Accept-API-Version": "protocol=1.0,resource=2.0"},
-            type: "DELETE"
-        });
-    };
-
-    obj.getReferralByName = function (name) {
-        return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm("/referrals/" + encodeURIComponent(name)),
-            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
-        });
-    };
-
-    obj.updateReferral = function (name, data) {
-        return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm("/referrals/" + encodeURIComponent(name)),
-            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
-            type: "PUT",
-            data: JSON.stringify(data),
-            errorsHandlers: obj.ERROR_HANDLERS
-        });
-    };
-
-    obj.createReferral = function (data) {
-        return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm("/referrals/?_action=create"),
-            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
-            type: "POST",
-            data: JSON.stringify(data),
-            errorsHandlers: obj.ERROR_HANDLERS
-        });
-    };
-
-    obj.deleteReferral = function (name) {
-        return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm("/referrals/" + encodeURIComponent(name)),
-            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
-            type: "DELETE"
-        });
-    };
-
     obj.getAllUserAttributes = function () {
         return obj.serviceCall({
             url: RealmHelper.decorateURLWithOverrideRealm("/subjectattributes?_queryFilter=true"),
@@ -223,15 +180,6 @@ define("org/forgerock/openam/ui/policy/delegates/PolicyDelegate", [
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             type: "POST",
             data: JSON.stringify(data),
-            errorsHandlers: obj.ERROR_HANDLERS
-        });
-    };
-
-    obj.deleteResourceType = function (uuid) {
-        return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm("/resourcetypes/" + uuid),
-            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
-            type: "DELETE",
             errorsHandlers: obj.ERROR_HANDLERS
         });
     };

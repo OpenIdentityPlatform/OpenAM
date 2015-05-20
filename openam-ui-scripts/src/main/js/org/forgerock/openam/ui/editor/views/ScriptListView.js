@@ -22,20 +22,17 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define, $, _, Backgrid, Backbone*/
+/*global define, $, _, Backbone*/
 
 define("org/forgerock/openam/ui/editor/views/ScriptListView", [
-    "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/common/util/URLHelper",
-    "org/forgerock/commons/ui/common/main/Router",
     "backgrid",
+    "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/commons/ui/common/util/UIUtils",
+    "org/forgerock/openam/ui/common/util/URLHelper",
     "org/forgerock/openam/ui/editor/util/BackgridUtils",
     "org/forgerock/openam/ui/editor/models/ScriptModel"
-], function (AbstractView, conf, eventManager, uiUtils, constants, URLHelper, router, Backgrid, BackgridUtils, Script) {
+], function (Backgrid, AbstractView, Router, UIUtils, URLHelper, BackgridUtils, Script) {
 
     var ScriptListView = AbstractView.extend({
         template: "templates/editor/views/ScriptListTemplate.html",
@@ -45,6 +42,7 @@ define("org/forgerock/openam/ui/editor/views/ScriptListView", [
                 columns,
                 grid,
                 paginator,
+                ClickableRow,
                 Scripts;
 
             this.data.selectedUUIDs = [];
@@ -100,6 +98,18 @@ define("org/forgerock/openam/ui/editor/views/ScriptListView", [
                 }
             ];
 
+            ClickableRow = BackgridUtils.ClickableRow.extend({
+                callback: function (e) {
+                    var $target = $(e.target);
+
+                    if ($target.is('input') || $target.is('.select-row-cell')) {
+                        return;
+                    }
+
+                    Router.routeTo(Router.configuration.routes.editScript, {args: [encodeURIComponent(this.model.id)], trigger: true});
+                }
+            });
+
             self.data.scripts = new Scripts();
 
             self.data.scripts.on("backgrid:selected", function (model, selected) {
@@ -108,6 +118,7 @@ define("org/forgerock/openam/ui/editor/views/ScriptListView", [
 
             grid = new Backgrid.Grid({
                 columns: columns,
+                row: ClickableRow,
                 collection: self.data.scripts,
                 emptyText: $.t("scripts.grid.noResults")
             });
@@ -133,16 +144,19 @@ define("org/forgerock/openam/ui/editor/views/ScriptListView", [
 
         onRowSelect: function (model, selected) {
             if (selected) {
-                this.data.selectedUUIDs.push(model.attributes._id);
+                if (!_.contains(this.data.selectedUUIDs, model.id)) {
+                    this.data.selectedUUIDs.push(model.id);
+                }
             } else {
-                this.data.selectedUUIDs = _.without(this.data.selectedUUIDs, model.attributes._id);
+                this.data.selectedUUIDs = _.without(this.data.selectedUUIDs, model.id);
             }
 
             this.renderToolbar();
         },
 
         renderToolbar: function () {
-            this.$el.find('#gridToolbar').html(uiUtils.fillTemplateWithData("templates/editor/views/ScriptListBtnToolbarTemplate.html", this.data));
+            this.$el.find('#gridToolbar').html(UIUtils.fillTemplateWithData(
+                "templates/editor/views/ScriptListBtnToolbarTemplate.html", this.data));
         }
     });
 

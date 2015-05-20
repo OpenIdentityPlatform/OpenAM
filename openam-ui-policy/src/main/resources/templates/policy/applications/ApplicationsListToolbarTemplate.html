@@ -1,8 +1,8 @@
 <a href="#app/" class="btn btn-primary pull-left" id="addNewApp">
     <span class="fa fa-plus"></span> {{t "policy.applications.list.add"}}
 </a>
-<a href="#" class="btn btn-danger {{#unless selectedApplications}} disabled {{/unless}} pull-left" id="deleteApps">
-    <span class="fa fa-close"></span> {{t "policy.common.buttons.deleteSelected"}}{{#if selectedApplications}} ({{selectedApplications.length}}) {{/if}}
+<a href="#" class="btn btn-danger {{#unless selectedItems}} disabled {{/unless}} pull-left" id="deleteApps">
+    <span class="fa fa-close"></span> {{t "policy.common.buttons.deleteSelected"}}{{#if selectedItems}} ({{selectedItems.length}}) {{/if}}
 </a>
 <a href="#" class="btn btn-default pull-right" id="importPolicies">
     <span class="fa fa-download"></span> {{t "policy.applications.list.importPolicies"}}

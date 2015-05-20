@@ -2,7 +2,7 @@
     <span class="fa fa-plus"></span> {{t "policy.resourceTypes.list.add"}}
 </a>
 
-<a class="btn btn-danger {{#unless selectedResourceTypes}} disabled {{/unless}}" id="deleteResTypes">
+<a class="btn btn-danger {{#unless selectedItems}} disabled {{/unless}}" id="deleteResTypes">
     <span class="fa fa-close"></span> {{t "policy.common.buttons.deleteSelected"}}
-    {{#if selectedResourceTypes}} ({{selectedResourceTypes.length}}) {{/if}}
+    {{#if selectedItems}} ({{selectedItems.length}}) {{/if}}
 </a>
