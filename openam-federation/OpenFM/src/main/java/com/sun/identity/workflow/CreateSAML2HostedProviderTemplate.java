@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: CreateSAML2HostedProviderTemplate.java,v 1.29 2009/11/24 21:49:04 madan_ranganath Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.workflow;
@@ -211,6 +212,9 @@ public class CreateSAML2HostedProviderTemplate {
             "\">\n" +
             "            <Value>com.sun.identity.saml2.plugins.DefaultIDPAccountMapper" +
             "</Value>\n" +
+            "        </Attribute>\n" +
+            "        <Attribute name=\"" + SAML2Constants.IDP_DISABLE_NAMEID_PERSISTENCE + "\">\n" +
+            "            <Value>false</Value>\n" +
             "        </Attribute>\n" +
             "        <Attribute name=\"" + SAML2Constants.IDP_ATTRIBUTE_MAPPER +
             "\">\n" +

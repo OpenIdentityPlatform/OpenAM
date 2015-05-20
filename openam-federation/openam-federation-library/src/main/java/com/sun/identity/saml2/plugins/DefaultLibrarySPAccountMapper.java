@@ -49,6 +49,7 @@ import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.key.KeyUtil;
 import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.StringUtils;
 
 /**
  * This class <code>DefaultLibrarySPAccountMapper</code> is the default implementation of the
@@ -109,39 +110,18 @@ public class DefaultLibrarySPAccountMapper extends DefaultAccountMapper implemen
  
         String userID = null;
         String format = nameID.getFormat();
-        boolean transientFormat = false;
-        if (format != null && format.equals(SAML2Constants.NAMEID_TRANSIENT_FORMAT)) {
-           transientFormat = true;
-           userID = getTransientUser(realm, hostEntityID);
+        boolean isTransient = SAML2Constants.NAMEID_TRANSIENT_FORMAT.equals(format);
+        if (isTransient) {
+            userID = getTransientUser(realm, hostEntityID);
         }
 
-        if (userID != null && !userID.isEmpty()) {
+        if (StringUtils.isNotEmpty(userID)) {
             return userID;
-        }
-
-        if (!transientFormat) {
-            String remoteEntityID = assertion.getIssuer().getValue();
-            if (debug.messageEnabled()) {
-                 debug.message("DefaultLibrarySPAccountMapper.getIdentity(Assertion): realm = " + realm
-                         + " hostEntityID = " + hostEntityID);
-            }
-  
-            try {
-                userID = dsProvider.getUserID(realm,
-                        SAML2Utils.getNameIDKeyMap(nameID, hostEntityID, remoteEntityID, realm, role));
-
-            } catch (DataStoreProviderException dse) {
-                debug.error("DefaultLibrarySPAccountMapper.getIdentity(Assertion): DataStoreProviderException", dse);
-                throw new SAML2Exception(dse.getMessage());
-            }
-            if (userID != null) {
-                return userID;
-            }
         }
 
         // Check if this is an auto federation case.
         userID = getAutoFedUser(realm, hostEntityID, assertion, nameID.getValue());
-        if (userID != null && !userID.isEmpty()) {
+        if (StringUtils.isNotEmpty(userID)) {
             return userID;
         } else {
             if (useNameIDAsSPUserID(realm, hostEntityID) && !isAutoFedEnabled(realm, hostEntityID)) {
@@ -154,6 +134,13 @@ public class DefaultLibrarySPAccountMapper extends DefaultAccountMapper implemen
                 return null;
             }
         }
+    }
+
+    @Override
+    public boolean shouldPersistNameIDFormat(String realm, String hostEntityID, String remoteEntityID,
+            String nameIDFormat) {
+        return !Boolean.parseBoolean(SAML2Utils.getAttributeValueFromSSOConfig(realm, hostEntityID,
+                SAML2Constants.SP_ROLE, SAML2Constants.SP_DO_NOT_WRITE_FEDERATION_INFO));
     }
 
     /**
@@ -275,7 +262,7 @@ public class DefaultLibrarySPAccountMapper extends DefaultAccountMapper implemen
                 debug.message("DefaultLibrarySPAccountMapper.getAutoFedUser: Search map: " + map);
             }
 
-            String userId = dsProvider.getUserID(realm, map); 
+            String userId = dsProvider.getUserID(realm, map);
             if (userId != null && !userId.isEmpty()) {
                 return userId;
             } else {
@@ -349,9 +336,7 @@ public class DefaultLibrarySPAccountMapper extends DefaultAccountMapper implemen
             if (values == null || values.isEmpty()) {
                return null;
             }
-            Set<String> set = new HashSet<>();
-            set.addAll(values); 
-            return set; 
+            return new HashSet<>(values);
         }
         return null;
     }

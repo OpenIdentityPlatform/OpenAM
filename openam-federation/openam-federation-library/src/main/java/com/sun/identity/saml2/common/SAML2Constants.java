@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: SAML2Constants.java,v 1.44 2009/11/24 21:53:02 madan_ranganath Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.common;
@@ -1602,12 +1599,16 @@ public interface SAML2Constants {
     public static final String RESPONSE_CODE = "RESPONSE_CODE";
 
     /**
-     * Flag to Indicate that we do not want to write the Federation info
-     * in the SP local User Data Store. This flag is set in the local SP
-     * extended metadata configuration
+     * Flag to Indicate that we do not want to write the Federation info in the local User Data Store. This flag is
+     * set in the local/remote SP extended metadata configuration.
      */
-    public static final String SP_DO_NOT_WRITE_FEDERATION_INFO =
-            "spDoNotWriteFederationInfo";
+    public static final String SP_DO_NOT_WRITE_FEDERATION_INFO = "spDoNotWriteFederationInfo";
+
+    /**
+     * Flag to indicate that we do not want to write the federation info in the IdP's local User Data Store. This flag
+     * is set in the local IdP extended metadata configuration.
+     */
+    public static final String IDP_DISABLE_NAMEID_PERSISTENCE = "idpDisableNameIDPersistence";
 
     /**
      * Property to determine whether SAML SP Decryption Debug mode has been enabled.

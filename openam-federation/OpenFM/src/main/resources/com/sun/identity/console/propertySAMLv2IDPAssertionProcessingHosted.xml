@@ -24,9 +24,7 @@
 
    $Id: propertySAMLv2IDPAssertionProcessingHosted.xml,v 1.5 2008/07/30 21:46:27 babysunil Exp $
 
--->
-<!--
-   Portions Copyrighted 2012 ForgeRock Inc
+   Portions Copyrighted 2012-2015 ForgeRock AS.
 -->
 
 <!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
@@ -83,7 +81,15 @@
                         <attribute name="localizeDisplayFieldValue" value="false" />
                     </cc>
                     <fieldhelp name="helpIdpAccountMapper" defaultValue="samlv2idp.attribute.help.idpAccountMapper" />
-                </property>               
+                </property>
+                <property>
+                    <label name="lblIdpDisableNameIDPersistence"
+                           defaultValue="samlv2idp.attribute.label.idpDisableNameIDPersistence"
+                           labelFor="idpDisableNameIDPersistence" />
+                    <cc name="idpDisableNameIDPersistence"
+                        tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" />
+                    <fieldhelp name="helpIdpDisableNameIDPersistence" defaultValue="samlv2idp.attribute.help.idpDisableNameIDPersistence" />
+                </property>
             </ccgroup>
         </property>
     </section>

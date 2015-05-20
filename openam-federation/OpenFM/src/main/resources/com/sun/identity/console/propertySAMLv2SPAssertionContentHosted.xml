@@ -24,7 +24,7 @@
 
    $Id: propertySAMLv2SPAssertionContentHosted.xml,v 1.7 2008/08/05 22:23:58 babysunil Exp $
 
-   Portions Copyrighted 2010-2014 ForgeRock AS
+   Portions Copyrighted 2010-2015 ForgeRock AS.
 -->
 
 <!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
@@ -200,7 +200,7 @@
                            labelFor="spDoNotWriteFederationInfo" />
                     <cc name="spDoNotWriteFederationInfo"
                         tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" />
-                    <fieldhelp name="helpspDoNotWriteFederationInfo" defaultValue="samlv2sp.attribute.help.spDoNotWriteFederationInfo" />
+                    <fieldhelp name="helpspDoNotWriteFederationInfo" defaultValue="samlv2sp.attribute.help.hosted.spDoNotWriteFederationInfo" />
         </property>
     </section>
     
