@@ -18,11 +18,11 @@
 define("org/forgerock/openam/ui/admin/delegates/SMSDelegate", [
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants"
-], function(AbstractDelegate, Constants) {
+], function (AbstractDelegate, Constants) {
     var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/");
 
     obj.RealmAuthentication = {
-        get: function() {
+        get: function () {
             var url = "realm-config/authentication",
                 schemaPromise = obj.serviceCall({
                     url: url + "?_action=schema",
@@ -32,14 +32,14 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegate", [
                     url: url
                 });
 
-            return $.when(schemaPromise, valuesPromise).then(function(schemaData, valuesData) {
+            return $.when(schemaPromise, valuesPromise).then(function (schemaData, valuesData) {
                 return {
                     schema: obj.sanitizeSchema(schemaData[0]),
                     values: valuesData[0]
                 };
             });
         },
-        save: function(data) {
+        save: function (data) {
             return obj.serviceCall({
                 url: "realm-config/authentication",
                 type: "PUT",
@@ -49,12 +49,12 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegate", [
     };
 
     obj.RealmAuthenticationChains = {
-        get: function() {
+        get: function () {
             var promise = obj.serviceCall({
                     url: "realm-config/authentication/chains?_queryFilter=true"
                 });
 
-            return $.when(promise).then(function(valuesData) {
+            return $.when(promise).then(function (valuesData) {
                 return {
                     values: valuesData
                 };
@@ -108,7 +108,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegate", [
     };
 
     obj.RealmAuthenticationChain = {
-        remove: function(name) {
+        remove: function (name) {
             return obj.serviceCall({
                 url: 'realm-config/authentication/chains/' + name,
                 type: 'DELETE'
@@ -116,12 +116,18 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegate", [
         }
     };
 
-    obj.sanitizeSchema = function(schema) {
+    obj.sanitizeSchema = function (schema) {
         // Recursively transforms propertyOrder attribute to int
         _.forEach(schema.properties, obj.propertyOrderTransform);
 
+        // Recursively add checkbox format to boolean FIXME: To fix server side? Visual only?
+        _.forEach(schema.properties, obj.addCheckboxFormatToBoolean);
+
+        // Recursively add string type to enum FIXME: To fix server side
+        _.forEach(schema.properties, obj.addStringTypeToEnum);
+
         // Create ordered array
-        schema.orderedProperties = _.sortBy(_.map(schema.properties, function(value, key) {
+        schema.orderedProperties = _.sortBy(_.map(schema.properties, function (value, key) {
             value._id = key;
             return value;
         }), 'propertyOrder');
@@ -129,12 +135,32 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegate", [
         return schema;
     };
 
-    obj.propertyOrderTransform = function(property) {
-        if(property.hasOwnProperty('propertyOrder')) {
+    obj.addCheckboxFormatToBoolean = function (property) {
+        if (property.hasOwnProperty('type') && property.type === 'boolean') {
+            property.format = 'checkbox';
+        }
+
+        if (property.type === "object") {
+            _.forEach(property.properties, obj.addCheckboxFormatToBoolean);
+        }
+    };
+
+    obj.addStringTypeToEnum = function (property) {
+        if (property.hasOwnProperty('enum')) {
+            property.type = 'string';
+        }
+
+        if (property.type === "object") {
+            _.forEach(property.properties, obj.addStringTypeToEnum);
+        }
+    };
+
+    obj.propertyOrderTransform = function (property) {
+        if (property.hasOwnProperty('propertyOrder')) {
             property.propertyOrder = parseInt(property.propertyOrder.slice(1), 10);
         }
 
-        if(property.type === "object") {
+        if (property.type === "object") {
             _.forEach(property.properties, obj.propertyOrderTransform);
         }
     };

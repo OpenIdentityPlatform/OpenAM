@@ -21,15 +21,11 @@ define("org/forgerock/openam/ui/admin/utils/JsonEditorTheme", [
 ], function (JSONEditor) {
     var obj = {};
 
-
-    obj.getTheme = function(gridColWidth1, gridColWidth2){
-
+    obj.getTheme = function (gridColWidth1, gridColWidth2) {
         // Magic number 12 is the number of colomns in the bootstrap grid.
         var gridColWidth3 = 12 - gridColWidth2,
-
             theme = JSONEditor.AbstractTheme.extend({
-
-                getSelectInput: function(options) {
+                getSelectInput: function (options) {
                     var input = this._super(options),
                         group = document.createElement('div');
 
@@ -40,7 +36,7 @@ define("org/forgerock/openam/ui/admin/utils/JsonEditorTheme", [
                     return group;
                 },
 
-                setSelectOptions: function(selectGroup, options, titles) {
+                setSelectOptions: function (selectGroup, options, titles) {
                     var select = selectGroup.getElementsByTagName('select')[0] || selectGroup,
                         option = null,
                         i;
@@ -48,38 +44,38 @@ define("org/forgerock/openam/ui/admin/utils/JsonEditorTheme", [
                     titles = titles || [];
                     select.innerHTML = '';
 
-                    for(i=0; i<options.length; i++) {
+                    for (i = 0; i < options.length; i++) {
                         option = document.createElement('option');
-                        option.setAttribute('value',options[i]);
+                        option.setAttribute('value', options[i]);
                         option.textContent = titles[i] || options[i];
                         select.appendChild(option);
                     }
                 },
 
-                setGridColumnSize: function(el,size) {
+                setGridColumnSize: function (el, size) {
                     // JSONEditor grid system not used, so overrided here.
                 },
 
-                afterInputReady: function(input) {
+                afterInputReady: function (input) {
                     if (input.controlgroup) {
                         return;
                     }
-                    input.controlgroup = this.closest(input,'.form-group');
-                    if(this.closest(input,'.compact')) {
+                    input.controlgroup = this.closest(input, '.form-group');
+                    if (this.closest(input, '.compact')) {
                         input.controlgroup.style.marginBottom = 0;
                     }
                 },
 
-                getTextareaInput: function() {
+                getTextareaInput: function () {
                     var el = document.createElement('textarea');
                     el.className = 'form-control';
                     return el;
                 },
 
-                getFormInputField: function(type) {
+                getFormInputField: function (type) {
                     var input = this._super(type),
                         group = document.createElement('div');
-                    if(type !== 'checkbox') {
+                    if (type !== 'checkbox') {
                         input.className += 'form-control';
                     }
                     group.className += 'col-sm-' + gridColWidth1;
@@ -88,18 +84,18 @@ define("org/forgerock/openam/ui/admin/utils/JsonEditorTheme", [
                     return group;
                 },
 
-                getFormInputLabel: function(text) {
+                getFormInputLabel: function (text) {
                     var el = document.createElement('label');
                     el.appendChild(document.createTextNode(text));
                     el.className += ' control-label col-sm-' + gridColWidth2;
                     return el;
                 },
 
-                getFormControl: function(label, input, description) {
+                getFormControl: function (label, input, description) {
                     var group = document.createElement('div'),
                         div = document.createElement('div');
 
-                    if (label && input.type === 'checkbox'){
+                    if (label && input.type === 'checkbox') {
                         group.className += ' checkbox';
                         label.appendChild(input);
                         label.style.fontSize = '14px';
@@ -129,17 +125,17 @@ define("org/forgerock/openam/ui/admin/utils/JsonEditorTheme", [
                     return group;
                 },
 
-                getIndentedPanel: function() {
+                getIndentedPanel: function () {
                     var el = document.createElement('div');
                     el.className = 'well well-sm';
                     return el;
                 },
 
-                getFormInputDescription: function(text) {
+                getFormInputDescription: function (text) {
                     return this.getDescription(text);
                 },
 
-                getDescription: function(text) {
+                getDescription: function (text) {
                     var el = document.createElement('div'),
                         parseHtml = document.implementation.createHTMLDocument();
 
@@ -150,24 +146,24 @@ define("org/forgerock/openam/ui/admin/utils/JsonEditorTheme", [
                     return el;
                 },
 
-                getHeaderButtonHolder: function() {
+                getHeaderButtonHolder: function () {
                     var el = this.getButtonHolder();
                     return el;
                 },
 
-                getButtonHolder: function() {
+                getButtonHolder: function () {
                     var el = document.createElement('div');
                     el.className = 'btn-group';
                     return el;
                 },
 
-                getButton: function(text, icon, title) {
+                getButton: function (text, icon, title) {
                     var el = this._super(text, icon, title);
                     el.className += 'btn btn-default';
                     return el;
                 },
 
-                getTable: function() {
+                getTable: function () {
                     var el = document.createElement('table');
                     el.className = 'table table-bordered';
                     el.style.width = 'auto';
@@ -175,61 +171,60 @@ define("org/forgerock/openam/ui/admin/utils/JsonEditorTheme", [
                     return el;
                 },
 
-                getGridRow: function() {
+                getGridRow: function () {
                     var el = document.createElement('div');
                     el.className = 'form-horizontal';
                     return el;
                 },
 
-                addInputError: function(input,text) {
-                    if (!input.controlgroup){
+                addInputError: function (input, text) {
+                    if (!input.controlgroup) {
                         return;
                     }
                     input.controlgroup.className += ' has-error';
-                    if(!input.errmsg) {
+                    if (!input.errmsg) {
                         input.errmsg = document.createElement('p');
                         input.errmsg.className = 'help-block errormsg';
                         input.controlgroup.appendChild(input.errmsg);
-                    }
-                    else {
+                    } else {
                         input.errmsg.style.display = '';
                     }
 
                     input.errmsg.textContent = text;
                 },
 
-                removeInputError: function(input) {
-                    if(!input.errmsg){
+                removeInputError: function (input) {
+                    if (!input.errmsg) {
                         return;
                     }
                     input.errmsg.style.display = 'none';
-                    input.controlgroup.className = input.controlgroup.className.replace(/\s?has-error/g,'');
+                    input.controlgroup.className = input.controlgroup.className.replace(/\s?has-error/g, '');
                 },
 
-                getTabHolder: function() {
+                getTabHolder: function () {
                     var el = document.createElement('div');
                     el.innerHTML = "<div class='tabs list-group col-md-2'></div><div class='col-md-10'></div>";
                     el.className = 'rows';
                     return el;
                 },
 
-                getTab: function(text) {
+                getTab: function (text) {
                     var el = document.createElement('a');
                     el.className = 'list-group-item';
-                    el.setAttribute('href','#');
+                    el.setAttribute('href', '#');
                     el.appendChild(text);
                     return el;
                 },
 
-                markTabActive: function(tab) {
+                markTabActive: function (tab) {
                     tab.className += ' active';
                 },
 
-                markTabInactive: function(tab) {
-                    tab.className = tab.className.replace(/\s?active/g,'');
+                markTabInactive: function (tab) {
+                    tab.className = tab.className.replace(/\s?active/g, '');
                 },
 
-                getProgressBar: function() {
+                getProgressBar: function () {
                     var min = 0,
                         max = 100,
                         start = 0,
@@ -248,8 +243,10 @@ define("org/forgerock/openam/ui/admin/utils/JsonEditorTheme", [
                     return container;
                 },
 
-                updateProgressBar: function(progressBar, progress) {
-                    if (!progressBar){return;}
+                updateProgressBar: function (progressBar, progress) {
+                    if (!progressBar) {
+                        return;
+                    }
 
                     var bar = progressBar.firstChild,
                         percentage = progress + "%";
@@ -258,8 +255,10 @@ define("org/forgerock/openam/ui/admin/utils/JsonEditorTheme", [
                     bar.innerHTML = percentage;
                 },
 
-                updateProgressBarUnknown: function(progressBar) {
-                    if (!progressBar){return;}
+                updateProgressBarUnknown: function (progressBar) {
+                    if (!progressBar) {
+                        return;
+                    }
 
                     var bar = progressBar.firstChild;
                     progressBar.className = 'progress progress-striped active';
@@ -267,11 +266,9 @@ define("org/forgerock/openam/ui/admin/utils/JsonEditorTheme", [
                     bar.style.width = '100%';
                     bar.innerHTML = '';
                 }
-
             });
 
         return theme;
-
     };
 
     return obj;

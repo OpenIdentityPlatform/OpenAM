@@ -18,12 +18,13 @@
 define('org/forgerock/openam/ui/admin/models/Form', [
     'jsonEditor',
     'org/forgerock/openam/ui/admin/utils/JsonEditorTheme'
-], function(JSONEditor, JsonEditorTheme) {
+], function (JSONEditor, JsonEditorTheme) {
     var obj = function Form(element, schema, values) {
         this.element = element;
         this.schema = schema;
         this.values = values;
 
+        JSONEditor.plugins.selectize.enable = true;
         JSONEditor.defaults.themes.openam = JsonEditorTheme.getTheme(6, 4);
 
         this.editor = new JSONEditor(element, {
@@ -35,7 +36,7 @@ define('org/forgerock/openam/ui/admin/models/Form', [
             theme: "openam"
         });
 
-        $(element).find('.help-block').hide().each( function(){
+        $(element).find('.help-block').hide().each(function () {
             var group = $(this).parent(),
                 button = $('<button class="btn btn-default info-button" type="button"><i class="fa fa-info-circle"></i></button>');
 
@@ -47,7 +48,7 @@ define('org/forgerock/openam/ui/admin/models/Form', [
                 placement: 'auto top',
                 trigger: 'focus',
                 content: this.innerHTML,
-                title: group.find( "label:first-of-type" ).text()
+                title: group.find("label:first-of-type").text()
             });
 
         });
@@ -55,11 +56,11 @@ define('org/forgerock/openam/ui/admin/models/Form', [
         this.reset();
     };
 
-    obj.prototype.data = function() {
+    obj.prototype.data = function () {
         return this.editor.getValue();
     };
 
-    obj.prototype.reset = function() {
+    obj.prototype.reset = function () {
         this.editor.setValue(_.pick(this.values, _.keys(this.schema.properties)));
     };
 
