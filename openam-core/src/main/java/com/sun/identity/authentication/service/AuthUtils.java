@@ -32,7 +32,6 @@ import static org.forgerock.openam.session.SessionConstants.*;
 
 import com.iplanet.am.util.Misc;
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
@@ -88,8 +87,6 @@ import javax.security.auth.login.Configuration;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionServiceURLService;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 import org.forgerock.util.Reject;
@@ -125,8 +122,7 @@ public class AuthUtils extends AuthClientUtils {
     private static String serviceURI = SystemProperties.get(
         Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR) + "/UI/Login";
 
-    private static final SessionServiceURLService SESSION_SERVICE_URL_SERVICE = InjectorHolder.getInstance(SessionServiceURLService.class);
-    private static final SessionCache sessionCache = InjectorHolder.getInstance(SessionCache.class);
+    private static final SessionServiceURLService SESSION_SERVICE_URL_SERVICE = SessionServiceURLService.getInstance();
 
     /*
      * Private constructor to prevent any instances being created
