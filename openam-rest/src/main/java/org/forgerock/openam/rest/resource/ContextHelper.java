@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.rest.resource;
 
+import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdUtils;
 import org.forgerock.json.resource.RouterContext;
 import org.forgerock.json.resource.ServerContext;
@@ -37,7 +38,7 @@ public class ContextHelper {
      * @return The resource users UID.
      */
     public String getUserUid(ServerContext context) {
-        return IdUtils.getIdentity(getUserId(context), getRealm(context)).getUniversalId();
+        return getUserUid(context, getUserId(context));
     }
 
     /**
@@ -48,7 +49,13 @@ public class ContextHelper {
      * @return The users UID.
      */
     public String getUserUid(ServerContext context, String username) {
-        return IdUtils.getIdentity(username, getRealm(context)).getUniversalId();
+        final AMIdentity identity = IdUtils.getIdentity(username, getRealm(context));
+
+        if (identity == null) {
+            return null;
+        }
+
+        return identity.getUniversalId();
     }
 
     /**

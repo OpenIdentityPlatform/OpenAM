@@ -98,10 +98,18 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
     }
 
     private JsonValue resolveUsernameToUID(final ServerContext context, JsonValue policy) {
+        final String resourceOwnerName = contextHelper.getUserId(context);
+        final String resourceOwnerUserUid = contextHelper.getUserUid(context);
+
         for (JsonValue permission : policy.get("permissions")) {
-            String uuid = contextHelper.getUserUid(context, permission.get("subject").asString());
-            if (uuid != null) {
-                permission.put("subject", uuid);
+            final String userName = permission.get("subject").asString();
+            String userUid = contextHelper.getUserUid(context, userName);
+
+            if (userUid != null) {
+                permission.put("subject", userUid);
+            } else if (resourceOwnerUserUid.contains(resourceOwnerName)) {
+                final String derivedUserUid = resourceOwnerUserUid.replace(resourceOwnerName, userName);
+                permission.put("subject", derivedUserUid);
             }
         }
         return policy;
