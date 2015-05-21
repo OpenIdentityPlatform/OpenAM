@@ -25,15 +25,12 @@ define("org/forgerock/openam/ui/admin/utils/JsonEditorTheme", [
         // Magic number 12 is the number of colomns in the bootstrap grid.
         var gridColWidth3 = 12 - gridColWidth2,
             theme = JSONEditor.AbstractTheme.extend({
-                getSelectInput: function (options) {
-                    var input = this._super(options),
-                        group = document.createElement('div');
 
+                getSelectInput: function(options) {
+                    var input = this._super(options);
                     input.className += 'form-control';
-                    group.className += 'col-sm-' + gridColWidth1;
-                    group.appendChild(input);
 
-                    return group;
+                    return input;
                 },
 
                 setSelectOptions: function (selectGroup, options, titles) {
@@ -109,8 +106,8 @@ define("org/forgerock/openam/ui/admin/utils/JsonEditorTheme", [
                             label.className += ' control-label col-sm-' + gridColWidth2;
                             group.appendChild(label);
                         }
-                        if (input.nodeName === 'INPUT') {
-                            // all Inoputs need to be wrapped in a div with the BS grid class added.
+                        if (input.nodeName.toLowerCase() === 'input' || input.nodeName.toLowerCase() === 'select') {
+                            // All Inputs need to be wrapped in a div with the BS grid class added.
                             div.className += 'col-sm-' + gridColWidth1;
                             div.appendChild(input);
                             group.appendChild(div);
