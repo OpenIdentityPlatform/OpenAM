@@ -36,8 +36,9 @@ define("org/forgerock/openam/ui/policy/policies/conditions/EditEnvironmentView",
     "org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrTimeView",
     "org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrDayView",
     "org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrDateView",
-    "org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrTimeZoneView"
-], function (AbstractView, uiUtils, HelpLink, BooleanAttr, ArrayAttr, StringAttr, ObjectAttr, EnumAttr, TimeAttr, DayAttr, DateAttr, TimeZoneAttr) {
+    "org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrTimeZoneView",
+    "org/forgerock/openam/ui/policy/delegates/PolicyDelegate"
+], function (AbstractView, uiUtils, HelpLink, BooleanAttr, ArrayAttr, StringAttr, ObjectAttr, EnumAttr, TimeAttr, DayAttr, DateAttr, TimeZoneAttr, PolicyDelegate) {
     var EditEnvironmentView = AbstractView.extend({
         events: {
             'change select#selection': 'changeType'
@@ -49,7 +50,8 @@ define("org/forgerock/openam/ui/policy/policies/conditions/EditEnvironmentView",
         SCRIPT_RESOURCE: 'Script',
 
         render: function (schema, callback, element, itemID, itemData) {
-            var self = this;
+            var self = this,
+                hiddenData = {};
 
             this.setElement(element);
 
@@ -70,6 +72,12 @@ define("org/forgerock/openam/ui/policy/policies/conditions/EditEnvironmentView",
                 // Temporary fix, the name attribute is being added by the server after the policy is created.
                 // TODO: Serverside solution required
                 delete itemData.name;
+
+                if (itemData.type === self.SCRIPT_RESOURCE) {
+                    hiddenData[itemData.type] = itemData.scriptId;
+                    this.$el.data('hiddenData', hiddenData);
+                }
+
                 this.$el.data('itemData', itemData);
                 this.$el.find('select#selection').val(itemData.type).trigger('change');
             }
@@ -86,27 +94,41 @@ define("org/forgerock/openam/ui/policy/policies/conditions/EditEnvironmentView",
         createListItem: function (allEnvironments, item) {
             var self = this,
                 itemToDisplay = null,
-                data = item.data().itemData,
-                type,
-                html;
+                itemData = item.data().itemData,
+                hiddenData = item.data().hiddenData,
+                mergedData = _.merge({}, itemData, hiddenData),
+                type;
 
             item.focus(); //  Required to trigger changeInput.
-
             this.data.conditions = allEnvironments;
 
-            if (data) {
-                type = data.type;
+            if (mergedData && mergedData.type) {
+                type = mergedData.type;
                 itemToDisplay = {};
-                _.each(data, function (val, key) {
-                    if (key === 'type') {
-                        itemToDisplay['policy.common.type'] = $.t(self.i18n.condition.key + type + self.i18n.condition.title);
-                    } else {
-                        itemToDisplay[self.i18n.condition.key + type + self.i18n.condition.props + key] = val;
-                    }
-                });
+                if (type === self.SCRIPT_RESOURCE) {
+                    itemToDisplay['policy.common.type'] = $.t(self.i18n.condition.key + type + self.i18n.condition.title);
+                    PolicyDelegate.getScriptById(mergedData.scriptId).done(function (script) {
+                        itemToDisplay[self.i18n.condition.key + type + self.i18n.condition.props + 'scriptId'] = script.name;
+                        self.setListItemHtml(item, itemToDisplay);
+                    });
+                } else {
+                    _.each(mergedData, function (val, key) {
+                        if (key === 'type') {
+                            itemToDisplay['policy.common.type'] = $.t(self.i18n.condition.key + type + self.i18n.condition.title);
+                        } else {
+                            itemToDisplay[self.i18n.condition.key + type + self.i18n.condition.props + key] = val;
+                        }
+                    });
+                    this.setListItemHtml(item, itemToDisplay);
+                }
+            } else {
+                this.setListItemHtml(item, itemToDisplay);
             }
 
-            html = uiUtils.fillTemplateWithData('templates/policy/policies/conditions/ListItem.html', {data: itemToDisplay});
+        },
+
+        setListItemHtml: function(item, itemToDisplay) {
+            var html = uiUtils.fillTemplateWithData('templates/policy/policies/conditions/ListItem.html', {data: itemToDisplay});
             item.find('.item-data').html(html);
             this.setElement('#' + item.attr('id'));
         },
@@ -115,6 +137,7 @@ define("org/forgerock/openam/ui/policy/policies/conditions/EditEnvironmentView",
             e.stopPropagation();
             var self = this,
                 itemData = {},
+                hiddenData = {},
                 selectedType = e.target.value,
                 schema = _.findWhere(this.data.conditions, {title: selectedType}) || {},
                 delay = self.$el.find('.field-float-pattern').length > 0 ? 500 : 0,
@@ -122,9 +145,11 @@ define("org/forgerock/openam/ui/policy/policies/conditions/EditEnvironmentView",
 
             if (this.$el.data().itemData && this.$el.data().itemData.type === selectedType) {
                 itemData = this.$el.data().itemData;
+                hiddenData = this.$el.data().hiddenData;
             } else {
                 itemData = self.setDefaultJsonValues(schema);
                 self.$el.data('itemData', itemData);
+                self.$el.data('hiddenData', hiddenData);
             }
 
             if (itemData) {
@@ -143,7 +168,7 @@ define("org/forgerock/openam/ui/policy/policies/conditions/EditEnvironmentView",
                     }
 
                     if (!self.$el.parents('#dropbox').length || self.$el.hasClass('editing')) {
-                        self.buildHTML(itemData, schema);
+                        self.buildHTML(itemData, hiddenData, schema);
                     }
 
                     self.animateIn();
@@ -168,7 +193,7 @@ define("org/forgerock/openam/ui/policy/policies/conditions/EditEnvironmentView",
             return helperText;
         },
 
-        buildHTML: function (itemData, schema) {
+        buildHTML: function (itemData, hiddenData, schema) {
             var self = this,
                 itemDataEl = this.$el.find('.item-data'),
                 schemaProps = schema.config.properties,
@@ -184,7 +209,15 @@ define("org/forgerock/openam/ui/policy/policies/conditions/EditEnvironmentView",
                 new TimeZoneAttr().render({itemData: itemData}, itemDataEl);
             } else if (schema.title === self.SCRIPT_RESOURCE) {
                 attributesWrapper = '<div class="no-float"></div>';
-                new ArrayAttr().render({itemData: itemData, data: [itemData.scriptId], title: 'scriptId', i18nKey: self.i18n.condition.key + schema.title + self.i18n.condition.props + 'scriptId', dataSource: 'scripts'}, itemDataEl);
+                if (itemData && itemData.scriptId) {
+                    PolicyDelegate.getScriptById(itemData.scriptId).done(function (script) {
+                        hiddenData[itemData.type] = script.name;
+                        new ArrayAttr().render({itemData: itemData, hiddenData: hiddenData, data: [hiddenData[itemData.type]], title: 'scriptId', i18nKey: self.i18n.condition.key + schema.title + self.i18n.condition.props + 'scriptId', dataSource: 'scripts'}, itemDataEl);
+                        self.animateIn();
+                    });
+                } else {
+                    new ArrayAttr().render({itemData: itemData, hiddenData: hiddenData, data: [hiddenData[itemData.type]], title: 'scriptId', i18nKey: self.i18n.condition.key + schema.title + self.i18n.condition.props + 'scriptId', dataSource: 'scripts'}, itemDataEl);
+                }
             } else {
                 attributesWrapper = '<div class="no-float"></div>';
 

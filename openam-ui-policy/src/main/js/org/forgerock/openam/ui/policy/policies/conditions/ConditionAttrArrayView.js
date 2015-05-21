@@ -32,7 +32,7 @@
 define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrArrayView", [
     "org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrBaseView",
     "org/forgerock/openam/ui/policy/delegates/PolicyDelegate"
-], function (ConditionAttrBaseView, policyDelegate) {
+], function (ConditionAttrBaseView, PolicyDelegate) {
     var ConditionAttrArrayView = ConditionAttrBaseView.extend({
         template: 'templates/policy/policies/conditions/ConditionAttrArray.html',
         MIN_QUERY_LENGTH: 1,
@@ -47,6 +47,7 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrArrayVie
             this.parentRender(function () {
                 var view = this,
                     title = '',
+                    text = '',
                     itemData,
                     options,
                     item, $item,
@@ -72,8 +73,9 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrArrayVie
                                 },
                                 onChange: function (value) {
                                     title = this.$input.parent().find('label')[0].dataset.title;
-                                    itemData = view.data.itemData;
-                                    itemData[title] = value ? value : '';
+                                    text = this.$input.find(':selected').text();
+                                    view.data.itemData[title] = value ? value : '';
+                                    view.data.hiddenData[view.data.itemData.type] = text ? text : '';
                                 }
                             });
                         } else {
@@ -91,7 +93,6 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrArrayVie
                                 onItemAdd: function (item) {
                                     view.getUniversalId(item, type);
                                 },
-
                                 onItemRemove: function (item) {
                                     var universalid = _.findKey(view.data.hiddenData[type], function (obj) {
                                         return obj === item;
@@ -136,7 +137,7 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrArrayVie
 
         queryIdentities: function (item, query, callback) {
             var selectize = this;
-            policyDelegate.queryIdentities(item.dataset.source, query)
+            PolicyDelegate.queryIdentities(item.dataset.source, query)
                 .done(function (data) {
                     _.each(data.result, function (value) {
                         selectize.addOption({value: value, text: value});
@@ -150,7 +151,7 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrArrayVie
 
         getUniversalId: function (item, type) {
             var self = this;
-            policyDelegate.getUniversalId(item, type).done(function (subject) {
+            PolicyDelegate.getUniversalId(item, type).done(function (subject) {
                 self.data.itemData.subjectValues = _.union(self.data.itemData.subjectValues, subject.universalid);
                 self.data.hiddenData[type][subject.universalid[0]] = item;
             });
@@ -158,10 +159,10 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrArrayVie
 
         loadFromDataSource: function(item, callback) {
             var selectize = this;
-            policyDelegate.getDataByType(item.dataset.source)
+            PolicyDelegate.getDataByType(item.dataset.source)
                 .done(function (data) {
                     _.each(data.result, function (value) {
-                        selectize.addOption({value: value.name, text: value.name});
+                        selectize.addOption({value: value._id, text: value.name});
                     });
                     callback(data.result);
                 }).error(function (e) {
