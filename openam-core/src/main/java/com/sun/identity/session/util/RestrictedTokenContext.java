@@ -24,22 +24,18 @@
  *
  * $Id: RestrictedTokenContext.java,v 1.4 2008/06/25 05:43:59 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.session.util;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import com.sun.identity.shared.encode.Base64;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import org.forgerock.openam.utils.IOUtils;
 
 /**
  * Utility to attach the context for token restriction checking to the current
@@ -126,10 +122,7 @@ public class RestrictedTokenContext {
                     data.substring(TOKEN_PREFIX.length()));
         } else if (data.startsWith(OBJECT_PREFIX)) {
             // perform general Java deserialization
-            ObjectInputStream is = new ObjectInputStream(
-                    new ByteArrayInputStream(Base64.decode(data
-                            .substring(OBJECT_PREFIX.length()))));
-            return is.readObject();
+            return IOUtils.deserialise(Base64.decode(data.substring(OBJECT_PREFIX.length())), false);
         } else {
             throw new IllegalArgumentException("Bad context value:" + data);
         }

@@ -24,14 +24,15 @@
  *
  * $Id: TokenRestrictionFactory.java,v 1.3 2008/06/25 05:41:29 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session;
 
 import com.sun.identity.shared.encode.Base64;
-import java.io.ByteArrayInputStream;
+import org.forgerock.openam.utils.IOUtils;
+
 import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 /**
@@ -65,8 +66,6 @@ public class TokenRestrictionFactory {
      */
     public static TokenRestriction unmarshal(String data) throws Exception {
         // perform general Java deserialization
-        ObjectInputStream is = new ObjectInputStream(new ByteArrayInputStream(
-                Base64.decode(data)));
-        return (TokenRestriction) is.readObject();
+        return IOUtils.deserialise(Base64.decode(data), false);
     }
 }

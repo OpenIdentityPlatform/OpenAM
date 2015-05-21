@@ -24,10 +24,7 @@
  *
  * $Id: AMViewBeanBase.java,v 1.15 2009/10/19 18:17:33 asyhuang Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.console.base;
 
@@ -40,7 +37,6 @@ import com.iplanet.jato.util.Encoder;
 import com.iplanet.jato.view.DisplayField;
 import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.ViewBean;
-import com.iplanet.jato.view.ViewBeanBase;
 import com.iplanet.jato.view.event.ChildDisplayEvent;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
@@ -94,14 +90,15 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.forgerock.openam.console.base.ConsoleViewBeanBase;
+import org.forgerock.openam.utils.IOUtils;
 import org.owasp.esapi.ESAPI;
 
 /**
  * This is the base class for all view beans in Console.
  */
-public abstract class AMViewBeanBase
-    extends ViewBeanBase
-{
+public abstract class AMViewBeanBase extends ConsoleViewBeanBase {
     public static Debug debug = Debug.getInstance(
         AMAdminConstants.CONSOLE_DEBUG_FILENAME);
         
@@ -235,8 +232,7 @@ public abstract class AMViewBeanBase
 
         if (pgSession != null) {
             try {
-                Map map = (Map) Encoder.deserialize(
-                    Encoder.decodeHttp64(pgSession), false);
+                Map map = IOUtils.deserialise(Encoder.decodeHttp64(pgSession), false);
 
                 if (map != null) {
                     for (Iterator i = map.keySet().iterator(); i.hasNext(); ) {

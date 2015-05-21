@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.cts.utils;
 
@@ -20,17 +20,12 @@ import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
-import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.debug.Debug;
 import java.lang.reflect.Field;
-import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import org.forgerock.openam.cts.TokenTestUtils;
 import org.forgerock.openam.cts.api.TokenType;
 import org.forgerock.openam.cts.api.tokens.Token;
@@ -190,65 +185,5 @@ public class JSONSerialisationTest {
 
     private static boolean randomBoolean() {
         return Math.random() > 0.5d;
-    }
-
-    /**
-     * Demonstrates that neither serialisation mechanism is consistent with the time it takes
-     * to serialise a session. This is not a completely fair test because the Internal Session
-     * class being serialised is awkward at best to serialise and deserialise.
-     *
-     * @param args none.
-     */
-    public static void main(String[] args) throws InterruptedException {
-        final ExecutorService service = Executors.newFixedThreadPool(8);
-        final long iterations = 1000;
-
-        final Runnable command = new Runnable() {
-            public void run() {
-
-                /**
-                 * Time the previous mechanism
-                 */
-                long start = System.currentTimeMillis();
-                for (int ii = 0; ii < iterations; ii++) {
-                    try {
-                        SessionUtils.encode(generateSession());
-                    } catch (Exception e) {
-                        throw new IllegalStateException(e);
-                    }
-                }
-                long delta = System.currentTimeMillis() - start;
-                float previous = (float)delta / iterations;
-
-                /**
-                 * Time the current mechanism
-                 */
-                start = System.currentTimeMillis();
-                for (int ii = 0; ii < iterations; ii++) {
-                    SERIALISATION.serialise(generateSession());
-                }
-                delta = System.currentTimeMillis() - start;
-                float current = (float)delta / iterations;
-
-                String msg = MessageFormat.format(
-                        "Object {0}ms vs JSON: {1}ms",
-                        previous,
-                        current);
-                (current <= previous ? System.out : System.err).println(msg);
-
-                if (!service.isShutdown()) {
-                    service.execute(this);
-                }
-            }
-        };
-
-        System.out.println("Serialisation Test");
-        for (int ii = 0; ii < 8; ii++) {
-            service.execute(command);
-        }
-        Thread.sleep(3000);
-        service.shutdown();
-        service.awaitTermination(1, TimeUnit.SECONDS);
-        System.exit(0);
     }
 }
