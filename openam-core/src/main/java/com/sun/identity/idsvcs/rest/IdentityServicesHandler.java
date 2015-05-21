@@ -51,15 +51,16 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.client.AuthClientUtils;
-import com.sun.identity.authentication.client.ZeroPageLoginConfig;
-import com.sun.identity.authentication.service.AuthException;
-import com.sun.identity.authentication.service.AuthUtils;
+import com.sun.identity.idsvcs.Attribute;
 import com.sun.identity.idsvcs.GeneralFailure;
+import com.sun.identity.idsvcs.IdentityDetails;
 import com.sun.identity.idsvcs.IdentityServicesFactory;
 import com.sun.identity.idsvcs.IdentityServicesImpl;
+import com.sun.identity.idsvcs.ListWrapper;
+import com.sun.identity.idsvcs.ObjectNotFound;
 import com.sun.identity.idsvcs.Token;
+import com.sun.identity.idsvcs.UserDetails;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSException;
 
 /**
  * Provides a marshall/unmarshall layer to the Security interface.
@@ -185,25 +186,36 @@ public class IdentityServicesHandler extends HttpServlet {
     public static class SecurityParameter {
 
         public static final SecurityParameter URI =
-                new SecurityParameter("URI");
+            new SecurityParameter("URI");
         public static final SecurityParameter ACTION =
-                new SecurityParameter("ACTION");
+            new SecurityParameter("ACTION");
         public static final SecurityParameter USERNAME =
-                new SecurityParameter("USERNAME");
+            new SecurityParameter("USERNAME");
         public static final SecurityParameter PASSWORD =
-                new SecurityParameter("PASSWORD");
+            new SecurityParameter("PASSWORD");
         public static final SecurityParameter SUBJECTID =
-                new SecurityParameter("SUBJECTID", Token.class);
+            new SecurityParameter("SUBJECTID", Token.class);
+        public static final SecurityParameter IDENTITY =
+            new SecurityParameter("IDENTITY", IdentityDetails.class);
+        public static final SecurityParameter ATTRIBUTENAMES =
+            new SecurityParameter("ATTRIBUTENAMES",
+            (new String[1]).getClass());
         public static final SecurityParameter LOGNAME =
-                new SecurityParameter("LOGNAME");
+            new SecurityParameter("LOGNAME");
         public static final SecurityParameter MESSAGE =
-                new SecurityParameter("MESSAGE");
+            new SecurityParameter("MESSAGE");
         public static final SecurityParameter APPID =
-                new SecurityParameter("APPID", Token.class);
+            new SecurityParameter("APPID", Token.class);
+        public static final SecurityParameter ADMIN =
+            new SecurityParameter("ADMIN", Token.class);
         public static final SecurityParameter NAME =
-                new SecurityParameter("NAME");
+            new SecurityParameter("NAME");
         public static final SecurityParameter FILTER =
-                new SecurityParameter("FILTER");
+            new SecurityParameter("FILTER");
+        public static final SecurityParameter ATTRIBUTES =
+            new SecurityParameter("ATTRIBUTES", Attribute[].class);
+        public static final SecurityParameter REFRESH =
+                new SecurityParameter("REFRESH", Boolean.class);
         // ===================================================================
         // Fields
         // ===================================================================
@@ -232,6 +244,10 @@ public class IdentityServicesHandler extends HttpServlet {
                 ret = getList(request);
             } else if (this.type == String[].class) {
                 ret = getArray(request);
+            } else if (this.type == Attribute[].class) {
+                ret = getAttributeArray(request);
+            } else if (this.type == IdentityDetails.class) {
+                ret = getIdentityDetails(request);
             } else if (type == Boolean.class) {
                 ret = getBoolean(request);
             } else {
@@ -262,7 +278,8 @@ public class IdentityServicesHandler extends HttpServlet {
                 try {
                     // Check the cookie value "iPlanetDirectoryPro"
                     SSOTokenManager mgr = SSOTokenManager.getInstance();
-                    SSOToken token = mgr.createSSOToken((HttpServletRequest) request);
+                    SSOToken token = mgr.createSSOToken(
+                        (HttpServletRequest) request);
                     if (token != null) {
                         id = token.getTokenID().toString();
                     }
@@ -293,7 +310,8 @@ public class IdentityServicesHandler extends HttpServlet {
             return ret;
         }
 
-        public String[] getArray(ServletRequest request) {
+        public String[] getArray(ServletRequest request)
+        {
             String[] ret = null;
             List valuesList = getList(request);
 
@@ -304,6 +322,197 @@ public class IdentityServicesHandler extends HttpServlet {
             }
 
             return ret;
+        }
+
+        public Attribute[] getAttributeArray(ServletRequest request)
+        {
+            Attribute[] ret = null;
+            List attributeList = null;
+            String n = name().toLowerCase();
+            String[] attrNames = request.getParameterValues(n + "_names");
+
+            if (attrNames != null) {
+                for (int i = 0; i < attrNames.length; i++) {
+                    String attrName = attrNames[i];
+
+                    if (isBlank(attrName)) {
+                        break;
+                    }
+
+                    String attrValues[] =
+                        request.getParameterValues(n + "_values_" + attrName);
+
+                    if ((attrValues != null) && (attrValues.length > 0)) {
+                        List attrValueList = new ArrayList();
+
+                        for (int j = 0; j < attrValues.length; j++) {
+                            String attrValue = attrValues[j];
+
+                            if (!isBlank(attrValue)) {
+                                attrValueList.add(attrValue);
+                            }
+                        }
+
+                        String[] attrValuesArray =
+                            new String[attrValueList.size()];
+
+                        attrValueList.toArray(attrValuesArray);
+
+                        Attribute attribute = new Attribute();
+                        attribute.setName(attrName);
+                        attribute.setValues(attrValuesArray);
+
+                        if (attributeList == null) {
+                            attributeList = new ArrayList();
+                        }
+
+                        attributeList.add(attribute);
+                    } else {
+                        // Add empyt attribute
+                        Attribute attribute = new Attribute();
+                        attribute.setName(attrName);
+                        if (attributeList == null) {
+                            attributeList = new ArrayList();
+                        }
+                        attributeList.add(attribute);
+                    }
+                }
+            }
+
+            if ((attributeList != null) && (attributeList.size() > 0)) {
+                ret = new Attribute[attributeList.size()];
+                attributeList.toArray(ret);
+            }
+
+            return ret;
+        }
+
+        public IdentityDetails getIdentityDetails(ServletRequest request)
+        {
+            IdentityDetails rv = null;
+            String n = name().toLowerCase();
+            String identityName = request.getParameter(n + "_name");
+
+            if (!isBlank(identityName)) {
+                rv = new IdentityDetails();
+                rv.setName(identityName);
+
+                String objType = request.getParameter(n + "_type");
+                if (!isBlank(objType)) {
+                    rv.setType(objType);
+                }
+
+                String realm = request.getParameter(n + "_realm");
+                if (!isBlank(realm)) {
+                    rv.setRealm(realm);
+                }
+
+                String[] roles = request.getParameterValues(n + "_roles");
+                if (roles != null) {
+                    List rolesList = new ArrayList();
+
+                    for (int i = 0; i < roles.length; i++) {
+                        String role = roles[i];
+
+                        if (!isBlank(role)) {
+                            rolesList.add(role);
+                        }
+                    }
+
+                    String[] rolesArray = new String[rolesList.size()];
+
+                    rolesList.toArray(rolesArray);
+                    rv.setRoleList(new ListWrapper(rolesArray));
+                }
+
+                String[] groups = request.getParameterValues(n + "_groups");
+                if (groups != null) {
+                    List groupsList = new ArrayList();
+
+                    for (int i = 0; i < groups.length; i++) {
+                        String group = groups[i];
+
+                        if (!isBlank(group)) {
+                            groupsList.add(group);
+                        }
+                    }
+
+                    String[] groupsArray = new String[groupsList.size()];
+
+                    groupsList.toArray(groupsArray);
+                    rv.setGroupList(new ListWrapper(groupsArray));
+                }
+
+                String[] members = request.getParameterValues(n + "_members");
+                if (members != null) {
+                    List membersList = new ArrayList();
+
+                    for (int i = 0; i < members.length; i++) {
+                        String member = members[i];
+
+                        if (!isBlank(member)) {
+                            membersList.add(member);
+                        }
+                    }
+
+                    String[] membersArray = new String[membersList.size()];
+
+                    membersList.toArray(membersArray);
+                    rv.setMemberList(new ListWrapper(membersArray));
+                }
+
+                List attrList = new ArrayList();
+                String[] attrNames =
+                        request.getParameterValues(n + "_attribute_names");
+
+                if (attrNames != null) {
+                    for (int i = 0; i < attrNames.length; i++) {
+                        String attrName = attrNames[i];
+
+                        if (isBlank(attrName)) {
+                            break;
+                        }
+
+                        Attribute attribute = null;
+                        String attrValues[] =
+                            request.getParameterValues(n + "_attribute_values_" + attrName);
+
+                        if (attrValues != null) {
+                            List attrValueList = new ArrayList();
+
+                            for (int j = 0; j < attrValues.length; j++) {
+                                String attrValue = attrValues[j];
+
+                                if (!isBlank(attrValue)) {
+                                    attrValueList.add(attrValue);
+                                }
+                            }
+
+                            String[] attrValuesArray =
+                                new String[attrValueList.size()];
+
+                            attrValueList.toArray(attrValuesArray);
+                            attribute = new Attribute();
+                            attribute.setName(attrName);
+                            attribute.setValues(attrValuesArray);
+                            attrList.add(attribute);
+                        } else {
+                            attribute = new Attribute();
+                            attribute.setName(attrName);
+                            attrList.add(attribute);
+                        }
+
+                        if (attrList.size() > 0) {
+                            Attribute[] attrArray = new Attribute[attrList.size()];
+
+                            attrList.toArray(attrArray);
+                            rv.setAttributes(attrArray);
+                        }
+                    }
+                }
+            }
+
+            return rv;
         }
     }
 
@@ -316,10 +525,17 @@ public class IdentityServicesHandler extends HttpServlet {
             "GETCOOKIENAMEFORTOKEN", String.class, (SecurityParameter[]) null);
         public static final SecurityMethod ALLCOOKIES = new SecurityMethod(
             "GETCOOKIENAMESTOFORWARD", String[].class, (SecurityParameter[]) null);
+        public static final SecurityMethod ATTRIBUTES = new SecurityMethod(
+            "ATTRIBUTES", UserDetails.class, SecurityParameter.ATTRIBUTENAMES,
+            SecurityParameter.SUBJECTID, SecurityParameter.REFRESH);
         public static final SecurityMethod LOG = new SecurityMethod(
                 "LOG", Void.class, new SecurityParameter[]
                 {SecurityParameter.APPID, SecurityParameter.SUBJECTID,
                  SecurityParameter.LOGNAME, SecurityParameter.MESSAGE});
+        public static final SecurityMethod READ = new SecurityMethod(
+            "READ", IdentityDetails.class, new SecurityParameter[]
+            {SecurityParameter.NAME, SecurityParameter.ATTRIBUTES,
+             SecurityParameter.ADMIN});
 
         // ===================================================================
         // Constructors
@@ -395,8 +611,12 @@ public class IdentityServicesHandler extends HttpServlet {
             }
             path = path.substring(path.lastIndexOf('/') + 1).toUpperCase();
             SecurityMethod method = null;
-            if (path.equals("LOG")) {
+            if (path.equals("ATTRIBUTES")) {
+                method = SecurityMethod.ATTRIBUTES;
+            } else if (path.equals("LOG")) {
                 method = SecurityMethod.LOG;
+            } else if (path.equals("READ")) {
+                method = SecurityMethod.READ;
             } else if (path.equals("GETCOOKIENAMEFORTOKEN")) {
                 method = SecurityMethod.TOKENCOOKIE;
             } else if (path.equals("GETCOOKIENAMESTOFORWARD")) {
@@ -422,6 +642,19 @@ public class IdentityServicesHandler extends HttpServlet {
                     if (value == null) {
                         wrt.write("NULL");
                     }
+                }
+            } catch (ObjectNotFound ex) {
+                // write out the proper ObjectNotFound exception.
+                // set the response error code
+                if(debug.messageEnabled()) {
+                    debug.message("An objecjNotFound exception has been caught; details: ", ex);
+                }
+                try {
+                    mar.newInstance(ObjectNotFound.class).marshall(wrt, ex);
+                    response.setStatus(401);
+                } catch (Exception e) {
+                    // something really went wrong so just give up..
+                    throw new ServletException(e);
                 }
             } catch (GeneralFailure ex) {
                 // write out the proper security based exception..
@@ -458,13 +691,6 @@ public class IdentityServicesHandler extends HttpServlet {
                 }
             }
         }
-
-       private static boolean isZeroPageLoginAllowed(HttpServletRequest request) throws AuthException, SMSException,
-               SSOException {
-           final String realm = getRealm(request);
-           final ZeroPageLoginConfig config = AuthUtils.getZeroPageLoginConfig(realm);
-           return AuthClientUtils.isZeroPageLoginAllowed(config, request);
-       }
 
        /**
         * Gets the realm being used for this request by parsing the query parameters on the URI parameter (if present).
@@ -513,17 +739,19 @@ public class IdentityServicesHandler extends HttpServlet {
                 }
             }
             
-            Object ret = null;
             try {
                 // invoke the actual security param..
-                ret = method.invoke(security, params);
-            } catch (IllegalArgumentException | IllegalAccessException e) {
+                return method.invoke(security, params);
+            } catch (IllegalArgumentException e) {
+                throw new GeneralFailure(e.getMessage());
+            } catch (IllegalAccessException e) {
                 throw new GeneralFailure(e.getMessage());
             } catch (InvocationTargetException e) {
-                debug.warning("Exception during invocation", e);
+                if (debug.warningEnabled()) {
+                    debug.warning("Exception during invocation", e);
+                }
                 throw e.getTargetException();
             }
-            return ret;
         }
     }
 }

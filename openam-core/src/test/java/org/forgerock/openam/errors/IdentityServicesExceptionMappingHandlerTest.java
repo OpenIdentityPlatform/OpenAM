@@ -13,16 +13,15 @@
 *
 * Copyright 2015 ForgeRock AS.
 */
-
 package org.forgerock.openam.errors;
 
 import static org.mockito.BDDMockito.*;
 import static org.testng.Assert.*;
 
 import com.sun.identity.idm.IdRepoException;
-import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.json.resource.NotFoundException;
-import org.forgerock.json.resource.ResourceException;
+import com.sun.identity.idsvcs.GeneralFailure;
+import com.sun.identity.idsvcs.IdServicesException;
+import com.sun.identity.idsvcs.ObjectNotFound;
 import org.testng.annotations.Test;
 
 public class IdentityServicesExceptionMappingHandlerTest {
@@ -37,10 +36,10 @@ public class IdentityServicesExceptionMappingHandlerTest {
         given(mockException.getMessage()).willReturn("Message");
 
         //when
-        ResourceException exp = handler.handleError(mockException);
+        IdServicesException exp = handler.handleError(mockException);
 
         //then
-        assertTrue(exp instanceof InternalServerErrorException);
+        assertTrue(exp instanceof GeneralFailure);
         assertTrue(exp.getMessage().equals("Message"));
     }
 
@@ -51,10 +50,10 @@ public class IdentityServicesExceptionMappingHandlerTest {
         given(mockException.getLDAPErrorCode()).willReturn(String.valueOf(IdentityServicesException.LDAP_NO_SUCH_OBJECT));
 
         //when
-        ResourceException exp = handler.handleError(mockException);
+        IdServicesException exp = handler.handleError(mockException);
 
         //then
-        assertTrue(exp instanceof NotFoundException);
+        assertTrue(exp instanceof ObjectNotFound);
     }
 
     @Test
@@ -64,10 +63,10 @@ public class IdentityServicesExceptionMappingHandlerTest {
         given(mockException.getErrorCode()).willReturn(String.valueOf(IdentityServicesException.GENERAL_OBJECT_NOT_FOUND));
 
         //when
-        ResourceException exp = handler.handleError(mockException);
+        IdServicesException exp = handler.handleError(mockException);
 
         //then
-        assertTrue(exp instanceof NotFoundException);
+        assertTrue(exp instanceof ObjectNotFound);
     }
 
 }

@@ -29,11 +29,10 @@
 
 package com.sun.identity.idsvcs;
 
-import com.iplanet.am.util.Token;
-
-import java.util.List;
 import java.rmi.Remote;
-import java.rmi.RemoteException;
+import java.util.List;
+
+import com.iplanet.am.util.Token;
 
 /**
  * Base interface for all security providers.
@@ -41,36 +40,71 @@ import java.rmi.RemoteException;
 public interface IdentityServices extends Remote {
 
     /**
+     * Retrieve user details (roles, attributes) for the subject.
+     *
+     * @param attributeNames Optional list of attributes to be returned.
+     * @param subject Token for subject.
+     * @return User details for the subject.
+     * @throws TokenExpired When Token has expired.
+     * @throws GeneralFailure On other errors.
+     * @throws AccessDenied If reading of attributes for the user is
+     * disallowed.
+     */
+    UserDetails attributes(List attributeNames, Token subject, boolean refresh) throws TokenExpired, GeneralFailure,
+            AccessDenied;
+
+    /**
      * Logs a message on behalf of the authenticated app.
      *
      * @param app Token corresponding to the authenticated application.
-     * @param subject Optional token identifying the subject for which the log record pertains.
+     * @param subject Optional token identifying the subject for which the log
+     *                record pertains.
      * @param logName Identifier for the log file, e.g. "MyApp.access".
      * @param message String containing the message to be logged.
      * @throws AccessDenied If app token is not specified.
-     * @throws GeneralFailure On any other error.
+     * @throws GeneralFailure On error.
      */
     void log(Token app, Token subject, String logName, String message) throws AccessDenied, TokenExpired,
-            GeneralFailure, RemoteException;
+            GeneralFailure;
 
     /**
-     * Returns the cookie used by OpenAM Authentication module to store
-     * the SSOToken. Can be used for Single-Sign-On by replaying this cookie
-     * back to OpenAM for other operations.
+     * Retrieves an identity object matching input criteria.
      *
-     * @return cookie name that contains the SSOToken
-     * @throws GeneralFailure on other errors.
+     * @param name The name of identity to retrieve.
+     * @param attributes Attribute objects specifying criteria for the object
+     *                   to retrieve.
+     * @param admin Token identifying the administrator to be used to authorize
+     *              the request.
+     * @return IdentityDetails of the subject.
+     * @throws NeedMoreCredentials When more credentials are required for
+     * authorization.
+     * @throws ObjectNotFound If no subject is found that matches the input
+     * criteria.
+     * @throws TokenExpired When subject's token has expired.
+     * @throws GeneralFailure On other errors.
+     * @throws AccessDenied If reading of attributes for the user is
+     * disallowed.
      */
-    String getCookieNameForToken() throws GeneralFailure, RemoteException;
+    IdentityDetails read(String name, List attributes, Token admin) throws NeedMoreCredentials, ObjectNotFound,
+            TokenExpired, GeneralFailure, AccessDenied;
+    
+    /**
+     * Returns the cookie used by OpenAM Authentication module to store the
+     * SSOToken. Can be used for Single-Sign-On by replaying this cookie back
+     * to OpenAM for other operations.
+     *
+     * @return Cookie name that contains the SSOToken.
+     * @throws GeneralFailure On other errors.
+     */
+    String getCookieNameForToken() throws GeneralFailure;
     
     /**
      * Returns a list of cookie names that are used by OpenAM for
-     * authentication and load balancing. Replaying all these cookies
-     * during the request is highly recommended.
+     * authentication and load balancing. Replaying all these cookies during
+     * the request is highly recommended.
      *
-     * @return <true> if token is valid
-     * @throws GeneralFailure on other errors.
-     * @throws RemoteException On a remote error.
+     * @return {@code true} If token is valid.
+     * @throws GeneralFailure On other errors.
      */
-    List getCookieNamesToForward() throws GeneralFailure, RemoteException;
+    List getCookieNamesToForward() throws GeneralFailure;
 }

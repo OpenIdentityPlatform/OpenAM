@@ -19,7 +19,17 @@
 
             <xsd:element name="GeneralFailure" type="tns:GeneralFailure"></xsd:element>
 
+            <xsd:element name="NeedMoreCredentials" type="tns:NeedMoreCredentials"></xsd:element>
+
             <xsd:element name="TokenExpired" type="tns:TokenExpired"></xsd:element>
+
+            <xsd:element name="ObjectNotFound" type="tns:ObjectNotFound"></xsd:element>
+
+            <xsd:element name="attributes" type="tns:attributes"></xsd:element>
+
+            <xsd:element name="attributesRequest" type="tns:attributesRequest"></xsd:element>
+
+            <xsd:element name="attributesResponse" type="tns:attributesResponse"></xsd:element>
 
             <xsd:element name="getCookieNameForToken" type="tns:getCookieNameForToken"></xsd:element>
 
@@ -32,6 +42,10 @@
             <xsd:element name="log" type="tns:log"></xsd:element>
 
             <xsd:element name="logResponse" type="tns:logResponse"></xsd:element>
+
+            <xsd:element name="read" type="tns:read"></xsd:element>
+
+            <xsd:element name="readResponse" type="tns:readResponse"></xsd:element>
 
             <xsd:complexType name="log">
                 <xsd:sequence>
@@ -84,6 +98,42 @@
                 </xsd:complexContent>
             </xsd:complexType>
 
+            <xsd:complexType name="attributes">
+                <xsd:sequence>
+                    <xsd:element name="attributeNames" type="xsd:string" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+                    <xsd:element name="subject" type="tns:token" minOccurs="0"></xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="attributesRequest">
+                <xsd:sequence>
+                    <xsd:element name="attributes" type="xsd:string" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+                    <xsd:element name="subject" type="tns:token" minOccurs="0"></xsd:element>
+                    <xsd:element name="refresh" type="xsd:boolean" minOccurs="0" maxOccurs="1"></xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="attributesResponse">
+                <xsd:sequence>
+                    <xsd:element name="return" type="tns:userDetails" minOccurs="0"></xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="userDetails">
+                <xsd:sequence>
+                    <xsd:element name="attributes" type="tns:attribute" nillable="true" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+                    <xsd:element name="roles" type="xsd:string" nillable="true" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+                    <xsd:element name="token" type="tns:token" minOccurs="0"></xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="attribute">
+                <xsd:sequence>
+                    <xsd:element name="name" type="xsd:string" minOccurs="0"></xsd:element>
+                    <xsd:element name="values" type="xsd:string" nillable="true" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+
             <xsd:complexType name="getCookieNameForToken">
             </xsd:complexType>
 
@@ -102,6 +152,57 @@
                 </xsd:sequence>
             </xsd:complexType>
 
+            <xsd:complexType name="listWrapper">
+                <xsd:sequence>
+                    <xsd:element name="elements" type="xsd:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="identityDetails">
+                <xsd:sequence>
+                    <xsd:element name="name" type="xsd:string" minOccurs="0"></xsd:element>
+                    <xsd:element name="type" type="xsd:string" minOccurs="0"></xsd:element>
+                    <xsd:element name="realm" type="xsd:string" minOccurs="0"></xsd:element>
+                    <xsd:element name="roleList" type="tns:listWrapper" nillable="true" minOccurs="0"></xsd:element>
+                    <xsd:element name="groupList" type="tns:listWrapper" nillable="true" minOccurs="0"></xsd:element>
+                    <xsd:element name="memberList" type="tns:listWrapper" nillable="true" minOccurs="0"></xsd:element>
+                    <xsd:element name="attributes" type="tns:attribute" nillable="true" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="read">
+                <xsd:sequence>
+                    <xsd:element name="name" type="xsd:string" minOccurs="0"></xsd:element>
+                    <xsd:element name="attributes" type="tns:attribute" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+                    <xsd:element name="admin" type="tns:token" minOccurs="0"></xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="readResponse">
+                <xsd:sequence>
+                    <xsd:element name="return" type="tns:identityDetails" minOccurs="0"></xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="NeedMoreCredentials">
+                <xsd:complexContent>
+                    <xsd:extension base="tns:IdServicesException">
+                        <xsd:sequence>
+                            <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
+                        </xsd:sequence>
+                    </xsd:extension>
+                </xsd:complexContent>
+            </xsd:complexType>
+
+            <xsd:complexType name="ObjectNotFound">
+                <xsd:complexContent>
+                    <xsd:extension base="tns:IdServicesException">
+                        <xsd:sequence>
+                            <xsd:element name="message" type="xsd:string" minOccurs="0"></xsd:element>
+                        </xsd:sequence>
+                    </xsd:extension>
+                </xsd:complexContent>
+            </xsd:complexType>
         </xsd:schema>
     </types>
     <message name="IdServicesException">
@@ -122,6 +223,18 @@
     <message name="GeneralFailure">
         <part name="fault" element="tns:GeneralFailure"></part>
     </message>
+    <message name="attributesRequest">
+        <part name="parameters" element="tns:attributesRequest"></part>
+    </message>
+    <message name="attributesResponse">
+        <part name="parameters" element="tns:attributesResponse"></part>
+    </message>
+    <message name="ObjectNotFound">
+        <part name="fault" element="tns:ObjectNotFound"></part>
+    </message>
+    <message name="NeedMoreCredentials">
+        <part name="fault" element="tns:NeedMoreCredentials"></part>
+    </message>
     <message name="getCookieNameForToken">
         <part name="parameters" element="tns:getCookieNameForToken"></part>
     </message>
@@ -134,6 +247,12 @@
     <message name="getCookieNamesToForwardResponse">
         <part name="parameters" element="tns:getCookieNamesToForwardResponse"></part>
     </message>
+    <message name="read">
+        <part name="parameters" element="tns:read"></part>
+    </message>
+    <message name="readResponse">
+        <part name="parameters" element="tns:readResponse"></part>
+    </message>
     <portType name="IdentityServicesImpl">
         <operation name="log">
             <input message="tns:log"></input>
@@ -141,6 +260,13 @@
             <fault message="tns:AccessDenied" name="AccessDenied"></fault>
             <fault message="tns:TokenExpired" name="TokenExpired"></fault>
             <fault message="tns:GeneralFailure" name="GeneralFailure"></fault>
+        </operation>
+        <operation name="attributes">
+            <input message="tns:attributesRequest"></input>
+            <output message="tns:attributesResponse"></output>
+            <fault message="tns:TokenExpired" name="TokenExpired"></fault>
+            <fault message="tns:GeneralFailure" name="GeneralFailure"></fault>
+            <fault message="tns:AccessDenied" name="AccessDenied"></fault>
         </operation>
         <operation name="getCookieNameForToken">
             <input message="tns:getCookieNameForToken"></input>
@@ -151,6 +277,16 @@
             <input message="tns:getCookieNamesToForward"></input>
             <output message="tns:getCookieNamesToForwardResponse"></output>
             <fault message="tns:GeneralFailure" name="GeneralFailure"></fault>
+        </operation>
+        <operation name="read">
+            <input message="tns:read"></input>
+            <output message="tns:readResponse"></output>
+            <fault message="tns:TokenExpired" name="TokenExpired"></fault>
+            <fault message="tns:NeedMoreCredentials" name="NeedMoreCredentials"></fault>
+            <fault message="tns:ObjectNotFound" name="ObjectNotFound"></fault>
+            <fault message="tns:GeneralFailure" name="GeneralFailure"></fault>
+            <fault message="tns:AccessDenied" name="AccessDenied"></fault>
+            <fault message="tns:IdServicesException" name="IdServicesException"></fault>
         </operation>
     </portType>
     <binding name="IdentityServicesImplPortBinding" type="tns:IdentityServicesImpl">
@@ -173,6 +309,24 @@
                 <soap:fault name="GeneralFailure" use="literal"></soap:fault>
             </fault>
         </operation>
+        <operation name="attributes">
+            <soap:operation soapAction=""></soap:operation>
+            <input>
+                <soap:body use="literal"></soap:body>
+            </input>
+            <output>
+                <soap:body use="literal"></soap:body>
+            </output>
+            <fault name="TokenExpired">
+                <soap:fault name="TokenExpired" use="literal"></soap:fault>
+            </fault>
+            <fault name="GeneralFailure">
+                <soap:fault name="GeneralFailure" use="literal"></soap:fault>
+            </fault>
+            <fault name="AccessDenied">
+                <soap:fault name="AccessDenied" use="literal"></soap:fault>
+            </fault>
+        </operation>
         <operation name="getCookieNameForToken">
             <soap:operation soapAction=""></soap:operation>
             <input>
@@ -195,6 +349,33 @@
             </output>
             <fault name="GeneralFailure">
                 <soap:fault name="GeneralFailure" use="literal"></soap:fault>
+            </fault>
+        </operation>
+        <operation name="read">
+            <soap:operation soapAction=""></soap:operation>
+            <input>
+                <soap:body use="literal"></soap:body>
+            </input>
+            <output>
+                <soap:body use="literal"></soap:body>
+            </output>
+            <fault name="TokenExpired">
+                <soap:fault name="TokenExpired" use="literal"></soap:fault>
+            </fault>
+            <fault name="NeedMoreCredentials">
+                <soap:fault name="NeedMoreCredentials" use="literal"></soap:fault>
+            </fault>
+            <fault name="ObjectNotFound">
+                <soap:fault name="ObjectNotFound" use="literal"></soap:fault>
+            </fault>
+            <fault name="GeneralFailure">
+                <soap:fault name="GeneralFailure" use="literal"></soap:fault>
+            </fault>
+            <fault name="AccessDenied">
+                <soap:fault name="AccessDenied" use="literal"></soap:fault>
+            </fault>
+            <fault name="IdServicesException">
+                <soap:fault name="IdServicesException" use="literal"></soap:fault>
             </fault>
         </operation>
     </binding>

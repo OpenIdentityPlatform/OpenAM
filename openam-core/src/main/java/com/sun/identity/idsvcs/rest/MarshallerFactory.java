@@ -29,20 +29,28 @@
 
 package com.sun.identity.idsvcs.rest;
 
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.lang.reflect.Method;
-import java.util.HashMap;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.sun.identity.idsvcs.GeneralFailure;
-import com.sun.identity.idsvcs.Token;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import com.sun.identity.idsvcs.Attribute;
+import com.sun.identity.idsvcs.GeneralFailure;
+import com.sun.identity.idsvcs.IdentityDetails;
+import com.sun.identity.idsvcs.ListWrapper;
+import com.sun.identity.idsvcs.ObjectNotFound;
+import com.sun.identity.idsvcs.Token;
+import com.sun.identity.idsvcs.UserDetails;
+import java.lang.reflect.Method;
+import java.util.HashMap;
 
 /**
  * Determines which marshaller to give based on class/type.
@@ -56,7 +64,7 @@ public class MarshallerFactory {
     // ===================================================================
     // Fields
     // ===================================================================
-    private Map<Class<?>, Class<?>> _map = new HashMap<>();
+    private Map _map = new HashMap();
     
     private String protocol;
 
@@ -68,25 +76,39 @@ public class MarshallerFactory {
             _map.put(Boolean.class, JSONBooleanMarshaller.class);
             _map.put(String.class, JSONStringMarshaller.class);
             _map.put(String[].class, JSONStringArrayMarshaller.class);
+            _map.put(UserDetails.class, JSONUserDetailsMarshaller.class);
+            _map.put(IdentityDetails.class, JSONIdentityDetailsMarshaller.class);
             _map.put(Throwable.class, JSONThrowableMarshaller.class);
             _map.put(GeneralFailure.class, JSONThrowableMarshaller.class);
             _map.put(Throwable.class, JSONThrowableMarshaller.class);
+            _map.put(ObjectNotFound.class, JSONThrowableMarshaller.class);
             _map.put(GeneralFailure.class, JSONThrowableMarshaller.class);
         } else if (protocol.equals("XML")) {
             _map.put(Token.class, XMLTokenMarshaller.class);
+            _map.put(UserDetails.class, XMLUserDetailsMarshaller.class);
             _map.put(Boolean.class, XMLBooleanMarshaller.class);
             _map.put(String.class, XMLStringMarshaller.class);
             _map.put(String[].class, XMLStringArrayMarshaller.class);
+            _map.put(IdentityDetails.class, XMLIdentityDetailsMarshaller.class);
             _map.put(List.class, PropertiesListMarshaller.class);
             _map.put(GeneralFailure.class, XMLGeneralFailureMarshaller.class);
+            _map.put(ObjectNotFound.class, XMLObjectNotFoundMarshaller.class);
             _map.put(Throwable.class, XMLThrowableMarshaller.class);
         } else if (protocol.equals("PROPS"))  {
             _map.put(Token.class, PropertiesTokenMarshaller.class);
+            _map.put(UserDetails.class, PropertiesUserDetailsMarshaller.class);
             _map.put(Boolean.class, PropertiesBooleanMarshaller.class);
             _map.put(String.class, PropertiesStringMarshaller.class);
             _map.put(String[].class, PropertiesStringArrayMarshaller.class);
+            _map.put(IdentityDetails.class,
+                PropertiesIdentityDetailsMarshaller.class);
+            _map.put(IdentityDetails[].class,
+                PropertiesIdentityDetailsArrayMarshaller.class);
             _map.put(List.class, PropertiesListMarshaller.class);
-            _map.put(GeneralFailure.class, PropertiesGeneralFailureMarshaller.class);
+            _map.put(GeneralFailure.class,
+                PropertiesGeneralFailureMarshaller.class);
+            _map.put(ObjectNotFound.class,
+                PropertiesObjectNotFoundMarshaller.class);
             _map.put(Throwable.class, PropertiesThrowableMarshaller.class);
         }
     }
@@ -94,7 +116,7 @@ public class MarshallerFactory {
     /**
      * Returns the Marshaller Map for the mechanism
      */
-    Map<Class<?>, Class<?>> getMarshallerMap() {
+    Map getMarshallerMap() {
         return _map;
     }
 
@@ -144,6 +166,36 @@ public class MarshallerFactory {
             wrt.writeStartElement("token");
             if (token != null) {
                 wrt.writeAttribute("id", token);
+            }
+            wrt.writeEndElement();
+        }
+    }
+    /**
+     * Marshall an Attribute into XML.
+     */
+    static class XMLAttributeMarshaller implements Marshaller {
+        public void marshall(Writer wrt, Object value) throws Exception {
+            assert wrt != null;
+            // get an XMl factory for use..
+            XMLOutputFactory xmlFactory = XMLOutputFactory.newInstance();
+            XMLStreamWriter xwrt = xmlFactory.createXMLStreamWriter(wrt);
+            xwrt.writeStartDocument();
+            marshall(xwrt, (Attribute) value);
+            xwrt.writeEndDocument();
+        }
+        public void marshall(XMLStreamWriter wrt, Attribute attr)
+                throws Exception {
+            assert wrt != null && attr != null;
+            wrt.writeStartElement("attribute");
+            if (attr != null) {
+                wrt.writeAttribute("name", attr.getName());
+                String[] vals = attr.getValues();
+                for (int i = 0; (vals != null && i < vals.length); i++) {
+                    String val = vals[i];
+                    wrt.writeStartElement("value");
+                    wrt.writeCharacters(val);
+                    wrt.writeEndElement();
+                }
             }
             wrt.writeEndElement();
         }
@@ -207,6 +259,221 @@ public class MarshallerFactory {
             if (msg != null) {
                 wrt.writeAttribute("message", thr.getMessage());
             }
+            wrt.writeEndElement();
+        }
+    }
+
+    /**
+     * Marshall an ObjectNotFound exception into XML format.
+     */
+    static class XMLObjectNotFoundMarshaller
+        implements Marshaller
+    {
+        public void marshall(Writer wrt, Object value)
+            throws Exception
+        {
+            assert ((wrt != null) && (value != null));
+
+            // get an XMl factory for use..
+            XMLOutputFactory xmlFactory = XMLOutputFactory.newInstance();
+            XMLStreamWriter xwrt = xmlFactory.createXMLStreamWriter(wrt);
+            xwrt.writeStartDocument();
+            marshall(xwrt, (ObjectNotFound)value);
+            xwrt.writeEndDocument();
+        }
+
+        public void marshall(XMLStreamWriter wrt, ObjectNotFound onf)
+            throws Exception
+        {
+            wrt.writeStartElement("exception");
+            wrt.writeAttribute("name", onf.getClass().getName());
+            String msg = onf.getMessage();
+            if (msg != null) {
+                wrt.writeAttribute("message", onf.getMessage());
+            }
+            wrt.writeEndElement();
+        }
+    }
+
+    /**
+     * Marshall the UserDetails into Xml format.
+     */
+    static class XMLUserDetailsMarshaller implements Marshaller {
+        public void marshall(Writer wrt, Object value) throws Exception {
+            assert wrt != null;
+            // get an XMl factory for use..
+            XMLOutputFactory xmlFactory = XMLOutputFactory.newInstance();
+            XMLStreamWriter xwrt = xmlFactory.createXMLStreamWriter(wrt);
+            xwrt.writeStartDocument();
+            marshall(xwrt, (UserDetails)value);
+            xwrt.writeEndDocument();
+        }
+
+        public void marshall(XMLStreamWriter wrt, UserDetails value)
+                throws Exception {
+            // write out the userdetails element..
+            wrt.writeStartElement("userdetails");
+            if (value != null) {
+                // marshall the token using the XMLTokenMarshaller..
+                Token token = value.getToken();
+                XMLTokenMarshaller mar = new XMLTokenMarshaller();
+                mar.marshall(wrt, token);
+                // write each of the roles..
+                String[] values = value.getRoles();
+                for (int i = 0; (values != null && i < values.length); i++) {
+                    String role = values[i];
+                    wrt.writeStartElement("role");
+                    wrt.writeAttribute("id", role);
+                    wrt.writeEndElement();
+                }
+                // write each of the attributes
+                XMLAttributeMarshaller attrMarshaller =
+                    new XMLAttributeMarshaller();
+                Attribute[] vals = value.getAttributes();
+                for (int i = 0; (vals != null && i < vals.length); i++) {
+                    Attribute attr = vals[i];
+                    attrMarshaller.marshall(wrt, attr);
+                }
+            }
+            // end the userdetails..
+            wrt.writeEndElement();
+        }
+    }
+
+    /**
+     * Marshall the UserDetails into Xml format.
+     */
+    static class XMLIdentityDetailsMarshaller
+        implements Marshaller
+    {
+        public void marshall(Writer wrt, Object value)
+            throws Exception
+        {
+            assert wrt != null;
+            // get an XMl factory for use..
+            XMLOutputFactory xmlFactory = XMLOutputFactory.newInstance();
+            XMLStreamWriter xwrt = xmlFactory.createXMLStreamWriter(wrt);
+            xwrt.writeStartDocument();
+            marshall(xwrt, (IdentityDetails)value);
+            xwrt.writeEndDocument();
+        }
+
+        public void marshall(XMLStreamWriter wrt, IdentityDetails value)
+            throws Exception
+        {
+            // write out the identitydetails element..
+            wrt.writeStartElement("identitydetails");
+            if (value != null) {
+                // marshall the name.
+                String name = value.getName();
+                wrt.writeStartElement("name");
+                wrt.writeAttribute("value", name);
+                wrt.writeEndElement();
+
+                // marshall the identity type
+                String identityType = value.getType();
+                wrt.writeStartElement("type");
+                wrt.writeAttribute("value", identityType);
+                wrt.writeEndElement();
+
+                // marshall the realm
+                String realm = value.getRealm();
+                wrt.writeStartElement("realm");
+                wrt.writeAttribute("value", realm);
+                wrt.writeEndElement();
+
+                // write the roles.
+                ListWrapper roleList = value.getRoleList();
+                if (roleList != null) {
+                    String[] roles = roleList.getElements();
+                    for (int i = 0; (roles != null && i < roles.length); i++) {
+                        wrt.writeStartElement("role");
+                        wrt.writeAttribute("id", roles[i]);
+                        wrt.writeEndElement();
+                    }
+                }
+
+                // write the groups.
+                ListWrapper groupList = value.getGroupList();
+                if (groupList != null) {
+                    String[] groups = groupList.getElements();
+                    for (int i = 0; (groups != null && i < groups.length); i++) {
+                        wrt.writeStartElement("group");
+                        wrt.writeAttribute("id", groups[i]);
+                        wrt.writeEndElement();
+                    }
+                }
+
+                // write the memberships.
+                ListWrapper memberList = value.getMemberList();
+                if (memberList != null) {
+                    String[] members = memberList.getElements();
+                    for (int i = 0; (members != null && i < members.length); i++) {
+                        wrt.writeStartElement("member");
+                        wrt.writeAttribute("id", members[i]);
+                        wrt.writeEndElement();
+                    }
+                }
+
+                // write each of the attributes
+                XMLAttributeMarshaller attrMarshaller =
+                    new XMLAttributeMarshaller();
+                Attribute[] vals = value.getAttributes();
+
+                for (int i = 0; ((vals != null) && (i < vals.length)); i++) {
+                    Attribute attr = vals[i];
+                    attrMarshaller.marshall(wrt, attr);
+                }
+            }
+
+            // end the identitydetails..
+            wrt.writeEndElement();
+        }
+    }
+
+    /**
+     * Marshall a List into Xml format.
+     */
+    static class XMLListMarshaller
+        implements Marshaller
+    {
+        Writer wrt;
+        public void marshall(Writer wrt, Object value)
+            throws Exception
+        {
+            assert ((wrt != null) && (value != null));
+            this.wrt = wrt;
+            // get an XMl factory for use..
+            XMLOutputFactory xmlFactory = XMLOutputFactory.newInstance();
+            XMLStreamWriter xwrt = xmlFactory.createXMLStreamWriter(wrt);
+
+            xwrt.writeStartDocument();
+            marshall(xwrt, (List) value);
+            xwrt.writeEndDocument();
+        }
+
+        public void marshall(XMLStreamWriter wrt, List value)
+            throws Exception
+        {
+            // write out the identitydetails element..
+            wrt.writeStartElement("List");
+
+            if (value != null) {
+                Iterator iter = value.iterator();
+
+                while (iter.hasNext()) {
+                    Object nextObj = iter.next();
+                    Marshaller mar = MarshallerFactory.XML.newInstance(
+                        nextObj.getClass());
+                    Class[] params = { XMLStreamWriter.class,
+                        nextObj.getClass() };
+                    Method m = mar.getClass().getMethod("marshall", params);
+                    Object[] objs = { wrt, value };
+                    m.invoke(mar, objs);
+                }
+            }
+
+            // end the List
             wrt.writeEndElement();
         }
     }
@@ -356,6 +623,129 @@ public class MarshallerFactory {
         }
     }
 
+    static class JSONUserDetailsMarshaller implements Marshaller {
+
+        public void marshall(Writer wrt, Object value) throws Exception {
+            assert wrt != null && value != null;
+            wrt.write(getObject((UserDetails) value).toString());
+        }
+
+        public JSONObject getObject(UserDetails ud) throws Exception {
+            JSONObject obj = new JSONObject();
+            // add token..
+            JSONObject token = new JSONTokenMarshaller()
+                .getObject(ud.getToken());
+            obj.put("token", token);
+            // add roles..
+            JSONArray roles = new JSONArray();
+            String[] rols = ud.getRoles();
+            if (rols != null) {
+                for (String role : rols) {
+                    roles.put(role);
+                }
+            }
+            obj.put("roles", roles);
+            // add attributes..
+            JSONArray attributes = new JSONArray();
+            JSONAttributeMarshaller attrMar = new JSONAttributeMarshaller();
+            Attribute[] ats = ud.getAttributes();
+            if (ats != null) {
+                for (Attribute attr : ats) {
+                    attributes.put(attrMar.getObject(attr));
+                }
+            }
+            obj.put("attributes", attributes);
+            return obj;
+        }
+    }
+
+    /**
+     * Marshall an Attribute object into JSON.
+     */
+    static class JSONAttributeMarshaller implements Marshaller {
+
+        public void marshall(Writer wrt, Object value) throws Exception {
+            assert wrt != null && value != null;
+            wrt.write(getObject((Attribute) value).toString());
+        }
+
+        public JSONObject getObject(Attribute attr) throws Exception {
+            JSONObject obj = new JSONObject();
+            // add name..
+            obj.put("name", attr.getName());
+            // add values..
+            JSONArray array = new JSONArray();
+            String[] vals = attr.getValues();
+            if (vals != null) {
+                for (String val : vals) {
+                    array.put(val);
+                }
+            }
+            obj.put("values", array);
+
+            return obj;
+        }
+    }
+
+    static class JSONIdentityDetailsMarshaller implements Marshaller {
+
+        public void marshall(Writer wrt, Object value) throws Exception {
+            wrt.write(getObject((IdentityDetails) value).toString());
+        }
+
+        public JSONObject getObject(IdentityDetails id) throws Exception {
+            JSONObject obj = new JSONObject();
+            obj.put("name", id.getName());
+            obj.put("type", id.getType());
+            obj.put("realm", id.getRealm());
+            JSONArray roles = new JSONArray();
+            ListWrapper roleList = id.getRoleList();
+            if (roleList != null) {
+                String[] values = roleList.getElements();
+                if (values != null) {
+                    for (String val : values) {
+                        roles.put(val);
+                    }
+                }
+            }
+            obj.put("roles", roles);
+            JSONArray groups = new JSONArray();
+            ListWrapper groupList = id.getGroupList();
+            if (groupList != null) {
+                String[] values = groupList.getElements();
+                if (values != null) {
+                    for (String val : values) {
+                        groups.put(val);
+                    }
+                }
+            }
+            obj.put("groups", groups);
+            JSONArray members = new JSONArray();
+            ListWrapper memberList = id.getMemberList();
+            if (memberList != null) {
+                String[] values = memberList.getElements();
+                if (values != null) {
+                    for (String val : values) {
+                        members.put(val);
+                    }
+                }
+            }
+            obj.put("members", members);
+
+            JSONArray attributes = new JSONArray();
+            JSONAttributeMarshaller attrMar = new JSONAttributeMarshaller();
+            Attribute[] ats = id.getAttributes();
+            if (ats != null) {
+                for (Attribute attr : ats) {
+                    attributes.put(attrMar.getObject(attr));
+                }
+            }
+            obj.put("attributes", attributes);
+
+            return obj;
+        }
+    }
+
     /**
      * Marshall an Exception class into JSON format.
      */
@@ -401,6 +791,185 @@ public class MarshallerFactory {
             wrt.print("token.id=");
             if (value != null) {
                 wrt.println(value.getId());
+            }
+        }
+    }
+    
+    /**
+     * Marshall an Attribute object into Properties format.
+     */
+    static class PropertiesAttributeMarshaller implements Marshaller {
+        public void marshall(Writer wrt, Object value) throws Exception {
+            assert wrt != null;
+            marshall(new PrintWriter(wrt), "", (Attribute) value);
+        }
+
+        public void marshall(PrintWriter wrt, String prefix, Attribute attr)
+                throws Exception {
+            String prfx = prefix + "attribute.";
+            wrt.print(prfx);
+            if (attr != null) {
+                wrt.print("name=");
+                wrt.println(attr.getName());
+                String[] vals = attr.getValues();
+                for (int i = 0; (vals != null && i < vals.length); i++) {
+                    String value = vals[i];
+                    wrt.print(prfx);
+                    wrt.print("value=");
+                    wrt.println(value);
+                }
+            }
+        }
+    }
+
+    /**
+     * Marshall a UserDetails object into Properties format.
+     */
+    static class PropertiesUserDetailsMarshaller implements Marshaller {
+        public void marshall(Writer wrt, Object value) throws Exception {
+            assert wrt != null;
+            marshall(new PrintWriter(wrt), "", (UserDetails)value);
+        }
+
+        public void marshall(PrintWriter wrt, String prefix, UserDetails ud)
+                throws Exception {
+            String prfx = prefix + "userdetails.";
+            if (ud != null) {
+                // write the token..
+                PropertiesTokenMarshaller tokenMarshaller =
+                    new PropertiesTokenMarshaller();
+                tokenMarshaller.marshall(wrt, prfx, ud.getToken());
+                // write the roles..
+                String[] rols = ud.getRoles();
+                for (int i = 0; (rols != null && i < rols.length); i++) {
+                    String v = rols[i];
+                    // add prefix to denote a parent object..
+                    wrt.print(prfx);
+                    wrt.print("role=");
+                    wrt.println(v);
+                }
+                // write the attributes..
+                PropertiesAttributeMarshaller attrMarshaller =
+                    new PropertiesAttributeMarshaller();
+                Attribute[] atts = ud.getAttributes();
+                for (int i = 0; (atts != null && i < atts.length); i++) {
+                    Attribute attr = atts[i];
+                    attrMarshaller.marshall(wrt, prfx, attr);
+                }
+            }
+        }
+    }
+
+    /**
+     * Marshall an IdentityDetails object into Properties format.
+     */
+    static class PropertiesIdentityDetailsMarshaller
+        implements Marshaller
+    {
+        public void marshall(Writer wrt, Object value)
+            throws Exception
+        {
+            assert((wrt != null) && (value != null));
+            marshall(new PrintWriter(wrt), "", (IdentityDetails)value);
+        }
+
+        public void marshall(PrintWriter wrt, String prefix,
+            IdentityDetails details) throws Exception
+        {
+            String prfx = prefix + "identitydetails.";
+            if (details != null) {
+                // write the name
+                wrt.print(prfx);
+                wrt.print("name=");
+                wrt.println(details.getName());
+
+                // write the identity type
+                wrt.print(prfx);
+                wrt.print("type=");
+                wrt.println(details.getType());
+
+                // write the realm
+                wrt.print(prfx);
+                wrt.print("realm=");
+                wrt.println(details.getRealm());
+
+                // write the roles.
+                ListWrapper roleList = details.getRoleList();
+                if (roleList != null) {
+                    String[] roles = roleList.getElements();
+                    for (int i = 0; (roles != null && i < roles.length); i++) {
+                        // add prefix to denote a parent object..
+                        wrt.print(prfx);
+                        wrt.print("role=");
+                        wrt.println(roles[i]);
+                    }
+                }
+
+                // write the groups.
+                ListWrapper groupList = details.getGroupList();
+                if (groupList != null) {
+                    String[] groups = groupList.getElements();
+                    for (int i = 0; (groups != null && i < groups.length); i++) {
+                        // add prefix to denote a parent object..
+                        wrt.print(prfx);
+                        wrt.print("group=");
+                        wrt.println(groups[i]);
+                    }
+                }
+
+                // write the members.
+                ListWrapper memberList = details.getMemberList();
+                if (memberList != null) {
+                    String[] members = memberList.getElements();
+                    for (int i = 0; (members != null && i < members.length); i++) {
+                        // add prefix to denote a parent object..
+                        wrt.print(prfx);
+                        wrt.print("member=");
+                        wrt.println(members[i]);
+                    }
+                }
+
+                // write the attributes..
+                PropertiesAttributeMarshaller attrMarshaller =
+                    new PropertiesAttributeMarshaller();
+                Attribute[] atts = details.getAttributes();
+                for (int i = 0; ((atts != null) && (i < atts.length)); i++) {
+                    Attribute attr = atts[i];
+
+                    wrt.print(prfx);
+                    wrt.println("attribute=");
+                    attrMarshaller.marshall(wrt, prfx, attr);
+                }
+            }
+        }
+    }
+
+    /**
+     * Marshall an IdentityDetails array into Properties format.
+     */
+    static class PropertiesIdentityDetailsArrayMarshaller
+        implements Marshaller
+    {
+        public void marshall(Writer wrt, Object value)
+            throws Exception
+        {
+            assert((wrt != null) && (value != null));
+            marshall(new PrintWriter(wrt), "", (IdentityDetails[])value);
+        }
+
+        public void marshall(PrintWriter wrt, String prefix,
+            IdentityDetails[] value) throws Exception
+        {
+            String prfx = prefix + "identitydetails";
+
+            if ((value != null) && (value.length > 0)) {
+                PropertiesIdentityDetailsMarshaller detailsMarshaller =
+                    new PropertiesIdentityDetailsMarshaller();
+
+                for (int i = 0; i < value.length; i++) {
+                    wrt.println(prfx + "=");
+                    detailsMarshaller.marshall(wrt, prefix, value[i]);
+                }
             }
         }
     }
@@ -494,6 +1063,36 @@ public class MarshallerFactory {
             }
         }
     }
+
+    /**
+     * Marshall the ObjectNotFound exception class into Properties format.
+     */
+    static class PropertiesObjectNotFoundMarshaller
+        implements Marshaller
+    {
+        public void marshall(Writer wrt, Object value)
+        {
+            assert ((wrt != null) && (value != null));
+            marshall(new PrintWriter(wrt), "", (ObjectNotFound)value);
+        }
+
+        public void marshall(PrintWriter wrt, String prefix,
+                             ObjectNotFound value)
+        {
+            String msg = value.getMessage();
+
+            wrt.print(prefix);
+            wrt.print("exception.name=");
+
+            if ((msg != null) && (msg.length() > 0)) {
+                wrt.print(value.getClass().getName());
+                wrt.println(" " + msg);
+            } else {
+                wrt.println(value.getClass().getName());
+            }
+        }
+    }
+
     /**
      * Marshall the Boolean into Properties format.
      */
