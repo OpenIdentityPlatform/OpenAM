@@ -23,6 +23,12 @@
 * "Portions Copyrighted [2012] [ForgeRock Inc]"
 */
 -->
+
+<%--
+   Portions Copyrighted 2015 ForgeRock AS.
+   Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+--%>
+
 <%@ page info="ConfigureOAuth2" language="java" %>
 <%@taglib uri="/WEB-INF/jato.tld" prefix="jato" %>
 <%@taglib uri="/WEB-INF/cc.tld" prefix="cc" %>
@@ -92,7 +98,7 @@
    </cc:form>
 </cc:header>
 </div>
-<div id="dlg" class="dvs" style="width:600px; height: 225px; margin-left:-300px"></div>
+<div id="dlg" class="dvs"></div>
  
 <script language="javascript">
  

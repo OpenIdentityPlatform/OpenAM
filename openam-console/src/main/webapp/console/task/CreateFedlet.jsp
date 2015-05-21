@@ -27,7 +27,8 @@
 --%>
 
 <%--
-   Portions Copyrighted 2013 ForgeRock AS
+   Portions Copyrighted 2013-2015 ForgeRock AS.
+   Portions Copyrighted 2015 Nomura Research Institute, Ltd.
 --%>
 
 <%@ page import="org.owasp.esapi.ESAPI"%>
@@ -161,7 +162,7 @@
 </cc:form>
 </cc:header>
 </div>
-<div id="dlg" class="dvs" style="width:600px; height: 225px; margin-left:-300px"></div>
+<div id="dlg" class="dvs"></div>
 
 <script language="javascript">
 

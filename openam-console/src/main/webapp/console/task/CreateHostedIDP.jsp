@@ -26,6 +26,11 @@
 
 --%>
 
+<%--
+   Portions Copyrighted 2015 ForgeRock AS.
+   Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+--%>
+
 <%@ page info="CreateHostedIDP" language="java" %>
 <%@taglib uri="/WEB-INF/jato.tld" prefix="jato" %>
 <%@taglib uri="/WEB-INF/cc.tld" prefix="cc" %>
@@ -84,7 +89,7 @@
 
 </cc:form>
 </div>
-<div id="dlg" class="dvs" style="height:200px"></div>
+<div id="dlg" class="dvs"></div>
 
 <script language="javascript">
     metadiv = document.getElementById("meta");
