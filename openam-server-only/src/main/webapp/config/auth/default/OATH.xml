@@ -22,14 +22,14 @@
 
 <ModuleProperties moduleName="OATH" version="1.0">
     <!-- For determining which we are -->
-    <Callbacks length="0" order="1" timeout="120" header="Two Factor Authentication - 2nd factor">
+    <Callbacks length="0" order="1" timeout="120" header="Two Step Verification">
     </Callbacks>
 
     <!-- For when we're optional -->
-    <Callbacks length="2" order="2" timeout="120" header="Two Factor Authentication - 2nd factor">
-        <PasswordCallback>
+    <Callbacks length="2" order="2" timeout="120" header="Two Step Verification">
+        <NameCallback>
             <Prompt>Enter verification code:</Prompt>
-        </PasswordCallback>
+        </NameCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
@@ -45,10 +45,10 @@
         </ConfirmationCallback>
     </Callbacks>
     <!-- For when we're not optional -->
-    <Callbacks length="2" order="3" timeout="120" header="Two Factor Authentication - 2nd factor">
-        <PasswordCallback>
+    <Callbacks length="2" order="3" timeout="120" header="Two Step Verification">
+        <NameCallback>
             <Prompt>Enter verification code:</Prompt>
-        </PasswordCallback>
+        </NameCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>

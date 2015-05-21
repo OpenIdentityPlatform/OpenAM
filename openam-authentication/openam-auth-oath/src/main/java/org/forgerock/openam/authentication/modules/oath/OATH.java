@@ -45,7 +45,7 @@ import java.util.Set;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.ConfirmationCallback;
-import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.NameCallback;
 import javax.xml.bind.DatatypeConverter;
 import org.apache.commons.codec.DecoderException;
 import org.forgerock.openam.utils.qr.GenerationUtils;
@@ -300,7 +300,7 @@ public class OATH extends AMLoginModule {
 
                 case LOGIN_OPTIONAL:
                     //process callbacks
-                    //callback[0] = Password CallBack (OTP)
+                    //callback[0] = Name CallBack (OTP)
                     //callback[1] = Confirmation CallBack (Submit OTP/Register device)
                     //callback[2] = Configure account to skip OATH
                     if (callbacks == null) {
@@ -324,7 +324,7 @@ public class OATH extends AMLoginModule {
                     }
 
                     //get OTP
-                    String OTP = String.valueOf(((PasswordCallback) callbacks[0]).getPassword());
+                    String OTP = ((NameCallback) callbacks[0]).getName();
                     if (OTP.length() == 0) {
                         debug.error("OATH.process() : invalid OTP code");
                         setFailureID(userName);
