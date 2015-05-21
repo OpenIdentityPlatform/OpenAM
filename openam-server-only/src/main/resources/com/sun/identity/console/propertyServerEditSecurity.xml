@@ -24,6 +24,7 @@
 
    $Id: propertyServerEditSecurity.xml,v 1.5 2008/06/25 05:45:15 qcheng Exp $
 
+   Portions Copyrighted 2015 ForgeRock AS.
 -->
 
 <!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
@@ -287,5 +288,20 @@
             <attribute name="label" value="amconfig.choice.yes" />
         </cc>
     </property>
+    </section>
+    <section name="secDeserialisationWhitelist" defaultValue="amconfig.header.deserialisationwhitelist" >
+        <property>
+            <label name="deserialisationwhitelistLabel"
+                defaultValue="amconfig.openam.deserialisation.classes.whitelist"
+                labelFor="cscopenam.deserialisation.classes.whitelist" />
+            <cc name="cscopenam.deserialisation.classes.whitelist"
+                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag">
+                <attribute name="name" value="list" />
+                <attribute name="listboxLabel" value="label.current.value" />
+                <attribute name="textboxLabel" value="label.new.value" />
+            </cc>
+            <fieldhelp name="helpcsccscopenam.deserialisation.classes.whitelist"
+                       defaultValue="amconfig.help.openam.deserialisation.classes.whitelist" />
+        </property>
     </section>
 </propertysheet>

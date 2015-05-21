@@ -24,19 +24,16 @@
  *
  * $Id: PWResetViewBeanBase.java,v 1.2 2008/06/25 05:43:42 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.password.ui;
 
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
-import com.iplanet.jato.view.ViewBeanBase;
 import com.iplanet.jato.view.event.ChildDisplayEvent;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.html.StaticTextField;
+import org.forgerock.openam.console.base.ConsoleViewBeanBase;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.password.ui.model.PWResetModel;
 import com.sun.identity.password.ui.model.PWResetModelImpl;
@@ -45,8 +42,7 @@ import com.sun.identity.password.ui.model.PWResetModelImpl;
 /**
  * <code>PWResetViewBeanBase</code> is the base class for password reset.
  */
-public abstract class PWResetViewBeanBase extends ViewBeanBase 
-             implements Constants {
+public abstract class PWResetViewBeanBase extends ConsoleViewBeanBase implements Constants {
 
     /**
      * Name of HTML title

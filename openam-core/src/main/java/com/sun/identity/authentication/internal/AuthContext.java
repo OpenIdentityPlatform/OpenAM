@@ -24,16 +24,11 @@
  *
  * $Id: AuthContext.java,v 1.10 2009/01/28 05:34:52 ww203982 Exp $
  *  
- * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.internal;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.security.Principal;
 import java.security.SecureRandom;
@@ -448,38 +443,6 @@ public final class AuthContext extends Object {
     }
 
     /**
-     * Constructor to re-create a limited instance of this class given the
-     * ByteArray, which was originally obtained using the
-     * <code>toByteArray()</code> method. Using this constructor, the only
-     * methods that will provide valid return values are
-     * <code>getSubject()</code>, <code>getLoginStatus()</code>,
-     * <code>getAuthPrincipal()</code>, and <code>getAuthPrincipals()</code>.
-     */
-    protected AuthContext(byte[] bArray) throws LoginException {
-        try {
-            ByteArrayInputStream bis = new ByteArrayInputStream(bArray);
-            ObjectInputStream bin = new ObjectInputStream(bis);
-
-            String readOrgName = (String) bin.readObject();
-            int readStatus = bin.readInt();
-            AuthSubject readSubject = (AuthSubject) bin.readObject();
-
-            this.organizationName = readOrgName;
-            reset(readSubject);
-            setLoginStatus(readStatus); // change status from starting
-        } catch (IOException e) {
-            authDebug.message("AuthContext::bArray constructor():IOException"
-                    + e);
-            throw (new LoginException(e.getMessage()));
-        } catch (ClassNotFoundException e) {
-            authDebug.message(
-                    "AuthContext::bArray constructor():ClassNotFoundException"
-                            + e);
-            throw (new LoginException(e.getMessage()));
-        }
-    }
-
-    /**
      * Method to reset this instance of <code>AuthContext</code> object, so
      * that a new login process can be initiated. Authenticates the user to the
      * same organization or resource this object was instantiated with. If this
@@ -777,33 +740,6 @@ public final class AuthContext extends Object {
     protected Set getPrincipals() {
         authDebug.message("AuthContext::getAuthPrincipals()");
         return (getSubject().getPrincipals());
-    }
-
-    /**
-     * Method to retrieve a Byte array of serializable portions of the
-     * <code>AuthContext</code>.
-     */
-    protected byte[] toByteArray() {
-        try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            ObjectOutputStream bout = new ObjectOutputStream(bos);
-
-            bout.writeObject(((organizationName == null) ? " "
-                    : organizationName));
-            bout.writeInt(loginStatus);
-            bout.writeObject(loginContext.getSubject());
-            byte[] bytestuff = bos.toByteArray();
-            return (bytestuff);
-        } catch (IOException iox) {
-            if (authDebug.messageEnabled()) {
-                authDebug.message("AuthContext:toByteArray():IOException", iox);
-            }
-        } catch (Exception e) {
-            if (authDebug.messageEnabled()) {
-                authDebug.message("AuthContext:toByteArray():Exception", e);
-            }
-        }
-        return null;
     }
 
     /**

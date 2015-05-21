@@ -24,7 +24,12 @@
 
 package org.forgerock.openam.utils;
 
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import com.sun.identity.shared.debug.Debug;
+
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,7 +37,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.InvalidClassException;
+import java.io.ObjectInputStream;
+import java.io.ObjectStreamClass;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.zip.InflaterInputStream;
 
 /**
  * Utility class for handling I/O streams
@@ -190,6 +202,133 @@ public final class IOUtils {
         }
         for (Closeable c : o) {
             closeIfNotNull(c);
+        }
+    }
+
+    /**
+     *
+     * @param bytes The bytes that represent the Object to be deserialized. The classes to be loaded must be from the
+     *              set specified in the whitelist
+     * @param compressed If true, expect that the bytes are compressed.
+     * @return The Object T representing the deserialized bytes
+     * @throws IOException If there was a problem with the ObjectInputStream process.
+     * @throws ClassNotFoundException If there was problem loading a class that makes up the bytes to be deserialized.
+     */
+    public static <T> T deserialise(byte[] bytes, boolean compressed) throws IOException, ClassNotFoundException {
+        return deserialise(bytes, compressed, null);
+    }
+
+    /**
+     *
+     * @param bytes The bytes that represent the Object to be deserialized. The classes to be loaded must be from the
+     *              set specified in the whitelist maintained in the <code>WhitelistObjectInputStream</code>
+     * @param compressed If true, expect that the bytes are compressed.
+     * @param classLoader Used in place of the default ClassLoader, default will be used if null.
+     * @return The Object T representing the deserialized bytes
+     * @throws IOException If there was a problem with the ObjectInputStream process.
+     * @throws ClassNotFoundException If there was problem loading a class that makes up the bytes to be deserialized.
+     */
+    public static <T> T deserialise(byte[] bytes, boolean compressed, ClassLoader classLoader) throws IOException,
+            ClassNotFoundException {
+
+        final ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        final ObjectInputStream ois = compressed
+                ? new WhitelistObjectInputStream(new InflaterInputStream(bais), classLoader)
+                : new WhitelistObjectInputStream(bais, classLoader);
+
+        final T result;
+        try {
+            result = (T)ois.readObject();
+        } finally {
+            closeIfNotNull(ois);
+        }
+
+        return result;
+    }
+
+    /**
+     * When dealing with Object deserialisation, this class provides protection from classes outside of the Whitelist
+     * being loaded unexpectedly.
+     */
+    private static class WhitelistObjectInputStream extends ObjectInputStream {
+
+        private ClassLoader classLoader;
+        private List<String> classWhitelist;
+
+        private static final Debug DEBUG = Debug.getInstance("amUtil");
+
+        // Any class name that starts with this flag indicates an Object/Primitive array so allow.
+        // The Object in the array will trigger a followup validation call.
+        private static final String ARRAY_FLAG = "[";
+
+        // These are the bare minimum set of classes that are needed for JATO framework
+        private static final List<String> FALLBACK_CLASS_WHITELIST = Arrays.asList(
+                    "com.sun.identity.console.base.model.SMSubConfig",
+                    "com.sun.identity.console.service.model.SMDescriptionData",
+                    "com.sun.identity.console.service.model.SMDiscoEntryData",
+                    "com.sun.identity.console.session.model.SMSessionData",
+                    "com.sun.identity.shared.datastruct.OrderedSet",
+                    "com.sun.xml.bind.util.ListImpl",
+                    "com.sun.xml.bind.util.ProxyListImpl",
+                    "java.lang.Boolean",
+                    "java.lang.Integer",
+                    "java.lang.Number",
+                    "java.lang.String",
+                    "java.util.ArrayList",
+                    "java.util.Collections$EmptyMap",
+                    "java.util.HashMap",
+                    "java.util.HashSet");
+
+        public WhitelistObjectInputStream(InputStream in, ClassLoader classLoader) throws IOException {
+            super(in);
+            this.classLoader = classLoader;
+            // Read this every time to avoid having to do a restart to pick up any changes to the list
+            final String property = SystemPropertiesManager.get(Constants.DESERIALISATION_CLASSES_WHITELIST);
+            // The list is stored as a comma delimited String, use fallback list if null or empty
+            classWhitelist = StringUtils.isEmpty(property)
+                    ? FALLBACK_CLASS_WHITELIST
+                    : CollectionUtils.asList(property.split(","));
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("WhitelistObjectInputStream: using class whitelist:" + classWhitelist);
+            }
+        }
+
+        @Override
+        protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+
+            final Class<?> result;
+            final String classToLoad = desc.getName();
+
+            if (isValidClass(classToLoad)) {
+                result = (classLoader == null)
+                    ? Class.forName(classToLoad)
+                    : Class.forName(classToLoad, true, classLoader);
+            } else {
+                DEBUG.error("WhitelistObjectInputStream.resolveClass:" + classToLoad +
+                        " was not in the whitelist of allowed classes: " + classWhitelist);
+                throw new InvalidClassException("Requested ObjectStreamClass was not in the " +
+                        "whitelist of allowed classes", classToLoad);
+            }
+
+            return result;
+        }
+
+        private boolean isValidClass(String classToLoad) {
+
+            final boolean result;
+
+            // All Object/primitive arrays are valid by default, the contents will be validated in future calls
+            if (classToLoad.startsWith(ARRAY_FLAG)) {
+                result = true;
+            } else {
+                result = classWhitelist.contains(classToLoad);
+            }
+
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("WhitelistObjectInputStream.isValidClass:" + classToLoad + " " + result);
+            }
+
+            return result;
         }
     }
 }

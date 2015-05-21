@@ -53,11 +53,14 @@ import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.web.ui.model.CCNavNode;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
+import com.sun.web.ui.view.editablelist.CCEditableList;
 import com.sun.web.ui.view.html.CCCheckBox;
 import com.sun.web.ui.view.html.CCButton;
 import com.sun.web.ui.view.html.CCPassword;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import com.sun.web.ui.view.tabs.CCTabs;
+import org.apache.commons.lang.StringUtils;
+import org.forgerock.openam.utils.CollectionUtils;
 
 import java.security.AccessController;
 import java.text.MessageFormat;
@@ -183,6 +186,12 @@ public abstract class ServerEditViewBeanBase
                             propertyName);
                         String v = (val.equals(trueValue)) ? "true" : "false";
                         propertySheetModel.setValue(name, v);
+                    } else if (view instanceof CCEditableList) {
+                        CCEditableList list = (CCEditableList)view;
+                        list.resetStateData();
+                        // The list is stored as a comma delimited String
+                        list.getModel().setOptionList(CollectionUtils.asSet(val.split(",")));
+                        propertySheetModel.setValue(name, val);
                     } else {
                         propertySheetModel.setValue(name, XMLUtils.escapeSpecialCharacters(val));
                     }
@@ -317,12 +326,20 @@ public abstract class ServerEditViewBeanBase
 
     protected Map<String, String> getAttributeValues() {
         Map<String, String> map = new HashMap<String, String>();
-        for (Iterator i = activePropertyNames.iterator(); i.hasNext(); ) {
-            String uiName = (String)i.next();
-            String value = (String)getDisplayFieldValue(uiName);
+        for (String uiName : activePropertyNames) {
+            View view = getChild(uiName);
+            String value;
+            if (view instanceof CCEditableList) {
+                CCEditableList list = (CCEditableList)view;
+                list.restoreStateData();
+                // Create a comma delimited String from the items in the OptionList for storage.
+                value = StringUtils.join(getValues(list.getModel().getOptionList()), ",");
+            } else {
+                value = (String)getDisplayFieldValue(uiName);
+            }
+
             String propertyName = getActualPropertyName(uiName);
 
-            View view = getChild(uiName);
             if (view instanceof CCCheckBox) {
                 value = (value.equals("true")) ?
                     ServerPropertyValidator.getTrueValue(propertyName) :

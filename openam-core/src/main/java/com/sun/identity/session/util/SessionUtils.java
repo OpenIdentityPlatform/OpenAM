@@ -24,10 +24,7 @@
  *
  * $Id: SessionUtils.java,v 1.10 2009/11/09 18:35:22 beomsuk Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2013-2015 ForgeRock, AS.
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 package com.sun.identity.session.util;
@@ -52,14 +49,9 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.security.EncodeAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.URL;
 import java.security.AccessController;
-import java.security.PrivilegedExceptionAction;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
@@ -177,62 +169,6 @@ public class SessionUtils {
             trustedSources = getTrustedSourceList();
         }
         return trustedSources.contains(source);
-    }
-
-    /**
-     * Helper method to serialize and encrypt objects saved in the repository
-     * 
-     * @param obj
-     *            object to be serialized and encrypted
-     * @return encrypted byte array containing serialized objects
-     * @throws Exception
-     *             if anything goes wrong
-     */
-    public static byte[] encode(Object obj) throws Exception {
-        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-        ObjectOutputStream objOutStream = new ObjectOutputStream(byteOut);
-
-        // convert object to byte using streams
-        objOutStream.writeObject(obj);
-        objOutStream.close();
-
-        final byte[] blob = byteOut.toByteArray();
-
-        if (SESSION_ENCRYPTION) {
-            return (byte[]) AccessController
-                    .doPrivileged(new PrivilegedExceptionAction() {
-                        public Object run() throws Exception {
-                            return Crypt.getEncryptor().encrypt(blob);
-                        }
-                    });
-        }
-        return blob;
-
-    }
-
-    /**
-     * Deserializes and decrypts objects retrieved from the repository.
-     * 
-     * @param blob Byte array containing serialized and encrypted object value.
-     * @return retrieved object.
-     * @throws Exception if anything goes wrong.
-     */
-    public static Object decode(final byte blob[]) throws Exception {
-        byte[] decryptedBlob;
-        if (SESSION_ENCRYPTION) {
-            decryptedBlob = (byte[]) AccessController
-                    .doPrivileged(new PrivilegedExceptionAction() {
-                        public Object run() throws Exception {
-                            return Crypt.getEncryptor().decrypt(blob);
-                        }
-                    });
-        } else {
-            decryptedBlob = blob;
-        }
-        ByteArrayInputStream byteIn = new ByteArrayInputStream(decryptedBlob);
-        ObjectInputStream objInStream = new ObjectInputStream(byteIn);
-        return objInStream.readObject();
-
     }
 
     /**

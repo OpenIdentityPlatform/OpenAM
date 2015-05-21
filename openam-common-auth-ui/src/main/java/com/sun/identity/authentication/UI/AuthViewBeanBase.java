@@ -33,7 +33,6 @@ import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.iplanet.am.util.BrowserEncoding;
 import com.sun.identity.shared.debug.Debug;
 import com.iplanet.jato.view.View;
-import com.iplanet.jato.view.ViewBeanBase;
 import com.iplanet.jato.view.html.StaticTextField;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.common.ISLocaleContext;
@@ -50,11 +49,12 @@ import java.util.Set;
 import java.util.Enumeration;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.forgerock.openam.console.base.ConsoleViewBeanBase;
 
 /**
  * This class is a default implementation of <code>ViewBean</code> auth UI.
  */
-public abstract class AuthViewBeanBase extends ViewBeanBase {
+public abstract class AuthViewBeanBase extends ConsoleViewBeanBase {
     private static String[] ignoreList = {
         "goto", "encoded", "IDtoken0", "IDtoken1", "IDtoken2", "IDButton", "AMAuthCookie", "IDToken3"
     };

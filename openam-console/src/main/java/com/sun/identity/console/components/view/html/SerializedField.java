@@ -24,14 +24,18 @@
  *
  * $Id: SerializedField.java,v 1.4 2008/08/19 19:09:06 veiming Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.components.view.html;
+
 import com.iplanet.jato.model.Model;
 import com.iplanet.jato.util.Encoder;
 import com.iplanet.jato.view.ContainerView;
 import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.html.HtmlDisplayFieldBase;
+import org.forgerock.openam.utils.IOUtils;
+
 import java.io.IOException;
 import java.io.Serializable;
 
@@ -108,21 +112,22 @@ public class SerializedField extends HtmlDisplayFieldBase
      *
      * @return serializable object
      */
-    public Object getSerializedObj() {
-        Object obj = null;
-        String serializedStr = (String)super.getValue();
+    public <T> T getSerializedObj() {
+
+        T result = null;
+        final String serializedStr = (String)super.getValue();
 
         if (serializedStr != null) {
             try {
-                obj = Encoder.deserialize(Encoder.decode(serializedStr), true);
+                result = IOUtils.deserialise(Encoder.decode(serializedStr), true);
             } catch (IOException ioe) {
-                obj = null;
+                result = null;
             } catch (ClassNotFoundException cnfe) {
-                obj = null;
+                result = null;
             }
         }
 
-        return obj;
+        return result;
     }
 
     /**

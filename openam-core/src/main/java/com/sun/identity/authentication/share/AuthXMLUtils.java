@@ -24,10 +24,7 @@
  *
  * $Id: AuthXMLUtils.java,v 1.10 2009/06/19 20:39:09 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.share;
@@ -72,6 +69,8 @@ import javax.security.auth.callback.TextInputCallback;
 import javax.security.auth.callback.TextOutputCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.forgerock.openam.utils.IOUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -1768,10 +1767,7 @@ public class AuthXMLUtils {
         Object obj = null;
 
         if (encObj != null && encObj.length() > 0) {
-            ByteArrayInputStream bais = new ByteArrayInputStream(Base64.decode(encObj));
-            ObjectInputStream oos = new ObjectInputStream(bais);
-            obj = oos.readObject();
-            oos.close();
+            obj = IOUtils.deserialise(Base64.decode(encObj), false);
         }
 
         return obj;

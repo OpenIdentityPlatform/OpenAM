@@ -24,14 +24,10 @@
  *
  * $Id: Cache.java,v 1.4 2009/12/12 00:03:13 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011-2013] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.entitlement.opensso;
 
-import java.io.Serializable;
 import java.util.AbstractCollection;
 import java.util.AbstractSet;
 import java.util.Collection;
@@ -126,7 +122,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @see            Map
  * @since JDK1.0
  */
-public class Cache extends Dictionary implements Map, java.io.Serializable {
+public class Cache extends Dictionary implements Map {
 
     /**
      * The hash table data.
@@ -172,10 +168,6 @@ public class Cache extends Dictionary implements Map, java.io.Serializable {
      * ConcurrentModificationException).
      */
     private transient int modCount = 0;
-
-    /** use serialVersionUID from JDK 1.0.2 for interoperability */
-    private static final long serialVersionUID = 1421746759512286392L;
-
 
     private transient ReadWriteLock rwlock = new ReentrantReadWriteLock();
 
@@ -914,66 +906,6 @@ public class Cache extends Dictionary implements Map, java.io.Serializable {
     }
 
     /**
-     * Save the state of the Cache to a stream (i.e., serialize it).
-     * 
-     * @param s
-     *            object output stream instance.
-     * @throws IOException
-     *             if object cannot be written.
-     *
-    private synchronized void writeObject(java.io.ObjectOutputStream s)
-            throws IOException {
-        // Write out the length, threshold, loadfactor
-        s.defaultWriteObject();
-
-        // Write out length, count of elements and then the key/value objects
-        s.writeInt(table.length);
-        s.writeInt(count);
-        for (int index = table.length - 1; index >= 0; index--) {
-            Entry entry = table[index];
-
-            while (entry != null) {
-                s.writeObject(entry.key);
-                s.writeObject(entry.value);
-                entry = entry.next;
-            }
-        }
-    }
-
-    /**
-     * Reconstitute the Cache from a stream (i.e., deserialize it).
-     *
-    private synchronized void readObject(java.io.ObjectInputStream s)
-            throws IOException, ClassNotFoundException {
-        // Read in the length, threshold, and loadfactor
-        s.defaultReadObject();
-
-        // Read the original length of the array and number of elements
-        int origlength = s.readInt();
-        int elements = s.readInt();
-
-        // Compute new size with a bit of room 5% to grow but
-        // No larger than the original size. Make the length
-        // odd if it's large enough, this helps distribute the entries.
-        // Guard against the length ending up zero, that's not valid.
-        int length = (int) (elements * loadFactor) + (elements / 20) + 3;
-        if (length > elements && (length & 1) == 0)
-            length--;
-        if (origlength > 0 && length > origlength)
-            length = origlength;
-
-        table = new Entry[length];
-        count = 0;
-
-        // Read the number of elements and then all the key/value objects
-        for (; elements > 0; elements--) {
-            Object key = s.readObject();
-            Object value = s.readObject();
-            put(key, value);
-        }
-    } */
-
-    /**
      * Class which is used to create and maintain a circular doubly linked with
      * functionality to add and delete Entry objects.
      */
@@ -1229,9 +1161,7 @@ public class Cache extends Dictionary implements Map, java.io.Serializable {
         }
     }
 
-    static class SynchronizedCollection implements Collection, Serializable {
-        // use serialVersionUID from JDK 1.2.2 for interoperability
-        private static final long serialVersionUID = 3053995032091335093L;
+    static class SynchronizedCollection implements Collection {
 
         Collection c; // Backing Collection
 

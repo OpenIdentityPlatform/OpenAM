@@ -24,22 +24,21 @@
  *
  * $Id: AMLoginViewBean.java,v 1.2 2008/06/25 05:42:47 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.base;
 
 import com.iplanet.jato.view.View;
-import com.iplanet.jato.view.ViewBeanBase;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.html.StaticTextField;
+import org.forgerock.openam.console.base.ConsoleViewBeanBase;
 
 /**
  * This view bean takes a login URL and make sure that login page occupies the
  * entire browser.
  */
-public class AMLoginViewBean
-    extends ViewBeanBase
-{
+public class AMLoginViewBean extends ConsoleViewBeanBase {
     /** page name of view bean */
     public static final String PAGE_NAME = "AMLogin";
 

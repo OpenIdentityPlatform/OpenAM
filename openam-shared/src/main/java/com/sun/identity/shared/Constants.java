@@ -1338,4 +1338,10 @@ public interface Constants {
      * Property to define the default time limit for LDAP operations performed by the Netscape LDAP SDK.
      */
     public static final String DEFAULT_LDAP_TIME_LIMIT = "org.forgerock.openam.ldap.default.time.limit";
+
+    /**
+     * Property that defines a comma separated list of classes that are valid during deserialisation of Java classes
+     * in OpenAM, for example, in the JATO framework
+     */
+    public static final String DESERIALISATION_CLASSES_WHITELIST = "openam.deserialisation.classes.whitelist";
 }
