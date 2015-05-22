@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2011-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -25,54 +25,18 @@
 /*global $, _, define*/
 
 define("org/forgerock/openam/ui/user/login/RESTLoginDialog", [
-    "./RESTLoginView",
+    "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/components/Dialog",
-    "org/forgerock/commons/ui/common/main/SessionManager",
-    "org/forgerock/commons/ui/common/main/ViewManager"
-], function(loginView, conf, eventManager, constants, Dialog, sessionManager, viewManager) {
-    var LoginDialog = Dialog.extend({
-        data : {
-            width: 512
-        },
+    "org/forgerock/openam/ui/user/login/RESTLoginView"
+], function(AbstractView, conf, RESTLoginView) {
+    var LoginDialog = AbstractView.extend({
+        template: "templates/common/DefaultBaseTemplate.html",
+        data : {},
         actions: [],
-        el: '#dialogs',
-        parentRender: function (completed) {
-            var genericDialog = new Dialog();
-            
-            this.contentTemplate = this.template;
-            this.template = genericDialog.template;
-            
-            this.setElement($("#dialogs"));
-            genericDialog.parentRender.call(this, _.bind(function() {
-                this.setElement(this.$el.find(".dialogContainer:last"));
-                
-                $(".dialog-background").show();
-                $(".dialog-background").off('click').on('click', _.bind(this.close, this));
-                
-                this.loadContent(_.bind(function () {
-                    this.resize();
-                    completed();
-                }, this));
-            }, this));
-        },
         render: function () {
-            this.displayed = true;
-            loginView.render.call(this);
-        },
-        formSubmit: function (e) {
             conf.backgroundLogin = true;
-            loginView.formSubmit.call(this,e);
-        },
-        events: loginView.events,
-        selfServiceClick: loginView.selfServiceClick,
-        reloadData: loginView.reloadData
+            RESTLoginView.render();
+        }
     });
-
-    //$.extend(LoginDialog.prototype, _.pick(loginView, 'render', 'formSubmit', 'events'));
-    
     return new LoginDialog();
-
 });

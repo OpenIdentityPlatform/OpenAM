@@ -38,8 +38,8 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
     "org/forgerock/commons/ui/common/main/i18nManager",
     "org/forgerock/openam/ui/user/login/RESTLoginHelper",
     "org/forgerock/commons/ui/common/components/Messages",
-    'org/forgerock/openam/ui/common/util/RealmHelper'
-], function(AbstractView, authNDelegate, validatorsManager, eventManager, constants, conf, sessionManager, router, cookieHelper, uiUtils, i18nManager, restLoginHelper, messageManager, RealmHelper) {
+    "bootstrap-dialog"
+], function(AbstractView, authNDelegate, validatorsManager, eventManager, constants, conf, sessionManager, router, cookieHelper, uiUtils, i18nManager, restLoginHelper, messageManager, BootstrapDialog) {
 
     var LoginView = AbstractView.extend({
         template: "templates/openam/RESTLoginTemplate.html",
@@ -288,6 +288,26 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                             }
                             this.data.showRegister = true;
                         }
+
+                        if (conf.backgroundLogin){
+                            this.reloadData();
+                            var self = this,
+                                args = {
+                                    type: BootstrapDialog.TYPE_DEFAULT,
+                                    title: $.t("common.form.sessionExpired"),
+                                    cssClass: "loginDialog",
+                                    closable: false,
+                                    message: $(populatedTemplate),
+                                    onshow: function(dialog){
+                                        self.element = dialog.$modal;
+                                        dialog.$modalBody.find("form").removeClass("col-sm-6 col-sm-offset-3");
+                                        self.rebind();
+                                    }
+                                };
+                            BootstrapDialog.show(args);
+                            return;
+                        }
+
                         this.parentRender(_.bind(function () {
                             this.reloadData();
                             // resolve a promise when all templates will be loaded
