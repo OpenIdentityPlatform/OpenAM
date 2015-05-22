@@ -26,23 +26,18 @@
 
 define("org/forgerock/openam/ui/policy/resourcetypes/ResourceTypesListView", [
     "backgrid",
-    "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/common/util/URLHelper",
+    "org/forgerock/openam/ui/policy/common/AbstractListView",
     "org/forgerock/openam/ui/policy/resourcetypes/ResourceTypeModel",
     "org/forgerock/openam/ui/policy/util/BackgridUtils"
-], function (Backgrid, AbstractView, Router, Configuration, UIUtils, URLHelper, ResourceTypeModel, BackgridUtils) {
+], function (Backgrid, Router, Configuration, UIUtils, URLHelper, AbstractListView, ResourceTypeModel, BackgridUtils) {
 
-    var ResourceTypesListView = AbstractView.extend({
+    var ResourceTypesListView = AbstractListView.extend({
         template: 'templates/policy/resourcetypes/ResourceTypesListTemplate.html',
         toolbarTemplate: 'templates/policy/resourcetypes/ResourceTypesListToolbarTemplate.html',
-        toolbarTemplateID: '#gridToolbar',
-
-        events: {
-            'click #deleteResTypes': 'deleteResourceTypes'
-        },
 
         render: function (args, callback) {
             var self = this,
@@ -59,6 +54,7 @@ define("org/forgerock/openam/ui/policy/resourcetypes/ResourceTypesListView", [
                 url: URLHelper.substitute("__api__/resourcetypes"),
                 model: ResourceTypeModel,
                 queryParams: {
+                    _sortKeys: BackgridUtils.sortKeys,
                     _queryFilter: BackgridUtils.queryFilter,
                     pageSize: null,  // todo implement pagination
                     _pagedResultsOffset: null //todo implement pagination
@@ -95,6 +91,7 @@ define("org/forgerock/openam/ui/policy/resourcetypes/ResourceTypesListView", [
                     label: $.t("policy.resourceTypes.list.grid.0"),
                     cell: "string",
                     headerCell: BackgridUtils.FilterHeaderCell,
+                    sortType: "toggle",
                     editable: false
                 },
                 {
@@ -102,6 +99,7 @@ define("org/forgerock/openam/ui/policy/resourcetypes/ResourceTypesListView", [
                     label: $.t("policy.resourceTypes.list.grid.1"),
                     cell: "string",
                     headerCell: BackgridUtils.FilterHeaderCell,
+                    sortType: "toggle",
                     editable: false
                 },
                 {
@@ -109,6 +107,7 @@ define("org/forgerock/openam/ui/policy/resourcetypes/ResourceTypesListView", [
                     label: $.t("policy.resourceTypes.list.grid.2"),
                     cell: BackgridUtils.ArrayCell,
                     headerCell: BackgridUtils.FilterHeaderCell,
+                    sortType: "toggle",
                     editable: false
                 },
                 {
@@ -116,15 +115,12 @@ define("org/forgerock/openam/ui/policy/resourcetypes/ResourceTypesListView", [
                     label: $.t("policy.resourceTypes.list.grid.3"),
                     cell: BackgridUtils.ObjectCell,
                     headerCell: BackgridUtils.FilterHeaderCell,
+                    sortType: "toggle",
                     editable: false
                 }
             ];
 
-            self.data.items = new ResourceTypes();
-
-            self.data.items.on("backgrid:selected", function (model, selected) {
-                BackgridUtils.onRowSelect(self, model, selected);
-            });
+            this.data.items = new ResourceTypes();
 
             grid = new Backgrid.Grid({
                 columns: columns,
@@ -137,6 +133,8 @@ define("org/forgerock/openam/ui/policy/resourcetypes/ResourceTypesListView", [
                 collection: self.data.items,
                 windowSize: 3
             });
+
+            this.bindDefaultHandlers();
 
             this.parentRender(function () {
                 UIUtils.fillTemplateWithData(this.toolbarTemplate, this.data, function (tpl) {
@@ -152,10 +150,6 @@ define("org/forgerock/openam/ui/policy/resourcetypes/ResourceTypesListView", [
                     }
                 });
             });
-        },
-
-        deleteResourceTypes: function (e) {
-            BackgridUtils.deleteRecords(e, this);
         }
     });
 

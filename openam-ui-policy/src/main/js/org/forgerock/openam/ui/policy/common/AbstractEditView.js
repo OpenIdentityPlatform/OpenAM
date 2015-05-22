@@ -26,16 +26,21 @@
 
 define("org/forgerock/openam/ui/policy/common/AbstractEditView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/policy/common/ReviewInfoView",
     "org/forgerock/openam/ui/common/components/Accordion",
-    "org/forgerock/openam/ui/policy/common/HelpLinkView"
-], function (AbstractView, ReviewInfoView, Accordion, HelpLink) {
-    var AbstractEditView = AbstractView.extend({
+    "org/forgerock/openam/ui/policy/common/HelpLinkView",
+    "org/forgerock/openam/ui/policy/common/ReviewInfoView"
+], function (AbstractView, Accordion, HelpLink, ReviewInfoView) {
 
-        events: {
-            'click input[name=submitForm]': 'submitForm',
-            'click .review-panel': 'reviewRowClick',
-            'keyup .review-panel': 'reviewRowClick'
+    return AbstractView.extend({
+
+        initialize: function () {
+            AbstractView.prototype.initialize.call(this) ;
+
+            this.events = {
+                'click input[name=submitForm]': 'submitForm',
+                'click .review-panel': 'reviewRowClick',
+                'keyup .review-panel': 'reviewRowClick'
+            };
         },
 
         initAccordion: function () {
@@ -106,6 +111,4 @@ define("org/forgerock/openam/ui/policy/common/AbstractEditView", [
         }
 
     });
-
-    return AbstractEditView;
 });

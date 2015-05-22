@@ -26,24 +26,20 @@
 
 define("org/forgerock/openam/ui/policy/policies/PoliciesListView", [
     "backgrid",
-    "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/UIUtils",
+    "org/forgerock/openam/ui/common/util/URLHelper",
     "org/forgerock/openam/ui/policy/applications/ApplicationModel",
+    "org/forgerock/openam/ui/policy/common/AbstractListView",
     "org/forgerock/openam/ui/policy/policies/PolicyModel",
-    "org/forgerock/openam/ui/policy/util/BackgridUtils",
-    "org/forgerock/openam/ui/common/util/URLHelper"
-], function (Backgrid, AbstractView, Configuration, Router, UIUtils, ApplicationModel, PolicyModel, BackgridUtils, URLHelper) {
+    "org/forgerock/openam/ui/policy/util/BackgridUtils"
+], function (Backgrid, Configuration, Router, UIUtils, URLHelper, ApplicationModel, AbstractListView, PolicyModel,
+             BackgridUtils) {
 
-    var PoliciesListView = AbstractView.extend({
+    var PoliciesListView = AbstractListView.extend({
         template: 'templates/policy/policies/PoliciesListTemplate.html',
         toolbarTemplate: 'templates/policy/policies/PoliciesListToolbarTemplate.html',
-        toolbarTemplateID: '#gridToolbar',
-
-        events: {
-            'click #deletePolicies': 'deletePolicies'
-        },
 
         render: function (args, callback) {
             var self = this,
@@ -62,6 +58,7 @@ define("org/forgerock/openam/ui/policy/policies/PoliciesListView", [
                 url: URLHelper.substitute("__api__/policies"),
                 model: PolicyModel,
                 queryParams: {
+                    _sortKeys: BackgridUtils.sortKeys,
                     _queryFilter: function () {
                         return BackgridUtils.queryFilter.bind(self.data.items)(['applicationName+eq+"' + args[0] + '"']);
                     },
@@ -102,6 +99,7 @@ define("org/forgerock/openam/ui/policy/policies/PoliciesListView", [
                     label: $.t("policy.policies.list.grid.0"),
                     cell: "string",
                     headerCell: BackgridUtils.FilterHeaderCell,
+                    sortType: "toggle",
                     editable: false
                 },
                 {
@@ -109,6 +107,7 @@ define("org/forgerock/openam/ui/policy/policies/PoliciesListView", [
                     label: $.t("policy.policies.list.grid.1"),
                     cell: "string",
                     headerCell: BackgridUtils.FilterHeaderCell,
+                    sortType: "toggle",
                     editable: false
                 },
                 {
@@ -116,6 +115,7 @@ define("org/forgerock/openam/ui/policy/policies/PoliciesListView", [
                     label: $.t("policy.policies.list.grid.2"),
                     cell: BackgridUtils.ArrayCell,
                     headerCell: BackgridUtils.FilterHeaderCell,
+                    sortType: "toggle",
                     editable: false
                 },
                 {
@@ -123,16 +123,13 @@ define("org/forgerock/openam/ui/policy/policies/PoliciesListView", [
                     label: $.t("policy.policies.list.grid.3"),
                     cell: BackgridUtils.ObjectCell,
                     headerCell: BackgridUtils.FilterHeaderCell,
+                    sortType: "toggle",
                     editable: false
                 }
                 // TODO: add other columns
             ];
 
-            self.data.items = new Policies();
-
-            self.data.items.on("backgrid:selected", function (model, selected) {
-                BackgridUtils.onRowSelect(self, model, selected);
-            });
+            this.data.items = new Policies();
 
             grid = new Backgrid.Grid({
                 columns: columns,
@@ -145,6 +142,8 @@ define("org/forgerock/openam/ui/policy/policies/PoliciesListView", [
                 collection: self.data.items,
                 windowSize: 3
             });
+
+            this.bindDefaultHandlers();
 
             this.parentRender(function () {
                 application.done(function (app) {
@@ -167,10 +166,6 @@ define("org/forgerock/openam/ui/policy/policies/PoliciesListView", [
                     callback();
                 }
             });
-        },
-
-        deletePolicies: function (e) {
-            BackgridUtils.deleteRecords(e, this);
         }
     });
 

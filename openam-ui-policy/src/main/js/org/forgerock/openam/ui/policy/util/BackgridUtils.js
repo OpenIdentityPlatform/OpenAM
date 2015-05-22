@@ -14,16 +14,12 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global define Backgrid, Backbone, _, $*/
+/*global define Backbone, _, $*/
 
 define("org/forgerock/openam/ui/policy/util/BackgridUtils", [
-    "org/forgerock/commons/ui/common/components/Messages",
-    "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/util/UIUtils",
-    "backgrid"
-], function (Messages, EventManager, Router, Constants, UIUtils, Backgrid) {
+    "backgrid",
+    "org/forgerock/commons/ui/common/util/UIUtils"
+], function (Backgrid, UIUtils) {
     var obj = {};
 
     // TODO: the difference between this implementation and the one used for UMA is that here the cell is not clickable
@@ -202,57 +198,23 @@ define("org/forgerock/openam/ui/policy/util/BackgridUtils", [
         return data.result;
     };
 
-    //TODO: move this to another file
-    obj.deleteRecords = function(e, view) {
-        e.preventDefault();
-
-        if ($(e.target).hasClass('inactive')) {
-            return;
-        }
-
-        var data = view.data,
-            i = 0,
-            item,
-            onDestroy = function () {
-                data.selectedItems = [];
-                data.items.fetch({reset: true});
-                UIUtils.fillTemplateWithData(view.toolbarTemplate, data, function (tpl) {
-                    view.$el.find(view.toolbarTemplateID).html(tpl);
-                });
-            },
-            onSuccess = function (model, response, options) {
-                onDestroy();
-                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, 'deleteSuccess');
-            },
-            onError = function (model, response, options) {
-                onDestroy();
-                Messages.messages.addMessage({message: response.responseJSON.message, type: 'error'});
-            };
-
-        for (; i < data.selectedItems.length; i++) {
-            item = data.items.get(data.selectedItems[i]);
-
-            item.destroy({
-                success: onSuccess,
-                error: onError
-            });
-        }
+    // TODO: candidate for commons, have not changed it, using UMA version
+    obj.sortKeys = function() {
+        return this.state.order === 1 ? '-' + this.state.sortKey : this.state.sortKey;
     };
 
-    //TODO: move this to another file
-    obj.onRowSelect = function (view, model, selected) {
-        var data = view.data;
+    // TODO: candidate for commons, have not changed it, using UMA version
+    // FIXME: Workaround to fix "Double sort indicators" issue
+    // @see https://github.com/wyuenho/backgrid/issues/453
+    obj.doubleSortFix = function(model) {
+        // No ids so identify model with CID
+        var cid = model.cid,
+            filtered = model.collection.filter(function(model) {
+                return model.cid !== cid;
+            });
 
-        if (selected) {
-            if (!_.contains(data.selectedItems, model.id)) {
-                data.selectedItems.push(model.id);
-            }
-        } else {
-            data.selectedItems = _.without(data.selectedItems, model.id);
-        }
-
-        UIUtils.fillTemplateWithData(view.toolbarTemplate, data, function (tpl) {
-            view.$el.find(view.toolbarTemplateID).html(tpl);
+        _.each(filtered, function(model) {
+            model.set('direction', null);
         });
     };
 

@@ -36,6 +36,7 @@ define([
     "./common/Utils",
     "./common/HelpLinkView",
     "./common/AbstractEditView",
+    "./common/AbstractListView",
 
     "./applications/ApplicationsListView",
     "./applications/EditApplicationView",

@@ -38,7 +38,6 @@ define("org/forgerock/openam/ui/policy/resourcetypes/EditResourceTypeView", [
     var EditResourceTypeView = AbstractEditView.extend({
         template: "templates/policy/resourcetypes/EditResourceTypeTemplate.html",
         reviewTemplate: "templates/policy/resourcetypes/ReviewResourceTypeStepTemplate.html",
-        data: {},
         validationFields: ["name", "actions", "patterns"],
         render: function (args, callback) {
             var self = this,

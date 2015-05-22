@@ -26,31 +26,22 @@
 
 define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
     "backgrid",
-    "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/common/util/URLHelper",
-    "org/forgerock/openam/ui/policy/delegates/PolicyDelegate",
     "org/forgerock/openam/ui/policy/applications/ApplicationModel",
+    "org/forgerock/openam/ui/policy/common/AbstractListView",
+    "org/forgerock/openam/ui/policy/delegates/PolicyDelegate",
     "org/forgerock/openam/ui/policy/util/BackgridUtils"
-], function (Backgrid, AbstractView, Configuration, EventManager, Router, Constants, UIUtils, URLHelper, PolicyDelegate,
-             ApplicationModel, BackgridUtils) {
+], function (Backgrid, Configuration, EventManager, Router, Constants, UIUtils, URLHelper, ApplicationModel,
+             AbstractListView, PolicyDelegate, BackgridUtils) {
 
-    var ApplicationsListView = AbstractView.extend({
+    var ApplicationsListView = AbstractListView.extend({
         template: 'templates/policy/applications/ApplicationsListTemplate.html',
         toolbarTemplate: 'templates/policy/applications/ApplicationsListToolbarTemplate.html',
-        toolbarTemplateID: '#gridToolbar',
-
-        events: {
-            'click .fa-pencil': 'editApplication',
-            'click #deleteApps': 'deleteApplications',
-            'click #importPolicies': 'startImportPolicies',
-            'click #exportPolicies': 'exportPolicies',
-            'change #realImport': 'readImportFile'
-        },
 
         render: function (args, callback) {
             var self = this,
@@ -63,10 +54,18 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
             this.data.realm = Configuration.globalData.auth.realm;
             this.data.selectedItems = [];
 
+            _.extend(this.events, {
+                'click .fa-pencil': 'editApplication',
+                'click #importPolicies': 'startImportPolicies',
+                'click #exportPolicies': 'exportPolicies',
+                'change #realImport': 'readImportFile'
+            });
+
             Apps = Backbone.PageableCollection.extend({
                 url: URLHelper.substitute("__api__/applications"),
                 model: ApplicationModel,
                 queryParams: {
+                    _sortKeys: BackgridUtils.sortKeys,
                     _queryFilter: self.getDefaultFilter,
                     pageSize: null,  // todo implement pagination
                     _pagedResultsOffset: null //todo implement pagination
@@ -105,6 +104,7 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
                     cell: BackgridUtils.TemplateCell.extend({
                         template: "templates/policy/applications/ApplicationsListActionsCellTemplate.html"
                     }),
+                    sortable: false,
                     editable: false
                 },
                 {
@@ -115,6 +115,7 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
                     href: function (rawValue, formattedValue, model) {
                         return "#app/" + encodeURIComponent(model.id);
                     },
+                    sortType: "toggle",
                     editable: false
                 },
                 {
@@ -122,6 +123,7 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
                     label: $.t("policy.applications.list.grid.2"),
                     cell: "string",
                     headerCell: BackgridUtils.FilterHeaderCell,
+                    sortType: "toggle",
                     editable: false
                 },
                 {
@@ -129,16 +131,13 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
                     label: $.t("policy.applications.list.grid.3"),
                     cell: BackgridUtils.ArrayCell,
                     headerCell: BackgridUtils.FilterHeaderCell,
+                    sortType: "toggle",
                     editable: false
                 }
                 // TODO: add other columns
             ];
 
-            self.data.items = new Apps();
-
-            self.data.items.on("backgrid:selected", function (model, selected) {
-                BackgridUtils.onRowSelect(self, model, selected);
-            });
+            this.data.items = new Apps();
 
             grid = new Backgrid.Grid({
                 columns: columns,
@@ -151,6 +150,8 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
                 collection: self.data.items,
                 windowSize: 3
             });
+
+            this.bindDefaultHandlers();
 
             this.parentRender(function () {
                 UIUtils.fillTemplateWithData(this.toolbarTemplate, this.data, function (tpl) {
@@ -194,10 +195,6 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
             });
 
             return returnList.join('+AND+');
-        },
-
-        deleteApplications: function (e) {
-            BackgridUtils.deleteRecords(e, this);
         },
 
         startImportPolicies: function () {
