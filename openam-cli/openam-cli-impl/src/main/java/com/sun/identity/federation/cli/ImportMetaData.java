@@ -24,10 +24,7 @@
  *
  * $Id: ImportMetaData.java,v 1.15 2009/10/29 00:03:50 exu Exp $
  *
- */
-
- /*
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2015 ForgeRock As.
  */
 package com.sun.identity.federation.cli;
 
@@ -62,6 +59,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBException;
@@ -171,12 +169,13 @@ public class ImportMetaData extends AuthenticatedCommand {
         }
     }
 
+
     private void handleSAML2Request(RequestContext rc)
         throws CLIException {
         try {
             SAML2MetaManager metaManager = new SAML2MetaManager(ssoToken);
             EntityConfigElement configElt = null;
-
+            List<String> newMetaAliases = null;
             if (extendedData != null) {
                 configElt = geEntityConfigElement();
                 /*
@@ -184,24 +183,28 @@ public class ImportMetaData extends AuthenticatedCommand {
                  * the realm value
                  */
                 if (configElt != null && configElt.isHosted()) {
-                    List config = configElt.
+                    List<BaseConfigType> config = configElt.
                        getIDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig();
                     if (!config.isEmpty()) {
                         BaseConfigType bConfig = (BaseConfigType)
                             config.iterator().next();
                         realm = SAML2MetaUtils.getRealmByMetaAlias(
                             bConfig.getMetaAlias());
+                        newMetaAliases = getMetaAliases(config);
                     }
                 }
             }
 
-            List<String> entityIds = null;
+            List<String> entityIds = null;         
             // Load the metadata if it has been provided
             if (metadata != null) {
                 entityIds = importSAML2Metadata(metaManager);
             }
             // Load the extended metadata if it has been provided
             if (configElt != null) {
+                if (null != newMetaAliases && !newMetaAliases.isEmpty()) {
+                    metaManager.validateMetaAliasForNewEntity(realm, newMetaAliases);
+                }
                 metaManager.createEntityConfig(realm, configElt);
             }
 
@@ -303,6 +306,7 @@ public class ImportMetaData extends AuthenticatedCommand {
         throws CLIException {
         try {
             String federationID = null;
+            List<String> newMetaAliases = null;
             com.sun.identity.wsfederation.jaxb.entityconfig.FederationConfigElement
                 configElt = null;
 
@@ -322,6 +326,7 @@ public class ImportMetaData extends AuthenticatedCommand {
                             config.iterator().next();
                         realm = WSFederationMetaUtils.getRealmByMetaAlias(
                             bConfig.getMetaAlias());
+                        newMetaAliases = getMetaAliases(config);
                     }
                 }
             }
@@ -333,6 +338,9 @@ public class ImportMetaData extends AuthenticatedCommand {
             }
 
             if (configElt != null) {
+                if (null != newMetaAliases && !newMetaAliases.isEmpty()) {
+                    metaManager.validateMetaAliasForNewEntity(realm, newMetaAliases);
+                }
                 metaManager.createEntityConfig(realm, configElt);
 
                 String out = (webAccess) ? "web" : extendedData;
@@ -685,6 +693,22 @@ public class ImportMetaData extends AuthenticatedCommand {
                 }
             }
         }
+    }
+
+    /**
+     * Gets the metaaliases for this configuration
+     * @param config the{@link BaseConfigType}.
+     * @return the metaAliases or an empty list if none found.
+     */
+    private List<String> getMetaAliases(List<BaseConfigType> config) {
+        List<String> metaAliases = new ArrayList<String>();
+        for (BaseConfigType bConfig : config) {
+            String cMetaAlias = bConfig.getMetaAlias();
+            if (cMetaAlias != null && !cMetaAlias.isEmpty()) {
+                metaAliases.add(cMetaAlias);
+            }
+        }
+        return metaAliases;
     }
 
     private static String getFileContent(String fileName)

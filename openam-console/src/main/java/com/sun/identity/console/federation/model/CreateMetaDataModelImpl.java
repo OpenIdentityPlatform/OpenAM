@@ -24,6 +24,7 @@
  *
  * $Id: CreateMetaDataModelImpl.java,v 1.7 2010/01/06 23:11:25 veiming Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.federation.model;
@@ -38,10 +39,12 @@ import com.sun.identity.federation.meta.IDFFMetaManager;
 import com.sun.identity.federation.meta.IDFFMetaUtils;
 import com.sun.identity.liberty.ws.meta.jaxb.EntityDescriptorElement;
 import com.sun.identity.saml2.meta.SAML2MetaException;
+import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.workflow.CreateIDFFMetaDataTemplate;
 import com.sun.identity.workflow.CreateSAML2HostedProviderTemplate;
 import com.sun.identity.workflow.CreateWSFedMetaDataTemplate;
 import com.sun.identity.workflow.ImportSAML2MetaData;
+import com.sun.identity.workflow.MetaTemplateParameters;
 import com.sun.identity.workflow.WorkflowException;
 import com.sun.identity.wsfederation.common.WSFederationConstants;
 import com.sun.identity.wsfederation.jaxb.entityconfig.FederationConfigElement;
@@ -50,7 +53,11 @@ import com.sun.identity.wsfederation.meta.WSFederationMetaException;
 import com.sun.identity.wsfederation.meta.WSFederationMetaManager;
 import com.sun.identity.wsfederation.meta.WSFederationMetaUtils;
 import java.security.cert.CertificateEncodingException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBException;
 
@@ -83,14 +90,22 @@ public class CreateMetaDataModelImpl extends AMModelBase
      * @param realm Realm Name.
      * @param entityId Entity Id.
      * @param values   Map of property name to values.
+     * 
+     * @throws AMConsoleException if duplicate metaAliases provided or unable to create or import metadata.
      */
-    public void createSAMLv2Provider(String realm, String entityId, Map values)
-        throws AMConsoleException {
+    public void createSAMLv2Provider(String realm, String entityId, Map values) throws AMConsoleException {
         try {
-            String metadata = CreateSAML2HostedProviderTemplate.
-                buildMetaDataTemplate(entityId, values, requestURL);
-            String extendedData = CreateSAML2HostedProviderTemplate.
-                createExtendedDataTemplate(entityId, values, requestURL);
+            // validate hosted entities to check that metaAliases are unique
+            List<String> metaAliases = getFederationAlias(values, MetaTemplateParameters.P_SAML_ALIASES);
+            Set<String> duplicateCheck = new HashSet<String>(metaAliases);
+            if (duplicateCheck.size() < metaAliases.size()) {
+                throw new AMConsoleException(getLocalizedString("federation.create.provider.duplicate.metaAlias"));
+            }
+            SAML2MetaManager mgr = new SAML2MetaManager();
+            mgr.validateMetaAliasForNewEntity(realm, metaAliases);
+            String metadata = CreateSAML2HostedProviderTemplate.buildMetaDataTemplate(entityId, values, requestURL);
+            String extendedData = CreateSAML2HostedProviderTemplate.createExtendedDataTemplate(entityId, values,
+                    requestURL);
             ImportSAML2MetaData.importData(realm, metadata, extendedData);
         } catch (WorkflowException ex) {
             throw new AMConsoleException(getErrorString(ex));
@@ -133,10 +148,21 @@ public class CreateMetaDataModelImpl extends AMModelBase
      * @param realm Realm Name.
      * @param entityId Entity Id.
      * @param values   Map of property name to values.
-     */
+     * 
+     * @throws AMConsoleException if duplicate metaAliases provided or unable to create or import metadata.
+     * */
     public void createWSFedProvider(String realm, String entityId, Map values)
         throws AMConsoleException {
-        try {
+        try {     
+            List<String> metaAliases = getFederationAlias(values, MetaTemplateParameters.P_WS_FED_ALIASES);
+            Set<String> duplicateCheck = new HashSet<String>(metaAliases);
+            if (duplicateCheck.size() < metaAliases.size()) {
+                throw new AMConsoleException(getLocalizedString("federation.create.provider.duplicate.metaAlias"));
+            }
+            WSFederationMetaManager metaManager = 
+                    new WSFederationMetaManager();
+            metaManager.validateMetaAliasForNewEntity(realm, metaAliases);
+            
             String metadata = 
                 CreateWSFedMetaDataTemplate.createStandardMetaTemplate(
                 entityId, values, requestURL);
@@ -150,8 +176,6 @@ public class CreateMetaDataModelImpl extends AMModelBase
             if (federationID == null) {
                 federationID = WSFederationConstants.DEFAULT_FEDERATION_ID;
             }
-            WSFederationMetaManager metaManager = 
-                new WSFederationMetaManager();
             metaManager.createFederation(realm, elt);
             
             FederationConfigElement cfg = (FederationConfigElement)
@@ -164,5 +188,23 @@ public class CreateMetaDataModelImpl extends AMModelBase
         } catch (CertificateEncodingException ex) {
             throw new AMConsoleException(ex.getMessage());
         }
+    }
+
+    /**
+     * Gets the federation meta aliases from provided values.
+     * @param values The map of parameters.
+     * @param aliasNames  the provided metaAlias names.
+     * @return the metaAlias if present or null if not present.
+     */
+    private List<String> getFederationAlias(Map<String, String> values, List<String> aliasNames ) {
+        String metaAlias = null;
+        List<String> metaAliases = new ArrayList<String>();
+        for (String aliasName :aliasNames) {
+            metaAlias = (String) values.get(aliasName);
+            if (null != metaAlias && !metaAlias.isEmpty()) {
+                metaAliases.add(metaAlias);
+            }
+        }
+        return metaAliases;
     }
 }

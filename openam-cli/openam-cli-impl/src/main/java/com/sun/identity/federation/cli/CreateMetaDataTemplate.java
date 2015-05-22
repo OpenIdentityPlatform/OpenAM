@@ -24,9 +24,7 @@
  *
  * $Id: CreateMetaDataTemplate.java,v 1.38 2009/10/29 00:03:50 exu Exp $
  *
- */
-/**
- * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 package com.sun.identity.federation.cli;
 
@@ -58,15 +56,17 @@ import java.net.URL;
 import java.security.cert.CertificateEncodingException;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.xml.bind.JAXBException;
 
 /**
  * Create Meta Data Template.
  */
 public class CreateMetaDataTemplate extends AuthenticatedCommand {
-    
+
     private String entityID;
     private String metadata;
     private String extendedData;
@@ -149,9 +149,15 @@ public class CreateMetaDataTemplate extends AuthenticatedCommand {
             throw e; 
         } 
     }
-    
+
     private void handleSAML2Request(RequestContext rc)
         throws CLIException {
+        if (extendedData != null) {
+            if (hasDuplicateMetaAliases(FederationManager.DEFAULT_SPECIFICATION)) {
+                throw new CLIException(getResourceString("create-meta-template-exception-metaalias-duplicate"),
+                        ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
+            }
+        }
         if (!isWebBased || (extendedData != null)) {
             buildConfigTemplate();
         }
@@ -173,6 +179,12 @@ public class CreateMetaDataTemplate extends AuthenticatedCommand {
     private void handleWSFedRequest(RequestContext rc)
     throws CLIException {
         if (!isWebBased || (extendedData != null)) {
+            if (extendedData != null) {
+                if (hasDuplicateMetaAliases(FedCLIConstants.WSFED_SPECIFICATION)) {
+                    throw new CLIException(getResourceString("create-meta-template-exception-metaalias-duplicate"),
+                            ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
+                }
+            }
             buildWSFedConfigTemplate();
         }
 
@@ -481,7 +493,60 @@ public class CreateMetaDataTemplate extends AuthenticatedCommand {
                 ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         }
     }
-    
+
+    /**
+     * Checks that there are no duplicate metaAliases for SAML entity providers.
+     * @param specification The specification - SAML or WS-FED
+     * @return true if there are duplicates.
+     */
+    private boolean hasDuplicateMetaAliases(String specification) {
+        Set<String> metaAliases = new HashSet<String>();
+        if (idpAlias != null && !idpAlias.isEmpty()) {
+            if (!metaAliases.add(idpAlias)) {
+                return true;
+            }
+        }
+        if (spAlias != null && !spAlias.isEmpty()) {
+            if (!metaAliases.add(spAlias)) {
+                return true;
+            }
+        }
+        // following checks only needed for SAML
+        if (FederationManager.DEFAULT_SPECIFICATION.equalsIgnoreCase(specification)) {
+            if (attraAlias != null && !attraAlias.isEmpty()) {
+                if (!metaAliases.add(attraAlias)) {
+                    return true;
+                }
+            }
+            if (attrqAlias != null && !attrqAlias.isEmpty()) {
+                if (!metaAliases.add(attrqAlias)) {
+                    return true;
+                }
+            }
+            if (authnaAlias != null && !authnaAlias.isEmpty()) {
+                if (!metaAliases.add(authnaAlias)) {
+                    return true;
+                }
+            }
+            if (pdpAlias != null && !pdpAlias.isEmpty()) {
+                if (!metaAliases.add(pdpAlias)) {
+                    return true;
+                }
+            }
+            if (pdpAlias != null && !pdpAlias.isEmpty()) {
+                if (!metaAliases.add(pdpAlias)) {
+                    return true;
+                }
+            }
+            if (affiAlias != null && !affiAlias.isEmpty()) {
+                if (!metaAliases.add(affiAlias)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private void buildDescriptorTemplate()
     throws CLIException {
         Writer pw = null;

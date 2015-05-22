@@ -24,10 +24,7 @@
  *
  * $Id: SAML2MetaManager.java,v 1.18 2009/10/28 23:58:58 exu Exp $
  *
- */
-
- /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.meta;
@@ -68,9 +65,6 @@ import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.XACMLPDPDescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.XACMLAuthzDecisionQueryDescriptorElement;
 import com.sun.identity.saml2.jaxb.metadataextquery.AttributeQueryDescriptorElement;
-import com.sun.identity.saml2.jaxb.metadataattr.EntityAttributesType;
-import com.sun.identity.saml2.jaxb.metadataattr.EntityAttributesElement;
-import com.sun.identity.saml2.jaxb.metadataattr.ObjectFactory;
 import com.sun.identity.saml2.logging.LogUtil;
 import com.sun.identity.shared.debug.Debug;
 
@@ -1517,7 +1511,42 @@ public class SAML2MetaManager {
 
         return null;
     }
-    
+
+    /**
+     * Returns all the hosted entity metaAliases for a realm.
+     *
+     * @param realm The given realm.
+     * @return all the hosted entity metaAliases for a realm or an empty arrayList if not found.
+     * @throws SAML2MetaException  if unable to retrieve the entity ids.
+     */
+    public List<String> getAllHostedMetaAliasesByRealm(String realm) throws SAML2MetaException {
+
+        List<String> metaAliases = new ArrayList<String>();
+        try {
+            Set<String> entityIds = configInst.getAllConfigurationNames(realm);
+            if (entityIds == null || entityIds.isEmpty()) {
+                return metaAliases;
+            }
+            for (String entityId : entityIds) {
+                EntityConfigElement config = getEntityConfig(realm, entityId);
+                if (config == null || !config.isHosted()) {
+                    continue;
+                }
+                List<BaseConfigType> configList = config.getIDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig();
+                for (BaseConfigType bConfigType : configList) {
+                    String curMetaAlias = bConfigType.getMetaAlias();
+                    if (curMetaAlias != null && !curMetaAlias.isEmpty()) {
+                        metaAliases.add(curMetaAlias);
+                    }
+                }
+            }
+        } catch (ConfigurationException e) {
+            debug.error("SAML2MetaManager.getAllHostedMetaAliasesByRealm:", e);
+            throw new SAML2MetaException(e);
+        }
+        return metaAliases;
+    }
+
     /**
      * Returns role of an entity based on its metaAlias.
      *
@@ -1570,7 +1599,7 @@ public class SAML2MetaManager {
     }
     
     /**
-     * Returns metaAliasies of all hosted identity providers under the realm.
+     * Returns metaAliases of all hosted identity providers under the realm.
      * @param realm The realm under which the identity provider metaAliases
      *              reside.
      * @return a <code>List</code> of metaAliases <code>String</code>.
@@ -1593,7 +1622,7 @@ public class SAML2MetaManager {
     }
 
     /**
-     * Returns metaAliasies of all hosted service providers under the realm.
+     * Returns metaAliases of all hosted service providers under the realm.
      * @param realm The realm under which the service provider metaAliases
      *              reside.
      * @return a <code>List</code> of metaAliases <code>String</code>.
@@ -1786,5 +1815,50 @@ public class SAML2MetaManager {
                        objs,
                        null);
         return ret;
+    }
+
+    /**
+     * Checks that the provided metaAliases are valid for a new hosted entity in the specified realm.
+     * Will verify that the metaAliases do not already exist in the realm and that no duplicates are provided.
+     *
+     * @param realm The realm in which we are validating the metaAliases.
+     * @param newMetaAliases  values we are using to create the new metaAliases.
+     * @throws SAML2MetaException if duplicate values found.
+     */
+    public void validateMetaAliasForNewEntity(String realm, List<String> newMetaAliases) throws SAML2MetaException {
+
+        if (null != newMetaAliases && !newMetaAliases.isEmpty()) {
+            if (newMetaAliases.size() > 1) {
+                Set checkForDuplicates = new HashSet<String>(newMetaAliases);
+                if (checkForDuplicates.size() < newMetaAliases.size()) {
+                    debug.error("SAML2MetaManager.validateMetaAliasForNewEntity:Duplicate" +
+                    		" metaAlias values provided in list:\n"
+                            + newMetaAliases);
+                    String[] data = { newMetaAliases.toString() };
+                    throw new SAML2MetaException("meta_alias_duplicate", data);
+                }
+            }
+            List<String> allRealmMetaAliaes = getAllHostedMetaAliasesByRealm(realm);
+            // only check if we have existing aliases
+            if (!allRealmMetaAliaes.isEmpty()) {
+                List<String> duplicateMetaAliases = new ArrayList<String>();
+                for (String metaAlias : newMetaAliases) {
+                    if (allRealmMetaAliaes.contains(metaAlias)) {
+                        duplicateMetaAliases.add(metaAlias);
+                    }
+                }
+                if (!duplicateMetaAliases.isEmpty()) {
+                    StringBuilder sb = new StringBuilder();
+                    for (String value : duplicateMetaAliases) {
+                        sb.append(value);
+                        sb.append("\t");
+                    }
+                    debug.error("SAML2MetaManager.validateMetaAliasForNewEntity: metaAliases " + sb.toString()
+                            + " already exists in the realm: " + realm);
+                    String[] data = { sb.toString(), realm };
+                    throw new SAML2MetaException("meta_alias_exists", data);
+                }
+            }
+        }
     }
 }

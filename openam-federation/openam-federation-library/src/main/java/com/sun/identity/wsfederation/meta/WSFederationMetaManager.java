@@ -24,6 +24,7 @@
  *
  * $Id: WSFederationMetaManager.java,v 1.8 2009/10/28 23:58:59 exu Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 
@@ -767,6 +768,87 @@ public class WSFederationMetaManager {
             throw new WSFederationMetaException(e);
         }
     } 
+    
+    /**
+     * Checks that the provided metaAliases are valid for a new hosted entity in the specified realm.
+     * Will verify that the metaAliases do not already exist in the realm and that no duplicates are provided.
+     *
+     * @param realm The realm in which we are validating the metaAliases.
+     * @param newMetaAliases  values we are using to create the new metaAliases.
+     * @throws WSFederationMetaException if duplicate values found.
+     */
+    public void validateMetaAliasForNewEntity(String realm, List<String> newMetaAliases) throws WSFederationMetaException {
+
+        if (null != newMetaAliases && !newMetaAliases.isEmpty()) {
+            if (newMetaAliases.size() > 1) {
+                Set checkForDuplicates = new HashSet<String>(newMetaAliases);
+                if (checkForDuplicates.size() < newMetaAliases.size()) {
+                    debug.error("WSFederationMetaManager.validateMetaAliasForNewEntity:Duplicate"
+                            + " metaAlias values provided in list:\n" + newMetaAliases);
+                    String[] data = { newMetaAliases.toString() };
+                    throw new WSFederationMetaException("meta_alias_duplicate", data);
+                }
+            }
+            List<String> allRealmMetaAliaes = getAllHostedMetaAliasesByRealm(realm);
+            // only check if we have existing aliases
+            if (!allRealmMetaAliaes.isEmpty()) {
+                List<String> duplicateMetaAliases = new ArrayList<String>();
+                for (String metaAlias : newMetaAliases) {
+                    if (allRealmMetaAliaes.contains(metaAlias)) {
+                        duplicateMetaAliases.add(metaAlias);
+                    }
+                }
+                if (!duplicateMetaAliases.isEmpty()) {
+                    StringBuilder sb = new StringBuilder();
+                    for (String value : duplicateMetaAliases) {
+                        sb.append(value);
+                        sb.append("\t");
+                    }
+                    debug.error("WSFederationMetaManager.validateMetaAliasForNewEntity: metaAliases " + sb.toString()
+                            + " already exists in the realm: " + realm);
+                    String[] data = { sb.toString(), realm };
+                    throw new WSFederationMetaException("meta_alias_exists", data);
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns all the hosted entity metaAliases for a realm.
+     *
+     * @param realm The given realm.
+     * @return all the hosted entity metaAliases for a realm or an empty arrayList if not found.
+     * @throws WSFederationMetaException  if unable to retrieve the entity ids.
+     */
+    public List<String> getAllHostedMetaAliasesByRealm(String realm) throws WSFederationMetaException {
+
+        List<String> metaAliases = new ArrayList<String>();
+        try {
+            Set<String> entityIds = configInst.getAllConfigurationNames(realm);
+            if (entityIds == null || entityIds.isEmpty()) {
+                return metaAliases;
+            }
+            for (String entityId : entityIds) {
+                FederationConfigElement config = getEntityConfig(realm, entityId);
+                if (config == null || !config.isHosted()) {
+                    continue;
+                }
+                List<BaseConfigType> configList = config.getIDPSSOConfigOrSPSSOConfig();
+                for (BaseConfigType bConfigType : configList) {
+                    String curMetaAlias = bConfigType.getMetaAlias();
+                    if (curMetaAlias != null && !curMetaAlias.isEmpty()) {
+                        metaAliases.add(curMetaAlias);
+                    }
+                }
+            }
+        } catch (ConfigurationException e) {
+            debug.error(
+                    "WSFederationMetaManager.getAllHostedMetaAliasesByRealm: Error getting "
+                            + "hostedMetaAliases for realm: "+ realm, e);
+            throw new WSFederationMetaException(e);
+        }
+        return metaAliases;
+    }
 
     private void removeFromCircleOfTrust(BaseConfigType config, 
         String realm, String federationId) {
@@ -1087,7 +1169,7 @@ public class WSFederationMetaManager {
     }
     
     /**
-     * Returns metaAliasies of all hosted identity providers under the realm.
+     * Returns metaAliases of all hosted identity providers under the realm.
      * 
      * @param realm The realm under which the identity provider metaAliases
      *              reside.
@@ -1111,7 +1193,7 @@ public class WSFederationMetaManager {
     }
 
     /**
-     * Returns metaAliasies of all hosted service providers under the realm.
+     * Returns metaAliases of all hosted service providers under the realm.
      * 
      * @param realm The realm under which the service provider metaAliases
      *              reside.

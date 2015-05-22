@@ -24,9 +24,14 @@
  *
  * $Id: MetaTemplateParameters.java,v 1.3 2008/06/25 05:50:02 qcheng Exp $
  *
+ *
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.workflow;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Meta Template Parameters.
@@ -58,4 +63,15 @@ public class MetaTemplateParameters {
     public static final String P_PEP = "pep";
     public static final String P_PEP_E_CERT = "pepecert";
     public static final String P_PEP_S_CERT = "pepscert";
+   
+    /**
+     * A list of all the SAML alias parameters.
+     */
+    public static final List<String> P_SAML_ALIASES = Arrays.asList(P_IDP, P_SP, P_AUTHN_AUTHORITY, P_ATTR_QUERY_PROVIDER,
+            P_PEP, P_PDP, P_ATTR_AUTHORITY, P_AFFILIATION);
+    
+    /**
+     * A list of all the WS_FED alias parameters.
+     */
+    public static final List<String> P_WS_FED_ALIASES = Arrays.asList(P_IDP, P_SP);
 }
