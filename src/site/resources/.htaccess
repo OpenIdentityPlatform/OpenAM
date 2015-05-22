@@ -1,2 +1,64 @@
-# Docs are now under http://openam.forgerock.org/doc/
-RedirectMatch 301 ^/openam-documentation/openam-doc-source/doc/(.*)$ http://openam.forgerock.org/doc/$1
+# DOCS-212 Redirect away from obsolete in-progress documentation
+# sending obsolete formats to the Bootstrap-styled HTML.
+
+### OpenAM docs ###
+
+# EPUB
+RedirectMatch 301 ^/doc/OpenAM-Release-Notes.epub        http://openam.forgerock.org/doc/bootstrap/release-notes/
+RedirectMatch 301 ^/doc/OpenAM-Getting-Started.epub      http://openam.forgerock.org/doc/bootstrap/getting-started/
+RedirectMatch 301 ^/doc/OpenAM-Install-Guide.epub        http://openam.forgerock.org/doc/bootstrap/install-guide/
+RedirectMatch 301 ^/doc/OpenAM-Upgrade-Guide.epub        http://openam.forgerock.org/doc/bootstrap/upgrade-guide/
+RedirectMatch 301 ^/doc/OpenAM-Admin-Guide.epub          http://openam.forgerock.org/doc/bootstrap/admin-guide/
+RedirectMatch 301 ^/doc/OpenAM-Dev-Guide.epub            http://openam.forgerock.org/doc/bootstrap/dev-guide/
+RedirectMatch 301 ^/doc/OpenAM-Reference.epub            http://openam.forgerock.org/doc/bootstrap/reference/
+RedirectMatch 301 ^/doc/OpenAM-JEE-Release-Notes.epub    http://openam.forgerock.org/doc/bootstrap/jee-release-notes/
+RedirectMatch 301 ^/doc/OpenAM-JEE-Users-Guide.epub      http://openam.forgerock.org/doc/bootstrap/jee-users-guide/
+RedirectMatch 301 ^/doc/OpenAM-JEE-Reference.epub        http://openam.forgerock.org/doc/bootstrap/jee-reference/
+RedirectMatch 301 ^/doc/OpenAM-Web-Release-Notes.epub    http://openam.forgerock.org/doc/bootstrap/web-release-notes/
+RedirectMatch 301 ^/doc/OpenAM-Web-Users-Guide.epub      http://openam.forgerock.org/doc/bootstrap/web-users-guide/
+RedirectMatch 301 ^/doc/OpenAM-Web-Reference.epub        http://openam.forgerock.org/doc/bootstrap/web-reference/
+
+# Single page HTML
+RedirectMatch 301 ^/doc/release-notes/(.*)        http://openam.forgerock.org/doc/bootstrap/release-notes/$1
+RedirectMatch 301 ^/doc/getting-started/(.*)      http://openam.forgerock.org/doc/bootstrap/getting-started/$1
+RedirectMatch 301 ^/doc/install-guide/(.*)        http://openam.forgerock.org/doc/bootstrap/install-guide/$1
+RedirectMatch 301 ^/doc/upgrade-guide/(.*)        http://openam.forgerock.org/doc/bootstrap/upgrade-guide/$1
+RedirectMatch 301 ^/doc/admin-guide/(.*)          http://openam.forgerock.org/doc/bootstrap/admin-guide/$1
+RedirectMatch 301 ^/doc/dev-guide/(.*)            http://openam.forgerock.org/doc/bootstrap/dev-guide/$1
+RedirectMatch 301 ^/doc/reference/(.*)            http://openam.forgerock.org/doc/bootstrap/reference/$1
+RedirectMatch 301 ^/doc/jee-release-notes/(.*)    http://openam.forgerock.org/doc/bootstrap/jee-release-notes/$1
+RedirectMatch 301 ^/doc/jee-users-guide/(.*)      http://openam.forgerock.org/doc/bootstrap/jee-users-guide/$1
+RedirectMatch 301 ^/doc/jee-reference/(.*)        http://openam.forgerock.org/doc/bootstrap/jee-reference/$1
+RedirectMatch 301 ^/doc/web-release-notes/(.*)    http://openam.forgerock.org/doc/bootstrap/web-release-notes/$1
+RedirectMatch 301 ^/doc/web-users-guide/(.*)      http://openam.forgerock.org/doc/bootstrap/web-users-guide/$1
+RedirectMatch 301 ^/doc/web-reference/(.*)        http://openam.forgerock.org/doc/bootstrap/web-reference/$1
+
+# RTF
+RedirectMatch 301 ^/doc/OpenAM-Release-Notes.rtf        http://openam.forgerock.org/doc/bootstrap/release-notes/
+RedirectMatch 301 ^/doc/OpenAM-Getting-Started.rtf      http://openam.forgerock.org/doc/bootstrap/getting-started/
+RedirectMatch 301 ^/doc/OpenAM-Install-Guide.rtf        http://openam.forgerock.org/doc/bootstrap/install-guide/
+RedirectMatch 301 ^/doc/OpenAM-Upgrade-Guide.rtf        http://openam.forgerock.org/doc/bootstrap/upgrade-guide/
+RedirectMatch 301 ^/doc/OpenAM-Admin-Guide.rtf          http://openam.forgerock.org/doc/bootstrap/admin-guide/
+RedirectMatch 301 ^/doc/OpenAM-Dev-Guide.rtf            http://openam.forgerock.org/doc/bootstrap/dev-guide/
+RedirectMatch 301 ^/doc/OpenAM-Reference.rtf            http://openam.forgerock.org/doc/bootstrap/reference/
+RedirectMatch 301 ^/doc/OpenAM-JEE-Release-Notes.rtf    http://openam.forgerock.org/doc/bootstrap/jee-release-notes/
+RedirectMatch 301 ^/doc/OpenAM-JEE-Users-Guide.rtf      http://openam.forgerock.org/doc/bootstrap/jee-users-guide/
+RedirectMatch 301 ^/doc/OpenAM-JEE-Reference.rtf        http://openam.forgerock.org/doc/bootstrap/jee-reference/
+RedirectMatch 301 ^/doc/OpenAM-Web-Release-Notes.rtf    http://openam.forgerock.org/doc/bootstrap/web-release-notes/
+RedirectMatch 301 ^/doc/OpenAM-Web-Users-Guide.rtf      http://openam.forgerock.org/doc/bootstrap/web-users-guide/
+RedirectMatch 301 ^/doc/OpenAM-Web-Reference.rtf        http://openam.forgerock.org/doc/bootstrap/web-reference/
+
+# Webhelp
+RedirectMatch 301 ^/doc/webhelp/release-notes/(.*)        http://openam.forgerock.org/doc/bootstrap/release-notes/
+RedirectMatch 301 ^/doc/webhelp/getting-started/(.*)      http://openam.forgerock.org/doc/bootstrap/getting-started/
+RedirectMatch 301 ^/doc/webhelp/install-guide/(.*)        http://openam.forgerock.org/doc/bootstrap/install-guide/
+RedirectMatch 301 ^/doc/webhelp/upgrade-guide/(.*)        http://openam.forgerock.org/doc/bootstrap/upgrade-guide/
+RedirectMatch 301 ^/doc/webhelp/admin-guide/(.*)          http://openam.forgerock.org/doc/bootstrap/admin-guide/
+RedirectMatch 301 ^/doc/webhelp/dev-guide/(.*)            http://openam.forgerock.org/doc/bootstrap/dev-guide/
+RedirectMatch 301 ^/doc/webhelp/reference/(.*)            http://openam.forgerock.org/doc/bootstrap/reference/
+RedirectMatch 301 ^/doc/webhelp/jee-release-notes/(.*)    http://openam.forgerock.org/doc/bootstrap/jee-release-notes/
+RedirectMatch 301 ^/doc/webhelp/jee-users-guide/(.*)      http://openam.forgerock.org/doc/bootstrap/jee-users-guide/
+RedirectMatch 301 ^/doc/webhelp/jee-reference/(.*)        http://openam.forgerock.org/doc/bootstrap/jee-reference/
+RedirectMatch 301 ^/doc/webhelp/web-release-notes/(.*)    http://openam.forgerock.org/doc/bootstrap/web-release-notes/
+RedirectMatch 301 ^/doc/webhelp/web-users-guide/(.*)      http://openam.forgerock.org/doc/bootstrap/web-users-guide/
+RedirectMatch 301 ^/doc/webhelp/web-reference/(.*)        http://openam.forgerock.org/doc/bootstrap/web-reference/
