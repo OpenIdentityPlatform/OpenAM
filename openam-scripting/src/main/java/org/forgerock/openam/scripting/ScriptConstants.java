@@ -56,6 +56,7 @@ public final class ScriptConstants {
     public static final String USE_SECURITY_MANAGER = "useSecurityManager";
     public static final String ENGINE_CONFIGURATION = "EngineConfiguration";
     public static final String DEFAULT_LANGUAGE = "defaultLanguage";
+    public static final String DEFAULT_SCRIPT = "defaultScript";
 
     public static final int DEFAULT_CORE_THREADS = 10;
     public static final int DEFAULT_MAX_THREADS = 10;

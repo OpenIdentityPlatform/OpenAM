@@ -148,7 +148,7 @@ Unique Declaration name for DOCTYPE tag:
         type ( single | list | single_choice | multiple_choice |
                 signature | validator ) "list"
         uitype ( radio | link | button | name_value_list | unorderedlist |
-                orderedlist | maplist | globalmaplist | addremovelist ) #IMPLIED
+                orderedlist | maplist | globalmaplist | addremovelist | dropdown) #IMPLIED
         syntax ( boolean | string | paragraph | password | encrypted_password | 
                 dn | email | url | numeric | percent | number |
                 decimal_number | number_range | decimal_range | xml | date | script ) "string"

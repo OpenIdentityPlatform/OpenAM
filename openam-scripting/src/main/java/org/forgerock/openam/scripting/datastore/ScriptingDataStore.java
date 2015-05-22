@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.scripting.datastore;
 
-import org.forgerock.json.resource.QueryFilter;
+import org.forgerock.util.query.QueryFilter;
 import org.forgerock.openam.scripting.ScriptException;
 
 import java.util.Set;
@@ -77,5 +77,5 @@ public interface ScriptingDataStore<T> {
      * @return a set of matching data objects.
      * @throws ScriptException should an error occur during lookup
      */
-    public Set<T> get(QueryFilter filter) throws ScriptException;
+    public Set<T> get(QueryFilter<String> filter) throws ScriptException;
 }

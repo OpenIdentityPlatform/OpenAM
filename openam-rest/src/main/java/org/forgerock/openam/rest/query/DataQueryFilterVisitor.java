@@ -118,7 +118,7 @@ public class DataQueryFilterVisitor implements QueryFilterVisitor<Set<String>, M
 
     private void assertFieldDepth(JsonPointer field, int depth) {
         if (field.size() > depth) {
-            throw new QueryException(FILTER_DEPTH_SUPPORTED);
+            throw new QueryException(FILTER_DEPTH_NOT_SUPPORTED);
         }
     }
 

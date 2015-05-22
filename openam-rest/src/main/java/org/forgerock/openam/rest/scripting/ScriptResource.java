@@ -40,6 +40,7 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.entitlements.RealmAwareResource;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
+import org.forgerock.openam.rest.query.QueryByStringFilterConverter;
 import org.forgerock.openam.scripting.ScriptError;
 import org.forgerock.openam.scripting.ScriptException;
 import org.forgerock.openam.scripting.ScriptObject;
@@ -163,7 +164,9 @@ public class ScriptResource extends RealmAwareResource {
             if (filter == null) {
                 configs = serviceFactory.create(getContextSubject(context), getRealm(context)).getAll();
             } else {
-                configs = serviceFactory.create(getContextSubject(context), getRealm(context)).get(filter);
+                org.forgerock.util.query.QueryFilter<String> stringQueryFilter = filter.accept(
+                        new QueryByStringFilterConverter(), null);
+                configs = serviceFactory.create(getContextSubject(context), getRealm(context)).get(stringQueryFilter);
             }
             for (ScriptConfiguration sc : configs) {
                 resultHandler.handleResource(new Resource(sc.getId(), String.valueOf(sc.hashCode()), asJson(sc)));

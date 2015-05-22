@@ -86,7 +86,8 @@ public class ScriptResourceTest {
         }
 
         @Override
-        public Set<ScriptConfiguration> get(QueryFilter queryFilter) throws ScriptException {
+        public Set<ScriptConfiguration> get(org.forgerock.util.query.QueryFilter<String> queryFilter)
+                throws ScriptException {
             return new LinkedHashSet<ScriptConfiguration>(scriptConfigSet.values());
         }
 

@@ -30,7 +30,8 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import org.forgerock.json.resource.QueryFilter;
+import org.forgerock.openam.sm.ServiceConfigQueryFilterVisitor;
+import org.forgerock.util.query.QueryFilter;
 import org.forgerock.openam.scripting.ScriptException;
 import org.forgerock.openam.scripting.service.ScriptConfiguration;
 import org.forgerock.util.Reject;
@@ -159,22 +160,17 @@ public class ScriptConfigurationDataStore implements ScriptingDataStore<ScriptCo
     }
 
     @Override
-    public Set<ScriptConfiguration> get(QueryFilter queryFilter) throws ScriptException {
-        final Set<ScriptConfiguration> scriptConfigurations = new LinkedHashSet<ScriptConfiguration>();
+    public Set<ScriptConfiguration> get(QueryFilter<String> queryFilter) throws ScriptException {
+        final Set<ScriptConfiguration> scriptConfigurations = new LinkedHashSet<>();
         try {
-            final Map<String, Map<String, Set<String>>> configData = new HashMap<String, Map<String, Set<String>>>();
             final ServiceConfig subOrgConfig = getSubOrgConfig();
             final Set<String> uuids = subOrgConfig.getSubConfigNames();
             for (String uuid : uuids) {
-                configData.put(uuid, subOrgConfig.getSubConfig(uuid).getAttributesForRead());
+                if (queryFilter.accept(new ServiceConfigQueryFilterVisitor(), subOrgConfig.getSubConfig(uuid))) {
+                    scriptConfigurations.add(get(uuid));
+                }
             }
-            final Set<String> filterResults = queryFilter.accept(new ScriptingQueryFilterVisitor(), configData);
-            for (String uuid : filterResults) {
-                scriptConfigurations.add(get(uuid));
-            }
-        } catch (SMSException e) {
-            throw createAndLogError(logger, RETRIEVE_ALL_FAILED, e, realm);
-        } catch (SSOException e) {
+        } catch (SMSException | SSOException e) {
             throw createAndLogError(logger, RETRIEVE_ALL_FAILED, e, realm);
         } catch (UnsupportedOperationException e) {
             throw createAndLogError(logger, ScriptErrorCode.valueOf(e.getMessage()), e);
@@ -211,13 +207,15 @@ public class ScriptConfigurationDataStore implements ScriptingDataStore<ScriptCo
     private ScriptConfiguration scriptConfigurationFromMap(String uuid, Map<String, Set<String>> data)
             throws ScriptException {
 
+        String script = getMapAttr(data, SCRIPT_TEXT);
+
         return ScriptConfiguration.builder()
                 .setId(uuid)
                 .setName(getMapAttr(data, SCRIPT_NAME))
                 .setDescription(getMapAttr(data, SCRIPT_DESCRIPTION))
                 .setContext(getContextFromString(getMapAttr(data, SCRIPT_CONTEXT)))
                 .setLanguage(getLanguageFromString(getMapAttr(data, SCRIPT_LANGUAGE)))
-                .setScript(getMapAttr(data, SCRIPT_TEXT))
+                .setScript(script == null ? EMPTY : script)
                 .setCreatedBy(getMapAttr(data, SCRIPT_CREATED_BY, EMPTY))
                 .setCreationDate(CollectionHelper.getMapAttrAsDateLong(data, SCRIPT_CREATION_DATE, logger))
                 .setLastModifiedBy(getMapAttr(data, SCRIPT_LAST_MODIFIED_BY, EMPTY))

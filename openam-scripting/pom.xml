@@ -100,4 +100,36 @@
 
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.forgerock.maven.plugins</groupId>
+                <artifactId>build-helper-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>inject-content</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>inject-content</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <injects>
+                        <inject>
+                            <contents>
+                                <content>
+                                    <id>authentication-server-side-javascript</id>
+                                    <file>${project.build.sourceDirectory}/../js/authentication-server-side.js</file>
+                                </content>
+                            </contents>
+                            <destinationFile>${project.build.outputDirectory}/scripting.xml</destinationFile>
+                            <contentConverter>xml</contentConverter>
+                        </inject>
+                    </injects>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>

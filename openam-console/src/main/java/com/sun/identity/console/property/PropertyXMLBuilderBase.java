@@ -58,9 +58,10 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.StringTokenizer;      
+import java.util.StringTokenizer;
 import java.util.TreeSet;
 import org.forgerock.openam.console.ui.taglib.propertysheet.CCPropertySheetTag;
+import org.forgerock.openam.utils.CollectionUtils;
 
 public abstract class PropertyXMLBuilderBase
     implements PropertyTemplate
@@ -102,6 +103,7 @@ public abstract class PropertyXMLBuilderBase
         mapUITypeToName.put(AttributeSchema.UIType.MAPLIST,  "maplist");
         mapUITypeToName.put(AttributeSchema.UIType.GLOBALMAPLIST,  
             "globalmaplist");
+        mapUITypeToName.put(AttributeSchema.UIType.DROPDOWN, "dropdown");
 
         mapTypeToName.put(AttributeSchema.Type.LIST, "list");
         mapTypeToName.put(AttributeSchema.Type.MULTIPLE_CHOICE,
@@ -454,8 +456,8 @@ public abstract class PropertyXMLBuilderBase
             boolean orderedList = tagClassName.equals(TAGNAME_ORDERED_LIST);
             boolean unorderedList = tagClassName.equals(TAGNAME_UNORDERED_LIST);
             boolean mapList = tagClassName.equals(TAGNAME_MAP_LIST);
-            boolean globalMapList = tagClassName.equals(
-                TAGNAME_GLOBAL_MAP_LIST);
+            boolean globalMapList = tagClassName.equals(TAGNAME_GLOBAL_MAP_LIST);
+            boolean dropDown = tagClassName.equals(TAGNAME_DROPDOWN_MENU);
             
             AttributeSchema.Type type = as.getType();
             AttributeSchema.UIType uitype = as.getUIType();
@@ -542,6 +544,18 @@ public abstract class PropertyXMLBuilderBase
                     } else if (globalMapList) {
                         xml.append(MessageFormat.format(
                             COMPONENT_GLOBAL_MAP_LIST_START_TAG, param));
+                    }
+                } else if (dropDown) {
+                    xml.append(MessageFormat.format(COMPONENT_START_TAG, name, tagClassName));
+                    Map<String, String> choiceValues = getSortedChoiceValueMap(as);
+                    for (Map.Entry<String, String> entry : choiceValues.entrySet()) {
+                        String displayName = entry.getValue();
+                        if ("label.default".equals(displayName)) {
+                            displayName =
+                                    com.sun.identity.shared.locale.Locale.getString(serviceBundle, displayName, debug);
+                        }
+                        xml.append(MessageFormat.format(OPTION_TAG, escapeSpecialChars(displayName),
+                                escapeSpecialChars(entry.getKey())));
                     }
                 } else {
                     Object[] param = {name, tagClassName};
@@ -944,6 +958,13 @@ public abstract class PropertyXMLBuilderBase
         }
 
         return sorted;
+    }
+
+    private Map<String, String> getSortedChoiceValueMap(AttributeSchema as) {
+        @SuppressWarnings("unchecked")
+        Map<String, String> choiceValues = as.getChoiceValuesMap(
+                Collections.singletonMap(Constants.ORGANIZATION_NAME, getCurrentRealm()));
+        return CollectionUtils.sortMapByValue(choiceValues);
     }
         
 

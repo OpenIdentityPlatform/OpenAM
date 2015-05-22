@@ -1159,6 +1159,12 @@ public class AttributeSchema {
          */
         public static final UIType ADDREMOVELIST = new UIType("addremovelist");
 
+        /**
+         * The <code>DROPDOWN</code> attribute type specifies that the
+         * attribute should be display as drop down widget.
+         */
+        public static final UIType DROPDOWN = new UIType("dropdown");
+
         private String attrType;
 
         private UIType() {

@@ -42,7 +42,7 @@ public class QueryException extends RuntimeException implements L10NMessage {
         FILTER_LESS_THAN_OR_EQUAL,
         FILTER_NOT,
         FILTER_PRESENT,
-        FILTER_DEPTH_SUPPORTED;
+        FILTER_DEPTH_NOT_SUPPORTED;
     }
 
     private static final String RESOURCE_BUNDLE = "queryError";

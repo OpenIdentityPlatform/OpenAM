@@ -23,10 +23,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -434,6 +437,40 @@ public class CollectionUtils {
             }
         }
         return false;
+    }
+
+    /**
+     * Sort the given Map by comparing it's values.
+     * @param map The map to sort.
+     * @return The given map sorted and presented in a {@code LinkedHashMap} to guarantee iteration order.
+     */
+    public static <K, V extends Comparable<? super V>> Map<K, V> sortMapByValue(Map<K, V> map) {
+
+        List<Map.Entry<K, V>> sortedEntries = new ArrayList<>(map.entrySet());
+        Collections.sort(sortedEntries, new Comparator<Map.Entry<K, V>>() {
+            @Override
+            public int compare(Map.Entry<K, V> entry1, Map.Entry<K, V> entry2) {
+                V value1 = entry1.getValue();
+                V value2 = entry2.getValue();
+
+                if (value1 == null && value2 == null) {
+                    return 0;
+                } else if (value1 == null) {
+                    return -1;
+                } else if (value2 == null) {
+                    return 1;
+                } else {
+                    return (value1).compareTo(value2);
+                }
+            }
+        });
+
+        Map<K, V> result = new LinkedHashMap<>();
+        for (Map.Entry<K, V> entry : sortedEntries) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+
+        return result;
     }
 
 }

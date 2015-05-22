@@ -68,7 +68,7 @@ public class QueryExceptionTest {
         assertThat(qe.getMessage()).isEqualTo("The 'present' filter is not supported");
 
         // when
-        qe = new QueryException(FILTER_DEPTH_SUPPORTED);
+        qe = new QueryException(FILTER_DEPTH_NOT_SUPPORTED);
         //then
         assertThat(qe.getMessage()).isEqualTo("Filter path is too long, a depth of 1 is supported");
     }

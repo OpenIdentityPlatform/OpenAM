@@ -23,7 +23,7 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.name.Named;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
-import org.forgerock.json.resource.QueryFilter;
+import org.forgerock.util.query.QueryFilter;
 import org.forgerock.openam.scripting.ScriptException;
 import org.forgerock.openam.scripting.datastore.ScriptingDataStore;
 import org.forgerock.openam.scripting.datastore.ScriptingDataStoreFactory;
@@ -86,7 +86,7 @@ public class ScriptConfigurationService implements ScriptingService<ScriptConfig
     }
 
     @Override
-    public Set<ScriptConfiguration> get(QueryFilter queryFilter) throws ScriptException {
+    public Set<ScriptConfiguration> get(QueryFilter<String> queryFilter) throws ScriptException {
         return dataStore.get(queryFilter);
     }
 
