@@ -24,10 +24,7 @@
  *
  * $Id: FederationManager.java,v 1.40 2009/10/29 00:03:51 exu Exp $
  *
- */
-
-/*
- * Portions copyright 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 package com.sun.identity.federation.cli.definition;
 
@@ -112,6 +109,7 @@ public class FederationManager {
             "create-meta-template-exception-host-not-found=Host was not found in configuration file.",
             "create-meta-template-exception-port-not-found=Port was not found in configuration file.",
             "create-meta-template-exception-deploymentURI-not-found=Deployment URI was not found in configuration file.",
+            "create-meta-template-exception-metaalias-duplicate=Meta Alias values must be unique within a realm",
             "create-meta-template-created-descriptor-template=Hosted entity descriptor was written to {0}.",
             "create-meta-template-created-configuration-template=Hosted entity configuration was written to {0}."})
     private String create_metadata_templ;
