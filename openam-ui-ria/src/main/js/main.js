@@ -128,8 +128,7 @@ require.config({
         "sortable": {
             deps: ["jquery"]
         }
-    },
-    urlArgs: "v=${version}" // jshint ignore:line
+    }
 });
 
 /**
@@ -173,7 +172,6 @@ require([
     "org/forgerock/openam/ui/admin/main",
     "sortable",
     "qrcode"
-
 ], function(constants, eventManager, $, _, Backbone) {
     // Helpers for the code that hasn't been properly migrated to require these as explicit dependencies:
     window.$ = $;

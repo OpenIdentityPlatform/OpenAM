@@ -88,7 +88,6 @@
         <resources>
             <resource>
                 <directory>${basedir}/src/main/js</directory>
-                <filtering>true</filtering>
             </resource>
             <resource>
                 <directory>${basedir}/src/main/resources</directory>

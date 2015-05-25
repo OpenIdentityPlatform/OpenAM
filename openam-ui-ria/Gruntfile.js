@@ -10,18 +10,6 @@ module.exports = function(grunt) {
     grunt.initConfig({
         destination: process.env.OPENAM_HOME,
         forgerockui: process.env.FORGEROCK_UI_SRC,
-        replace: {
-            version: {
-                src: ['src/main/js/main.js'],
-                dest: '<%= destination %>/XUI/main.js',
-                replacements: [{
-                    from: '${version}',
-                    to: function () {
-                        return new Date().getTime();
-                    }
-                }]
-            }
-        },
         sync: {
             XUI: {
                 files: [{
@@ -66,15 +54,14 @@ module.exports = function(grunt) {
                     'src/main/js/**',
                     'src/main/resources/**'
                 ],
-                tasks: ['sync', 'replace']
+                tasks: ['sync']
             }
         }
     });
 
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-sync');
-    grunt.loadNpmTasks('grunt-text-replace');
 
-    grunt.registerTask('default', ['sync', 'replace', 'watch']);
+    grunt.registerTask('default', ['sync', 'watch']);
 
 };
