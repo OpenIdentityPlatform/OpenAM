@@ -24,24 +24,15 @@
 
    $Id: spSSOInit.jsp,v 1.11 2009/06/24 23:05:30 mrudulahg Exp $
 
-   Portions Copyright 2013 ForgeRock AS
+   Portions Copyright 2013-2015 ForgeRock AS.
 --%>
 
-
-
-
-<%@ page import="com.sun.identity.shared.debug.Debug" %>
-<%@ page import="com.sun.identity.saml2.common.SAML2Constants" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Utils" %>
 <%@ page import="com.sun.identity.saml.common.SAMLUtils" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Exception" %>
 <%@ page import="com.sun.identity.saml2.profile.SPCache" %>
 <%@ page import="com.sun.identity.saml2.profile.SPSSOFederate" %>
-<%@ page import="java.util.HashMap" %>
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
-<%@ page import="java.util.StringTokenizer" %>
 
 <%--
     spssoinit.jsp initiates the Single Sign-On at the Service Provider.
@@ -159,9 +150,12 @@
 
                             In this advice, the requested auth level is 1.
                             Note: The ":" before auth level 1 is a must.
+
+    21.includeRequestedAuthnContext boolean flag to indicate if the authentication request should include the
+                            Requested Authentication Context element. True by default.
 --%>
 <%
-    // Retreive the Request Query Parameters
+    // Retrieve the Request Query Parameters
     // metaAlias and idpEntiyID are the required query parameters
     // metaAlias - Service Provider Entity Id
     // idpEntityID - Identity Provider Identifier

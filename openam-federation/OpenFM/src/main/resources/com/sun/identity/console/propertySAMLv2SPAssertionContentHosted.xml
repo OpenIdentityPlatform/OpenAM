@@ -249,6 +249,15 @@
                 <option label="samlv2.better.label" value="better" />
             </cc>
         </property>
+        <property>
+            <label name="lblSPincludeReqAuthnCtx"
+                   defaultValue="samlv2.sp.attribute.label.spincludereqauthnctx"
+                   labelFor="includeRequestedAuthnContext" />
+            <cc name="includeRequestedAuthnContext" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                    <attribute name="checkedValue" value="true"/>
+            </cc>
+            <fieldhelp name="helpspIncludeReqAuthnContext" defaultValue="samlv2sp.authnctx.help.spIncludeReqAuthnContext" />
+        </property>
     </section>
     <section name="SPAassertionTimeSkew" defaultValue="samlv2sp.attribute.label.spassertiontimeskew" >
         <property>

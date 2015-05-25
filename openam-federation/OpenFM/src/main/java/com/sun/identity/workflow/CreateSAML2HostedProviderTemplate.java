@@ -383,6 +383,9 @@ public class CreateSAML2HostedProviderTemplate {
             "            <Value>com.sun.identity.saml2.plugins.DefaultSPAttributeMapper" +
             "</Value>\n" +
             "        </Attribute>\n" +
+            "        <Attribute name=\"" + SAML2Constants.INCLUDE_REQUESTED_AUTHN_CONTEXT + "\">\n" +
+            "            <Value>true</Value>\n" +
+            "        </Attribute>\n" +
             "        <Attribute name=\"" +
             SAML2Constants.SP_AUTHCONTEXT_MAPPER + "\">\n" +
             "            <Value>" +

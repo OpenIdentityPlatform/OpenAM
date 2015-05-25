@@ -24,7 +24,7 @@
  *
  * $Id: SPSSOFederate.java,v 1.29 2009/11/24 21:53:28 madan_ranganath Exp $
  *
- * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.saml2.profile;
 
@@ -730,9 +730,11 @@ public class SPSSOFederate {
         // destinationURI required if message is signed.
          String destinationURI= getParameter(paramsMap,
                                              SAML2Constants.DESTINATION);
-         Boolean isPassive = doPassive(paramsMap,spConfigMap);
-         Boolean isforceAuthn= isForceAuthN(paramsMap,spConfigMap);
-         boolean allowCreate=isAllowCreate(paramsMap,spConfigMap);
+         Boolean isPassive = doPassive(paramsMap, spConfigMap);
+         Boolean isforceAuthn = isForceAuthN(paramsMap, spConfigMap);
+         boolean allowCreate = isAllowCreate(paramsMap, spConfigMap);
+         boolean includeRequestedAuthnContextFlag = includeRequestedAuthnContext(paramsMap, spConfigMap);
+
          String consent = getParameter(paramsMap,SAML2Constants.CONSENT);
          Extensions extensions = createExtensions(extensionsList);
          String nameIDPolicyFormat = getParameter(paramsMap,
@@ -763,10 +765,6 @@ public class SPSSOFederate {
              throw new SAML2Exception(
                  SAML2Utils.bundle.getString("unsupportedBinding"));
          }
-
-         RequestedAuthnContext reqAuthnContext = 
-                                createReqAuthnContext(realmName,spEntityID,
-                                                      paramsMap,spConfigMap);
          
          AuthnRequest authnReq = 
                 ProtocolFactory.getInstance().createAuthnRequest();    
@@ -789,7 +787,9 @@ public class SPSSOFederate {
          authnReq.setProtocolBinding(protocolBinding);
          authnReq.setIssuer(issuer);
          authnReq.setNameIDPolicy(nameIDPolicy);
-         authnReq.setRequestedAuthnContext(reqAuthnContext);
+         if (includeRequestedAuthnContextFlag) {
+             authnReq.setRequestedAuthnContext(createReqAuthnContext(realmName, spEntityID, paramsMap, spConfigMap));
+         }
          if (extensions != null) {
                authnReq.setExtensions(extensions);
          }
@@ -985,7 +985,30 @@ public class SPSSOFederate {
         }
         return allowCreate;
     }
-    
+
+    private static boolean includeRequestedAuthnContext(Map paramsMap, Map spConfigAttrsMap) {
+
+        // Default to true if this flag is not found to be backwards compatible.
+        boolean result = true;
+
+        // Check the parameters first in case the request wants to override the metadata value.
+        Boolean val = getAttrValueFromMap(paramsMap, SAML2Constants.INCLUDE_REQUESTED_AUTHN_CONTEXT);
+        if (val != null) {
+            result = val;
+        } else {
+            val = getAttrValueFromMap(spConfigAttrsMap, SAML2Constants.INCLUDE_REQUESTED_AUTHN_CONTEXT);
+            if (val != null) {
+                result = val;
+            }
+        }
+
+        if (SAML2Utils.debug.messageEnabled()) {
+            SAML2Utils.debug.message("SPSSOFederate:includeRequestedAuthnContext:" + result);
+        }
+
+        return result;
+    }
+
     /* Returns the AssertionConsumerServiceURL Index */
     private static Integer getIndex(Map paramsMap,String attrName) {
         Integer attrIndex = null;

@@ -24,10 +24,7 @@
  *
  * $Id: SAMLv2Model.java,v 1.34 2009/11/24 21:48:40 madan_ranganath Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.federation.model;
@@ -215,6 +212,7 @@ public interface SAMLv2Model
         "spAuthncontextClassrefMapping";
     public static final String SP_AUTHN_CONTEXT_COMPARISON =
         "spAuthncontextComparisonType";
+    public static final String SP_INCLUDE_REQUESTED_AUTHN_CONTEXT = "includeRequestedAuthnContext";
     public static final String SAML2_AUTH_MODULE = "saml2AuthModuleName";
     public static final String LOCAL_AUTH_URL = "localAuthURL";
     public static final String INTERMEDIATE_URL = "intermediateUrl";

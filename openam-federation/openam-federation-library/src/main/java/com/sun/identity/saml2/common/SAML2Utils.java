@@ -1510,6 +1510,12 @@ public class SAML2Utils extends SAML2SDKUtils {
             list.add(affiID);
             paramsMap.put(SAML2Constants.AFFILIATION_ID,list);
         }
+
+        String includeContext = request.getParameter(SAML2Constants.INCLUDE_REQUESTED_AUTHN_CONTEXT);
+        if (includeContext != null) {
+            paramsMap.put(SAML2Constants.INCLUDE_REQUESTED_AUTHN_CONTEXT, Arrays.asList(includeContext));
+        }
+
         return paramsMap;
     }
     

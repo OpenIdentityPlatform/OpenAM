@@ -196,6 +196,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 Collections.EMPTY_SET);
         extendedMetaSpMap.put(SP_AUTHN_CONTEXT_COMPARISON,
                 Collections.EMPTY_SET);
+        extendedMetaSpMap.put(SP_INCLUDE_REQUESTED_AUTHN_CONTEXT, Collections.EMPTY_SET);
         extendedMetaSpMap.put(SAML2_AUTH_MODULE, Collections.EMPTY_SET);
         extendedMetaSpMap.put(LOCAL_AUTH_URL, Collections.EMPTY_SET);
         extendedMetaSpMap.put(APP_LOGOUT_URL, Collections.EMPTY_SET);
@@ -333,6 +334,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 Collections.EMPTY_SET);
         extendedACMetaSpMap.put(SP_AUTHN_CONTEXT_COMPARISON,
                 Collections.EMPTY_SET);
+        extendedACMetaSpMap.put(SP_INCLUDE_REQUESTED_AUTHN_CONTEXT, Collections.EMPTY_SET);
         extendedACMetaSpMap.put(ASSERT_TIME_SKEW, Collections.EMPTY_SET);
         extendedACMetaSpMap.put(SP_BASIC_AUTH_ON, Collections.EMPTY_SET);
         extendedACMetaSpMap.put(SP_BASIC_AUTH_USER, Collections.EMPTY_SET);
