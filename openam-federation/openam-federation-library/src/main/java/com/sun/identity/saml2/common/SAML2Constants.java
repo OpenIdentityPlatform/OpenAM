@@ -1099,6 +1099,11 @@ public interface SAML2Constants {
     public String SP_AUTHCONTEXT_COMPARISON_TYPE_VALUE = "exact";
 
     /**
+     * Flag to indicate if the RequestedAuthnContext should be included in an AuthnRequest.
+     */
+    public String INCLUDE_REQUESTED_AUTHN_CONTEXT = "includeRequestedAuthnContext";
+
+    /**
      * Service provider AuthnContext Comparison Parameter Name
      */
     public String SP_AUTHCONTEXT_COMPARISON = "AuthComparison";
