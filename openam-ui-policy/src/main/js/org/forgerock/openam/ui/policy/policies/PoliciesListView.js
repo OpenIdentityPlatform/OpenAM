@@ -57,15 +57,9 @@ define("org/forgerock/openam/ui/policy/policies/PoliciesListView", [
             Policies = Backbone.PageableCollection.extend({
                 url: URLHelper.substitute("__api__/policies"),
                 model: PolicyModel,
-                queryParams: {
-                    _sortKeys: BackgridUtils.sortKeys,
-                    _queryFilter: function () {
-                        return BackgridUtils.queryFilter.bind(self.data.items)(['applicationName+eq+"' + args[0] + '"']);
-                    },
-                    pageSize: null,  // todo implement pagination
-                    _pagedResultsOffset: null //todo implement pagination
-                },
-
+                state: BackgridUtils.getState(),
+                queryParams: BackgridUtils.getQueryParams(),
+                parseState: BackgridUtils.parseState,
                 parseRecords: BackgridUtils.parseRecords,
                 sync: function (method, model, options) {
                     options.beforeSend = function (xhr) {

@@ -54,14 +54,30 @@ define("org/forgerock/openam/ui/policy/util/BackgridUtils", [
      *     template: "templates/MyTemplate.html"
      * });
      */
-     // TODO: difference from UMA: using fillTemplateWithData() instead of render() to pass data to the template
+    // TODO: difference from UMA: using fillTemplateWithData() instead of render() to pass data to the template
     obj.TemplateCell = Backgrid.Cell.extend({
         className: 'template-cell',
+
+        events: {
+            'click': 'onClick'
+        },
+
         render: function () {
             this.$el.html(UIUtils.fillTemplateWithData(this.template, this.model.attributes));
+
+            if (this.additionalClassName) {
+                this.$el.addClass(this.additionalClassName);
+            }
+
             this.delegateEvents();
 
             return this;
+        },
+
+        onClick: function (e) {
+            if (this.callback) {
+                this.callback(e, this.model.id);
+            }
         }
     });
 
@@ -104,9 +120,9 @@ define("org/forgerock/openam/ui/policy/util/BackgridUtils", [
                 i = 0;
 
             for (; i < arrayVal.length; i++) {
-                if (_.isString(arrayVal[i])){
+                if (_.isString(arrayVal[i])) {
                     result += '<li>' + arrayVal[i] + '</li>';
-                } else{
+                } else {
                     result += '<li>' + JSON.stringify(arrayVal[i]) + '</li>';
                 }
             }
@@ -138,8 +154,7 @@ define("org/forgerock/openam/ui/policy/util/BackgridUtils", [
 
     // TODO: candidate for commons, have not changed it, using UMA version
     obj.queryFilter = function (customFilters) {
-        var params = [],
-            i = 0;
+        var params = [];
 
         customFilters = customFilters || [];
 
@@ -180,7 +195,7 @@ define("org/forgerock/openam/ui/policy/util/BackgridUtils", [
      *     callback: myCallback
      * });
      */
-    //TODO: commons candidate
+        //TODO: commons candidate
     obj.ClickableRow = Backgrid.Row.extend({
         events: {
             "click": "onClick"
@@ -199,23 +214,66 @@ define("org/forgerock/openam/ui/policy/util/BackgridUtils", [
     };
 
     // TODO: candidate for commons, have not changed it, using UMA version
-    obj.sortKeys = function() {
+    obj.sortKeys = function () {
         return this.state.order === 1 ? '-' + this.state.sortKey : this.state.sortKey;
     };
 
     // TODO: candidate for commons, have not changed it, using UMA version
     // FIXME: Workaround to fix "Double sort indicators" issue
     // @see https://github.com/wyuenho/backgrid/issues/453
-    obj.doubleSortFix = function(model) {
+    obj.doubleSortFix = function (model) {
         // No ids so identify model with CID
         var cid = model.cid,
-            filtered = model.collection.filter(function(model) {
+            filtered = model.collection.filter(function (model) {
                 return model.cid !== cid;
             });
 
-        _.each(filtered, function(model) {
+        _.each(filtered, function (model) {
             model.set('direction', null);
         });
+    };
+
+    // TODO: candidate for commons, have not changed it, using UMA version
+    obj.parseState = function (resp, queryParams, state, options) {
+        if (!this.state.totalRecords) {
+            this.state.totalRecords = resp.remainingPagedResults + resp.resultCount;
+        }
+        if (!this.state.totalPages) {
+            this.state.totalPages = Math.ceil(this.state.totalRecords / this.state.pageSize);
+        }
+        return this.state;
+    };
+
+    // TODO: candidate for commons, have not changed it, using UMA version
+    obj.pagedResultsOffset = function () {
+        return (this.state.currentPage - 1) * this.state.pageSize;
+    };
+
+    // TODO: candidate for commons, have not changed it, using UMA version
+    obj.getQueryParams = function (data) {
+        var params = {
+            _sortKeys: this.sortKeys,
+            _queryFilter: this.queryFilter,
+            pageSize: "_pageSize",
+            _pagedResultsOffset: this.pagedResultsOffset
+        };
+
+        if (data && typeof data === 'object') {
+            _.extend(params, data);
+        }
+        return params;
+    };
+
+    obj.getState = function (data) {
+        var state = {
+            pageSize: 10,
+            sortKey: "name"
+        };
+
+        if (data && typeof data === 'object') {
+            _.extend(state, data);
+        }
+        return state;
     };
 
     return obj;

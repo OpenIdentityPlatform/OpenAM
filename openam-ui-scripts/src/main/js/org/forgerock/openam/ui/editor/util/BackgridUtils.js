@@ -137,5 +137,68 @@ define("org/forgerock/openam/ui/editor/util/BackgridUtils", [
         return data.result;
     };
 
+    // TODO: candidate for commons, have not changed it, using UMA version
+    obj.sortKeys = function () {
+        return this.state.order === 1 ? '-' + this.state.sortKey : this.state.sortKey;
+    };
+
+    // TODO: candidate for commons, have not changed it, using UMA version
+    // FIXME: Workaround to fix "Double sort indicators" issue
+    // @see https://github.com/wyuenho/backgrid/issues/453
+    obj.doubleSortFix = function (model) {
+        // No ids so identify model with CID
+        var cid = model.cid,
+            filtered = model.collection.filter(function (model) {
+                return model.cid !== cid;
+            });
+
+        _.each(filtered, function (model) {
+            model.set('direction', null);
+        });
+    };
+
+    // TODO: candidate for commons, have not changed it, using UMA version
+    obj.parseState = function (resp, queryParams, state, options) {
+        if (!this.state.totalRecords) {
+            this.state.totalRecords = resp.remainingPagedResults + resp.resultCount;
+        }
+        if (!this.state.totalPages) {
+            this.state.totalPages = Math.ceil(this.state.totalRecords / this.state.pageSize);
+        }
+        return this.state;
+    };
+
+    // TODO: candidate for commons, have not changed it, using UMA version
+    obj.pagedResultsOffset = function () {
+        return (this.state.currentPage - 1) * this.state.pageSize;
+    };
+
+    // TODO: candidate for commons, have not changed it, using UMA version
+    obj.getQueryParams = function (data) {
+        var params = {
+            _sortKeys: this.sortKeys,
+            _queryFilter: this.queryFilter,
+            pageSize: "_pageSize",
+            _pagedResultsOffset: this.pagedResultsOffset
+        };
+
+        if (data && typeof data === 'object') {
+            _.extend(params, data);
+        }
+        return params;
+    };
+
+    obj.getState = function (data) {
+        var state = {
+            pageSize: 10,
+            sortKey: "name"
+        };
+
+        if (data && typeof data === 'object') {
+            _.extend(state, data);
+        }
+        return state;
+    };
+
     return obj;
 });

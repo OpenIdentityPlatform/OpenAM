@@ -50,12 +50,9 @@ define("org/forgerock/openam/ui/editor/views/ScriptListView", [
             Scripts = Backbone.PageableCollection.extend({
                 url: URLHelper.substitute("__api__/scripts"),
                 model: Script,
-                queryParams: {
-                    _queryFilter: BackgridUtils.queryFilter,
-                    pageSize: null,  // todo implement pagination
-                    _pagedResultsOffset: null //todo implement pagination
-                },
-
+                state: BackgridUtils.getState(),
+                queryParams: BackgridUtils.getQueryParams(),
+                parseState: BackgridUtils.parseState,
                 parseRecords: BackgridUtils.parseRecords,
                 sync: BackgridUtils.sync
             });
@@ -69,11 +66,9 @@ define("org/forgerock/openam/ui/editor/views/ScriptListView", [
                 {
                     name: "name",
                     label: $.t("scripts.list.grid.0"),
-                    cell: BackgridUtils.UriExtCell,
+                    cell: "string",
                     headerCell: BackgridUtils.FilterHeaderCell,
-                    href: function (rawValue, formattedValue, model) {
-                        return "#edit/" + model.get('_id');
-                    },
+                    sortType: "toggle",
                     editable: false
                 },
                 {
@@ -81,6 +76,7 @@ define("org/forgerock/openam/ui/editor/views/ScriptListView", [
                     label: $.t("scripts.list.grid.1"),
                     cell: "string",
                     headerCell: BackgridUtils.FilterHeaderCell,
+                    sortType: "toggle",
                     editable: false
                 },
                 {
@@ -88,12 +84,14 @@ define("org/forgerock/openam/ui/editor/views/ScriptListView", [
                     label: $.t("scripts.list.grid.2"),
                     cell: "string",
                     headerCell: BackgridUtils.FilterHeaderCell,
+                    sortType: "toggle",
                     editable: false
                 },
                 {
                     name: "script",
                     label: $.t("scripts.list.grid.3"),
                     cell: "string",
+                    sortType: "toggle",
                     editable: false
                 }
             ];
@@ -110,11 +108,13 @@ define("org/forgerock/openam/ui/editor/views/ScriptListView", [
                 }
             });
 
-            self.data.scripts = new Scripts();
+            this.data.scripts = new Scripts();
 
-            self.data.scripts.on("backgrid:selected", function (model, selected) {
+            this.data.scripts.on("backgrid:selected", function (model, selected) {
                 self.onRowSelect(model, selected);
             });
+
+            this.data.scripts.on("backgrid:sort", BackgridUtils.doubleSortFix);
 
             grid = new Backgrid.Grid({
                 columns: columns,

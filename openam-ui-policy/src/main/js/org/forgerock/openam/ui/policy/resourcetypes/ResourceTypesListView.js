@@ -53,13 +53,9 @@ define("org/forgerock/openam/ui/policy/resourcetypes/ResourceTypesListView", [
             ResourceTypes = Backbone.PageableCollection.extend({
                 url: URLHelper.substitute("__api__/resourcetypes"),
                 model: ResourceTypeModel,
-                queryParams: {
-                    _sortKeys: BackgridUtils.sortKeys,
-                    _queryFilter: BackgridUtils.queryFilter,
-                    pageSize: null,  // todo implement pagination
-                    _pagedResultsOffset: null //todo implement pagination
-                },
-
+                state: BackgridUtils.getState(),
+                queryParams: BackgridUtils.getQueryParams(),
+                parseState: BackgridUtils.parseState,
                 parseRecords: BackgridUtils.parseRecords,
                 sync: function (method, model, options) {
                     options.beforeSend = function (xhr) {

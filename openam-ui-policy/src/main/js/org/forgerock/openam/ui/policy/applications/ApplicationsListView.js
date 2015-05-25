@@ -55,7 +55,6 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
             this.data.selectedItems = [];
 
             _.extend(this.events, {
-                'click .fa-pencil': 'editApplication',
                 'click #importPolicies': 'startImportPolicies',
                 'click #exportPolicies': 'exportPolicies',
                 'change #realImport': 'readImportFile'
@@ -64,13 +63,9 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
             Apps = Backbone.PageableCollection.extend({
                 url: URLHelper.substitute("__api__/applications"),
                 model: ApplicationModel,
-                queryParams: {
-                    _sortKeys: BackgridUtils.sortKeys,
-                    _queryFilter: self.getDefaultFilter,
-                    pageSize: null,  // todo implement pagination
-                    _pagedResultsOffset: null //todo implement pagination
-                },
-
+                state: BackgridUtils.getState(),
+                queryParams: BackgridUtils.getQueryParams(),
+                parseState: BackgridUtils.parseState,
                 parseRecords: BackgridUtils.parseRecords,
                 sync: function (method, model, options) {
                     options.beforeSend = function (xhr) {
@@ -85,7 +80,7 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
                     var $target = $(e.target);
 
                     if ($target.is('a') || $target.is('input') || $target.is('.select-row-cell') ||
-                        $target.parents('.template-cell').length === 1) {
+                        $target.is('.fa') || $target.is('.template-cell')) {
                         return;
                     }
                     Router.routeTo(Router.configuration.routes.managePolicies, {args: [encodeURIComponent(this.model.id)], trigger: true});
@@ -102,6 +97,11 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
                     name: "",
                     label: $.t("policy.applications.list.grid.0"),
                     cell: BackgridUtils.TemplateCell.extend({
+                        callback: function (e, modelId) {
+                            Router.routeTo(Router.configuration.routes.editApp, {args: [encodeURIComponent(modelId)],
+                                trigger: true});
+                        },
+                        additionalClassName: 'edit-cell',
                         template: "templates/policy/applications/ApplicationsListActionsCellTemplate.html"
                     }),
                     sortable: false,
@@ -110,11 +110,8 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
                 {
                     name: "name",
                     label: $.t("policy.applications.list.grid.1"),
-                    cell: BackgridUtils.UriExtCell,
+                    cell: "string",
                     headerCell: BackgridUtils.FilterHeaderCell,
-                    href: function (rawValue, formattedValue, model) {
-                        return "#app/" + encodeURIComponent(model.id);
-                    },
                     sortType: "toggle",
                     editable: false
                 },
@@ -169,11 +166,6 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
                     }
                 });
             });
-        },
-
-        editApplication: function (e) {
-            Router.routeTo(Router.configuration.routes.editApp, {args: [encodeURIComponent($(e.target).data('appName'))],
-                trigger: true});
         },
 
         getDefaultFilter: function () {
