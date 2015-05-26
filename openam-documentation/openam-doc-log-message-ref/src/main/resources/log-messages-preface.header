@@ -135,7 +135,8 @@
      <term>amSSO.access</term>
      <listitem>
       <para>Contains data about user sessions, including times of access, session time outs,
-       and session creation/termination</para>
+       and session creation/termination for stateful sessions; contains data about
+       session creation for stateless sessions</para>
      </listitem>
     </varlistentry>
     <varlistentry>
