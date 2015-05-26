@@ -58,7 +58,9 @@ define("org/forgerock/openam/ui/policy/policies/PoliciesListView", [
                 url: URLHelper.substitute("__api__/policies"),
                 model: PolicyModel,
                 state: BackgridUtils.getState(),
-                queryParams: BackgridUtils.getQueryParams(),
+                queryParams: BackgridUtils.getQueryParams({
+                    _queryFilter: 'applicationName+eq+"' + args[0] + '"'
+                }),
                 parseState: BackgridUtils.parseState,
                 parseRecords: BackgridUtils.parseRecords,
                 sync: function (method, model, options) {
