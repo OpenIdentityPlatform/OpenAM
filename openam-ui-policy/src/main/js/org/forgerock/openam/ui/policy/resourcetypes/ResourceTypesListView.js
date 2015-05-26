@@ -95,7 +95,7 @@ define("org/forgerock/openam/ui/policy/resourcetypes/ResourceTypesListView", [
                     label: $.t("policy.resourceTypes.list.grid.1"),
                     cell: "string",
                     headerCell: BackgridUtils.FilterHeaderCell,
-                    sortType: "toggle",
+                    sortable: false,
                     editable: false
                 },
                 {
@@ -103,7 +103,7 @@ define("org/forgerock/openam/ui/policy/resourcetypes/ResourceTypesListView", [
                     label: $.t("policy.resourceTypes.list.grid.2"),
                     cell: BackgridUtils.ArrayCell,
                     headerCell: BackgridUtils.FilterHeaderCell,
-                    sortType: "toggle",
+                    sortable: false,
                     editable: false
                 },
                 {
@@ -111,7 +111,7 @@ define("org/forgerock/openam/ui/policy/resourcetypes/ResourceTypesListView", [
                     label: $.t("policy.resourceTypes.list.grid.3"),
                     cell: BackgridUtils.ObjectCell,
                     headerCell: BackgridUtils.FilterHeaderCell,
-                    sortType: "toggle",
+                    sortable: false,
                     editable: false
                 }
             ];

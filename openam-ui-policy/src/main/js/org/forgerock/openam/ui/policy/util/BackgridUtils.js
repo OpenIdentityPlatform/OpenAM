@@ -59,7 +59,7 @@ define("org/forgerock/openam/ui/policy/util/BackgridUtils", [
         className: 'template-cell',
 
         events: {
-            'click': 'onClick'
+            'click': '_onClick'
         },
 
         render: function () {
@@ -69,14 +69,18 @@ define("org/forgerock/openam/ui/policy/util/BackgridUtils", [
                 this.$el.addClass(this.additionalClassName);
             }
 
+            if (this.callback) {
+                this.callback();
+            }
+
             this.delegateEvents();
 
             return this;
         },
 
-        onClick: function (e) {
-            if (this.callback) {
-                this.callback(e, this.model.id);
+        _onClick: function (e) {
+            if (this.onClick) {
+                this.onClick(e, this.model.id);
             }
         }
     });
@@ -112,11 +116,8 @@ define("org/forgerock/openam/ui/policy/util/BackgridUtils", [
     obj.ArrayCell = Backgrid.Cell.extend({
         className: 'array-formatter-cell',
 
-        render: function () {
-            this.$el.empty();
-
-            var arrayVal = this.model.get(this.column.attributes.name),
-                result = '<ul>',
+        buildHtml: function (arrayVal) {
+            var result = '<ul>',
                 i = 0;
 
             for (; i < arrayVal.length; i++) {
@@ -128,7 +129,14 @@ define("org/forgerock/openam/ui/policy/util/BackgridUtils", [
             }
             result += '</ul>';
 
-            this.$el.append(result);
+            return result;
+        },
+
+        render: function () {
+            this.$el.empty();
+
+            var arrayVal = this.model.get(this.column.attributes.name);
+            this.$el.append(this.buildHtml(arrayVal));
 
             this.delegateEvents();
             return this;
