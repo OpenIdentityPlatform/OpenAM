@@ -223,7 +223,8 @@ public class UmaPolicyApplicationListener implements IdEventListener {
         Set<String> scopes = getScopes(getIdentityAttributes(identity));
         if (scopes != null) {
             for (String scope : scopes) {
-                if (scope.endsWith("uma_protection")) {
+                String[] scopeParts = scope.split("\\|");
+                if (scopeParts[0].contains("uma_protection")) {
                     return true;
                 }
             }
