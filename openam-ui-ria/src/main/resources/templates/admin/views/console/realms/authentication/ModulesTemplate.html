@@ -4,20 +4,22 @@
         <table class="table table-hover table-striped">
             <thead>
                 <tr>
-                    <th class="col-md-1">Select</th>
-                    <th class="col-md-9"/>
+                    <th class="col-md-1">{{t "console.authentication.modules.selectModule"}}</th>
+                    <th class="col-md-5">{{t "console.authentication.modules.moduleName"}}</th>
+                    <th class="col-md-4">{{t "console.authentication.modules.moduleType"}}</th>
                     <th class="col-md-2"/>
                 </tr>
             </thead>
             <tbody>
                 {{#each this}}
                 <tr>
-                    <td><input data-chain-name="{{_id}}" type="checkbox"/></td>
+                    <td><input data-module-name="{{_id}}" type="checkbox"/></td>
                     <td>{{_id}}</td>
+                    <td>{{type}}</td>
                     <td>
                         <div class="pull-right">
-                            <button type="button" class="btn btn-transparent"><i class="fa fa-pencil"></i></button>
-                            <button type="button" class="btn btn-transparent" data-chain-name="{{_id}}"><i class="fa fa-close"></i></button>
+                            <button type="button" id="editModule" class="btn btn-transparent"><i class="fa fa-pencil" data-toggle="tooltip" title="{{t "console.authentication.modules.editModule"}}"></i></button>
+                            <button type="button" id="deleteModule" class="btn btn-transparent" data-module-name="{{_id}}"><i class="fa fa-close" data-toggle="tooltip" title="{{t "console.authentication.modules.deleteModule"}}"></i></button>
                         </div>
                     </td>
                 </tr>
@@ -28,7 +30,7 @@
 
     <div class="tab-pane-footer clearfix">
         <div class="pull-right">
-            <button type="button" disabled class="btn btn-sm btn-default">{{t "console.authentication.modules.deleteModule"}}</button>
+            <button type="button" id="deleteModules" disabled class="btn btn-sm btn-default">{{t "console.authentication.modules.deleteModule"}}</button>
             <a id="addModule" href="#console/realms/authentication/modules/" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i>{{t "console.authentication.modules.addModule"}}</a>
         </div>
     </div>

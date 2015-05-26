@@ -44,7 +44,11 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authen
             'click  #chains #deleteChains'          : 'deleteChains',
             'click  #chains #addChain'              : 'addChain',
             // Modules
-            'click #addModule':   'addModule'
+            'click #addModule':   'addModule',
+            'change #modules input[data-module-name]' : 'moduleSelected',
+            'click  #modules #editModule': 'editModule',
+            'click  #modules button[data-module-name]:not([data-active])': 'deleteModule',
+            'click  #modules #deleteModules': 'deleteModules'
         },
         data: {
             rows: []
@@ -73,27 +77,33 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authen
         },
         addModule: function(e) {
             e.preventDefault();
-            // This is mock code, please swap out
-            var href = $(e.currentTarget).attr('href');
+            var href = $(e.currentTarget).attr('href'),
+                self = this;
 
-            BootstrapDialog.show({
-                title: $.t("console.authentication.modules.addModuleDialogTitle"),
-                message: '<label>Name</label> <input type="text" id="newModuleNme" class="form-control" placeholder=""  value=""> <br/> <label>Type</label> <select class="form-control">  <option disabled selected>Select Module type</option> <option>Active Directory</option> <option>Adaptive Risk </option> <option>Anonymous</option> <option>Certificate</option> <option>Data Store</option> <option>Device Id (Match)</option> <option>Device Id (Save)</option> <option>Federation</option> <option>HOTP</option> <option>HTTP Basic</option> <option>JDBC</option> <option>LDAP</option> <option>Membership</option> <option>MSISDN</option> <option>OATH</option> <option>OAuth 2.0 / OpenID Connect</option> <option>OpenID Connect id_token bearer</option> <option>Persistent Cookie</option> <option>RADIUS</option> <option>SAE</option> <option>Scripted Module</option> <option>Windows Desktop SSO</option> <option>Windows NT</option> <option>WSSAuth</option> </select>',
-                buttons: [{
-                    label: $.t("common.form.next"),
-                    cssClass: "btn-primary",
-                    action: function(dialog) {
-                        dialog.close();
-                        //TODO Check name first.
-                        Router.navigate( href + dialog.getModalBody().find('#newModuleNme').val(), { trigger: true });
+            UIUtils.fillTemplateWithData("templates/admin/views/console/realms/authentication/AddModuleTemplate.html", self.data, function(html) {
+                BootstrapDialog.show({
+                    title: $.t("console.authentication.modules.addModuleDialogTitle"),
+                    message: $(html),
+                    buttons: [{
+                        label: $.t("common.form.next"),
+                        cssClass: "btn-primary",
+                        action: function(dialog) {
+                            dialog.close();
+                            //TODO Check name first.
+                            Router.navigate( href + dialog.getModalBody().find('#newModuleNme').val(), { trigger: true });
+                        }
+                    },{
+                        label: $.t("common.form.cancel"),
+                        action: function(dialog) {
+                            dialog.close();
+                        }
+                    }],
+                    onshow: function(dialog) {
+                        //dialog.$modalBody.selectize();
                     }
-                },{
-                    label: $.t("common.form.cancel"),
-                    action: function(dialog) {
-                        dialog.close();
-                    }
-                }]
+                });
             });
+
         },
         chainSelected: function(event) {
             var hasChainsSelected = this.$el.find('#chains input[type=checkbox]').is(':checked'),
@@ -139,6 +149,55 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authen
         editChain: function(e) {
             e.preventDefault();
             Router.navigate( '#console/chaining/', {trigger: true});
+        },
+        moduleSelected: function(event) {
+            var hasModuleSelected = this.$el.find('#modules input[type=checkbox]').is(':checked'),
+                row = $(event.currentTarget).closest('tr'),
+                checked = $(event.currentTarget).is(':checked');
+
+            this.$el.find('#deleteModules').prop('disabled', !hasModuleSelected);
+            if (checked) {
+                row.addClass('selected');
+            } else {
+                row.removeClass('selected');
+            }
+        },
+        editModule: function(event) {
+          event.preventDefault();
+          var
+              moduleName = $(event.currentTarget).closest('td').find('button[data-module-name]').attr('data-module-name');
+              Router.navigate( '#console/realms/authentication/modules/' + moduleName, {trigger: true});
+
+
+        },
+        deleteModule: function(event) {
+            var self = this,
+                moduleName = $(event.currentTarget).attr('data-module-name');
+
+            SMSDelegate.RealmAuthenticationModule.remove(moduleName)
+            .done(function(data) {
+                self.renderModulesTab();
+            })
+            .fail(function() {
+                // TODO: Add failure condition
+            });
+        },
+        deleteModules: function() {
+            var self = this,
+                moduleNames = self.$el.find('#modules input[type=checkbox]:checked').toArray().map(function(element) {
+                    return $(element).attr('data-module-name');
+                }),
+                promises = moduleNames.map(function(name) {
+                    return SMSDelegate.RealmAuthenticationModule.remove(name);
+                });
+
+            $.when(promises)
+            .done(function(data) {
+                self.renderModulesTab();
+            })
+            .fail(function() {
+                // TODO: Add failure condition
+            });
         },
         render: function(args, callback) {
             var self = this;
@@ -188,7 +247,7 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authen
                     if ( obj.active) {
                         sortedChains.unshift(obj);
                     } else {
-                        sortedChains.push(obj);
+                    sortedChains.push(obj);
                     }
                 });
 
@@ -208,6 +267,7 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authen
             .done(function(data) {
                 UIUtils.fillTemplateWithData("templates/admin/views/console/realms/authentication/ModulesTemplate.html", data.values.result, function(html) {
                     self.$el.find('#modules').html(html);
+                    self.$el.find('[data-toggle="tooltip"]').tooltip();
                 });
             })
             .fail(function() {
