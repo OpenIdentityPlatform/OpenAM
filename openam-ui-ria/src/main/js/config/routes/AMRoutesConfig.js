@@ -139,8 +139,28 @@ define("config/routes/AMRoutesConfig", [
             pattern: "uma/apps/?"
         },
 
+        // Common Tasks
+        "commonTasks": {
+            view: "org/forgerock/openam/ui/admin/views/commonTasks/CommonTasksView",
+            url: /^commonTasks\/$/,
+            pattern: "commonTasks/",
+            role: "ui-admin"
+        },
 
-        // Console
+        // Realms
+        "realms": {
+            view: "org/forgerock/openam/ui/admin/views/realms/RealmsView",
+            url: /^realms\/$/,
+            pattern: "realms/",
+            role: "ui-admin"
+        },
+        "realmGeneral": {
+            view: "org/forgerock/openam/ui/admin/views/realms/GeneralView",
+            url: /^realms\/(.*?)\/general\/$/,
+            pattern: "realms/?/general/",
+            role: "ui-admin"
+        },
+
         "authentication": {
             view: "org/forgerock/openam/ui/admin/views/console/realms/authentication/Authentication",
             url: /^realms\/authentication/,
@@ -155,8 +175,8 @@ define("config/routes/AMRoutesConfig", [
         },
         "chains": {
             view: "org/forgerock/openam/ui/admin/views/console/realms/authentication/chains/Chains",
-            url: /^realms\/authentication\/chains\/(.*?)(?:\/){0,1}$/,
-            pattern: "realms/authentication/chains/?",
+            url: /^console\/realms\/authentication\/chains\/(.*?)(?:\/){0,1}$/,
+            pattern: "console/realms/authentication/chains/?",
             defaults: [""],
             role: "ui-admin"
         },
@@ -165,11 +185,31 @@ define("config/routes/AMRoutesConfig", [
             url: /^realms\/authentication\/modules\/(.*?)(?:\/){0,1}$/,
             pattern: "realms/authentication/modules/?",
             defaults: [""],
+            role: "ui-user"
+        },
+
+        // Federation
+        "federation": {
+            view: "org/forgerock/openam/ui/admin/views/federation/FederationView",
+            url: /^federation\/$/,
+            pattern: "federation/",
             role: "ui-admin"
         },
-        "consoleRealm": {
-            url: "console/",
-            event: Constants.EVENT_RETURN_TO_AM_CONSOLE
+
+        // Configuration
+        "configuration": {
+            view: "org/forgerock/openam/ui/admin/views/configuration/ConfigurationView",
+            url: /^configuration\/$/,
+            pattern: "configuration/",
+            role: "ui-admin"
+        },
+
+        // Sessions
+        "sessions": {
+            view: "org/forgerock/openam/ui/admin/views/sessions/SessionsView",
+            url: /^sessions\/$/,
+            pattern: "sessions/",
+            role: "ui-admin"
         }
     };
 

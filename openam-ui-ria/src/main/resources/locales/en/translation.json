@@ -63,6 +63,11 @@
         "AppConfiguration" : {
             "Navigation" : {
                 "links" : {
+                    "commonTasks": "Common Tasks",
+                    "realms": "Realms",
+                    "federation": "Federation",
+                    "configuration": "Configuration",
+                    "sessions": "Sessions",
                     "dashboard" : "Dashboard",
                     "users" : "Users",
                     "apps" : "Applications",

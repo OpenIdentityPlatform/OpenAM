@@ -150,10 +150,30 @@ define("config/AppConfiguration", [
                             "admin": {
                                 "role": "ui-admin",
                                 "urls": {
-                                    "console": {
-                                        "url": "#console",
-                                        "name": "config.AppConfiguration.Navigation.links.console",
-                                        "icon": "fa fa-cubes"
+                                    "commonTasks": {
+                                        "url": "#commonTasks",
+                                        "name": "config.AppConfiguration.Navigation.links.commonTasks",
+                                        "icon": "fa fa-check"
+                                    },
+                                    "realms": {
+                                        "url": "#realms",
+                                        "name": "config.AppConfiguration.Navigation.links.realms",
+                                        "icon": "fa fa-cloud"
+                                    },
+                                    "federation": {
+                                        "url": "#federation",
+                                        "name": "config.AppConfiguration.Navigation.links.federation",
+                                        "icon": "fa fa-building-o"
+                                    },
+                                    "configuration": {
+                                        "url": "#configuration",
+                                        "name": "config.AppConfiguration.Navigation.links.configuration",
+                                        "icon": "fa fa-cog"
+                                    },
+                                    "sessions": {
+                                        "url": "#sessions",
+                                        "name": "config.AppConfiguration.Navigation.links.sessions",
+                                        "icon": "fa fa-users"
                                     }
                                 }
                             },

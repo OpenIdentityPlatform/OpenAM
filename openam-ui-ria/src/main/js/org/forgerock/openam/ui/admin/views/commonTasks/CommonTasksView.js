@@ -14,27 +14,16 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global define*/
-define([
-    "./delegates/SMSDelegate",
-    "./models/Form",
-    "./models/FormCollection",
-    "./utils/FormHelper",
-    "./utils/JsonEditorTheme",
+/*global, define*/
+define("org/forgerock/openam/ui/admin/views/commonTasks/CommonTasksView", [
+    "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/openam/ui/common/util/RedirectToLegacyConsole"
+], function (AbstractView, RedirectToLegacyConsole) {
+    var CommonTasksView = AbstractView.extend({
+        render: function (args, callback) {
+            RedirectToLegacyConsole.global.commonTasks();
+        }
+    });
 
-    "./views/commonTasks/CommonTasksView",
-
-    "./views/configuration/ConfigurationView",
-
-    "./views/console/realms/authentication/Authentication",
-    "./views/console/realms/authentication/advanced/AdvancedSettings",
-    "./views/console/realms/authentication/chains/Chains",
-    "./views/console/realms/authentication/modules/Modules",
-
-    "./views/federation/FederationView",
-
-    "./views/realms/GeneralView",
-    "./views/realms/RealmsView",
-
-    "./views/sessions/SessionsView"
-]);
+    return new CommonTasksView();
+});
