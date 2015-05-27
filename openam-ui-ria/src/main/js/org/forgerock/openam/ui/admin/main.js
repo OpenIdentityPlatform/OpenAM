@@ -31,10 +31,7 @@ define([
     "./views/console/realms/authentication/chains/Chains",
     "./views/console/realms/authentication/modules/Modules",
 
-    "./views/federation/FederationView",
-
-    "./views/realms/GeneralView",
-    "./views/realms/RealmsView",
+    "./views/federation/FederationView", 
 
     "./views/sessions/SessionsView"
 ]);
