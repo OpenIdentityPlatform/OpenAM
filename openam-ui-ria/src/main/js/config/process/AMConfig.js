@@ -115,7 +115,47 @@ define("config/process/AMConfig", [
                 var subRealm = conf.globalData.auth.subRealm || "/";
                 window.location.href = "/" + Constants.context + "/realm/RMRealm?RMRealm.tblDataActionHref=" + encodeURIComponent(subRealm);
             }
+        },
+        {
+            startEvent: Constants.EVENT_AUTHENTICATED,
+            description: "",
+            dependencies: [
+                "org/forgerock/commons/ui/common/main/Configuration",
+                "org/forgerock/commons/ui/common/components/Navigation"
+            ],
+            processDescription: function (event, Configuration, Navigation) {
+
+                /*if(_.contains(Configuration.loggedUser.roles, 'ui-admin')){
+
+                    // TODO: This is only mock data. This would be replaced with a
+                    // Delegate and call to appropriate endpoint. Possibly even
+                    // carrying out this functionality in a specific module elsewhere.
+                    var realms = [{
+                        "url": "#realms/authentication/advanced/",
+                        "name": "Top Level Realm"
+                    },
+                    {
+                        "url": "#realms/authentication/chains/",
+                        "name": "My Realm"
+                    },
+                    {
+                        "url": "#realms/authentication/",
+                        "name": "Another Realm"
+                    }];
+
+                    Navigation.configuration.links.admin.urls.realms.urls.push({
+                        divider: true
+                    });
+
+                    _.each(realms, function(obj){
+                        Navigation.configuration.links.admin.urls.realms.urls.push(obj);
+                    });
+
+                    Navigation.reload();
+                }*/
+            }
         }
+
 
     ];
     return obj;

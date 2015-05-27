@@ -28,9 +28,8 @@
  * @author yaromin
  */
 define("config/AppConfiguration", [
-    "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/main/EventManager"
-], function(constants, eventManager) {
+    "org/forgerock/commons/ui/common/util/Constants"
+], function(Constants) {
     var obj = {
             moduleDefinition: [
                 {
@@ -139,7 +138,7 @@ define("config/AppConfiguration", [
                                 "i18nKey": "common.user.profile"
                             }, {
                                 "id": "changePasswordLink",
-                                "event" : constants.EVENT_SHOW_CHANGE_SECURITY_DIALOG,
+                                "event" : Constants.EVENT_SHOW_CHANGE_SECURITY_DIALOG,
                                 "i18nKey": "common.user.changePassword"
                             }, {
                                 "id": "logoutLink",
@@ -153,7 +152,7 @@ define("config/AppConfiguration", [
                                 "urls": {
                                     "console": {
                                         "url": "#console",
-                                        "name": "config.AppConfiguration.Navigation.links.console",
+                                        "name": "config.AppConfiguration.Navigation.links.console",
                                         "icon": "fa fa-cubes"
                                     }
                                 }

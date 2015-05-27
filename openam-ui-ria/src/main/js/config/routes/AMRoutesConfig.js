@@ -143,32 +143,32 @@ define("config/routes/AMRoutesConfig", [
         // Console
         "authentication": {
             view: "org/forgerock/openam/ui/admin/views/console/realms/authentication/Authentication",
-            url: /^console\/realms\/authentication/,
-            pattern: "console/realms/authentication/",
-            role: "ui-user"
+            url: /^realms\/authentication/,
+            pattern: "realms/authentication/",
+            role: "ui-admin"
         },
         "advancedSettings": {
             view: "org/forgerock/openam/ui/admin/views/console/realms/authentication/advanced/AdvancedSettings",
-            url: /^console\/realms\/authentication\/advanced/,
-            pattern: "console/realms/authentication/advanced/",
-            role: "ui-user"
+            url: /^realms\/authentication\/advanced/,
+            pattern: "realms/authentication/advanced/",
+            role: "ui-admin"
         },
         "chains": {
             view: "org/forgerock/openam/ui/admin/views/console/realms/authentication/chains/Chains",
-            url: /^console\/realms\/authentication\/chains\/(.*?)(?:\/){0,1}$/,
-            pattern: "console/realms/authentication/chains/?",
+            url: /^realms\/authentication\/chains\/(.*?)(?:\/){0,1}$/,
+            pattern: "realms/authentication/chains/?",
             defaults: [""],
-            role: "ui-user"
+            role: "ui-admin"
         },
         "module": {
             view: "org/forgerock/openam/ui/admin/views/console/realms/authentication/modules/Modules",
-            url: /^console\/realms\/authentication\/modules\/(.*?)(?:\/){0,1}$/,
-            pattern: "console/realms/authentication/modules/?",
+            url: /^realms\/authentication\/modules\/(.*?)(?:\/){0,1}$/,
+            pattern: "realms/authentication/modules/?",
             defaults: [""],
-            role: "ui-user"
+            role: "ui-admin"
         },
         "consoleRealm": {
-            url: "console/realm",
+            url: "console/",
             event: Constants.EVENT_RETURN_TO_AM_CONSOLE
         }
     };
