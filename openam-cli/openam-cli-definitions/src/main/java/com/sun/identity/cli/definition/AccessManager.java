@@ -97,7 +97,7 @@ public class AccessManager {
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.SessionCommand",
-          description="List Sessions.",
+          description="List stateful sessions.",
           webSupport="false",
           mandatoryOptions={
                   "host|t|s|Host Name."},
