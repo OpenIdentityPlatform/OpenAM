@@ -22,29 +22,6 @@ define("org/forgerock/openam/ui/policy/util/BackgridUtils", [
 ], function (Backgrid, UIUtils) {
     var obj = {};
 
-    // TODO: the difference between this implementation and the one used for UMA is that here the cell is not clickable
-    obj.UriExtCell = Backgrid.UriCell.extend({
-        render: function () {
-            this.$el.empty();
-            var rawValue = this.model.get(this.column.get("name")),
-                formattedValue = this.formatter.fromRaw(rawValue, this.model),
-                href = _.isFunction(this.column.get("href")) ? this.column.get('href')(rawValue, formattedValue, this.model) : this.column.get('href');
-
-            this.$el.append($("<a>", {
-                href: href || rawValue,
-                title: this.title || formattedValue
-            }).text(formattedValue));
-
-            if (href) {
-                this.$el.data('href', href);
-                this.$el.prop('title', this.title || formattedValue);
-            }
-
-            this.delegateEvents();
-            return this;
-        }
-    });
-
     /**
      * Handlebars Template Cell Renderer
      * <p>
@@ -145,7 +122,7 @@ define("org/forgerock/openam/ui/policy/util/BackgridUtils", [
 
     // TODO: candidate for commons, placeholder is the only difference with UMA
     obj.FilterHeaderCell = Backgrid.HeaderCell.extend({
-        className: 'filter-header-cell', // todo
+        className: 'filter-header-cell',
         render: function () {
             var filter = new Backgrid.Extension.ServerSideFilter({
                 name: this.column.get("name"),
@@ -160,7 +137,6 @@ define("org/forgerock/openam/ui/policy/util/BackgridUtils", [
         }
     });
 
-    // TODO: candidate for commons, have not changed it, using UMA version
     obj.queryFilter = function (customFilters) {
         var params = [];
 
@@ -168,8 +144,8 @@ define("org/forgerock/openam/ui/policy/util/BackgridUtils", [
 
         _.each(this.state.filters, function (filter) {
             if (filter.query() !== '') {
-                // todo: No server side support for 'co' ATM, this is effectively an 'eq'
-                params.push(filter.name + '+co+' + encodeURIComponent('"' + filter.query() + '"'));
+                // todo: No server side support for 'co' ATM
+                params.push(filter.name + '+eq+' + encodeURIComponent('"*' + filter.query() + '*"'));
             }
         });
 
@@ -178,13 +154,12 @@ define("org/forgerock/openam/ui/policy/util/BackgridUtils", [
         return params.length === 0 || params.join('+AND+');
     };
 
-    // TODO: not working properly yet
     obj.sync = function (method, model, options) {
         var params = [],
-            excludeList = ['page', 'total_pages', 'total_entries', 'order', 'per_page', 'sort_by'];
+            includeList = ['_pageSize', '_pagedResultsOffset', '_sortKeys', '_queryFilter'];
 
         _.forIn(options.data, function (val, key) {
-            if (!_.include(excludeList, key)) {
+            if (_.include(includeList, key)) {
                 params.push(key + '=' + val);
             }
         });
@@ -257,19 +232,17 @@ define("org/forgerock/openam/ui/policy/util/BackgridUtils", [
         return (this.state.currentPage - 1) * this.state.pageSize;
     };
 
-    // TODO: candidate for commons, have not changed it, using UMA version
     obj.getQueryParams = function (data) {
-        var params = {
+        data = data || {};
+
+        return {
             _sortKeys: this.sortKeys,
-            _queryFilter: this.queryFilter,
+            _queryFilter: function () {
+                return obj.queryFilter.call(this, data._queryFilter);
+            },
             pageSize: "_pageSize",
             _pagedResultsOffset: this.pagedResultsOffset
         };
-
-        if (data && typeof data === 'object') {
-            _.extend(params, data);
-        }
-        return params;
     };
 
     obj.getState = function (data) {

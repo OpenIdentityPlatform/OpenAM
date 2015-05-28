@@ -110,7 +110,6 @@ define("org/forgerock/openam/ui/policy/policies/PoliciesListView", [
                     name: "resources",
                     label: $.t("policy.policies.list.grid.2"),
                     cell: BackgridUtils.ArrayCell,
-                    headerCell: BackgridUtils.FilterHeaderCell,
                     sortable: false,
                     editable: false
                 },
@@ -118,7 +117,6 @@ define("org/forgerock/openam/ui/policy/policies/PoliciesListView", [
                     name: "actionValues",
                     label: $.t("policy.policies.list.grid.3"),
                     cell: BackgridUtils.ObjectCell,
-                    headerCell: BackgridUtils.FilterHeaderCell,
                     sortable: false,
                     editable: false
                 }

@@ -66,7 +66,7 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
                 model: ApplicationModel,
                 state: BackgridUtils.getState(),
                 queryParams: BackgridUtils.getQueryParams({
-                    _queryFilter: self.getDefaultFilter
+                    _queryFilter: self.getDefaultFilter()
                 }),
                 parseState: BackgridUtils.parseState,
                 parseRecords: BackgridUtils.parseRecords,
@@ -151,7 +151,6 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
                             return this;
                         }
                     }),
-                    headerCell: BackgridUtils.FilterHeaderCell,
                     sortable: false,
                     editable: false
                 }
@@ -212,7 +211,7 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
                 returnList.push('name+eq+"^(?!' + string + '$).*"');
             });
 
-            return returnList.join('+AND+');
+            return returnList;
         },
 
         startImportPolicies: function () {

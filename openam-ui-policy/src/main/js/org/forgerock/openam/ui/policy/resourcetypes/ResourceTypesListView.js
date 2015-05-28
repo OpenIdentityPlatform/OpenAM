@@ -102,7 +102,6 @@ define("org/forgerock/openam/ui/policy/resourcetypes/ResourceTypesListView", [
                     name: "patterns",
                     label: $.t("policy.resourceTypes.list.grid.2"),
                     cell: BackgridUtils.ArrayCell,
-                    headerCell: BackgridUtils.FilterHeaderCell,
                     sortable: false,
                     editable: false
                 },
@@ -110,7 +109,6 @@ define("org/forgerock/openam/ui/policy/resourcetypes/ResourceTypesListView", [
                     name: "actions",
                     label: $.t("policy.resourceTypes.list.grid.3"),
                     cell: BackgridUtils.ObjectCell,
-                    headerCell: BackgridUtils.FilterHeaderCell,
                     sortable: false,
                     editable: false
                 }

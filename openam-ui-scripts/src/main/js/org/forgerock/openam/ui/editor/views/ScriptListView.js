@@ -91,7 +91,7 @@ define("org/forgerock/openam/ui/editor/views/ScriptListView", [
                     name: "script",
                     label: $.t("scripts.list.grid.3"),
                     cell: "string",
-                    sortType: "toggle",
+                    sortable: false,
                     editable: false
                 }
             ];

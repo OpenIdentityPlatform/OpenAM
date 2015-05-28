@@ -100,6 +100,11 @@ define("config/AppConfiguration", [
                                     "name": "config.AppConfiguration.Navigation.links.policyEditor",
                                     "icon": "fa fa-briefcase"
                                 },
+                                "scripts": {
+                                    "url": "#list",
+                                    "icon": "fa fa-code",
+                                    "name": "config.AppConfiguration.Navigation.links.scriptsEditor"
+                                },
                                 "console": {
                                     "event": Constants.EVENT_RETURN_TO_AM_CONSOLE,
                                     "name": "config.AppConfiguration.Navigation.links.console",
