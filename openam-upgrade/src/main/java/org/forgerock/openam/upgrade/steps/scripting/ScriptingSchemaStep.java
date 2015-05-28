@@ -86,7 +86,7 @@ public class ScriptingSchemaStep extends AbstractUpgradeStep {
         try {
             ServiceSchemaManager schemaManager = new ServiceSchemaManager(AUTH_MODULE_SERVICE_NAME, getAdminToken());
             ServiceSchema globalSchema = schemaManager.getGlobalSchema();
-            if (globalSchema == null) {
+            if (globalSchema == null || globalSchema.getAttributeDefaults().isEmpty()) {
                 DEBUG.message("No upgrade required for {}; no global schema found.", AUTH_MODULE_SERVICE_NAME);
                 return;
             }
