@@ -109,11 +109,11 @@ public class Scripted extends AMLoginModule {
         userName = (String) sharedState.get(getUserKey());
         moduleConfiguration = options;
 
+        scriptingService = initialiseScriptingService();
         scriptEvaluator = getScriptEvaluator();
         clientSideScriptEnabled = getClientSideScriptEnabled();
         httpClient = getHttpClient();
         identityRepository  = getScriptIdentityRepository();
-        scriptingService = initialiseScriptingService();
     }
 
     private ScriptIdentityRepository getScriptIdentityRepository() {
