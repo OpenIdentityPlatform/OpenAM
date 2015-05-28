@@ -40,7 +40,7 @@ define('org/forgerock/openam/ui/common/util/RedirectToLegacyConsole', [
 
     obj.realm = {
         general       : function () { obj.realm.redirectToTab(11); },
-        autentication : function () { obj.realm.redirectToTab(12); },
+        authentication: function () { obj.realm.redirectToTab(12); },
         services      : function () { obj.realm.redirectToTab(13); },
         dataStores    : function () { obj.realm.redirectToTab(14); },
         privileges    : function () { obj.realm.redirectToTab(15); },
