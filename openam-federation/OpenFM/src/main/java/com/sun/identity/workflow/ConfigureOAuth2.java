@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2012-2014 ForgeRock AS.
+ * Copyright 2012-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -19,13 +19,13 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- *
- * Portions Copyrighted 2012-2014 ForgeRock AS
+ * "Portions copyright [year] [name of copyright owner]".
  */
 package com.sun.identity.workflow;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
@@ -36,6 +36,18 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SMSUtils;
 import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.entitlement.ResourceType;
+import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
+import org.forgerock.openam.entitlement.service.ResourceTypeService;
+import org.forgerock.openam.forgerockrest.entitlements.PolicyStore;
+import org.forgerock.openam.forgerockrest.entitlements.PolicyStoreProvider;
+import org.forgerock.openam.forgerockrest.entitlements.PrivilegePolicyStoreProvider;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
+
+import javax.security.auth.Subject;
 import java.security.AccessController;
 import java.text.MessageFormat;
 import java.util.Collections;
@@ -43,14 +55,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.ServiceSchemaManager;
-import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
-import org.forgerock.openam.forgerockrest.entitlements.PolicyStore;
-import org.forgerock.openam.forgerockrest.entitlements.PolicyStoreProvider;
-import org.forgerock.openam.forgerockrest.entitlements.PrivilegePolicyStoreProvider;
-import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
 
 public class ConfigureOAuth2 extends Task {
 
@@ -124,7 +128,7 @@ public class ConfigureOAuth2 extends Task {
             try {
                 Privilege toStore = Privilege.getNewInstance();
 
-                Map<String, Boolean> actions = new HashMap<String, Boolean>();
+                Map<String, Boolean> actions = new HashMap<>();
                 actions.put("POST", true);
                 actions.put("GET", true);
 
@@ -132,15 +136,18 @@ public class ConfigureOAuth2 extends Task {
                 entitlement.setActionValues(actions);
                 entitlement.setResourceName(policyURL);
 
+                Subject adminSubject = SubjectUtils.createSuperAdminSubject();
+                toStore.setResourceTypeUuid(getUrlResourceTypeId(entitlement, adminSubject, realm));
                 toStore.setSubject(new AuthenticatedUsers());
                 toStore.setName(POLICY_NAME);
                 toStore.setEntitlement(entitlement);
 
-                PolicyStore policyStore = storeProvider.getPolicyStore(SubjectUtils.createSuperAdminSubject(), ROOT);
+                PolicyStore policyStore = storeProvider.getPolicyStore(adminSubject, ROOT);
                 policyStore.create(toStore);
 
             } catch (EntitlementException e) {
-                throw new WorkflowException("ConfigureOAuth2.execute() : Unable to create policy");
+                DEBUG.error("ConfigureOAuth2.execute() : Unable to create policy", e);
+                throw new WorkflowException("oauth2.provider.policy.failed");
             }
 
         }
@@ -149,6 +156,23 @@ public class ConfigureOAuth2 extends Task {
 
         return MessageFormat.format(messageTemplate, realm,
                 MessageFormat.format(getMessage(createPolicy ? POLICY_CREATED : POLICY_EXISTS, locale), POLICY_NAME));
+    }
+
+    private String getUrlResourceTypeId(Entitlement entitlement, Subject adminSubject, String realm)
+            throws EntitlementException, WorkflowException {
+
+        ResourceTypeService resourceTypeService = InjectorHolder.getInstance(ResourceTypeService.class);
+        Application application = entitlement.getApplication(adminSubject, realm);
+        Set<String> resourceTypeIds = application.getResourceTypeUuids();
+        for (String id : resourceTypeIds) {
+            ResourceType resourceType = resourceTypeService.getResourceType(adminSubject, realm, id);
+            if ("URL".equalsIgnoreCase(resourceType.getName())) {
+                return id;
+            }
+        }
+        DEBUG.error("Could not find URL resource type on {} application. Found: {}", entitlement.getApplicationName(),
+                resourceTypeIds.toString());
+        throw new WorkflowException("oauth2.provider.resourceType.error", entitlement.getApplicationName());
     }
 
     private Map<String, Set<String>> getDefaultOAuth2ProviderAttributes(SSOToken token) throws WorkflowException {

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: WorkflowException.java,v 1.3 2008/06/25 05:50:03 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS
  */
 
 package com.sun.identity.workflow;
@@ -60,7 +61,7 @@ public class WorkflowException
      *        as null
      * be displayed according to user's preferred locale.
      */
-    public WorkflowException(String errorCode, Object[] args) {
+    public WorkflowException(String errorCode, Object... args) {
         this.errorCode = errorCode;
         this.args = args;
         this.message = getL10NMessage(Locale.getDefault());
