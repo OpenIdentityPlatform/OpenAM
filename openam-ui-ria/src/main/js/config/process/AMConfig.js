@@ -132,15 +132,18 @@ define("config/process/AMConfig", [
                     // carrying out this functionality in a specific module elsewhere.
                     var realms = [{
                         "url": "#realms/authentication/advanced/",
-                        "name": "Top Level Realm"
+                        "name": "Top Level Realm",
+                        "cssClass": "dropdown-sub"
                     },
                     {
                         "url": "#realms/authentication/chains/",
-                        "name": "My Realm"
+                        "name": "My Realm",
+                        "cssClass": "dropdown-sub"
                     },
                     {
                         "url": "#realms/authentication/",
-                        "name": "Another Realm"
+                        "name": "Another Realm",
+                        "cssClass": "dropdown-sub"
                     }];
 
                     Navigation.configuration.links.admin.urls.realms.urls.push({

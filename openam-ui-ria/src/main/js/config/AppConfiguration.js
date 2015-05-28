@@ -158,7 +158,18 @@ define("config/AppConfiguration", [
                                     "realms": {
                                         "url": "#realms",
                                         "name": "config.AppConfiguration.Navigation.links.realms",
-                                        "icon": "fa fa-cloud"
+                                        "icon": "fa fa-cloud",
+                                        "dropdown" : true,
+                                        "urls": [{
+                                            "url": "#realms",
+                                            "name": "Show All",
+                                            "icon": "fa fa-th"
+                                        },
+                                        {
+                                            "event": "New Realm BS Event triggered here",
+                                            "name": "New Realm",
+                                            "icon": "fa fa-plus"
+                                        }]
                                     },
                                     "federation": {
                                         "url": "#federation",

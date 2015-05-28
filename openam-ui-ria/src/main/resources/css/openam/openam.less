@@ -17,46 +17,6 @@
 
 
 
-/* Helpers */
-
-/* Candidate for Commons */
- .wordwrap{
-    white-space: initial;
-    word-wrap: break-word;
-    word-break: break-word;
- }
-
- /* Candidate for Commons */
- .ellipsis{
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
- }
-
- /* Candidate for Commons */
- .btn-transparent {
-     background: none;
-     border-color:transparent;
-     &:hover{
-         background:none;
-         border-color:transparent;
-         color:#519387;
-     }
-     &:focus{
-         outline:none;
-         box-shadow:none;
-         color:#3f7269;
-     }
- }
-
- /* Candidate for Commons */
- .transition(@property: all, @duration:.5s, @easing:ease, @delay:0s){
-     -webkit-transition: @arguments;
-        -moz-transition: @arguments;
-         -ms-transition: @arguments;
-          -o-transition: @arguments;
-             transition: @arguments;
- }
 
  /* Candidate for Commons */
  .popover{
@@ -76,8 +36,7 @@
  }
 
 
-
- .page-header {
+.page-header{
 
      margin: 40px 0 20px;
      border-bottom:none;
@@ -106,7 +65,7 @@
          overflow: hidden;
      }
 
-     .fa-question-circle{
+     .fa-question-circle {
          font-size: 15px;
          vertical-align: top;
          color:grey;

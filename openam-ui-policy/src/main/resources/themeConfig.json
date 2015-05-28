@@ -2,7 +2,7 @@
     "icon": "favicon.ico",
     "settings": {
         "logo": {
-            "src": "images/logo.png",
+            "src": "images/logo-horizontal.png",
             "title": "ForgeRock",
             "alt": "ForgeRock"
         },
