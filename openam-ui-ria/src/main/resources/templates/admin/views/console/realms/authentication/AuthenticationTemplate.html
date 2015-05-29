@@ -1,30 +1,73 @@
 <div class="container">
-    <div class="page-header clearfix">
-        <span class="header-icon pull-left"><i class="fa fa-key"></i></span>
-        <h4 class="page-type">Realm</h4>
-        <h1>Authentication</h1>
+
+
+    <div class="page-header-min">
+        <h3><a href="#realms">My Realm</a></h3>
     </div>
 
-    <div class="console-tabs">
-        <div class="tab-menu">
-            <ul class="nav nav-tabs" role="tablist">
-                <li class="dropdown pull-right tabdrop hide">
-                  <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                    <i class="icon-align-justify"></i>
-                    <i class="fa fa-ellipsis-v"></i>
-                  </a>
-                  <ul class="dropdown-menu"></ul>
-                </li>
-                <li class="active"><a href="#settings" role="tab" data-toggle="tab" aria-expanded="true">Settings</a></li>
-                <li><a href="#chains" role="tab" data-toggle="tab" aria-expanded="false">Chains</a></li>
-                <li><a href="#modules" role="tab" data-toggle="tab" aria-expanded="false">Modules</a></li>
-            </ul>
+    <div class="row">
+
+        <div class="col-sm-3 col-md-2">
+
+            <nav class="sidenav">
+                <ol class="list-unstyled">
+                    <li><a href="#"><i class="fa fa-cloud"></i>Overview</a></li>
+                    <li class="active">
+                        <a data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample"><i class="fa fa-key"></i>Authentication</a>
+                        <div class="collapse" id="collapseExample">
+                            <ol class="list-unstyled sidenav-submenu">
+                                <li><a href="#">Modules</a></li>
+                                <li class="active"><a href="#">Settings</a></li>
+                                <li><a href="#">Chains</a></li>
+                            </ol>
+                        </div>
+                    </li>
+                    <li><a href="#"><i class="fa fa-plug"           ></i>Services</a></li>
+                    <li><a href="#"><i class="fa fa-database"       ></i>Data Stores</a></li>
+                    <li><a href="#"><i class="fa fa-check-square-o" ></i>Privileges</a></li>
+                    <li><a href="#"><i class="fa fa-briefcase"      ></i>Policies</a></li>
+                    <li><a href="#"><i class="fa fa-users"          ></i>Subjects</a></li>
+                    <li><a href="#"><i class="fa fa-male"           ></i>Agents</a></li>
+                    <li><a href="#"><i class="fa fa-ticket"         ></i>STS</a></li>
+                    <li><a href="#"><i class="fa fa-code"           ></i>Scripts</a></li>
+                </ol>
+            </nav>
+
         </div>
 
-        <div class="tab-content clearfix">
-            <div role="tabpanel" class="tab-pane active" id="settings"></div>
-            <div role="tabpanel" class="tab-pane" id="chains"></div>
-            <div role="tabpanel" class="tab-pane" id="modules"></div>
+
+        <div class="col-sm-9 col-lg-10">
+
+            <div class="page-header clearfix">
+                <span class="header-icon pull-left"><i class="fa fa-key"></i></span>
+                <h4 class="page-type">Realm</h4>
+                <h1>Authentication</h1>
+            </div>
+
+            <div class="console-tabs">
+                <div class="tab-menu">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="dropdown pull-right tabdrop hide">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="icon-align-justify"></i>
+                                <i class="fa fa-ellipsis-v"></i>
+                            </a>
+                            <ul class="dropdown-menu"></ul>
+                        </li>
+                        <li class="active"><a href="#settings" role="tab" data-toggle="tab" aria-expanded="true">Settings</a></li>
+                        <li><a href="#chains" role="tab" data-toggle="tab" aria-expanded="false">Chains</a></li>
+                        <li><a href="#modules" role="tab" data-toggle="tab" aria-expanded="false">Modules</a></li>
+                    </ul>
+                </div>
+
+                <div class="tab-content clearfix">
+                    <div role="tabpanel" class="tab-pane active" id="settings"></div>
+                    <div role="tabpanel" class="tab-pane" id="chains"></div>
+                    <div role="tabpanel" class="tab-pane" id="modules"></div>
+                </div>
+
+            </div>
+
         </div>
     </div>
 </div>
