@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-2015 ForgeRock AS.
 */
 package org.forgerock.openam.scripting.factories;
 
@@ -35,6 +35,18 @@ import org.kohsuke.groovy.sandbox.SandboxTransformer;
 public class GroovyEngineFactory extends GroovyScriptEngineFactory {
     private volatile GroovyValueFilter sandbox;
 
+    private final GroovyScriptEngineImpl groovyScriptEngine;
+
+    public GroovyEngineFactory() {
+        CompilerConfiguration compilerConfig = new CompilerConfiguration();
+        // Apply sandbox before any other customisation, otherwise sandbox will be applied to implementation details.
+        compilerConfig.addCompilationCustomizers(new SandboxTransformer());
+        compilerConfig.addCompilationCustomizers(new ASTTransformationCustomizer(ThreadInterrupt.class));
+        GroovyClassLoader classLoader = new GroovyClassLoader(Thread.currentThread().getContextClassLoader(),
+                compilerConfig);
+        groovyScriptEngine = new GroovyScriptEngineImpl(classLoader);
+    }
+
     /**
      * Instantiates and returns an instance of {@link GroovyScriptEngineImpl} passing in
      * a new {@link GroovyClassLoader} with an AST transformation customizer that will ensure
@@ -46,15 +58,7 @@ public class GroovyEngineFactory extends GroovyScriptEngineFactory {
      */
     @Override
     public ScriptEngine getScriptEngine() {
-
-        CompilerConfiguration compilerConfig = new CompilerConfiguration();
-        // Apply sandbox before any other customisation, otherwise sandbox will be applied to implementation details.
-        compilerConfig.addCompilationCustomizers(new SandboxTransformer());
-        compilerConfig.addCompilationCustomizers(new ASTTransformationCustomizer(ThreadInterrupt.class));
-        GroovyClassLoader classLoader =
-                new GroovyClassLoader(Thread.currentThread().getContextClassLoader(), compilerConfig);
-
-        return new SandboxedGroovyScriptEngine(this, new GroovyScriptEngineImpl(classLoader), sandbox);
+        return new SandboxedGroovyScriptEngine(this, groovyScriptEngine, sandbox);
     }
 
     /**
