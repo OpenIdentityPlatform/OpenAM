@@ -27,14 +27,19 @@
 define("org/forgerock/openam/ui/user/login/RESTLoginDialog", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/openam/ui/user/login/RESTLoginView"
-], function(AbstractView, conf, RESTLoginView) {
+    "org/forgerock/openam/ui/user/login/RESTLoginView",
+    "org/forgerock/openam/ui/user/login/RESTLoginHelper"
+], function(AbstractView, conf, RESTLoginView, RESTLoginHelper) {
     var LoginDialog = AbstractView.extend({
         template: "templates/common/DefaultBaseTemplate.html",
         data : {},
         actions: [],
         render: function () {
             conf.backgroundLogin = true;
+            // The session cookie does not expire until the browser is closed. So if the server session expires and the browser remains,
+            // the XUI will attempt to login sending the old cookie and the server will assume this is a session upgrade.
+            // Removing the old session cookie first resolves this problem.
+            RESTLoginHelper.removeSessionCookie();
             RESTLoginView.render();
         }
     });
