@@ -216,8 +216,8 @@ public final class IOUtils {
      */
     private static class WhitelistObjectInputStream extends ObjectInputStream {
 
-        private ClassLoader classLoader;
-        private List<String> classWhitelist;
+        private final ClassLoader classLoader;
+        private final List<String> classWhitelist;
 
         private static final Debug DEBUG = Debug.getInstance("amUtil");
 
@@ -225,8 +225,9 @@ public final class IOUtils {
         // The Object in the array will trigger a followup validation call.
         private static final String ARRAY_FLAG = "[";
 
-        // These are the bare minimum set of classes that are needed for JATO framework
+        // These are the bare minimum set of classes that are needed for the JATO framework and TokenRestriction
         private static final List<String> FALLBACK_CLASS_WHITELIST = Arrays.asList(
+                "com.iplanet.dpro.session.DNOrIPAddressListTokenRestriction",
                 "com.sun.identity.console.base.model.SMSubConfig",
                 "com.sun.identity.console.service.model.SMDescriptionData",
                 "com.sun.identity.console.service.model.SMDiscoEntryData",
@@ -238,10 +239,12 @@ public final class IOUtils {
                 "java.lang.Integer",
                 "java.lang.Number",
                 "java.lang.String",
+                "java.net.InetAddress",
                 "java.util.ArrayList",
                 "java.util.Collections$EmptyMap",
                 "java.util.HashMap",
-                "java.util.HashSet");
+                "java.util.HashSet",
+                "org.forgerock.openam.dpro.session.NoOpTokenRestriction");
 
         public WhitelistObjectInputStream(InputStream in, ClassLoader classLoader) throws IOException {
             super(in);
@@ -268,10 +271,10 @@ public final class IOUtils {
                         ? Class.forName(classToLoad)
                         : Class.forName(classToLoad, true, classLoader);
             } else {
-                DEBUG.error("WhitelistObjectInputStream.resolveClass:" + classToLoad +
-                        " was not in the whitelist of allowed classes: " + classWhitelist);
-                throw new InvalidClassException("Requested ObjectStreamClass was not in the " +
-                        "whitelist of allowed classes", classToLoad);
+                DEBUG.warning("WhitelistObjectInputStream.resolveClass:" + classToLoad +
+                        " was not in the whitelist of allowed classes");
+                throw new InvalidClassException(classToLoad, "Requested ObjectStreamClass was not in the " +
+                        "whitelist of allowed classes");
             }
 
             return result;
@@ -282,11 +285,7 @@ public final class IOUtils {
             final boolean result;
 
             // All Object/primitive arrays are valid by default, the contents will be validated in future calls
-            if (classToLoad.startsWith(ARRAY_FLAG)) {
-                result = true;
-            } else {
-                result = classWhitelist.contains(classToLoad);
-            }
+            result = classToLoad.startsWith(ARRAY_FLAG) || classWhitelist.contains(classToLoad);
 
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("WhitelistObjectInputStream.isValidClass:" + classToLoad + " " + result);
