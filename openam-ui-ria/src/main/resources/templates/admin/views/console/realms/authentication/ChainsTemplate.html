@@ -1,37 +1,42 @@
 <div class="tab-pane-body">
     <div class="panel-body">
+        <div class="page-header">
+            <h1>{{t 'console.authentication.chains.title'}}</h1>
+        </div>
         <p class="panel-description">{{t 'console.authentication.chains.description'}}</p>
-        <table class="table table-hover table-striped">
+        <div class="btn-toolbar">
+            <a class="btn btn-primary" id="addChain" href="#console/realms/authentication/chains/"><i class="fa fa-plus"></i>{{t 'console.authentication.chains.action'}}</a>
+            <button id="deleteChains" disabled class="btn btn-default" type="button"><i class="fa fa-times"></i>{{t 'common.form.delete'}}</button>
+        </div>
+        <table class="table table-striped">
             <thead>
-                <tr>
-                    <th class="col-md-1">{{t 'common.form.select'}}</th>
-                    <th class="col-md-9"/>
-                    <th class="col-md-2"/>
-                </tr>
+            <tr>
+                <th class="col-check"><input data-chain-name="{{_id}}" type="checkbox" /></th>
+                <th>{{t 'console.authentication.chains.chainName'}}</th>
+                <th></th>
+            </tr>
             </thead>
             <tbody>
-                {{#each this}}
-                <tr>
-                    <td><input data-chain-name="{{_id}}" type="checkbox" {{#if active}}disabled{{/if}}/></td>
-                    <td>{{_id}} {{#if active}}
-                        <div class="active-config">{{#if active.adminAuthModule}}{{t 'console.authentication.chains.defaultAdminAuthConfiguration'}} {{#if active.orgConfig}}/ {{/if}}{{/if}}{{#if active.orgConfig}}{{t 'console.authentication.chains.defaultOrgAuthConfiguration'}} {{/if}}</div>{{/if}}</td>
-                    <td>
-                        <div class="pull-right">
-                            <button type="button" class="btn btn-transparent"><i class="fa fa-pencil"></i></button>
-                            <button type="button" class="btn btn-transparent" data-chain-name="{{_id}}" {{#if active}}data-active="true"{{/if}}>
-                                <i class="fa fa-close"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                {{/each}}
+            {{#each this}}
+            <tr>
+                <td><input data-chain-name="{{_id}}" type="checkbox" {{#if active}}disabled{{/if}}/></td>
+                <td>{{_id}} {{#if active}}
+                    <div class="active-config">
+                        {{#if active.adminAuthModule}}{{t 'console.authentication.chains.defaultAdminAuthConfiguration'}} {{#if active.orgConfig}}/ {{/if}}{{/if}}
+                        {{#if active.orgConfig}}{{t 'console.authentication.chains.defaultOrgAuthConfiguration'}} {{/if}}
+                    </div>{{/if}}
+                </td>
+                <td>
+                    <div class="pull-right btn-group">
+                        <button type="button" class="btn btn-transparent"><i class="fa fa-pencil"></i></button>
+                        <button type="button" class="btn btn-transparent" data-chain-name="{{_id}}" {{#if active}}data-active="true"{{/if}}>
+                        <i class="fa fa-close"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            {{/each}}
             </tbody>
         </table>
-    </div>
-</div>
-<div class="tab-pane-footer clearfix">
-    <div class="pull-right">
-        <button class="btn btn-sm btn-default" disabled id="deleteChains" type="button">{{t 'common.form.delete'}}</button>
-        <a href="#console/realms/authentication/chains/" id="addChain" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> {{t 'console.authentication.chains.action'}}</a>
     </div>
 </div>

@@ -15,9 +15,6 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-
-
-
  /* Candidate for Commons */
  .popover{
      max-width: 500px;
@@ -30,47 +27,77 @@
      }
  }
 
- /* Candidate for Commons */
- .table-striped>tbody>tr.selected{
-     background-color:#d9edf7;
- }
+.table > thead > tr > th {
+    background-color: transparent;
+    border-bottom: 2px solid #ddd;
+    border-radius: 4px 4px 0 0;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: -1px;
+    padding: 10px 15px 7px;
+    position: relative;
+    text-transform: uppercase;
+    vertical-align: bottom;
+}
+
+.table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
+    border-color: #eee;
+    padding: 13px 15px;
+}
+
+.table-striped>tbody>tr.selected{
+    background-color:#d9edf7;
+}
+
+.table-striped {
+    .btn-transparent {
+        color: #777;
+        padding: 1px 6px;
+    }
+
+    .btn-transparent:hover, .btn-transparent:focus {
+        color: #519387;
+    }
+}
+/* END of Candidate for Commons */
 
 
 .page-header{
 
-     margin: 40px 0 20px;
-     border-bottom:none;
+    margin: 40px 0 20px;
+    border-bottom:none;
 
-     h4.page-type {
-         text-transform: uppercase;
-         font-size: 13px;
-         letter-spacing: 1px;
-         margin-bottom: 5px;
-         color: #666;
-         font-weight: 600;
-         margin-top: 3px;
-     }
+    h4.page-type {
+        text-transform: uppercase;
+        font-size: 13px;
+        letter-spacing: 1px;
+        margin-bottom: 5px;
+        color: #666;
+        font-weight: 600;
+        margin-top: 3px;
+    }
 
-     .header-icon {
-         display: table;
-         background: #519387;
-         color: #fff;
-         text-align: center;
-         width: 64px;
-         height: 64px;
-         border-radius: 32px;
-         line-height: 64px;
-         font-size: 32px;
-         margin: -2px 10px 0 0;
-         overflow: hidden;
-     }
+    .header-icon {
+        display: table;
+        background: #519387;
+        color: #fff;
+        text-align: center;
+        width: 64px;
+        height: 64px;
+        border-radius: 32px;
+        line-height: 64px;
+        font-size: 32px;
+        margin: -2px 10px 0 0;
+        overflow: hidden;
+    }
 
-     .fa-question-circle {
-         font-size: 15px;
-         vertical-align: top;
-         color:grey;
-     }
- }
+    .fa-question-circle {
+        font-size: 15px;
+        vertical-align: top;
+        color:grey;
+    }
+}
 
 
 .remember-forgot{
@@ -102,7 +129,7 @@
         font-weight: normal;
     }
 
-     .btn-default.active {
+    .btn-default.active {
         cursor:auto;
     }
 }

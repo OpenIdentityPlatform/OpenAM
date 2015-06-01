@@ -490,7 +490,9 @@
                 "moduleType": "Type"
             },
             "chains": {
+                "title" : "Authentication Chains",
                 "action" : "Add Chain",
+                "chainName" : "Name",
                 "description" : "OpenAM uses authentication chains to control the authentication flow the user. Use this section to add, configure or remove the realms set of authentication chains.",
                 "defaultAdminAuthConfiguration" : "Default Administrator Authentication Chain",
                 "defaultOrgAuthConfiguration" : "Default Organization Authentication Chain"
