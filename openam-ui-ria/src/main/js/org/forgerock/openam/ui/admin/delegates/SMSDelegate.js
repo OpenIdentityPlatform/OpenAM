@@ -133,10 +133,51 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegate", [
     };
 
     obj.RealmAuthenticationModule = {
+        get: function (name) {
+            return obj.serviceCall({
+                url: 'realm-config/authentication/modules/' + name
+            });
+        },
+        //mock data, should be deleted after server endpoint will be created
+        getMock: function (name) {
+          var
+              promise = $.Deferred(),
+              data = {
+                name: name
+              };
+          promise.resolve(data);
+          return $.when(promise);
+        },
         remove: function (name) {
             return obj.serviceCall({
                 url: 'realm-config/authentication/modules/' + name,
                 type: 'DELETE'
+            });
+        },
+        hasModuleName: function(name) {
+            var
+                promise = $.Deferred(),
+                request = obj.serviceCall({
+                    url: 'realm-config/authentication/modules/' + name,
+                    errorsHandlers: {
+                      "Not Found": { status: "404"}
+                    }
+                });
+
+            request
+            .done(function() {
+                promise.resolve(false);
+            })
+            .fail(function() {
+                promise.resolve(true);
+            });
+            return promise;
+        },
+        save: function (name, data) {
+            return obj.serviceCall({
+                url: 'realm-config/authentication/modules/' + name,
+                type: "PUT",
+                data: JSON.stringify(data)
             });
         }
     };

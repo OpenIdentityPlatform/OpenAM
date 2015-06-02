@@ -21,19 +21,58 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/module
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/commons/ui/common/util/Constants"
-], function(AbstractView, Configuration, EventManager, Router, Constants) {
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/openam/ui/admin/delegates/SMSDelegate",
+    "org/forgerock/openam/ui/admin/models/Form",
+    "org/forgerock/openam/ui/admin/utils/FormHelper"
+], function(AbstractView, Configuration, EventManager, Router, Constants, SMSDelegate, Form, FormHelper) {
 
     var Module = AbstractView.extend({
         template: "templates/admin/views/console/realms/authentication/modules/ModuleTemplate.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
-        events: {},
+        events: {
+            'click #revertChanges': 'revert',
+            'click #saveChanges': 'save',
+            'show.bs.tab ul.nav.nav-tabs a': 'renderTab'
+        },
 
         render: function(args, callback) {
+            var self = this;
             this.data.realm = Configuration.globalData.auth.subRealm || "Top level Realm";
             this.data.name = args[0];
             this.data.consolePath = Constants.CONSOLE_PATH;
-            this.parentRender();
+            SMSDelegate.RealmAuthenticationModule.get(this.data.name)
+            .done(function(data) {
+                self.data.formData = data;
+                self.parentRender(function() {
+                    self.$el.find('ul.nav a:first').tab('show');
+                    self.$el.find('.console-tabs .nav-tabs').tabdrop();
+
+                    if (callback) {
+                        callback();
+                    }
+                });
+            })
+            .fail(function() {
+            // TODO: Add failure condition
+            });
+        },
+
+        save: function(event) {
+            var promise = SMSDelegate.RealmAuthenticationModule.save(this.data.form.data());
+            FormHelper.bindSavePromiseToElement(promise, event.target);
+        },
+        revert: function() {
+            this.data.form.reset();
+        },
+
+        renderTab: function(event) {
+            var tabId = $(event.target).attr("href"),
+                schema = this.data.formData.schema.properties[tabId.slice(1)],
+                element = $(tabId).get(0);
+
+            this.$el.find(tabId).empty();
+            this.data.form = new Form(element, schema, this.data.formData.values);
         }
 
     });

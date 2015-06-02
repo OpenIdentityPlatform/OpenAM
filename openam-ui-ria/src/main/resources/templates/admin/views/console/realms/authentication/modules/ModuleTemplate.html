@@ -1,15 +1,15 @@
 <div class="container">
     <div class="page-header clearfix">
         <span class="header-icon pull-left"><i class="fa fa-cubes"></i></span>
-      	<h4 class="page-type">Module_type</h4>
+      	<h4 class="page-type">{{moduleType}}</h4>
         <h1>{{name}}</h1>
   	</div>
 
     <div class="console-tabs">
         <div class=" tab-menu">
             <ul class="nav nav-tabs" role="tablist">
-                <li class="active"><a href="#standard" role="tab"  data-toggle="tab" aria-expanded="true">Standard</a></li>
-                <li><a href="#advanced" role="tab" data-toggle="tab" aria-expanded="false">Advanced</a></li>
+                <li class="active"><a href="#standard" role="tab"  data-toggle="tab" aria-expanded="true">{{t "common.form.standard"}}</a></li>
+                <li><a href="#advanced" role="tab" data-toggle="tab" aria-expanded="false">{{t "common.form.advanced"}}</a></li>
             </ul>
         </div>
 
@@ -37,8 +37,8 @@
 
             <div class="tab-pane-footer clearfix">
                 <div class="pull-right">
-                    <button class="btn btn-default btn-sm" type="button">Cancel</button>
-                    <input id="addEditConnector" name="addEditButton" class="btn btn-primary btn-sm" type="button" value="Save">
+                    <button id="revertChanges" class="btn btn-default btn-sm" type="button">{{t "common.form.revert"}}</button>
+                    <button id="saveChanges" class="btn btn-primary" type="button">{{t "common.form.saveChanges"}}</button>
                 </div>
             </div>
 

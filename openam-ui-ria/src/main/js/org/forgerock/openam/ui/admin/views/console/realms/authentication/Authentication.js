@@ -23,10 +23,11 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authen
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
+    "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/admin/delegates/SMSDelegate",
     "org/forgerock/commons/ui/common/util/UIUtils"
-], function(AbstractView, BootstrapDialog, Configuration, Constants, EventManager, Form, FormHelper, Router, SMSDelegate, UIUtils) {
+], function(AbstractView, BootstrapDialog, Configuration, Constants, EventManager, Form, FormHelper, MessageManager, Router, SMSDelegate, UIUtils) {
     var Authentication = AbstractView.extend({
         template: "templates/admin/views/console/realms/authentication/AuthenticationTemplate.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
@@ -77,20 +78,35 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authen
         },
         addModule: function(e) {
             e.preventDefault();
-            var href = $(e.currentTarget).attr('href'),
-                self = this;
+            var self = this;
 
             UIUtils.fillTemplateWithData("templates/admin/views/console/realms/authentication/AddModuleTemplate.html", self.data, function(html) {
                 BootstrapDialog.show({
                     title: $.t("console.authentication.modules.addModuleDialogTitle"),
                     message: $(html),
                     buttons: [{
+                        id: "nextButton",
                         label: $.t("common.form.next"),
                         cssClass: "btn-primary",
                         action: function(dialog) {
-                            dialog.close();
-                            //TODO Check name first.
-                            Router.navigate( href + dialog.getModalBody().find('#newModuleNme').val(), { trigger: true });
+                            if (self.addModuleDialogValidation(dialog)) {
+                                var moduleName = dialog.getModalBody().find('#newModuleName').val();
+                                SMSDelegate.RealmAuthenticationModule.hasModuleName(moduleName)
+                                .done(function(result) {
+                                    if (result) {
+                                        dialog.close();
+                                        Router.navigate(Router.getLink(Router.configuration.routes.module) + moduleName, {trigger: true});
+                                    } else {
+                                        MessageManager.messages.addMessage({
+                                            message: $.t("console.authentication.modules.addModuleDialogError"),
+                                            type: "error"
+                                        });
+                                    }
+                                  }
+                                ).fail(function(error) {
+                                  // TODO: Add failure condition
+                                });
+                            }
                         }
                     },{
                         label: $.t("common.form.cancel"),
@@ -99,11 +115,31 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authen
                         }
                     }],
                     onshow: function(dialog) {
-                        //dialog.$modalBody.selectize();
+                        dialog.getButton('nextButton').disable();
+                        dialog.$modalBody.find('#newModuleType').selectize();
+                        self.enableOrDisableNextButton(dialog);
+                    },
+                    onshown: function(dialog) {
                     }
                 });
             });
 
+        },
+        addModuleDialogValidation: function(dialog) {
+            var nameValid = dialog.$modalBody.find('#newModuleName').val().length > 0,
+                typeValid = dialog.$modalBody.find('#newModuleType')[0].selectize.getValue().length > 0;
+            return (nameValid && typeValid);
+        },
+        enableOrDisableNextButton: function(dialog) {
+            var self = this;
+            dialog.$modalBody
+            .on('change','#newModuleName, #newModuleType',function(e) {
+              if (self.addModuleDialogValidation(dialog)) {
+                dialog.getButton('nextButton').enable();
+              } else {
+                dialog.getButton('nextButton').disable();
+              }
+            });
         },
         chainSelected: function(event) {
             var hasChainsSelected = this.$el.find('#chains input[type=checkbox]').is(':checked'),
@@ -164,9 +200,8 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authen
         },
         editModule: function(event) {
           event.preventDefault();
-          var
-              moduleName = $(event.currentTarget).closest('td').find('button[data-module-name]').attr('data-module-name');
-              Router.navigate( '#console/realms/authentication/modules/' + moduleName, {trigger: true});
+          var moduleName = $(event.currentTarget).closest('td').find('button[data-module-name]').attr('data-module-name');
+          Router.navigate(Router.getLink(Router.configuration.routes.module) + moduleName, {trigger: true});
 
 
         },

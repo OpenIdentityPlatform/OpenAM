@@ -240,6 +240,11 @@
             "revoke" : "Revoke",
             "done" : "Done",
             "ok" : "OK",
+            "standard": "Standard",
+            "advanced": "Advanced",
+            "revert": "Revert",
+            "saveChanges": "Save Changes",
+            "edit": "Edit",
             "working" : "Working...",
             "copyright" : "Copyright &copy; 2010-15 ForgeRock AS. All rights reserved.",
             "sessionExpired" : "Session Expired",
@@ -482,10 +487,8 @@
             "modules": {
                 "description" : "OpenAM uses authentication modules to identify the user. Normally authentication modules are associated with an authentication chain. Each realm has a default authentication chain that will be used to authenticate users. This section is used to add, configure or remove authentication module available for authentication into this realm.",
                 "addModuleDialogTitle" : "Create new Module",
+                "addModuleDialogError": "Authentication instance already exists.",
                 "addModule": "Add Module",
-                "editModule": "Edit Module",
-                "deleteModule": "Delete",
-                "selectModule": "Select",
                 "moduleName": "Name",
                 "moduleType": "Type"
             },
