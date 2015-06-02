@@ -102,6 +102,9 @@
     }
 
     .list-group {
+        box-shadow: none;
+        -webkit-box-shadow: none;
+
         .list-group-item {
             border-right: 0;
             border-left: 0;
@@ -536,12 +539,13 @@ body.editing {
 
     .selectize-control.multi, .selectize-control.single {
         .selectize-input {
-            margin-top: 16px;
-            padding: 5px 15px 6px;
+            margin-top: 17px;
+            padding: 4px 15px 3px;
             border-radius: 4px;
             -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
             box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
             border-color: #ccc;
+            min-height: inherit;
         }
     }
 

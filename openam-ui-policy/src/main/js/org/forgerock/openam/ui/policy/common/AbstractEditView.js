@@ -64,9 +64,9 @@ define("org/forgerock/openam/ui/policy/common/AbstractEditView", [
             });
         },
 
-        validateThenRenderReview: function () {
+        validateThenRenderReview: function (callback) {
             this.data.options.invalidEntity = this.validate();
-            ReviewInfoView.render(this.data, null, this.$el.find('#reviewInfo'), this.reviewTemplate);
+            ReviewInfoView.render(this.data, callback, this.$el.find('#reviewInfo'), this.reviewTemplate);
         },
 
         validate: function () {

@@ -54,6 +54,8 @@ define("org/forgerock/openam/ui/policy/applications/EditApplicationView", [
 
             $.when(appTypePromise, envConditionsPromise, subjConditionsPromise, decisionCombinersPromise, resourceTypesPromise, appPromise).done(
                 function (appType, envConditions, subjConditions, decisionCombiners, resourceTypes) {
+                    var promises = [], resolve = function () { return (promises[promises.length] = $.Deferred()).resolve; };
+
                     if (!data.entity.applicationType) {
                         data.entity.applicationType = self.APPLICATION_TYPE;
                     }
@@ -73,19 +75,19 @@ define("org/forgerock/openam/ui/policy/applications/EditApplicationView", [
                     });
 
                     self.parentRender(function () {
-                        self.buildResourceTypesList();
+                        self.buildResourceTypesList(resolve);
 
-                        self.validateThenRenderReview();
+                        self.validateThenRenderReview(resolve());
                         self.initAccordion();
 
-                        if (callback) {
-                            callback();
-                        }
+                        $.when.apply($, promises).done(function () {
+                            if (callback) { callback(); }
+                        });
                     });
                 });
         },
 
-        buildResourceTypesList: function () {
+        buildResourceTypesList: function (callback) {
             var availableNames = _.pluck(this.data.options.availableResourceTypes, 'name'),
                 selected = _.findByValues(this.data.options.allResourceTypes, 'uuid', this.data.entity.resourceTypeUuids);
 
@@ -97,7 +99,7 @@ define("org/forgerock/openam/ui/policy/applications/EditApplicationView", [
                 title: $.t('policy.applications.edit.resourceTypes.availableResourceTypes'),
                 filter: true,
                 clickItem: this.selectResourceType.bind(this)
-            }, '#availableResTypes');
+            }, '#availableResTypes', callback());
 
             this.resourceTypesListSelectedView = new StripedList();
             this.resourceTypesListSelectedView.render({
@@ -105,7 +107,7 @@ define("org/forgerock/openam/ui/policy/applications/EditApplicationView", [
                 title: $.t('policy.applications.edit.resourceTypes.selectedResourceTypes'),
                 created: true,
                 clickItem: this.deselectResourceType.bind(this)
-            }, '#selectedResTypes');
+            }, '#selectedResTypes', callback());
         },
 
         selectResourceType: function (item) {

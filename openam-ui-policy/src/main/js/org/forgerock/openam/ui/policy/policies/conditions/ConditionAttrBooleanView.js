@@ -48,13 +48,22 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrBooleanV
                 return;
             }
 
-            var $target = $(e.currentTarget),
-                buttonControl = $target.closest('.btn-group'),
-                label = buttonControl.prev('label').data().title;
+            var target = $(e.currentTarget),
+                buttonControl = target.closest('.btn-group'),
+                label = buttonControl.prev('label').data().title,
+                secondButton = buttonControl.find('.btn.btn-primary');
 
-            this.data.itemData[label] = $target.data('val');
-            buttonControl.find('.btn').removeClass('btn-primary');
-            $target.addClass('btn-primary');
+            if (target.hasClass('btn-primary')) {
+                return;
+            }
+
+            this.data.itemData[label] = target.data('val');
+
+            secondButton.removeClass('btn-primary');
+            secondButton.addClass('btn-default');
+
+            target.addClass('btn-primary');
+            target.removeClass('btn-default');
         }
     });
 

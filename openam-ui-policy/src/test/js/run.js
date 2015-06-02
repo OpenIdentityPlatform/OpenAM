@@ -26,10 +26,12 @@
 
 define([
     "jquery",
-    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "../test/tests/editor"
-], function ($, Constants, EventManager, EditorMocks) {
+    "org/forgerock/commons/ui/common/util/Constants",
+    "../test/tests/CommonTests",
+    "../test/tests/EditTests",
+    "../test/tests/ListTests"
+], function ($, EventManager, Constants, CommonTests, EditViewsTests, ListViewsTests) {
     return function () {
         EventManager.registerListener(Constants.EVENT_APP_INTIALIZED, function () {
             $.doTimeout = function (name, time, func) {
@@ -38,7 +40,10 @@ define([
 
             require("ThemeManager").getTheme().then(function () {
                 QUnit.start();
-                EditorMocks.executeAll();
+
+                CommonTests.executeAll();
+                EditViewsTests.executeAll();
+                ListViewsTests.executeAll();
             });
         });
     }

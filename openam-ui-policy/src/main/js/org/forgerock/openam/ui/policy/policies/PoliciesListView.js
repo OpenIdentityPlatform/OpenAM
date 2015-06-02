@@ -154,11 +154,11 @@ define("org/forgerock/openam/ui/policy/policies/PoliciesListView", [
                 this.$el.find("#backgridContainer").append(grid.render().el);
                 this.$el.find("#paginationContainer").append(paginator.render().el);
 
-                this.data.items.fetch({reset: true});
-
-                if (callback) {
-                    callback();
-                }
+                this.data.items.fetch({reset: true}).done(function () {
+                    if (callback) {
+                        callback();
+                    }
+                });
             });
         }
     });

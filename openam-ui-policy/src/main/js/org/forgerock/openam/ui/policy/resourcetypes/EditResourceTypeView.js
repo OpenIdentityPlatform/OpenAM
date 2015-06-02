@@ -59,19 +59,20 @@ define("org/forgerock/openam/ui/policy/resourcetypes/EditResourceTypeView", [
                 data.actions.sort();
 
                 self.parentRender(function () {
+                    var promises = [], resolve = function () { return (promises[promises.length] = $.Deferred()).resolve; };
 
                     self.patternsView = new ResourceTypePatternsView();
-                    self.patternsView.render(data.entity, data.entity.patterns, '#resTypePatterns');
+                    self.patternsView.render(data.entity, data.entity.patterns, '#resTypePatterns', resolve());
 
                     self.actionsList = new ResourceTypeActionsView();
-                    self.actionsList.render(data.entity, data.actions, '#resTypeActions');
+                    self.actionsList.render(data.entity, data.actions, '#resTypeActions', resolve());
 
-                    self.validateThenRenderReview();
+                    self.validateThenRenderReview(resolve());
                     self.initAccordion();
 
-                    if (callback) {
-                        callback();
-                    }
+                    $.when.apply($, promises).done(function () {
+                        if (callback) { callback(); }
+                    });
                 });
             });
         },

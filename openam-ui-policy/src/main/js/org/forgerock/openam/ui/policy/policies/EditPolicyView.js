@@ -104,25 +104,26 @@ define("org/forgerock/openam/ui/policy/policies/EditPolicyView", [
                 }
 
                 self.parentRender(function () {
+                    var promises = [], resolve = function () { return (promises[promises.length] = $.Deferred()).resolve; };
 
-                    ManageSubjectsView.render(data);
-                    ManageEnvironmentsView.render(data);
+                    ManageSubjectsView.render(data, resolve());
+                    ManageEnvironmentsView.render(data, resolve());
 
-                    PolicyActionsView.render(data);
-                    ResourcesView.render(data);
+                    PolicyActionsView.render(data, resolve());
+                    ResourcesView.render(data, resolve());
 
                     self.staticAttrsView = new StaticResponseAttributesView();
-                    self.staticAttrsView.render(data.entity, staticAttributes, '#staticAttrs');
+                    self.staticAttrsView.render(data.entity, staticAttributes, '#staticAttrs', resolve());
 
-                    SubjectResponseAttributesView.render([userAttributes, allUserAttributes]);
+                    SubjectResponseAttributesView.render([userAttributes, allUserAttributes], resolve());
 
                     self.prepareInfoReview();
-                    self.validateThenRenderReview();
+                    self.validateThenRenderReview(resolve());
                     self.initAccordion();
 
-                    if (callback) {
-                        callback();
-                    }
+                    $.when.apply($, promises).done(function () {
+                        if (callback) { callback(); }
+                    });
                 });
             });
         },
