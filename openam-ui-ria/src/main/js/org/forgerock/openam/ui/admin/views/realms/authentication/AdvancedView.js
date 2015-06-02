@@ -15,7 +15,7 @@
  */
 
 /*global, define*/
-define("org/forgerock/openam/ui/admin/views/realms/authentication/AdvancedSettingsView", [
+define("org/forgerock/openam/ui/admin/views/realms/authentication/AdvancedView", [
     'jquery',
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
@@ -24,8 +24,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AdvancedSettin
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/openam/ui/admin/delegates/SMSDelegate"
 ], function ($, AbstractView, Configuration, Constants, Form, FormHelper, SMSDelegate) {
-    var AdvancedSettingsView = AbstractView.extend({
-        template: "templates/admin/views/realms/authentication/advanced/AdvancedSettingsTemplate.html",
+    var AdvancedView = AbstractView.extend({
+        template: "templates/admin/views/realms/authentication/AdvancedTemplate.html",
         events: {
             'click #revert': 'revert',
             'click #saveChanges': 'save',
@@ -77,5 +77,5 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AdvancedSettin
         }
     });
 
-    return AdvancedSettingsView;
+    return AdvancedView;
 });

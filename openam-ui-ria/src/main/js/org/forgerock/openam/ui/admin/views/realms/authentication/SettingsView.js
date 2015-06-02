@@ -29,7 +29,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
     "org/forgerock/commons/ui/common/util/UIUtils"
 ], function(AbstractView, BootstrapDialog, Configuration, Constants, EventManager, Form, FormHelper, MessageManager, Router, SMSDelegate, UIUtils) {
     var SettingsView = AbstractView.extend({
-        template: "templates/admin/views/realms/authentication/AuthenticationTemplate.html",
+        template: "templates/admin/views/realms/authentication/SettingsTemplate.html",
         events: {
             // Tabs
             'show.bs.tab a[href="#settings"]': 'renderSettingsTab',
@@ -79,7 +79,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
             e.preventDefault();
             var self = this;
 
-            UIUtils.fillTemplateWithData("templates/admin/views/console/realms/authentication/AddModuleTemplate.html", self.data, function(html) {
+            UIUtils.fillTemplateWithData("templates/admin/views/realms/authentication/modules/AddModuleTemplate.html", self.data, function(html) {
                 BootstrapDialog.show({
                     title: $.t("console.authentication.modules.addModuleDialogTitle"),
                     message: $(html),
@@ -254,7 +254,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
             .done(function(data) {
                 UIUtils.fillTemplateWithData("templates/admin/views/realms/authentication/SettingsTemplate.html", data.values.result, function(html) {
                     self.$el.find('#settings').html(html);
-                    self.data.form = new Form(self.$el.find('#settings .panel-body').get(0), {
+                    self.data.form = new Form(self.$el.find('#content').get(0), {
                         type: 'object',
                         properties: {
                             adminAuthModule: data.schema.properties.core.properties.adminAuthModule,

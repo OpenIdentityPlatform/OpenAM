@@ -45,11 +45,11 @@ define('config/routes/admin/RealmsRoutes', function () {
             role: 'ui-admin'
         },
         // TODO: Remove this *very* soon
-        'realmsAuthenticationAdvancedSettings': {
+        'realmsAuthenticationAdvanced': {
             view: 'org/forgerock/openam/ui/admin/views/realms/RealmView',
-            page: 'org/forgerock/openam/ui/admin/views/realms/authentication/AdvancedSettingsView',
-            url: scopedByRealm('authentication\/settings\/advanced\/?'),
-            pattern: 'realms/?/authentication/settings/advanced',
+            page: 'org/forgerock/openam/ui/admin/views/realms/authentication/AdvancedView',
+            url: scopedByRealm('authentication\/advanced\/?'),
+            pattern: 'realms/?/authentication/advanced',
             role: 'ui-admin'
         },
         'realmsAuthenticationChains': {
