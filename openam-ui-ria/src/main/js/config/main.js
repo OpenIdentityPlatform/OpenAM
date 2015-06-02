@@ -28,9 +28,14 @@ define("config/main", [
     "./errorhandlers/CommonErrorHandlers",
     "./validators/CommonValidators",
     "./validators/UserValidators",
-    "./routes/CommonRoutesConfig",
+
+    "./routes/CommonRoutesConfig",  // In FR-Commons
     "./routes/AMRoutesConfig",
-    "./routes/UserRoutesConfig",
+    "./routes/UserRoutesConfig", // In FR-Commons
+    './routes/admin/AdminRoutes',
+    './routes/admin/RealmsRoutes',
+    './routes/user/UMARoutes',
+
     "./messages/CommonMessages",
     "./messages/UserMessages",
     "./AppMessages",

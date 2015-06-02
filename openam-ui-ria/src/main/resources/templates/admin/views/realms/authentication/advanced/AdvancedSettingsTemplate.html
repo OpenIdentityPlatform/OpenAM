@@ -1,0 +1,32 @@
+<div class="page-header clearfix">
+    <span class="header-icon pull-left"><i class="fa fa-key"></i></span>
+  	<h4 class="page-type">Authentication</h4>
+    <h1>Advanced Settings</h1>
+	</div>
+
+
+
+<div class="console-tabs">
+    <div class="tab-menu">
+        <ul class="nav nav-tabs" role="tablist">
+            {{#each formData.schema.orderedProperties}}
+            <li><a href="#{{this._id}}" role="tab" data-toggle="tab" aria-expanded="false">{{this.title}}</a></li>
+            {{/each}}
+        </ul>
+    </div>
+
+    <div class="tab-content clearfix">
+        <div role="tabpanel" class="tab-pane" id="{{this._id}}">
+            <div class="tab-pane-body">
+                <div class="panel-body"></div>
+            </div>
+        </div>
+
+        <div class="tab-pane-footer clearfix">
+            <div class="pull-right">
+                <button id="revert" class="btn btn-default" type="button">{{t "console.authentication.advancedSettings.revert"}}</button>
+                <button id="saveChanges" class="btn btn-primary" type="button">{{t 'console.authentication.advancedSettings.saveChanges'}}</button>
+            </div>
+        </div>
+    </div>
+</div>

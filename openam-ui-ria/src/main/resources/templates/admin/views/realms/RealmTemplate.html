@@ -1,0 +1,34 @@
+<div id="menu" class="menubar"></div>
+<div class="container">
+   <div class="page-header-min">
+       <h3><a href="#realms">{{realmName}}</a></h3>
+    </div>
+
+   <div class="row">
+       <div class="col-sm-3 col-md-2">
+           <nav class="sidenav">
+               <ol class="list-unstyled">
+                   <li><a href="{{routeTo 'realmsGeneral' realmName}}"><i class="fa fa-cloud"></i>General</a></li>
+                   <li><a data-toggle="collapse" href="#authenticationList" aria-expanded="false" aria-controls="authenticationList"><i class="fa fa-key"></i>Authentication</a>
+                       <ol class="collapse list-unstyled sidenav-submenu" id="authenticationList">
+                           <li><a href="{{routeTo 'realmsAuthenticationSettings' realmName}}">Settings</a></li>
+                           <li><a href="{{routeTo 'realmsAuthenticationAdvancedSettings' realmName}}">Advanced Settings</a></li>
+                           <li><a href="{{routeTo 'realmsAuthenticationChains' realmName}}">Chains</a></li>
+                           <li><a href="{{routeTo 'realmsAuthenticationModules' realmName}}">Modules</a></li>
+                       </ol>
+                   </li>
+                   <li><a href ="{{routeTo 'realmsServices' realmName}}"><i class="fa fa-plug" ></i>Services</a></li>
+                   <li><a href ="{{routeTo 'realmsDataStores' realmName}}"><i class="fa fa-database" ></i>Data Stores</a></li>
+                   <li><a href ="{{routeTo 'realmsPrivileges' realmName}}"><i class="fa fa-check-square-o" ></i>Privileges</a></li>
+                   <li><a href ="{{routeTo 'realmsPolicies' realmName}}"><i class="fa fa-briefcase" ></i>Policies</a></li>
+                   <li><a href ="{{routeTo 'realmsSubjects' realmName}}"><i class="fa fa-users" ></i>Subjects</a></li>
+                   <li><a href ="{{routeTo 'realmsAgents' realmName}}"><i class="fa fa-male" ></i>Agents</a></li>
+                   <li><a href ="{{routeTo 'realmsSTS' realmName}}"><i class="fa fa-ticket" ></i>STS</a></li>
+                   <li><a href ="{{routeTo 'realmsScripts' realmName}}"><i class="fa fa-code" ></i>Scripts</a></li>
+               </ol>
+           </nav>
+        </div>
+
+       <div id="realmsPageContent" class="col-sm-9 col-md-10"></div>
+    </div>
+</div>

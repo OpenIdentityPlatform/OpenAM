@@ -53,9 +53,12 @@ define("config/AppConfiguration", [
                     configuration: {
                         routes: { },
                         loader: [
-                            {"routes":"config/routes/AMRoutesConfig"},
-                            {"routes":"config/routes/CommonRoutesConfig"},
-                            {"routes":"config/routes/UserRoutesConfig"}
+                            { "routes": "config/routes/AMRoutesConfig" },
+                            { "routes": "config/routes/CommonRoutesConfig" },
+                            { "routes": "config/routes/UserRoutesConfig" },
+                            { "routes": "config/routes/admin/AdminRoutes" },
+                            { "routes": "config/routes/admin/RealmsRoutes" },
+                            { "routes": "config/routes/user/UMARoutes" }
                         ]
                     }
                 },

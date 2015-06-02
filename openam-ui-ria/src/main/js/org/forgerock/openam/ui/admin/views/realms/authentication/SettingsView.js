@@ -15,7 +15,7 @@
  */
 
 /*global define, $, _*/
-define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authentication", [
+define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "bootstrap-dialog",
     "org/forgerock/commons/ui/common/main/Configuration",
@@ -28,9 +28,8 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authen
     "org/forgerock/openam/ui/admin/delegates/SMSDelegate",
     "org/forgerock/commons/ui/common/util/UIUtils"
 ], function(AbstractView, BootstrapDialog, Configuration, Constants, EventManager, Form, FormHelper, MessageManager, Router, SMSDelegate, UIUtils) {
-    var Authentication = AbstractView.extend({
-        template: "templates/admin/views/console/realms/authentication/AuthenticationTemplate.html",
-        baseTemplate: "templates/common/DefaultBaseTemplate.html",
+    var SettingsView = AbstractView.extend({
+        template: "templates/admin/views/realms/authentication/AuthenticationTemplate.html",
         events: {
             // Tabs
             'show.bs.tab a[href="#settings"]': 'renderSettingsTab',
@@ -240,7 +239,7 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authen
             this.data.realm = Configuration.globalData.auth.subRealm || "Top level Realm";
             this.data.consolePath = Constants.CONSOLE_PATH;
 
-            this.parentRender(function() {
+            this.parentRender( function () {
                 self.renderSettingsTab();
 
                 if(callback) {
@@ -253,7 +252,7 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authen
 
             SMSDelegate.RealmAuthentication.get()
             .done(function(data) {
-                UIUtils.fillTemplateWithData("templates/admin/views/console/realms/authentication/SettingsTemplate.html", data.values.result, function(html) {
+                UIUtils.fillTemplateWithData("templates/admin/views/realms/authentication/SettingsTemplate.html", data.values.result, function(html) {
                     self.$el.find('#settings').html(html);
                     self.data.form = new Form(self.$el.find('#settings .panel-body').get(0), {
                         type: 'object',
@@ -286,7 +285,7 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authen
                     }
                 });
 
-                UIUtils.fillTemplateWithData("templates/admin/views/console/realms/authentication/ChainsTemplate.html", sortedChains, function(html) {
+                UIUtils.fillTemplateWithData("templates/admin/views/realms/authentication/ChainsTemplate.html", sortedChains, function(html) {
                     self.$el.find('#chains').html(html);
                 });
             })
@@ -300,7 +299,7 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authen
 
             SMSDelegate.RealmAuthenticationModules.get()
             .done(function(data) {
-                UIUtils.fillTemplateWithData("templates/admin/views/console/realms/authentication/ModulesTemplate.html", data.values.result, function(html) {
+                UIUtils.fillTemplateWithData("templates/admin/views/realms/authentication/ModulesTemplate.html", data.values.result, function(html) {
                     self.$el.find('#modules').html(html);
                     self.$el.find('[data-toggle="tooltip"]').tooltip();
                 });
@@ -338,5 +337,5 @@ define("org/forgerock/openam/ui/admin/views/console/realms/authentication/Authen
         }
     });
 
-    return new Authentication();
+    return SettingsView;
 });

@@ -26,12 +26,24 @@ define([
 
     "./views/configuration/ConfigurationView",
 
-    "./views/console/realms/authentication/Authentication",
-    "./views/console/realms/authentication/advanced/AdvancedSettings",
-    "./views/console/realms/authentication/chains/Chains",
-    "./views/console/realms/authentication/modules/Modules",
+    "./views/federation/FederationView",
 
-    "./views/federation/FederationView", 
+    "./views/realms/agents/AgentsView",
+    "./views/realms/authentication/AdvancedSettingsView",
+    "./views/realms/authentication/ChainsView",
+    "./views/realms/authentication/ModulesView",
+    "./views/realms/authentication/SettingsView",
+    "./views/realms/dataStores/DataStoresView",
+    "./views/realms/general/GeneralView",
+    "./views/realms/policies/PoliciesView",
+    "./views/realms/privileges/PrivilegesView",
+    "./views/realms/scripts/ScriptsView",
+    "./views/realms/services/ServicesView",
+    "./views/realms/sts/STSView",
+    "./views/realms/subjects/SubjectsView",
+
+    "./views/realms/RealmsListView",
+    "./views/realms/RealmView",
 
     "./views/sessions/SessionsView"
 ]);
