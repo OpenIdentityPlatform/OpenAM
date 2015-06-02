@@ -1502,12 +1502,17 @@ public class AccessManager {
 
   @SubCommandInfo(
           implClassName="com.sun.identity.cli.authentication.CreateAuthInstance",
-          description="Create authentication instance",
+          description="Create authentication module instance",
           webSupport="true",
           mandatoryOptions={
                   "realm|e|s|Name of realm.",
-                  "name|m|s|Name of authentication instance.",
-                  "authtype|t|s|Type of authentication instance e.g. LDAP, DataStore."},
+                  "name|m|s|Name of authentication module instance.",
+                  "authtype|t|s|Type of authentication module instance. "
+                          + "Possible values include AD, Adaptive, Anonymous, Cert, DataStore, "
+                          + "DeviceIdMatch, DeviceIdSave, Federation, HOTP, HTTPBasic, JDBC, "
+                          + "LDAP, Membership, MSISDN, OATH, OAuth, OpenIdConnect, "
+                          + "PersistentCookie, RADIUS, SAE, Scripted, WindowsDesktopSSO, "
+                          + "NT, and WSSAuthModule." },
           optionAliases={},
           macro="authentication",
           optionalOptions={},
