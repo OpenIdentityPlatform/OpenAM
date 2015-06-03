@@ -145,7 +145,7 @@ public class AuthLevel {
             String moduleName = (String) iter.next();
             String localizedName = getModuleLocalizedName(moduleName);
             moduleMap.put(localizedName,moduleName);
-            modList.addElement(localizedName);
+            modList.addElement(moduleName);
             i++;
         }
 
