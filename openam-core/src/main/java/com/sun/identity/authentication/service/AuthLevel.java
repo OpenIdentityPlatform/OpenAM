@@ -24,6 +24,7 @@
  *
  * $Id: AuthLevel.java,v 1.3 2008/06/25 05:42:04 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 
@@ -145,7 +146,7 @@ public class AuthLevel {
             String moduleName = (String) iter.next();
             String localizedName = getModuleLocalizedName(moduleName);
             moduleMap.put(localizedName,moduleName);
-            modList.addElement(localizedName);
+            modList.addElement(moduleName);
             i++;
         }
 
