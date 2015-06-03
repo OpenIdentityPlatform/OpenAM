@@ -14,9 +14,9 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.rest.dashboard;
+package org.forgerock.openam.rest.devices;
 
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.openam.utils.JsonValueBuilder.*;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.service.AuthD;
@@ -26,7 +26,7 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdSearchControl;
 import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
-import java.io.IOException;
+import com.sun.identity.sm.SMSException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,16 +34,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.resource.Context;
 import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.json.resource.RouterContext;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.devices.services.DeviceServiceFactory;
 
 /**
- * DAO for handling the retrieval and saving of a user's trusted devices.
+ * DAO for handling the retrieval and saving of a user's devices.
  *
  * @since 13.0.0
  */
@@ -51,69 +47,70 @@ public class UserDevicesDao {
 
     private static final int NO_LIMIT = 0;
 
-    private static final ObjectMapper mapper = new ObjectMapper()
-            .configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
-    private final String attributeName;
+    private final DeviceServiceFactory serviceFactory;
 
-    public UserDevicesDao(String attributeName) {
-        this.attributeName = attributeName;
+    public UserDevicesDao(DeviceServiceFactory serviceFactory) {
+        this.serviceFactory = serviceFactory;
     }
 
     /**
-     * Gets a user's device profiles. The JSON returned will correspond to the objects utilised
-     * by {@link OathDeviceSettings}.
+     * Gets a user's device profiles. The returned profiles must be stored in JSON format.
      *
      * @param username User whose profiles to return.
      * @param realm Realm in which we are operating.
      * @return A list of device profiles.
      * @throws InternalServerErrorException If there is a problem retrieving the device profiles.
      */
-    public List<JsonValue> getDeviceProfiles(String username, String realm) throws InternalServerErrorException {
+    public List<JsonValue> getDeviceProfiles(String username, String realm)
+            throws InternalServerErrorException {
 
-        List<JsonValue> devices = new ArrayList<JsonValue>();
+        List<JsonValue> devices = new ArrayList<>();
 
-        AMIdentity identity = getIdentity(username, realm);
-
+        final AMIdentity identity = getIdentity(username, realm);
         try {
-            Set<String> set = (Set<String>) identity.getAttribute(attributeName);
+            final String attrName = serviceFactory.create(realm).getConfigStorageAttributeName();
+
+            Set<String> set = (Set<String>) identity.getAttribute(attrName);
 
             for (String profile : set) {
-                devices.add(json(mapper.readValue(profile, Map.class))); //todo update based on AME-6128/AME-6129
+                devices.add(toJsonValue(profile));
             }
 
             return devices;
 
-        } catch (SSOException | IOException | IdRepoException e) {
+        } catch (SSOException | IdRepoException | SMSException e) {
             throw new InternalServerErrorException(e.getMessage(), e);
         }
     }
 
     /**
-     * Saves a user's trusted device profiles.
+     * Saves a user's device profiles.
      *
      * @param username User whose profiles to return.
      * @param realm Realm in which we are operating.
-     * @param profiles The user's trusted device profiles to store.
+     * @param profiles The user's device profiles to store.
+     *
      * @throws InternalServerErrorException If there is a problem storing the device profiles.
      */
     public void saveDeviceProfiles(String username, String realm, List<JsonValue> profiles)
             throws InternalServerErrorException {
 
-        AMIdentity identity = getIdentity(username, realm);
+        final AMIdentity identity = getIdentity(username, realm);
 
-        Set<String> vals = new HashSet<String>();
+        Set<String> vals = new HashSet<>();
 
         for (JsonValue profile : profiles) {
             vals.add(profile.toString());
         }
-
-        Map<String, Set> attrMap = new HashMap<String, Set>();
-        attrMap.put(attributeName, vals);
-
         try {
+            final String attrName = serviceFactory.create(realm).getConfigStorageAttributeName();
+
+            Map<String, Set> attrMap = new HashMap<>();
+            attrMap.put(attrName, vals);
+
             identity.setAttributes(attrMap);
             identity.store();
-        } catch (SSOException | IdRepoException e) {
+        } catch (SSOException | IdRepoException | SMSException e) {
             throw new InternalServerErrorException(e.getMessage(), e);
         }
     }
@@ -124,7 +121,7 @@ public class UserDevicesDao {
      * @param userName The user's name.
      * @param realm The user's realm.
      * @return An {@code AMIdentity}.
-     * @throws InternalServerErrorException If there is a problem getting the users identity.
+     * @throws InternalServerErrorException If there is a problem getting the user's identity.
      */
     private AMIdentity getIdentity(String userName, String realm) throws InternalServerErrorException {
         final AMIdentity amIdentity;

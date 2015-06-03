@@ -19,6 +19,8 @@ package org.forgerock.openam.rest.dashboard;
 import static org.fest.assertions.Assertions.*;
 import static org.forgerock.json.fluent.JsonValue.*;
 import static org.forgerock.json.resource.Resources.*;
+import static org.mockito.BDDMockito.anyObject;
+import static org.mockito.BDDMockito.anyString;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -39,6 +41,9 @@ import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.RootContext;
 import org.forgerock.json.resource.ServerContext;
+import org.forgerock.openam.rest.devices.OathDevicesDao;
+import org.forgerock.openam.rest.devices.OathDevicesResource;
+import org.forgerock.openam.rest.resource.ContextHelper;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
@@ -49,13 +54,17 @@ public class OathDevicesResourceTest {
     private OathDevicesResource resource;
 
     private OathDevicesDao dao;
+    private ContextHelper contextHelper;
 
     @BeforeMethod
     public void setUp() {
 
         dao = mock(OathDevicesDao.class);
+        contextHelper = mock(ContextHelper.class);
 
-        resource = new OathDevicesResource(dao);
+        resource = new OathDevicesResource(dao, contextHelper);
+
+        given(contextHelper.getUserId((ServerContext) anyObject())).willReturn("demo");
     }
 
     private Context ctx() {

@@ -39,6 +39,9 @@ import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ServerContext;
+import org.forgerock.openam.rest.devices.TrustedDevicesDao;
+import org.forgerock.openam.rest.devices.TrustedDevicesResource;
+import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.mockito.ArgumentCaptor;
@@ -51,13 +54,17 @@ public class TrustedDevicesResourceTest {
     private TrustedDevicesResource resource;
 
     private TrustedDevicesDao dao;
+    private ContextHelper contextHelper;
 
     @BeforeMethod
     public void setUp() {
 
         dao = mock(TrustedDevicesDao.class);
+        contextHelper = mock(ContextHelper.class);
 
-        resource = new TrustedDevicesResource(dao);
+        resource = new TrustedDevicesResource(dao, contextHelper);
+
+        given(contextHelper.getUserId((ServerContext) anyObject())).willReturn("demo");
     }
 
     private Context ctx() {

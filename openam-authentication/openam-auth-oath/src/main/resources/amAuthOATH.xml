@@ -70,16 +70,6 @@
                         <Value>32</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="iplanet-am-auth-oath-secret-key-attribute"
-                                 type="single"
-                                 syntax="string"
-                                 validator="RequiredValueValidator"
-                                 i18nKey="a503"
-                                 resourceName="userProfileSecretKeyAttribute">
-                    <DefaultValues>
-                        <Value></Value>
-                    </DefaultValues>
-                </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-oath-algorithm"
                                  type="single_choice"
                                  syntax="string"
@@ -101,15 +91,6 @@
                                  resourceName="hotpWindowSize">
                     <DefaultValues>
                         <Value>100</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-                <AttributeSchema name="iplanet-am-auth-oath-hotp-counter-attribute"
-                                 type="single"
-                                 syntax="string"
-                                 i18nKey="a506"
-                                 resourceName="userProfileHotpCounterAttribute">
-                    <DefaultValues>
-                        <Value></Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -163,15 +144,6 @@
                         <Value>2</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="iplanet-am-auth-oath-last-login-time-attribute-name"
-                                 type="single"
-                                 syntax="string"
-                                 i18nKey="a511"
-                                 resourceName="userProfileLastLoginAttribute">
-                    <DefaultValues>
-                        <Value></Value>
-                    </DefaultValues>
-                </AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                     <AttributeSchema name="iplanet-am-auth-oath-auth-level"
                                      type="single"
@@ -200,15 +172,6 @@
                             <Value>32</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="iplanet-am-auth-oath-secret-key-attribute"
-                                     type="single"
-                                     syntax="string"
-                                     i18nKey="a503"
-                                     resourceName="userProfileSecretKeyAttribute">
-                        <DefaultValues>
-                            <Value></Value>
-                        </DefaultValues>
-                    </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-oath-algorithm"
                                      type="single_choice"
                                      syntax="string"
@@ -229,15 +192,6 @@
                                      resourceName="hotpWindowSize">
                         <DefaultValues>
                             <Value>100</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    <AttributeSchema name="iplanet-am-auth-oath-hotp-counter-attribute"
-                                     type="single"
-                                     syntax="string"
-                                     i18nKey="a506"
-                                     resourceName="userProfileHotpCounterAttribute">
-                        <DefaultValues>
-                            <Value></Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -289,15 +243,6 @@
                                      resourceName="totpTimeStepsInWindow">
                         <DefaultValues>
                             <Value>2</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    <AttributeSchema name="iplanet-am-auth-oath-last-login-time-attribute-name"
-                                     type="single"
-                                     syntax="string"
-                                     i18nKey="a511"
-                                     resourceName="userProfileLastLoginAttribute">
-                        <DefaultValues>
-                            <Value></Value>
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>

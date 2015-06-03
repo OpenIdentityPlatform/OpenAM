@@ -14,7 +14,7 @@
  * Copyright 2014 ForgeRock AS.
  */
 
-package org.forgerock.openam.rest.dashboard;
+package org.forgerock.openam.rest.devices;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -23,6 +23,7 @@ import java.util.Date;
 import javax.inject.Inject;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.Resource;
+import org.forgerock.openam.rest.resource.ContextHelper;
 
 /**
  * REST resource for a user's trusted devices.
@@ -40,10 +41,11 @@ public class TrustedDevicesResource extends UserDevicesResource<TrustedDevicesDa
      * Constructs a new TrustedDevicesResource.
      *
      * @param dao An instance of the {@code TrustedDevicesDao}.
+     * @param contextHelper An instance of the {@code ContextHelper}.
      */
     @Inject
-    public TrustedDevicesResource(TrustedDevicesDao dao) {
-        super(dao);
+    public TrustedDevicesResource(TrustedDevicesDao dao, ContextHelper contextHelper) {
+        super(dao, contextHelper);
     }
 
     protected Resource convertValue(JsonValue profile) throws ParseException {

@@ -24,8 +24,7 @@
     <!-- For determining which we are -->
     <Callbacks length="0" order="1" timeout="120" header="Two Step Verification">
     </Callbacks>
-
-    <!-- For when we're optional -->
+    <!-- For when we're optional and device isn't registered -->
     <Callbacks length="2" order="2" timeout="120" header="Two Step Verification">
         <NameCallback>
             <Prompt>Enter verification code:</Prompt>
@@ -44,7 +43,7 @@
             </OptionValues>
         </ConfirmationCallback>
     </Callbacks>
-    <!-- For when we're not optional -->
+    <!-- For when we're not optional and a device isn't registered -->
     <Callbacks length="2" order="3" timeout="120" header="Two Step Verification">
         <NameCallback>
             <Prompt>Enter verification code:</Prompt>
@@ -60,7 +59,21 @@
             </OptionValues>
         </ConfirmationCallback>
     </Callbacks>
-    <Callbacks length="3" order="4" timeout="120" header="Register your device with OpenAM">
+    <!-- For when we're not optional and a device is registered -->
+    <Callbacks length="2" order="4" timeout="120" header="Two Step Verification">
+        <NameCallback>
+            <Prompt>Enter verification code:</Prompt>
+        </NameCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>Submit</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    <!-- For registration -->
+    <Callbacks length="3" order="5" timeout="120" header="Register your device with OpenAM">
         <TextOutputCallback>
             Scan the barcode image below with the ForgeRock Authenticator App. Once registered click the button to
             enter your verification code and login.
@@ -70,6 +83,20 @@
             <OptionValues>
                 <OptionValue>
                     <Value>Login using verification code</Value>
+                </OptionValue>
+            </OptionValues>
+        </ConfirmationCallback>
+    </Callbacks>
+    <!-- For recovery code use -->
+    <Callbacks length="2" order="6" timeout="120" header="Two Step Verification Emergency Code Used">
+        <TextOutputCallback>
+            You have used one of your Emergency Two Step Verification Codes. Please make sure you have a note of
+            any remaining Two Step Verification Codes.
+        </TextOutputCallback>
+        <ConfirmationCallback>
+            <OptionValues>
+                <OptionValue>
+                    <Value>Continue</Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>

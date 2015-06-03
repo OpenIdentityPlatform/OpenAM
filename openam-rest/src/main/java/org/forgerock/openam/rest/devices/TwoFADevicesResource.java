@@ -13,16 +13,15 @@
 *
 * Copyright 2015 ForgeRock AS.
 */
-package org.forgerock.openam.rest.dashboard;
+package org.forgerock.openam.rest.devices;
 
 import java.text.ParseException;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.Resource;
+import org.forgerock.openam.rest.resource.ContextHelper;
 
 /**
- * Abstract subimplementation of the UserDevicesResource - used to ensure that
- * rest security's second factor is enabled before allowing requests through to the
- * individual resource dao's for processing.
+ * Abstract sub-implementation of the UserDevicesResource.
  *
  * A TwoFADevice must have a "uuid" field in it's stored attribute profile.
  *
@@ -34,14 +33,16 @@ public abstract class TwoFADevicesResource<T extends UserDevicesDao> extends Use
      * Constructs a new UserDevicesResource.
      *
      * @param userDevicesDao An instance of the {@code UserDevicesDao}.
+     * @param helper An instance of the {@code ContextHelper}.
      */
-    public TwoFADevicesResource(T userDevicesDao) {
-        super(userDevicesDao);
+    public TwoFADevicesResource(T userDevicesDao, ContextHelper helper) {
+        super(userDevicesDao, helper);
     }
 
     @Override
     protected Resource convertValue(JsonValue queryResult) throws ParseException {
-        return new Resource(queryResult.get(UUID_KEY).asString(), Integer.toString(queryResult.hashCode()), queryResult);
+        return new Resource(queryResult.get(UUID_KEY).asString(), Integer.toString(queryResult.hashCode()),
+                queryResult);
     }
 
 }

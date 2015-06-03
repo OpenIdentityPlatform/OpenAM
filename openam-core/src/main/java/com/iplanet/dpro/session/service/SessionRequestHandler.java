@@ -83,8 +83,7 @@ public class SessionRequestHandler implements RequestHandler {
     private static Boolean enableAddListenerOnAllSessions = null;
     private SSOToken clientToken = null;
 
-    private static final SessionServiceURLService SESSION_SERVICE_URL_SERVICE
-            = InjectorHolder.getInstance(SessionServiceURLService.class);
+    private static final SessionServiceURLService SESSION_SERVICE_URL_SERVICE = InjectorHolder.getInstance(SessionServiceURLService.class);
     private static final SessionCookies sessionCookies
             = InjectorHolder.getInstance(SessionCookies.class);
     private static final SessionCache sessionCache = InjectorHolder.getInstance(SessionCache.class);

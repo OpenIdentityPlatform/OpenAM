@@ -169,7 +169,7 @@ public class RestAuthenticationHandler {
         } catch (L10NMessageImpl e) {
             throw new RestAuthException(amAuthErrorCodeResponseStatusMapping.getAuthLoginExceptionResponseStatus(
                     e.getErrorCode()), e);
-        } catch (JsonException e)  {
+        } catch (JsonException e) {
             throw new RestAuthException(ResourceException.INTERNAL_ERROR, e);
         } catch (SignatureException e) {
             throw new RestAuthException(ResourceException.INTERNAL_ERROR, e);

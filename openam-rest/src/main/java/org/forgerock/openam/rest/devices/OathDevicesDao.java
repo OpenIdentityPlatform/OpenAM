@@ -14,20 +14,21 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.rest.dashboard;
+package org.forgerock.openam.rest.devices;
 
-import javax.inject.Singleton;
+import javax.inject.Inject;
+import org.forgerock.openam.rest.devices.services.OathServiceFactory;
 
 /**
  * A DAO instance for accessing OATH user devices.
  *
  * @since 13.0.0
  */
-@Singleton
 public class OathDevicesDao extends UserDevicesDao {
 
-    public OathDevicesDao() {
-        super("oathDeviceProfiles");
+    @Inject
+    public OathDevicesDao(OathServiceFactory serviceFactory) {
+        super(serviceFactory);
     }
 
 }

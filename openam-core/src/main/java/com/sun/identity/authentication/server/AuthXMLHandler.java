@@ -95,8 +95,7 @@ public class AuthXMLHandler implements RequestHandler {
     private static String serviceURI;
     private static boolean messageEnabled = false;
     private boolean security = false;
-    private static final SessionServiceURLService SESSION_SERVICE_URL_SERVICE
-            = InjectorHolder.getInstance(SessionServiceURLService.class);
+    private static final SessionServiceURLService SESSION_SERVICE_URL_SERVICE = InjectorHolder.getInstance(SessionServiceURLService.class);
 
     static {
         debug = com.sun.identity.shared.debug.Debug.getInstance("amXMLHandler");

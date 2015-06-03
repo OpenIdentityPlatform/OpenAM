@@ -38,16 +38,27 @@ import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.TextOutputCallback;
 import javax.xml.bind.DatatypeConverter;
 import org.apache.commons.codec.DecoderException;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.openam.rest.devices.OathDeviceSettings;
+import org.forgerock.openam.rest.devices.OathDevicesDao;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.qr.GenerationUtils;
 
 /**
@@ -61,19 +72,17 @@ public class OATH extends AMLoginModule {
     //debug log name
     protected Debug debug = null;
 
-    private String UUID = null;
+    private String userId = null;
     private String userName = null;
 
     //static attribute names
+    private static final int NUM_CODES = 10;
+
     private static final String AUTHLEVEL = "iplanet-am-auth-oath-auth-level";
     private static final String PASSWORD_LENGTH =
             "iplanet-am-auth-oath-password-length";
-    private static final String SECRET_KEY_ATTRIBUTE_NAME =
-            "iplanet-am-auth-oath-secret-key-attribute";
     private static final String WINDOW_SIZE =
             "iplanet-am-auth-oath-hotp-window-size";
-    private static final String COUNTER_ATTRIBUTE_NAME =
-            "iplanet-am-auth-oath-hotp-counter-attribute";
     private static final String USER_OATH_ACTIVATED_ATTRIBUTE_NAME =
             "iplanet-am-auth-oath-skippable-attr-name";
     private static final String TRUNCATION_OFFSET =
@@ -84,8 +93,6 @@ public class OATH extends AMLoginModule {
     private static final String TOTP_STEPS_IN_WINDOW =
             "iplanet-am-auth-oath-steps-in-window";
     private static final String ALGORITHM = "iplanet-am-auth-oath-algorithm";
-    private static final String LAST_LOGIN_TIME_ATTRIBUTE_NAME =
-            "iplanet-am-auth-oath-last-login-time-attribute-name";
     private static final String MIN_SECRET_KEY_LENGTH =
             "iplanet-am-auth-oath-min-secret-key-length";
 
@@ -95,16 +102,13 @@ public class OATH extends AMLoginModule {
     private boolean isOptional;
     private int passLen = 0;
     private int minSecretKeyLength = 0;
-    private String secretKeyAttrName = null;
     private int windowSize = 0;
-    private String counterAttrName = null;
     private String authLevel = null;
     private int truncationOffset = -1;
     private boolean checksum = false;
     private int totpTimeStep = 0;
     private int totpStepsInWindow = 0;
     private long time = 0;
-    private String loginTimeAttrName = null;
 
     private static final int HOTP = 0;
     private static final int TOTP = 1;
@@ -115,20 +119,22 @@ public class OATH extends AMLoginModule {
 
     private static final int LOGIN_START = ISAuthConstants.LOGIN_START;
     private static final int LOGIN_OPTIONAL = 2;
-    private static final int LOGIN_NORMAL = 3;
-    private static final int REGISTER_DEVICE = 4;
+    private static final int LOGIN_NO_DEVICE = 3;
+    private static final int LOGIN_SAVED_DEVICE = 4;
+    private static final int REGISTER_DEVICE = 5;
+    private static final int RECOVERY_USED = 6;
 
-    private static final int SKIP_OATH_INDEX = 2;
     private static final int REGISTER_DEVICE_OPTION_VALUE_INDEX = 1;
-    private static final int LOGIN_OPTION_VALUE_INDEX = 0;
+    private static final int SKIP_OATH_INDEX = 2;
 
     private static final int SCRIPT_OUTPUT_CALLBACK_INDEX = 1;
-    private static final int CONFIRMATION_CALLBACK_INDEX = 2;
 
     private static final int NOT_SET = 0;
     private static final int SKIPPABLE = 1;
     private static final int NOT_SKIPPABLE = 2;
 
+    private final OathDevicesDao devicesDao = InjectorHolder.getInstance(OathDevicesDao.class);
+    private final OathMaker deviceFactory = InjectorHolder.getInstance(OathMaker.class);
 
     /**
      * Standard constructor sets-up the debug logging module.
@@ -146,8 +152,8 @@ public class OATH extends AMLoginModule {
      */
     @Override
     public java.security.Principal getPrincipal() {
-        if (UUID != null) {
-            return new OATHPrincipal(UUID);
+        if (userId != null) {
+            return new OATHPrincipal(userId);
         }
         if (userName != null) {
             return new OATHPrincipal(userName);
@@ -176,41 +182,26 @@ public class OATH extends AMLoginModule {
             this.authLevel = CollectionHelper.getMapAttr(options, AUTHLEVEL);
 
             try {
-                this.passLen = Integer.parseInt(
-                        CollectionHelper.getMapAttr(options, PASSWORD_LENGTH));
+                this.passLen = CollectionHelper.getIntMapAttr(options, PASSWORD_LENGTH, 0, debug);
             } catch (NumberFormatException e) {
                 passLen = 0;
             }
 
             try {
-                this.minSecretKeyLength = Integer.parseInt(
-                        CollectionHelper.getMapAttr(options, MIN_SECRET_KEY_LENGTH));
+                this.minSecretKeyLength = CollectionHelper.getIntMapAttr(options, MIN_SECRET_KEY_LENGTH, 0, debug);
             } catch (NumberFormatException e) {
                 minSecretKeyLength = 0; //Default value has been delete, set to 0
             }
 
             this.skippableAttrName = CollectionHelper.getMapAttr(options, USER_OATH_ACTIVATED_ATTRIBUTE_NAME);
-
-            this.secretKeyAttrName = CollectionHelper.getMapAttr(
-                    options, SECRET_KEY_ATTRIBUTE_NAME);
-            this.windowSize = Integer.parseInt(CollectionHelper.getMapAttr(
-                    options, WINDOW_SIZE));
-            this.counterAttrName = CollectionHelper.getMapAttr(
-                    options, COUNTER_ATTRIBUTE_NAME);
-            this.truncationOffset = Integer.parseInt(
-                    CollectionHelper.getMapAttr(options, TRUNCATION_OFFSET));
-
+            this.windowSize = CollectionHelper.getIntMapAttr(options, WINDOW_SIZE, 0, debug);
+            this.truncationOffset = CollectionHelper.getIntMapAttr(options, TRUNCATION_OFFSET, 0, debug);
             this.isOptional = !getLoginState("OATH").is2faMandatory();
+            this.totpTimeStep = CollectionHelper.getIntMapAttr(options, TOTP_TIME_STEP, 1, debug);
+            this.totpStepsInWindow = CollectionHelper.getIntMapAttr(options, TOTP_STEPS_IN_WINDOW, 1, debug);
+            this.checksum = CollectionHelper.getBooleanMapAttr(options, CHECKSUM, false);
 
-            this.totpTimeStep = Integer.parseInt(
-                    CollectionHelper.getMapAttr(options, TOTP_TIME_STEP));
-            this.totpStepsInWindow = Integer.parseInt(
-                    CollectionHelper.getMapAttr(options, TOTP_STEPS_IN_WINDOW));
-            this.loginTimeAttrName = CollectionHelper.getMapAttr(
-                    options, LAST_LOGIN_TIME_ATTRIBUTE_NAME);
-
-
-            String algorithm = CollectionHelper.getMapAttr(options, ALGORITHM);
+            final String algorithm = CollectionHelper.getMapAttr(options, ALGORITHM);
             if (algorithm.equalsIgnoreCase("HOTP")) {
                 this.algorithm = HOTP;
             } else if (algorithm.equalsIgnoreCase("TOTP")) {
@@ -218,9 +209,6 @@ public class OATH extends AMLoginModule {
             } else {
                 this.algorithm = ERROR;
             }
-
-            String checksumVal = CollectionHelper.getMapAttr(options, CHECKSUM);
-            checksum = !checksumVal.equalsIgnoreCase("False");
 
             //set authentication level
             if (authLevel != null) {
@@ -266,7 +254,7 @@ public class OATH extends AMLoginModule {
                     throw new AuthLoginException("amAuth", "noInternalSession", null);
                 }
                 SSOToken token = mgr.createSSOToken(isess.getID().toString());
-                UUID = token.getPrincipal().getName();
+                userId = token.getPrincipal().getName();
                 userName = token.getProperty("UserToken");
                 if (debug.messageEnabled()) {
                     debug.message("OATH.process() : Username from SSOToken : " + userName);
@@ -279,48 +267,66 @@ public class OATH extends AMLoginModule {
 
             final AMIdentity id = getIdentity();
 
+            final OathDeviceSettings settings = getOathDeviceSettings(id.getName(), id.getRealm());
+
             try {
                 detectNecessity(id); //figures out whether we're optional or not, based on server + user setting
             } catch (Exception e) {
                 throw new AuthLoginException(amAuthOATH, "authFailed", null);
             }
 
+            int selectedIndex;
+
+            //fall-throughs are INTENTIONAL
             switch (state) {
                 case LOGIN_START:
 
-                    if (!isOptional) {
-                        return LOGIN_NORMAL;
-                    } else if (userConfiguredSkippable == SKIPPABLE) { //isOptional and set to be skipped
+                    if (isOptional && userConfiguredSkippable == SKIPPABLE) {
                         return ISAuthConstants.LOGIN_SUCCEED;
-                    } else if (userConfiguredSkippable == NOT_SET) { //isOptional and not set
+                    } else if (isOptional && userConfiguredSkippable == NOT_SET) {
                         return LOGIN_OPTIONAL;
-                    } else { //isOptional and set to utilise
-                        return LOGIN_NORMAL;
+                    } else if (isOptional && userConfiguredSkippable != NOT_SKIPPABLE) {
+                        throw new AuthLoginException(amAuthOATH, "authFailed", null); //invalid so error
+                    } else {
+                        if (settings == null) {
+                            return LOGIN_NO_DEVICE;
+                        } else {
+                            return LOGIN_SAVED_DEVICE;
+                        }
                     }
 
+                //process callbacks
+                //callback[0] = Name CallBack (OTP)
+                //callback[1] = Confirmation CallBack (Submit OTP/Register device)
+                //callback[2] = Configure account to skip OATH
                 case LOGIN_OPTIONAL:
-                    //process callbacks
-                    //callback[0] = Name CallBack (OTP)
-                    //callback[1] = Confirmation CallBack (Submit OTP/Register device)
-                    //callback[2] = Configure account to skip OATH
+
                     if (callbacks == null) {
                         throw new AuthLoginException(amAuthOATH, "authFailed", null);
                     }
 
-                    int loginIndex = ((ConfirmationCallback) callbacks[1]).getSelectedIndex();
-                    if (loginIndex == SKIP_OATH_INDEX) {
+                    selectedIndex = ((ConfirmationCallback) callbacks[1]).getSelectedIndex();
+                    if (selectedIndex == SKIP_OATH_INDEX) {
                         setUserSkipOath(id, true);
                         return ISAuthConstants.LOGIN_SUCCEED;
                     }
 
-                    //fall through is INTENTIONAL HERE
-                case LOGIN_NORMAL:
+                case LOGIN_NO_DEVICE:
 
-                    int selectedIndex = ((ConfirmationCallback) callbacks[1]).getSelectedIndex();
+                    if (callbacks == null) {
+                        throw new AuthLoginException(amAuthOATH, "authFailed", null);
+                    }
+
+                    selectedIndex = ((ConfirmationCallback) callbacks[1]).getSelectedIndex();
                     if (selectedIndex == REGISTER_DEVICE_OPTION_VALUE_INDEX) {
-                        substituteUIStrings(id);
-
+                        paintRegisterDeviceCallback(id, createBasicDevice(id));
                         return REGISTER_DEVICE;
+                    }
+
+                case LOGIN_SAVED_DEVICE:
+
+                    if (callbacks == null) {
+                        throw new AuthLoginException(amAuthOATH, "authFailed", null);
                     }
 
                     //get OTP
@@ -334,37 +340,63 @@ public class OATH extends AMLoginModule {
                     //get Arrival time of the OTP
                     time = System.currentTimeMillis() / 1000L;
 
-                    //check HOTP
-                    if (checkOTP(OTP, id)) {
+                    if (isRecoveryCode(OTP, settings, id)) {
+                        return RECOVERY_USED;
+                    } else if (checkOTP(OTP, id, settings)) {
                         return ISAuthConstants.LOGIN_SUCCEED;
                     } else {
                         //the OTP is out of the window or incorrect
                         setFailureID(userName);
                         throw new InvalidPasswordException("amAuth", "invalidPasswd", null);
                     }
+
                 case REGISTER_DEVICE:
+                    setUserSkipOath(id, false);
+                    return LOGIN_SAVED_DEVICE;
 
-                    if (callbacks == null) {
-                        throw new AuthLoginException(amAuthOATH, "authFailed", null);
-                    }
+                case RECOVERY_USED:
 
-                    int registerIndex = ((ConfirmationCallback) callbacks[CONFIRMATION_CALLBACK_INDEX]).getSelectedIndex();
-                    if (registerIndex == LOGIN_OPTION_VALUE_INDEX) {
-                        setUserSkipOath(id, false);
-                        return LOGIN_START;
-                    } else {
-                        throw new AuthLoginException(amAuthOATH, "authFailed", null);
-                    }
+                    return ISAuthConstants.LOGIN_SUCCEED;
+
                 default:
                     throw new AuthLoginException("amAuth", "invalidLoginState", new Object[]{state});
             }
-        } catch (SSOException e) {
-            debug.error("OATH.process() : SSOException", e);
-            throw new AuthLoginException(amAuthOATH, "authFailed", null);
-        } catch (IdRepoException e) {
+        } catch (SSOException | IdRepoException | InternalServerErrorException | IOException e) {
             debug.error("OATH.process() : SSOException", e);
             throw new AuthLoginException(amAuthOATH, "authFailed", null);
         }
+    }
+
+    private OathDeviceSettings createBasicDevice(AMIdentity id) throws AuthLoginException {
+
+        OathDeviceSettings settings = deviceFactory.createDeviceProfile(minSecretKeyLength);
+        settings.setLastLogin(System.currentTimeMillis());
+        settings.setChecksumDigit(checksum);
+        settings.setRecoveryCodes(OathDeviceSettings.generateRecoveryCodes(NUM_CODES));
+
+        deviceFactory.saveDeviceProfile(id.getName(), id.getRealm(), settings);
+
+        return settings;
+    }
+
+    private boolean isRecoveryCode(String otp, OathDeviceSettings settings, AMIdentity id)
+            throws InternalServerErrorException, IOException, AuthLoginException {
+        //check settings aren't null
+        if (settings == null) {
+            debug.error("OATH.checkOTP() : Invalid stored settings.");
+            throw new AuthLoginException(amAuthOATH, "authFailed", null);
+        }
+
+        List<String> recoveryCodes = new ArrayList<>(Arrays.asList(settings.getRecoveryCodes()));
+        if (recoveryCodes.contains(otp)) {
+            recoveryCodes.remove(otp);
+            settings.setRecoveryCodes(recoveryCodes.toArray(new String[recoveryCodes.size()]));
+            devicesDao.saveDeviceProfiles(id.getName(), id.getRealm(),
+                    Collections.singletonList(JsonConversionUtils.toJsonValue(settings)));
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -379,15 +411,15 @@ public class OATH extends AMLoginModule {
      * If they have it blank, then default flow (this is required).
      * If they have it set to 'can ignore' (e.g. userCanIgnoreAttrName's value is set to "true"), then ignore.
      */
-    private void detectNecessity(AMIdentity identity) throws IdRepoException, SSOException {
+    private void detectNecessity(AMIdentity identity) throws AuthLoginException, IdRepoException, SSOException {
 
         //not optional if they haven't selected anywhere to save the user's preference
         if (isOptional && skippableAttrName == null) {
             isOptional = false;
         }
 
-        //value is stored as "true" or "false" or is null.
-        if (skippableAttrName != null) {
+        //value is stored as: 0 (not chosen), 1 (skippable) or 2 (not skippable)
+        if (isOptional) {
             Set response = identity.getAttribute(skippableAttrName);
             if (response != null && !response.isEmpty()) { //sets skippable to true if set in user
                 String tmp = (String) response.iterator().next();
@@ -397,8 +429,8 @@ public class OATH extends AMLoginModule {
 
     }
 
-    private void substituteUIStrings(AMIdentity id) throws AuthLoginException {
-        replaceCallback(REGISTER_DEVICE, SCRIPT_OUTPUT_CALLBACK_INDEX, createQRCodeCallback(id));
+    private void paintRegisterDeviceCallback(AMIdentity id, OathDeviceSettings settings) throws AuthLoginException {
+        replaceCallback(REGISTER_DEVICE, SCRIPT_OUTPUT_CALLBACK_INDEX, createQRCodeCallback(settings, id));
     }
 
     /**
@@ -419,18 +451,22 @@ public class OATH extends AMLoginModule {
     * hideButtonHack
     *           A hack to reverse a hack in RESTLoginView.js. See more detailed comment above.
     */
-    private Callback createQRCodeCallback(AMIdentity id) throws AuthLoginException {
+    private Callback createQRCodeCallback(OathDeviceSettings settings, AMIdentity id) throws AuthLoginException {
 
-        String hideButtonHack = "if(document.getElementsByClassName('button')[0] != undefined){document" +
+        final String hideButtonHack = "if(document.getElementsByClassName('button')[0] != undefined){document" +
                 ".getElementsByClassName('button')[0].style.visibility = 'visible';}\n";
+        final String createQRDomElementJS = getCreateQRDomElementJS();
 
-        String createQRDomElementJS = getCreateQRDomElementJS();
-        String authenticatorAppRegistrationUri = getAuthenticatorAppRegistrationUri(id);
+        try {
+            final String authenticatorAppRegistrationUri = getAuthenticatorAppRegistrationUri(settings, id);
+            return new ScriptTextOutputCallback(createQRDomElementJS +
+                    GenerationUtils.
+                            getQRCodeGenerationJavascriptForAuthenticatorAppRegistration(authenticatorAppRegistrationUri) +
+                    hideButtonHack);
 
-        return new ScriptTextOutputCallback(createQRDomElementJS +
-                GenerationUtils.
-                        getQRCodeGenerationJavascriptForAuthenticatorAppRegistration(authenticatorAppRegistrationUri) +
-                hideButtonHack);
+        } catch (InternalServerErrorException | IOException e) {
+            throw new AuthLoginException(amAuthOATH, "authFailed", null);
+        }
 
     }
 
@@ -441,8 +477,8 @@ public class OATH extends AMLoginModule {
     * In the returned String, the Javascript if statement is used to handle presentation in the classic UI.
     */
     private String getCreateQRDomElementJS() {
-        String qrImagePositioningCss = "node.style.marginTop='20px';";
-        String qrImageCentralizationCss = "node.style.textAlign='center';";
+        final String qrImagePositioningCss = "node.style.marginTop='20px';";
+        final String qrImageCentralizationCss = "node.style.textAlign='center';";
 
         return "var node = document.createElement('div'); node.id='qr'; "
                 + qrImagePositioningCss + qrImageCentralizationCss +
@@ -453,15 +489,24 @@ public class OATH extends AMLoginModule {
 
     }
 
-    private String getAuthenticatorAppRegistrationUri(AMIdentity id) throws AuthLoginException {
-        String secretHex = getSecretKey(id);
+    private String getAuthenticatorAppRegistrationUri(OathDeviceSettings settings, AMIdentity id) throws
+            AuthLoginException, InternalServerErrorException, IOException {
 
-        AuthenticatorAppRegistrationURIBuilder builder = new AuthenticatorAppRegistrationURIBuilder(id, secretHex);
+        //check settings aren't null
+        if (settings == null) {
+            debug.error("OATH.checkOTP() : Invalid settings discovered.");
+            throw new AuthLoginException(amAuthOATH, "authFailed", null);
+        }
+
+        final String secretHex = settings.getSharedSecret();
+
+        final AuthenticatorAppRegistrationURIBuilder builder =
+                new AuthenticatorAppRegistrationURIBuilder(id, secretHex);
 
         int algorithm = this.algorithm;
         try {
             if (algorithm == HOTP) {
-                int counter = getCounter(id);
+                int counter = settings.getCounter();
                 return builder.getAuthenticatorAppRegistrationUriForHOTP(counter);
             } else if (algorithm == TOTP) {
                 return builder.getAuthenticatorAppRegistrationUriForTOTP(totpTimeStep);
@@ -480,7 +525,7 @@ public class OATH extends AMLoginModule {
      */
     @Override
     public void destroyModuleState() {
-        UUID = null;
+        userId = null;
         userName = null;
     }
 
@@ -489,28 +534,29 @@ public class OATH extends AMLoginModule {
      */
     @Override
     public void nullifyUsedVars() {
-        secretKeyAttrName = null;
-        counterAttrName = null;
         authLevel = null;
         amAuthOATH = null;
-        loginTimeAttrName = null;
     }
 
     /**
-     * Checks the input OTP
+     * Checks the input OTP.
      *
-     * @param otp The OTP to verify
+     * @param otp The OTP to verify.
+     * @param id The user for whom to verify the OTP.
+     * @param settings With which the OTP was configured.
      * @return true if the OTP is valid; false if the OTP is invalid, or out of
      *         sync with server.
      * @throws AuthLoginException on any error
      */
-    private boolean checkOTP(String otp, AMIdentity id) throws AuthLoginException {
-        if (id == null) {
-            debug.error("OATH.checkOTP() : Identity was null.");
+    private boolean checkOTP(String otp, AMIdentity id, OathDeviceSettings settings) throws AuthLoginException {
+
+        //check settings aren't null
+        if (settings == null) {
+            debug.error("OATH.checkOTP() : Invalid stored settings.");
             throw new AuthLoginException(amAuthOATH, "authFailed", null);
         }
 
-        String secretKey = getSecretKey(id);
+        String secretKey = parseSecretKey(settings.getSharedSecret());
 
         if (minSecretKeyLength <= 0) {
             debug.error("OATH.checkOTP() : Min Secret Key Length is not a valid value");
@@ -548,7 +594,7 @@ public class OATH extends AMLoginModule {
                  * HOTP check section
                  */
 
-                int counter = getCounter(id);
+                int counter = settings.getCounter();
 
                 // we have to do counter+1 because counter is the last previous accepted counter
                 counter++;
@@ -559,7 +605,7 @@ public class OATH extends AMLoginModule {
                             truncationOffset);
                     if (otpGen.equals(otp)) {
                         //OTP is correct set the counter value to counter+i
-                        setCounterAttr(id, counter + i);
+                        setCounterAttr(id, counter + i, settings);
                         return true;
                     }
                 }
@@ -569,24 +615,7 @@ public class OATH extends AMLoginModule {
                  */
 
                 //get Last login time
-                Set<String> lastLoginTimeSet;
-                try {
-                    if (loginTimeAttrName == null || loginTimeAttrName.isEmpty()) {
-                        debug.error("OATH.checkOTP() : invalid login time attribute name : ");
-                        throw new AuthLoginException(amAuthOATH, "authFailed", null);
-                    }
-                    lastLoginTimeSet = id.getAttribute(loginTimeAttrName);
-                } catch (IdRepoException e) {
-                    debug.error("OATH.checkOTP() : error getting last login time attribute : ", e);
-                    throw new AuthLoginException(amAuthOATH, "authFailed", null);
-                } catch (SSOException e) {
-                    debug.error("OATH.checkOTP() : error invalid repo id : " + id, e);
-                    throw new AuthLoginException(amAuthOATH, "authFailed", null);
-                }
-                long lastLoginTime = 0;
-                if (lastLoginTimeSet != null && !lastLoginTimeSet.isEmpty()) {
-                    lastLoginTime = Long.parseLong(lastLoginTimeSet.iterator().next());
-                }
+                long lastLoginTime = settings.getLastLogin();
 
                 //Check TOTP values for validity
                 if (lastLoginTime < 0) {
@@ -594,7 +623,7 @@ public class OATH extends AMLoginModule {
                     throw new AuthLoginException(amAuthOATH, "authFailed", null);
                 }
 
-                //must be greater than 0 or we get divide by 0, and cant be negetive
+                //must be greater than 0 or we get divide by 0, and cant be negative
                 if (totpTimeStep <= 0) {
                     debug.error("OATH.checkOTP() : invalid TOTP time step interval : ");
                     throw new AuthLoginException(amAuthOATH, "authFailed", null);
@@ -625,7 +654,7 @@ public class OATH extends AMLoginModule {
                 otpGen = TOTPAlgorithm.generateTOTP(secretKey, Long.toHexString(localTime), passLenStr);
 
                 if (otpGen.equals(otp)) {
-                    setLoginTime(id, localTime);
+                    setLoginTime(id, localTime, settings);
                     return true;
                 }
 
@@ -637,7 +666,7 @@ public class OATH extends AMLoginModule {
                     otpGen = TOTPAlgorithm.generateTOTP(secretKey, Long.toHexString(time1), passLenStr);
 
                     if (otpGen.equals(otp)) {
-                        setLoginTime(id, time1);
+                        setLoginTime(id, time1, settings);
                         return true;
                     }
 
@@ -649,7 +678,7 @@ public class OATH extends AMLoginModule {
                                 "than the current times OTP");
                         return false;
                     } else if(otpGen.equals(otp) && !sameWindow)  {
-                        setLoginTime(id, time2);
+                        setLoginTime(id, time2, settings);
                         return true;
                     }
                 }
@@ -665,10 +694,21 @@ public class OATH extends AMLoginModule {
         return false;
     }
 
-    private String getSecretKey(AMIdentity id) throws AuthLoginException {
-        Set<String> secretKeySet = getSecretKeySet(id);
-        String secretKey = secretKeySet.iterator().next();
+    /**
+     * Returns the first in the set of OATH device settings, or null if no
+     * device settings were returned.
+     */
+    private OathDeviceSettings getOathDeviceSettings(String username, String realm)
+            throws InternalServerErrorException, IOException, AuthLoginException {
 
+        //get data from the DAO
+        List<JsonValue> profiles = devicesDao.getDeviceProfiles(username, realm);
+        List<OathDeviceSettings> allSettings = JsonConversionUtils.toOathDeviceSettingValues(profiles);
+
+        return CollectionUtils.getFirstItem(allSettings, null);
+    }
+
+    private String parseSecretKey(String secretKey) {
         //get rid of white space in string (messes with the data converter)
         secretKey = secretKey.replaceAll("\\s+", "");
         //convert secretKey to lowercase
@@ -681,82 +721,10 @@ public class OATH extends AMLoginModule {
         return secretKey;
     }
 
-    private Set<String> getSecretKeySet(AMIdentity id) throws AuthLoginException {
-        Set<String> secretKeySet;
-        try {
-            if (secretKeyAttrName == null || secretKeyAttrName.isEmpty()) {
-                debug.error("OATH .getSecretKeySet() : invalid secret key attribute name : null or empty string");
-                throw new AuthLoginException(amAuthOATH, "authFailed", null);
-            }
-
-            secretKeySet = id.getAttribute(secretKeyAttrName);
-        } catch (IdRepoException e) {
-            debug.error("OATH .getSecretKeySet() : error getting secret key attribute : ",
-                    e);
-            throw new AuthLoginException(amAuthOATH, "authFailed", null);
-        } catch (SSOException e) {
-            debug.error("OATH .getSecretKeySet() : error invalid repo id : " + id, e);
-            throw new AuthLoginException(amAuthOATH, "authFailed", null);
-        }
-
-        //check secretKey attribute
-        if (secretKeySet == null || secretKeySet.isEmpty()) {
-            debug.error("OATH.getSecretKeySet() : Secret key setting is empty or null");
-            throw new AuthLoginException(amAuthOATH, "authFailed", null);
-        }
-
-        return secretKeySet;
-    }
-
-    private int getCounter(AMIdentity id) throws AuthLoginException {
-        int counter;
-
-        Set<String> counterSet = getCounterSet(id);
-
-        try {
-            counter = Integer.parseInt((counterSet.iterator().next()));
-        } catch (NumberFormatException e) {
-            debug.error("OATH .getCounter() : Counter is not a valid number", e);
-            throw new AuthLoginException(amAuthOATH, "authFailed", null);
-        }
-
-        //check window size
-        if (windowSize < 0) {
-            debug.error("OATH .getCounter() : Window size is not valid");
-            throw new AuthLoginException(amAuthOATH, "authFailed", null);
-        }
-
-        return counter;
-    }
-
-    private Set<String> getCounterSet(AMIdentity id) throws AuthLoginException {
-        Set<String> counterSet;
-        try {
-            if (counterAttrName == null || counterAttrName.isEmpty()) {
-                debug.error("OATH .getCounterSet() : invalid counter attribute name : null or empty string");
-                throw new AuthLoginException(amAuthOATH, "authFailed", null);
-            }
-            counterSet = id.getAttribute(counterAttrName);
-        } catch (IdRepoException e) {
-            debug.error("OATH .getCounterSet() : error getting counter attribute : ", e);
-            throw new AuthLoginException(amAuthOATH, "authFailed", null);
-        } catch (SSOException e) {
-            debug.error("OATH .getCounterSet() : error invalid repo id : " + id, e);
-            throw new AuthLoginException(amAuthOATH, "authFailed", null);
-        }
-        //check counter value
-        if (counterSet == null || counterSet.isEmpty()) {
-            debug.error("OATH .getCounterSet() : Counter value is empty or null");
-            throw new AuthLoginException(amAuthOATH, "authFailed", null);
-        }
-
-        return counterSet;
-    }
-
     /**
-     * Gets the AMIdentity of a user with username equal to uName.
+     * Gets the AMIdentity of a user with username equal to userName.
      *
-     * @return The AMIdentity of user with username equal to uName.
+     * @return The AMIdentity of user with username equal to userName.
      */
     private AMIdentity getIdentity() {
         AMIdentity theID = null;
@@ -766,7 +734,7 @@ public class OATH extends AMLoginModule {
         idsc.setRecursive(true);
         idsc.setAllReturnAttributes(true);
         // search for the identity
-        Set<AMIdentity> results = Collections.EMPTY_SET;
+        Set<AMIdentity> results = Collections.emptySet();
         try {
             idsc.setMaxResults(0);
             IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, userName, idsc);
@@ -793,26 +761,13 @@ public class OATH extends AMLoginModule {
      *
      * @param id      The user id to set the counter for.
      * @param counter The counter value to set the attribute too.
-     * @throws AuthLoginException on any error.
+     * @param settings The settings to store the value in.
      */
-    private void setCounterAttr(AMIdentity id, int counter)
-            throws AuthLoginException {
-        Map<String, Set<String>> map = new HashMap<String, Set<String>>();
-        map.put(counterAttrName, Collections.singleton(Integer.toString(counter)));
-        try {
-            id.setAttributes(map);
-            id.store();
-        } catch (IdRepoException e) {
-            if (debug.errorEnabled()) {
-                debug.error("OATH.setCounterAttr : error setting counter attribute to : " + counter, e);
-            }
-            throw new AuthLoginException(amAuthOATH, "authFailed", null);
-        } catch (SSOException e) {
-            if (debug.errorEnabled()) {
-                debug.error("OATH.setCounterAttr : error invalid token for id : " + id, e);
-            }
-            throw new AuthLoginException(amAuthOATH, "authFailed", null);
-        }
+    private void setCounterAttr(AMIdentity id, int counter, OathDeviceSettings settings)
+            throws AuthLoginException, IOException, InternalServerErrorException {
+        settings.setCounter(counter);
+        devicesDao.saveDeviceProfiles(id.getName(), id.getRealm(),
+                Collections.singletonList(JsonConversionUtils.toJsonValue(settings)));
     }
 
     /**
@@ -820,31 +775,17 @@ public class OATH extends AMLoginModule {
      *
      * @param id   The id of the user to set the attribute of.
      * @param time The time to set the attribute too.
-     * @throws AuthLoginException on any error.
+     * @param settings The settings to store the value in.
      */
-    private void setLoginTime(AMIdentity id, long time)
-            throws AuthLoginException {
-        Map<String, Set<String>> map = new HashMap<String, Set<String>>();
-
-        map.put(loginTimeAttrName, map.put(counterAttrName, Collections.singleton(Long.toString(time))));
-        try {
-            id.setAttributes(map);
-            id.store();
-        } catch (IdRepoException e) {
-            if (debug.errorEnabled()) {
-                debug.error("OATH.setLoginTime : error setting time attribute to : " + time, e);
-            }
-            throw new AuthLoginException(amAuthOATH, "authFailed", null);
-        } catch (SSOException e) {
-            if (debug.errorEnabled()) {
-                debug.error("OATH.setLoginTime : error invalid token for id : " + id, e);
-            }
-            throw new AuthLoginException(amAuthOATH, "authFailed", null);
-        }
+    private void setLoginTime(AMIdentity id, long time, OathDeviceSettings settings)
+            throws AuthLoginException, IOException, InternalServerErrorException {
+        settings.setLastLogin(time);
+        devicesDao.saveDeviceProfiles(id.getName(), id.getRealm(),
+                Collections.singletonList(JsonConversionUtils.toJsonValue(settings)));
     }
 
     private void setUserSkipOath(AMIdentity id, boolean userSkipOath) throws IdRepoException, SSOException {
-        final HashMap<String, Set<String>> attributesToWrite = new HashMap<String, Set<String>>();
+        final HashMap<String, Set<String>> attributesToWrite = new HashMap<>();
         attributesToWrite.put(skippableAttrName,
                 userSkipOath ?
                         Collections.singleton(String.valueOf(SKIPPABLE)) :

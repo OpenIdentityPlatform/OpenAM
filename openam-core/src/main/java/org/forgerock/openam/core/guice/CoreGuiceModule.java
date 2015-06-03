@@ -24,6 +24,7 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
+import com.iplanet.am.util.SecureRandomManager;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.monitoring.SessionMonitoringStore;
 import com.iplanet.dpro.session.operations.ServerSessionOperationStrategy;
@@ -118,6 +119,7 @@ import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.security.SecureRandom;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -256,6 +258,21 @@ public class CoreGuiceModule extends AbstractModule {
         bind(SessionCookies.class).toInstance(SessionCookies.getInstance());
         bind(SessionURL.class).toInstance(SessionURL.getInstance());
         bind(SessionServiceURLService.class).toInstance(SessionServiceURLService.getInstance());
+    }
+
+    /**
+     * Returns a secure random number generator suitable for generating shared secrets and other key material. This
+     * uses the provider configured by system property
+     * {@code com.iplanet.security.SecureRandomFactoryImpl}. By default this is the SHA-1 PRNG algorithm, seeded from
+     * the system entropy pool.
+     *
+     * @return the configured secure random number generator.
+     * @see SecureRandomManager
+     * @throws Exception if an error occurs trying to obtain the secure random instance.
+     */
+    @Provides @Singleton
+    SecureRandom getSecureRandom() throws Exception {
+        return SecureRandomManager.getSecureRandom();
     }
 
     @Provides @Inject @Named(PolicyMonitorImpl.EXECUTOR_BINDING_NAME)

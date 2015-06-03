@@ -49,8 +49,7 @@ public class RemoteSessionQuery implements SessionQueryType {
 
     private String serverId;
     private static Debug debug = InjectorHolder.getInstance(Key.get(Debug.class, Names.named(SESSION_DEBUG)));
-    private final SessionServiceURLService sessionServiceUrlService =
-            InjectorHolder.getInstance(SessionServiceURLService.class);
+    private final SessionServiceURLService sessionServiceUrlService = InjectorHolder.getInstance(SessionServiceURLService.class);
     private final SessionPLLSender sessionPllSender =
             InjectorHolder.getInstance(SessionPLLSender.class);
 

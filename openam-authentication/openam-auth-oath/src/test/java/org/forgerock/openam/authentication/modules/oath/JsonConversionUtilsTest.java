@@ -16,20 +16,20 @@
 
 package org.forgerock.openam.authentication.modules.oath;
 
-import org.forgerock.json.fluent.JsonValue;
-import org.testng.Assert;
-import org.testng.annotations.Test;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.rest.devices.OathDeviceSettings;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class JsonConversionUtilsTest {
 
     @Test
     public void shouldPerformRoundTripWithOathDeviceSettingsObject() throws IOException {
         //Given
-        OathDeviceSettings object = getOathDeviceSettingsObject("secret", "Device Name", "1431999532", "1", "12", "-1");
+        OathDeviceSettings object = getOathDeviceSettingsObject("secret", "Device Name", 1431999532, 1, true, -1);
 
         //When
         JsonValue jsonValue = JsonConversionUtils.toJsonValue(object);
@@ -43,9 +43,9 @@ public class JsonConversionUtilsTest {
     public void shouldPerformRoundTripWithOathDeviceSettingsList() throws IOException {
         //Given
         OathDeviceSettings object1 =
-                getOathDeviceSettingsObject("secret", "Device Name", "1431999532", "1", "12", "-1");
+                getOathDeviceSettingsObject("secret", "Device Name", 1431999532, 1, true, -1);
         OathDeviceSettings object2 =
-                getOathDeviceSettingsObject("secret2", "Device Name 2", "1431999533", "2", "14", "-2");
+                getOathDeviceSettingsObject("secret2", "Device Name 2", 1431999533, 2, true, -2);
         List<OathDeviceSettings> list = new ArrayList<>();
         list.add(object1);
         list.add(object2);
@@ -58,9 +58,9 @@ public class JsonConversionUtilsTest {
         Assert.assertEquals(list, oathDeviceSettingsList, "Expected OathDeviceSettings objects to have same content");
     }
 
-    private OathDeviceSettings getOathDeviceSettingsObject(String sharedSecret, String deviceName, String lastLogin,
-                                                           String counter, String checksumDigit,
-                                                           String truncationOffset) {
+    private OathDeviceSettings getOathDeviceSettingsObject(String sharedSecret, String deviceName, long lastLogin,
+                                                           int counter, boolean checksumDigit,
+                                                           int truncationOffset) {
         OathDeviceSettings oathDeviceSettings = new OathDeviceSettings(sharedSecret, deviceName, lastLogin, counter);
         oathDeviceSettings.setChecksumDigit(checksumDigit);
         oathDeviceSettings.setTruncationOffset(truncationOffset);

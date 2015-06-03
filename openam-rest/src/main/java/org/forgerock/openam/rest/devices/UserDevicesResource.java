@@ -14,11 +14,10 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.rest.dashboard;
+package org.forgerock.openam.rest.devices;
 
 import java.text.ParseException;
 import java.util.List;
-import javax.security.auth.Subject;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
@@ -36,7 +35,7 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.entitlements.RealmAwareResource;
-import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
+import org.forgerock.openam.rest.resource.ContextHelper;
 
 /**
  * REST resource for a user's trusted devices.
@@ -45,18 +44,21 @@ import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
  */
 public abstract class UserDevicesResource<T extends UserDevicesDao> extends RealmAwareResource {
 
-    static final String USER = "user";
     static final String UUID_KEY = "uuid";
 
     protected final T userDevicesDao;
+
+    private final ContextHelper contextHelper;
 
     /**
      * Constructs a new UserDevicesResource.
      *
      * @param userDevicesDao An instance of the {@code UserDevicesDao}.
      */
-    public UserDevicesResource(T userDevicesDao) {
+    public UserDevicesResource(T userDevicesDao, ContextHelper contextHelper) {
         this.userDevicesDao = userDevicesDao;
+        this.contextHelper = contextHelper;
+
     }
 
     /**
@@ -91,11 +93,10 @@ public abstract class UserDevicesResource<T extends UserDevicesDao> extends Real
     public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request,
                                ResultHandler<Resource> handler) {
 
-        final Subject subject = getContextSubject(context);
-        final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(subject);
+        final String userName = contextHelper.getUserId(context);
 
         try {
-            List<JsonValue> devices = userDevicesDao.getDeviceProfiles(principalName, getRealm(context));
+            List<JsonValue> devices = userDevicesDao.getDeviceProfiles(userName, getRealm(context));
 
             JsonValue toDelete = null;
             for (JsonValue device : devices) {
@@ -112,7 +113,7 @@ public abstract class UserDevicesResource<T extends UserDevicesDao> extends Real
 
             devices.remove(toDelete);
 
-            userDevicesDao.saveDeviceProfiles(principalName, getRealm(context), devices);
+            userDevicesDao.saveDeviceProfiles(userName, getRealm(context), devices);
 
             handler.handleResult(new Resource(resourceId, toDelete.hashCode() + "", toDelete));
         } catch (InternalServerErrorException e) {
@@ -135,10 +136,9 @@ public abstract class UserDevicesResource<T extends UserDevicesDao> extends Real
     @Override
     public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
         try {
-            final Subject subject = getContextSubject(context);
-            final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(subject);
+            final String userName = contextHelper.getUserId(context);
 
-            for (JsonValue profile : userDevicesDao.getDeviceProfiles(principalName, getRealm(context))) {
+            for (JsonValue profile : userDevicesDao.getDeviceProfiles(userName, getRealm(context))) {
                 handler.handleResource(convertValue(profile));
             }
             handler.handleResult(new QueryResult());

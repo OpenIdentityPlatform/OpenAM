@@ -11,24 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Copyright 2015 ForgeRock Inc.
  */
-
-package org.forgerock.openam.rest.dashboard;
-
-import javax.inject.Inject;
 
 /**
- * A user devices resource for OATH authentication devices.
- *
- * @since 13.0.0
- * @see UserDevicesResource
+ * This package contains classes for the OpenAM OATH implementation.
  */
-public class OathDevicesResource extends TwoFADevicesResource<OathDevicesDao> {
-
-    @Inject
-    public OathDevicesResource(OathDevicesDao dao) {
-        super(dao);
-    }
-
-}
+package org.forgerock.openam.rest.devices.services;

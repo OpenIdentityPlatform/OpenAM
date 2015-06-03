@@ -16,14 +16,14 @@
 
 package org.forgerock.openam.authentication.modules.oath;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.forgerock.json.fluent.JsonValue;
-
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.rest.devices.OathDeviceSettings;
+import org.forgerock.openam.utils.JsonValueBuilder;
 
 /**
  * Utility functions for ease of conversion between OathDeviceSettings objects and Json
@@ -46,7 +46,7 @@ public class JsonConversionUtils {
     public static JsonValue toJsonValue(OathDeviceSettings oathDeviceSetting) throws IOException {
         StringWriter stringWriter = new StringWriter();
         mapper.writeValue(stringWriter, oathDeviceSetting);
-        return new JsonValue(stringWriter.toString());
+        return JsonValueBuilder.toJsonValue(stringWriter.toString());
     }
 
     /**
@@ -58,7 +58,7 @@ public class JsonConversionUtils {
      * {@link OathDeviceSettings} object
      */
     public static OathDeviceSettings toOathDeviceSettingValue(JsonValue jsonValue) throws IOException {
-        return mapper.readValue(new StringReader(jsonValue.asString()), OathDeviceSettings.class);
+        return mapper.readValue(jsonValue.toString(), OathDeviceSettings.class);
     }
 
     /**

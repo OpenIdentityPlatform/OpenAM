@@ -126,8 +126,7 @@ public class CDCClientServlet extends HttpServlet {
     private static boolean cookieEncoding =
             SystemProperties.getAsBoolean(Constants.AM_COOKIE_ENCODE);
 
-    private final SessionServiceURLService sessionServiceUrl
-            = InjectorHolder.getInstance(SessionServiceURLService.class);
+    private final SessionServiceURLService sessionServiceUrl = InjectorHolder.getInstance(SessionServiceURLService.class);
 
     /**
      * @param config the ServletConfig object that contains configutation

@@ -32,6 +32,8 @@
 
 package com.iplanet.dpro.session.service;
 
+import static org.forgerock.openam.session.SessionConstants.*;
+
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
@@ -47,17 +49,6 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.cts.CTSPersistentStore;
-import org.forgerock.openam.cts.api.fields.SessionTokenField;
-import org.forgerock.openam.cts.api.filter.TokenFilter;
-import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
-import org.forgerock.openam.session.SessionPLLSender;
-import org.forgerock.openam.session.SessionServiceURLService;
-import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
-import org.forgerock.openam.tokens.CoreTokenField;
-import org.forgerock.openam.utils.TimeUtils;
-
 import java.net.URL;
 import java.security.AccessController;
 import java.text.MessageFormat;
@@ -69,8 +60,16 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
-import static org.forgerock.openam.session.SessionConstants.SESSION_DEBUG;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.api.fields.SessionTokenField;
+import org.forgerock.openam.cts.api.filter.TokenFilter;
+import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
+import org.forgerock.openam.session.SessionPLLSender;
+import org.forgerock.openam.session.SessionServiceURLService;
+import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
+import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.openam.utils.TimeUtils;
 
 
 /**

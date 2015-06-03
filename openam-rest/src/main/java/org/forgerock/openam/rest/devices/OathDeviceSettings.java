@@ -14,8 +14,10 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.authentication.modules.oath;
+package org.forgerock.openam.rest.devices;
 
+import java.util.Objects;
+import java.util.UUID;
 import org.forgerock.util.Reject;
 
 /**
@@ -27,13 +29,16 @@ public final class OathDeviceSettings {
 
     private String sharedSecret;
     private String deviceName;
-    private String lastLogin;
-    private String counter;
-    private String checksumDigit;
-    private String truncationOffset;
+    private long lastLogin;
+    private int counter;
+    private boolean checksumDigit = false;
+    private int truncationOffset = 0;
+    private String[] recoveryCodes = new String[0];
+    private String uuid;
 
     public OathDeviceSettings() {
         //Empty no-arg constructor for Jackson usage, due to presence of non-default constructor.
+        //UUID is injected by Jackson.
     }
 
     /**
@@ -42,11 +47,33 @@ public final class OathDeviceSettings {
      * @param lastLogin The last login time, for TOTP algorithm usage. Non-null value.
      * @param counter The counter value, for HOTP algorithm usage. Non-null value.
      */
-    public OathDeviceSettings(String sharedSecret, String deviceName, String lastLogin, String counter) {
+    public OathDeviceSettings(String sharedSecret, String deviceName, long lastLogin, int counter) {
         setSharedSecret(sharedSecret);
         setDeviceName(deviceName);
         setLastLogin(lastLogin);
         setCounter(counter);
+
+        //when created w/ the constructor, use a random String
+        uuid = UUID.randomUUID().toString();
+    }
+
+    /**
+     * Sets the remaining recovery codes for this device.
+     *
+     * @param recoveryCodes the remaining recovery codes for this device. Can not be null.
+     */
+    public void setRecoveryCodes(String[] recoveryCodes) {
+        Reject.ifNull(recoveryCodes);
+        this.recoveryCodes = recoveryCodes;
+    }
+
+    /**
+     * Get the array of recovery codes which are usable for this device.
+     *
+     * @return an array of the remaining recovery codes for this device.
+     */
+    public String[] getRecoveryCodes() {
+        return recoveryCodes;
     }
 
     /**
@@ -73,9 +100,9 @@ public final class OathDeviceSettings {
      * Set the last login time, in milliseconds, when this device was used. This is relevant for authentication using
      * the TOTP algorithm.
      *
-     * @param lastLogin The last login time. Can not be null.
+     * @param lastLogin The last login time in ms. Can not be null.
      */
-    public void setLastLogin(String lastLogin) {
+    public void setLastLogin(long lastLogin) {
         Reject.ifNull(lastLogin, "lastLogin can not be null.");
         this.lastLogin = lastLogin;
     }
@@ -85,7 +112,7 @@ public final class OathDeviceSettings {
      *
      * @param counter The counter value. Can not be null.
      */
-    public void setCounter(String counter) {
+    public void setCounter(int counter) {
         Reject.ifNull(counter, "counter can not be null.");
         this.counter = counter;
     }
@@ -95,8 +122,18 @@ public final class OathDeviceSettings {
      *
      * @param truncationOffset The truncation offset.
      */
-    public void setTruncationOffset(String truncationOffset) {
+    public void setTruncationOffset(int truncationOffset) {
         this.truncationOffset = truncationOffset;
+    }
+
+    /**
+     * Sets the UUID for this device.
+     *
+     * @param uuid The UUID.
+     */
+    public void setUUID(String uuid) {
+        Reject.ifNull(uuid, "UUID can not be null.");
+        this.uuid = uuid;
     }
 
     /**
@@ -104,7 +141,7 @@ public final class OathDeviceSettings {
      *
      * @param checksumDigit The checksum digit.
      */
-    public void setChecksumDigit(String checksumDigit) {
+    public void setChecksumDigit(boolean checksumDigit) {
         this.checksumDigit = checksumDigit;
     }
 
@@ -130,9 +167,9 @@ public final class OathDeviceSettings {
      * Get the last login time, in milliseconds, when this device was used. This is relevant for authentication using
      * the TOTP algorithm.
      *
-     * @return lastLogin The last login time.
+     * @return lastLogin The last login time in ms.
      */
-    public String getLastLogin() {
+    public long getLastLogin() {
         return lastLogin;
     }
 
@@ -141,7 +178,7 @@ public final class OathDeviceSettings {
      *
      * @return counter The counter value.
      */
-    public String getCounter() {
+    public int getCounter() {
         return counter;
     }
 
@@ -150,7 +187,7 @@ public final class OathDeviceSettings {
      *
      * @return checksumDigit The checksum digit.
      */
-    public String getChecksumDigit() {
+    public boolean getChecksumDigit() {
         return checksumDigit;
     }
 
@@ -159,8 +196,18 @@ public final class OathDeviceSettings {
      *
      * @return truncationOffset The truncation offset.
      */
-    public String getTruncationOffset() {
+    public int getTruncationOffset() {
         return truncationOffset;
+    }
+
+    /**
+     * Gets the UUID from this class which is used as reference and set
+     * on creation.
+     *
+     * @return UUID the UUID.
+     */
+    public String getUUID() {
+        return uuid;
     }
 
     @Override
@@ -174,23 +221,25 @@ public final class OathDeviceSettings {
 
         OathDeviceSettings that = (OathDeviceSettings) o;
 
-        if (checksumDigit != null ? !checksumDigit.equals(that.checksumDigit) : that.checksumDigit != null) {
+        if (checksumDigit != that.checksumDigit) {
             return false;
         }
-        if (!counter.equals(that.counter)) {
+        if (counter != that.counter) {
             return false;
         }
         if (!deviceName.equals(that.deviceName)) {
             return false;
         }
-        if (!lastLogin.equals(that.lastLogin)) {
+        if (lastLogin  != that.lastLogin) {
             return false;
         }
         if (!sharedSecret.equals(that.sharedSecret)) {
             return false;
         }
-        if (truncationOffset != null ? !truncationOffset.equals(that.truncationOffset) : that.truncationOffset
-                != null) {
+        if (truncationOffset != that.truncationOffset) {
+            return false;
+        }
+        if (!uuid.equals(that.getUUID())) {
             return false;
         }
 
@@ -199,13 +248,8 @@ public final class OathDeviceSettings {
 
     @Override
     public int hashCode() {
-        int result = sharedSecret.hashCode();
-        result = 31 * result + deviceName.hashCode();
-        result = 31 * result + lastLogin.hashCode();
-        result = 31 * result + counter.hashCode();
-        result = 31 * result + (checksumDigit != null ? checksumDigit.hashCode() : 0);
-        result = 31 * result + (truncationOffset != null ? truncationOffset.hashCode() : 0);
-        return result;
+        return Objects.hash(sharedSecret, deviceName, lastLogin, counter,
+                checksumDigit, truncationOffset, recoveryCodes, uuid);
     }
 
     @Override
@@ -217,6 +261,28 @@ public final class OathDeviceSettings {
                 ", counter='" + counter + '\'' +
                 ", checksumDigit='" + checksumDigit + '\'' +
                 ", truncationOffset='" + truncationOffset + '\'' +
+                ", UUID='"+ uuid + '\'' +
                 '}';
+    }
+
+    /**
+     * Generates numCodes of recovery codes, utilising java.util.UUID.randomUUID() to create random
+     * String characters.
+     *
+     * @param numCodes Number of recovery codes to generate. Must be > 0.
+     * @return a String array of randomly generated recovery codes, of size numSize.
+     */
+    public static String[] generateRecoveryCodes(int numCodes) {
+        Reject.ifTrue(numCodes < 1, "numCodes must be greater than or equal to 1.");
+
+        String[] recoveryCodes = new String[numCodes];
+
+        for ( int i = 0; i < numCodes; i++) {
+            String temp = UUID.randomUUID().toString();
+            temp = temp.replace("-", "").substring(0, 10);
+            recoveryCodes[i] = temp;
+        }
+
+        return recoveryCodes;
     }
 }

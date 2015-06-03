@@ -133,6 +133,9 @@ public class ScriptingSchemaStep extends AbstractUpgradeStep {
             scriptAttributes.put(DEFAULT_SCRIPT, Collections.singleton(serverScript));
         }
         String scriptLanguage = getMapAttr(orgAttributes, SERVER_SCRIPT_TYPE);
+        if (StringUtils.isBlank(scriptLanguage)) {
+            scriptLanguage = "JAVASCRIPT"; //set default to JS if no default provided as per scripting.xml schema
+        }
         scriptAttributes.put(DEFAULT_LANGUAGE, Collections.singleton(scriptLanguage.toUpperCase()));
         contextScriptConfigurations.put(ScriptContext.AUTHENTICATION_SERVER_SIDE, scriptAttributes);
     }
