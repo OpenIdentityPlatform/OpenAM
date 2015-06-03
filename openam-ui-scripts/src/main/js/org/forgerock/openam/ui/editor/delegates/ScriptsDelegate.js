@@ -41,5 +41,19 @@ define('org/forgerock/openam/ui/editor/delegates/ScriptsDelegate', [
         });
     };
 
+    obj.getAllContexts = function () {
+        return obj.serviceCall({
+            url: RealmHelper.decorateURLWithOverrideRealm('/global-config/services/scripting/contexts?_queryFilter=true'),
+            errorsHandlers: obj.ERROR_HANDLERS
+        });
+    };
+
+    obj.getDefaultGlobalContext = function () {
+        return obj.serviceCall({
+            url: RealmHelper.decorateURLWithOverrideRealm('/global-config/services/scripting'),
+            errorsHandlers: obj.ERROR_HANDLERS
+        });
+    };
+
     return obj;
 });

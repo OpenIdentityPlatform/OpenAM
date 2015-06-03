@@ -7,7 +7,10 @@
                 {{else}}
                 {{t "scripts.edit.createTitle"}}
                 {{/if}}
-                <a class="pull-right btn btn-default" href="#list" role="button">{{t 'common.form.cancel'}}</a>
+                <div class="pull-right">
+                    <a class="btn btn-default" id="changeContext" role="button">{{t 'scripts.edit.changeContext'}}</a>
+                    <a class="btn btn-default" href="#list" role="button">{{t 'common.form.cancel'}}</a>
+                </div>
             </h1>
         </div>
 
@@ -22,20 +25,11 @@
                         </div>
                     </div>
 
-                    <!-- LANGUAGE -->
+                    <!-- DESCRIPTION -->
                     <div class="form-group">
-                        <label class="col-sm-3 control-label">{{t "scripts.edit.language"}}</label>
+                        <label class="col-sm-3 control-label">{{t "scripts.edit.description"}}</label>
                         <div class="col-sm-8">
-                        {{#if languages}}
-                        {{#each languages}}
-                        <div class="radio">
-                            <label>
-                                <input type="radio" name="language" id="{{value}}" value="{{value}}" data-field="language"
-                                    {{#equals ../entity.language value}} checked {{/equals}}> {{name}}
-                            </label>
-                        </div>
-                        {{/each}}
-                        {{/if}}
+                            <textarea id="description" class="form-control pull-left script-text" rows="3" data-field="description">{{entity.description}}</textarea>
                         </div>
                     </div>
 
@@ -43,16 +37,22 @@
                     <div class="form-group">
                         <label class="col-sm-3 control-label">{{t "scripts.edit.context"}}</label>
                         <div class="col-sm-8">
-                            {{#if contexts}}
-                            {{#each contexts}}
-                            <div class="radio">
-                                <label>
-                                    <input type="radio" name="context" value="{{value}}" data-field="context"
-                                        {{#equals ../entity.context value}} checked {{/equals}}> {{name}}
-                                </label>
-                            </div>
-                            {{/each}}
-                            {{/if}}
+                            <span class="form-control" id="context">{{entity.context}}</span>
+                        </div>
+                    </div>
+
+                    <!-- LANGUAGE -->
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{{t "scripts.edit.language"}}</label>
+                        <div class="col-sm-8">
+                        {{#each languages}}
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="language" id="{{this}}" value="{{this}}" data-field="language"
+                                    {{#equals ../entity.language this}} checked {{/equals}}> {{this}}
+                            </label>
+                        </div>
+                        {{/each}}
                         </div>
                     </div>
 

@@ -1,0 +1,25 @@
+{{#if newScript}}
+    <p>{{t "scripts.edit.dialog.helper"}}</p>
+{{else}}
+    <div class="alert" role="alert">
+        <div class="media">
+            <div class="media-left" href="#"><i class="fa fa-exclamation-circle"></i></div>
+            <div class="media-body">{{t "scripts.edit.dialog.warning"}}</div>
+        </div>
+    </div>
+{{/if}}
+
+{{#each contexts}}
+<div class="radio">
+    <label>
+        <input type="radio" name="changeContext" id="{{this._id}}" value="{{this._id}}"
+        {{#if ../newScript}}
+            {{#equals ../../defaultContext this._id}} checked {{/equals}}
+        {{else}}
+            {{#equals ../../entity.context this._id}} checked {{/equals}}
+        {{/if}}
+        >
+        {{this._id}}
+    </label>
+</div>
+{{/each}}

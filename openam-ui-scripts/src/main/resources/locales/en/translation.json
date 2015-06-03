@@ -39,8 +39,11 @@
                 "scriptCreated": "Script created successfully",
                 "scriptUpdated": "Script updated successfully",
                 "validation": {
-                    "noLanguage": "Please select language",
                     "noScript": "Please upload existing script or create a new one"
+                },
+                "error": {
+                    "noName": "Name is required",
+                    "noScript": "Script is required"
                 }
             }
         },
@@ -141,6 +144,7 @@
             "actions": "Actions",
             "complete": "Complete",
             "reset": "Reset",
+            "change": "Change",
             "copyright": "Copyright &copy; 2010-15 ForgeRock AS. All rights reserved.",
             "sessionExpired": "Session Expired",
             "enableCookies": "Cookies must be enabled to login",
@@ -238,6 +242,7 @@
             "editTitle": "Edit Script",
             "createTitle": "Create Script",
             "name": "Name",
+            "description": "Description",
             "language": "Language",
             "context": "Context",
             "script": "Script",
@@ -249,6 +254,15 @@
                 "message": "message",
                 "errors": "This script contains errors:",
                 "noErrors": "No errors found."
+            },
+            "changeContext": "Change Context",
+            "dialog": {
+                "title": {
+                    "change": "Change Context",
+                    "select": "Select Context"
+                },
+                "helper": "To create a new script first select one of the available scripting contexts.",
+                "warning": "By changing the context you will lose any unsaved data."
             }
         },
         "list": {

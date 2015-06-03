@@ -1,41 +1,34 @@
 /**
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
- *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
- *
- * You can obtain a copy of the License at
- * http://forgerock.org/license/CDDLv1.0.html
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at http://forgerock.org/license/CDDLv1.0.html
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
 /*global define, $, _*/
 
 define("org/forgerock/openam/ui/editor/views/EditScriptView", [
+    "bootstrap-dialog",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Base64",
+    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/editor/models/ScriptModel",
     "org/forgerock/openam/ui/editor/delegates/ScriptsDelegate"
-], function (AbstractView, Constants, EventManager, Base64, UIUtils, Script, ScriptsDelegate) {
+], function (BootstrapDialog, AbstractView, EventManager, Base64, Constants, UIUtils, Script, ScriptsDelegate) {
 
     var EditScriptView = AbstractView.extend({
-        initialize: function(options) {
+        initialize: function (options) {
             this.model = null;
         },
 
@@ -44,16 +37,17 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
         events: {
             'click #validateScript': 'validateScript',
             'keyup #validateScript': 'validateScript',
+            'click #changeContext': 'openDialog',
+            'keyup #changeContext': 'openDialog',
             'click input[name=save]': 'submitForm',
             'keyup input[name=save]': 'submitForm'
         },
 
-        onModelError: function(model, response) {
-            console.error('Unrecoverable load failure Script. ' +
-                response.status + ' ' + response.statusText);
+        onModelError: function (model, response) {
+            console.error('Unrecoverable load failure Script. ' + response.status + ' ' + response.statusText);
         },
 
-        onModelSync: function(model, response) {
+        onModelSync: function (model, response) {
             this.renderAfterSyncModel();
         },
 
@@ -63,8 +57,10 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
             // As we interrupt render to update the model, we need to remember the callback
             if (callback) { this.renderCallback = callback; }
 
-            // Get the current id
-            if(args && args[0]) { uuid = args[0]; }
+            if (args && args[0]) { uuid = args[0]; }
+
+            this.contextsPromise = ScriptsDelegate.getAllContexts();
+            this.defaultContextPromise = ScriptsDelegate.getDefaultGlobalContext();
 
             /**
              * Guard clause to check if model requires sync'ing/updating
@@ -74,7 +70,7 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
              * Behaviour: If the model does require sync'ing then we abort this render via the return and render
              * will it invoked again when the model is updated
              */
-            if(this.syncModel(uuid)) { return; }
+            if (this.syncModel(uuid)) { return; }
 
             this.renderAfterSyncModel();
         },
@@ -87,26 +83,41 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
          * In the first case we should to create a new model, in second case is not create.
          * So I divided the render function into two parts, so as not to cause a re-check and avoid the second case.
          */
-        renderAfterSyncModel: function() {
+        renderAfterSyncModel: function () {
             var self = this;
 
-            this.data.entity = _.pick(this.model.attributes, 'uuid', 'name', 'language', 'context', 'script');
+            this.data.entity = _.pick(this.model.attributes, 'uuid', 'name', 'description', 'language', 'context', 'script');
 
-            this.data.languages = [ {name: 'Groovy', value: 'GROOVY'},
-                 {name: 'Javascript', value: 'JAVASCRIPT'}
-            ];
+            if (!this.data.contexts) {
+                this.contextsPromise.done(function (contexts) {
+                    self.data.contexts = contexts.result;
+                    self.renderScript();
+                });
+            } else {
+                self.renderScript();
+            }
 
-            // TODO temporary, until contexts are not implemented on the server side
-            this.data.contexts = [ {name: 'General Purpose', value: 'GENERAL_PURPOSE'},
-                {name: 'Authorization', value: 'AUTHORIZATION'},
-                {name: 'Client-side Authentication', value: 'CLIENT_SIDE_AUTHENTICATION'},
-                {name: 'Server-side Authentication', value: 'SERVER_SIDE_AUTHENTICATION'},
-                {name: 'Authorization entitlement condition', value: 'AUTHORIZATION_ENTITLEMENT_CONDITION'}
-            ];
+        },
+
+        renderScript: function () {
+            var self = this;
+
+            if (this.model.id) {
+                this.data.languages = _.findWhere(this.data.contexts,function (context) {
+                    return context._id === self.data.entity.context;
+                }).languages;
+            } else {
+                this.data.languages = [];
+                this.data.newScript = true;
+            }
 
             this.parentRender(function () {
-                if (self.renderCallback) {
-                    self.renderCallback();
+                if (this.data.newScript) {
+                    this.openDialog();
+                }
+
+                if (this.renderCallback) {
+                    this.renderCallback();
                 }
             });
         },
@@ -134,12 +145,14 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
                 return;
             }
 
-            var savePromise;
+            var savePromise,
+                nonModifiedAttributes = _.clone(this.model.attributes);
 
             this.updateFields();
-            _.extend(this.model.attributes, this.data.entity);
 
+            _.extend(this.model.attributes, this.data.entity);
             savePromise = this.model.save();
+
             if (savePromise) {
                 if (this.model.id) {
                     savePromise.done(function (e) {
@@ -154,18 +167,18 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
                     });
                 }
             } else {
-                console.log(this.model.validationError);
-                // TODO: implement highlighting for inputs
+                _.extend(this.model.attributes, nonModifiedAttributes);
+                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, this.model.validationError);
             }
         },
 
-        syncModel: function(uuid) {
+        syncModel: function (uuid) {
             var syncRequired = !this.model || (uuid && this.model.id !== uuid);
 
             if (syncRequired && uuid) {
                 // edit existing script
                 this.stopListening(this.model);
-                this.model = new Script( { _id: uuid} );
+                this.model = new Script({_id: uuid});
                 this.listenTo(this.model, 'sync', this.onModelSync);
                 this.listenTo(this.model, 'error', this.onModelError);
                 this.model.fetch();
@@ -194,11 +207,6 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
                 return;
             }
 
-            if (language.length === 0) {
-                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "validationNoLanguage");
-                return;
-            }
-
             script = {
                 script: Base64.encodeUTF8(scriptText),
                 language: language.val()
@@ -207,6 +215,77 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
             ScriptsDelegate.validateScript(script).done(function (result) {
                 self.$el.find('#validation').html(UIUtils.fillTemplateWithData("templates/editor/views/ScriptValidationTemplate.html", result));
             });
+        },
+
+        openDialog: function (e) {
+            var self = this;
+
+            if (!this.data.defaultContext) {
+                this.defaultContextPromise.done(function (context) {
+                    self.data.defaultContext = context.defaultContext;
+                    self.renderDialog();
+                });
+            } else {
+                self.renderDialog();
+            }
+        },
+
+        renderDialog: function() {
+            var self = this,
+                footerButtons = [],
+                options = {
+                    type: self.data.newScript ? BootstrapDialog.TYPE_PRIMARY : BootstrapDialog.TYPE_DANGER,
+                    title: self.data.newScript ? $.t('scripts.edit.dialog.title.select') : $.t('scripts.edit.dialog.title.change'),
+                    cssClass: "change-context",
+                    closable: !self.data.newScript,
+                    message: $('<div></div>'),
+                    onshow: function(dialog){
+                        this.message.append(UIUtils.fillTemplateWithData('templates/editor/views/ChangeContextTemplate.html', self.data));
+                        dialog.$modalContent.find('[name=changeContext]:checked');
+                    }
+                };
+
+            if (!self.data.newScript) {
+                footerButtons.push({
+                    label: $.t('common.form.cancel'),
+                    cssClass: 'btn-default',
+                    action: function (dialog) {
+                        dialog.close();
+                    }
+                });
+            }
+
+            footerButtons.push({
+                label: self.data.newScript ? $.t('common.form.save') : $.t('common.form.change'),
+                cssClass: self.data.newScript ? 'btn-primary' : 'btn-danger',
+                action: function (dialog) {
+                    var newContext = dialog.$modalContent.find('[name=changeContext]:checked').val();
+                    if (self.data.entity.context !== newContext) {
+                        self.data.entity.context = newContext;
+                        self.changeContext();
+                    }
+                    dialog.close();
+                }
+            });
+
+            options.buttons = footerButtons;
+            BootstrapDialog.show(options);
+
+            this.data.newScript = false;
+        },
+
+        changeContext: function () {
+            var self = this,
+                selectedContext = _.findWhere(this.data.contexts, function (context) {
+                    return context._id === self.data.entity.context;
+                });
+
+            this.data.languages = selectedContext.languages;
+
+            this.data.entity.script =  Base64.decodeUTF8(selectedContext.defaultScript);
+            this.data.entity.language =  selectedContext.defaultLanguage;
+
+            this.parentRender();
         }
     });
 
