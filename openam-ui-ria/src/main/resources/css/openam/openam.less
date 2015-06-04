@@ -41,16 +41,29 @@
     vertical-align: bottom;
 }
 
-.table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
+.table > thead > tr > th,
+.table > tbody > tr > th,
+.table > tfoot > tr > th
+.table > thead > tr > td,
+.table > tbody > tr > td,
+.table > tfoot > tr > td {
     border-color: #eee;
     padding: 13px 15px;
 }
 
-.table-striped>tbody>tr.selected{
+.table-striped > tbody > tr.selected{
     background-color:#d9edf7;
 }
 
 .table-striped {
+    th.col-check {
+        width: 13px;
+    }
+
+    th.col-btn {
+        width: auto;
+    }
+
     .btn-transparent {
         color: #777;
         padding: 1px 6px;
@@ -58,6 +71,20 @@
 
     .btn-transparent:hover, .btn-transparent:focus {
         color: #519387;
+    }
+}
+
+.page-toolbar, .panel-toolbar {
+    border-bottom: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+    margin-top: 0;
+    margin-bottom: 20px;
+    padding: 10px;
+
+    .btn .fa {
+        width: 18px;
+        display: inline-block;
+        text-align: left;
     }
 }
 /* END of Candidate for Commons */
