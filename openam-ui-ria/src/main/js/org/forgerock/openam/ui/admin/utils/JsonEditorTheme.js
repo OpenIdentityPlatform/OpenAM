@@ -92,34 +92,37 @@ define("org/forgerock/openam/ui/admin/utils/JsonEditorTheme", [
                     var group = document.createElement('div'),
                         div = document.createElement('div');
 
-                    if (label && input.type === 'checkbox') {
+
+                    if (label && $(input).find('input').prop('type') === 'checkbox') {
                         group.className += ' checkbox';
-                        label.appendChild(input);
-                        label.style.fontSize = '14px';
-                        group.style.marginTop = '0';
+                        input.style.marginTop = '6px';
+                    }
+
+                    group.className = 'form-group';
+
+                    if (label) {
+                        label.className += ' control-label col-sm-' + gridColWidth2;
                         group.appendChild(label);
-                        input.style.position = 'relative';
-                        input.style.cssFloat = 'left';
+                    }
+
+                    if (input.nodeName.toLowerCase() === 'input' || input.nodeName.toLowerCase() === 'select') {
+                        // All Inputs need to be wrapped in a div with the BS grid class added.
+                        div.className += 'col-sm-' + gridColWidth1;
+                        div.appendChild(input);
+                        group.appendChild(div);
                     } else {
-                        group.className = 'form-group';
-                        if (label) {
-                            label.className += ' control-label col-sm-' + gridColWidth2;
-                            group.appendChild(label);
-                        }
-                        if (input.nodeName.toLowerCase() === 'input' || input.nodeName.toLowerCase() === 'select') {
-                            // All Inputs need to be wrapped in a div with the BS grid class added.
-                            div.className += 'col-sm-' + gridColWidth1;
-                            div.appendChild(input);
-                            group.appendChild(div);
-                        } else {
-                            group.appendChild(input);
-                        }
+                        group.appendChild(input);
                     }
 
                     if (description) {
                         group.appendChild(description);
                     }
+
                     return group;
+                },
+
+                getCheckboxLabel: function(text) {
+                    return this.getFormInputLabel(text);
                 },
 
                 getIndentedPanel: function () {
@@ -144,8 +147,7 @@ define("org/forgerock/openam/ui/admin/utils/JsonEditorTheme", [
                 },
 
                 getHeaderButtonHolder: function () {
-                    var el = this.getButtonHolder();
-                    return el;
+                    return this.getButtonHolder();
                 },
 
                 getButtonHolder: function () {
