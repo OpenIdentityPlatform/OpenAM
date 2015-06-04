@@ -252,8 +252,10 @@ define("org/forgerock/openam/ui/policy/policies/conditions/EditEnvironmentView",
             _.map(schema.config.properties, function (value, key) {
                 switch (value.type) {
                     case 'string':
-                        // OPENAM-5182: we should not submit empty string if IP is missing
-                        if (key !== 'startIp' && key !== 'endIp') {
+                        if (key === 'authenticateToRealm') {
+                            itemData[key] = '/';
+                        } else if (key !== 'startIp' && key !== 'endIp') {
+                            // OPENAM-5182: we should not submit empty string if IP is missing
                             itemData[key] = '';
                         }
                         break;

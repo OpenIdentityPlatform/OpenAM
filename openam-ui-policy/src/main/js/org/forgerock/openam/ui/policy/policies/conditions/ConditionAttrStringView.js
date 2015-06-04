@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2015 ForgeRock AS. All rights reserved.
+ * Copyright 2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,17 +22,12 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/**
- * @author JKigwana
- * @author Eugenia Sergueeva
- */
-
 /*global window, define, $, _ */
 
 define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrStringView", [
     "org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrBaseView" ,
     "org/forgerock/commons/ui/common/util/Constants"
-], function (ConditionAttrBaseView, constants) {
+], function (ConditionAttrBaseView, Constants) {
     var ConditionAttrStringView = ConditionAttrBaseView.extend({
         template: 'templates/policy/policies/conditions/ConditionAttrString.html',
 
@@ -41,15 +36,15 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrStringVi
 
             if (data.title === 'startIp' || data.title === 'endIp') {
                 if (data.schema.title === 'IPv4') {
-                    data.pattern = constants.IPV4_PATTERN;
+                    data.pattern = Constants.IPV4_PATTERN;
                 } else if (data.schema.title === 'IPv6') {
-                    data.pattern = constants.IPV6_PATTERN;
+                    data.pattern = Constants.IPV6_PATTERN;
                 }
                 cssClass = 'auto-fill-group';
             } else if (data.value && data.value.type === 'number') {
-                data.pattern = constants.NUMBER_PATTERN;
+                data.pattern = Constants.NUMBER_PATTERN;
             } else if (data.value && data.value.type === 'integer') {
-                data.pattern = constants.INTEGER_PATTERN;
+                data.pattern = Constants.INTEGER_PATTERN;
             } else {
                 data.pattern = null;
             }
@@ -61,6 +56,15 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrStringVi
                     callback();
                 }
             });
+        },
+
+        attrSpecificChangeInput: function (e) {
+            if (this.data.title === 'authenticateToRealm') {
+                var itemData = this.data.itemData;
+                if (itemData.authenticateToRealm.indexOf('/') !== 0) {
+                    itemData.authenticateToRealm = '/' + itemData.authenticateToRealm;
+                }
+            }
         }
     });
 
