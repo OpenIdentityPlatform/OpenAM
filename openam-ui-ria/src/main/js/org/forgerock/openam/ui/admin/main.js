@@ -29,6 +29,7 @@ define([
     "./views/federation/FederationView",
 
     "./views/realms/agents/AgentsView",
+
     "./views/realms/authentication/AdvancedView",
     "./views/realms/authentication/ChainsView",
     "./views/realms/authentication/ModulesView",

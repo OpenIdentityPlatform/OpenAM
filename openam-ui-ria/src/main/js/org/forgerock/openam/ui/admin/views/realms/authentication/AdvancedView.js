@@ -59,11 +59,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AdvancedView",
             });
         },
         renderTab: function (event) {
-            this.$el.find("div.panel-body").empty(); // FIXME: Improve
+            this.$el.find("#tabpanel").empty();
 
             var id = $(event.target).attr('href').slice(1),
                 schema = this.data.formData.schema.properties[id],
-                element = $("div.panel-body").get(0);
+                element = this.$el.find("#tabpanel").get(0);
 
             this.data.form = new Form(element, schema, this.data.formData.values);
         },

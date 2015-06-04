@@ -207,7 +207,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
                 .done(function(data) {
                     UIUtils.fillTemplateWithData("templates/admin/views/realms/authentication/SettingsTemplate.html", data.values.result, function(html) {
                         self.$el.find('#settings').html(html);
-                        self.data.form = new Form(self.$el.find('#content').get(0), {
+                        self.data.form = new Form(self.$el.find('#tabpanel').get(0), {
                             type: 'object',
                             properties: {
                                 adminAuthModule: data.schema.properties.core.properties.adminAuthModule,
