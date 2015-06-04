@@ -115,6 +115,8 @@ public class SmsJsonConverter {
             attributeSchemaConverter = new IntegerAttributeSchemaValue();
         } else if (isScript(syntax)) {
             attributeSchemaConverter = new ScriptAttributeSchemaValue();
+        } else if (isPassword(syntax)) {
+            attributeSchemaConverter = new PasswordAttributeSchemaValue();
         } else {
             attributeSchemaConverter = new StringAttributeSchemaValue();
         }
@@ -241,6 +243,10 @@ public class SmsJsonConverter {
 
     private boolean isScript(AttributeSchema.Syntax syntax) {
         return syntax.equals(AttributeSchema.Syntax.SCRIPT);
+    }
+
+    private boolean isPassword(AttributeSchema.Syntax syntax) {
+        return syntax.equals(AttributeSchema.Syntax.PASSWORD);
     }
 
     /**
@@ -408,6 +414,18 @@ public class SmsJsonConverter {
         @Override
         public Object toJson(String value) {
             return value;
+        }
+
+        @Override
+        public String fromJson(Object json) {
+            return (String) json;
+        }
+    }
+
+    private static class PasswordAttributeSchemaValue implements AttributeSchemaConverter {
+        @Override
+        public Object toJson(String value) {
+            return null;
         }
 
         @Override

@@ -16,25 +16,10 @@
 
 package org.forgerock.openam.rest.sms;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
-import static org.mockito.BDDMockito.given;
+import static org.assertj.core.api.Assertions.*;
+import static org.forgerock.json.fluent.JsonValue.*;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.mock;
-
-import com.sun.identity.shared.encode.Base64;
-import com.sun.identity.sm.AttributeSchema;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceSchema;
-import org.assertj.core.api.Assertions;
-import org.assertj.core.api.Condition;
-import org.assertj.core.data.MapEntry;
-import org.forgerock.json.fluent.JsonException;
-import org.forgerock.json.fluent.JsonPointer;
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.test.assertj.AssertJJsonValueAssert;
-import org.mockito.Matchers;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -44,6 +29,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.assertj.core.api.Assertions;
+import org.forgerock.json.fluent.JsonException;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.test.assertj.AssertJJsonValueAssert;
+import org.mockito.Matchers;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import com.sun.identity.shared.encode.Base64;
+import com.sun.identity.sm.AttributeSchema;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceSchema;
+
 
 public class SmsJsonConverterTest {
     public static final String SECTION_1_NAME = "section1";
@@ -52,6 +50,7 @@ public class SmsJsonConverterTest {
     public static final String INT_VALUE_NAME = "intValueName";
     public static final String BOOLEAN_VALUE_NAME = "booleanValueName";
     public static final String DECIMAL_VALUE_NAME = "decimalValueName";
+    public static final String PASSWORD_VALUE_NAME = "passwordValueName";
     public static final String MAP_VALUE_NAME = "mapValueName";
     public static final String ARRAY_VALUE_NAME = "arrayValueName";
     public static final String ATT_1_NAME = "att1Name";
@@ -97,7 +96,7 @@ public class SmsJsonConverterTest {
 
         given(serviceSchema.getAttributeSchemaNames()).willReturn(getHashSet(STRING_VALUE_NAME, INT_VALUE_NAME,
                 BOOLEAN_VALUE_NAME, DECIMAL_VALUE_NAME, ARRAY_VALUE_NAME, MAP_VALUE_NAME, SECTION_1_STRING_VALUE_NAME,
-                SCRIPT_VALUE_NAME));
+                SCRIPT_VALUE_NAME, PASSWORD_VALUE_NAME));
 
         addAttributeSchema(STRING_VALUE_NAME, AttributeSchema.Syntax.STRING, null, AttributeSchema.Type.SINGLE,
                 STRING_VALUE_RESOURCE_NAME);
@@ -111,11 +110,12 @@ public class SmsJsonConverterTest {
         addAttributeSchema(SECTION_1_STRING_VALUE_NAME, AttributeSchema.Syntax.STRING, null, AttributeSchema.Type.SINGLE,
                 null);
         addAttributeSchema(SCRIPT_VALUE_NAME, AttributeSchema.Syntax.SCRIPT, null, AttributeSchema.Type.SINGLE, null);
+        addAttributeSchema(PASSWORD_VALUE_NAME, AttributeSchema.Syntax.PASSWORD, null, AttributeSchema.Type.SINGLE, null);
 
         converter = new TestJsonConverter(serviceSchema);
 
         //create map version..
-        mapRepresentation = new HashMap<String, Set<String>>();
+        mapRepresentation = new HashMap<>();
         mapRepresentation.put(STRING_VALUE_NAME, getHashSet(STRING_VALUE));
         mapRepresentation.put(INT_VALUE_NAME, getHashSet(Integer.toString(INT_VALUE)));
         mapRepresentation.put(BOOLEAN_VALUE_NAME, getHashSet(Boolean.toString(BOOLEAN_VALUE)));
@@ -125,6 +125,7 @@ public class SmsJsonConverterTest {
                 + ATT_2_VAL));
         mapRepresentation.put(SECTION_1_STRING_VALUE_NAME, getHashSet(STRING_VALUE));
         mapRepresentation.put(SCRIPT_VALUE_NAME, getHashSet(SCRIPT_VALUE));
+        mapRepresentation.put(PASSWORD_VALUE_NAME, getHashSet(STRING_VALUE));
 
         //create json version..
         final HashMap<String, String> mapValue = new
@@ -137,11 +138,16 @@ public class SmsJsonConverterTest {
         arrayValue.add(ARRAY_STRING_1);
         arrayValue.add(ARRAY_STRING_2);
 
-        jsonRepresentation = JsonValue.json(new HashMap<String, Object>()).put(STRING_VALUE_RESOURCE_NAME,
-        STRING_VALUE).put(INT_VALUE_NAME, INT_VALUE).put
-                (BOOLEAN_VALUE_NAME, BOOLEAN_VALUE).put(DECIMAL_VALUE_NAME, DOUBLE_VALUE).put
-                (ARRAY_VALUE_NAME, arrayValue).put(MAP_VALUE_NAME, mapValue).put(SECTION_1_NAME, sectionValue)
-                .put(SCRIPT_VALUE_NAME, Base64.encode(SCRIPT_VALUE.getBytes("UTF-8")));
+        jsonRepresentation = json(object(
+                field(STRING_VALUE_RESOURCE_NAME, STRING_VALUE),
+                field(INT_VALUE_NAME, INT_VALUE),
+                field(BOOLEAN_VALUE_NAME, BOOLEAN_VALUE),
+                field(DECIMAL_VALUE_NAME, DOUBLE_VALUE),
+                field(ARRAY_VALUE_NAME, arrayValue),
+                field(MAP_VALUE_NAME, mapValue),
+                field(SECTION_1_NAME, sectionValue),
+                field(SCRIPT_VALUE_NAME, Base64.encode(SCRIPT_VALUE.getBytes("UTF-8"))),
+                field(PASSWORD_VALUE_NAME, STRING_VALUE)));
     }
 
     private void addAttributeSchema(String valueName, AttributeSchema.Syntax syntax, AttributeSchema.UIType
@@ -215,6 +221,8 @@ public class SmsJsonConverterTest {
         asserter.hasObject(MAP_VALUE_NAME)
                 .contains(Assertions.entry(ATT_1_NAME, ATT_1_VAL))
                 .contains(Assertions.entry(ATT_2_NAME, ATT_2_VAL));
+
+        asserter.isObject().hasNull(PASSWORD_VALUE_NAME);
     }
 
     @Test(expectedExceptions = JsonException.class)
