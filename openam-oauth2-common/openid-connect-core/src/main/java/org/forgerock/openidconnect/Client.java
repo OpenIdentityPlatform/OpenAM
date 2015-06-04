@@ -684,7 +684,7 @@ public class Client extends JsonValue {
      * @param clientName The client name.
      */
     public void setClientName(String clientName) {
-        if (StringUtils.isBlank(clientName)) {
+        if (!StringUtils.isBlank(clientName)) {
             put(OAuth2Constants.ShortClientAttributeNames.CLIENT_NAME.getType(), clientName);
         }
     }
