@@ -2,6 +2,6 @@
     <span class="fa fa-plus"></span> {{t "scripts.list.addNew"}}
 </a>
 
-<a href="#list" class="btn btn-danger" {{#unless selectedUUIDs}} disabled {{/unless}}>
+<button id="deleteRecords" class="btn btn-danger" {{#unless selectedUUIDs}} disabled {{/unless}}>
     <span class="fa fa-close"></span> {{t "scripts.list.deleteSelected"}} {{#if selectedUUIDs}}({{selectedUUIDs.length}}){{/if}}
-</a>
+</button>

@@ -38,6 +38,7 @@
             "ScriptsMessages": {
                 "scriptCreated": "Script created successfully",
                 "scriptUpdated": "Script updated successfully",
+                "scriptDeleted": "Script deleted successfully",
                 "validation": {
                     "noScript": "Please upload existing script or create a new one"
                 },
@@ -269,7 +270,7 @@
             "title": "Scripts List",
             "addNew": "Add New Script",
             "deleteSelected": "Delete Selected",
-            "grid": ["Name", "Context", "Language", "Script"]
+            "grid": ["Name", "Context", "Language", "Description"]
         }
     }
 }

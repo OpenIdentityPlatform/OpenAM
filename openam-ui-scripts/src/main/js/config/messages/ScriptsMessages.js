@@ -26,6 +26,10 @@ define("config/messages/ScriptsMessages", [], function () {
             msg: "config.messages.ScriptsMessages.scriptUpdated",
             type: "info"
         },
+        "scriptDeleted": {
+            msg: "config.messages.ScriptsMessages.scriptDeleted",
+            type: "info"
+        },
         "validationNoScript": {
             msg: "config.messages.ScriptsMessages.validation.noScript",
             type: "info"

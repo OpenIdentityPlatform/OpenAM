@@ -18,16 +18,23 @@
 
 define("org/forgerock/openam/ui/editor/views/ScriptListView", [
     "backgrid",
+    "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/common/util/URLHelper",
     "org/forgerock/openam/ui/editor/util/BackgridUtils",
     "org/forgerock/openam/ui/editor/models/ScriptModel"
-], function (Backgrid, AbstractView, Router, UIUtils, URLHelper, BackgridUtils, Script) {
+], function (Backgrid, Messages, AbstractView, EventManager, Router, Constants, UIUtils, URLHelper, BackgridUtils, Script) {
 
     var ScriptListView = AbstractView.extend({
-        template: "templates/editor/views/ScriptListTemplate.html",
+        template: 'templates/editor/views/ScriptListTemplate.html',
+        toolbarTemplate: 'templates/editor/views/ScriptListBtnToolbarTemplate.html',
+        events: {
+            'click #deleteRecords': 'deleteRecords'
+        },
 
         render: function (args, callback) {
             var self = this,
@@ -134,6 +141,39 @@ define("org/forgerock/openam/ui/editor/views/ScriptListView", [
             });
         },
 
+        deleteRecords: function (e) {
+            e.preventDefault();
+
+            var self = this,
+                i = 0,
+                item,
+                onDestroy = function () {
+                    self.data.selectedUUIDs = [];
+                    self.data.scripts.fetch({reset: true});
+
+                    UIUtils.fillTemplateWithData(self.toolbarTemplate, self.data, function (tpl) {
+                        self.$el.find('#gridToolbar').html(tpl);
+                    });
+                },
+                onSuccess = function (model, response, options) {
+                    onDestroy();
+                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, 'scriptDeleted');
+                },
+                onError = function (model, response, options) {
+                    onDestroy();
+                    Messages.messages.addMessage({message: response.responseJSON.message, type: 'error'});
+                };
+
+            for (; i < this.data.selectedUUIDs.length; i++) {
+                item = this.data.scripts.get(this.data.selectedUUIDs[i]);
+
+                item.destroy({
+                    success: onSuccess,
+                    error: onError
+                });
+            }
+        },
+
         onRowSelect: function (model, selected) {
             if (selected) {
                 if (!_.contains(this.data.selectedUUIDs, model.id)) {
@@ -147,8 +187,7 @@ define("org/forgerock/openam/ui/editor/views/ScriptListView", [
         },
 
         renderToolbar: function () {
-            this.$el.find('#gridToolbar').html(UIUtils.fillTemplateWithData(
-                "templates/editor/views/ScriptListBtnToolbarTemplate.html", this.data));
+            this.$el.find('#gridToolbar').html(UIUtils.fillTemplateWithData(this.toolbarTemplate, this.data));
         }
     });
 
