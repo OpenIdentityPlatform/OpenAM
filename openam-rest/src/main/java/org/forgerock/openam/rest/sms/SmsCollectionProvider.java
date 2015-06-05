@@ -88,9 +88,14 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
             String name = content.get("_id").asString();
             if (name == null) {
                 name = request.getNewResourceId();
-            } else if (!name.equals(request.getNewResourceId())) {
+            } else if (request.getNewResourceId() != null && !name.equals(request.getNewResourceId())) {
                 handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST,
                         "name and URI's resource ID do not match"));
+                return;
+            }
+            if (name == null) {
+                handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST, "Invalid name"));
+                return;
             }
             config.addSubConfig(name, lastSchemaNodeName(), 0, attrs);
             ServiceConfig created = checkedInstanceSubConfig(name, config);

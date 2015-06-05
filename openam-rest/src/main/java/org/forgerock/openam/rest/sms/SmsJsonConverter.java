@@ -28,6 +28,7 @@ import org.forgerock.guava.common.collect.HashBiMap;
 import org.forgerock.json.fluent.JsonException;
 import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.Resource;
 import org.forgerock.util.Pair;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -268,6 +269,11 @@ public class SmsJsonConverter {
         Map<String, Object> translatedAttributeValuePairs = getTranslatedAttributeValuePairs(jsonValue.asMap());
 
         for (String attributeName : translatedAttributeValuePairs.keySet()) {
+
+            // Ignore _id field used to name resource when creating
+            if (Resource.FIELD_CONTENT_ID.equals(attributeName)) {
+                continue;
+            }
 
             if (shouldBeIgnored(attributeName)) {
                 continue;
