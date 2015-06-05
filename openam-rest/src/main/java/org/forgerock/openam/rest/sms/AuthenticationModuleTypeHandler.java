@@ -17,23 +17,19 @@
 package org.forgerock.openam.rest.sms;
 
 import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.openam.rest.sms.AuthenticationModuleCollectionHandler.getI18NValue;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.security.AccessController;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.config.AMAuthenticationInstance;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
-import com.sun.identity.authentication.config.AMAuthenticationSchema;
 import com.sun.identity.authentication.config.AMConfigurationException;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.locale.AMResourceBundleCache;
-import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.json.fluent.JsonValue;
@@ -57,17 +53,17 @@ import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 
 /**
- * Collection handler for handling queries on the {@literal /authentication/modules} resource.
+ * Collection handler for handling queries on the {@literal /authentication/modules/types} resource.
  *
  * @since 13.0.0
  */
-public class AuthenticationModuleCollectionHandler implements RequestHandler {
+public class AuthenticationModuleTypeHandler implements RequestHandler {
 
     private final Debug debug;
     private final SSOToken adminToken;
 
     @Inject
-    AuthenticationModuleCollectionHandler(@Named("frRest") Debug debug) {
+    AuthenticationModuleTypeHandler(@Named("frRest") Debug debug) {
         this.debug = debug;
         this.adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
     }
@@ -93,18 +89,18 @@ public class AuthenticationModuleCollectionHandler implements RequestHandler {
             SSOToken ssoToken = context.asContext(SSOTokenContext.class).getCallerSSOToken();
             String realm = context.asContext(RealmContext.class).getResolvedRealm();
             AMAuthenticationManager mgr = new AMAuthenticationManager(ssoToken, realm);
-            Set<AMAuthenticationInstance> moduleInstances = mgr.getAuthenticationInstances();
+            Set<String> authenticationServiceNames = AMAuthenticationManager.getAuthenticationServiceNames();
 
-            for (AMAuthenticationInstance instance : moduleInstances) {
-                String name = instance.getName();
-                ServiceSchemaManager schemaManager = getSchemaManager(instance.getType());
-                String typePath = schemaManager.getResourceName();
-                String typeI18N = getI18NValue(schemaManager, instance.getType(), debug);
+            for (String serviceName : authenticationServiceNames) {
+                ServiceSchemaManager schemaManager = new ServiceSchemaManager(serviceName, adminToken);
+
+
+                String resourceId = schemaManager.getResourceName();
+                String typeI18N = getI18NValue(schemaManager, resourceId, debug);
                 JsonValue result = json(object(
-                        field(Resource.FIELD_CONTENT_ID, name),
-                        field("type", typeI18N),
-                        field("path", typePath + "/" + name)));
-                handler.handleResource(new Resource(name, String.valueOf(result.hashCode()), result));
+                        field(Resource.FIELD_CONTENT_ID, resourceId),
+                        field("name", typeI18N)));
+                handler.handleResource(new Resource(resourceId, String.valueOf(result.hashCode()), result));
             }
 
             handler.handleResult(new QueryResult());
@@ -119,27 +115,6 @@ public class AuthenticationModuleCollectionHandler implements RequestHandler {
             debug.warning("::AuthenticationModuleCollectionHandler:: SMSException on create", e);
             handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
         }
-    }
-
-    private ServiceSchemaManager getSchemaManager(String authType) throws SSOException, SMSException,
-            AMConfigurationException {
-        AMAuthenticationManager authenticationManager = new AMAuthenticationManager(adminToken, "/");
-        AMAuthenticationSchema schema = authenticationManager.getAuthenticationSchema(authType);
-        return new ServiceSchemaManager(schema.getServiceName(), adminToken);
-    }
-
-    static String getI18NValue(ServiceSchemaManager schemaManager, String authType, Debug debug) {
-        String i18nKey = schemaManager.getI18NKey();
-        String i18nName = authType;
-        ResourceBundle rb = getBundle(schemaManager.getI18NFileName(), Locale.getDefaultLocale());
-        if (rb != null && i18nKey != null && !i18nKey.isEmpty()) {
-            i18nName = Locale.getString(rb, i18nKey, debug);
-        }
-        return i18nName;
-    }
-
-    private static ResourceBundle getBundle(String name, java.util.Locale locale) {
-        return AMResourceBundleCache.getInstance().getResBundle(name, locale);
     }
 
     @Override
