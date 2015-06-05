@@ -145,6 +145,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
     private final Debug debug;
     private final Pattern schemaDnPattern;
     private final Collection<String> excludedServices;
+    private final AuthenticationModuleCollectionHandler authenticationModuleCollectionHandler;
     private final Map<SchemaType, Collection<Function<String, Boolean>>> excludedServiceSingletons =
             new HashMap<SchemaType, Collection<Function<String, Boolean>>>();
     private final Map<SchemaType, Collection<Function<String, Boolean>>> excludedServiceCollections =
@@ -156,14 +157,16 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
     public SmsRequestHandler(@Assisted SchemaType type, SmsCollectionProviderFactory collectionProviderFactory,
             SmsSingletonProviderFactory singletonProviderFactory,
             SmsGlobalSingletonProviderFactory globalSingletonProviderFactory, @Named("frRest") Debug debug,
-            ExcludedServicesFactory excludedServicesFactory)
-            throws SMSException, SSOException {
+            ExcludedServicesFactory excludedServicesFactory,
+            AuthenticationModuleCollectionHandler authenticationModuleCollectionHandler) throws SMSException,
+            SSOException {
         this.schemaType = type;
         this.collectionProviderFactory = collectionProviderFactory;
         this.singletonProviderFactory = singletonProviderFactory;
         this.globalSingletonProviderFactory = globalSingletonProviderFactory;
         this.debug = debug;
         this.excludedServices = excludedServicesFactory.get(type);
+        this.authenticationModuleCollectionHandler = authenticationModuleCollectionHandler;
         this.schemaDnPattern = Pattern.compile("^ou=([.0-9]+),ou=([^,]+)," +
                 Pattern.quote(ServiceManager.getServiceDN()) + "$");
         routeTree = tree(
@@ -176,7 +179,18 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
         addExcludedServiceProviders();
 
         createServices();
+        addAuthenticationModulesQueryHandler();
         SMSNotificationManager.getInstance().registerCallbackHandler(this);
+    }
+
+    private SmsRouteTree getAuthenticationModuleRouter() {
+        return routeTree.handles(new ArrayList<>(AMAuthenticationManager.getAuthenticationServiceNames()).get(0));
+    }
+
+    private void addAuthenticationModulesQueryHandler() {
+        if (SchemaType.ORGANIZATION.equals(schemaType)) {
+            getAuthenticationModuleRouter().addRoute(RoutingMode.EQUALS, "", authenticationModuleCollectionHandler);
+        }
     }
 
     private void addExcludedServiceProviders() {
