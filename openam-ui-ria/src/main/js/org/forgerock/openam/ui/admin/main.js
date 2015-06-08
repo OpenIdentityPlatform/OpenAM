@@ -33,6 +33,7 @@ define([
     "./views/realms/authentication/AdvancedView",
     "./views/realms/authentication/ChainsView",
     "./views/realms/authentication/ModulesView",
+    "./views/realms/authentication/modules/EditModuleView",
     "./views/realms/authentication/SettingsView",
     "./views/realms/dataStores/DataStoresView",
     "./views/realms/general/GeneralView",

@@ -18,58 +18,168 @@
 define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", [
     "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView",
+    "bootstrap-dialog",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/delegates/SMSDelegate",
     "org/forgerock/openam/ui/admin/models/Form",
-    "org/forgerock/openam/ui/admin/utils/FormHelper"
-], function ($, AbstractView, Configuration, EventManager, Router, Constants, SMSDelegate, Form, FormHelper) {
+    "org/forgerock/openam/ui/admin/utils/FormHelper",
+    "org/forgerock/commons/ui/common/components/Messages",
+    "org/forgerock/commons/ui/common/util/UIUtils"
+], function ($, AbstractView, BootstrapDialog, Configuration, EventManager, Router, Constants, SMSDelegate, Form, FormHelper, MessageManager, UIUtils) {
     var ModulesView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/ModulesTemplate.html",
         events: {
-            'click #revertChanges': 'revert',
-            'click #saveChanges': 'save',
-            'show.bs.tab ul.nav.nav-tabs a': 'renderTab'
+            'click #addModule':   'addModule',
+            'change input[data-module-name]' : 'moduleSelected',
+            'click  #editModule': 'editModule',
+            'click  button[data-module-name]:not([data-active])': 'deleteModule',
+            'click  #deleteModules': 'deleteModules'
         },
-        render: function (args, callback) {
+        data:{},
+        addModule: function(e) {
+            e.preventDefault();
             var self = this;
 
-            SMSDelegate.RealmAuthenticationModule.get()
-            .done(function (data) {
-                self.data.formData = data;
-                self.parentRender(function () {
-                    self.$el.find('ul.nav a:first').tab('show');
-                    self.$el.find('.console-tabs .nav-tabs').tabdrop();
+            UIUtils.fillTemplateWithData("templates/admin/views/realms/authentication/modules/AddModuleTemplate.html", self.data, function(html) {
+                BootstrapDialog.show({
+                    title: $.t("console.authentication.modules.addModuleDialogTitle"),
+                    message: $(html),
+                    buttons: [{
+                        id: "nextButton",
+                        label: $.t("common.form.next"),
+                        cssClass: "btn-primary",
+                        action: function(dialog) {
+                            if (self.addModuleDialogValidation(dialog)) {
+                                var moduleName = dialog.getModalBody().find('#newModuleName').val();
+                                SMSDelegate.RealmAuthenticationModule.hasModuleName(moduleName)
+                                .done(function(result) {
+                                    if (result) {
+                                        dialog.close();
+                                        Router.routeTo(Router.configuration.routes.EditModuleView, {
+                                            args: [encodeURIComponent(self.data.realmName), encodeURIComponent(moduleName)],
+                                            trigger: true
+                                        });
+                                    } else {
+                                        MessageManager.messages.addMessage({
+                                            message: $.t("console.authentication.modules.addModuleDialogError"),
+                                            type: "error"
+                                        });
+                                    }
+                                  }
+                                ).fail(function(error) {
+                                  // TODO: Add failure condition
+                                });
+                            }
+                        }
+                    },{
+                        label: $.t("common.form.cancel"),
+                        action: function(dialog) {
+                            dialog.close();
+                        }
+                    }],
+                    onshow: function(dialog) {
+                        dialog.getButton('nextButton').disable();
+                        dialog.$modalBody.find('#newModuleType').selectize();
+                        self.enableOrDisableNextButton(dialog);
+                    },
+                    onshown: function(dialog) {
+                    }
+                });
+            });
 
+        },
+        addModuleDialogValidation: function(dialog) {
+            var nameValid = dialog.$modalBody.find('#newModuleName').val().length > 0,
+                typeValid = dialog.$modalBody.find('#newModuleType')[0].selectize.getValue().length > 0;
+            return (nameValid && typeValid);
+        },
+        enableOrDisableNextButton: function(dialog) {
+            var self = this;
+            dialog.$modalBody
+            .on('change','#newModuleName, #newModuleType',function(e) {
+              if (self.addModuleDialogValidation(dialog)) {
+                dialog.getButton('nextButton').enable();
+              } else {
+                dialog.getButton('nextButton').disable();
+              }
+            });
+        },
+        moduleSelected: function(event) {
+            var hasModuleSelected = this.$el.find('input[type=checkbox]').is(':checked'),
+                row = $(event.currentTarget).closest('tr'),
+                checked = $(event.currentTarget).is(':checked');
+
+            this.$el.find('#deleteModules').prop('disabled', !hasModuleSelected);
+            if (checked) {
+                row.addClass('selected');
+            } else {
+                row.removeClass('selected');
+            }
+        },
+        editModule: function(event) {
+          event.preventDefault();
+          var moduleName = $(event.currentTarget).closest('td').find('button[data-module-name]').attr('data-module-name');
+          Router.routeTo(Router.configuration.routes.EditModuleView, {
+              args: [encodeURIComponent(this.data.realmName), encodeURIComponent(moduleName)],
+              trigger: true
+          });
+        },
+        deleteModule: function(event) {
+            var self = this,
+                moduleName = $(event.currentTarget).attr('data-module-name');
+
+            SMSDelegate.RealmAuthenticationModule.remove(moduleName)
+            .done(function(data) {
+                self.renderModulesTab();
+            })
+            .fail(function() {
+                // TODO: Add failure condition
+            });
+        },
+        deleteModules: function() {
+            var self = this,
+                moduleNames = self.$el.find('input[type=checkbox]:checked').toArray().map(function(element) {
+                    return $(element).attr('data-module-name');
+                }),
+                promises = moduleNames.map(function(name) {
+                    return SMSDelegate.RealmAuthenticationModule.remove(name);
+                });
+
+            $.when(promises)
+            .done(function(data) {
+                self.render();
+            })
+            .fail(function() {
+                // TODO: Add failure condition
+            });
+        },
+        render: function(args, callback) {
+            var self = this;
+            this.data.realmName = (args) ? args[0] : " ";
+
+            SMSDelegate.RealmAuthenticationModules.get()
+            .done(function(data) {
+              self.data.formData = data.values.result;
+                self.$el.find('[data-toggle="tooltip"]').tooltip();
+                self.parentRender(function () {
                     if (callback) {
                         callback();
                     }
                 });
             })
-            .fail(function () {
+            .fail(function() {
                 // TODO: Add failure condition
             });
-        },
 
-        save: function (event) {
-            var promise = SMSDelegate.RealmAuthenticationModule.save(this.data.form.data());
+        },
+        save: function(event) {
+            var promise = SMSDelegate.RealmAuthentication.save(this.data.form.data());
+
             FormHelper.bindSavePromiseToElement(promise, event.target);
-        },
-        revert: function () {
-            this.data.form.reset();
-        },
-
-        renderTab: function (event) {
-            var tabId = $(event.target).attr("href"),
-                schema = this.data.formData.schema.properties[tabId.slice(1)],
-                element = $(tabId).get(0);
-
-            this.$el.find(tabId).empty();
-            this.data.form = new Form(element, schema, this.data.formData.values);
         }
-
     });
 
     return ModulesView;

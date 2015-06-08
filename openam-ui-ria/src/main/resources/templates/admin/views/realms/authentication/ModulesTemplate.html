@@ -1,37 +1,38 @@
-<div class="tab-pane-body">
-    <div class="panel-body">
-        <p class="panel-description">{{t "console.authentication.modules.description"}}</p>
-        <table class="table table-hover table-striped">
-            <thead>
-                <tr>
-                    <th class="col-md-1"></th>
-                    <th class="col-md-5">{{t "console.authentication.modules.moduleName"}}</th>
-                    <th class="col-md-4">{{t "console.authentication.modules.moduleType"}}</th>
-                    <th class="col-md-2"/>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each this}}
-                <tr>
-                    <td><input data-module-name="{{_id}}" type="checkbox"/></td>
-                    <td>{{_id}}</td>
-                    <td>{{type}}</td>
-                    <td>
-                        <div class="pull-right">
-                            <button type="button" id="editModule" class="btn btn-transparent"><i class="fa fa-pencil" data-toggle="tooltip" title="{{t "common.form.edit"}}"></i></button>
-                            <button type="button" id="deleteModule" class="btn btn-transparent" data-module-name="{{_id}}"><i class="fa fa-close" data-toggle="tooltip" title="{{t "common.form.delete"}}"></i></button>
-                        </div>
-                    </td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
-    </div>
+<div class="page-header">
+    <h1>{{t 'console.authentication.modules.title'}}</h1>
+</div>
+<p class="panel-description">{{t "console.authentication.modules.description"}}</p>
+<div class="btn-toolbar page-toolbar">
+    <a class="btn btn-primary" id="addModule" href="#console/realms/authentication/modules/"><i class="fa fa-plus"></i>{{t 'console.authentication.modules.addModule'}}</a>
+    <button id="deleteModules" disabled class="btn btn-default" type="button"><i class="fa fa-times"></i>{{t 'common.form.delete'}}</button>
+</div>
 
-    <div class="tab-pane-footer clearfix">
-        <div class="pull-right">
-            <button type="button" id="deleteModules" disabled class="btn btn-sm btn-default">{{t "common.form.delete"}}</button>
-            <a id="addModule" href="#console/realms/authentication/modules/" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i>{{t "console.authentication.modules.addModule"}}</a>
-        </div>
+<div class="panel panel-default">
+    <div class="panel-body">
+      <table class="table table-hover table-striped">
+          <thead>
+              <tr>
+                  <th class="col-md-1"></th>
+                  <th class="col-md-5">{{t "console.authentication.modules.moduleName"}}</th>
+                  <th class="col-md-4">{{t "console.authentication.modules.moduleType"}}</th>
+                  <th class="col-md-2"/>
+              </tr>
+          </thead>
+          <tbody>
+              {{#each this.formData}}
+              <tr>
+                  <td><input data-module-name="{{_id}}" type="checkbox"/></td>
+                  <td>{{_id}}</td>
+                  <td>{{type}}</td>
+                  <td>
+                      <div class="pull-right">
+                          <button type="button" id="editModule" class="btn btn-transparent"><i class="fa fa-pencil" data-toggle="tooltip" title="{{t "common.form.edit"}}"></i></button>
+                          <button type="button" id="deleteModule" class="btn btn-transparent" data-module-name="{{_id}}"><i class="fa fa-close" data-toggle="tooltip" title="{{t "common.form.delete"}}"></i></button>
+                      </div>
+                  </td>
+              </tr>
+              {{/each}}
+          </tbody>
+      </table>
     </div>
 </div>

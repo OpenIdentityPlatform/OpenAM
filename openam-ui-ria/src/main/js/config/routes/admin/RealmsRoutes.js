@@ -66,6 +66,13 @@ define('config/routes/admin/RealmsRoutes', function () {
             pattern: 'realms/?/authentication/modules',
             role: 'ui-admin'
         },
+        'EditModuleView': {
+            view: 'org/forgerock/openam/ui/admin/views/realms/RealmView',
+            page: 'org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditModuleView',
+            url: scopedByRealm('authentication\/modules\/([^\/]+)'),
+            pattern: 'realms/?/authentication/modules/?',
+            role: 'ui-admin'
+        },
         'realmsServices': {
             view: 'org/forgerock/openam/ui/admin/views/realms/RealmView',
             page: 'org/forgerock/openam/ui/admin/views/realms/services/ServicesView',

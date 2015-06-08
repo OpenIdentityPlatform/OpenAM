@@ -485,6 +485,7 @@
                 "saveChanges": "Save Changes"
             },
             "modules": {
+                "title" : "Authentication Modules",
                 "description" : "OpenAM uses authentication modules to identify the user. Normally authentication modules are associated with an authentication chain. Each realm has a default authentication chain that will be used to authenticate users. This section is used to add, configure or remove authentication module available for authentication into this realm.",
                 "addModuleDialogTitle" : "Create new Module",
                 "addModuleDialogError": "Authentication instance already exists.",
