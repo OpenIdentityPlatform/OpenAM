@@ -17,29 +17,27 @@
 
  /* Candidate for Commons */
 
- #default-base{
+#wrapper{
     padding-bottom: 50px;
- }
+}
 
  a[data-toggle="popover"] {
     &:hover, &:focus{
         box-shadow:none;
         text-decoration:none;
+        cursor: pointer;
         outline:none;
+        color: darken(@base-theme-color,5%);
     }
  }
  .popover{
-     max-width: 500px;
-
-     .popover-title {
-         background-color: @base-theme-color;
-         border-bottom: 1px solid darken(@base-theme-color,5%);
-         color: white;
-         font-weight: normal;
-     }
-
-
-
+    max-width: 500px;
+    .popover-title {
+        background-color: @base-theme-color;
+        border-bottom: 1px solid darken(@base-theme-color,5%);
+        color: white;
+        font-weight: normal;
+    }
  }
  /* END of Candidate for Commons */
 
@@ -128,7 +126,7 @@
         text-transform: uppercase;
         font-size: 13px;
         letter-spacing: 1px;
-        margin: 10px 0 10px;
+        margin: 5px 0 0;
         color: #666;
         font-weight: 600;
 
@@ -146,11 +144,12 @@
         background: @base-theme-color;
         color: #fff;
         text-align: center;
-        width: 110px;
-        height: 110px;
-        border-radius: 55px;
-        line-height: 110px;
-        font-size: 50px;
+        width: 64px;
+        height: 64px;
+        border-radius: 64px;
+        line-height: 64px;
+        font-size: 32px;
+        font-size: 32px;
         margin: -2px 10px 0 0;
         overflow: hidden;
     }

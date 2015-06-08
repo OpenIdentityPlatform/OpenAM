@@ -61,6 +61,18 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegate", [
             });
         },
 
+        getChain: function (name) {
+            var promise = obj.serviceCall({
+                    url: "realm-config/authentication/chains/" + name
+                });
+
+            return $.when(promise).then(function (valuesData) {
+                return {
+                    values: valuesData
+                };
+            });
+        },
+
         getWithDefaults: function () {
             var url = "realm-config/authentication",
                 chainsPromise = obj.serviceCall({

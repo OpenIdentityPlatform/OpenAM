@@ -31,6 +31,7 @@ define([
     "./views/realms/agents/AgentsView",
 
     "./views/realms/authentication/AdvancedView",
+    "./views/realms/authentication/chains/EditChainView",
     "./views/realms/authentication/ChainsView",
     "./views/realms/authentication/ModulesView",
     "./views/realms/authentication/modules/EditModuleView",

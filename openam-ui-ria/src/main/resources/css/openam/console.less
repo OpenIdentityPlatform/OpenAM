@@ -14,6 +14,24 @@
  * Copyright 2015 ForgeRock AS.
  */
 
+
+.block {
+  margin-bottom: 50px;
+}
+
+h3.block-header {
+  border: none;
+  font-size: 12px;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: #5F686E;
+  padding-bottom: 10px;
+  margin-top: 0;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 20px;
+}
+
 .nav-tab-content .btn-action-group{
     margin-left: -2px;
 }
@@ -21,6 +39,36 @@
 div.active-config {
     color: #647077;
     font-size: 12px;
+}
+
+.form-horizontal .form-group .info-button{
+    margin-left: -15px;
+}
+
+.info-button{
+
+    background-color: transparent;
+    background-image: none;
+    border-color: transparent;
+    box-shadow: none;
+    color:#519387;
+
+    &:hover{
+        background-color:transparent;
+        border-color:transparent;
+        color:#3f7269;
+    }
+
+    &:focus{
+        outline:none;
+        box-shadow:none;
+        color:#3f7269;
+
+        background-color: transparent;
+        background-image: none;
+        border-color: transparent;
+        box-shadow: none;
+    }
 }
 
 // json-editor
@@ -34,29 +82,6 @@ div[data-schemaid] {
         background: none;
         border: none;
         box-shadow: none;
-    }
-
-    .info-button {
-
-        margin-left: -15px;
-        background-color:transparent;
-        border-color:transparent;
-        box-shadow: none;
-
-        color:#519387;
-
-        &:hover{
-            background-color:transparent;
-            border-color:transparent;
-            color:#3f7269;
-        }
-
-        &:focus{
-            outline:none;
-            box-shadow:none;
-            color:#3f7269;
-        }
-
     }
 
     .selectize-control {
@@ -141,3 +166,435 @@ div[data-schemaid] {
         }
     }
 }
+
+
+div.active-config {
+    color: #647077;
+    font-size: 12px;
+}
+
+
+.btn-toolbar {
+    border-top: 1px solid #ddd;
+    padding: 10px;
+    margin-top: 0;
+
+    .btn .fa {
+        width: 18px;
+        display: inline-block;
+        text-align: left;
+      }
+}
+
+
+
+@chaining-success-color:#517A93;
+@chaining-failure-color:#FF8784;
+
+#sortableContainer {
+    padding: 10px;
+    border: 1px dashed #919191;
+    padding-bottom: 15px;
+    border-radius: 6px;
+    background: #E0E0E0;
+    margin:30px 0;
+
+
+    #failArrow .arrow-title, #failBlock {
+        background-color: @chaining-failure-color;
+        color: #fff;
+    }
+    .arrow-title {
+        height: 20px;
+        padding-top: 2px;
+        font-size: 13px;
+        text-transform: uppercase;
+    }
+
+
+    #successArrow .arrow-title, #successBlock {
+        background-color: @chaining-success-color;
+    }
+
+
+    .chain-link.moving .panel, .dragged .panel {
+        cursor: move;
+        box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.3);
+        transition: all 0.2s ease-out;
+    }
+
+}
+
+#successArrow .arrow-down {
+    margin: 0 auto;
+    .arrow-down(@chaining-success-color, 40px, 16px, 5px );
+}
+
+#successArrow .arrow-left {
+    margin: 0 auto;
+    position: absolute;
+    left: -20px;
+    top: -10px;
+    .arrow-left(@chaining-success-color, 40px, 20px );
+}
+
+#failArrow .arrow-down {
+    margin: 0 auto;
+    .arrow-down(@chaining-failure-color, 40px, 16px, 5px );
+}
+
+#failArrow .arrow-right {
+    margin: 0 auto;
+    position: absolute;
+    right: -20px;
+    top: -10px;
+    .arrow-right(@chaining-failure-color, 40px, 20px );
+}
+
+#successArrow .arrow-title, #successBlock{
+    background-color: @chaining-success-color;
+    color:#fff;
+}
+
+#failArrow .arrow-title, #failBlock{
+    background-color: @chaining-failure-color;
+    color:#fff;
+}
+
+#helperBlock{
+    border-radius: 5px;
+    #successBlock p, #failBlock p  {
+        margin: 10px 5px;
+    }
+}
+
+
+#controls{
+    margin: 0 auto;
+    width: 920px;
+}
+
+ol#sortable {
+    list-style-type: none;
+    width:260px;
+    margin: 0 auto 10px;
+
+}
+
+ol#sortable li.placeholder {
+    display: block;
+  border: 1px solid #BBB;
+  background: 0 0 repeat-y rgba(0, 0, 0, 0.2);
+  transition: background 200ms ease-out 0ms, box-shadow 100ms linear 0ms;
+  width: 260px;
+  height: 96px;
+  position: relative;
+  margin: 0 0 50px 0;
+  /* border: none; */
+  border-radius: 5px;
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255, 255, 255, 0.2) 35px, rgba(255, 255, 255, 0.2) 70px);
+  background-size: 100% 100px;
+    box-shadow: 0 1px 1px -1px rgba(0, 0, 0, 0.5) inset;
+}
+
+.btn-default .badge {
+    color: #3D3D3D;
+    background-color: #D3D3D3;
+}
+
+
+.chain-link{
+    width:260px;
+    padding: 0 0 10px 0;
+
+    .panel-default {
+        border-color: #BABABA;
+    }
+
+    .panel-body {
+        padding: 15px;
+    }
+
+    .module-title {
+        font-weight:bold;
+        color:black;
+    }
+
+    .panel-image{
+        clear:both;
+    }
+
+    .panel-heading{
+        padding: 0;
+        height: 0;
+        overflow: hidden;
+        border-color: #fff;
+        opacity:0;
+        transition: all 0.2s ease-out;
+    }
+}
+
+
+
+.editing-shown .module-title i, .editing-shown .module-title:hover{
+    color:#519387;
+}
+
+
+.editing-shown{
+    display:block;
+}
+
+.editing-hidden{
+    display:none;
+}
+
+.chain-link.editing .editing-hidden{
+    display:inline-block;
+}
+
+.chain-link.editing .editing-shown{
+    display:none;
+}
+
+.dragged{
+    position: absolute;
+    z-index: 2000;
+}
+
+
+
+.module-criteria{
+    clear:both;
+}
+
+
+
+.panel-label{
+    padding-top: 10px;
+}
+
+
+.btn-group-vertical.editing-hidden{
+    padding-top:3px
+}
+
+.dropdown-menu>li>a {
+    padding: 3px 10px;
+}
+
+.dropdown-menu li .fa {
+    width:20px;
+    text-align: center;
+}
+
+
+#sortable{
+    padding:0;
+    margin:0;
+}
+
+
+
+
+
+
+
+.arrow-box-container{
+    float:left;
+    width:50%;
+    text-align:center;
+    font-size:10px;
+    position:relative;
+}
+
+
+
+.arrow-title{
+    height: 20px;
+    padding-top: 2px;
+    font-size: 13px;
+}
+
+
+#sortable{
+
+
+}
+
+#addItem .panel-default{
+    background:rgba(174, 174, 174, 0.16);
+}
+
+#addItem {
+    width: 260px;
+    margin: 20px auto 0;
+
+}
+
+#addItem .panel-label{
+    padding-top: 18px;
+    color: #777;
+}
+
+#addItem .fa-plus{
+    font-size: 40px;
+    background: #777;
+    border-radius: 50%;
+    padding: 9px 14px 15px 13px;
+    width: 55px;
+    height: 55px;
+    text-align: center;
+    color: white;
+    margin: 0 10px 0 0;
+}
+
+
+#addItem .panel-default:hover{
+    background: white;
+    cursor:pointer;
+}
+
+#addItem .panel-default:hover .panel-label{
+
+    color: #519387;
+}
+
+
+
+.panel-success{
+    color: #3A776C;
+}
+
+.panel-fail{
+    border-color: #ebccd1;
+}
+
+.panel-success, .panel-fail{
+    width:300px;
+    margin: 0 30px 0 0;
+    display: table;
+}
+
+.panel-success label, .panel-fail label{
+    font-weight:normal;
+}
+
+.panel-success .panel-body,.panel-fail .panel-body   {
+    display: table-cell;
+}
+
+
+
+/*.btn-toolbar {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    margin-top: 0;
+    margin-left: 0;
+}*/
+
+
+
+
+#newItem {
+    display:none;
+}
+
+
+
+
+
+.panel-footer {
+  border-top: none;
+  padding: 20px 0 0;
+}
+
+.table>tbody>tr>td{
+
+  vertical-align: middle;
+
+ }
+
+ .footer-links{
+     margin-top: 7px;
+ }
+
+
+
+ .chain-link{
+
+     .float-right{
+
+         float:right;
+     }
+     .fa-link {
+         font-size: 32px;
+         color: #FFFFFF;
+         background: #8E8E8E;
+         border-radius: 50%;
+         padding: 17px 14px 13px 14px;
+         margin: 0 10px 0 0;
+         width: 64px;
+         height: 64px;
+         text-align: center;
+        // transition: all 0.2s ease-out;
+     }
+
+
+     &.moving #showOptions{
+         text-decoration:none;
+         cursor:auto;
+     }
+
+     &.editing{
+
+         .panel-body {
+            padding-top: 4px;
+            padding-bottom: 4px;
+            //transition: all 0.2s ease-out;
+        }
+
+        .panel-label{
+            padding: 12px 0;
+            //transition: all 0.2s ease-out;
+        }
+
+        .panel{
+            box-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+        }
+
+        .fa-link {
+
+            color: #519387;
+            font-size: 20px;
+            width: 0;
+            height: 0;
+            //transition: all 0.2s ease-out;
+            background: rgba(0, 0, 0, 0);
+            line-height: 20px;
+            padding: 10px;
+            margin: 0 18px 0 0;
+        }
+
+
+
+
+    }
+
+
+     .panel-footer {
+        background:transparent;
+        padding: 0;
+        height: 20px;
+        transition: opacity 0.2s ease-out;
+     }
+
+
+
+     &.dragged  .panel-footer, &.moving  .panel-footer {
+         opacity:0;
+         height:0;
+         transition: all 0.3s ease-in-out;
+     }
+ }

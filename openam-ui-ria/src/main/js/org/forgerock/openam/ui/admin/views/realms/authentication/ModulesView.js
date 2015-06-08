@@ -162,7 +162,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
 
             SMSDelegate.RealmAuthenticationModules.get()
             .done(function(data) {
-              self.data.formData = data.values.result;
+                self.data.formData = data.values.result;
                 self.$el.find('[data-toggle="tooltip"]').tooltip();
                 self.parentRender(function () {
                     if (callback) {

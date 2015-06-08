@@ -1,0 +1,106 @@
+<div class="page-header clearfix">
+    <span class="header-icon pull-left"><i class="fa fa-link"></i></span>
+    <h4 class="page-type">Chains</h4>
+    <h1>{{name}}</h1>
+</div>
+
+<div class="tab-menu">
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="active"><a href="#chains" role="tab"  data-toggle="tab" aria-expanded="true">Edit Chain</a></li>
+        <li><a href="#settings" role="tab" data-toggle="tab" aria-expanded="true">Settings</a></li>
+    </ul>
+</div>
+
+<div class="nav-tab-content">
+
+    <div class="tab-content clearfix">
+
+        <div role="tabpanel" class="tab-pane active" id="chains">
+
+        </div>
+
+        <div role="tabpanel" class="tab-pane" id="settings">
+
+             <div class="block clearfix">
+                 <a  data-toggle="popover"
+                     data-placement="top"
+                     data-trigger="focus"
+                     data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Dic in quovis conventu te omnia facere, ne doleas. Duo Reges: constructio interrete. Illud dico, ea, quae dicat, praeclare inter se cohaerere."
+                     tabindex="0"
+                     title="Redirect URLS"
+                     class="pull-right">Help <i class="fa fa-question-circle"></i></a>
+        	    <h3 class="block-header">Redirect URLS</h3>
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Successful Login URL</label>
+                        <div class="col-sm-6">
+                            <input type="url" class="form-control input-btn" placeholder="Successful Login URL"  value="{{loginSuccessUrl.[0]}}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Failed Login URL</label>
+                        <div class="col-sm-6">
+                            <input type="url" class="form-control input-btn" placeholder="Add a failed login URL" value="{{loginFailureUrl.[0]}}">
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="block clearfix">
+                <a  data-toggle="popover"
+                    data-placement="top"
+                    data-trigger="focus"
+                    data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Dic in quovis conventu te omnia facere, ne doleas. Duo Reges: constructio interrete. Illud dico, ea, quae dicat, praeclare inter se cohaerere."
+                    tabindex="0"
+                    title="Post Authentication Processing Class"
+                    class="pull-right">Help <i class="fa fa-question-circle"></i></a>
+        	    <h3 class="block-header">Post Authentication Processing Class</h3>
+
+                {{#if loginPostProcessClass}}
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th>Value</th>
+                        <th class="col-btn"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {{#each loginPostProcessClass}}
+                    <tr>
+                        <td>{{this}}</td>
+                        <td>
+                            <div class="btn-group pull-right">
+                                <button class="btn btn-transparent "><i class="fa fa-times"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    {{/each}}
+                    </tbody>
+                </table>
+                {{/if}}
+
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Add Value">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button"><i class="fa fa-plus"></i> Add</button>
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="tab-pane-footer clearfix">
+        <div class="pull-right">
+            <button id="revertChanges" class="btn btn-default" type="button">{{t "common.form.revert"}}</button>
+            <button id="saveChanges" class="btn btn-primary" type="button">{{t "common.form.saveChanges"}}</button>
+        </div>
+    </div>
+
+</div>

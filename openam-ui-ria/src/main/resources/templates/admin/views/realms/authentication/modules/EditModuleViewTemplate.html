@@ -1,41 +1,38 @@
+<div class="page-header">
+    <h4 class="page-type">{{this.formData.type}}</h4>
+    <h1>{{this.formData.name}}</h1>
+</div>
 
-    <div class="page-header">
-        <h4 class="page-type">{{this.formData.type}}</h4>
-        <h1>{{this.formData.name}}</h1>
-    </div>
+<div class="tab-menu">
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="active"><a href="#standard" role="tab"  data-toggle="tab" aria-expanded="true">{{t "common.form.standard" }}</a></li>
+        <li><a href="#advanced" role="tab" data-toggle="tab" aria-expanded="false">{{t "common.form.advanced" }}</a></li>
+    </ul>
+</div>
 
-    <div class="console-tabs">
-        <div class=" tab-menu">
-            <ul class="nav nav-tabs" role="tablist">
-                <li class="active"><a href="#standard" role="tab"  data-toggle="tab" aria-expanded="true">{{t "common.form.standard" }}</a></li>
-                <li><a href="#advanced" role="tab" data-toggle="tab" aria-expanded="false">{{t "common.form.advanced" }}</a></li>
-            </ul>
+<div class="nav-tab-content clearfix">
+
+    <div role="tabpanel" class="tab-pane active" id="standard">
+        <div class="tab-pane-body">
+            <div class="panel-body">
+
+            </div>
         </div>
 
-        <div class="nav-tab-content clearfix">
+    </div>
 
-            <div role="tabpanel" class="tab-pane active" id="standard">
-                <div class="tab-pane-body">
-                    <div class="panel-body">
+    <div role="tabpanel" class="tab-pane" id="advanced">
+        <div class="tab-pane-body">
+            <div class="panel-body">
 
-                    </div>
-                </div>
-
-            </div>
-
-            <div role="tabpanel" class="tab-pane" id="advanced">
-                <div class="tab-pane-body">
-                    <div class="panel-body">
-
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-sm-offset-4 col-sm-8">
-                <div class="btn-action-group">
-                    <button id="revert" class="btn btn-default" type="button">{{t "console.authentication.advancedSettings.revert"}}</button>
-                    <button id="saveChanges" class="btn btn-primary" type="button">{{t 'console.authentication.advancedSettings.saveChanges'}}</button>
-                </div>
             </div>
         </div>
     </div>
+
+    <div class="col-sm-offset-4 col-sm-8">
+        <div class="btn-action-group">
+            <button id="revert" class="btn btn-default" type="button">{{t "console.authentication.advancedSettings.revert"}}</button>
+            <button id="saveChanges" class="btn btn-primary" type="button">{{t 'console.authentication.advancedSettings.saveChanges'}}</button>
+        </div>
+    </div>
+</div>

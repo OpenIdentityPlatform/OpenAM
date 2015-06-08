@@ -47,7 +47,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AdvancedView",
                     self.$el.find("div.tab-pane").show(); // FIXME: To remove
                     self.$el.find('ul.nav a:first').tab('show');
 
-                    self.$el.find('.console-tabs .nav-tabs').tabdrop();
+                    self.$el.find('.tab-menu .nav-tabs').tabdrop();
 
                     if (callback) {
                         callback();

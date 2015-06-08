@@ -8,7 +8,7 @@
 </div>
 <div class="panel panel-default">
     <div class="panel-body">
-        <table class="table table-striped">
+        <table class="table table-striped table-hover">
             <thead>
             <tr>
                 <th class="col-check"><input data-chain-name="{{_id}}" type="checkbox" /></th>
@@ -28,8 +28,8 @@
                 </td>
                 <td>
                     <div class="pull-right btn-group">
-                        <button type="button" class="btn btn-transparent"><i class="fa fa-pencil"></i></button>
-                        <button type="button" class="btn btn-transparent" data-chain-name="{{_id}}" {{#if active}}data-active="true"{{/if}}>
+                        <button data-chain-name="{{_id}}" type="button" class="btn btn-transparent edit-chain-btn"><i class="fa fa-pencil"></i></button>
+                        <button data-chain-name="{{_id}}" type="button" class="btn btn-transparent delete-chain-btn" {{#if active}}data-active="true"{{/if}}>
                         <i class="fa fa-close"></i>
                         </button>
                     </div>
