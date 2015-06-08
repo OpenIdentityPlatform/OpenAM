@@ -2,7 +2,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2013 ForgeRock AS. All Rights Reserved
+* Copyright (c) 2013-2015 ForgeRock AS. All Rights Reserved
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -102,12 +102,16 @@
             <artifactId>servlet-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-libs</artifactId>
+            <groupId>org.apache.santuario</groupId>
+            <artifactId>xmlsec</artifactId>
         </dependency>
+         <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+        </dependency> 
         <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb1-impl</artifactId>
-        </dependency>
+            <groupId>external</groupId>
+            <artifactId>webservices-rt</artifactId>
+        </dependency>             
     </dependencies>
 </project>

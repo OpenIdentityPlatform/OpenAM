@@ -28,7 +28,7 @@
 #
 #$Id: run-xacml-client-sample.sh,v 1.9 2008/08/19 19:11:25 veiming Exp $
 #
-# Portions Copyrighted 2013-2014 ForgeRock AS
+# Portions Copyrighted 2013-2015 ForgeRock AS.
 #------------------------------------------------------------------------------
 #
 #Runs the xacml client sample program
@@ -64,7 +64,7 @@
 # We would call this PDP OpenAM. At PDP host, do the following:
 #
 # deploy openam.war  and configure it on a supported java ee container
-# using OpenAM console, Configuration > SAMLv2 SOAP Binding,set soap handler,
+# using OpenAM console, Configuration > Global> SAMLv2 SOAP Binding, set soap handler,
 # key=/xacmlPdp|class=com.sun.identity.xacml.plugins.XACMLAuthzDecisionQueryHandler
 #
 # unzip ssoAdminTools.zip and setup OpenAM admin tools
@@ -92,4 +92,4 @@
 # openam/bin/ssoadm import-entity -t xacml-pdp-cot -m xacmlPep-r.xml -u amadmin -f <password_file>
 #
 # Then, run this script
-java -classpath resources:lib/openam-clientsdk-${project.version}.jar:lib/servlet-api-${servlet-api.version}.jar:lib/openam-example-clientsdk-cli-${project.version}.jar:lib/jaxb-impl-${jaxb.version}.jar:lib/jaxb-libs-${jaxb.version}.jar samples.xacml.XACMLClientSample xacmlClientSample
+java -classpath resources:lib/* samples.xacml.XACMLClientSample xacmlClientSample
