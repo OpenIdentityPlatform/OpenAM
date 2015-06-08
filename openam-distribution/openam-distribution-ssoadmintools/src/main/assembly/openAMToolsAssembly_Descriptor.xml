@@ -84,7 +84,7 @@
                 <include>org.apache.santuario:xmlsec</include>
                 <include>commons-logging:commons-logging-api</include>
                 <include>org.mozilla:rhino</include>
-                <include>org.codehaus.groovy:groovy-all</include>
+                <include>org.codehaus.groovy:groovy</include>
                 <include>org.kohsuke:groovy-sandbox</include>
                 <include>org.codehaus.groovy:groovy-jsr223:jar</include>
             </includes>
