@@ -121,6 +121,9 @@ public class SessionCache {
      * @param sid Session ID.
      */
     public void removeSID(SessionID sid) {
+        if(sid == null || sid.isNull()){
+            return;
+        }
         Session session = readSession(sid);
         if (session != null) {
 
