@@ -34,11 +34,11 @@ define("org/forgerock/openam/ui/editor/models/ScriptModel", [
         },
 
         validate: function (attrs, options) {
-            if (!attrs.name) {
+            if (attrs.name.trim() === '') {
                 return 'scriptErrorNoName';
             }
 
-            if (!attrs.script) {
+            if (attrs.script.trim() === '') {
                 return 'scriptErrorNoScript';
             }
         },

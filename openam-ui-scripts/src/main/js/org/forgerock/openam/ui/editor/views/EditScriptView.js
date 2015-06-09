@@ -18,6 +18,9 @@
 
 define("org/forgerock/openam/ui/editor/views/EditScriptView", [
     "bootstrap-dialog",
+    "libs/codemirror/lib/codemirror",
+    "libs/codemirror/mode/groovy/groovy",
+    "libs/codemirror/mode/javascript/javascript",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Base64",
@@ -25,7 +28,7 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/editor/models/ScriptModel",
     "org/forgerock/openam/ui/editor/delegates/ScriptsDelegate"
-], function (BootstrapDialog, AbstractView, EventManager, Base64, Constants, UIUtils, Script, ScriptsDelegate) {
+], function (BootstrapDialog, CodeMirror, Groovy, Javascript, AbstractView, EventManager, Base64, Constants, UIUtils, Script, ScriptsDelegate) {
 
     var EditScriptView = AbstractView.extend({
         initialize: function (options) {
@@ -40,7 +43,9 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
             'click #changeContext': 'openDialog',
             'keyup #changeContext': 'openDialog',
             'click input[name=save]': 'submitForm',
-            'keyup input[name=save]': 'submitForm'
+            'keyup input[name=save]': 'submitForm',
+            'change input[name=language]': 'changeLanguage',
+            'submit form': 'submitForm'
         },
 
         onModelError: function (model, response) {
@@ -114,6 +119,8 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
             this.parentRender(function () {
                 if (this.data.newScript) {
                     this.openDialog();
+                } else {
+                    this.initScriptEditor();
                 }
 
                 if (this.renderCallback) {
@@ -138,9 +145,13 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
                     app[dataField] = field.value;
                 }
             });
+
+            app.script = this.scriptEditor.getValue();
         },
 
         submitForm: function (e) {
+            e.preventDefault();
+
             if (e.type === 'keyup' && e.keyCode !== 13) {
                 return;
             }
@@ -161,7 +172,6 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
                     });
                 } else {
                     savePromise.done(function (e) {
-                        console.log(e);
                         EventManager.sendEvent(Constants.EVENT_HANDLE_DEFAULT_ROUTE);
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "scriptCreated");
                     });
@@ -197,12 +207,12 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
                 return;
             }
 
-            var scriptText = this.$el.find('#script').val(),
+            var scriptText = this.scriptEditor.getValue(),
                 language = this.$el.find('input[name=language]:checked'),
                 script,
                 self = this;
 
-            if (scriptText === '') {
+            if (scriptText.trim() === '') {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "validationNoScript");
                 return;
             }
@@ -230,7 +240,7 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
             }
         },
 
-        renderDialog: function() {
+        renderDialog: function () {
             var self = this,
                 footerButtons = [],
                 options = {
@@ -239,7 +249,7 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
                     cssClass: "change-context",
                     closable: !self.data.newScript,
                     message: $('<div></div>'),
-                    onshow: function(dialog){
+                    onshow: function (dialog) {
                         this.message.append(UIUtils.fillTemplateWithData('templates/editor/views/ChangeContextTemplate.html', self.data));
                         dialog.$modalContent.find('[name=changeContext]:checked');
                     }
@@ -263,6 +273,7 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
                     if (self.data.entity.context !== newContext) {
                         self.data.entity.context = newContext;
                         self.changeContext();
+                        self.parentRender(self.initScriptEditor);
                     }
                     dialog.close();
                 }
@@ -282,10 +293,23 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
 
             this.data.languages = selectedContext.languages;
 
-            this.data.entity.script =  Base64.decodeUTF8(selectedContext.defaultScript);
-            this.data.entity.language =  selectedContext.defaultLanguage;
+            this.data.entity.script = Base64.decodeUTF8(selectedContext.defaultScript);
+            this.data.entity.language = selectedContext.defaultLanguage;
+        },
 
-            this.parentRender();
+        initScriptEditor: function () {
+            this.scriptEditor = CodeMirror.fromTextArea(this.$el.find("#script")[0], {
+                lineNumbers: true,
+                autofocus: true,
+                viewportMargin: Infinity,
+                mode: this.data.entity.language.toLowerCase(),
+                theme: 'forgerock'
+            });
+        },
+
+        changeLanguage: function (e) {
+            this.data.entity.language = e.target.value;
+            this.scriptEditor.setOption('mode', this.data.entity.language.toLowerCase());
         }
     });
 
