@@ -279,10 +279,11 @@ public class MultiServerClusterMonitor implements ClusterMonitor {
             return primaryID;
         } else {
             int selectionListSize = clusterStateService.getServerSelectionListSize();
-            PermutationGenerator perm = new PermutationGenerator(
-                    sid.getExtension(SessionID.STORAGE_KEY).hashCode(),
-                    selectionListSize);
-
+            String sKey = sid.getExtension(SessionID.STORAGE_KEY);
+            if(sKey == null){
+                throw new SessionException("SessionService.locateCurrentHostServer: StorageKey is null");
+            }
+            PermutationGenerator perm = new PermutationGenerator(sKey.hashCode(), selectionListSize);
             String selectedServerId = null;
             for (int i = 0; i < selectionListSize; ++i) {
                 selectedServerId = clusterStateService.getServerSelection(perm.itemAt(i));
