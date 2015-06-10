@@ -309,6 +309,9 @@ public class SessionUtils {
             throws Exception {
 
         String sKey = sessionID.getExtension(SessionID.STORAGE_KEY);
+        if (sKey == null) {
+            throw new SessionException("SessionUtils.getEncryptedStorageKey: StorageKey is null");
+        }
         if (SESSION_ENCRYPTION) {
             String strEncrypted = (String) AccessController
                     .doPrivileged(new EncodeAction(sKey, Crypt
