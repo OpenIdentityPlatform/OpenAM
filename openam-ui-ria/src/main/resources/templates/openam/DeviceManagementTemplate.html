@@ -1,0 +1,39 @@
+<div id="deviceManagement" class="panel panel-default">
+    <div class="panel-heading" role="tab" id="deviceManagementCollapseHeading">
+        <h4 class="panel-title collapse-title">
+            <a data-toggle="collapse" href="#deviceManagementCollapse" aria-expanded="true" aria-controls="deviceManagementCollapseHeading" class="">{{t "openam.deviceManagement.header"}}</a>
+        </h4>
+    </div>
+    <div id="deviceManagementCollapse" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="deviceManagementCollapse" aria-expanded="true">
+        <div class="panel-body">
+            {{#if devices}}
+                {{#each devices}}
+                    <div class="col-sm-6 col-md-3">
+                        <div class="card am-device-card" data-device-uuid="{{uuid}}">
+                            <div class="btn-group card-menu">
+                                <button type="button" class="btn btn-link dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa fa-ellipsis-v fa-lg card-menu-icon"></i>
+                                </button>
+                                <ul class="dropdown-menu pull-right" role="menu">
+                                    <li><a id="recoveryCodes" href="#"><i class="fa fa-list"></i>{{ t 'openam.deviceManagement.menu.recoveryCodes' }}</a></li>
+                                    <li class="divider"></li>
+                                    <li><a id="delete" href="#"><i class="fa fa-times"></i>{{ t 'openam.deviceManagement.menu.delete' }}</a></li>
+                                </ul>
+                            </div>
+                            <div class="card-icon-symbol">
+                                <div class="am-device-card-circle">
+                                    <i class="fa fa-mobile card-icon"></i>
+                                </div>
+                            </div>
+                            <div class="card-content">
+                                <h3 class="am-device-card-content-title">{{deviceName}}</h3>
+                            </div>
+                        </div>
+                    </div>
+                {{/each}}
+            {{else}}
+                {{t "openam.deviceManagement.noneFound"}}
+            {{/if}}
+        </div>
+    </div>
+</div>

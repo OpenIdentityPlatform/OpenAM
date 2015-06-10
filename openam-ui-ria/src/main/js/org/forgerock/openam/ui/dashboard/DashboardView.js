@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2011-2014 ForgeRock AS.
+ * Copyright 2011-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,32 +22,27 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define, $, form2js, _ */
-
-/**
- * @author mbilski
- */
-define("org/forgerock/openam/ui/dashboard/DashboardView", [
-    "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/dashboard/MyApplicationsView",
-    "org/forgerock/openam/ui/dashboard/TrustedDevicesView",
-    "org/forgerock/openam/ui/dashboard/OAuthTokensView"
-], function(AbstractView, MyApplicationsView, TrustedDevicesView, OAuthTokensView) {
-
+/*global, define*/
+define('org/forgerock/openam/ui/dashboard/DashboardView', [
+    'jquery',
+    'underscore',
+    'org/forgerock/commons/ui/common/main/AbstractView',
+    'org/forgerock/openam/ui/dashboard/DeviceManagementView',
+    'org/forgerock/openam/ui/dashboard/MyApplicationsView',
+    'org/forgerock/openam/ui/dashboard/OAuthTokensView',
+    'org/forgerock/openam/ui/dashboard/TrustedDevicesView'
+], function ($, _, AbstractView, DeviceManagementView, MyApplicationsView, OAuthTokensView, TrustedDevicesView) {
     var Dashboard = AbstractView.extend({
-        template: "templates/openam/DashboardTemplate.html",
-        render: function() {
-
-            this.parentRender(function() {
-
+        template: 'templates/openam/DashboardTemplate.html',
+        render: function () {
+            this.parentRender(function () {
                 MyApplicationsView.render();
                 TrustedDevicesView.render();
                 OAuthTokensView.render();
+                DeviceManagementView.render();
             });
         }
     });
 
     return new Dashboard();
 });
-
-

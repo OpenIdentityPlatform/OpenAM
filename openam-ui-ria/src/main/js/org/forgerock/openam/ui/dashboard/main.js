@@ -25,11 +25,13 @@
 /*global define*/
 
 define("org/forgerock/openam/ui/dashboard/main", [
+    "./DeviceManagementDelegate",
+    "./DeviceManagementView",
     "./MyApplicationsDelegate",
     "./MyApplicationsView",
     "./TrustedDevicesDelegate",
     "./TrustedDevicesView",
-    "./DashboardView",
     "./OAuthTokensDelegate",
-    "./OAuthTokensView"
+    "./OAuthTokensView",
+    "./DashboardView"
 ]);
