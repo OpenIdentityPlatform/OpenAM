@@ -23,6 +23,7 @@ import org.forgerock.openam.sts.DeploymentPathNormalizationImpl;
 import org.forgerock.openam.sts.MapMarshallUtils;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.config.user.DeploymentConfig;
+import org.forgerock.openam.sts.config.user.OpenIdConnectTokenConfig;
 import org.forgerock.openam.sts.config.user.SAML2Config;
 import org.forgerock.openam.sts.config.user.STSInstanceConfig;
 import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
@@ -73,8 +74,8 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         private boolean delegationRelationshipsSupported;
 
         private SoapSTSInstanceConfigBuilderBase() {
-            issueTokenTypes = new HashSet<TokenType>();
-            securityPolicyValidatedTokenConfiguration = new HashSet<TokenValidationConfig>();
+            issueTokenTypes = new HashSet<>();
+            securityPolicyValidatedTokenConfiguration = new HashSet<>();
         }
 
         public T deploymentConfig(SoapDeploymentConfig deploymentConfig) {
@@ -93,8 +94,8 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         }
 
         public T addIssueTokenType(TokenType type) {
-            if (!TokenType.SAML2.equals(type)) {
-                throw new IllegalArgumentException("Only SAML2 tokens can be issued, not tokens of type " + type);
+            if (!TokenType.SAML2.equals(type) && !TokenType.OPENIDCONNECT.equals(type)) {
+                throw new IllegalArgumentException("Only SAML2 and OPENIDCONNECT tokens can be issued, not tokens of type " + type);
             }
             issueTokenTypes.add(type);
             return self();
@@ -164,7 +165,6 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         this.soapDelegationConfig = builder.soapDelegationConfig;
         //Keystore config can be null if we are dealing with an unprotected SecurityPolicy binding, or just the transport binding
         //not sure if the SecurityPolicy validator for the transport binding needs any crypto context, or if it just confirms container. TODO
-        Reject.ifNull(issuerName, "Issuer name cannot be null");
         Reject.ifNull(deploymentConfig, "DeploymentConfig cannot be null");
         if (CollectionUtils.isEmpty(issueTokenTypes)) {
             throw new IllegalStateException("Issued token types must be specified.");
@@ -177,6 +177,7 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
             throw new IllegalStateException("Either the securityPolicyValidatedTokenConfiguration must be specified to configure " +
                     "TokenValidators enforcing SecurityPolicy bindings, or token delegation relationships must be supported.");
         }
+
         if (this.saml2Config == null) {
             for (TokenType tokenType : issueTokenTypes) {
                 if (TokenType.SAML2.equals(tokenType)) {
@@ -185,6 +186,17 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
                 }
             }
         }
+
+        if (this.openIdConnectTokenConfig == null) {
+            for (TokenType tokenType : issueTokenTypes) {
+                if (TokenType.OPENIDCONNECT.equals(tokenType)) {
+                    throw new IllegalStateException("A OPENIDCONNECT token is specified as an issued token type, but no " +
+                            "OpenIdConnectTokenConfig state has been specified to guide the production of OPENIDCONNECT tokens.");
+                }
+            }
+
+        }
+
         if (delegationRelationshipsSupported && (soapDelegationConfig == null)) {
             throw new IllegalStateException("If the soap STS instance is configured to support delegation relationship, the " +
                     "SoapDelegationConfig instance must be non-null.");
@@ -277,7 +289,6 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         StringBuilder sb = new StringBuilder("SoapSTSInstanceConfig instance:\n");
         sb.append('\t').append("STSInstanceConfig base: ").append(super.toString()).append('\n');
         sb.append('\t').append("KeyStoreConfig: ").append(keystoreConfig != null ? keystoreConfig : null).append('\n');
-        sb.append('\t').append("issuerName: ").append(issuerName).append('\n');
         sb.append('\t').append("issueTokenTypes: ").append(issueTokenTypes).append('\n');
         sb.append('\t').append("securityPolicyValidatedTokenConfiguration: ").append(securityPolicyValidatedTokenConfiguration).append('\n');
         sb.append('\t').append("deploymentConfig: ").append(deploymentConfig).append('\n');
@@ -314,7 +325,7 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         JsonValue baseValue = super.toJson();
         baseValue.add(DEPLOYMENT_CONFIG, deploymentConfig.toJson());
 
-        JsonValue validatedTokenConfiguration = new JsonValue(new ArrayList<Object>());
+        JsonValue validatedTokenConfiguration = new JsonValue(new ArrayList<>());
         List<Object> translationList = validatedTokenConfiguration.asList();
         for (TokenValidationConfig tokenValidationConfig : securityPolicyValidatedTokenConfiguration) {
             translationList.add(tokenValidationConfig.toJson());
@@ -352,8 +363,8 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         }
         STSInstanceConfig baseConfig = STSInstanceConfig.fromJson(json);
         SoapSTSInstanceConfigBuilderBase<?> builder = SoapSTSInstanceConfig.builder()
-                .issuerName(baseConfig.getIssuerName())
                 .saml2Config(baseConfig.getSaml2Config())
+                .oidcIdTokenConfig(baseConfig.getOpenIdConnectTokenConfig())
                 .deploymentConfig(SoapDeploymentConfig.fromJson(json.get(DEPLOYMENT_CONFIG)));
 
         JsonValue validatedTokenConfiguration = json.get(VALIDATED_TOKEN_CONFIG);
@@ -362,7 +373,7 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
                 throw new IllegalStateException("Unexpected value for the " + VALIDATED_TOKEN_CONFIG + " field: "
                         + validatedTokenConfiguration.asString());
             }
-            Set<TokenValidationConfig> validationConfigs = new HashSet<TokenValidationConfig>();
+            Set<TokenValidationConfig> validationConfigs = new HashSet<>();
             for (Object obj : validatedTokenConfiguration.asList()) {
                 validationConfigs.add(TokenValidationConfig.fromJson(new JsonValue(obj)));
             }
@@ -409,7 +420,7 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
          */
         if (securityPolicyValidatedTokenConfiguration != null) {
             interimMap.remove(VALIDATED_TOKEN_CONFIG);
-            Set<String> validatedTokenConfig = new HashSet<String>();
+            Set<String> validatedTokenConfig = new HashSet<>();
             interimMap.put(VALIDATED_TOKEN_CONFIG, validatedTokenConfig);
             for (TokenValidationConfig tvc : securityPolicyValidatedTokenConfiguration) {
                 validatedTokenConfig.add(tvc.toSMSString());
@@ -417,7 +428,7 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         }
         if (issueTokenTypes != null) {
             interimMap.remove(ISSUE_TOKEN_TYPES);
-            Set<String> tokenTypes = new HashSet<String>();
+            Set<String> tokenTypes = new HashSet<>();
             interimMap.put(ISSUE_TOKEN_TYPES, tokenTypes);
             for (TokenType tt : issueTokenTypes) {
                 tokenTypes.add(tt.toString());
@@ -426,6 +437,11 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         if (saml2Config != null) {
             interimMap.remove(SAML2_CONFIG);
             interimMap.putAll(saml2Config.marshalToAttributeMap());
+        }
+
+        if (openIdConnectTokenConfig != null) {
+            interimMap.remove(OIDC_ID_TOKEN_CONFIG);
+            interimMap.putAll(openIdConnectTokenConfig.marshalToAttributeMap());
         }
 
         if (keystoreConfig != null) {
@@ -471,6 +487,12 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
             jsonAttributes.put(SAML2_CONFIG, saml2Config.toJson());
         }
 
+        OpenIdConnectTokenConfig openIdConnectTokenConfig = OpenIdConnectTokenConfig.marshalFromAttributeMap(attributeMap);
+        if (openIdConnectTokenConfig != null) {
+            jsonAttributes.remove(OIDC_ID_TOKEN_CONFIG);
+            jsonAttributes.put(OIDC_ID_TOKEN_CONFIG, openIdConnectTokenConfig.toJson());
+        }
+
         SoapSTSKeystoreConfig keystoreConfig = SoapSTSKeystoreConfig.marshalFromAttributeMap(attributeMap);
         if (keystoreConfig != null) {
             jsonAttributes.remove(SOAP_KEYSTORE_CONFIG);
@@ -482,7 +504,7 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
          to the VALIDATED_TOKEN_CONFIG key. I need to marshal each back into a TokenValidationConfig instance, and then
          call toJson on each, and put them in a JsonValue wrapping a list.
          */
-        ArrayList<JsonValue> jsonValidationConfigList = new ArrayList<JsonValue>();
+        ArrayList<JsonValue> jsonValidationConfigList = new ArrayList<>();
         JsonValue jsonTranslations = new JsonValue(jsonValidationConfigList);
         jsonAttributes.remove(VALIDATED_TOKEN_CONFIG);
         jsonAttributes.put(VALIDATED_TOKEN_CONFIG, jsonTranslations);
@@ -495,7 +517,7 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         Ultimately, the ISSUE_TOKEN_TYPES is a set, but it's set type gets stripped by the MapMarshalUtils.toJsonValueMap
         method. Thus it is a 'complex' object, which must be reconstituted in this method.
          */
-        Set<String> jsonIssueSet = new HashSet<String>();
+        Set<String> jsonIssueSet = new HashSet<>();
         JsonValue jsonIssueTypes = new JsonValue(jsonIssueSet);
         jsonAttributes.remove(ISSUE_TOKEN_TYPES);
         jsonAttributes.put(ISSUE_TOKEN_TYPES, jsonIssueTypes);
@@ -518,8 +540,7 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
     JsonValue wrapping this Map<String, Set<String>>. It cannot directly attempt to marshal these configuration properties
     in the ViewBean class, as this would introduce a dependency on the rest-sts into the openam-console module. Thus the
     RestSecurityTokenServiceViewBean can only invoke the rest-sts-publish service with a JsonValue wrapping the
-    Map<String, Set<String>> (or the Set<String> has to be turned into List<String> as JsonValue#toString does not currently
-    turn Set values into json arrays - TODO: is this still true, or can this logic be changed?).
+    Map<String, Set<String>>.
     This method will be invoked with the JsonValue generated by wrapping a Map<String, List<String>>
     containing the user's rest-sts-configurations. It will turn the Map<String, List<String>> wrapped by the JsonValue back into
     a raw Map<String, Set<String>>, and call marshalFromAttributeMap.
@@ -532,17 +553,17 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
             throw new IllegalStateException("In SoapSTSInstanceConfig#marshalFromJsonAttributeMap, Passed-in JsonValue " +
                     "is not a map. The JsonValue instance: " + jsonValue.toString());
         }
-        Map<String, Set<String>> smsMap = new HashMap<String, Set<String>>();
+        Map<String, Set<String>> smsMap = new HashMap<>();
         for (String key : jsonValue.keys()) {
             final JsonValue value = jsonValue.get(key);
             if (value.isNull()) {
                 smsMap.put(key, Collections.EMPTY_SET);
-            } else if(!value.isList()) {
+            } else if(!value.isCollection()) {
                 throw new IllegalStateException("In SoapSTSInstanceConfig#marshalFromJsonAttributeMap, value " +
-                        "corresponding to key " + key + " is not a list. The value: " + value);
+                        "corresponding to key " + key + " is not a collection. The value: " + value);
             } else {
-                List<String> stringList = value.asList(String.class);
-                Set<String> stringSet = new HashSet<String>(stringList);
+                Collection<String> stringCollection = value.asCollection(String.class);
+                Set<String> stringSet = new HashSet<>(stringCollection);
                 smsMap.put(key, stringSet);
             }
         }

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.tokengeneration.config;
@@ -22,6 +22,7 @@ import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import com.sun.identity.sm.ServiceListener;
+import org.forgerock.json.jose.builders.JwtBuilderFactory;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.InstanceConfigMarshaller;
 import org.forgerock.openam.sts.SoapSTSInstanceConfigMarshaller;
@@ -35,26 +36,32 @@ import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
 import org.forgerock.openam.sts.RestSTSInstanceConfigMarshaller;
 import org.forgerock.openam.sts.publish.rest.RestSTSInstanceConfigStore;
 import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
-import org.forgerock.openam.sts.tokengeneration.saml2.RestSTSInstanceState;
-import org.forgerock.openam.sts.tokengeneration.saml2.RestSTSInstanceStateFactoryImpl;
-import org.forgerock.openam.sts.tokengeneration.saml2.RestSTSInstanceStateProvider;
-import org.forgerock.openam.sts.tokengeneration.saml2.RestSTSInstanceStateServiceListener;
+import org.forgerock.openam.sts.tokengeneration.oidc.OpenIdConnectTokenClaimMapperProvider;
+import org.forgerock.openam.sts.tokengeneration.oidc.OpenIdConnectTokenClaimMapperProviderImpl;
+import org.forgerock.openam.sts.tokengeneration.oidc.OpenIdConnectTokenGeneration;
+import org.forgerock.openam.sts.tokengeneration.oidc.OpenIdConnectTokenGenerationImpl;
+import org.forgerock.openam.sts.tokengeneration.oidc.crypto.OpenIdConnectTokenPKIProviderFactory;
+import org.forgerock.openam.sts.tokengeneration.oidc.crypto.OpenIdConnectTokenPKIProviderFactoryImpl;
+import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.SAML2CryptoProviderFactoryImpl;
+import org.forgerock.openam.sts.tokengeneration.state.RestSTSInstanceState;
+import org.forgerock.openam.sts.tokengeneration.state.RestSTSInstanceStateFactoryImpl;
+import org.forgerock.openam.sts.tokengeneration.state.RestSTSInstanceStateProvider;
+import org.forgerock.openam.sts.tokengeneration.state.RestSTSInstanceStateServiceListener;
 import org.forgerock.openam.sts.tokengeneration.saml2.SAML2TokenGeneration;
 import org.forgerock.openam.sts.tokengeneration.saml2.SAML2TokenGenerationImpl;
-import org.forgerock.openam.sts.tokengeneration.saml2.SSOTokenIdentity;
-import org.forgerock.openam.sts.tokengeneration.saml2.SSOTokenIdentityImpl;
-import org.forgerock.openam.sts.tokengeneration.saml2.STSInstanceStateFactory;
-import org.forgerock.openam.sts.tokengeneration.saml2.STSInstanceStateProvider;
-import org.forgerock.openam.sts.tokengeneration.saml2.SoapSTSInstanceState;
-import org.forgerock.openam.sts.tokengeneration.saml2.SoapSTSInstanceStateFactoryImpl;
-import org.forgerock.openam.sts.tokengeneration.saml2.SoapSTSInstanceStateProvider;
-import org.forgerock.openam.sts.tokengeneration.saml2.SoapSTSInstanceStateServiceListener;
+import org.forgerock.openam.sts.tokengeneration.SSOTokenIdentity;
+import org.forgerock.openam.sts.tokengeneration.SSOTokenIdentityImpl;
+import org.forgerock.openam.sts.tokengeneration.state.STSInstanceStateFactory;
+import org.forgerock.openam.sts.tokengeneration.state.STSInstanceStateProvider;
+import org.forgerock.openam.sts.tokengeneration.state.SoapSTSInstanceState;
+import org.forgerock.openam.sts.tokengeneration.state.SoapSTSInstanceStateFactoryImpl;
+import org.forgerock.openam.sts.tokengeneration.state.SoapSTSInstanceStateProvider;
+import org.forgerock.openam.sts.tokengeneration.state.SoapSTSInstanceStateServiceListener;
 import org.forgerock.openam.sts.tokengeneration.saml2.StatementProvider;
 import org.forgerock.openam.sts.tokengeneration.saml2.StatementProviderImpl;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.KeyInfoFactory;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.KeyInfoFactoryImpl;
-import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProviderFactory;
-import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProviderFactoryImpl;
+import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.SAML2CryptoProviderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,8 +73,9 @@ public class TokenGenerationModule extends AbstractModule {
     public static final String SOAP_STS_INSTANCE_STATE_LISTENER = "soap_sts_instance_state_listener";
     @Override
     protected void configure() {
-        bind(SAML2TokenGeneration.class).to(SAML2TokenGenerationImpl.class);
-        bind(StatementProvider.class).to(StatementProviderImpl.class);
+        bind(OpenIdConnectTokenGeneration.class).to(OpenIdConnectTokenGenerationImpl.class).in(Scopes.SINGLETON);
+        bind(SAML2TokenGeneration.class).to(SAML2TokenGenerationImpl.class).in(Scopes.SINGLETON);
+        bind(StatementProvider.class).to(StatementProviderImpl.class).in(Scopes.SINGLETON);
         /*
         Bind the top-level instances which will provide sts-instance state to the TGS
          */
@@ -93,7 +101,8 @@ public class TokenGenerationModule extends AbstractModule {
         bind(new TypeLiteral<STSInstanceStateFactory<RestSTSInstanceState, RestSTSInstanceConfig>>(){}).to(RestSTSInstanceStateFactoryImpl.class);
         bind(new TypeLiteral<STSInstanceStateFactory<SoapSTSInstanceState, SoapSTSInstanceConfig>>(){}).to(SoapSTSInstanceStateFactoryImpl.class);
 
-        bind(STSKeyProviderFactory.class).to(STSKeyProviderFactoryImpl.class);
+        bind(SAML2CryptoProviderFactory.class).to(SAML2CryptoProviderFactoryImpl.class);
+        bind(OpenIdConnectTokenPKIProviderFactory.class).to(OpenIdConnectTokenPKIProviderFactoryImpl.class);
         bind(KeyInfoFactory.class).to(KeyInfoFactoryImpl.class);
         bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
         bind(SSOTokenIdentity.class).to(SSOTokenIdentityImpl.class);
@@ -115,6 +124,18 @@ public class TokenGenerationModule extends AbstractModule {
                 .to(RestSTSInstanceStateServiceListener.class).in(Scopes.SINGLETON);
         bind(ServiceListener.class).annotatedWith(Names.named(SOAP_STS_INSTANCE_STATE_LISTENER))
                 .to(SoapSTSInstanceStateServiceListener.class).in(Scopes.SINGLETON);
+
+        /*
+        Bind the class responsible for creating and signing OpenIdConnect tokens. Binding consumed by the
+        OpenIdConnectTokenGenerationImpl class. No interface/impl combination here,
+        and the ctor is no-arg, so this binding is not even strictly necessary - included for clarity.
+         */
+        bind(JwtBuilderFactory.class);
+        /*
+        Bind the class which will provide either the user-specified OpenIdConnectTokenClaimMapperProvider, or
+        the default implementation.
+         */
+        bind(OpenIdConnectTokenClaimMapperProvider.class).to(OpenIdConnectTokenClaimMapperProviderImpl.class);
     }
 
     @Provides

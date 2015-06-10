@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.tokengeneration.saml2;
@@ -28,10 +28,15 @@ import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.config.user.SAML2Config;
-import org.forgerock.openam.sts.service.invocation.ProofTokenState;
+import org.forgerock.openam.sts.tokengeneration.oidc.crypto.OpenIdConnectTokenPKIProviderFactory;
+import org.forgerock.openam.sts.tokengeneration.oidc.crypto.OpenIdConnectTokenPKIProviderFactoryImpl;
+import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.SAML2CryptoProviderFactoryImpl;
+import org.forgerock.openam.sts.user.invocation.ProofTokenState;
 import org.forgerock.openam.sts.config.user.DeploymentConfig;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
+import org.forgerock.openam.sts.service.invocation.SAML2TokenGenerationState;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
+import org.forgerock.openam.sts.tokengeneration.SSOTokenIdentity;
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.AttributeMapper;
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.DefaultAttributeStatementsProvider;
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.DefaultAuthenticationStatementsProvider;
@@ -40,9 +45,11 @@ import org.forgerock.openam.sts.tokengeneration.saml2.statements.DefaultConditio
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.DefaultSubjectProvider;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.KeyInfoFactory;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.KeyInfoFactoryImpl;
-import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProviderFactory;
-import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProviderFactoryImpl;
+import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.SAML2CryptoProviderFactory;
 import org.forgerock.openam.sts.service.invocation.TokenGenerationServiceInvocationState;
+import org.forgerock.openam.sts.tokengeneration.state.RestSTSInstanceStateFactoryImpl;
+import org.forgerock.openam.sts.tokengeneration.state.STSInstanceState;
+import org.forgerock.openam.sts.tokengeneration.state.STSInstanceStateFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeTest;
@@ -85,7 +92,8 @@ public class SAML2TokenGenerationImplTest {
             }
             bind(SAML2TokenGeneration.class).to(SAML2TokenGenerationImpl.class);
             bind(STSInstanceStateFactory.class).to(RestSTSInstanceStateFactoryImpl.class);
-            bind(STSKeyProviderFactory.class).to(STSKeyProviderFactoryImpl.class);
+            bind(SAML2CryptoProviderFactory.class).to(SAML2CryptoProviderFactoryImpl.class);
+            bind(OpenIdConnectTokenPKIProviderFactory.class).to(OpenIdConnectTokenPKIProviderFactoryImpl.class);
             bind(SSOTokenIdentity.class).toInstance(mockTokenIdentity);
         }
 
@@ -173,14 +181,24 @@ public class SAML2TokenGenerationImplTest {
     private TokenGenerationServiceInvocationState getTokenGenerationInvocationState(
             SAML2SubjectConfirmation subjectConfirmation) throws Exception {
         return TokenGenerationServiceInvocationState.builder()
+                .stsType(AMSTSConstants.STSType.REST)
                 .ssoTokenString(SSO_TOKEN_STRING)
-                .authNContextClassRef(AUTHN_CONTEXT)
+                .saml2GenerationState(buildSAML2TokenGenerationState(subjectConfirmation))
                 .tokenType(TokenType.SAML2)
                 .stsInstanceId(STS_INSTANCE_ID)
-                .saml2SubjectConfirmation(subjectConfirmation)
-                .proofTokenState(ProofTokenState.builder().x509Certificate(getCertificate()).build())
                 .build();
 
+    }
+    SAML2TokenGenerationState buildSAML2TokenGenerationState(SAML2SubjectConfirmation subjectConfirmation)
+            throws Exception {
+        SAML2TokenGenerationState.SAML2TokenGenerationStateBuilder builder = SAML2TokenGenerationState.builder();
+        builder
+                .authenticationContextClassReference(AUTHN_CONTEXT)
+                .subjectConfirmation(subjectConfirmation);
+        if (SAML2SubjectConfirmation.HOLDER_OF_KEY.equals(subjectConfirmation)) {
+            builder.proofTokenState(ProofTokenState.builder().x509Certificate(getCertificate()).build());
+        }
+        return builder.build();
     }
 
     private X509Certificate getCertificate() throws Exception {
@@ -188,7 +206,7 @@ public class SAML2TokenGenerationImplTest {
     }
 
     private RestSTSInstanceConfig getRestSTSInstanceConfig(boolean signAssertion) throws UnsupportedEncodingException {
-        Map<String, String> context = new HashMap<String, String>();
+        Map<String, String> context = new HashMap<>();
         context.put(AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_AUTH_TARGET_HEADER_KEY, "oidc_id_token");
         AuthTargetMapping mapping = AuthTargetMapping.builder()
                 .addMapping(TokenType.USERNAME, "service", "ldapService")
@@ -200,7 +218,7 @@ public class SAML2TokenGenerationImplTest {
                         .authTargetMapping(mapping)
                         .build();
 
-        Map<String, String> attributes = new HashMap<String, String>();
+        Map<String, String> attributes = new HashMap<>();
         attributes.put("email", "mail");
         SAML2Config saml2Config =
                 SAML2Config.builder()
@@ -213,12 +231,12 @@ public class SAML2TokenGenerationImplTest {
                         .encryptionKeyAlias("test")
                         .signatureKeyAlias("test")
                         .signatureKeyPassword("changeit".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
+                        .idpId("da_idp")
                         .build();
 
         return RestSTSInstanceConfig.builder()
                 .deploymentConfig(deploymentConfig)
                 .saml2Config(saml2Config)
-                .issuerName("idpEntityId")
                 .addSupportedTokenTranslation(
                         TokenType.X509,
                         TokenType.SAML2,

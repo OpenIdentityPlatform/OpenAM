@@ -49,14 +49,18 @@ import org.forgerock.openam.sts.soap.token.config.TokenIssueOperationProvider;
 import org.forgerock.openam.sts.soap.token.config.TokenOperationFactory;
 import org.forgerock.openam.sts.soap.token.config.TokenOperationFactoryImpl;
 import org.forgerock.openam.sts.soap.token.delegation.TokenDelegationHandlersProvider;
+import org.forgerock.openam.sts.soap.token.provider.oidc.DefaultSoapOpenIdConnectTokenAuthnContextMapper;
+import org.forgerock.openam.sts.soap.token.provider.oidc.DefaultSoapOpenIdConnectTokenAuthnMethodsReferencesMapper;
+import org.forgerock.openam.sts.soap.token.provider.oidc.SoapOpenIdConnectTokenAuthnContextMapper;
+import org.forgerock.openam.sts.soap.token.provider.oidc.SoapOpenIdConnectTokenAuthnMethodsReferencesMapper;
+import org.forgerock.openam.sts.soap.token.provider.saml2.Saml2XmlTokenAuthnContextMapper;
+import org.forgerock.openam.sts.soap.token.provider.saml2.Saml2XmlTokenAuthnContextMapperImpl;
 import org.forgerock.openam.sts.soap.token.validator.wss.WSSValidatorFactory;
 import org.forgerock.openam.sts.soap.token.validator.wss.WSSValidatorFactoryImpl;
 import org.forgerock.openam.sts.token.AMTokenParser;
 import org.forgerock.openam.sts.token.AMTokenParserImpl;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
-import org.forgerock.openam.sts.soap.token.provider.XmlTokenAuthnContextMapper;
-import org.forgerock.openam.sts.soap.token.provider.XmlTokenAuthnContextMapperImpl;
 import org.forgerock.openam.sts.token.provider.AMSessionInvalidator;
 import org.forgerock.openam.sts.token.provider.AMSessionInvalidatorImpl;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
@@ -173,7 +177,6 @@ public class SoapSTSInstanceModule extends AbstractModule {
     @Inject
     STSPropertiesMBean getSTSProperties(Logger logger) {
         StaticSTSProperties stsProperties = new StaticSTSProperties();
-        stsProperties.setIssuer(stsInstanceConfig.getIssuerName());
         stsProperties.setCallbackHandler(new SoapSTSCallbackHandler(stsInstanceConfig.getKeystoreConfig(), logger));
         Crypto crypto;
         try {
@@ -206,7 +209,7 @@ public class SoapSTSInstanceModule extends AbstractModule {
     @Named(AMSTSConstants.STS_WEB_SERVICE_PROPERTIES)
     @Inject
     Map<String, Object> getProperties(WSSValidatorFactory wssValidatorFactory, Logger logger) throws WSSecurityException {
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.CALLBACK_HANDLER, new SoapSTSCallbackHandler(stsInstanceConfig.getKeystoreConfig(), logger));
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         properties.put(SecurityConstants.ENCRYPT_CRYPTO, crypto);
@@ -337,24 +340,33 @@ public class SoapSTSInstanceModule extends AbstractModule {
     }
 
     /*
-    Allows for a custom XmlTokenAuthnContextMapper to be plugged-in. This XmlTokenAuthnContextMapper provides a
+    Allows for a custom Saml2XmlTokenAuthnContextMapper to be plugged-in. This Saml2XmlTokenAuthnContextMapper provides a
     SAML2 AuthnContext class ref value given an input token and input token type.
      */
     @Provides
     @Inject
-    XmlTokenAuthnContextMapper getAuthnContextMapper(Logger logger) {
-        String customMapperClassName = stsInstanceConfig.getSaml2Config().getCustomAuthNContextMapperClassName();
-        if (customMapperClassName == null) {
-            return new XmlTokenAuthnContextMapperImpl(logger);
-        } else {
-            try {
-                return Class.forName(customMapperClassName).asSubclass(XmlTokenAuthnContextMapper.class).newInstance();
-            } catch (Exception e) {
-                logger.error("Exception caught implementing custom JsonTokenAuthnContextMapper class " + customMapperClassName
-                        + "; Returning default XmlTokenAuthnContextMapperImpl. The exception: " + e);
-                return new XmlTokenAuthnContextMapperImpl(logger);
+    Saml2XmlTokenAuthnContextMapper getAuthnContextMapper(Logger logger) {
+        if (stsInstanceConfig.getSaml2Config() != null) {
+            String customMapperClassName = stsInstanceConfig.getSaml2Config().getCustomAuthNContextMapperClassName();
+            if (customMapperClassName != null) {
+                try {
+                    return Class.forName(customMapperClassName).asSubclass(Saml2XmlTokenAuthnContextMapper.class).newInstance();
+                } catch (Exception e) {
+                    logger.error("Exception caught implementing custom Saml2XmlTokenAuthnContextMapper class " + customMapperClassName
+                            + "; Returning default Saml2XmlTokenAuthnContextMapperImpl. The exception: " + e);
+                }
             }
         }
+        /*
+        Slight semantic impurity: note that I am returning a default mapper, even though no config for the corresponding
+        token type is present. I could return null, and annotate the dependency with @Nullable so Guice will inject null.
+        The SoapSTSInstanceConfig ctor will reject a construction which defines an SAML2 output token, without
+        a corresponding SAML2Config. However, it is possible that an sts instance will be published programmatically
+        without the aid of the SoapSTSInstanceConfig class. In this case, if null were returned here, the SoapSamlTokenProvider
+        would NPE when obtaining the mapping. Thus the default mapper is a better choice. Token creation will be rejected
+        at the token service if the invoking sts has no config corresponding to the desired token type.
+         */
+        return new Saml2XmlTokenAuthnContextMapperImpl(logger);
     }
 
     @Provides
@@ -416,6 +428,60 @@ public class SoapSTSInstanceModule extends AbstractModule {
     @Provides
     SoapSTSInstanceConfig getStsInstanceConfig() {
         return stsInstanceConfig;
+    }
+
+    @Provides
+    @Inject
+    SoapOpenIdConnectTokenAuthnContextMapper getOpenIdConnectTokenAuthnContextMapper(Logger logger) {
+        if (stsInstanceConfig.getOpenIdConnectTokenConfig() != null) {
+            final String customAuthnContextMapperClass = stsInstanceConfig.getOpenIdConnectTokenConfig().getCustomAuthnContextMapperClass();
+            if (customAuthnContextMapperClass != null) {
+                try {
+                    return Class.forName(customAuthnContextMapperClass).asSubclass(SoapOpenIdConnectTokenAuthnContextMapper.class).newInstance();
+                } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
+                    logger.error("Exception caught instantiating custom SoapOpenIdConnectTokenAuthnContextMapper " +
+                            "implementation class named " + customAuthnContextMapperClass + ". Default mapper will be returned, " +
+                            "but this means that no acr claims will be included in issued OIDC tokens.");
+                }
+            }
+        }
+        /*
+        Slight semantic impurity: note that I am returning a default mapper, even though no config for the corresponding
+        token type is present. I could return null, and annotate the dependency with @Nullable so Guice will inject null.
+        The SoapSTSInstanceConfig ctor will reject a construction which defines an OPENIDCONNECT output token, without
+        a corresponding OpenIdConnectTokenConfig. However, it is possible that an sts instance will be published programmatically
+        without the aid of the SoapSTSInstanceConfig class. In this case, if null were returned here, the SoapIdConnectTokenProvider
+        would NPE when obtaining the mapping. Thus the default mapper is a better choice. Token creation will be rejected
+        at the token service if the invoking sts has no config corresponding to the desired token type.
+         */
+        return new DefaultSoapOpenIdConnectTokenAuthnContextMapper();
+    }
+
+    @Provides
+    @Inject
+    SoapOpenIdConnectTokenAuthnMethodsReferencesMapper getOpenIdConnectTokenAuthnMethodsReferencesMapper(Logger logger) {
+        if (stsInstanceConfig.getOpenIdConnectTokenConfig() != null) {
+            final String customAuthnMethodsReferencesMapperClass = stsInstanceConfig.getOpenIdConnectTokenConfig().getCustomAuthnMethodReferencesMapperClass();
+            if (customAuthnMethodsReferencesMapperClass != null) {
+                try {
+                    return Class.forName(customAuthnMethodsReferencesMapperClass).asSubclass(SoapOpenIdConnectTokenAuthnMethodsReferencesMapper.class).newInstance();
+                } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
+                    logger.error("Exception caught instantiating custom SoapOpenIdConnectTokenAuthnMethodsReferencesMapper " +
+                            "implementation class named " + customAuthnMethodsReferencesMapperClass + ". Default mapper will be returned, " +
+                            "but this means that no amr claims will be included in issued OIDC tokens.");
+                }
+            }
+        }
+        /*
+        Slight semantic impurity: note that I am returning a default mapper, even though no config for the corresponding
+        token type is present. I could return null, and annotate the dependency with @Nullable so Guice will inject null.
+        The SoapSTSInstanceConfig ctor will reject a construction which defines an OPENIDCONNECT output token, without
+        a corresponding OpenIdConnectTokenConfig. However, it is possible that an sts instance will be published programmatically
+        without the aid of the SoapSTSInstanceConfig class. In this case, if null were returned here, the SoapIdConnectTokenProvider
+        would NPE when obtaining the mapping. Thus the default mapper is a better choice. Token creation will be rejected
+        at the token service if the invoking sts has no config corresponding to the desired token type.
+         */
+        return new DefaultSoapOpenIdConnectTokenAuthnMethodsReferencesMapper();
     }
 }
 

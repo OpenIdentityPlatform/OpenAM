@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS. All rights reserved.
  */
 
 package com.sun.identity.console.reststs.model;
@@ -32,6 +32,7 @@ import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.shared.sts.SharedSTSConstants;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.openam.utils.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -39,10 +40,8 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,11 +57,12 @@ import static org.forgerock.json.fluent.JsonValue.object;
  */
 public class RestSTSModelImpl extends AMServiceProfileModelImpl implements RestSTSModel {
     private static final String COOKIE = "Cookie";
+    /*
+    A string matching a regular expression which will match the '|' character (u007c), which needs to be escaped to
+    escape its regular-expression semantics. Equivalent to "\|", which is not a valid string.
+     */
+    private static final String REGEX_PIPE = "\\u007c";
     private static final String EQUALS = "=";
-    private static final String USERNAME = "USERNAME";
-    private static final String OPENAM = "OPENAM";
-    private static final String OPENIDCONNECT = "OPENIDCONNECT";
-    private static final String X509 = "X509";
     private static final String REST_STS_PUBLISH_SERVICE_VERSION = "protocol=1.0, resource=1.0";
 
     public RestSTSModelImpl(HttpServletRequest req, Map map) throws AMConsoleException {
@@ -140,11 +140,7 @@ public class RestSTSModelImpl extends AMServiceProfileModelImpl implements RestS
     }
 
     public RestSTSModelResponse validateConfigurationState(Map<String, Set<String>> configurationState) {
-        if (isNullOrEmpty(configurationState.get(SharedSTSConstants.SAML2_TOKEN_LIFETIME))) {
-            return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.token.lifetime.message"));
-        }
-
-        if (isNullOrEmpty(configurationState.get(SharedSTSConstants.DEPLOYMENT_URL_ELEMENT))) {
+        if (StringUtils.isEmpty(CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.DEPLOYMENT_URL_ELEMENT))) {
             return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.deployment.url.message"));
         } else {
             String urlElement = configurationState.get(SharedSTSConstants.DEPLOYMENT_URL_ELEMENT).iterator().next();
@@ -153,46 +149,8 @@ public class RestSTSModelImpl extends AMServiceProfileModelImpl implements RestS
             }
         }
 
-        if (isNullOrEmpty(configurationState.get(SharedSTSConstants.ISSUER_NAME))) {
-            return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.issuername.message"));
-        }
-
-        if (CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_SIGN_ASSERTION, false)
-                || CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_ASSERTION, false)
-                || CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_ATTRIBUTES, false)
-                || CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_NAME_ID, false)) {
-
-            if (isNullOrEmpty(configurationState.get(SharedSTSConstants.SAML2_KEYSTORE_FILE_NAME))) {
-                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.saml2.keystore.filename.message"));
-            }
-            if (isNullOrEmpty(configurationState.get(SharedSTSConstants.SAML2_KEYSTORE_PASSWORD))) {
-                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.saml2.keystore.password.message"));
-            }
-        }
-        if (CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_SIGN_ASSERTION, false)) {
-            if (isNullOrEmpty(configurationState.get(SharedSTSConstants.SAML2_SIGNATURE_KEY_ALIAS))) {
-                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.saml2.keystore.signature.keyalias.message"));
-            }
-            if (isNullOrEmpty(configurationState.get(SharedSTSConstants.SAML2_SIGNATURE_KEY_PASSWORD))) {
-                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.saml2.keystore.signature.keypassword.message"));
-            }
-        }
-        if (CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_ASSERTION, false)
-                || CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_ATTRIBUTES, false)
-                || CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_NAME_ID, false)) {
-
-            if (isNullOrEmpty(configurationState.get(SharedSTSConstants.SAML2_ENCRYPTION_KEY_ALIAS))) {
-                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.saml2.keystore.encryption.keyalias.message"));
-            }
-        }
-        if (CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_ASSERTION, false)
-                && (CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_ATTRIBUTES, false)
-                    || CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_NAME_ID, false))) {
-            return RestSTSModelResponse.failure(getLocalizedString("rest.sts.saml2.encryptioncombinations.message"));
-        }
-
         final Set<String> supportedTokenTransforms = configurationState.get(SharedSTSConstants.SUPPORTED_TOKEN_TRANSFORMS);
-        if (isNullOrEmpty(supportedTokenTransforms)) {
+        if (CollectionUtils.isEmpty(supportedTokenTransforms)) {
             return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.tokentransforms.message"));
         }
         /*
@@ -204,7 +162,131 @@ public class RestSTSModelImpl extends AMServiceProfileModelImpl implements RestS
             return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.tokentransforms.duplicate.message"));
         }
 
+        if (StringUtils.isEmpty(CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.ISSUER_NAME)) &&
+                StringUtils.isEmpty(CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.OIDC_ISSUER))) {
+            return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.output.token.configuration.message"));
+        }
+
+        //block above will insure that either the SAML2 issuer or the OIDC issuer has been set if we reach here, so null will
+        //not be returned
+        RestSTSModelResponse response = null;
+        if (!StringUtils.isEmpty(CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.ISSUER_NAME))) {
+            response = validateSAML2ConfigurationState(configurationState);
+            if (!response.isSuccessful()) {
+                return response;
+            }
+        }
+        if (!StringUtils.isEmpty(CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.OIDC_ISSUER))) {
+            response = validateOIDCConfigurationState(configurationState);
+        }
+        return response;
+    }
+
+    private RestSTSModelResponse validateSAML2ConfigurationState(Map<String, Set<String>> configurationState) {
+        if (StringUtils.isEmpty(CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.SAML2_TOKEN_LIFETIME))) {
+            return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.saml2.token.lifetime.message"));
+        }
+
+        if (CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_SIGN_ASSERTION, false)
+                || CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_ASSERTION, false)
+                || CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_ATTRIBUTES, false)
+                || CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_NAME_ID, false)) {
+
+            if (StringUtils.isEmpty(CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.SAML2_KEYSTORE_FILE_NAME))) {
+                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.saml2.keystore.filename.message"));
+            }
+            if (StringUtils.isEmpty(CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.SAML2_KEYSTORE_PASSWORD))) {
+                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.saml2.keystore.password.message"));
+            }
+        }
+        if (CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_SIGN_ASSERTION, false)) {
+            if (StringUtils.isEmpty(CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.SAML2_SIGNATURE_KEY_ALIAS))) {
+                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.saml2.keystore.signature.keyalias.message"));
+            }
+            if (StringUtils.isEmpty(CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.SAML2_SIGNATURE_KEY_PASSWORD))) {
+                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.saml2.keystore.signature.keypassword.message"));
+            }
+        }
+        if (CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_ASSERTION, false)
+                || CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_ATTRIBUTES, false)
+                || CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_NAME_ID, false)) {
+
+            if (StringUtils.isEmpty(CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPTION_KEY_ALIAS))) {
+                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.saml2.keystore.encryption.keyalias.message"));
+            }
+        }
+        if (CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_ASSERTION, false)
+                && (CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_ATTRIBUTES, false)
+                    || CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_NAME_ID, false))) {
+            return RestSTSModelResponse.failure(getLocalizedString("rest.sts.saml2.encryptioncombinations.message"));
+        }
+
+        if (!CollectionUtils.isEmpty(configurationState.get(SharedSTSConstants.SAML2_ATTRIBUTE_MAP))) {
+            if (!attributeMappingCorrectFormat(configurationState.get(SharedSTSConstants.SAML2_ATTRIBUTE_MAP))) {
+                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.saml2.claim.map.incorrect.format.message"));
+            }
+        }
+
         return RestSTSModelResponse.success();
+    }
+
+    private RestSTSModelResponse validateOIDCConfigurationState(Map<String, Set<String>> configurationState) {
+        if (StringUtils.isEmpty(CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.OIDC_TOKEN_LIFETIME))) {
+            return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.oidc.token.lifetime.message"));
+        }
+
+        boolean rsaSignature = false;
+        if (StringUtils.isEmpty(CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.OIDC_SIGNATURE_ALGORITHM))) {
+            return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.oidc.signature.algorithm.message"));
+        } else {
+            rsaSignature = rsaSignatureForOIDC(CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.OIDC_SIGNATURE_ALGORITHM));
+        }
+
+        if (rsaSignature) {
+            if (StringUtils.isEmpty(CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.OIDC_KEYSTORE_LOCATION))) {
+                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.oidc.keystore.location.message"));
+            }
+            if (StringUtils.isEmpty(CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.OIDC_KEYSTORE_PASSWORD))) {
+                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.oidc.keystore.password.message"));
+            }
+            if (StringUtils.isEmpty(CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.OIDC_SIGNATURE_KEY_ALIAS))) {
+                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.oidc.keystore.signature.keyalias.message"));
+            }
+            if (StringUtils.isEmpty(CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.OIDC_SIGNATURE_KEY_PASSWORD))) {
+                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.oidc.keystore.signature.keypassword.message"));
+            }
+        } else {
+            if (StringUtils.isEmpty(CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.OIDC_CLIENT_SECRET))) {
+                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.oidc.client.secret.missing.message"));
+            }
+        }
+
+        if (CollectionUtils.isEmpty(configurationState.get(SharedSTSConstants.OIDC_AUDIENCE))) {
+            return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.oidc.audience.not.specified.message"));
+        }
+
+        if (!CollectionUtils.isEmpty(configurationState.get(SharedSTSConstants.OIDC_CLAIM_MAP))) {
+            if (!attributeMappingCorrectFormat(configurationState.get(SharedSTSConstants.OIDC_CLAIM_MAP))) {
+                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.oidc.claim.map.incorrect.format.message"));
+            }
+        }
+        return RestSTSModelResponse.success();
+    }
+
+    /*
+    Method to insure that the attribute/claim mappings are of format x=y
+     */
+    private boolean attributeMappingCorrectFormat(Set<String> attributeMapping) {
+        for (String mapping : attributeMapping) {
+            if (mapping.split(EQUALS).length != 2) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean rsaSignatureForOIDC(String algorithm) {
+        return algorithm.startsWith("RS");
     }
 
     /**
@@ -218,26 +300,32 @@ public class RestSTSModelImpl extends AMServiceProfileModelImpl implements RestS
      *      OPENAM|SAML2|false
      *      X509|SAML2|true
      *      X509|SAML2|false
+     *      USERNAME|OPENIDCONNECT|true
+     *      USERNAME|OPENIDCONNECT|false
+     *      OPENIDCONNECT|OPENIDCONNECT|true
+     *      OPENIDCONNECT|OPENIDCONNECT|false
+     *      OPENAM|OPENIDCONNECT|true
+     *      OPENAM|OPENIDCONNECT|false
+     *      X509|OPENIDCONNECT|true
+     *      X509|OPENIDCONNECT|false
      * This method will return true if the supportedTokenTransforms method specified by the user contains more than a single
-     * entry for a given input token type.
+     * entry for a given input token type per given output token type.
      * @param supportedTokenTransforms The set of supported token transformations specified by the user
      * @return true if duplicate transformations are specified - i.e. the user cannot specify token transformations with
      * USERNAME input which specify that interim OpenAM sessions should be, and should not be, invalidated.
      */
     private boolean duplicateTransformsSpecified(Set<String> supportedTokenTransforms) {
-        int numUsername = 0, numOidc = 0, numOpenam = 0, numx509 = 0;
+        Set<String> inputOutputComboSet = new HashSet<>(supportedTokenTransforms.size());
         for (String transform : supportedTokenTransforms) {
-            if (transform.startsWith(OPENAM)) {
-                numOpenam++;
-            } else if (transform.startsWith(OPENIDCONNECT)) {
-                numOidc++;
-            } else if (transform.startsWith(X509)) {
-                numx509++;
-            } else if (transform.startsWith(USERNAME)) {
-                numUsername++;
+            String[] breakdown = transform.split(REGEX_PIPE);
+            String entry = breakdown[0] + breakdown[1];
+            if (inputOutputComboSet.contains(entry)) {
+                return true;
+            } else {
+                inputOutputComboSet.add(entry);
             }
         }
-        return (numOidc > 1) || (numOpenam > 1) || (numUsername > 1) || (numx509 > 1);
+        return false;
     }
 
     /*
@@ -266,7 +354,7 @@ public class RestSTSModelImpl extends AMServiceProfileModelImpl implements RestS
     }
 
     private JsonValue createInstanceInvocationState(Map<String, Set<String>> configurationState) {
-        JsonValue propertiesMap = new JsonValue(marshalSetValuesToListValues(configurationState));
+        JsonValue propertiesMap = new JsonValue(configurationState);
         return json(object(
                 field(SharedSTSConstants.STS_PUBLISH_INVOCATION_CONTEXT, SharedSTSConstants.STS_PUBLISH_INVOCATION_CONTEXT_VIEW_BEAN),
                 field(SharedSTSConstants.STS_PUBLISH_INSTANCE_STATE, propertiesMap)));
@@ -313,25 +401,6 @@ public class RestSTSModelImpl extends AMServiceProfileModelImpl implements RestS
 
     private String getAMDeploymentUrl() {
         return AMSystemConfig.serverURL + AMSystemConfig.serverDeploymentURI;
-    }
-
-    /*
-    Currently, JsonValue#toString will only create a json array for elements which are lists. If I want the
-    Map<String, Set<String>> returned by this.getValues() to marshal to json correctly using JsonValue#toString(), I
-    need to transform the Map<String, Set<String>> to a Map<String, List<String>>.
-     */
-    private Map<String, List<String>> marshalSetValuesToListValues(Map<String, Set<String>> smsMap) {
-        Map<String, List<String>> listMap = new HashMap<String, List<String>>();
-        for (Map.Entry<String, Set<String>> entry : smsMap.entrySet()) {
-            List<String> list = new ArrayList<String>(entry.getValue().size());
-            list.addAll(entry.getValue());
-            listMap.put(entry.getKey(), list);
-        }
-        return listMap;
-    }
-
-    private boolean isNullOrEmpty(Set<String> set) {
-        return ((set == null) || set.isEmpty());
     }
 
     private RestSTSModelResponse deleteInstance(String instanceId) throws IOException {

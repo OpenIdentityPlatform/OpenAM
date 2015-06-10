@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.tokengeneration.saml2.statements;
@@ -28,7 +28,7 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.config.user.SAML2Config;
-import org.forgerock.openam.sts.service.invocation.ProofTokenState;
+import org.forgerock.openam.sts.user.invocation.ProofTokenState;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.KeyInfoFactory;
 import org.w3c.dom.Element;
 
@@ -93,7 +93,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
                             "Unexpected SubjectConfirmation value in DefaultSubjectProvider: " + subjectConfirmation);
 
             }
-            List<SubjectConfirmation> subjectConfirmationList = new ArrayList<SubjectConfirmation>();
+            List<SubjectConfirmation> subjectConfirmationList = new ArrayList<>();
             subjectConfirmationList.add(subConfirmation);
             subject.setSubjectConfirmation(subjectConfirmationList);
             return subject;

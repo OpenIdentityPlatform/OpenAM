@@ -48,11 +48,69 @@ public class SharedSTSConstants {
     public static final String DEPLOYMENT_REALM = "deployment-realm";
 
     /*
+    This field referenced in OpenIdConnectTokenConfig.ISSUER. It is the name of the key of the json field referencing
+    the id of the OIDC token issuer, which also matches the name of the AttributeSchema element defined in restSTS.xml
+     */
+    public static final String OIDC_ISSUER = "oidc-issuer";
+
+    /*
+    This field referenced in OpenIdConnectTokenConfig.TOKEN_LIFETIME. It is the name of the key of the json field referencing
+    the token lifetime of issued oidc tokens, which also matches the name of the AttributeSchema element defined in restSTS.xml
+     */
+    public static final String OIDC_TOKEN_LIFETIME = "oidc-token-lifetime-seconds";
+
+    /*
+    This field referenced in OpenIdConnectTokenConfig.CLIENT_SECRET. It is the name of the key of the json field referencing
+    the secret used as HMAC signing key, which also matches the name of the AttributeSchema element defined in restSTS.xml
+     */
+    public static final String OIDC_CLIENT_SECRET = "oidc-client-secret";
+
+    /*
+    This field referenced in OpenIdConnectTokenConfig.KEYSTORE_LOCATION. It is the name of the key of the json field referencing
+    the keystore location, which also matches the name of the AttributeSchema element defined in restSTS.xml
+    */
+    public static final String OIDC_KEYSTORE_LOCATION = "oidc-keystore-location";
+
+    /*
+    This field referenced in OpenIdConnectTokenConfig.KEYSTORE_PASSWORD. It is the name of the key of the json field referencing
+    the keystore password, which also matches the name of the AttributeSchema element defined in restSTS.xml
+    */
+    public static final String OIDC_KEYSTORE_PASSWORD = "oidc-keystore-password";
+    /*
+    This field referenced in OpenIdConnectTokenConfig.SIGNATURE_KEY_ALIAS. It is the name of the key of the json field referencing
+    the keystore signature key alias, which also matches the name of the AttributeSchema element defined in restSTS.xml
+    */
+    public static final String OIDC_SIGNATURE_KEY_ALIAS = "oidc-signature-key-alias";
+    /*
+    This field referenced in OpenIdConnectTokenConfig.SIGNATURE_KEY_PASSWORD. It is the name of the key of the json field referencing
+    the keystore singature key password, which also matches the name of the AttributeSchema element defined in restSTS.xml
+    */
+    public static final String OIDC_SIGNATURE_KEY_PASSWORD = "oidc-signature-key-password";
+
+    /*
+    This field referenced in OpenIdConnectTokenConfig.SIGNATURE_ALGORITHM. It is the name of the key of the json field referencing
+    the signature algorithm, which also matches the name of the AttributeSchema element defined in restSTS.xml
+    */
+    public static final String OIDC_SIGNATURE_ALGORITHM = "oidc-signature-algorithm";
+
+    /*
+    This field referenced in OpenIdConnectTokenConfig.CLAIM_MAP. It is the name of the key of the json field referencing
+    the claim map, which also matches the name of the AttributeSchema element defined in restSTS.xml
+    */
+    public static final String OIDC_CLAIM_MAP = "oidc-claim-map";
+
+    /*
+    This field referenced in OpenIdConnectTokenConfig.AUDIENCE. It is the name of the key of the json field referencing
+    the audience of issued OIDC tokens, which also matches the name of the AttributeSchema element defined in restSTS.xml
+    */
+    public static final String OIDC_AUDIENCE = "oidc-audience";
+
+    /*
     This field referenced in SAML2Config.TOKEN_LIFETIME. It is the name of the key of the json field referencing
     the token lifetime of issued saml2 assertions, which also matches the name of the AttributeSchema element defined in restSTS.xml
      */
-    public static final String SAML2_TOKEN_LIFETIME = "saml2-token-lifetime-seconds";
 
+    public static final String SAML2_TOKEN_LIFETIME = "saml2-token-lifetime-seconds";
     /*
     This field referenced in SAML2Config.SIGN_ASSERTION. It is the name of the key of the json field referencing
     whether the issued assertion should be signed, which also matches the name of the AttributeSchema element defined in restSTS.xml
@@ -114,30 +172,42 @@ public class SharedSTSConstants {
    element defined in restSTS.xml
     */
     public static final String SAML2_SIGNATURE_KEY_ALIAS = "saml2-signature-key-alias";
+
     /*
    This field referenced in SAML2Config.SIGNATURE_KEY_PASSWORD. It is the name of the key of the json field referencing
    the signature key password, which also matches the name of the AttributeSchema
    element defined in restSTS.xml
     */
     public static final String SAML2_SIGNATURE_KEY_PASSWORD = "saml2-signature-key-password";
+
     /*
    This field referenced in SAML2Config.SP_ENTITY_ID. It is the name of the key of the json field referencing
    the entity id of the SP for whom generated assertions are intended, which also matches the name of the AttributeSchema
    element defined in restSTS.xml
     */
     public static final String SAML2_SP_ENTITY_ID = "saml2-sp-entity-id";
+
     /*
    This field referenced in SAML2Config.SP_ACS_URL. It is the name of the key of the json field referencing
    the url of the SP's assertion consumer service, which is required when issuing bearer assertions. Also matches the
    name of the AttributeSchema element defined in restSTS.xml
     */
     public static final String SAML2_SP_ACS_URL = "saml2-sp-acs-url";
+
     /*
    This field referenced in SAML2Config.ENCRYPTION_KEY_ALIAS. It is the name of the key of the json field referencing
    the public key of the SP intented to consume issued assertions, which also matches the name of the AttributeSchema
    element defined in restSTS.xml
     */
     public static final String SAML2_ENCRYPTION_KEY_ALIAS = "saml2-encryption-key-alias";
+
+    /*
+   This field referenced in SAML2Config.ATTRIBUTE_MAP. It is the name of the key of the json field referencing
+   the map of saml2 attributes, which also matches the name of the AttributeSchema
+   element defined in restSTS.xml
+    */
+    public static final String SAML2_ATTRIBUTE_MAP = "saml2-attribute-map";
+
     /*
     This field referenced in RestDeploymentConfig.URI_ELEMENT. It is the name of the key of the json field referencing
     the realm-relative url element where a published rest instance is to be exposed, which also matches the name of the
@@ -167,8 +237,8 @@ public class SharedSTSConstants {
     public static final String TLS_OFFLOAD_ENGINE_HOSTS = "deployment-tls-offload-engine-hosts";
 
     /*
-    This field referenced in STSInstanceConfig.ISSUER_NAME. It is the name of the key of the json field referencing
-    the token issuer name, which also matches the name of the AttributeSchema element defined in restSTS.xml
+    This field referenced in SAML2Config.ISSUER_NAME. It is the name of the key of the json field referencing
+    the IdP id of the SAML2 token issuer, which also matches the name of the AttributeSchema element defined in restSTS.xml
      */
     public static final String ISSUER_NAME = "issuer-name";
 

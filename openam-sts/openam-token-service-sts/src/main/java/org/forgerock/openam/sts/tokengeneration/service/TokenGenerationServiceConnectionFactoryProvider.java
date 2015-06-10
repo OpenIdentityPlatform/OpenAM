@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.tokengeneration.service;
@@ -25,10 +25,11 @@ import org.forgerock.json.resource.SingletonResourceProvider;
 import org.forgerock.openam.rest.authz.STSTokenGenerationServiceAuthzModule;
 import org.forgerock.openam.rest.fluent.FluentRouter;
 import org.forgerock.openam.sts.tokengeneration.config.TokenGenerationServiceInjectorHolder;
-import org.forgerock.openam.sts.tokengeneration.saml2.RestSTSInstanceState;
+import org.forgerock.openam.sts.tokengeneration.oidc.OpenIdConnectTokenGeneration;
+import org.forgerock.openam.sts.tokengeneration.state.RestSTSInstanceState;
 import org.forgerock.openam.sts.tokengeneration.saml2.SAML2TokenGeneration;
-import org.forgerock.openam.sts.tokengeneration.saml2.STSInstanceStateProvider;
-import org.forgerock.openam.sts.tokengeneration.saml2.SoapSTSInstanceState;
+import org.forgerock.openam.sts.tokengeneration.state.STSInstanceStateProvider;
+import org.forgerock.openam.sts.tokengeneration.state.SoapSTSInstanceState;
 import org.slf4j.Logger;
 
 /**
@@ -40,7 +41,9 @@ public class TokenGenerationServiceConnectionFactoryProvider {
     public static ConnectionFactory getConnectionFactory() {
         final FluentRouter router = InjectorHolder.getInstance(FluentRouter.class);
         final SingletonResourceProvider tokenGenerationService =
-                new TokenGenerationService(TokenGenerationServiceInjectorHolder.getInstance(Key.get(SAML2TokenGeneration.class)),
+                new TokenGenerationService(
+                        TokenGenerationServiceInjectorHolder.getInstance(Key.get(SAML2TokenGeneration.class)),
+                        TokenGenerationServiceInjectorHolder.getInstance(Key.get(OpenIdConnectTokenGeneration.class)),
                         TokenGenerationServiceInjectorHolder.getInstance(Key.get(new TypeLiteral<STSInstanceStateProvider<RestSTSInstanceState>>(){})),
                         TokenGenerationServiceInjectorHolder.getInstance(Key.get(new TypeLiteral<STSInstanceStateProvider<SoapSTSInstanceState>>(){})),
                         TokenGenerationServiceInjectorHolder.getInstance(Key.get(Logger.class)));

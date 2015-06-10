@@ -22,7 +22,7 @@ import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.rest.service.RestSTSServiceHttpServletContext;
-import org.forgerock.openam.sts.service.invocation.RestSTSServiceInvocationState;
+import org.forgerock.openam.sts.user.invocation.RestSTSServiceInvocationState;
 
 /**
  * This class is the analogue to the Token{Issue/Validate/Renew/Cancel}Operation instances plugged-into the CXF-STS.

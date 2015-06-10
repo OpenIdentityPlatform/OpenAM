@@ -26,11 +26,13 @@ import org.apache.ws.security.message.token.UsernameToken;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.STSInitializationException;
-import org.forgerock.openam.sts.TokenTypeId;
 import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProvider;
-import org.forgerock.openam.sts.soap.token.provider.SoapSamlTokenProvider;
-import org.forgerock.openam.sts.soap.token.provider.XmlTokenAuthnContextMapper;
+import org.forgerock.openam.sts.soap.token.provider.oidc.SoapOpenIdConnectTokenAuthnContextMapper;
+import org.forgerock.openam.sts.soap.token.provider.oidc.SoapOpenIdConnectTokenAuthnMethodsReferencesMapper;
+import org.forgerock.openam.sts.soap.token.provider.oidc.SoapOpenIdConnectTokenProvider;
+import org.forgerock.openam.sts.soap.token.provider.saml2.Saml2XmlTokenAuthnContextMapper;
+import org.forgerock.openam.sts.soap.token.provider.saml2.SoapSamlTokenProvider;
 import org.forgerock.openam.sts.token.provider.AMSessionInvalidator;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
@@ -53,10 +55,12 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
     private final String stsInstanceId;
     private final String realm;
     private final XMLUtilities xmlUtilities;
-    private final XmlTokenAuthnContextMapper xmlTokenAuthnContextMapper;
+    private final Saml2XmlTokenAuthnContextMapper saml2XmlTokenAuthnContextMapper;
     private final Provider<AMSessionInvalidator> amSessionInvalidatorProvider;
     private final SoapSTSAccessTokenProvider soapSTSAccessTokenProvider;
     private final AuthenticationHandler<UsernameToken> usernameTokenAuthenticationHandler;
+    private final SoapOpenIdConnectTokenAuthnContextMapper soapOpenIdConnectTokenAuthnContextMapper;
+    private final SoapOpenIdConnectTokenAuthnMethodsReferencesMapper soapOpenIdConnectTokenAuthnMethodsReferencesMapper;
     private final Logger logger;
 
     /**
@@ -71,10 +75,12 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
             @Named(AMSTSConstants.STS_INSTANCE_ID) String stsInstanceId,
             @Named (AMSTSConstants.REALM) String realm,
             XMLUtilities xmlUtilities,
-            XmlTokenAuthnContextMapper xmlTokenAuthnContextMapper,
+            Saml2XmlTokenAuthnContextMapper saml2XmlTokenAuthnContextMapper,
             Provider<AMSessionInvalidator> amSessionInvalidatorProvider,
             SoapSTSAccessTokenProvider soapSTSAccessTokenProvider,
             AuthenticationHandler<UsernameToken> usernameTokenAuthenticationHandler,
+            SoapOpenIdConnectTokenAuthnContextMapper soapOpenIdConnectTokenAuthnContextMapper,
+            SoapOpenIdConnectTokenAuthnMethodsReferencesMapper soapOpenIdConnectTokenAuthnMethodsReferencesMapper,
             Logger logger) {
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
         this.principalFromSession = principalFromSession;
@@ -82,10 +88,12 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
         this.stsInstanceId = stsInstanceId;
         this.realm = realm;
         this.xmlUtilities = xmlUtilities;
-        this.xmlTokenAuthnContextMapper = xmlTokenAuthnContextMapper;
+        this.saml2XmlTokenAuthnContextMapper = saml2XmlTokenAuthnContextMapper;
         this.amSessionInvalidatorProvider = amSessionInvalidatorProvider;
         this.soapSTSAccessTokenProvider = soapSTSAccessTokenProvider;
         this.usernameTokenAuthenticationHandler = usernameTokenAuthenticationHandler;
+        this.soapOpenIdConnectTokenAuthnContextMapper = soapOpenIdConnectTokenAuthnContextMapper;
+        this.soapOpenIdConnectTokenAuthnMethodsReferencesMapper = soapOpenIdConnectTokenAuthnMethodsReferencesMapper;
         this.logger = logger;
     }
     /**
@@ -112,7 +120,7 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
      *
      * @param issuedTokenType the type of token to be created
      * @return a TokenProvider implementation which can create the specified token type
-     * @throws STSInitializationException
+     * @throws STSInitializationException if an unsupported token type is specified
      */
     @Override
     public TokenProvider getTokenProvider(TokenType issuedTokenType) throws STSInitializationException{
@@ -124,8 +132,21 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
                     .stsInstanceId(stsInstanceId)
                     .realm(realm)
                     .xmlUtilities(xmlUtilities)
-                    .authnContextMapper(xmlTokenAuthnContextMapper)
+                    .authnContextMapper(saml2XmlTokenAuthnContextMapper)
                     .soapSTSAccessTokenProvider(soapSTSAccessTokenProvider)
+                    .logger(logger)
+                    .build();
+        } else if (TokenType.OPENIDCONNECT.equals(issuedTokenType)) {
+            return SoapOpenIdConnectTokenProvider.builder()
+                    .tokenGenerationServiceConsumer(tokenGenerationServiceConsumer)
+                    .amSessionInvalidator(amSessionInvalidatorProvider.get())
+                    .threadLocalAMTokenCache(threadLocalAMTokenCache)
+                    .stsInstanceId(stsInstanceId)
+                    .realm(realm)
+                    .xmlUtilities(xmlUtilities)
+                    .soapSTSAccessTokenProvider(soapSTSAccessTokenProvider)
+                    .authenticationContextReferenceMapper(soapOpenIdConnectTokenAuthnContextMapper)
+                    .authenticationMethodsReferencesMapper(soapOpenIdConnectTokenAuthnMethodsReferencesMapper)
                     .logger(logger)
                     .build();
         }

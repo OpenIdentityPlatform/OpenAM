@@ -38,9 +38,13 @@ import org.forgerock.openam.sts.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProvider;
 import org.forgerock.openam.sts.soap.config.user.SoapDeploymentConfig;
 import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
-import org.forgerock.openam.sts.soap.token.provider.SoapSamlTokenProvider;
-import org.forgerock.openam.sts.soap.token.provider.XmlTokenAuthnContextMapper;
-import org.forgerock.openam.sts.soap.token.provider.XmlTokenAuthnContextMapperImpl;
+import org.forgerock.openam.sts.soap.token.provider.oidc.DefaultSoapOpenIdConnectTokenAuthnContextMapper;
+import org.forgerock.openam.sts.soap.token.provider.oidc.DefaultSoapOpenIdConnectTokenAuthnMethodsReferencesMapper;
+import org.forgerock.openam.sts.soap.token.provider.oidc.SoapOpenIdConnectTokenAuthnContextMapper;
+import org.forgerock.openam.sts.soap.token.provider.oidc.SoapOpenIdConnectTokenAuthnMethodsReferencesMapper;
+import org.forgerock.openam.sts.soap.token.provider.saml2.Saml2XmlTokenAuthnContextMapper;
+import org.forgerock.openam.sts.soap.token.provider.saml2.Saml2XmlTokenAuthnContextMapperImpl;
+import org.forgerock.openam.sts.soap.token.provider.saml2.SoapSamlTokenProvider;
 import org.forgerock.openam.sts.token.AMTokenParser;
 import org.forgerock.openam.sts.token.AMTokenParserImpl;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
@@ -99,10 +103,12 @@ public class TokenOperationFactoryImplTest {
             bind(UrlConstituentCatenator.class).to(UrlConstituentCatenatorImpl.class);
             bind(TokenGenerationServiceConsumer.class).to(TokenGenerationServiceConsumerImpl.class);
             bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
-            bind(XmlTokenAuthnContextMapper.class).to(XmlTokenAuthnContextMapperImpl.class);
+            bind(Saml2XmlTokenAuthnContextMapper.class).to(Saml2XmlTokenAuthnContextMapperImpl.class);
             bind(SoapSTSAccessTokenProvider.class).toInstance(mock(SoapSTSAccessTokenProvider.class));
             bind(HttpURLConnectionFactory.class).to(DefaultHttpURLConnectionFactory.class);
             bind(HttpURLConnectionWrapperFactory.class);
+            bind(SoapOpenIdConnectTokenAuthnContextMapper.class).to(DefaultSoapOpenIdConnectTokenAuthnContextMapper.class);
+            bind(SoapOpenIdConnectTokenAuthnMethodsReferencesMapper.class).to(DefaultSoapOpenIdConnectTokenAuthnMethodsReferencesMapper.class);
         }
 
         @Provides
@@ -200,7 +206,7 @@ public class TokenOperationFactoryImplTest {
 
         @Provides
         Set<TokenTransformConfig> getValidateTransformations() {
-            Set<TokenTransformConfig> transformConfigs = new HashSet<TokenTransformConfig>();
+            Set<TokenTransformConfig> transformConfigs = new HashSet<>();
             transformConfigs.add(new TokenTransformConfig(TokenType.OPENAM, TokenType.SAML2, true));
             return transformConfigs;
         }

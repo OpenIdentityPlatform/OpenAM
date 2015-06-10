@@ -25,7 +25,7 @@ import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.rest.operation.TokenTranslateOperation;
 import org.forgerock.openam.sts.rest.service.RestSTSServiceHttpServletContext;
-import org.forgerock.openam.sts.service.invocation.RestSTSServiceInvocationState;
+import org.forgerock.openam.sts.user.invocation.RestSTSServiceInvocationState;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 
 /**

@@ -11,21 +11,22 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.token.provider;
 
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import org.forgerock.json.fluent.JsonException;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.HttpURLConnectionWrapper;
 import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenType;
-import org.forgerock.openam.sts.service.invocation.ProofTokenState;
+import org.forgerock.openam.sts.service.invocation.OpenIdConnectTokenGenerationState;
+import org.forgerock.openam.sts.user.invocation.ProofTokenState;
+import org.forgerock.openam.sts.service.invocation.SAML2TokenGenerationState;
 import org.forgerock.openam.sts.service.invocation.TokenGenerationServiceInvocationState;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
@@ -39,6 +40,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static org.forgerock.openam.sts.service.invocation.TokenGenerationServiceInvocationState.TokenGenerationServiceInvocationStateBuilder;
 
@@ -48,6 +50,7 @@ import static org.forgerock.openam.sts.service.invocation.TokenGenerationService
  */
 public class TokenGenerationServiceConsumerImpl implements TokenGenerationServiceConsumer {
     private static final String COOKIE = "Cookie";
+    private static final ProofTokenState NULL_PROOF_TOKEN_STATE = null;
 
     private final AMSTSConstants.STSType stsType;
     private final String tokenGenerationServiceEndpoint;
@@ -70,36 +73,33 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
         this.amSessionCookieName = amSessionCookieName;
     }
 
+    @Override
     public String getSAML2BearerAssertion(String ssoTokenString,
                                           String stsInstanceId,
                                           String realm,
                                           String authnContextClassRef,
                                           String callerSSOTokenString) throws TokenCreationException {
         final TokenGenerationServiceInvocationStateBuilder invocationStateBuilder =
-                buildCommonSaml2InvocationState(
-                        SAML2SubjectConfirmation.BEARER,
-                        authnContextClassRef,
-                        stsInstanceId,
-                        realm,
-                        ssoTokenString);
+                buildCommonInvocationState(TokenType.SAML2, stsInstanceId, realm, ssoTokenString);
+        invocationStateBuilder.saml2GenerationState(buildSaml2TokenGenerationState(authnContextClassRef,
+                SAML2SubjectConfirmation.BEARER, NULL_PROOF_TOKEN_STATE));
         return makeInvocation(invocationStateBuilder.build().toJson().toString(), callerSSOTokenString);
     }
 
+    @Override
     public String getSAML2SenderVouchesAssertion(String ssoTokenString,
                                                  String stsInstanceId,
                                                  String realm,
                                                  String authnContextClassRef,
                                                  String callerSSOTokenString) throws TokenCreationException {
         final TokenGenerationServiceInvocationStateBuilder invocationStateBuilder =
-                buildCommonSaml2InvocationState(
-                        SAML2SubjectConfirmation.SENDER_VOUCHES,
-                        authnContextClassRef,
-                        stsInstanceId,
-                        realm,
-                        ssoTokenString);
+                buildCommonInvocationState(TokenType.SAML2, stsInstanceId, realm, ssoTokenString);
+        invocationStateBuilder.saml2GenerationState(buildSaml2TokenGenerationState(authnContextClassRef,
+                SAML2SubjectConfirmation.SENDER_VOUCHES, NULL_PROOF_TOKEN_STATE));
         return makeInvocation(invocationStateBuilder.build().toJson().toString(), callerSSOTokenString);
     }
 
+    @Override
     public String getSAML2HolderOfKeyAssertion(String ssoTokenString,
                                                String stsInstanceId,
                                                String realm,
@@ -107,34 +107,62 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
                                                ProofTokenState proofTokenState,
                                                String callerSSOTokenString) throws TokenCreationException {
         final TokenGenerationServiceInvocationStateBuilder invocationStateBuilder =
-                buildCommonSaml2InvocationState(
-                        SAML2SubjectConfirmation.HOLDER_OF_KEY,
-                        authnContextClassRef,
-                        stsInstanceId,
-                        realm,
-                        ssoTokenString);
-        invocationStateBuilder.proofTokenState(proofTokenState);
+                buildCommonInvocationState(TokenType.SAML2, stsInstanceId, realm, ssoTokenString);
+        invocationStateBuilder.saml2GenerationState(buildSaml2TokenGenerationState(authnContextClassRef,
+                SAML2SubjectConfirmation.HOLDER_OF_KEY, proofTokenState));
         return makeInvocation(invocationStateBuilder.build().toJson().toString(), callerSSOTokenString);
     }
 
-    private TokenGenerationServiceInvocationStateBuilder buildCommonSaml2InvocationState(SAML2SubjectConfirmation subjectConfirmation,
-                                                                                         String authnContextClassRef,
-                                                                                         String stsInstanceId,
-                                                                                         String realm,
-                                                                                         String ssoTokenString) {
+    @Override
+    public String getOpenIdConnectToken(String ssoTokenString, String stsInstanceId, String realm,
+                                 String authnContextClassRef, Set<String> authnMethodReferences,
+                                 long authnTimeInSeconds, String nonce,
+                                 String callerSSOTokenString) throws TokenCreationException {
+        final TokenGenerationServiceInvocationStateBuilder invocationStateBuilder =
+                buildCommonInvocationState(TokenType.OPENIDCONNECT, stsInstanceId, realm, ssoTokenString);
+        invocationStateBuilder.openIdConnectTokenGenerationState(buildOpenIdConectTokenGenerationState(authnContextClassRef,
+                authnMethodReferences, authnTimeInSeconds, nonce));
+        return makeInvocation(invocationStateBuilder.build().toJson().toString(), callerSSOTokenString);
+
+    }
+
+    private TokenGenerationServiceInvocationStateBuilder buildCommonInvocationState(TokenType tokenType,
+                                                                                    String stsInstanceId,
+                                                                                    String realm,
+                                                                                    String ssoTokenString) {
         return TokenGenerationServiceInvocationState.builder()
-                .tokenType(TokenType.SAML2)
-                .saml2SubjectConfirmation(subjectConfirmation)
-                .authNContextClassRef(authnContextClassRef)
+                .tokenType(tokenType)
                 .stsType(stsType)
                 .stsInstanceId(stsInstanceId)
                 .realm(realm)
                 .ssoTokenString(ssoTokenString);
     }
 
+    private SAML2TokenGenerationState buildSaml2TokenGenerationState(String authnContextClassRef,
+                                                                     SAML2SubjectConfirmation subjectConfirmation,
+                                                                     ProofTokenState proofTokenState) {
+        return SAML2TokenGenerationState.builder()
+                .authenticationContextClassReference(authnContextClassRef)
+                .proofTokenState(proofTokenState)
+                .subjectConfirmation(subjectConfirmation)
+                .build();
+    }
+
+    private OpenIdConnectTokenGenerationState buildOpenIdConectTokenGenerationState(String authenticationContextClassReference,
+                                                                                    Set<String> authenticationMethodReferences,
+                                                                                    long authenticationTimeInSeconds,
+                                                                                    String nonce) {
+        return OpenIdConnectTokenGenerationState.builder()
+                .authenticationMethodReferences(authenticationMethodReferences)
+                .authenticationContextClassReference(authenticationContextClassReference)
+                .authenticationTimeInSeconds(authenticationTimeInSeconds)
+                .nonce(nonce)
+                .build();
+    }
+
     private String makeInvocation(String invocationString, String callerSSOTokenString) throws TokenCreationException {
         try {
-            Map<String, String> headerMap = new HashMap<String, String>();
+            Map<String, String> headerMap = new HashMap<>();
             headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
             headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersionTokenGenService);
             headerMap.put(COOKIE, createAMSessionCookie(callerSSOTokenString));
@@ -149,10 +177,10 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 return parseTokenResponse(connectionResult.getResult());
             } else {
-                return connectionResult.getResult();
+                throw new TokenCreationException(ResourceException.BAD_REQUEST, connectionResult.getResult());
             }
         } catch (IOException e) {
-            throw new TokenCreationException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR,
+            throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
                     "Exception caught invoking TokenGenerationService: " + e);
         }
     }
@@ -171,13 +199,13 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
         try {
             responseContent = JsonValueBuilder.toJsonValue(response);
         } catch (JsonException e) {
-            throw new TokenCreationException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR,
+            throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
                     "Could not map the response from the TokenGenerationService to a json object. The response: "
                             + response + "; The exception: " + e);
         }
         JsonValue assertionJson = responseContent.get(AMSTSConstants.ISSUED_TOKEN);
         if (!assertionJson.isString()) {
-            throw new TokenCreationException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR,
+            throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
                     "The json response returned from the TokenGenerationService did not have " +
                             "a non-null string element for the " + AMSTSConstants.ISSUED_TOKEN + " key. The json: "
                             + responseContent.toString());

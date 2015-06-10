@@ -46,16 +46,12 @@ public class TokenTransformConfig {
         this.invalidateInterimOpenAMSession = invalidateInterimOpenAMSession;
         Reject.ifNull(inputTokenType, "Input TokenType cannot be null");
         Reject.ifNull(outputTokenType, "Output TokenType cannot be null");
-        if (!TokenType.SAML2.equals(outputTokenType)) {
-            throw new IllegalArgumentException("Only output token types of SAML2 are currently supported. " +
+        if (!TokenType.SAML2.equals(outputTokenType) && !TokenType.OPENIDCONNECT.equals(outputTokenType)) {
+            throw new IllegalArgumentException("Only output token types of SAML2 and OPENIDCONNECT are currently supported. " +
                     "Invalid output token type: " + outputTokenType);
         }
         if (TokenType.SAML2.equals(inputTokenType)) {
             throw new IllegalArgumentException("SAML2 tokens are not supported as inputs to a token transformation.");
-        }
-
-        if (inputTokenType.equals(outputTokenType)) {
-            throw new IllegalArgumentException("Input and output token types in transformation cannot be identical.");
         }
     }
 

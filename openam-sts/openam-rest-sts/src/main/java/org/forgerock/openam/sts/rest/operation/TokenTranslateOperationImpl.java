@@ -32,12 +32,11 @@ import javax.inject.Named;
 
 import org.forgerock.openam.sts.rest.service.RestSTSServiceHttpServletContext;
 import org.forgerock.openam.sts.rest.token.validator.RestTokenValidatorParameters;
-import org.forgerock.openam.sts.service.invocation.RestSTSServiceInvocationState;
+import org.forgerock.openam.sts.user.invocation.RestSTSServiceInvocationState;
 import org.forgerock.openam.sts.rest.token.provider.RestTokenProviderParameters;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 /**

@@ -22,6 +22,7 @@ import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.shared.sts.SharedSTSConstants;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.MapMarshallUtils;
+import org.forgerock.openam.utils.CollectionUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
@@ -54,6 +55,7 @@ import static org.forgerock.json.fluent.JsonValue.object;
 public class SAML2Config {
     private static final String EQUALS = "=";
     public static class SAML2ConfigBuilder {
+        private String idpId;
         /*
         Cannot use the SAML2Constants defined in openam-federation, as this dependency
         introduces a dependency on openam-core, which pulls the ws-* dependencies into the soap-sts, which I don't want.
@@ -96,6 +98,11 @@ public class SAML2Config {
         public SAML2ConfigBuilder nameIdFormat(String nameIdFormat) {
             //TODO - test to see if it matches one of the allowed values?
             this.nameIdFormat = nameIdFormat;
+            return this;
+        }
+
+        public SAML2ConfigBuilder idpId(String idpId) {
+            this.idpId = idpId;
             return this;
         }
 
@@ -246,11 +253,11 @@ public class SAML2Config {
 
     /*
     Define the names of fields to aid in json marshalling. Note that these names match the names of the AttributeSchema
-    entries in restSTS.xml, as this aids in marshalling an instance of this class into the attribute map needed for
+    entries in restSTS.xml and soapSTS.xml, as this aids in marshalling an instance of this class into the attribute map needed for
     SMS persistence.
      */
     static final String NAME_ID_FORMAT = "saml2-name-id-format";
-    static final String ATTRIBUTE_MAP = "saml2-attribute-map";
+    static final String ATTRIBUTE_MAP = SharedSTSConstants.SAML2_ATTRIBUTE_MAP;
     static final String TOKEN_LIFETIME = SharedSTSConstants.SAML2_TOKEN_LIFETIME;
     static final String CUSTOM_CONDITIONS_PROVIDER_CLASS = "saml2-custom-conditions-provider-class-name";
     static final String CUSTOM_SUBJECT_PROVIDER_CLASS = "saml2-custom-subject-provider-class-name";
@@ -272,6 +279,15 @@ public class SAML2Config {
     static final String ENCRYPTION_KEY_ALIAS = SharedSTSConstants.SAML2_ENCRYPTION_KEY_ALIAS;
     static final String SIGNATURE_KEY_ALIAS = SharedSTSConstants.SAML2_SIGNATURE_KEY_ALIAS;
     static final String SIGNATURE_KEY_PASSWORD = SharedSTSConstants.SAML2_SIGNATURE_KEY_PASSWORD;
+    /*
+    Note that this attribute(issuer-name) was defined in STSInstanceConfig, and thus global to an STS instance. It was
+    used to set the issuer field in issued SAML2 assertions, when the STS only issued SAML2 assertions. Now that
+    OIDC tokens are also issued, the issuer-name must be scoped to the token-specific config. Thus, by convention,
+    the name of the AttributeSchema element would be saml2-issuer-name. However, changing the name of this attribute
+    would involve a schema migration step. This can be avoided by encapsulating this same attribute in the SAML2Config
+    class, and via an update to the AdminUI to describe this attribute as the IDP identifier
+     */
+    static final String ISSUER_NAME = SharedSTSConstants.ISSUER_NAME;
 
     private final String nameIdFormat;
     private final Map<String, String> attributeMap;
@@ -296,6 +312,7 @@ public class SAML2Config {
     private final String signatureKeyAlias;
     private final byte[] signatureKeyPassword;
     private final String encryptionKeyAlias;
+    private final String idpId;
 
     private SAML2Config(SAML2ConfigBuilder builder) {
         this.nameIdFormat = builder.nameIdFormat; //not required so don't reject if null
@@ -325,6 +342,7 @@ public class SAML2Config {
         this.signatureKeyAlias = builder.signatureKeyAlias;
         this.signatureKeyPassword = builder.signatureKeyPassword;
         this.encryptionKeyAlias = builder.encryptionKeyAlias;
+        this.idpId = builder.idpId;
 
         if (spEntityId ==  null) {
             throw new IllegalArgumentException("The entity id of the consumer (SP) for issued assertions must be specified.");
@@ -358,6 +376,10 @@ public class SAML2Config {
 
         if (encryptAssertion && (encryptNameID || encryptAttributes)) {
             throw new IllegalArgumentException("Either the entire assertion can be encrypted, or the Attributes and/or NameID.");
+        }
+
+        if (idpId == null) {
+            throw new IllegalArgumentException("The Identity Provider id must be set.");
         }
     }
 
@@ -457,10 +479,15 @@ public class SAML2Config {
         return signatureKeyPassword;
     }
 
+    public String getIdpId() {
+        return idpId;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("SAML2Config instance:").append('\n');
+        sb.append('\t').append("IDP id: ").append(idpId).append('\n');
         sb.append('\t').append("nameIDFormat: ").append(nameIdFormat).append('\n');
         sb.append('\t').append("attributeMap: ").append(attributeMap).append('\n');
         sb.append('\t').append("tokenLifetimeInSeconds: ").append(tokenLifetimeInSeconds).append('\n');
@@ -490,29 +517,30 @@ public class SAML2Config {
     public boolean equals(Object other) {
         if (other instanceof SAML2Config) {
             SAML2Config otherConfig = (SAML2Config)other;
-            return nameIdFormat.equals(otherConfig.getNameIdFormat()) &&
+            return  nameIdFormat.equals(otherConfig.nameIdFormat) &&
+                    idpId.equals(otherConfig.idpId) &&
                     tokenLifetimeInSeconds == otherConfig.tokenLifetimeInSeconds &&
                     attributeMap.equals(otherConfig.attributeMap) &&
-                    signAssertion == otherConfig.signAssertion() &&
-                    encryptAssertion == otherConfig.encryptAssertion() &&
-                    encryptAttributes == otherConfig.encryptAttributes() &&
-                    encryptNameID == otherConfig.encryptNameID() &&
+                    signAssertion == otherConfig.signAssertion &&
+                    encryptAssertion == otherConfig.encryptAssertion &&
+                    encryptAttributes == otherConfig.encryptAttributes &&
+                    encryptNameID == otherConfig.encryptNameID &&
                     encryptionAlgorithmStrength == otherConfig.encryptionAlgorithmStrength &&
                     spEntityId.equals(otherConfig.spEntityId) &&
-                    Objects.equal(encryptionAlgorithm, otherConfig.getEncryptionAlgorithm()) &&
-                    Objects.equal(customConditionsProviderClassName, otherConfig.getCustomConditionsProviderClassName()) &&
-                    Objects.equal(customSubjectProviderClassName, otherConfig.getCustomSubjectProviderClassName()) &&
-                    Objects.equal(customAttributeStatementsProviderClassName, otherConfig.getCustomAttributeStatementsProviderClassName()) &&
-                    Objects.equal(customAuthzDecisionStatementsProviderClassName, otherConfig.getCustomAuthzDecisionStatementsProviderClassName()) &&
-                    Objects.equal(customAttributeMapperClassName, otherConfig.getCustomAttributeMapperClassName()) &&
-                    Objects.equal(customAuthNContextMapperClassName, otherConfig.getCustomAuthNContextMapperClassName()) &&
-                    Objects.equal(customAuthenticationStatementsProviderClassName, otherConfig.getCustomAuthenticationStatementsProviderClassName()) &&
-                    Objects.equal(keystoreFileName, otherConfig.getKeystoreFileName()) &&
-                    Arrays.equals(keystorePassword, otherConfig.getKeystorePassword()) &&
-                    Objects.equal(spAcsUrl, otherConfig.getSpAcsUrl()) &&
-                    Objects.equal(signatureKeyAlias, otherConfig.getSignatureKeyAlias()) &&
-                    Objects.equal(encryptionKeyAlias, otherConfig.getEncryptionKeyAlias()) &&
-                    Arrays.equals(signatureKeyPassword, otherConfig.getSignatureKeyPassword());
+                    Objects.equal(encryptionAlgorithm, otherConfig.encryptionAlgorithm) &&
+                    Objects.equal(customConditionsProviderClassName, otherConfig.customConditionsProviderClassName) &&
+                    Objects.equal(customSubjectProviderClassName, otherConfig.customSubjectProviderClassName) &&
+                    Objects.equal(customAttributeStatementsProviderClassName, otherConfig.customAttributeStatementsProviderClassName) &&
+                    Objects.equal(customAuthzDecisionStatementsProviderClassName, otherConfig.customAuthzDecisionStatementsProviderClassName) &&
+                    Objects.equal(customAttributeMapperClassName, otherConfig.customAttributeMapperClassName) &&
+                    Objects.equal(customAuthNContextMapperClassName, otherConfig.customAuthNContextMapperClassName) &&
+                    Objects.equal(customAuthenticationStatementsProviderClassName, otherConfig.customAuthenticationStatementsProviderClassName) &&
+                    Objects.equal(keystoreFileName, otherConfig.keystoreFileName) &&
+                    Arrays.equals(keystorePassword, otherConfig.keystorePassword) &&
+                    Objects.equal(spAcsUrl, otherConfig.spAcsUrl) &&
+                    Objects.equal(signatureKeyAlias, otherConfig.signatureKeyAlias) &&
+                    Objects.equal(encryptionKeyAlias, otherConfig.encryptionKeyAlias) &&
+                    Arrays.equals(signatureKeyPassword, otherConfig.signatureKeyPassword);
         }
         return false;
     }
@@ -530,6 +558,7 @@ public class SAML2Config {
     public JsonValue toJson() {
         try {
             return json(object(
+                    field(ISSUER_NAME, idpId),
                     field(NAME_ID_FORMAT, nameIdFormat),
                     field(TOKEN_LIFETIME, String.valueOf(tokenLifetimeInSeconds)),
                     field(CUSTOM_CONDITIONS_PROVIDER_CLASS, customConditionsProviderClassName),
@@ -563,6 +592,7 @@ public class SAML2Config {
     public static SAML2Config fromJson(JsonValue json) throws IllegalStateException {
         try {
             return SAML2Config.builder()
+                    .idpId(json.get(ISSUER_NAME).asString())
                     .nameIdFormat(json.get(NAME_ID_FORMAT).asString())
                     //because we have to go to the SMS Map representation, where all values are Set<String>, I need to
                     // pull the value from Json as a string, and then parse out a Long.
@@ -607,7 +637,7 @@ public class SAML2Config {
         Object attributesObject = preMap.get(ATTRIBUTE_MAP);
         if (attributesObject instanceof Map) {
             finalMap.remove(ATTRIBUTE_MAP);
-            Set<String> attributeValues = new LinkedHashSet<String>();
+            Set<String> attributeValues = new LinkedHashSet<>();
             finalMap.put(ATTRIBUTE_MAP, attributeValues);
             for (Map.Entry<String, String> entry : ((Map<String, String>)attributesObject).entrySet()) {
                 attributeValues.add(entry.getKey() + EQUALS + entry.getValue());
@@ -625,22 +655,22 @@ public class SAML2Config {
     object, and the representation expected by the SMS
      */
     public static SAML2Config marshalFromAttributeMap(Map<String, Set<String>> smsAttributeMap) {
-        Set<String> attributes = smsAttributeMap.get(ATTRIBUTE_MAP);
+        Set<String> issuerName = smsAttributeMap.get(ISSUER_NAME);
         /*
         The STSInstanceConfig may not have SAML2Config, if there are no defined token transformations that result
-        in a SAML2 assertion. So if we have null attributes, this means that STSInstanceConfig.marshalFromAttributeMap
-        was called. Note that we cannot check for isEmpty, as this will be the case if SAML2Config has been defined, but
-        simply without any attributes.
+        in a SAML2 assertion. So we check for the ISSUER_NAME attribute, which is the IdP id, a mandatory field if
+        SAML2 assertions are to be issued.
          */
-        if (attributes == null) {
+        if (CollectionUtils.isEmpty(issuerName)) {
             return null;
         }
         Map<String, Object> jsonAttributes = MapMarshallUtils.toJsonValueMap(smsAttributeMap);
         jsonAttributes.remove(ATTRIBUTE_MAP);
-        Map<String, Object> jsonAttributeMap = new LinkedHashMap<String, Object>();
+        Set<String> attributes = smsAttributeMap.get(ATTRIBUTE_MAP);
+        Map<String, Object> jsonAttributeMap = new LinkedHashMap<>();
         for (String entry : attributes) {
-            StringTokenizer st = new StringTokenizer(entry, EQUALS);
-            jsonAttributeMap.put(st.nextToken(), st.nextToken());
+            String[] breakdown = entry.split(EQUALS);
+            jsonAttributeMap.put(breakdown[0], breakdown[1]);
         }
         jsonAttributes.put(ATTRIBUTE_MAP, new JsonValue(jsonAttributeMap));
 

@@ -26,10 +26,11 @@ import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenTypeId;
 import org.forgerock.openam.sts.rest.service.RestSTSServiceHttpServletContext;
 import org.forgerock.openam.sts.rest.token.provider.RestTokenProviderParameters;
-import org.forgerock.openam.sts.rest.token.provider.Saml2TokenCreationState;
+import org.forgerock.openam.sts.rest.token.provider.oidc.OpenIdConnectTokenCreationState;
+import org.forgerock.openam.sts.rest.token.provider.saml.Saml2TokenCreationState;
 import org.forgerock.openam.sts.rest.token.validator.RestTokenValidatorParameters;
-import org.forgerock.openam.sts.service.invocation.ProofTokenState;
-import org.forgerock.openam.sts.service.invocation.SAML2TokenState;
+import org.forgerock.openam.sts.user.invocation.ProofTokenState;
+import org.forgerock.openam.sts.user.invocation.SAML2TokenState;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
@@ -104,6 +105,8 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
                                                                         JsonValue desiredTokenState) throws TokenMarshalException {
         if (TokenType.SAML2.equals(desiredTokenType)) {
             return createSAML2TokenProviderParameters(inputTokenType, inputToken, desiredTokenState);
+        } else if (TokenType.OPENIDCONNECT.equals(desiredTokenType)) {
+            return createOpenIdConnectTokenProviderParameters(inputTokenType, inputToken, desiredTokenState);
         } else {
             throw new TokenMarshalException(ResourceException.BAD_REQUEST, "Unsupported output token type: " + desiredTokenType);
         }
@@ -398,5 +401,36 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
                 }
             };
         }
+    }
+
+    private RestTokenProviderParameters<OpenIdConnectTokenCreationState> createOpenIdConnectTokenProviderParameters(
+                                                                        final TokenTypeId inputTokenType,
+                                                                        final JsonValue inputToken,
+                                                                        final JsonValue desiredToken)
+                                                                        throws TokenMarshalException {
+        org.forgerock.openam.sts.user.invocation.OpenIdConnectTokenCreationState userSpecifiedTokenCreationState =
+                org.forgerock.openam.sts.user.invocation.OpenIdConnectTokenCreationState.fromJson(desiredToken);
+        if (!userSpecifiedTokenCreationState.getAllowAccess()) {
+            throw new TokenMarshalException(ResourceException.BAD_REQUEST, "The OpenIdConnectTokenCreation state must " +
+                    "indicate access to the caller's identity with a field of allow_access:true.");
+        }
+        final OpenIdConnectTokenCreationState openIdConnectTokenCreationState =
+                new OpenIdConnectTokenCreationState(userSpecifiedTokenCreationState.getNonce(), System.currentTimeMillis() / 1000);
+        return new RestTokenProviderParameters<OpenIdConnectTokenCreationState>() {
+            @Override
+            public OpenIdConnectTokenCreationState getTokenCreationState() {
+                return openIdConnectTokenCreationState;
+            }
+
+            @Override
+            public TokenTypeId getInputTokenType() {
+                return inputTokenType;
+            }
+
+            @Override
+            public JsonValue getInputToken() {
+                return inputToken;
+            }
+        };
     }
 }

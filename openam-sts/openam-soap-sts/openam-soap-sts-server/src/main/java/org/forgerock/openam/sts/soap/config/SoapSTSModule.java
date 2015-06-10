@@ -62,7 +62,7 @@ import java.util.concurrent.ScheduledExecutorService;
 /**
  * Defines the guice bindings needed by the soap-sts 'framework' - i.e. the elements need to exposed published soap-sts
  * instances as web-services. Also defines bindings common to all soap-sts instances - i.e. version strings, and rest target
- * endpoints. It is a PrivateModule as the Tuice Injector created for each soap-sts instance will be a child of the Injector
+ * endpoints. It is a PrivateModule as the Guice Injector created for each soap-sts instance will be a child of the Injector
  * created by this module, and only some of the global bindings should be exposed to the child Injector.
  */
 public class SoapSTSModule extends PrivateModule {

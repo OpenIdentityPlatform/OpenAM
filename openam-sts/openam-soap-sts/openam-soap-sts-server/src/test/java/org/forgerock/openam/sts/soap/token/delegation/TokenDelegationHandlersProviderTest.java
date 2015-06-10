@@ -95,7 +95,7 @@ public class TokenDelegationHandlersProviderTest {
         SoapSTSInstanceConfig.SoapSTSInstanceConfigBuilderBase<?> builder = SoapSTSInstanceConfig.builder();
         builder.addSecurityPolicyTokenValidationConfiguration(TokenType.OPENAM, false);
         builder.addIssueTokenType(TokenType.SAML2);
-        Map<String,String> attributeMap = new HashMap<String, String>();
+        Map<String,String> attributeMap = new HashMap<>();
         attributeMap.put("mail", "email");
         attributeMap.put("uid", "id");
         SAML2Config saml2Config =
@@ -113,6 +113,7 @@ public class TokenDelegationHandlersProviderTest {
                         .keystoreFile("da/directory/file")
                         .keystorePassword("super.secret".getBytes())
                         .attributeMap(attributeMap)
+                        .idpId("da_idp")
                         .build();
         boolean delegationRelationshipsSupported = customDelegationHandler || delegationValidatorsSpecified;
         if (delegationRelationshipsSupported) {
@@ -130,7 +131,6 @@ public class TokenDelegationHandlersProviderTest {
         return  builder
                 .deploymentConfig(deploymentConfig)
                 .soapSTSKeystoreConfig(keystoreConfig)
-                .issuerName("Cornholio")
                 .saml2Config(saml2Config)
                 .delegationRelationshipsSupported(delegationRelationshipsSupported)
                 .build();

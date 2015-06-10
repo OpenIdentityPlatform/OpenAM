@@ -23,8 +23,6 @@ import org.forgerock.openam.sts.TokenTypeId;
 import org.forgerock.openam.sts.rest.service.RestSTSServiceHttpServletContext;
 import org.forgerock.openam.sts.rest.token.provider.RestTokenProviderParameters;
 import org.forgerock.openam.sts.rest.token.validator.RestTokenValidatorParameters;
-import org.forgerock.openam.sts.service.invocation.ProofTokenState;
-import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 
 /**
  * Defines an interface encapsulating the concerns of taking the json posted at the rest-sts, and marshalling it into

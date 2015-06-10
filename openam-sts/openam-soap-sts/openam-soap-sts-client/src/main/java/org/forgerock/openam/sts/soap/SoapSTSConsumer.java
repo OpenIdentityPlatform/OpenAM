@@ -39,6 +39,7 @@ import org.forgerock.openam.sts.soap.policy.am.OpenAMSessionTokenClientIntercept
 
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -287,15 +288,24 @@ public class SoapSTSConsumer {
         }
     }
 
-    void testIssueSuite(List<EndpointSpecification> endpoints, List<TokenSpecification> tokenSpecifications) throws SoapSTSConsumerException {
+    /**
+     *
+     * @param endpoints the endpoints targeted by the issue operation
+     * @param tokenSpecifications the desired tokens, including any additional necessary state
+     * @return the list SecurityTokens resulting from the successful invocations
+     * @throws SoapSTSConsumerException if any individual issue invocation did not succeed.
+     */
+    public List<SecurityToken> testIssueSuite(List<EndpointSpecification> endpoints, List<TokenSpecification> tokenSpecifications) throws SoapSTSConsumerException {
+        final List<SecurityToken> tokens = new ArrayList<>(endpoints.size() * tokenSpecifications.size());
         for (EndpointSpecification endpoint : endpoints) {
             for (TokenSpecification tokenSpecification : tokenSpecifications) {
-                testIssueInternal(
+                tokens.add(testIssueInternal(
                         endpoint,
                         tokenSpecification,
-                        ALLOW_TOKEN_RENEWAL);
+                        ALLOW_TOKEN_RENEWAL));
             }
         }
+        return tokens;
     }
 
     private void testRenewSuite(List<EndpointSpecification> endpoints, List<TokenSpecification> tokenSpecs) throws SoapSTSConsumerException {
@@ -306,9 +316,17 @@ public class SoapSTSConsumer {
         testValidateSuiteInternal(endpoints, tokenSpecs, NULL_SECURITY_TOKEN);
     }
 
-    void testIssue(EndpointSpecification endpointSpecification, TokenSpecification tokenSpecification)
+    /**
+     * Invoke the issue operation to obtain a token specified by the tokenSpecification on the endpoint specified by
+     * the endpointSpecification
+     * @param endpointSpecification specifies the targeted endpoint
+     * @param tokenSpecification specifies the desired token, along with any necessary state
+     * @return a SecurityToken encapsulating the issued token
+     * @throws SoapSTSConsumerException if an exception occurred when issuing the token
+     */
+    public SecurityToken testIssue(EndpointSpecification endpointSpecification, TokenSpecification tokenSpecification)
             throws SoapSTSConsumerException {
-        testIssueInternal(
+        return testIssueInternal(
                 endpointSpecification,
                 tokenSpecification,
                 ALLOW_TOKEN_RENEWAL);
@@ -324,7 +342,7 @@ public class SoapSTSConsumer {
         stsClient.setServiceName(serviceQName.toString());
         stsClient.setEndpointName(portQName.toString());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
 
         properties.put(SecurityConstants.USERNAME, usernameTokenSupportingTokenUsername);
         properties.put(SecurityConstants.CALLBACK_HANDLER, callbackHander);
@@ -336,7 +354,7 @@ public class SoapSTSConsumer {
          */
         properties.put(SecurityConstants.ENCRYPT_USERNAME, stsPublicKeyAlias);
 
-        Crypto crypto = null;
+        Crypto crypto;
         try {
             crypto = CryptoFactory.getInstance(getEncryptionProperties());
         } catch (WSSecurityException e) {
@@ -391,9 +409,7 @@ public class SoapSTSConsumer {
         tlsClientParameters.setDisableCNCheck(true);
         try {
             ((HTTPConduit)stsClient.getClient().getConduit()).setTlsClientParameters(tlsClientParameters);
-        } catch (BusException e) {
-            throw new SoapSTSConsumerException(e.getMessage(), e);
-        } catch (EndpointException e) {
+        } catch (BusException | EndpointException e) {
             throw new SoapSTSConsumerException(e.getMessage(), e);
         }
     }

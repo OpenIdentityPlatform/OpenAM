@@ -27,17 +27,13 @@
    <!--             propertiesViewBeanURL="../soapsts/SoapSTSEdit"> -->
 
             <Organization>
-                <AttributeSchema name="issuer-name"
-                                 type="single" syntax="string" i18nKey="issuer_name"
-                                 validator="RequiredValueValidator">
-                </AttributeSchema>
-
                 <AttributeSchema name="issued-token-types"
                                  type="list"
                                  syntax="string"
                                  i18nKey="issued_token_types">
                     <DefaultValues>
                         <Value>SAML2</Value>
+                        <Value>OPENIDCONNECT</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -159,6 +155,20 @@
                                  i18nKey="custom_delegation_token_handlers">
                 </AttributeSchema>
 
+                <!--
+                This AttributeSchema element will represent the issuer name included in SAML2 assertions. As such, following
+                the naming conventions, its name should be saml2-issuer-name. It was defined at the top-level, outside
+                of the scoping of any token-specific configurations, when the sts issued only SAML2 assertions. Now the
+                identifier of the token authority needs to be scoped in token-specific configuration state. This attribute
+                name will not be changed to saml2-issuer-name to avoid a migration task, and because any existing, migrated
+                sts instances will continue to issue SAML2 assertions with an issuer containing the state contained in this
+                attribute. In the 13 release, this attribute will be encapsulated/generated/referenced in the SAML2Config
+                class, instead of in the top-level STSInstanceConfig class, as in the 12 release.
+                -->
+                <AttributeSchema name="issuer-name"
+                                 type="single" syntax="string" i18nKey="issuer_name"
+                                 validator="RequiredValueValidator">
+                </AttributeSchema>
                 <AttributeSchema name="saml2-name-id-format"
                                  type="single" syntax="string" i18nKey="saml2_name_id_format"
                                  validator="RequiredValueValidator">
@@ -264,22 +274,85 @@
                 <AttributeSchema name="soap-encryption-key-password"
                                  type="single" syntax="password" i18nKey="soap_encryption_key_password">
                 </AttributeSchema>
+                <AttributeSchema name="oidc-issuer"
+                                 type="single" syntax="string" i18nKey="oidc_issuer"
+                                 validator="RequiredValueValidator">
+                </AttributeSchema>
+                <AttributeSchema name="oidc-token-lifetime-seconds"
+                                 type="single" syntax="number" i18nKey="oidc_token_lifetime_seconds">
+                    <DefaultValues>
+                        <Value>600</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="oidc-signature-algorithm"
+                                 type="single_choice" syntax="string" i18nKey="oidc_signature_algorithm">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="oidc_signature_algorithm_hmac_sha_256">HS256</ChoiceValue>
+                        <ChoiceValue i18nKey="oidc_signature_algorithm_hmac_sha_384">HS384</ChoiceValue>
+                        <ChoiceValue i18nKey="oidc_signature_algorithm_hmac_sha_512">HS512</ChoiceValue>
+                        <ChoiceValue i18nKey="oidc_signature_algorithm_rsa_sha_256">RS256</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>RSA</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="oidc-public-key-reference-type"
+                                 type="single_choice" syntax="string" i18nKey="oidc_public_key_reference_type">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="oidc_signature_verification_reference_type_none">NONE</ChoiceValue>
+                        <ChoiceValue i18nKey="oidc_signature_verification_reference_type_jwk">JWK</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>none</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="oidc-keystore-location"
+                                 type="single" syntax="string" i18nKey="oidc_keystore_location">
+                </AttributeSchema>
+                <AttributeSchema name="oidc-keystore-password"
+                                 type="single" syntax="password" i18nKey="oidc_keystore_password">
+                </AttributeSchema>
+                <AttributeSchema name="oidc-signature-key-alias"
+                                 type="single" syntax="string" i18nKey="oidc_signature_key_alias">
+                </AttributeSchema>
+                <AttributeSchema name="oidc-signature-key-password"
+                                 type="single" syntax="password" i18nKey="oidc_signature_key_password">
+                </AttributeSchema>
+                <AttributeSchema name="oidc-client-secret"
+                                 type="single" syntax="password" i18nKey="oidc_client_secret">
+                </AttributeSchema>
+                <AttributeSchema name="oidc-audience"
+                                 type="list" syntax="string" i18nKey="oidc_audience">
+                </AttributeSchema>
+                <AttributeSchema name="oidc-authorized-party"
+                                 type="single" syntax="string" i18nKey="oidc_authorized_party">
+                </AttributeSchema>
+                <AttributeSchema name="oidc-claim-map"
+                                 type="list"
+                                 syntax="string"
+                                 i18nKey="oidc_attribute_map">
+                </AttributeSchema>
+                <AttributeSchema name="oidc-custom-claim-mapper-class"
+                                 type="single" syntax="string" i18nKey="oidc_custom_claim_mapper_class">
+                </AttributeSchema>
+                <AttributeSchema name="oidc-custom-authn-context-mapper-class"
+                                 type="single" syntax="string" i18nKey="oidc_custom_authn_context_mapper_class">
+                </AttributeSchema>
+                <AttributeSchema name="oidc-custom-authn-method-references-mapper-class"
+                                 type="single" syntax="string" i18nKey="oidc_custom_authn_method_references_mapper_class">
+                </AttributeSchema>
 
                 <!--
                 Necessary to have multiple soap STS instances per realm, like authN modules.
                 -->
                 <SubSchema name="serverconfig" inheritance="multiple">
-                    <AttributeSchema name="issuer-name"
-                                     type="single" syntax="string" i18nKey="issuer_name"
-                                     validator="RequiredValueValidator">
-                    </AttributeSchema>
-
                     <AttributeSchema name="issued-token-types"
                                      type="list"
                                      syntax="string"
                                      i18nKey="issued_token_types">
                         <DefaultValues>
                             <Value>SAML2</Value>
+                            <Value>OPENIDCONNECT</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -401,6 +474,10 @@
                                      i18nKey="custom_delegation_token_handlers">
                     </AttributeSchema>
 
+                    <AttributeSchema name="issuer-name"
+                                     type="single" syntax="string" i18nKey="issuer_name"
+                                     validator="RequiredValueValidator">
+                    </AttributeSchema>
                     <AttributeSchema name="saml2-name-id-format"
                                      type="single" syntax="string" i18nKey="saml2_name_id_format"
                                      validator="RequiredValueValidator">
@@ -505,6 +582,73 @@
                     </AttributeSchema>
                     <AttributeSchema name="soap-encryption-key-password"
                                      type="single" syntax="password" i18nKey="soap_encryption_key_password">
+                    </AttributeSchema>
+                    <AttributeSchema name="oidc-issuer"
+                                     type="single" syntax="string" i18nKey="oidc_issuer"
+                                     validator="RequiredValueValidator">
+                    </AttributeSchema>
+                    <AttributeSchema name="oidc-token-lifetime-seconds"
+                                     type="single" syntax="number" i18nKey="oidc_token_lifetime_seconds">
+                        <DefaultValues>
+                            <Value>600</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="oidc-signature-algorithm"
+                                     type="single_choice" syntax="string" i18nKey="oidc_signature_algorithm">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="oidc_signature_algorithm_hmac_sha_256">HS256</ChoiceValue>
+                            <ChoiceValue i18nKey="oidc_signature_algorithm_hmac_sha_384">HS384</ChoiceValue>
+                            <ChoiceValue i18nKey="oidc_signature_algorithm_hmac_sha_512">HS512</ChoiceValue>
+                            <ChoiceValue i18nKey="oidc_signature_algorithm_rsa_sha_256">RS256</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>RSA</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="oidc-public-key-reference-type"
+                                     type="single_choice" syntax="string" i18nKey="oidc_public_key_reference_type">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="oidc_signature_verification_reference_type_none">NONE</ChoiceValue>
+                            <ChoiceValue i18nKey="oidc_signature_verification_reference_type_jwk">JWK</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>none</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="oidc-keystore-location"
+                                     type="single" syntax="string" i18nKey="oidc_keystore_location">
+                    </AttributeSchema>
+                    <AttributeSchema name="oidc-keystore-password"
+                                     type="single" syntax="password" i18nKey="oidc_keystore_password">
+                    </AttributeSchema>
+                    <AttributeSchema name="oidc-signature-key-alias"
+                                     type="single" syntax="string" i18nKey="oidc_signature_key_alias">
+                    </AttributeSchema>
+                    <AttributeSchema name="oidc-signature-key-password"
+                                     type="single" syntax="password" i18nKey="oidc_signature_key_password">
+                    </AttributeSchema>
+                    <AttributeSchema name="oidc-client-secret"
+                                     type="single" syntax="password" i18nKey="oidc_client_secret">
+                    </AttributeSchema>
+                    <AttributeSchema name="oidc-audience"
+                                     type="list" syntax="string" i18nKey="oidc_audience">
+                    </AttributeSchema>
+                    <AttributeSchema name="oidc-authorized-party"
+                                     type="single" syntax="string" i18nKey="oidc_authorized_party">
+                    </AttributeSchema>
+                    <AttributeSchema name="oidc-claim-map"
+                                     type="list"
+                                     syntax="string"
+                                     i18nKey="oidc_attribute_map">
+                    </AttributeSchema>
+                    <AttributeSchema name="oidc-custom-claim-mapper-class"
+                                     type="single" syntax="string" i18nKey="oidc_custom_claim_mapper_class">
+                    </AttributeSchema>
+                    <AttributeSchema name="oidc-custom-authn-context-mapper-class"
+                                     type="single" syntax="string" i18nKey="oidc_custom_authn_context_mapper_class">
+                    </AttributeSchema>
+                    <AttributeSchema name="oidc-custom-authn-method-references-mapper-class"
+                                     type="single" syntax="string" i18nKey="oidc_custom_authn_method_references_mapper_class">
                     </AttributeSchema>
                 </SubSchema>
             </Organization>

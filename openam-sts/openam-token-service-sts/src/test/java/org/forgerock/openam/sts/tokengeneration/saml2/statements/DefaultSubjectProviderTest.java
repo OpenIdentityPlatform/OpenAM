@@ -27,7 +27,7 @@ import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.config.user.SAML2Config;
-import org.forgerock.openam.sts.service.invocation.ProofTokenState;
+import org.forgerock.openam.sts.user.invocation.ProofTokenState;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.KeyInfoFactory;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.KeyInfoFactoryImpl;
@@ -98,7 +98,7 @@ public class DefaultSubjectProviderTest {
     }
 
     private SAML2Config createSAML2Config() {
-        Map<String, String> attributeMap = new HashMap<String, String>();
+        Map<String, String> attributeMap = new HashMap<>();
         attributeMap.put("email", "mail");
         SAML2Config.SAML2ConfigBuilder builder = SAML2Config.builder();
         return builder
@@ -106,6 +106,7 @@ public class DefaultSubjectProviderTest {
                 .nameIdFormat(NAME_ID_FORMAT)
                 .spEntityId("http://host.com/sp/entity/id")
                 .tokenLifetimeInSeconds(TOKEN_LIFETIME_SECONDS)
+                .idpId("da_idp")
                 .build();
     }
 

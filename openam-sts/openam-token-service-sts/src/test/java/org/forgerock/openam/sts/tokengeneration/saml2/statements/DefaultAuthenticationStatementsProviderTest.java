@@ -41,13 +41,14 @@ public class DefaultAuthenticationStatementsProviderTest {
     }
 
     private SAML2Config createSAML2Config() {
-        Map<String, String> attributeMap = new HashMap<String, String>();
+        Map<String, String> attributeMap = new HashMap<>();
         attributeMap.put("email", "mail");
 
         return SAML2Config.builder()
                 .attributeMap(attributeMap)
                 .nameIdFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent")
                 .spEntityId("http://host.com/sp/entity/id")
+                .idpId("da_idp")
                 .build();
     }
 }

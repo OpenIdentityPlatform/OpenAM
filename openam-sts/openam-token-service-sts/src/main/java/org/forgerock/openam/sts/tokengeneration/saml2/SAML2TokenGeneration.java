@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.tokengeneration.saml2;
@@ -19,8 +19,7 @@ package org.forgerock.openam.sts.tokengeneration.saml2;
 import com.iplanet.sso.SSOToken;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.service.invocation.TokenGenerationServiceInvocationState;
-
-import java.util.List;
+import org.forgerock.openam.sts.tokengeneration.state.STSInstanceState;
 
 /**
  * This interface defines the concerns of SAML2TokenGeneration, as exposed by the TokenGenerationService, and consumed by

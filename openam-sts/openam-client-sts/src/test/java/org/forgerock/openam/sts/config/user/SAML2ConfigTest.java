@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class SAML2ConfigTest {
+    private static final String IDP_ID = "da_idp";
     private static final String NAME_ID_FORMAT = "nameidformat";
     private static final long TOKEN_LIFETIME = 60 * 10;
     private static final String CUSTOM_SUBJECT_PROVIDER = "org.foo.MyCustomSubjectProvider";
@@ -214,11 +215,12 @@ public class SAML2ConfigTest {
     private SAML2Config buildConfig(boolean withAttributeMap, boolean withCustomProviders,
                                     boolean signAssertion, boolean encryptAssertion, boolean encryptAttributes, boolean encryptNameId) {
         SAML2Config.SAML2ConfigBuilder builder = SAML2Config.builder()
+                .idpId(IDP_ID)
                 .tokenLifetimeInSeconds(TOKEN_LIFETIME)
                 .signAssertion(signAssertion)
                 .nameIdFormat(NAME_ID_FORMAT);
         if (withAttributeMap) {
-            Map<String, String> attrMap = new LinkedHashMap<String, String>();
+            Map<String, String> attrMap = new LinkedHashMap<>();
             attrMap.put("saml_attr", "ldap_attr");
             attrMap.put("saml_attr1", "ldap_attr1");
             builder.attributeMap(attrMap);

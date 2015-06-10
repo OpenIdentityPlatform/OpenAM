@@ -44,7 +44,12 @@ import org.forgerock.openam.sts.rest.operation.TokenTransformFactory;
 import org.forgerock.openam.sts.rest.operation.TokenTransformFactoryImpl;
 import org.forgerock.openam.sts.rest.operation.TokenTranslateOperation;
 import org.forgerock.openam.sts.rest.operation.TokenTranslateOperationImpl;
-import org.forgerock.openam.sts.rest.token.provider.JsonTokenAuthnContextMapperImpl;
+import org.forgerock.openam.sts.rest.token.provider.oidc.DefaultOpenIdConnectTokenAuthMethodReferencesMapper;
+import org.forgerock.openam.sts.rest.token.provider.oidc.DefaultOpenIdConnectTokenAuthnContextMapper;
+import org.forgerock.openam.sts.rest.token.provider.oidc.OpenIdConnectTokenAuthMethodReferencesMapper;
+import org.forgerock.openam.sts.rest.token.provider.oidc.OpenIdConnectTokenAuthnContextMapper;
+import org.forgerock.openam.sts.rest.token.provider.saml.Saml2JsonTokenAuthnContextMapperImpl;
+import org.forgerock.openam.sts.rest.token.provider.saml.Saml2JsonTokenAuthnContextMapper;
 import org.forgerock.openam.sts.rest.token.validator.disp.RestUsernameTokenAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.AMTokenParser;
 import org.forgerock.openam.sts.token.AMTokenParserImpl;
@@ -53,7 +58,6 @@ import org.forgerock.openam.sts.token.ThreadLocalAMTokenCacheImpl;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
-import org.forgerock.openam.sts.rest.token.provider.JsonTokenAuthnContextMapper;
 import org.forgerock.openam.sts.token.model.RestUsernameToken;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumerImpl;
@@ -263,25 +267,87 @@ public class RestSTSInstanceModule extends AbstractModule {
         return stsInstanceConfig.getDeploymentSubPath();
     }
 
+    @Provides
+    @Inject
+    OpenIdConnectTokenAuthnContextMapper getOpenIdConnectTokenAuthnContextMapper(Logger logger) {
+        if (stsInstanceConfig.getOpenIdConnectTokenConfig() != null) {
+            String customMapperClassName = stsInstanceConfig.getOpenIdConnectTokenConfig().getCustomAuthnContextMapperClass();
+            if (customMapperClassName != null) {
+                try {
+                    return Class.forName(customMapperClassName).asSubclass(OpenIdConnectTokenAuthnContextMapper.class).newInstance();
+                } catch (Exception e) {
+                    logger.error("Exception caught instantiating custom OpenIdConnectTokenAuthnContextMapper class: " + e + ". Default" +
+                            " implementation will be returned. This means that acr claims will not be included in issued OIDC tokens.");
+                }
+            }
+        }
+        /*
+        Slight semantic impurity: note that I am returning a default mapper, even though no config for the corresponding
+        token type is present. I could return null, and annotate the dependency with @Nullable so Guice will inject null.
+        The RestSTSInstanceConfig ctor will reject a construction which defines an OPENIDCONNECT output token, without
+        a corresponding OpenIdConnectTokenConfig. However, it is possible that an sts instance will be published programmatically
+        without the aid of the RestSTSInstanceConfig class. In this case, if null were returned here, the RestOpenIdConnectTokenProvider
+        would NPE when obtaining the mapping. Thus the default mapper is a better choice. Token creation will be rejected
+        at the token service if the invoking sts has no config corresponding to the desired token type.
+         */
+        return new DefaultOpenIdConnectTokenAuthnContextMapper();
+    }
+
+    @Provides
+    @Inject
+    OpenIdConnectTokenAuthMethodReferencesMapper getOpenIdConnectTokenAuthMethodReferencesMapper(Logger logger) {
+        if (stsInstanceConfig.getOpenIdConnectTokenConfig() != null) {
+            String customMapperClassName = stsInstanceConfig.getOpenIdConnectTokenConfig().getCustomAuthnMethodReferencesMapperClass();
+            if (customMapperClassName != null) {
+                try {
+                    return Class.forName(customMapperClassName).asSubclass(OpenIdConnectTokenAuthMethodReferencesMapper.class).newInstance();
+                } catch (Exception e) {
+                    logger.error("Exception caught instantiating custom OpenIdConnectTokenAuthMethodReferencesMapper class: " + e + ". Default" +
+                            " implementation will be returned. This means that amr claims will not be included in issued OIDC tokens.");
+                }
+            }
+        }
+        /*
+        Slight semantic impurity: note that I am returning a default mapper, even though no config for the corresponding
+        token type is present. I could return null, and annotate the dependency with @Nullable so Guice will inject null.
+        The RestSTSInstanceConfig ctor will reject a construction which defines an OPENIDCONNECT output token, without
+        a corresponding OpenIdConnectTokenConfig. However, it is possible that an sts instance will be published programmatically
+        without the aid of the RestSTSInstanceConfig class. In this case, if null were returned here, the RestOpenIdConnectTokenProvider
+        would NPE when obtaining the mapping. Thus the default mapper is a better choice. Token creation will be rejected
+        at the token service if the invoking sts has no config corresponding to the desired token type.
+         */
+        return new DefaultOpenIdConnectTokenAuthMethodReferencesMapper();
+    }
+
     /*
-    Allows for a custom JsonTokenAuthnContextMapper to be plugged-in. This JsonTokenAuthnContextMapper provides a
+    Allows for a custom Saml2JsonTokenAuthnContextMapper to be plugged-in. This Saml2JsonTokenAuthnContextMapper provides a
     SAML2 AuthnContext class ref value given an input token and input token type.
      */
     @Provides
     @Inject
-    JsonTokenAuthnContextMapper getAuthnContextMapper(Logger logger) {
-        String customMapperClassName = stsInstanceConfig.getSaml2Config().getCustomAuthNContextMapperClassName();
-        if (customMapperClassName == null) {
-            return new JsonTokenAuthnContextMapperImpl(logger);
-        } else {
-            try {
-                return Class.forName(customMapperClassName).asSubclass(JsonTokenAuthnContextMapper.class).newInstance();
-            } catch (Exception e) {
-                logger.error("Exception caught implementing custom JsonTokenAuthnContextMapper class " + customMapperClassName
-                        + "; Returning default JsonTokenAuthnContextMapperImpl. The exception: " + e);
-                return new JsonTokenAuthnContextMapperImpl(logger);
+    Saml2JsonTokenAuthnContextMapper getSaml2AuthnContextMapper(Logger logger) {
+        if (stsInstanceConfig.getSaml2Config() != null) {
+            String customMapperClassName = stsInstanceConfig.getSaml2Config().getCustomAuthNContextMapperClassName();
+            if (customMapperClassName != null) {
+                try {
+                    return Class.forName(customMapperClassName).asSubclass(Saml2JsonTokenAuthnContextMapper.class).newInstance();
+                } catch (Exception e) {
+                    logger.error("Exception caught instantiating custom Saml2JsonTokenAuthnContextMapper class " + customMapperClassName
+                            + "; Returning default Saml2JsonTokenAuthnContextMapperImpl. The exception: " + e);
+                }
             }
         }
+        /*
+        Slight semantic impurity: note that I am returning a default mapper, even though no config for the corresponding
+        token type is present. I could return null, and annotate the dependency with @Nullable so Guice will inject null.
+        The RestSTSInstanceConfig ctor will reject a construction which defines an SAML2 output token, without
+        a corresponding SAML2Config. However, it is possible that an sts instance will be published programmatically
+        without the aid of the RestSTSInstanceConfig class. In this case, if null were returned here, the RestOpenIdConnectTokenProvider
+        would NPE when obtaining the mapping. Thus the default mapper is a better choice. Token creation will be rejected
+        at the token service if the invoking sts has no config corresponding to the desired token type.
+         */
+        return new Saml2JsonTokenAuthnContextMapperImpl(logger);
+
     }
 
     @Provides

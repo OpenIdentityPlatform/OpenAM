@@ -23,8 +23,11 @@ import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.TokenTypeId;
 import org.forgerock.openam.sts.config.user.TokenTransformConfig;
-import org.forgerock.openam.sts.rest.token.provider.JsonTokenAuthnContextMapper;
-import org.forgerock.openam.sts.rest.token.provider.Saml2TokenCreationState;
+import org.forgerock.openam.sts.rest.token.provider.oidc.OpenIdConnectTokenAuthMethodReferencesMapper;
+import org.forgerock.openam.sts.rest.token.provider.oidc.OpenIdConnectTokenAuthnContextMapper;
+import org.forgerock.openam.sts.rest.token.provider.oidc.RestOpenIdConnectTokenProvider;
+import org.forgerock.openam.sts.rest.token.provider.saml.Saml2JsonTokenAuthnContextMapper;
+import org.forgerock.openam.sts.rest.token.provider.saml.Saml2TokenCreationState;
 import org.forgerock.openam.sts.rest.token.validator.RestAMTokenValidator;
 import org.forgerock.openam.sts.rest.token.validator.RestTokenValidator;
 import org.forgerock.openam.sts.rest.token.validator.RestUsernameTokenValidator;
@@ -33,7 +36,7 @@ import org.forgerock.openam.sts.token.model.RestUsernameToken;
 import org.forgerock.openam.sts.token.provider.AMSessionInvalidator;
 import org.forgerock.openam.sts.rest.token.validator.RestCertificateTokenValidator;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
-import org.forgerock.openam.sts.rest.token.provider.RestSamlTokenProvider;
+import org.forgerock.openam.sts.rest.token.provider.saml.RestSamlTokenProvider;
 import org.forgerock.openam.sts.token.provider.AMSessionInvalidatorImpl;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
@@ -68,9 +71,12 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
     private final AuthenticationHandler<RestUsernameToken> usernameTokenAuthenticationHandler;
     private final UrlConstituentCatenator urlConstituentCatenator;
     private final TokenGenerationServiceConsumer tokenGenerationServiceConsumer;
-    private final JsonTokenAuthnContextMapper jsonTokenAuthnContextMapper;
+    private final Saml2JsonTokenAuthnContextMapper saml2JsonTokenAuthnContextMapper;
     private final HttpURLConnectionWrapperFactory connectionWrapperFactory;
     private final String crestVersionSessionService;
+    private final OpenIdConnectTokenAuthnContextMapper oidcAuthnContextMapper;
+    private final OpenIdConnectTokenAuthMethodReferencesMapper oidcAuthModeReferencesMapper;
+
     private final Logger logger;
 
     @Inject
@@ -88,9 +94,11 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
             AuthenticationHandler<RestUsernameToken> usernameTokenAuthenticationHandler,
             UrlConstituentCatenator urlConstituentCatenator,
             TokenGenerationServiceConsumer tokenGenerationServiceConsumer,
-            JsonTokenAuthnContextMapper jsonTokenAuthnContextMapper,
+            Saml2JsonTokenAuthnContextMapper saml2JsonTokenAuthnContextMapper,
             HttpURLConnectionWrapperFactory connectionWrapperFactory,
             @Named(AMSTSConstants.CREST_VERSION_SESSION_SERVICE) String crestVersionSessionService,
+            OpenIdConnectTokenAuthnContextMapper oidcAuthnContextMapper,
+            OpenIdConnectTokenAuthMethodReferencesMapper oidcAuthModeReferencesMapper,
             Logger logger) {
 
         this.amDeploymentUrl = amDeploymentUrl;
@@ -106,9 +114,11 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
         this.usernameTokenAuthenticationHandler = usernameTokenAuthenticationHandler;
         this.urlConstituentCatenator = urlConstituentCatenator;
         this.tokenGenerationServiceConsumer = tokenGenerationServiceConsumer;
-        this.jsonTokenAuthnContextMapper = jsonTokenAuthnContextMapper;
+        this.saml2JsonTokenAuthnContextMapper = saml2JsonTokenAuthnContextMapper;
         this.connectionWrapperFactory = connectionWrapperFactory;
         this.crestVersionSessionService = crestVersionSessionService;
+        this.oidcAuthnContextMapper = oidcAuthnContextMapper;
+        this.oidcAuthModeReferencesMapper = oidcAuthModeReferencesMapper;
         this.logger = logger;
     }
 
@@ -134,6 +144,8 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
         RestTokenProvider<? extends TokenTypeId> tokenProvider;
         if (TokenType.SAML2.equals(outputTokenType)) {
             tokenProvider = buildOpenSAMLTokenProvider();
+        } else if (TokenType.OPENIDCONNECT.equals(outputTokenType)) {
+            tokenProvider = buildOpenIdConnectTokenProvider();
         } else {
             String message = "Unexpected output token type of: " + outputTokenType;
             logger.error(message);
@@ -169,7 +181,20 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
                     new AMSessionInvalidatorImpl(amDeploymentUrl, jsonRestRoot, realm, restLogoutUriElement,
                             amSessionCookieName, urlConstituentCatenator, crestVersionSessionService, connectionWrapperFactory, logger);
             return new RestSamlTokenProvider(tokenGenerationServiceConsumer, sessionInvalidator,
-                    threadLocalAMTokenCache, stsInstanceId, realm, jsonTokenAuthnContextMapper,
+                    threadLocalAMTokenCache, stsInstanceId, realm, saml2JsonTokenAuthnContextMapper,
+                    ValidationInvocationContext.REST_TOKEN_TRANSFORMATION, logger);
+        } catch (MalformedURLException e) {
+            throw new STSInitializationException(ResourceException.INTERNAL_ERROR, e.getMessage(), e);
+        }
+    }
+
+    private RestOpenIdConnectTokenProvider buildOpenIdConnectTokenProvider() throws STSInitializationException {
+        try {
+            final AMSessionInvalidator sessionInvalidator =
+                    new AMSessionInvalidatorImpl(amDeploymentUrl, jsonRestRoot, realm, restLogoutUriElement,
+                            amSessionCookieName, urlConstituentCatenator, crestVersionSessionService, connectionWrapperFactory, logger);
+            return new RestOpenIdConnectTokenProvider(tokenGenerationServiceConsumer, sessionInvalidator,
+                    threadLocalAMTokenCache, stsInstanceId, realm, oidcAuthnContextMapper, oidcAuthModeReferencesMapper,
                     ValidationInvocationContext.REST_TOKEN_TRANSFORMATION, logger);
         } catch (MalformedURLException e) {
             throw new STSInitializationException(ResourceException.INTERNAL_ERROR, e.getMessage(), e);

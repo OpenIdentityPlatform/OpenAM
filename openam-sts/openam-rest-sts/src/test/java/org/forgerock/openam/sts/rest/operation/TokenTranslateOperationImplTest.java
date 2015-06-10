@@ -30,9 +30,9 @@ import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.rest.marshal.TokenRequestMarshaller;
 import org.forgerock.openam.sts.rest.marshal.TokenRequestMarshallerImpl;
-import org.forgerock.openam.sts.service.invocation.RestSTSServiceInvocationState;
-import org.forgerock.openam.sts.service.invocation.SAML2TokenState;
-import org.forgerock.openam.sts.service.invocation.UsernameTokenState;
+import org.forgerock.openam.sts.user.invocation.RestSTSServiceInvocationState;
+import org.forgerock.openam.sts.user.invocation.SAML2TokenState;
+import org.forgerock.openam.sts.user.invocation.UsernameTokenState;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +79,7 @@ public class TokenTranslateOperationImplTest {
         @Provides
         @Named(AMSTSConstants.REST_SUPPORTED_TOKEN_TRANSLATIONS)
         Set<TokenTransformConfig> getSupportedTokenTransforms() {
-            HashSet<TokenTransformConfig> supportedTransforms = new HashSet<TokenTransformConfig>();
+            HashSet<TokenTransformConfig> supportedTransforms = new HashSet<>();
             supportedTransforms.add(new TokenTransformConfig(TokenType.USERNAME, TokenType.SAML2, INVALIDATE_INTERIM_AM_SESSIONS));
             return supportedTransforms;
         }

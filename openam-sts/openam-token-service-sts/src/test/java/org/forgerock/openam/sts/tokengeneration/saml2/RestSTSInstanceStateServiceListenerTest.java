@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS. All rights reserved.
+ * Copyright 2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.tokengeneration.saml2;
@@ -37,8 +37,16 @@ import org.forgerock.openam.sts.rest.ServiceListenerRegistration;
 import org.forgerock.openam.sts.rest.ServiceListenerRegistrationImpl;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
 import org.forgerock.openam.sts.tokengeneration.config.TokenGenerationModule;
-import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProviderFactory;
-import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProviderFactoryImpl;
+import org.forgerock.openam.sts.tokengeneration.oidc.crypto.OpenIdConnectTokenPKIProviderFactory;
+import org.forgerock.openam.sts.tokengeneration.oidc.crypto.OpenIdConnectTokenPKIProviderFactoryImpl;
+import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.SAML2CryptoProviderFactory;
+import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.SAML2CryptoProviderFactoryImpl;
+import org.forgerock.openam.sts.tokengeneration.state.RestSTSInstanceState;
+import org.forgerock.openam.sts.tokengeneration.state.RestSTSInstanceStateFactoryImpl;
+import org.forgerock.openam.sts.tokengeneration.state.RestSTSInstanceStateProvider;
+import org.forgerock.openam.sts.tokengeneration.state.RestSTSInstanceStateServiceListener;
+import org.forgerock.openam.sts.tokengeneration.state.STSInstanceStateFactory;
+import org.forgerock.openam.sts.tokengeneration.state.STSInstanceStateProvider;
 import org.slf4j.Logger;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
@@ -66,7 +74,8 @@ public class RestSTSInstanceStateServiceListenerTest {
             mockConfigStore = mock(RestSTSInstanceConfigStore.class);
             bind(new TypeLiteral<STSInstanceConfigStore<RestSTSInstanceConfig>>(){}).toInstance(mockConfigStore);
             bind(Logger.class).toInstance(mock(Logger.class));
-            bind(STSKeyProviderFactory.class).to(STSKeyProviderFactoryImpl.class);
+            bind(SAML2CryptoProviderFactory.class).to(SAML2CryptoProviderFactoryImpl.class);
+            bind(OpenIdConnectTokenPKIProviderFactory.class).to(OpenIdConnectTokenPKIProviderFactoryImpl.class);
             bind(ServiceListenerRegistration.class).toInstance(mock(ServiceListenerRegistrationImpl.class));
             bind(ServiceListener.class).annotatedWith(Names.named(TokenGenerationModule.REST_STS_INSTANCE_STATE_LISTENER))
                     .to(RestSTSInstanceStateServiceListener.class).in(Scopes.SINGLETON);
@@ -109,7 +118,7 @@ public class RestSTSInstanceStateServiceListenerTest {
     }
 
     private RestSTSInstanceConfig createInstanceConfig(String issuerName) {
-        Map<String, String> context = new HashMap<String, String>();
+        Map<String, String> context = new HashMap<>();
         context.put(AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_AUTH_TARGET_HEADER_KEY, "oidc_id_token");
         AuthTargetMapping mapping = AuthTargetMapping.builder()
                 .addMapping(TokenType.USERNAME, "service", "ldapService")
@@ -121,19 +130,19 @@ public class RestSTSInstanceStateServiceListenerTest {
                         .authTargetMapping(mapping)
                         .build();
 
-        Map<String, String> attributes = new HashMap<String, String>();
+        Map<String, String> attributes = new HashMap<>();
         attributes.put("email", "mail");
         SAML2Config saml2Config =
                 SAML2Config.builder()
                         .attributeMap(attributes)
                         .nameIdFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent")
                         .spEntityId("http://host.com/sp/entity/id")
+                        .idpId(issuerName)
                         .build();
 
         return RestSTSInstanceConfig.builder()
                 .deploymentConfig(deploymentConfig)
                 .saml2Config(saml2Config)
-                .issuerName(issuerName)
                 .addSupportedTokenTranslation(
                         TokenType.X509,
                         TokenType.SAML2,

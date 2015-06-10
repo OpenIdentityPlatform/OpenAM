@@ -39,7 +39,7 @@ public interface RestTokenProviderParameters<T extends TokenTypeId> {
      *
      * @return the type of the input token. Necessary to generate the authentication context class ref for
      * a SAML2 assertion - in general, produced tokens may have to have a representation of how the subject encapsulated
-     * in the generated token was authenticated. Published sts instances allow for the specification of a JsonTokenAuthnContextMapper
+     * in the generated token was authenticated. Published sts instances allow for the specification of a Saml2JsonTokenAuthnContextMapper
      * implementation which will generate this SAML2 authentication context class ref, a plug-in interface which takes
      * the TokenTypeId as input.
      */
@@ -49,7 +49,7 @@ public interface RestTokenProviderParameters<T extends TokenTypeId> {
      *
      * @return the json representation of the input token. Necessary to generate the authentication context class ref for
      * a SAML2 assertion - in general, produced tokens may have to have a representation of how the subject encapsulated
-     * in the generated token was authenticated. Published sts instances allow for the specification of a JsonTokenAuthnContextMapper
+     * in the generated token was authenticated. Published sts instances allow for the specification of a Saml2JsonTokenAuthnContextMapper
      * implementation which will generate this SAML2 authentication context class ref, a plug-in interface which takes the json representation
      * of the token as input.
      */

@@ -20,15 +20,6 @@
 <propertysheet>
     <section name="General" defaultValue="rest.sts.general.section.title">
         <property>
-            <label name="lblIssuerName"
-                   defaultValue="rest.sts.issuerName"
-                   labelFor="issuer-name"/>
-            <cc name="issuer-name"
-                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
-            </cc>
-        </property>
-
-        <property>
             <label name="lblTokenTransforms"
                    defaultValue="rest.sts.tokentransforms"
                    labelFor="supported-token-transforms"/>
@@ -42,6 +33,14 @@
                 <option label="rest.sts.transform.openam.saml2.false" value="OPENAM|SAML2|false"/>
                 <option label="rest.sts.transform.x509.saml2.true" value="X509|SAML2|true"/>
                 <option label="rest.sts.transform.x509.saml2.false" value="X509|SAML2|false"/>
+                <option label="rest.sts.transform.unt.oidc.true" value="USERNAME|OPENIDCONNECT|true"/>
+                <option label="rest.sts.transform.unt.oidc.false" value="USERNAME|OPENIDCONNECT|false"/>
+                <option label="rest.sts.transform.oidc.oidc.true" value="OPENIDCONNECT|OPENIDCONNECT|true"/>
+                <option label="rest.sts.transform.oidc.oidc.false" value="OPENIDCONNECT|OPENIDCONNECT|false"/>
+                <option label="rest.sts.transform.openam.oidc.true" value="OPENAM|OPENIDCONNECT|true"/>
+                <option label="rest.sts.transform.openam.oidc.false" value="OPENAM|OPENIDCONNECT|false"/>
+                <option label="rest.sts.transform.x509.oidc.true" value="X509|OPENIDCONNECT|true"/>
+                <option label="rest.sts.transform.x509.oidc.false" value="X509|OPENIDCONNECT|false"/>
                 <attribute name="multiple" value="true" />
             </cc>
             <fieldhelp name="helpTokenTransforms" defaultValue="rest.sts.tokentransforms.help" />
@@ -96,6 +95,15 @@
         </property>
     </section>
     <section name="SAML2" defaultValue="rest.sts.saml2.section.title">
+        <property>
+            <label name="lblSAML2IssuerName"
+                   defaultValue="rest.sts.saml2.issuerName"
+                   labelFor="issuer-name"/>
+            <cc name="issuer-name"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+        </property>
+
         <property>
             <label name="lblSAML2ServiceProviderEntityId"
                    defaultValue="rest.sts.saml2.ServiceProviderEntityId"
@@ -351,6 +359,205 @@
             <cc name="saml2-signature-key-password_confirm"
                 tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
             </cc>
+        </property>
+    </section>
+    <section name="OPENIDCONNECT" defaultValue="rest.sts.oidc.section.title">
+        <property>
+            <label name="lblOIDCIssuerName"
+                   defaultValue="rest.sts.oidc.issuerName"
+                   labelFor="oidc-issuer"/>
+            <cc name="oidc-issuer"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+        </property>
+
+        <property>
+            <label name="lblOIDCTokenLifetime"
+                   defaultValue="rest.sts.oidc.token.lifetime"
+                   labelFor="oidc-token-lifetime-seconds"/>
+            <cc name="oidc-token-lifetime-seconds"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+        </property>
+
+        <property>
+            <label name="lblOIDCSignatureAlgorithm"
+                   defaultValue="rest.sts.oidc.signature.algorithm"
+                   labelFor="oidc-signature-algorithm"/>
+            <cc name="oidc-signature-algorithm"
+                tagclass="com.sun.web.ui.taglib.html.CCSelectableListTag">
+                <option label="rest.sts.oidc.signature.algorithm.hmac.sha.256" value="HS256"/>
+                <option label="rest.sts.oidc.signature.algorithm.hmac.sha.384" value="HS384"/>
+                <option label="rest.sts.oidc.signature.algorithm.hmac.sha.512" value="HS512"/>
+                <option label="rest.sts.oidc.signature.algorithm.rsa.sha.256" value="RS256"/>
+                <attribute name="multiple" value="false" />
+            </cc>
+            <fieldhelp name="helpOIDCSignatureAlgorithm" defaultValue="rest.sts.oidc.signature.algorithm.help" />
+        </property>
+
+        <property>
+            <label name="lblOIDCPublicKeyReferenceType"
+                   defaultValue="rest.sts.oidc.public.key.reference.type"
+                   labelFor="oidc-public-key-reference-type"/>
+            <cc name="oidc-public-key-reference-type"
+                tagclass="com.sun.web.ui.taglib.html.CCSelectableListTag">
+                <option label="rest.sts.oidc.public.key.reference.type.none" value="NONE"/>
+                <option label="rest.sts.oidc.public.key.reference.type.jwk" value="JWK"/>
+                <attribute name="multiple" value="false" />
+            </cc>
+            <fieldhelp name="helpOIDCPublicKeyReferenceType" defaultValue="rest.sts.oidc.public.key.reference.type.help" />
+        </property>
+
+        <property>
+            <label name="lblOIDCKeystoreLocation"
+                   defaultValue="rest.sts.oidc.keystore.location"
+                   labelFor="oidc-keystore-location"/>
+            <cc name="oidc-keystore-location"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpOIDCKeystoreLocation" defaultValue="rest.sts.oidc.keystore.location.help" />
+        </property>
+
+        <property>
+            <label name="lblOIDCKeystorePassword"
+                   defaultValue="rest.sts.oidc.keystore.password"
+                   labelFor="oidc-keystore-password"/>
+            <cc name="oidc-keystore-password"
+                tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
+            </cc>
+        </property>
+        <!--
+            note that the name of the password confirmation field must be the name of the password field + _confirm.
+            See AMPropertySheet.getAttributeValues for details.
+        -->
+        <property>
+            <label name="lblOIDCKeystorePasswordConfirm"
+                   defaultValue="rest.sts.oidc.keystore.password.confirm"
+                   labelFor="oidc-keystore-password_confirm"/>
+            <cc name="oidc-keystore-password_confirm"
+                tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
+            </cc>
+        </property>
+
+        <property>
+            <label name="lblOIDCKeystoreSignatureKeyAlias"
+                   defaultValue="rest.sts.oidc.keystore.signature.key.alias"
+                   labelFor="oidc-signature-key-alias"/>
+            <cc name="oidc-signature-key-alias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpOIDCKeystoreSignatureKeyAlias" defaultValue="rest.sts.oidc.keystore.signature.key.alias.help" />
+        </property>
+
+        <property>
+            <label name="lblOIDCKeystoreSignatureKeyPassword"
+                   defaultValue="rest.sts.oidc.keystore.signature.key.password"
+                   labelFor="oidc-signature-key-password"/>
+            <cc name="oidc-signature-key-password"
+                tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
+            </cc>
+        </property>
+
+        <!--
+            note that the name of the password confirmation field must be the name of the password field + _confirm.
+            See AMPropertySheet.getAttributeValues for details.
+        -->
+        <property>
+            <label name="lblOIDCKeystoreSignatureKeyPasswordConfirm"
+                   defaultValue="rest.sts.oidc.keystore.signature.key.password.confirm"
+                   labelFor="oidc-signature-key-password_confirm"/>
+            <cc name="oidc-signature-key-password_confirm"
+                tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
+            </cc>
+        </property>
+
+        <property>
+            <label name="lblOIDCClientSecret"
+                   defaultValue="rest.sts.oidc.client.secret"
+                   labelFor="oidc-client-secret"/>
+            <cc name="oidc-client-secret"
+                tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
+            </cc>
+            <fieldhelp name="helpOIDCClientSecret" defaultValue="rest.sts.oidc.client.secret.help" />
+        </property>
+
+        <!--
+            note that the name of the password confirmation field must be the name of the password field + _confirm.
+            See AMPropertySheet.getAttributeValues for details.
+        -->
+        <property>
+            <label name="lblOIDCClientSecret"
+                   defaultValue="rest.sts.oidc.client.secret.confirm"
+                   labelFor="oidc-client-secret_confirm"/>
+            <cc name="oidc-client-secret_confirm"
+                tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
+            </cc>
+        </property>
+
+        <property>
+            <label name="lblOIDCAudience"
+                   defaultValue="rest.sts.oidc.audience"
+                   labelFor="oidc-audience"/>
+            <cc name="oidc-audience"
+                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag">
+                <attribute name="name" value="list" />
+                <attribute name="listboxLabel" value="label.current.value" />
+                <attribute name="textboxLabel" value="label.new.value" />
+            </cc>
+            <fieldhelp name="helpOIDCAudience" defaultValue="rest.sts.oidc.audience.help" />
+        </property>
+
+        <property>
+            <label name="lblOIDCAuthorizedParty"
+                   defaultValue="rest.sts.oidc.authorized.party"
+                   labelFor="oidc-authorized-party"/>
+            <cc name="oidc-authorized-party"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpOIDCAuthorizedParty" defaultValue="rest.sts.oidc.authorized.party.help" />
+        </property>
+
+        <property>
+            <label name="lblOIDCClaimMap"
+                   defaultValue="rest.sts.oidc.claim.map"
+                   labelFor="oidc-claim-map"/>
+            <cc name="oidc-claim-map"
+                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag">
+                <attribute name="name" value="list" />
+                <attribute name="listboxLabel" value="label.current.value" />
+                <attribute name="textboxLabel" value="label.new.value" />
+            </cc>
+            <fieldhelp name="helpSAML2AttributeMap" defaultValue="rest.sts.oidc.claim.map.help" />
+        </property>
+
+        <property>
+            <label name="lblOIDCCustomClaimMapperClass"
+                   defaultValue="rest.sts.oidc.custom.claim.mapper.class"
+                   labelFor="oidc-custom-claim-mapper-class"/>
+            <cc name="oidc-custom-claim-mapper-class"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpOIDCCustomClaimMapperClass" defaultValue="rest.sts.oidc.custom.claim.mapper.class.help" />
+        </property>
+
+        <property>
+            <label name="lblOIDCCustomAuthenticationContextMapperClass"
+                   defaultValue="rest.sts.oidc.custom.authentication.context.mapper.class"
+                   labelFor="oidc-custom-authn-context-mapper-class"/>
+            <cc name="oidc-custom-authn-context-mapper-class"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpOIDCCustomAuthenticationContextMapperClass" defaultValue="rest.sts.oidc.custom.authentication.context.mapper.class.help" />
+        </property>
+
+        <property>
+            <label name="lblOIDCCustomAuthenticationMethodsReferencesMapperClass"
+                   defaultValue="rest.sts.oidc.custom.authentication.methods.references.mapper.class"
+                   labelFor="oidc-custom-authn-method-references-mapper-class"/>
+            <cc name="oidc-custom-authn-method-references-mapper-class"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpOIDCCustomAuthenticationMethodsReferencesMapperClass" defaultValue="rest.sts.oidc.custom.authentication.methods.references.mapper.class.help" />
         </property>
     </section>
 </propertysheet>

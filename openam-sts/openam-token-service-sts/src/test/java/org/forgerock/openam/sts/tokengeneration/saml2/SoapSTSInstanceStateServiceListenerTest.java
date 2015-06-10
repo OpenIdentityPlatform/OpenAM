@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS. All rights reserved.
+ * Copyright 2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.tokengeneration.saml2;
@@ -38,8 +38,16 @@ import org.forgerock.openam.sts.soap.config.user.SoapDeploymentConfig;
 import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
 import org.forgerock.openam.sts.soap.config.user.SoapSTSKeystoreConfig;
 import org.forgerock.openam.sts.tokengeneration.config.TokenGenerationModule;
-import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProviderFactory;
-import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProviderFactoryImpl;
+import org.forgerock.openam.sts.tokengeneration.oidc.crypto.OpenIdConnectTokenPKIProviderFactory;
+import org.forgerock.openam.sts.tokengeneration.oidc.crypto.OpenIdConnectTokenPKIProviderFactoryImpl;
+import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.SAML2CryptoProviderFactory;
+import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.SAML2CryptoProviderFactoryImpl;
+import org.forgerock.openam.sts.tokengeneration.state.STSInstanceStateFactory;
+import org.forgerock.openam.sts.tokengeneration.state.STSInstanceStateProvider;
+import org.forgerock.openam.sts.tokengeneration.state.SoapSTSInstanceState;
+import org.forgerock.openam.sts.tokengeneration.state.SoapSTSInstanceStateFactoryImpl;
+import org.forgerock.openam.sts.tokengeneration.state.SoapSTSInstanceStateProvider;
+import org.forgerock.openam.sts.tokengeneration.state.SoapSTSInstanceStateServiceListener;
 import org.slf4j.Logger;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
@@ -67,7 +75,8 @@ public class SoapSTSInstanceStateServiceListenerTest {
             mockConfigStore = mock(SoapSTSInstanceConfigStore.class);
             bind(new TypeLiteral<STSInstanceConfigStore<SoapSTSInstanceConfig>>(){}).toInstance(mockConfigStore);
             bind(Logger.class).toInstance(mock(Logger.class));
-            bind(STSKeyProviderFactory.class).to(STSKeyProviderFactoryImpl.class);
+            bind(SAML2CryptoProviderFactory.class).to(SAML2CryptoProviderFactoryImpl.class);
+            bind(OpenIdConnectTokenPKIProviderFactory.class).to(OpenIdConnectTokenPKIProviderFactoryImpl.class);
             bind(ServiceListenerRegistration.class).toInstance(mock(ServiceListenerRegistrationImpl.class));
             bind(ServiceListener.class).annotatedWith(Names.named(TokenGenerationModule.SOAP_STS_INSTANCE_STATE_LISTENER))
                     .to(SoapSTSInstanceStateServiceListener.class).in(Scopes.SINGLETON);
@@ -134,13 +143,14 @@ public class SoapSTSInstanceStateServiceListenerTest {
                         .encryptionKeyPassword("stskpass".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                         .signatureKeyPassword("stskpass".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                         .build();
-        Map<String, String> attributes = new HashMap<String, String>();
+        Map<String, String> attributes = new HashMap<>();
         attributes.put("email", "mail");
         SAML2Config saml2Config =
                 SAML2Config.builder()
                         .attributeMap(attributes)
                         .nameIdFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent")
                         .spEntityId("http://host.com/sp/entity/id")
+                        .idpId("da_idp")
                         .build();
 
         SoapSTSInstanceConfig.SoapSTSInstanceConfigBuilderBase<?> builder = SoapSTSInstanceConfig.builder();
@@ -149,7 +159,6 @@ public class SoapSTSInstanceStateServiceListenerTest {
         return  builder
                 .deploymentConfig(deploymentConfig)
                 .soapSTSKeystoreConfig(keystoreConfig)
-                .issuerName("Cornholio")
                 .saml2Config(saml2Config)
                 .build();
     }

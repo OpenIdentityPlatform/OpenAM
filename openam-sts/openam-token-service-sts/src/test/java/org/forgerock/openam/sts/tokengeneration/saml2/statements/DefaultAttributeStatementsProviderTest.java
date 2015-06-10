@@ -47,17 +47,17 @@ public class DefaultAttributeStatementsProviderTest {
 
     @BeforeTest
     public void setup() throws TokenCreationException, SAML2Exception {
-        attributeMap = new HashMap<String, String>();
+        attributeMap = new HashMap<>();
         attributeMap.put(ATTRIBUTE_NAME, "mail");
 
         mockAttributeMapper = mock(AttributeMapper.class);
         mockToken = mock(SSOToken.class);
         Attribute attribute = AssertionFactory.getInstance().createAttribute();
         attribute.setName(ATTRIBUTE_NAME);
-        List<String> attributeValueList = new ArrayList<String>();
+        List<String> attributeValueList = new ArrayList<>();
         attributeValueList.add(ATTRIBUTE_VALUE);
         attribute.setAttributeValue(attributeValueList);
-        attributeList = new ArrayList<Attribute>();
+        attributeList = new ArrayList<>();
         attributeList.add(attribute);
         when(mockAttributeMapper.getAttributes(mockToken, attributeMap)).thenReturn(attributeList);
 
@@ -74,12 +74,13 @@ public class DefaultAttributeStatementsProviderTest {
     }
 
     private SAML2Config createSAML2Config() {
-        Map<String, String> attributeMap = new HashMap<String, String>();
+        Map<String, String> attributeMap = new HashMap<>();
         attributeMap.put("email", "mail");
         return SAML2Config.builder()
                 .attributeMap(attributeMap)
                 .nameIdFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent")
                 .spEntityId("http://host.com/sp/entity/id")
+                .idpId("da_idp")
                 .build();
     }
 }

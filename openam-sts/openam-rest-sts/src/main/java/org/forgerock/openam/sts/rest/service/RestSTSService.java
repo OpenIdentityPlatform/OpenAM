@@ -33,7 +33,7 @@ import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.sts.AMSTSRuntimeException;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.rest.RestSTS;
-import org.forgerock.openam.sts.service.invocation.RestSTSServiceInvocationState;
+import org.forgerock.openam.sts.user.invocation.RestSTSServiceInvocationState;
 import org.slf4j.Logger;
 
 /**

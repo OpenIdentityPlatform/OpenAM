@@ -171,7 +171,7 @@ public class SoapSTSInstancePublisherImplTest {
         builder.addSecurityPolicyTokenValidationConfiguration(TokenType.USERNAME, true);
 
         builder.addIssueTokenType(TokenType.SAML2);
-        Map<String,String> attributeMap = new HashMap<String, String>();
+        Map<String,String> attributeMap = new HashMap<>();
         attributeMap.put("mail", "email");
         attributeMap.put("uid", "id");
         SAML2Config saml2Config =
@@ -189,12 +189,12 @@ public class SoapSTSInstancePublisherImplTest {
                         .keystoreFile("da/directory/file")
                         .keystorePassword("super.secret".getBytes())
                         .attributeMap(attributeMap)
+                        .idpId("da_idp")
                         .build();
 
         return  builder
                 .deploymentConfig(deploymentConfig)
                 .soapSTSKeystoreConfig(keystoreConfig)
-                .issuerName("Cornholio")
                 .saml2Config(saml2Config)
                 .build();
     }

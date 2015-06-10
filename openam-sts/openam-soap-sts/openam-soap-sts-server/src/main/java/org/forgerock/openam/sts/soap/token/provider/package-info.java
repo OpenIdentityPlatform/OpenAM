@@ -15,6 +15,7 @@
 */
 
 /**
- * The classes in this package pertain to issuing tokens, and related context, specific to the soap-sts.
+ * The classes in this package pertain to issuing tokens, and related context, specific to the soap-sts. It contains
+ * base classes common to the providers of SAML2 and OpenIdConnect tokens.
  */
 package org.forgerock.openam.sts.soap.token.provider;

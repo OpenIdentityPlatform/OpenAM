@@ -59,7 +59,7 @@ public class DefaultConditionsProviderTest {
     }
 
     private SAML2Config createSAML2Config() throws UnsupportedEncodingException {
-        Map<String, String> attributeMap = new HashMap<String, String>();
+        Map<String, String> attributeMap = new HashMap<>();
         attributeMap.put("email", "mail");
         return SAML2Config.builder()
                 .attributeMap(attributeMap)
@@ -71,6 +71,7 @@ public class DefaultConditionsProviderTest {
                 .encryptionKeyAlias("test")
                 .signatureKeyAlias("test")
                 .signatureKeyPassword("changeit".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
+                .idpId("da_idp")
                 .build();
     }
 }

@@ -20,6 +20,7 @@ import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.message.WSSecUsernameToken;
+import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.soap.policy.am.OpenAMSessionAssertion;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -40,6 +41,7 @@ import java.util.Date;
 public class TokenSpecification {
     private static final Element NULL_ON_BEHALF_OF = null;
     private static final X509Certificate NULL_HOLDER_OF_KEY_CERTIFICATE = null;
+    private static final String NULL_KEY_TYPE = null;
 
     public static final String SAML2_TOKEN_TYPE =
             "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0";
@@ -60,11 +62,16 @@ public class TokenSpecification {
         this.holderOfKeyCertificate = holderOfKeyCertificate;
     }
 
+    private TokenSpecification(String tokenType, String keyType, Element onBehalfOf) {
+        this(tokenType, keyType, onBehalfOf, NULL_HOLDER_OF_KEY_CERTIFICATE);
+    }
+
+
     /**
      * @return A TokenSpecification instance with the state necessary to generate a SAML2 bearer assertion
      */
     public static TokenSpecification saml2Bearer() {
-        return new TokenSpecification(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, NULL_ON_BEHALF_OF, NULL_HOLDER_OF_KEY_CERTIFICATE);
+        return new TokenSpecification(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, NULL_ON_BEHALF_OF);
     }
 
     /**
@@ -74,8 +81,7 @@ public class TokenSpecification {
      * subject confirmation. The OnBehalfOf element in this TokenSpecification will be a UsernameToken.
      */
     public static TokenSpecification usernameTokenSaml2SenderVouches(String username, String password) {
-        return new TokenSpecification(SAML2_TOKEN_TYPE, PUBLIC_KEY_KEYTYPE, usernameTokenOnBehalfOfElement(username, password),
-                NULL_HOLDER_OF_KEY_CERTIFICATE);
+        return new TokenSpecification(SAML2_TOKEN_TYPE, PUBLIC_KEY_KEYTYPE, usernameTokenOnBehalfOfElement(username, password));
     }
 
     /**
@@ -84,8 +90,7 @@ public class TokenSpecification {
      * subject confirmation. The OnBehalfOf element in this TokenSpecification will be a OpenAMSessionToken.
      */
     public static TokenSpecification openAMSessionTokenSaml2SenderVouches(String sessionId) {
-        return new TokenSpecification(SAML2_TOKEN_TYPE, PUBLIC_KEY_KEYTYPE, openAMSessionTokenOnBehalfOfElement(sessionId),
-                NULL_HOLDER_OF_KEY_CERTIFICATE);
+        return new TokenSpecification(SAML2_TOKEN_TYPE, PUBLIC_KEY_KEYTYPE, openAMSessionTokenOnBehalfOfElement(sessionId));
     }
 
     /**
@@ -98,6 +103,35 @@ public class TokenSpecification {
     public static TokenSpecification saml2HolderOfKey(X509Certificate x509Certificate) {
         return new TokenSpecification(SAML2_TOKEN_TYPE, PUBLIC_KEY_KEYTYPE, NULL_ON_BEHALF_OF,
                 x509Certificate);
+    }
+
+    /**
+     *
+     * @return A TokenSpecification instance which will result in the STS generating an OpenIdConnect token.
+     */
+    public static TokenSpecification openIdConnectToken() {
+        return new TokenSpecification(AMSTSConstants.AM_OPEN_ID_CONNECT_TOKEN_ASSERTION_TYPE, NULL_KEY_TYPE,
+                NULL_ON_BEHALF_OF);
+    }
+
+    /**
+     *
+     * @return  A TokenSpecification instance which will result in the STS generating an OpenIdConnect token.
+     * The subject asserted by this token will correspond to the {username, password} credentials.
+     */
+    public static TokenSpecification openIdConnectTokenUsernameTokenDelegation(String username, String password) {
+        return new TokenSpecification(AMSTSConstants.AM_OPEN_ID_CONNECT_TOKEN_ASSERTION_TYPE, NULL_KEY_TYPE,
+                usernameTokenOnBehalfOfElement(username, password));
+    }
+
+    /**
+     *
+     * @return  A TokenSpecification instance which will result in the STS generating an OpenIdConnect token.
+     * The subject asserted by this token will correspond to the principal associated with the OpenAM session id.
+     */
+    public static TokenSpecification openIdConnectTokenOpenAMSessionTokenDelegation(String sessionId) {
+        return new TokenSpecification(AMSTSConstants.AM_OPEN_ID_CONNECT_TOKEN_ASSERTION_TYPE, NULL_KEY_TYPE,
+                openAMSessionTokenOnBehalfOfElement(sessionId), NULL_HOLDER_OF_KEY_CERTIFICATE);
     }
 
     /**

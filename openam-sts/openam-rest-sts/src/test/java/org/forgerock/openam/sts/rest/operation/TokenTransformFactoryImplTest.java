@@ -30,6 +30,11 @@ import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.config.user.TokenTransformConfig;
+import org.forgerock.openam.sts.rest.token.provider.oidc.DefaultOpenIdConnectTokenAuthMethodReferencesMapper;
+import org.forgerock.openam.sts.rest.token.provider.oidc.DefaultOpenIdConnectTokenAuthnContextMapper;
+import org.forgerock.openam.sts.rest.token.provider.oidc.OpenIdConnectTokenAuthMethodReferencesMapper;
+import org.forgerock.openam.sts.rest.token.provider.oidc.OpenIdConnectTokenAuthnContextMapper;
+import org.forgerock.openam.sts.rest.token.provider.saml.Saml2JsonTokenAuthnContextMapperImpl;
 import org.forgerock.openam.sts.rest.token.validator.disp.RestUsernameTokenAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.AMTokenParser;
 import org.forgerock.openam.sts.token.AMTokenParserImpl;
@@ -38,8 +43,7 @@ import org.forgerock.openam.sts.token.ThreadLocalAMTokenCacheImpl;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
-import org.forgerock.openam.sts.rest.token.provider.JsonTokenAuthnContextMapper;
-import org.forgerock.openam.sts.rest.token.provider.JsonTokenAuthnContextMapperImpl;
+import org.forgerock.openam.sts.rest.token.provider.saml.Saml2JsonTokenAuthnContextMapper;
 import org.forgerock.openam.sts.token.model.RestUsernameToken;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
 import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumerImpl;
@@ -100,8 +104,10 @@ public class TokenTransformFactoryImplTest {
             bind(AMTokenParser.class).to(AMTokenParserImpl.class);
             bind(TokenGenerationServiceConsumer.class).to(TokenGenerationServiceConsumerImpl.class);
             bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
-            bind(JsonTokenAuthnContextMapper.class).to(JsonTokenAuthnContextMapperImpl.class);
+            bind(Saml2JsonTokenAuthnContextMapper.class).to(Saml2JsonTokenAuthnContextMapperImpl.class);
             bind(HttpURLConnectionFactory.class).to(DefaultHttpURLConnectionFactory.class);
+            bind(OpenIdConnectTokenAuthnContextMapper.class).to(DefaultOpenIdConnectTokenAuthnContextMapper.class);
+            bind(OpenIdConnectTokenAuthMethodReferencesMapper.class).to(DefaultOpenIdConnectTokenAuthMethodReferencesMapper.class);
         }
 
         @Provides

@@ -246,15 +246,27 @@ public class AMSTSConstants {
     public static final String REST_STS_CONNECTION_FACTORY_NAME = "rest_sts_connection_factory_name";
 
     /*
-    used to identify the key referencing the OIDC ID Token in both the json and xml representation of the OIDC ID Token
+    used to identify the key referencing the OIDC ID Token in both the json representation of the OIDC ID Token.
+    This value is also used as the local name in the AM_OPEN_ID_CONNECT_TOKEN_ASSERTION_TYPE, which is the token type
+    indicator set by the cxf sts client, and  used by the SoapOpenIdConnectTokenProvider#canHandleToken to
+    indicate that it can issue a token of the specified type.
      */
     public static final String OPEN_ID_CONNECT_ID_TOKEN_KEY = "oidc_id_token";
 
     /*
-    The namespace of the DOM Element used to communicate an OpenID Connect ID Token. Yes, it is strange to provide an XML
-    representation of a token which is only defined in json, but the CXF-STS engine handles only tokens defined in xml.
+    The namespace of the DOM Element used to communicate an OpenID Connect ID Token. When the SoapOpenIdConnectTokenProvider
+    issues an OIDC token, it can only be set as an xml element in the TokenProviderResponse. This constant defines the
+    namespace of the xml element.
      */
-    public static final String OPEN_ID_CONNECT_ID_TOKEN_ELEMENT_NAMESPACE="http://forgerock.org/token/type/OpenAM/oidc_id_token";
+    public static final String OPEN_ID_CONNECT_ID_TOKEN_ELEMENT_NAMESPACE="http://forgerock.org/OpenAM/tokens";
+
+    /*
+    The identifier of an OpenIdConnect token, as specified in the CXF STS client, as the specification of the
+    desired token type. SoapOpenIdConnectTokenProvider#canHandleToken will check for this constant to deterime if it can
+    handle the issue token request. It is also used as the ValueType in the BinarySecurityToken which will wrap the
+    OpenIdConnectToken returned in the TokenProviderResponse returned from SoapOpenIdConnectTokenProvider#createToken.
+    */
+    public static final String AM_OPEN_ID_CONNECT_TOKEN_ASSERTION_TYPE = OPEN_ID_CONNECT_ID_TOKEN_ELEMENT_NAMESPACE + "#" + OPEN_ID_CONNECT_ID_TOKEN_KEY;
 
     /*
     When validating OIDC ID Tokens, the OpenAM authN module needs to be configured with the header which will reference
@@ -269,34 +281,6 @@ public class AMSTSConstants {
     client's x509 certificate. This header name must be configured in the AuthTargetMapping
      */
     public static final String X509_TOKEN_AUTH_TARGET_HEADER_KEY = "x509_token_auth_target_header_key";
-    /*
-    This value is used to key the SAML2SubjectConfirmation instance in additionalProperties Map<String, Object> encapsulated
-    in the TokenProviderParameters so that the AMSAMLTokenProvider
-    can determine the type of subject confirmation specified in the REST invocation, avoiding the WS-Trust secret decoder
-    ring of KeyType and OnBehalfOf values to make this determination.
-     */
-    public static final String SAML2_SUBJECT_CONFIRMATION_KEY = "saml2_subject_confirmation_key";
-
-    /*
-    This value is used to key the TokenType instance in additionalProperties Map<String, Object> encapsulated
-    in the TokenProviderParameters so that the AMSAMLTokenProvider can use it to determine the AuthnContext passed to the
-    TokenGenerationService when issuing SAML2 assertions.
-     */
-    public static final String VALIDATED_TOKEN_TYPE_KEY = "validated_token_type_key";
-
-    /*
-    This value is used to key the ProofTokenState instance in additionalProperties Map<String, Object> encapsulated
-    in the TokenProviderParameters so that the AMSAMLTokenProvider can pass it to the TokenGenerationService when issuing
-    HolderOfKey assertions.
-     */
-    public static final String PROOF_TOKEN_STATE_KEY = "proof_token_state_key";
-
-    /*
-    This value is used to key the JsonValue instance in additionalProperties Map<String, Object> encapsulated
-    in the TokenProviderParameters so that the AMSAMLTokenProvider can pass it to AuthnContextMapper to obtain the
-    appropriate AuthnContext for the generated SAML2 assertion.
-     */
-    public static final String INPUT_TOKEN_STATE_KEY = "input_token_state_key";
 
     /*
     Used in a @Named annotation to inject the instance id for the STS, as this is required to make invocations to the

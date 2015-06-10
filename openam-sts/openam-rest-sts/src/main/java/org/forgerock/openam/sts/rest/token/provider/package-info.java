@@ -15,6 +15,6 @@
  */
 
 /**
- * Contains classes related to creating tokens.
+ * Contains classes and interface definitions common to all token provider classes.
  */
 package org.forgerock.openam.sts.rest.token.provider;

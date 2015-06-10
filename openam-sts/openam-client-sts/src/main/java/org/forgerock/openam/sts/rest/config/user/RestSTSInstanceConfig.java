@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright © 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.rest.config.user;
@@ -22,6 +22,7 @@ import org.forgerock.openam.sts.DeploymentPathNormalizationImpl;
 import org.forgerock.openam.sts.MapMarshallUtils;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.config.user.DeploymentConfig;
+import org.forgerock.openam.sts.config.user.OpenIdConnectTokenConfig;
 import org.forgerock.openam.sts.config.user.SAML2Config;
 import org.forgerock.openam.sts.config.user.STSInstanceConfig;
 import org.forgerock.openam.sts.config.user.TokenTransformConfig;
@@ -52,7 +53,7 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
         private DeploymentConfig deploymentConfig;
 
         private RestSTSInstanceConfigBuilderBase() {
-            supportedTokenTranslations = new HashSet<TokenTransformConfig>();
+            supportedTokenTranslations = new HashSet<>();
         }
 
         public T deploymentConfig(DeploymentConfig deploymentConfig) {
@@ -94,7 +95,7 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
     entries in restSTS.xml, as this aids in marshalling an instance of this class into the attribute map needed for
     SMS persistence.
      */
-    static final String SUPPORTED_TOKEN_TRANSLATIONS = SharedSTSConstants.SUPPORTED_TOKEN_TRANSFORMS;
+    public static final String SUPPORTED_TOKEN_TRANSLATIONS = SharedSTSConstants.SUPPORTED_TOKEN_TRANSFORMS;
 
     private RestSTSInstanceConfig(RestSTSInstanceConfigBuilderBase<?> builder) {
         super(builder);
@@ -104,13 +105,21 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
         Reject.ifNull(deploymentConfig, "DeploymentConfig cannot be null");
         /*
         throw an exception if no SAML2Config is set, but a SAML token is specified as
-        output in one of the token transformations.
+        output in one of the token transformations. Likewise for OIDC.
          */
         if (this.saml2Config == null) {
             for (TokenTransformConfig tokenTransformConfig : supportedTokenTranslations) {
                 if (TokenType.SAML2.equals(tokenTransformConfig.getOutputTokenType())) {
                     throw new IllegalStateException("A SAML2 token is a transformation output, but no Saml2Config " +
                             "state has been specified to guide the production of SAML2 tokens.");
+                }
+            }
+        }
+        if (this.openIdConnectTokenConfig == null) {
+            for (TokenTransformConfig tokenTransformConfig : supportedTokenTranslations) {
+                if (TokenType.OPENIDCONNECT.equals(tokenTransformConfig.getOutputTokenType())) {
+                    throw new IllegalStateException("A OPENIDCONNECT token is a transformation output, but no OIDCTokenConfig " +
+                            "state has been specified to guide the production of OIDC Id Tokens.");
                 }
             }
         }
@@ -180,11 +189,10 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
     public JsonValue toJson() {
         JsonValue baseValue = super.toJson();
         baseValue.add(DEPLOYMENT_CONFIG, deploymentConfig.toJson());
-        JsonValue supportedTranslations = new JsonValue(new ArrayList<Object>());
+        JsonValue supportedTranslations = new JsonValue(new ArrayList<>());
         List<Object> translationList = supportedTranslations.asList();
-        Iterator<TokenTransformConfig> iter = supportedTokenTranslations.iterator();
-        while (iter.hasNext()) {
-            translationList.add(iter.next().toJson());
+        for (TokenTransformConfig tokenTransformConfig : supportedTokenTranslations) {
+            translationList.add(tokenTransformConfig.toJson());
         }
         baseValue.add(SUPPORTED_TOKEN_TRANSLATIONS, supportedTranslations);
         return baseValue;
@@ -196,18 +204,17 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
         }
         STSInstanceConfig baseConfig = STSInstanceConfig.fromJson(json);
         RestSTSInstanceConfigBuilderBase<?> builder = RestSTSInstanceConfig.builder()
-                .issuerName(baseConfig.getIssuerName())
                 .saml2Config(baseConfig.getSaml2Config())
+                .oidcIdTokenConfig(baseConfig.getOpenIdConnectTokenConfig())
                 .deploymentConfig(DeploymentConfig.fromJson(json.get(DEPLOYMENT_CONFIG)));
         JsonValue supportedTranslations = json.get(SUPPORTED_TOKEN_TRANSLATIONS);
         if (!supportedTranslations.isList()) {
             throw new IllegalStateException("Unexpected value for the " + SUPPORTED_TOKEN_TRANSLATIONS + " field: "
                     + supportedTranslations.asString());
         }
-        List<TokenTransformConfig> transformConfigList = new ArrayList<TokenTransformConfig>();
-        Iterator<Object> iter = supportedTranslations.asList().iterator();
-        while (iter.hasNext()) {
-            transformConfigList.add(TokenTransformConfig.fromJson(new JsonValue(iter.next())));
+        List<TokenTransformConfig> transformConfigList = new ArrayList<>();
+        for (Object translation: supportedTranslations.asList()) {
+            transformConfigList.add(TokenTransformConfig.fromJson(new JsonValue(translation)));
         }
         builder.setSupportedTokenTranslations(transformConfigList);
         return builder.build();
@@ -233,7 +240,7 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
         a string representation for each TokenTransformConfig instance, and adding it to the Set<String>
          */
         interimMap.remove(SUPPORTED_TOKEN_TRANSLATIONS);
-        Set<String> supportedTransforms = new HashSet<String>();
+        Set<String> supportedTransforms = new HashSet<>();
         interimMap.put(SUPPORTED_TOKEN_TRANSLATIONS, supportedTransforms);
         for (TokenTransformConfig ttc : supportedTokenTranslations) {
             supportedTransforms.add(ttc.toSMSString());
@@ -244,6 +251,10 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
             interimMap.putAll(saml2Config.marshalToAttributeMap());
         }
 
+        if (openIdConnectTokenConfig != null) {
+            interimMap.remove(OIDC_ID_TOKEN_CONFIG);
+            interimMap.putAll(openIdConnectTokenConfig.marshalToAttributeMap());
+        }
         return interimMap;
     }
 
@@ -270,12 +281,18 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
             jsonAttributes.put(SAML2_CONFIG, saml2Config.toJson());
         }
 
+        OpenIdConnectTokenConfig openIdConnectTokenConfig = OpenIdConnectTokenConfig.marshalFromAttributeMap(attributeMap);
+        if (openIdConnectTokenConfig != null) {
+            jsonAttributes.remove(OIDC_ID_TOKEN_CONFIG);
+            jsonAttributes.put(OIDC_ID_TOKEN_CONFIG, openIdConnectTokenConfig.toJson());
+        }
+
         /*
          The SUPPORTED_TOKEN_TRANSLATIONS are currently each in a String representation in the Set<String> map entry corresponding
          to the SUPPORTED_TOKEN_TRANSLATIONS key. I need to marshal each back into a TokenTransformConfig instance, and then
          call toJson on each, and put them in a JsonValue wrapping a list.
          */
-        ArrayList<JsonValue> jsonTranslationsList = new ArrayList<JsonValue>();
+        ArrayList<JsonValue> jsonTranslationsList = new ArrayList<>();
         JsonValue jsonTranslations = new JsonValue(jsonTranslationsList);
         jsonAttributes.remove(SUPPORTED_TOKEN_TRANSLATIONS);
         jsonAttributes.put(SUPPORTED_TOKEN_TRANSLATIONS, jsonTranslations);
@@ -292,8 +309,7 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
     JsonValue wrapping this Map<String, Set<String>>. It cannot directly attempt to marshal these configuration properties
     in the ViewBean class, as this would introduce a dependency on the rest-sts into the openam-console module. Thus the
     RestSecurityTokenServiceViewBean can only invoke the rest-sts-publish service with a JsonValue wrapping the
-    Map<String, Set<String>> (or the Set<String> has to be turned into List<String> as JsonValue#toString does not currently
-    turn Set values into json arrays- TODO: is this still true, or can this logic be changed?).
+    Map<String, Set<String>>.
     This method will be invoked with the JsonValue generated by wrapping a Map<String, List<String>>
     containing the user's rest-sts-configurations. It will turn the Map<String, List<String>> wrapped by the JsonValue back into
     a raw Map<String, Set<String>>, and call marshalFromAttributeMap.
@@ -306,17 +322,17 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
             throw new IllegalStateException("In RestSTSInstanceConfig#marshalFromJsonAttributeMap, Passed-in JsonValue " +
                     "is not a map. The JsonValue instance: " + jsonValue.toString());
         }
-        Map<String, Set<String>> smsMap = new HashMap<String, Set<String>>();
+        Map<String, Set<String>> smsMap = new HashMap<>();
         for (String key : jsonValue.keys()) {
             final JsonValue value = jsonValue.get(key);
             if (value.isNull()) {
                 smsMap.put(key, Collections.EMPTY_SET);
-            } else if(!value.isList()) {
+            } else if(!value.isCollection()) {
                 throw new IllegalStateException("In RestSTSInstanceConfig#marshalFromJsonAttributeMap, value " +
-                        "corresponding to key " + key + " is not a list. The value: " + value);
+                        "corresponding to key " + key + " is not a collection. The value: " + value);
             } else {
-                List<String> stringList = value.asList(String.class);
-                Set<String> stringSet = new HashSet<String>(stringList);
+                Collection<String> stringCollection = value.asCollection(String.class);
+                Set<String> stringSet = new HashSet<>(stringCollection);
                 smsMap.put(key, stringSet);
             }
         }
