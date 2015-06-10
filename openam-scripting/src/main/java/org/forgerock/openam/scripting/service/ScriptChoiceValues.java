@@ -15,21 +15,24 @@
  */
 package org.forgerock.openam.scripting.service;
 
-import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
-import com.google.inject.name.Names;
+import static org.forgerock.openam.scripting.ScriptConstants.EMPTY_SCRIPT_SELECTION;
+
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.sm.ChoiceValues;
 import com.sun.identity.sm.SMSEntry;
-import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.scripting.ScriptConstants;
 import org.forgerock.openam.scripting.ScriptException;
+import org.forgerock.openam.scripting.datastore.ScriptConfigurationDataStore;
+import org.forgerock.openam.scripting.datastore.ScriptingDataStore;
+import org.forgerock.openam.scripting.datastore.ScriptingDataStoreFactory;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.query.QueryFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.security.auth.Subject;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -37,11 +40,11 @@ import java.util.Set;
 
 /**
  * This class is used to retrieve the script names and IDs from the scripting service for display
- * in a drop down UI component. Implementing classes has to specify the context on which to filter the scripts.
+ * in a drop down UI component.
  *
  * @since 13.0.0
  */
-public abstract class ScriptChoiceValues extends ChoiceValues {
+public class ScriptChoiceValues extends ChoiceValues {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(ScriptConstants.LOGGER_NAME);
 
@@ -53,38 +56,54 @@ public abstract class ScriptChoiceValues extends ChoiceValues {
     @Override
     public Map getChoiceValues(Map envParams) {
         String realm = null;
-
+        String contextId = null;
         if (envParams != null) {
             realm = (String)envParams.get(Constants.ORGANIZATION_NAME);
+            contextId = (String)envParams.get(Constants.CONFIGURATION_NAME);
         }
         if (StringUtils.isBlank(realm)) {
             realm = SMSEntry.getRootSuffix();
         }
+        Map<?, ?> keyValues = getConfiguredKeyValues();
+        if (StringUtils.isBlank(contextId) && CollectionUtils.isNotEmpty(keyValues)) {
+            Set<?> values = (Set<?>)keyValues.get("ContextId");
+            if (CollectionUtils.isNotEmpty(values)) {
+                contextId = (String)values.iterator().next();
+            }
+        }
+
         ScriptingService<ScriptConfiguration> scriptingService = getScriptingService(realm);
         Map<String, String> choiceValues = new LinkedHashMap<>();
         try {
-            Set<ScriptConfiguration> scriptConfigs = scriptingService.get(
-                    QueryFilter.equalTo(ScriptConstants.SCRIPT_CONTEXT, getContextName()));
+            Set<ScriptConfiguration> scriptConfigs;
+            if (contextId == null) {
+                scriptConfigs = scriptingService.getAll();
+            } else {
+                scriptConfigs = scriptingService.get(QueryFilter.equalTo(ScriptConstants.SCRIPT_CONTEXT, contextId));
+            }
             for (ScriptConfiguration config : scriptConfigs) {
                 choiceValues.put(config.getId(), config.getName());
             }
         } catch (ScriptException e) {
-            LOGGER.error("Failed to retrieve scripts for " + getContextName(), e);
+            LOGGER.error("Failed to retrieve scripts for " + contextId, e);
         }
-        choiceValues.put("[Default]", "label.default");
+        choiceValues.put(EMPTY_SCRIPT_SELECTION, "label.select.script");
         return choiceValues;
     }
 
     /**
-     * Override this method to specify the context on which to filter the scripts.
-     * @return The name of the script context to filter on.
+     * We are not using Guice here as this class is used by the SSOADM, which is not packaged with Guice.
+     * @param realm The realm in which to scripting service should be created.
+     * @return the scripting service.
      */
-    protected abstract String getContextName();
-
     private ScriptingService<ScriptConfiguration> getScriptingService(String realm) {
-        ScriptingServiceFactory<ScriptConfiguration> scriptingServiceFactory =
-                InjectorHolder.getInstance(Key.get(new TypeLiteral<ScriptingServiceFactory<ScriptConfiguration>>() {}));
-        return scriptingServiceFactory.create(SubjectUtils.createSuperAdminSubject(), realm);
+        final Subject admin = SubjectUtils.createSuperAdminSubject();
+        return new ScriptConfigurationService(LOGGER, admin, realm, new ScriptingDataStoreFactory<ScriptConfiguration>() {
+            @Override
+            public ScriptingDataStore<ScriptConfiguration> create(Subject subject, String realm) {
+                return new ScriptConfigurationDataStore(LOGGER, admin, realm);
+            }
+        });
     }
 
 }

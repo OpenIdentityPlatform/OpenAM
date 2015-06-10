@@ -214,6 +214,7 @@ public class SMSUtils {
         "BooleanFalseValue";
 
     public static final String RESOURCE_NAME = "resourceName";
+    public static final String HIDE_CONFIG_UI = "hideConfigUI";
 
     protected static int counter = 0;
 

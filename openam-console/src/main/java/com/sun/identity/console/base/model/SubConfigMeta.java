@@ -225,6 +225,14 @@ public class SubConfigMeta {
     }
 
     /**
+     * Get the parent configuration's name.
+     * @return The parent configuration's name.
+     */
+    public String getParentName() {
+        return parentConfig.getName();
+    }
+
+    /**
      * Get the parent configuration's display name. It will check if the service configuration
      * has an internationalization key and if it does, the localised name will be returned.
      * Otherwise the config name itself will be returned.
@@ -316,7 +324,9 @@ public class SubConfigMeta {
                             mapServiceSchemaNameToL10NName.get(schemaID);
                         String localizedName = getLocalizedString(
                                 CollectionHelper.getMapAttr(conf.getAttributes(), SMSUtils.I18N_KEY));
-                        set.add(new SMSubConfig(conf.getComponentName(), name, displayType, localizedName));
+                        ServiceSchema schema = corrSchema.getSubSchema(schemaID);
+                        set.add(new SMSubConfig(
+                                conf.getComponentName(), name, displayType, localizedName, schema.isHiddenInConfigUI()));
                         if (singleInstanceGlobalSubSchemas.contains(schemaID)) {
                             creatableGlobalSubSchemas.remove(schemaID);
                         }

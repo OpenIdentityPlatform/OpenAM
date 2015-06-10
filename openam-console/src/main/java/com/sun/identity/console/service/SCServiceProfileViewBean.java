@@ -110,13 +110,13 @@ public class SCServiceProfileViewBean extends AMServiceProfileViewBeanBase {
             SubSchemaModel model = (SubSchemaModel)getModel();
             if (model.hasGlobalSubSchema()) {
                 SerializedField szCache = (SerializedField)getChild(SZ_CACHE);
-                populateTableModel((List)szCache.getSerializedObj());
+                populateTableModel(szCache.<List<SMSubConfig>>getSerializedObj());
             }
         }
         return super.createChild(name);
     }
 
-    private void populateTableModel(List subconfig) {
+    private void populateTableModel(List<SMSubConfig> subconfig) {
         CCActionTable tbl = (CCActionTable)getChild(
             AMPropertySheetModel.TBL_SUB_CONFIG);
         CCActionTableModel tblModel =(CCActionTableModel)tbl.getModel();
@@ -124,19 +124,21 @@ public class SCServiceProfileViewBean extends AMServiceProfileViewBeanBase {
 
         if (subconfig != null) {
             SerializedField szCache = (SerializedField)getChild(SZ_CACHE);
-            List cache = new ArrayList(subconfig.size());
+            List<SMSubConfig> cache = new ArrayList<>(subconfig.size());
 
             if (!subconfig.isEmpty()) {
                 tblModel.clearAll();
                 boolean firstEntry = true;
 
-                for (Iterator iter = subconfig.iterator(); iter.hasNext(); ) {
+                for (SMSubConfig conf : subconfig) {
+                    if (conf.isHidden()) {
+                        continue;
+                    }
                     if (firstEntry) {
                         firstEntry = false;
                     } else {
                         tblModel.appendRow();
                     }
-                    SMSubConfig conf = (SMSubConfig)iter.next();
                     tblModel.setValue(
                         AMPropertySheetModel.TBL_SUB_CONFIG_DATA_NAME,
                         conf.getLocalizedName() == null ? conf.getName() : conf.getLocalizedName());
@@ -149,7 +151,7 @@ public class SCServiceProfileViewBean extends AMServiceProfileViewBeanBase {
                     cache.add(conf);
                 }
             }
-            szCache.setValue((ArrayList)cache);
+            szCache.setValue(cache);
         }
     }
 

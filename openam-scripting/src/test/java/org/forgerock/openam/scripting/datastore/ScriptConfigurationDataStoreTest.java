@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.scripting.datastore;
 
-import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHORIZATION_ENTITLEMENT_CONDITION;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.POLICY_CONDITION;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode.*;
 import static org.forgerock.openam.scripting.SupportedScriptingLanguage.JAVASCRIPT;
 import static org.mockito.Mockito.mock;
@@ -69,7 +69,7 @@ public class ScriptConfigurationDataStoreTest {
                 .setName("MyJavaScript")
                 .setScript("var a = 123;var b = 456;")
                 .setLanguage(JAVASCRIPT)
-                .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION).build();
+                .setContext(POLICY_CONDITION).build();
 
         // when
         try {

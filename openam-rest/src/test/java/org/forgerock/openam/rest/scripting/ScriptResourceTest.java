@@ -18,7 +18,7 @@ package org.forgerock.openam.rest.scripting;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.fluent.JsonValue.*;
 import static org.forgerock.openam.scripting.ScriptConstants.*;
-import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHORIZATION_ENTITLEMENT_CONDITION;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.POLICY_CONDITION;
 import static org.forgerock.openam.scripting.SupportedScriptingLanguage.GROOVY;
 import static org.forgerock.openam.scripting.SupportedScriptingLanguage.JAVASCRIPT;
 import static org.mockito.Matchers.any;
@@ -31,7 +31,6 @@ import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
@@ -158,7 +157,7 @@ public class ScriptResourceTest {
         MockResultHandler<Resource> resultHandler = new MockResultHandler<Resource>();
         JsonValue requestJson = json(object(field(SCRIPT_NAME, "MyJavaScript"), field(SCRIPT_DESCRIPTION,
                 "A test script configuration"), field(SCRIPT_TEXT, encodeScript), field(SCRIPT_LANGUAGE,
-                "JAVASCRIPT"), field(SCRIPT_CONTEXT, "AUTHORIZATION_ENTITLEMENT_CONDITION")));
+                "JAVASCRIPT"), field(SCRIPT_CONTEXT, "POLICY_CONDITION")));
         CreateRequest createRequest = mock(CreateRequest.class);
         when(createRequest.getContent()).thenReturn(requestJson);
 
@@ -174,8 +173,7 @@ public class ScriptResourceTest {
         assertEquals(responseJson.get(SCRIPT_DESCRIPTION).asString(), "A test script configuration");
         assertEquals(responseJson.get(SCRIPT_TEXT).asString(), encodeScript);
         assertEquals(getLanguageFromString(responseJson.get(SCRIPT_LANGUAGE).asString()), JAVASCRIPT);
-        assertEquals(getContextFromString(responseJson.get(SCRIPT_CONTEXT).asString()),
-                AUTHORIZATION_ENTITLEMENT_CONDITION);
+        assertEquals(getContextFromString(responseJson.get(SCRIPT_CONTEXT).asString()), POLICY_CONDITION);
     }
 
     @Test
@@ -204,7 +202,7 @@ public class ScriptResourceTest {
                 .setDescription("A test JavaScript configuration")
                 .setScript(script)
                 .setLanguage(JAVASCRIPT)
-                .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION).build());
+                .setContext(POLICY_CONDITION).build());
 
         scriptConfigSet.put("0987654321", ScriptConfiguration.builder()
                 .setId("0987654321")
@@ -212,7 +210,7 @@ public class ScriptResourceTest {
                 .setDescription("A test Groovy script configuration")
                 .setScript(script)
                 .setLanguage(GROOVY)
-                .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION).build());
+                .setContext(POLICY_CONDITION).build());
 
         MockQueryResultHandler resultHandler = new MockQueryResultHandler();
         QueryRequest queryRequest = mock(QueryRequest.class);
@@ -231,16 +229,14 @@ public class ScriptResourceTest {
         assertEquals(responseJsonOne.get(SCRIPT_DESCRIPTION).asString(), "A test JavaScript configuration");
         assertEquals(responseJsonOne.get(SCRIPT_TEXT).asString(), encodeScript);
         assertEquals(getLanguageFromString(responseJsonOne.get(SCRIPT_LANGUAGE).asString()), JAVASCRIPT);
-        assertEquals(getContextFromString(responseJsonOne.get(SCRIPT_CONTEXT).asString()),
-                AUTHORIZATION_ENTITLEMENT_CONDITION);
+        assertEquals(getContextFromString(responseJsonOne.get(SCRIPT_CONTEXT).asString()), POLICY_CONDITION);
 
         assertEquals(responseJsonTwo.get(JSON_UUID).asString(), "0987654321");
         assertEquals(responseJsonTwo.get(SCRIPT_NAME).asString(), "MyGroovyScript");
         assertEquals(responseJsonTwo.get(SCRIPT_DESCRIPTION).asString(), "A test Groovy script configuration");
         assertEquals(responseJsonTwo.get(SCRIPT_TEXT).asString(), encodeScript);
         assertEquals(getLanguageFromString(responseJsonTwo.get(SCRIPT_LANGUAGE).asString()), GROOVY);
-        assertEquals(getContextFromString(responseJsonTwo.get(SCRIPT_CONTEXT).asString()),
-                AUTHORIZATION_ENTITLEMENT_CONDITION);
+        assertEquals(getContextFromString(responseJsonTwo.get(SCRIPT_CONTEXT).asString()), POLICY_CONDITION);
     }
 
     @Test
@@ -254,7 +250,7 @@ public class ScriptResourceTest {
                 .setDescription("A test JavaScript configuration")
                 .setScript(script)
                 .setLanguage(JAVASCRIPT)
-                .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION).build());
+                .setContext(POLICY_CONDITION).build());
 
         MockResultHandler<Resource> resultHandler = new MockResultHandler<Resource>();
         ReadRequest readRequest = mock(ReadRequest.class);
@@ -273,8 +269,7 @@ public class ScriptResourceTest {
         assertEquals(responseJson.get(SCRIPT_DESCRIPTION).asString(), "A test JavaScript configuration");
         assertEquals(responseJson.get(SCRIPT_TEXT).asString(), encodeScript);
         assertEquals(getLanguageFromString(responseJson.get(SCRIPT_LANGUAGE).asString()), JAVASCRIPT);
-        assertEquals(getContextFromString(responseJson.get(SCRIPT_CONTEXT).asString()),
-                AUTHORIZATION_ENTITLEMENT_CONDITION);
+        assertEquals(getContextFromString(responseJson.get(SCRIPT_CONTEXT).asString()), POLICY_CONDITION);
     }
 
     @Test
@@ -284,7 +279,7 @@ public class ScriptResourceTest {
         MockResultHandler<Resource> resultHandler = new MockResultHandler<Resource>();
         JsonValue requestJson = json(object(field(SCRIPT_NAME, "MyJavaScript"), field(SCRIPT_DESCRIPTION,
                 "A test script configuration"), field(SCRIPT_TEXT, encodeScript),
-                field(SCRIPT_LANGUAGE, "JAVASCRIPT"), field(SCRIPT_CONTEXT, "AUTHORIZATION_ENTITLEMENT_CONDITION")));
+                field(SCRIPT_LANGUAGE, "JAVASCRIPT"), field(SCRIPT_CONTEXT, "POLICY_CONDITION")));
         UpdateRequest updateRequest = mock(UpdateRequest.class);
         when(updateRequest.getContent()).thenReturn(requestJson);
 
@@ -300,8 +295,7 @@ public class ScriptResourceTest {
         assertEquals(responseJson.get(SCRIPT_DESCRIPTION).asString(), "A test script configuration");
         assertEquals(responseJson.get(SCRIPT_TEXT).asString(), encodeScript);
         assertEquals(getLanguageFromString(responseJson.get(SCRIPT_LANGUAGE).asString()), JAVASCRIPT);
-        assertEquals(getContextFromString(responseJson.get(SCRIPT_CONTEXT).asString()),
-                AUTHORIZATION_ENTITLEMENT_CONDITION);
+        assertEquals(getContextFromString(responseJson.get(SCRIPT_CONTEXT).asString()), POLICY_CONDITION);
     }
 
     @Test
@@ -309,7 +303,7 @@ public class ScriptResourceTest {
         // given
         MockResultHandler<Resource> resultHandler = new MockResultHandler<Resource>();
         JsonValue requestJson = json(object(field(SCRIPT_TEXT, encodeScript), field(SCRIPT_LANGUAGE,
-                "JAVASCRIPT"), field(SCRIPT_CONTEXT, "AUTHORIZATION_ENTITLEMENT_CONDITION")));
+                "JAVASCRIPT"), field(SCRIPT_CONTEXT, "POLICY_CONDITION")));
         CreateRequest createRequest = mock(CreateRequest.class);
         when(createRequest.getContent()).thenReturn(requestJson);
 
@@ -330,7 +324,7 @@ public class ScriptResourceTest {
         JsonValue requestJson = json(object(
                 field(SCRIPT_NAME, "MyJavaScript"),
                 field(SCRIPT_LANGUAGE, "JAVASCRIPT"),
-                field(SCRIPT_CONTEXT, "AUTHORIZATION_ENTITLEMENT_CONDITION")));
+                field(SCRIPT_CONTEXT, "POLICY_CONDITION")));
         CreateRequest createRequest = mock(CreateRequest.class);
         when(createRequest.getContent()).thenReturn(requestJson);
 
@@ -351,7 +345,7 @@ public class ScriptResourceTest {
         JsonValue requestJson = json(object(
                 field(SCRIPT_NAME, "MyJavaScript"),
                 field(SCRIPT_TEXT, encodeScript),
-                field(SCRIPT_CONTEXT, "AUTHORIZATION_ENTITLEMENT_CONDITION")));
+                field(SCRIPT_CONTEXT, "POLICY_CONDITION")));
         CreateRequest createRequest = mock(CreateRequest.class);
         when(createRequest.getContent()).thenReturn(requestJson);
 
@@ -394,7 +388,7 @@ public class ScriptResourceTest {
         JsonValue requestJson = json(object(
                 field(SCRIPT_TEXT, encodeScript),
                 field(SCRIPT_LANGUAGE, "JAVASCRIPT"),
-                field(SCRIPT_CONTEXT, "AUTHORIZATION_ENTITLEMENT_CONDITION")));
+                field(SCRIPT_CONTEXT, "POLICY_CONDITION")));
         UpdateRequest updateRequest = mock(UpdateRequest.class);
         when(updateRequest.getContent()).thenReturn(requestJson);
 
@@ -416,7 +410,7 @@ public class ScriptResourceTest {
         JsonValue requestJson = json(object(
                 field(SCRIPT_NAME, "MyJavaScript"),
                 field(SCRIPT_LANGUAGE, "JAVASCRIPT"),
-                field(SCRIPT_CONTEXT, "AUTHORIZATION_ENTITLEMENT_CONDITION")));
+                field(SCRIPT_CONTEXT, "POLICY_CONDITION")));
         UpdateRequest updateRequest = mock(UpdateRequest.class);
         when(updateRequest.getContent()).thenReturn(requestJson);
 
@@ -438,7 +432,7 @@ public class ScriptResourceTest {
         JsonValue requestJson = json(object(
                 field(SCRIPT_NAME, "MyJavaScript"),
                 field(SCRIPT_TEXT, encodeScript),
-                field(SCRIPT_CONTEXT, "AUTHORIZATION_ENTITLEMENT_CONDITION")));
+                field(SCRIPT_CONTEXT, "POLICY_CONDITION")));
         UpdateRequest updateRequest = mock(UpdateRequest.class);
         when(updateRequest.getContent()).thenReturn(requestJson);
 
@@ -482,7 +476,7 @@ public class ScriptResourceTest {
                     .setName("MyJavaScript"+i)
                     .setScript(script)
                     .setLanguage(JAVASCRIPT)
-                    .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION).build();
+                    .setContext(POLICY_CONDITION).build();
             scriptConfigSet.put(sc.getId(), sc);
         }
 

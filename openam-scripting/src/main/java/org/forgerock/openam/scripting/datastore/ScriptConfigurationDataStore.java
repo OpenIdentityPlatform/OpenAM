@@ -76,14 +76,16 @@ public class ScriptConfigurationDataStore implements ScriptingDataStore<ScriptCo
         try {
             createCollectionConfig();
             final Map<String, Set<String>> data = getScriptConfigurationData(config);
-            if (containsUuid(config.getId())) {
+            if (containsGlobalUuid(config.getId())) {
+                getSubGlobalConfig().getSubConfig(config.getId()).setAttributes(data);
+            }
+
+            if (containsOrgUuid(config.getId())) {
                 getSubOrgConfig().getSubConfig(config.getId()).setAttributes(data);
             } else {
                 getSubOrgConfig().addSubConfig(config.getId(), SCRIPT_CONFIGURATION, 0, data);
             }
-        } catch (SMSException e) {
-            throw createAndLogError(logger, SAVE_FAILED, e, config.getId(), realm);
-        } catch (SSOException e) {
+        } catch (SSOException | SMSException e) {
             throw createAndLogError(logger, SAVE_FAILED, e, config.getId(), realm);
         }
     }
@@ -92,26 +94,29 @@ public class ScriptConfigurationDataStore implements ScriptingDataStore<ScriptCo
     public void delete(String uuid) throws ScriptException {
         try {
             getSubOrgConfig().removeSubConfig(uuid);
-        } catch (SMSException e) {
-            throw createAndLogError(logger, DELETE_FAILED, e, uuid, realm);
-        } catch (SSOException e) {
+        } catch (SSOException | SMSException e) {
             throw createAndLogError(logger, DELETE_FAILED, e, uuid, realm);
         }
     }
 
     @Override
     public Set<ScriptConfiguration> getAll() throws ScriptException {
-        final Set<ScriptConfiguration> scriptConfigurations = new LinkedHashSet<ScriptConfiguration>();
+        final Set<ScriptConfiguration> scriptConfigurations = new LinkedHashSet<>();
         try {
-            final ServiceConfig subOrgConfig = getSubOrgConfig();
-            final Set<String> uuids = subOrgConfig.getSubConfigNames();
+            ServiceConfig config = getSubOrgConfig();
+            Set<String> uuids = config.getSubConfigNames();
             for (String uuid : uuids) {
                 scriptConfigurations.add(
-                        scriptConfigurationFromMap(uuid, subOrgConfig.getSubConfig(uuid).getAttributesForRead()));
+                        scriptConfigurationFromMap(uuid, config.getSubConfig(uuid).getAttributesForRead()));
             }
-        } catch (SMSException e) {
-            throw createAndLogError(logger, RETRIEVE_ALL_FAILED, e, realm);
-        } catch (SSOException e) {
+
+            config = getSubGlobalConfig();
+            uuids = config.getSubConfigNames();
+            for (String uuid : uuids) {
+                scriptConfigurations.add(
+                        scriptConfigurationFromMap(uuid, config.getSubConfig(uuid).getAttributesForRead()));
+            }
+        } catch (SSOException | SMSException e) {
             throw createAndLogError(logger, RETRIEVE_ALL_FAILED, e, realm);
         }
         return scriptConfigurations;
@@ -120,40 +125,64 @@ public class ScriptConfigurationDataStore implements ScriptingDataStore<ScriptCo
     @Override
     public ScriptConfiguration get(String uuid) throws ScriptException {
         try {
-            return scriptConfigurationFromMap(uuid, getSubOrgConfig().getSubConfig(uuid).getAttributesForRead());
-        } catch (SMSException e) {
-            throw createAndLogError(logger, RETRIEVE_FAILED, e, uuid, realm);
-        } catch (SSOException e) {
+            ServiceConfig config = getSubOrgConfig();
+            if (config.getSubConfigNames().contains(uuid)) {
+                return scriptConfigurationFromMap(uuid, config.getSubConfig(uuid).getAttributesForRead());
+            }
+            config = getSubGlobalConfig();
+            if (config.getSubConfigNames().contains(uuid)) {
+                return scriptConfigurationFromMap(uuid, config.getSubConfig(uuid).getAttributesForRead());
+            }
+        } catch (SSOException | SMSException e) {
             throw createAndLogError(logger, RETRIEVE_FAILED, e, uuid, realm);
         }
+
+        throw createAndLogError(logger, SCRIPT_UUID_NOT_FOUND, uuid, realm);
     }
 
     @Override
     public boolean containsUuid(String uuid) throws ScriptException {
-        final ServiceConfig serviceConfig;
+        return containsOrgUuid(uuid) || containsGlobalUuid(uuid);
+    }
+
+    private boolean containsOrgUuid(String uuid) throws ScriptException {
+        final ServiceConfig orgConfig;
         try {
-            serviceConfig = getSubOrgConfig().getSubConfig(uuid);
-        } catch (SMSException e) {
-            throw createAndLogError(logger, FIND_BY_UUID_FAILED, e, uuid, realm);
-        } catch (SSOException e) {
+            orgConfig = getSubOrgConfig().getSubConfig(uuid);
+        } catch (SSOException | SMSException e) {
             throw createAndLogError(logger, FIND_BY_UUID_FAILED, e, uuid, realm);
         }
-        return serviceConfig != null && serviceConfig.exists();
+        return orgConfig != null && orgConfig.exists();
+    }
+
+    private boolean containsGlobalUuid(String uuid) throws ScriptException {
+        final ServiceConfig globalConfig;
+        try {
+            globalConfig = getSubGlobalConfig().getSubConfig(uuid);
+        } catch (SSOException | SMSException e) {
+            throw createAndLogError(logger, FIND_BY_UUID_FAILED, e, uuid, realm);
+        }
+        return globalConfig != null && globalConfig.exists();
     }
 
     @Override
     public boolean containsName(String name) throws ScriptException {
         try {
-            final ServiceConfig subOrgConfig = getSubOrgConfig();
-            final Set<String> configNames = subOrgConfig.getSubConfigNames();
+            ServiceConfig config = getSubOrgConfig();
+            Set<String> configNames = config.getSubConfigNames();
             for (String configName : configNames) {
-                if (name.equals(getMapAttr(subOrgConfig.getSubConfig(configName).getAttributes(), SCRIPT_NAME))) {
+                if (name.equals(getMapAttr(config.getSubConfig(configName).getAttributes(), SCRIPT_NAME))) {
                     return true;
                 }
             }
-        } catch (SMSException e) {
-            throw createAndLogError(logger, FIND_BY_NAME_FAILED, e, name, realm);
-        } catch (SSOException e) {
+            config = getSubGlobalConfig();
+            configNames = config.getSubConfigNames();
+            for (String configName : configNames) {
+                if (name.equals(getMapAttr(config.getSubConfig(configName).getAttributes(), SCRIPT_NAME))) {
+                    return true;
+                }
+            }
+        } catch (SSOException | SMSException e) {
             throw createAndLogError(logger, FIND_BY_NAME_FAILED, e, name, realm);
         }
         return false;
@@ -163,10 +192,18 @@ public class ScriptConfigurationDataStore implements ScriptingDataStore<ScriptCo
     public Set<ScriptConfiguration> get(QueryFilter<String> queryFilter) throws ScriptException {
         final Set<ScriptConfiguration> scriptConfigurations = new LinkedHashSet<>();
         try {
-            final ServiceConfig subOrgConfig = getSubOrgConfig();
-            final Set<String> uuids = subOrgConfig.getSubConfigNames();
+            ServiceConfig config = getSubOrgConfig();
+            Set<String> uuids = config.getSubConfigNames();
             for (String uuid : uuids) {
-                if (queryFilter.accept(new ServiceConfigQueryFilterVisitor(), subOrgConfig.getSubConfig(uuid))) {
+                if (queryFilter.accept(new ServiceConfigQueryFilterVisitor(), config.getSubConfig(uuid))) {
+                    scriptConfigurations.add(get(uuid));
+                }
+            }
+
+            config = getSubGlobalConfig();
+            uuids = config.getSubConfigNames();
+            for (String uuid : uuids) {
+                if (queryFilter.accept(new ServiceConfigQueryFilterVisitor(), config.getSubConfig(uuid))) {
                     scriptConfigurations.add(get(uuid));
                 }
             }
@@ -185,7 +222,7 @@ public class ScriptConfigurationDataStore implements ScriptingDataStore<ScriptCo
      * @return The map containing the resource type attributes.
      */
     private Map<String, Set<String>> getScriptConfigurationData(ScriptConfiguration config) {
-        final Map<String, Set<String>> dataMap = new HashMap<String, Set<String>>();
+        final Map<String, Set<String>> dataMap = new HashMap<>();
         dataMap.put(SCRIPT_NAME, Collections.singleton(config.getName()));
         dataMap.put(SCRIPT_DESCRIPTION, Collections.singleton(config.getDescription()));
         dataMap.put(SCRIPT_TEXT, Collections.singleton(config.getScript()));
@@ -259,6 +296,20 @@ public class ScriptConfigurationDataStore implements ScriptingDataStore<ScriptCo
     }
 
     /**
+     * Get the global configuration for the ScriptingService service.
+     * @return The global configuration, which is guaranteed to not be null.
+     * @throws SMSException If the configuration could not be read.
+     * @throws SSOException If the Admin token could not be found.
+     */
+    private ServiceConfig getGlobalConfig() throws SMSException, SSOException {
+        ServiceConfig globalConfig = getConfigManager().getGlobalConfig(null);
+        if (globalConfig == null) {
+            throw new SMSException("Global Configuration for '" + SERVICE_NAME + "' could not be retrieved.");
+        }
+        return globalConfig;
+    }
+
+    /**
      * Get the sub configuration from the organization configuration for the ScriptingService.
      * @return The sub configuration, which is guaranteed to not be null.
      * @throws SMSException If the sub configuration could not be read.
@@ -272,6 +323,21 @@ public class ScriptConfigurationDataStore implements ScriptingDataStore<ScriptCo
         }
         return config;
     }
+
+    /**
+     * Get the sub configuration from the global configuration for the ScriptingService.
+     * @return The sub configuration, which is guaranteed to not be null.
+     * @throws SMSException If the sub configuration could not be read.
+     * @throws SSOException If the Admin token could not be found.
+     */
+    private ServiceConfig getSubGlobalConfig()throws SMSException, SSOException {
+        final ServiceConfig config = getGlobalConfig().getSubConfig("globalScripts");
+        if (config == null) {
+            throw new SMSException("Global Configuration for '" + SERVICE_NAME + "' could not be retrieved.");
+        }
+        return config;
+    }
+
 
     /**
      * Returns an admin SSO token for administrative actions.

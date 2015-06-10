@@ -15,14 +15,12 @@
  */
 package org.forgerock.openam.authentication.modules.scripted;
 
-import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHENTICATION_CLIENT_SIDE;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHENTICATION_SERVER_SIDE;
-import static org.forgerock.openam.scripting.ScriptConstants.getLanguageFromString;
+import static org.forgerock.openam.scripting.ScriptConstants.EMPTY_SCRIPT_SELECTION;
 
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
-import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.authentication.spi.AMLoginModule;
@@ -32,14 +30,10 @@ import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.client.RestletHttpClient;
 import org.forgerock.http.client.request.HttpClientRequest;
 import org.forgerock.http.client.request.HttpClientRequestFactory;
-import org.forgerock.openam.scripting.ScriptConstants;
 import org.forgerock.openam.scripting.ScriptEvaluator;
 import org.forgerock.openam.scripting.ScriptObject;
 import org.forgerock.openam.scripting.SupportedScriptingLanguage;
@@ -63,10 +57,7 @@ public class Scripted extends AMLoginModule {
     private static final String ATTR_NAME_PREFIX = "iplanet-am-auth-scripted-";
     private static final String CLIENT_SCRIPT_ATTR_NAME = ATTR_NAME_PREFIX + "client-script";
     private static final String CLIENT_SCRIPT_ENABLED_ATTR_NAME = ATTR_NAME_PREFIX + "client-script-enabled";
-    public static final String SCRIPT_TYPE_ATTR_NAME = ATTR_NAME_PREFIX + "script-type";
     private static final String SERVER_SCRIPT_ATTRIBUTE_NAME = ATTR_NAME_PREFIX + "server-script";
-
-    public static final String SCRIPT_MODULE_NAME = "amAuthScripted";
 
     private final static int STATE_RUN_SCRIPT = 2;
     public static final String STATE_VARIABLE_NAME = "authState";
@@ -192,18 +183,12 @@ public class Scripted extends AMLoginModule {
     private ScriptObject getServerSideScript() throws AuthLoginException {
         String serverSideScriptId = getConfigValue(SERVER_SCRIPT_ATTRIBUTE_NAME);
         try {
-            if ("[Default]".equals(serverSideScriptId)) {
-                ServiceConfigManager manager = new ServiceConfigManager(ScriptConstants.SERVICE_NAME, getSSOSession());
-                ServiceConfig subConfig = manager.getGlobalConfig(null).getSubConfig(AUTHENTICATION_SERVER_SIDE.name());
-                String defaultScript = CollectionHelper.getMapAttr(subConfig.getAttributesForRead(),
-                        ScriptConstants.DEFAULT_SCRIPT);
-                String defaultLanguage = CollectionHelper.getMapAttr(subConfig.getAttributesForRead(),
-                        ScriptConstants.DEFAULT_LANGUAGE);
-                return new ScriptObject("DefaultScript", defaultScript, getLanguageFromString(defaultLanguage));
+            if (EMPTY_SCRIPT_SELECTION.equals(serverSideScriptId)) {
+                return new ScriptObject("DefaultScript", "", SupportedScriptingLanguage.JAVASCRIPT);
             }
             ScriptConfiguration config = scriptingService.get(serverSideScriptId);
             return new ScriptObject(config.getName(), config.getScript(), config.getLanguage());
-        } catch (SMSException | SSOException | org.forgerock.openam.scripting.ScriptException e) {
+        } catch (org.forgerock.openam.scripting.ScriptException e) {
             DEBUG.error("Error retrieving server side script", e);
             throw new AuthLoginException("Error retrieving script", e);
         }
@@ -235,14 +220,13 @@ public class Scripted extends AMLoginModule {
         }
 
         String clientSideScriptId = getConfigValue(CLIENT_SCRIPT_ATTR_NAME);
+        if (EMPTY_SCRIPT_SELECTION.equals(clientSideScriptId)) {
+            return script;
+        }
+
         try {
-            if ("[Default]".equals(clientSideScriptId)) {
-                ServiceConfigManager manager = new ServiceConfigManager(ScriptConstants.SERVICE_NAME, getSSOSession());
-                ServiceConfig subConfig = manager.getGlobalConfig(null).getSubConfig(AUTHENTICATION_CLIENT_SIDE.name());
-                return CollectionHelper.getMapAttr(subConfig.getAttributesForRead(), ScriptConstants.DEFAULT_SCRIPT);
-            }
             script = scriptingService.get(clientSideScriptId).getScript();
-        } catch (AuthLoginException | SMSException | SSOException | org.forgerock.openam.scripting.ScriptException e) {
+        } catch (org.forgerock.openam.scripting.ScriptException e) {
             DEBUG.error("Error retrieving client side script", e);
         }
         return script;

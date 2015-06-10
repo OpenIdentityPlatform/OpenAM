@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2015 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -24,10 +24,12 @@
  */
 package com.sun.identity.config.upgrade;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.config.util.AjaxPage;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.setup.SetupConstants;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import java.security.AccessController;
 import org.apache.click.control.ActionLink;
@@ -77,7 +79,9 @@ public class Upgrade extends AjaxPage {
 
     public boolean doUpgrade() {
         try {
+            SystemProperties.initializeProperties(Constants.SYS_PROPERTY_INSTALL_TIME, "true");
             upgrade.upgrade(adminToken, isLicenseAccepted());
+            SystemProperties.initializeProperties(Constants.SYS_PROPERTY_INSTALL_TIME, "false");
             writeToResponse("true");
         } catch (UpgradeException ue) {
             writeToResponse(ue.getMessage());

@@ -312,6 +312,11 @@ public class SubConfigModelImpl
     }
 
     @Override
+    public String getName() {
+        return subConfigMeta.getParentName();
+    }
+
+    @Override
     public String getDisplayName() {
         return displayName;
     }

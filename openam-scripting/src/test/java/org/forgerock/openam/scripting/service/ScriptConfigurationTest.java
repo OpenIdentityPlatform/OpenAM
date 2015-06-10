@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.scripting.service;
 
-import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHORIZATION_ENTITLEMENT_CONDITION;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.POLICY_CONDITION;
 import static org.forgerock.openam.scripting.SupportedScriptingLanguage.GROOVY;
 import static org.forgerock.openam.scripting.SupportedScriptingLanguage.JAVASCRIPT;
 import static org.testng.Assert.assertEquals;
@@ -37,7 +37,7 @@ public class ScriptConfigurationTest {
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
                 .setLanguage(JAVASCRIPT)
-                .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION)
+                .setContext(POLICY_CONDITION)
                 .setCreatedBy("TestUser1")
                 .setCreationDate(1422886484092l)
                 .setLastModifiedBy("TestUser2")
@@ -45,13 +45,14 @@ public class ScriptConfigurationTest {
 
         //when
         ScriptConfiguration scriptConfiguration = builder.build();
+        System.out.println(scriptConfiguration.getId());
 
         //then
         assertEquals(scriptConfiguration.getName(), "MyJavaScript");
         assertEquals(scriptConfiguration.getDescription(), "This is a test script configuration");
         assertEquals(scriptConfiguration.getScript(), "var a = 123;var b = 456;");
         assertEquals(scriptConfiguration.getLanguage(), JAVASCRIPT);
-        assertEquals(scriptConfiguration.getContext(), AUTHORIZATION_ENTITLEMENT_CONDITION);
+        assertEquals(scriptConfiguration.getContext(), POLICY_CONDITION);
         assertEquals(scriptConfiguration.getCreatedBy(), "TestUser1");
         assertEquals(scriptConfiguration.getCreationDate(), 1422886484092l);
         assertEquals(scriptConfiguration.getLastModifiedBy(), "TestUser2");
@@ -69,7 +70,7 @@ public class ScriptConfigurationTest {
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
                 .setLanguage(JAVASCRIPT)
-                .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION)
+                .setContext(POLICY_CONDITION)
                 .setCreatedBy("TestUser1")
                 .setCreationDate(1422886484092l)
                 .setLastModifiedBy("TestUser2")
@@ -80,7 +81,7 @@ public class ScriptConfigurationTest {
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
                 .setLanguage(JAVASCRIPT)
-                .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION)
+                .setContext(POLICY_CONDITION)
                 .setCreatedBy("TestUser1")
                 .setCreationDate(1422886484092l)
                 .setLastModifiedBy("TestUser2")
@@ -105,7 +106,7 @@ public class ScriptConfigurationTest {
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
                 .setLanguage(JAVASCRIPT)
-                .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION)
+                .setContext(POLICY_CONDITION)
                 .setCreatedBy("TestUser1")
                 .setCreationDate(1422886484092l)
                 .setLastModifiedBy("TestUser2")
@@ -116,7 +117,7 @@ public class ScriptConfigurationTest {
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
                 .setLanguage(GROOVY)
-                .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION)
+                .setContext(POLICY_CONDITION)
                 .setCreatedBy("TestUser1")
                 .setCreationDate(1422886484092l)
                 .setLastModifiedBy("TestUser2")
@@ -141,7 +142,7 @@ public class ScriptConfigurationTest {
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
                 .setLanguage(JAVASCRIPT)
-                .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION)
+                .setContext(POLICY_CONDITION)
                 .setCreatedBy("TestUser1")
                 .setCreationDate(1422886484092l)
                 .setLastModifiedBy("TestUser2")
@@ -171,7 +172,7 @@ public class ScriptConfigurationTest {
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
                 .setLanguage(JAVASCRIPT)
-                .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION)
+                .setContext(POLICY_CONDITION)
                 .setCreatedBy("TestUser1")
                 .setCreationDate(1422886484092l)
                 .setLastModifiedBy("TestUser2")
@@ -193,7 +194,7 @@ public class ScriptConfigurationTest {
                 .setName("MyJavaScript")
                 .setScript("var a = 123;var b = 456;")
                 .setLanguage(JAVASCRIPT)
-                .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION);
+                .setContext(POLICY_CONDITION);
 
         //when
         builder.build();
@@ -207,7 +208,7 @@ public class ScriptConfigurationTest {
                 .generateId()
                 .setScript("var a = 123;var b = 456;")
                 .setLanguage(JAVASCRIPT)
-                .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION);
+                .setContext(POLICY_CONDITION);
 
         //when
         builder.build();
@@ -221,7 +222,7 @@ public class ScriptConfigurationTest {
                 .generateId()
                 .setName("MyJavaScript")
                 .setLanguage(JAVASCRIPT)
-                .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION);
+                .setContext(POLICY_CONDITION);
 
         //when
         builder.build();
@@ -235,7 +236,7 @@ public class ScriptConfigurationTest {
                 .generateId()
                 .setName("MyJavaScript")
                 .setScript("var a = 123;var b = 456;")
-                .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION);
+                .setContext(POLICY_CONDITION);
 
         //when
         builder.build();

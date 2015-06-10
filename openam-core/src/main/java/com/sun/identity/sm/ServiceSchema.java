@@ -273,6 +273,14 @@ public class ServiceSchema {
     }
 
     /**
+     * Should this service schema be hidden in the Configuration UI.
+     * @return True if it should be hidden.
+     */
+    public boolean isHiddenInConfigUI() {
+        return ss.isHiddenInConfigUI();
+    }
+
+    /**
      * Sets the CREST resource name for the service schema.
      *
      * @param name

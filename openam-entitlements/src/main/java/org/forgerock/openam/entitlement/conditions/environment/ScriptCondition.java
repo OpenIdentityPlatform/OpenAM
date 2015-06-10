@@ -76,7 +76,7 @@ public class ScriptCondition extends EntitlementConditionAdaptor {
         scriptingServiceFactory = InjectorHolder.getInstance(
                 Key.get(new TypeLiteral<ScriptingServiceFactory<ScriptConfiguration>>() {}));
         evaluator = InjectorHolder.getInstance(
-                Key.get(ScriptEvaluator.class, Names.named(ScriptContext.AUTHORIZATION_ENTITLEMENT_CONDITION.name())));
+                Key.get(ScriptEvaluator.class, Names.named(ScriptContext.POLICY_CONDITION.name())));
         coreWrapper = InjectorHolder.getInstance(CoreWrapper.class);
     }
 

@@ -15,12 +15,10 @@
  */
 package org.forgerock.openam.upgrade.steps.scripting;
 
-import static com.sun.identity.shared.datastruct.CollectionHelper.getBooleanMapAttr;
 import static com.sun.identity.shared.datastruct.CollectionHelper.getMapAttr;
-import static org.forgerock.openam.scripting.ScriptConstants.EMPTY;
+import static org.forgerock.openam.scripting.ScriptConstants.*;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHENTICATION_CLIENT_SIDE;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHENTICATION_SERVER_SIDE;
-import static org.forgerock.openam.scripting.ScriptConstants.getLanguageFromString;
 import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
 
@@ -42,6 +40,7 @@ import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeProgress;
 import org.forgerock.openam.upgrade.UpgradeStepInfo;
 import org.forgerock.openam.upgrade.steps.AbstractUpgradeStep;
+import org.forgerock.openam.utils.StringUtils;
 
 import javax.inject.Inject;
 import java.security.PrivilegedAction;
@@ -64,7 +63,6 @@ public class ScriptedAuthModulesStep extends AbstractUpgradeStep {
     private static final String CLIENT_SCRIPT = "iplanet-am-auth-scripted-client-script";
     private static final String SCRIPT_TYPE = "iplanet-am-auth-scripted-script-type";
     private static final String SERVER_SCRIPT = "iplanet-am-auth-scripted-server-script";
-    private static final String CLIENT_SCRIPT_ENABLED = "iplanet-am-auth-scripted-client-script-enabled";
 
     private class ScriptData {
         String moduleName;
@@ -100,7 +98,8 @@ public class ScriptedAuthModulesStep extends AbstractUpgradeStep {
         AMAuthenticationManager authManager = new AMAuthenticationManager(getAdminToken(), realm);
         Set<AMAuthenticationInstance> instances = authManager.getAuthenticationInstances();
         for (AMAuthenticationInstance instance : instances) {
-            if ("Scripted".equalsIgnoreCase(instance.getType())) {
+            String moduleType = instance.getType();
+            if ("Scripted".equalsIgnoreCase(moduleType) || "DeviceIdMatch".equalsIgnoreCase(moduleType)) {
                 DEBUG.message("Found Scripted Module called {}, in realm {}", instance.getName(), realm);
                 @SuppressWarnings("unchecked")
                 Map<String, Set<String>> attributes = instance.getAttributeValues();
@@ -120,21 +119,21 @@ public class ScriptedAuthModulesStep extends AbstractUpgradeStep {
         scriptData.moduleName = moduleName;
         String serverScript = getMapAttr(attributes, SERVER_SCRIPT);
         scriptData.serverSideScript = ScriptConfiguration.builder().generateId()
-                .setName("Server-Side " + moduleName)
-                .setDescription("Server-Side script for Scripted Module: " + moduleName)
+                .setName(moduleName + " - Server Side")
+                .setDescription("Server side script for Scripted Module: " + moduleName)
                 .setContext(AUTHENTICATION_SERVER_SIDE)
                 .setLanguage(getLanguageFromString(getMapAttr(attributes, SCRIPT_TYPE)))
                 .setScript(serverScript == null ? EMPTY : serverScript).build();
         DEBUG.message("Captured server script for {}", moduleName);
 
-        if (getBooleanMapAttr(attributes, CLIENT_SCRIPT_ENABLED, false)) {
-            String clientScript = getMapAttr(attributes, CLIENT_SCRIPT);
+        String clientScript = getMapAttr(attributes, CLIENT_SCRIPT);
+        if (StringUtils.isNotEmpty(clientScript)) {
             scriptData.clientSideScript = ScriptConfiguration.builder().generateId()
-                    .setName("Client-Side " + moduleName)
-                    .setDescription("Client-Side script for Scripted Module: " + moduleName)
+                    .setName(moduleName + " - Client Side")
+                    .setDescription("Client side script for Scripted Module: " + moduleName)
                     .setContext(AUTHENTICATION_CLIENT_SIDE)
                     .setLanguage(SupportedScriptingLanguage.JAVASCRIPT)
-                    .setScript(clientScript == null ? EMPTY : clientScript).build();
+                    .setScript(clientScript).build();
             DEBUG.message("Captured client script for {}", moduleName);
         }
 
@@ -175,12 +174,12 @@ public class ScriptedAuthModulesStep extends AbstractUpgradeStep {
 
             if (scriptData.clientSideScript != null) {
                 UpgradeProgress.reportStart("upgrade.scripted.auth.client.script.start",
-                        scriptData.serverSideScript.getName(), realm);
+                        scriptData.clientSideScript.getName(), realm);
                 service.create(scriptData.clientSideScript);
                 attributes.put(CLIENT_SCRIPT, Collections.singleton(scriptData.clientSideScript.getId()));
                 UpgradeProgress.reportEnd("upgrade.success");
             } else {
-                attributes.put(CLIENT_SCRIPT, Collections.singleton("[Default]"));
+                attributes.put(CLIENT_SCRIPT, Collections.singleton(EMPTY_SCRIPT_SELECTION));
             }
 
             UpgradeProgress.reportStart("upgrade.scripted.auth.module.script.start", scriptData.moduleName, realm);

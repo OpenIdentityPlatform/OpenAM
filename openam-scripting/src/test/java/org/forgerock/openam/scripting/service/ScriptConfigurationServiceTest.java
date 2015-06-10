@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.scripting.service;
 
-import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHORIZATION_ENTITLEMENT_CONDITION;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.POLICY_CONDITION;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode.*;
 import static org.forgerock.openam.scripting.SupportedScriptingLanguage.JAVASCRIPT;
 import static org.mockito.Matchers.any;
@@ -67,7 +67,7 @@ public class ScriptConfigurationServiceTest {
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
                 .setLanguage(JAVASCRIPT)
-                .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION).build();
+                .setContext(POLICY_CONDITION).build();
         when(dataStore.containsUuid(anyString())).thenReturn(false);
         when(dataStore.containsName(anyString())).thenReturn(false);
 
@@ -94,7 +94,7 @@ public class ScriptConfigurationServiceTest {
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
                 .setLanguage(JAVASCRIPT)
-                .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION).build();
+                .setContext(POLICY_CONDITION).build();
         when(dataStore.containsUuid(anyString())).thenReturn(false);
         when(dataStore.containsName(anyString())).thenReturn(true);
 
@@ -118,7 +118,7 @@ public class ScriptConfigurationServiceTest {
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
                 .setLanguage(JAVASCRIPT)
-                .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION).build();
+                .setContext(POLICY_CONDITION).build();
         when(dataStore.containsUuid(anyString())).thenReturn(true);
         when(dataStore.containsName(anyString())).thenReturn(false);
 
@@ -176,7 +176,7 @@ public class ScriptConfigurationServiceTest {
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
                 .setLanguage(JAVASCRIPT)
-                .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION)
+                .setContext(POLICY_CONDITION)
                 .setCreatedBy("TestUser")
                 .setCreationDate(1422886484092l).build();
         ScriptConfiguration scNew = ScriptConfiguration.builder()
@@ -185,7 +185,7 @@ public class ScriptConfigurationServiceTest {
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
                 .setLanguage(JAVASCRIPT)
-                .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION).build();
+                .setContext(POLICY_CONDITION).build();
 
         when(dataStore.get(anyString())).thenReturn(scOld);
         when(dataStore.containsUuid(anyString())).thenReturn(true);
@@ -213,7 +213,7 @@ public class ScriptConfigurationServiceTest {
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
                 .setLanguage(JAVASCRIPT)
-                .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION).build();
+                .setContext(POLICY_CONDITION).build();
 
         when(dataStore.containsUuid(anyString())).thenReturn(false);
 
@@ -236,7 +236,7 @@ public class ScriptConfigurationServiceTest {
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
                 .setLanguage(JAVASCRIPT)
-                .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION)
+                .setContext(POLICY_CONDITION)
                 .setCreatedBy("TestUser")
                 .setCreationDate(1422886484092l).build();
         ScriptConfiguration scNew = ScriptConfiguration.builder()
@@ -245,7 +245,7 @@ public class ScriptConfigurationServiceTest {
                 .setDescription("This is a test script configuration")
                 .setScript("var a = 123;var b = 456;")
                 .setLanguage(JAVASCRIPT)
-                .setContext(AUTHORIZATION_ENTITLEMENT_CONDITION).build();
+                .setContext(POLICY_CONDITION).build();
 
         when(dataStore.get(anyString())).thenReturn(scOld);
         when(dataStore.containsUuid(anyString())).thenReturn(true);

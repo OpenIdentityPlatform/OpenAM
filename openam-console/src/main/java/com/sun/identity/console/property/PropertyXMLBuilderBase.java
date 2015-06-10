@@ -36,6 +36,7 @@ package com.sun.identity.console.property;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.base.model.AMAdminConstants;
+import com.sun.identity.console.service.model.SubConfigModel;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.DynamicAttributeValidator;
 import com.sun.identity.sm.SMSUtils;
@@ -547,13 +548,9 @@ public abstract class PropertyXMLBuilderBase
                     }
                 } else if (dropDown) {
                     xml.append(MessageFormat.format(COMPONENT_START_TAG, name, tagClassName));
-                    Map<String, String> choiceValues = getSortedChoiceValueMap(as);
+                    Map<String, String> choiceValues = getSortedChoiceValueMap(as, model);
                     for (Map.Entry<String, String> entry : choiceValues.entrySet()) {
-                        String displayName = entry.getValue();
-                        if ("label.default".equals(displayName)) {
-                            displayName =
-                                    com.sun.identity.shared.locale.Locale.getString(serviceBundle, displayName, debug);
-                        }
+                        String displayName = model.getLocalizedString(entry.getValue());
                         xml.append(MessageFormat.format(OPTION_TAG, escapeSpecialChars(displayName),
                                 escapeSpecialChars(entry.getKey())));
                     }
@@ -960,10 +957,14 @@ public abstract class PropertyXMLBuilderBase
         return sorted;
     }
 
-    private Map<String, String> getSortedChoiceValueMap(AttributeSchema as) {
+    private Map<String, String> getSortedChoiceValueMap(AttributeSchema as, AMModel model) {
+        Map<String, String> env = new HashMap<>();
+        if (model instanceof SubConfigModel) {
+            env.put(Constants.CONFIGURATION_NAME, ((SubConfigModel)model).getName());
+        }
+        env.put(Constants.ORGANIZATION_NAME, getCurrentRealm());
         @SuppressWarnings("unchecked")
-        Map<String, String> choiceValues = as.getChoiceValuesMap(
-                Collections.singletonMap(Constants.ORGANIZATION_NAME, getCurrentRealm()));
+        Map<String, String> choiceValues = as.getChoiceValuesMap(env);
         return CollectionUtils.sortMapByValue(choiceValues);
     }
         

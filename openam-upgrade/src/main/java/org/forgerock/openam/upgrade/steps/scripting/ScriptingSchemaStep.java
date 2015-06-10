@@ -17,18 +17,23 @@ package org.forgerock.openam.upgrade.steps.scripting;
 
 import static com.sun.identity.shared.datastruct.CollectionHelper.getMapAttr;
 import static org.forgerock.openam.scripting.ScriptConstants.*;
+import static org.forgerock.openam.scripting.ScriptConstants.GlobalScript.*;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHENTICATION_CLIENT_SIDE;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHENTICATION_SERVER_SIDE;
 import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
 
 import com.google.inject.Inject;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceNotFoundException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.openam.scripting.SupportedScriptingLanguage;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
@@ -44,6 +49,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * This upgrade step moves global script engine configurations from the Scripted Auth global settings
@@ -55,6 +61,7 @@ import java.util.Set;
 public class ScriptingSchemaStep extends AbstractUpgradeStep {
 
     private static final String AUTH_MODULE_SERVICE_NAME = "iPlanetAMAuthScriptedService";
+    private static final String DEVICE_ID_SERVICE_NAME = "iPlanetAMAuthDeviceIdMatchService";
     private static final String SCRIPTING_SERVICE_NAME = "ScriptingService";
     private static final String CLIENT_SIDE_SCRIPT = "iplanet-am-auth-scripted-client-script";
     private static final String SERVER_SIDE_SCRIPT = "iplanet-am-auth-scripted-server-script";
@@ -62,7 +69,7 @@ public class ScriptingSchemaStep extends AbstractUpgradeStep {
 
     private final Map<ScriptContext, Map<String, String>> globalSchemaKeys = new HashMap<>();
     private final Map<ScriptContext, Map<String, Set<String>>> contextEngineConfigurations = new HashMap<>();
-    private final Map<ScriptContext, Map<String, Set<String>>> contextScriptConfigurations = new HashMap<>();
+    private final Map<GlobalScript, Map<String, Set<String>>> globalScriptConfigurations = new HashMap<>();
 
     @Inject
     public ScriptingSchemaStep(PrivilegedAction<SSOToken> adminTokenAction,
@@ -84,20 +91,41 @@ public class ScriptingSchemaStep extends AbstractUpgradeStep {
     @Override
     public void initialize() throws UpgradeException {
         try {
-            ServiceSchemaManager schemaManager = new ServiceSchemaManager(AUTH_MODULE_SERVICE_NAME, getAdminToken());
-            ServiceSchema globalSchema = schemaManager.getGlobalSchema();
-            if (globalSchema == null || globalSchema.getAttributeDefaults().isEmpty()) {
-                DEBUG.message("No upgrade required for {}; no global schema found.", AUTH_MODULE_SERVICE_NAME);
-                return;
-            }
-            captureEngineConfiguration(globalSchema);
-            captureScriptConfiguration(schemaManager.getOrganizationSchema());
+            captureScriptedAuthModuleConfiguration();
+            captureDeviceIdMatchConfiguration();
         } catch (ServiceNotFoundException e) {
             DEBUG.message("Scripted auth modules not found. Nothing to upgrade", e);
         }catch (SMSException | SSOException e) {
-            DEBUG.error("An error occurred while trying to look for upgradable Scripted auth global settings", e);
-            throw new UpgradeException("Unable to retrieve Scripted auth global settings", e);
+            DEBUG.error("An error occurred while trying to look for upgradable global Scripting settings", e);
+            throw new UpgradeException("Unable to retrieve global Scripting settings", e);
         }
+    }
+
+    private void captureScriptedAuthModuleConfiguration() throws SSOException, SMSException {
+        ServiceSchemaManager schemaManager = new ServiceSchemaManager(AUTH_MODULE_SERVICE_NAME, getAdminToken());
+        ServiceSchema globalSchema = schemaManager.getGlobalSchema();
+        if (globalSchema == null || globalSchema.getAttributeDefaults().isEmpty()) {
+            DEBUG.message("No upgrade required for {}; no global schema found.", AUTH_MODULE_SERVICE_NAME);
+            return;
+        }
+        captureEngineConfiguration(globalSchema);
+        captureServerScriptConfiguration(schemaManager.getOrganizationSchema(),
+                AUTH_MODULE_SERVER_SIDE, AUTHENTICATION_SERVER_SIDE, AUTH_MODULE_SERVICE_NAME);
+        captureClientScriptConfiguration(schemaManager.getOrganizationSchema(),
+                AUTH_MODULE_CLIENT_SIDE, AUTHENTICATION_CLIENT_SIDE, AUTH_MODULE_SERVICE_NAME);
+    }
+
+    private void captureDeviceIdMatchConfiguration() throws SSOException, SMSException {
+        ServiceSchemaManager schemaManager = new ServiceSchemaManager(DEVICE_ID_SERVICE_NAME, getAdminToken());
+        ServiceSchema orgSchema = schemaManager.getOrganizationSchema();
+        if (orgSchema == null || orgSchema.getAttributeSchema(SERVER_SCRIPT_TYPE) == null) {
+            DEBUG.message("No upgrade required for {}; no script type found.", DEVICE_ID_SERVICE_NAME);
+            return;
+        }
+        captureServerScriptConfiguration(schemaManager.getOrganizationSchema(),
+                DEVICE_ID_MATCH_SERVER_SIDE, AUTHENTICATION_SERVER_SIDE, DEVICE_ID_SERVICE_NAME);
+        captureClientScriptConfiguration(schemaManager.getOrganizationSchema(),
+                DEVICE_ID_MATCH_CLIENT_SIDE, AUTHENTICATION_CLIENT_SIDE, DEVICE_ID_SERVICE_NAME);
     }
 
     private void captureEngineConfiguration(ServiceSchema globalSchema) {
@@ -113,36 +141,60 @@ public class ScriptingSchemaStep extends AbstractUpgradeStep {
         }
     }
 
-    private void captureScriptConfiguration(ServiceSchema organisationSchema) {
-        DEBUG.message("Capture org schema attributes for {}", AUTH_MODULE_SERVICE_NAME);
+    private void captureServerScriptConfiguration(ServiceSchema orgSchema, GlobalScript globalScript,
+                                                  ScriptContext context, String service) {
+        DEBUG.message("Capture default server script attributes for {}", service);
+        Map<String, Set<String>> attributes = new HashMap<>();
+        attributes.put(SCRIPT_NAME, Collections.singleton(globalScript.getDisplayName()));
+        attributes.put(SCRIPT_CONTEXT, Collections.singleton(context.name()));
+
         @SuppressWarnings("unchecked")
-        Map<String, Set<String>> orgAttributes = organisationSchema.getAttributeDefaults();
-
-        Map<String, Set<String>> scriptAttributes = new HashMap<>();
-        String clientScript = getMapAttr(orgAttributes, CLIENT_SIDE_SCRIPT);
-        if (StringUtils.isNotEmpty(clientScript)) {
-            DEBUG.message("Found default client side script for {}", AUTH_MODULE_SERVICE_NAME);
-            scriptAttributes.put(DEFAULT_SCRIPT, Collections.singleton(clientScript));
-            contextScriptConfigurations.put(ScriptContext.AUTHENTICATION_CLIENT_SIDE, scriptAttributes);
-        }
-
-        scriptAttributes = new HashMap<>();
+        Map<String, Set<String>> orgAttributes = orgSchema.getAttributeDefaults();
         String serverScript = getMapAttr(orgAttributes, SERVER_SIDE_SCRIPT);
         if (StringUtils.isNotEmpty(serverScript)) {
-            DEBUG.message("Found default server side script for {}", AUTH_MODULE_SERVICE_NAME);
-            scriptAttributes.put(DEFAULT_SCRIPT, Collections.singleton(serverScript));
+            DEBUG.message("Found default server side script for {}", service);
+            attributes.put(SCRIPT_TEXT, Collections.singleton(serverScript));
+        } else {
+            DEBUG.message("No default server side script found for {}", service);
+            attributes.put(SCRIPT_TEXT, Collections.singleton(""));
         }
+
         String scriptLanguage = getMapAttr(orgAttributes, SERVER_SCRIPT_TYPE);
         if (StringUtils.isBlank(scriptLanguage)) {
-            scriptLanguage = "JAVASCRIPT"; //set default to JS if no default provided as per scripting.xml schema
+            scriptLanguage = SupportedScriptingLanguage.JAVASCRIPT.name();
         }
-        scriptAttributes.put(DEFAULT_LANGUAGE, Collections.singleton(scriptLanguage.toUpperCase()));
-        contextScriptConfigurations.put(ScriptContext.AUTHENTICATION_SERVER_SIDE, scriptAttributes);
+        attributes.put(SCRIPT_LANGUAGE, Collections.singleton(scriptLanguage.toUpperCase()));
+        globalScriptConfigurations.put(globalScript, attributes);
+    }
+
+    private void captureClientScriptConfiguration(ServiceSchema orgSchema, GlobalScript globalScript,
+                                                  ScriptContext context, String service) {
+        DEBUG.message("Capture default client script attributes for {}", service);
+        @SuppressWarnings("unchecked")
+        Map<String, Set<String>> orgAttributes = orgSchema.getAttributeDefaults();
+        String clientScript = getMapAttr(orgAttributes, CLIENT_SIDE_SCRIPT);
+        if (StringUtils.isEmpty(clientScript) && AUTH_MODULE_CLIENT_SIDE.equals(globalScript)) {
+            return;
+        }
+
+        Map<String, Set<String>> attributes = new HashMap<>();
+        attributes.put(SCRIPT_NAME, Collections.singleton(globalScript.getDisplayName()));
+        attributes.put(SCRIPT_CONTEXT, Collections.singleton(context.name()));
+        if (StringUtils.isNotEmpty(clientScript)) {
+            DEBUG.message("Found default client side script for {}", service);
+            attributes.put(SCRIPT_TEXT, Collections.singleton(clientScript));
+        } else {
+            DEBUG.message("No default client side script found for {}", service);
+            attributes.put(SCRIPT_TEXT, Collections.singleton(""));
+        }
+
+        attributes.put(SCRIPT_LANGUAGE, Collections.singleton(SupportedScriptingLanguage.JAVASCRIPT.name()));
+        globalScriptConfigurations.put(globalScript, attributes);
     }
 
     @Override
     public boolean isApplicable() {
-        return !contextEngineConfigurations.isEmpty() || !contextScriptConfigurations.isEmpty();
+        return !contextEngineConfigurations.isEmpty() || !globalScriptConfigurations.isEmpty();
     }
 
     @Override
@@ -173,23 +225,51 @@ public class ScriptingSchemaStep extends AbstractUpgradeStep {
     }
 
     private void upgradeScriptConfiguration(ServiceConfig globalConfig) throws SMSException, SSOException {
-        for (Map.Entry<ScriptContext, Map<String, Set<String>>> entry : contextScriptConfigurations.entrySet()) {
-            String contextName = entry.getKey().name();
-            DEBUG.message("Upgrading script configuration for script context: {}", contextName);
-            UpgradeProgress.reportStart("upgrade.scripting.global.script.start", contextName);
-            ServiceConfig contextConfig = globalConfig.getSubConfig(contextName);
-            contextConfig.setAttributes(entry.getValue());
-            DEBUG.message("Saved script configuration: {}", entry.getValue().toString());
+        for (Map.Entry<GlobalScript, Map<String, Set<String>>> entry : globalScriptConfigurations.entrySet()) {
+            Map<String, Set<String>> attributes = entry.getValue();
+            updateMetaData(attributes);
+            String scriptName = getMapAttr(attributes, SCRIPT_NAME);
+            DEBUG.message("Upgrading default script to global script: {}", scriptName);
+            UpgradeProgress.reportStart("upgrade.scripting.global.script.start", scriptName);
+            GlobalScript globalScript = entry.getKey();
+            ServiceConfig scriptConfigs = globalConfig.getSubConfig("globalScripts");
+            ServiceConfig globalScriptConfig = scriptConfigs.getSubConfig(globalScript.getId());
+            if (AUTH_MODULE_CLIENT_SIDE.equals(globalScript)) {
+                attributes.put(SCRIPT_DESCRIPTION,
+                        Collections.singleton("Default global script created during upgrade."));
+                scriptConfigs.addSubConfig(UUID.randomUUID().toString(), "globalScript", 0, attributes);
+                DEBUG.message("Created script configuration: {}", attributes.toString());
+            } else if (globalScriptConfig == null) {
+                attributes.put(SCRIPT_DESCRIPTION,
+                        Collections.singleton("Default global script created during upgrade."));
+                scriptConfigs.addSubConfig(globalScript.getId(), "globalScript", 0, attributes);
+                DEBUG.message("Created script configuration: {}", attributes.toString());
+            } else {
+                globalScriptConfig.setAttributes(attributes);
+                DEBUG.message("Upgraded script configuration: {}", attributes.toString());
+            }
             UpgradeProgress.reportEnd("upgrade.success");
         }
+    }
+
+    private void updateMetaData(Map<String, Set<String>> attributes) {
+        long now = System.currentTimeMillis();
+        String principalName = SubjectUtils.getPrincipalId(getAdminSubject());
+
+        if (!attributes.containsKey(SCRIPT_CREATED_BY)) {
+            attributes.put(SCRIPT_CREATED_BY, Collections.singleton(principalName));
+            attributes.put(SCRIPT_CREATION_DATE, Collections.singleton(String.valueOf(now)));
+        }
+        attributes.put(SCRIPT_LAST_MODIFIED_BY, Collections.singleton(principalName));
+        attributes.put(SCRIPT_LAST_MODIFIED_DATE, Collections.singleton(String.valueOf(now)));
     }
 
     @Override
     public String getShortReport(String delimiter) {
         StringBuilder sb = new StringBuilder();
-        if (contextEngineConfigurations.size() > 0) {
+        if (globalScriptConfigurations.size() > 0) {
             sb.append(MessageFormat.format(BUNDLE.getString("upgrade.scripting.global.settings"),
-                    contextEngineConfigurations.size()));
+                    globalScriptConfigurations.size()));
             sb.append(delimiter);
         }
         return sb.toString();
@@ -204,6 +284,10 @@ public class ScriptingSchemaStep extends AbstractUpgradeStep {
         sb.append(INDENT);
         sb.append(MessageFormat.format(BUNDLE.getString("upgrade.scripting.global.context"),
                 AUTH_MODULE_SERVICE_NAME, SCRIPTING_SERVICE_NAME));
+        sb.append(delimiter);
+        sb.append(INDENT);
+        sb.append(MessageFormat.format(BUNDLE.getString("upgrade.scripting.global.context"),
+                DEVICE_ID_SERVICE_NAME, SCRIPTING_SERVICE_NAME));
         sb.append(delimiter);
         tags.put("%REPORT_DATA%", sb.toString());
         return tagSwapReport(tags, "upgrade.scripting.global.report");

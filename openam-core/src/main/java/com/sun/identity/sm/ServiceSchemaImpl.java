@@ -36,9 +36,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.ums.IUMSConstants;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -68,6 +66,8 @@ class ServiceSchemaImpl {
     String inheritance;
 
     String resourceName;
+
+    String hideConfigUI;
 
     // Attribute & sub-schema variables
     Set serviceAttributes;
@@ -124,6 +124,14 @@ class ServiceSchemaImpl {
      */
     String getResourceName() {
         return resourceName;
+    }
+
+    /**
+     * Should this service schema be hidden in the Configuration UI.
+     * @return True if it should be hidden.
+     */
+    boolean isHiddenInConfigUI() {
+        return "yes".equalsIgnoreCase(hideConfigUI);
     }
 
     /**
@@ -364,6 +372,7 @@ class ServiceSchemaImpl {
                 .getNodeAttributeValue(schemaNode, SMSUtils.VALIDATE);
         resourceName = XMLUtils
                 .getNodeAttributeValue(schemaNode, SMSUtils.RESOURCE_NAME);
+        hideConfigUI = XMLUtils.getNodeAttributeValue(schemaNode, SMSUtils.HIDE_CONFIG_UI);
 
         // Update sub-schema's, organization schema and attributes
         Set newServiceAttributes = new HashSet();

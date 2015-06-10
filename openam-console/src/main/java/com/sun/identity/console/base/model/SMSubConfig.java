@@ -41,6 +41,7 @@ public class SMSubConfig
     private String name;
     private String type;
     private String localizedName;
+    private boolean hidden;
 
     private SMSubConfig() {
     }
@@ -51,12 +52,15 @@ public class SMSubConfig
      * @param id ID of the sub configuration.
      * @param name Name of the sub configuration.
      * @param type Type of the sub configuration.
+     * @param localizedName The localized name of the sub configuration.
+     * @param hidden Whether or not the sub configuration should be displayed in the console.
      */
-    public SMSubConfig(String id, String name, String type, String localizedName) {
+    public SMSubConfig(String id, String name, String type, String localizedName, boolean hidden) {
         this.id = id;
         this.name = name;
         this.type = type;
         this.localizedName = localizedName;
+        this.hidden = hidden;
     }
 
     /**
@@ -67,7 +71,7 @@ public class SMSubConfig
      * @param type Type of the sub configuration.
      */
     public SMSubConfig(String id, String name, String type) {
-        this(id, name, type, null);
+        this(id, name, type, null, false);
     }
 
     /**
@@ -104,5 +108,13 @@ public class SMSubConfig
      */
     public String getLocalizedName() {
         return localizedName;
+    }
+
+    /**
+     * Whether or not the sub configuration should be displayed in the console.
+     * @return True if the sub configuration should be hidden.
+     */
+    public boolean isHidden() {
+        return hidden;
     }
 }

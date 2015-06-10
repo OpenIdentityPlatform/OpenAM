@@ -1344,4 +1344,9 @@ public interface Constants {
      * in OpenAM, for example, in the JATO framework
      */
     public static final String DESERIALISATION_CLASSES_WHITELIST = "openam.deserialisation.classes.whitelist";
+
+    /**
+     * Property used by the XML builder to retrieve a configuration specific name for an attribute schema.
+     */
+    public static final String CONFIGURATION_NAME = "configuration_name";
 }

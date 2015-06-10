@@ -20,7 +20,7 @@ import static com.sun.identity.shared.datastruct.CollectionHelper.getBooleanMapA
 import static com.sun.identity.shared.datastruct.CollectionHelper.getMapAttr;
 import static org.forgerock.openam.scripting.ScriptConstants.*;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHENTICATION_SERVER_SIDE;
-import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHORIZATION_ENTITLEMENT_CONDITION;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.POLICY_CONDITION;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
@@ -84,7 +84,7 @@ public class ScriptEngineConfigurator implements ServiceListener {
                 }
                 logger.info("Registered service config listener: %s", listenerId);
 
-                updateConfig(AUTHORIZATION_ENTITLEMENT_CONDITION);
+                updateConfig(POLICY_CONDITION);
                 updateConfig(AUTHENTICATION_SERVER_SIDE);
                 initialised = true;
 

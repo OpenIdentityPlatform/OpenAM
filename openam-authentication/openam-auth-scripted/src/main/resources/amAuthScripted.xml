@@ -14,7 +14,8 @@
  *
  * Copyright 2014-2015 ForgeRock AS.
 -->
-<!DOCTYPE ServicesConfiguration PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN" "jar://com/sun/identity/sm/sms.dtd">
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN" "jar://com/sun/identity/sm/sms.dtd">
 
 <ServicesConfiguration>
     <Service name="iPlanetAMAuthScriptedService" version="1.0">
@@ -48,9 +49,16 @@
                                  i18nKey="a102"
                                  resourceName="clientScript">
                     <ChoiceValues>
-                        <ChoiceValuesClassName
-                            className="org.forgerock.openam.authentication.modules.scripted.ClientScriptChoiceValues" />
+                        <ChoiceValuesClassName className="org.forgerock.openam.scripting.service.ScriptChoiceValues">
+                            <AttributeValuePair>
+                                <Attribute name="ContextId"/>
+                                <Value>AUTHENTICATION_CLIENT_SIDE</Value>
+                            </AttributeValuePair>
+                        </ChoiceValuesClassName>
                     </ChoiceValues>
+                    <DefaultValues>
+                        <Value>&NoScriptDefined;</Value>
+                    </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-scripted-server-script"
                                  type="single_choice"
@@ -59,9 +67,16 @@
                                  i18nKey="a104"
                                  resourceName="serverScript">
                     <ChoiceValues>
-                        <ChoiceValuesClassName
-                            className="org.forgerock.openam.authentication.modules.scripted.ServerScriptChoiceValues" />
+                        <ChoiceValuesClassName className="org.forgerock.openam.scripting.service.ScriptChoiceValues">
+                            <AttributeValuePair>
+                                <Attribute name="ContextId"/>
+                                <Value>AUTHENTICATION_SERVER_SIDE</Value>
+                            </AttributeValuePair>
+                        </ChoiceValuesClassName>
                     </ChoiceValues>
+                    <DefaultValues>
+                        <Value>&GlobalServerSideAuthModuleScriptId;</Value>
+                    </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-scripted-auth-level"
                                  type="single"
@@ -74,13 +89,6 @@
                 </AttributeSchema>
 
                 <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
-                    <AttributeSchema name="RequiredValueValidator"
-                                     type="validator"
-                                     syntax="string">
-                        <DefaultValues>
-                            <Value>com.sun.identity.sm.RequiredValueValidator</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-scripted-client-script-enabled"
                                      type="single"
                                      syntax="boolean"
@@ -101,26 +109,33 @@
                                      i18nKey="a102"
                                      resourceName="clientScript">
                         <ChoiceValues>
-                            <ChoiceValuesClassName
-                                className="org.forgerock.openam.authentication.modules.scripted.ClientScriptChoiceValues" />
+                            <ChoiceValuesClassName className="org.forgerock.openam.scripting.service.ScriptChoiceValues">
+                                <AttributeValuePair>
+                                    <Attribute name="ContextId"/>
+                                    <Value>AUTHENTICATION_CLIENT_SIDE</Value>
+                                </AttributeValuePair>
+                            </ChoiceValuesClassName>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>[Default]</Value>
+                            <Value>&NoScriptDefined;</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-scripted-server-script"
                                      type="single_choice"
                                      uitype="dropdown"
                                      syntax="string"
-                                     validator="RequiredValueValidator"
                                      i18nKey="a104"
                                      resourceName="serverScript">
                         <ChoiceValues>
-                            <ChoiceValuesClassName
-                                className="org.forgerock.openam.authentication.modules.scripted.ServerScriptChoiceValues" />
+                            <ChoiceValuesClassName className="org.forgerock.openam.scripting.service.ScriptChoiceValues">
+                                <AttributeValuePair>
+                                    <Attribute name="ContextId"/>
+                                    <Value>AUTHENTICATION_SERVER_SIDE</Value>
+                                </AttributeValuePair>
+                            </ChoiceValuesClassName>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>[Default]</Value>
+                            <Value>&GlobalServerSideAuthModuleScriptId;</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-scripted-auth-level"

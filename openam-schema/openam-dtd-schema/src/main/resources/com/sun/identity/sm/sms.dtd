@@ -112,6 +112,7 @@ Unique Declaration name for DOCTYPE tag:
         maintainPriority ( yes | no ) "no"
         validate ( yes | no ) "yes"
         supportsApplicableOrganization ( yes | no ) "no"
+        hideConfigUI ( yes | no ) "no"
         i18nFileName CDATA #IMPLIED
         resourceName CDATA #IMPLIED
         %i18nIndex;
@@ -278,3 +279,14 @@ Unique Declaration name for DOCTYPE tag:
 
 <!-- Value defines the value within an attribute-value pair. -->
 <!ELEMENT Value (#PCDATA) >
+
+<!--
+ Predefined global script configuration IDs. The global script configurations are defined in the scripting service and
+ accessible in all realms. The entities are referenced from the scripting service and other services that define
+ default global scripts.
+-->
+<!ENTITY GlobalEntitlementConditionScriptId "9de3eb62-f131-4fac-a294-7bd170fd4acb">
+<!ENTITY GlobalServerSideAuthModuleScriptId "7e3d7067-d50f-4674-8c76-a3e13a810c33">
+<!ENTITY GlobalServerSideDeviceIdMatchScriptId "703dab1a-1921-4981-98dd-b8e5349d8548">
+<!ENTITY GlobalClientSideDeviceIdMatchScriptId "157298c0-7d31-4059-a95b-eeb08473b7e5">
+<!ENTITY NoScriptDefined "[Empty]">

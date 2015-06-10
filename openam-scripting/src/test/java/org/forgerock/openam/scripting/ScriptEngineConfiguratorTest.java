@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.openam.scripting.ScriptConstants.ENGINE_CONFIGURATION;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHENTICATION_SERVER_SIDE;
-import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHORIZATION_ENTITLEMENT_CONDITION;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.POLICY_CONDITION;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
@@ -148,7 +148,7 @@ public class ScriptEngineConfiguratorTest {
     @Test
     public void shouldUpdateEngineWithAuthorisationEntitlementConditionConfig() {
         // given
-        ScriptContext context = AUTHORIZATION_ENTITLEMENT_CONDITION;
+        ScriptContext context = POLICY_CONDITION;
         String serviceComponent = "/" + context.name() + "/" + ENGINE_CONFIGURATION;
         doCallRealMethod().when(mockEngineConfigurator)
                 .globalConfigChanged(anyString(), anyString(), anyString(), anyString(), anyInt());
@@ -166,7 +166,7 @@ public class ScriptEngineConfiguratorTest {
     @Test
     public void shouldNotUpdateEngineWhenEngineConfigDidNotChange() {
         // given
-        ScriptContext context = AUTHORIZATION_ENTITLEMENT_CONDITION;
+        ScriptContext context = POLICY_CONDITION;
         String serviceComponent = "/" + context.name() + "/SomeOtherConfig";
         doCallRealMethod().when(mockEngineConfigurator)
                 .globalConfigChanged(anyString(), anyString(), anyString(), anyString(), anyInt());

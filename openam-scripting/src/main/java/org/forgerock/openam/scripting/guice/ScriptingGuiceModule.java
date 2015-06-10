@@ -17,7 +17,7 @@
 package org.forgerock.openam.scripting.guice;
 
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHENTICATION_SERVER_SIDE;
-import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHORIZATION_ENTITLEMENT_CONDITION;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.POLICY_CONDITION;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
@@ -84,7 +84,7 @@ public class ScriptingGuiceModule extends AbstractModule {
                 .toInstance(new StandardScriptEngineManager());
 
         bind(StandardScriptEngineManager.class)
-                .annotatedWith(Names.named(AUTHORIZATION_ENTITLEMENT_CONDITION.name()))
+                .annotatedWith(Names.named(POLICY_CONDITION.name()))
                 .toInstance(new StandardScriptEngineManager());
 
         bind(RestletHttpClient.class)
@@ -128,9 +128,9 @@ public class ScriptingGuiceModule extends AbstractModule {
     @Provides
     @Singleton
     @Inject
-    @Named("AUTHORIZATION_ENTITLEMENT_CONDITION")
+    @Named("POLICY_CONDITION")
     ScriptEvaluator getAuthorizationEntitlementConditionScriptEvaluator(
-            @Named("AUTHORIZATION_ENTITLEMENT_CONDITION") StandardScriptEngineManager scriptEngineManager,
+            @Named("POLICY_CONDITION") StandardScriptEngineManager scriptEngineManager,
             ExecutorServiceFactory executorServiceFactory, ScriptEngineConfigurator configurator) {
 
         return createEvaluator(scriptEngineManager, executorServiceFactory, configurator);

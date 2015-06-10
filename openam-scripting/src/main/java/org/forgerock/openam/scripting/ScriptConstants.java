@@ -45,6 +45,7 @@ public final class ScriptConstants {
     public static final String SCRIPT_CONFIGURATION = "scriptConfiguration";
     public static final String SCRIPT_CONFIGURATIONS = "scriptConfigurations";
     public static final String EMPTY = "";
+    public static final String EMPTY_SCRIPT_SELECTION = "[Empty]";
 
     public static final String SCRIPT_TIMEOUT = "serverTimeout";
     public static final String THREAD_POOL_CORE_SIZE = "coreThreads";
@@ -55,16 +56,11 @@ public final class ScriptConstants {
     public static final String BLACK_LIST = "blackList";
     public static final String USE_SECURITY_MANAGER = "useSecurityManager";
     public static final String ENGINE_CONFIGURATION = "EngineConfiguration";
-    public static final String DEFAULT_LANGUAGE = "defaultLanguage";
-    public static final String DEFAULT_SCRIPT = "defaultScript";
 
     public static final int DEFAULT_CORE_THREADS = 10;
     public static final int DEFAULT_MAX_THREADS = 10;
     public static final int DEFAULT_QUEUE_SIZE = 10;
     public static final long DEFAULT_IDLE_TIMEOUT_SECONDS = 60l; // Seconds
-
-    public static final String SCRIPT_ERROR_MESSAGE = "validation-error-message";
-    public static final String SCRIPT_ERROR_DETAIL = "validation-error-detail";
 
     public static final String LOGGER_NAME = "Scripting";
 
@@ -74,7 +70,42 @@ public final class ScriptConstants {
     public static enum ScriptContext {
         AUTHENTICATION_SERVER_SIDE,
         AUTHENTICATION_CLIENT_SIDE,
-        AUTHORIZATION_ENTITLEMENT_CONDITION
+        POLICY_CONDITION
+    }
+
+    /**
+     * Predefined global script configuration IDs. The global script configurations are defined in the
+     * scripting service and accessible in all realms.
+     */
+    public static enum GlobalScript {
+        AUTH_MODULE_SERVER_SIDE("Scripted Module - Server Side", "7e3d7067-d50f-4674-8c76-a3e13a810c33"),
+        AUTH_MODULE_CLIENT_SIDE("Scripted Module - Client Side", ""),
+        DEVICE_ID_MATCH_SERVER_SIDE("Device Id (Match) - Server Side", "703dab1a-1921-4981-98dd-b8e5349d8548"),
+        DEVICE_ID_MATCH_CLIENT_SIDE("Device Id (Match) - Client Side", "157298c0-7d31-4059-a95b-eeb08473b7e5");
+
+        private final String displayName;
+        private final String id;
+
+        private GlobalScript(String displayName, String id) {
+            this.displayName = displayName;
+            this.id = id;
+        }
+
+        /**
+         * Get the display name of the global script.
+         * @return The display name of the script.
+         */
+        public String getDisplayName() {
+            return displayName;
+        }
+
+        /**
+         * Get the Id of the global script.
+         * @return The Id of the global script.
+         */
+        public String getId() {
+            return id;
+        }
     }
 
     /**

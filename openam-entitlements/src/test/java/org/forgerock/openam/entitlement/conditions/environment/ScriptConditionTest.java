@@ -107,7 +107,7 @@ public class ScriptConditionTest extends GuiceTestCase {
         binder
                 .bind(ScriptEvaluator.class)
                 .annotatedWith(Names
-                        .named(ScriptConstants.ScriptContext.AUTHORIZATION_ENTITLEMENT_CONDITION.name()))
+                        .named(ScriptConstants.ScriptContext.POLICY_CONDITION.name()))
                 .toInstance(scriptEvaluator);
 
         binder
@@ -168,7 +168,7 @@ public class ScriptConditionTest extends GuiceTestCase {
                 .builder()
                 .setId("123-456-789")
                 .setName("test-script")
-                .setContext(ScriptContext.AUTHORIZATION_ENTITLEMENT_CONDITION)
+                .setContext(ScriptContext.POLICY_CONDITION)
                 .setLanguage(SupportedScriptingLanguage.JAVASCRIPT)
                 .setScript("some-script-here")
                 .build();

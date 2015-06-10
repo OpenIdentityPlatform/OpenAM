@@ -158,4 +158,10 @@ public interface SubConfigModel
      * @return the sub configuration's display name.
      */
     String getDisplayName();
+
+    /**
+     * Get the name for the sub configuration represented by this model.
+     * @return the sub configuration's name.
+     */
+    String getName();
 }
