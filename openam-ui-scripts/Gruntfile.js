@@ -35,6 +35,11 @@ module.exports = function (grunt) {
                         dest: 'target/www'
                     },
                     {
+                        cwd: 'target/codemirror-4.10',
+                        src: ['lib/codemirror.js', 'mode/javascript/javascript.js', 'mode/groovy/groovy.js'],
+                        dest: 'target/www/libs/codemirror'
+                    },
+                    {
                         cwd: 'test/libs',
                         src: ['**'],
                         dest: '../../target/www/libs'

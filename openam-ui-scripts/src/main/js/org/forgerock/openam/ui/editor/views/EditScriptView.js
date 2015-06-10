@@ -14,7 +14,7 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global define, $, _*/
+/*global define, $, _, window, FileReader*/
 
 define("org/forgerock/openam/ui/editor/views/EditScriptView", [
     "bootstrap-dialog",
@@ -38,6 +38,9 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
         template: "templates/editor/views/EditScriptTemplate.html",
         data: {},
         events: {
+            'click #upload': 'uploadScript',
+            'keyup #upload': 'uploadScript',
+            'change [name=upload]': 'readUploadedFile',
             'click #validateScript': 'validateScript',
             'keyup #validateScript': 'validateScript',
             'click #changeContext': 'openDialog',
@@ -117,6 +120,8 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
             }
 
             this.parentRender(function () {
+                this.showUploadButton();
+
                 if (this.data.newScript) {
                     this.openDialog();
                 } else {
@@ -227,6 +232,24 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
             });
         },
 
+        uploadScript: function (e) {
+            this.$el.find("[name=upload]").trigger("click");
+        },
+
+        readUploadedFile: function (e) {
+            var self = this,
+                file = e.target.files[0],
+                reader = new FileReader();
+
+            reader.onload = (function (file) {
+                return function (e) {
+                    self.scriptEditor.setValue(e.target.result);
+                };
+            }(file));
+
+            reader.readAsText(file);
+        },
+
         openDialog: function (e) {
             var self = this;
 
@@ -273,7 +296,10 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
                     if (self.data.entity.context !== newContext) {
                         self.data.entity.context = newContext;
                         self.changeContext();
-                        self.parentRender(self.initScriptEditor);
+                        self.parentRender(function () {
+                            self.showUploadButton();
+                            self.initScriptEditor();
+                        });
                     }
                     dialog.close();
                 }
@@ -310,6 +336,15 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
         changeLanguage: function (e) {
             this.data.entity.language = e.target.value;
             this.scriptEditor.setOption('mode', this.data.entity.language.toLowerCase());
+        },
+
+        showUploadButton: function () {
+            // Show the Upload button for modern browsers only. Documented feature.
+            // File: Chrome 13; Firefox (Gecko) 3.0 (1.9) (non standard), 7 (7) (standard); Internet Explorer 10.0; Opera 11.5; Safari (WebKit) 6.0
+            // FileReader: Firefox (Gecko) 3.6 (1.9.2);	Chrome 7; Internet Explorer 10; Opera 12.02; Safari 6.0.2
+            if (window.File && window.FileReader && window.FileList) {
+                this.$el.find('#upload').show();
+            }
         }
     });
 

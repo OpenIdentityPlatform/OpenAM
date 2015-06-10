@@ -38,12 +38,16 @@ define([
                 $('#qunit-fixture').append(EditScriptView.$el);
 
                 EditScriptView.render([], function () {
-                    QUnit.ok(EditScriptView.$el.find('input[name="cancel"]').length, "Cancel button is available");
+                    QUnit.ok(EditScriptView.$el.find('#changeContext').length, "Change context button is available");
                     QUnit.ok(EditScriptView.$el.find('input[name="save"]').length, "Save button is available");
 
                     QUnit.ok(EditScriptView.$el.find('#name').val() === '', "Name is empty");
                     QUnit.ok(EditScriptView.$el.find('#script').val() === '', "Script code is empty");
                     QUnit.ok(EditScriptView.$el.find('#validation').empty(), 'Validation block is empty');
+
+                    if (window.File && window.FileReader && window.FileList) {
+                        QUnit.ok(!!EditScriptView.$el.find('#upload')[0].style.display, "Upload button is shown");
+                    }
 
                     start();
                 });
