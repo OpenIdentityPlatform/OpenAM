@@ -26,8 +26,9 @@
 
 define("org/forgerock/openam/ui/editor/util/BackgridUtils", [
     "backgrid",
+    "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/Router"
-], function (Backgrid, Router) {
+], function (Backgrid, Messages, Router) {
     var obj = {};
 
     // todo: candidate for commons, have not changed it, using UMA version
@@ -131,6 +132,12 @@ define("org/forgerock/openam/ui/editor/util/BackgridUtils", [
         options.data = params.join('&');
         options.beforeSend = function (xhr) {
             xhr.setRequestHeader('Accept-API-Version', 'protocol=1.0,resource=1.0');
+        };
+        options.error = function (response) {
+            Messages.messages.addMessage({
+                type: 'error',
+                message: response.responseJSON.message
+            });
         };
         return Backbone.sync(method, model, options);
     };

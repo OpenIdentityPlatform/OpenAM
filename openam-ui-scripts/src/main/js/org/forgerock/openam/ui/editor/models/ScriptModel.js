@@ -18,8 +18,9 @@
 define("org/forgerock/openam/ui/editor/models/ScriptModel", [
     "backbone",
     "org/forgerock/openam/ui/common/util/URLHelper",
+    "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/util/Base64"
-], function (Backbone, URLHelper, Base64) {
+], function (Backbone, URLHelper, Messages, Base64) {
     return Backbone.Model.extend({
         idAttribute: '_id',
         urlRoot: URLHelper.substitute("__api__/scripts"),
@@ -37,10 +38,6 @@ define("org/forgerock/openam/ui/editor/models/ScriptModel", [
             if (attrs.name.trim() === '') {
                 return 'scriptErrorNoName';
             }
-
-            if (attrs.script.trim() === '') {
-                return 'scriptErrorNoScript';
-            }
         },
 
         parse: function (resp, options) {
@@ -53,6 +50,13 @@ define("org/forgerock/openam/ui/editor/models/ScriptModel", [
         sync: function (method, model, options) {
             options.beforeSend = function (xhr) {
                 xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=1.0");
+            };
+
+            options.error = function (response) {
+                Messages.messages.addMessage({
+                    type: 'error',
+                    message: response.responseJSON.message
+                });
             };
 
             method = method.toLowerCase();

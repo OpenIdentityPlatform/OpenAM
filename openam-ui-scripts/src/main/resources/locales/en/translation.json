@@ -43,8 +43,7 @@
                     "noScript": "Please upload existing script or create a new one"
                 },
                 "error": {
-                    "noName": "Name is required",
-                    "noScript": "Script is required"
+                    "noName": "Name is required"
                 }
             }
         },

@@ -37,10 +37,6 @@ define("config/messages/ScriptsMessages", [], function () {
         "scriptErrorNoName": {
             msg: "config.messages.ScriptsMessages.error.noName",
             type: "error"
-        },
-        "scriptErrorNoScript": {
-            msg: "config.messages.ScriptsMessages.error.noScript",
-            type: "error"
         }
     };
 });
