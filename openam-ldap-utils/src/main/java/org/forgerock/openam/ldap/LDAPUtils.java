@@ -11,11 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.ldap;
 
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
+
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
+
 import org.forgerock.i18n.LocalizedIllegalArgumentException;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
@@ -66,6 +70,7 @@ public class LDAPUtils {
     private static final String LDAP_SCOPE_SUB = "SCOPE_SUB";
     private static final Map<String, SearchScope> scopes;
     private static final Debug DEBUG = Debug.getInstance("LDAPUtils");
+    private static final int DEFAULT_HEARTBEAT_TIMEOUT = 3;
 
     static {
         Map<String, SearchScope> mappings = new HashMap<String, SearchScope>(3);
@@ -209,6 +214,9 @@ public class LDAPUtils {
             String heartBeatTimeUnit,
             LDAPOptions ldapOptions) {
         Boolean ssl = ldapurl.isSSL();
+        int heartBeatTimeout 
+            = SystemPropertiesManager.getAsInt(Constants.LDAP_HEARTBEAT_TIMEOUT, DEFAULT_HEARTBEAT_TIMEOUT);
+        
         if (ssl != null && ssl.booleanValue()) {
             try {
                 //Creating a defensive copy of ldapOptions to handle the case when a mixture of SSL/non-SSL connections
@@ -221,7 +229,11 @@ public class LDAPUtils {
         ConnectionFactory cf = new LDAPConnectionFactory(ldapurl.getHost(), ldapurl.getPort(), ldapOptions);
         if (heartBeatInterval > 0) {
             TimeUnit unit = TimeUnit.valueOf(heartBeatTimeUnit.toUpperCase());
-            cf = Connections.newHeartBeatConnectionFactory(cf, unit.toSeconds(heartBeatInterval), TimeUnit.SECONDS);
+            
+            cf = Connections.newHeartBeatConnectionFactory(cf, 
+                     unit.toSeconds(heartBeatInterval), //interval
+                     unit.toSeconds(heartBeatTimeout), //timeout 
+                     TimeUnit.SECONDS);
         }
         if (username != null) {
             cf = Connections.newAuthenticatedConnectionFactory(cf, Requests.newSimpleBindRequest(username, password));
