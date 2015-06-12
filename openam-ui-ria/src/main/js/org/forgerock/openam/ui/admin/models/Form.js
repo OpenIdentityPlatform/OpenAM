@@ -38,19 +38,20 @@ define('org/forgerock/openam/ui/admin/models/Form', [
 
         $(element).find('.help-block').hide().each(function () {
             var group = $(this).parent(),
-                button = $('<button class="btn btn-default info-button" type="button"><i class="fa fa-info-circle"></i></button>');
+                element = $('<a class="btn btn-default info-button" tabindex="0" data-toggle="popover" data-trigger="focus"><i class="fa fa-info-circle"></i></a>');
 
-            $(group).append(button);
+            $(group).append(element);
 
-            button.popover({
+            element.popover({
                 container: '#content',
                 html: true,
                 placement: 'auto top',
-                trigger: 'focus',
                 content: this.innerHTML,
                 title: group.find("label:first-of-type").text()
             });
-
+            element.click(function (event) {
+                event.preventDefault();
+            });
         });
 
         this.reset();
