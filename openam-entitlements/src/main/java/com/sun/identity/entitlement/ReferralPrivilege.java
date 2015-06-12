@@ -23,10 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: ReferralPrivilege.java,v 1.7 2010/01/08 23:59:31 veiming Exp $
- */
-
-/*
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ *
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
@@ -486,9 +484,12 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
                             // this realm and clear the public credentials.
                             // this needs to be revisited later if public
                             // credentials contains realm-independent credentials
-                            Subject subjectSubRealm = new Subject(false,
-                                subject.getPrincipals(), new HashSet(),
-                                subject.getPrivateCredentials());
+                            Subject subjectSubRealm = null;
+                            if (subject != null) {
+                                subjectSubRealm = new Subject(false,
+                                    subject.getPrincipals(), new HashSet(),
+                                    subject.getPrivateCredentials());
+                            }
 
                             // Fix for OPENAM-790
                             // Ensure that the Entitlement environment contains the correct 
