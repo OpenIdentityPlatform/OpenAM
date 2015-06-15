@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2011-2014 ForgeRock AS.
+ * Copyright 2011-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -29,6 +29,7 @@ import com.sun.identity.sm.AttributeSchemaImpl;
 import java.util.Set;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.UpgradeUtils;
 
 /**
  * Used to upgrade the iPlanetAMAuthService.
@@ -51,6 +52,7 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
     private final static String ATTR = "iplanet-am-auth-authenticators";
     // other attributes
     private final static String XUI = "openam-xui-interface-enabled";
+    private final static String XUI_REVERSE_PROXY_SUPPORT = "openam-xui-reverseproxy-support";
     private static final String GOTO_DOMAINS = "iplanet-am-auth-valid-goto-domains";
 
     public AuthServiceHelper() {
@@ -99,13 +101,13 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
     public AttributeSchemaImpl addNewAttribute(Set<AttributeSchemaImpl> existingAttrs, AttributeSchemaImpl newAttr)
             throws UpgradeException {
 
-        if (!newAttr.getName().equals(XUI)) {
-            return newAttr;
+        if (newAttr.getName().equals(XUI)) {
+            // XUI should not be default for upgraded systems
+            newAttr = updateDefaultValues(newAttr, asSet("false"));
+        } else if (newAttr.getName().equals(XUI_REVERSE_PROXY_SUPPORT) && UpgradeUtils.isCurrentVersionEqualTo(1200)) {
+            newAttr = updateDefaultValues(newAttr, asSet("false"));
         }
 
-        // XUI should not be default for upgraded systems
-        newAttr = updateDefaultValues(newAttr, asSet("false"));
         return newAttr;
     }
-
 }
