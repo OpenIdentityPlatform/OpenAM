@@ -26,9 +26,6 @@
 
     $Id: amAuth.xml,v 1.16 2009/11/25 12:06:32 manish_rustagi Exp $
 
--->
-
-<!--
     Portions Copyrighted 2011-2015 ForgeRock AS.
 -->
 
@@ -134,6 +131,14 @@
                         <Value>true</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="openam-xui-reverseproxy-support"
+                                 type="single"
+                                 syntax="boolean"
+                                 i18nKey="a157">
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
             </Global>
             <Organization>
                 <AttributeSchema name="iplanet-am-auth-allowed-modules"
@@ -201,7 +206,7 @@
                 <AttributeSchema name="openam-auth-stateless-sessions"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a157"
+                                 i18nKey="a158"
                                  resourceName="statelessSessionsEnabled">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
@@ -478,7 +483,7 @@
                                  syntax="boolean"
                                  validator="RequiredValueValidator"
                                  resourceName="twoFactorRequired"
-                                 i18nKey="a158">
+                                 i18nKey="a159">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>

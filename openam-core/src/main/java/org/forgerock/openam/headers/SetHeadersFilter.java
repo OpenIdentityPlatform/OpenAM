@@ -13,13 +13,15 @@
  *
  * Copyright 2015 ForgeRock AS.
  */
-
 package org.forgerock.openam.headers;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -31,24 +33,37 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * SetHeadersFilter is a servlet Filter for setting headers in static files such as HTML. This filter adds headers keys
- * and values to a response and is configurable from the OpenAM web descriptor file {@code web.xml}
+ * SetHeadersFilter is a servlet Filter for setting arbitrary headers for web resources. This filter adds headers keys
+ * and values to a response and is configurable from the web descriptor file {@code web.xml}.
  */
 public class SetHeadersFilter implements Filter {
 
-    private Map<String, String> headerKeyValues = new HashMap<String, String>();
+    private static final String EXCLUDES = "excludes";
+    private final Map<String, String> headerKeyValues = new HashMap<String, String>();
+    private final Set<String> excludes = new HashSet<String>();
+    private int contextPathLength = 0;
 
     /**
-     * Populate the map containing the headers keys and values based on the {@link FilterConfig}. {@inheritDoc}
+     * Initializes the filter based on the {@link FilterConfig}.
+     * The "excludes" init parameter is used to prevent the filter from setting the headers when accessing certain URIs.
+     * Any other init parameter specified in web.xml will be handled as a headername-headervalue pair that should be
+     * added to the HttpServletResponse.
+     *
+     * {@inheritDoc}
      */
     @Override
     public void init(FilterConfig config) throws ServletException {
-
         if (config != null) {
+            contextPathLength = config.getServletContext().getContextPath().length();
             Enumeration<String> initParams = config.getInitParameterNames();
             while (initParams.hasMoreElements()) {
-                String headerKey = initParams.nextElement();
-                headerKeyValues.put(headerKey, config.getInitParameter(headerKey));
+                String key = initParams.nextElement();
+                String value = config.getInitParameter(key);
+                if (EXCLUDES.equals(key)) {
+                    excludes.addAll(Arrays.asList(value.split(",")));
+                } else {
+                    headerKeyValues.put(key, value);
+                }
             }
         }
     }
@@ -61,13 +76,16 @@ public class SetHeadersFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
-
+        HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
-        HttpServletRequest httpServleRequest = (HttpServletRequest) servletRequest;
-        for (Map.Entry<String, String> entry : headerKeyValues.entrySet()) {
-            httpServletResponse.addHeader(entry.getKey(), entry.getValue());
+
+        if (!excludes.contains(httpServletRequest.getRequestURI().substring(contextPathLength))) {
+            for (Map.Entry<String, String> entry : headerKeyValues.entrySet()) {
+                httpServletResponse.addHeader(entry.getKey(), entry.getValue());
+            }
         }
-        filterChain.doFilter(httpServleRequest, httpServletResponse);
+
+        filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
 
     /**

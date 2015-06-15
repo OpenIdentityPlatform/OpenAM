@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -1355,4 +1355,9 @@ public interface Constants {
      * The heartbeat timeout after which a connection will be marked as failed
      */
     public static final String LDAP_HEARTBEAT_TIMEOUT = "org.forgerock.openam.ldap.heartbeat.timeout";
+
+    /**
+     * Property that defines whether XUI's Reverse Proxy support should be enabled or not.
+     */
+    public static final String XUI_REVERSE_PROXY_SUPPORT = "org.forgerock.openam.xui.reverseproxy.support";
 }

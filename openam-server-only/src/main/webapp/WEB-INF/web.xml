@@ -48,6 +48,26 @@
         <filter-name>XUIFilter</filter-name>
         <filter-class>org.forgerock.openam.xui.XUIFilter</filter-class>
     </filter>
+    <filter>
+        <filter-name>CacheForFiveMinutes</filter-name>
+        <filter-class>org.forgerock.openam.headers.SetHeadersFilter</filter-class>
+        <init-param>
+            <param-name>Cache-Control</param-name>
+            <param-value>public, max-age=300</param-value>
+        </init-param>
+    </filter>
+    <filter>
+        <filter-name>CacheForAMonth</filter-name>
+        <filter-class>org.forgerock.openam.headers.SetHeadersFilter</filter-class>
+        <init-param>
+            <param-name>Cache-Control</param-name>
+            <param-value>public, max-age=2592000</param-value>
+        </init-param>
+        <init-param>
+            <param-name>excludes</param-name>
+            <param-value>/policyEditor/,/policyEditor/index.html,/scripts/,/scripts/index.html,/XUI/,/XUI/index.html</param-value>
+        </init-param>
+    </filter>
     <!-- To configure CORS Support, please see the documentation and use the following lines as a template.
     <filter>
         <filter-name>CORSFilter</filter-name>
@@ -165,6 +185,30 @@
     <filter-mapping>
         <filter-name>ResponseValidationFilter</filter-name>
         <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>CacheForFiveMinutes</filter-name>
+        <url-pattern>/policyEditor/index.html</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>CacheForFiveMinutes</filter-name>
+        <url-pattern>/scripts/index.html</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>CacheForFiveMinutes</filter-name>
+        <url-pattern>/XUI/index.html</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>CacheForAMonth</filter-name>
+        <url-pattern>/policyEditor/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>CacheForAMonth</filter-name>
+        <url-pattern>/scripts/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>CacheForAMonth</filter-name>
+        <url-pattern>/XUI/*</url-pattern>
     </filter-mapping>
     <!--
     <filter-mapping>

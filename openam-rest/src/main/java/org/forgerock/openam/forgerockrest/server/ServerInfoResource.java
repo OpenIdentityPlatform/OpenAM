@@ -144,9 +144,13 @@ public class ServerInfoResource extends RealmAwareResource {
             result.put("referralsEnabled", String.valueOf(PolicyConfig.isReferralsEnabled()));
             result.put("zeroPageLogin", AuthUtils.getZeroPageLoginConfig(realm));
 
-            String hostName = URI.create(context.asContext(HttpContext.class).getPath()).getHost();
+            String hostName = URI.create(httpContext.getPath()).getHost();
 
-            result.put("FQDN", FQDNUtils.getInstance().getFullyQualifiedHostName(hostName));
+            String fqdn = FQDNUtils.getInstance().getFullyQualifiedHostName(hostName);
+            if (fqdn == null && !SystemProperties.getAsBoolean(Constants.XUI_REVERSE_PROXY_SUPPORT)) {
+                fqdn = hostName;
+            }
+            result.put("FQDN", fqdn);
 
             if (debug.messageEnabled()) {
                 debug.message("ServerInfoResource.getAllServerInfo ::" +
