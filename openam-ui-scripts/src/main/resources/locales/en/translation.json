@@ -39,11 +39,9 @@
                 "scriptCreated": "Script created successfully",
                 "scriptUpdated": "Script updated successfully",
                 "scriptDeleted": "Script deleted successfully",
-                "validation": {
-                    "noScript": "Please upload existing script or create a new one"
-                },
                 "error": {
-                    "noName": "Name is required"
+                    "noName": "Name is required",
+                    "noLanguage": "Language is required"
                 }
             }
         },

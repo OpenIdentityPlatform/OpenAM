@@ -38,6 +38,10 @@ define("org/forgerock/openam/ui/editor/models/ScriptModel", [
             if (attrs.name.trim() === '') {
                 return 'scriptErrorNoName';
             }
+
+            if (attrs.language === '') {
+                return 'scriptErrorNoLanguage';
+            }
         },
 
         parse: function (resp, options) {

@@ -30,12 +30,12 @@ define("config/messages/ScriptsMessages", [], function () {
             msg: "config.messages.ScriptsMessages.scriptDeleted",
             type: "info"
         },
-        "validationNoScript": {
-            msg: "config.messages.ScriptsMessages.validation.noScript",
-            type: "info"
-        },
         "scriptErrorNoName": {
             msg: "config.messages.ScriptsMessages.error.noName",
+            type: "error"
+        },
+        "scriptErrorNoLanguage": {
+            msg: "config.messages.ScriptsMessages.error.noLanguage",
             type: "error"
         }
     };

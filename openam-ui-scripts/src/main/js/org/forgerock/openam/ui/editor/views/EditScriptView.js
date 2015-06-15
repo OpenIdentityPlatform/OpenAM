@@ -28,9 +28,11 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/editor/models/ScriptModel",
     "org/forgerock/openam/ui/editor/delegates/ScriptsDelegate"
-], function (BootstrapDialog, CodeMirror, Groovy, Javascript, AbstractView, EventManager, Base64, Constants, UIUtils, Script, ScriptsDelegate) {
+], function (BootstrapDialog, CodeMirror, Groovy, Javascript, AbstractView, EventManager, Base64, Constants, UIUtils,
+             Script, ScriptsDelegate) {
 
     var EditScriptView = AbstractView.extend({
+
         initialize: function (options) {
             this.model = null;
         },
@@ -49,10 +51,6 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
             'keyup input[name=save]': 'submitForm',
             'change input[name=language]': 'changeLanguage',
             'submit form': 'submitForm'
-        },
-
-        onModelError: function (model, response) {
-            console.error('Unrecoverable load failure Script. ' + response.status + ' ' + response.statusText);
         },
 
         onModelSync: function (model, response) {
@@ -104,7 +102,6 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
             } else {
                 self.renderScript();
             }
-
         },
 
         renderScript: function () {
@@ -195,7 +192,6 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
                 this.stopListening(this.model);
                 this.model = new Script({_id: uuid});
                 this.listenTo(this.model, 'sync', this.onModelSync);
-                this.listenTo(this.model, 'error', this.onModelError);
                 this.model.fetch();
             } else if (!uuid) {
                 // create new script, sync is not needed
@@ -217,23 +213,19 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
                 script,
                 self = this;
 
-            if (scriptText.trim() === '') {
-                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "validationNoScript");
-                return;
-            }
-
             script = {
                 script: Base64.encodeUTF8(scriptText),
                 language: language.val()
             };
 
             ScriptsDelegate.validateScript(script).done(function (result) {
-                self.$el.find('#validation').html(UIUtils.fillTemplateWithData("templates/editor/views/ScriptValidationTemplate.html", result));
+                self.$el.find('#validation').html(UIUtils.fillTemplateWithData(
+                    'templates/editor/views/ScriptValidationTemplate.html', result));
             });
         },
 
         uploadScript: function (e) {
-            this.$el.find("[name=upload]").trigger("click");
+            this.$el.find('[name=upload]').trigger('click');
         },
 
         readUploadedFile: function (e) {
@@ -273,8 +265,8 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
                     closable: !self.data.newScript,
                     message: $('<div></div>'),
                     onshow: function (dialog) {
-                        this.message.append(UIUtils.fillTemplateWithData('templates/editor/views/ChangeContextTemplate.html', self.data));
-                        dialog.$modalContent.find('[name=changeContext]:checked');
+                        this.message.append(UIUtils.fillTemplateWithData(
+                            'templates/editor/views/ChangeContextTemplate.html', self.data));
                     }
                 };
 
@@ -295,10 +287,11 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
                     var newContext = dialog.$modalContent.find('[name=changeContext]:checked').val();
                     if (self.data.entity.context !== newContext) {
                         self.data.entity.context = newContext;
-                        self.changeContext();
-                        self.parentRender(function () {
-                            self.showUploadButton();
-                            self.initScriptEditor();
+                        self.changeContext().done(function () {
+                            self.parentRender(function () {
+                                self.showUploadButton();
+                                self.initScriptEditor();
+                            });
                         });
                     }
                     dialog.close();
@@ -315,12 +308,27 @@ define("org/forgerock/openam/ui/editor/views/EditScriptView", [
             var self = this,
                 selectedContext = _.findWhere(this.data.contexts, function (context) {
                     return context._id === self.data.entity.context;
-                });
+                }),
+                defaultScript,
+                promise = $.Deferred();
 
             this.data.languages = selectedContext.languages;
 
-            this.data.entity.script = Base64.decodeUTF8(selectedContext.defaultScript);
-            this.data.entity.language = selectedContext.defaultLanguage;
+            if (selectedContext.defaultScript === '[Empty]') {
+                this.data.entity.script = '';
+                this.data.entity.language = '';
+                promise.resolve();
+            } else {
+                defaultScript = new Script({_id: selectedContext.defaultScript});
+                this.listenTo(defaultScript, 'sync', function (model, response) {
+                    self.data.entity.script = model.attributes.script;
+                    self.data.entity.language = model.attributes.language;
+                    promise.resolve();
+                });
+                defaultScript.fetch();
+            }
+
+            return promise;
         },
 
         initScriptEditor: function () {

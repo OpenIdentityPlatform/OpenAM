@@ -16,42 +16,39 @@
 
 /*global _, define*/
 define('org/forgerock/openam/ui/editor/delegates/ScriptsDelegate', [
+    "org/forgerock/commons/ui/common/components/Messages",
     'org/forgerock/commons/ui/common/main/AbstractDelegate',
     'org/forgerock/commons/ui/common/main/Configuration',
     'org/forgerock/commons/ui/common/util/Constants',
     'org/forgerock/openam/ui/common/util/RealmHelper'
-], function (AbstractDelegate, Configuration, Constants, RealmHelper) {
+], function (Messages, AbstractDelegate, Configuration, Constants, RealmHelper) {
     var obj = new AbstractDelegate(Constants.host + '/' + Constants.context + '/json');
 
-    obj.ERROR_HANDLERS = {
-        "Bad Request": { status: "400" },
-        "Not found": { status: "404" },
-        "Gone": { status: "410" },
-        "Conflict": { status: "409" },
-        "Internal Server Error": { status: "500" },
-        "Service Unavailable": { status: "503" }
-    };
+    function getLocalizedResponse (response) {
+        Messages.messages.addMessage({
+            type: 'error',
+            message: JSON.parse(response.responseText).message
+        });
+    }
 
     obj.validateScript = function (data) {
         return obj.serviceCall({
             url: RealmHelper.decorateURLWithOverrideRealm('/scripts/?_action=validate'),
             type: 'POST',
             data: JSON.stringify(data),
-            errorsHandlers: obj.ERROR_HANDLERS
+            error: getLocalizedResponse
         });
     };
 
     obj.getAllContexts = function () {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm('/global-config/services/scripting/contexts?_queryFilter=true'),
-            errorsHandlers: obj.ERROR_HANDLERS
+            url: RealmHelper.decorateURLWithOverrideRealm('/global-config/services/scripting/contexts?_queryFilter=true')
         });
     };
 
     obj.getDefaultGlobalContext = function () {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm('/global-config/services/scripting'),
-            errorsHandlers: obj.ERROR_HANDLERS
+            url: RealmHelper.decorateURLWithOverrideRealm('/global-config/services/scripting')
         });
     };
 
