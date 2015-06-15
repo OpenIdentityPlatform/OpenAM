@@ -35,12 +35,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
         },
         render: function (args, callback) {
             var self = this;
-            SMSDelegate.RealmAuthenticationModule.getMock(args[1])
+            SMSDelegate.RealmAuthenticationModules.getModule(args[1])
             .done(function (data) {
                 self.data.formData = data;
                 self.parentRender(function () {
                     self.$el.find('ul.nav a:first').tab('show');
-                    self.$el.find('.console-tabs .nav-tabs').tabdrop();
+                    self.$el.find('.tab-menu .nav-tabs').tabdrop();
 
                     if (callback) {
                         callback();
@@ -48,12 +48,13 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
                 });
             })
             .fail(function () {
-                // TODO: Add failure condition
+                //TODO: Add failure condition
+                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "notFoundError");
             });
         },
 
         save: function (event) {
-            var promise = SMSDelegate.RealmAuthenticationModule.save(this.data.form.data());
+            var promise = SMSDelegate.RealmAuthenticationModules.saveModule(this.data.form.data());
             FormHelper.bindSavePromiseToElement(promise, event.target);
         },
         revert: function () {

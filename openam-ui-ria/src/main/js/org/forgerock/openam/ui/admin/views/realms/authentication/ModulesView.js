@@ -42,54 +42,66 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
         addModule: function(e) {
             e.preventDefault();
             var self = this;
-
-            UIUtils.fillTemplateWithData("templates/admin/views/realms/authentication/modules/AddModuleTemplate.html", self.data, function(html) {
-                BootstrapDialog.show({
-                    title: $.t("console.authentication.modules.addModuleDialogTitle"),
-                    message: $(html),
-                    buttons: [{
-                        id: "nextButton",
-                        label: $.t("common.form.next"),
-                        cssClass: "btn-primary",
-                        action: function(dialog) {
-                            if (self.addModuleDialogValidation(dialog)) {
-                                var moduleName = dialog.getModalBody().find('#newModuleName').val();
-                                SMSDelegate.RealmAuthenticationModule.hasModuleName(moduleName)
-                                .done(function(result) {
-                                    if (result) {
-                                        dialog.close();
-                                        Router.routeTo(Router.configuration.routes.EditModuleView, {
-                                            args: [encodeURIComponent(self.data.realmName), encodeURIComponent(moduleName)],
-                                            trigger: true
-                                        });
-                                    } else {
-                                        MessageManager.messages.addMessage({
-                                            message: $.t("console.authentication.modules.addModuleDialogError"),
-                                            type: "error"
-                                        });
-                                    }
-                                  }
-                                ).fail(function(error) {
-                                  // TODO: Add failure condition
-                                });
+            SMSDelegate.RealmAuthenticationModules.getModuleTypes()
+            .done(function(result) {
+                self.data.moduleTypes = result;
+                UIUtils.fillTemplateWithData("templates/admin/views/realms/authentication/modules/AddModuleTemplate.html", self.data, function(html) {
+                    BootstrapDialog.show({
+                        title: $.t("console.authentication.modules.addModuleDialogTitle"),
+                        message: $(html),
+                        buttons: [{
+                            id: "nextButton",
+                            label: $.t("common.form.next"),
+                            cssClass: "btn-primary",
+                            action: function(dialog) {
+                                if (self.addModuleDialogValidation(dialog)) {
+                                    var moduleName = dialog.getModalBody().find('#newModuleName').val(),
+                                        moduleType = dialog.getModalBody().find('#newModuleType').val();
+                                    SMSDelegate.RealmAuthenticationModules.hasModuleName(moduleName)
+                                    .done(function(result) {
+                                        if (result) {
+                                          SMSDelegate.RealmAuthenticationModules.saveModule({
+                                              _id: moduleName,
+                                              type : moduleType
+                                          })
+                                          .done(function() {
+                                              dialog.close();
+                                              Router.routeTo(Router.configuration.routes.EditModuleView, {
+                                                  args: [encodeURIComponent(self.data.realmName), encodeURIComponent(moduleName)],
+                                                  trigger: true
+                                              });
+                                          }).
+                                          fail(function(error) {
+                                            // TODO: Add failure condition
+                                          });
+                                        } else {
+                                            MessageManager.messages.addMessage({
+                                                message: $.t("console.authentication.modules.addModuleDialogError"),
+                                                type: "error"
+                                            });
+                                        }
+                                      }
+                                    ).fail(function(error) {
+                                      // TODO: Add failure condition
+                                    });
+                                }
                             }
+                        },{
+                            label: $.t("common.form.cancel"),
+                            action: function(dialog) {
+                                dialog.close();
+                            }
+                        }],
+                        onshow: function(dialog) {
+                            dialog.getButton('nextButton').disable();
+                            dialog.$modalBody.find('#newModuleType').selectize();
+                            self.enableOrDisableNextButton(dialog);
+                        },
+                        onshown: function(dialog) {
                         }
-                    },{
-                        label: $.t("common.form.cancel"),
-                        action: function(dialog) {
-                            dialog.close();
-                        }
-                    }],
-                    onshow: function(dialog) {
-                        dialog.getButton('nextButton').disable();
-                        dialog.$modalBody.find('#newModuleType').selectize();
-                        self.enableOrDisableNextButton(dialog);
-                    },
-                    onshown: function(dialog) {
-                    }
+                    });
                 });
             });
-
         },
         addModuleDialogValidation: function(dialog) {
             var nameValid = dialog.$modalBody.find('#newModuleName').val().length > 0,
@@ -131,7 +143,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
             var self = this,
                 moduleName = $(event.currentTarget).attr('data-module-name');
 
-            SMSDelegate.RealmAuthenticationModule.remove(moduleName)
+            SMSDelegate.RealmAuthenticationModules.removeModule(moduleName)
             .done(function(data) {
                 self.renderModulesTab();
             })
@@ -145,7 +157,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
                     return $(element).attr('data-module-name');
                 }),
                 promises = moduleNames.map(function(name) {
-                    return SMSDelegate.RealmAuthenticationModule.remove(name);
+                    return SMSDelegate.RealmAuthenticationModules.removeModule(name);
                 });
 
             $.when(promises)
@@ -160,7 +172,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
             var self = this;
             this.data.realmName = (args) ? args[0] : " ";
 
-            SMSDelegate.RealmAuthenticationModules.get()
+            SMSDelegate.RealmAuthenticationModules.getModules()
             .done(function(data) {
                 self.data.formData = data.values.result;
                 self.$el.find('[data-toggle="tooltip"]').tooltip();

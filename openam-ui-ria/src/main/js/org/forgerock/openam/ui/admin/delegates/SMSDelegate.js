@@ -106,7 +106,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegate", [
     };
 
     obj.RealmAuthenticationModules = {
-        get: function () {
+        getModules: function () {
             var promise = obj.serviceCall({
                     url: "realm-config/authentication/modules?_queryFilter=true"
                 });
@@ -117,50 +117,24 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegate", [
                 };
             });
         },
-        //mock data, should be deleted after server endpoint will be created
-        getMock: function() {
-          var
-          promise = $.Deferred(),
-          valuesData = {
-            values: {
-              result: [
-                {_id: 'My Datastore', type: 'Datastore'},
-                {_id: 'Feders', type: 'Federation'},
-                {_id: 'One Time Password', type: 'HOTP'}
-              ]
-            }
-          };
-          promise.resolve(valuesData);
-          return $.when(promise);
-        }
-    };
+        getModuleTypes: function() {
+            var promise = obj.serviceCall({
+                    url: "realm-config/authentication/modules/types?_queryFilter=true"
+                });
 
-    obj.RealmAuthenticationChain = {
-        remove: function (name) {
-            return obj.serviceCall({
-                url: 'realm-config/authentication/chains/' + name,
-                type: 'DELETE'
-            });
-        }
-    };
-
-    obj.RealmAuthenticationModule = {
-        get: function (name) {
-            return obj.serviceCall({
-                url: 'realm-config/authentication/modules/' + name
+            return $.when(promise).then(function(data) {
+                return _.sortBy(data.result,'name');
             });
         },
-        //mock data, should be deleted after server endpoint will be created
-        getMock: function (name) {
-          var
-              promise = $.Deferred(),
-              data = {
-                name: name
-              };
-          promise.resolve(data);
-          return $.when(promise);
+        getModule: function (name) {
+            return obj.serviceCall({
+                url: 'realm-config/authentication/modules/' + name,
+                errorsHandlers: {
+                  "Not Found": { status: "404"}
+                }
+            });
         },
-        remove: function (name) {
+        removeModule: function (name) {
             return obj.serviceCall({
                 url: 'realm-config/authentication/modules/' + name,
                 type: 'DELETE'
@@ -169,12 +143,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegate", [
         hasModuleName: function(name) {
             var
                 promise = $.Deferred(),
-                request = obj.serviceCall({
-                    url: 'realm-config/authentication/modules/' + name,
-                    errorsHandlers: {
-                      "Not Found": { status: "404"}
-                    }
-                });
+                request = this.getModule(name);
 
             request
             .done(function() {
@@ -185,11 +154,20 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegate", [
             });
             return promise;
         },
-        save: function (name, data) {
+        saveModule: function (data) {
             return obj.serviceCall({
-                url: 'realm-config/authentication/modules/' + name,
+                url: 'realm-config/authentication/modules/',
                 type: "PUT",
                 data: JSON.stringify(data)
+            });
+        }
+    };
+
+    obj.RealmAuthenticationChain = {
+        remove: function (name) {
+            return obj.serviceCall({
+                url: 'realm-config/authentication/chains/' + name,
+                type: 'DELETE'
             });
         }
     };
