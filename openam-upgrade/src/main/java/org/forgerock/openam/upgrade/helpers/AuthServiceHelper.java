@@ -30,6 +30,7 @@ import java.util.Set;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeUtils;
+import org.forgerock.openam.upgrade.VersionUtils;
 
 /**
  * Used to upgrade the iPlanetAMAuthService.
@@ -104,7 +105,7 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
         if (newAttr.getName().equals(XUI)) {
             // XUI should not be default for upgraded systems
             newAttr = updateDefaultValues(newAttr, asSet("false"));
-        } else if (newAttr.getName().equals(XUI_REVERSE_PROXY_SUPPORT) && UpgradeUtils.isCurrentVersionEqualTo(1200)) {
+        } else if (newAttr.getName().equals(XUI_REVERSE_PROXY_SUPPORT) && VersionUtils.isCurrentVersionEqualTo(1200)) {
             newAttr = updateDefaultValues(newAttr, asSet("false"));
         }
 
