@@ -8,7 +8,7 @@
                 "icon": "favicon.ico",
                 "settings": {
                     "logo": {
-                        "src": "images/logo.png",
+                        "src": "images/logo.png?v=${version}",
                         "title": "ForgeRock",
                         "alt": "ForgeRock",
                         "height": "80px",
@@ -16,7 +16,7 @@
                     },
                     "lessVars": {
                         "background-color": "#eee",
-                        "background-image": "url('../images/box-bg.png')",
+                        "background-image": "url('../images/box-bg.png?v=${version}')",
                         "background-repeat": "no-repeat",
                         "background-position": "950px -100px",
                         "footer-background-color": "rgba(238, 238, 238, 0.7)",

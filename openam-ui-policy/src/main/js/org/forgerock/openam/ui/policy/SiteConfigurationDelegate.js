@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define, _ */
+/*global require, define, _ */
 
 define("org/forgerock/openam/ui/policy/SiteConfigurationDelegate", [
     "org/forgerock/commons/ui/common/util/Constants",
@@ -31,7 +31,7 @@ define("org/forgerock/openam/ui/policy/SiteConfigurationDelegate", [
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/main/AbstractDelegate"
 
-], function(constants, conf, eventManager, uiUtils, AbstractDelegate) {
+], function(Constants, conf, eventManager, uiUtils, AbstractDelegate) {
     var obj = new AbstractDelegate('');
     
     obj.getConfiguration = function(successCallback, errorCallback) {
@@ -44,7 +44,7 @@ define("org/forgerock/openam/ui/policy/SiteConfigurationDelegate", [
             conf.globalData.auth.realm = undefined;
         }
 
-        obj.serviceCall({url: "configuration.json", 
+        obj.serviceCall({url: require.toUrl('configuration.json'),
             success: function (data) {
                 if (successCallback) {
                     successCallback(data.configuration);
@@ -59,7 +59,7 @@ define("org/forgerock/openam/ui/policy/SiteConfigurationDelegate", [
         });
 
         obj.serviceCall({
-            serviceUrl: constants.host + "/" + constants.context + "/json",
+            serviceUrl: Constants.host + "/" + Constants.context + "/json",
             url: "/serverinfo/*",
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         }).done(function (info) {

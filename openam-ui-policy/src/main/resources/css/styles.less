@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2014-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -21,19 +21,22 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
+
+@openam-version: "${version}";
+
 /* css basic configuration */
-@import "common/config.less";
+@import url("common/config.less?v=@{openam-version}");
 /* helpers, functions, columns */
-@import "common/helpers.less";
+@import url("common/helpers.less?v=@{openam-version}");
 /* header, footer, menu, dialogs, messages, popups, basic buttons & links */
-@import "common/layout.less";
+@import url("common/layout.less?v=@{openam-version}");
 /* specific css used in specific modules */
-@import "common/forms.less";
+@import url("common/forms.less?v=@{openam-version}");
 
 /* policies */
 @import "policy/jquery-clockpicker.0.0.7.min.css";
-@import "selectize/selectize.less";
+@import url("selectize/selectize.less?v=@{openam-version}");
 /* fonts */
-@import "policy/font-icomoon.less";
+@import url("policy/font-icomoon.less?v=@{openam-version}");
 /* rules */
-@import "policy/policyEditor.less";
+@import url("policy/policyEditor.less?v=@{openam-version}");

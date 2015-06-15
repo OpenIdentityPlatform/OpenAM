@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2013 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2011-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define, $, form2js, _ , console*/
+/*global require, define, $, form2js, _ , console*/
 
 define("org/forgerock/openam/ui/user/oauth2/TokensView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
@@ -111,7 +111,7 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
                     }
                 ],
                 "oLanguage": {
-                    "sUrl": "locales/" + i18nManager.language + "/translation.json"
+                    "sUrl": require.toUrl("locales/" + i18nManager.language + "/translation.json")
                 },
                 "sDom": 'l<"deleteSelected">f<"clear">rt<"clear">ip<"clear">',
                 "sPaginationType": "full_numbers",

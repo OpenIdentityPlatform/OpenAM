@@ -17,7 +17,13 @@
     <div id="dialog-background"></div>
     <div id="dialogs"></div>
 
-    <script data-main="main" src="libs/requirejs-2.1.14-min.js"></script>
+    <script type="text/javascript">
+        var require = {
+            urlArgs : "v=${version}", // jshint ignore:line
+            deps : ['main']
+        };
+    </script>
+    <script src="libs/requirejs-2.1.14-min.js"></script>
 
 </body>
 </html>

@@ -2,7 +2,7 @@
 <!--
   ~ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   ~
-  ~ Copyright (c) 2014 ForgeRock AS. All Rights Reserved
+  ~ Copyright (c) 2014-2015 ForgeRock AS. All Rights Reserved
   ~
   ~ The contents of this file are subject to the terms
   ~ of the Common Development and Distribution License
@@ -34,12 +34,12 @@
     </formats>
     <fileSets>
         <fileSet>
-            <directory>${basedir}/src/main/js</directory>
-            <outputDirectory>.</outputDirectory>
+            <directory>${project.build.outputDirectory}</directory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>${basedir}/src/main/resources</directory>
-            <outputDirectory>.</outputDirectory>
+            <directory>${project.build.directory}/dependency</directory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
     </fileSets>
     <dependencySets>

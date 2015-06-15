@@ -8,8 +8,31 @@
 module.exports = function(grunt) {
 
     grunt.initConfig({
+        buildNumber: process.env.OPENAM_VERSION,
         destination: process.env.OPENAM_HOME,
         forgerockui: process.env.FORGEROCK_UI_SRC,
+        replace: {
+            html: {
+                src: ['src/main/resources/index.html'],
+                dest: '<%= destination %>/XUI/index.html',
+                replacements: [{
+                    from: '${version}',
+                    to: function () {
+                        return '<%= buildNumber %>';
+                    }
+                }]
+            },
+            style: {
+                src: ['src/main/resources/css/styles.less'],
+                dest: '<%= destination %>/XUI/css/styles.less',
+                replacements: [{
+                    from: '${version}',
+                    to: function () {
+                        return '<%= buildNumber %>';
+                    }
+                }]
+            }
+        },
         sync: {
             XUI: {
                 files: [{
@@ -54,14 +77,15 @@ module.exports = function(grunt) {
                     'src/main/js/**',
                     'src/main/resources/**'
                 ],
-                tasks: [ 'sync' ]
+                tasks: [ 'sync', 'replace' ]
             }
         }
     });
 
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-sync');
+    grunt.loadNpmTasks('grunt-text-replace');
 
-    grunt.registerTask('default', ['sync', 'watch']);
+    grunt.registerTask('default', ['sync', 'replace', 'watch']);
 
 };
