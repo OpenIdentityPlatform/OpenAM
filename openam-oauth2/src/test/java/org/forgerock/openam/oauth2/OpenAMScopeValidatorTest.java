@@ -50,7 +50,7 @@ public class OpenAMScopeValidatorTest {
         OAuth2ProviderSettingsFactory factory = mock(OAuth2ProviderSettingsFactory.class);
         when(factory.get(request)).thenReturn(providerSettings);
         ScriptEvaluator scriptEvaluator = mock(ScriptEvaluator.class);
-        this.validator = new OpenAMScopeValidator(null, null, factory, null, scriptEvaluator, clientRegistrationStore);
+        validator = new OpenAMScopeValidator(null, null, factory, null, scriptEvaluator, clientRegistrationStore, null);
     }
 
     @Test

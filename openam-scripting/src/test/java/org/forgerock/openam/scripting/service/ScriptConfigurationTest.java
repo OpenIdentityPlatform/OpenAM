@@ -45,7 +45,6 @@ public class ScriptConfigurationTest {
 
         //when
         ScriptConfiguration scriptConfiguration = builder.build();
-        System.out.println(scriptConfiguration.getId());
 
         //then
         assertEquals(scriptConfiguration.getName(), "MyJavaScript");

@@ -20,6 +20,7 @@ import static com.sun.identity.shared.datastruct.CollectionHelper.getBooleanMapA
 import static com.sun.identity.shared.datastruct.CollectionHelper.getMapAttr;
 import static org.forgerock.openam.scripting.ScriptConstants.*;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHENTICATION_SERVER_SIDE;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.OIDC_CLAIMS;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.POLICY_CONDITION;
 
 import com.google.inject.Key;
@@ -86,12 +87,10 @@ public class ScriptEngineConfigurator implements ServiceListener {
 
                 updateConfig(POLICY_CONDITION);
                 updateConfig(AUTHENTICATION_SERVER_SIDE);
+                updateConfig(OIDC_CLAIMS);
                 initialised = true;
 
-            } catch (SMSException e) {
-                logger.error("Unable to create ServiceConfigManager", e);
-                throw new IllegalStateException(e);
-            } catch (SSOException e) {
+            } catch (SSOException | SMSException e) {
                 logger.error("Unable to create ServiceConfigManager", e);
                 throw new IllegalStateException(e);
             }

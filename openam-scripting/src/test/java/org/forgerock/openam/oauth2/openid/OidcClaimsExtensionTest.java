@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.script.Bindings;
-import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
 import org.codehaus.groovy.jsr223.GroovyScriptEngineFactory;
@@ -39,7 +38,6 @@ import org.forgerock.openam.scripting.StandardScriptEngineManager;
 import org.forgerock.openam.scripting.StandardScriptEvaluator;
 import org.forgerock.openam.scripting.SupportedScriptingLanguage;
 import org.forgerock.openam.utils.IOUtils;
-import org.slf4j.Logger;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

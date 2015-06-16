@@ -16,15 +16,18 @@
 
 package org.forgerock.openam.oauth2;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.TokenEndpoint.*;
-import static org.forgerock.oauth2.core.Utils.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.OPENID;
+import static org.forgerock.oauth2.core.OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS;
+import static org.forgerock.oauth2.core.Utils.splitScope;
+import static org.forgerock.openam.scripting.ScriptConstants.EMPTY_SCRIPT_SELECTION;
+import static org.forgerock.openam.scripting.ScriptConstants.OIDC_CLAIMS_NAME;
 
 import com.iplanet.am.sdk.AMHashMap;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoException;
@@ -36,25 +39,6 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
-import java.security.AccessController;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.script.Bindings;
-import javax.script.ScriptException;
-import javax.script.SimpleBindings;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.OAuth2Constants;
@@ -68,10 +52,11 @@ import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
-import org.forgerock.openam.oauth2.scripting.ScriptedConfigurator;
 import org.forgerock.openam.scripting.ScriptEvaluator;
 import org.forgerock.openam.scripting.ScriptObject;
 import org.forgerock.openam.scripting.SupportedScriptingLanguage;
+import org.forgerock.openam.scripting.service.ScriptConfiguration;
+import org.forgerock.openam.scripting.service.ScriptingServiceFactory;
 import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.openam.utils.OpenAMSettingsImpl;
 import org.forgerock.openam.utils.StringUtils;
@@ -84,6 +69,27 @@ import org.json.JSONObject;
 import org.restlet.Request;
 import org.restlet.ext.servlet.ServletUtils;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.script.Bindings;
+import javax.script.ScriptException;
+import javax.script.SimpleBindings;
+import javax.security.auth.Subject;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import java.security.AccessController;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Provided as extension points to allow the OpenAM OAuth2 provider to customise the requested scope of authorize,
  * access token and refresh token requests and to allow the OAuth2 provider to return additional data from these
@@ -94,8 +100,6 @@ import org.restlet.ext.servlet.ServletUtils;
 @Singleton
 public class OpenAMScopeValidator implements ScopeValidator {
 
-    private static final String JAVA_SCRIPT_LABEL = "JavaScript";
-    private static final String GROOVY_LABEL = "Groovy";
     private static final String MULTI_ATTRIBUTE_SEPARATOR = ",";
     private static final String DEFAULT_TIMESTAMP = "0";
     private static final DateFormat TIMESTAMP_DATE_FORMAT = new SimpleDateFormat("yyyyMMddhhmmss");
@@ -106,6 +110,9 @@ public class OpenAMScopeValidator implements ScopeValidator {
     private final OpenAMSettings openAMSettings;
     private final ScriptEvaluator scriptEvaluator;
     private final OpenIdConnectClientRegistrationStore clientRegistrationStore;
+    private final ScriptingServiceFactory<ScriptConfiguration> scriptingServiceFactory;
+
+    private Subject adminSubject;
 
     /**
      * Constructs a new OpenAMScopeValidator.
@@ -116,18 +123,21 @@ public class OpenAMScopeValidator implements ScopeValidator {
      * @param openAMSettings An instance of the OpenAMSettings.
      * @param scriptEvaluator An instance of the OIDC Claims ScriptEvaluator.
      * @param clientRegistrationStore An instance of the OpenIdConnectClientRegistrationStore.
+     * @param scriptingServiceFactory An instance of the ScriptingServiceFactory.
      */
     @Inject
     public OpenAMScopeValidator(IdentityManager identityManager, OpenIDTokenIssuer openIDTokenIssuer,
             OAuth2ProviderSettingsFactory providerSettingsFactory, OpenAMSettings openAMSettings,
-            @Named(ScriptedConfigurator.SCRIPT_EVALUATOR_NAME) ScriptEvaluator scriptEvaluator,
-            OpenIdConnectClientRegistrationStore clientRegistrationStore) {
+            @Named(OIDC_CLAIMS_NAME) ScriptEvaluator scriptEvaluator,
+            OpenIdConnectClientRegistrationStore clientRegistrationStore,
+            ScriptingServiceFactory<ScriptConfiguration> scriptingServiceFactory) {
         this.identityManager = identityManager;
         this.openIDTokenIssuer = openIDTokenIssuer;
         this.providerSettingsFactory = providerSettingsFactory;
         this.openAMSettings = openAMSettings;
         this.scriptEvaluator = scriptEvaluator;
         this.clientRegistrationStore = clientRegistrationStore;
+        this.scriptingServiceFactory = scriptingServiceFactory;
     }
 
     /**
@@ -351,27 +361,26 @@ public class OpenAMScopeValidator implements ScopeValidator {
         OpenAMSettingsImpl settings = new OpenAMSettingsImpl(OAuth2Constants.OAuth2ProviderService.NAME,
                 OAuth2Constants.OAuth2ProviderService.VERSION);
         try {
-            String rawScript = settings.getStringSetting(realm,
+            String scriptId = settings.getStringSetting(realm,
                     OAuth2Constants.OAuth2ProviderService.OIDC_CLAIMS_EXTENSION_SCRIPT);
-            SupportedScriptingLanguage scriptType = getScriptType(settings.getStringSetting(realm,
-                    OAuth2Constants.OAuth2ProviderService.OIDC_CLAIMS_EXTENSION_SCRIPT_TYPE));
-            return new ScriptObject("oidc-claims-script", rawScript, scriptType, null);
-        } catch (SMSException e) {
-            logger.message("Error running OIDC claims script", e);
-            throw new ServerException("Error running OIDC claims script: " + e.getMessage());
-        } catch (SSOException e) {
+            if (EMPTY_SCRIPT_SELECTION.equals(scriptId)) {
+                return new ScriptObject("oidc-claims-script", "", SupportedScriptingLanguage.JAVASCRIPT);
+            }
+            ScriptConfiguration config = getScriptConfiguration(realm, scriptId);
+            return new ScriptObject(config.getName(), config.getScript(), config.getLanguage());
+        } catch (org.forgerock.openam.scripting.ScriptException | SSOException | SMSException e) {
             logger.message("Error running OIDC claims script", e);
             throw new ServerException("Error running OIDC claims script: " + e.getMessage());
         }
     }
 
-    private SupportedScriptingLanguage getScriptType(String scriptType) {
-        if (JAVA_SCRIPT_LABEL.equals(scriptType)) {
-            return SupportedScriptingLanguage.JAVASCRIPT;
-        } else if (GROOVY_LABEL.equals(scriptType)) {
-            return SupportedScriptingLanguage.GROOVY;
+    private ScriptConfiguration getScriptConfiguration(String realm, String scriptId)
+            throws org.forgerock.openam.scripting.ScriptException {
+
+        if (adminSubject == null) {
+            adminSubject = SubjectUtils.createSuperAdminSubject();
         }
-        return null;
+        return scriptingServiceFactory.create(adminSubject, realm).get(scriptId);
     }
 
     /**

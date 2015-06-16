@@ -16,8 +16,8 @@
 
 package org.forgerock.openam.scripting.guice;
 
-import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHENTICATION_SERVER_SIDE;
-import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.POLICY_CONDITION;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.*;
+import static org.forgerock.openam.scripting.ScriptConstants.*;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
@@ -87,6 +87,10 @@ public class ScriptingGuiceModule extends AbstractModule {
                 .annotatedWith(Names.named(POLICY_CONDITION.name()))
                 .toInstance(new StandardScriptEngineManager());
 
+        bind(StandardScriptEngineManager.class)
+                .annotatedWith(Names.named(OIDC_CLAIMS.name()))
+                .toInstance(new StandardScriptEngineManager());
+
         bind(RestletHttpClient.class)
                 .annotatedWith(Names.named(SupportedScriptingLanguage.JAVASCRIPT.name()))
                 .to(JavaScriptHttpClient.class);
@@ -108,9 +112,9 @@ public class ScriptingGuiceModule extends AbstractModule {
     @Provides
     @Singleton
     @Inject
-    @Named("AUTHENTICATION_SERVER_SIDE")
+    @Named(AUTHENTICATION_SERVER_SIDE_NAME)
     ScriptEvaluator getAuthenticationServerSideScriptEvaluator(
-            @Named("AUTHENTICATION_SERVER_SIDE") StandardScriptEngineManager scriptEngineManager,
+            @Named(AUTHENTICATION_SERVER_SIDE_NAME) StandardScriptEngineManager scriptEngineManager,
             ExecutorServiceFactory executorServiceFactory, ScriptEngineConfigurator configurator) {
 
         return createEvaluator(scriptEngineManager, executorServiceFactory, configurator);
@@ -128,9 +132,29 @@ public class ScriptingGuiceModule extends AbstractModule {
     @Provides
     @Singleton
     @Inject
-    @Named("POLICY_CONDITION")
-    ScriptEvaluator getAuthorizationEntitlementConditionScriptEvaluator(
-            @Named("POLICY_CONDITION") StandardScriptEngineManager scriptEngineManager,
+    @Named(POLICY_CONDITION_NAME)
+    ScriptEvaluator getPoliyConditionScriptEvaluator(
+            @Named(POLICY_CONDITION_NAME) StandardScriptEngineManager scriptEngineManager,
+            ExecutorServiceFactory executorServiceFactory, ScriptEngineConfigurator configurator) {
+
+        return createEvaluator(scriptEngineManager, executorServiceFactory, configurator);
+    }
+
+    /**
+     * Creates the script evaluator to use for evaluating OIDC Claims scripts. The evaluator returned uses a
+     * thread pool to evaluate scripts (supporting script interruption), delegating to a sandboxed script evaluator.
+     *
+     * @param scriptEngineManager the script engine manager to use.
+     * @param executorServiceFactory the factory for creating managed thread pools for script execution.
+     * @param configurator the service configuration listener.
+     * @return an appropriately configured script evaluator for use with OIDC Claims scripts.
+     */
+    @Provides
+    @Singleton
+    @Inject
+    @Named(OIDC_CLAIMS_NAME)
+    ScriptEvaluator getOidcClaimsScriptEvaluator(
+            @Named(OIDC_CLAIMS_NAME) StandardScriptEngineManager scriptEngineManager,
             ExecutorServiceFactory executorServiceFactory, ScriptEngineConfigurator configurator) {
 
         return createEvaluator(scriptEngineManager, executorServiceFactory, configurator);

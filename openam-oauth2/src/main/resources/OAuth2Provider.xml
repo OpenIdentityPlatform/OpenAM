@@ -28,101 +28,6 @@
                 revisionNumber="1"
                 i18nKey="forgerock-oauth2-provider-description"
                 resourceName="oauth-oidc">
-            <Global>
-                <AttributeSchema name="forgerock-oauth2-provider-oidc-script-server-timeout"
-                                 type="single" syntax="number_range" rangeStart="0"
-                                 rangeEnd="2147483647" i18nKey="g101" resourceName="scriptServerTimeout">
-                    <DefaultValues>
-                        <Value>0</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-                <AttributeSchema name="forgerock-oauth2-provider-oidc-script-core-threads"
-                                 type="single" syntax="number_range" rangeStart="1"
-                                 rangeEnd="2147483647" i18nKey="g102" resourceName="scriptCoreThreads">
-                    <DefaultValues>
-                        <Value>10</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-                <AttributeSchema name="forgerock-oauth2-provider-oidc-script-max-threads"
-                                 type="single" syntax="number_range" rangeStart="1"
-                                 rangeEnd="2147483647" i18nKey="g103" resourceName="scriptMaxThreads">
-                    <DefaultValues>
-                        <Value>50</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-                <AttributeSchema name="forgerock-oauth2-provider-oidc-script-queue-size"
-                                 type="single" syntax="number_range" rangeStart="-1"
-                                 rangeEnd="2147483647" i18nKey="g104" resourceName="scriptQueueSize">
-                    <DefaultValues>
-                        <Value>10</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-                <AttributeSchema name="forgerock-oauth2-provider-oidc-script-idle-timeout"
-                                 type="single" syntax="number_range" rangeStart="0"
-                                 rangeEnd="2147483647" i18nKey="g105" resourceName="scriptIdleTimeout">
-                    <DefaultValues>
-                        <Value>60</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-                <AttributeSchema name="forgerock-oauth2-provider-oidc-script-white-list"
-                                 type="list" syntax="string" i18nKey="g106" resourceName="scriptWhiteList">
-                    <DefaultValues>
-                        <Value>java.lang.Boolean</Value>
-                        <Value>java.lang.Byte</Value>
-                        <Value>java.lang.Character</Value>
-                        <Value>java.lang.Character$Subset</Value>
-                        <Value>java.lang.Character$UnicodeBlock</Value>
-                        <Value>java.lang.Double</Value>
-                        <Value>java.lang.Float</Value>
-                        <Value>java.lang.Integer</Value>
-                        <Value>java.lang.Long</Value>
-                        <Value>java.lang.Math</Value>
-                        <Value>java.lang.Number</Value>
-                        <Value>java.lang.Object</Value>
-                        <Value>java.lang.Short</Value>
-                        <Value>java.lang.StrictMath</Value>
-                        <Value>java.lang.String</Value>
-                        <Value>java.lang.Void</Value>
-                        <Value>java.util.ArrayList</Value>
-                        <Value>java.util.HashSet</Value>
-                        <Value>java.util.HashMap</Value>
-                        <Value>java.util.HashMap$Entry</Value>
-                        <Value>java.util.HashMap$KeyIterator</Value>
-                        <Value>java.util.LinkedHashMap</Value>
-                        <Value>java.util.LinkedHashSet</Value>
-                        <Value>java.util.LinkedList</Value>
-                        <Value>java.util.TreeMap</Value>
-                        <Value>java.util.TreeSet</Value>
-                        <Value>com.sun.identity.shared.debug.Debug</Value>
-                        <Value>com.iplanet.sso.providers.dpro.SSOTokenImpl</Value>
-                        <Value>org.forgerock.http.client.*</Value>
-                        <Value>groovy.json.JsonSlurper</Value>
-                        <Value>com.sun.identity.idm.AMIdentity</Value>
-                        <Value>java.util.LinkedHashMap$Entry</Value>
-                        <Value>java.util.LinkedHashMap$LinkedEntrySet</Value>
-                        <Value>org.forgerock.openam.oauth2.OpenAMAccessToken</Value>
-                        <Value>java.util.HashMap$Node</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-                <AttributeSchema name="forgerock-oauth2-provider-oidc-script-black-list"
-                                 type="list" syntax="string" i18nKey="g107" resourceName="scriptBlackList">
-                    <DefaultValues>
-                        <Value>java.security.AccessController</Value>
-                        <Value>java.lang.Class</Value>
-                        <Value>java.lang.reflect.*</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-                <AttributeSchema name="forgerock-oauth2-provider-oidc-script-use-security-manager"
-                                 type="single" syntax="boolean" i18nKey="g108" resourceName="scriptUseSecurityManager">
-                    <BooleanValues>
-                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-                    </BooleanValues>
-                    <DefaultValues>
-                        <Value>true</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-            </Global>
 
             <Organization>
                 <AttributeSchema name="forgerock-oauth2-provider-authorization-code-lifetime"
@@ -192,29 +97,21 @@
                 </AttributeSchema>
 
                 <AttributeSchema name="forgerock-oauth2-provider-oidc-claims-extension-script"
-                                 type="single"
-                                 syntax="script"
-                                 validator="ScriptValidator"
+                                 type="single_choice"
+                                 uitype="dropdown"
+                                 syntax="string"
                                  i18nKey="a104aa"
                                  resourceName="oidcClaimsScript">
-                    <DefaultValues>
-                        <Value>
-                            ${inject.content.oidc-claims-extension-groovy}
-                        </Value>
-                    </DefaultValues>
-                </AttributeSchema>
-
-                <AttributeSchema name="forgerock-oauth2-provider-oidc-claims-extension-script-type"
-                                 type="single_choice"
-                                 syntax="string"
-                                 i18nKey="a104ab"
-                                 resourceName="oidcClaimsScriptType">
                     <ChoiceValues>
-                        <ChoiceValue i18nKey="scriptGroovyChoice">Groovy</ChoiceValue>
-                        <ChoiceValue i18nKey="scriptJavaScriptChoice">JavaScript</ChoiceValue>
+                        <ChoiceValuesClassName className="org.forgerock.openam.scripting.service.ScriptChoiceValues">
+                            <AttributeValuePair>
+                                <Attribute name="ContextId"/>
+                                <Value>OIDC_CLAIMS</Value>
+                            </AttributeValuePair>
+                        </ChoiceValuesClassName>
                     </ChoiceValues>
                     <DefaultValues>
-                        <Value>Groovy</Value>
+                        <Value>&GlobalOidcClaimsScriptId;</Value>
                     </DefaultValues>
                 </AttributeSchema>
 

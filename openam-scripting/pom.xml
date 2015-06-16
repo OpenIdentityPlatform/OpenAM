@@ -102,6 +102,14 @@
     </dependencies>
 
     <build>
+        <testResources>
+            <testResource>
+                <directory>${basedir}/src/main/groovy</directory>
+            </testResource>
+            <testResource>
+                <directory>${basedir}/src/test/resources</directory>
+            </testResource>
+        </testResources>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -178,6 +186,10 @@
                                 <content>
                                     <id>deviceIdMatch-server-js</id>
                                     <file>${project.build.sourceDirectory}/../js/deviceIdMatch-server-side.js</file>
+                                </content>
+                                <content>
+                                    <id>oidc-claims-extension-groovy</id>
+                                    <file>${project.build.sourceDirectory}/../groovy/oidc-claims-extension.groovy</file>
                                 </content>
                             </contents>
                             <destinationFile>${project.build.outputDirectory}/scripting.xml</destinationFile>

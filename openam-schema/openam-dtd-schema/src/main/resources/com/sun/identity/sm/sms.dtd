@@ -289,4 +289,5 @@ Unique Declaration name for DOCTYPE tag:
 <!ENTITY GlobalServerSideAuthModuleScriptId "7e3d7067-d50f-4674-8c76-a3e13a810c33">
 <!ENTITY GlobalServerSideDeviceIdMatchScriptId "703dab1a-1921-4981-98dd-b8e5349d8548">
 <!ENTITY GlobalClientSideDeviceIdMatchScriptId "157298c0-7d31-4059-a95b-eeb08473b7e5">
+<!ENTITY GlobalOidcClaimsScriptId "36863ffb-40ec-48b9-94b1-9a99f71cc3b5">
 <!ENTITY NoScriptDefined "[Empty]">

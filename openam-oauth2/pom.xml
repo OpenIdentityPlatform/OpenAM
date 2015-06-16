@@ -119,37 +119,4 @@
             <artifactId>javassist</artifactId>
         </dependency>
     </dependencies>
-
-    <build>
-        <testResources><testResource><directory>src/main/groovy</directory></testResource></testResources>
-        <plugins>
-            <plugin>
-                <groupId>org.forgerock.maven.plugins</groupId>
-                <artifactId>build-helper-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>inject-content</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>inject-content</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <injects>
-                        <inject>
-                            <contents>
-                                <content>
-                                    <id>oidc-claims-extension-groovy</id>
-                                    <file>${project.build.sourceDirectory}/../groovy/oidc-claims-extension.groovy</file>
-                                </content>
-                            </contents>
-                            <destinationFile>${project.build.outputDirectory}/OAuth2Provider.xml</destinationFile>
-                            <contentConverter>xml</contentConverter>
-                        </inject>
-                    </injects>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>
