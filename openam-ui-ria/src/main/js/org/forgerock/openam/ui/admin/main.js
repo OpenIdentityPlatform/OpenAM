@@ -23,15 +23,16 @@ define([
     "./utils/JsonEditorTheme",
 
     "./views/commonTasks/CommonTasksView",
-
     "./views/configuration/ConfigurationView",
-
     "./views/federation/FederationView",
-
     "./views/realms/agents/AgentsView",
 
     "./views/realms/authentication/AdvancedView",
+    "./views/realms/authentication/chains/CriteriaView",
     "./views/realms/authentication/chains/EditChainView",
+    "./views/realms/authentication/chains/LinkView",
+    "./views/realms/authentication/chains/LinkInfoView",
+    "./views/realms/authentication/chains/PostProcessView",
     "./views/realms/authentication/ChainsView",
     "./views/realms/authentication/ModulesView",
     "./views/realms/authentication/modules/EditModuleView",

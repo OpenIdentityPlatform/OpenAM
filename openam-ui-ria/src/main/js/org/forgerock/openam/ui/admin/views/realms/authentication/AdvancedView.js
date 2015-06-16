@@ -31,8 +31,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AdvancedView",
             'click #saveChanges': 'save',
             'show.bs.tab ul.nav.nav-tabs a': 'renderTab'
         },
-        data: {},
-
+    
         render: function (args, callback) {
             var self = this;
 

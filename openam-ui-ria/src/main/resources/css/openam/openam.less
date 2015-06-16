@@ -21,6 +21,10 @@
     padding-bottom: 50px;
 }
 
+.float-right{
+    float:right;
+}
+
  a[data-toggle="popover"] {
     &:hover, &:focus{
         box-shadow:none;
@@ -38,6 +42,15 @@
         color: white;
         font-weight: normal;
     }
+ }
+
+ .dropdown-menu>li>a {
+     padding: 3px 10px;
+ }
+
+ .dropdown-menu li .fa {
+     width:20px;
+     text-align: center;
  }
  /* END of Candidate for Commons */
 
@@ -69,12 +82,8 @@
 .table > tbody > tr > td,
 .table > tfoot > tr > td {
     border-color: #eee;
-    padding: 13px 15px;
 }
 
-.table-striped > tbody > tr.selected{
-    background-color: #d9edf7;
-}
 
 .table-striped {
     th.col-check {
@@ -88,12 +97,38 @@
     .btn-transparent {
         color: #777;
         padding: 1px 6px;
+
+        &:disabled {
+            opacity: 0.5;
+        }
+    }
+
+    > tbody > tr.selected{
+        background-color: #d9edf7;
+    }
+
+    > tbody > tr:nth-of-type(odd).tr-row{
+        background:transparent;
     }
 
     .btn-transparent:hover, .btn-transparent:focus {
         color: @base-theme-color;
     }
 }
+
+.table>tbody>tr.tr-row>td{
+   padding-left:0;
+   border-top: none;
+   &:last-of-type{
+       padding-right:2px;
+   }
+}
+
+.table>tbody>tr>td{
+  vertical-align: middle;
+}
+
+
 
 .page-toolbar, .panel-toolbar {
     border-bottom: 1px solid #ddd;

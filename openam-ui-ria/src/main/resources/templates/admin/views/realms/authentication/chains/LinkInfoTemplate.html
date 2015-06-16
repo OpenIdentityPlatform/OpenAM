@@ -1,0 +1,20 @@
+<div class="pull-left">
+    <i class="fa fa-link {{#unless module}}module-new{{/unless}}"></i>
+</div>
+
+<div class="link-info">
+    <div class="module {{#unless module}}module-new{{/unless}}">
+        <div class="module-title">
+            {{#if module}}{{module}}
+            {{else}}{{t 'console.authentication.editChains.newModule'}}{{/if}}
+        </div>
+        <div class="module-type">
+            {{#if type}}{{type}}
+            {{else}}{{t 'console.authentication.editChains.selectCriteria'}}{{/if}}
+        </div>
+        <div class="module-options">
+            {{#if options}}{{t 'console.authentication.editChains.options'}} <span class="badge">{{options.length}}</span>
+            {{else}}{{t 'console.authentication.editChains.noOptions'}}{{/if}}
+        </div>
+    </div>
+</div>

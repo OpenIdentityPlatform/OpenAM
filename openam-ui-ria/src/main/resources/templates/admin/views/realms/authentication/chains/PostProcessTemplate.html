@@ -1,0 +1,26 @@
+<thead>
+    <tr>
+        <th>{{t 'common.form.value'}}</th>
+        <th class="col-check"></th>
+    </tr>
+</thead>
+<tbody>
+    {{#each chainData.loginPostProcessClass}}
+    <tr {{#equals this ""}}class="hidden"{{/equals}}>
+        <td>{{this}}</td>
+        <td>
+            <div class="btn-group pull-right">
+                <button class="btn btn-transparent delete-btn"><i class="fa fa-times"></i></button>
+            </div>
+        </td>
+    </tr>
+    {{/each}}
+    <tr class="tr-row">
+        <td><input type="text" class="form-control" id="newProcessClass" placeholder="{{t 'console.authentication.editChains.addValue'}}"></td>
+        <td>
+            <div class="btn-group pull-right">
+                <button id="addBtn" class="btn btn-default" disabled type="button"><i class="fa fa-plus"></i></button>
+            </div>
+        </td>
+    </tr>
+</tbody>

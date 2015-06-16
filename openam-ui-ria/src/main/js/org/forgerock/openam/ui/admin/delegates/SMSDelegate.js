@@ -67,8 +67,34 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegate", [
                 });
 
             return $.when(promise).then(function (valuesData) {
+                // FIXME: This is a temporay client side fix until AME-7202 is completed.
+                valuesData.authChainConfiguration = obj.authChainConfigurationToJson(valuesData.authChainConfiguration);
                 return {
                     values: valuesData
+                };
+            });
+        },
+
+        getChainWithType: function (name) {
+            var chainData = obj.serviceCall({
+                    url: "realm-config/authentication/chains/" + name
+                }),
+                modulesPromise = obj.serviceCall({
+                    url: "realm-config/authentication/modules?_queryFilter=true"
+                });
+
+            return $.when(chainData, modulesPromise).then(function (chainData, modulesData) {
+
+                // FIXME: This is a temporay client side fix until AME-7202 is completed.
+                chainData[0].authChainConfiguration = obj.authChainConfigurationToJson(chainData[0].authChainConfiguration);
+
+                _.each(chainData[0].authChainConfiguration, function(chainLink, index){
+                    chainData[0].authChainConfiguration[index].type = _.findWhere(modulesData[0].result, { _id:chainLink.module}).type;
+                });
+
+                return {
+                    chainData: chainData[0],
+                    modulesData: modulesData[0].result
                 };
             });
         },
@@ -87,13 +113,13 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegate", [
                 _.each(chainsData[0].result, function(obj) {
 
                     if (obj._id === valuesData[0].adminAuthModule) {
-                        obj.active = obj.active || {};
-                        obj.active.adminAuthModule = true;
+                        obj.defaultConfig = obj.defaultConfig || {};
+                        obj.defaultConfig.adminAuthModule = true;
                     }
 
                     if (obj._id === valuesData[0].orgConfig ) {
-                        obj.active = obj.active || {};
-                        obj.active.orgConfig = true;
+                        obj.defaultConfig = obj.defaultConfig || {};
+                        obj.defaultConfig.orgConfig = true;
                     }
 
                 });
@@ -101,6 +127,23 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegate", [
                 return {
                     values: chainsData[0]
                 };
+            });
+        },
+        save: function (name, data) {
+
+            var cleaned = obj.authChainConfigurationToXml(data);
+            return obj.serviceCall({
+                url: 'realm-config/authentication/chains/' + name,
+                type: "PUT",
+                data: JSON.stringify(cleaned)
+            });
+        },
+
+        create: function (data) {
+            return obj.serviceCall({
+                url: "realm-config/authentication/chains?_action=create",
+                type: "POST",
+                data: JSON.stringify(data)
             });
         }
     };
@@ -219,6 +262,54 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegate", [
         if (property.type === "object") {
             _.forEach(property.properties, obj.propertyOrderTransform);
         }
+    };
+
+    obj.authChainConfigurationToJson = function(data){
+        // FIXME: This is a temporay client side fix until AME-7202 is completed.
+        var xmlDoc = $.parseXML( data ),
+            xml =  $( xmlDoc ),
+            array = [],
+            cleaned = [],
+            options = [],
+            keypairs = [],
+            obj = {};
+
+        _.each(xml.find("Value"), function(node){
+            array = node.textContent.split(" ");
+            options = _.drop(array, 2)[0].split(",");
+            keypairs = [];
+            _.each(options, function(option){
+                if(option.length>0){
+                    option = option.split("=");
+                    obj = {};
+                    obj[option[0]] = option[1];
+                    keypairs.push(obj);
+                }
+            });
+
+            cleaned.push({
+                module: array[0],
+                criteria: array[1],
+                options: keypairs
+            });
+        });
+
+        return cleaned;
+    };
+
+    obj.authChainConfigurationToXml = function(data){
+        // FIXME: This is a temporay client side fix until AME-7202 is completed.
+        var xmlString = '',
+            xmlData = $.extend(true, {}, data);
+
+        if (data.authChainConfiguration){
+            _.each(data.authChainConfiguration, function(authChain){
+                xmlString += '<Value>' + authChain.module + ' ' + authChain.criteria + ' </Value>';
+            });
+            xmlData.authChainConfiguration = '<AttributeValuePair>' + xmlString + '</AttributeValuePair>';
+        }
+
+        return xmlData;
     };
 
     return obj;

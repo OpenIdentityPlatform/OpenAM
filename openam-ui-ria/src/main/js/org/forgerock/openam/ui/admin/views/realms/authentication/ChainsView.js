@@ -27,14 +27,17 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
         template: "templates/admin/views/realms/authentication/ChainsTemplate.html",
         events: {
             'change input[data-chain-name]' : 'chainSelected',
-            'click  button.delete-chain-btn': 'warningBeforeDeleteChain',
-            'click  button.delete-chain-btn:not([data-active])': 'deleteChain',
+            'click  button.delete-chain-btn': 'deleteChain',
             'click  #deleteChains'          : 'deleteChains',
             'click  #addChain'              : 'addChain'
         },
         addChain: function(e) {
             e.preventDefault();
-            var href = $(e.currentTarget).attr('href');
+            var self = this,
+                chainName,
+                invalidName = false,
+                href = $(e.currentTarget).attr('href');
+
             BootstrapDialog.show({
                 title: "Enter the chain name",
                 message: '<p>Some helpful text here explaining that you need to name your chain before you can configure it</p><br/><input type="text" id="newName" class="form-control" placeholder="Enter Name"  value="">',
@@ -42,9 +45,26 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
                     label: $.t("common.form.next"),
                     cssClass: "btn-primary",
                     action: function(dialog) {
-                        dialog.close();
-                        //TODO Check name first.
-                        Router.navigate( href + dialog.getModalBody().find('#newName').val(), { trigger: true });
+                        chainName = dialog.getModalBody().find('#newName').val();
+
+                        invalidName = _.find(self.data.sortedChains, function(chain){
+                            return chain._id === chainName;
+                        });
+
+                        if (invalidName){
+                            // TODO - duplicate chain name - message or alert box
+                            console.log('invalidName'); // jslinter
+                        } else {
+
+                            SMSDelegate.RealmAuthenticationChains.create({_id : chainName})
+                            .done(function(data) {
+                                dialog.close();
+                                Router.navigate( href + dialog.getModalBody().find('#newName').val(), { trigger: true });
+                            })
+                            .fail(function() {
+                                // TODO: Add failure condition
+                            });
+                        }
                     }
                 },{
                     label: $.t("common.form.cancel"),
@@ -65,28 +85,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
             } else {
                 row.removeClass('selected');
             }
-        },
-        warningBeforeDeleteChain: function(event) {
-            var self = this,
-                chainName = $(event.currentTarget).attr('data-chain-name');
-
-            BootstrapDialog.show({
-                title: "Delete " + chainName,
-                type: BootstrapDialog.TYPE_DANGER,
-                message: '<p>This chain is being used as one of the default chains. Deleting may result in locking out the administors or the users.</p><p>Are you sure you want to continue?</p>',
-                buttons: [{
-                    label: "Delete",
-                    cssClass: "btn-danger",
-                    action: function(dialog) {
-                        self.deleteChain(event);
-                    }
-                }, {
-                    label: "Cancel",
-                    action: function(dialog) {
-                        dialog.close();
-                    }
-                }]
-            });
         },
         deleteChain: function(event) {
             var self = this,

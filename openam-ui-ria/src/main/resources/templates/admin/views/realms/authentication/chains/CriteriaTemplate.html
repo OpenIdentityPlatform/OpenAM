@@ -1,0 +1,47 @@
+{{#if linkConfig.criteria}}
+<div id="criteriaButtonsContainer">
+    <div class="btn-group btn-group-justified" role="group" aria-label="Criteria">
+        {{#each allCriteria}}
+        <div class="btn-group" role="group">
+            {{#each this}}<button type="button" data-criteria="{{@key}}" class="btn btn-default btn-xs {{#equals ../../linkConfig.criteria @key}}active{{/equals}}">{{this}}</button>{{/each}}
+        </div>
+        {{/each}}
+    </div>
+</div>
+
+<div id="criteriaFooter">
+    <div id="successArrow" class="arrow-box-container">
+        <div
+            {{#equals linkConfig.criteria 'REQUIRED'}}   class="arrow-title arrow-title-left"{{/equals}}
+            {{#equals linkConfig.criteria 'SUFFICIENT'}} class="arrow-title arrow-title-left"{{/equals}}
+            {{#equals linkConfig.criteria 'REQUISITE'}}  class="arrow-title arrow-title-down"{{/equals}}
+            {{#equals linkConfig.criteria 'OPTIONAL'}}   class="arrow-title arrow-title-down"{{/equals}}
+        >
+        Success</div>
+        <div
+            {{#equals linkConfig.criteria 'REQUIRED'}}   class="arrow-left"{{/equals}}
+            {{#equals linkConfig.criteria 'SUFFICIENT'}} class="arrow-left"{{/equals}}
+            {{#equals linkConfig.criteria 'REQUISITE'}}  class="arrow-down"{{/equals}}
+            {{#equals linkConfig.criteria 'OPTIONAL'}}   class="arrow-down"{{/equals}}
+        >
+        </div>
+    </div>
+
+    <div id="failArrow" class="arrow-box-container">
+        <div
+            {{#equals linkConfig.criteria 'REQUIRED'}}   class="arrow-title arrow-title-down"{{/equals}}
+            {{#equals linkConfig.criteria 'SUFFICIENT'}} class="arrow-title arrow-title-down"{{/equals}}
+            {{#equals linkConfig.criteria 'REQUISITE'}}  class="arrow-title arrow-title-right"{{/equals}}
+            {{#equals linkConfig.criteria 'OPTIONAL'}}   class="arrow-title arrow-title-down"{{/equals}}
+        >
+            Fail</div>
+        <div
+            {{#equals linkConfig.criteria 'REQUIRED'}}   class="arrow-down"{{/equals}}
+            {{#equals linkConfig.criteria 'SUFFICIENT'}} class="arrow-down"{{/equals}}
+            {{#equals linkConfig.criteria 'REQUISITE'}}  class="arrow-right"{{/equals}}
+            {{#equals linkConfig.criteria 'OPTIONAL'}}   class="arrow-down"{{/equals}}
+        >
+        </div>
+    </div>
+</div>
+{{/if}}

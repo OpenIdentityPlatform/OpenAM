@@ -1,13 +1,14 @@
 <div class="page-header clearfix">
     <span class="header-icon pull-left"><i class="fa fa-link"></i></span>
-    <h4 class="page-type">Chains</h4>
-    <h1>{{name}}</h1>
+    <h4 class="page-type">{{t 'console.authentication.editChains.chains'}}</h4>
+    <h1>{{chainData._id}}</h1>
 </div>
+
 
 <div class="tab-menu">
     <ul class="nav nav-tabs" role="tablist">
-        <li class="active"><a href="#chains" role="tab"  data-toggle="tab" aria-expanded="true">Edit Chain</a></li>
-        <li><a href="#settings" role="tab" data-toggle="tab" aria-expanded="true">Settings</a></li>
+        <li class="active"><a href="#chains" role="tab"  data-toggle="tab" aria-expanded="true">{{t 'console.authentication.editChains.editChain'}}</a></li>
+        <li><a href="#settings" role="tab" data-toggle="tab" aria-expanded="true">{{t 'common.form.settings'}}</a></li>
     </ul>
 </div>
 
@@ -15,7 +16,43 @@
 
     <div class="tab-content clearfix">
 
-        <div role="tabpanel" class="tab-pane active" id="chains">
+        <div role="tabpanel" class="tab-pane  active" id="chains">
+
+            <a  data-toggle="popover"
+                data-placement="top"
+                data-trigger="focus"
+                data-content="OpenAM uses authentication chains to control the authentication flow for the user. Use this section to add, configure or remove this realms set of authentication chains. To add an instance to the chain you the add button below or hover your mouse over the position in the chain where you what to add the instance and press the add which is displayed."
+                tabindex="0"
+                title="Modules"
+                class="pull-right">Help <i class="fa fa-question-circle"></i></a>
+
+            <button type="button" id="addModuleLink" class="btn btn-primary"><i class="fa fa-plus"></i> {{t 'console.authentication.editChains.addModule'}}</button>
+
+            <div id="sortableContainer">
+                <ol id="sortable" class="{{#unless chainData.authChainConfiguration}} empty{{/unless}}">
+                    <li class="placeholder not-draggable" id="noItemsPlaceholder"><i class="fa fa-inbox"></i>{{t 'common.form.empty'}}</li>
+                </ol>
+            </div>
+
+            <ol class="pull-left list-unstyled" id="editChainLegend">
+
+                <li id="nextModuleKey">
+                    <i class="fa fa-arrow-down"></i> {{t 'console.authentication.editChains.gotoNextModule'}}
+                </li>
+
+                <!--<li id="nextModuleAndFailKey">
+                    <i class="fa fa-arrow-down"></i> Pass through to next module, but goto fail url at end of chain
+                </li>-->
+
+                <li id="successUrlKey">
+                    <i class="fa fa-external-link"></i> {{t 'console.authentication.editChains.gotoSuccessUrl'}}
+                </li>
+
+                <li id="failUrlKey">
+                    <i class="fa fa-external-link"></i> {{t 'console.authentication.editChains.gotoFailUrl'}}
+                </li>
+
+            </ol>
 
         </div>
 
@@ -27,22 +64,22 @@
                      data-trigger="focus"
                      data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Dic in quovis conventu te omnia facere, ne doleas. Duo Reges: constructio interrete. Illud dico, ea, quae dicat, praeclare inter se cohaerere."
                      tabindex="0"
-                     title="Redirect URLS"
-                     class="pull-right">Help <i class="fa fa-question-circle"></i></a>
-        	    <h3 class="block-header">Redirect URLS</h3>
+                     title="{{t 'console.authentication.editChains.redirectUrls'}}"
+                     class="pull-right">{{t 'common.form.help'}} <i class="fa fa-question-circle"></i></a>
+        	    <h3 class="block-header">{{t 'console.authentication.editChains.redirectUrls'}}</h3>
                 <div class="form-horizontal">
 
                     <div class="form-group">
-                        <label class="control-label col-sm-4">Successful Login URL</label>
+                        <label for="loginSuccessUrl" class="control-label col-sm-4">{{t 'console.authentication.editChains.successUrl'}}</label>
                         <div class="col-sm-6">
-                            <input type="url" class="form-control input-btn" placeholder="Successful Login URL"  value="{{loginSuccessUrl.[0]}}">
+                            <input id="loginSuccessUrl" type="text" class="form-control input-btn" placeholder="{{t 'console.authentication.editChains.addUrl'}}"  value="{{chainData.loginSuccessUrl.[0]}}">
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label class="control-label col-sm-4">Failed Login URL</label>
+                        <label for="loginFailureUrl" class="control-label col-sm-4">{{t 'console.authentication.editChains.failUrl'}}</label>
                         <div class="col-sm-6">
-                            <input type="url" class="form-control input-btn" placeholder="Add a failed login URL" value="{{loginFailureUrl.[0]}}">
+                            <input id="loginFailureUrl" type="text" class="form-control input-btn" placeholder="{{t 'console.authentication.editChains.addUrl'}}" value="{{chainData.loginFailureUrl.[0]}}">
                         </div>
                     </div>
 
@@ -57,38 +94,11 @@
                     data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Dic in quovis conventu te omnia facere, ne doleas. Duo Reges: constructio interrete. Illud dico, ea, quae dicat, praeclare inter se cohaerere."
                     tabindex="0"
                     title="Post Authentication Processing Class"
-                    class="pull-right">Help <i class="fa fa-question-circle"></i></a>
-        	    <h3 class="block-header">Post Authentication Processing Class</h3>
+                    class="pull-right">{{t 'common.form.help'}} <i class="fa fa-question-circle"></i></a>
+        	    <h3 class="block-header">{{t 'console.authentication.editChains.processingClass'}}</h3>
 
-                {{#if loginPostProcessClass}}
-                <table class="table table-striped table-hover">
-                    <thead>
-                    <tr>
-                        <th>Value</th>
-                        <th class="col-btn"></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {{#each loginPostProcessClass}}
-                    <tr>
-                        <td>{{this}}</td>
-                        <td>
-                            <div class="btn-group pull-right">
-                                <button class="btn btn-transparent "><i class="fa fa-times"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                    {{/each}}
-                    </tbody>
-                </table>
-                {{/if}}
 
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Add Value">
-                    <span class="input-group-btn">
-                        <button class="btn btn-default" type="button"><i class="fa fa-plus"></i> Add</button>
-                    </span>
-                </div>
+                <table class="table table-striped" id="postProcessView"></table>
 
             </div>
 
@@ -98,7 +108,7 @@
 
     <div class="tab-pane-footer clearfix">
         <div class="pull-right">
-            <button id="revertChanges" class="btn btn-default" type="button">{{t "common.form.revert"}}</button>
+            <!--<button id="revertChanges" class="btn btn-default" type="button">{{t "common.form.revert"}}</button>-->
             <button id="saveChanges" class="btn btn-primary" type="button">{{t "common.form.saveChanges"}}</button>
         </div>
     </div>

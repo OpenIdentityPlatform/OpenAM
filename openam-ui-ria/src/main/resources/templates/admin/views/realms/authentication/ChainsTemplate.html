@@ -3,7 +3,7 @@
 </div>
 <p class="panel-description">{{t 'console.authentication.chains.description'}}</p>
 <div class="btn-toolbar page-toolbar">
-    <a class="btn btn-primary" id="addChain" href="#realms/authentication/chains/"><i class="fa fa-plus"></i>{{t 'console.authentication.chains.action'}}</a>
+    <a class="btn btn-primary" id="addChain" href="{{routeTo 'realmsAuthenticationChainEdit' realmLocation}}"><i class="fa fa-plus"></i>{{t 'console.authentication.chains.action'}}</a>
     <button id="deleteChains" disabled class="btn btn-default" type="button"><i class="fa fa-times"></i>{{t 'common.form.delete'}}</button>
 </div>
 <div class="panel panel-default">
@@ -19,17 +19,19 @@
             <tbody>
             {{#each sortedChains}}
             <tr>
-                <td><input data-chain-name="{{_id}}" type="checkbox" {{#if active}}disabled{{/if}}/></td>
-                <td>{{_id}} {{#if active}}
-                    <div class="active-config">
-                        {{#if active.adminAuthModule}}{{t 'console.authentication.chains.defaultAdminAuthConfiguration'}} {{#if active.orgConfig}}/ {{/if}}{{/if}}
-                        {{#if active.orgConfig}}{{t 'console.authentication.chains.defaultOrgAuthConfiguration'}} {{/if}}
-                    </div>{{/if}}
+                <td><input data-chain-name="{{_id}}" type="checkbox" {{#if defaultConfig}}disabled{{/if}}/></td>
+                <td>{{_id}}
+                    {{#if defaultConfig}}
+                    <div class="default-config">
+                        {{#if defaultConfig.adminAuthModule}}{{t 'console.authentication.chains.defaultAdminAuthConfiguration'}} {{#if defaultConfig.orgConfig}}/ {{/if}}{{/if}}
+                        {{#if defaultConfig.orgConfig}}{{t 'console.authentication.chains.defaultOrgAuthConfiguration'}} {{/if}}
+                    </div>
+                    {{/if}}
                 </td>
                 <td>
                     <div class="pull-right btn-group">
-                        <a class="btn btn-transparent edit-chain-btn" href="{{routeTo 'realmsAuthenticationChainEdit' ../realmLocation _id}}"><i class="fa fa-pencil"></i></a>
-                        <button data-chain-name="{{_id}}" type="button" class="btn btn-transparent delete-chain-btn" {{#if active}}data-active="true"{{/if}}>
+                        <a class="btn btn-transparent edit-chain-btn" href="{{routeTo 'realmsAuthenticationChainEdit' ../realmLocation}}{{_id}}"><i class="fa fa-pencil"></i></a>
+                        <button data-chain-name="{{_id}}" type="button" class="btn btn-transparent delete-chain-btn" {{#if defaultConfig}}disabled{{/if}}>
                         <i class="fa fa-close"></i>
                         </button>
                     </div>

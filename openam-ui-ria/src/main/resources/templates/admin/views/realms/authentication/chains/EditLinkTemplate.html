@@ -1,0 +1,71 @@
+<div class="block">
+
+    <div class="row">
+
+        <div class="col-sm-6">
+            <label class="block-header">{{t 'console.authentication.editChains.selectModule'}}</label>
+            <select id="selectModule" type="text" class="form-control" single value="{{linkConfig.module}}">
+                <option value="" selected disabled >{{t 'common.form.select'}}...</option>
+                {{#each formData.allModules}}
+                <option value="{{this._id}}" {{#equals ../linkConfig.module this._id}} selected{{/equals}}>{{this.type}}</option>
+                {{/each}}
+            </select>
+        </div>
+
+        <div class="col-sm-6">
+            <label class="block-header">{{t 'console.authentication.editChains.selectCriteria'}}</label>
+            <select id="selectCriteria" type="text" class="form-control" single value="{{linkConfig.module}}">
+                <option value="" selected disabled >{{t 'common.form.select'}}...</option>
+                {{#each formData.allCriteria}}
+                {{#each this}}<option value="{{@key}}" {{#equals ../../linkConfig.criteria @key}} selected{{/equals}}>{{this}}</option>{{/each}}
+                {{/each}}
+            </select>
+        </div>
+
+    </div>
+
+</div>
+
+<label class="block-header">{{t 'console.authentication.editChains.options'}}</label>
+<table class="table table-striped">
+    {{#if linkConfig.options}}
+    <thead>
+        <tr>
+            <th>{{t 'common.form.key'}}</th>
+            <th>{{t 'common.form.value'}}</th>
+            <th class="col-check"></th>
+        </tr>
+    </thead>
+    {{/if}}
+    <tbody>
+        {{#each linkConfig.options}}
+        {{#each this}}
+        <tr>
+            <td>{{@key}}</td>
+            <td>{{this}}</td>
+            <td>
+                <!--<div class="btn-group pull-right">
+                    <button class="btn btn-transparent delete-option"><i class="fa fa-times"></i></button>
+                </div>-->
+            </td>
+        </tr>
+        {{/each}}
+        {{/each}}
+
+        <tr class="tr-row">
+            <td>
+                <label class="sr-only" for="optionsKey">{{t 'common.form.key'}}</label>
+                <input disabled type="text" class="form-control" id="optionsKey" placeholder="{{t 'common.form.addKey'}}">
+            </td>
+            <td>
+                <label class="sr-only" for="optionsKey">{{t 'common.form.value'}}</label>
+                <input disabled type="text" class="form-control" id="optionsKey" placeholder="{{t 'common.form.addValue'}}">
+            </td>
+            <td>
+                <div class="btn-group pull-right">
+                    <button disabled type="submit" class="btn btn-default"><i class="fa fa-plus"></i></button>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>

@@ -1,0 +1,21 @@
+<div class="panel panel-default" data-id={{id}}>
+
+    <div class="btn-group float-right">
+        <button type="button" class="btn btn-link dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+            <i class="fa fa-ellipsis-v"></i>
+        </button>
+
+        <ul class="dropdown-menu" role="menu">
+            <li><a href="#" id="editItem"><i class="fa fa-pencil"></i>{{t 'common.form.edit'}}</a></li>
+            <li id="moveUpLi"  ><a href="#" id="moveUpBtn"><i class="fa fa-long-arrow-up"></i>{{t 'common.form.moveUp'}}</a></li>
+            <li id="moveDownLi"><a href="#" id="moveDownBtn"><i class="fa fa-long-arrow-down"></i>{{t 'common.form.moveDown'}}</a></li>
+            <li class="divider"></li>
+            <li><a href="#" id="deleteItem"><i class="fa fa-trash"></i>{{t 'common.form.delete'}}</a></li>
+        </ul>
+
+    </div>
+
+    <div id="link-info-{{id}}" class="panel-body"></div>
+    <div id="criteria-{{id}}"></div>
+
+</div>
