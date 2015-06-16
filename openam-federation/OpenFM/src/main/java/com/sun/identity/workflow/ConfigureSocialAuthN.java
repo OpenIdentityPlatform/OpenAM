@@ -11,7 +11,8 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 package com.sun.identity.workflow;
 
@@ -198,7 +199,6 @@ public class ConfigureSocialAuthN extends Task {
         attrs.put(AUTH_MODULE_CLIENT_SECRET, asSet(clientSecret));
         attrs.put(AUTH_MODULE_PROXY_URL, asSet(redirectUrl));
         attrs.put(AUTH_MODULE_CRYPTO_TYPE, asSet("client_secret"));
-        attrs.put(AUTH_MODULE_CRYPTO_VALUE, asSet(clientSecret));
         attrs.put(AUTH_MODULE_CREATE_PASSWORD, asSet("false"));
 
         // If the wizard didn't provide a discoveryUrl, see if it was in the properties file
