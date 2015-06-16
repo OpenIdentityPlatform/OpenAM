@@ -34,7 +34,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
         events: {
             'click #addModule':   'addModule',
             'change input[data-module-name]' : 'moduleSelected',
-            'click  #editModule': 'editModule',
             'click  button[data-module-name]:not([data-active])': 'deleteModule',
             'click  #deleteModules': 'deleteModules'
         },
@@ -66,8 +65,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
                                           })
                                           .done(function() {
                                               dialog.close();
-                                              Router.routeTo(Router.configuration.routes.EditModuleView, {
-                                                  args: [encodeURIComponent(self.data.realmName), encodeURIComponent(moduleName)],
+                                              Router.routeTo(Router.configuration.routes.realmsAuthenticationModuleEdit, {
+                                                  args: [encodeURIComponent(self.data.realmLocation), encodeURIComponent(moduleName)],
                                                   trigger: true
                                               });
                                           }).
@@ -131,14 +130,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
                 row.removeClass('selected');
             }
         },
-        editModule: function(event) {
-          event.preventDefault();
-          var moduleName = $(event.currentTarget).closest('td').find('button[data-module-name]').attr('data-module-name');
-          Router.routeTo(Router.configuration.routes.EditModuleView, {
-              args: [encodeURIComponent(this.data.realmName), encodeURIComponent(moduleName)],
-              trigger: true
-          });
-        },
         deleteModule: function(event) {
             var self = this,
                 moduleName = $(event.currentTarget).attr('data-module-name');
@@ -170,7 +161,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
         },
         render: function(args, callback) {
             var self = this;
-            this.data.realmName = (args) ? args[0] : " ";
+            this.data.realmLocation = args[0];
 
             SMSDelegate.RealmAuthenticationModules.getModules()
             .done(function(data) {

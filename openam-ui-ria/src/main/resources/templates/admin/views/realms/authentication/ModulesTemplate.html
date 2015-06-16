@@ -26,7 +26,7 @@
                   <td>{{type}}</td>
                   <td>
                       <div class="pull-right">
-                          <button type="button" id="editModule" class="btn btn-transparent"><i class="fa fa-pencil" data-toggle="tooltip" title="{{t "common.form.edit"}}"></i></button>
+                          <a class="btn btn-transparent" href="{{routeTo 'realmsAuthenticationModuleEdit' ../realmLocation _id}}" title="{{t 'common.form.edit'}}"><i class="fa fa-pencil"></i></a>
                           <button type="button" id="deleteModule" class="btn btn-transparent" data-module-name="{{_id}}"><i class="fa fa-close" data-toggle="tooltip" title="{{t "common.form.delete"}}"></i></button>
                       </div>
                   </td>

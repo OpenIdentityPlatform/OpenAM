@@ -27,7 +27,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
         template: "templates/admin/views/realms/authentication/ChainsTemplate.html",
         events: {
             'change input[data-chain-name]' : 'chainSelected',
-            'click  button.edit-chain-btn'  : 'editChain',
             'click  button.delete-chain-btn': 'warningBeforeDeleteChain',
             'click  button.delete-chain-btn:not([data-active])': 'deleteChain',
             'click  #deleteChains'          : 'deleteChains',
@@ -118,20 +117,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
                     // TODO: Add failure condition
                 });
         },
-        editChain: function(event) {
-            var self = this,
-                chainName = $(event.currentTarget).attr('data-chain-name');
-
-            Router.routeTo(Router.configuration.routes.realmsAuthenticationEditChain, {
-                args: [encodeURIComponent(self.data.realmName), encodeURIComponent(chainName)],
-                trigger: true
-            });
-        },
         render: function (args, callback) {
             var self = this,
                 sortedChains = [];
-            this.data = {};
-            this.data.realmName = (args) ? args[0] : " ";
+            this.data.realmLocation = args[0];
 
             SMSDelegate.RealmAuthenticationChains.getWithDefaults()
                 .done(function(data) {

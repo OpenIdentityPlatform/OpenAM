@@ -59,12 +59,12 @@ define('config/routes/admin/RealmsRoutes', function () {
             pattern: 'realms/?/authentication/chains',
             role: 'ui-admin'
         },
-        'realmsAuthenticationEditChain': {
+        'realmsAuthenticationChainEdit': {
             view: 'org/forgerock/openam/ui/admin/views/realms/RealmView',
             page: 'org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditChainView',
             url: scopedByRealm('authentication\/chains\/([^\/]+)'),
-            pattern: 'realms/?/authentication/chains/?',
-            role: 'ui-admin'
+            pattern: 'realms/?/authentication/chains/?',
+            role: 'ui-admin'
         },
         'realmsAuthenticationModules': {
             view: 'org/forgerock/openam/ui/admin/views/realms/RealmView',
@@ -73,7 +73,7 @@ define('config/routes/admin/RealmsRoutes', function () {
             pattern: 'realms/?/authentication/modules',
             role: 'ui-admin'
         },
-        'EditModuleView': {
+        'realmsAuthenticationModuleEdit': {
             view: 'org/forgerock/openam/ui/admin/views/realms/RealmView',
             page: 'org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditModuleView',
             url: scopedByRealm('authentication\/modules\/([^\/]+)'),

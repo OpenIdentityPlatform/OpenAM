@@ -36,9 +36,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AdvancedView",
         render: function (args, callback) {
             var self = this;
 
-            this.data.realm = Configuration.globalData.auth.subRealm || "Top level Realm";
-            this.data.consolePath = Constants.CONSOLE_PATH;
-
             SMSDelegate.RealmAuthentication.get()
             .done(function (data) {
                 self.data.formData = data;

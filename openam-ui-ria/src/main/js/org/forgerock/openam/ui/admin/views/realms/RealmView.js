@@ -26,6 +26,24 @@ define('org/forgerock/openam/ui/admin/views/realms/RealmView', [
         events: {
             'click .sidenav a[href]:not([data-toggle])': 'navigateToPage'
         },
+        findActiveNavItem: function (fragment) {
+            var element = this.$el.find('li a[href^="#' + fragment + '"]'),
+                parent, fragmentSections;
+            if (element.length) {
+                parent = element.parent();
+                parent.addClass('active');
+
+                // Expand any collapsed element direct above. Only works one level up
+                if (parent.parent().hasClass('collapse')) {
+                    $.support.transition = false;
+                    parent.parent().collapse('show');
+                    $.support.transition = true;
+                }
+            } else {
+                fragmentSections = fragment.split('/');
+                this.findActiveNavItem(fragmentSections.slice(0, -1).join('/'));
+            }
+        },
         navigateToPage: function (event) {
             this.$el.find('li').removeClass('active');
             $(event.currentTarget).parent().addClass('active');
@@ -39,7 +57,7 @@ define('org/forgerock/openam/ui/admin/views/realms/RealmView', [
                 var module = require(this.route.page);
                 if (module) {
                     this.nextRenderPage = false;
-                    this.renderPage(module);
+                    this.renderPage(module, this.args);
                 } else {
                     throw 'Unable to render realm page for module ' + this.route.page;
                 }
@@ -48,21 +66,12 @@ define('org/forgerock/openam/ui/admin/views/realms/RealmView', [
         render: function (args, callback) {
             var self = this;
 
-            this.data.realmName = args[0];
+            this.args = args;
+            this.data.realmLocation = args[0];
 
             this.parentRender(function () {
                 this.$el.find('li').removeClass('active');
-
-                var activeLink = this.$el.find('li a[href="#' + Router.getURIFragment() + '"]'), parent;
-                if (activeLink) {
-                    parent = activeLink.parent();
-                    parent.addClass('active');
-
-                    // Expand any collapsed element direct above. Only works one level up
-                    if (parent.parent().hasClass('collapse')) {
-                        parent.parent().collapse('show');
-                    }
-                }
+                this.findActiveNavItem(Router.getURIFragment());
 
                 self.renderPage(require(this.route.page), args, callback);
             });

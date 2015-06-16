@@ -28,7 +28,7 @@
                 </td>
                 <td>
                     <div class="pull-right btn-group">
-                        <button data-chain-name="{{_id}}" type="button" class="btn btn-transparent edit-chain-btn"><i class="fa fa-pencil"></i></button>
+                        <a class="btn btn-transparent edit-chain-btn" href="{{routeTo 'realmsAuthenticationChainEdit' ../realmLocation _id}}"><i class="fa fa-pencil"></i></a>
                         <button data-chain-name="{{_id}}" type="button" class="btn btn-transparent delete-chain-btn" {{#if active}}data-active="true"{{/if}}>
                         <i class="fa fa-close"></i>
                         </button>
