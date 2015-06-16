@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openidconnect;
@@ -340,7 +341,7 @@ public class Client extends JsonValue {
      */
     public Client(String clientID, String clientType, List<String> redirectionURIs, List<String> allowedGrantScopes,
                   List<String> defaultGrantScopes, List<String> displayName, List<String> displayDescription,
-                  String clientName, String subjectType, String idTokenSignedResponseAlgorithm,
+                  List<String> clientName, String subjectType, String idTokenSignedResponseAlgorithm,
                   List<String> postLogoutRedirectionURIs, String accessToken, String clientSessionURI, String applicationType,
                   String clientSecret, List<String> responseTypes, List<String> contacts, Long defaultMaxAge,
                   Boolean defaultMaxAgeEnabled, String tokenEndpointAuthMethod, String jwks,
@@ -666,24 +667,25 @@ public class Client extends JsonValue {
     }
 
     /**
-     * Gets the client name of the OAuth2Client. If the client name is {@code null}, {@code null} is returned.
+     * Gets the client names of the OAuth2Client. If the client name is {@code null}, {@code null} is returned.
      *
-     * @return The client name.
+     * @return The client names.
      */
-    public String getClientName() {
-        if (get(OAuth2Constants.ShortClientAttributeNames.CLIENT_NAME.getType()).asString() != null) {
-            return get(OAuth2Constants.ShortClientAttributeNames.CLIENT_NAME.getType()).asString();
+    public Set<String> getClientName() {
+        if (get(OAuth2Constants.ShortClientAttributeNames.CLIENT_NAME.getType()).asList(String.class) != null) {
+            return new HashSet<String>(get(OAuth2Constants.ShortClientAttributeNames.CLIENT_NAME.getType())
+                    .asList(String.class));
         } else {
             return null;
         }
     }
 
     /**
-     * Sets the client name of the OAuth2Client.
+     * Sets the client names of the OAuth2Client.
      *
-     * @param clientName The client name.
+     * @param clientName The client names.
      */
-    public void setClientName(String clientName) {
+    public void setClientName(List<String> clientName) {
         if (!StringUtils.isBlank(clientName)) {
             put(OAuth2Constants.ShortClientAttributeNames.CLIENT_NAME.getType(), clientName);
         }

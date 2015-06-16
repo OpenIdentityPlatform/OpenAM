@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-15 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openidconnect;
@@ -32,7 +33,7 @@ public class ClientBuilder {
     private List<String> defaultGrantScopes;
     private List<String> displayName;
     private List<String> displayDescription;
-    private String clientName;
+    private List<String> clientName;
     private String subjectType;
     private String idTokenSignedResponseAlgorithm;
     private List<String> postLogoutRedirectionURIs;
@@ -127,7 +128,7 @@ public class ClientBuilder {
      * @param clientName
      *            the client_name to set.
      */
-    public ClientBuilder setClientName(String clientName) {
+    public ClientBuilder setClientName(List<String> clientName) {
         this.clientName = clientName;
         return this;
     }

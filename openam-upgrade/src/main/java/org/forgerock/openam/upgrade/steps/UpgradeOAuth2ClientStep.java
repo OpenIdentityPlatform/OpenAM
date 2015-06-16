@@ -12,6 +12,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 package org.forgerock.openam.upgrade.steps;
 
@@ -62,7 +64,7 @@ public class UpgradeOAuth2ClientStep extends AbstractUpgradeStep {
 
     private static final String OAUTH2_DATA = "%OAUTH2_DATA%";
     public static final List<String> CHANGED_PROPERTIES = Arrays.asList(
-            REDIRECT_URI, SCOPES, DEFAULT_SCOPES, NAME, DESCRIPTION, POST_LOGOUT_URI);
+            REDIRECT_URI, SCOPES, DEFAULT_SCOPES, NAME, DESCRIPTION, POST_LOGOUT_URI, CLIENT_NAME);
     private static final Pattern pattern = Pattern.compile("\\[\\d+\\]=.*");
     private final Map<String, Map<AgentType, Map<String, Set<String>>>> upgradableConfigs =
             new HashMap<String, Map<AgentType, Map<String, Set<String>>>>();

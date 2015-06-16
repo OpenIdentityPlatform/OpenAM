@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openam.oauth2;
@@ -198,15 +199,12 @@ public class OpenAMClientDAO implements ClientDAO {
 
     private Map<String, Set<String>> createClientAttributeMap(Client client) {
         Map<String, Set<String>> clientAttributeMap = new HashMap<String, Set<String>>();
-        Set<String> temp;
 
         if (client.getClientSecret() != null) {
             clientAttributeMap.put(USERPASSWORD, CollectionUtils.asSet(client.getClientSecret()));
         }
 
         if (client.getAccessToken() != null) {
-            temp = new HashSet<String>();
-            temp.add(client.getAccessToken());
             clientAttributeMap.put(ACCESS_TOKEN, CollectionUtils.asSet(client.getAccessToken()));
         }
 
@@ -215,9 +213,7 @@ public class OpenAMClientDAO implements ClientDAO {
         }
 
         if (client.getClientName() != null) {
-            temp = new HashSet<String>();
-            temp.add(client.getClientName());
-            clientAttributeMap.put(CLIENT_NAME, CollectionUtils.asSet(client.getClientName()));
+            clientAttributeMap.put(CLIENT_NAME, formatSet(client.getClientName()));
         }
 
         if (client.getClientSessionURI() != null) {
@@ -252,14 +248,10 @@ public class OpenAMClientDAO implements ClientDAO {
         }
 
         if (client.getJwksUri() != null) {
-            temp = new HashSet<String>();
-            temp.add(client.getJwksUri());
             clientAttributeMap.put(JWKS_URI, CollectionUtils.asSet(client.getJwksUri()));
         }
 
         if (client.getX509() != null) {
-            temp = new HashSet<String>();
-            temp.add(client.getX509());
             clientAttributeMap.put(CLIENT_JWT_PUBLIC_KEY, CollectionUtils.asSet(client.getX509()));
         }
 
@@ -274,10 +266,6 @@ public class OpenAMClientDAO implements ClientDAO {
 
         if (client.getSubjectType() != null) {
             clientAttributeMap.put(SUBJECT_TYPE, CollectionUtils.asSet(client.getSubjectType().getType()));
-        }
-
-        if (client.getClientName() != null) {
-            clientAttributeMap.put(CLIENT_NAME, CollectionUtils.asSet(client.getClientName()));
         }
 
         if (client.getDefaultMaxAgeEnabled() != null) {
@@ -306,7 +294,7 @@ public class OpenAMClientDAO implements ClientDAO {
         }
 
         if (client.getPostLogoutRedirectionURIs() != null) {
-            temp = new HashSet<String>();
+            Set<String> temp = new HashSet<String>();
             temp.addAll(client.getPostLogoutRedirectionURIs());
             clientAttributeMap.put(POST_LOGOUT_URI, temp);
         }
@@ -352,7 +340,7 @@ public class OpenAMClientDAO implements ClientDAO {
 
         clientBuilder.setAccessToken(getSingleAttribute(clientAttributeMap, ACCESS_TOKEN));
         clientBuilder.setAllowedGrantScopes(new ArrayList<String>(getSetAttribute(clientAttributeMap, SCOPES)));
-        clientBuilder.setClientName(getSingleAttribute(clientAttributeMap, CLIENT_NAME));
+        clientBuilder.setClientName(new ArrayList<String>(getSetAttribute(clientAttributeMap, CLIENT_NAME)));
         clientBuilder.setClientSessionURI(getSingleAttribute(clientAttributeMap, CLIENT_SESSION_URI));
         clientBuilder.setClientType(getSingleAttribute(clientAttributeMap, CLIENT_TYPE));
         clientBuilder.setDefaultGrantScopes(new ArrayList<String>(getSetAttribute(clientAttributeMap, DEFAULT_SCOPES)));

@@ -17,10 +17,8 @@
 
 package org.forgerock.openam.openidconnect;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.OPENID;
 import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.CLIENT_ID;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.CLIENT_SECRET;
 
 import com.sun.identity.shared.validation.ValidationException;
 import java.net.MalformedURLException;
@@ -30,6 +28,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -284,8 +283,23 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
                 }
             }
 
-            if (input.get(CLIENT_NAME.getType()).asString() != null) {
-                clientBuilder.setClientName(input.get(CLIENT_NAME.getType()).asString());
+            List<String> clientNames = new ArrayList<String>();
+            Set<String> keys = input.keys();
+            for (String key : keys) {
+                if (key.equals(CLIENT_NAME.getType())) {
+                    clientNames.add(input.get(key).asString());
+                } else if (key.startsWith(CLIENT_NAME.getType())) {
+                    try {
+                        Locale locale = new Locale(key.substring(CLIENT_NAME.getType().length() + 1));
+                        clientNames.add(locale.toString() + "|" + input.get(key).asString());
+                    } catch (Exception e) {
+                        logger.error("Invalid locale for client_name.");
+                        throw new InvalidClientMetadata("Invalid locale for client_name.");
+                    }
+                }
+            }
+            if (clientNames != null) {
+                clientBuilder.setClientName(clientNames);
             }
 
             if (input.get(CLIENT_DESCRIPTION.getType()).asList() != null) {
@@ -391,6 +405,7 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
         }
 
         Map<String, Object> response = client.asMap();
+        response = convertClientReadResponseFormat(response);
 
         response.put(REGISTRATION_CLIENT_URI,
                 deploymentUrl + "/oauth2/connect/register?client_id=" + client.getClientID());
@@ -399,6 +414,22 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
         response.put(EXPIRES_AT, 0);
 
         return new JsonValue(response);
+    }
+
+    private Map<String, Object> convertClientReadResponseFormat(Map<String, Object> response) {
+        ArrayList<String> clientNames = (ArrayList<String>) response.get(CLIENT_NAME.getType());
+        response.remove(CLIENT_NAME.getType());
+        if (clientNames != null && !clientNames.isEmpty()) {
+            for (String clientName : clientNames) {
+                if (clientName.indexOf("|") >= 0) {
+                    String[] localeAndClientName = clientName.split("\\|");
+                    response.put(CLIENT_NAME.getType() + "#" + localeAndClientName[0], localeAndClientName[1]);
+                } else {
+                    response.put(CLIENT_NAME.getType(), clientName);
+                }
+            }
+        }
+        return response;
     }
 
     /**
@@ -477,7 +508,7 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
             client.remove(CLIENT_SECRET.getType());
             client.remove(REGISTRATION_ACCESS_TOKEN.getType());
 
-            return new JsonValue(client.asMap());
+            return new JsonValue(convertClientReadResponseFormat(client.asMap()));
         } else {
             logger.error("ConnectClientRegistration.readRequest(): No client id sent");
             throw new InvalidRequestException();
