@@ -22,32 +22,24 @@ define("org/forgerock/openam/ui/policy/policies/PolicyActionsView", [
 ], function (AbstractView, StripedList) {
 
     var PolicyActionsView = AbstractView.extend({
-        element: "#actions",
-        template: "templates/policy/policies/PolicyActionsTemplate.html",
+        element: '#actions',
+        template: 'templates/policy/policies/PolicyActionsTemplate.html',
         noBaseTemplate: true,
         events: {
-          'click .radio-inline': 'changePermission'
+            'click .radio-inline': 'changePermission'
         },
 
         render: function (data, callback) {
             _.extend(this.data, data);
 
-            var self = this,
-                availableActions = data.options.availableActions,
-                selectedActions = data.entity.actionValues,
-                itemTpl = "templates/policy/policies/StripedListActionItemTemplate.html";
+            var availableActions = _.cloneDeep(data.options.availableActions),
+                selectedActions = [],
+                itemTpl = 'templates/policy/policies/StripedListActionItemTemplate.html';
 
-            this.selectedActions = [];
-
-            if (!_.isEmpty(selectedActions)) {
-                _.each(availableActions, function (action) {
-                    if ( _.has(selectedActions, action.action)) {
-                        data.options.availableActions = _.without(data.options.availableActions,  _.findWhere(data.options.availableActions, {action: action.action}));
-                        self.selectedActions.push(action);
-                        data.entity.actionValues[action.action] = action.value;
-                    }
-                });
-            }
+            _.each(data.entity.actionValues, function (value, key) {
+                availableActions = _.without(availableActions, _.findWhere(availableActions, {action: key}));
+                selectedActions.push({action: key, value: value});
+            });
 
             this.parentRender(function () {
                 var d1 = $.Deferred(), d2 = $.Deferred();
@@ -55,7 +47,7 @@ define("org/forgerock/openam/ui/policy/policies/PolicyActionsView", [
                 this.actionsListView = new StripedList();
                 this.actionsListView.render({
                     itemTpl: itemTpl,
-                    items: this.data.options.availableActions,
+                    items: availableActions,
                     title: $.t('policy.actions.availableActions'),
                     clickItem: this.selectAction.bind(this)
                 }, '#availableActions', function () {
@@ -65,7 +57,7 @@ define("org/forgerock/openam/ui/policy/policies/PolicyActionsView", [
                 this.actionsListSelectedView = new StripedList();
                 this.actionsListSelectedView.render({
                     itemTpl: itemTpl,
-                    items: this.selectedActions,
+                    items: selectedActions,
                     title: $.t('policy.actions.selectedActions'),
                     created: true,
                     clickItem: this.deselectAction.bind(this)
@@ -82,29 +74,31 @@ define("org/forgerock/openam/ui/policy/policies/PolicyActionsView", [
         },
 
         selectAction: function (item) {
-            var action = _.findWhere(this.data.options.availableActions, {action: item});
-            this.moveSelected(action, this.actionsListView, this.actionsListSelectedView);
+            var action = _.findWhere(this.actionsListView.getAllItems(), {action: item}),
+                cloned = _.clone(action);
 
-            this.data.options.availableActions = _.without(this.data.options.availableActions, action);
-            this.selectedActions.push(action);
+            this.removeSelected(action, this.actionsListView);
+            this.addSelected(cloned, this.actionsListSelectedView);
 
             this.data.entity.actionValues[action.action] = action.value;
         },
 
         deselectAction: function (item) {
-            var action = _.findWhere(this.selectedActions, {action: item});
-            this.moveSelected(action, this.actionsListSelectedView, this.actionsListView);
+            var action = _.findWhere(this.actionsListSelectedView.getAllItems(), {action: item}),
+                initialAction = _.clone(_.findWhere(this.data.options.availableActions, {action: item}));
 
-            this.selectedActions = _.without(this.selectedActions, action);
-            this.data.options.availableActions.push(action);
+            this.removeSelected(action, this.actionsListSelectedView);
+            this.addSelected(initialAction, this.actionsListView);
 
             delete this.data.entity.actionValues[item];
         },
 
-        moveSelected: function (item, fromView, toView) {
+        removeSelected: function (item, fromView) {
             fromView.removeItem(item);
             fromView.renderItems();
+        },
 
+        addSelected: function (item, toView) {
             toView.addItem(item);
             toView.renderItems();
         },
@@ -119,11 +113,14 @@ define("org/forgerock/openam/ui/policy/policies/PolicyActionsView", [
             actionName = $target.closest('li').data('listItem');
             itemSelected = $target.closest('li').data('itemSelected');
 
-            _.find(itemSelected ? this.selectedActions : this.data.options.availableActions, function (action) {
-                return action.action === actionName;
-            }).value = permitted;
+            _.findWhere(itemSelected ? this.actionsListSelectedView.getAllItems() : this.actionsListView.getAllItems(),
+                function (action) {
+                    return action.action === actionName;
+                }).value = permitted;
 
-            this.data.entity.actionValues[actionName] = permitted;
+            if (itemSelected) {
+                this.data.entity.actionValues[actionName] = permitted;
+            }
         }
     });
 

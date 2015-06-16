@@ -69,8 +69,8 @@
                     <div class="panel-body">
                         {{#if options.availableResourceTypes}}
                         <div class="form-group">
-                            <label class="col-sm-2 control-label" for="availableResTypes">{{t "policy.common.resourceTypes"}}</label>
-                            <div class="col-sm-8">
+                            <label class="col-sm-2 res-type-label" for="availableResTypes">{{t "policy.common.resourceTypes"}}</label>
+                            <div class="col-sm-4">
                                 <select id="availableResTypes" class="form-control">
                                     <option value="">{{t "policy.policies.edit.selectResourceType"}}</option>
                                     {{#each options.availableResourceTypes}}

@@ -41,7 +41,7 @@ define("org/forgerock/openam/ui/policy/common/StripedListView", [
         render: function (data, el, callback) {
             this.data = data;
             this.element = el;
-            this.items = data.items ? _.clone(data.items).sort() : [];
+            this.items = data.items ? _.cloneDeep(data.items).sort() : [];
 
             if (!this.data.itemTpl) {
                 this.data.itemTpl = "templates/policy/common/StripedListItemTemplate.html";
