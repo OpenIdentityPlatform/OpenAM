@@ -142,11 +142,6 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-distauth</artifactId>
-            <type>war</type>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-clientsdk</artifactId>
             <type>jar</type>
         </dependency>
