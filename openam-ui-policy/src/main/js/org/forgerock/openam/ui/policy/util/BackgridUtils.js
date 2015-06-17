@@ -70,7 +70,7 @@ define("org/forgerock/openam/ui/policy/util/BackgridUtils", [
             this.$el.empty();
 
             var object = this.model.get(this.column.attributes.name),
-                result = '<div class="multiple-columns"><dl class="dl-horizontal">',
+                result = '<dl class="dl-horizontal">',
                 prop;
 
             for (prop in object) {
@@ -80,7 +80,7 @@ define("org/forgerock/openam/ui/policy/util/BackgridUtils", [
                     result += '<dt>' + prop + '</dt><dd>' + JSON.stringify(object[prop]) + '</dd>';
                 }
             }
-            result += '</dl></div>';
+            result += '</dl>';
 
             this.$el.append(result);
 
