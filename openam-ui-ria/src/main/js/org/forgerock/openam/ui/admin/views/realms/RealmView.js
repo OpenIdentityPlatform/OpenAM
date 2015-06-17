@@ -67,7 +67,8 @@ define('org/forgerock/openam/ui/admin/views/realms/RealmView', [
             var self = this;
 
             this.args = args;
-            this.data.realmLocation = args[0] === "/" ? "Top Level Realm" : args[0];
+            this.data.realmLocation = args[0];
+            this.data.realmName = this.data.realmLocation === "/" ? "Top Level Realm" : this.data.realmLocation;
 
             this.parentRender(function () {
                 this.$el.find('li').removeClass('active');
