@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions copyright 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.cli.realm;
 
@@ -104,19 +104,19 @@ public class RealmGetServiceAttributeValues extends AuthenticatedCommand {
             writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                 "SUCCEED_GET_REALM_SERVICE_ATTR_VALUES", params);
         } catch (IdRepoException e) {
-            String[] args = {realm, e.getMessage()};
+            String[] args = {realm, serviceName, e.getMessage()};
             debugError("RealmGetServiceAttributeValues.handleRequest", e);
             writeLog(LogWriter.LOG_ERROR, Level.INFO,
                 "FAILED_GET_REALM_SERVICE_ATTR_VALUES", args);
             throw new CLIException(e,ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         } catch (SSOException e) {
-            String[] args = {realm, e.getMessage()};
+            String[] args = {realm, serviceName, e.getMessage()};
             debugError("RealmGetServiceAttributeValues.handleRequest", e);
             writeLog(LogWriter.LOG_ERROR, Level.INFO,
                 "FAILED_GET_REALM_SERVICE_ATTR_VALUES", args);
             throw new CLIException(e,ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         } catch (SMSException e) {
-            String[] args = {realm, e.getMessage()};
+            String[] args = {realm, serviceName, e.getMessage()};
             debugError("RealmGetServiceAttributeValues.handleRequest", e);
             writeLog(LogWriter.LOG_ERROR, Level.INFO,
                 "FAILED_GET_REALM_SERVICE_ATTR_VALUES", args);

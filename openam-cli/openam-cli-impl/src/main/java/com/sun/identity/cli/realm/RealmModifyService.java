@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions copyright 2015 ForgeRock AS.
+ */
 package com.sun.identity.cli.realm;
 
 
@@ -121,19 +124,19 @@ public class RealmModifyService extends AuthenticatedCommand {
                     (Object[])params));
             }
         } catch (IdRepoException e) {
-            String[] args = {realm, e.getMessage()};
+            String[] args = {realm, serviceName, e.getMessage()};
             debugError("RealmModifyService.handleRequest", e);
             writeLog(LogWriter.LOG_ERROR, Level.INFO,
                 "FAILED_MODIFY_SERVICE_REALM", args);
             throw new CLIException(e,ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         } catch (SSOException e) {
-            String[] args = {realm, e.getMessage()};
+            String[] args = {realm, serviceName, e.getMessage()};
             debugError("RealmModifyService.handleRequest", e);
             writeLog(LogWriter.LOG_ERROR, Level.INFO,
                 "FAILED_MODIFY_SERVICE_REALM", args);
             throw new CLIException(e,ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         } catch (SMSException e) {
-            String[] args = {realm, e.getMessage()};
+            String[] args = {realm, serviceName, e.getMessage()};
             debugError("RealmModifyService.handleRequest", e);
             writeLog(LogWriter.LOG_ERROR, Level.INFO,
                 "FAILED_MODIFY_SERVICE_REALM", args);

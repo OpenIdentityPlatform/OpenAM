@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010-2011] [ForgeRock AS]
+ * Portions copyright 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.cli.realm;
@@ -111,19 +111,19 @@ public class RealmAssignService extends AuthenticatedCommand {
             writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                 "SUCCEED_ASSIGN_SERVICE_TO_REALM", params);
         } catch (SSOException e) {
-            String[] args = {realm, e.getMessage()};
+            String[] args = {realm, serviceName, e.getMessage()};
             debugError("RealmAssignService.handleRequest", e);
             writeLog(LogWriter.LOG_ERROR, Level.INFO,
                 "FAILED_ASSIGN_SERVICE_TO_REALM", args);
             throw new CLIException(e,ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         } catch (IdRepoException e) {
-            String[] args = {realm, e.getMessage()};
+            String[] args = {realm, serviceName, e.getMessage()};
             debugError("RealmAssignService.handleRequest", e);
             writeLog(LogWriter.LOG_ERROR, Level.INFO,
                 "FAILED_ASSIGN_SERVICE_TO_REALM", args);
             throw new CLIException(e,ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         } catch (SMSException e) {
-            String[] args = {realm, e.getMessage()};
+            String[] args = {realm, serviceName, e.getMessage()};
             debugError("RealmAssignService.handleRequest", e);
             writeLog(LogWriter.LOG_ERROR, Level.INFO,
                 "FAILED_ASSIGN_SERVICE_TO_REALM", args);

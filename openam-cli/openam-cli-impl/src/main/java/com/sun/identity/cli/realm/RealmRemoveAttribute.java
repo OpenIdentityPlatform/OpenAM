@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions copyright 2015 ForgeRock AS.
+ */
 package com.sun.identity.cli.realm;
 
 
@@ -76,7 +79,7 @@ public class RealmRemoveAttribute extends AuthenticatedCommand {
             writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                 "SUCCEED_REMOVE_REALM_ATTRIBUTE", params);
         } catch (SMSException e) {
-            String[] args = {realm, e.getMessage()};
+            String[] args = {realm, serviceName, attributeName, e.getMessage()};
             debugError("RealmRemoveAttribute.handleRequest", e);
             writeLog(LogWriter.LOG_ERROR, Level.INFO,
                 "FAILED_REMOVE_REALM_ATTRIBUTE", args);
