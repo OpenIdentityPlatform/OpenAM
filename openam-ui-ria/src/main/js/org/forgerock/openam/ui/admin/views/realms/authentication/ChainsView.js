@@ -29,6 +29,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
             'change input[data-chain-name]' : 'chainSelected',
             'click  button.delete-chain-btn': 'deleteChain',
             'click  #deleteChains'          : 'deleteChains',
+            'click  #selectAll'             : 'selectAll',
             'click  #addChain'              : 'addChain'
         },
         addChain: function(e) {
@@ -86,13 +87,23 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
                 row.removeClass('selected');
             }
         },
+        selectAll: function(event) {
+            var checked = $(event.currentTarget).is(':checked');
+            this.$el.find('.sorted-chains input[type=checkbox]:not(:disabled)').prop('checked', checked);
+            if (checked) {
+                this.$el.find('.sorted-chains').addClass('selected');
+            } else {
+                this.$el.find('.sorted-chains').removeClass('selected');
+            }
+            this.$el.find('#deleteChains').prop('disabled', !checked);
+        },
         deleteChain: function(event) {
             var self = this,
                 chainName = $(event.currentTarget).attr('data-chain-name');
 
             SMSDelegate.RealmAuthenticationChain.remove(chainName)
                 .done(function(data) {
-                    self.render();
+                    self.render([self.data.realmLocation]);
                 })
                 .fail(function() {
                     // TODO: Add failure condition
@@ -109,7 +120,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
 
             $.when(promises)
                 .done(function(data) {
-                    self.render();
+                    self.render([self.data.realmLocation]);
                 })
                 .fail(function() {
                     // TODO: Add failure condition

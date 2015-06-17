@@ -11,15 +11,15 @@
         <table class="table table-striped table-hover">
             <thead>
             <tr>
-                <th class="col-check"><input data-chain-name="{{_id}}" type="checkbox" /></th>
+                <th class="col-check"><input id="selectAll" type="checkbox" /></th>
                 <th>{{t 'console.authentication.chains.chainName'}}</th>
                 <th class="col-btn"></th>
             </tr>
             </thead>
             <tbody>
             {{#each sortedChains}}
-            <tr>
-                <td><input data-chain-name="{{_id}}" type="checkbox" {{#if defaultConfig}}disabled{{/if}}/></td>
+            <tr class="sorted-chains">
+                <td class="col-check"><input data-chain-name="{{_id}}" type="checkbox" {{#if defaultConfig}}disabled{{/if}}/></td>
                 <td>{{_id}}
                     {{#if defaultConfig}}
                     <div class="default-config">
