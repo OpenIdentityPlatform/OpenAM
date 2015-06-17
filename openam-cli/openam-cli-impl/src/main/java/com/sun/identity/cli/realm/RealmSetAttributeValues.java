@@ -25,11 +25,11 @@
  * $Id: RealmSetAttributeValues.java,v 1.7 2008/08/26 21:13:15 veiming Exp $
  */
 
-package com.sun.identity.cli.realm;
-
 /*
  * Portions copyright 2015 ForgeRock AS.
  */
+package com.sun.identity.cli.realm;
+
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.cli.AttributeValues;
 import com.sun.identity.cli.AuthenticatedCommand;
