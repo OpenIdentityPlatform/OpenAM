@@ -107,9 +107,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
                 redirectionURIs.add(URI.create(uri));
             }
         } catch (Exception e){
-            if (logger.errorEnabled()) {
-                logger.error("Unable to get "+ OAuth2Constants.OAuth2Client.REDIRECT_URI +" from repository", e);
-            }
+            logger.error("Unable to get {} from repository", OAuth2Constants.OAuth2Client.REDIRECT_URI, e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.REDIRECT_URI +" from repository");
         }
@@ -124,9 +122,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         try {
             set = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.RESPONSE_TYPES);
         } catch (Exception e){
-            if (logger.errorEnabled()) {
-                logger.error("Unable to get "+ OAuth2Constants.OAuth2Client.RESPONSE_TYPES +" from repository", e);
-            }
+            logger.error("Unable to get {} from repository", OAuth2Constants.OAuth2Client.RESPONSE_TYPES, e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.RESPONSE_TYPES +" from repository");
         }
@@ -141,9 +137,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         try {
             set = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.USERPASSWORD);
         } catch (Exception e) {
-            if (logger.errorEnabled()) {
-                logger.error("Unable to get "+ OAuth2Constants.OAuth2Client.USERPASSWORD +" from repository", e);
-            }
+            logger.error("Unable to get {} from repository", OAuth2Constants.OAuth2Client.USERPASSWORD, e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.USERPASSWORD +" from repository");
         }
@@ -169,9 +163,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         try {
             displayName = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.NAME);
         } catch (Exception e){
-            if (logger.errorEnabled()) {
-                logger.error("Unable to get "+ OAuth2Constants.OAuth2Client.NAME +" from repository", e);
-            }
+            logger.error("Unable to get {} from repository", OAuth2Constants.OAuth2Client.NAME, e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.NAME +" from repository");
         }
@@ -200,9 +192,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         try {
             displayDescription = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.DESCRIPTION);
         } catch (Exception e){
-            if (logger.errorEnabled()) {
-                logger.error("Unable to get "+ OAuth2Constants.OAuth2Client.DESCRIPTION +" from repository", e);
-            }
+            logger.error("Unable to get {} from repository", OAuth2Constants.OAuth2Client.DESCRIPTION, e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.DESCRIPTION +" from repository");
         }
@@ -238,9 +228,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         try {
             scopes = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.SCOPES);
         } catch (Exception e) {
-            if (logger.errorEnabled()) {
-                logger.error("Unable to get "+ OAuth2Constants.OAuth2Client.SCOPES +" from repository", e);
-            }
+            logger.error("Unable to get {} from repository", OAuth2Constants.OAuth2Client.SCOPES, e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.SCOPES +" from repository");
         }
@@ -308,9 +296,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         try {
             scopes = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.DEFAULT_SCOPES);
         } catch (Exception e){
-            if (logger.errorEnabled()) {
-                logger.error("Unable to get "+ OAuth2Constants.OAuth2Client.DEFAULT_SCOPES +" from repository", e);
-            }
+            logger.error("Unable to get {} from repository", OAuth2Constants.OAuth2Client.DEFAULT_SCOPES, e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.DEFAULT_SCOPES +" from repository");
         }
@@ -360,9 +346,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         try {
             set = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.CLIENT_SESSION_URI);
         } catch (Exception e) {
-            if (logger.errorEnabled()) {
-                logger.error("Unable to get "+ OAuth2Constants.OAuth2Client.CLIENT_SESSION_URI +" from repository", e);
-            }
+            logger.error("Unable to get {} from repository", OAuth2Constants.OAuth2Client.CLIENT_SESSION_URI, e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.CLIENT_SESSION_URI +" from repository");
         }
@@ -382,9 +366,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
                 clientType = ClientType.PUBLIC;
             }
         } catch (Exception e) {
-            if (logger.errorEnabled()) {
-                logger.error("Unable to get "+ OAuth2Constants.OAuth2Client.CLIENT_TYPE +" from repository", e);
-            }
+            logger.error("Unable to get {} from repository", OAuth2Constants.OAuth2Client.CLIENT_TYPE, e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.CLIENT_TYPE +" from repository");
         }
@@ -414,9 +396,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         try {
             set = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.IDTOKEN_SIGNED_RESPONSE_ALG);
         } catch (Exception e) {
-            if (logger.errorEnabled()) {
-                logger.error("Unable to get "+ OAuth2Constants.OAuth2Client.IDTOKEN_SIGNED_RESPONSE_ALG +" from repository", e);
-            }
+            logger.error("Unable to get {} from repository", OAuth2Constants.OAuth2Client.IDTOKEN_SIGNED_RESPONSE_ALG, e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.IDTOKEN_SIGNED_RESPONSE_ALG +" from repository");
         }
@@ -435,9 +415,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         try {
             authMethodSet = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.TOKEN_ENDPOINT_AUTH_METHOD);
         } catch (Exception e) {
-            if (logger.errorEnabled()) {
-                logger.error("Unable to get "+ OAuth2Constants.OAuth2Client.TOKEN_ENDPOINT_AUTH_METHOD +" from repository", e);
-            }
+            logger.error("Unable to get {} from repository", OAuth2Constants.OAuth2Client.TOKEN_ENDPOINT_AUTH_METHOD, e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.TOKEN_ENDPOINT_AUTH_METHOD +" from repository");
         }
@@ -460,9 +438,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         try {
             subjectTypeSet = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.SUBJECT_TYPE);
         } catch (Exception e) {
-            if (logger.errorEnabled()) {
-                logger.error("Unable to get "+ OAuth2Constants.OAuth2Client.SUBJECT_TYPE +" from repository", e);
-            }
+            logger.error("Unable to get {} from repository", OAuth2Constants.OAuth2Client.SUBJECT_TYPE, e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.SUBJECT_TYPE +" from repository");
         }
@@ -489,9 +465,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
                     return byX509Key(jwt);
             }
         } catch (Exception e) {
-            if (logger.errorEnabled()) {
-                logger.error("Unable to get Client Bearer Jwt Public key from repository", e);
-            }
+            logger.error("Unable to get Client Bearer Jwt Public key from repository", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get Client Bearer Jwt Public key from repository");
         }
@@ -574,15 +548,11 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         try {
             set = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.PUBLIC_KEY_SELECTOR);
         } catch (SSOException e) {
-            if (logger.errorEnabled()) {
-                logger.error("Unable to get " + OAuth2Constants.OAuth2Client.PUBLIC_KEY_SELECTOR + " from repository", e);
-            }
+            logger.error("Unable to get {} from repository", OAuth2Constants.OAuth2Client.PUBLIC_KEY_SELECTOR, e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.PUBLIC_KEY_SELECTOR +" from repository");
         } catch (IdRepoException e) {
-            if (logger.errorEnabled()) {
-                logger.error("Unable to get " + OAuth2Constants.OAuth2Client.PUBLIC_KEY_SELECTOR + " from repository", e);
-            }
+            logger.error("Unable to get {} from repository", OAuth2Constants.OAuth2Client.PUBLIC_KEY_SELECTOR, e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.PUBLIC_KEY_SELECTOR +" from repository");
         }
@@ -603,21 +573,15 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
             }
 
         } catch (SSOException e) {
-            if (logger.errorEnabled()) {
-                logger.error("Unable to get " + OAuth2Constants.OAuth2Client.SECTOR_IDENTIFIER_URI + " from repository", e);
-            }
+            logger.error("Unable to get {} from repository", OAuth2Constants.OAuth2Client.SECTOR_IDENTIFIER_URI, e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.SECTOR_IDENTIFIER_URI +" from repository");
         } catch (IdRepoException e) {
-            if (logger.errorEnabled()) {
-                logger.error("Unable to get " + OAuth2Constants.OAuth2Client.SECTOR_IDENTIFIER_URI + " from repository", e);
-            }
+            logger.error("Unable to get {} from repository", OAuth2Constants.OAuth2Client.SECTOR_IDENTIFIER_URI, e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.SECTOR_IDENTIFIER_URI +" from repository");
         } catch (URISyntaxException e) {
-            if (logger.errorEnabled()) {
-                logger.error("Unable to get " + OAuth2Constants.OAuth2Client.SECTOR_IDENTIFIER_URI + " from repository", e);
-            }
+            logger.error("Unable to get {} from repository", OAuth2Constants.OAuth2Client.SECTOR_IDENTIFIER_URI, e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.SECTOR_IDENTIFIER_URI +" from repository");
         }
@@ -634,9 +598,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
             if (getSectorIdentifierUri() != null) {
                 host = getSectorIdentifierUri().getHost();
             } else if (getRedirectUris().size() != 1 && containsMultipleRedirectUriHosts(getRedirectUris())) {
-                if (logger.messageEnabled()) {
-                    logger.message("Must configure sector identifier uri when multiple redirect uris are specified.");
-                }
+                logger.message("Must configure sector identifier uri when multiple redirect uris are specified.");
                 return null;
             } else {
                 host = getRedirectUris().iterator().next().getHost();
@@ -653,14 +615,10 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
             byte[] hash = digest.digest(concat.getBytes("UTF-8"));
             return Base64.encode(hash);
         } catch (UnsupportedEncodingException e) {
-            if (logger.messageEnabled()) {
-                logger.message("Unable to encrypt the sub value for user.");
-            }
+            logger.message("Unable to encrypt the sub value for user.");
             return null;
         } catch (ServerException e) {
-            if (logger.messageEnabled()) {
-                logger.message("Unable to encrypt the sub value for user.");
-            }
+            logger.message("Unable to encrypt the sub value for user.");
             return null;
         }
     }
