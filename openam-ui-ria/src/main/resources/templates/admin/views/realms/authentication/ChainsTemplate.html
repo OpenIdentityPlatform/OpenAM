@@ -18,7 +18,7 @@
             </thead>
             <tbody>
             {{#each sortedChains}}
-            <tr class="sorted-chains">
+            <tr class="sorted-chains {{#if defaultConfig}}default-config-row{{/if}}">
                 <td class="col-check"><input data-chain-name="{{_id}}" type="checkbox" {{#if defaultConfig}}disabled{{/if}}/></td>
                 <td>{{_id}}
                     {{#if defaultConfig}}

@@ -91,7 +91,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
             var checked = $(event.currentTarget).is(':checked');
             this.$el.find('.sorted-chains input[type=checkbox]:not(:disabled)').prop('checked', checked);
             if (checked) {
-                this.$el.find('.sorted-chains').addClass('selected');
+                this.$el.find('.sorted-chains:not(.default-config-row)').addClass('selected'); 
             } else {
                 this.$el.find('.sorted-chains').removeClass('selected');
             }
