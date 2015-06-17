@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,12 @@
  *
  * $Id: DNValidator.java,v 1.4 2009/01/28 05:34:52 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.ums.validation;
 
-import com.sun.identity.shared.ldap.util.DN;
+import org.forgerock.opendj.ldap.DN;
 
 /**
  *
@@ -59,10 +60,6 @@ public class DNValidator implements IValidator {
      * @return true if value is an DN
      */
     public boolean validate(String value) {
-        if (DN.isDN(value)) {
-            return true;
-        } else {
-            return false;
-        }
+        return !DN.valueOf(value).isRootDN();
     }
 }

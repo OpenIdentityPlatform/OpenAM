@@ -52,7 +52,7 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import static org.forgerock.openam.utils.CollectionUtils.*;
-import static org.forgerock.openam.idrepo.ldap.LDAPConstants.*;
+import static org.forgerock.openam.ldap.LDAPConstants.*;
 import org.forgerock.openam.idrepo.ldap.helpers.ADAMHelper;
 import org.forgerock.openam.idrepo.ldap.helpers.ADHelper;
 import org.forgerock.openam.idrepo.ldap.helpers.DirectoryHelper;
@@ -2064,7 +2064,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                     pSearch.addMovedOrRenamedListener(this);
                 }
                 pSearch.addListener(idRepoListener, getSupportedTypes());
-                pSearch.startPSearch();
+                pSearch.startSearch();
                 pSearchMap.put(pSearchId, pSearch);
             } else {
                 pSearch.addListener(idRepoListener, getSupportedTypes());
@@ -2094,7 +2094,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
                 pSearch.removeMovedOrRenamedListener(this);
                 pSearch.removeListener(idRepoListener);
                 if (!pSearch.hasListeners()) {
-                    pSearch.stopPSearch();
+                    pSearch.stopSearch();
                     pSearchMap.remove(pSearchId);
                 }
             }

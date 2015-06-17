@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,26 +24,30 @@
  *
  * $Id: SearchResults.java,v 1.7 2009/01/28 05:34:51 ww203982 Exp $
  *
- */
-
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.iplanet.ums;
+
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 import com.iplanet.services.ldap.Attr;
 import com.iplanet.services.ldap.AttrSet;
 import com.iplanet.services.util.I18n;
 import com.sun.identity.shared.debug.Debug;
-import java.security.Principal;
-import java.util.Hashtable;
-import java.util.NoSuchElementException;
-import com.sun.identity.shared.ldap.LDAPConnection;
-import com.sun.identity.shared.ldap.LDAPControl;
-import com.sun.identity.shared.ldap.LDAPEntry;
-import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.LDAPSearchResults;
-import com.sun.identity.shared.ldap.controls.LDAPVirtualListResponse;
+import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ErrorResultIOException;
+import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
+import org.forgerock.opendj.ldap.controls.Control;
+import org.forgerock.opendj.ldap.controls.VirtualListViewResponseControl;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
 
 /**
  * Represents search results. Each search result is a PersistentObject
@@ -113,15 +117,13 @@ public class SearchResults implements java.io.Serializable {
      *        results.
      * @param dataLayer Data Layer assosciated with the connection.
      */
-    protected SearchResults(
-        LDAPSearchResults ldapSearchResult,
-        LDAPConnection conn,
-        DataLayer dataLayer
-    ) {
+    protected SearchResults(Connection connection, ConnectionEntryReader ldapSearchResult, Connection conn,
+            DataLayer dataLayer) {
         // TODO: SearchResults is tightly coupled with DataLayer and
         // PersistentObject. That could make it harder to separate them
         // in the future.
         //
+        this.connection = connection;
         m_ldapSearchResults = ldapSearchResult;
         m_conn = conn;
         m_dataLayer = dataLayer;
@@ -139,9 +141,8 @@ public class SearchResults implements java.io.Serializable {
      * @param conn <code>LDAPConnection</code> associated with the search
      *        results.
      */
-    protected SearchResults(LDAPSearchResults ldapSearchResult,
-            LDAPConnection conn) {
-        this(ldapSearchResult, conn, null);
+    protected SearchResults(Connection connection, ConnectionEntryReader ldapSearchResult, Connection conn) {
+        this(connection, ldapSearchResult, conn, null);
     }
 
     /**
@@ -166,22 +167,35 @@ public class SearchResults implements java.io.Serializable {
      * @supported.api
      */
     public boolean hasMoreElements() {
-        boolean hasGotMoreElements;
-        hasGotMoreElements = (m_attrVals != null) ? 
-                (m_attrIndex < m_attrVals.length)
-                : m_ldapSearchResults.hasMoreElements();
-        if (!hasGotMoreElements && m_conn != null) {
-            if (debug.messageEnabled()) {
-                debug.message("Finishing SearchResults: " + this
-                        + "  with connection : " + m_conn);
-                debug.message("SearchResults: " + this
-                        + "  releasing connection : " + m_conn);
+        boolean hasGotMoreElements = false;
+        try {
+            hasGotMoreElements = (m_attrVals != null) ?
+                    (m_attrIndex < m_attrVals.length)
+                    : m_ldapSearchResults.hasNext();
+            if (hasGotMoreElements) {
+                readEntry();
             }
-
-            m_dataLayer.releaseConnection(m_conn);
-
+            if (debug.messageEnabled()) {
+            if (!hasGotMoreElements && m_conn != null) {
+                    debug.message("Finishing SearchResults: " + this
+                            + "  with connection : " + m_conn);
+                    debug.message("SearchResults: " + this
+                            + "  releasing connection : " + m_conn);
+                }
+            }
+        } catch (ErrorResultIOException | SearchResultReferenceIOException ignored) {
         }
         return hasGotMoreElements;
+    }
+
+    private void readEntry() throws SearchResultReferenceIOException, ErrorResultIOException {
+        if (m_ldapSearchResults != null) {
+            if (m_ldapSearchResults.isReference()) {
+                //Ignoring references
+                m_ldapSearchResults.readReference();
+            }
+            currentEntry = m_ldapSearchResults.readEntry();
+        }
     }
 
     /**
@@ -195,63 +209,45 @@ public class SearchResults implements java.io.Serializable {
         // TODO: define detailed exception list (eg. referral, ...)
         //
 
-        LDAPEntry ldapEntry;
+        SearchResultEntry ldapEntry;
 
-        try {
-            if (m_attrVals != null) {
-                if (m_attrIndex < m_attrVals.length) {
-                    String dn = m_attrVals[m_attrIndex++];
-                    PersistentObject pO = new PersistentObject();
-                    pO.setGuid(new Guid(dn));
-                    pO.setPrincipal(m_principal);
-                    return pO;
-                } else {
-                    throw new NoSuchElementException();
-                }
-            }
-            if ((ldapEntry = m_ldapSearchResults.next()) != null) {
-                String id = ldapEntry.getDN();
-                AttrSet attrSet = new AttrSet(ldapEntry.getAttributeSet());
-                Class javaClass = TemplateManager.getTemplateManager()
-                        .getJavaClassForEntry(id, attrSet);
-                PersistentObject pO = null;
-                try {
-                    pO = (PersistentObject) javaClass.newInstance();
-                } catch (Exception e) {
-                    String args[] = new String[1];
-
-                    args[0] = e.toString();
-                    String msg = i18n.getString(
-                            IUMSConstants.NEW_INSTANCE_FAILED, args);
-                    throw new UMSException(msg);
-                }
-                // Make it a live object
-                pO.setAttrSet(attrSet);
-                pO.setGuid(new Guid(ldapEntry.getDN()));
+        if (m_attrVals != null) {
+            if (m_attrIndex < m_attrVals.length) {
+                String dn = m_attrVals[m_attrIndex++];
+                PersistentObject pO = new PersistentObject();
+                pO.setGuid(new Guid(dn));
                 pO.setPrincipal(m_principal);
                 return pO;
+            } else {
+                throw new NoSuchElementException();
             }
-        } catch (LDAPException e) {
-            abandon();
-            debug.error("Exception in SearchResults.next: ", e);
-            String args[] = new String[1];
-            args[0] = e.errorCodeToString();
-            String msg = i18n.getString(IUMSConstants.NEXT_ENTRY_FAILED, args);
+        }
 
-            int errorCode = e.getLDAPResultCode();
-            switch (errorCode) {
-            case LDAPException.TIME_LIMIT_EXCEEDED: {
-                throw new TimeLimitExceededException(msg, e);
+        if ((ldapEntry = currentEntry) != null) {
+            String id = ldapEntry.getName().toString();
+            Collection<Attribute> attributes = new ArrayList<>();
+            for (Attribute attribute : ldapEntry.getAllAttributes()) {
+                attributes.add(attribute);
             }
-            case LDAPException.SIZE_LIMIT_EXCEEDED: {
-                throw new SizeLimitExceededException(msg, e);
+            AttrSet attrSet = new AttrSet(attributes);
+            Class javaClass = TemplateManager.getTemplateManager()
+                    .getJavaClassForEntry(id, attrSet);
+            PersistentObject pO = null;
+            try {
+                pO = (PersistentObject) javaClass.newInstance();
+            } catch (Exception e) {
+                String args[] = new String[1];
+
+                args[0] = e.toString();
+                String msg = i18n.getString(
+                        IUMSConstants.NEW_INSTANCE_FAILED, args);
+                throw new UMSException(msg);
             }
-            case LDAPException.ADMIN_LIMIT_EXCEEDED: {
-                throw new SizeLimitExceededException(msg, e);
-            }
-            default:
-                throw new UMSException(msg, e);
-            }
+            // Make it a live object
+            pO.setAttrSet(attrSet);
+            pO.setGuid(new Guid(ldapEntry.getName().toString()));
+            pO.setPrincipal(m_principal);
+            return pO;
         }
         return null;
     }
@@ -310,10 +306,10 @@ public class SearchResults implements java.io.Serializable {
 
         // The rest is related to vlv response control
         //
-        if (m_ldapSearchResults == null)
+        if (currentEntry == null)
             return null;
 
-        LDAPControl[] ctrls = m_ldapSearchResults.getResponseControls();
+        List<Control> ctrls = currentEntry.getControls();
 
         if (ctrls == null && expectVlvResponse() == true) {
 
@@ -376,14 +372,13 @@ public class SearchResults implements java.io.Serializable {
         if (ctrls == null)
             return null;
 
-        LDAPVirtualListResponse vlvResponse = null;
+        VirtualListViewResponseControl vlvResponse = null;
 
         // Find the VLV response control recorded in SearchResults
         //
-        for (int i = 0; i < ctrls.length; i++) {
-            if (ctrls[i].getType() ==
-                LDAPControl.LDAP_VIRTUAL_LIST_RESPONSE_CONTROL) {
-                vlvResponse = (LDAPVirtualListResponse) ctrls[i];
+        for (Control control : ctrls) {
+            if (VirtualListViewResponseControl.OID.equals(control.getOID())) {
+                vlvResponse = (VirtualListViewResponseControl) control;
             }
         }
 
@@ -392,18 +387,16 @@ public class SearchResults implements java.io.Serializable {
         // Currently only expose the VirtualListResponse control
         // returned after a search operation
         //
-        if (name.equalsIgnoreCase(VLVRESPONSE_CONTENT_COUNT)
-                && vlvResponse != null) {
-            return new Integer(vlvResponse.getContentCount());
-        } else if (name.equalsIgnoreCase(VLVRESPONSE_FIRST_POSITION)
-                && vlvResponse != null) {
-            return new Integer(vlvResponse.getFirstPosition());
-        } else if (name.equalsIgnoreCase(VLVRESPONSE_RESULT_CODE)
-                && vlvResponse != null) {
-            return new Integer(vlvResponse.getResultCode());
-        } else if (name.equalsIgnoreCase(VLVRESPONSE_CONTEXT)
-                && vlvResponse != null) {
-            return vlvResponse.getContext();
+        if (vlvResponse != null) {
+            if (name.equalsIgnoreCase(VLVRESPONSE_CONTENT_COUNT)) {
+                return vlvResponse.getContentCount();
+            } else if (name.equalsIgnoreCase(VLVRESPONSE_FIRST_POSITION)) {
+                return vlvResponse.getTargetPosition();
+            } else if (name.equalsIgnoreCase(VLVRESPONSE_RESULT_CODE)) {
+                return vlvResponse.getResult().intValue();
+            } else if (name.equalsIgnoreCase(VLVRESPONSE_CONTEXT)) {
+                return vlvResponse.getValue().toString();
+            }
         }
 
         // For all other unknown attribute names,
@@ -422,32 +415,8 @@ public class SearchResults implements java.io.Serializable {
      * @supported.api
      */
     public void abandon() throws UMSException {
-
-        /*
-         * If we add m_conn.isConnected() in the following check, we get
-         * LDAPException on the m_conn.abandon(...) line, if there are more
-         * results in the searchresults. The LDAPException is Failed to send
-         * abandon request to the server. (80); Unknown error
-         */
-        if (m_conn != null && m_ldapSearchResults != null) {
-            try {
-                m_dataLayer.releaseConnection(m_conn);
-                if (debug.messageEnabled()) {
-                    debug.message("Abandoning SearchResults: " + this
-                            + " connection : " + m_conn);
-                }
-                if (hasMoreElements()) {
-                    m_conn.abandon(m_ldapSearchResults);
-                }
-
-                if (debug.messageEnabled()) {
-                    debug.message("SearchResults: " + this
-                            + " releasing connection : " + m_conn);
-                }
-            } catch (LDAPException e) {
-                throw new UMSException(m_conn.toString(), e);
-            }
-        }
+        //Nothing to do
+        IOUtils.closeIfNotNull(connection, m_ldapSearchResults);
     }
 
     /**
@@ -544,9 +513,13 @@ public class SearchResults implements java.io.Serializable {
      * public void remove() { throw new UnsupportedOperationException(); } }; }
      */
 
-    private LDAPSearchResults m_ldapSearchResults = null;
+    private SearchResultEntry currentEntry = null;
 
-    private LDAPConnection m_conn = null;
+    private Connection connection;
+
+    private ConnectionEntryReader m_ldapSearchResults = null;
+
+    private Connection m_conn = null;
 
     private Principal m_principal = null;
 

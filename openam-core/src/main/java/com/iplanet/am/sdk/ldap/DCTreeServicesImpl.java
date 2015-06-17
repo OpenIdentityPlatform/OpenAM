@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,9 @@
  *
  * $Id: DCTreeServicesImpl.java,v 1.5 2009/01/28 05:34:48 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.iplanet.am.sdk.ldap;
 
 import java.util.Collections;
@@ -38,11 +36,13 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import com.sun.identity.shared.ldap.util.DN;
-
+import com.iplanet.am.sdk.AMConstants;
+import com.iplanet.am.sdk.AMException;
+import com.iplanet.am.sdk.AMSDKBundle;
+import com.iplanet.am.sdk.common.DCTreeServicesHelper;
+import com.iplanet.am.sdk.common.IDCTreeServices;
 import com.iplanet.services.ldap.Attr;
 import com.iplanet.services.ldap.AttrSet;
-import com.iplanet.services.ldap.ModSet;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.ums.Guid;
@@ -54,13 +54,8 @@ import com.iplanet.ums.UMSObject;
 import com.iplanet.ums.dctree.DomainComponent;
 import com.iplanet.ums.dctree.DomainComponentTree;
 import com.iplanet.ums.dctree.InvalidDCRootException;
-
-import com.iplanet.am.sdk.AMConstants;
-import com.iplanet.am.sdk.AMException;
-import com.iplanet.am.sdk.AMSDKBundle;
-import com.iplanet.am.sdk.common.DCTreeServicesHelper;
-import com.iplanet.am.sdk.common.IDCTreeServices;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.opendj.ldap.ModificationType;
 
 /**
  * This class <code>DCTree</code> contains the functionality to support a DC
@@ -317,9 +312,9 @@ public class DCTreeServicesImpl extends DCTreeServicesHelper implements
                                 + ocAttr.toString());
                     }
                     if (ocAttr.size() == 0)
-                        dcNode.modify(ocAttr, ModSet.DELETE);
+                        dcNode.modify(ocAttr, ModificationType.DELETE);
                     else
-                        dcNode.modify(ocAttr, ModSet.REPLACE);
+                        dcNode.modify(ocAttr, ModificationType.REPLACE);
                     dcNode.save();
                     attrSet.remove("objectclass");
                 }
@@ -328,10 +323,10 @@ public class DCTreeServicesImpl extends DCTreeServicesHelper implements
                     Attr attr = attrSet.elementAt(i);
                     if (attr.size() == 0) {
                         // remove attribute
-                        dcNode.modify(attr, ModSet.DELETE);
+                        dcNode.modify(attr, ModificationType.DELETE);
                     } else {
                         // replace attribute
-                        dcNode.modify(attr, ModSet.REPLACE);
+                        dcNode.modify(attr, ModificationType.REPLACE);
                     }
                 }
                 dcNode.save();
@@ -468,12 +463,7 @@ public class DCTreeServicesImpl extends DCTreeServicesHelper implements
 
     protected String getCanonicalDomain(SSOToken token, String orgDN)
             throws AMException {
-        String canonOrgDN = (new DN(orgDN)).toRFCString().toLowerCase();
-        /*
-         * if (AMCacheManager.isCachingEnabled()) { returnDomain = (String)
-         * canonicalDomainMap.get(canonOrgDN); if (returnDomain != null) {
-         * return returnDomain; } }
-         */
+        String canonOrgDN = CommonUtils.formatToRFC(orgDN);
         return updateCacheAndReturnDomain(token, canonOrgDN);
     }
 

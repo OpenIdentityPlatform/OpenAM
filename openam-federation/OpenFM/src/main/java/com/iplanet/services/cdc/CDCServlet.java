@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -67,10 +67,10 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.encode.URLEncDec;
-import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.sm.SMSEntry;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.ldap.LDAPUtils;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -93,7 +93,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 
 /**
  * The <code>CDCServlet</code> is the heart of the Cross Domain Single
@@ -494,7 +493,7 @@ public class CDCServlet extends HttpServlet {
                         try {
                             String orgDN = token.getProperty("Organization");
                         if (orgDN !=null ) {
-                                String tokenRealm = LDAPDN.explodeDN(orgDN, false)[0];
+                                String tokenRealm = LDAPUtils.rdnTypeFromDn(orgDN);
                                 if (tokenRealm.equalsIgnoreCase(SMSEntry.getRootSuffix())) {
                                     tokenRealm = "/";
                                 } else {

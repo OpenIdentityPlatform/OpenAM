@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,13 +24,13 @@
  *
  * $Id: Request.java,v 1.4 2009/01/28 05:34:50 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.services.ldap.event;
 
-import com.sun.identity.shared.ldap.LDAPConnection;
-
 import com.iplanet.sso.SSOToken;
+import org.forgerock.opendj.ldap.Connection;
 
 class Request {
 
@@ -61,7 +61,7 @@ class Request {
     // The event listener
     private IDSEventListener _listener;
 
-    private LDAPConnection _connection;
+    private Connection _connection;
 
     private long _lastUpdatedTime;
 
@@ -70,7 +70,7 @@ class Request {
      */
     Request(int id, String reqID, SSOToken requester, String baseDn, int scope,
             String filter, String[] attrs, int operations,
-            IDSEventListener listener, LDAPConnection connection,
+            IDSEventListener listener, Connection connection,
             long lastResponseTime) {
         _id = id;
         _reqID = reqID;
@@ -148,7 +148,7 @@ class Request {
         return _listener;
     }
 
-    protected LDAPConnection getLDAPConnection() {
+    protected Connection getLDAPConnection() {
         return _connection;
     }
 

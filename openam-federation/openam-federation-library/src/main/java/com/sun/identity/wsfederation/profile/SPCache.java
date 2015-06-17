@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,32 +24,28 @@
  *
  * $Id: SPCache.java,v 1.5 2009/12/14 23:42:48 mallas Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
-
 
 package com.sun.identity.wsfederation.profile;
 
-import com.sun.identity.shared.Constants;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Date;
-import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.wsfederation.common.WSFederationUtils;
 import com.sun.identity.common.PeriodicCleanUpMap;
 import com.sun.identity.common.SystemTimerPool;
 
-
 /**
  * This class provides the memory store for
  * WS-Federation request and response information on Service Provider side.
  *
  */
-
 public class SPCache {
 
     public static int interval = SAML2Constants.CACHE_CLEANUP_INTERVAL_DEFAULT;

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,14 +24,13 @@
  *
  * $Id: LocalLdapAuthModule.java,v 1.7 2009/01/28 05:34:52 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.sun.identity.authentication.internal.server;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.Map;
 import java.util.Set;
 
@@ -50,19 +49,31 @@ import com.sun.identity.authentication.internal.LoginModule;
 import com.sun.identity.authentication.internal.util.AuthI18n;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
+
+import javax.net.ssl.SSLContext;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginException;
-import com.sun.identity.shared.ldap.LDAPConnection;
-import com.sun.identity.shared.ldap.LDAPEntry;
-import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.LDAPSearchResults;
-import com.sun.identity.shared.ldap.LDAPv2;
-import com.sun.identity.shared.ldap.factory.JSSESocketFactory;
-import com.sun.identity.shared.ldap.util.DN;
+
+import com.sun.identity.sm.DNMapper;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.Connections;
+import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.ErrorResultIOException;
+import org.forgerock.opendj.ldap.LDAPConnectionFactory;
+import org.forgerock.opendj.ldap.LDAPOptions;
+import org.forgerock.opendj.ldap.SSLContextBuilder;
+import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.requests.Requests;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
 
 public class LocalLdapAuthModule implements LoginModule {
 
@@ -77,7 +88,7 @@ public class LocalLdapAuthModule implements LoginModule {
 
     private String baseDN = null;
 
-    private LDAPConnection conn = null;
+    private Connection conn = null;
 
     private CallbackHandler cbHandler;
 
@@ -166,7 +177,11 @@ public class LocalLdapAuthModule implements LoginModule {
     private boolean authenticate(String dn, String passwd)
             throws LoginException {
         // LDAP connection used for authentication
-        LDAPConnection localConn = null;
+        Connection localConn = null;
+
+        String host;
+        int port;
+        LDAPOptions ldapOptions = new LDAPOptions();
 
         // Check if organization is present in options
         String orgUrl = (String) options.get(LoginContext.ORGNAME);
@@ -187,31 +202,26 @@ public class LocalLdapAuthModule implements LoginModule {
                 String hostName = dscm.getHostName(DSConfigMgr.DEFAULT);
                 if (si.getConnectionType() == Server.Type.CONN_SSL) {
                     try {
-                        localConn = new LDAPConnection(new JSSESocketFactory(
-                                null));
-                    } catch (Exception e) {
+                        ldapOptions.setSSLContext(new SSLContextBuilder().getSSLContext());
+                    } catch (GeneralSecurityException e) {
                         debug.error("getConnection.JSSESocketFactory", e);
                         throw new LDAPServiceException(AuthI18n.authI18n
                                 .getString(IUMSConstants.DSCFG_JSSSFFAIL));
                     }
-                } else {
-                    localConn = new LDAPConnection();
                 }
-                if ((dn != null) && (passwd != null)) {
+                if (dn != null && passwd != null) {
                     // The 389 port number passed is overridden by the
                     // hostName:port
                     // constructed by the getHostName method. So, this is not
                     // a hardcoded port number.
-                    localConn.connect(3, hostName, 389, dn, passwd);
+                    host = hostName;
+                    port = 389;
                 } else {
                     // Throw LoginException
                     throw new LoginException(AuthI18n.authI18n
                             .getString(IUMSConstants.DSCFG_CONNECTFAIL));
                 }
             } catch (LDAPServiceException ex) {
-                debug.error("Authenticate failed: " + ex);
-                throw new LoginException(ex.getMessage());
-            } catch (LDAPException ex) {
                 debug.error("Authenticate failed: " + ex);
                 throw new LoginException(ex.getMessage());
             }
@@ -248,42 +258,32 @@ public class LocalLdapAuthModule implements LoginModule {
                 }
                 if (useSSL) {
                     try {
-                        localConn = new LDAPConnection(new JSSESocketFactory(
-                                null));
-                        if (debug.messageEnabled()) {
-                            debug.message("authenticate(): LDAPConnection " +
-                                    "created with new JSSESocetFactory");
-                        }
-                    } catch (Exception e) {
+                        ldapOptions.setSSLContext(new SSLContextBuilder().getSSLContext());
+                    } catch (GeneralSecurityException e) {
                         debug.error("authentication().JSSESocketFactory()", e);
                         throw (new LoginException(e.getMessage()));
                     }
-                } else {
-                    localConn = new LDAPConnection();
                 }
                 if (debug.messageEnabled()) {
                     debug.message("before connect(), hostName=" + hostName
                             + ",port=" + portNumber);
                 }
-                localConn.connect(hostName, Integer.parseInt(portNumber));
+                host = hostName;
+                port = Integer.parseInt(portNumber);
             } catch (Exception e) {
                 debug.error("authentication", e);
                 throw (new LoginException(e.getMessage()));
             }
         }
 
-        try {
-            localConn.authenticate(3, dn, passwd);
-        } catch (LDAPException ex) {
-            throw (new LoginException(ex.getMessage()));
-        } finally {
-            try {
-                localConn.disconnect();
-            } catch (LDAPException e) {
-                // do nothing
-            }
+        try (ConnectionFactory factory = Connections.newAuthenticatedConnectionFactory(
+                new LDAPConnectionFactory(host, port, ldapOptions),
+                Requests.newSimpleBindRequest(dn, passwd.toCharArray()));
+             Connection conn = factory.getConnection()) {
+            return true;
+        } catch (ErrorResultException e) {
+            throw new LoginException(e.getMessage());
         }
-        return (true);
     }
 
     private String getDN(String uid) throws LoginException {
@@ -293,14 +293,14 @@ public class LocalLdapAuthModule implements LoginModule {
                     .getString("com.iplanet.auth.invalid-username")));
         }
 
-        if (DN.isDN(uid)) {
+        if (LDAPUtils.isDN(uid)) {
             return uid;
         }
 
         String namingAttribute = UIDATTR;
         try {
             String orgName = (String) options.get(LoginContext.ORGNAME);
-            if ((orgName != null) && !DN.isDN(orgName)) {
+            if ((orgName != null) && !LDAPUtils.isDN(orgName)) {
                 // Use orgname only if it a DN, else baseDN
                 orgName = baseDN;
             }
@@ -318,7 +318,7 @@ public class LocalLdapAuthModule implements LoginModule {
         filter.append('(').append(namingAttribute).append('=').append(uid)
                 .append(')');
         String[] attrs = { "noAttr" };
-        LDAPSearchResults results = null;
+        ConnectionEntryReader results = null;
         try {
             // Read the serverconfig.xml for LDAP information
             if (!readServerConfiguration) {
@@ -327,35 +327,27 @@ public class LocalLdapAuthModule implements LoginModule {
             if (conn == null) {
                 debug.warning(
                         "LocalLdapAuthModule.getDN(): lda connection is null");
-                throw (new LoginException("INVALID_USER_NAME")); 
+                throw (new LoginException("INVALID_USER_NAME"));
             } else {
-                results = conn.search(baseDN, LDAPv2.SCOPE_SUB, filter.toString(),
-                        attrs, false);
+                results = conn.search(baseDN, SearchScope.WHOLE_SUBTREE, filter.toString(), attrs);
             }
-        } catch (LDAPException ex) {
-            throw (new LoginException(ex.getMessage()));
+
+            if (results.hasNext()) {
+                SearchResultEntry entry = results.readEntry();
+                retVal = entry.getName().toString();
+            }
+
+            if (retVal == null || retVal.equals("")) {
+                throw new LoginException("INVALID_USER_NAME");
+            }
+            return retVal;
+
+        } catch (ErrorResultIOException | SearchResultReferenceIOException ex) {
+            throw new LoginException(ex.getMessage());
         } finally {
-            try {
-                conn.disconnect();
-                conn=null;
-            } catch (Exception e) {
-                conn=null;
-            }
-         }
-
-
-        LDAPEntry entry = null;
-        try {
-            if (results.hasMoreElements()) {
-                entry = results.next();
-                retVal = entry.getDN();
-            }
-        } catch (LDAPException ex) {
-            throw (new LoginException(ex.getMessage()));
+            IOUtils.closeIfNotNull(conn);
+            conn = null;
         }
-        if (retVal == null || retVal.equals(""))
-            throw (new LoginException("INVALID_USER_NAME"));
-        return retVal;
     }
 
     private void readServerConfig() throws LoginException {
@@ -364,13 +356,12 @@ public class LocalLdapAuthModule implements LoginModule {
 
         try {
             DSConfigMgr cfgMgr = DSConfigMgr.getDSConfigMgr();
-            conn = cfgMgr.getNewBasicConnection();
-            ServerInstance si = cfgMgr.getServerInstance(DSConfigMgr.DEFAULT,
-                    LDAPUser.Type.AUTH_BASIC);
+            conn = cfgMgr.getNewBasicConnectionFactory().getConnection();
+            ServerInstance si = cfgMgr.getServerInstance(DSConfigMgr.DEFAULT, LDAPUser.Type.AUTH_BASIC);
             baseDN = si.getBaseDN();
             readServerConfiguration = true;
-        } catch (LDAPServiceException ex) {
-            throw (new LoginException(ex.getMessage()));
+        } catch (LDAPServiceException | ErrorResultException ex) {
+            throw new LoginException(ex.getMessage());
         }
     }
 }

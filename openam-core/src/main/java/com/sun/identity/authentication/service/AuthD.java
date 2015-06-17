@@ -28,6 +28,8 @@
  */
 package com.sun.identity.authentication.service;
 
+import static org.forgerock.openam.ldap.LDAPUtils.rdnValueFromDn;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -75,7 +77,6 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
@@ -83,8 +84,10 @@ import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
+import org.forgerock.opendj.ldap.DN;
 
 
 /**
@@ -814,11 +817,9 @@ public class AuthD  {
         authSession.setProperty("Organization", defaultOrg);
         authSession.setProperty("Host",
                 authSession.getID().getSessionServer());
-        DN dn = new DN(clientID);
 
-        if (dn.isDN()) {
-            String[] tokens = dn.explodeDN(true);
-            String id = "id=" + tokens[0] + ",ou=user," + ServiceManager.getBaseDN();
+        if (LDAPUtils.isDN(clientID)) {
+            String id = "id=" + rdnValueFromDn(clientID) + ",ou=user," + ServiceManager.getBaseDN();
             authSession.setProperty(Constants.UNIVERSAL_IDENTIFIER, id);
         }
 
@@ -963,27 +964,22 @@ public class AuthD  {
      * @return Organization DN of the organization
      */
     public String getOrgDN(String userOrg) {
-        DN userOrgDN = new DN(userOrg);
-        DN rootSuffixDN = new DN(rootSuffix);
+        DN rootSuffixDN = DN.valueOf(rootSuffix);
         String orgDN = null;
 
-        if (debug.messageEnabled()) {
-            debug.message("userOrg is : " + userOrg);
-            debug.message("rootSuffix is : " + rootSuffix);
-            debug.message("rootSuffixDN is : " + rootSuffixDN);
-            debug.message("userOrgDN is : " +  userOrgDN);
-        }
+        debug.message("userOrg is : {}", userOrg);
+        debug.message("rootSuffix is : {}", rootSuffix);
+        debug.message("rootSuffixDN is : {}", rootSuffixDN);
 
         if (userOrg == null) {
             return rootSuffixDN.toString();
         }
-        if ( (userOrgDN.equals(rootSuffixDN))
-            || (userOrgDN.isDescendantOf(rootSuffixDN))
-        ) {
+        DN userOrgDN = DN.valueOf(userOrg);
+        debug.message("userOrgDN is : {}",  userOrgDN);
+        if (userOrgDN.isSubordinateOrEqualTo(rootSuffixDN)) {
             orgDN = userOrgDN.toString();
         } else {
-            orgDN = (new StringBuffer(50)).append(userOrgDN.toString())
-            .append(",").append(rootSuffixDN).toString();
+            orgDN = rootSuffixDN.child(userOrgDN).toString();
         }
         
         if (debug.messageEnabled()) {

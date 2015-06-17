@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: SMSFlatFileObjectBase.java,v 1.13 2009/10/28 04:24:26 hengming Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.sm.flatfile;
 
@@ -39,6 +36,7 @@ import com.sun.identity.common.CaseInsensitiveProperties;
 import com.sun.identity.common.CaseInsensitiveTreeSet;
 import com.sun.identity.common.ReaderWriterLock;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSDataEntry;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SMSObjectDB;
@@ -398,7 +396,7 @@ public abstract class SMSFlatFileObjectBase extends SMSObjectDB {
     /**
      * Returns sub-configuration names
      */
-    private Set getSubEntries(
+    private Set<String> getSubEntries(
         String objName, 
         String filter,
         String sidFilter, 
@@ -406,8 +404,8 @@ public abstract class SMSFlatFileObjectBase extends SMSObjectDB {
         boolean sortResults,
         boolean ascendingOrder
     )  throws SMSException {
-        return (getSubEntries(objName, "ou=" + filter, sidFilter, true,
-            numOfEntries, sortResults, ascendingOrder));
+        return getSubEntries(objName, "ou=" + filter, sidFilter, true,
+            numOfEntries, sortResults, ascendingOrder);
     }
     
 
@@ -459,7 +457,7 @@ public abstract class SMSFlatFileObjectBase extends SMSObjectDB {
      * @throws SchemaException if a sub directory name is not in the expected 
      * "ou=..." format.
      */
-    public Set subEntries(
+    public Set<String> subEntries(
         SSOToken token,
         String objName,
         String filter,
@@ -477,7 +475,7 @@ public abstract class SMSFlatFileObjectBase extends SMSObjectDB {
                 "] filter ]"+filter==null?"null":filter+"]");
         }
 
-        Set subentries = null;
+        Set<String> subentries = null;
         try {
             subentries = getSubEntries(objName, filter, null, numOfEntries,
                 sortResults, ascendingOrder);
@@ -491,7 +489,7 @@ public abstract class SMSFlatFileObjectBase extends SMSObjectDB {
                 "SubEntries search "+ filter + " for " + objName +
                 " returned " + subentries.size() + " items");
         }
-        return (subentries);
+        return subentries;
     }
 
     /**
@@ -522,7 +520,7 @@ public abstract class SMSFlatFileObjectBase extends SMSObjectDB {
      * @throws SchemaException if a sub directory name is not in the expected 
      * "ou=..." format.
      */
-    public Set schemaSubEntries(SSOToken token, String objName, String filter, 
+    public Set<String> schemaSubEntries(SSOToken token, String objName, String filter,
         String sidFilter, int numOfEntries, boolean sortResults, 
         boolean ascendingOrder)
         throws SMSException, SSOException {
@@ -536,13 +534,13 @@ public abstract class SMSFlatFileObjectBase extends SMSObjectDB {
                 "One or more arguments is null or empty.");
         }
 
-        Set subentries = null;
+        Set<String> subentries = null;
         try {
             subentries = getSubEntries(objName, filter, sidFilter,
                 numOfEntries, sortResults, ascendingOrder);
         } catch (ServiceNotFoundException e) {
             // return empty set if service does not exist.
-            subentries = new CaseInsensitiveHashSet();
+            subentries = new CaseInsensitiveHashSet<>();
         }
 
         if (mDebug.messageEnabled()) {
@@ -578,7 +576,7 @@ public abstract class SMSFlatFileObjectBase extends SMSObjectDB {
      * @throws IllegalArgumentException if objName or filter is null or empty, 
      * or if filter is not in the expected format.
      */
-    public Iterator search(SSOToken token, String objName, String filter,
+    public Iterator<SMSDataEntry> search(SSOToken token, String objName, String filter,
         int numOfEntries, int timeLimit, boolean sortResults,
         boolean ascendingOrder, Set excludes)
         throws SSOException, SMSException {
@@ -609,7 +607,7 @@ public abstract class SMSFlatFileObjectBase extends SMSObjectDB {
      * @throws IllegalArgumentException if objName or filter is null or empty, 
      * or if filter is not in the expected format.
      */
-    public Set search(SSOToken token, String objName, String filter,
+    public Set<String> search(SSOToken token, String objName, String filter,
         int numOfEntries, int timeLimit, boolean sortResults,
         boolean ascendingOrder) throws SSOException, SMSException {
 
@@ -633,7 +631,7 @@ public abstract class SMSFlatFileObjectBase extends SMSObjectDB {
             String serviceName = (String)args[0];
             String sunservice = (String)args[1];
             String theObjName = "ou="+serviceName+",ou=services,"+mRootDN;
-            Set subentries = null;
+            Set<String> subentries = null;
             subentries = getSubEntries(theObjName, "*", "ou="+sunservice, 
                                         0, false, false);
             return subentries;
@@ -650,12 +648,12 @@ public abstract class SMSFlatFileObjectBase extends SMSObjectDB {
      * identifies the number of entries to return, if <code>0</code>
      * returns all the entries.
      */
-    public Set searchSubOrgNames(SSOToken token, String objName, 
+    public Set<String> searchSubOrgNames(SSOToken token, String objName,
         String filter, int numOfEntries, boolean sortResults, 
         boolean ascendingOrder, boolean recursive)
         throws SMSException, SSOException {
-        return (searchOrgs(token, objName, filter, numOfEntries,
-            sortResults, ascendingOrder, recursive, null, null, null));
+        return searchOrgs(token, objName, filter, numOfEntries,
+            sortResults, ascendingOrder, recursive, null, null, null);
     }
 
     /**
@@ -664,7 +662,7 @@ public abstract class SMSFlatFileObjectBase extends SMSObjectDB {
      * identifies the number of entries to return, if <code>0</code>
      * returns all the entries.
      */
-    public Set searchOrganizationNames(SSOToken token, String objName,
+    public Set<String> searchOrganizationNames(SSOToken token, String objName,
         int numOfEntries, boolean sortResults, boolean ascendingOrder, 
         String serviceName, String attrName, Set values)
         throws SMSException, SSOException {
@@ -674,11 +672,11 @@ public abstract class SMSFlatFileObjectBase extends SMSObjectDB {
         if (index != -1) {
             objName = objName.substring(index + 1);
         }
-        return (searchOrgs(token, objName, "*", numOfEntries, sortResults,
-            ascendingOrder, true, serviceName, attrName, values));
+        return searchOrgs(token, objName, "*", numOfEntries, sortResults,
+            ascendingOrder, true, serviceName, attrName, values);
     }
 
-    private Set searchOrgs(
+    private Set<String> searchOrgs(
         SSOToken token,
         String objName,
         String filter,
@@ -718,7 +716,7 @@ public abstract class SMSFlatFileObjectBase extends SMSObjectDB {
             }
         }
 
-        Set subentries = null;
+        Set<String> subentries = null;
         if (sortResults) {
             subentries = new CaseInsensitiveTreeSet(ascendingOrder);
         } else {
@@ -737,7 +735,7 @@ public abstract class SMSFlatFileObjectBase extends SMSObjectDB {
             
             if (recursive) {
                 // Get the list if sub-orgs and search
-                Set subOrgs = new HashSet();
+                Set<String> subOrgs = new HashSet();
                 if (!filter.equals("*") || (sidFilter != null)) {
                     Set ssubOrgs = getSubEntries(objName, fPrefix + "*",
                         null, false, 0, sortResults, ascendingOrder);
@@ -748,22 +746,21 @@ public abstract class SMSFlatFileObjectBase extends SMSObjectDB {
                 } else {
                     subOrgs.addAll(subentries);
                 }
-                for (Iterator i = subOrgs.iterator(); i.hasNext();) {
-                    String subOrgName = (String)i.next();
+                for (String subOrgName : subOrgs) {
                     int reqEntries = (numOfEntries == 0) ? numOfEntries :
-                        numOfEntries - subentries.size();
+                            numOfEntries - subentries.size();
                     if (numOfEntries < 0) {
                         break;
                     }
-                    Set subsubentries = searchOrgs(token, subOrgName,
-                        filter, reqEntries, sortResults, ascendingOrder,
-                        recursive, serviceName, attrName, values);
+                    Set<String> subsubentries = searchOrgs(token, subOrgName,
+                            filter, reqEntries, sortResults, ascendingOrder,
+                            recursive, serviceName, attrName, values);
                     subentries.addAll(subsubentries);
                 }
             }
         } catch (ServiceNotFoundException e) {
             // return empty set if object does not exist. 
-            subentries = new CaseInsensitiveHashSet();
+            subentries = new CaseInsensitiveHashSet<>();
         }
 
         if (mDebug.messageEnabled()) {
@@ -809,7 +806,7 @@ public abstract class SMSFlatFileObjectBase extends SMSObjectDB {
      * @throws SchemaException if a sub directory name is not in the 
      * expected "ou=..." format.
      */
-    abstract protected Set getSubEntries(
+    abstract protected Set<String> getSubEntries(
         String objName,
         String filter,
         String sidFilter, 

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,52 +24,50 @@
  *
  * $Id: PolicyUtils.java,v 1.16 2010/01/13 03:01:15 dillidorai Exp $
  *
- */
-/**
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.policy;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.TreeMap;
+import java.util.Vector;
 
 import com.iplanet.am.sdk.AMConstants;
 import com.iplanet.am.sdk.AMException;
 import com.iplanet.am.sdk.AMOrganization;
 import com.iplanet.am.sdk.AMStoreConnection;
 import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.xml.XMLUtils;
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.ldap.LDAPServiceException;
-import com.iplanet.services.util.Crypt; //from products/shared
-import com.iplanet.sso.SSOToken;
+import com.iplanet.services.util.Crypt;
 import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.delegation.DelegationManager;
-import com.sun.identity.log.Logger;
 import com.sun.identity.log.LogRecord;
+import com.sun.identity.log.Logger;
 import com.sun.identity.log.messageid.LogMessageProvider;
 import com.sun.identity.log.messageid.MessageProviderFactory;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.SMSEntry;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.AccessController;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.TreeMap;
-import java.util.Vector;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.util.DN;
-import com.sun.identity.shared.ldap.util.RDN;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.RDN;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -234,9 +232,7 @@ public class PolicyUtils {
      *          value of the naming attribute of the entry
      */
     public static String getDisplayName(String dn) {
-        String[] componentValues = LDAPDN.explodeDN(dn, true);
-        return (componentValues.length > 0 ) ?
-                componentValues[0] : "";
+        return LDAPUtils.rdnValueFromDn(dn);
     }
     
     /**
@@ -736,14 +732,12 @@ public class PolicyUtils {
                 StringTokenizer st = new StringTokenizer(principalsString, "|");
                 while (st.hasMoreTokens()) {
                     String principalName = (String) st.nextToken();
-                    DN ldapDN = new DN(principalName);
-                    if (ldapDN.isDN()) {
-                        String[] components = ldapDN.explodeDN(true);
-                        if (components == null || components.length < 1) {
+                    DN ldapDN = DN.valueOf(principalName);
+                    if (LDAPUtils.isDN(principalName)) {
+                        String userID = LDAPUtils.rdnValueFromDn(ldapDN);
+                        if (userID == null || userID.isEmpty()) {
                             continue;
                         }
-                        String userID = components[0];
-                            
                         if (!userID.equalsIgnoreCase(userName)) {
                             userFilter.append("(").append(userRDNAttrName)
                                 .append("=").append(userID).append(")");
@@ -785,7 +779,8 @@ public class PolicyUtils {
              AMOrganization rootOrg 
                     = (AMOrganization)dpStore.getOrganization(org);
              String dn,policyName,ruleName; 
-             DN rootDN,tmpDN;
+             DN rootDN;
+             DN tmpDN;
              Set policyNames;
              Policy p;
              Rule rule,ruleDeleted;
@@ -794,7 +789,7 @@ public class PolicyUtils {
              Map levelDNs = new HashMap(); 
              TreeMap sortedDNs; 
                
-             rootDN = new DN(SMSEntry.getRootSuffix());
+             rootDN = DN.valueOf(SMSEntry.getRootSuffix());
              Map avPair = new HashMap();
              Set value = new HashSet(); 
              value.add("iPlanetAMPolicyConfigService");
@@ -843,9 +838,8 @@ public class PolicyUtils {
                                  policyDNs.put(dn,policies);
                               }
                               //store DNs corresponding to levels wrt root
-                              tmpDN = new DN (dn);
-                              String levelDiff = String.valueOf(rootDN
-                                   .countRDNs()-tmpDN.countRDNs());
+                              tmpDN = DN.valueOf(dn);
+                              String levelDiff = String.valueOf(rootDN.size() - tmpDN.size());
                               if(levelDNs.containsKey(levelDiff)) {
                                  ((Vector)levelDNs.get(levelDiff)).add(dn);
                               } else {
@@ -927,18 +921,19 @@ public class PolicyUtils {
          * Given a value of cn=Accounting Managers,ou=groups,dc=iplanet,dc=com,
          * this method returns com > iplanet > groups > Accounting Managers
          */
-        DN dn = new DN(strDN);
-        if (!dn.isDN()) {
+        DN dn = DN.valueOf(strDN);
+        if (!LDAPUtils.isDN(strDN)) {
             displayString = strDN;
         } else {
+            List<RDN> rdns = new ArrayList<>();
+            for (RDN rdn : dn) {
+                rdns.add(0, rdn);
+            }
             StringBuilder buff = new StringBuilder(1024);
-            List rdns = dn.getRDNs();
-            for (ListIterator iter = rdns.listIterator(rdns.size());
-                iter.hasPrevious();) {
-                RDN rdn = (RDN) iter.previous();
-                buff.append(rdn.getValues()[0]);
-
-                if (iter.hasPrevious()) {
+            for (int i = 0; i < rdns.size(); i++) {
+                RDN rdn = rdns.get(i);
+                buff.append(rdn.getFirstAVA().getAttributeValue().toString());
+                if (i < rdns.size() - 1) {
                     buff.append(" > ");
                 }
             }

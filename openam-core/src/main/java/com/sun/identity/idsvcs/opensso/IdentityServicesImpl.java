@@ -74,7 +74,6 @@ import com.sun.identity.log.Logger;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.sm.SMSException;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.BadRequestException;
@@ -85,6 +84,7 @@ import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.errors.IdentityServicesExceptionMappingHandler;
+import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
 
@@ -963,7 +963,7 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
             throws IdRepoException, SSOException {
         if (isOperationSupported(repo, idType, IdOperation.READ)) {
             try {
-                if (DN.isDN(guid)) {
+                if (LDAPUtils.isDN(guid)) {
                     return new AMIdentity(ssoToken, guid);
                 } else {
                     return new AMIdentity(ssoToken, guid, idType, repo.getRealmIdentity().getRealm(), null);

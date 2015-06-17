@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,20 +24,19 @@
  *
  * $Id: AssignableDynamicGroup.java,v 1.6 2009/01/28 05:34:50 ww203982 Exp $
  *
- */
-/**
- * Portions Copyrighted 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 package com.iplanet.ums;
 
 import com.iplanet.services.ldap.Attr;
 import com.iplanet.services.ldap.AttrSet;
-import com.iplanet.services.ldap.ModSet;
 import com.iplanet.services.util.I18n;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.ldap.LDAPUrl;
-import com.sun.identity.shared.ldap.LDAPv2;
-import com.sun.identity.shared.ldap.util.DN;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.Filter;
+import org.forgerock.opendj.ldap.LDAPUrl;
+import org.forgerock.opendj.ldap.ModificationType;
+import org.forgerock.opendj.ldap.SearchScope;
 
 /**
  * Represents a dynamic group entry that uses memberOf as its filter. It checks
@@ -137,7 +136,7 @@ public class AssignableDynamicGroup extends DynamicGroup implements
         super(template, attrSet);
         // No host, port, or attributes in the URL
         // setUrl( new LDAPUrl( null, 0, base, (String[])null, scope, "" ) );
-        setUrl(baseGuid, null, scope);
+        setUrl(baseGuid, null, SearchScope.valueOf(scope));
     }
 
     /**
@@ -154,13 +153,13 @@ public class AssignableDynamicGroup extends DynamicGroup implements
      */
     public void setSearchFilter(String filter) {
         LDAPUrl url = getUrl();
-        int scope = url.getScope();
-        if (scope != LDAPv2.SCOPE_ONE && scope != LDAPv2.SCOPE_SUB) {
+        SearchScope scope = url.getScope();
+        if (SearchScope.SINGLE_LEVEL.equals(scope) && SearchScope.WHOLE_SUBTREE.equals(scope)) {
             String msg = i18n.getString(IUMSConstants.ILLEGAL_ADGROUP_SCOPE);
             throw new IllegalArgumentException(msg);
         }
-        Guid baseGuid = new Guid(url.getDN());
-        setUrl(baseGuid, filter, scope);
+        Guid baseGuid = new Guid(url.getName().toString());
+        setUrl(baseGuid, Filter.valueOf(filter), scope);
     }
 
     /**
@@ -217,27 +216,22 @@ public class AssignableDynamicGroup extends DynamicGroup implements
      */
     public void addMember(PersistentObject member) throws UMSException {
         // check whether the userGuid is within the scope of memberUrl
-        DN userDN = new DN(member.getGuid().getDn());
+        DN userDN = DN.valueOf(member.getGuid().getDn());
         LDAPUrl memberUrl = getUrl();
-        DN memberDN = new DN(memberUrl.getDN());
+        DN memberDN = memberUrl.getName();
 
-        if (!userDN.isDescendantOf(memberDN) || userDN.equals(memberDN)) {
+        if (!userDN.isInScopeOf(memberDN, SearchScope.WHOLE_SUBTREE)) {
             String args[] = new String[2];
             args[0] = userDN.toString();
             args[1] = memberUrl.toString();
-            String msg = i18n.getString(IUMSConstants.USER_NOT_IN_GROUP_SCOPE,
-                    args);
-            throw new UMSException(msg);
-        } else if (((userDN.countRDNs() - memberDN.countRDNs()) > 1)
-                && (memberUrl.getScope() == LDAPv2.SCOPE_ONE)) {
+            throw new UMSException(i18n.getString(IUMSConstants.USER_NOT_IN_GROUP_SCOPE, args));
+        } else if ((userDN.size() - memberDN.size()) > 1 && SearchScope.SINGLE_LEVEL.equals(memberUrl.getScope())) {
             String args[] = new String[2];
             args[0] = userDN.toString();
             args[1] = memberUrl.toString();
-            String msg = i18n.getString(IUMSConstants.USER_NOT_IN_GROUP_SCOPE,
-                    args);
-            throw new UMSException(msg);
+            throw new UMSException(i18n.getString(IUMSConstants.USER_NOT_IN_GROUP_SCOPE, args));
         }
-        member.modify(new Attr(MEMBER_ATTR_NAME, this.getDN()), ModSet.ADD);
+        member.modify(new Attr(MEMBER_ATTR_NAME, this.getDN()), ModificationType.ADD);
         member.save();
     }
 
@@ -284,7 +278,7 @@ public class AssignableDynamicGroup extends DynamicGroup implements
      * @supported.api
      */
     public void removeMember(PersistentObject member) throws UMSException {
-        member.modify(new Attr(MEMBER_ATTR_NAME, this.getDN()), ModSet.DELETE);
+        member.modify(new Attr(MEMBER_ATTR_NAME, this.getDN()), ModificationType.DELETE);
         member.save();
     }
 

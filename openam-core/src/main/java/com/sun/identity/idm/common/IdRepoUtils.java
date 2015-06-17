@@ -23,10 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: IdRepoUtils.java,v 1.3 2010/01/06 22:31:55 veiming Exp $
- */
-
-/*
- * Portions Copyrighted 2011-2013 ForgeRock AS
+ *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.idm.common;
 
@@ -41,11 +39,25 @@ import java.util.StringTokenizer;
 import javax.servlet.ServletContext;
 
 import com.iplanet.am.sdk.AMHashMap;
-import com.iplanet.am.util.SSLSocketFactoryManager;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.CaseInsensitiveHashMap;
-import com.sun.identity.common.LDAPUtils;
+
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.ldap.LdifUtils;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.Connections;
+import org.forgerock.opendj.ldap.LDAPConnectionFactory;
+import org.forgerock.opendj.ldap.LDAPOptions;
+import org.forgerock.opendj.ldap.SSLContextBuilder;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.requests.BindRequest;
+import org.forgerock.opendj.ldap.requests.Requests;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
+
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepoBundle;
@@ -54,17 +66,12 @@ import com.sun.identity.idm.IdType;
 import com.sun.identity.shared.StringUtils;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.ldap.LDAPAttribute;
-import com.sun.identity.shared.ldap.LDAPConnection;
-import com.sun.identity.shared.ldap.LDAPEntry;
-import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.LDAPSearchResults;
-import com.sun.identity.shared.ldap.LDAPv2;
 import com.sun.identity.setup.ServicesDefaultValues;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -241,14 +248,10 @@ public class IdRepoUtils {
         Map attrValues, ServletContext servletCtx, String idRepoType)
         throws Exception {
 
-        LDAPConnection ld = null;
-        InputStreamReader fin = null;
         DataInputStream dis = null;
-        try {
-            ld = getLDAPConnection(attrValues);
-
-            fin = new InputStreamReader(servletCtx.getResourceAsStream(
-                schemaFile));
+        try (ConnectionFactory factory = getLDAPConnection(attrValues);
+             Connection ld = factory.getConnection();
+             InputStreamReader fin = new InputStreamReader(servletCtx.getResourceAsStream(schemaFile))) {
 
             StringBuilder sbuf = new StringBuilder();
             char[] cbuf = new char[1024];
@@ -263,7 +266,7 @@ public class IdRepoUtils {
             if (suffix != null) {
                 schemaStr = StringUtils.strReplaceAll(schemaStr, 
                     "@userStoreRootSuffix@", suffix);
-                String dbName =LDAPUtils.getDBName(suffix, ld);
+                String dbName = LDAPUtils.getDBName(suffix, ld);
                 schemaStr = StringUtils.strReplaceAll(schemaStr, "@DB_NAME@",
                     dbName);
             }
@@ -275,19 +278,11 @@ public class IdRepoUtils {
                         "@INSTANCE_GUID@", adamInstanceGUID);
                 }
             }
-	    schemaStr = ServicesDefaultValues.tagSwap(schemaStr);
+	        schemaStr = ServicesDefaultValues.tagSwap(schemaStr);
 
-            dis = new DataInputStream(
-                new ByteArrayInputStream(schemaStr.getBytes()));
-            LDAPUtils.createSchemaFromLDIF(dis, ld);
+            dis = new DataInputStream(new ByteArrayInputStream(schemaStr.getBytes()));
+            LdifUtils.createSchemaFromLDIF(dis, ld);
         } finally {
-            if (fin != null) {
-                try {
-                    fin.close();
-                } catch (Exception ex) {
-                    //No handling requried
-                }
-            }
             if (dis != null) {
                 try {
                     dis.close();
@@ -295,39 +290,24 @@ public class IdRepoUtils {
                     //No handling requried
                 }
             }
-            if ((ld != null) && ld.isConnected()) {
-                try {
-                    ld.disconnect();
-                } catch (LDAPException ex) {
-                }
-            }
         }
     }
 
     private static String getADAMInstanceGUID(Map attrValues) throws Exception {
-        LDAPConnection ld = null;
-        try {
-            ld = getLDAPConnection(attrValues);
+        try (ConnectionFactory factory = getLDAPConnection(attrValues);
+             Connection ld = factory.getConnection()){
             String attrName = "schemaNamingContext";
             String[] attrs = { attrName };
-            LDAPSearchResults res = ld.search("", LDAPv2.SCOPE_BASE,
-                "(objectclass=*)", null, false );
-            if (res.hasMoreElements()) {
-                LDAPEntry entry = (LDAPEntry)res.nextElement();
-                LDAPAttribute ldapAttr = entry.getAttribute(attrName);
+            ConnectionEntryReader res = ld.search("", SearchScope.BASE_OBJECT, "(objectclass=*)");
+            if (res.hasNext()) {
+                SearchResultEntry entry = res.readEntry();
+                Attribute ldapAttr = entry.getAttribute(attrName);
                 if (ldapAttr != null) {
-                    String value = ldapAttr.getStringValueArray()[0];
+                    String value = ldapAttr.firstValueAsString();
                     int index = value.lastIndexOf("=");
                     if (index != -1) {
                         return value.substring(index + 1).trim();
                     }
-                }
-            }
-        } finally {
-            if ((ld != null) && ld.isConnected()) {
-                try {
-                    ld.disconnect();
-                } catch (LDAPException ex) {
                 }
             }
         }
@@ -335,21 +315,20 @@ public class IdRepoUtils {
         return null;
     }
 
-    private static LDAPConnection getLDAPConnection(Map attrValues) 
+    private static ConnectionFactory getLDAPConnection(Map attrValues)
         throws Exception {
-        String s = CollectionHelper.getMapAttr(attrValues,
-            "sun-idrepo-ldapv3-config-ssl-enabled");
-        boolean ssl = ((s != null) && s.equals("true"));
-        LDAPConnection ld = (ssl) ? new LDAPConnection(
-            SSLSocketFactoryManager.getSSLSocketFactory()) :
-            new LDAPConnection();
-        ld.setConnectTimeout(300);
+        LDAPOptions options = new LDAPOptions().setConnectTimeout(300, TimeUnit.SECONDS);
+        if (CollectionHelper.getBooleanMapAttr(attrValues, "sun-idrepo-ldapv3-config-ssl-enabled", false)) {
+            options.setSSLContext(new SSLContextBuilder().getSSLContext());
+        }
 
-        String hostPort = CollectionHelper.getMapAttr(attrValues,
-            "sun-idrepo-ldapv3-config-ldap-server");
-        if ((hostPort == null) || (hostPort.trim().length() == 0)) {
+        String hostName = CollectionHelper.getMapAttr(attrValues,
+                "sun-idrepo-ldapv3-config-ldap-server");
+        if ((hostName == null) || (hostName.trim().length() == 0)) {
             throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "405", null);
         }
+
+        ConnectionFactory factory = new LDAPConnectionFactory(hostName, 389, options);
 
         String bindDn = CollectionHelper.getMapAttr(attrValues,
             "sun-idrepo-ldapv3-config-authid");
@@ -362,9 +341,9 @@ public class IdRepoUtils {
             throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "405", null);
         }
 
-        // hostPort contains port so 389 will be ignored
-        ld.connect(3, hostPort, 389, bindDn, bindPwd);
-        return ld;
+        // hostName contains port so 389 will be ignored
+        BindRequest bindRequest = Requests.newSimpleBindRequest(bindDn, bindPwd.getBytes());
+        return Connections.newAuthenticatedConnectionFactory(factory, bindRequest);
     }
 
     /**

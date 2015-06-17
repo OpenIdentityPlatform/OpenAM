@@ -30,13 +30,9 @@
 package com.sun.identity.setup;
 
 import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.ldap.LDAPAttribute;
-import com.sun.identity.shared.ldap.LDAPConnection;
-import com.sun.identity.shared.ldap.LDAPEntry;
-import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.LDAPModification;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -57,20 +53,33 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.servlet.ServletContext;
 import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.Attributes;
+import org.forgerock.opendj.ldap.ByteString;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.Connections;
+import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.LDAPConnectionFactory;
+import org.forgerock.opendj.ldap.LDAPOptions;
+import org.forgerock.opendj.ldap.Modification;
+import org.forgerock.opendj.ldap.ModificationType;
+import org.forgerock.opendj.ldap.requests.ModifyRequest;
+import org.forgerock.opendj.ldap.requests.Requests;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.util.thread.listener.ShutdownListener;
-import org.forgerock.util.thread.listener.ShutdownManager;
 import org.forgerock.util.thread.listener.ShutdownPriority;
 import org.opends.messages.Message;
 import org.opends.server.core.DirectoryServer;
@@ -99,6 +108,8 @@ public class EmbeddedOpenDS {
     private static final String OPENDS_UPGRADE_DIR = "/config/upgrade/";
     private static final String OPENDS_CONFIG_LDIF = "config.ldif";
     private static boolean serverStarted = false;
+
+    private static ConnectionFactory factory;
 
     /**
      * Returns <code>true</code> if the server has already been started.
@@ -820,34 +831,22 @@ public class EmbeddedOpenDS {
                 "cn=replication server,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config";
         final String[] attrs = {"ds-cfg-replication-port"};
         String replPort = null;
-        LDAPConnection ld = null;
-        try {
+        Connection ld = null;
+        username = "cn=Directory Manager";
+        try (Connection conn = getLDAPConnection(hostname, port, username, password)) {
             // We'll use Directory Manager
-            username = "cn=Directory Manager";
-            LDAPConnection lc = getLDAPConnection(
-                    hostname,
-                    port,
-                    username,
-                    password
-            );
-            if (lc != null) {
-                LDAPEntry le = lc.read(replDN, attrs);
+            if (conn != null) {
+                SearchResultEntry le = conn.readEntry(replDN, attrs);
                 if (le != null) {
-                    LDAPAttribute la = le.getAttribute(attrs[0]);
+                    Attribute la = le.getAttribute(attrs[0]);
                     if (la != null) {
-                        Enumeration en = la.getStringValues();
-                        if (en != null && en.hasMoreElements()) {
-                            replPort = (String) en.nextElement();
-                        }
+                        replPort = la.firstValueAsString();
                     }
                 }
             }
         } catch (Exception ex) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                    "EmbeddedOpenDS.getReplicationPort(). Error getting replication port:", ex);
-
-        } finally {
-            disconnectDServer(ld);
+            Debug.getInstance(SetupConstants.DEBUG_NAME)
+                    .error("EmbeddedOpenDS.getReplicationPort(). Error getting replication port:", ex);
         }
         return replPort;
 
@@ -871,36 +870,23 @@ public class EmbeddedOpenDS {
         final String adminConnectorDN = "cn=Administration Connector,cn=config";
         final String[] attrs = {"ds-cfg-listen-port"};
         String adminPort = null;
-        LDAPConnection ld = null;
+        Connection ld = null;
 
-        try {
-            LDAPConnection lc = getLDAPConnection(
-                    hostname,
-                    port,
-                    username,
-                    password
-            );
-
-            if (lc != null) {
-                LDAPEntry le = lc.read(adminConnectorDN, attrs);
+        try (Connection conn = getLDAPConnection(hostname, port, username, password)) {
+            if (conn != null) {
+                SearchResultEntry le = conn.readEntry(adminConnectorDN, attrs);
 
                 if (le != null) {
-                    LDAPAttribute la = le.getAttribute(attrs[0]);
+                    Attribute la = le.getAttribute(attrs[0]);
 
                     if (la != null) {
-                        Enumeration en = la.getStringValues();
-
-                        if (en != null && en.hasMoreElements()) {
-                            adminPort = (String) en.nextElement();
-                        }
+                        adminPort = la.firstValueAsString();
                     }
                 }
             }
         } catch (Exception ex) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                    "EmbeddedOpenDS.getAdminPort(). Error getting admin port:", ex);
-        } finally {
-            disconnectDServer(ld);
+            Debug.getInstance(SetupConstants.DEBUG_NAME)
+                    .error("EmbeddedOpenDS.getAdminPort(). Error getting admin port:", ex);
         }
 
         return adminPort;
@@ -1154,28 +1140,19 @@ public class EmbeddedOpenDS {
      */
     public static boolean syncReplicatedServerList(
             Set currServerSet, String port, String passwd) {
-        LDAPConnection lc = null;
-        try {
-            lc = getLDAPConnection(
-                    "localhost",
-                    port,
-                    "cn=Directory Manager",
-                    passwd
-            );
-            Set dsServers = getServerSet(lc);
+        try (Connection conn = getLDAPConnection("localhost", port, "cn=Directory Manager", passwd)) {
+            Set<String> dsServers = getServerSet(conn);
 
-            if (dsServers == null)
+            if (dsServers == null) {
                 return false;
-            Iterator iter = dsServers.iterator();
-            while (iter.hasNext()) {
-                String tok = (String) iter.next();
-                if (!currServerSet.contains(tok))
-                    delOpenDSServer(lc, tok);
+            }
+            for (String tok : dsServers) {
+                if (!currServerSet.contains(tok)) {
+                    delOpenDSServer(conn, tok);
+                }
             }
         } catch (Exception ex) {
             return false;
-        } finally {
-            disconnectDServer(lc);
         }
         return true;
     }
@@ -1186,47 +1163,42 @@ public class EmbeddedOpenDS {
      *
      * @return Ldap connection
      */
-    private static LDAPConnection getLDAPConnection(
-            String dsHostName,
-            String dsPort,
-            String dsManager,
-            String dsAdminPwd
-    ) {
-        LDAPConnection ld = null;
+    private static Connection getLDAPConnection(String dsHostName, String dsPort, String dsManager,
+            String dsAdminPwd) {
         try {
-            int dsPortInt = Integer.parseInt(dsPort);
-            ld = new LDAPConnection();
-            ld.setConnectTimeout(300);
-            ld.connect(3, dsHostName, dsPortInt, dsManager, dsAdminPwd);
-        } catch (LDAPException ex) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                    "EmbeddedOpenDS.setup(). Error getting LDAPConnection:", ex);
+            return getLDAPConnectionFactory(dsHostName, dsPort, dsManager, dsAdminPwd).getConnection();
+        } catch (ErrorResultException ex) {
+            Debug.getInstance(SetupConstants.DEBUG_NAME)
+                    .error("EmbeddedOpenDS.setup(). Error getting LDAPConnection:", ex);
         }
-        return ld;
+        return null;
     }
 
-    /**
-     * Helper method to disconnect from Directory Server.
-     */
-    private static void disconnectDServer(LDAPConnection ld) {
-        if ((ld != null) && ld.isConnected()) {
-            try {
-                ld.disconnect();
-            } catch (LDAPException e) {
-            }
+    private static synchronized ConnectionFactory getLDAPConnectionFactory(String dsHostName, String dsPort,
+            String dsManager, String dsAdminPwd) {
+        if (factory == null) {
+            factory = Connections.newAuthenticatedConnectionFactory(
+                    new LDAPConnectionFactory(dsHostName, Integer.parseInt(dsPort),
+                            new LDAPOptions().setConnectTimeout(300, TimeUnit.SECONDS)),
+                    Requests.newSimpleBindRequest(dsManager, dsAdminPwd.toCharArray()));
+            ShutdownManager.getInstance().addShutdownListener(new ShutdownListener() {
+                @Override
+                public void shutdown() {
+                    if (factory != null) {
+                        factory.close();
+                    }
+                }
+            });
         }
+        return factory;
     }
 
-    static final String replDN =
-            "cn=all-servers,cn=Server Groups,cn=admin data";
+    static final String replDN = "cn=all-servers,cn=Server Groups,cn=admin data";
 
     /**
      * Removes host:port from OpenDJ replication
      */
-    public static void delOpenDSServer(
-            LDAPConnection lc,
-            String delServer
-    ) {
+    public static void delOpenDSServer(Connection lc, String delServer) {
         String replServerDN =
                 "cn=" + delServer + ",cn=Servers,cn=admin data";
         final String[] attrs = {"ds-cfg-key-id"};
@@ -1238,14 +1210,11 @@ public class EmbeddedOpenDS {
         }
         String trustKey = null;
         try {
-            LDAPEntry le = lc.read(replServerDN, attrs);
+            SearchResultEntry le = lc.readEntry(replServerDN, attrs);
             if (le != null) {
-                LDAPAttribute la = le.getAttribute(attrs[0]);
+                Attribute la = le.getAttribute(attrs[0]);
                 if (la != null) {
-                    Enumeration en = la.getStringValues();
-                    if (en != null && en.hasMoreElements()) {
-                        trustKey = (String) en.nextElement();
-                    }
+                    trustKey = la.firstValueAsString();
                 }
                 String keyDN = "ds-cfg-key-id=" + trustKey +
                         ",cn=instance keys,cn=admin data";
@@ -1267,11 +1236,10 @@ public class EmbeddedOpenDS {
 
         }
         try {
-            LDAPAttribute attr = new LDAPAttribute(
-                    "uniqueMember", "cn=" + delServer);
-            LDAPModification mod = new LDAPModification(
-                    LDAPModification.DELETE, attr);
-            lc.modify(replDN, mod);
+            ModifyRequest modifyRequest = Requests.newModifyRequest(replDN)
+                    .addModification(new Modification(ModificationType.DELETE,
+                            Attributes.singletonAttribute("uniqueMember", "cn=" + delServer)));
+            lc.modify(modifyRequest);
         } catch (Exception ex) {
             debug.error("EmbeddedOpenDS.syncOpenDSServer()." +
                     " Error getting removing :" + replDN, ex);
@@ -1282,23 +1250,18 @@ public class EmbeddedOpenDS {
     /**
      * Gets list of replicated servers from local OpenDJ directory.
      */
-    public static Set getServerSet(
-            LDAPConnection lc
-    ) {
+    public static Set getServerSet(Connection lc) {
         final String[] attrs = {"uniqueMember"};
         Debug debug = Debug.getInstance(SetupConstants.DEBUG_NAME);
         try {
             if (lc != null) {
-                LDAPEntry le = lc.read(replDN, attrs);
+                SearchResultEntry le = lc.readEntry(replDN, attrs);
                 if (le != null) {
                     Set hostSet = new HashSet();
-                    LDAPAttribute la = le.getAttribute(attrs[0]);
+                    Attribute la = le.getAttribute(attrs[0]);
                     if (la != null) {
-                        Enumeration en = la.getStringValues();
-                        while (en != null && en.hasMoreElements()) {
-                            String val = (String) en.nextElement();
-                            // strip "cn="
-                            hostSet.add(val.substring(3, val.length()));
+                        for (ByteString value : la) {
+                            hostSet.add(value.toString().substring(3, value.length()));
                         }
                     }
                     return hostSet;

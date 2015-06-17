@@ -34,11 +34,14 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.policy.PolicyUtils;
+import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.openam.ldap.LDAPUtils;
+
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
@@ -49,8 +52,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import javax.servlet.ServletContext;
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.util.DN;
 
 /**
  * Configures product bootstrap data.
@@ -139,9 +140,8 @@ public class ConfigureData {
     
     private static String DNToName(String dn) {
         String ret = dn;
-        if (DN.isDN(dn)) {
-            String[] comps = LDAPDN.explodeDN(dn, true);
-            ret = comps[0];
+        if (LDAPUtils.isDN(dn)) {
+            ret = LDAPUtils.rdnValueFromDn(dn);
         }
         return ret;
     }

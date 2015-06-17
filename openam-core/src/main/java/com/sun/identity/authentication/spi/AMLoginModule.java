@@ -61,6 +61,8 @@ import javax.security.auth.spi.LoginModule;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.forgerock.openam.ldap.LDAPUtils;
+
 import com.iplanet.am.sdk.AMException;
 import com.iplanet.am.sdk.AMUser;
 import com.iplanet.am.sdk.AMUserPasswordValidation;
@@ -94,7 +96,6 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import com.sun.identity.shared.ldap.util.DN;
 
 /**
  * An abstract class which implements JAAS LoginModule, it provides
@@ -2504,7 +2505,7 @@ public abstract class AMLoginModule implements LoginModule {
     /* returns the normalized DN  */
     private String normalizeDN(String userDN) {
         String normalizedDN = userDN;
-        if ((userDN != null) && DN.isDN(userDN)) {
+        if ((userDN != null) && LDAPUtils.isDN(userDN)) {
             normalizedDN = DNUtils.normalizeDN(userDN);
         }
         if (ad.debug.messageEnabled()) {

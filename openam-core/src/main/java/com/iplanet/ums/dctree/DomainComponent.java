@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,12 @@
  *
  * $Id: DomainComponent.java,v 1.4 2008/06/25 05:41:47 qcheng Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.ums.dctree;
 
 import com.iplanet.services.ldap.Attr;
-import com.iplanet.services.ldap.ModSet;
 import com.iplanet.services.util.I18n;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -39,6 +39,7 @@ import com.iplanet.ums.IUMSConstants;
 import com.iplanet.ums.PersistentObject;
 import com.iplanet.ums.UMSException;
 import com.iplanet.ums.UMSObject;
+import org.forgerock.opendj.ldap.ModificationType;
 
 /**
  * Represents a domain component in the domain componet tree. Each Domain
@@ -116,7 +117,7 @@ public class DomainComponent extends PersistentObject {
             throw new IllegalArgumentException();
         }
 
-        modify(new Attr(TAG_ORG_LINK, orgGuid.getDn()), ModSet.REPLACE);
+        modify(new Attr(TAG_ORG_LINK, orgGuid.getDn()), ModificationType.REPLACE);
 
         // Only save if it is already a persistent object
         //
@@ -182,7 +183,7 @@ public class DomainComponent extends PersistentObject {
      * @supported.api
      */
     public void setDomainStatus(String status) throws UMSException {
-        modify(new Attr(TAG_DOMAIN_STATUS, status), ModSet.REPLACE);
+        modify(new Attr(TAG_DOMAIN_STATUS, status), ModificationType.REPLACE);
 
         // Only save if it is already a persistent object
         //

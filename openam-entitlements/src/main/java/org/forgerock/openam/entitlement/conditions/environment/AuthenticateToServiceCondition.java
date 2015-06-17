@@ -12,12 +12,19 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2006 Sun Microsystems Inc
- */
-/*
  * Portions Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.conditions.environment;
+
+import static com.sun.identity.entitlement.EntitlementException.PROPERTY_VALUE_NOT_DEFINED;
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.*;
+
+import javax.security.auth.Subject;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.util.ISAuthConstants;
@@ -26,24 +33,12 @@ import com.sun.identity.entitlement.EntitlementConditionAdaptor;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.ldap.util.DN;
-import com.sun.identity.sm.DNMapper;
-
 import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import javax.security.auth.Subject;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import static com.sun.identity.entitlement.EntitlementException.PROPERTY_VALUE_NOT_DEFINED;
-import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.*;
 
 /**
  * An implementation of an {@link com.sun.identity.entitlement.EntitlementCondition} that will check whether the
@@ -180,8 +175,8 @@ public class AuthenticateToServiceCondition extends EntitlementConditionAdaptor 
      */
     private String getRealmAwareService(String authenticateToService, String realm) {
         //make sure the passed realm is not DN format
-        if (DN.isDN(realm)) {
-            realm = DNMapper.orgNameToRealmName(realm);
+        if (LDAPUtils.isDN(realm)) {
+            realm = coreWrapper.convertOrgNameToRealmName(realm);
         }
         if (!authenticateToService.contains(ISAuthConstants.COLON)) {
             return realm + ISAuthConstants.COLON + authenticateToService;

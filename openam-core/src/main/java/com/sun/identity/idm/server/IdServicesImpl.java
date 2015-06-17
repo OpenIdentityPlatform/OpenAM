@@ -1,31 +1,32 @@
 /*
-* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-*
-* Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
-*
-* The contents of this file are subject to the terms
-* of the Common Development and Distribution License
-* (the License). You may not use this file except in
-* compliance with the License.
-*
-* You can obtain a copy of the License at
-* https://opensso.dev.java.net/public/CDDLv1.0.html or
-* opensso/legal/CDDLv1.0.txt
-* See the License for the specific language governing
-* permission and limitations under the License.
-*
-* When distributing Covered Code, include this CDDL
-* Header Notice in each file and include the License file
-* at opensso/legal/CDDLv1.0.txt.
-* If applicable, add the following below the CDDL Header,
-* with the fields enclosed by brackets [] replaced by
-* your own identifying information:
-* "Portions Copyrighted [year] [name of copyright owner]"
-*
-* $Id: IdServicesImpl.java,v 1.61 2010/01/20 01:08:36 goodearth Exp $
-*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ *
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * https://opensso.dev.java.net/public/CDDLv1.0.html or
+ * opensso/legal/CDDLv1.0.txt
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at opensso/legal/CDDLv1.0.txt.
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * $Id: IdServicesImpl.java,v 1.61 2010/01/20 01:08:36 goodearth Exp $
+ *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
+
 package com.sun.identity.idm.server;
 
 import java.util.Collections;
@@ -39,8 +40,6 @@ import javax.security.auth.callback.Callback;
 
 import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationEvaluatorImpl;
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.util.DN;
 
 import com.iplanet.am.sdk.AMHashMap;
 import com.iplanet.sso.SSOException;
@@ -80,6 +79,7 @@ import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.thread.listener.ShutdownManager;
 
@@ -269,9 +269,9 @@ public class IdServicesImpl implements IdServices {
        for (int i = 0; i < credentials.length; i++) {
            if (credentials[i] instanceof NameCallback) {
                name = ((NameCallback) credentials[i]).getName();
-               if (DN.isDN(name)) {
+               if (LDAPUtils.isDN(name)) {
                    // Obtain the firsr RDN
-                   name = LDAPDN.explodeDN(name, true)[0];
+                   name = LDAPUtils.rdnValueFromDn(name);
                }
                break;
            }
@@ -367,7 +367,7 @@ public class IdServicesImpl implements IdServices {
    private AMIdentity getSubRealmIdentity(SSOToken token, String subRealmName,
            String parentRealmName) throws IdRepoException, SSOException {
        String realmName = parentRealmName;
-       if (DN.isDN(parentRealmName)) {
+       if (LDAPUtils.isDN(parentRealmName)) {
            // Wouldn't be a DN if it starts with "/"
            realmName = DNMapper.orgNameToRealmName(parentRealmName);
        }
@@ -2658,7 +2658,7 @@ public class IdServicesImpl implements IdServices {
            Iterator it = results.iterator();
            while (it.hasNext()) {
                String dn = (String) it.next();
-               String name =  LDAPDN.explodeDN(dn, true)[0];
+               String name = LDAPUtils.rdnValueFromDn(dn);
                amsdkDNs.put(name, dn);
                Set attrMaps = new HashSet();
                attrMaps.add((Map) attrResults.get(dn));

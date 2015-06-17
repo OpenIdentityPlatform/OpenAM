@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,21 +24,21 @@
  *
  * $Id: DirectoryServerVendor.java,v 1.3 2009/01/28 05:35:03 ww203982 Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 package com.sun.identity.sm;
 
 import java.util.Enumeration;
-import com.sun.identity.shared.ldap.LDAPAttribute;
-import com.sun.identity.shared.ldap.LDAPAttributeSet;
-import com.sun.identity.shared.ldap.LDAPConnection;
-import com.sun.identity.shared.ldap.LDAPEntry;
-import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.LDAPSearchResults;
-import com.sun.identity.shared.ldap.LDAPv2;
+
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.ByteString;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.ErrorResultIOException;
+import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
 
 /**
  * This singleton attempts to query vendor information of a Directory Server. 
@@ -76,37 +76,37 @@ public class DirectoryServerVendor {
      * Returns the vendor of Directory Server.
      * @param conn LDAP connection to the server.
      * @return the vendor of Directory Server.
-     * @throws LDAPException if unable to get the vendor information.
+     * @throws ErrorResultException if unable to get the vendor information.
+     * @throws ErrorResultIOException if unable to get the vendor information
+     * @throws SearchResultReferenceIOException if unable to get the vendor information
      */
-    public Vendor query(LDAPConnection conn) throws LDAPException {
+    public Vendor query(Connection conn) throws ErrorResultException, ErrorResultIOException,
+            SearchResultReferenceIOException {
         String result = null;
-        LDAPSearchResults res = conn.search("", LDAPv2.SCOPE_BASE,
-            "(objectclass=*)", attrs, false);
+        ConnectionEntryReader res = conn.search("", SearchScope.BASE_OBJECT, "(objectclass=*)", attrs);
 
-        while (res.hasMoreElements()) {
-            LDAPEntry findEntry = (LDAPEntry) res.nextElement();
+        while (res.hasNext()) {
+            if (res.isReference()) {
+                //ignore
+                res.readReference();
+            } else {
+                SearchResultEntry findEntry = res.readEntry();
 
-            /* Get the attributes of the root DSE. */
-            LDAPAttributeSet findAttrs = findEntry.getAttributeSet();
-            Enumeration enumAttrs = findAttrs.getAttributes();
-
-            while (enumAttrs.hasMoreElements()) {
-                LDAPAttribute anAttr = (LDAPAttribute) enumAttrs.nextElement();
-                String attrName = anAttr.getName();
-
-                if (attrName.equalsIgnoreCase("vendorversion")) {
-                    Enumeration enumVals = anAttr.getStringValues();
-
-                    while (enumVals.hasMoreElements()) {
-                        result = (String)enumVals.nextElement();
-                        break;
+                /* Get the attributes of the root DSE. */
+                for (Attribute attribute : findEntry.getAllAttributes()) {
+                    String attrName = attribute.getAttributeDescriptionAsString();
+                    if ("vendorversion".equalsIgnoreCase(attrName)) {
+                        for (ByteString value : attribute) {
+                            result = value.toString();
+                            break;
+                        }
                     }
                 }
             }
         }
-        
+
         Vendor vendor = unknownVendor;
-        
+
         if (result != null) {
             if (result.startsWith(VENDOR_OPENDJ)) {
                 String version = result.substring(VENDOR_OPENDJ.length());

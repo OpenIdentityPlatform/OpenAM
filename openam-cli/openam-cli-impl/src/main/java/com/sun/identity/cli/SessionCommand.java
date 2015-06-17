@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: SessionCommand.java,v 1.9 2010/01/04 18:59:21 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.sun.identity.cli;
@@ -40,8 +37,7 @@ import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.common.DisplayUtils;
 import com.sun.identity.common.SearchResults;
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.util.DN;
+import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.session.SessionCache;
 
 import javax.inject.Inject;
@@ -368,9 +364,8 @@ public class SessionCommand extends AuthenticatedCommand {
 
     private String dnToName(String dn) {
         String ret = dn;
-        if (DN.isDN(dn)) {
-            String[] comps = LDAPDN.explodeDN(dn, true);
-            ret = comps[0];
+        if (LDAPUtils.isDN(dn)) {
+            ret = LDAPUtils.rdnValueFromDn(dn);
         }
         return ret;
     }

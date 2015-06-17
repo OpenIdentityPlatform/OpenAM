@@ -30,25 +30,7 @@ package com.sun.identity.setup;
 
 import static org.forgerock.openam.utils.IOUtils.writeToFile;
 
-import com.iplanet.am.util.AdminUtils;
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.services.ldap.DSConfigMgr;
-import com.iplanet.services.ldap.LDAPServiceException;
-import com.iplanet.services.ldap.LDAPUser;
-import com.iplanet.services.ldap.ServerGroup;
-import com.iplanet.services.util.Crypt;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.internal.AuthContext;
-import com.sun.identity.authentication.internal.AuthPrincipal;
-import com.sun.identity.authentication.internal.InvalidAuthContextException;
-import com.sun.identity.authentication.internal.server.SMSAuthModule;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.common.DebugPropertiesObserver;
-import com.sun.identity.common.configuration.ServerConfiguration;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSEntry;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.SMSPropertiesObserver;
+import javax.security.auth.login.LoginException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -61,8 +43,28 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
-import javax.security.auth.login.LoginException;
-import com.sun.identity.shared.ldap.LDAPConnection;
+
+import com.iplanet.am.util.AdminUtils;
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.services.ldap.DSConfigMgr;
+import com.iplanet.services.ldap.LDAPServiceException;
+import com.iplanet.services.ldap.LDAPUser;
+import com.iplanet.services.ldap.ServerGroup;
+import com.iplanet.services.util.Crypt;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.internal.AuthContext;
+import com.sun.identity.authentication.internal.AuthPrincipal;
+import com.sun.identity.authentication.internal.InvalidAuthContextException;
+import com.sun.identity.authentication.internal.server.SMSAuthModule;
+import com.sun.identity.common.DebugPropertiesObserver;
+import com.sun.identity.common.configuration.ServerConfiguration;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSEntry;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SMSPropertiesObserver;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
 
 /**
  * This class is responsible for bootstrapping the WAR.
@@ -180,27 +182,26 @@ public class Bootstrap {
             SMSAuthModule.initialize();
         }
 
-        LDAPConnection ld = null;
         DSConfigMgr dsCfg = DSConfigMgr.getDSConfigMgr();
         ServerGroup sg = dsCfg.getServerGroup("sms");
-        if (sg != null) {
-            try {
-                ld = dsCfg.getNewConnection("sms", LDAPUser.Type.AUTH_ADMIN);
-            } catch (LDAPServiceException e) {
-                // ignore, DS is down
-            }
-        }
-        if (ld == null) {
+        if (sg == null) {
             return null;
         }
-        
+        try (ConnectionFactory factory = dsCfg.getNewConnectionFactory("sms", LDAPUser.Type.AUTH_ADMIN);
+             Connection conn = factory.getConnection()) {
+            // Success case. Managed to get connection
+        } catch (LDAPServiceException e) {
+            // ignore, DS is down
+            return null;
+        }
+
         String dsbasedn = bootstrapData.getUserBaseDN();
         String pwd = bootstrapData.getDsameUserPassword();
         String dsameUser = "cn=dsameuser,ou=DSAME Users," + dsbasedn;
         String instanceName = bootstrapData.getInstanceName();
 
-        SSOToken ssoToken = getSSOToken(dsbasedn, dsameUser, 
-            JCECrypt.decode(pwd));
+        SSOToken ssoToken = getSSOToken(dsbasedn, dsameUser,
+                JCECrypt.decode(pwd));
         try {
             properties = ServerConfiguration.getServerInstance(
                 ssoToken, instanceName);

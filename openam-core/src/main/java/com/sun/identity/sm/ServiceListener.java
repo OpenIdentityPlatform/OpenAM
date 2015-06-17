@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,12 @@
  *
  * $Id: ServiceListener.java,v 1.5 2009/01/28 05:35:03 ww203982 Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.sm;
 
-import com.sun.identity.shared.ldap.controls.LDAPPersistSearchControl;
+import org.forgerock.openam.ldap.PersistentSearchChangeType;
 
 /**
  * The interface <code>ServiceListener</code> needs to be implemented by
@@ -45,17 +46,17 @@ public interface ServiceListener {
     /**
      * The change type specifies that the entry has been added.
      */
-    public static final int ADDED = LDAPPersistSearchControl.ADD;
+    int ADDED = PersistentSearchChangeType.ADDED;
 
     /**
      * The change type specifies that the entry has been removed.
      */
-    public static final int REMOVED = LDAPPersistSearchControl.DELETE;
+    int REMOVED = PersistentSearchChangeType.REMOVED;
 
     /**
      * The change type specifies that the entry has been modified.
      */
-    public static final int MODIFIED = LDAPPersistSearchControl.MODIFY;
+    int MODIFIED = PersistentSearchChangeType.MODIFIED;
 
     /**
      * This method will be invoked when a service's schema has been changed.

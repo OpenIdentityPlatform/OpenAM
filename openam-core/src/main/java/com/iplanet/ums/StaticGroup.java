@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,20 +24,24 @@
  *
  * $Id: StaticGroup.java,v 1.4 2009/01/28 05:34:51 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.ums;
 
 import java.security.Principal;
-import java.util.Enumeration;
-
-import com.sun.identity.shared.ldap.LDAPAttribute;
-import com.sun.identity.shared.ldap.LDAPDN;
+import java.util.Collections;
+import java.util.Iterator;
 
 import com.iplanet.services.ldap.Attr;
 import com.iplanet.services.ldap.AttrSet;
-import com.iplanet.services.ldap.ModSet;
 import com.iplanet.services.util.I18n;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.Attributes;
+import org.forgerock.opendj.ldap.ByteString;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.Modification;
+import org.forgerock.opendj.ldap.ModificationType;
 
 /**
  * Represents a static group entry.
@@ -138,7 +142,7 @@ public class StaticGroup extends PersistentObject implements
      */
     public void addMember(Guid guid) throws UMSException {
 
-        String id = LDAPDN.normalize(guid.getDn());
+        String id = DN.valueOf(guid.getDn()).toNormalizedString();
 
         PersistentObject entry = null;
 
@@ -157,7 +161,7 @@ public class StaticGroup extends PersistentObject implements
             }
         }
 
-        modify(new Attr(MEMBER_ATTR_NAME, id), ModSet.ADD);
+        modify(new Attr(MEMBER_ATTR_NAME, id), ModificationType.ADD);
         save();
     }
 
@@ -240,11 +244,11 @@ public class StaticGroup extends PersistentObject implements
         }
 
         Attr nestedMembers = new Attr(MEMBER_ATTR_NAME);
-        LDAPAttribute la = attr.toLDAPAttribute();
-        Enumeration en = la.getStringValues();
+        Attribute la = attr.toLDAPAttribute();
+        Iterator<ByteString> iterator = la.iterator();
 
-        while (en.hasMoreElements()) {
-            String memberdn = (String) en.nextElement();
+        while (iterator.hasNext()) {
+            String memberdn = iterator.next().toString();
             PersistentObject entry = null;
 
             try {
@@ -376,8 +380,8 @@ public class StaticGroup extends PersistentObject implements
      */
     public void removeMember(Guid guid) throws UMSException {
         String dn = guid.getDn();
-        super.modify(new Attr(MEMBER_ATTR_NAME, LDAPDN.normalize(dn)),
-                ModSet.DELETE);
+        super.modify(new Attr(MEMBER_ATTR_NAME, DN.valueOf(dn).toNormalizedString()),
+                ModificationType.DELETE);
         save();
     }
 
@@ -408,13 +412,9 @@ public class StaticGroup extends PersistentObject implements
             return;
         }
 
-        ModSet modSet = new ModSet();
-
-        // TODO: this should probably be REPLACE instead of DELETE, so it
-        // works even if there are no members
-        modSet.add(ModSet.DELETE, new LDAPAttribute(MEMBER_ATTR_NAME));
-
-        modify(modSet);
+        // TODO: this should probably be REPLACE instead of DELETE, so it works even if there are no members
+        modify(Collections.singleton(
+                new Modification(ModificationType.DELETE, Attributes.emptyAttribute(MEMBER_ATTR_NAME))));
         save();
     }
 

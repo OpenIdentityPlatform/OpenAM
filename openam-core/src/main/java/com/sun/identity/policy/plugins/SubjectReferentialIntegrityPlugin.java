@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,35 +24,33 @@
  *
  * $Id: SubjectReferentialIntegrityPlugin.java,v 1.5 2009/01/28 05:35:01 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.sun.identity.policy.plugins;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
-import com.sun.identity.shared.debug.Debug;
 import com.iplanet.am.sdk.AMCallBack;
 import com.iplanet.am.sdk.AMConstants;
 import com.iplanet.am.sdk.AMObject;
 import com.iplanet.am.sdk.AMOrganization;
 import com.iplanet.am.sdk.AMPostCallBackException;
 import com.iplanet.am.sdk.AMStoreConnection;
-import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.policy.Policy;
 import com.sun.identity.policy.PolicyConfig;
 import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.policy.PolicyUtils;
 import com.sun.identity.policy.interfaces.Subject;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSEntry;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import com.sun.identity.shared.ldap.util.DN;
+import org.forgerock.opendj.ldap.DN;
 
 /**
  * The class <code>SubjectReferentialIntegrityPlugin</code> provides
@@ -97,10 +95,10 @@ public class SubjectReferentialIntegrityPlugin extends AMCallBack {
                 Subject subject;
                 Iterator policyIter,subjectIter;
                 // create a DN for the entry to be deleted
-                DN entryDName = new DN(entryDN);
+                DN entryDName = DN.valueOf(entryDN);
                 //a connection to the Identity Server data store.
                 AMStoreConnection dpStore = new AMStoreConnection(token);
-                DN rootDN = new DN(SMSEntry.getRootSuffix());
+                DN rootDN = DN.valueOf(SMSEntry.getRootSuffix());
                 if (debug.messageEnabled()) {
                     debug.message("Searching for all policies from root DN: " 
                     + rootDN.toString());
@@ -168,7 +166,7 @@ public class SubjectReferentialIntegrityPlugin extends AMCallBack {
                                     DN strDN = null;
                                     while (ite.hasNext()) {
                                         str = (String)ite.next();
-                                        strDN = new DN(str);
+                                        strDN = DN.valueOf(str);
                                         if(entryDName.equals(strDN)) {
                                             replacePolicy = true;
                                             if (debug.messageEnabled()) {

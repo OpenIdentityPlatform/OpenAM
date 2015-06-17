@@ -62,6 +62,8 @@ public class EntitlementException extends Exception {
 
     public static final int UNABLE_TO_SERIALIZE_OBJECT = 200;
     public static final int NO_SUCH_POLICY = 203;
+    public static final int UNABLE_SEARCH_PRIVILEGES = 215;
+    public static final int UNABLE_SEARCH_PRIVILEGES_MISSING_TOKEN = 216;
     public static final int POLICY_ALREADY_EXISTS = 217;
     public static final int RESOURCE_TYPE_ALREADY_EXISTS = 218;
     public static final int NO_SUCH_RESOURCE_TYPE = 219;

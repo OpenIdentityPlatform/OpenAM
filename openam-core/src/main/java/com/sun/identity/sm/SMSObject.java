@@ -24,6 +24,7 @@
  *
  * $Id: SMSObject.java,v 1.9 2009/10/28 04:24:26 hengming Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.sm;
@@ -62,7 +63,7 @@ public abstract class SMSObject {
      * the ssoToken are valid. If the entry does not exist the method should
      * return <code>null</code>
      */
-    public abstract Map read(SSOToken token, String objName)
+    public abstract Map<String, Set<String>> read(SSOToken token, String objName)
             throws SMSException, SSOException;
 
     /**
@@ -90,7 +91,7 @@ public abstract class SMSObject {
      * identifies the number of entries to return, if <code>0</code> returns
      * all the entries.
      */
-    public abstract Set searchSubOrgNames(SSOToken token, String dn,
+    public abstract Set<String> searchSubOrgNames(SSOToken token, String dn,
             String filter, int numOfEntries, boolean sortResults,
             boolean ascendingOrder, boolean recursive) throws SMSException,
             SSOException;
@@ -101,7 +102,7 @@ public abstract class SMSObject {
      * identifies the number of entries to return, if <code>0</code> returns
      * all the entries.
      */
-    public abstract Set searchOrganizationNames(SSOToken token, String dn,
+    public abstract Set<String> searchOrganizationNames(SSOToken token, String dn,
             int numOfEntries, boolean sortResults, boolean ascendingOrder,
             String serviceName, String attrName, Set values)
             throws SMSException, SSOException;
@@ -111,7 +112,7 @@ public abstract class SMSObject {
      * sub-entries. The paramter <code>numOfEntries</code> identifies the
      * number of entries to return, if <code>0</code> returns all the entries.
      */
-    public abstract Set subEntries(SSOToken token, String dn, String filter,
+    public abstract Set<String> subEntries(SSOToken token, String dn, String filter,
             int numOfEntries, boolean sortResults, boolean ascendingOrder)
             throws SMSException, SSOException;
 
@@ -120,7 +121,7 @@ public abstract class SMSObject {
      * sub-entries. The paramter <code>numOfEntries</code> identifies the
      * number of entries to return, if <code>0</code> returns all the entries.
      */
-    public abstract Set schemaSubEntries(SSOToken token, String dn,
+    public abstract Set<String> schemaSubEntries(SSOToken token, String dn,
             String filter, String sidFilter, int numOfEntries,
             boolean sortResults, boolean ascendingOrder) throws SMSException,
             SSOException;
@@ -128,16 +129,16 @@ public abstract class SMSObject {
     /**
      * Searchs the data store for objects that match the filter
      */
-    public abstract Set search(SSOToken token, String startDN, String filter,
+    public abstract Set<String> search(SSOToken token, String startDN, String filter,
             int numOfEntries, int timeLimit, boolean sortResults,
             boolean ascendingOrder) throws SMSException, SSOException;
 
     /**
      * Searchs the data store for objects that match the filter
      */
-    public abstract Iterator search(SSOToken token, String startDN,
+    public abstract Iterator<SMSDataEntry> search(SSOToken token, String startDN,
         String filter, int numOfEntries, int timeLimit, boolean sortResults,
-        boolean ascendingOrder, Set excludes) throws SMSException, SSOException;
+        boolean ascendingOrder, Set<String> excludes) throws SMSException, SSOException;
 
     /**
      * Checks if the provided DN exists. Used by PolicyManager.

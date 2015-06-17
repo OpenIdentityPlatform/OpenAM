@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,9 @@
  *
  * $Id: ACIEventListener.java,v 1.5 2009/01/28 05:34:48 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.iplanet.am.sdk.ldap;
 
 import com.iplanet.am.sdk.AMObjectListener;
@@ -37,12 +35,13 @@ import com.iplanet.am.sdk.common.IDirectoryServices;
 import com.iplanet.services.ldap.event.DSEvent;
 import com.iplanet.services.ldap.event.IDSEventListener;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.ldap.PersistentSearchChangeType;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import com.sun.identity.shared.ldap.controls.LDAPPersistSearchControl;
 
 /**
  * The <code>ACIEventListener</code> handles all the events that are generated
@@ -54,9 +53,7 @@ public class ACIEventListener implements IDSEventListener {
 
     protected static final String SEARCH_FILTER = "(aci=*)";
 
-    protected static final int OPERATIONS = LDAPPersistSearchControl.ADD
-            | LDAPPersistSearchControl.MODIFY | LDAPPersistSearchControl.DELETE
-            | LDAPPersistSearchControl.MODDN;
+    protected static final int OPERATIONS = PersistentSearchChangeType.ALL_OPERATIONS;
 
     // Instance variables
     private Debug debug = EventManager.getDebug();

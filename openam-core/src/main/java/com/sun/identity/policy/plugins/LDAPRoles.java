@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,37 +24,49 @@
  *
  * $Id: LDAPRoles.java,v 1.8 2009/11/20 23:52:55 ww203982 Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation 
  */
+
 package com.sun.identity.policy.plugins;
 
-import java.util.*;
-import com.sun.identity.shared.ldap.*;
-import com.sun.identity.shared.ldap.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
-import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.ldap.LDAPBindRequest;
-import com.sun.identity.shared.ldap.LDAPRequestParser;
-import com.sun.identity.shared.ldap.LDAPSearchRequest;
-import com.sun.identity.common.LDAPConnectionPool;
-import com.sun.identity.policy.PolicyManager;
-import com.sun.identity.policy.PolicyEvaluator;
-import com.sun.identity.policy.SubjectEvaluationCache;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.policy.InvalidNameException;
+import com.sun.identity.policy.NameNotFoundException;
 import com.sun.identity.policy.PolicyConfig;
+import com.sun.identity.policy.PolicyEvaluator;
+import com.sun.identity.policy.PolicyException;
+import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.policy.PolicyUtils;
 import com.sun.identity.policy.ResBundleUtils;
-import com.sun.identity.policy.ValidValues;
+import com.sun.identity.policy.SubjectEvaluationCache;
 import com.sun.identity.policy.Syntax;
-import com.sun.identity.policy.PolicyException;
-import com.sun.identity.policy.NameNotFoundException;
-import com.sun.identity.policy.InvalidNameException;
+import com.sun.identity.policy.ValidValues;
 import com.sun.identity.policy.interfaces.Subject;
+import com.sun.identity.shared.debug.Debug;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.ByteString;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.LDAPOptions;
+import org.forgerock.opendj.ldap.ResultCode;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.requests.Requests;
+import org.forgerock.opendj.ldap.requests.SearchRequest;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
 
 /**
  * This class represents a group of LDAP roles
@@ -86,15 +98,15 @@ public class LDAPRoles implements Subject {
 
     // Variables
     private boolean initialized = false;
-    private Set selectedRoleDNs = Collections.EMPTY_SET;
-    private Set selectedRFCRoleDNs = Collections.EMPTY_SET;
+    private Set<String> selectedRoleDNs = Collections.emptySet();
+    private Set<String> selectedRFCRoleDNs = Collections.emptySet();
     private String authid;
     private String authpw;
     private String baseDN;
     private String roleSearchFilter;
-    private int roleSearchScope = LDAPv2.SCOPE_SUB;
+    private SearchScope roleSearchScope = SearchScope.WHOLE_SUBTREE;
     private String userSearchFilter;
-    private int userSearchScope = LDAPv2.SCOPE_SUB;
+    private SearchScope userSearchScope = SearchScope.WHOLE_SUBTREE;
     private String roleRDNAttrName;
     private String userRDNAttrName;
     private int timeLimit;
@@ -103,7 +115,7 @@ public class LDAPRoles implements Subject {
     private int minPoolSize;
     private int maxPoolSize;
     private String orgName;
-    private LDAPConnectionPool connPool;
+    private ConnectionFactory connPool;
     private boolean localDS;
     private boolean aliasEnabled;
     private String ldapServer;
@@ -159,11 +171,11 @@ public class LDAPRoles implements Subject {
         String scope = (String) configParams.get(
             PolicyConfig.LDAP_ROLES_SEARCH_SCOPE);
         if (scope.equalsIgnoreCase(LDAP_SCOPE_BASE)) {
-            roleSearchScope = LDAPv2.SCOPE_BASE;
+            roleSearchScope = SearchScope.BASE_OBJECT;
         } else if (scope.equalsIgnoreCase(LDAP_SCOPE_ONE)) {
-            roleSearchScope = LDAPv2.SCOPE_ONE;
+            roleSearchScope = SearchScope.SINGLE_LEVEL;
         } else {
-            roleSearchScope = LDAPv2.SCOPE_SUB;
+            roleSearchScope = SearchScope.WHOLE_SUBTREE;
         }
 
         roleRDNAttrName = (String) configParams.get(
@@ -172,11 +184,11 @@ public class LDAPRoles implements Subject {
             PolicyConfig.LDAP_USERS_SEARCH_FILTER);
         scope = (String) configParams.get(PolicyConfig.LDAP_USERS_SEARCH_SCOPE);
         if (scope.equalsIgnoreCase(LDAP_SCOPE_BASE)) {
-            userSearchScope = LDAPv2.SCOPE_BASE;
+            userSearchScope = SearchScope.BASE_OBJECT;
         } else if (scope.equalsIgnoreCase(LDAP_SCOPE_ONE)) {
-            userSearchScope = LDAPv2.SCOPE_ONE;
+            userSearchScope = SearchScope.SINGLE_LEVEL;
         } else {
-            userSearchScope = LDAPv2.SCOPE_SUB;
+            userSearchScope = SearchScope.WHOLE_SUBTREE;
         }
 
         userRDNAttrName = (String) configParams.get(
@@ -228,9 +240,10 @@ public class LDAPRoles implements Subject {
                            + "\nOrgName: " + orgName);
         }
 
-        // initialize the connection pool for the ldap server 
-        LDAPConnectionPools.initConnectionPool(ldapServer, 
-                authid, authpw, sslEnabled, minPoolSize, maxPoolSize);
+        // initialize the connection pool for the ldap server
+        LDAPOptions options = new LDAPOptions().setConnectTimeout(timeLimit, TimeUnit.SECONDS);
+        LDAPConnectionPools.initConnectionPool(ldapServer, authid, authpw, sslEnabled, minPoolSize, maxPoolSize,
+                options);
         connPool = LDAPConnectionPools.getConnectionPool(ldapServer);
         initialized = true;
     }
@@ -302,97 +315,50 @@ public class LDAPRoles implements Subject {
                 + searchFilter);
         }
         String[] attrs = { roleRDNAttrName };
-        LDAPConnection ld = null;
-        Set validRoleDNs = new HashSet();
+        Set<String> validRoleDNs = new HashSet<>();
         int status = ValidValues.SUCCESS;
-        try {
-            LDAPSearchResults res = null;
-            LDAPBindRequest bindRequest = LDAPRequestParser.parseBindRequest(
-                3, authid, authpw);
-            LDAPSearchRequest searchRequest =
-                LDAPRequestParser.parseSearchRequest(baseDN, roleSearchScope,
-                searchFilter, attrs, false, timeLimit,
-                LDAPRequestParser.DEFAULT_DEREFERENCE, maxResults);
-            try {
-                ld = connPool.getConnection();
-                // connect to the server to authenticate
-                try {
-                    ld.authenticate(bindRequest);
-                } catch (LDAPException connEx) {
-                    // fallback to ldap v2 if v3 is not supported
-                    if (connEx.getLDAPResultCode() ==
-                        LDAPException.PROTOCOL_ERROR)
-                    {
-                        if (debug.messageEnabled()) {
-                            debug.message("LDAPRoles.getValidValues(): "+
-                            "Bind with LDAPv3 failed, retrying with v2");
-                        }
-                        bindRequest = LDAPRequestParser.parseBindRequest(
-                                2, authid, authpw);
-                        ld.authenticate(bindRequest);
-                    } else {
-                        throw connEx;
-                    }
-                }
-                res = ld.search(searchRequest);
-            } finally {
-                if (ld != null) {
-                    connPool.close(ld);
-                }
-            }
-            while (res.hasMoreElements()) {
-                try {
-                    LDAPEntry entry = res.next();
+        try (Connection conn = connPool.getConnection()) {
+            SearchRequest searchRequest = Requests.newSearchRequest(baseDN, roleSearchScope, searchFilter, attrs);
+            ConnectionEntryReader reader = conn.search(searchRequest);
+
+            while (reader.hasNext()) {
+                if (reader.isReference()) {
+                    //Ignore
+                    reader.readReference();
+                } else {
+                    SearchResultEntry entry = reader.readEntry();
                     if (entry != null) {
-                        validRoleDNs.add(entry.getDN());
-                        if (debug.messageEnabled()) {
-                            debug.message("LDAPRoles.getValidValues(): "+
-                                "found role name=" + entry.getDN());
-                        }
-                    }
-                } catch (LDAPReferralException lre) {
-                    // ignore referrals
-                    continue;
-                } catch (LDAPException le) {
-                    String objs[] = { orgName };
-                    int resultCode = le.getLDAPResultCode();
-                    if (resultCode == le.SIZE_LIMIT_EXCEEDED) {
-                        debug.warning("LDAPRoles.getValidValues(): "+
-                             "exceeded the size limit");
-                        status = ValidValues.SIZE_LIMIT_EXCEEDED;
-                    } else if (resultCode == le.TIME_LIMIT_EXCEEDED) {
-                        debug.warning("LDAPRoles.getValidValues(): "+
-                            "exceeded the time limit");
-                        status = ValidValues.TIME_LIMIT_EXCEEDED;
-                    } else {
-                        throw (new PolicyException(le));
+                        validRoleDNs.add(entry.getName().toString());
+                        debug.message("LDAPRoles.getValidValues(): found role name={}", entry.getName().toString());
                     }
                 }
             }
-        } catch (LDAPException lde) {
-            int ldapErrorCode = lde.getLDAPResultCode();
-            if (ldapErrorCode == LDAPException.INVALID_CREDENTIALS) {
-                throw (new PolicyException(ResBundleUtils.rbName,
-                    "ldap_invalid_password", null, null));
-            } else if (ldapErrorCode == LDAPException.NO_SUCH_OBJECT) {
+        } catch (ErrorResultException le) {
+            ResultCode resultCode = le.getResult().getResultCode();
+            if (ResultCode.SIZE_LIMIT_EXCEEDED.equals(resultCode)) {
+                debug.warning("LDAPRoles.getValidValues(): exceeded the size limit");
+                return new ValidValues(ValidValues.SIZE_LIMIT_EXCEEDED, validRoleDNs);
+            } else if (ResultCode.TIME_LIMIT_EXCEEDED.equals(resultCode)) {
+                debug.warning("LDAPRoles.getValidValues(): exceeded the time limit");
+                return new ValidValues(ValidValues.TIME_LIMIT_EXCEEDED, validRoleDNs);
+            } else if (ResultCode.INVALID_CREDENTIALS.equals(resultCode)) {
+                throw new PolicyException(ResBundleUtils.rbName, "ldap_invalid_password", null, null);
+            } else if (ResultCode.NO_SUCH_OBJECT.equals(resultCode)) {
                 String objs[] = { baseDN };
-                throw (new PolicyException(ResBundleUtils.rbName,
-                    "no_such_ldap_base_dn", objs, null));
+                throw new PolicyException(ResBundleUtils.rbName, "no_such_ldap_base_dn", objs, null);
             } 
-            String errorMsg = lde.getLDAPErrorMessage(); 
-            String additionalMsg = lde.errorCodeToString(); 
+            String errorMsg = le.getMessage();
+            String additionalMsg = le.getResult().getDiagnosticMessage();
             if (additionalMsg != null) {
-                throw (new PolicyException(
-                         errorMsg + ": " + additionalMsg));
+                throw new PolicyException(errorMsg + ": " + additionalMsg);
             } else { 
-                throw (new PolicyException(errorMsg));
+                throw new PolicyException(errorMsg);
             }
         } catch (Exception e) {
-            throw (new PolicyException(e));
+            throw new PolicyException(e);
         }
-        return(new ValidValues(status, validRoleDNs));
+        return new ValidValues(status, validRoleDNs);
     }
-
 
     /**
      * Returns the display name for the value for the given locale.
@@ -453,18 +419,18 @@ public class LDAPRoles implements Subject {
                 "ldaproles_subject_invalid_group_names", null, 
                 null, PolicyException.USER_COLLECTION));
         }
-        selectedRoleDNs = new HashSet();
+        selectedRoleDNs = new HashSet<>();
         selectedRoleDNs.addAll(names);
         if (debug.messageEnabled()) {
             debug.message("LDAPRoles.setValues(): selected role names=" + 
                 selectedRoleDNs);
         }
-        selectedRFCRoleDNs = new HashSet();
+        selectedRFCRoleDNs = new HashSet<>();
         // add to the RFC Set now
         Iterator it = names.iterator();
         while (it.hasNext()) {
-            selectedRFCRoleDNs.add(new DN((String)it.next()).toRFCString().
-                toLowerCase());
+            selectedRFCRoleDNs.add(DN.valueOf((String) it.next()).toString().
+                    toLowerCase());
         }
     }
 
@@ -489,7 +455,7 @@ public class LDAPRoles implements Subject {
         boolean roleMatch = false;
         String userLocalDN = token.getPrincipal().getName();
         if (selectedRFCRoleDNs.size() > 0) {
-            LDAPEntry userEntry = null;
+            SearchResultEntry userEntry = null;
             Set userRoles = null;
             boolean listenerAdded = false;
             String tokenID = token.getTokenID().toString();
@@ -641,7 +607,7 @@ public class LDAPRoles implements Subject {
      *  else gets users roles from the directory
      *  @return <code>Set</code> of Role DNs.
      */
-    private Set getUserRoles(SSOToken token, LDAPEntry userEntry) throws
+    private Set getUserRoles(SSOToken token, SearchResultEntry userEntry) throws
         SSOException, PolicyException 
     {
         if (token == null) {
@@ -668,15 +634,12 @@ public class LDAPRoles implements Subject {
         // we come here either the token is not registered with the
         // cache or the cache element is out of date. 
         // get the user DN from the directory server.
-        Set roles = new HashSet();
+        Set<String> roles = new HashSet<>();
         if (userEntry != null) {
-            LDAPAttribute attribute
-                = userEntry.getAttribute(LDAP_USER_ROLE_ATTR);
+            Attribute attribute = userEntry.getAttribute(LDAP_USER_ROLE_ATTR);
             if (attribute != null) {
-                Enumeration enumVals = attribute.getStringValues();
-                while (enumVals.hasMoreElements()) {
-                    roles.add(new DN((String)enumVals.nextElement()).
-                        toRFCString().toLowerCase());
+                for (ByteString value : attribute) {
+                    roles.add(DN.valueOf(value.toString()).toString());
                 }
             }
             // If the cache is enabled
@@ -707,10 +670,10 @@ public class LDAPRoles implements Subject {
      * up the search, but if user is not local then the base DN as
      * configured in the policy config service is used.
      */
-    private LDAPEntry getUserEntry(SSOToken token) throws SSOException,
+    private SearchResultEntry getUserEntry(SSOToken token) throws SSOException,
         PolicyException 
     {
-        Set qualifiedUsers = new HashSet();
+        Set<SearchResultEntry> qualifiedUsers = new HashSet<>();
         String userLocalDN = token.getPrincipal().getName();
     
         if (debug.messageEnabled()) {
@@ -721,12 +684,9 @@ public class LDAPRoles implements Subject {
         String searchBaseDN = baseDN;
         if (localDS && !PolicyUtils.principalNameEqualsUuid( token)) {
            // if it is local, then we search the user entry only
-           searchBaseDN = (new DN(userLocalDN)).toString();
-           if (debug.messageEnabled()) {
-               debug.message("LDAPRoles.getUserEntry(): search user " 
-                             + searchBaseDN + " only as it is local.");
-           }
-        } 
+           searchBaseDN = DN.valueOf(userLocalDN).toString();
+           debug.message("LDAPRoles.getUserEntry(): search user {} only as it is local.", searchBaseDN);
+        }
 
         // try to figure out the user name from the local user DN
         int beginIndex = userLocalDN.indexOf("=");
@@ -754,78 +714,53 @@ public class LDAPRoles implements Subject {
         }
         
         // search the remote ldap and find out the user DN        
-        LDAPConnection ld = null;
         String[] myAttrs = { LDAP_USER_ROLE_ATTR };
-        try {
-            LDAPSearchResults res = null;
-            LDAPBindRequest bindRequest = LDAPRequestParser.parseBindRequest(
-                authid, authpw);
-            LDAPSearchRequest searchRequest =
-                LDAPRequestParser.parseSearchRequest(searchBaseDN,
-                userSearchScope, searchFilter, myAttrs, false, timeLimit,
-                LDAPRequestParser.DEFAULT_DEREFERENCE, maxResults);
-            try {
-                ld = connPool.getConnection();
-                // connect to the server to authenticate
-                ld.authenticate(bindRequest);
-                res = ld.search(searchRequest);
-            } finally {
-                if (ld != null) {
-                    connPool.close(ld);
-                }
-            }
-            while (res.hasMoreElements()) {
-                try {
-                    LDAPEntry entry = res.next();
+        try (Connection conn = connPool.getConnection()) {
+            SearchRequest searchRequest = Requests.newSearchRequest(searchBaseDN, userSearchScope, searchFilter,
+                    myAttrs);
+            ConnectionEntryReader reader = conn.search(searchRequest);
+
+            while (reader.hasNext()) {
+                if (reader.isReference()) {
+                    //Ignore
+                    reader.readReference();
+                } else {
+                    SearchResultEntry entry = reader.readEntry();
                     if (entry != null) {
                         qualifiedUsers.add(entry);
                     }
-                } catch (LDAPReferralException lre) {
-                    // ignore referrals
-                    continue;
-                } catch (LDAPException le) {
-                    String objs[] = { orgName };
-                    int resultCode = le.getLDAPResultCode();
-                    if (resultCode == le.SIZE_LIMIT_EXCEEDED) {
-                        debug.warning(
-                     "LDAPRoles.isMember(): exceeded the size limit");
-                        throw (new PolicyException(ResBundleUtils.rbName,
-                        "ldap_search_exceed_size_limit", objs, null));
-                    } else if (resultCode == le.TIME_LIMIT_EXCEEDED) {
-                        debug.warning(
-                     "LDAPRoles.isMember(): exceeded the time limit");
-                        throw (new PolicyException(ResBundleUtils.rbName,
-                        "ldap_search_exceed_time_limit", objs, null));
-                    } else {
-                        throw (new PolicyException(le));
-                    }
                 }
             }
-        } catch (LDAPException lde) {
-            int ldapErrorCode = lde.getLDAPResultCode();
-            if (ldapErrorCode == LDAPException.INVALID_CREDENTIALS) {
-                throw (new PolicyException(ResBundleUtils.rbName,
-                    "ldap_invalid_password", null, null));
-            } else if (ldapErrorCode == LDAPException.NO_SUCH_OBJECT) {
+        } catch (ErrorResultException le) {
+            ResultCode resultCode = le.getResult().getResultCode();
+            if (ResultCode.SIZE_LIMIT_EXCEEDED.equals(resultCode)) {
+                String objs[] = { orgName };
+                debug.warning("LDAPRoles.isMember(): exceeded the size limit");
+                throw new PolicyException(ResBundleUtils.rbName, "ldap_search_exceed_size_limit", objs, null);
+            } else if (ResultCode.TIME_LIMIT_EXCEEDED.equals(resultCode)) {
+                String objs[] = { orgName };
+                debug.warning("LDAPRoles.isMember(): exceeded the time limit");
+                throw new PolicyException(ResBundleUtils.rbName, "ldap_search_exceed_time_limit", objs, null);
+            } else if (ResultCode.INVALID_CREDENTIALS.equals(resultCode)) {
+                throw new PolicyException(ResBundleUtils.rbName, "ldap_invalid_password", null, null);
+            } else if (ResultCode.NO_SUCH_OBJECT.equals(resultCode)) {
                 String objs[] = { baseDN };
-                throw (new PolicyException(ResBundleUtils.rbName,
-                    "no_such_ldap_base_dn", objs, null));
+                throw new PolicyException(ResBundleUtils.rbName, "no_such_ldap_base_dn", objs, null);
             } 
-            String errorMsg = lde.getLDAPErrorMessage();
-            String additionalMsg = lde.errorCodeToString(); 
+            String errorMsg = le.getMessage();
+            String additionalMsg = le.getResult().getDiagnosticMessage();
             if (additionalMsg != null) {
-                throw (new PolicyException(
-                          errorMsg + ": " + additionalMsg));
+                throw new PolicyException(errorMsg + ": " + additionalMsg);
             } else {
-                throw (new PolicyException(errorMsg));
+                throw new PolicyException(errorMsg);
             }
         } catch (Exception e) {
-            throw (new PolicyException(e));
+            throw new PolicyException(e);
         }
         if (qualifiedUsers.size() > 0) {
-            Iterator iter = qualifiedUsers.iterator();
+            Iterator<SearchResultEntry> iter = qualifiedUsers.iterator();
             // we only take the first qualified DN
-            return (LDAPEntry)iter.next();
+            return iter.next();
         }
         return null;
     }

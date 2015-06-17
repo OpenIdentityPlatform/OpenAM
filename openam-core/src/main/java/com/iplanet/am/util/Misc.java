@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,16 +24,19 @@
  *
  * $Id: Misc.java,v 1.6 2009/01/28 05:34:48 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.am.util;
 
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.SearchScope;
+
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import com.sun.identity.shared.ldap.util.DN;
 
 /**
  * The Misc class contains various misc methods :)
@@ -159,24 +162,6 @@ public class Misc {
         }
     }
 
-    /**
-     * check if dn1 is descendant of dn2
-     * 
-     * @param dn1
-     *            dn string
-     * @param dn2
-     *            dn string
-     * @return true if dn1 is descendant of dn2 or equals to dn2, false
-     *         otherwise
-     */
-    public static boolean isDescendantOf(String dn1, String dn2) {
-        DN temp1 = new DN(dn1);
-        DN temp2 = new DN(dn2);
-        if (temp1.equals(temp2)) {
-            return true;
-        }
-        return temp1.isDescendantOf(temp2);
-    }
 
     /**
      * This convenience method is for getting server specific attributes from a
@@ -244,7 +229,7 @@ public class Misc {
         // with caseInsensitive/caseSensitive syntax)
         // differences (given that it requires schema queries)
 
-        String canonicalizedDN = (new DN(dn)).toRFCString();
+        String canonicalizedDN = DN.valueOf(dn).toString();
         if (isCaseInsensitiveDN) {
             canonicalizedDN = canonicalizedDN.toLowerCase();
         }

@@ -35,13 +35,13 @@ import java.util.Set;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.shared.ldap.util.DN;
+import org.forgerock.opendj.ldap.DN;
 
 /**
- * Class that lets a priviliged user to compute policy results for 
+ * Class that lets a priviliged user to compute policy results for
  * another user.
  * Only privileged users can get <code>ProxyPolicyEvaluator</code>
- *  - only top level administrator, realm level policy administrator, 
+ *  - only top level administrator, realm level policy administrator,
  * realm administrator or realm policy administrator can get
  * <code>ProxyPolicyEvaluator</code>. Top level administrator can compute policy
  * results for any user. Realm administrator or policy administrator can
@@ -64,7 +64,7 @@ public class ProxyPolicyEvaluator {
 
     static {
         baseDNString = com.sun.identity.sm.ServiceManager.getBaseDN();
-        baseDN= new DN(baseDNString);
+        baseDN = DN.valueOf(baseDNString);
     }
 
     /**
@@ -73,36 +73,36 @@ public class ProxyPolicyEvaluator {
      *
      * @param token single sign on token used to construct the proxy policy
      *        evaluator.
-     * @param serviceType service type for which construct the proxy policy 
-     *                    evaluator 
-     * @throws NoPermissionException if the token does not have privileges 
+     * @param serviceType service type for which construct the proxy policy
+     *                    evaluator
+     * @throws NoPermissionException if the token does not have privileges
      *         to create proxy policy evaluator
      * @throws NameNotFoundException if the serviceType is not found in
      *         registered service types
-     * @throws PolicyException any policy exception coming from policy 
+     * @throws PolicyException any policy exception coming from policy
      *                         framework
      * @throws SSOException if the token is invalid
      */
-    ProxyPolicyEvaluator(SSOToken token, String serviceType) 
-        throws NoPermissionException, NameNotFoundException, 
-        PolicyException, SSOException 
+    ProxyPolicyEvaluator(SSOToken token, String serviceType)
+        throws NoPermissionException, NameNotFoundException,
+        PolicyException, SSOException
     {
         SSOTokenManager.getInstance().validateToken(token);
         this.adminToken = token;
         this.serviceType = serviceType;
-        this.policyEvaluator 
+        this.policyEvaluator
                 = PolicyEvaluatorFactory.getInstance()
                 .getPolicyEvaluator(token, serviceType);
     }
 
     /**
-     * Gets policy decision for a resource, skipping subject evaluation. 
-     * Conditions would be evaluated and would include applicable advices 
+     * Gets policy decision for a resource, skipping subject evaluation.
+     * Conditions would be evaluated and would include applicable advices
      * in policy decisions. Hence, you could get details such as
      * <code>AuthLevel</code>, <code>AuthScheme</code> that would be required to
-     * access the resource.  
+     * access the resource.
      *
-     * @param resourceName name of the resource for which to compute policy 
+     * @param resourceName name of the resource for which to compute policy
      *                      decision
      * @param actionNames names of the actions the user is trying to perform on
      *                   the resource
@@ -113,13 +113,13 @@ public class ProxyPolicyEvaluator {
      *
      * @throws PolicyException exception form policy framework
      * @throws SSOException if single sign on token is invalid
-     * 
+     *
      */
-    public PolicyDecision getPolicyDecisionIgnoreSubjects(String resourceName, 
-            Set actionNames, Map env) throws PolicyException, SSOException 
+    public PolicyDecision getPolicyDecisionIgnoreSubjects(String resourceName,
+            Set actionNames, Map env) throws PolicyException, SSOException
     {
         PolicyDecision pd = policyEvaluator.getPolicyDecisionIgnoreSubjects(
-                resourceName, actionNames, env); 
+                resourceName, actionNames, env);
         // Let us log all policy evaluation results
         if (PolicyUtils.logStatus) {
             String decision = pd.toString();
@@ -128,7 +128,7 @@ public class ProxyPolicyEvaluator {
                     {adminToken.getPrincipal().getName(), resourceName,
                         decision};
                 PolicyUtils.logAccessMessage(
-                     "PROXIED_POLICY_EVALUATION_IGNORING_SUBJECTS", 
+                     "PROXIED_POLICY_EVALUATION_IGNORING_SUBJECTS",
                       objs, adminToken);
             }
         }

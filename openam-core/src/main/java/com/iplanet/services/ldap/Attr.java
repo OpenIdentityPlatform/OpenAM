@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,17 +24,18 @@
  *
  * $Id: Attr.java,v 1.4 2009/01/28 05:34:49 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.iplanet.services.ldap;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.StringTokenizer;
 
-import com.sun.identity.shared.ldap.LDAPAttribute;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.Attributes;
 
 /**
  * Represents an attribute value pair in UMS. The value of an attribute can be
@@ -45,11 +46,11 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
 
     String _name;
 
-    private ArrayList _stringValues;
+    private List<String> _stringValues;
 
-    private ArrayList _byteValues;
+    private List<byte[]> _byteValues;
 
-    private LDAPAttribute _ldapAttribute;
+    private Attribute _ldapAttribute;
 
     /**
      * Default constructor
@@ -80,7 +81,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      */
     public Attr(String name, String value) {
         _name = name.toLowerCase();
-        _stringValues = new ArrayList(1);
+        _stringValues = new ArrayList<>(1);
         _stringValues.add(value);
     }
 
@@ -96,7 +97,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
     public Attr(String name, String[] value) {
         _name = name.toLowerCase();
         int size = value.length;
-        _stringValues = new ArrayList(size);
+        _stringValues = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             _stringValues.add(value[i]);
         }
@@ -113,7 +114,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      */
     public Attr(String name, byte[] value) {
         _name = name.toLowerCase();
-        _byteValues = new ArrayList(1);
+        _byteValues = new ArrayList<>(1);
         _byteValues.add(value);
     }
 
@@ -128,7 +129,7 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      */
     public Attr(String name, byte[][] value) {
         _name = name.toLowerCase();
-        _byteValues = new ArrayList(1);
+        _byteValues = new ArrayList<>(1);
         int size = value.length;
         for (int i = 0; i < size; i++) {
             _byteValues.add(value[i]);
@@ -141,8 +142,8 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      * @param attr
      *            ldap attribute to construct from
      */
-    public Attr(LDAPAttribute attr) {
-        _name = attr.getName().toLowerCase();
+    public Attr(Attribute attr) {
+        _name = attr.getAttributeDescriptionAsString().toLowerCase();
         _ldapAttribute = attr; // attr.clone() ?
     }
 
@@ -151,32 +152,29 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      * 
      * @return an ldap attribute
      */
-    public LDAPAttribute toLDAPAttribute() {
-        int size = 0;
-        LDAPAttribute ldapAttribute = null;
+    public Attribute toLDAPAttribute() {
+        Attribute ldapAttribute = null;
         if (_stringValues != null) {
-            size = _stringValues.size();
+            int size = _stringValues.size();
             if (size == 0) {
-                ldapAttribute = new LDAPAttribute(_name);
+                ldapAttribute = Attributes.emptyAttribute(_name);
             } else if (size == 1) {
-                ldapAttribute = new LDAPAttribute(_name, (String) _stringValues
-                        .get(0));
+                ldapAttribute = Attributes.singletonAttribute(_name, _stringValues.get(0));
             } else if (size > 1) {
-                ldapAttribute = new LDAPAttribute(_name);
-                for (int i = 0; i < size; i++) {
-                    ldapAttribute.addValue((String) _stringValues.get(i));
+                ldapAttribute = Attributes.emptyAttribute(_name);
+                for (String value : _stringValues) {
+                    ldapAttribute.add(value);
                 }
             }
         } else if (_byteValues != null) {
-            ldapAttribute = new LDAPAttribute(_name);
-            size = _byteValues.size();
-            for (int i = 0; i < size; i++) {
-                ldapAttribute.addValue((byte[]) _byteValues.get(i)); // clone?
+            ldapAttribute = Attributes.emptyAttribute(_name);
+            for (byte[] value : _byteValues) {
+                ldapAttribute.add(value); // clone?
             }
         } else if (_ldapAttribute != null) {
             ldapAttribute = _ldapAttribute; // clone?
         } else if (_name != null) {
-            ldapAttribute = new LDAPAttribute(_name);
+            ldapAttribute = Attributes.emptyAttribute(_name);
         }
         return ldapAttribute;
     }
@@ -373,13 +371,10 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      * @supported.api
      */
     public String getBaseName() {
-        String baseName = null;
-        if (_name == null) {
-            baseName = null;
-        } else {
-            baseName = LDAPAttribute.getBaseName(_name);
+        if (_name != null) {
+            return getBaseName(getName());
         }
-        return baseName;
+        return null;
     }
 
     /**
@@ -390,7 +385,12 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      * @supported.api
      */
     static public String getBaseName(String attrName) {
-        return LDAPAttribute.getBaseName(attrName);
+        String basename = attrName;
+        StringTokenizer st = new StringTokenizer(attrName, ";");
+        if( st.hasMoreElements() )
+            // First element is base name
+            basename = (String)st.nextElement();
+        return basename;
     }
 
     /**
@@ -563,10 +563,10 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
         } catch (Exception e) {
         }
         if (_stringValues != null) {
-            theClone._stringValues = (ArrayList) _stringValues.clone();
+            theClone._stringValues = new ArrayList<>(_stringValues);
         }
         if (_byteValues != null) {
-            theClone._byteValues = (ArrayList) _byteValues.clone();
+            theClone._byteValues = new ArrayList<>(_byteValues);
         } else if (_ldapAttribute != null) {
             theClone._ldapAttribute = _ldapAttribute; // clone?
         }
@@ -590,14 +590,14 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      */
     private void setupStringValues() {
         if (_ldapAttribute != null) {
-            String[] values = _ldapAttribute.getStringValueArray();
+            String[] values = _ldapAttribute.toArray(new String[0]);
             int size = values.length;
-            _stringValues = new ArrayList(size);
+            _stringValues = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
                 _stringValues.add(values[i]);
             }
         } else {
-            _stringValues = new ArrayList();
+            _stringValues = new ArrayList<>();
         }
     }
 
@@ -605,14 +605,14 @@ public class Attr implements java.io.Serializable, java.lang.Cloneable {
      */
     private void setupByteValues() {
         if (_ldapAttribute != null) {
-            byte[][] values = _ldapAttribute.getByteValueArray();
+            byte[][] values = _ldapAttribute.toArray(new byte[0][]);
             int size = values.length;
-            _byteValues = new ArrayList(size);
+            _byteValues = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
                 _byteValues.add(values[i]);
             }
         } else {
-            _byteValues = new ArrayList();
+            _byteValues = new ArrayList<>();
         }
     }
 

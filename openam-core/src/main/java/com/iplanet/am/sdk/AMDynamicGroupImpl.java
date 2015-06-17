@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,9 @@
  *
  * $Id: AMDynamicGroupImpl.java,v 1.5 2009/01/28 05:34:47 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.iplanet.am.sdk;
 
 import java.util.HashMap;
@@ -36,10 +34,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import com.sun.identity.shared.ldap.util.DN;
-
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import org.forgerock.opendj.ldap.DN;
 
 /**
  * The <code>AMDynamicGroupImpl</code> implements interface 
@@ -86,7 +83,7 @@ class AMDynamicGroupImpl extends AMGroupImpl implements AMDynamicGroup {
      */
     private void setACI() {
         try {
-            DN thisDN = new DN(entryDN);
+            DN thisDN = DN.valueOf(entryDN);
             String orgDN = this.getOrganizationDN();
             String roleDN = AMNamingAttrManager.getNamingAttr(AMObject.ROLE)
                     + "=" + thisDN.toString().replace(',', '_') + "," + orgDN;

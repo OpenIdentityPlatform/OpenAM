@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,37 +24,50 @@
  *
  * $Id: LDAPUsers.java,v 1.7 2009/11/20 23:52:55 ww203982 Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011 ForgeRock Inc 
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation 
  */
 package com.sun.identity.policy.plugins;
 
-import java.util.*;
-import com.sun.identity.shared.ldap.*;
-import com.sun.identity.shared.ldap.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
-import com.iplanet.sso.SSOToken;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.ByteString;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.DereferenceAliasesPolicy;
+import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.ErrorResultIOException;
+import org.forgerock.opendj.ldap.ResultCode;
+import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.requests.Requests;
+import org.forgerock.opendj.ldap.requests.SearchRequest;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
+
 import com.iplanet.sso.SSOException;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.common.LDAPConnectionPool;
-import com.sun.identity.policy.PolicyManager;
-import com.sun.identity.policy.PolicyEvaluator;
-import com.sun.identity.policy.SubjectEvaluationCache;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.policy.InvalidNameException;
+import com.sun.identity.policy.NameNotFoundException;
 import com.sun.identity.policy.PolicyConfig;
+import com.sun.identity.policy.PolicyEvaluator;
+import com.sun.identity.policy.PolicyException;
+import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.policy.PolicyUtils;
 import com.sun.identity.policy.ResBundleUtils;
-import com.sun.identity.policy.ValidValues;
+import com.sun.identity.policy.SubjectEvaluationCache;
 import com.sun.identity.policy.Syntax;
-import com.sun.identity.policy.PolicyException;
-import com.sun.identity.policy.NameNotFoundException;
-import com.sun.identity.policy.InvalidNameException;
+import com.sun.identity.policy.ValidValues;
 import com.sun.identity.policy.interfaces.Subject;
-import com.sun.identity.shared.ldap.LDAPBindRequest;
-import com.sun.identity.shared.ldap.LDAPRequestParser;
-import com.sun.identity.shared.ldap.LDAPSearchRequest;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * This class respresents a group of LDAP users
@@ -67,21 +80,16 @@ public class LDAPUsers implements Subject {
 
     // Variables
     private boolean initialized = false;
-    private Set selectedUserDNs = Collections.EMPTY_SET;
-    private Set selectedRFCUserDNs = Collections.EMPTY_SET;
-    private String authid;
-    private String authpw;
+    private Set<String> selectedUserDNs = Collections.emptySet();
+    private Set<String> selectedRFCUserDNs = Collections.emptySet();
     private String baseDN;
     private String userSearchFilter;
-    private int userSearchScope = LDAPv2.SCOPE_SUB;
+    private SearchScope userSearchScope = SearchScope.WHOLE_SUBTREE;
     private String userRDNAttrName;
     private int timeLimit;
     private int maxResults;
-    private boolean sslEnabled = false;
-    private int minPoolSize;
-    private int maxPoolSize;
     private String orgName;
-    private LDAPConnectionPool connPool;
+    private ConnectionFactory connPool;
     private boolean localDS;
     private String ldapServer;
     private boolean aliasEnabled;
@@ -126,11 +134,10 @@ public class LDAPUsers implements Subject {
         ldapServer = configuredLdapServer.toLowerCase();
         localDS = PolicyUtils.isLocalDS(ldapServer);
 
-        aliasEnabled = Boolean.valueOf((String) configParams.get(
-            PolicyConfig.USER_ALIAS_ENABLED)).booleanValue();
+        aliasEnabled = Boolean.valueOf((String) configParams.get(PolicyConfig.USER_ALIAS_ENABLED));
 
-        authid = (String) configParams.get(PolicyConfig.LDAP_BIND_DN);
-        authpw = (String) configParams.get(PolicyConfig.LDAP_BIND_PASSWORD);
+        String authid = (String) configParams.get(PolicyConfig.LDAP_BIND_DN);
+        String authpw = (String) configParams.get(PolicyConfig.LDAP_BIND_PASSWORD);
         if (authpw != null) {
             authpw = PolicyUtils.decrypt(authpw);
         }
@@ -141,15 +148,17 @@ public class LDAPUsers implements Subject {
         String scope = (String) configParams.get(
                               PolicyConfig.LDAP_USERS_SEARCH_SCOPE);
         if (scope.equalsIgnoreCase(LDAP_SCOPE_BASE)) {
-            userSearchScope = LDAPv2.SCOPE_BASE;
+            userSearchScope = SearchScope.BASE_OBJECT;
         } else if (scope.equalsIgnoreCase(LDAP_SCOPE_ONE)) {
-            userSearchScope = LDAPv2.SCOPE_ONE;
+            userSearchScope = SearchScope.SINGLE_LEVEL;
         } else {
-            userSearchScope = LDAPv2.SCOPE_SUB;
+            userSearchScope = SearchScope.WHOLE_SUBTREE;
         }
 
         userRDNAttrName = (String) configParams.get(
                               PolicyConfig.LDAP_USER_SEARCH_ATTRIBUTE);
+        int minPoolSize;
+        int maxPoolSize;
         try {
             timeLimit = Integer.parseInt(
                  (String) configParams.get(PolicyConfig.LDAP_SEARCH_TIME_OUT));
@@ -164,12 +173,7 @@ public class LDAPUsers implements Subject {
             throw (new PolicyException(nfe));
         }
 
-        String ssl = (String) configParams.get(PolicyConfig.LDAP_SSL_ENABLED);
-        if (ssl.equalsIgnoreCase("true")) {
-            sslEnabled = true;
-        } else {
-            sslEnabled = false;
-        }
+        boolean sslEnabled = Boolean.valueOf((String) configParams.get(PolicyConfig.LDAP_SSL_ENABLED));
 
         // get the organization name
         Set orgNameSet = (Set) configParams.get(
@@ -259,96 +263,49 @@ public class LDAPUsers implements Subject {
         }
 
         String searchFilter = getSearchFilter(pattern);
-        String[] attrs = { userRDNAttrName };
-        Set validUserDNs = new HashSet();
-        LDAPConnection ld = null;
+        Set<String> validUserDNs = new HashSet<>();
         int status = ValidValues.SUCCESS;
 
-        try {
-            LDAPSearchResults res = null;
-            LDAPBindRequest bindRequest = LDAPRequestParser.parseBindRequest(
-               3, authid, authpw);
-            LDAPSearchRequest searchRequest =
-                LDAPRequestParser.parseSearchRequest(baseDN, userSearchScope,
-                searchFilter, attrs, false, timeLimit,
-                LDAPRequestParser.DEFAULT_DEREFERENCE, maxResults);
-            try {
-                ld = connPool.getConnection();
-                // connect to the server to authenticate 
+        try (Connection ld = connPool.getConnection()){
+            ConnectionEntryReader res = search(searchFilter, ld, userRDNAttrName);
+            while (hasNext(res)) {
                 try {
-                    ld.authenticate(bindRequest);
-                } catch (LDAPException connEx) {
-                    // fallback to ldap v2 if v3 is not supported
-                    if (connEx.getLDAPResultCode() ==
-                        LDAPException.PROTOCOL_ERROR)
-                    {
-                        if (debug.messageEnabled()) {
-                            debug.message("LDAPUsers.getValidValues(): "+
-                            "Bind with LDAPv3 failed, retrying with v2");
-                        }
-                        bindRequest = LDAPRequestParser.parseBindRequest(
-                                2, authid, authpw);
-                        ld.authenticate(bindRequest);
+                    if (res.isEntry()) {
+                        SearchResultEntry entry = res.readEntry();
+                        String name = entry.getName().toString();
+                        validUserDNs.add(name);
+                        debug.message("LDAPUsers.getValidValues(): found user name={}", name);
                     } else {
-                        throw connEx;
+                        // ignore referrals
+                        debug.message("LDAPUsers.getValidValues(): Ignoring reference: {}", res.readReference());
                     }
-                }
-                res = ld.search(searchRequest);
-            } finally {
-                if (ld != null) {
-                    connPool.close(ld); 
-                }
-            }
-            while (res.hasMoreElements()) {
-                try {
-                    LDAPEntry entry = res.next();
-                    if (entry != null) {
-                        validUserDNs.add(entry.getDN());
-                        if (debug.messageEnabled()) {
-                            debug.message(
-                              "LDAPUsers.getValidValues(): found user name=" 
-                              + entry.getDN());
-                        }
-                    }
-                } catch (LDAPReferralException lre) {
-                    // ignore referrals
-                    continue;
-                } catch (LDAPException le) {
-                    String objs[] = { orgName };
-                    int resultCode = le.getLDAPResultCode();
-                    if (resultCode == le.SIZE_LIMIT_EXCEEDED) {
-                        debug.warning(
-                         "LDAPUsers.getValidValues(): exceeded the size limit");
+                } catch (ErrorResultIOException e) {
+                    ResultCode resultCode = e.getCause().getResult().getResultCode();
+                    if (resultCode.equals(ResultCode.SIZE_LIMIT_EXCEEDED)) {
+                        debug.warning("LDAPUsers.getValidValues(): exceeded the size limit");
                         status = ValidValues.SIZE_LIMIT_EXCEEDED;
-                    } else if (resultCode == le.TIME_LIMIT_EXCEEDED) {
-                        debug.warning(
-                         "LDAPUsers.getValidValues(): exceeded the time limit");
+                    } else if (resultCode.equals(ResultCode.TIME_LIMIT_EXCEEDED)) {
+                        debug.warning("LDAPUsers.getValidValues(): exceeded the time limit");
                         status = ValidValues.TIME_LIMIT_EXCEEDED;
                     } else {
-                        throw (new PolicyException(le));
+                        throw new PolicyException(e);
                     }
+                } catch (SearchResultReferenceIOException e) {
+                    // ignore referrals
                 }
             }
-        } catch (LDAPException lde) {
-            int ldapErrorCode = lde.getLDAPResultCode();
-            if (ldapErrorCode == LDAPException.INVALID_CREDENTIALS) {
-                throw (new PolicyException(ResBundleUtils.rbName,
-                    "ldap_invalid_password", null, null));
-            } else if (ldapErrorCode == LDAPException.NO_SUCH_OBJECT) {
-                String[] objs = { baseDN };
-                throw (new PolicyException(ResBundleUtils.rbName,
-                    "no_such_ldap_users_base_dn", objs, null));
-            } 
-            String errorMsg = lde.getLDAPErrorMessage(); 
-            String additionalMsg = lde.errorCodeToString();
-            if (additionalMsg != null) {
-                throw (new PolicyException(
-                         errorMsg + ": " + additionalMsg));
-            } else { 
-                throw (new PolicyException(errorMsg));
-            }
+        } catch (ErrorResultException e) {
+            throw handleResultException(e);
         }
-        return(new ValidValues(status, validUserDNs));
+        return new ValidValues(status, validUserDNs);
+    }
+
+    protected boolean hasNext(ConnectionEntryReader res) throws ErrorResultException {
+        try {
+            return res.hasNext();
+        } catch (ErrorResultIOException e) {
+            throw e.getCause();
+        }
     }
 
     /**
@@ -375,81 +332,56 @@ public class LDAPUsers implements Subject {
                 "ldapusers_subject_not_yet_initialized", null, null));
         }
 
-        Set results = new HashSet();
+        Set<Map<String, Map<String, String[]>>> results = new HashSet<>();
         String searchFilter = getSearchFilter(pattern);
-        LDAPConnection ld = null;
         int status = ValidValues.SUCCESS;
 
-        try {
-            LDAPBindRequest bindRequest = LDAPRequestParser.parseBindRequest(
-                authid, authpw);
-            LDAPSearchRequest searchRequest =
-                LDAPRequestParser.parseSearchRequest(baseDN, userSearchScope,           
-                searchFilter, attributeNames, false, timeLimit,
-                LDAPRequestParser.DEFAULT_DEREFERENCE, maxResults);
-            LDAPSearchResults res = null;
-            try {
-                ld = connPool.getConnection();
-                ld.authenticate(bindRequest);
-                res = ld.search(searchRequest);
-            } finally {
-                if (ld != null) {
-                    connPool.close(ld);
-                }
-            }
-            Map map = new HashMap();
+        try (Connection ld = connPool.getConnection()) {
+            ConnectionEntryReader res = search(searchFilter, ld, attributeNames);
+            Map<String, Map<String, String[]>> map = new HashMap<>();
             results.add(map);
 
-            while (res.hasMoreElements()) {
+            while (hasNext(res)) {
                 try {
-                    LDAPEntry entry = res.next();
+                    SearchResultEntry entry = res.readEntry();
         
                     if (entry != null) {
-                        String userDN = entry.getDN();
-                        map.put(userDN, getUserAttributeValues(
-                            entry, attributeNames));
+                        String userDN = entry.getName().toString();
+                        map.put(userDN, getUserAttributeValues(entry, attributeNames));
                     }
-                } catch (LDAPReferralException lre) {
+                } catch (SearchResultReferenceIOException lre) {
                     // ignore referrals
                     continue;
-                } catch (LDAPException le) {
-                    String objs[] = { orgName };
-                    int resultCode = le.getLDAPResultCode();
-                    if (resultCode == le.SIZE_LIMIT_EXCEEDED) {
-                        debug.warning(
-                        "LDAPUsers.getValidEntries(): exceeded the size limit");
+                } catch (ErrorResultIOException e) {
+                    ResultCode resultCode = e.getCause().getResult().getResultCode();
+                    if (resultCode.equals(ResultCode.SIZE_LIMIT_EXCEEDED)) {
+                        debug.warning("LDAPUsers.getValidEntries(): exceeded the size limit");
                         status = ValidValues.SIZE_LIMIT_EXCEEDED;
-                    } else if (resultCode == le.TIME_LIMIT_EXCEEDED) {
+                    } else if (resultCode.equals(ResultCode.TIME_LIMIT_EXCEEDED)) {
                         debug.warning(
                         "LDAPUsers.getValidEntries(): exceeded the time limit");
                         status = ValidValues.TIME_LIMIT_EXCEEDED;
                     } else {
-                        throw (new PolicyException(le));
+                        throw new PolicyException(e);
                     }
                 }
             }
-        } catch (LDAPException lde) {
-            int ldapErrorCode = lde.getLDAPResultCode();
-            if (ldapErrorCode == LDAPException.INVALID_CREDENTIALS) {
-                throw (new PolicyException(ResBundleUtils.rbName,
-                    "ldap_invalid_password", null, null));
-            } else if (ldapErrorCode == LDAPException.NO_SUCH_OBJECT) {
-                String[] objs = { baseDN };
-                throw (new PolicyException(ResBundleUtils.rbName,
-                    "no_such_ldap_users_base_dn", objs, null));
-            }
-            String errorMsg = lde.getLDAPErrorMessage();
-            String additionalMsg = lde.errorCodeToString();
-            if (additionalMsg != null) {
-                throw (new PolicyException(
-                         errorMsg + ": " + additionalMsg));
-            } else {
-                throw (new PolicyException(errorMsg));
-            }
+        } catch (ErrorResultException e) {
+            throw handleResultException(e);
         } catch (Exception e) {
-            throw (new PolicyException(e));
+            throw new PolicyException(e);
         }
         return new ValidValues(status, results);
+    }
+
+    protected ConnectionEntryReader search(String searchFilter, Connection ld, String... attributeNames) {
+        SearchRequest request = Requests.newSearchRequest(baseDN, userSearchScope, searchFilter, attributeNames)
+                .setDereferenceAliasesPolicy(DereferenceAliasesPolicy.NEVER)
+                .setTimeLimit(timeLimit);
+        if (maxResults > 0) {
+            request.setSizeLimit(maxResults);
+        }
+        return ld.search(request);
     }
 
     /**
@@ -459,24 +391,30 @@ public class LDAPUsers implements Subject {
      * values for the attribute name.
      */
 
-    private Map getUserAttributeValues(
-        LDAPEntry entry,
-        String[] attributeNames
-    ) {
-        Map map = new HashMap();
+    private Map<String, String[]> getUserAttributeValues(SearchResultEntry entry, String[] attributeNames) {
+        Map<String, String[]> map = new HashMap<>();
 
         if ((attributeNames != null) && (attributeNames.length > 0)) {
-            for (int i = 0; i < attributeNames.length; i++) {
-                String attrName = attributeNames[i];
-                LDAPAttribute lAttr = entry.getAttribute(attrName);
-    
+            for (String attrName : attributeNames) {
+
+                Attribute lAttr = entry.getAttribute(attrName);
+
                 if (lAttr != null) {
-                    map.put(attrName, lAttr.getStringValueArray());
+                    map.put(attrName, toStringArray(lAttr));
                 }
             }
         }
 
         return map;
+    }
+
+    private String[] toStringArray(Attribute lAttr) {
+        String[] values = new String[lAttr.size()];
+        int j = 0;
+        for (ByteString value : lAttr) {
+            values[j++] = value.toString();
+        }
+        return values;
     }
 
     /**
@@ -561,18 +499,16 @@ public class LDAPUsers implements Subject {
                 "ldapusers_subject_invalid_user_names", null, "null", 
                 PolicyException.USER_COLLECTION));
         }
-        selectedUserDNs = new HashSet();
+        selectedUserDNs = new HashSet<>();
         selectedUserDNs.addAll(names);
         if (debug.messageEnabled()) {
             debug.message("LDAPUsers.setValues(): selected user names=" + 
                 selectedUserDNs);
         }
-        selectedRFCUserDNs = new HashSet();
+        selectedRFCUserDNs = new HashSet<>();
         // add to the RFC Set now
-        Iterator it = names.iterator();
-        while (it.hasNext()) {
-            selectedRFCUserDNs.add(new DN((String)it.next()).toRFCString().
-                toLowerCase());
+        for (Object name : names) {
+            selectedRFCUserDNs.add(DN.valueOf((String) name).toString().toLowerCase());
         }
     }
 
@@ -605,79 +541,56 @@ public class LDAPUsers implements Subject {
              "LDAPUsers.isMember(): user local DN is " + userLocalDN);
         }
 
-        if (selectedRFCUserDNs.size() > 0) {
-            Iterator usersIter = selectedRFCUserDNs.iterator();
-            while (usersIter.hasNext()) {     
-                String valueDN = (String)usersIter.next();
-                Boolean matchFound = null;
-                if ((matchFound = SubjectEvaluationCache.isMember(
-                tokenID, ldapServer,valueDN)) != null) {
-                    if (debug.messageEnabled()) {
-                        debug.message("LDAPUsers.isMember():Got membership "
-                            +"from cache of " +userLocalDN+" in subject user "
-                            +valueDN+ " :" +matchFound.booleanValue());
-                    }
-                    boolean result = matchFound.booleanValue();
-                    if (result) {
-                        return result;
-                    } else {
-                        continue;
-                    }
+        for (String valueDN : selectedRFCUserDNs) {
+            Boolean matchFound = SubjectEvaluationCache.isMember(tokenID, ldapServer, valueDN);
+            if (matchFound != null) {
+                debug.message("LDAPUsers.isMember():Got membership from cache of {} in subject user {} : {}",
+                        userLocalDN, valueDN, matchFound);
+                if (matchFound) {
+                    return true;
+                } else {
+                    continue;
                 }
-                // got here so entry not in subject evalauation cache
-                if (debug.messageEnabled()) {
-                    debug.message("LDAPUsers:isMember():entry for "+valueDN
-                        +" not in subject evaluation cache, fetching from "
-                        +"directory server.");
-                }
+            }
+            // got here so entry not in subject evalauation cache
+            if (debug.messageEnabled()) {
+                debug.message("LDAPUsers:isMember():entry for " + valueDN
+                        + " not in subject evaluation cache, fetching from "
+                        + "directory server.");
+            }
+            if (userDN == null) {
+                userDN = getUserDN(token);
                 if (userDN == null) {
-                    userDN = getUserDN(token);
-                    if (userDN == null) {
-                        if (debug.messageEnabled()) {
-                            debug.message("LDAPUsers.isMember(): User " 
-                                + token.getPrincipal().getName() 
-                                + " is not found in the directory"); 
-                        }
-                        return false;
+                    if (debug.messageEnabled()) {
+                        debug.message("LDAPUsers.isMember(): User {} is not found in the directory",
+                                token.getPrincipal().getName());
                     }
+                    return false;
                 }
-                if (userDN.equals(new DN(valueDN))) {
-                    userMatch = true;
-                }
-                if (debug.messageEnabled()) {
-                        debug.message("LDAPUsers.isMember:adding entry "
-                          +tokenID+" "+ldapServer+" "+valueDN+" "+userMatch
-                        +" in subject evaluation cache.");
-                }
-                SubjectEvaluationCache.addEntry(tokenID, ldapServer, 
-                       valueDN, userMatch);
-                if (!listenerAdded) {
-                    if (!PolicyEvaluator.ssoListenerRegistry.containsKey(
-                        tokenID)) 
-                    {
-                        token.addSSOTokenListener(PolicyEvaluator.ssoListener);
-                        PolicyEvaluator.ssoListenerRegistry.put(
-                            tokenID, PolicyEvaluator.ssoListener);
-                        if (debug.messageEnabled()) {
-                            debug.message("LDAPUsers.isMember():"
-                                    + " sso listener added .\n");
-                        }
-                        listenerAdded = true;
-                    }
-                }
-                if (userMatch) {
-                    break;
-                }
+            }
+            if (userDN.equals(DN.valueOf(valueDN))) {
+                userMatch = true;
+            }
+            if (debug.messageEnabled()) {
+                debug.message("LDAPUsers.isMember:adding entry "
+                        + tokenID + " " + ldapServer + " " + valueDN + " " + userMatch
+                        + " in subject evaluation cache.");
+            }
+            SubjectEvaluationCache.addEntry(tokenID, ldapServer, valueDN, userMatch);
+            if (!listenerAdded && !PolicyEvaluator.ssoListenerRegistry.containsKey(tokenID)) {
+                token.addSSOTokenListener(PolicyEvaluator.ssoListener);
+                PolicyEvaluator.ssoListenerRegistry.put(tokenID, PolicyEvaluator.ssoListener);
+                debug.message("LDAPUsers.isMember(): sso listener added");
+                listenerAdded = true;
+            }
+            if (userMatch) {
+                break;
             }
         }
-        if (debug.messageEnabled()) {
-            if (!userMatch) { 
-                debug.message("LDAPUsers.isMember(): User " + userLocalDN 
-                  + " is not a member of this LDAPUsers object"); 
-            } else {
-                debug.message("LDAPUsers.isMember(): User " + userLocalDN 
-                  + " is a member of this LDAPUsers object"); 
-            }
+        if (!userMatch) {
+            debug.message("LDAPUsers.isMember(): User {} is not a member of this LDAPUsers object", userLocalDN);
+        } else {
+            debug.message("LDAPUsers.isMember(): User {} is a member of this LDAPUsers object", userLocalDN);
         }
         return userMatch;
     }
@@ -745,11 +658,11 @@ public class LDAPUsers implements Subject {
      */
 
     private DN getUserDN(SSOToken token) throws SSOException, PolicyException {
-        Set qualifiedUserDNs = new HashSet();
+        Set<String> qualifiedUserDNs = new HashSet<>();
         String userLocalDN = token.getPrincipal().getName();
         DN userDN = null;
         if (localDS && !PolicyUtils.principalNameEqualsUuid( token)) {
-            userDN = new DN(userLocalDN);
+            userDN = DN.valueOf(userLocalDN);
         } else {
             // try to figure out the user name from the local user DN
             int beginIndex = userLocalDN.indexOf("=");
@@ -780,90 +693,62 @@ public class LDAPUsers implements Subject {
                
             String[] attrs = { userRDNAttrName };     
             // search the remote ldap and find out the user DN
-            LDAPConnection ld = null;
-            try {
-                LDAPBindRequest bindRequest =
-                    LDAPRequestParser.parseBindRequest(authid, authpw);
-                LDAPSearchRequest searchRequest =
-                    LDAPRequestParser.parseSearchRequest(baseDN,
-                    userSearchScope, searchFilter, attrs, false, timeLimit,
-                    LDAPRequestParser.DEFAULT_DEREFERENCE, maxResults);
-                LDAPSearchResults res = null;
-                try {
-                    ld = connPool.getConnection();
-                    // connect to the server to authenticate
-                    ld.authenticate(bindRequest);
-                    res = ld.search(searchRequest);
-                } finally {
-                    if (ld != null) {
-                        connPool.close(ld);
-                    }
-                }
-                while (res.hasMoreElements()) {
+            try (Connection ld = connPool.getConnection()){
+                ConnectionEntryReader res = search(searchFilter, ld, attrs);
+                while (hasNext(res)) {
                     try {
-                        LDAPEntry entry = res.next();
-                        if (entry != null) {
-                            qualifiedUserDNs.add(entry.getDN());
-                        }
-                    } catch (LDAPReferralException lre) {
+                        SearchResultEntry entry = res.readEntry();
+                        qualifiedUserDNs.add(entry.getName().toString());
+                    } catch (SearchResultReferenceIOException e) {
                         // ignore referrals
                         continue;
-                    } catch (LDAPException le) {
+                    } catch (ErrorResultIOException e) {
                         String objs[] = { orgName };
-                        int resultCode = le.getLDAPResultCode();
-                        if (resultCode == le.SIZE_LIMIT_EXCEEDED) {
-                            debug.warning("LDAPUsers.getUserDN(): exceeded the "
-                                    +"size limit");
-                            throw (new PolicyException(
-                                ResBundleUtils.rbName,
-                                "ldap_search_exceed_size_limit", objs, 
-                                null));
-                        } else if (resultCode == le.TIME_LIMIT_EXCEEDED) {
-                            debug.warning("LDAPUsers.getUserDN(): exceeded the "
-                                +"time limit");
-                            throw (new PolicyException(
-                                ResBundleUtils.rbName,
-                                "ldap_search_exceed_time_limit", objs, 
-                                null));
+                        ResultCode resultCode = e.getCause().getResult().getResultCode();
+                        if (resultCode.equals(ResultCode.SIZE_LIMIT_EXCEEDED)) {
+                            debug.warning("LDAPUsers.getUserDN(): exceeded the size limit");
+                            throw new PolicyException(ResBundleUtils.rbName, "ldap_search_exceed_size_limit", objs,
+                                null);
+                        } else if (resultCode.equals(ResultCode.TIME_LIMIT_EXCEEDED)) {
+                            debug.warning("LDAPUsers.getUserDN(): exceeded the time limit");
+                            throw new PolicyException(ResBundleUtils.rbName, "ldap_search_exceed_time_limit", objs,
+                                null);
                         } else {
-                            throw (new PolicyException(le));
+                            throw new PolicyException(e);
                         }
                     }
                 }
-            } catch (LDAPException lde) {
-                int ldapErrorCode = lde.getLDAPResultCode();
-                if (ldapErrorCode == LDAPException.INVALID_CREDENTIALS) {
-                    throw (new PolicyException(ResBundleUtils.rbName,
-                             "ldap_invalid_password", null, null));
-                } else if (ldapErrorCode == LDAPException.NO_SUCH_OBJECT) {
-                    String[] objs = { baseDN };
-                    throw (new PolicyException(ResBundleUtils.rbName,
-                        "no_such_ldap_users_base_dn", objs, null));
-                }
-                String errorMsg = lde.getLDAPErrorMessage();
-                String additionalMsg = lde.errorCodeToString();
-                if (additionalMsg != null) {
-                    throw (new PolicyException(
-                                errorMsg + ": " + additionalMsg));
-                } else {
-                    throw (new PolicyException(errorMsg));
-                }
+            } catch (ErrorResultException e) {
+                throw handleResultException(e);
             } catch (Exception e) {
-                throw (new PolicyException(e));
+                throw new PolicyException(e);
             }
-            
+
             // check if the user belongs to any of the selected users
             if (qualifiedUserDNs.size() > 0) {
-                if (debug.messageEnabled()) {
-                    debug.message(
-                           "LDAPUsers.getUserDN(): qualified users="
-                           + qualifiedUserDNs);
-                }
-                Iterator iter = qualifiedUserDNs.iterator();
+                debug.message("LDAPUsers.getUserDN(): qualified users={}", qualifiedUserDNs);
+                Iterator<String> iter = qualifiedUserDNs.iterator();
                 // we only take the first qualified DN
-                userDN =  new DN((String)iter.next());
+                userDN =  DN.valueOf(iter.next());
             }
         }
         return userDN;
+    }
+
+    private PolicyException handleResultException(ErrorResultException e) {
+        ResultCode ldapErrorCode = e.getResult().getResultCode();
+        if (ldapErrorCode.equals(ResultCode.INVALID_CREDENTIALS)) {
+            return new PolicyException(ResBundleUtils.rbName, "ldap_invalid_password", null, null);
+        } else if (ldapErrorCode.equals(ResultCode.NO_SUCH_OBJECT)) {
+            String[] objs = { baseDN };
+            return new PolicyException(ResBundleUtils.rbName, "no_such_ldap_users_base_dn", objs, null);
+        }
+        String errorMsg = e.getResult().getDiagnosticMessage();
+        String additionalMsg = e.getMessage();
+        if (additionalMsg != null) {
+            return new PolicyException(errorMsg + ": " + additionalMsg);
+        } else {
+            return new PolicyException(errorMsg);
+        }
     }
 }

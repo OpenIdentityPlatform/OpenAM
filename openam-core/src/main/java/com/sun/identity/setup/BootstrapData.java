@@ -29,12 +29,6 @@
 
 package com.sun.identity.setup;
 
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.services.ldap.DSConfigMgr;
-import com.iplanet.services.ldap.LDAPServiceException;
-import com.iplanet.services.util.Crypt;
-import com.sun.identity.shared.StringUtils;
-import com.sun.identity.shared.xml.XMLUtils;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -53,9 +47,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
-import com.sun.identity.shared.ldap.util.DN;
+
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.services.ldap.DSConfigMgr;
+import com.iplanet.services.ldap.LDAPServiceException;
+import com.iplanet.services.util.Crypt;
+import com.sun.identity.shared.StringUtils;
+import com.sun.identity.shared.xml.XMLUtils;
 import org.forgerock.openam.upgrade.DirectoryContentUpgrader;
 import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.opendj.ldap.DN;
 
 public class BootstrapData {
     private List data = new ArrayList();
@@ -328,9 +329,9 @@ public class BootstrapData {
             dsuserbasedn = dsbasedn;
         } else {
             // Obtain user base dn from dsamaeUser
-            DN dsameUserDn = new DN(dsameUser);
-            DN userBaseDN = dsameUserDn.getParent().getParent();
-            dsuserbasedn = userBaseDN.toRFCString();
+            DN dsameUserDn = DN.valueOf(dsameUser);
+            DN userBaseDN = dsameUserDn.parent().parent();
+            dsuserbasedn = userBaseDN.toString();
         }
         
         if (instanceName.startsWith("/")) {

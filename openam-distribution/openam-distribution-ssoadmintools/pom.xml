@@ -40,7 +40,7 @@
     <artifactId>openam-distribution-ssoadmintools</artifactId>
     <packaging>pom</packaging>
     <properties>
-        <setupArtifactIDs>opendj-server,forgerock-util,json,xalan,xercesImpl,xml-apis,xmlsec,openam-core,openam-entitlements,openam-shared,openam-dtd-schema,openam-rest,openam-license-manager-cli,openam-license-core,forgerock-guice-core,guice,guice-assistedinject,commons-lang,javax.inject,slf4j-api,slf4j-nop</setupArtifactIDs>
+        <setupArtifactIDs>opendj-server,forgerock-util,json,xalan,xercesImpl,xml-apis,xmlsec,openam-core,openam-entitlements,openam-shared,openam-dtd-schema,openam-rest,openam-license-manager-cli,openam-license-core,forgerock-guice-core,guice,guice-assistedinject,commons-lang,javax.inject,slf4j-api,slf4j-nop,opendj-ldap-sdk,i18n-core,openam-ldap-utils,grizzly-framework</setupArtifactIDs>
     </properties>
 
 
@@ -265,6 +265,11 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-nop</artifactId>
             <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.opendj</groupId>
+            <artifactId>opendj-ldap-sdk</artifactId>
         </dependency>
 
     </dependencies>

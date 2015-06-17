@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,23 +24,23 @@
  *
  * $Id: DynamicGroup.java,v 1.6 2009/01/28 05:34:50 ww203982 Exp $
  *
- */
-
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.iplanet.ums;
 
 import com.iplanet.services.ldap.Attr;
 import com.iplanet.services.ldap.AttrSet;
-import com.iplanet.services.ldap.ModSet;
 import com.iplanet.services.util.I18n;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.URLEncDec;
 import java.security.Principal;
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.LDAPUrl;
-import com.sun.identity.shared.ldap.LDAPv2;
+
+import org.forgerock.i18n.LocalizedIllegalArgumentException;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.Filter;
+import org.forgerock.opendj.ldap.LDAPUrl;
+import org.forgerock.opendj.ldap.ModificationType;
+import org.forgerock.opendj.ldap.SearchScope;
 
 /**
  * Represents a dynamic group entry.
@@ -157,7 +157,7 @@ public class DynamicGroup extends PersistentObject implements
     ) throws UMSException {
         super(template, attrSet);
         try {
-            setUrl(baseGuid, filter, scope);
+            setUrl(baseGuid, Filter.valueOf(filter), SearchScope.valueOf(scope));
         } catch (Exception e) {
             // TODO - Log Exception
             debug.error("DynamicGroup : Exception : " + e.getMessage());
@@ -173,11 +173,11 @@ public class DynamicGroup extends PersistentObject implements
      */
     public void setSearchFilter(String filter) {
         LDAPUrl url = getUrl();
-        int scope = url.getScope();
+        SearchScope scope = url.getScope();
 
-        Guid baseGuid = new Guid(url.getDN());
+        Guid baseGuid = new Guid(url.getName().toString());
         try {
-            setUrl(baseGuid, filter, scope);
+            setUrl(baseGuid, Filter.valueOf(filter), scope);
         } catch (Exception e) {
             // TODO - Log Exception
             debug.error("DynamicGroup.setSearchFilter : Exception : "
@@ -195,7 +195,7 @@ public class DynamicGroup extends PersistentObject implements
      * @supported.api
      */
     public String getSearchFilter() {
-        return getUrl().getFilter();
+        return getUrl().getFilter().toString();
     }
 
     /**
@@ -207,8 +207,8 @@ public class DynamicGroup extends PersistentObject implements
      */
     public void setSearchBase(Guid baseGuid) {
         LDAPUrl url = getUrl();
-        int scope = url.getScope();
-        String filter = url.getFilter();
+        SearchScope scope = url.getScope();
+        Filter filter = url.getFilter();
         try {
             setUrl(baseGuid, filter, scope);
         } catch (Exception e) {
@@ -226,7 +226,7 @@ public class DynamicGroup extends PersistentObject implements
      * @supported.api
      */
     public Guid getSearchBase() {
-        return new Guid(getUrl().getDN());
+        return new Guid(getUrl().getName().toString());
     }
 
     /**
@@ -240,10 +240,10 @@ public class DynamicGroup extends PersistentObject implements
      */
     public void setSearchScope(int scope) {
         LDAPUrl url = getUrl();
-        Guid baseGuid = new Guid(url.getDN());
-        String filter = url.getFilter();
+        Guid baseGuid = new Guid(url.getName().toString());
+        Filter filter = url.getFilter();
         try {
-            setUrl(baseGuid, filter, scope);
+            setUrl(baseGuid, filter, SearchScope.valueOf(scope));
         } catch (Exception e) {
             // TODO - Log Exception
             debug.error("DynamicGroup.setSearchFilter : Exception : "
@@ -259,7 +259,7 @@ public class DynamicGroup extends PersistentObject implements
      * @supported.api
      */
     public int getSearchScope() {
-        return getUrl().getScope();
+        return getUrl().getScope().intValue();
     }
 
     /**
@@ -272,24 +272,19 @@ public class DynamicGroup extends PersistentObject implements
      * @param scope Search scope in LDAP URL.
      * @return LDAP URL.
      */
-    protected String toUrlStr(String base, String filter, int scope) {
+    protected String toUrlStr(String base, Filter filter, SearchScope scope) {
         StringBuilder urlBuf = new StringBuilder();
         urlBuf.append("ldap:///").append(base).append("?");
 
-        switch (scope) {
-        case LDAPv2.SCOPE_BASE:
+        if (SearchScope.BASE_OBJECT.equals(scope)) {
             urlBuf.append("?base");
-            break;
-        case LDAPv2.SCOPE_ONE:
+        } else if (SearchScope.SINGLE_LEVEL.equals(scope)) {
             urlBuf.append("?one");
-            break;
-        default:
-        case LDAPv2.SCOPE_SUB:
+        } else {
             urlBuf.append("?sub");
-            break;
         }
 
-        if (filter != null && filter.length() > 0) {
+        if (filter != null && !filter.toString().isEmpty()) {
             urlBuf.append("?").append(filter);
         } else {
             urlBuf.append("?");
@@ -306,10 +301,10 @@ public class DynamicGroup extends PersistentObject implements
      * @param filter Search filter for evaluating members of the group.
      * @param scope Search scope for evaluating members of the group.
      */
-    protected void setUrl(Guid baseGuid, String filter, int scope) {
+    protected void setUrl(Guid baseGuid, Filter filter, SearchScope scope) {
         // Only valid scope is "sub" and "one"
         //
-        if (scope != LDAPv2.SCOPE_ONE && scope != LDAPv2.SCOPE_SUB) {
+        if (!SearchScope.SINGLE_LEVEL.equals(scope) && !SearchScope.WHOLE_SUBTREE.equals(scope)) {
             String msg = i18n.getString(IUMSConstants.ILLEGAL_GROUP_SCOPE);
             throw new IllegalArgumentException(msg);
         }
@@ -319,15 +314,15 @@ public class DynamicGroup extends PersistentObject implements
         // Sanity check on the url
         //
         try {
-            new LDAPUrl(urlStr);
-        } catch (java.net.MalformedURLException e) {
+            LDAPUrl.valueOf(urlStr);
+        } catch (LocalizedIllegalArgumentException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
 
         // TODO: Need to support multiple values of memberUrl? If so, do
         // an ADD instead of a replace.
         //
-        modify(new Attr(MEMBER_URL_NAME, urlStr), ModSet.REPLACE);
+        modify(new Attr(MEMBER_URL_NAME, urlStr), ModificationType.REPLACE);
     }
 
     /**
@@ -340,21 +335,15 @@ public class DynamicGroup extends PersistentObject implements
         LDAPUrl url = null;
         try {
             // TODO: Need to support multiple values of memberUrl?
-            if ((attr != null) && (attr.getStringValues().length > 0)) {
+            if (attr != null && attr.getStringValues().length > 0) {
 
                 // Converting the url string to
                 // application/x-www-form-urlencoded as expected by
                 // LDAPUrl constructor.
-                url = new LDAPUrl(URLEncDec.encodeLDAPUrl(attr
-                        .getStringValues()[0]));
+                url = LDAPUrl.valueOf(URLEncDec.encodeLDAPUrl(attr.getStringValues()[0]));
             }
-            if (url == null) {
-                url = new LDAPUrl(null, 0, "", (String[]) null,
-                        LDAPv2.SCOPE_ONE, "");
-            }
-        } catch (java.net.MalformedURLException ex) {
-            debug.error("DynamicGroup.setSearchFilter : Exception : "
-                    + ex.getMessage());
+        } catch (LocalizedIllegalArgumentException ex) {
+            debug.error("DynamicGroup.setSearchFilter : Exception : " + ex.getMessage());
             throw new IllegalArgumentException(ex.getMessage());
         }
         return url;
@@ -369,22 +358,13 @@ public class DynamicGroup extends PersistentObject implements
      */
     protected void setUrl(LDAPUrl url) {
         String ldapurl = url.toString();
-        try {
-            ldapurl = LDAPUrl.decode(ldapurl);
-        } catch (Exception ex) {
-            if (debug.messageEnabled()) {
-                debug.message("DynamicGroup.setUrl : " +
-                        "Exception:" + ex.getMessage());
-            }
-        }
-        if (url.getScope() != LDAPv2.SCOPE_ONE
-                && url.getScope() != LDAPv2.SCOPE_SUB) {
+        if (SearchScope.SINGLE_LEVEL.equals(url.getScope()) && SearchScope.WHOLE_SUBTREE.equals(url.getScope())) {
             String msg = i18n.getString(IUMSConstants.ILLEGAL_GROUP_SCOPE);
             throw new IllegalArgumentException(msg);
         }
         // TODO: Need to support multiple values of memberUrl? If so, do
         // an ADD instead of a replace.
-        modify(new Attr(MEMBER_URL_NAME, ldapurl), ModSet.REPLACE);
+        modify(new Attr(MEMBER_URL_NAME, ldapurl), ModificationType.REPLACE);
         // modify( new Attr( MEMBER_URL_NAME, url.toString() ), ModSet.ADD );
     }
 
@@ -481,7 +461,7 @@ public class DynamicGroup extends PersistentObject implements
         // Narrow the filter by using the RDN of the target
         // TODO: Should not have to use a DN here
         String dn = guid.getDn();
-        String rdn = LDAPDN.explodeDN(dn, false)[0];
+        String rdn = DN.valueOf(dn).rdn().toString();
         filter = "(&" + filter + "(" + rdn + "))";
         String[] attributesToGet = { "dn" };
         SearchResults searchResults = DataLayer.getInstance().search(

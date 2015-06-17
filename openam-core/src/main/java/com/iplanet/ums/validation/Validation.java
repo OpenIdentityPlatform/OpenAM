@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,13 +24,12 @@
  *
  * $Id: Validation.java,v 1.4 2009/01/28 05:34:52 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.ums.validation;
 
 import java.util.Enumeration;
-
-import com.sun.identity.shared.ldap.LDAPModification;
 
 import com.iplanet.services.ldap.Attr;
 import com.iplanet.services.ldap.AttrSet;
@@ -41,6 +40,8 @@ import com.iplanet.ums.Guid;
 import com.iplanet.ums.IUMSConstants;
 import com.iplanet.ums.TemplateManager;
 import com.iplanet.ums.UMSException;
+import org.forgerock.opendj.ldap.Modification;
+import org.forgerock.opendj.ldap.ModificationType;
 
 /**
  * Validation handles all validation routines. This class is constructed using
@@ -200,8 +201,8 @@ public class Validation {
         }
 
         for (int i = 0; i < modSet.size(); i++) {
-            LDAPModification ldapMod = modSet.elementAt(i);
-            if (ldapMod.getOp() != LDAPModification.DELETE) {
+            Modification ldapMod = modSet.elementAt(i);
+            if (!ModificationType.DELETE.equals(ldapMod.getModificationType())) {
                 Attr attr = new Attr(ldapMod.getAttribute());
                 validateAttribute(attr, cls, guid);
             }

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: EntitiesViewBean.java,v 1.14 2009/12/11 23:25:19 veiming Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.idm;
@@ -58,6 +59,8 @@ import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import com.sun.web.ui.view.table.CCActionTable;
 import com.sun.web.ui.model.CCActionTableModel;
 import com.sun.web.ui.model.CCPageTitleModel;
+import org.forgerock.openam.ldap.LDAPUtils;
+
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -68,7 +71,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
-import com.sun.identity.shared.ldap.LDAPDN;
 
 public class EntitiesViewBean
     extends RealmPropertiesBase
@@ -351,8 +353,7 @@ public class EntitiesViewBean
 
                 String universalId = IdUtils.getUniversalId(entity);
                 tblModel.setValue(TBL_DATA_NAME, name);
-                String[] comps = LDAPDN.explodeDN(universalId, true);
-                tblModel.setValue(TBL_DATA_ID, comps[0]);
+                tblModel.setValue(TBL_DATA_ID, LDAPUtils.rdnValueFromDn(universalId));
                 tblModel.setValue(TBL_DATA_UNIVERSALNAME, universalId);
                 tblModel.setValue(TBL_DATA_ACTION_HREF,
                     stringToHex(universalId));

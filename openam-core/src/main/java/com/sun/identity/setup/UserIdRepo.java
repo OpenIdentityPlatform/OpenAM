@@ -29,10 +29,25 @@
 
 package com.sun.identity.setup;
 
-import com.iplanet.am.util.SSLSocketFactoryManager;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.common.LDAPUtils;
+import com.sun.identity.common.ShutdownManager;
+
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.ldap.LdifUtils;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.Connections;
+import org.forgerock.opendj.ldap.LDAPConnectionFactory;
+import org.forgerock.opendj.ldap.LDAPOptions;
+import org.forgerock.opendj.ldap.SSLContextBuilder;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.requests.BindRequest;
+import org.forgerock.opendj.ldap.requests.Requests;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
+
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.shared.StringUtils;
 import com.sun.identity.shared.xml.XMLUtils;
@@ -44,6 +59,19 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.Connections;
+import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.LDAPConnectionFactory;
+import org.forgerock.opendj.ldap.LDAPOptions;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.requests.Requests;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
+import org.forgerock.util.thread.listener.ShutdownListener;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -59,14 +87,10 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
-import javax.servlet.ServletContext;
-import com.sun.identity.shared.ldap.LDAPAttribute;
-import com.sun.identity.shared.ldap.LDAPConnection;
-import com.sun.identity.shared.ldap.LDAPEntry;
-import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.LDAPSearchResults;
-import com.sun.identity.shared.ldap.LDAPv2;
+import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.SSLContext;
+import javax.servlet.ServletContext;
 
 /**
  * This class does Directory Server related tasks for 
@@ -76,6 +100,8 @@ class UserIdRepo {
     private static final String umSunDSForAM;
     private static final String umSunDSGeneric;
     private static UserIdRepo instance = new UserIdRepo();
+
+    private ConnectionFactory factory;
 
     static {
         ResourceBundle rb = ResourceBundle.getBundle(
@@ -91,12 +117,13 @@ class UserIdRepo {
         return instance;
     }
     
-    void configure(
+    synchronized void configure(
         Map userRepo, 
         String basedir,
         ServletContext servletCtx,
         SSOToken adminToken
     ) throws Exception {
+        factory = null;
         String type = 
             (String) userRepo.get(SetupConstants.USER_STORE_TYPE);
         if (type == null) {
@@ -228,26 +255,20 @@ class UserIdRepo {
     }
     
     private String getADAMInstanceGUID(Map userRepo) throws Exception {
-        LDAPConnection ld = null;
-        try {
-            ld = getLDAPConnection(userRepo);
+        try (Connection ld = getLDAPConnection(userRepo)) {
             String attrName = "schemaNamingContext";
-            String[] attrs = { attrName };
-            LDAPSearchResults res = ld.search("", LDAPv2.SCOPE_BASE,
-                "(objectclass=*)", null, false );
-            if (res.hasMoreElements()) {
-                LDAPEntry entry = (LDAPEntry)res.nextElement();
-                LDAPAttribute ldapAttr = entry.getAttribute(attrName);
-                if (ldapAttr != null) {
-                    String value = ldapAttr.getStringValueArray()[0];
-                    int index = value.lastIndexOf("=");
-                    if (index != -1) {
-                        return value.substring(index + 1).trim();
+            ConnectionEntryReader res = ld.search("", SearchScope.BASE_OBJECT, "(objectclass=*)");
+            if (res.hasNext()) {
+                SearchResultEntry entry = res.readEntry();
+                    Attribute ldapAttr = entry.getAttribute(attrName);
+                    if (ldapAttr != null) {
+                        String value = ldapAttr.firstValueAsString();
+                        int index = value.lastIndexOf("=");
+                        if (index != -1) {
+                            return value.substring(index + 1).trim();
+                        }
                     }
-                }
             }
-        } finally {
-            disconnectDServer(ld);
         }
 
         return null;
@@ -260,28 +281,21 @@ class UserIdRepo {
         String strFiles,
         String type
     ) throws Exception {
-        LDAPConnection ld = null;
-        try {
-            ld = getLDAPConnection(userRepo);
-            String dbName = getDBName(userRepo, ld);
-            List schemas = writeSchemaFiles(basedir, dbName, 
-                servletCtx, strFiles, userRepo, type);
-            for (Iterator i = schemas.iterator(); i.hasNext(); ) {
-                String file = (String)i.next();
+        try (Connection conn = getLDAPConnection(userRepo)){
+            String dbName = getDBName(userRepo, conn);
+            for (String file :  writeSchemaFiles(basedir, dbName, servletCtx, strFiles, userRepo, type)) {
                 Object[] params = {file};
                 SetupProgress.reportStart("emb.loadingschema", params);
-                LDAPUtils.createSchemaFromLDIF(file, ld);
+                LdifUtils.createSchemaFromLDIF(file, conn);
                 SetupProgress.reportEnd("emb.success", null);
 
                 File f = new File(file);
                 f.delete();
             }
-        } finally {
-            disconnectDServer(ld);
         }
     }
     
-    private List writeSchemaFiles(
+    private List<String> writeSchemaFiles(
         String basedir, 
         String dbName,
         ServletContext servletCtx,
@@ -289,7 +303,7 @@ class UserIdRepo {
         Map userRepo,
         String type
     ) throws Exception {
-        List files = new ArrayList();
+        List<String> files = new ArrayList<>();
 
         StringTokenizer st = new StringTokenizer(strFiles);
         while (st.hasMoreTokens()) {
@@ -373,32 +387,36 @@ class UserIdRepo {
         return content;
     }
     
-    private void disconnectDServer(LDAPConnection ld)
-        throws LDAPException {
-        if ((ld != null) && ld.isConnected()) {
-            ld.disconnect();
+    private Connection getLDAPConnection(Map userRepo) throws Exception {
+        String userSSLStore = (String) userRepo.get(SetupConstants.USER_STORE_SSL);
+        LDAPOptions options = new LDAPOptions().setTimeout(300, TimeUnit.SECONDS);
+        if (userSSLStore != null && userSSLStore.equals("SSL")) {
+            options.setSSLContext(SSLContext.getDefault());
         }
-    }
-    
-    private LDAPConnection getLDAPConnection(Map userRepo)
-        throws Exception {
-        String s = (String) userRepo.get(SetupConstants.USER_STORE_SSL);
-        boolean ssl = ((s != null) && s.equals("SSL"));
-        LDAPConnection ld = (ssl) ? new LDAPConnection(
-            SSLSocketFactoryManager.getSSLSocketFactory()) :
-            new LDAPConnection();
-        ld.setConnectTimeout(300);
-
-        int port = Integer.parseInt(getPort(userRepo));
-        ld.connect(3, getHost(userRepo), port,
-            getBindDN(userRepo), getBindPassword(userRepo));
-        return ld;
+        return getConnectionFactory(getHost(userRepo), Integer.parseInt(getPort(userRepo)), options,
+                getBindDN(userRepo), getBindPassword(userRepo).toCharArray()).getConnection();
     }
 
-    private String getDBName(Map userRepo, LDAPConnection ld)
-        throws LDAPException {
-        String suffix = (String) userRepo.get(
-            SetupConstants.USER_STORE_ROOT_SUFFIX);
+    private synchronized ConnectionFactory getConnectionFactory(String hostname, int port, LDAPOptions options,
+            String bindDN, char[] bindPassword) {
+        if (factory == null) {
+            factory = Connections.newAuthenticatedConnectionFactory(
+                    new LDAPConnectionFactory(hostname, port, options),
+                    Requests.newSimpleBindRequest(bindDN, bindPassword));
+            ShutdownManager.getInstance().addShutdownListener(new ShutdownListener() {
+                @Override
+                public void shutdown() {
+                    if (factory != null) {
+                        factory.close();
+                    }
+                }
+            });
+        }
+        return factory;
+    }
+
+    private String getDBName(Map userRepo, Connection ld) throws ErrorResultException {
+        String suffix = (String) userRepo.get(SetupConstants.USER_STORE_ROOT_SUFFIX);
         return LDAPUtils.getDBName(suffix, ld);
     }
 }

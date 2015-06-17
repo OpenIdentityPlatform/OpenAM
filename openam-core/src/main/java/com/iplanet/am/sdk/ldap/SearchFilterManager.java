@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,9 @@
  *
  * $Id: SearchFilterManager.java,v 1.6 2009/01/28 05:34:48 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.iplanet.am.sdk.ldap;
 
 import com.iplanet.am.sdk.AMConstants;
@@ -41,9 +39,10 @@ import com.iplanet.ums.TemplateManager;
 import com.iplanet.ums.UMSException;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSEntry;
+import org.forgerock.opendj.ldap.DN;
+
 import java.util.HashMap;
 import java.util.Map;
-import com.sun.identity.shared.ldap.util.DN;
 
 /**
  * A Class which manages the search filters correponding to each of the AMObject
@@ -64,7 +63,7 @@ import com.sun.identity.shared.ldap.util.DN;
 public class SearchFilterManager {
 
     private static final String ROOT_SUFFIX_DN =
-        (new DN(SMSEntry.getAMSdkBaseDN()).toRFCString().toLowerCase());
+            DN.valueOf(SMSEntry.getAMSdkBaseDN()).toString().toLowerCase();
 
     private static Debug debug = CommonUtils.getDebugInstance();
 
@@ -249,7 +248,7 @@ public class SearchFilterManager {
     public static String getSearchFilter(int objectType, String orgDN,
             String searchTemplateName, boolean ignoreComplianceFilter) {
         String filter;
-        String organizationDN = new DN(orgDN).toRFCString();
+        String organizationDN = DN.valueOf(orgDN).toString();
 
         if (orgDN != null && organizationDN.equals(ROOT_SUFFIX_DN)) {
             orgDN = null;

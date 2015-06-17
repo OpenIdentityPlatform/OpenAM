@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,21 @@
  *
  * $Id: CreateServiceConfig.java,v 1.14 2009/01/28 05:35:03 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.sun.identity.sm;
+
+import javax.naming.ldap.Rdn;
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.iplanet.services.util.AMEncryption;
 import com.iplanet.sso.SSOException;
@@ -37,15 +46,9 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.security.DecodeAction;
 import com.sun.identity.shared.xml.XMLUtils;
-import java.security.AccessController;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.util.DN;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.RDN;
 import org.w3c.dom.Node;
 
 public class CreateServiceConfig {
@@ -177,7 +180,7 @@ public class CreateServiceConfig {
             String orgName = XMLUtils.getNodeAttributeValue(orgNode,
                     SMSUtils.NAME);
             if (orgName != null) {
-                if (DN.isDN(orgName)) {
+                if (LDAPUtils.isDN(orgName)) {
                     orgDN = orgName;
                 } else if (orgName.indexOf('/') != -1) {
                     orgDN = DNMapper.orgNameToDN(orgName);
@@ -472,12 +475,12 @@ public class CreateServiceConfig {
     static void updateSubEntriesNode(SSOToken token, String sdn)
             throws SMSException {
         // Get the name
-        DN dn = new DN(sdn);
-        String name = (dn.explodeDN(true))[0];
+        DN dn = DN.valueOf(sdn);
+        String name = LDAPUtils.rdnValueFromDn(dn);
         // Get the parent DN
-        DN parent = dn.getParent();
+        DN parent = dn.parent();
         CachedSubEntries subEntries = CachedSubEntries.getInstanceIfCached(
-            token, parent.toRFCString(), true);
+            token, parent.toString(), true);
         if (subEntries != null) {
             subEntries.add(name);
         }
@@ -549,7 +552,8 @@ public class CreateServiceConfig {
         try {
             // Normalize DN, so it can be parsed and compared
             Object args1[] = {orgDN};
-            orgDN = (new DN(orgDN)).toRFCString();
+            DN ldapName = DN.valueOf(orgDN);
+            orgDN = ldapName.toString();
             if (orgDN.length() == 0) {
                 SMSEntry.debug.error("CreateServiceConfig."+
                     "createOrganization() : Detected invalid characters. "+
@@ -570,18 +574,23 @@ public class CreateServiceConfig {
                         IUMSConstants.SMS_organization_already_exists_no_args,
                         null));
             }
-            
+
+            // Reverse RDN order
+            List<RDN> rdns = new ArrayList<>();
+            for (RDN rdn : ldapName) {
+                rdns.add(0, rdn);
+            }
+
             // Need to start from baseDN, to create intermediate nodes
-            String[] dns = LDAPDN.explodeDN(orgDN, false);
-            String partdn = dns[dns.length -1];
+            String partdn = rdns.get(0).toString();
             // Obtain the baseDN
-            int index = dns.length -1;
-            while ((index > 0) && !partdn.equalsIgnoreCase(DNMapper.serviceDN)){
-                partdn = dns[--index] + "," + partdn;
+            int index = 0;
+            while (index < rdns.size() - 1 && !partdn.equalsIgnoreCase(DNMapper.serviceDN)) {
+                partdn = rdns.get(++index).toString() + "," + partdn;
             }
             // Check the intermediate nodes
-            while (index >= 1) {
-                partdn = dns[--index] + "," + partdn;
+            while (index < rdns.size() - 1) {
+                partdn = rdns.get(++index).toString() + "," + partdn;
                 cEntry = CachedSMSEntry.getInstance(token, partdn);
                 if (cEntry.isDirty()) {
                     cEntry.refresh();
@@ -590,13 +599,12 @@ public class CreateServiceConfig {
                 if (e.isNewEntry()) {
                     // Create the realm
                     // Add needed object classes
-                    e.addAttribute(SMSEntry.ATTR_OBJECTCLASS,
-                        SMSEntry.OC_REALM_SERVICE);
+                    e.addAttribute(SMSEntry.ATTR_OBJECTCLASS, SMSEntry.OC_REALM_SERVICE);
                     e.addAttribute(SMSEntry.ATTR_OBJECTCLASS, SMSEntry.OC_TOP);
                     e.save(token);
                     cEntry.refresh(e);
                 }
-            } 
+            }
         } catch (SSOException ssoe) {
             SMSEntry.debug.error("CreateServiceConfig: Unable to "
                     + "create organization ", ssoe);

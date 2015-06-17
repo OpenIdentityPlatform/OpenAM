@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,23 +24,25 @@
  *
  * $Id: AMStoreConnection.java,v 1.13 2009/01/28 05:34:47 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted 2011-2012 ForgeRock Inc
- */
 package com.iplanet.am.sdk;
 
 import com.iplanet.am.sdk.common.IDirectoryServices;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
+
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.ParsePosition;
@@ -54,8 +56,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.util.DN;
 
 
 /**
@@ -616,7 +616,7 @@ public final class AMStoreConnection implements AMConstants {
 
         // If a DN is passed and is a valid organization DN, then
         // return it.
-        if (DN.isDN(domainname) && isValidEntry(domainname)
+        if (LDAPUtils.isDN(domainname) && isValidEntry(domainname)
                 && (getAMObjectType(domainname) == AMObject.ORGANIZATION)) {
             return domainname;
         }
@@ -1122,7 +1122,7 @@ public final class AMStoreConnection implements AMConstants {
      */
     public boolean isValidEntry(String dn) throws SSOException {
         // First check if DN syntax is valid. Avoid making iDS call
-        if (!com.sun.identity.shared.ldap.util.DN.isDN(dn)) { // May be a exception thrown
+        if (!LDAPUtils.isDN(dn)) { // May be a exception thrown
 
             return false; // would be better here.
         }
@@ -1260,7 +1260,7 @@ public final class AMStoreConnection implements AMConstants {
                 List list = new ArrayList();
 
                 // get number of RDNs in the entry itself
-                int entryRDNs = (new DN(orgDN)).countRDNs();
+                int entryRDNs = DN.valueOf(orgDN).size();
 
                 // to count maximum level of RDNs in the search return
                 int maxRDNCount = entryRDNs;
@@ -1269,8 +1269,8 @@ public final class AMStoreConnection implements AMConstants {
                 // set the maximun RDN count, will be used to remove DNs
                 while (iter.hasNext()) {
                     String thisDN = (String) iter.next();
-                    DN dn = new DN(thisDN);
-                    int count = dn.countRDNs();
+                    DN dn = DN.valueOf(thisDN);
+                    int count = dn.size();
 
                     if (count > maxRDNCount) {
                         maxRDNCount = count;
@@ -1285,8 +1285,8 @@ public final class AMStoreConnection implements AMConstants {
                         // depending on object type,
                         DN thisdn = (DN) list.get(j);
 
-                        if (thisdn.countRDNs() == i) {
-                            String thisDN = thisdn.toRFCString();
+                        if (thisdn.size() == i) {
+                            String thisDN = thisdn.toString();
                             int objType = getAMObjectType(thisDN);
                             AMObject thisObj;
 
@@ -1329,8 +1329,7 @@ public final class AMStoreConnection implements AMConstants {
                                 case AMObject.ORGANIZATION:
                                     thisObj = getOrganization(thisDN);
 
-                                    if (!(new DN(thisDN)).equals(new DN(orgDN)))
-                                    {
+                                    if (!DN.valueOf(thisDN).equals(DN.valueOf(orgDN))) {
                                         thisObj.purge(true, graceperiod);
                                     }
 
@@ -1588,7 +1587,7 @@ public final class AMStoreConnection implements AMConstants {
      */
     protected static void addToOrgMapCache(SSOToken stoken, String dn)
             throws AMException, SSOException {
-        if ((dn == null) || !DN.isDN(dn)) {
+        if ((dn == null) || !LDAPUtils.isDN(dn)) {
             return;
         }
 
@@ -1604,7 +1603,7 @@ public final class AMStoreConnection implements AMConstants {
                 .getAttributes(stoken, dn, attrNames, AMObject.ORGANIZATION);
 
         // Add to cache
-        String rdn = LDAPDN.explodeDN(dn, true)[0];
+        String rdn = LDAPUtils.rdnValueFromDn(dn);
         Set prefDomain = (Set) attributes.get("sunpreferreddomain");
         Set associatedDomain = (Set) attributes.get("associateddomain");
         Set orgAlias = (Set) attributes.get("sunorganizationalias");
@@ -1710,7 +1709,7 @@ public final class AMStoreConnection implements AMConstants {
      * Protected method to update <code>orgMapCache</code>.
      */
     protected static void updateCache(String dn, int eventType) {
-        if ((dn == null) || !DN.isDN(dn)) {
+        if ((dn == null) || !LDAPUtils.isDN(dn)) {
             return;
         }
 
@@ -1808,7 +1807,7 @@ public final class AMStoreConnection implements AMConstants {
         }
 
         // Check if it is org name
-        if (DN.isDN(orgName)) {
+        if (LDAPUtils.isDN(orgName)) {
             return (orgName);
         }
 

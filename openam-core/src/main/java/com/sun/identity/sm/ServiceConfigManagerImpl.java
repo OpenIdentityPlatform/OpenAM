@@ -24,12 +24,22 @@
  *
  * $Id: ServiceConfigManagerImpl.java,v 1.13 2009/01/28 05:35:03 ww203982 Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2013 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 package com.sun.identity.sm;
+
+import static org.forgerock.openam.ldap.LDAPUtils.rdnValue;
+
+import javax.naming.event.NamingEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.iplanet.am.util.Cache;
 import com.iplanet.sso.SSOException;
@@ -37,16 +47,9 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.common.DNUtils;
 import com.sun.identity.shared.debug.Debug;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-import javax.naming.event.NamingEvent;
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.util.DN;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.RDN;
 
 /**
  * The class <code>ServiceConfigurationManagerImpl</code> provides interfaces
@@ -309,9 +312,8 @@ class ServiceConfigManagerImpl implements SMSObjectListener {
             listenerId = SMSNotificationManager.getInstance()
                 .registerCallbackHandler(this);
             // Construct strings for determining notifications types
-            DN notifyDN = new DN("ou=" + version + ",ou=" + serviceName +
-                "," + SMSEntry.SERVICES_RDN);
-            String sdn = notifyDN.toRFCString().toLowerCase();
+            DN notifyDN = DN.valueOf("ou=" + version + ",ou=" + serviceName + "," + SMSEntry.SERVICES_RDN);
+            String sdn = notifyDN.toString().toLowerCase();
             orgNotificationSearchString =
                 CreateServiceConfig.ORG_CONFIG_NODE.toLowerCase() + sdn;
             glbNotificationSearchString =
@@ -418,10 +420,14 @@ class ServiceConfigManagerImpl implements SMSObjectListener {
         String groupName = "";
         String compName = "";
         if (index > 1) {
-            String rdns[] = LDAPDN.explodeDN(dn.substring(0, index-1), true);
-            groupName = rdns[rdns.length - 1];
-            for (int i = rdns.length - 2; i > -1; i--) {
-                compName = compName + "/" + rdns[i];
+            DN compDn = DN.valueOf(dn.substring(0, index - 1));
+            List<RDN> rdns = new ArrayList<>();
+            for (RDN rdn : compDn) {
+                rdns.add(rdn);
+            }
+            groupName = rdnValue(rdns.get(rdns.size() - 1));
+            for (int i = rdns.size() - 2; i > -1; i--) {
+                compName = compName + "/" + rdnValue(rdns.get(i));
             }
         }
 
@@ -517,7 +523,7 @@ class ServiceConfigManagerImpl implements SMSObjectListener {
                         SMSEntry.COMMA);
         if ((orgName == null) || (orgName.length() == 0)) {
             orgName = SMSEntry.baseDN;
-        } else if (DN.isDN(orgName)) {
+        } else if (LDAPUtils.isDN(orgName)) {
             // Do nothing
         } else if (orgName.startsWith("/")) {
             orgName = DNMapper.orgNameToDN(orgName);

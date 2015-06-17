@@ -24,24 +24,30 @@
  *
  * $Id: LDAPConnectionPools.java,v 1.7 2009/01/28 05:35:01 ww203982 Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.policy.plugins;
 
-import com.sun.identity.shared.ldap.*; 
-import com.sun.identity.shared.debug.Debug;    
-import com.sun.identity.shared.ldap.factory.JSSESocketFactory;
-import com.sun.identity.common.LDAPConnectionPool;
-import com.sun.identity.policy.PolicyManager;
-import com.sun.identity.policy.PolicyException;
-import com.sun.identity.policy.ResBundleUtils;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.Connections;
+import org.forgerock.opendj.ldap.LDAPConnectionFactory;
+import org.forgerock.opendj.ldap.LDAPOptions;
+import org.forgerock.opendj.ldap.SSLContextBuilder;
+import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.thread.listener.ShutdownManager;
 
-import java.util.*;
+import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.policy.PolicyException;
+import com.sun.identity.policy.PolicyManager;
+import com.sun.identity.policy.ResBundleUtils;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * Provides a pool of <code>LDAPConnection</code>
@@ -49,7 +55,7 @@ import java.util.*;
  */
 public class LDAPConnectionPools {
 
-    private static HashMap connectionPools = new HashMap();
+    private static final Map<String, ConnectionFactory> connectionPools = new HashMap<>();
     
     private final static int MIN_CONNECTION_POOL_SIZE = 1;
     private final static int MAX_CONNECTION_POOL_SIZE = 10;
@@ -59,6 +65,27 @@ public class LDAPConnectionPools {
 
     private LDAPConnectionPools() {
     // Do nothing
+    }
+
+
+    /**
+     * Create a Ldap Connection Pool for a ldap server
+     * @param host the name of the LDAP server host and its port number.
+     *        For example, dsame.sun.com:389
+     *        Alternatively, this can be a space-delimited list of
+     *        host names.
+     * @param ssl if the connection is in ssl
+     * @param minPoolSize minimal pool size
+     * @param maxPoolSize maximum pool size
+     */
+    static void initConnectionPool(String host,
+            String authDN,
+            String authPasswd,
+            boolean ssl,
+            int minPoolSize,
+            int maxPoolSize)
+            throws PolicyException {
+        initConnectionPool(host, authDN, authPasswd, ssl, minPoolSize, maxPoolSize, new LDAPOptions());
     }
 
     /**
@@ -76,7 +103,8 @@ public class LDAPConnectionPools {
                                    String authPasswd,
                                    boolean ssl, 
                                    int minPoolSize, 
-                                   int maxPoolSize) 
+                                   int maxPoolSize,
+                                   LDAPOptions options)
             throws PolicyException {
 
         if (host.length() < 1) {
@@ -85,27 +113,19 @@ public class LDAPConnectionPools {
                 "invalid_ldap_server_host", null, null);
         }
 
-        LDAPConnectionPool cPool = null;
         try {
             synchronized(connectionPools) {
-                cPool = (LDAPConnectionPool)connectionPools.get(host);
-    
-                if (cPool == null) {
+                if (connectionPools.get(host) == null) {
                     if (debug.messageEnabled()) {
                         debug.message("Create LDAPConnectionPool: " + host);
                     }
-                    LDAPConnection ldc;
                     if (ssl) {
-                        ldc = new LDAPConnection(
-                            new JSSESocketFactory(null));
+                        options.setSSLContext(new SSLContextBuilder().getSSLContext());
                     }
-                    else {
-                        ldc = new LDAPConnection();
-                    }
-    
-                    ldc.setOption(LDAPv3.PROTOCOL_VERSION, new Integer(3));
-                    ldc.connect(host, DEFAULT_PORT, authDN, authPasswd);
-    
+
+                    ConnectionFactory ldc =
+                            LDAPUtils.createFailoverConnectionFactory(host, DEFAULT_PORT, authDN, authPasswd, options);
+
                     if (minPoolSize < 1) {
                         minPoolSize = MIN_CONNECTION_POOL_SIZE;
                     }
@@ -114,41 +134,31 @@ public class LDAPConnectionPools {
                         maxPoolSize = MAX_CONNECTION_POOL_SIZE;
                     }
     
-                    if (debug.messageEnabled()) {
-                        debug.message(
-                            "LDAPConnectionPools.initConnectionPool(): " +
-                            "minPoolSize=" + minPoolSize +
-                            ", maxPoolSize=" + maxPoolSize);
-                    }
+                    debug.message("LDAPConnectionPools.initConnectionPool(): minPoolSize={}, maxPoolSize={}",
+                            minPoolSize, maxPoolSize);
+
                     ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
 
-                    cPool = new LDAPConnectionPool (host + "-Policy",
-                        minPoolSize, maxPoolSize, ldc);
-                    if (debug.messageEnabled()) {
-                        debug.message(
-                        "LDAPConnectionPools.initConnectionPool(): " +
-                            " host: " + host);
+                    int idleTimeout = SystemProperties.getAsInt(Constants.LDAP_CONN_IDLE_TIME_IN_SECS, 0);
+                    if (idleTimeout == 0) {
+                        debug.error("LDAPConnectionPools: Idle timeout could not be parsed, connection reaping is disabled");
                     }
-                    final LDAPConnectionPool finalPool = cPool;
-                    shutdownMan.addShutdownListener(new
-                        ShutdownListener() {
+                    final ConnectionFactory cPool = Connections.newCachedConnectionPool(ldc, minPoolSize, maxPoolSize,
+                            idleTimeout, TimeUnit.SECONDS);
+                    debug.message("LDAPConnectionPools.initConnectionPool(): host: {}", host);
 
-                            public void shutdown() {
-                                if (finalPool != null) {
-                                    finalPool.destroy();
-                                }
-                            }
-
-                        });
+                    shutdownMan.addShutdownListener(new ShutdownListener() {
+                        public void shutdown() {
+                            cPool.close();
+                        }
+                    });
 
                     connectionPools.put(host, cPool);
                 }
             }
         }
         catch (Exception e) {
-            if (debug.messageEnabled()) {
-                debug.message("Unable to create LDAPConnectionPool", e);
-            }
+            debug.message("Unable to create LDAPConnectionPool", e);
             throw new PolicyException(e.getMessage(), e);
         }
     }
@@ -160,14 +170,14 @@ public class LDAPConnectionPools {
      *        It can be a space-delimited list of host names.
      * @return LDAPConnectionPool for the ldap server
      */
-    static LDAPConnectionPool getConnectionPool(String host)
+    static ConnectionFactory getConnectionPool(String host)
     {
         if (debug.messageEnabled()) {
             debug.message("LDAPConnectionPools.getConnectionPool(): host: " +
                 host);
         }
         synchronized(connectionPools) {
-           return (LDAPConnectionPool)(connectionPools.get(host));
+           return connectionPools.get(host);
         }
     }
 

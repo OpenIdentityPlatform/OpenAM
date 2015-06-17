@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,9 @@
  *
  * $Id: DirectCOSDefinition.java,v 1.3 2008/06/25 05:41:47 qcheng Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.iplanet.ums.cos;
 
 import java.util.ArrayList;
@@ -36,7 +34,6 @@ import java.util.Collection;
 
 import com.iplanet.services.ldap.Attr;
 import com.iplanet.services.ldap.AttrSet;
-import com.iplanet.services.ldap.ModSet;
 import com.iplanet.services.util.I18n;
 import com.iplanet.ums.CreationTemplate;
 import com.iplanet.ums.Guid;
@@ -45,6 +42,7 @@ import com.iplanet.ums.PersistentObject;
 import com.iplanet.ums.SearchResults;
 import com.iplanet.ums.TemplateManager;
 import com.iplanet.ums.UMSException;
+import org.forgerock.opendj.ldap.ModificationType;
 
 /**
  * This class represents a Direct (or Classic) COS definition.
@@ -157,7 +155,7 @@ public class DirectCOSDefinition extends PersistentObject implements
         attrStr.append(attrName);
         attrStr.append(" ");
         attrStr.append(ICOSDefinition.qualifiers[qualifier]);
-        modify(ICOSDefinition.COSATTRIBUTE, attrStr.toString(), ModSet.ADD);
+        modify(ICOSDefinition.COSATTRIBUTE, attrStr.toString(), ModificationType.ADD);
     }
 
     /**
@@ -168,7 +166,7 @@ public class DirectCOSDefinition extends PersistentObject implements
      * @supported.api
      */
     public void removeCOSAttribute(String attrName) {
-        modify(new Attr(ICOSDefinition.COSATTRIBUTE, attrName), ModSet.DELETE);
+        modify(new Attr(ICOSDefinition.COSATTRIBUTE, attrName), ModificationType.DELETE);
     }
 
     /**
@@ -232,7 +230,7 @@ public class DirectCOSDefinition extends PersistentObject implements
 
         if (getAttribute(ICOSDefinition.COSTEMPLATEDN) == null) {
             this.modify(new Attr(ICOSDefinition.COSTEMPLATEDN, getGuid()
-                    .getDn()), ModSet.ADD);
+                    .getDn()), ModificationType.ADD);
             this.save();
         }
         this.addChild(cosTemplate);

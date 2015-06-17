@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -29,11 +29,18 @@
 
 package com.sun.identity.authentication.modules.cert;
 
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.security.auth.x500.X500Principal;
+import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
@@ -42,46 +49,34 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.security.auth.x500.X500Principal;
-import javax.servlet.http.HttpServletRequest;
-
-import com.sun.identity.shared.ldap.LDAPUrl;
-import org.mozilla.jss.CryptoManager;
-
-import sun.security.x509.X509CertInfo;
-import sun.security.x509.X509CertImpl;
-import sun.security.x509.CertificateExtensions;
-import sun.security.x509.SubjectAlternativeNameExtension;
-import sun.security.x509.GeneralNames;
-import sun.security.x509.GeneralName;
-import sun.security.x509.GeneralNameInterface;
-import sun.security.x509.OtherName;
-import sun.security.x509.RFC822Name;
-import sun.security.util.ObjectIdentifier;
-import sun.security.util.DerValue;
-
-import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.iplanet.am.util.JSSInit;
-import com.iplanet.am.util.SSLSocketFactoryManager;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.security.x509.CertUtils;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.authentication.spi.X509CertificateCallback;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.authentication.spi.X509CertificateCallback;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.security.cert.AMCRLStore;
+import com.sun.identity.security.cert.AMCertPath;
 import com.sun.identity.security.cert.AMCertStore;
 import com.sun.identity.security.cert.AMLDAPCertStoreParameters;
-import com.sun.identity.security.cert.AMCertPath;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.encode.Base64;
-import java.util.Arrays;
-import javax.naming.InvalidNameException;
-import javax.naming.ldap.LdapName;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.LDAPUrl;
+import org.mozilla.jss.CryptoManager;
+import sun.security.util.DerValue;
+import sun.security.util.ObjectIdentifier;
+import sun.security.x509.CertificateExtensions;
+import sun.security.x509.GeneralName;
+import sun.security.x509.GeneralNameInterface;
+import sun.security.x509.GeneralNames;
+import sun.security.x509.OtherName;
+import sun.security.x509.RFC822Name;
+import sun.security.x509.SubjectAlternativeNameExtension;
+import sun.security.x509.X509CertImpl;
+import sun.security.x509.X509CertInfo;
 
 public class Cert extends AMLoginModule {
 
@@ -327,8 +322,7 @@ public class Cert extends AMLoginModule {
             if (amAuthCert_serverHost != null) {
                 // set LDAP Parameters
                 try {
-                    LDAPUrl ldapUrl = 
-                            new LDAPUrl("ldap://"+amAuthCert_serverHost);
+                    LDAPUrl ldapUrl = LDAPUrl.valueOf("ldap://"+amAuthCert_serverHost);
                     amAuthCert_serverPort = ldapUrl.getPort();
                     amAuthCert_serverHost = ldapUrl.getHost();
                 } catch (Exception e) {
@@ -348,12 +342,7 @@ public class Cert extends AMLoginModule {
             }
 
             if (amAuthCert_startSearchLoc != null) {
-                try {
-                    LdapName ldapName = new LdapName(amAuthCert_startSearchLoc);
-                } catch (InvalidNameException ine) {
-                    debug.error("Fatal error: LDAP Start Search DN misconfigured");
-                    throw new AuthLoginException(amAuthCert, "wrongStartDN", null);
-                }
+                DN.valueOf(amAuthCert_startSearchLoc);
             }
 
             if (debug.messageEnabled()) {
@@ -599,11 +588,7 @@ public class Cert extends AMLoginModule {
                        amAuthCert_startSearchLoc,
                        amAuthCert_uriParamsCRL,
                        amAuthCert_useSSL.equalsIgnoreCase("true"));
-            if (ldapParam.isSecure()) {
-                ldapParam.setSecureSocketFactory
-                    (SSLSocketFactoryManager.getSSLSocketFactory());
-            }
-            
+
             ldapParam.setDoCRLCaching(doCRLCaching);
             ldapParam.setDoCRLUpdate(doCRLUpdate);
             

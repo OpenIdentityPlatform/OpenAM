@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: EntityEditViewBean.java,v 1.11 2009/01/28 05:34:57 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */ 
         
 package com.sun.identity.console.idm;
@@ -48,6 +49,8 @@ import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.model.CCTabsModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
+import org.forgerock.openam.ldap.LDAPUtils;
+
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
@@ -58,7 +61,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
-import com.sun.identity.shared.ldap.LDAPDN; 
 
 public class EntityEditViewBean
     extends EntityOpViewBeanBase
@@ -401,8 +403,7 @@ public class EntityEditViewBean
                 for (Iterator it = lookup.keySet().iterator(); it.hasNext(); ) {
                    id = (String)it.next();
                    if (lookup.get(id).equals(name)) {
-                       String[] comps = LDAPDN.explodeDN(id, true);
-                       tmp = name + "(" + comps[0] + ")"; 
+                       tmp = name + "(" + LDAPUtils.rdnValueFromDn(id) + ")";
                        optList.add(tmp, id);
                 }
             }

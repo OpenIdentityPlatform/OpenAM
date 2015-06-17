@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,8 +24,9 @@
  *
  * $Id: DelegationPolicyImpl.java,v 1.12 2010/01/16 06:35:25 dillidorai Exp $
  *
- * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
+
 package com.sun.identity.delegation.plugins;
 
 import java.util.Set;
@@ -40,7 +41,6 @@ import java.security.AccessController;
 
 import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationEvaluatorImpl;
-import com.sun.identity.shared.ldap.util.DN;
 
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenID;
@@ -82,6 +82,8 @@ import com.sun.identity.delegation.ResBundleUtils;
 import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.delegation.DelegationPermission;
 import com.sun.identity.delegation.DelegationPrivilege;
+import org.forgerock.openam.ldap.LDAPUtils;
+
 import java.util.List;
 
 /**
@@ -728,8 +730,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                         Iterator sit = subjects.iterator();
                         while (sit.hasNext()) { 
                             String subject = (String)sit.next();
-                            String subjectId = 
-                                (new DN(subject)).explodeDN(true)[0];
+                            String subjectId = LDAPUtils.rdnValueFromDn(subject);
                             if (subjectId != null) {
                                 results = idRepo.searchIdentities(
                                            IdType.ROLE, subjectId, ctrl);

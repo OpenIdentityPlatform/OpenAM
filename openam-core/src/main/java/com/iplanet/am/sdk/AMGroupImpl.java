@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,9 @@
  *
  * $Id: AMGroupImpl.java,v 1.7 2009/11/20 23:52:51 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.iplanet.am.sdk;
 
 import java.util.HashSet;
@@ -36,13 +34,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import com.sun.identity.shared.ldap.util.DN;
-import com.sun.identity.shared.ldap.util.RDN;
-
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.iplanet.ums.SearchControl;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
 
 /**
  * The <code>AMGroupImpl</code> class implements interface AMGroup
@@ -111,8 +108,8 @@ abstract class AMGroupImpl extends AMObjectImpl implements AMGroup {
                     "122");
         }
 
-        Set resultSet;
-        Set usersSet = getUserDNs();
+        Set<String> resultSet;
+        Set<String> usersSet = getUserDNs();
 
         if (wildcard.length() == 1) {
             if (wildcard.equals("*")) {
@@ -122,38 +119,14 @@ abstract class AMGroupImpl extends AMObjectImpl implements AMGroup {
                         .getString("122", super.locale), "122");
             }
         } else {
-            resultSet = new HashSet();
+            resultSet = new HashSet<>();
 
             if (wildcard.startsWith("*")) {
                 String pattern = wildcard.substring(1);
-                if (pattern.indexOf('*') != -1) {
-                    throw new AMException(AMSDKBundle.getString("122",
-                            super.locale), "122");
-                }
-                Iterator iter = usersSet.iterator();
-                while (iter.hasNext()) {
-                    DN userDN = new DN((String) iter.next());
-                    RDN userRDN = (RDN) userDN.getRDNs().get(0);
-                    String userName = userRDN.getValues()[0];
-                    if (userName.endsWith(pattern)) {
-                        resultSet.add(userDN.toString());
-                    }
-                }
+                extractUserDNs(pattern, usersSet, resultSet);
             } else if (wildcard.endsWith("*")) {
                 String pattern = wildcard.substring(0, wildcard.length() - 1);
-                if (pattern.indexOf('*') != -1) {
-                    throw new AMException(AMSDKBundle.getString("122",
-                            super.locale), "122");
-                }
-                Iterator iter = usersSet.iterator();
-                while (iter.hasNext()) {
-                    DN userDN = new DN((String) iter.next());
-                    RDN userRDN = (RDN) userDN.getRDNs().get(0);
-                    String userName = userRDN.getValues()[0];
-                    if (userName.startsWith(pattern)) {
-                        resultSet.add(userDN.toString());
-                    }
-                }
+                extractUserDNs(pattern, usersSet, resultSet);
             } else {
                 throw new AMException(AMSDKBundle
                         .getString("122", super.locale), "122");
@@ -161,6 +134,20 @@ abstract class AMGroupImpl extends AMObjectImpl implements AMGroup {
         }
 
         return resultSet;
+    }
+
+    private void extractUserDNs(String pattern, Set<String> users, Set<String> resultSet) throws AMException {
+        if (pattern.indexOf('*') != -1) {
+            throw new AMException(AMSDKBundle.getString("122",
+                    super.locale), "122");
+        }
+        for (String user : users) {
+            DN userDN = DN.valueOf(user);
+            String userName = LDAPUtils.rdnValueFromDn(userDN);
+            if (userName.startsWith(pattern)) {
+                resultSet.add(userDN.toString());
+            }
+        }
     }
 
     /**

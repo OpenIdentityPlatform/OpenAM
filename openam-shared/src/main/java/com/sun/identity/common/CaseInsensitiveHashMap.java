@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: CaseInsensitiveHashMap.java,v 1.4 2009/01/13 18:08:54 leiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.common;
 
@@ -42,7 +39,7 @@ import java.util.Set;
  * case insensitive hash code is used for hashing but original case of the key
  * is preserved.
  */
-public class CaseInsensitiveHashMap extends HashMap {
+public class CaseInsensitiveHashMap<K, V> extends HashMap<K, V> {
 
     public CaseInsensitiveHashMap() {
         super();
@@ -71,8 +68,8 @@ public class CaseInsensitiveHashMap extends HashMap {
         return retval;
     }
 
-    public Object get(Object key) {
-        Object retval;
+    public V get(Object key) {
+        V retval;
         if (key instanceof String) {
             CaseInsensitiveKey ciKey = new CaseInsensitiveKey((String) key);
             retval = super.get(ciKey);
@@ -85,11 +82,8 @@ public class CaseInsensitiveHashMap extends HashMap {
     /**
      * @return a <code>Set</Code> of keys.
      */
-    public Set keySet() {
-        Set keys = super.keySet();
-        Set set = new CaseInsensitiveHashSet();
-        set.addAll(keys);
-        return set;
+    public Set<K> keySet() {
+        return new CaseInsensitiveHashSet<>(super.keySet());
     }
 
     /**
@@ -110,29 +104,28 @@ public class CaseInsensitiveHashMap extends HashMap {
         return set;
     }
 
-    public Object put(Object key, Object value) {
-        Object retval;
+    public V put(K key, V value) {
+        V retval;
         if (key instanceof String) {
             CaseInsensitiveKey ciKey = new CaseInsensitiveKey((String) key);
-            retval = super.put(ciKey, value);
+            retval = super.put((K) ciKey, value);
         } else {
             retval = super.put(key, value);
         }
         return retval;
     }
 
-    public void putAll(Map map) {
+    public void putAll(Map<? extends K, ? extends V> map) {
         if (map == null || map.isEmpty()) {
             return;
         }
-        for (Iterator iter = map.entrySet().iterator(); iter.hasNext();) {
-            Map.Entry entry = (Map.Entry)iter.next();
+        for (Map.Entry<? extends K, ? extends V> entry : map.entrySet()) {
             put(entry.getKey(), entry.getValue());
         }
     }
 
-    public Object remove(Object key) {
-        Object retval;
+    public V remove(Object key) {
+        V retval;
         if (key instanceof String) {
             CaseInsensitiveKey ciKey = new CaseInsensitiveKey((String) key);
             retval = super.remove(ciKey);

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,16 +24,14 @@
  *
  * $Id: EventManager.java,v 1.7 2009/01/28 05:34:48 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.iplanet.am.sdk.ldap;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-
-import com.sun.identity.shared.ldap.LDAPv2;
 
 import com.iplanet.services.ldap.event.EventService;
 import com.iplanet.services.ldap.event.IDSEventListener;
@@ -42,6 +40,7 @@ import com.iplanet.am.sdk.AMEventManagerException;
 import com.iplanet.am.sdk.AMSDKBundle;
 import com.iplanet.am.sdk.AMStoreConnection;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.opendj.ldap.SearchScope;
 
 /**
  * This <code>AMEventManager</code> adds Listeners to the EventService and
@@ -57,19 +56,21 @@ import com.sun.identity.shared.debug.Debug;
  * <p>
  */
 class EventManager {
-    protected static final int EVENT_SCOPE = LDAPv2.SCOPE_SUB;
+    protected static final int EVENT_SCOPE = SearchScope.WHOLE_SUBTREE.intValue();
 
     protected static String EVENT_BASE_NODE = 
         AMStoreConnection.getAMSdkBaseDN();
 
-    protected static final String ACI_EVENT_LISTENER_CLASS = 
-        "com.iplanet.am.sdk.ldap.ACIEventListener";
+    protected static final Class<? extends IDSEventListener> ACI_EVENT_LISTENER_CLASS = ACIEventListener.class;
 
-    protected static final String ENTRY_EVENT_LISTENER_CLASS = 
-        "com.iplanet.am.sdk.ldap.EntryEventListener";
+    protected static final Class<? extends IDSEventListener> ENTRY_EVENT_LISTENER_CLASS = EntryEventListener.class;
 
-    protected static final String[] PSEARCH_LISTENERS = {
-            ACI_EVENT_LISTENER_CLASS, ENTRY_EVENT_LISTENER_CLASS };
+    protected static final List<Class<? extends IDSEventListener>> PSEARCH_LISTENERS = new ArrayList<>();
+
+    static {
+        PSEARCH_LISTENERS.add(ACI_EVENT_LISTENER_CLASS);
+        PSEARCH_LISTENERS.add(ENTRY_EVENT_LISTENER_CLASS);
+    }
 
     private static Debug debug = Debug.getInstance("amEventService");
 
@@ -107,8 +108,10 @@ class EventManager {
                         + " instance");
             }
             eventService = EventService.getEventService();
-            if (!EventService.isThreadStarted()) {
-                eventService.resetAllSearches(false);
+            synchronized (eventService) {
+                if (!EventService.isStarted()) {
+                    eventService.restartPSearches();
+                }
             }
         } catch (Exception e) {
             debug.error("EventManager.start() Unable to get EventService ", e);
@@ -118,14 +121,12 @@ class EventManager {
 
         // Initialize the listeners
         if (eventService != null) { // If "null" then disabled!!
-            int count = PSEARCH_LISTENERS.length;
-            for (int i = 0; i < count; i++) {
-                IDSEventListener pSearchListener = eventService
-                        .getIDSListeners(PSEARCH_LISTENERS[i]);
+            for (Class<? extends IDSEventListener> listenerClass : PSEARCH_LISTENERS) {
+                IDSEventListener pSearchListener = eventService.getListener(listenerClass);
                 if (pSearchListener != null) {
                     pSearchListener.setListeners(listeners);
                     debug.message("EventManager.start() - Added listeners to "
-                            + "pSearch Listener: " + PSEARCH_LISTENERS[i]);
+                            + "pSearch Listener: " + listenerClass.getSimpleName());
                 }
             }
         }

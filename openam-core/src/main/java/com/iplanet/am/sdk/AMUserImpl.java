@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: AMUserImpl.java,v 1.7 2009/11/20 23:52:51 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.am.sdk;
@@ -34,9 +35,6 @@ import java.util.Iterator;
 import java.util.Set;
 import java.security.AccessController;
 
-import com.sun.identity.shared.ldap.util.DN;
-import com.sun.identity.shared.ldap.util.RDN;
-
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -46,6 +44,8 @@ import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import com.sun.identity.security.AdminTokenAction;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.RDN;
 
 /**
  * The <code>AMUserImpl</code> implementation of interface AMUser
@@ -60,7 +60,7 @@ class AMUserImpl extends AMObjectImpl implements AMUser {
 
     static String nsroleAN = "nsrole";
 
-    static RDN ContainerDefaultTemplateRoleRDN = new RDN(AMNamingAttrManager
+    static RDN ContainerDefaultTemplateRoleRDN = RDN.valueOf(AMNamingAttrManager
             .getNamingAttr(FILTERED_ROLE)
             + "=" + CONTAINER_DEFAULT_TEMPLATE_ROLE);
 
@@ -120,7 +120,7 @@ class AMUserImpl extends AMObjectImpl implements AMUser {
         Iterator iter = nsroledns.iterator();
         Set normdns = new HashSet();
         while (iter.hasNext()) {
-            normdns.add((new DN((String) iter.next())).toRFCString()
+            normdns.add(DN.valueOf((String) iter.next()).toString()
                     .toLowerCase());
         }
 
@@ -134,10 +134,10 @@ class AMUserImpl extends AMObjectImpl implements AMUser {
         getAMStoreConnection();
         while (iter.hasNext()) {
             String nsrole = (String) iter.next();
-            DN nsroleDN = new DN(nsrole);
-            if (!normdns.contains(nsroleDN.toRFCString().toLowerCase()))
+            DN nsroleDN = DN.valueOf(nsrole);
+            if (!normdns.contains(nsroleDN.toString().toLowerCase()))
             {
-                RDN rdn = (RDN) nsroleDN.getRDNs().get(0);
+                RDN rdn = nsroleDN.rdn();
                 if (!rdn.equals(ContainerDefaultTemplateRoleRDN)
                         && isAMManagedRole(nsrole)) {
                     result.add(nsroleDN.toString());
@@ -193,11 +193,8 @@ class AMUserImpl extends AMObjectImpl implements AMUser {
         getAMStoreConnection();
         while (iter.hasNext()) {
             String nsrole = (String) iter.next();
-            DN nsroleDN = new DN(nsrole);
-            /**/
-            //RDN rdn = (RDN) nsroleDN.getRDNs().firstElement();
-            RDN rdn = (RDN) nsroleDN.getRDNs().get(0);
-            /**/
+            DN nsroleDN = DN.valueOf(nsrole);
+            RDN rdn = nsroleDN.rdn();
 
             if (!rdn.equals(ContainerDefaultTemplateRoleRDN)
                     && isAMManagedRole(nsrole)) {

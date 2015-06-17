@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,23 @@
  *
  * $Id: OrgConfigViaAMSDK.java,v 1.14 2009/11/20 23:52:56 ww203982 Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.sm;
+
+import static org.forgerock.openam.ldap.LDAPUtils.*;
+
+import java.security.AccessController;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.RDN;
 
 import com.iplanet.am.sdk.AMConstants;
 import com.iplanet.am.sdk.AMException;
@@ -41,25 +52,14 @@ import com.iplanet.am.sdk.AMStoreConnection;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.CaseInsensitiveHashMap;
+import com.sun.identity.common.DNUtils;
 import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationEvaluatorImpl;
 import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.delegation.DelegationPermission;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.idm.IdConstants;
-import com.sun.identity.common.DNUtils;
-import java.security.AccessController;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import com.sun.identity.shared.ldap.util.DN;
-import com.sun.identity.shared.ldap.util.RDN;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
 
 // This class provides support for OrganizationConfigManager
 // in coexistence mode. This class interfaces with AMSDK
@@ -893,19 +893,17 @@ public class OrgConfigViaAMSDK {
         if(!orgUnitDN.startsWith(ou)) {
             return orgUnitDN;
         }
-        DN result = new DN();
-        result.setDNType(DN.RFC);
-        DN dn = new DN(orgUnitDN);
-        List rdns = dn.getRDNs();
-        for(Iterator iter = rdns.iterator();iter.hasNext();) {
-            String relDN = ((RDN)iter.next()).toString();
-            if(relDN.startsWith(ou)) {
-                relDN = relDN.replaceFirst(ou + SMSEntry.EQUALS,
-                    ou + SMSEntry.EQUALS + SMSEntry.SUN_INTERNAL_REALM_NAME);
+        DN result = DN.rootDN();
+        DN rdns = DN.valueOf(orgUnitDN);
+        for (int i = rdns.size() - 1; i >= 0; i--) {
+            RDN rdn = rdns.parent(i).rdn();
+            if(rdnType(rdn).equals(ou)) {
+                result.child(new RDN(ou, SMSEntry.SUN_INTERNAL_REALM_NAME + rdnValue(rdn)));
+            } else {
+                result.child(rdn);
             }
-            result.addRDNToBack(new RDN(relDN));
         }
-        return result.toRFCString();
+        return result.toString();
     }
     
     private static boolean updateAmsdk2RealmNameCache(SSOToken token,

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,16 +24,14 @@
  *
  * $Id: LDAPFilterCondition.java,v 1.8 2009/11/20 23:52:55 ww203982 Exp $
  *
- */
-/*
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.policy.plugins;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.common.LDAPConnectionPool;
+import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.policy.ConditionDecision;
 import com.sun.identity.policy.PolicyConfig;
 import com.sun.identity.policy.PolicyEvaluator;
@@ -46,16 +44,20 @@ import com.sun.identity.policy.Syntax;
 import com.sun.identity.policy.interfaces.Condition;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.ldap.LDAPBindRequest;
-import com.sun.identity.shared.ldap.LDAPConnection;
-import com.sun.identity.shared.ldap.LDAPEntry;
-import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.LDAPReferralException;
-import com.sun.identity.shared.ldap.LDAPRequestParser;
-import com.sun.identity.shared.ldap.LDAPSearchRequest;
-import com.sun.identity.shared.ldap.LDAPSearchResults;
-import com.sun.identity.shared.ldap.LDAPv2;
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.ConnectionPool;
+import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.ErrorResultIOException;
+import org.forgerock.opendj.ldap.LDAPOptions;
+import org.forgerock.opendj.ldap.ResultCode;
+import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.requests.Requests;
+import org.forgerock.opendj.ldap.requests.SearchRequest;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
+import org.forgerock.util.thread.listener.ShutdownListener;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -67,7 +69,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-
+import java.util.concurrent.TimeUnit;
 
 /**
  * The class <code>LDAPFilterCondition</code> is a plugin 
@@ -107,7 +109,7 @@ public class LDAPFilterCondition implements Condition {
     private String authpw;
     private String baseDN;
     private String userSearchFilter;
-    private int userSearchScope = LDAPv2.SCOPE_SUB;
+    private SearchScope userSearchScope = SearchScope.WHOLE_SUBTREE;
     private String userRDNAttrName;
     private int timeLimit;
     private int maxResults;
@@ -115,7 +117,7 @@ public class LDAPFilterCondition implements Condition {
     private int minPoolSize;
     private int maxPoolSize;
     private String orgName;
-    private LDAPConnectionPool connPool;
+    private ConnectionFactory connPool;
     private String ldapServer;
     private boolean aliasEnabled;
 
@@ -413,86 +415,57 @@ public class LDAPFilterCondition implements Condition {
         String[] attrs = { userRDNAttrName };      
 
         // search the remote ldap         
-        LDAPConnection ld = null;
-        try {
-            LDAPSearchResults res = null;
-            int ldapVersion = 3;
-            LDAPBindRequest bindRequest = LDAPRequestParser.parseBindRequest(
-                ldapVersion, authid, authpw);
-            LDAPSearchRequest searchRequest =
-                LDAPRequestParser.parseSearchRequest(baseDN, userSearchScope,
-                searchFilter, attrs, false, timeLimit,
-                LDAPRequestParser.DEFAULT_DEREFERENCE, maxResults);
-            try {
-                ld = connPool.getConnection();
-                // connect to the server to authenticate
-                ld.authenticate(bindRequest);
-                res = ld.search(searchRequest);
-            } finally {
-                if (ld != null) {
-                    connPool.close(ld);
-                }
-            }
-            if (res.hasMoreElements()) {
-                try {
-                    LDAPEntry entry = res.next();
+        Connection ld = null;
+        try (Connection conn = connPool.getConnection()) {
+
+            SearchRequest searchRequest = Requests.newSearchRequest(baseDN, userSearchScope, searchFilter, attrs);
+            ConnectionEntryReader reader = conn.search(searchRequest);
+
+            if (reader.hasNext()) {
+                if (reader.isReference()) {
+                    //Ignore
+                    reader.readReference();
+                } else {
+                    SearchResultEntry entry = reader.readEntry();
+
                     if (entry != null) {
-                        String dn = entry.getDN();
+                        String dn = entry.getName().toString();
                         if (dn != null && dn.length() != 0) {
-                            if (debug.messageEnabled()) {
-                                debug.message("LDAPFilterCondition."
-                                        + "searchFilterSatified(): dn=" + dn);
-                            }
+                            debug.message("LDAPFilterCondition.searchFilterSatified(): dn={}", dn);
                             filterSatisfied = true;
                         }
                     }
-                } catch (LDAPReferralException lre) {
-                    debug.warning("LDAPFilterCondition.searchFilterSatified()"
-                            + ": Partial results have been received, status code 9."
-                            + " The message provided by the LDAP server is: \n"
-                            + lre.getLDAPErrorMessage());
-                } catch (LDAPException le) {
-                    int resultCode = le.getLDAPResultCode();
-                    if (resultCode == le.SIZE_LIMIT_EXCEEDED) {
-                        debug.warning(
-                        "LDAPFilterCondition.searchFilterSatified(): "
-                                + "exceeded the size limit");
-                    } else if (resultCode == le.TIME_LIMIT_EXCEEDED) {
-                        debug.warning(
-                        "LDAPFilterCondition.searchFilterSatified(): "
-                                + "exceeded the time limit");
-                    } else {
-                       throw le;
-                    }
                 }
-                
             }
-        } catch (LDAPException lde) {
-            int ldapErrorCode = lde.getLDAPResultCode();
-            if (ldapErrorCode == LDAPException.INVALID_CREDENTIALS) {
-                throw (new PolicyException(ResBundleUtils.rbName,
-                    "ldap_invalid_password", null, null));
-            } else if (ldapErrorCode == LDAPException.NO_SUCH_OBJECT) {
+        } catch (ErrorResultException le) {
+            ResultCode resultCode = le.getResult().getResultCode();
+            if (ResultCode.SIZE_LIMIT_EXCEEDED.equals(resultCode)) {
+                debug.warning("LDAPFilterCondition.searchFilterSatified(): exceeded the size limit");
+            } else if (ResultCode.TIME_LIMIT_EXCEEDED.equals(resultCode)) {
+                debug.warning("LDAPFilterCondition.searchFilterSatified(): exceeded the time limit");
+            } else if (ResultCode.INVALID_CREDENTIALS.equals(resultCode)) {
+                throw new PolicyException(ResBundleUtils.rbName, "ldap_invalid_password", null, null);
+            } else if (ResultCode.NO_SUCH_OBJECT.equals(resultCode)) {
                 String[] objs = { baseDN };
-                throw (new PolicyException(ResBundleUtils.rbName,
-                    "no_such_ldap_users_base_dn", objs, null));
+                throw new PolicyException(ResBundleUtils.rbName, "no_such_ldap_users_base_dn", objs, null);
             } 
-            String errorMsg = lde.getLDAPErrorMessage(); 
-            String additionalMsg = lde.errorCodeToString();
+            String errorMsg = le.getMessage();
+            String additionalMsg = le.getResult().getDiagnosticMessage();
             if (additionalMsg != null) {
-                throw (new PolicyException(
-                         errorMsg + ": " + additionalMsg));
+                throw new PolicyException(errorMsg + ": " + additionalMsg);
             } else { 
-                throw (new PolicyException(errorMsg));
+                throw new PolicyException(errorMsg);
             }
+        } catch (SearchResultReferenceIOException e) {
+            debug.warning("LDAPFilterCondition.searchFilterSatified()"
+                    + ": Partial results have been received, status code 9."
+                    + " The message provided by the LDAP server is: \n"
+                    + e.getMessage());
+        } catch (ErrorResultIOException e) {
+            throw new PolicyException(e.getMessage());
         }
-
-        if (debug.messageEnabled()) {
-            debug.message("LDAPFilterCondition.searchFilterSatified():"
-                    + "returning, filterSatisfied=" + filterSatisfied); 
-        }
+        debug.message("LDAPFilterCondition.searchFilterSatified():returning, filterSatisfied={}", filterSatisfied);
         return filterSatisfied;
-            
     }
 
     /**
@@ -556,11 +529,11 @@ public class LDAPFilterCondition implements Condition {
         userSearchFilter = (String) configParams.get(PolicyConfig.LDAP_USERS_SEARCH_FILTER);
         String scope = (String) configParams.get(PolicyConfig.LDAP_USERS_SEARCH_SCOPE);
         if (scope.equalsIgnoreCase(LDAP_SCOPE_BASE)) {
-            userSearchScope = LDAPv2.SCOPE_BASE;
+            userSearchScope = SearchScope.BASE_OBJECT;
         } else if (scope.equalsIgnoreCase(LDAP_SCOPE_ONE)) {
-            userSearchScope = LDAPv2.SCOPE_ONE;
+            userSearchScope = SearchScope.SINGLE_LEVEL;
         } else {
-            userSearchScope = LDAPv2.SCOPE_SUB;
+            userSearchScope = SearchScope.WHOLE_SUBTREE;
         }
 
         userRDNAttrName = (String) configParams.get(PolicyConfig.LDAP_USER_SEARCH_ATTRIBUTE);
@@ -601,9 +574,21 @@ public class LDAPFilterCondition implements Condition {
                            + "\nOrgName: " + orgName);
         }
 
-        // initialize the connection pool for the ldap server 
-        LDAPConnectionPools.initConnectionPool(ldapServer, authid, authpw, sslEnabled, minPoolSize, maxPoolSize);
+        // initialize the connection pool for the ldap server
+        LDAPOptions options = new LDAPOptions();
+        options.setConnectTimeout(timeLimit, TimeUnit.SECONDS);
+        LDAPConnectionPools.initConnectionPool(ldapServer, authid, authpw, sslEnabled, minPoolSize, maxPoolSize,
+                options);
         connPool = LDAPConnectionPools.getConnectionPool(ldapServer);
+        ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
+        shutdownMan.addShutdownListener(
+                new ShutdownListener() {
+                    public void shutdown() {
+                        if (connPool != null) {
+                            connPool.close();
+                        }
+                    }
+                });
 
         policyConfigExpiresAt = System.currentTimeMillis() + PolicyConfig.getSubjectsResultTtl(configParams);
     }

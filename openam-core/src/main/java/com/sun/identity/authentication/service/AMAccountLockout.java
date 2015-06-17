@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: AMAccountLockout.java,v 1.10 2009/03/06 22:09:20 hengming Exp $
  *
- * Portions Copyrighted 2013-2014 ForgeRock AS.
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 package com.sun.identity.authentication.service;
 
@@ -36,13 +36,14 @@ import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.shared.locale.Locale;
 import java.util.Date;
 import java.util.Set;
 import java.util.Map;
 
 import static org.forgerock.openam.utils.CollectionUtils.*;
+
+import org.forgerock.openam.ldap.LDAPUtils;
 
 /**
  * <code>AMAccountLockout</code> contains the utility methods to retrieve and set account lockout related information
@@ -385,7 +386,7 @@ class AMAccountLockout {
 
     private String normalizeDN(String userDN) {
         String normalizedDN = userDN;
-        if (userDN != null && DN.isDN(userDN)) {
+        if (userDN != null && LDAPUtils.isDN(userDN)) {
             normalizedDN = DNUtils.normalizeDN(userDN);
         }
         if (DEBUG.messageEnabled()) {

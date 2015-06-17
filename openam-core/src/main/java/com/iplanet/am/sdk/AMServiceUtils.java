@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: AMServiceUtils.java,v 1.7 2009/01/28 05:34:47 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.am.sdk;
@@ -41,12 +42,13 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceNotFoundException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.opendj.ldap.DN;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import com.sun.identity.shared.ldap.util.DN;
 
 /**
  * This class has some of the most commonly used Service Management
@@ -245,8 +247,8 @@ public class AMServiceUtils {
             ServiceConfigManager scm = new ServiceConfigManager(serviceName,
                     token);
             ServiceConfig sc = scm.getOrganizationConfig(orgDN, null);
-            DN theOrgDN = new DN(orgDN);
-            if (theOrgDN.equals(new DN(SMSEntry.getAMSdkBaseDN()))
+            DN theOrgDN = DN.valueOf(orgDN);
+            if (theOrgDN.equals(DN.valueOf(SMSEntry.getAMSdkBaseDN()))
                     && sc != null) {
                 Map avPair = sc.getAttributes();
                 Set subConfigs = sc.getSubConfigNames();

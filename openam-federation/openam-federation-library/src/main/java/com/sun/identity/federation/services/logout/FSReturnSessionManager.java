@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,16 +24,17 @@
  *
  * $Id: FSReturnSessionManager.java,v 1.4 2009/01/28 05:35:07 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
-
 
 package com.sun.identity.federation.services.logout;
 
-import com.sun.identity.federation.common.IFSConstants;
-import com.sun.identity.federation.common.FSUtils;
 import java.util.HashMap;
 import java.util.Map;
-import com.sun.identity.shared.ldap.util.DN;
+
+import com.sun.identity.federation.common.FSUtils;
+import com.sun.identity.federation.common.IFSConstants;
+import org.forgerock.opendj.ldap.DN;
 
 /**
  * Contains session information for logout.
@@ -60,7 +61,7 @@ public final class FSReturnSessionManager{
      */
     public HashMap getUserProviderInfo(String userDN){
         FSUtils.debug.message("FSReturnSessionManager::getUserProviderInfo");
-        userDN = new DN(userDN).toRFCString().toLowerCase();
+        userDN = DN.valueOf(userDN).toString().toLowerCase();
         return (HashMap)userAndProviderMap.get(userDN);
     }
     
@@ -72,7 +73,7 @@ public final class FSReturnSessionManager{
      */
     public void setLogoutStatus(String logoutStatus,String userDN){
         FSUtils.debug.message("FSReturnSessionManager::setLogoutStatus");
-        userDN = new DN(userDN).toRFCString().toLowerCase();
+        userDN = DN.valueOf(userDN).toString().toLowerCase();
         if(userDN != null) {
             HashMap userMap =  (HashMap)userAndProviderMap.get(userDN);
             if (userMap != null) {
@@ -105,7 +106,7 @@ public final class FSReturnSessionManager{
     {
         FSUtils.debug.message(
             "Entered FSReturnSessionManager::setUserProviderInfo");
-        userDN = new DN(userDN).toRFCString().toLowerCase();
+        userDN = DN.valueOf(userDN).toString().toLowerCase();
         HashMap valMap = new HashMap();
         valMap.put(IFSConstants.PROVIDER, providerId);
         valMap.put(IFSConstants.ROLE, isIDP);
@@ -125,7 +126,7 @@ public final class FSReturnSessionManager{
     public void removeUserProviderInfo(String userDN){
         FSUtils.debug.message(
             "Entered FSReturnSessionManager::removeUserProviderInfo");
-        userDN = new DN(userDN).toRFCString().toLowerCase();
+        userDN = DN.valueOf(userDN).toString().toLowerCase();
         synchronized (userAndProviderMap) {
             userAndProviderMap.remove(userDN);
         }

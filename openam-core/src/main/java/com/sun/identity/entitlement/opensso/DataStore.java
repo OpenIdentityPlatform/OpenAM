@@ -28,6 +28,19 @@
  */
 package com.sun.identity.entitlement.opensso;
 
+import javax.naming.NamingException;
+import javax.security.auth.Subject;
+import java.security.AccessController;
+import java.text.MessageFormat;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Entitlement;
@@ -42,8 +55,6 @@ import com.sun.identity.entitlement.SubjectAttributesManager;
 import com.sun.identity.entitlement.util.NetworkMonitor;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.BufferedIterator;
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.shared.stats.Stats;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSDataEntry;
@@ -52,20 +63,10 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.openam.entitlement.PolicyConstants;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import javax.security.auth.Subject;
-import java.security.AccessController;
-import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * This class *talks* to SMS to get the configuration information.
@@ -159,7 +160,7 @@ public class DataStore {
         if (indexName == null) {
             indexName = POLICY_STORE;
         }
-        String dn = (DN.isDN(realm)) ? realm : DNMapper.orgNameToDN(realm);
+        String dn = LDAPUtils.isDN(realm) ? realm : DNMapper.orgNameToDN(realm);
         Object[] args = {indexName, dn};
         return MessageFormat.format(REALM_DN_TEMPLATE, args);
     }
@@ -471,7 +472,7 @@ public class DataStore {
         ReferralPrivilege referral
     ) throws EntitlementException {
         ResourceSaveIndexes indexes = referral.getResourceSaveIndexes(
-            adminSubject, realm);
+                adminSubject, realm);
         SSOToken token = getSSOToken(adminSubject);
         String dn = null;
         try {
@@ -691,35 +692,7 @@ public class DataStore {
         boolean sortResults,
         boolean ascendingOrder
     ) throws EntitlementException {
-        Set<String> results = new HashSet<String>();
-
-        try {
-            SSOToken token = getSSOToken(adminSubject);
-
-            if (token == null) {
-                throw new EntitlementException(216);
-            }
-
-            String baseDN = getSearchBaseDN(realm, null);
-
-            if (SMSEntry.checkIfEntryExists(baseDN, token)) {
-                Set<String> dns = SMSEntry.search(token, baseDN, filter,
-                    numOfEntries, 0, sortResults, ascendingOrder);
-                for (String dn : dns) {
-                    if (!areDNIdentical(baseDN, dn)) {
-                        String rdns[] = LDAPDN.explodeDN(dn, true);
-                        if ((rdns != null) && rdns.length > 0) {
-                            results.add(rdns[0]);
-                        }
-                    }
-                }
-            } else {
-                return Collections.EMPTY_SET;
-            }
-        } catch (SMSException ex) {
-            throw new EntitlementException(215, ex);
-        }
-        return results;
+        return search(adminSubject, realm, filter, numOfEntries, sortResults, ascendingOrder, null);
     }
     
     /**
@@ -733,7 +706,7 @@ public class DataStore {
      * @param ascendingOrder <code>true</code> to have result sorted in
      * ascending order.
      * @return a set of privilege names that satifies a search filter.
-     * @throws EntityExistsException if search failed.
+     * @throws EntitlementException if search failed.
      */
     public Set<String> searchReferral(
         Subject adminSubject,
@@ -743,44 +716,32 @@ public class DataStore {
         boolean sortResults,
         boolean ascendingOrder
     ) throws EntitlementException {
-        Set<String> results = new HashSet<String>();
+        return search(adminSubject, realm, filter, numOfEntries, sortResults, ascendingOrder, REFERRAL_STORE);
+    }
 
+    private Set<String> search(Subject adminSubject, String realm, String filter, int numOfEntries, boolean sortResults, boolean ascendingOrder, String indexName) throws EntitlementException {
         try {
             SSOToken token = getSSOToken(adminSubject);
 
             if (token == null) {
-                throw new EntitlementException(216);
+                throw new EntitlementException(EntitlementException.UNABLE_SEARCH_PRIVILEGES_MISSING_TOKEN);
             }
 
-            String baseDN = getSearchBaseDN(realm, REFERRAL_STORE);
+            String baseDNString = getSearchBaseDN(realm, indexName);
 
-            if (SMSEntry.checkIfEntryExists(baseDN, token)) {
-                Set<String> dns = SMSEntry.search(token, baseDN, filter,
-                    numOfEntries, 0, sortResults, ascendingOrder);
-                for (String dn : dns) {
-                    if (!areDNIdentical(baseDN, dn)) {
-                        String rdns[] = LDAPDN.explodeDN(dn, true);
-                        if ((rdns != null) && rdns.length > 0) {
-                            results.add(rdns[0]);
-                        }
-                    }
-                }
+            if (SMSEntry.checkIfEntryExists(baseDNString, token)) {
+                DN baseDN = DN.valueOf(baseDNString);
+                return LDAPUtils.collectNonIdenticalValues(baseDN,
+                        SMSEntry.search(token, baseDNString, filter, numOfEntries, 0, sortResults, ascendingOrder));
             } else {
-                return Collections.EMPTY_SET;
+                return Collections.emptySet();
             }
-        } catch (SMSException ex) {
-            throw new EntitlementException(215, ex);
+        } catch (SMSException | NamingException ex) {
+            throw new EntitlementException(EntitlementException.UNABLE_SEARCH_PRIVILEGES, ex);
         }
-        return results;
     }
 
-    private static boolean areDNIdentical(String dn1, String dn2) {
-        DN dnObj1 = new DN(dn1);
-        DN dnObj2 = new DN(dn2);
-        return dnObj1.equals(dnObj2);
-    }
-
-     public boolean hasPrivilgesWithApplication(
+    public boolean hasPrivilgesWithApplication(
         Subject adminSubject,
         String realm,
         String applName
@@ -1121,25 +1082,17 @@ public class DataStore {
     static Set<String> getReferralNames(String realm, String referredRealm)
         throws EntitlementException {
         try {
-            Set<String> results = new HashSet<String>();
-            String filter = "(ou=" + REFERRAL_REALMS + "=" + 
+            String filter = "(ou=" + REFERRAL_REALMS + "=" +
                 DNMapper.orgNameToRealmName(referredRealm) + ")";
-            String baseDN = getSearchBaseDN(realm, REFERRAL_STORE);
+            String baseDNString = getSearchBaseDN(realm, REFERRAL_STORE);
 
-            if (SMSEntry.checkIfEntryExists(baseDN, adminToken)) {
-                Set<String> dns = SMSEntry.search(adminToken, baseDN, filter,
-                    0, 0, false, false);
-                for (String dn : dns) {
-                    if (!areDNIdentical(baseDN, dn)) {
-                        String rdns[] = LDAPDN.explodeDN(dn, true);
-                        if ((rdns != null) && rdns.length > 0) {
-                            results.add(rdns[0]);
-                        }
-                    }
-                }
+            if (SMSEntry.checkIfEntryExists(baseDNString, adminToken)) {
+                DN baseDN = DN.valueOf(baseDNString);
+                return LDAPUtils.collectNonIdenticalValues(baseDN,
+                        SMSEntry.search(adminToken, baseDNString, filter, 0, 0, false, false));
             }
-            return results;
-        } catch (SMSException ex) {
+            return Collections.emptySet();
+        } catch (SMSException | NamingException ex) {
             throw new EntitlementException(215, ex);
         }
     }

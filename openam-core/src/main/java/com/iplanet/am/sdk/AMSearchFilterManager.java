@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,19 +24,18 @@
  *
  * $Id: AMSearchFilterManager.java,v 1.7 2009/01/28 05:34:47 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.iplanet.am.sdk;
 
 import com.iplanet.am.sdk.common.IDirectoryServices;
 import com.iplanet.am.util.Cache;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.opendj.ldap.DN;
+
 import java.util.HashMap;
 import java.util.Map;
-import com.sun.identity.shared.ldap.util.DN;
 
 /**
  * A Class which manages the search filters correponding to each of the AMObject
@@ -111,7 +110,7 @@ public class AMSearchFilterManager {
     public static String getSearchFilter(int objectType, String orgDN,
             String searchTemplateName, boolean ignoreComplianceFilter) {
         String filter;
-        String organizationDN = new DN(orgDN).toRFCString();
+        String organizationDN = DN.valueOf(orgDN).toString();
         // Already in RFC
         String rootSuffixDN = AMStoreConnection.getAMSdkBaseDN(); 
         if (orgDN != null && organizationDN.equals(rootSuffixDN)) {

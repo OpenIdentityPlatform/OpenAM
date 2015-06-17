@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -31,6 +31,15 @@ package com.sun.identity.entitlement.opensso;
 
 import static com.sun.identity.policy.PolicyEvaluator.REALM_DN;
 
+import javax.security.auth.Subject;
+import java.text.MessageFormat;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Application;
@@ -47,8 +56,6 @@ import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.policy.PolicyConfig;
 import com.sun.identity.policy.PolicyEvaluator;
 import com.sun.identity.policy.PolicyException;
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.OrganizationConfigManager;
@@ -59,16 +66,9 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.entitlement.utils.EntitlementUtils;
+import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.utils.CollectionUtils;
-
-import javax.security.auth.Subject;
-import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
+import org.forgerock.opendj.ldap.DN;
 
 /**
  *
@@ -281,10 +281,7 @@ public class EntitlementService extends EntitlementConfiguration {
 
             for (String dn : dns) {
                 if (!areDNIdentical(baseDN, dn)) {
-                    String rdns[] = LDAPDN.explodeDN(dn, true);
-                    if ((rdns != null) && rdns.length > 0) {
-                        results.add(rdns[0]);
-                    }
+                    results.add(LDAPUtils.rdnValueFromDn(dn));
                 }
             }
             return results;
@@ -294,8 +291,8 @@ public class EntitlementService extends EntitlementConfiguration {
     }
 
     private static boolean areDNIdentical(String dn1, String dn2) {
-        DN dnObj1 = new DN(dn1);
-        DN dnObj2 = new DN(dn2);
+        DN dnObj1 = DN.valueOf(dn1);
+        DN dnObj2 = DN.valueOf(dn2);
         return dnObj1.equals(dnObj2);
     }
 
@@ -413,7 +410,7 @@ public class EntitlementService extends EntitlementConfiguration {
                 // TODO. Since applications for the hidden realms have to be
                 // the same as root realm mainly for delegation without any
                 // referrals, the hack is to use root realm for hidden realm.
-                String hackRealm = (DN.isDN(realm)) ? DNMapper.orgNameToRealmName(realm) : realm;
+                String hackRealm = LDAPUtils.isDN(realm) ? DNMapper.orgNameToRealmName(realm) : realm;
                 ServiceConfigManager mgr = new ServiceConfigManager(SERVICE_NAME, token);
                 ServiceConfig orgConfig = mgr.getOrganizationConfig(hackRealm, null);
                 if (orgConfig != null) {

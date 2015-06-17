@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -23,16 +23,12 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: EmbeddedSearchResultIterator.java,v 1.1 2009/05/13 21:27:25 hengming Exp $
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.sm.ldap;
 
 import com.sun.identity.common.CaseInsensitiveHashMap;
-import com.sun.identity.shared.ldap.LDAPAttribute;
-import com.sun.identity.shared.ldap.LDAPAttributeSet;
 import com.sun.identity.sm.SMSDataEntry;
 
 import java.util.*;
@@ -41,12 +37,13 @@ import org.opends.server.types.Attribute;
 import org.opends.server.types.AttributeValue;
 import org.opends.server.types.SearchResultEntry;
 
+
 /**
  * This class iterates through the list of <code>SearchResultEntry</code> and
  * converts the <code>SearchResultEntry</code> to a <code>SMSDataEntry</code>
  * object.
  */
-public class EmbeddedSearchResultIterator implements Iterator {
+public class EmbeddedSearchResultIterator implements Iterator<SMSDataEntry> {
     private Iterator resultIter;
     private Set excludeDNs;
     private boolean hasExcludeDNs;
@@ -89,7 +86,7 @@ public class EmbeddedSearchResultIterator implements Iterator {
         return (current != null);
     }
 
-    public Object next() {
+    public SMSDataEntry next() {
         SMSDataEntry tmp = current;
         current = null;
         return tmp;
@@ -99,33 +96,16 @@ public class EmbeddedSearchResultIterator implements Iterator {
         //not supported.
     }
 
-      static Map convertLDAPAttributeSetToMap(List attributes) {
+    static Map convertLDAPAttributeSetToMap(List attributes) {
         Map answer = null;
         if ((attributes != null) && (!attributes.isEmpty())) {
-             for (Iterator iter = attributes.iterator(); iter.hasNext();) {
-                 Attribute attr = (Attribute) iter.next();
-               if (attr != null) {
-                 Set strValues = new HashSet();
-                 for(AttributeValue value : attr) {
-                         strValues.add(value.toString());
-                 }
-                 if (answer == null) {
-                     answer = new CaseInsensitiveHashMap(10);
-                  }
-                  answer.put(attr.getName(), strValues);
-                 }
-             }
-        }
-        return (answer);
-    }
-
-    static Map convertLDAPAttributeSetToMap(LDAPAttributeSet set) {
-        Map answer = null;
-        if ((set != null) && !(set.size() == 0)) {
-            for (Enumeration enumeration = set.getAttributes(); enumeration.hasMoreElements();) {
-                LDAPAttribute attr = (LDAPAttribute) enumeration.nextElement();
+            for (Iterator iter = attributes.iterator(); iter.hasNext();) {
+                Attribute attr = (Attribute) iter.next();
                 if (attr != null) {
-                    Set strValues = new HashSet<String>(Arrays.asList(attr.getStringValueArray()));
+                    Set strValues = new HashSet();
+                    for(AttributeValue value : attr) {
+                        strValues.add(value.toString());
+                    }
                     if (answer == null) {
                         answer = new CaseInsensitiveHashMap(10);
                     }

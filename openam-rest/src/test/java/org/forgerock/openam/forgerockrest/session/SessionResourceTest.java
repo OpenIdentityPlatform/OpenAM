@@ -1,6 +1,4 @@
 /*
- * Copyright 2013-2014 ForgeRock AS.
- *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,33 +10,16 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.session;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenID;
-import com.iplanet.sso.SSOTokenManager;
-import org.forgerock.json.resource.AdviceContext;
-import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.shared.ldap.util.DN;
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.BadRequestException;
-import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResultHandler;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.json.resource.ServerContext;
-import org.forgerock.openam.forgerockrest.session.query.SessionQueryManager;
-import org.forgerock.openam.rest.resource.SSOTokenContext;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import static org.fest.assertions.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.mock;
+import static org.mockito.Mockito.*;
 
 import java.security.Principal;
 import java.util.Arrays;
@@ -47,14 +28,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.fest.assertions.Assertions.*;
-import static org.mockito.BDDMockito.*;
-import static org.mockito.BDDMockito.mock;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenID;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.AdviceContext;
+import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.ResultHandler;
+import org.forgerock.json.resource.ServerContext;
+import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
+import org.forgerock.openam.forgerockrest.session.query.SessionQueryManager;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.opendj.ldap.DN;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Matchers;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class SessionResourceTest {
 
@@ -79,7 +75,7 @@ public class SessionResourceTest {
         urlResponse = null;
         cookieResponse = null;
 
-        amIdentity = new AMIdentity(new DN("id=demo,dc=example,dc=com"), null);
+        amIdentity = new AMIdentity(DN.valueOf("id=demo,dc=example,dc=com"), null);
 
         sessionResource = new SessionResource(sessionQueryManager, ssoTokenManager, authUtilsWrapper) {
             @Override

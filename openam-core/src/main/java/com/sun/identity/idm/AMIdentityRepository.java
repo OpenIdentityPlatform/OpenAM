@@ -31,8 +31,6 @@
  */
 package com.sun.identity.idm;
 
-import javax.inject.Inject;
-import javax.security.auth.callback.Callback;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,6 +39,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.security.auth.callback.Callback;
+
+import org.forgerock.openam.ldap.LDAPUtils;
+
 import com.google.inject.assistedinject.Assisted;
 import com.iplanet.am.sdk.AMHashMap;
 import com.iplanet.sso.SSOException;
@@ -48,8 +51,6 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.common.DNUtils;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
@@ -373,7 +374,7 @@ public final class AMIdentityRepository {
     private AMIdentity getSubRealmIdentity(String subRealmName) throws
         IdRepoException, SSOException {
         String realmName = idRealmName;
-        if (DN.isDN(idRealmName)) {  // Wouldn't be a DN if it starts with "/"
+        if (LDAPUtils.isDN(idRealmName)) {  // Wouldn't be a DN if it starts with "/"
             realmName = DNMapper.orgNameToRealmName(idRealmName);
         }
 
@@ -666,10 +667,8 @@ public final class AMIdentityRepository {
                 amsdkResults[0][0];
             Set results = amsdkRepoRes.getSearchResults();
             Map attrResults = amsdkRepoRes.getResultAttributes();
-            Iterator it = results.iterator();
-            while (it.hasNext()) {
-                String dn = (String) it.next();
-                String name = LDAPDN.explodeDN(dn, true)[0];
+            for (String dn : (Set<String>) results) {
+                String name = LDAPUtils.rdnValueFromDn(dn);
                 amsdkDNs.put(name, dn);
                 Set attrMaps = new HashSet();
                 attrMaps.add((Map) attrResults.get(dn));
@@ -680,10 +679,8 @@ public final class AMIdentityRepository {
         for (int i = 0; i < sizeOfArray; i++) {
             RepoSearchResults current = (RepoSearchResults) arrayOfResult[i][0];
             Map configMap = (Map) arrayOfResult[i][1];
-            Iterator it = current.getSearchResults().iterator();
             Map allAttrMaps = current.getResultAttributes();
-            while (it.hasNext()) {
-                String m = (String) it.next();
+            for (String m : (Set<String>) current.getSearchResults()) {
                 String mname = DNUtils.DNtoName(m);
                 Map attrMap = (Map) allAttrMaps.get(m);
                 attrMap = reverseMapAttributeNames(attrMap, configMap);
@@ -696,10 +693,8 @@ public final class AMIdentityRepository {
             }
         }
         IdSearchResults results = new IdSearchResults(type, orgName);
-        Iterator it = resultsMap.keySet().iterator();
-        while (it.hasNext()) {
-            String mname = (String) it.next();
-            Map combinedMap = combineAttrMaps((Set) resultsMap.get(mname), 
+        for (String mname : (Set<String>) resultsMap.keySet()) {
+            Map combinedMap = combineAttrMaps((Set) resultsMap.get(mname),
                     true);
             AMIdentity id = new AMIdentity(token, mname, type, orgName,
                     (String) amsdkDNs.get(mname));

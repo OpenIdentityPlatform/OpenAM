@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,10 @@
  *
  * $Id: ServiceBase.java,v 1.2 2009/01/28 05:34:58 ww203982 Exp $
  *
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  */
-/**
- * Portions Copyrighted 2012-2014 ForgeRock AS
- */
-package com.sun.identity.diagnostic.plugin.services.common;
 
+package com.sun.identity.diagnostic.plugin.services.common;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,6 +40,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.security.AccessController;
+import java.security.GeneralSecurityException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -50,13 +49,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
+import java.util.concurrent.TimeUnit;
 import javax.net.ssl.HttpsURLConnection;
-import com.sun.identity.shared.ldap.LDAPConnection;
-import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.LDAPSearchResults;
 
-
-import com.iplanet.am.util.SSLSocketFactoryManager;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.util.Crypt;
 import com.iplanet.sso.SSOToken;
@@ -68,8 +63,17 @@ import com.sun.identity.setup.Bootstrap;
 import com.sun.identity.setup.BootstrapData;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceManager;
-
-
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.Connections;
+import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.ErrorResultIOException;
+import org.forgerock.opendj.ldap.LDAPConnectionFactory;
+import org.forgerock.opendj.ldap.LDAPOptions;
+import org.forgerock.opendj.ldap.SSLContextBuilder;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.requests.Requests;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
 
 /**
  * This is the base class for Server related functionality.
@@ -427,26 +431,20 @@ public abstract class ServiceBase implements ToolConstants, ServiceConstants {
      * @param dsAdminPwd  admin password used by admin user name
      * @return LDAP connection
      */
-    protected static LDAPConnection getLDAPConnection(
-        String dsHostName,
-        int dsPort,
-        String dsProtocol,
-        String dsManager,
-        String dsAdminPwd
-    ) {
-        LDAPConnection ld = null;
+    protected static Connection getLDAPConnection(String dsHostName, int dsPort, String dsProtocol, String dsManager,
+            String dsAdminPwd) {
         try {
-            ld = (dsProtocol.equalsIgnoreCase("ldaps")) ?
-                new LDAPConnection(
-                SSLSocketFactoryManager.getSSLSocketFactory()) :
-                new LDAPConnection();
-            ld.setConnectTimeout(300);
-            ld.connect(3, dsHostName, dsPort, dsManager, dsAdminPwd);
-        } catch (Exception e) {
-            disconnectDServer(ld);
-            ld = null;
+            LDAPOptions options = new LDAPOptions().setTimeout(300, TimeUnit.SECONDS);
+            if (dsProtocol.equalsIgnoreCase("ldaps")) {
+                options.setSSLContext(new SSLContextBuilder().getSSLContext());
+            }
+            ConnectionFactory factory = Connections.newAuthenticatedConnectionFactory(
+                    new LDAPConnectionFactory(dsHostName, dsPort, options),
+                    Requests.newSimpleBindRequest(dsManager, dsAdminPwd.toCharArray()));
+            return factory.getConnection();
+        } catch (Exception ignored) {
+            return null;
         }
-        return ld;
     }
     
     /**
@@ -455,28 +453,14 @@ public abstract class ServiceBase implements ToolConstants, ServiceConstants {
      * @param paramMap Map containing directory specific information
      * @return LDAP connection
      */
-    private LDAPConnection getLDAPConnection(
-        Map paramMap
-    ) {
-        String dsHost = (String)paramMap.get(DS_HOST);
-        String dsPort = (String)paramMap.get(DS_PORT);
-        String dsProtocol = (String)paramMap.get(DS_PROTOCOL);
-        String dsMgr = (String)paramMap.get(DS_MGR);
-        String dsPwd = (String)paramMap.get(DS_PWD);
+    private Connection getLDAPConnection(Map paramMap) {
+        String dsHost = (String) paramMap.get(DS_HOST);
+        String dsPort = (String) paramMap.get(DS_PORT);
+        String dsProtocol = (String) paramMap.get(DS_PROTOCOL);
+        String dsMgr = (String) paramMap.get(DS_MGR);
+        String dsPwd = (String) paramMap.get(DS_PWD);
         dsPwd = Crypt.decode(dsPwd, Crypt.getHardcodedKeyEncryptor());
-        LDAPConnection ld = null;
-        try {
-            ld = (dsProtocol.equalsIgnoreCase("ldaps")) ?
-                new LDAPConnection(
-                    SSLSocketFactoryManager.getSSLSocketFactory()) :
-                new LDAPConnection();
-            ld.setConnectTimeout(300);
-            ld.connect(3, dsHost, getPort(dsPort), dsMgr, dsPwd);
-        } catch (Exception e) {
-            disconnectDServer(ld);
-            ld = null;
-        }
-        return ld;
+        return getLDAPConnection(dsHost, getPort(dsPort), dsProtocol, dsMgr, dsPwd);
     }
        
     /**
@@ -484,36 +468,13 @@ public abstract class ServiceBase implements ToolConstants, ServiceConstants {
      *
      * @return <code>true</code> if specified suffix exists.
      */
-    protected static boolean connectDSwithDN(
-        LDAPConnection ld,
-        String suffix
-    ) {
+    protected static boolean connectDSwithDN(Connection ld, String suffix) {
         String filter = "cn=" + suffix;
         String[] attrs = { "" };
-        LDAPSearchResults results = null;
-        boolean isValidSuffix = true;
-        try {
-            results = ld.search(suffix,
-                LDAPConnection.SCOPE_BASE, filter, attrs, false);
-        } catch (LDAPException e) {
-            isValidSuffix = false;
-        }
-        return isValidSuffix;
-    }   
-    
-    /**
-     * Helper method to disconnect from Directory Server.
-     */
-    private static void disconnectDServer(LDAPConnection ld) {
-        if ((ld != null) && ld.isConnected()) {
-            try {
-                ld.disconnect();
-            } catch (LDAPException e) {
-                Debug.getInstance(DEBUG_NAME).error(
-                    "ServiceBase.disconnectDServer: " +
-                    "LDAP Operation return code: " +
-                    e.getLDAPResultCode());
-            }
+        try (ConnectionEntryReader reader = ld.search(suffix, SearchScope.BASE_OBJECT, filter, attrs)) {
+            return reader.hasNext();
+        } catch (ErrorResultIOException e) {
+            return false;
         }
     }
     
@@ -522,22 +483,14 @@ public abstract class ServiceBase implements ToolConstants, ServiceConstants {
      *
      * @return <code>true</code> if directory is running.
      */
-    protected static boolean isDSServerUp(
-        String dsHostName,
-        int dsPort,
-        String dsProtocol,
-        String dsManager,
-        String dsAdminPwd
-    ) {
-        boolean canConnect = false;
-        LDAPConnection ld = null;
-        ld = getLDAPConnection(dsHostName, dsPort,
-            dsProtocol, dsManager, dsAdminPwd);
-        if ((ld != null) && ld.isConnected()) {
-            canConnect = true;
-            disconnectDServer(ld);
+    protected static boolean isDSServerUp(String dsHostName, int dsPort, String dsProtocol, String dsManager,
+            String dsAdminPwd) {
+        try (Connection conn = getLDAPConnection(dsHostName, dsPort, dsProtocol, dsManager, dsAdminPwd)) {
+            if (conn != null) {
+                return true;
+            }
         }
-        return canConnect;
+        return false;
     }
     
     /**
@@ -570,17 +523,18 @@ public abstract class ServiceBase implements ToolConstants, ServiceConstants {
      * @return <code>true</code> if suffix is valid.
      */
     protected boolean isValidSuffix(Map instanceMap) {
-        boolean  validSuffix = false;
-        if (connectDSwithDN(getLDAPConnection(instanceMap),
-            (String)instanceMap.get(DS_BASE_DN))) {
-            validSuffix = true;
-        } else {
-            Debug.getInstance(DEBUG_NAME).error(
-                "ServiceBase.isValidateSuffix : " +
-                "Cannot connect to Directory Server :" +
-                instanceMap.get(DS_HOST) +
-                ":" + instanceMap.get(DS_PORT) +
-                " with suffix" + DS_BASE_DN);
+        boolean validSuffix = false;
+        try (Connection conn = getLDAPConnection(instanceMap)) {
+            if (connectDSwithDN(conn, (String) instanceMap.get(DS_BASE_DN))) {
+                validSuffix = true;
+            } else {
+                Debug.getInstance(DEBUG_NAME).error(
+                        "ServiceBase.isValidateSuffix : " +
+                                "Cannot connect to Directory Server :" +
+                                instanceMap.get(DS_HOST) +
+                                ":" + instanceMap.get(DS_PORT) +
+                                " with suffix" + DS_BASE_DN);
+            }
         }
         return validSuffix;
     }

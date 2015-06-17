@@ -28,10 +28,11 @@
  */
 package com.sun.identity.entitlement;
 
+import static org.forgerock.openam.ldap.LDAPUtils.rdnValueFromDn;
+
 import com.sun.identity.entitlement.interfaces.ResourceName;
 import com.sun.identity.shared.JSONUtils;
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.util.DN;
+
 import java.security.Principal;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,6 +42,7 @@ import java.util.Set;
 import javax.security.auth.Subject;
 
 import org.forgerock.openam.entitlement.PolicyConstants;
+import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -537,9 +539,8 @@ public class Entitlement {
         if (!principals.isEmpty()) {
             for (Principal p : principals) {
                 String pName = p.getName();
-                if (DN.isDN(pName)) {
-                    String[] rdns = LDAPDN.explodeDN(pName, true);
-                    userIds.add(rdns[0]);
+                if (LDAPUtils.isDN(pName)) {
+                    userIds.add(LDAPUtils.rdnValueFromDn(pName));
                 } else {
                     userIds.add(pName);
                 }

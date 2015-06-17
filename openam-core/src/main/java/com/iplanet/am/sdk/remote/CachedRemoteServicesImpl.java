@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,9 @@
  *
  * $Id: CachedRemoteServicesImpl.java,v 1.6 2009/11/20 23:52:52 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted 2011 ForgeRock AS
- */
 package com.iplanet.am.sdk.remote;
 
 import java.security.AccessController;
@@ -38,15 +36,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import com.sun.identity.shared.ldap.util.DN;
-
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-
-import com.sun.identity.security.AdminTokenAction;
-
 import com.iplanet.am.sdk.AMEntryExistsException;
-import com.iplanet.am.sdk.AMEvent;
 import com.iplanet.am.sdk.AMException;
 import com.iplanet.am.sdk.AMHashMap;
 import com.iplanet.am.sdk.AMNamingAttrManager;
@@ -59,6 +49,11 @@ import com.iplanet.am.sdk.common.IDirectoryServices;
 import com.iplanet.am.sdk.common.MiscUtils;
 import com.iplanet.am.util.Cache;
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.security.AdminTokenAction;
+import org.forgerock.openam.ldap.PersistentSearchChangeType;
+import org.forgerock.opendj.ldap.DN;
 
 public class CachedRemoteServicesImpl extends RemoteServicesImpl implements
         ICachedDirectoryServices {
@@ -228,7 +223,7 @@ public class CachedRemoteServicesImpl extends RemoteServicesImpl implements
         String origdn = dn;
         dn = MiscUtils.formatToRFC(dn);
         switch (eventType) {
-        case AMEvent.OBJECT_ADDED:
+        case PersistentSearchChangeType.ADDED:
             cb = (CacheBlock) sdkCache.get(dn);
             if (cb != null) { // Mark an invalid entry as valid now
                 cb.setExists(true);
@@ -237,7 +232,7 @@ public class CachedRemoteServicesImpl extends RemoteServicesImpl implements
                 removeCachedAttributes(dn, attrNames);
             }
             break;
-        case AMEvent.OBJECT_REMOVED:
+        case PersistentSearchChangeType.REMOVED:
             cb = (CacheBlock) sdkCache.remove(dn);
             if (cb != null) {
                 cb.clear(); // Clear anyway & help the GC process
@@ -246,7 +241,7 @@ public class CachedRemoteServicesImpl extends RemoteServicesImpl implements
                 removeCachedAttributes(dn, attrNames);
             }
             break;
-        case AMEvent.OBJECT_RENAMED:
+        case PersistentSearchChangeType.RENAMED:
             // Better to remove the renamed entry, or else it will be just
             // hanging in the cache, until LRU kicks in.
             cb = (CacheBlock) sdkCache.remove(dn);
@@ -257,7 +252,7 @@ public class CachedRemoteServicesImpl extends RemoteServicesImpl implements
                 removeCachedAttributes(dn, attrNames);
             }
             break;
-        case AMEvent.OBJECT_CHANGED:
+        case PersistentSearchChangeType.MODIFIED:
             cb = (CacheBlock) sdkCache.get(dn);
             if (cb != null) {
                 cb.clear(); // Just clear the entry. Don't remove.
@@ -458,8 +453,8 @@ public class CachedRemoteServicesImpl extends RemoteServicesImpl implements
      */
     public String getOrganizationDN(SSOToken token, String entryDN)
             throws AMException {
-        DN dnObject = new DN(entryDN);
-        if (entryDN.length() == 0 || !dnObject.isDN()) {
+        DN dnObject = DN.valueOf(entryDN);
+        if (entryDN.length() == 0 || dnObject.size() <= 0) {
             getDebug().error(
                     "CachedRemoteServicesImpl.getOrganizationDN() "
                             + "Invalid DN: " + entryDN);
@@ -472,7 +467,7 @@ public class CachedRemoteServicesImpl extends RemoteServicesImpl implements
         boolean found = false;
         while (!errorCondition && !found) {
             boolean lookupDirectory = true;
-            String childDN = dnObject.toRFCString().toLowerCase();
+            String childDN = dnObject.toString().toLowerCase();
             if (getDebug().messageEnabled()) {
                 getDebug().message("CachedRemoteServicesImpl."
                         + "getOrganizationDN() - looping Organization DN for"
@@ -514,13 +509,13 @@ public class CachedRemoteServicesImpl extends RemoteServicesImpl implements
             if (organizationDN != null && organizationDN.length() > 0) {
                 found = true;
                 setOrganizationDNs(organizationDN, childDNSet);
-            } else if (dnObject.countRDNs() == 1) { // Reached topmost level
+            } else if (dnObject.size() == 1) { // Reached topmost level
                 errorCondition = true;
                 getDebug().error("CachedRemoteServicesImpl."
                         + "getOrganizationDN(): Reached root suffix. Unable to"
                         + " get parent Org");
             } else { // Climb tree on level up
-                dnObject = dnObject.getParent();
+                dnObject = dnObject.parent();
             }
         }
         return organizationDN;
@@ -600,7 +595,7 @@ public class CachedRemoteServicesImpl extends RemoteServicesImpl implements
 
         String eDN;
         if (profileType == AMObject.USER) {
-            eDN = (new DN(entryDN)).getParent().toString();
+            eDN = DN.valueOf(entryDN).parent().toString();
         } else {
             eDN = entryDN;
         }

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: AMSDKRepo.java,v 1.28 2009/12/25 05:54:05 hengming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.iplanet.am.sdk;
@@ -43,6 +40,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.InvalidPasswordException;
+import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.idm.IdOperation;
@@ -55,11 +53,11 @@ import com.sun.identity.idm.IdRepoUnsupportedOpException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.idm.RepoSearchResults;
-import com.sun.identity.idm.plugins.ldapv3.LDAPAuthUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.shared.locale.Locale;
+import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceSchema;
@@ -70,15 +68,18 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Set;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.util.DN;
-import com.sun.identity.shared.ldap.util.LDAPUtilException;
+
+import org.forgerock.openam.ldap.LDAPAuthUtils;
+import org.forgerock.openam.ldap.LDAPUtilException;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.ldap.ModuleState;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.ResultCode;
+import org.forgerock.opendj.ldap.SearchScope;
 
 public class AMSDKRepo extends IdRepo {
 
@@ -1050,7 +1051,7 @@ public class AMSDKRepo extends IdRepo {
             String ldapError = ame.getLDAPErrorCode();
             String errorMessage = ame.getMessage();
             int errCode = Integer.parseInt(ldapError);
-            if (errCode == LDAPException.CONSTRAINT_VIOLATION) {
+            if (ResultCode.CONSTRAINT_VIOLATION.equals(ResultCode.valueOf(errCode))) {
                 Object args[] = 
                     { this.getClass().getName(), ldapError, errorMessage };
                 //Throw Fatal exception for errCode 19(eg.,Password too short)
@@ -1890,7 +1891,7 @@ public class AMSDKRepo extends IdRepo {
 
     private String getDN(IdType type, String name) throws IdRepoException,
             SSOException {
-        if (!type.equals(IdType.REALM) && DN.isDN(name)
+        if (!type.equals(IdType.REALM) && LDAPUtils.isDN(name)
                 && (name.indexOf(",") > -1)) {
             // If should contain at least one comma for it to be a DN
             return name;
@@ -2166,10 +2167,14 @@ public class AMSDKRepo extends IdRepo {
         ServerInstance svrCfg = getDsSvrCfg(LDAPUser.Type.AUTH_ADMIN);
         boolean ssl = (svrCfg.getConnectionType() == Server.Type.CONN_SSL);
 
-        LDAPAuthUtils ldapAuthUtil = null;
+        LDAPAuthUtils ldapAuthUtil;
         try {
-            ldapAuthUtil = new LDAPAuthUtils(svrCfg.getServerName(), svrCfg
-                    .getPort(), ssl, Locale.getDefaultLocale(), debug);
+            ldapAuthUtil = new LDAPAuthUtils(Collections.singleton(svrCfg.getServerName() + ":" + svrCfg.getPort()),
+                    Collections.<String>emptySet(), ssl,
+                    AMResourceBundleCache.getInstance().getResBundle(
+                            IdRepoBundle.BUNDLE_NAME, Locale.getDefaultLocale()),
+                    //BaseDN is set later based on whether authenticating user or agent
+                    "BASE_DN", debug);
         } catch (LDAPUtilException ldapUtilEx) {
             if (debug.messageEnabled()) {
                 debug.message("AMSDKRepo: authenticate"
@@ -2179,8 +2184,8 @@ public class AMSDKRepo extends IdRepo {
             throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "211", args);
         }
         ldapAuthUtil.setAuthDN(AdminUtils.getAdminDN());
-        ldapAuthUtil.setAuthPassword(new String(AdminUtils.getAdminPassword()));
-        ldapAuthUtil.setScope(AMConstants.SCOPE_ONE);
+        ldapAuthUtil.setAuthPassword(new String(AdminUtils.getAdminPassword()).toCharArray());
+        ldapAuthUtil.setScope(SearchScope.SINGLE_LEVEL);
         // TODO?do one then sub?
 
         if (authenticateIt(ldapAuthUtil, IdType.USER, username, password)) {
@@ -2243,61 +2248,60 @@ public class AMSDKRepo extends IdRepo {
             attrs[0] = "dn";
             attrs[1] = namingAttr;
             ldapAuthUtil.setUserAttrs(attrs);
-            if (DN.isDN(username)) {
-                userid = LDAPDN.explodeDN(username, true)[0]; 
+            if (LDAPUtils.isDN(username)) {
+                userid = LDAPUtils.rdnValueFromDn(username);
             }
             ldapAuthUtil.authenticateUser(userid, password);
         } catch (LDAPUtilException ldapUtilEx) {
-            switch (ldapUtilEx.getLDAPResultCode()) {
-                case LDAPUtilException.NO_SUCH_OBJECT:
-                    if (debug.messageEnabled()) {
-                        debug.message("AMSDKRepo:authenticateIt. " +
+            if (ResultCode.NO_SUCH_OBJECT.equals(ldapUtilEx.getResultCode())) {
+                if (debug.messageEnabled()) {
+                    debug.message("AMSDKRepo:authenticateIt. " +
                             "The specified user does not exist. " +
                             "username=" + username);
-                    }
-                    throw new AuthLoginException(amAuthLDAP,
-                            "NoUser", null);
-                case LDAPUtilException.INVALID_CREDENTIALS:
-                    if (debug.messageEnabled()) {
-                        debug.message("AMSDKRepo:authenticateIt." +
+                }
+                throw new AuthLoginException(amAuthLDAP,
+                        "NoUser", null);
+            } else if (ResultCode.INVALID_CREDENTIALS.equals(ldapUtilEx.getResultCode())) {
+                if (debug.messageEnabled()) {
+                    debug.message("AMSDKRepo:authenticateIt." +
                             " Invalid password. username=" + username);
-                    }
-                    String failureUserID = ldapAuthUtil.getUserId();
-                    throw new InvalidPasswordException(amAuthLDAP,
+                }
+                String failureUserID = ldapAuthUtil.getUserId();
+                throw new InvalidPasswordException(amAuthLDAP,
                         "InvalidUP", null, failureUserID, null);
-                case LDAPUtilException.UNWILLING_TO_PERFORM:
-                    if (debug.messageEnabled()) {
-                        debug.message("AMSDKRepo:authenticateIt. " +
+            } else if (ResultCode.UNWILLING_TO_PERFORM.equals(ldapUtilEx.getResultCode())) {
+                if (debug.messageEnabled()) {
+                    debug.message("AMSDKRepo:authenticateIt. " +
                             "Unwilling to perform. Account inactivated." +
-                             " username" + username);
-                    }
-                    throw new AuthLoginException(amAuthLDAP,
+                            " username" + username);
+                }
+                throw new AuthLoginException(amAuthLDAP,
                         "FConnect", null);
-                case LDAPUtilException.INAPPROPRIATE_AUTHENTICATION:
-                    if (debug.messageEnabled()) {
-                        debug.message("AMSDKRepo:authenticateIt. " +
+            } else if (ResultCode.INAPPROPRIATE_AUTHENTICATION.equals(ldapUtilEx.getResultCode())) {
+                if (debug.messageEnabled()) {
+                    debug.message("AMSDKRepo:authenticateIt. " +
                             "Inappropriate authentication. username="
                             + username);
-                    }
-                    throw new AuthLoginException(amAuthLDAP, "InappAuth",
+                }
+                throw new AuthLoginException(amAuthLDAP, "InappAuth",
                         null);
-                case LDAPUtilException.CONSTRAINT_VIOLATION:
-                    if (debug.messageEnabled()) {
-                        debug.message("AMSDKRepo:authenticateIt. " +
+            } else if (ResultCode.CONSTRAINT_VIOLATION.equals(ldapUtilEx.getResultCode())) {
+                if (debug.messageEnabled()) {
+                    debug.message("AMSDKRepo:authenticateIt. " +
                             "Exceed password retry limit. username"
                             + username);
-                    }
-                    throw new AuthLoginException(amAuthLDAP,
-                            "ExceedRetryLimit", null);
-                default:
-                    if (debug.messageEnabled()) {
-                        debug.message("AMSDKRepo:authenticateIt. " +
-                            "default exception. username=" + username);
-                    }
-                    throw new AuthLoginException(amAuthLDAP, "LDAPex", null);
+                }
+                throw new AuthLoginException(amAuthLDAP,
+                        "ExceedRetryLimit", null);
+            } else {
+                if (debug.messageEnabled()) {
+                    debug.message("AMSDKRepo:authenticateIt. " +
+                        "default exception. username=" + username);
+                }
+                throw new AuthLoginException(amAuthLDAP, "LDAPex", null);
             }
         }
 
-        return (ldapAuthUtil.getState() == LDAPAuthUtils.SUCCESS);
+        return ldapAuthUtil.getState() == ModuleState.SUCCESS;
     }
 }

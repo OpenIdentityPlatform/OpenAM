@@ -29,17 +29,18 @@
  */
 package com.sun.identity.sm;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import org.forgerock.opendj.ldap.DN;
+
 import com.iplanet.services.util.AMEncryption;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.ums.IUMSConstants;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import com.sun.identity.shared.ldap.util.DN;
 
 /**
  * The class <code>ServiceConfig</code> provides interfaces to manage the
@@ -869,7 +870,7 @@ public class ServiceConfig {
                     .orgNameToDN(sc.getOrganizationName()), getServiceName(),
                     getVersion());
             // Check if parent DN is present
-            String parentDN = (new DN(e.getDN())).getParent().toString();
+            String parentDN = DN.valueOf(e.getDN()).parent().toString();
             checkAndCreateComponents(parentDN);
             // Add object classses to this entry
             e.addAttribute(SMSEntry.ATTR_OBJECTCLASS, SMSEntry.OC_TOP);
@@ -888,7 +889,7 @@ public class ServiceConfig {
         }
         if (entry.isNewEntry()) {
             // Check if parent exisits
-            String pDN = (new DN(dn)).getParent().toString();
+            String pDN = DN.valueOf(dn).parent().toString();
             CachedSMSEntry pEntry = CachedSMSEntry.getInstance(token, pDN);
             if (pEntry.isDirty()) {
                 pEntry.refresh();
@@ -913,7 +914,7 @@ public class ServiceConfig {
         }
         if (entry.isNewEntry()) {
             // Check if parent exisits
-            String pDN = (new DN(dn)).getParent().toString();
+            String pDN = DN.valueOf(dn).parent().toString();
             CachedSMSEntry pEntry = CachedSMSEntry.getInstance(token, pDN);
             if (pEntry.isDirty()) {
                 pEntry.refresh();

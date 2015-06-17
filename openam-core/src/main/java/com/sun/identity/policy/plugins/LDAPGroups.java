@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,38 +24,52 @@
  *
  * $Id: LDAPGroups.java,v 1.8 2009/11/20 23:52:55 ww203982 Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011 ForgeRock Inc 
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation 
  */
+
 package com.sun.identity.policy.plugins;
 
-import java.util.*;
-import com.sun.identity.shared.ldap.*;
-import com.sun.identity.shared.ldap.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
-import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
-import com.sun.identity.shared.debug.Debug;
-
-import com.sun.identity.common.LDAPConnectionPool;
-import com.sun.identity.policy.PolicyManager;
-import com.sun.identity.policy.PolicyEvaluator;
-import com.sun.identity.policy.PolicyConfig;
-import com.sun.identity.policy.PolicyUtils;
-import com.sun.identity.policy.SubjectEvaluationCache;
-import com.sun.identity.policy.ResBundleUtils;
-import com.sun.identity.policy.ValidValues;
-import com.sun.identity.policy.Syntax;
-import com.sun.identity.policy.PolicyException;
-import com.sun.identity.policy.NameNotFoundException;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.policy.InvalidNameException;
+import com.sun.identity.policy.NameNotFoundException;
+import com.sun.identity.policy.PolicyConfig;
+import com.sun.identity.policy.PolicyEvaluator;
+import com.sun.identity.policy.PolicyException;
+import com.sun.identity.policy.PolicyManager;
+import com.sun.identity.policy.PolicyUtils;
+import com.sun.identity.policy.ResBundleUtils;
+import com.sun.identity.policy.SubjectEvaluationCache;
+import com.sun.identity.policy.Syntax;
+import com.sun.identity.policy.ValidValues;
 import com.sun.identity.policy.interfaces.Subject;
-import com.sun.identity.shared.ldap.LDAPBindRequest;
-import com.sun.identity.shared.ldap.LDAPRequestParser;
-import com.sun.identity.shared.ldap.LDAPSearchRequest;
+import com.sun.identity.shared.debug.Debug;
+import org.forgerock.i18n.LocalizedIllegalArgumentException;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.ByteString;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.Filter;
+import org.forgerock.opendj.ldap.LDAPOptions;
+import org.forgerock.opendj.ldap.LDAPUrl;
+import org.forgerock.opendj.ldap.ResultCode;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.requests.Requests;
+import org.forgerock.opendj.ldap.requests.SearchRequest;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
 
 /**
  * This class respresents a group of LDAP groups
@@ -71,15 +85,15 @@ public class LDAPGroups implements Subject {
 
     // Variables
     private boolean initialized = false;
-    private Set selectedGroupDNs = Collections.EMPTY_SET;
-    private Set selectedRFCGroupDNs = Collections.EMPTY_SET;
+    private Set<String> selectedGroupDNs = Collections.emptySet();
+    private Set<String> selectedRFCGroupDNs = Collections.emptySet();
     private String authid;
     private String authpw;
     private String baseDN;
     private String groupSearchFilter;
-    private int groupSearchScope = LDAPv2.SCOPE_SUB;
+    private SearchScope groupSearchScope = SearchScope.WHOLE_SUBTREE;
     private String userSearchFilter;
-    private int userSearchScope = LDAPv2.SCOPE_SUB;
+    private SearchScope userSearchScope = SearchScope.WHOLE_SUBTREE;
     private String groupRDNAttrName;
     private String userRDNAttrName;
     private int timeLimit;
@@ -88,7 +102,7 @@ public class LDAPGroups implements Subject {
     private int minPoolSize;
     private int maxPoolSize;
     private String orgName;
-    private LDAPConnectionPool connPool;
+    private ConnectionFactory connPool;
     private boolean localDS;
     private boolean aliasEnabled;
     private String ldapServer;
@@ -146,11 +160,11 @@ public class LDAPGroups implements Subject {
         String scope = (String) configParams.get(
                                 PolicyConfig.LDAP_GROUP_SEARCH_SCOPE);
         if (scope.equalsIgnoreCase(LDAP_SCOPE_BASE)) {
-            groupSearchScope = LDAPv2.SCOPE_BASE;
+            groupSearchScope = SearchScope.BASE_OBJECT;
         } else if (scope.equalsIgnoreCase(LDAP_SCOPE_ONE)) {
-            groupSearchScope = LDAPv2.SCOPE_ONE;
+            groupSearchScope = SearchScope.SINGLE_LEVEL;
         } else {
-            groupSearchScope = LDAPv2.SCOPE_SUB;
+            groupSearchScope = SearchScope.WHOLE_SUBTREE;
         }
 
         groupRDNAttrName = (String) configParams.get(
@@ -160,11 +174,11 @@ public class LDAPGroups implements Subject {
         scope = (String) configParams.get(
                            PolicyConfig.LDAP_USERS_SEARCH_SCOPE);
         if (scope.equalsIgnoreCase(LDAP_SCOPE_BASE)) {
-            userSearchScope = LDAPv2.SCOPE_BASE;
+            userSearchScope = SearchScope.BASE_OBJECT;
         } else if (scope.equalsIgnoreCase(LDAP_SCOPE_ONE)) {
-            userSearchScope = LDAPv2.SCOPE_ONE;
+            userSearchScope = SearchScope.SINGLE_LEVEL;
         } else {
-            userSearchScope = LDAPv2.SCOPE_SUB;
+            userSearchScope = SearchScope.WHOLE_SUBTREE;
         }
 
         userRDNAttrName = (String) configParams.get(
@@ -215,9 +229,11 @@ public class LDAPGroups implements Subject {
                            + "\nOrgName: " + orgName);
         }
 
-        // initialize the connection pool for the ldap server 
-        LDAPConnectionPools.initConnectionPool(ldapServer,
-                 authid, authpw, sslEnabled, minPoolSize, maxPoolSize);
+        // initialize the connection pool for the ldap server
+        LDAPOptions options = new LDAPOptions();
+        options.setTimeout(timeLimit, TimeUnit.SECONDS);
+        LDAPConnectionPools.initConnectionPool(ldapServer, authid, authpw, sslEnabled, minPoolSize, maxPoolSize,
+                options);
         connPool = LDAPConnectionPools.getConnectionPool(ldapServer);
         initialized = true;
     }
@@ -273,114 +289,63 @@ public class LDAPGroups implements Subject {
     public ValidValues getValidValues(SSOToken token, String pattern)
         throws SSOException, PolicyException {
         if (!initialized) {
-            throw (new PolicyException(ResBundleUtils.rbName,
-                "ldapgroups_subject_not_yet_initialized", null, null));
+            throw new PolicyException(ResBundleUtils.rbName, "ldapgroups_subject_not_yet_initialized", null, null);
         }
 
-        Set validGroupDNs = new HashSet();
-        String searchFilter = null;
-        if ((pattern != null) && !(pattern.trim().length() == 0)) {
-            searchFilter = "(&" + groupSearchFilter + "(" 
-                           + groupRDNAttrName + "=" + pattern + "))";
+        Set<String> validGroupDNs = new HashSet<>();
+        String searchFilter;
+        if (pattern != null && !pattern.trim().isEmpty()) {
+            searchFilter = "(&" + groupSearchFilter + "(" + groupRDNAttrName + "=" + pattern + "))";
         } else {
            searchFilter = groupSearchFilter;
         }
-        if (debug.messageEnabled()) {
-            debug.message(
-               "LDAPGroups.getValidValues(): group search filter is: "
-                + searchFilter);
-        }
-       
+        debug.message("LDAPGroups.getValidValues(): group search filter is: {}", searchFilter);
+
         String[] attrs = { groupRDNAttrName };
-        LDAPConnection ld = null;
+        Connection ld = null;
         int status = ValidValues.SUCCESS;
-        try {
-            LDAPSearchResults res = null;
-            LDAPBindRequest bindRequest =
-                LDAPRequestParser.parseBindRequest(3, authid, authpw);
-            LDAPSearchRequest searchRequest =
-                LDAPRequestParser.parseSearchRequest(baseDN, groupSearchScope,
-                searchFilter, attrs, false, timeLimit,
-                LDAPRequestParser.DEFAULT_DEREFERENCE, maxResults);
-            try {
-                ld = connPool.getConnection();
-                // connect to the server to authenticate
-                try {
-                    ld.authenticate(bindRequest);
-                } catch (LDAPException connEx) {
-                    // fallback to ldap v2 if v3 is not supported
-                    if (connEx.getLDAPResultCode() ==
-                        LDAPException.PROTOCOL_ERROR)
-                    {
-                        if (debug.messageEnabled()) {
-                            debug.message("LDAPGroup.getValidValues(): "+
-                            "Bind with LDAPv3 failed, retrying with v2");
-                        }
-                        bindRequest = LDAPRequestParser.parseBindRequest(
-                                2, authid, authpw);
-                        ld.authenticate(bindRequest);
-                    } else {
-                        throw connEx;
-                    }
-                }
-                res = ld.search(searchRequest);
-            } finally {
-                if (ld != null) {
-                    connPool.close(ld);
-                }
-            }
-            while (res.hasMoreElements()) {
-                try {
-                    LDAPEntry entry = res.next();
+        try (Connection conn = connPool.getConnection()) {
+
+            SearchRequest searchRequest = Requests.newSearchRequest(baseDN, groupSearchScope, searchFilter, attrs);
+            ConnectionEntryReader reader = conn.search(searchRequest);
+
+            while (reader.hasNext()) {
+                if (reader.isReference()) {
+                    //Ignore
+                    reader.readReference();
+                } else {
+                    SearchResultEntry entry = reader.readEntry();
                     if (entry != null) {
-                        validGroupDNs.add(entry.getDN());
-                        if (debug.messageEnabled()) {
-                            debug.message(
-                      "LDAPGroups.getValidValues(): found group name=" 
-                                 + entry.getDN());
-                        }
-                    }
-                } catch (LDAPReferralException lre) {
-                    // ignore referrals
-                    continue;
-                } catch (LDAPException le) {
-                    String objs[] = { orgName };
-                    int resultCode = le.getLDAPResultCode();
-                    if (resultCode == le.SIZE_LIMIT_EXCEEDED) {
-                        debug.warning(
-              "LDAPGroups.getValidValues(): exceeded the size limit");
-                        status = ValidValues.SIZE_LIMIT_EXCEEDED;
-                    } else if (resultCode == le.TIME_LIMIT_EXCEEDED) {
-                        debug.warning(
-              "LDAPGroups.getValidValues(): exceeded the time limit");
-                        status = ValidValues.TIME_LIMIT_EXCEEDED;
-                    } else {
-                        throw (new PolicyException(le));
+                        validGroupDNs.add(entry.getName().toString());
+                        debug.message("LDAPGroups.getValidValues(): found group name={}", entry.getName().toString());
                     }
                 }
             }
-        } catch (LDAPException lde) {
-            int ldapErrorCode = lde.getLDAPResultCode();
-            if (ldapErrorCode == LDAPException.INVALID_CREDENTIALS) {
-                throw (new PolicyException(ResBundleUtils.rbName,
-                    "ldap_invalid_password", null, null));
-            } else if (ldapErrorCode == LDAPException.NO_SUCH_OBJECT) {
+        } catch (ErrorResultException lde) {
+            ResultCode resultCode = lde.getResult().getResultCode();
+            if (ResultCode.SIZE_LIMIT_EXCEEDED.equals(resultCode)) {
+                debug.warning("LDAPGroups.getValidValues(): exceeded the size limit");
+                return new ValidValues(ValidValues.SIZE_LIMIT_EXCEEDED, validGroupDNs);
+            } else if (ResultCode.TIME_LIMIT_EXCEEDED.equals(resultCode)) {
+                debug.warning("LDAPGroups.getValidValues(): exceeded the time limit");
+                return new ValidValues(ValidValues.TIME_LIMIT_EXCEEDED, validGroupDNs);
+            } else if (ResultCode.INVALID_CREDENTIALS.equals(resultCode)) {
+                throw new PolicyException(ResBundleUtils.rbName, "ldap_invalid_password", null, null);
+            } else if (ResultCode.NO_SUCH_OBJECT.equals(resultCode)) {
                 String[] objs = { baseDN };
-                throw (new PolicyException(ResBundleUtils.rbName,
-                    "no_such_ldap_base_dn", objs, null));
+                throw new PolicyException(ResBundleUtils.rbName, "no_such_ldap_base_dn", objs, null);
             } 
-            String errorMsg = lde.getLDAPErrorMessage(); 
-            String additionalMsg = lde.errorCodeToString(); 
+            String errorMsg = lde.getMessage();
+            String additionalMsg = lde.getResult().getDiagnosticMessage();
             if (additionalMsg != null) {
-                throw (new PolicyException(
-                         errorMsg + ": " + additionalMsg));
+                throw new PolicyException(errorMsg + ": " + additionalMsg);
             } else { 
-                throw (new PolicyException(errorMsg));
+                throw new PolicyException(errorMsg);
             }
         } catch (Exception e) {
-            throw (new PolicyException(e));
+            throw new PolicyException(e);
         }
-        return(new ValidValues(status, validGroupDNs));
+        return new ValidValues(status, validGroupDNs);
     }
 
 
@@ -453,8 +418,7 @@ public class LDAPGroups implements Subject {
         selectedRFCGroupDNs = new HashSet();
         Iterator it = names.iterator();
         while (it.hasNext()) {
-            selectedRFCGroupDNs.add(new DN((String)it.next()).toRFCString().
-                toLowerCase());
+            selectedRFCGroupDNs.add(DN.valueOf((String) it.next()).toString().toLowerCase());
         }
     }
 
@@ -488,92 +452,63 @@ public class LDAPGroups implements Subject {
                           + userLocalDN);
         }
         if (selectedRFCGroupDNs.size() > 0) {
-            Iterator groupsIter = selectedRFCGroupDNs.iterator();
+            Iterator<String> groupsIter = selectedRFCGroupDNs.iterator();
             String userRDN = null;
             while (groupsIter.hasNext()) {
-                Boolean matchFound = null;
-                String groupDN = (String)groupsIter.next();
-                if ((matchFound = SubjectEvaluationCache.isMember(
-                tokenID, ldapServer,groupDN)) != null) {
-                    if (debug.messageEnabled()) {
-                        debug.message("LDAPGroups.isMember():Got membership "
-                            +"from cache of " +userLocalDN+" in group "
-                            +groupDN+ " :" +matchFound.booleanValue());
-                    }
-                    boolean result = matchFound.booleanValue();
+                Boolean matchFound;
+                String groupDN = groupsIter.next();
+                if ((matchFound = SubjectEvaluationCache.isMember(tokenID, ldapServer,groupDN)) != null) {
+                    debug.message("LDAPGroups.isMember():Got membership from cache of {} in group {} :{}", userLocalDN,
+                            groupDN, matchFound);
+                    boolean result = matchFound;
                     if (result) {
-                        return result;
+                        return true;
                     } else {
                         continue;
                     }
                 }
                 // got here so entry not in subject evalauation cache
                 if (debug.messageEnabled()) {
-                    debug.message("LDAPGroups:isMember():entry for "+groupDN
-                        +" not in subject evaluation cache,fetching from "
-                        +"directory server.");
+                    debug.message("LDAPGroups:isMember():entry for {} not in subject evaluation cache,fetching from "
+                            + "directory server.", groupDN);
                 }
                 if (userDN == null) {
                     int beginIndex = userLocalDN.indexOf("=");
                     int endIndex = userLocalDN.indexOf(",");
-                    if ((beginIndex <= 0) || (endIndex <= 0) ||
-                        (beginIndex >= endIndex)) {
-                        throw (new PolicyException(ResBundleUtils.rbName,
-                                "ldapgroups_subject_invalid_local_user_dn", 
-                                null, null));
+                    if (beginIndex <= 0 || endIndex <= 0 || beginIndex >= endIndex) {
+                        throw new PolicyException(ResBundleUtils.rbName, "ldapgroups_subject_invalid_local_user_dn",
+                                null, null);
                     }
-                    String userName = userLocalDN.substring(
-                            beginIndex+1, endIndex);
-                    userRDN = PolicyUtils.constructUserFilter(
-                            token, userRDNAttrName, userName, aliasEnabled);
+                    String userName = userLocalDN.substring(beginIndex+1, endIndex);
+                    userRDN = PolicyUtils.constructUserFilter(token, userRDNAttrName, userName, aliasEnabled);
         
-                    if (localDS && !PolicyUtils.principalNameEqualsUuid(
-                            token)) {
-                            userDN = new DN(userLocalDN);
+                    if (localDS && !PolicyUtils.principalNameEqualsUuid(token)) {
+                        userDN = DN.valueOf(userLocalDN);
                      } else {
                         // try to figure out the user name from the local 
                         // user DN
                         userDN = getUserDN(userRDN);
                     }
                     if (userDN == null) {
-                        if (debug.messageEnabled()) {
-                            debug.message("LDAPGroups.isMember(): User " 
-                                + userLocalDN 
-                                + " is not found in the directory"); 
-                        }
+                        debug.message("LDAPGroups.isMember(): User {} is not found in the directory", userLocalDN);
                         return false;
                     }
                 }
                 if (!listenerAdded) {
-                    if (!PolicyEvaluator.ssoListenerRegistry.containsKey(
-                        tokenID)) 
-                    {
+                    if (!PolicyEvaluator.ssoListenerRegistry.containsKey(tokenID)) {
                         token.addSSOTokenListener(PolicyEvaluator.ssoListener);
-                        PolicyEvaluator.ssoListenerRegistry.put(
-                            tokenID, PolicyEvaluator.ssoListener);
-                        if (debug.messageEnabled()) {
-                            debug.message("LDAPGroups.isMember():"
-                                    + " sso listener added .\n");
-                        }
+                        PolicyEvaluator.ssoListenerRegistry.put(tokenID, PolicyEvaluator.ssoListener);
+                        debug.message("LDAPGroups.isMember(): sso listener added .\n");
                         listenerAdded = true;
                     }
                 }
-                if (isMemberOfGroup(groupDN, userDN, 
-                    userRDN, token)) 
-                {
-                    if (debug.messageEnabled()) {
-                        debug.message("LDAPGroups.isMember(): User " 
-                            + userDN.toRFCString() 
-                            + " is a member of this LDAPGroups.");
-                    }
+                if (isMemberOfGroup(groupDN, userDN, userRDN, token)) {
+                    debug.message("LDAPGroups.isMember(): User {} is a member of this LDAPGroups.", userDN.toString());
                     return  true;
                 }
             }
         }
-        if (debug.messageEnabled()) {
-            debug.message("LDAPGroups.isMember(): User " 
-            + userLocalDN+ " is not a member of this LDAPGroups.");
-        }
+        debug.message("LDAPGroups.isMember(): User {} is not a member of this LDAPGroups.", userLocalDN);
         return false;
     }
 
@@ -602,45 +537,21 @@ public class LDAPGroups implements Subject {
         }
         String tokenID = token.getTokenID().toString();
         boolean groupMatch = false;
-        LDAPConnection ld = null;
-        LDAPEntry groupEntry = null;
-        try {
-           LDAPBindRequest bindRequest =
-               LDAPRequestParser.parseBindRequest(authid, authpw);
-           LDAPSearchRequest readRequest =
-               LDAPRequestParser.parseReadRequest(groupName);
-           try {
-               ld = connPool.getConnection();
-               // connect to the server to authenticate
-               ld.authenticate(bindRequest);
-               // get the group entry based on its DN
-               groupEntry = ld.read(readRequest);
-           } finally {
-               if (ld != null) {
-                   connPool.close(ld);
-               }
-           }
+
+        SearchResultEntry entry;
+        try (Connection conn = connPool.getConnection()) {
+            entry = conn.readEntry(groupName);
         } catch (Exception e) {
-            debug.warning("LDAPGroups: invalid group name " 
-                    + groupName + " specified in the policy definition.");
+            debug.warning("LDAPGroups: invalid group name {} specified in the policy definition.", groupName);
             return false;
         }
 
-        if (debug.messageEnabled()) {
-            debug.message("LDAPGroups.isMemberOfGroup():"
-                    + " get " + STATIC_GROUP_MEMBER_ATTR  + " group attribute");
-        }
-        LDAPAttribute attribute 
-                = groupEntry.getAttribute(STATIC_GROUP_MEMBER_ATTR);
+        debug.message("LDAPGroups.isMemberOfGroup(): get {} group attribute", STATIC_GROUP_MEMBER_ATTR);
+        Attribute attribute = entry.getAttribute(STATIC_GROUP_MEMBER_ATTR);
         if (attribute != null) {
-            Enumeration enumVals = attribute.getStringValues();
-            while ((enumVals != null) && enumVals.hasMoreElements()) {
-                 String memberDNStr = (String)enumVals.nextElement();
-                if (debug.messageEnabled()) {
-                    debug.message("LDAPGroups.isMemberOfGroup():"
-                            + " memberDNStr = " + memberDNStr);
-                }
-                DN memberDN = new DN(memberDNStr);
+            for (ByteString memberDNStr : attribute) {
+                debug.message("LDAPGroups.isMemberOfGroup(): memberDNStr = ", memberDNStr);
+                DN memberDN = DN.valueOf(memberDNStr.toString());
                 if (userDN.equals(memberDN)) {
                     groupMatch = true;
                     break;
@@ -648,24 +559,13 @@ public class LDAPGroups implements Subject {
             }
         }
 
-
         if (!groupMatch) {
-            if (debug.messageEnabled()) {
-                debug.message("LDAPGroups.isMemberOfGroup(): get " 
-                        + STATIC_GROUP_MEMBER_ALT_ATTR  
-                        + " group attribute");
-            }
-            attribute 
-                    = groupEntry.getAttribute(STATIC_GROUP_MEMBER_ALT_ATTR);
+            debug.message("LDAPGroups.isMemberOfGroup(): get {} group attribute", STATIC_GROUP_MEMBER_ALT_ATTR);
+            attribute = entry.getAttribute(STATIC_GROUP_MEMBER_ALT_ATTR);
             if (attribute != null) {
-                Enumeration enumVals = attribute.getStringValues();
-                while ((enumVals != null) && enumVals.hasMoreElements()) {
-                    String memberDNStr = (String)enumVals.nextElement();
-                    if (debug.messageEnabled()) {
-                        debug.message("LDAPGroups.isMemberOfGroup():"
-                                + " memberDNStr = " + memberDNStr);
-                    }
-                    DN memberDN = new DN(memberDNStr);
+                for (ByteString memberDNStr : attribute) {
+                    debug.message("LDAPGroups.isMemberOfGroup(): memberDNStr = ", memberDNStr);
+                    DN memberDN = DN.valueOf(memberDNStr.toString());
                     if (userDN.equals(memberDN)) {
                         groupMatch = true;
                         break;
@@ -675,127 +575,98 @@ public class LDAPGroups implements Subject {
         }
 
         if (!groupMatch) {
-            attribute = groupEntry.getAttribute(DYNAMIC_GROUP_MEMBER_URL);
+            attribute = entry.getAttribute(DYNAMIC_GROUP_MEMBER_URL);
             if (attribute != null) {
-                Enumeration enumVals = attribute.getStringValues();
-                while ((enumVals != null) && enumVals.hasMoreElements()) {
-                    String memberUrl = (String)enumVals.nextElement();
+                for (ByteString memberUrl : attribute) {
                     try {
-                        LDAPUrl ldapUrl = new LDAPUrl(memberUrl);
-                        Set members = findDynamicGroupMembersByUrl(ldapUrl, 
-                                userRDN);
+                        LDAPUrl ldapUrl = LDAPUrl.valueOf(memberUrl.toString());
+                        Set members = findDynamicGroupMembersByUrl(ldapUrl, userRDN);
                         Iterator iter = members.iterator();
                         while (iter.hasNext()) {
-                                   String memberDNStr = (String)iter.next();
-                            DN memberDN = new DN(memberDNStr);
+                            String memberDNStr = (String)iter.next();
+                            DN memberDN = DN.valueOf(memberDNStr);
                             if (userDN.equals(memberDN)) {
                                 groupMatch = true;
                                 break;
                             }
                         }
-                    } catch (java.net.MalformedURLException e) {
-                        throw (new PolicyException(e));
+                    } catch (LocalizedIllegalArgumentException e) {
+                        throw new PolicyException(e);
                     }
                 }
             }
         }
-        if (debug.messageEnabled()) {
-            debug.message("LDAPGroups.isMemberOfGroup():adding entry "
-                  +tokenID+" "+ldapServer+" "+groupName+" "+groupMatch
-                +" in subject evaluation cache.");
-        }
-        SubjectEvaluationCache.addEntry(tokenID, ldapServer, 
-                           groupName, groupMatch);
+        debug.message("LDAPGroups.isMemberOfGroup():adding entry {} {} {} {} in subject evaluation cache.", tokenID,
+                ldapServer, groupName, groupMatch);
+        SubjectEvaluationCache.addEntry(tokenID, ldapServer, groupName, groupMatch);
         return groupMatch;
     }
-        
-   
+
     /**
      * Finds the dynamic group member DNs 
      * @param url the url to be used for the group member search
      * @return the set of group member DNs satisfied the search url
      */         
-
-    private Set findDynamicGroupMembersByUrl(LDAPUrl url, String userRDN) 
+    private Set findDynamicGroupMembersByUrl(LDAPUrl url, String userRDN)
         throws PolicyException {
 
-        LDAPConnection ld = null;
-        Set groupMemberDNs = new HashSet();
-        try {
+        Connection ld = null;
+        Set<String> groupMemberDNs = new HashSet<>();
+        try (Connection conn = connPool.getConnection()) {
             // Need to pass the user dn in the filter
-            StringBuffer filter = new StringBuffer(25);
+            StringBuilder filter = new StringBuilder(25);
             filter.append("(&").append(userRDN);
-            String groupFilter = url.getFilter();
-             int index = groupFilter.indexOf("(");
+            String groupFilter = url.getFilter().toString();
+            int index = groupFilter.indexOf("(");
             if (index != 0) {
                 filter.append("(").append(groupFilter).append("))"); 
             } else {
                 filter.append(groupFilter).append(")");
             }
-            if (debug.messageEnabled()) {
-                debug.message("search filter in LDAPGroups : " + filter);
-            }
+            debug.message("search filter in LDAPGroups : {}", filter);
             String[] attrs = { userRDNAttrName };
-            LDAPSearchResults res = null;
-            LDAPBindRequest bindRequest = LDAPRequestParser.parseBindRequest(
-                authid, authpw);
-            LDAPSearchRequest searchRequest =
-                LDAPRequestParser.parseSearchRequest(url.getDN(),            
-                url.getScope(), filter.toString(), attrs, false, timeLimit,
-                LDAPRequestParser.DEFAULT_DEREFERENCE, maxResults);
-            try {
-                ld = connPool.getConnection();
-                ld.authenticate(bindRequest);            
-                res = ld.search(searchRequest);
-            } finally {
-                if (ld != null) {
-                    connPool.close(ld);
+
+            SearchRequest searchRequest = Requests.newSearchRequest(url.getName(), url.getScope(),
+                    Filter.valueOf(filter.toString()), attrs);
+            ConnectionEntryReader reader = conn.search(searchRequest);
+
+            while (reader.hasNext()) {
+                if (reader.isReference()) {
+                    //Ignore
+                    reader.readReference();
+                } else {
+                    SearchResultEntry entry = reader.readEntry();
+                    if (entry != null) {
+                        groupMemberDNs.add(entry.getName().toString());
+                    }
                 }
             }
-            while (res.hasMoreElements()) {
-                try {
-                    LDAPEntry entry = res.next();
-                    if (entry != null) {
-                        groupMemberDNs.add(entry.getDN());
-                    }
-                } catch (LDAPReferralException lre) {
-                    // ignore referrals
-                    continue;
-                } catch (LDAPException le) {
-                    String objs[] = { orgName };
-                    int resultCode = le.getLDAPResultCode();
-                    if (resultCode == le.SIZE_LIMIT_EXCEEDED) {
-                        debug.warning("LDAPGroups.findDynamicGroupMembers"
-                                + "ByUrl(): exceeded the size limit");
-                        throw (new PolicyException(ResBundleUtils.rbName,
-                                "ldap_search_exceed_size_limit", objs, null));
-                    } else if (resultCode == le.TIME_LIMIT_EXCEEDED) {
-                        debug.warning("LDAPGroups.findDynamicGroupMembers"
-                                + "ByUrl(): exceeded the time limit");
-                        throw (new PolicyException(ResBundleUtils.rbName,
-                        "ldap_search_exceed_time_limit", objs, null));
-                    } else {
-                        throw (new PolicyException(le));
-                    }
-                }
+        } catch (ErrorResultException le) {
+            String objs[] = { orgName };
+            ResultCode resultCode = le.getResult().getResultCode();
+            if (ResultCode.SIZE_LIMIT_EXCEEDED.equals(resultCode)) {
+                debug.warning("LDAPGroups.findDynamicGroupMembersByUrl(): exceeded the size limit");
+                throw new PolicyException(ResBundleUtils.rbName, "ldap_search_exceed_size_limit", objs, null);
+            } else if (ResultCode.TIME_LIMIT_EXCEEDED.equals(resultCode)) {
+                debug.warning("LDAPGroups.findDynamicGroupMembersByUrl(): exceeded the time limit");
+                throw new PolicyException(ResBundleUtils.rbName, "ldap_search_exceed_time_limit", objs, null);
+            } else {
+                throw new PolicyException(le);
             }
         } catch (Exception e) {
-            throw (new PolicyException(e));
+            throw new PolicyException(e);
         }
         return groupMemberDNs;
     }
-
 
    /** 
     * Return a hash code for this <code>LDAPGroups</code>.
     *
     * @return a hash code for this <code>LDAPGroups</code> object.
     */
-
     public int hashCode() {
         return selectedGroupDNs.hashCode();
     }
-
 
     /**
      * Indicates whether some other object is "equal to" this one.
@@ -805,7 +676,6 @@ public class LDAPGroups implements Subject {
      * @return <code>true</code> if eqaul; <code>false</code>
      * otherwise
      */
-
     public boolean equals(Object o) {
         if (o instanceof LDAPGroups) {
             LDAPGroups g = (LDAPGroups) o;
@@ -848,13 +718,10 @@ public class LDAPGroups implements Subject {
      * Get the full DN for the user using the RDN against the
      * LDAP server configured in the policy config service.
      */
-
-    private DN getUserDN(String userRDN ) throws SSOException,
-        PolicyException 
-    {
+    private DN getUserDN(String userRDN ) throws SSOException, PolicyException {
         DN userDN = null;
         if (userRDN != null) {
-            Set qualifiedUserDNs = new HashSet();
+            Set<String> qualifiedUserDNs = new HashSet<>();
             String searchFilter = null;
             if ((userSearchFilter != null) 
                 && !(userSearchFilter.length() == 0)) {
@@ -869,87 +736,53 @@ public class LDAPGroups implements Subject {
             }
             
             String[] attrs = { userRDNAttrName }; 
-            LDAPConnection ld = null;
-            try {
-                LDAPBindRequest bindRequest =
-                    LDAPRequestParser.parseBindRequest(authid, authpw);
-                LDAPSearchRequest searchRequest =
-                    LDAPRequestParser.parseSearchRequest(baseDN,
-                    userSearchScope, searchFilter, attrs, false, timeLimit,
-                    LDAPRequestParser.DEFAULT_DEREFERENCE, maxResults);
-                LDAPSearchResults res = null;
-                try {
-                    ld = connPool.getConnection();
-                    // connect to the server to authenticate
-                    ld.authenticate(bindRequest);                
-                    res = ld.search(searchRequest);
-                } finally {
-                    if (ld != null) {
-                        connPool.close(ld);
-                    }
-                }
-                while (res.hasMoreElements()) {
-                    try {
-                        LDAPEntry entry = res.next();
+            try (Connection conn = connPool.getConnection()) {
+                SearchRequest searchRequest = Requests.newSearchRequest(baseDN, userSearchScope, searchFilter, attrs);
+                ConnectionEntryReader reader = conn.search(searchRequest);
+
+                while (reader.hasNext()) {
+                    if (reader.isReference()) {
+                        //Ignore
+                        reader.readReference();
+                    } else {
+                        SearchResultEntry entry = reader.readEntry();
                         if (entry != null) {
-                            qualifiedUserDNs.add(entry.getDN());
-                        }
-                    } catch (LDAPReferralException lre) {
-                        // ignore referrals
-                        continue;
-                    } catch (LDAPException le) {
-                        String objs[] = { orgName };
-                        int resultCode = le.getLDAPResultCode();
-                        if (resultCode == le.SIZE_LIMIT_EXCEEDED) {
-                            debug.warning("LDAPGroups.isMember(): "
-                                   +"exceeded the size limit");
-                                   throw (new PolicyException(
-                                        ResBundleUtils.rbName,
-                                        "ldap_search_exceed_size_limit", objs, 
-                                        null));
-                        } else if (resultCode ==le.TIME_LIMIT_EXCEEDED) {
-                            debug.warning("LDAPGroups.isMember(): "
-                                +"exceeded the time limit");
-                            throw (new PolicyException(
-                                ResBundleUtils.rbName,
-                                "ldap_search_exceed_time_limit", objs, 
-                                null));
-                        } else {
-                            throw (new PolicyException(le));
+                            qualifiedUserDNs.add(entry.getName().toString());
                         }
                     }
                 }
-            } catch (LDAPException lde) {
-                int ldapErrorCode = lde.getLDAPResultCode();
-                if (ldapErrorCode == LDAPException.INVALID_CREDENTIALS) {
-                    throw (new PolicyException(ResBundleUtils.rbName,
-                        "ldap_invalid_password", null, null));
-                } else if (ldapErrorCode == LDAPException.NO_SUCH_OBJECT) {
+            } catch (ErrorResultException le) {
+                ResultCode resultCode = le.getResult().getResultCode();
+                if (ResultCode.SIZE_LIMIT_EXCEEDED.equals(resultCode)) {
+                    String objs[] = { orgName };
+                    debug.warning("LDAPGroups.isMember(): exceeded the size limit");
+                    throw new PolicyException(ResBundleUtils.rbName, "ldap_search_exceed_size_limit", objs, null);
+                } else if (ResultCode.TIME_LIMIT_EXCEEDED.equals(resultCode)) {
+                    String objs[] = { orgName };
+                    debug.warning("LDAPGroups.isMember(): exceeded the time limit");
+                    throw new PolicyException(ResBundleUtils.rbName, "ldap_search_exceed_time_limit", objs, null);
+                } else if (ResultCode.INVALID_CREDENTIALS.equals(resultCode)) {
+                    throw new PolicyException(ResBundleUtils.rbName, "ldap_invalid_password", null, null);
+                } else if (ResultCode.NO_SUCH_OBJECT.equals(resultCode)) {
                     String[] objs = { baseDN };
-                    throw (new PolicyException(ResBundleUtils.rbName,
-                        "no_such_ldap_base_dn", objs, null));
+                    throw new PolicyException(ResBundleUtils.rbName, "no_such_ldap_base_dn", objs, null);
                 } 
-                String errorMsg = lde.getLDAPErrorMessage();
-                String additionalMsg = lde.errorCodeToString(); 
+                String errorMsg = le.getMessage();
+                String additionalMsg = le.getResult().getDiagnosticMessage();
                 if (additionalMsg != null) {
-                    throw (new PolicyException(
-                             errorMsg + ": " + additionalMsg));
+                    throw new PolicyException(errorMsg + ": " + additionalMsg);
                 } else {
-                    throw (new PolicyException(errorMsg));
+                    throw new PolicyException(errorMsg);
                 }
             } catch (Exception e) {
-                throw (new PolicyException(e));
+                throw new PolicyException(e);
             }
             // check if the user belongs to any of the selected groups
             if (qualifiedUserDNs.size() > 0) {
-                if (debug.messageEnabled()) {
-                    debug.message(
-                       "LDAPGroups.getUserDN(): qualified users=" 
-                       + qualifiedUserDNs);
-                }
-                Iterator iter = qualifiedUserDNs.iterator();
+                debug.message("LDAPGroups.getUserDN(): qualified users={}", qualifiedUserDNs);
+                Iterator<String> iter = qualifiedUserDNs.iterator();
                 // we only take the first qualified DN if the DN
-                userDN = new DN((String) iter.next());
+                userDN = DN.valueOf(iter.next());
             }
         }
         return userDN;

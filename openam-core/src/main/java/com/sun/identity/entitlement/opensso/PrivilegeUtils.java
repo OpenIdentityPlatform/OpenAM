@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,8 +24,9 @@
  *
  * $Id: PrivilegeUtils.java,v 1.4 2010/01/07 00:19:11 veiming Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
+
 package com.sun.identity.entitlement.opensso;
 
 import com.iplanet.sso.SSOException;
@@ -64,10 +65,10 @@ import com.sun.identity.policy.plugins.IDRepoResponseProvider;
 import com.sun.identity.policy.plugins.PrivilegeCondition;
 import com.sun.identity.policy.plugins.PrivilegeSubject;
 import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.DNMapper;
 import org.forgerock.openam.entitlement.PolicyConstants;
+import org.forgerock.openam.ldap.LDAPUtils;
 
 import java.security.AccessController;
 import java.util.Collections;
@@ -308,7 +309,7 @@ public class PrivilegeUtils {
             Referral r = policy.getReferral(name);
             Set<String> values = r.getValues();
             for (String s : values) {
-                if (DN.isDN(s)) {
+                if (LDAPUtils.isDN(s)) {
                     results.add(DNMapper.orgNameToRealmName(s));
                 } else {
                     results.add(s);
@@ -512,7 +513,7 @@ public class PrivilegeUtils {
         Map<String, Set<String>> map =
             referralPrivilege.getOriginalMapApplNameToResources();
         count = 1;
-        String realmName = (DN.isDN(realm))
+        String realmName = LDAPUtils.isDN(realm)
                 ? DNMapper.orgNameToRealmName(realm) : realm;
 
         for (String appName : map.keySet()) {
@@ -618,7 +619,7 @@ public class PrivilegeUtils {
         Set<Rule> rules = new HashSet<Rule>();
         String appName = entitlement.getApplicationName();
 
-        String realmName = (DN.isDN(realm)) ? DNMapper.orgNameToRealmName(realm) : realm;
+        String realmName = LDAPUtils.isDN(realm) ? DNMapper.orgNameToRealmName(realm) : realm;
 
         Application application = ApplicationManager.getApplication(
             PolicyConstants.SUPER_ADMIN_SUBJECT, realmName, appName);

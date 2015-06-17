@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,25 +24,10 @@
  *
  * $Id: FSUtils.java,v 1.10 2009/11/20 23:52:57 ww203982 Exp $
  *
- * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
-package com.sun.identity.federation.common;
 
-import com.sun.identity.common.SystemConfigurationException;
-import com.sun.identity.common.SystemConfigurationUtil;
-import com.sun.identity.federation.meta.IDFFMetaManager;
-import com.sun.identity.plugin.session.SessionManager;
-import com.sun.identity.plugin.session.SessionProvider;
-import com.sun.identity.saml.common.SAMLUtils;
-import com.sun.identity.saml2.common.SAML2Exception;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.Base64;
-import com.sun.identity.shared.encode.CookieUtils;
-import com.sun.identity.shared.ldap.util.DN;
-import com.sun.identity.shared.ldap.util.RDN;
-import com.sun.identity.shared.locale.Locale;
+package com.sun.identity.federation.common;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -59,6 +44,22 @@ import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
+
+import com.sun.identity.common.SystemConfigurationException;
+import com.sun.identity.common.SystemConfigurationUtil;
+import com.sun.identity.federation.meta.IDFFMetaManager;
+import com.sun.identity.plugin.session.SessionManager;
+import com.sun.identity.plugin.session.SessionProvider;
+import com.sun.identity.saml.common.SAMLUtils;
+import com.sun.identity.saml2.common.SAML2Exception;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Base64;
+import com.sun.identity.shared.encode.CookieUtils;
+import com.sun.identity.shared.locale.Locale;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
 
 /**
  * This class contain constants used in the SDK.
@@ -492,12 +493,9 @@ public class FSUtils {
         if (orgDN == null || orgDN.length() == 0) {
             return "/";
         }
-        DN orgdn = new DN(orgDN);
-        if (orgdn.isDN()) {
-            List rdn = orgdn.getRDNs();
-            if ((rdn != null) && (rdn.size() > 0)) {
-                return ((RDN) rdn.get(0)).getValues()[0];
-            }
+        DN orgdn = DN.valueOf(orgDN);
+        if (LDAPUtils.isDN(orgDN)) {
+            return orgdn.rdn().toString();
         } else {
             // should be realm name
             if (orgDN.startsWith("/")) {

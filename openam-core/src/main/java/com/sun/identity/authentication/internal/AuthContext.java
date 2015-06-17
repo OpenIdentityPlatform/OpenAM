@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -23,17 +23,15 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: AuthContext.java,v 1.10 2009/01/28 05:34:52 ww203982 Exp $
- *  
+ *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.internal;
 
-import java.net.InetAddress;
-import java.security.Principal;
-import java.security.SecureRandom;
-import java.util.Iterator;
-import java.util.Set;
+
+import static org.forgerock.openam.ldap.LDAPUtils.isDN;
+import static org.forgerock.openam.ldap.LDAPUtils.rdnValueFromDn;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.ChoiceCallback;
@@ -42,11 +40,12 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.TextInputCallback;
 import javax.security.auth.callback.TextOutputCallback;
 import javax.security.auth.login.LoginException;
+import java.net.InetAddress;
+import java.security.Principal;
+import java.security.SecureRandom;
+import java.util.Iterator;
+import java.util.Set;
 
-import com.sun.identity.shared.ldap.util.DN;
-import com.sun.identity.shared.ldap.LDAPDN;
-
-import com.sun.identity.shared.debug.Debug;
 import com.iplanet.am.util.SecureRandomManager;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.util.I18n;
@@ -54,7 +53,9 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.internal.server.AuthSPrincipal;
 import com.sun.identity.authentication.internal.util.AuthI18n;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceManager;
+import org.forgerock.opendj.ldap.DN;
 
 
 /**
@@ -170,7 +171,7 @@ public final class AuthContext extends Object {
      * <code>AuthContext</code>. Caller would then use
      * <code>getRequirements()</code> and <code>submitRequirements()</code>
      * to pass the credentials needed for authentication by the plugin modules.
-     * 
+     *
      * @throws LoginException
      *
      * @supported.api
@@ -185,7 +186,7 @@ public final class AuthContext extends Object {
      * of this class given the <code>java.security.Principal</code> the user
      * would like to be authenticated as, and the <code>password</code> for
      * the user.
-     * 
+     *
      * @param principal
      *            name of the user to be authenticated
      * @param password
@@ -215,7 +216,7 @@ public final class AuthContext extends Object {
      * access, the <code>java.security.Principal
      * </code>the user would like to
      * be authenticated as, and the <code>password</code> for the user.
-     * 
+     *
      * @param orgName
      *            name of the user's organization
      * @param principal
@@ -237,7 +238,7 @@ public final class AuthContext extends Object {
                     .getString("com.iplanet.auth.invalid-password")));
 
         AuthSubject subject = new AuthSubject();
-        
+
         if (orgName != null)
             organizationName = orgName;
         reset(subject);
@@ -430,7 +431,7 @@ public final class AuthContext extends Object {
      * Constructor to get an instance of this class
      * given the organization name <code>orgName</code>. The plug-in modules
      * would then query for the user name and related information.
-     * 
+     *
      * @param orgName organization name.
      * @throws LoginException
      *
@@ -514,7 +515,7 @@ public final class AuthContext extends Object {
     /**
      * Method to start the login process. This method will
      * read the plug-ins configured for the application and initialize them.
-     * 
+     *
      * @throws LoginException
      *
      * @supported.api
@@ -551,7 +552,7 @@ public final class AuthContext extends Object {
     /**
      * Returns true if the login process requires more
      * information from the user to complete the authentication.
-     * 
+     *
      * @return true if the login process requires more information from the user
      *         to complete the authentication.
      *
@@ -572,7 +573,7 @@ public final class AuthContext extends Object {
      * requested by the authentication plug-ins, and these are usually displayed
      * to the user. The user then provides the requested information for it to
      * be authenticated.
-     * 
+     *
      * @return an array of <code>Callback</code> objects that must be
      *         populated by the user and returned back.
      *
@@ -622,7 +623,7 @@ public final class AuthContext extends Object {
      * objects to the authentication plug-in modules. Called after
      * <code>getInformationRequired</code> method and obtaining user's
      * response to these requests.
-     * 
+     *
      * @param info
      *            array of <code>Callback</code> objects.
      *
@@ -644,7 +645,7 @@ public final class AuthContext extends Object {
 
     /**
      * Logs the user out.
-     * 
+     *
      * @throws LoginException
      *
      * @supported.api
@@ -660,7 +661,7 @@ public final class AuthContext extends Object {
     /**
      * Returns login exception, if any, during the
      * authentication process. Typically set when the login fails.
-     * 
+     *
      * @return login exception.
      *
      * @supported.api
@@ -673,7 +674,7 @@ public final class AuthContext extends Object {
     /**
      * Returns the current state of the login process.
      * Possible states are listed above.
-     * 
+     *
      * @return the current state of the login process.
      *
      * @supported.api
@@ -696,7 +697,7 @@ public final class AuthContext extends Object {
      * Returns the (first) <code>AuthPrincipal</code> in
      * the <code>Subject</code>. Returns the first <code>Principal</code>,
      * if more than one exists.
-     * 
+     *
      * @return the (first) <code>AuthPrincipal</code> in the
      *         <code>Subject</code>.
      *
@@ -719,7 +720,7 @@ public final class AuthContext extends Object {
      * Method to get the (first) <code>AuthPrincipal</code> in the
      * <code>Subject</code>. Returns the first <code>Principal</code>, if
      * more than one exists.
-     * 
+     *
      * @deprecated Use getPrincipal() instead
      */
     public AuthPrincipal getAuthPrincipal() {
@@ -745,7 +746,7 @@ public final class AuthContext extends Object {
     /**
      * Method to get organization name that was set during
      * construction of this instance.
-     * 
+     *
      * @return organization name; <code>null</code> if it was not initialized
      *         during construction of this instance
      *
@@ -753,12 +754,7 @@ public final class AuthContext extends Object {
      */
     public String getOrganizationName() {
         if (organizationName == null) {
-            String rootSuffix = organizationName = ServiceManager.getBaseDN();
-            if ((rootSuffix != null) && (organizationName != null)) {
-                rootSuffix = new DN(rootSuffix).toRFCString().toLowerCase();
-                organizationName = new DN(organizationName).toRFCString()
-                        .toLowerCase();
-            }
+            organizationName = DN.valueOf(ServiceManager.getBaseDN()).toString().toLowerCase();
         }
         return organizationName;
     }
@@ -770,7 +766,7 @@ public final class AuthContext extends Object {
     /**
      * Method to get the Single-Sign-On (SSO) Token. This
      * token can be used as the authenticated token.
-     * 
+     *
      * @return single-sign-on token.
      * @throws InvalidAuthContextException
      *
@@ -801,9 +797,9 @@ public final class AuthContext extends Object {
 
             if (ipAddress != null) {
                 if (isEnableHostLookUp) {
-                    final String strHostName = address.getHostName();   
+                    final String strHostName = address.getHostName();
                     if (authDebug.messageEnabled()) {
-                        authDebug.message("getSSOToken : HOST Name : " + strHostName);                    
+                        authDebug.message("getSSOToken : HOST Name : " + strHostName);
                     }
                     if (strHostName != null) {
                         token.setProperty("HostName", strHostName);
@@ -823,9 +819,9 @@ public final class AuthContext extends Object {
                  token.setProperty("Principal", principal);
                  // Set Universal Identifier
                  String username = principal;
-                 if (DN.isDN(principal)) {
+                 if (isDN(principal)) {
                      // Get the username
-                     username = LDAPDN.explodeDN(principal, true)[0];
+                     username = rdnValueFromDn(principal);
                  }
                  // Since internal auth will be used during install time
                  // and during boot strap for users "dsame" and "amadmin"
@@ -840,10 +836,10 @@ public final class AuthContext extends Object {
             // Set AuthLevel
             token.setProperty("AuthLevel", Integer.toString(0));
 
-            //Set ContextId 
-            SecureRandom secureRandom = 
+            //Set ContextId
+            SecureRandom secureRandom =
                 SecureRandomManager.getSecureRandom();
-            String amCtxId = 
+            String amCtxId =
                 Long.toHexString(secureRandom.nextLong());
             token.setProperty(Constants.AM_CTX_ID, amCtxId);
 

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -29,19 +29,28 @@
 
 package com.sun.identity.config.wizard;
 
-import com.iplanet.am.util.SSLSocketFactoryManager;
 import com.sun.identity.config.SessionAttributeNames;
 import com.sun.identity.config.util.ProtectedPage;
 import org.apache.click.control.ActionLink;
 import com.sun.identity.setup.SetupConstants;
 import org.apache.click.Context;
-import com.sun.identity.shared.ldap.LDAPConnection;
-import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.util.DN;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.Connections;
+import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.LDAPConnectionFactory;
+import org.forgerock.opendj.ldap.LDAPOptions;
+import org.forgerock.opendj.ldap.ResultCode;
+import org.forgerock.opendj.ldap.SSLContextBuilder;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.requests.Requests;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.security.GeneralSecurityException;
 import java.util.Hashtable;
+import java.util.concurrent.TimeUnit;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
@@ -328,7 +337,7 @@ public class Step4 extends ProtectedPage {
         String rootsuffix = toString("rootsuffix");
 
         if ((rootsuffix != null) && rootsuffix.length() > 0) {
-            if (DN.isDN(rootsuffix)) {
+            if (LDAPUtils.isDN(rootsuffix)) {
                 getContext().setSessionAttribute(
                     SessionAttributeNames.USER_STORE_ROOT_SUFFIX, rootsuffix);
             } else {
@@ -371,64 +380,20 @@ public class Step4 extends ProtectedPage {
         String bindPwd = (String)ctx.getSessionAttribute(
             SessionAttributeNames.USER_STORE_LOGIN_PWD);
         
-        LDAPConnection ld = null;
-        try {
-            ld = (ssl) ? new LDAPConnection(
-                SSLSocketFactoryManager.getSSLSocketFactory()) :
-                new LDAPConnection();
-            ld.setConnectTimeout(5);
-            ld.connect(3, host, port, bindDN, bindPwd);
-            
+        try (Connection conn = getConnection(host, port, bindDN, bindPwd.toCharArray(), 5, ssl)) {
             //String filter = "cn=" + "\"" + rootSuffix + "\"";    // NOT SURE Why "cn" is specified. would never work.
             String[] attrs = {""};
-            ld.search(rootSuffix, LDAPConnection.SCOPE_BASE, ObjectClassFilter,
-                attrs, false);
+            conn.search(rootSuffix, SearchScope.BASE_OBJECT, ObjectClassFilter, attrs);
             writeToResponse("ok");
-        } catch (LDAPException lex) {
-            switch (lex.getLDAPResultCode()) {
-                case LDAPException.CONNECT_ERROR:
-                    writeToResponse(getLocalizedString("ldap.connect.error")); 
-                    break;
-                case LDAPException.SERVER_DOWN:
-                    writeToResponse(getLocalizedString("ldap.server.down"));   
-                    break;
-                case LDAPException.INVALID_DN_SYNTAX:
-                    writeToResponse(getLocalizedString("ldap.invalid.dn"));  
-                    break;
-                case LDAPException.NO_SUCH_OBJECT:
-                    writeToResponse(getLocalizedString("ldap.nosuch.object"));
-                    break;
-                case LDAPException.INVALID_CREDENTIALS:
-                    writeToResponse(
-                            getLocalizedString("ldap.invalid.credentials"));
-                    break;
-                case LDAPException.UNWILLING_TO_PERFORM:
-                    writeToResponse(getLocalizedString("ldap.unwilling"));
-                    break;
-                case LDAPException.INAPPROPRIATE_AUTHENTICATION:
-                    writeToResponse(getLocalizedString("ldap.inappropriate"));
-                    break;
-                case LDAPException.CONSTRAINT_VIOLATION:
-                    writeToResponse(getLocalizedString("ldap.constraint"));
-                    break;
-                default:
-                    writeToResponse(
-                        getLocalizedString("cannot.connect.to.SM.datastore"));                                              
+        } catch (ErrorResultException lex) {
+            ResultCode resultCode = lex.getResult().getResultCode();
+            if (!writeErrorToResponse(resultCode)) {
+                writeToResponse(getLocalizedString("cannot.connect.to.SM.datastore"));
             }           
         } catch (Exception e) {
-            writeToResponse(
-                getLocalizedString("cannot.connect.to.SM.datastore"));
-        } finally {
-            if (ld != null) {
-                try {
-                    ld.disconnect();
-                } catch (LDAPException ex) {
-                    //ignore
-                }
-            }
+            writeToResponse(getLocalizedString("cannot.connect.to.SM.datastore"));
         }
 
-        
         setPath(null);
         return false;
     }
@@ -468,68 +433,18 @@ public class Step4 extends ProtectedPage {
         String bindPwd = (String)ctx.getSessionAttribute(
             SessionAttributeNames.USER_STORE_LOGIN_PWD);
         
-        LDAPConnection ld = null;
-        try {
-            ld = (ssl) ? new LDAPConnection(
-                SSLSocketFactoryManager.getSSLSocketFactory()) :
-                new LDAPConnection();
-            ld.setConnectTimeout(5);
-            ld.connect(3, host, port, bindDN, bindPwd);
-            
+        try (Connection conn = getConnection(host, port, bindDN, bindPwd.toCharArray(), 3, ssl)) {
             //String filter = "cn=" + "\"" + rootSuffix + "\"";
             String[] attrs = {""};
-            ld.search(rootSuffix, LDAPConnection.SCOPE_BASE, ObjectClassFilter,
-                attrs, false);
+            conn.search(rootSuffix, SearchScope.BASE_OBJECT, ObjectClassFilter, attrs);
             writeToResponse("ok");
-        } catch (LDAPException lex) {
-            switch (lex.getLDAPResultCode()) {
-                case LDAPException.CONNECT_ERROR:
-                    writeToResponse(getLocalizedString(
-                        "ldap.connect.error")); 
-                    break;
-                case LDAPException.SERVER_DOWN:
-                    writeToResponse(getLocalizedString(
-                        "ldap.server.down"));   
-                    break;
-                case LDAPException.INVALID_DN_SYNTAX:
-                    writeToResponse(getLocalizedString(
-                        "ldap.invalid.dn"));  
-                    break;
-                case LDAPException.NO_SUCH_OBJECT:
-                    writeToResponse(getLocalizedString(
-                        "ldap.nosuch.object"));
-                    break;
-                case LDAPException.INVALID_CREDENTIALS:
-                    writeToResponse(getLocalizedString(
-                        "ldap.invalid.credentials"));
-                    break;
-                case LDAPException.UNWILLING_TO_PERFORM:
-                    writeToResponse(getLocalizedString(
-                        "ldap.unwilling"));
-                    break;
-                case LDAPException.INAPPROPRIATE_AUTHENTICATION:
-                    writeToResponse(getLocalizedString(
-                        "ldap.inappropriate"));
-                    break;
-                case LDAPException.CONSTRAINT_VIOLATION:
-                    writeToResponse(getLocalizedString(
-                        "ldap.constraint"));
-                    break;
-                default:
-                    writeToResponse(getLocalizedString(
-                        "cannot.connect.to.UM.datastore"));
-            }           
-        } catch (Exception e) {
-            writeToResponse(getLocalizedString(
-                "cannot.connect.to.UM.datastore"));
-        } finally {
-            if (ld != null) {
-                try {
-                    ld.disconnect();
-                } catch (LDAPException ex) {
-                    //ignore
-                }
+        } catch (ErrorResultException lex) {
+            ResultCode resultCode = lex.getResult().getResultCode();
+            if (!writeErrorToResponse(resultCode)) {
+                writeToResponse(getLocalizedString("cannot.connect.to.UM.datastore"));
             }
+        } catch (Exception e) {
+            writeToResponse(getLocalizedString("cannot.connect.to.UM.datastore"));
         }
         return false;
     }

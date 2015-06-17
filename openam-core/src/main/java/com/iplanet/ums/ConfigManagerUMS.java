@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,21 @@
  *
  * $Id: ConfigManagerUMS.java,v 1.6 2009/01/28 05:34:50 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.iplanet.ums;
+
+import java.security.AccessController;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 import com.iplanet.am.util.Cache;
 import com.iplanet.services.ldap.Attr;
@@ -49,17 +58,10 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import java.security.AccessController;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-import com.sun.identity.shared.ldap.util.DN;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.RDN;
+import org.forgerock.opendj.ldap.SearchScope;
 
 /**
  * Configuration Manager is responsible for getting configuration parameters for
@@ -430,7 +432,7 @@ public class ConfigManagerUMS implements java.io.Serializable {
              * sb.append("/").append(dns[len-k-rootLen -1]); } fdn =
              * sb.toString();
              */
-            fdn = (new DN(org)).toRFCString().toLowerCase();
+            fdn = DN.valueOf(org).toString().toLowerCase();
         }
 
         String cchPartialKey1 = fdn + "/" + ENTITY;
@@ -479,7 +481,7 @@ public class ConfigManagerUMS implements java.io.Serializable {
          * if (!guid.getDn().startsWith("o=")) { guid =
          * GuidUtils.getOrgGuid(guid); }
          */
-        DN dn = new DN(guid.getDn());
+        DN dn = DN.valueOf(guid.getDn());
         // Till we find what we are looking for,
         // traverse the tree in the cache
         while (true) {
@@ -493,7 +495,7 @@ public class ConfigManagerUMS implements java.io.Serializable {
             // Build the cache key as fdn + name
             // ex: /b/a/com.iplanet.ums.organization
             // or /b/a/BasicUser
-            fdn = dn.toRFCString().toLowerCase();
+            fdn = dn.toString().toLowerCase();
             // Special case Cache Key for OBJECTRESOLVER
             if (template.equals(OBJECTRESOLVER))
                 cacheKey = OBJECTRESOLVERPATH;
@@ -539,17 +541,18 @@ public class ConfigManagerUMS implements java.io.Serializable {
             case TemplateManager.SCOPE_ORG:
                 return null;
             case TemplateManager.SCOPE_TOP:
-                dn = new DN(_rootDN);
+                dn = DN.valueOf(_rootDN);
                 break;
             case TemplateManager.SCOPE_ANCESTORS:
-                dn = dn.getParent();
+                dn = dn.parent();
                 // After getting parent, check if this is already root of tree,
                 // if so return null
                 // if (dn.toString().length() == 0) return null;
-                if (dn.isDescendantOf(_root) || dn.equals(_root))
+                if (dn.isInScopeOf(_root, SearchScope.WHOLE_SUBTREE)) {
                     break;
-                else
+                } else {
                     return null;
+                }
             }
             if (_debug.messageEnabled())
                 _debug.message("ConfigManager->getConfigData: Traversing " +
@@ -567,7 +570,7 @@ public class ConfigManagerUMS implements java.io.Serializable {
         if (!guid.getDn().startsWith("o=")) {
             guid = GuidUtils.getOrgGuid(guid);
         }
-        DN dn = new DN(guid.getDn());
+        DN dn = DN.valueOf(guid.getDn());
         while (true) {
             String fdn = "";
             boolean inCache = false;
@@ -585,7 +588,7 @@ public class ConfigManagerUMS implements java.io.Serializable {
              * rootdns.length; for (int k=0; k<len-rootLen; k++) { fdn = fdn +
              * "/" + dns[len-k-rootLen-1]; }
              */
-            fdn = dn.toRFCString().toLowerCase();
+            fdn = dn.toString().toLowerCase();
             cacheKey = fdn + "/" + template + "Names";
             //
             // Check the cache for the entry.
@@ -622,17 +625,18 @@ public class ConfigManagerUMS implements java.io.Serializable {
             case TemplateManager.SCOPE_ORG:
                 return java.util.Collections.EMPTY_SET;
             case TemplateManager.SCOPE_TOP:
-                dn = new DN(_rootDN);
+                dn = DN.valueOf(_rootDN);
                 break;
             case TemplateManager.SCOPE_ANCESTORS:
-                dn = dn.getParent();
+                dn = dn.parent();
                 // After getting parent, check if this is already root of tree,
                 // if so return null
                 // if (dn.toString().length() == 0)
-                if (dn.isDescendantOf(_root) || dn.equals(_root))
+                if (dn.isInScopeOf(_root, SearchScope.WHOLE_SUBTREE)) {
                     break;
-                else
+                } else {
                     return java.util.Collections.EMPTY_SET;
+                }
             }
             _debug.message("ConfigManager->getConfigTemplateNames: " +
                     "Traversing parent: " + dn);
@@ -833,12 +837,11 @@ public class ConfigManagerUMS implements java.io.Serializable {
         if (guid == null) {
             guid = new Guid(_rootDN);
         }
-        DN dn = new DN(guid.getDn());
-        String org = null;
-        String[] dns = dn.explodeDN(true);
+        DN dn = DN.valueOf(guid.getDn());
+        String org = "";
 
-        for (int k = 0; k < dns.length - 1; k++) {
-            org = org + "/" + dns[k];
+        for (RDN rdn : dn) {
+            org = org + "/" + LDAPUtils.rdnValue(rdn);
         }
 
         String service = CREATIONPATH + "/" + templateName;
@@ -905,8 +908,8 @@ public class ConfigManagerUMS implements java.io.Serializable {
             DSConfigMgr dm = DSConfigMgr.getDSConfigMgr();
             ServerInstance si = dm.getServerInstance(LDAPUser.Type.AUTH_ADMIN);
             _rootDN = si.getBaseDN();
-            _root = new DN(_rootDN);
-            _rootDN = _root.toRFCString().toLowerCase();
+            _root = DN.valueOf(_rootDN);
+            _rootDN = _root.toString().toLowerCase();
             if (_debug.messageEnabled())
                 _debug
                         .message("ConfigManager->Constructor: root DN "

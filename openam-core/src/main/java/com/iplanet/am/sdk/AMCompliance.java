@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: AMCompliance.java,v 1.8 2009/01/28 05:34:47 ww203982 Exp $
  *
- */
-
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyright 2011-2015 ForgeRock AS.
  */
 package com.iplanet.am.sdk;
 
@@ -39,11 +36,12 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.opendj.ldap.DN;
+
 import java.security.AccessController;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import com.sun.identity.shared.ldap.util.DN;
 
 /**
  * This class <code>AMCompliance</code> contains the functionality to support
@@ -101,7 +99,7 @@ class AMCompliance implements AMConstants {
      * deleted.
      *
      * @param token SSO token of user
-     * @param DN string representing dn of the object.
+     * @param dn string representing dn of the object.
      * @param profileType the profile type of the object whose ancestor is
      *        is being checked.
      **/
@@ -126,7 +124,7 @@ class AMCompliance implements AMConstants {
                 }
             }
             // Get the parent DN..
-            tdn = (new DN(tdn)).getParent().toRFCString().toLowerCase();
+            tdn = DN.valueOf(tdn).parent().toString().toLowerCase();
         }
     }
 
@@ -187,12 +185,9 @@ class AMCompliance implements AMConstants {
             return true;
         }
 
-        DN rootDN = new DN(rootSuffix);
-        DN objectDN = new DN(objDN);
-        if (rootDN.equals(objectDN) || rootDN.equals(objectDN.getParent())) {
-            return true;
-        }
-        return false;
+        DN rootDN = DN.valueOf(rootSuffix);
+        DN objectDN = DN.valueOf(objDN);
+        return rootDN.equals(objectDN) || rootDN.equals(objectDN.parent());
     }
 
     /**

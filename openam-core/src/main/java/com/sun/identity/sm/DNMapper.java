@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,11 @@
  *
  * $Id: DNMapper.java,v 1.13 2009/11/20 23:52:56 ww203982 Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.sm;
+
+import static org.forgerock.openam.ldap.LDAPUtils.rdnValue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,10 +36,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.util.DN;
-
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.RDN;
 
 /**
  * This class is used to convert a DN to iplanet UID and vice versa.
@@ -54,11 +53,15 @@ public class DNMapper {
     // Look for realmEnabled and cache the value.
     protected static boolean realmEnabled = ServiceManager.isRealmEnabled();
 
-    protected static String serviceDN = (new DN(SMSEntry.SERVICES_RDN
-            + SMSEntry.COMMA + SMSEntry.baseDN)).toRFCString().toLowerCase();
+    protected static String serviceDN;
 
     // This set is used in reversing the realm names to sdk format.
     static boolean migration = false;
+
+    static {
+        DN dn = DN.valueOf(SMSEntry.baseDN).child(SMSEntry.SERVICES_RDN);
+        serviceDN = dn.toString().toLowerCase();
+    }
 
     /**
      * Converts orgname which is "/" seperated to DN, else if DN normalize the
@@ -88,72 +91,74 @@ public class DNMapper {
          * "ou=services" is present in the orgName. If not add it to the
          * orgName.
          */
-        DN orgdnObject = new DN(orgName);
-        if (orgdnObject.isDN()) {
-            // If orgName is either the baseDN or root service's DN
-            // return the baseDN
-            orgdn = orgdnObject.toRFCString();
-            String orgdnlc = orgdn.toLowerCase();
+        if (!orgName.startsWith("/")) {
+            DN orgdnObject = LDAPUtils.newDN(orgName);
+            if (orgdnObject.size() > 0) {
+                // If orgName is either the baseDN or root service's DN
+                // return the baseDN
+                orgdn = orgdnObject.toString();
+                String orgdnlc = orgdn.toLowerCase();
 
-            // Check if orgdn is a hidden internal realm, if so return
-            if (orgdnlc.startsWith(SMSEntry.SUN_INTERNAL_REALM_PREFIX)) {
-                orgdn = LDAPDN.explodeDN(orgdn, false)[0] + "," + serviceDN;
-                // Add to cache and return
-                updateCache(orgName, orgdn);
-                return (orgdn);
-            }
-            // Check for root suffix and SMS base DN
-            if (orgdnlc.equals(SMSEntry.baseDN) || 
-                orgdnlc.equals(serviceDN) ||
-                orgdnlc.equals(SMSEntry.amsdkbaseDN)) {
-                // Add to cache and return
-                updateCache(orgName, SMSEntry.baseDN);
-                return (SMSEntry.baseDN);
-            }
-            // If realm is enabled, normalize the DN and return
-            if (realmEnabled) {
-                int ndx = orgdn.indexOf(serviceDN);
-                if (ndx == -1) {
-                    // Check for baseDN
-                    ndx = orgdn.lastIndexOf(SMSEntry.baseDN);
+                // Check if orgdn is a hidden internal realm, if so return
+                if (orgdnlc.startsWith(SMSEntry.SUN_INTERNAL_REALM_PREFIX)) {
+                    orgdn = orgdnObject.rdn().toString() + "," + serviceDN;
+                    // Add to cache and return
+                    updateCache(orgName, orgdn);
+                    return orgdn;
                 }
-                if (ndx > 0) {
-                    orgdn = orgdn.substring(0, ndx - 1);
+                // Check for root suffix and SMS base DN
+                if (orgdnlc.equals(SMSEntry.baseDN) ||
+                        orgdnlc.equals(serviceDN) ||
+                        orgdnlc.equals(SMSEntry.amsdkbaseDN)) {
+                    // Add to cache and return
+                    updateCache(orgName, SMSEntry.baseDN);
+                    return (SMSEntry.baseDN);
                 }
-                int indx = orgdn.lastIndexOf(SMSEntry.COMMA);
-                if (indx >= 0) {
-                    if (orgdn.substring(indx).equals(SMSEntry.COMMA)) {
-                        orgdn = orgdn.substring(0, indx);
+                // If realm is enabled, normalize the DN and return
+                if (realmEnabled) {
+                    int ndx = orgdn.indexOf(serviceDN);
+                    if (ndx == -1) {
+                        // Check for baseDN
+                        ndx = orgdn.lastIndexOf(SMSEntry.baseDN);
                     }
-                }
-                if (debug.messageEnabled()) {
-                    debug.message("DNMapper.orgNameToDN():orgdn " + orgdn);
-                }
-                String answer = normalizeDN(orgdn) + serviceDN;
-                if (debug.messageEnabled()) {
-                    debug.message("DNMapper.orgNameToDN(" + orgName + ")="
-                            + answer);
-                }
-                // Add to cache and return
-                updateCache(orgName, answer);
-                return (answer);
-            } else if (!migration) {
-                // Check if "ou=services" is present, if present remove it
-                orgdn = replaceString(orgdn, ",ou=services,", ",");
-                // Add to cache and return
-                updateCache(orgName, orgdn);
-                return (orgdn);
-            } else {
-                // When SMS Migration to 7.0 happens, the coexist mode is
-                // 'true' and realm is 'false'. In coexist mode, the
-                // 'ou=services' gets removed. But we need the new realm node
-                // for data migration from old DIT to new realm tree.
-                // So after creation of the realm during SMSMigration70,
-                // we set the DNMapper.migration flag to true to avoid
-                // removal of 'ou=services' from the newly formed realm DN
-                // and return the orgdn as such to the serviceconfig* class.
+                    if (ndx > 0) {
+                        orgdn = orgdn.substring(0, ndx - 1);
+                    }
+                    int indx = orgdn.lastIndexOf(SMSEntry.COMMA);
+                    if (indx >= 0) {
+                        if (orgdn.substring(indx).equals(SMSEntry.COMMA)) {
+                            orgdn = orgdn.substring(0, indx);
+                        }
+                    }
+                    if (debug.messageEnabled()) {
+                        debug.message("DNMapper.orgNameToDN():orgdn " + orgdn);
+                    }
+                    String answer = normalizeDN(orgdn) + serviceDN;
+                    if (debug.messageEnabled()) {
+                        debug.message("DNMapper.orgNameToDN(" + orgName + ")="
+                                + answer);
+                    }
+                    // Add to cache and return
+                    updateCache(orgName, answer);
+                    return (answer);
+                } else if (!migration) {
+                    // Check if "ou=services" is present, if present remove it
+                    orgdn = replaceString(orgdn, ",ou=services,", ",");
+                    // Add to cache and return
+                    updateCache(orgName, orgdn);
+                    return (orgdn);
+                } else {
+                    // When SMS Migration to 7.0 happens, the coexist mode is
+                    // 'true' and realm is 'false'. In coexist mode, the
+                    // 'ou=services' gets removed. But we need the new realm node
+                    // for data migration from old DIT to new realm tree.
+                    // So after creation of the realm during SMSMigration70,
+                    // we set the DNMapper.migration flag to true to avoid
+                    // removal of 'ou=services' from the newly formed realm DN
+                    // and return the orgdn as such to the serviceconfig* class.
 
-                return (orgdn);
+                    return (orgdn);
+                }
             }
         }
 
@@ -230,10 +235,9 @@ public class DNMapper {
         }
 
         String answer = (index == -1) ? dn : dn.substring(0, index - 1);
-        String[] rdns = LDAPDN.explodeDN(answer, true);
-        int size = rdns.length;
-        for (int i = 0; i < size; i++) {
-            buf.append(orgAttr).append(SMSEntry.EQUALS).append(rdns[i]);
+        DN answerDN = DN.valueOf(answer);
+        for (RDN rdn : answerDN) {
+            buf.append(orgAttr).append(SMSEntry.EQUALS).append(rdnValue(rdn));
             buf.append(',');
         }
         // Append baseDN and return
@@ -261,10 +265,10 @@ public class DNMapper {
         ) {
             return "/";
         }
-        DN orgdnObject = new DN(orgName);
-        if (!orgdnObject.isDN()) {
+        if (!orgName.contains("=")) {
             return orgName;
         }
+        DN orgdnObject = DN.valueOf(orgName);
 
         StringBuilder answer = new StringBuilder(100);
         answer.append("/");
@@ -273,7 +277,7 @@ public class DNMapper {
         resultSet.add(orgName);
 
         // Check if orgName ends with baseDN or serviceDN
-        String orgdn = orgdnObject.toRFCString();
+        String orgdn = orgdnObject.toString();
         String orgdnlc = orgdn.toLowerCase();
         Set returnSet = null;
 
@@ -349,10 +353,7 @@ public class DNMapper {
      */
     static String normalizeDN(String orgName) {
         String orgAttr = "";
-        String placeHold = "";
         StringBuilder buf = new StringBuilder(orgName.length());
-        String[] rdns = LDAPDN.explodeDN(orgName, false);
-        int size = rdns.length;
 
         if (debug.messageEnabled()) {
             debug.message("DNMapper.normalizeDN():orgName "+ orgName);
@@ -360,10 +361,9 @@ public class DNMapper {
         if (!realmEnabled) {
             orgAttr = OrgConfigViaAMSDK.getNamingAttrForOrg();
         }
-        placeHold = (realmEnabled) ? SMSEntry.ORGANIZATION_RDN : orgAttr;
-        for (int i = 0; i < size; i++) {
-            String[] strArr = splitString(rdns[i]);
-
+        String placeHold = (realmEnabled) ? SMSEntry.ORGANIZATION_RDN : orgAttr;
+        DN dn = DN.valueOf(orgName);
+        for (RDN rdn : dn) {
             // Check if orgName is a hidden internal realm,if so prepend with o
             if (orgName.toLowerCase().
                 startsWith(SMSEntry.SUN_INTERNAL_REALM_PREFIX)) {
@@ -371,14 +371,10 @@ public class DNMapper {
             } else {
                 buf.append(placeHold);
             }
-            buf.append(SMSEntry.EQUALS)
-               .append(strArr[1]).append(SMSEntry.COMMA);
+            buf.append(SMSEntry.EQUALS).append(rdnValue(rdn)).append(SMSEntry.COMMA);
         }
-        if (debug.messageEnabled()) {
-            debug.message("DNMapper.normalizeDN():finalorgdn "+
-                buf.toString());
-        }
-        return (buf.toString());
+        debug.message("DNMapper.normalizeDN():finalorgdn {}", buf);
+        return buf.toString();
     }
 
     /**

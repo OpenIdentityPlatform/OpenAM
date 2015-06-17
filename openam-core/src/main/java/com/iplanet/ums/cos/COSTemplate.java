@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,16 +24,17 @@
  *
  * $Id: COSTemplate.java,v 1.4 2008/06/25 05:41:47 qcheng Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.ums.cos;
 
 import com.iplanet.services.ldap.Attr;
 import com.iplanet.services.ldap.AttrSet;
-import com.iplanet.services.ldap.ModSet;
 import com.iplanet.ums.CreationTemplate;
 import com.iplanet.ums.PersistentObject;
 import com.iplanet.ums.UMSException;
+import org.forgerock.opendj.ldap.ModificationType;
 
 /**
  * This class represents a COS Template. A COS Template has attributes and
@@ -107,7 +108,7 @@ public class COSTemplate extends PersistentObject {
      * @supported.api
      */
     public void addTemplateAttribute(String name, String value) {
-        modify(name, value, ModSet.ADD);
+        modify(name, value, ModificationType.ADD);
     }
 
     /**

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -22,35 +22,19 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
-* $Id: AMAdminUtils.java,v 1.9 2009/10/19 18:17:37 asyhuang Exp $
+ * $Id: AMAdminUtils.java,v 1.9 2009/10/19 18:17:37 asyhuang Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted 2011-2014 ForgeRock, AS.
- */
 package com.sun.identity.console.base.model;
 
-import com.iplanet.jato.view.html.Option;
-import com.iplanet.jato.view.html.OptionList;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.common.SearchResults;
-import com.sun.identity.idm.IdType;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.datastruct.OrderedSet;
-import com.sun.identity.sm.AttributeSchema;
-import com.sun.identity.sm.SchemaType;
-import com.sun.identity.sm.ServiceSchemaManager;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.SMSException;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.IOException;
-import java.io.ByteArrayInputStream;
+import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -61,11 +45,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.security.AccessController;
 import java.util.TreeSet;
-import com.sun.identity.shared.ldap.util.DN;
 
-/* - NEED NOT LOG - */
+import com.iplanet.jato.view.html.Option;
+import com.iplanet.jato.view.html.OptionList;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.SearchResults;
+import com.sun.identity.idm.IdType;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.datastruct.OrderedSet;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.AttributeSchema;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SchemaType;
+import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.opendj.ldap.DN;
 
 /**
  * This provides a set helper methods to access
@@ -381,7 +378,7 @@ public class AMAdminUtils {
      */
     public static String getParent(String dn) {
         if (dn != null) {
-            return new DN(dn).getParent().toString();
+            return DN.valueOf(dn).parent().toString();
         }
         return "";
     }
@@ -777,31 +774,30 @@ public class AMAdminUtils {
      * @param toDelete Collection of entries to be deleted.
      */
     public static void removeAllByDN(Set originalSet, Collection toDelete) {
-        Set setDNs = toDNs(toDelete);
+        Set<DN> setDNs = toDNs(toDelete);
 
         for (Iterator iter = originalSet.iterator(); iter.hasNext(); ) {
             String strDN = (String)iter.next();
-            DN dn = new DN(strDN.toLowerCase());
+            DN dn = DN.valueOf(strDN.toLowerCase());
             if (containsDN(setDNs, dn)) {
                 iter.remove();
             }
         }
     }
 
-    private static Set toDNs(Collection set) {
-        Set setDNs = new HashSet();
+    private static Set<DN> toDNs(Collection set) {
+        Set<DN> setDNs = new HashSet<>();
         for (Iterator i = set.iterator(); i.hasNext(); ) {
-            String strDN = (String)i.next();
-            DN dn = new DN(strDN.toLowerCase());
+            String strDN = (String) i.next();
+            DN dn = DN.valueOf(strDN.toLowerCase());
             setDNs.add(dn);
         }
         return setDNs;
     }
 
-    private static boolean containsDN(Set set, DN dn) {
+    private static boolean containsDN(Set<DN> set, DN dn) {
         boolean contain = false;
-        for (Iterator i = set.iterator(); i.hasNext() && !contain; ) {
-            DN d = (DN)i.next();
+        for (DN d : set) {
             contain = d.equals(dn);
         }
         return contain;

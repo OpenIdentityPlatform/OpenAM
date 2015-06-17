@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: IdRepoException.java,v 1.8 2009/11/19 18:18:47 bhavnab Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.idm;
 
@@ -35,7 +32,6 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.shared.locale.L10NMessage;
 import com.sun.identity.shared.locale.Locale;
-import com.sun.identity.shared.ldap.LDAPException;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
@@ -66,8 +62,6 @@ public class IdRepoException extends Exception implements L10NMessage {
     private String errorCode;
 
     private Object[] args;
-
-    private LDAPException rootCause = null;
 
     private String ldapErrCode = null;
 

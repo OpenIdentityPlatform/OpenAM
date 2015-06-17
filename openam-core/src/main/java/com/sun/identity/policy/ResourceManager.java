@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,30 +24,39 @@
  *
  * $Id: ResourceManager.java,v 1.7 2009/06/30 17:46:02 veiming Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.sun.identity.policy;
 
-import java.util.*;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.security.AccessController;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 
-import org.w3c.dom.*;
-
+import com.iplanet.am.util.Cache;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.policy.interfaces.Referral;
 import com.sun.identity.policy.plugins.OrgReferral;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.ldap.util.DN;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOException;
-import com.sun.identity.sm.*;
-import com.sun.identity.shared.xml.XMLUtils;
-import com.iplanet.am.util.Cache;
 import com.sun.identity.security.AdminTokenAction;
-import java.security.AccessController;
-
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.xml.XMLUtils;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SMSSchema;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceManager;
+import org.forgerock.opendj.ldap.DN;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * The class <code>ResourceManager</code> manages an index to the  
@@ -102,8 +111,8 @@ public class ResourceManager {
         org = orgName;
         this.scm = new ServiceConfigManager(PolicyManager.POLICY_SERVICE_NAME,
             token);
-        DN orgDN = new DN(org);
-        DN baseDN = new DN(ServiceManager.getBaseDN());
+        DN orgDN = DN.valueOf(org);
+        DN baseDN = DN.valueOf(ServiceManager.getBaseDN());
         stm = ServiceTypeManager.getServiceTypeManager();
         canCreateNewRes = orgDN.equals(baseDN);
     }

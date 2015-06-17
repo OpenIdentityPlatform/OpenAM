@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,9 @@
  *
  * $Id: ComplianceServicesImpl.java,v 1.10 2009/11/20 23:52:51 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.iplanet.am.sdk.ldap;
 
 import java.util.HashMap;
@@ -37,12 +35,15 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import com.sun.identity.shared.ldap.util.DN;
-import com.sun.identity.shared.ldap.util.RDN;
-
+import com.iplanet.am.sdk.AMConstants;
+import com.iplanet.am.sdk.AMEntryExistsException;
+import com.iplanet.am.sdk.AMException;
+import com.iplanet.am.sdk.AMObject;
+import com.iplanet.am.sdk.AMSDKBundle;
+import com.iplanet.am.sdk.AMStoreConnection;
+import com.iplanet.am.sdk.common.IComplianceServices;
 import com.iplanet.services.ldap.Attr;
 import com.iplanet.services.ldap.AttrSet;
-import com.iplanet.services.ldap.ModSet;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.ums.AssignableDynamicGroup;
@@ -52,19 +53,13 @@ import com.iplanet.ums.ManagedRole;
 import com.iplanet.ums.PersistentObject;
 import com.iplanet.ums.UMSException;
 import com.iplanet.ums.UMSObject;
-
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-
-import com.iplanet.am.sdk.AMConstants;
-import com.iplanet.am.sdk.AMEntryExistsException;
-import com.iplanet.am.sdk.AMException;
-import com.iplanet.am.sdk.AMObject;
-import com.iplanet.am.sdk.AMSDKBundle;
-import com.iplanet.am.sdk.AMStoreConnection;
-import com.iplanet.am.sdk.common.IComplianceServices;
-import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.ModificationType;
 
 /**
  * This class <code>Compliance</code> contains the functionality to support
@@ -141,7 +136,7 @@ public class ComplianceServicesImpl implements AMConstants, IComplianceServices
         int size = attrSet.size();
         for (int i = 0; i < size; i++) {
             Attr attr = attrSet.elementAt(i);
-            po.modify(attr, ModSet.ADD);
+            po.modify(attr, ModificationType.ADD);
         }
         po.save();
     }
@@ -155,7 +150,7 @@ public class ComplianceServicesImpl implements AMConstants, IComplianceServices
         int size = attrSet.size();
         for (int i = 0; i < size; i++) {
             Attr attr = attrSet.elementAt(i);
-            po.modify(attr, ModSet.DELETE);
+            po.modify(attr, ModificationType.DELETE);
         }
         po.save();
     }
@@ -169,8 +164,7 @@ public class ComplianceServicesImpl implements AMConstants, IComplianceServices
         // Check if top level admin-role
         String groupName = (String) roleToGroupMap.get(dn.toString());
         if (groupName == null) { // If not, a org level admin-role
-            String roleName = ((RDN) 
-                    dn.getRDNs().get(0)).getValues()[0];
+            String roleName = LDAPUtils.rdnValueFromDn(dn);
             groupName = (String) roleToGroupMap.get(roleName);
             if (debug.messageEnabled()) {
                 debug.message("Compliance.getGroupRoleFromDN():"
@@ -188,7 +182,7 @@ public class ComplianceServicesImpl implements AMConstants, IComplianceServices
     private String getRoleFromGroupDN(DN dn) {
         // Obtain the role name from the roleDN
         // Check if top level admin-role
-        String groupName = dn.explodeDN(true)[0];
+        String groupName = LDAPUtils.rdnValueFromDn(dn);
         String roleName = (String) groupToRoleMap.get(groupName);
         if (debug.messageEnabled()) {
             debug.message("Compliance.getRoleFromGroupDN: "
@@ -233,10 +227,10 @@ public class ComplianceServicesImpl implements AMConstants, IComplianceServices
             String roleDN) throws AMException {
 
         // Obtain the group corresponding to roleDN
-        DN dn = new DN(roleDN);
+        DN dn = DN.valueOf(roleDN);
         String groupName = getGroupFromRoleDN(dn);
         if (groupName != null) { // roleDN corresponds to an admin role
-            String orgDN = dn.getParent().toString();
+            String orgDN = dn.parent().toString();
             String groupDN = NamingAttributeManager
                     .getNamingAttribute(AMObject.GROUP)
                     + "=" + groupName + ",ou=Groups," + orgDN;
@@ -288,10 +282,10 @@ public class ComplianceServicesImpl implements AMConstants, IComplianceServices
     protected void verifyAndUnLinkRoleToGroup(SSOToken token, Set members,
             String roleDN) throws AMException {
         // Obtain the group corresponding to roleDN
-        DN dn = new DN(roleDN);
+        DN dn = DN.valueOf(roleDN);
         String groupName = getGroupFromRoleDN(dn);
         if (groupName != null) {
-            String orgDN = dn.getParent().toString();
+            String orgDN = dn.parent().toString();
             String groupDN = NamingAttributeManager
                     .getNamingAttribute(AMObject.GROUP)
                     + "=" + groupName + ",ou=Groups," + orgDN;
@@ -344,10 +338,10 @@ public class ComplianceServicesImpl implements AMConstants, IComplianceServices
             String groupDN) throws AMException {
 
         // Obtain the role corresponding to groupDN
-        DN dn = new DN(groupDN);
+        DN dn = DN.valueOf(groupDN);
         String roleName = getRoleFromGroupDN(dn);
         if (roleName != null) { // roleDN corresponds to an admin role
-            String orgDN = dn.getParent().getParent().toString();
+            String orgDN = dn.parent().parent().toString();
             String roleDN = NamingAttributeManager
                     .getNamingAttribute(AMObject.ROLE)
                     + "=" + roleName + "," + orgDN;
@@ -387,10 +381,10 @@ public class ComplianceServicesImpl implements AMConstants, IComplianceServices
             String groupDN) throws AMException {
 
         // Obtain the group corresponding to roleDN
-        DN dn = new DN(groupDN);
+        DN dn = DN.valueOf(groupDN);
         String roleName = getRoleFromGroupDN(dn);
         if (roleName != null) {
-            String orgDN = dn.getParent().getParent().toString();
+            String orgDN = dn.parent().parent().toString();
             String roleDN = NamingAttributeManager
                     .getNamingAttribute(AMObject.ROLE)
                     + "=" + roleName + "," + orgDN;
@@ -585,7 +579,7 @@ public class ComplianceServicesImpl implements AMConstants, IComplianceServices
             debug.message("Compliance.isAncestorOrgDeleted-> "
                     + " checking from... " + dn);
         }
-        String tdn = (new DN(dn)).toRFCString().toLowerCase();
+        String tdn = DN.valueOf(dn).toString().toLowerCase();
         if ((profileType == AMObject.ORGANIZATION)
                 && deletedOrg.containsKey(tdn)) {
             if (((Boolean) deletedOrg.get(tdn)).booleanValue()) {
@@ -667,7 +661,7 @@ public class ComplianceServicesImpl implements AMConstants, IComplianceServices
                 }
             }
             // Get the parent DN..
-            tdn = (new DN(tdn)).getParent().toRFCString().toLowerCase();
+            tdn = DN.valueOf(tdn).parent().toString().toLowerCase();
         }
     }
 
@@ -700,7 +694,7 @@ public class ComplianceServicesImpl implements AMConstants, IComplianceServices
                             + "Soft-delete mode, setting inetuserstatus "
                             + "to deleted. " + "profileDN=" + profileDN);
                 }
-                po.modify(attr, ModSet.REPLACE);
+                po.modify(attr, ModificationType.REPLACE);
                 po.save();
                 mailer = new EmailNotificationHelper(profileDN);
                 if (mailer != null) {
@@ -720,7 +714,7 @@ public class ComplianceServicesImpl implements AMConstants, IComplianceServices
                             + "Soft-delete mode, setting icsstatus "
                             + "to deleted");
                 }
-                po.modify(attr, ModSet.REPLACE);
+                po.modify(attr, ModificationType.REPLACE);
                 po.save();
                 return;
             }
@@ -733,7 +727,7 @@ public class ComplianceServicesImpl implements AMConstants, IComplianceServices
                             + "Soft-delete mode, setting inetgroupstatus "
                             + "to deleted");
                 }
-                po.modify(attr, ModSet.REPLACE);
+                po.modify(attr, ModificationType.REPLACE);
                 po.save();
                 return;
             }
@@ -744,7 +738,7 @@ public class ComplianceServicesImpl implements AMConstants, IComplianceServices
                             + "to deleted");
                 }
                 Attr attr = new Attr(ORG_STATUS_ATTRIBUTE, "deleted");
-                po.modify(attr, ModSet.REPLACE);
+                po.modify(attr, ModificationType.REPLACE);
                 po.save();
                 DCTreeServicesImpl dcTreeImpl = (DCTreeServicesImpl) 
                     DirectoryServicesFactory.getInstance()
@@ -824,12 +818,9 @@ public class ComplianceServicesImpl implements AMConstants, IComplianceServices
             return true;
         }
 
-        DN rootDN = new DN(rootSuffix);
-        DN objectDN = new DN(objDN);
-        if (rootDN.equals(objectDN) || rootDN.equals(objectDN.getParent())) {
-            return true;
-        }
-        return false;
+        DN rootDN = DN.valueOf(rootSuffix);
+        DN objectDN = DN.valueOf(objDN);
+        return rootDN.equals(objectDN) || rootDN.equals(objectDN.parent());
     }
 
     /**

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,27 +24,23 @@
  *
  * $Id: SPCache.java,v 1.17 2009/06/09 20:28:32 exu Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 
 package com.sun.identity.saml2.profile;
 
+import java.util.Hashtable;
+
 import com.sun.identity.common.PeriodicCleanUpMap;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Utils;
-import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.HashSet;
-import java.util.Set;
-import com.sun.identity.shared.ldap.util.DN;
 
 
 /**
  * This class provides the memory store for
  * SAML request and response information on Service Provider side.
- *
  */
 
 public class SPCache {

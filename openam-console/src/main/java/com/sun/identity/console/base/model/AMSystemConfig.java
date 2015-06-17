@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,14 +24,11 @@
  *
  * $Id: AMSystemConfig.java,v 1.7 2009/01/28 05:34:56 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.base.model;
 
-import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.common.HttpURLConnectionManager;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.sm.SMSEntry;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,11 +36,11 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.util.DN;
-import com.sun.identity.shared.ldap.util.RDN;
 
-/* - NEED NOT LOG - */
+import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.common.HttpURLConnectionManager;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.sm.SMSEntry;
 
 /**
  * <code>AMSystemConfig</code> is contains system configuration information
@@ -151,26 +148,6 @@ public class AMSystemConfig
             }
         }
         return (result == null) ? "" : result;
-    }
-
-    public static String normalizeString(String tmp) {
-        if (tmp != null) {
-            // parse string to remove any extraneous space
-            String[] dns = LDAPDN.explodeDN(tmp, false);
-            if ((dns != null) && (dns.length > 0)) {
-                int len = dns.length -1;
-                DN root = new DN(dns[len]);
-
-                for (int i = len -1; i >= 0; --i) {
-                    root.addRDN(new RDN(dns[i]));
-                }
-
-                tmp = root.toString();
-            }
-        } else {
-            tmp = "";
-        }
-        return tmp;
     }
 
     /** this value is set to true if directory is iPlanet DIT compliance */

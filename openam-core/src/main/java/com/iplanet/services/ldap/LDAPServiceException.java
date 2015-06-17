@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,14 +24,12 @@
  *
  * $Id: LDAPServiceException.java,v 1.3 2009/01/28 05:34:49 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.iplanet.services.ldap;
 
-import com.sun.identity.shared.ldap.LDAPException;
+import org.forgerock.opendj.ldap.ErrorResultException;
 
 /**
  * This exception class captures expcetions that occurs in the
@@ -237,8 +235,8 @@ public class LDAPServiceException extends Exception {
     public int getLDAPExceptionErrorCode() {
         if (rootCause == null) {
             return -1;
-        } else if (rootCause instanceof LDAPException) {
-            return ((LDAPException) rootCause).getLDAPResultCode();
+        } else if (rootCause instanceof ErrorResultException) {
+            return ((ErrorResultException) rootCause).getResult().getResultCode().intValue();
         } else if (rootCause instanceof LDAPServiceException) {
             return ((LDAPServiceException) rootCause)
                     .getLDAPExceptionErrorCode();

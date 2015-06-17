@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,25 +24,29 @@
  *
  * $Id: SMSRepositoryMig.java,v 1.4 2009/01/28 05:35:04 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.sm.util;
 
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-
-import com.sun.identity.shared.ldap.LDAPAttribute;
-import com.sun.identity.shared.ldap.LDAPAttributeSet;
-import com.sun.identity.shared.ldap.LDAPConnection;
-import com.sun.identity.shared.ldap.LDAPEntry;
-import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.LDAPReferralException;
-import com.sun.identity.shared.ldap.LDAPSearchResults;
-import com.sun.identity.shared.ldap.LDAPv2;
+import java.util.Map;
+import java.util.Set;
 
 import com.sun.identity.sm.ServiceAlreadyExistsException;
 import com.sun.identity.sm.flatfile.SMSFlatFileObject;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.ByteString;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.Connections;
+import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.LDAPConnectionFactory;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.requests.Requests;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
 
 /**
  * Migrates a SMS in LDAP to flat file structure usable # by SMSFlatFileObject
@@ -51,19 +55,15 @@ import com.sun.identity.sm.flatfile.SMSFlatFileObject;
 public class SMSRepositoryMig {
 
     static private void createSMSEntry(SMSFlatFileObject smsFlatFileObject,
-            String dn, LDAPAttributeSet attrs) throws Exception {
+            String dn, Iterable<Attribute> attrs) throws Exception {
         // Convert attrs from LDAPAttributeSet to a Map needed by SMSObject.
-        HashMap attrsMap = new HashMap();
+        Map<String, Set<String>> attrsMap = new HashMap<>();
 
-        Enumeration attrsEnum = attrs.getAttributes();
-        while (attrsEnum.hasMoreElements()) {
-            LDAPAttribute attr = (LDAPAttribute) attrsEnum.nextElement();
-            String attrName = attr.getName();
-            HashSet attrVals = new HashSet();
-            Enumeration valsEnum = attr.getStringValues();
-            while (valsEnum.hasMoreElements()) {
-                String val = (String) valsEnum.nextElement();
-                attrVals.add(val);
+        for (Attribute attribute : attrs) {
+            String attrName = attribute.getAttributeDescriptionAsString();
+            Set<String> attrVals = new HashSet<>();
+            for (ByteString value : attribute) {
+                attrVals.add(value.toString());
             }
             attrsMap.put(attrName, attrVals);
         }
@@ -74,7 +74,7 @@ public class SMSRepositoryMig {
         }
     }
 
-    static private void migrate(String host, int port, String binddn,
+    static private void migrate(ConnectionFactory factory, String host, int port, String binddn,
             String pw, String basedn, String flatfiledir) throws Exception {
         // check args
         if (port < 0 || binddn == null || binddn.length() == 0 || pw == null
@@ -87,44 +87,33 @@ public class SMSRepositoryMig {
 
         // Create the SMSFlatFileObject
         SMSFlatFileObject smsFlatFileObject = new SMSFlatFileObject();
-        LDAPConnection conn = null;
-        try {
-            conn = new LDAPConnection();
-            conn.connect(host, port, binddn, pw);
-            String[] attrs = { "*" };
-
+        try (Connection conn = factory.getConnection()) {
             // Loop through LDAP attributes, create SMS object for each.
-            LDAPSearchResults res = conn.search("ou=services," + basedn,
-                LDAPv2.SCOPE_SUB, "(objectclass=*)", attrs, false);
-            System.out.println("Migrating " + res.getCount() + " results.");
-            while (res.hasMoreElements()) {
-                LDAPEntry entry = null;
-                try {
-                    entry = res.next();
-                    LDAPAttributeSet attrSet = entry.getAttributeSet();
-                    System.out.println(entry.getDN() + ": " + attrSet.size()
-                        + " Attributes found.");
-                    createSMSEntry(smsFlatFileObject, entry.getDN(), attrSet);
-                } catch (LDAPReferralException e) {
+            ConnectionEntryReader res = conn.search("ou=services," + basedn, SearchScope.BASE_OBJECT,
+                    "(objectclass=*)", "*");
+            while (res.hasNext()) {
+                if (res.isReference()) {
+                    //ignore
+                    res.readReference();
                     System.out.println("ERROR: LDAP Referral not supported.");
-                    System.out.println("LDAPReferralException received: "
-                        + e.toString());
-                    e.printStackTrace();
-                } catch (LDAPException e) {
-                    System.out.println("ERROR: LDAP Exception encountered: "
-                        + e.toString());
-                    e.printStackTrace();
-                }
-            }
-        } finally {
-            if ((conn != null) && (conn.isConnected())) {
-                try {
-                    conn.disconnect();
-                } catch (LDAPException ex) {
-                    //ignored
+                    System.out.println("LDAPReferralException received");
+                } else {
+                    SearchResultEntry entry;
+                    try {
+                        entry = res.readEntry();
+                        createSMSEntry(smsFlatFileObject, entry.getName().toString(), entry.getAllAttributes());
+                    } catch (ErrorResultException e) {
+                        System.out.println("ERROR: LDAP Exception encountered: " + e.toString());
+                        e.printStackTrace();
+                    }
                 }
             }
         }
+    }
+
+    private static ConnectionFactory getConnectionFactory(String hostname, int port, String bindDN, char[] bindPassword) {
+        return Connections.newAuthenticatedConnectionFactory(new LDAPConnectionFactory(hostname, port),
+                Requests.newSimpleBindRequest(bindDN, bindPassword));
     }
 
     static private void usage() {
@@ -150,7 +139,9 @@ public class SMSRepositoryMig {
         basedn = args[4];
         flatfiledir = args[5];
 
-        // do the migration
-        migrate(host, port, binddn, pw, basedn, flatfiledir);
+        try (ConnectionFactory factory = getConnectionFactory(host, port, basedn, pw.toCharArray())) {
+            // do the migration
+            migrate(factory, host, port, binddn, pw, basedn, flatfiledir);
+        }
     }
 }

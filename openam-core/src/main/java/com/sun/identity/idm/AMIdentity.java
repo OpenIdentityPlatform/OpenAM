@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,16 @@
  *
  * $Id: AMIdentity.java,v 1.37 2009/11/20 23:52:54 ww203982 Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.idm;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import com.iplanet.am.sdk.AMCommonUtils;
 import com.iplanet.am.sdk.AMCrypt;
@@ -48,15 +52,9 @@ import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceNotFoundException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.util.DN;
-import com.sun.identity.shared.ldap.util.RDN;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.RDN;
 
 /**
  * This class represents an Identity which needs to be managed by Access
@@ -155,18 +153,13 @@ public class AMIdentity {
      */
     public AMIdentity(SSOToken ssotoken, String universalId)
         throws IdRepoException {
-        this(new DN(universalId), ssotoken);
+        this(universalId == null ? null : DN.valueOf(universalId), ssotoken);
     }
 
     public AMIdentity(DN universalId, SSOToken ssotoken) throws IdRepoException {
         this.token = ssotoken;
         // Validate Universal ID
-        String[] array = null;
-        if (universalId != null && universalId.isDN()
-                && ("id".equals(((RDN) universalId.getRDNs().get(0)).getType().toLowerCase()))) {
-            array = universalId.explodeDN(true);
-        }
-        if (array == null || array.length < 3) {
+        if (universalId == null || universalId.size() < 3 || !"id".equalsIgnoreCase(LDAPUtils.rdnTypeFromDn(universalId))) {
             // Not a valid UUID since it should have the
             // name, type and realm components
             Object args[] = { universalId };
@@ -174,7 +167,7 @@ public class AMIdentity {
         }
 
         // Valid UUID, construct rest of the parameters
-        univIdWithoutDN = universalId.toRFCString();
+        univIdWithoutDN = universalId.toString();
 
         // Check for AMSDK DN
         int index;
@@ -182,11 +175,11 @@ public class AMIdentity {
             // obtain DN and univIdWithoutDN
             univDN = univIdWithoutDN.substring(index + 9);
             univIdWithoutDN = univIdWithoutDN.substring(0, index);
-            universalId = new DN(univIdWithoutDN);
+            universalId = DN.valueOf(univIdWithoutDN);
         }
-        name = LDAPDN.unEscapeValue(array[0]);
-        type = new IdType(array[1]);
-        orgName = universalId.getParent().getParent().toRFCString();
+        name = LDAPUtils.rdnValue(universalId.rdn());
+        type = new IdType(LDAPUtils.rdnValue(universalId.parent().rdn()));
+        orgName = universalId.parent().parent().toString();
     }
 
     /**
@@ -206,7 +199,7 @@ public class AMIdentity {
      *            the amsdk name assoicated with this identity if any.
      */
     public AMIdentity(SSOToken token, String name, IdType type, String orgName, String amsdkdn) {
-        this(new DN(amsdkdn), token, name, type, orgName);
+        this(amsdkdn == null ? null : DN.valueOf(amsdkdn), token, name, type, orgName);
     }
 
     public AMIdentity(DN amsdkdn, SSOToken token, String name, IdType type, String orgName) {
@@ -214,20 +207,18 @@ public class AMIdentity {
         this.type = type;
         this.orgName = DNMapper.orgNameToDN(orgName);
         this.token = token;
-        if (amsdkdn != null && amsdkdn.isDN()) {
-            this.univDN = amsdkdn.toRFCString();
+        if (amsdkdn != null && amsdkdn.size() > 0) {
+            this.univDN = amsdkdn.toString();
         }
-        StringBuilder sb = new StringBuilder(100);
-        if (name != null) {
-            DN nameDN = new DN(name);
-            if (nameDN.isDN()) {
-                name = LDAPDN.unEscapeValue(LDAPDN.explodeDN(nameDN, true)[0]);
-            }
-        }
-        sb.append("id=").append(LDAPDN.escapeValue(name)).append(",ou=").append(type.getName()).append(",")
-                .append(this.orgName);
 
-        univIdWithoutDN = sb.toString();
+        if (LDAPUtils.isDN(name)) {
+            name = LDAPUtils.rdnValueFromDn(name);
+        }
+
+        univIdWithoutDN = LDAPUtils.newDN(this.orgName)
+                .child(new RDN("ou", type.getName()))
+                .child(new RDN("id", name))
+                .toString();
     }
 
     // General APIs
@@ -243,8 +234,7 @@ public class AMIdentity {
         if (type.equals(IdType.REALM)) {
             // Since '0'th location currently has ContainerDefaultTemplate
             // the 2nd location would have the realm name
-            String[] array = (new DN(univIdWithoutDN)).explodeDN(true);
-            sname = array[2];
+            sname = LDAPUtils.rdnValue(DN.valueOf(univIdWithoutDN).parent().parent().rdn());
         }
         return sname;
     }
@@ -1341,7 +1331,7 @@ public class AMIdentity {
      *            SSOToken a valid SSOToken
      * @param serviceName
      *            the service name
-     * @param schemaType
+     * @param type
      *            service schema type (Dynamic, Policy etc)
      * @return returns a Map of Default Configuration values for the specified
      *         service.

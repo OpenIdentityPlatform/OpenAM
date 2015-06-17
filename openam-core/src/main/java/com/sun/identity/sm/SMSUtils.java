@@ -28,6 +28,8 @@
  */
 package com.sun.identity.sm;
 
+import static org.forgerock.openam.ldap.LDAPUtils.addAttributeToMapAsString;
+
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,6 +43,9 @@ import com.iplanet.sso.SSOException;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.security.AdminTokenAction;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.ByteString;
+import org.forgerock.opendj.ldap.Entry;
 
 public class SMSUtils {
 
@@ -565,5 +570,19 @@ public class SMSUtils {
         }
 
         return validators;
+    }
+
+    public static Map<String, Set<String>> convertEntryToAttributesMap(Entry entry) {
+        Map<String, Set<String>> answer = null;
+
+        if (entry != null) {
+            for (Attribute attribute : entry.getAllAttributes()) {
+                if (answer == null) {
+                    answer = new CaseInsensitiveHashMap<>(10);
+                }
+                addAttributeToMapAsString(attribute, answer);
+            }
+        }
+        return answer;
     }
 }

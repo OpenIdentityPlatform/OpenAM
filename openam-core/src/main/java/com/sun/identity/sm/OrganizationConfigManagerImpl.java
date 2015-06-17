@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,26 +24,25 @@
  *
  * $Id: OrganizationConfigManagerImpl.java,v 1.12 2009/07/25 05:11:55 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.sm;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.ums.IUMSConstants;
-import com.sun.identity.shared.debug.Debug;
+import javax.naming.event.NamingEvent;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import javax.naming.event.NamingEvent;
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.util.DN;
+
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.ums.IUMSConstants;
+import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.RDN;
 
 /**
  * The class <code>OrganizationConfigManagerImpl</code> provides interfaces to
@@ -85,8 +84,8 @@ class OrganizationConfigManagerImpl implements SMSObjectListener {
             .registerCallbackHandler(this);
 
         if (!orgDN.startsWith(SMSEntry.SERVICES_RDN)) {
-            DN notifyDN = new DN(SMSEntry.SERVICES_RDN + "," + orgDN);
-            orgNotificationSearchString = notifyDN.toRFCString().toLowerCase();
+            DN notifyDN = DN.valueOf(SMSEntry.SERVICES_RDN + "," + orgDN);
+            orgNotificationSearchString = notifyDN.toString().toLowerCase();
         } else {
             orgNotificationSearchString = orgDN;
         }
@@ -255,12 +254,10 @@ class OrganizationConfigManagerImpl implements SMSObjectListener {
 
             // Get the DN ignoring the organization name
             if (index != 0) {
-                String ndn = dn.substring(0, index - 1);
-
+                DN ndn = DN.valueOf(dn.substring(0, index - 1));
+                int size = ndn.size();
                 // Needs to check if the DN has more realm names
-                String rdns[] = LDAPDN.explodeDN(ndn, false);
-                int size = (rdns == null) ? 0 : rdns.length;
-                if ((size != 0) && (rdns[size - 1].startsWith("o="))) {
+                if (size != 0 && "o".equals(LDAPUtils.rdnValue(ndn.rdn()))) {
                     // More realm names are present, changes not meant for
                     // this organization
                     if (SMSEntry.eventDebug.messageEnabled()) {
@@ -273,23 +270,25 @@ class OrganizationConfigManagerImpl implements SMSObjectListener {
                     return;
                 }
 
+                Iterator<RDN> rdnIterator = ndn.iterator();
                 // Get the version, service, group and component name
-                rdns = LDAPDN.explodeDN(ndn, true); 
                 if (size > 0) {
-                    serviceName = rdns[size - 1];
+                    serviceName = LDAPUtils.rdnValue(rdnIterator.next());
                 }
                 if (size > 1) {
-                    version = rdns[size - 2];
+                    version = LDAPUtils.rdnValue(rdnIterator.next());
                 }
                 if (size >= 4) {
-                    groupName = rdns[size - 4];
+                    //Skip 1 RDNs
+                    rdnIterator.next();
+                    groupName = LDAPUtils.rdnValue(rdnIterator.next());
                 }
 
                 // The subconfig names should be "/" separated and left to right
-                if (size >= 5) {
+                if (ndn.size() >= 5) {
                     StringBuilder sbr = new StringBuilder();
-                    for (int i = size - 4; i >= 0; i--) {
-                        sbr.append('/').append(rdns[i]);
+                    while (rdnIterator.hasNext()) {
+                        sbr.append('/').append(LDAPUtils.rdnValue(rdnIterator.next()));
                     }
                     compName = sbr.toString();
                 } else {

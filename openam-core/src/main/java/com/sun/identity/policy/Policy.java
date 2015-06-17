@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,26 +24,33 @@
  *
  * $Id: Policy.java,v 1.9 2010/01/10 01:19:35 veiming Exp $
  *
- * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
+
 package com.sun.identity.policy;
 
-import com.sun.identity.policy.interfaces.Subject;
-import com.sun.identity.policy.interfaces.Condition;
-import com.sun.identity.policy.interfaces.ResponseProvider;
-import com.sun.identity.policy.interfaces.Referral;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
 
-import java.util.*;
-import com.sun.identity.shared.ldap.util.DN;
-
-import org.w3c.dom.*;
-
-import com.iplanet.sso.*;
-import com.sun.identity.shared.debug.Debug;
+import com.iplanet.am.sdk.AMCommonUtils;
 import com.iplanet.am.util.Cache;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.policy.interfaces.Condition;
+import com.sun.identity.policy.interfaces.Referral;
+import com.sun.identity.policy.interfaces.ResponseProvider;
+import com.sun.identity.policy.interfaces.Subject;
+import com.sun.identity.policy.plugins.OrgReferral;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.AttributeSchema;
-import com.sun.identity.policy.plugins.OrgReferral;
+import org.w3c.dom.Node;
 
 /**
  * The class <code>Policy</code> represents a policy definition.
@@ -753,7 +760,7 @@ public class Policy implements Cloneable {
             throws NameAlreadyExistsException, InvalidNameException,
             PolicyException, SSOException {
         String realmName = stm.getPolicyManager().getOrganizationDN();
-        realmName = new DN(realmName).toRFCString().toLowerCase();
+        realmName = AMCommonUtils.formatToRFC(realmName);
         if ((subjectRealm != null) && !subjectRealm.equals(realmName)) {
             String[] objs = {realmName, subjectRealm};
             if (DEBUG.messageEnabled()) {

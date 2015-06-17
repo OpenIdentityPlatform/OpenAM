@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,18 +24,18 @@
  *
  * $Id: AttrSet.java,v 1.4 2009/01/28 05:34:49 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.iplanet.services.ldap;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
 
-import com.sun.identity.shared.ldap.LDAPAttributeSet;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.ByteString;
 
 /**
  * Represents a set of attributes
@@ -91,11 +91,15 @@ public class AttrSet implements java.io.Serializable, java.lang.Cloneable {
      *            LDAP attribute set
      * 
      */
-    public AttrSet(LDAPAttributeSet ldapAttrSet) {
+    public AttrSet(Collection<Attribute> ldapAttrSet) {
         int size = ldapAttrSet.size();
         _attrs = new ArrayList(size);
-        for (int i = 0; i < size; i++) {
-            _attrs.add(new Attr(ldapAttrSet.elementAt(i)));
+        for (Attribute attribute : ldapAttrSet) {
+            Collection<byte[]> values = new ArrayList<>(attribute.size());
+            for (ByteString value : attribute) {
+                values.add(value.toByteArray());
+            }
+            _attrs.add(new Attr(attribute.getAttributeDescriptionAsString(), values.toArray(new byte[0][])));
         }
     }
 
@@ -366,8 +370,8 @@ public class AttrSet implements java.io.Serializable, java.lang.Cloneable {
      * 
      * @return the equivalent LDAPAttributeSet
      */
-    public LDAPAttributeSet toLDAPAttributeSet() {
-        LDAPAttributeSet ldapAttrSet = new LDAPAttributeSet();
+    public Collection<Attribute> toLDAPAttributeSet() {
+        Collection<Attribute> ldapAttrSet = new ArrayList<>();
         int size = size();
         for (int i = 0; i < size; i++) {
             Attr attr = (Attr) _attrs.get(i);

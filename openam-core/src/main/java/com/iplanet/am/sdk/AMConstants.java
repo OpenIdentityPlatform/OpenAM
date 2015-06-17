@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,15 @@
  *
  * $Id: AMConstants.java,v 1.6 2009/01/28 05:34:47 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.am.sdk;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import org.forgerock.opendj.ldap.SearchScope;
 
 /**
  * This interface defines constants used by <code>AM SDK</code>.
@@ -44,17 +47,17 @@ public interface AMConstants {
     /**
      * Specifies search scope to be just for the object specified
      */
-    public static final int SCOPE_BASE = com.sun.identity.shared.ldap.LDAPv2.SCOPE_BASE;
+    public static final int SCOPE_BASE = SearchScope.BASE_OBJECT.intValue();
 
     /**
      * Specifies search scope to be a one level search.
      */
-    public static final int SCOPE_ONE = com.sun.identity.shared.ldap.LDAPv2.SCOPE_ONE;
+    public static final int SCOPE_ONE = SearchScope.SINGLE_LEVEL.intValue();
 
     /**
      * Specifies search scope to be a sub tree search.
      */
-    public static final int SCOPE_SUB = com.sun.identity.shared.ldap.LDAPv2.SCOPE_SUB;
+    public static final int SCOPE_SUB = SearchScope.WHOLE_SUBTREE.intValue();
 
     /*
      * The above constants SCOPE_BASE, SCOPE_ONE, and SCOPE_SUB should be kept

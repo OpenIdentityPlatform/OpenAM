@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -41,10 +41,11 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.SMSException;
+import org.forgerock.openam.ldap.LDAPUtils;
+
 import java.security.AccessController;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -61,9 +62,9 @@ public class OpenSSOSubjectAttributesCollector
     implements SubjectAttributesCollector {
 
     static ServiceConfigManager idRepoServiceConfigManager;
-    private static final String GROUP_MEMBERSHIP_SEARCH_INDEX_ENABLED_ATTR = 
+    private static final String GROUP_MEMBERSHIP_SEARCH_INDEX_ENABLED_ATTR =
         "groupMembershipSearchIndexEnabled";
-    private static final String LDAPv3Config_USER_ATTR = 
+    private static final String LDAPv3Config_USER_ATTR =
         "sun-idrepo-ldapv3-config-user-attributes";
     private String realm;
     private boolean groupMembershipSearchIndexEnabled = false;
@@ -311,12 +312,12 @@ public class OpenSSOSubjectAttributesCollector
     /**
      * Returns the universal identifier of this object without organization
      * name.
-     * 
+     *
      * @return String representing the universal identifier of this object
      *     without organization name.
      */
     protected static String getIDWithoutOrgName(AMIdentity amidentity) {
-        return ("id=" + LDAPDN.escapeValue(amidentity.getName()) + ",ou=" +
+        return ("id=" + LDAPUtils.escapeValue(amidentity.getName()) + ",ou=" +
             amidentity.getType().getName());
     }
 }

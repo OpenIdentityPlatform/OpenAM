@@ -1,9 +1,0 @@
-dn: cn=Referential Integrity, cn=Plugins, cn=config
-changetype: modify
-replace: ds-cfg-enabled
-ds-cfg-enabled: true
-
-dn: cn=Referential Integrity, cn=Plugins, cn=config
-changetype: modify
-add: ds-cfg-attribute-type
-ds-cfg-attribute-type: memberof

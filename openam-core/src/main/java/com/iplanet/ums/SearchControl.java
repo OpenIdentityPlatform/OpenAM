@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,13 +24,14 @@
  *
  * $Id: SearchControl.java,v 1.5 2009/01/28 05:34:51 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.ums;
 
 import java.util.Hashtable;
 
-import com.sun.identity.shared.ldap.LDAPv2;
+import org.forgerock.opendj.ldap.SearchScope;
 
 /**
  * This class provides a way to customize Search behaviors. Common behaviors are
@@ -71,7 +72,7 @@ public class SearchControl implements java.io.Serializable {
      * 
      * @supported.api
      */
-    public static final int SCOPE_ONE = LDAPv2.SCOPE_ONE;
+    public static final int SCOPE_ONE = SearchScope.SINGLE_LEVEL.intValue();
 
     /**
      * Search scope for subtree level. This scope is used as the default search
@@ -80,14 +81,14 @@ public class SearchControl implements java.io.Serializable {
      * 
      * @supported.api
      */
-    public static final int SCOPE_SUB = LDAPv2.SCOPE_SUB;
+    public static final int SCOPE_SUB = SearchScope.WHOLE_SUBTREE.intValue();
 
     /**
      * Search scope for just this object.
      * 
      * @supported.api
      */
-    public static final int SCOPE_BASE = LDAPv2.SCOPE_BASE;
+    public static final int SCOPE_BASE = SearchScope.BASE_OBJECT.intValue();
 
     /**
      * Set sort order based on attribute names.

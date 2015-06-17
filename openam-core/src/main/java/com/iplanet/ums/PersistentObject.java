@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,9 @@
  *
  * $Id: PersistentObject.java,v 1.8 2009/07/02 20:27:01 hengming Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.iplanet.ums;
 
 import com.iplanet.am.sdk.AMException;
@@ -37,14 +35,10 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Enumeration;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
-
-import com.sun.identity.shared.ldap.LDAPAttribute;
-import com.sun.identity.shared.ldap.LDAPModification;
-import com.sun.identity.shared.ldap.util.DN;
-import com.sun.identity.shared.ldap.util.RDN;
 
 import com.sun.identity.shared.debug.Debug;
 import com.iplanet.services.ldap.Attr;
@@ -57,6 +51,14 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.iplanet.ums.validation.Validation;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.ByteString;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.Modification;
+import org.forgerock.opendj.ldap.ModificationType;
+import org.forgerock.opendj.ldap.RDN;
+import org.forgerock.opendj.ldap.SearchScope;
 
 /**
  * Represents a persistent object in UMS. This is the base class for all objects
@@ -338,9 +340,9 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
             m_attrSet = new AttrSet();
 
         if (m_attrSet.contains(attr.getName())) {
-            modify(attr, ModSet.REPLACE);
+            modify(attr, ModificationType.REPLACE);
         } else {
-            modify(attr, ModSet.ADD);
+            modify(attr, ModificationType.ADD);
         }
     }
 
@@ -388,7 +390,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
         String oldPassword, String newPassword) throws UMSException {
 
         DataLayer.getInstance().changePassword(getGuid(), attrName,
-            oldPassword, newPassword);
+                oldPassword, newPassword);
     }
 
     /**
@@ -409,7 +411,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
             return;
         }
 
-        modify(attr, ModSet.DELETE);
+        modify(attr, ModificationType.DELETE);
     }
 
     /**
@@ -452,44 +454,38 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      *
      * @supported.api
      */
-    public void modify(ModSet modSet) {
+    public void modify(Collection<Modification> modSet) {
         checkCache();
         if (m_modSet == null) {
-            m_modSet = new ModSet();
+            m_modSet = new HashSet<>();
         }
         if (m_attrSet == null) {
             m_attrSet = new AttrSet();
         }
 
-        int nMods = modSet.size();
-        LDAPModification mod = null;
-
-        for (int i = 0; i < nMods; i++) {
-            mod = modSet.elementAt(i);
-            switch (mod.getOp()) {
-            case ModSet.ADD:
+        for (Modification mod : modSet) {
+            switch (mod.getModificationType().intValue()) {
+            case 0://ModSet.ADD:
                 m_attrSet.add(new Attr(mod.getAttribute()));
                 break;
-            case ModSet.DELETE:
+            case 1://ModSet.DELETE:
                 if (mod.getAttribute().size() == 0) {
-                    m_attrSet.remove(mod.getAttribute().getName());
+                    m_attrSet.remove(mod.getAttribute().getAttributeDescriptionAsString());
                 } else {
-                    LDAPAttribute attr = mod.getAttribute();
-                    Enumeration en = attr.getStringValues();
-                    while (en.hasMoreElements()) {
-                        m_attrSet.remove(attr.getName(), (String) en
-                                .nextElement());
+                    Attribute attr = mod.getAttribute();
+                    for (ByteString value : attr) {
+                        m_attrSet.remove(attr.getAttributeDescriptionAsString(), value.toString());
                     }
                 }
                 break;
-            case ModSet.REPLACE:
+            case 2://ModSet.REPLACE:
                 m_attrSet.replace(new Attr(mod.getAttribute()));
                 break;
             default:
                 break;
             }
 
-            m_modSet.add(mod.getOp(), mod.getAttribute());
+            m_modSet.add(mod);
 
         }
     }
@@ -503,24 +499,23 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * 
      * @param attr
      *            Attribute value to be modified
-     * @param op
+     * @param modificationType
      *            Operation type in the modification. Input values include
      * 
      * <pre>
-     *               ModSet.ADD,
-     *               ModSet.DELETE,
-     *               ModSet.REPLACE
+     *               ModificationType.ADD,
+     *               ModificationType.DELETE,
+     *               ModificationType.REPLACE,
+     *               ModificationType.INCREMENT
      * </pre>
      * 
      * @see ModSet
      *
      * @supported.api
      */
-    public void modify(Attr attr, int op) {
-        ModSet modSet = new ModSet();
-
-        modSet.add(op, attr.toLDAPAttribute());
-        modify(modSet);
+    public void modify(Attr attr, ModificationType modificationType) {
+        Modification modification = new Modification(modificationType, attr.toLDAPAttribute());
+        modify(Collections.singleton(modification));
     }
 
     /**
@@ -534,24 +529,20 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      *            Attribute name of the attribute to be modified
      * @param value
      *            String value of the attribute
-     * @param op
+     * @param modificationType
      *            Operation type in the modification. Input values include
      * 
      * <pre>
-     *                   ModSet.ADD,
-     *                   ModSet.DELETE,
-     *                   ModSet.REPLACE
+     *                   ModificationType.ADD,
+     *                   ModificationType.DELETE,
+     *                   ModificationType.REPLACE,
+     *                   ModificationType.INCREMENT
      * </pre>
      * 
-     * @see ModSet
-     *
      * @supported.api
      */
-    public void modify(String attrName, String value, int op) {
-        ModSet modSet = new ModSet();
-
-        modSet.add(op, new LDAPAttribute(attrName, value));
-        modify(modSet);
+    public void modify(String attrName, String value, ModificationType modificationType) {
+        modify(new Attr(attrName, value), modificationType);
     }
 
     /**
@@ -608,10 +599,10 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
                     deleteOldName);
         } finally {
             // Must be set to new ID since the orignal DN would have changed now
-            RDN rdn = new RDN(newRDN);
-            DN parentDN = (new DN(m_guid.toString())).getParent();
-            parentDN.addRDN(rdn);
-            m_guid.setDn(parentDN.toRFCString());
+            RDN rdn = RDN.valueOf(newRDN);
+            DN parentDN = DN.valueOf(m_guid.toString()).parent();
+            parentDN.child(rdn);
+            m_guid.setDn(parentDN.toString());
         }
     }
 
@@ -626,7 +617,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * <pre>
      * User user = (User) UMSObject.getObject(principal, id);
      * user.modify(&quot;telephonenumber&quot;, 
-     *      &quot;650.937.4444&quot;, ModSet.REPLACE);
+     *      &quot;650.937.4444&quot;, ModificationType.REPLACE);
      * user.save();
      * </pre>
      * 
@@ -690,13 +681,9 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
             return m_namingAttribute;
         }
 
-        DN dn = new DN(getDN());
-
-        String[] components = dn.explodeDN(false);
-
-        if (components != null && components.length > 0) {
-            RDN rdn = new RDN(components[0]);
-            return rdn.getTypes()[0];
+        DN dn = DN.valueOf(getDN());
+        if (dn.size() > 0) {
+            return LDAPUtils.rdnTypeFromDn(dn);
         }
         return null;
     }
@@ -859,10 +846,10 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
             }
         }
 
-        DN parentEntry = new DN(getDN());
-        DN childEntry = new DN(childStr);
+        DN parentEntry = DN.valueOf(getDN());
+        DN childEntry = DN.valueOf(childStr);
 
-        if (!childEntry.isDescendantOf(parentEntry)) {
+        if (!childEntry.isInScopeOf(parentEntry, SearchScope.SUBORDINATES)) {
             String msg = i18n.getString(IUMSConstants.BAD_CHILD_OBJ);
             // TODO: need review. Should we throw something
             // more meaningful
@@ -893,10 +880,10 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      */
     public void removeChild(Guid childGuid) throws AccessRightsException,
             EntryNotFoundException, UMSException {
-        DN parentEntry = new DN(getDN());
-        DN childEntry = new DN(childGuid.getDn());
+        DN parentEntry = DN.valueOf(getDN());
+        DN childEntry = DN.valueOf(childGuid.getDn());
 
-        if (!childEntry.isDescendantOf(parentEntry)) {
+        if (!childEntry.isInScopeOf(parentEntry, SearchScope.SUBORDINATES)) {
             String msg = i18n.getString(IUMSConstants.BAD_CHILD_OBJ);
 
             throw new IllegalArgumentException(msg);
@@ -980,8 +967,8 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
             return null;
         }
 
-        DN dn = new DN(getDN());
-        return new Guid(dn.getParent().toString());
+        DN dn = DN.valueOf(getDN());
+        return new Guid(dn.parent().toString());
     }
 
     /**
@@ -1347,7 +1334,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      *            Modification Set to be used for the internal
      *            <code>modSet</code>.
      */
-    void setModSet(ModSet modSet) {
+    void setModSet(Collection<Modification> modSet) {
         m_modSet = modSet;
     }
 
@@ -1444,7 +1431,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      */
     public void addACI(ACI aci) throws AccessRightsException, UMSException {
         Attr attr = new Attr(ACI.ACI, aci.toString());
-        modify(attr, ModSet.ADD);
+        modify(attr, ModificationType.ADD);
         save();
     }
 
@@ -1459,7 +1446,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      */
     public void deleteACI(ACI aci) throws AccessRightsException, UMSException {
         Attr attr = new Attr(ACI.ACI, aci.getACIText());
-        modify(attr, ModSet.DELETE);
+        modify(attr, ModificationType.DELETE);
         save();
     }
 
@@ -1476,9 +1463,9 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
     public void replaceACI(ACI oldACI, ACI newACI)
             throws AccessRightsException, UMSException {
         Attr attr = new Attr(ACI.ACI, oldACI.getACIText());
-        modify(attr, ModSet.DELETE);
+        modify(attr, ModificationType.DELETE);
         attr = new Attr(ACI.ACI, newACI.toString());
-        modify(attr, ModSet.ADD);
+        modify(attr, ModificationType.ADD);
         save();
     }
 
@@ -1737,7 +1724,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * 
      * @serial
      */
-    private ModSet m_modSet;
+    private Collection<Modification> m_modSet;
 
     /**
      * Internal naming attribute (ex: "ou")

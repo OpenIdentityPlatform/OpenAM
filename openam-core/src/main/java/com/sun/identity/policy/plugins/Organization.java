@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,37 +24,44 @@
  *
  * $Id: Organization.java,v 1.9 2009/11/20 23:52:55 ww203982 Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011 ForgeRock Inc 
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation 
  */
+
 package com.sun.identity.policy.plugins;
 
-import java.util.*;
-import com.sun.identity.shared.ldap.*;
-import com.sun.identity.shared.ldap.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
-import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.common.LDAPConnectionPool;
-import com.sun.identity.policy.PolicyManager;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.policy.InvalidNameException;
+import com.sun.identity.policy.NameNotFoundException;
 import com.sun.identity.policy.PolicyConfig;
+import com.sun.identity.policy.PolicyEvaluator;
+import com.sun.identity.policy.PolicyException;
+import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.policy.PolicyUtils;
 import com.sun.identity.policy.ResBundleUtils;
-import com.sun.identity.policy.ValidValues;
-import com.sun.identity.policy.Syntax;
-import com.sun.identity.policy.PolicyException;
-import com.sun.identity.policy.NameNotFoundException;
 import com.sun.identity.policy.SubjectEvaluationCache;
-import com.sun.identity.policy.PolicyEvaluator;
-import com.sun.identity.policy.InvalidNameException;
+import com.sun.identity.policy.Syntax;
+import com.sun.identity.policy.ValidValues;
 import com.sun.identity.policy.interfaces.Subject;
-import com.sun.identity.shared.ldap.LDAPBindRequest;
-import com.sun.identity.shared.ldap.LDAPRequestParser;
-import com.sun.identity.shared.ldap.LDAPSearchRequest;
+import com.sun.identity.shared.debug.Debug;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.ResultCode;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.requests.Requests;
+import org.forgerock.opendj.ldap.requests.SearchRequest;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
 
 /**
  * This class represents a group of OpenAM organizations.
@@ -67,15 +74,15 @@ public class Organization implements Subject {
 
     // Variables
     private boolean initialized = false;
-    private Set selectedOrgDNs = Collections.EMPTY_SET;
-    private Set selectedRFCOrgDNs = Collections.EMPTY_SET;
+    private Set<String> selectedOrgDNs = Collections.emptySet();
+    private Set<String> selectedRFCOrgDNs = Collections.emptySet();
     private String authid;
     private String authpw;
     private String baseDN;
     private String userSearchFilter;
     private String orgSearchFilter;
-    private int userSearchScope = LDAPv2.SCOPE_SUB;
-    private int orgSearchScope = LDAPv2.SCOPE_SUB;
+    private SearchScope userSearchScope = SearchScope.WHOLE_SUBTREE;
+    private SearchScope orgSearchScope = SearchScope.WHOLE_SUBTREE;
     private String userRDNAttrName;
     private String orgRDNAttrName;
     private int timeLimit;
@@ -83,7 +90,7 @@ public class Organization implements Subject {
     private boolean sslEnabled = false;
     private int minPoolSize;
     private int maxPoolSize;
-    private LDAPConnectionPool connPool;
+    private ConnectionFactory connPool;
     private String orgName;
     private boolean localDS;
     private boolean aliasEnabled;
@@ -144,11 +151,11 @@ public class Organization implements Subject {
         String scope = (String) configParams.get(
                    PolicyConfig.LDAP_USERS_SEARCH_SCOPE);
         if (scope.equalsIgnoreCase(LDAP_SCOPE_BASE)) {
-            userSearchScope = LDAPv2.SCOPE_BASE;
+            userSearchScope = SearchScope.BASE_OBJECT;
         } else if (scope.equalsIgnoreCase(LDAP_SCOPE_ONE)) {
-            userSearchScope = LDAPv2.SCOPE_ONE;
+            userSearchScope = SearchScope.SINGLE_LEVEL;
         } else {
-            userSearchScope = LDAPv2.SCOPE_SUB;
+            userSearchScope = SearchScope.WHOLE_SUBTREE;
         }
 
         userRDNAttrName = (String) configParams.get(
@@ -158,11 +165,11 @@ public class Organization implements Subject {
         scope = (String) configParams.get(
                   PolicyConfig.LDAP_ORG_SEARCH_SCOPE);
         if (scope.equalsIgnoreCase(LDAP_SCOPE_BASE)) {
-            orgSearchScope = LDAPv2.SCOPE_BASE;
+            orgSearchScope = SearchScope.BASE_OBJECT;
         } else if (scope.equalsIgnoreCase(LDAP_SCOPE_ONE)) {
-            orgSearchScope = LDAPv2.SCOPE_ONE;
+            orgSearchScope = SearchScope.SINGLE_LEVEL;
         } else {
-            orgSearchScope = LDAPv2.SCOPE_SUB;
+            orgSearchScope = SearchScope.WHOLE_SUBTREE;
         }
 
         orgRDNAttrName = (String) configParams.get(
@@ -289,100 +296,57 @@ public class Organization implements Subject {
         }
 
         String[] attrs = { orgRDNAttrName };
-        LDAPConnection ld = null;
-        Set validOrgDNs = new HashSet();
+        Set<String> validOrgDNs = new HashSet<>();
         int status = ValidValues.SUCCESS;
         try {
-            LDAPSearchResults res = null;
-            LDAPBindRequest bindRequest = LDAPRequestParser.parseBindRequest(
-                3, authid, authpw);
-            LDAPSearchRequest searchRequest =
-                LDAPRequestParser.parseSearchRequest(baseDN, orgSearchScope,
-                searchFilter, attrs, false, timeLimit,
-                LDAPRequestParser.DEFAULT_DEREFERENCE, maxResults);
-            try {
-                ld = connPool.getConnection();
+            SearchRequest request = Requests.newSearchRequest(baseDN, orgSearchScope, searchFilter, attrs);
+            try (Connection conn = connPool.getConnection()) {
                 // connect to the server to authenticate
-                try {
-                    ld.authenticate(bindRequest);
-                } catch (LDAPException connEx) {
-                    // fallback to ldap v2 if v3 is not supported
-                    if (connEx.getLDAPResultCode() ==
-                        LDAPException.PROTOCOL_ERROR)
-                    {
-                        if (debug.messageEnabled()) {
-                            debug.message("Organization.getValidValues(): "+
-                            "Bind with LDAPv3 failed, retrying with v2");
-                        }
-                        bindRequest = LDAPRequestParser.parseBindRequest(
-                                2, authid, authpw);
-                        ld.authenticate(bindRequest);
+                ConnectionEntryReader reader = conn.search(request);
+                while (reader.hasNext()) {
+                    if (reader.isReference()) {
+                        //ignore
+                        reader.readReference();
                     } else {
-                        throw connEx;
-                    }
-                }
-                res = ld.search(searchRequest);
-            } finally {
-                if ( ld != null) {
-                    connPool.close(ld);
-                }
-            }
-            while (res.hasMoreElements()) {
-                try {
-                    LDAPEntry entry = res.next();
-                    if (entry != null) {
-                        validOrgDNs.add(entry.getDN());
-                        if (debug.messageEnabled()) {
-                            debug.message(
-                   "Organization.getValidValues(): found org name =" 
-                            + entry.getDN());
+                        SearchResultEntry entry = reader.readEntry();
+                        if (entry != null) {
+                            validOrgDNs.add(entry.getName().toString());
+                            debug.message("Organization.getValidValues(): found org name = {}",
+                                    entry.getName().toString());
                         }
-                    }
-                } catch (LDAPReferralException lre) {
-                    // ignore referrals
-                    continue;
-                } catch (LDAPException le) {
-                    String objs[] = { orgName };
-                    int resultCode = le.getLDAPResultCode();
-                    if (resultCode == le.SIZE_LIMIT_EXCEEDED) {
-                        debug.warning(
-                      "Organization.getValidValues(): exceeded the size limit");
-                        status = ValidValues.SIZE_LIMIT_EXCEEDED;
-                    } else if (resultCode == le.TIME_LIMIT_EXCEEDED) {
-                        debug.warning(
-                      "Organization.getValidValues(): exceeded the time limit");
-                        status = ValidValues.TIME_LIMIT_EXCEEDED;
-                    } else {
-                        throw (new PolicyException(le));
                     }
                 }
             }
-        } catch (LDAPException lde) {
-            int ldapErrorCode = lde.getLDAPResultCode();
-            if (ldapErrorCode == LDAPException.INVALID_CREDENTIALS) {
-                throw (new PolicyException(ResBundleUtils.rbName,
-                    "ldap_invalid_password", null, null));
-            } else if (ldapErrorCode == LDAPException.NO_SUCH_OBJECT) {
-                String objs[] = { baseDN };
-                throw (new PolicyException(ResBundleUtils.rbName,
-                    "no_such_ldap_base_dn", objs, null));
-            } 
-            String errorMsg = lde.getLDAPErrorMessage(); 
-            String additionalMsg = lde.errorCodeToString(); 
-            if (additionalMsg != null) {
-                throw (new PolicyException(
-                         errorMsg + ": " + additionalMsg));
-            } else { 
-                throw (new PolicyException(errorMsg));
+        } catch (ErrorResultException le) {
+            ResultCode resultCode = le.getResult().getResultCode();
+            if (ResultCode.SIZE_LIMIT_EXCEEDED.equals(resultCode)) {
+                debug.warning("Organization.getValidValues(): exceeded the size limit");
+                status = ValidValues.SIZE_LIMIT_EXCEEDED;
+            } else if (ResultCode.TIME_LIMIT_EXCEEDED.equals(resultCode)) {
+                debug.warning("Organization.getValidValues(): exceeded the time limit");
+                status = ValidValues.TIME_LIMIT_EXCEEDED;
+            } else {
+                if (ResultCode.INVALID_CREDENTIALS.equals(resultCode)) {
+                    throw new PolicyException(ResBundleUtils.rbName, "ldap_invalid_password", null, null);
+                } else if (ResultCode.NO_SUCH_OBJECT.equals(resultCode)) {
+                    String objs[] = { baseDN };
+                    throw new PolicyException(ResBundleUtils.rbName, "no_such_ldap_base_dn", objs, null);
+                }
+                String errorMsg = le.getMessage();
+                String additionalMsg = le.getResult().getDiagnosticMessage();
+                if (additionalMsg != null) {
+                    throw new PolicyException(errorMsg + ": " + additionalMsg);
+                } else {
+                    throw new PolicyException(errorMsg);
+                }
             }
         } catch (Exception e) {
-            throw (new PolicyException(e));
+            throw new PolicyException(e);
         }
         if (debug.messageEnabled()) {
-            debug.message("Organization.getValidValues(): return set=" 
-                           + validOrgDNs.toString());
+            debug.message("Organization.getValidValues(): return set= {}", validOrgDNs.toString());
         }
-        return(new ValidValues(status, validOrgDNs));
+        return new ValidValues(status, validOrgDNs);
     }
 
 
@@ -444,18 +408,16 @@ public class Organization implements Subject {
                 "org_subject_invalid_user_names", null, 
                 "null", PolicyException.USER_COLLECTION));
         }
-        selectedOrgDNs = new HashSet();
+        selectedOrgDNs = new HashSet<>();
         selectedOrgDNs.addAll(names);
         if (debug.messageEnabled()) {
             debug.message("Organization.setValues(): selected org names=" 
                           + selectedOrgDNs);
         }
-        selectedRFCOrgDNs = new HashSet();
+        selectedRFCOrgDNs = new HashSet<>();
         // add to the RFC Set now
-        Iterator it = names.iterator();
-        while (it.hasNext()) {
-            selectedRFCOrgDNs.add(new DN((String)it.next()).toRFCString().
-                toLowerCase());
+        for (Object name : names) {
+            selectedRFCOrgDNs.add(DN.valueOf((String) name).toString().toLowerCase());
         }
     }
 
@@ -540,7 +502,7 @@ public class Organization implements Subject {
                 if (isMemberOfOrg(valueDN, userDN, tokenID)) {
                     if (debug.messageEnabled()) {
                         debug.message("Organization.isMember(): User " 
-                        + userDN.toRFCString() + " is a member of the "
+                        + userDN.toString() + " is a member of the "
                         +"Organization object");
                     }
                     found = true;
@@ -567,12 +529,12 @@ public class Organization implements Subject {
      * <code>org</code>
      */
     private boolean isMemberOfOrg(String org, DN userDN, String tokenID) {
-        DN orgDN = new DN(org);
-        boolean orgMatch = userDN.isDescendantOf(orgDN);
+        DN orgDN = DN.valueOf(org);
+        boolean orgMatch = userDN.isInScopeOf(orgDN, SearchScope.SUBORDINATES);
         if (debug.messageEnabled()) {
             String member = (orgMatch) ? "is member of":"is not a member of";
             debug.message("Organization.isMemberOfGroup(): User " 
-                + userDN.toRFCString()+ " "+member+ " the Organization "+org
+                + userDN.toString()+ " "+member+ " the Organization "+org
                 +", adding to Subject eval cache");
         }
         SubjectEvaluationCache.addEntry(tokenID, ldapServer, 
@@ -642,14 +604,12 @@ public class Organization implements Subject {
      * from the token is returned. If the directory is remote
      * a LDAP search is performed to get the user DN.
      */
-    private DN getUserDN(SSOToken token) throws SSOException,
-        PolicyException  
-    {
+    private DN getUserDN(SSOToken token) throws SSOException, PolicyException {
         DN userDN = null;
-        Set qualifiedUserDNs = new HashSet();
+        Set<String> qualifiedUserDNs = new HashSet<>();
         String userLocalDN = token.getPrincipal().getName();
         if (localDS && !PolicyUtils.principalNameEqualsUuid( token)) {
-            userDN = new DN(userLocalDN);
+            userDN = DN.valueOf(userLocalDN);
         } else {
             // try to figure out the user name from the local user DN
             int beginIndex = userLocalDN.indexOf("=");
@@ -681,76 +641,48 @@ public class Organization implements Subject {
                     
             String[] attrs = { userRDNAttrName }; 
             // search the remote ldap and find out the user DN          
-            LDAPConnection ld = null;
-            try {
-                LDAPSearchResults res = null;
-                LDAPBindRequest bindRequest =
-                    LDAPRequestParser.parseBindRequest(authid, authpw);
-                LDAPSearchRequest searchRequest =
-                    LDAPRequestParser.parseSearchRequest(baseDN,
-                    userSearchScope, searchFilter, attrs, false, timeLimit,
-                    LDAPRequestParser.DEFAULT_DEREFERENCE, maxResults);
-                try {
-                    ld = connPool.getConnection();
-                    // connect to the server to authenticate                
-                    ld.authenticate(bindRequest);
-                    res = ld.search(searchRequest);
-                } finally {
-                    if (ld != null) {
-                        connPool.close(ld);
-                    }
-                }
-                while (res.hasMoreElements()) {
-                    try {
-                        LDAPEntry entry = res.next();
+            try (Connection conn = connPool.getConnection()) {
+                SearchRequest request = Requests.newSearchRequest(baseDN, userSearchScope, searchFilter, attrs);
+                ConnectionEntryReader reader = conn.search(request);
+                while (reader.hasNext()) {
+                    if (reader.isReference()) {
+                        //ignore
+                        reader.readReference();
+                    } else {
+                        SearchResultEntry entry = reader.readEntry();
                         if (entry != null) {
-                            qualifiedUserDNs.add(entry.getDN());
-                        }
-                    } catch (LDAPReferralException lre) {
-                        // ignore referrals
-                        continue;
-                    } catch (LDAPException le) {
-                        String objs[] = { orgName };
-                        int resultCode = le.getLDAPResultCode();
-                        if (resultCode == le.SIZE_LIMIT_EXCEEDED) {
-                            debug.warning("Organization.getUserDN(): exceeded "
-                                    +"the size limit");
-                            throw (new PolicyException(
-                                 ResBundleUtils.rbName,
-                                "ldap_search_exceed_size_limit", 
-                                objs, null));
-                        } else if (resultCode == le.TIME_LIMIT_EXCEEDED) {
-                            debug.warning("Organization.getUserDN(): exceeded "
-                                    +"the time limit");
-                            throw (new PolicyException(
-                                 ResBundleUtils.rbName,
-                                "ldap_search_exceed_time_limit", 
-                                objs, null));
-                        } else {
-                            throw (new PolicyException(le));
+                            qualifiedUserDNs.add(entry.getName().toString());
                         }
                     }
                 }
-            } catch (LDAPException lde) {
-                int ldapErrorCode = lde.getLDAPResultCode();
-                if (ldapErrorCode == LDAPException.INVALID_CREDENTIALS) {
-                    throw (new PolicyException(ResBundleUtils.rbName,
-                        "ldap_invalid_password", null, null));
-                } else if (ldapErrorCode == LDAPException.NO_SUCH_OBJECT) {
-                    String objs[] = { baseDN };
-                    throw (new PolicyException(ResBundleUtils.rbName,
-                        "no_such_ldap_base_dn", objs, null));
-                } 
-                String errorMsg = lde.getLDAPErrorMessage();
-                String additionalMsg = lde.errorCodeToString(); 
-                if (additionalMsg != null) {
-                    throw (new PolicyException(
-                             errorMsg + ": " + additionalMsg));
+            } catch (ErrorResultException le) {
+                String[] objs = {orgName};
+                ResultCode resultCode = le.getResult().getResultCode();
+                if (ResultCode.SIZE_LIMIT_EXCEEDED.equals(resultCode)) {
+                    debug.warning("Organization.getUserDN(): exceeded the size limit");
+                    throw new PolicyException(ResBundleUtils.rbName, "ldap_search_exceed_size_limit",
+                            objs, null);
+                } else if (ResultCode.TIME_LIMIT_EXCEEDED.equals(resultCode)) {
+                    debug.warning("Organization.getUserDN(): exceeded the time limit");
+                    throw new PolicyException(ResBundleUtils.rbName, "ldap_search_exceed_time_limit",
+                            objs, null);
                 } else {
-                    throw (new PolicyException(errorMsg));
+                    if (ResultCode.INVALID_CREDENTIALS.equals(resultCode)) {
+                        throw new PolicyException(ResBundleUtils.rbName, "ldap_invalid_password", null, null);
+                    } else if (ResultCode.NO_SUCH_OBJECT.equals(resultCode)) {
+                        objs = new String[]{ baseDN };
+                        throw new PolicyException(ResBundleUtils.rbName, "no_such_ldap_base_dn", objs, null);
+                    }
+                    String errorMsg = le.getMessage();
+                    String additionalMsg = le.getResult().getDiagnosticMessage();
+                    if (additionalMsg != null) {
+                        throw new PolicyException(errorMsg + ": " + additionalMsg);
+                    } else {
+                        throw new PolicyException(errorMsg);
+                    }
                 }
             } catch (Exception e) {
-                throw (new PolicyException(e));
+                throw new PolicyException(e);
             }
             if (qualifiedUserDNs.size() > 0) {
                 if (debug.messageEnabled()) {
@@ -760,7 +692,7 @@ public class Organization implements Subject {
                 }
                 Iterator iter = qualifiedUserDNs.iterator();
                 // we only take the first qualified DN
-                userDN = new DN((String)iter.next());
+                userDN = DN.valueOf((String) iter.next());
             }
         }
         return userDN;

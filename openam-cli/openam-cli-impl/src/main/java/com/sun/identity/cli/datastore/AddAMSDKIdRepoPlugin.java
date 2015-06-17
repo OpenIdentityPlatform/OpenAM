@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,12 @@
  *
  * $Id: AddAMSDKIdRepoPlugin.java,v 1.9 2009/12/11 06:50:36 hengming Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.cli.datastore;
 
 
-import com.iplanet.am.util.SSLSocketFactoryManager;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.util.Crypt;
 import com.iplanet.sso.SSOException;
@@ -42,7 +42,19 @@ import com.sun.identity.cli.IOutput;
 import com.sun.identity.cli.LogWriter;
 import com.sun.identity.cli.RequestContext;
 import com.sun.identity.common.DNUtils;
-import com.sun.identity.common.LDAPUtils;
+
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.ldap.LdifUtils;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.Connections;
+import org.forgerock.opendj.ldap.LDAPConnectionFactory;
+import org.forgerock.opendj.ldap.LDAPOptions;
+import org.forgerock.opendj.ldap.SSLContextBuilder;
+import org.forgerock.opendj.ldap.requests.BindRequest;
+import org.forgerock.opendj.ldap.requests.Requests;
+import org.forgerock.opendj.ldap.requests.SimpleBindRequest;
+
 import com.sun.identity.common.configuration.ServerConfigXML;
 import com.sun.identity.common.configuration.ServerConfigXML.DirUserObject;
 import com.sun.identity.common.configuration.ServerConfigXML.ServerGroup;
@@ -70,10 +82,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
-import com.sun.identity.shared.ldap.LDAPConnection;
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.LDAPException;
+
+import javax.net.ssl.SSLContext;
 
 /**
  * This command creates identity.
@@ -311,17 +323,15 @@ public class AddAMSDKIdRepoPlugin extends AuthenticatedCommand {
         }
     }
     
-    private void loadLDIFs() 
-        throws Exception {
+    private void loadLDIFs() throws Exception {
         CommandManager mgr = getCommandManager();
 
         List ldifs = getLDIFs();
         
         for (Iterator i = directoryServers.iterator(); i.hasNext(); ) {
             String dshost = (String)i.next();
-            LDAPConnection ld = null;
-            try {
-                ld = getLDAPConnection(new DSEntry(dshost));
+            try (ConnectionFactory factory = getLDAPConnection(new DSEntry(dshost));
+                 Connection ld = factory.getConnection()){
                 String dbName = LDAPUtils.getDBName(basedn, ld);
 
                 for (Iterator j = ldifs.iterator(); j.hasNext();) {
@@ -331,24 +341,16 @@ public class AddAMSDKIdRepoPlugin extends AuthenticatedCommand {
                     String swapped = tagswap(content, dbName);
                     loadLDIF(ld, swapped);
                 }
-            } finally {
-                try {
-                    if (ld != null) {
-                        ld.disconnect();
-                    }
-                } catch (LDAPException e) {
-                    //ingore
-                }
             }
         }
     }
     
-    private void loadLDIF(LDAPConnection ld, String ldif)
+    private void loadLDIF(Connection ld, String ldif)
         throws Exception {
         ByteArrayInputStream reader = null;
         try {
             reader = new ByteArrayInputStream(ldif.getBytes());
-            LDAPUtils.createSchemaFromLDIF(new DataInputStream(reader), ld);
+            LdifUtils.createSchemaFromLDIF(new DataInputStream(reader), ld);
         } finally {
             if (reader != null) {
                 reader.close();
@@ -366,7 +368,6 @@ public class AddAMSDKIdRepoPlugin extends AuthenticatedCommand {
         ldifs.add(templateDir + "/odsee/odsee_user_schema.ldif");
         ldifs.add(templateDir + "/odsee/odsee_plugin/amsdk_init_template.ldif");
         ldifs.add(templateDir + "/odsee/odsee_user_index.ldif");
-        ldifs.add(templateDir + "/odsee/odsee_plugin.ldif");
         return ldifs;
     }
 
@@ -374,15 +375,14 @@ public class AddAMSDKIdRepoPlugin extends AuthenticatedCommand {
         String orig,
         String dbName
     ) throws Exception {
-        String normalizedDN = LDAPDN.normalize(basedn);
+        String normalizedDN = LDAPUtils.normalizeDN(basedn);
         String escapedDN = SMSSchema.escapeSpecialCharacters(normalizedDN);
-        String[] doms = LDAPDN.explodeDN(normalizedDN, true);
-        String rdn = doms[0];
+        String rdn = LDAPUtils.rdnValueFromDn(normalizedDN);
         String peopleContainer = "People_" + basedn.replace(',', '_');
         
         orig = orig.replaceAll("@DB_NAME@", dbName);
         orig = orig.replaceAll("@NORMALIZED_RS@", escapedDN);
-        orig = orig.replaceAll("@RS_RDN@", LDAPDN.escapeRDN(rdn));
+        orig = orig.replaceAll("@RS_RDN@", LDAPUtils.escapeValue(rdn));
         orig = orig.replaceAll("@ADMIN_PWD@", dUserPwd);
         orig = orig.replaceAll("@SERVER_HOST@", 
             SystemProperties.get(Constants.AM_SERVER_HOST));
@@ -393,14 +393,14 @@ public class AddAMSDKIdRepoPlugin extends AuthenticatedCommand {
         return orig;
     }
     
-    private LDAPConnection getLDAPConnection(DSEntry ds) 
-        throws Exception {
-        LDAPConnection ld = (ds.ssl) ? new LDAPConnection(
-            SSLSocketFactoryManager.getSSLSocketFactory()) : 
-            new LDAPConnection();
-        ld.setConnectTimeout(300);
-        ld.connect(3, ds.host, ds.port, bindDN, bindPwd);
-        return ld;
+    private ConnectionFactory getLDAPConnection(DSEntry ds) throws Exception {
+        LDAPOptions options = new LDAPOptions().setConnectTimeout(300, TimeUnit.SECONDS);
+        if (ds.ssl) {
+            options.setSSLContext(new SSLContextBuilder().getSSLContext());
+        }
+        ConnectionFactory factory = new LDAPConnectionFactory(ds.host, ds.port, options);
+        BindRequest bindRequest = Requests.newSimpleBindRequest(bindDN, bindPwd.getBytes());
+        return Connections.newAuthenticatedConnectionFactory(factory, bindRequest);
     }
     
     class DSEntry {

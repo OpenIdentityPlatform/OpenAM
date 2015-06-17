@@ -29,12 +29,6 @@
 
 package com.sun.identity.setup;
 
-import com.sun.identity.common.DNUtils;
-import com.sun.identity.shared.encode.Hash;
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.services.util.Crypt;
-import com.sun.identity.shared.xml.XMLUtils;
-import com.sun.identity.sm.SMSSchema;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -44,9 +38,16 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.util.DN;
+
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.services.util.Crypt;
+import com.sun.identity.common.DNUtils;
+import com.sun.identity.shared.encode.Hash;
+import com.sun.identity.shared.xml.XMLUtils;
+import com.sun.identity.sm.SMSSchema;
+import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.utils.ValidateIPaddress;
+import org.forgerock.opendj.ldap.DN;
 
 /**
  * This class holds the default values of service schema.
@@ -142,8 +143,8 @@ public class ServicesDefaultValues {
                 throw new ConfiguratorException(
                     "configurator.dsconnnectfailure", null, locale);
             }
-            if ((!DN.isDN((String) map.get(
-                SetupConstants.CONFIG_VAR_ROOT_SUFFIX))) ||
+            if ((!LDAPUtils.isDN((String) map.get(
+                    SetupConstants.CONFIG_VAR_ROOT_SUFFIX))) ||
                 (!dsConfig.connectDSwithDN(ssl))) {
                 dsConfig = null;
                 throw new ConfiguratorException("configurator.invalidsuffix",
@@ -196,7 +197,7 @@ public class ServicesDefaultValues {
                 SetupConstants.CONFIG_VAR_ROOT_SUFFIX);
         }
         umRootSuffix = umRootSuffix.trim();
-        String normalizedDN = LDAPDN.normalize(umRootSuffix);
+        String normalizedDN = DN.valueOf(umRootSuffix).toString();
         String escapedDN = SMSSchema.escapeSpecialCharacters(normalizedDN);
         map.put(SetupConstants.UM_NORMALIZED_ORGBASE, escapedDN);
     }
@@ -553,7 +554,7 @@ public class ServicesDefaultValues {
                     orig = orig.replaceAll(
                         "@" + SetupConstants.SM_ROOT_SUFFIX_HAT + "@", tmp);
 
-                    String rfced = (new DN(value)).toRFCString();
+                    String rfced = DN.valueOf(value).toString();
                     tmp = (bXML) ? XMLUtils.escapeSpecialCharacters(rfced) :
                         rfced;
                     orig = orig.replaceAll(

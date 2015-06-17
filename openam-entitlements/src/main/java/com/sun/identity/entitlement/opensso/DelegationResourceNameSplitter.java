@@ -24,17 +24,22 @@
  *
  * $Id: DelegationResourceNameSplitter.java,v 1.2 2009/11/19 00:08:51 veiming Exp $
  *
- * Portions copyright 2013 ForgeRock, Inc.
+ * Portions copyright 2013-2015 ForgeRock AS.
  */
+
 package com.sun.identity.entitlement.opensso;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.sun.identity.entitlement.ResourceSearchIndexes;
 import com.sun.identity.entitlement.util.ResourceNameSplitter;
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.sm.SMSEntry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.RDN;
 
 public class DelegationResourceNameSplitter extends
     ResourceNameSplitter {
@@ -58,25 +63,29 @@ public class DelegationResourceNameSplitter extends
         String prefix = match.group(1);
         String suffix = match.group(3);
 
-        if (DN.isDN(dn)) {
-            DN rootDN = new DN(rootSuffix);
+        if (LDAPUtils.isDN(dn)) {
+            DN rootDN = DN.valueOf(rootSuffix);
 
-            if (rootDN.equals(new DN(dn))) {
+            DN dnObject = DN.valueOf(dn);
+            if (rootDN.equals(dnObject)) {
                 return super.getIndexes(resource, realm);
             } else {
                 ResourceSearchIndexes indexes = null;
-                String[] comp = LDAPDN.explodeDN(dn, false);
                 StringBuilder buff = new StringBuilder();
                 boolean start = false;
 
-                for (int i = comp.length - 1; i >= 0; --i) {
+                List<RDN> rdns = new ArrayList<>();
+                for (RDN rdn : dnObject) {
+                    rdns.add(rdn);
+                }
+                for (int i = rdns.size() - 1; i >= 0; --i) {
                     if (buff.length() > 0) {
                         buff.insert(0, ",");
                     }
-                    buff.insert(0, comp[i]);
+                    buff.insert(0, rdns.get(i).toString());
 
                     if (!start) {
-                        start = rootDN.equals(new DN(buff.toString()));
+                        start = rootDN.equals(DN.valueOf(buff.toString()));
                         if (start) {
                             indexes = super.getIndexes(
                                 prefix + buff.toString() + suffix, realm);

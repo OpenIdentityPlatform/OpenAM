@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,25 @@
  *
  * $Id: OpenSSOApplicationPrivilegeManager.java,v 1.16 2010/01/11 20:15:46 veiming Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.opensso;
+
+import javax.security.auth.Subject;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.security.AccessController;
+import java.security.Principal;
+import java.text.MessageFormat;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.DisplayUtils;
@@ -57,27 +72,13 @@ import com.sun.identity.entitlement.SubjectImplementation;
 import com.sun.identity.entitlement.interfaces.ResourceName;
 import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSEntry;
 import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.entitlement.conditions.environment.SimpleTimeCondition;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.security.AccessController;
-import java.security.Principal;
-import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-import javax.security.auth.Subject;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
 
 public class OpenSSOApplicationPrivilegeManager extends
     ApplicationPrivilegeManager {
@@ -712,15 +713,14 @@ public class OpenSSOApplicationPrivilegeManager extends
         Principal p = principals.iterator().next();
         String principalName = p.getName();
         
-        if (DN.isDN(principalName)) {
-            DN principalDN = new DN(p.getName());
-            DN adminDN = new DN(adminUser);
+        if (LDAPUtils.isDN(principalName)) {
+            DN principalDN = DN.valueOf(p.getName().toLowerCase());
+            DN adminDN = DN.valueOf(adminUser.toLowerCase());
 
             if (principalDN.equals(adminDN)) {
                 return true;
             }
-            DN dsameuser = new DN(dsameuserDN);
-
+            DN dsameuser = DN.valueOf(dsameuserDN.toLowerCase());
             if (principalDN.equals(dsameuser)) {
                 return true;
             }

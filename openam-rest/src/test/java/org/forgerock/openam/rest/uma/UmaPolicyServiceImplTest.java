@@ -113,10 +113,10 @@ public class UmaPolicyServiceImplTest {
                 field("policyId", "RESOURCE_SET_ID"),
                 field("permissions", array(
                         object(
-                                field("subject", "SUBJECT_ONE"),
+                                field("subject", "id=SUBJECT_ONE"),
                                 field("scopes", array("SCOPE_A", "SCOPE_B"))),
                         object(
-                                field("subject", "SUBJECT_TWO"),
+                                field("subject", "id=SUBJECT_TWO"),
                                 field("scopes", Arrays.asList(subjectTwoScopes)))
                 ))
         ));
@@ -138,11 +138,11 @@ public class UmaPolicyServiceImplTest {
                                 object(
                                         field("type", "JwtClaim"),
                                         field("claimName", "sub"),
-                                        field("claimValue", "SUBJECT_ONE")
+                                        field("claimValue", "id=SUBJECT_ONE")
                                 ), object(
                                         field("type", "JwtClaim"),
                                         field("claimName", "sub"),
-                                        field("claimValue", "SUBJECT_TWO")
+                                        field("claimValue", "id=SUBJECT_TWO")
                                 )))
                 ))
         ));
@@ -160,7 +160,7 @@ public class UmaPolicyServiceImplTest {
                                 object(
                                         field("type", "JwtClaim"),
                                         field("claimName", "sub"),
-                                        field("claimValue", "SUBJECT_ONE")
+                                        field("claimValue", "id=SUBJECT_ONE")
                                 )))
                 ))
         ));
@@ -178,7 +178,7 @@ public class UmaPolicyServiceImplTest {
                                 object(
                                         field("type", "JwtClaim"),
                                         field("claimName", "sub"),
-                                        field("claimValue", "SUBJECT_ONE")
+                                        field("claimValue", "id=SUBJECT_ONE")
                                 )))
                 ))
         ));
@@ -215,10 +215,10 @@ public class UmaPolicyServiceImplTest {
                 .contains(entry("policyId", "RESOURCE_SET_ID"), entry("name", "NAME"));
         JsonValue permissions = umaPolicy.asJson().get("permissions");
         assertThat(permissions.asList()).hasSize(2);
-        assertThat(permissions.get(0).asMap()).contains(entry("subject", "SUBJECT_ONE"));
-        assertThat(permissions.get(0).get("scopes").asList()).containsOnly("SCOPE_A", "SCOPE_B");
-        assertThat(permissions.get(1).asMap()).contains(entry("subject", "SUBJECT_TWO"));
-        assertThat(permissions.get(1).get("scopes").asList()).containsOnly("SCOPE_A");
+        assertThat(permissions.get(0).asMap()).contains(entry("subject", "id=SUBJECT_TWO"));
+        assertThat(permissions.get(0).get("scopes").asList()).containsOnly("SCOPE_A");
+        assertThat(permissions.get(1).asMap()).contains(entry("subject", "id=SUBJECT_ONE"));
+        assertThat(permissions.get(1).get("scopes").asList()).containsOnly("SCOPE_A", "SCOPE_B");
     }
 
     @Test(expectedExceptions = ConflictException.class)
@@ -573,7 +573,7 @@ public class UmaPolicyServiceImplTest {
         //Given
         ServerContext context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
-                .setQueryFilter(QueryFilter.equalTo("/permissions/subject", "SUBJECT_ONE"));
+                .setQueryFilter(QueryFilter.equalTo("/permissions/subject", "id=SUBJECT_ONE"));
 
         mockBackendQuery(context, createBackendScopeAPolicyJson(), createBackendScopeBPolicyJson());
 
@@ -592,7 +592,7 @@ public class UmaPolicyServiceImplTest {
         //Given
         ServerContext context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
-                .setQueryFilter(QueryFilter.equalTo("/permissions/subject", "SUBJECT_OTHER"));
+                .setQueryFilter(QueryFilter.equalTo("/permissions/subject", "id=SUBJECT_OTHER"));
 
         mockBackendQuery(context);
 
@@ -650,7 +650,7 @@ public class UmaPolicyServiceImplTest {
         ServerContext context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.and(
-                        QueryFilter.equalTo("/permissions/subject", "SUBJECT_ONE"),
+                        QueryFilter.equalTo("/permissions/subject", "id=SUBJECT_ONE"),
                         QueryFilter.equalTo("resourceServer", "CLIENT_ID")
                 ));
 
@@ -672,7 +672,7 @@ public class UmaPolicyServiceImplTest {
         ServerContext context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.and(
-                        QueryFilter.equalTo("/permissions/subject", "OTHER_SUBJECT"),
+                        QueryFilter.equalTo("/permissions/subject", "id=OTHER_SUBJECT"),
                         QueryFilter.equalTo("resourceServer", "CLIENT_ID")
                 ));
 
@@ -694,7 +694,7 @@ public class UmaPolicyServiceImplTest {
         ServerContext context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.and(
-                        QueryFilter.equalTo("/permissions/subject", "SUBJECT_ONE"),
+                        QueryFilter.equalTo("/permissions/subject", "id=SUBJECT_ONE"),
                         QueryFilter.equalTo("resourceServer", "OTHER_CLIENT_ID")
                 ));
 
@@ -716,7 +716,7 @@ public class UmaPolicyServiceImplTest {
         ServerContext context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.and(
-                        QueryFilter.equalTo("/permissions/subject", "SUBJECT_OTHER"),
+                        QueryFilter.equalTo("/permissions/subject", "id=SUBJECT_OTHER"),
                         QueryFilter.equalTo("resourceServer", "OTHER_CLIENT_ID")
                 ));
 
@@ -738,7 +738,7 @@ public class UmaPolicyServiceImplTest {
         ServerContext context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.or(
-                        QueryFilter.equalTo("/permissions/subject", "SUBJECT_ONE"),
+                        QueryFilter.equalTo("/permissions/subject", "id=SUBJECT_ONE"),
                         QueryFilter.equalTo("resourceServer", "CLIENT_ID")
                 ));
 
@@ -760,7 +760,7 @@ public class UmaPolicyServiceImplTest {
         ServerContext context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.or(
-                        QueryFilter.equalTo("/permissions/subject", "SUBJECT_OTHER"),
+                        QueryFilter.equalTo("/permissions/subject", "id=SUBJECT_OTHER"),
                         QueryFilter.equalTo("resourceServer", "CLIENT_ID")
                 ));
 
@@ -782,7 +782,7 @@ public class UmaPolicyServiceImplTest {
         ServerContext context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.or(
-                        QueryFilter.equalTo("/permissions/subject", "SUBJECT_ONE"),
+                        QueryFilter.equalTo("/permissions/subject", "id=SUBJECT_ONE"),
                         QueryFilter.equalTo("resourceServer", "OTHER_CLIENT_ID")
                 ));
 
@@ -804,7 +804,7 @@ public class UmaPolicyServiceImplTest {
         ServerContext context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.or(
-                        QueryFilter.equalTo("/permissions/subject", "SUBJECT_OTHER"),
+                        QueryFilter.equalTo("/permissions/subject", "id=SUBJECT_OTHER"),
                         QueryFilter.equalTo("resourceServer", "OTHER_CLIENT_ID")
                 ));
 

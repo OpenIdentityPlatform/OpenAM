@@ -386,15 +386,6 @@
 ./WEB-INF/classes/amIdRepo_ko.properties
 ./WEB-INF/classes/amIdRepo_zh.properties
 ./WEB-INF/classes/amIdRepo_zh_TW.properties
-./WEB-INF/classes/amLDAPv3Repo.properties
-./WEB-INF/classes/amLDAPv3Repo_de.properties
-./WEB-INF/classes/amLDAPv3Repo_en.properties
-./WEB-INF/classes/amLDAPv3Repo_es.properties
-./WEB-INF/classes/amLDAPv3Repo_fr.properties
-./WEB-INF/classes/amLDAPv3Repo_ja.properties
-./WEB-INF/classes/amLDAPv3Repo_ko.properties
-./WEB-INF/classes/amLDAPv3Repo_zh.properties
-./WEB-INF/classes/amLDAPv3Repo_zh_TW.properties
 ./WEB-INF/classes/amLogging.properties
 ./WEB-INF/classes/amLogging_de.properties
 ./WEB-INF/classes/amLogging_en.properties

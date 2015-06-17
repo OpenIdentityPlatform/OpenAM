@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,14 +24,14 @@
  *
  * $Id: DomainComponentTree.java,v 1.5 2009/01/28 05:34:51 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.ums.dctree;
 
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.StringTokenizer;
-
-import com.sun.identity.shared.ldap.LDAPDN;
 
 import com.iplanet.services.util.I18n;
 import com.iplanet.sso.SSOException;
@@ -45,6 +45,8 @@ import com.iplanet.ums.SearchResults;
 import com.iplanet.ums.UMSException;
 import com.iplanet.ums.UMSObject;
 import com.iplanet.ums.User;
+import org.forgerock.opendj.ldap.AVA;
+import org.forgerock.opendj.ldap.DN;
 
 /**
  * Represents the domain component index tree (dctree). A domain component tree
@@ -505,8 +507,8 @@ public class DomainComponentTree {
         if (m_dcRoot == null)
             return null;
 
-        String rootDN = LDAPDN.normalize(m_dcRoot.getDN());
-        String dcDN = LDAPDN.normalize(dc.getDN());
+        String rootDN = DN.valueOf(m_dcRoot.getDN()).toNormalizedString();
+        String dcDN = DN.valueOf(dc.getDN()).toNormalizedString();
 
         // Skip the dcRoot part of the DN for the given domain component.
         // Find the position of the rootDN in dcDN
@@ -517,15 +519,12 @@ public class DomainComponentTree {
         //
         dcDN = dcDN.substring(0, end);
 
-        String[] doms = LDAPDN.explodeDN(dcDN, true);
-        String domainName = doms[0];
-
+        Iterator<AVA> iterator = DN.valueOf(dcDN).rdn().iterator();
+        String domainName = iterator.next().getAttributeValue().toString();
         // Compose the fully qualified domain name with the "." character
-        //
-        for (int i = 1; i < doms.length; i++) {
-            domainName = domainName + "." + doms[i];
+        while (iterator.hasNext()) {
+            domainName += "." + iterator.next().getAttributeValue().toString();
         }
-
         return domainName;
     }
 

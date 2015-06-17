@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2012-2015 ForgeRock AS.
  */
+
 package com.sun.identity.console.user;
 
 import com.iplanet.jato.model.ModelControlException;
@@ -45,11 +46,12 @@ import com.sun.identity.console.realm.RMRealmViewBeanBase;
 import com.sun.identity.console.user.model.UMChangeUserPasswordModel;
 import com.sun.identity.console.user.model.UMChangeUserPasswordModelImpl;
 import com.sun.identity.shared.encode.Hash;
-import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.html.CCPassword;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
+import org.forgerock.openam.ldap.LDAPUtils;
+
 import java.text.MessageFormat;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
@@ -150,15 +152,11 @@ public class UMChangeUserPasswordViewBean
             userId = model.getUserName();
         }
         String loggedinUser = model.getUserName();
-        Set val = null;
-
-        //extract the user's name alone
-        String[] comps = LDAPDN.explodeDN(userId, true);
-        String[] compss = LDAPDN.explodeDN(loggedinUser, true);
 
         //check if the enabled flag is set to true and if the user being edited
         //is same as logged in user
-        if (model.isOldPasswordRequired() && (comps[0].equalsIgnoreCase(compss[0]))) {
+        if (model.isOldPasswordRequired()
+                && LDAPUtils.rdnValueFromDn(userId).equalsIgnoreCase(LDAPUtils.rdnValueFromDn(loggedinUser))) {
             oldapicall = false;
         } else {
             CCPassword pwdtag = (CCPassword) getChild(ATTR_OLD_PASSWORD);

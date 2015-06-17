@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,11 @@
  *
  * $Id: SMSAuthModule.java,v 1.9 2009/12/11 06:51:37 hengming Exp $
  *
- */
-
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.authentication.internal.server;
+
+import static org.forgerock.openam.ldap.LDAPUtils.rdnValueFromDn;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.internal.AuthPrincipal;
@@ -62,7 +61,8 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginException;
-import com.sun.identity.shared.ldap.util.DN;
+
+import org.forgerock.openam.ldap.LDAPUtils;
 
 /**
  * AM's internal user's authentication module
@@ -211,10 +211,9 @@ public class SMSAuthModule implements LoginModule {
                 debug.message("SMSAuthModule::login() For authentication: "
                         + "Username: " + username + " Password: <present>");
             }
-            DN userDNObject = new DN(username);
-            if (userDNObject.isDN()) {
+            if (LDAPUtils.isDN(username)) {
                 userDN = username;
-                username = userDNObject.explodeDN(true)[0];
+                username = rdnValueFromDn(username);
             } else {
                 userDN = (String) userNameToDN.get(username);
                 if (userDN == null && !loadedInternalUsers) {
@@ -382,9 +381,9 @@ public class SMSAuthModule implements LoginModule {
         // Add the DN
         users.put(name, hash);
         // Add the "name"
-        String[] rdns = (new DN(name)).explodeDN(true);
-        users.put(rdns[0], hash);
-        userNameToDN.put(rdns[0], name);
+        String username = rdnValueFromDn(name);
+        users.put(username, hash);
+        userNameToDN.put(username, name);
     }
 
     // Inner class for receiving SMS notifications

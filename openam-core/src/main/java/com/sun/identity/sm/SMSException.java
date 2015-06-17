@@ -24,12 +24,11 @@
  *
  * $Id: SMSException.java,v 1.7 2009/01/28 05:35:03 ww203982 Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.sm;
+
+import static org.forgerock.opendj.ldap.ResultCode.*;
 
 import com.sun.identity.authentication.internal.InvalidAuthContextException;
 import com.sun.identity.shared.debug.Debug;
@@ -46,7 +45,10 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
-import com.sun.identity.shared.ldap.LDAPException;
+
+import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.ErrorResultIOException;
+import org.forgerock.opendj.ldap.ResultCode;
 
 /**
  * The exception class whose instance is thrown if there is any error during the
@@ -353,8 +355,10 @@ public class SMSException extends Exception implements L10NMessage {
         if (rootCause == null) {
             return;
         }
-        if (rootCause instanceof LDAPException) {
-            message = mapLDAPException();
+        if (rootCause instanceof ErrorResultException) {
+            message = mapLDAPException(((ErrorResultException) rootCause).getResult().getResultCode());
+        } else if (rootCause instanceof ErrorResultIOException) {
+                message = mapLDAPException(((ErrorResultIOException) rootCause).getCause().getResult().getResultCode());
         } else if (rootCause instanceof LDAPServiceException) {
             // do nothing
         } else if (rootCause instanceof EventException) {
@@ -375,12 +379,10 @@ public class SMSException extends Exception implements L10NMessage {
         }
     }
 
-    private String mapLDAPException() {
-        int resultCode = ((LDAPException) rootCause).getLDAPResultCode();
+    private String mapLDAPException(ResultCode resultCode) {
 
         String message = null;
 
-        switch (resultCode) {
         // ////////////////////////////////
         // Errors that need to be handled
         // ////////////////////////////////
@@ -391,73 +393,43 @@ public class SMSException extends Exception implements L10NMessage {
         // These errors are either problems in connection
         // or configuration. So, some can be retired and
         // some are already busted.
-        case LDAPException.SERVER_DOWN:
-        case LDAPException.OTHER:
+        if (resultCode.equals(CLIENT_SIDE_SERVER_DOWN) || resultCode.equals(OTHER)) {
             message = getString(IUMSConstants.SMS_SERVER_DOWN);
             exceptionStatus = STATUS_RETRY;
-            break;
-        case LDAPException.LDAP_NOT_SUPPORTED:
+        } else if (resultCode.equals(CLIENT_SIDE_NOT_SUPPORTED)) {
             message = getString(IUMSConstants.SMS_LDAP_NOT_SUPPORTED);
             exceptionStatus = STATUS_ABORT;
-            break;
-        case LDAPException.BUSY:
+        } else if (resultCode.equals(BUSY)) {
             message = getString(IUMSConstants.SMS_LDAP_SERVER_BUSY);
             exceptionStatus = STATUS_RETRY;
-            break;
-
-        case LDAPException.INVALID_CREDENTIALS:
+        } else if (resultCode.equals(INVALID_CREDENTIALS)) {
             message = getString("INVALID_CREDENTIALS");
             exceptionStatus = STATUS_CONFIG_PROBLEM;
-            break;
-
-        // Application must show exactly what is happening
-        case LDAPException.NO_SUCH_OBJECT:
+        } else if (resultCode.equals(NO_SUCH_OBJECT)) {
             message = getString(IUMSConstants.SMS_NO_SUCH_OBJECT);
             exceptionStatus = STATUS_LDAP_OP_FAILED;
-            break;
-
-        case LDAPException.INSUFFICIENT_ACCESS_RIGHTS:
+        } else if (resultCode.equals(INSUFFICIENT_ACCESS_RIGHTS)) {
             message = getString(IUMSConstants.SMS_INSUFFICIENT_ACCESS_RIGHTS);
             exceptionStatus = STATUS_NO_PERMISSION;
-            break;
-
-        case LDAPException.ADMIN_LIMIT_EXCEEDED:
+        } else if (resultCode.equals(ADMIN_LIMIT_EXCEEDED)) {
             message = getString(IUMSConstants.SMS_ADMIN_LIMIT_EXCEEDED);
             exceptionStatus = STATUS_ABORT;
-            break;
-
-        case LDAPException.TIME_LIMIT_EXCEEDED:
+        } else if (resultCode.equals(TIME_LIMIT_EXCEEDED)) {
             message = getString(IUMSConstants.SMS_TIME_LIMIT_EXCEEDED);
             exceptionStatus = STATUS_ABORT;
-            break;
-
-        case LDAPException.REFERRAL:
+        } else if (resultCode.equals(REFERRAL)) {
             message = getString(IUMSConstants.SMS_LDAP_REFERRAL_EXCEPTION);
             exceptionStatus = STATUS_CONFIG_PROBLEM;
-            break;
-
-        // We screwed up with something
-        case LDAPException.OBJECT_CLASS_VIOLATION:
-        case LDAPException.NAMING_VIOLATION:
-        case LDAPException.CONSTRAINT_VIOLATION:
-        case LDAPException.INVALID_DN_SYNTAX:
-        case LDAPException.ENTRY_ALREADY_EXISTS:
-        case LDAPException.ATTRIBUTE_OR_VALUE_EXISTS:
-        case LDAPException.PROTOCOL_ERROR:
-        case LDAPException.UNDEFINED_ATTRIBUTE_TYPE:
+        } else if (resultCode.equals(OBJECTCLASS_VIOLATION) || resultCode.equals(NAMING_VIOLATION) ||
+                resultCode.equals(CONSTRAINT_VIOLATION) || resultCode.equals(INVALID_DN_SYNTAX) ||
+                resultCode.equals(ENTRY_ALREADY_EXISTS) || resultCode.equals(ATTRIBUTE_OR_VALUE_EXISTS) ||
+                resultCode.equals(PROTOCOL_ERROR) || resultCode.equals(UNDEFINED_ATTRIBUTE_TYPE)) {
             SMSEntry.debug.error(rootCause.toString());
             message = getString(IUMSConstants.SMS_LDAP_OPERATION_FAILED);
             exceptionStatus = STATUS_LDAP_OP_FAILED;
-            break;
-
-        // Exception code that means logical operation.
-        case LDAPException.COMPARE_TRUE:
-        case LDAPException.COMPARE_FALSE:
-        case LDAPException.LDAP_PARTIAL_RESULTS:
+        } else if (resultCode.equals(COMPARE_FALSE) || resultCode.equals(COMPARE_TRUE)) {
             exceptionStatus = STATUS_QUO_ANTE;
-            break;
-
-        default:
+        } else {
             message = getString(IUMSConstants.SMS_UNEXPECTED_LDAP_EXCEPTION);
             exceptionStatus = STATUS_UNKNOWN_EXCEPTION;
         }

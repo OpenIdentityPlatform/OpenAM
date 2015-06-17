@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,12 @@
  *
  * $Id: DSEvent.java,v 1.4 2009/01/28 05:34:49 ww203982 Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.iplanet.services.ldap.event;
 
-import com.sun.identity.shared.ldap.controls.LDAPPersistSearchControl;
+import org.forgerock.openam.ldap.PersistentSearchChangeType;
 
 /**
  * @supported.api
@@ -43,13 +44,13 @@ public class DSEvent {
 
     private String _className;
 
-    public static final int OBJECT_ADDED = LDAPPersistSearchControl.ADD;
+    public static final int OBJECT_ADDED = PersistentSearchChangeType.ADDED;
 
-    public static final int OBJECT_REMOVED = LDAPPersistSearchControl.DELETE;
+    public static final int OBJECT_REMOVED = PersistentSearchChangeType.REMOVED;
 
-    public static final int OBJECT_RENAMED = LDAPPersistSearchControl.MODDN;
+    public static final int OBJECT_RENAMED = PersistentSearchChangeType.RENAMED;
 
-    public static final int OBJECT_CHANGED = LDAPPersistSearchControl.MODIFY;
+    public static final int OBJECT_CHANGED = PersistentSearchChangeType.MODIFIED;
 
     /**
      * Default constructor

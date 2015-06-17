@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -26,8 +26,23 @@
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
+
 package com.sun.identity.policy;
 
+import java.io.ByteArrayInputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.AccessController;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.locks.Lock;
+
+import com.iplanet.am.sdk.AMCommonUtils;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -45,7 +60,6 @@ import com.sun.identity.idm.IdUtils;
 import com.sun.identity.policy.interfaces.Subject;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.OrganizationConfigManager;
@@ -60,22 +74,11 @@ import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceNotFoundException;
 import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.openam.entitlement.PolicyConstants;
+import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.shared.concurrency.LockFactory;
+import org.forgerock.opendj.ldap.DN;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-
-import java.io.ByteArrayInputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.AccessController;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.locks.Lock;
 
 /**
  * The <code>PolicyManager</code> class manages policies
@@ -193,7 +196,7 @@ public final class PolicyManager {
 
     // Can be shared by classes
     static Debug debug = Debug.getInstance(POLICY_DEBUG_NAME);
-    static DN delegationRealm = new DN(DNMapper.orgNameToDN(DELEGATION_REALM));
+    static DN delegationRealm = DN.valueOf(DNMapper.orgNameToDN(DELEGATION_REALM));
     private static boolean migratedToEntitlementService = false;
 
     /**
@@ -568,7 +571,7 @@ public final class PolicyManager {
         String realmName = getOrganizationDN();
 
         //TODO: handle non DNs/
-        realmName = new DN(realmName).toRFCString().toLowerCase();
+        realmName = AMCommonUtils.formatToRFC(realmName);
         String subjectRealm = policy.getSubjectRealm();
         String[] realmNames = {realmName, subjectRealm};
         if ((subjectRealm != null) && !subjectRealm.equals(realmName)) {
@@ -1285,7 +1288,7 @@ public final class PolicyManager {
         Set<String> resourcePrefixes,
         String resourceName) throws PolicyException, EntitlementException {
 
-        String realmName = (DN.isDN(realm)) ?
+        String realmName = LDAPUtils.isDN(realm) ?
             DNMapper.orgNameToRealmName(realm) :realm;
 
         Application appl = ApplicationManager.getApplication(
@@ -1342,8 +1345,8 @@ public final class PolicyManager {
 
     private void validateForResourcePrefixE(Policy policy)
         throws SSOException, PolicyException {
-        DN orgDN = new DN(org);
-        DN baseDN = new DN(ServiceManager.getBaseDN());
+        DN orgDN = DN.valueOf(org);
+        DN baseDN = DN.valueOf(ServiceManager.getBaseDN());
 
         if (!orgDN.equals(baseDN) && !orgDN.equals(delegationRealm)) {
             String realm = DNMapper.orgNameToRealmName(getOrganizationDN());
@@ -1388,8 +1391,8 @@ public final class PolicyManager {
 
     private void validateForResourcePrefixO(Policy policy)
             throws SSOException, PolicyException {
-        DN orgDN = new DN(org);
-        DN baseDN = new DN(ServiceManager.getBaseDN());
+        DN orgDN = DN.valueOf(org);
+        DN baseDN = DN.valueOf(ServiceManager.getBaseDN());
         Set prefixes = getManagedResourceNames();
         if (!orgDN.equals(baseDN) && !orgDN.equals(delegationRealm)
              && ((prefixes == null ) || prefixes.isEmpty()) ) {

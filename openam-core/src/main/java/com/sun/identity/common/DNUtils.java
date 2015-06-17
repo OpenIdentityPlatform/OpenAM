@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,16 +24,15 @@
  *
  * $Id: DNUtils.java,v 1.6 2009/11/20 23:52:54 ww203982 Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.common;
 
-import com.sun.identity.shared.ldap.util.DN;
-import com.sun.identity.shared.ldap.LDAPDN;
+import static org.forgerock.openam.ldap.LDAPUtils.rdnValueFromDn;
+
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
 
 public class DNUtils {
     /**
@@ -45,17 +44,13 @@ public class DNUtils {
      *         format otherwise returns null.
      */
     public static String normalizeDN(String dn) {
-        return normalizeDN(new DN(dn));
+        return normalizeDN(LDAPUtils.newDN(dn));
     }
 
     public static String normalizeDN(DN dn) {
         String newDN = null;
-        if (dn != null) {
-            newDN = dn.toRFCString().toLowerCase();
-            // in case dn is not a DN, the return value will be "".
-            if (newDN.length() == 0) {
-                newDN = null;
-            }
+        if (dn != null && dn.size() > 0) {
+            newDN = dn.toString().toLowerCase();
         }
         return newDN;
     }
@@ -88,7 +83,8 @@ public class DNUtils {
         // String dn is guaranteed type of DN
         String id = dn;
         try {
-            id = LDAPDN.unEscapeValue(LDAPDN.explodeDN(dn, noTypes)[0]);
+            DN name = DN.valueOf(dn);
+            id = noTypes ? rdnValueFromDn(name) : name.rdn().toString();
         } catch (Exception e) {
         }
         return id;

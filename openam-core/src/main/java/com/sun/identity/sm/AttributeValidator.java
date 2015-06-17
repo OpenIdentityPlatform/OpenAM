@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: AttributeValidator.java,v 1.10 2009/11/03 00:06:31 hengming Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.sm;
@@ -96,7 +97,7 @@ class AttributeValidator {
      *            if true, the values will be encrypted if the attribute's
      *            syntax is password
      * @return boolean true or false depending on whether the values are valid.
-     * @throws com.sun.identity.sms.SMSException
+     * @throws SMSException
      */
     private boolean validateSyntax(Set values, boolean encodePassword)
             throws SMSException {
@@ -244,7 +245,7 @@ class AttributeValidator {
      * @param values
      *            Set of all the values for this attribute.
      * @return boolean true or false depending on whether the values are valid.
-     * @throws com.sun.identity.sms.SMSException
+     * @throws SMSException
      */
     private boolean validateType(Set values, Map env) throws SMSException {
         String installTime = SystemProperties.get(
@@ -363,8 +364,8 @@ class AttributeValidator {
      *            if true, the values will be encrypted if the attribute's
      *            syntax is password
      * @return boolean true or false depending on whether the values are valid.
-     * @throws com.sun.identity.sms.SMSException
-     *             if values is invalidate.
+     * @throws SMSException
+     *             if values is invalid.
      */
     boolean validate(Set attrVals, String i18nFileName, boolean encodePassword)
             throws SMSException {
@@ -386,8 +387,8 @@ class AttributeValidator {
      * @param envParam
      *            a Map of environment parameters
      * @return boolean true or false depending on whether the values are valid.
-     * @throws com.sun.identity.sms.SMSException
-     *             if values is invalidate.
+     * @throws SMSException
+     *             if values is invalid.
      */
     boolean validate(Set attrVals, String i18nFileName, boolean encodePassword,
             Map envParam) throws SMSException {

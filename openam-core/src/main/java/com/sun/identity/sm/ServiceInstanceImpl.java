@@ -24,10 +24,7 @@
  *
  * $Id: ServiceInstanceImpl.java,v 1.6 2008/07/11 01:46:20 arviranga Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2013 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.sm;
 
@@ -35,7 +32,6 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.ldap.util.DN;
 
 import java.util.Collections;
 import java.util.HashMap;

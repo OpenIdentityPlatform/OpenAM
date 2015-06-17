@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,29 +24,27 @@
  *
  * $Id: SMDataLayer.java,v 1.16 2009/01/28 05:35:04 ww203982 Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.sm.ldap;
 
+import java.util.concurrent.TimeUnit;
+
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.Connections;
+import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
+
 import com.iplanet.am.util.SystemProperties;
-import java.util.HashMap;
-import com.sun.identity.shared.ldap.LDAPBind;
-import com.sun.identity.shared.ldap.LDAPConnection;
-import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.LDAPSearchConstraints;
-import com.sun.identity.shared.debug.Debug;
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.ldap.LDAPServiceException;
 import com.iplanet.services.ldap.LDAPUser;
 import com.iplanet.services.ldap.ServerGroup;
 import com.iplanet.services.ldap.ServerInstance;
-
-import com.sun.identity.common.LDAPConnectionPool;
-import org.forgerock.util.thread.listener.ShutdownListener;
-import org.forgerock.util.thread.listener.ShutdownManager;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * SMDataLayer (A PACKAGE SCOPE CLASS) to access LDAP or other database
@@ -68,26 +66,10 @@ class SMDataLayer {
      */
     private static Debug debug;
 
-    /**
-     * Default maximum connections if none is defined in configuration
-     */
-    static final int MAX_CONN = 20;
-
-    /**
-     * Default maximum backlog queue size
-     */
-    static final int MAX_BACKLOG = 100;
-    static final String LDAP_MAXBACKLOG = "maxbacklog";
-    static final String LDAP_RELEASECONNBEFORESEARCH = 
-        "releaseconnectionbeforesearchcompletes";
-    static final String LDAP_REFERRAL = "referral";
-    
     private static SMDataLayer m_instance = null;
 
-    private LDAPConnectionPool _ldapPool = null;
-    private LDAPConnection _trialConn = null;
-    private LDAPSearchConstraints _defaultSearchConstraints = null;
-    
+    private ConnectionFactory _ldapPool = null;
+
     /**
      * SMDataLayer constructor
      */
@@ -115,92 +97,28 @@ class SMDataLayer {
      * 
      * @return connection that is available to use
      */
-    protected LDAPConnection getConnection() {
+    protected Connection getConnection() {
         if (_ldapPool == null)
             return null;
 
-        if (debug.messageEnabled()) {
-            debug.message("SMDataLayer:getConnection()-"
-                    + "Invoking _ldapPool.getConnection()");
-        }
-        LDAPConnection conn = _ldapPool.getConnection();
-        if (debug.messageEnabled()) {
-            debug.message("SMDataLayer:getConnection()-Got Connection : "
-                    + conn);
+        debug.message("SMDataLayer:getConnection() - Invoking _ldapPool.getConnection()");
+        Connection conn = null;
+        try {
+            conn = _ldapPool.getConnection();
+            debug.message("SMDataLayer:getConnection() - Got Connection : {}", conn);
+        } catch (ErrorResultException e) {
+            debug.error("SMDataLayer:getConnection() - Failed to get Connection", e);
         }
 
         return conn;
     }
 
     /**
-     * Just call the pool method to release the connection so that the
-     * given connection is free for others to use
-     * @param conn connection in the pool to be released for others to use.
-     * @param ldapErrCode ldap exception error code used to determine 
-     *        failover.
-     * iPlanet-PUBLIC-METHOD
-     */
-    public void releaseConnection( LDAPConnection conn , int ldapErrCode)
-    {
-        if (_ldapPool == null || conn == null) return;
-
-        // reset the original constraints
-        // TODO: check with ldapjdk and see if this is appropriate
-        //       to restore the default constraints.
-        //
-        conn.setSearchConstraints(_defaultSearchConstraints);
-
-        // A soft close on the connection.
-        // Returns the connection to the pool and
-        // make it available.
-        if (debug.messageEnabled()) {
-           debug.message("SMDataLayer:releaseConnection()-"+
-               "Invoking _ldapPool.close(conn,ldapErrCode) : " +
-               conn + ":" + ldapErrCode);
-        }
-        _ldapPool.close( conn, ldapErrCode );
-        if (debug.messageEnabled()) {
-            debug.message("SMDataLayer:releaseConnection()-"+
-                "Released Connection:close(conn,ldapErrCode) : " + conn);
-        }
-    }
-
-    /**
-     * Just call the pool method to release the connection so that the given
-     * connection is free for others to use
-     * 
-     * @param conn
-     *            connection in the pool to be released for others to use
-     */
-    protected void releaseConnection(LDAPConnection conn) {
-        if (_ldapPool == null || conn == null)
-            return;
-
-        // reset the original constraints
-        // TODO: check with ldapjdk and see if this is appropriate
-        // to restore the default constraints.
-        //
-        conn.setSearchConstraints(_defaultSearchConstraints);
-
-        // A soft close on the connection.
-        // Returns the connection to the pool and make it available.
-        if (debug.messageEnabled()) {
-            debug.message("SMDataLayer:releaseConnection()-"
-                    + "Invoking _ldapPool.close(conn) : " + conn);
-        }
-        _ldapPool.close(conn);
-        if (debug.messageEnabled()) {
-            debug.message("SMDataLayer:releaseConnection()-"
-                    + "Released Connection : " + conn);
-        }
-    }
-    
-    /**
      * Closes all the open ldap connections 
      */
     protected synchronized void shutdown() {
         if (_ldapPool != null) {
-            _ldapPool.destroy();
+            _ldapPool.close();
         }
         _ldapPool = null;
         m_instance = null;
@@ -216,23 +134,20 @@ class SMDataLayer {
 
         // Initialize the pool with minimum and maximum connections settings
         // retrieved from configuration
-        ServerInstance svrCfg = null;
-        String hostName = null;
-        HashMap connOptions = new HashMap();
+        ServerInstance svrCfg;
 
         try {
             DSConfigMgr dsCfg = DSConfigMgr.getDSConfigMgr();
-            hostName = dsCfg.getHostName("default");
 
             // Get "sms" ServerGroup if present
             ServerGroup sg = dsCfg.getServerGroup("sms");
+            final ConnectionFactory baseFactory;
             if (sg != null) {
-                _trialConn = dsCfg.getNewConnection("sms",
+                baseFactory = dsCfg.getNewConnectionFactory("sms",
                         LDAPUser.Type.AUTH_ADMIN);
                 svrCfg = sg.getServerInstance(LDAPUser.Type.AUTH_ADMIN);
-                hostName = dsCfg.getHostName("sms");
             } else {
-                _trialConn = dsCfg.getNewAdminConnection();
+                baseFactory = dsCfg.getNewAdminConnectionFactory();
                 svrCfg = dsCfg.getServerInstance(LDAPUser.Type.AUTH_ADMIN);
             }
             if (svrCfg == null) {
@@ -247,80 +162,32 @@ class SMDataLayer {
                 poolMin = svrCfg.getMinConnections();
                 poolMax = svrCfg.getMaxConnections();
             }
-            String connDN = svrCfg.getAuthID();
-            String connPWD = svrCfg.getPasswd();
-            int maxBackLog = svrCfg.getIntValue(LDAP_MAXBACKLOG, MAX_BACKLOG);
-            boolean referrals = svrCfg.getBooleanValue(LDAP_REFERRAL, true);
 
-            if (debug.messageEnabled()) {
-                debug.message("SMDataLayer:initLdapPool()-"
-                        + "Creating ldap connection pool with :");
-                debug.message("SMDataLayer:initLdapPool()-poolMin : " + poolMin);
-                debug.message("SMDataLayer:initLdapPool()-poolMax : " + poolMax);
-                debug.message("SMDataLayer:getConnection()-maxBackLog : "
-                        + maxBackLog);
+            debug.message("SMDataLayer:initLdapPool(): Creating ldap connection pool with: poolMin {} poolMax {}",
+                    poolMin, poolMax);
+
+            int idleTimeout = SystemProperties.getAsInt(Constants.LDAP_CONN_IDLE_TIME_IN_SECS, 0);
+            if (idleTimeout == 0) {
+                debug.error("LDAPConnectionPools: Idle timeout could not be parsed, connection reaping is disabled");
             }
-
-            // establish one good connection before the pool
-            _trialConn.setOption(LDAPConnection.MAXBACKLOG, new Integer(
-                maxBackLog));
-            _trialConn.setOption(LDAPConnection.REFERRALS, Boolean.valueOf(
-                referrals));
-
-            // Default rebind method is to provide the same authentication
-            // in the rebind to the server being referred.
-            LDAPBind defaultBinder = new LDAPBind() {
-                public void bind(LDAPConnection ld) throws LDAPException {
-                    // There is possibly a bug in the ldapjdk that the passed in
-                    // ld is not carrying the original authentication dn and pwd
-                    // Hence, we have to kludge here using the one connection
-                    // that we know about:
-                    // the connection that we use to initialize the connection
-                    // pool.
-                    // TODO: need to investigate
-                    //
-                    String dn = _trialConn.getAuthenticationDN();
-                    String pwd = _trialConn.getAuthenticationPassword();
-                    String newhost = ld.getHost();
-                    int newport = ld.getPort();
-                    ld.connect(3, newhost, newport, dn, pwd);
-                }
-            };
-            _trialConn.setOption(LDAPConnection.BIND, defaultBinder);
-
-            // remember the original search constraints
-            _defaultSearchConstraints = _trialConn.getSearchConstraints();
-
-            // Construct the pool by cloning the successful connection
-            // Set the default options too for failover and fallback features.
-
-            connOptions.put("maxbacklog", Integer.valueOf(maxBackLog));
-            connOptions.put("referrals", Boolean.valueOf(referrals));
-            connOptions.put("searchconstraints", _defaultSearchConstraints);
+            _ldapPool = Connections.newCachedConnectionPool(baseFactory, poolMin, poolMax,
+                    idleTimeout, TimeUnit.SECONDS);
 
             ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
-
-            _ldapPool = new LDAPConnectionPool("SMS", poolMin, poolMax,
-                hostName, 389, connDN, connPWD, _trialConn,
-                connOptions);
             shutdownMan.addShutdownListener(
-                new ShutdownListener() {
-                    public void shutdown() {
-                        if (_ldapPool != null) {
-                            _ldapPool.destroy();
+                    new ShutdownListener() {
+                        public void shutdown() {
+                            if (_ldapPool != null) {
+                                _ldapPool.close();
+                            }
                         }
                     }
-                }
             );
 
         } catch (LDAPServiceException ex) {
             debug.error("SMDataLayer:initLdapPool()-"
                     + "Error initializing connection pool " + ex.getMessage());
             ex.printStackTrace();
-        } catch (LDAPException e) {
-            debug.error("SMDataLayer:initLdapPool()-"
-                    + "Exception in SMDataLayer.initLdapPool:", e);
-            e.printStackTrace();
         }
     }
 }

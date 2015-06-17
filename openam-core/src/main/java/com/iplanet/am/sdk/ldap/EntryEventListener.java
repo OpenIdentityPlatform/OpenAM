@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,17 @@
  *
  * $Id: EntryEventListener.java,v 1.4 2009/01/28 05:34:48 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.am.sdk.ldap;
+
+import java.security.AccessController;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import com.iplanet.am.sdk.AMObjectListener;
 import com.iplanet.am.sdk.common.ICachedDirectoryServices;
@@ -36,19 +44,14 @@ import com.iplanet.services.ldap.event.IDSEventListener;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import com.sun.identity.shared.debug.Debug;
-import java.security.AccessController;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import com.sun.identity.shared.ldap.controls.LDAPPersistSearchControl;
-import com.sun.identity.shared.ldap.util.DN;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.ldap.PersistentSearchChangeType;
+import org.forgerock.opendj.ldap.DN;
 
 /**
  * The <code>AMEntryEventListener</code> handles all the events that are
@@ -64,9 +67,7 @@ public class EntryEventListener implements IDSEventListener {
             + "(!(|(objectclass=sunService)(objectclass=sunServiceComponent)"
             + "(aci=*))))";
 
-    protected static final int OPERATIONS = LDAPPersistSearchControl.ADD
-            | LDAPPersistSearchControl.MODIFY | LDAPPersistSearchControl.DELETE
-            | LDAPPersistSearchControl.MODDN;
+    protected static final int OPERATIONS = PersistentSearchChangeType.ALL_OPERATIONS;
 
     // Instance variables
     private Debug debug = EventManager.getDebug();
@@ -120,8 +121,8 @@ public class EntryEventListener implements IDSEventListener {
      */
     public void entryChanged(DSEvent dsEvent) {
         // Get the "dn" responsible for the event
-        DN dn = new DN(dsEvent.getID());
-        String normalizedDN = dn.toRFCString().toLowerCase();
+        DN dn = DN.valueOf(dsEvent.getID());
+        String normalizedDN = dn.toString().toLowerCase();
 
         if (debug.messageEnabled()) {
             debug.message("EntryEventListener.entryChanged(): DSEvent "
@@ -146,10 +147,10 @@ public class EntryEventListener implements IDSEventListener {
         String objClasses = dsEvent.getClassName();
         if (objClasses.indexOf("cosClassicDefinition") != -1) {// COS
                                                                 // definition
-            affectDNs = dn.getParent().toRFCString().toLowerCase();
+            affectDNs = dn.parent().toString().toLowerCase();
             // Get the serviceName this applies to, and get the attribute
             // names of this service which impact the DNs.
-            serviceName = (String) dn.explodeDN(true)[0];
+            serviceName = LDAPUtils.rdnValueFromDn(dn);
             attrNames = getDynamicAttributeNames(serviceName);
             if (debug.messageEnabled()) {
                 debug.message("EntryEventListener.entryChanged() "
@@ -157,8 +158,8 @@ public class EntryEventListener implements IDSEventListener {
                         + "Dynamic Attributes: " + attrNames);
             }
         } else if (objClasses.indexOf("costemplate") != -1) { // COS template
-            affectDNs = dn.getParent().getParent().toRFCString().toLowerCase();
-            serviceName = (String) dn.getParent().explodeDN(true)[0];
+            affectDNs = dn.parent().parent().toString().toLowerCase();
+            serviceName = LDAPUtils.rdnValueFromDn(dn.parent());
             attrNames = getDynamicAttributeNames(serviceName);
             if (debug.messageEnabled()) {
                 debug.message("EntryEventListener." + "entryChanged()"

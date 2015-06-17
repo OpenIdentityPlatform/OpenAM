@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,12 @@
  *
  * $Id: Guid.java,v 1.4 2009/01/28 05:34:50 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.ums;
 
-import com.sun.identity.shared.ldap.LDAPDN;
+import org.forgerock.opendj.ldap.DN;
 
 /**
  * This class represents an LDAP entry and it provides
@@ -44,7 +45,7 @@ import com.sun.identity.shared.ldap.LDAPDN;
 public class Guid {
 
     // holds the LDAP dn for the LDAP entry associated with this Guid object
-    private String _dn;
+    private DN _dn;
 
     // holds the unique ID for the LDAP entry associated with this Guid object
     private long _uniqueId;
@@ -56,7 +57,7 @@ public class Guid {
      *            string representation of the distinguished name
      */
     public Guid(String dn) {
-        _dn = dn;
+        _dn = DN.valueOf(dn);
         _uniqueId = -1;
     }
 
@@ -67,7 +68,7 @@ public class Guid {
      *            unique ID
      */
     public Guid(long id) {
-        _dn = "";
+        _dn = DN.valueOf("");
         _uniqueId = id;
     }
 
@@ -81,7 +82,7 @@ public class Guid {
      *            unique ID
      */
     public Guid(String dn, long id) {
-        _dn = dn;
+        _dn = DN.valueOf(dn);
         _uniqueId = id;
     }
 
@@ -91,7 +92,7 @@ public class Guid {
      * @return the string representation of the distinguished name
      */
     public String getDn() {
-        return _dn;
+        return _dn.toString();
     }
 
     /**
@@ -102,7 +103,7 @@ public class Guid {
      *            string representation of the distinguished name
      */
     protected void setDn(String dn) {
-        _dn = dn;
+        _dn = DN.valueOf(dn);
     }
 
     /**
@@ -135,7 +136,7 @@ public class Guid {
      * @return true if the two Guids are the same
      */
     public boolean equals(Guid guid) {
-        return LDAPDN.equals(_dn, guid.getDn());
+        return _dn.equals(DN.valueOf(guid.getDn()));
     }
 
     /**
@@ -148,7 +149,7 @@ public class Guid {
      * @return true if the two dn's are equal
      */
     static boolean equals(String dn1, String dn2) {
-        return LDAPDN.equals(dn1, dn2);
+        return DN.valueOf(dn1).equals(DN.valueOf(dn2));
     }
 
     /**
@@ -157,7 +158,7 @@ public class Guid {
      * @return the string representation of the Guid
      */
     public String toString() {
-        return _dn;
+        return _dn.toString();
         // For future use
         // StringBuffer buff = new StringBuffer();
         // buff.append("DN : " + _dn + "\n");

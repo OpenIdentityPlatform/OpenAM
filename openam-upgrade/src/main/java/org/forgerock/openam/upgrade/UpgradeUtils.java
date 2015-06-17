@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -26,17 +26,17 @@
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
+
 package org.forgerock.openam.upgrade;
 
 import com.iplanet.am.sdk.AMException;
+import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.policy.PolicyUtils;
-import com.sun.identity.shared.ldap.util.DN;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.util.Crypt;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.internal.InvalidAuthContextException;
-import com.sun.identity.common.LDAPUtils;
 import com.sun.identity.common.configuration.ConfigurationException;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.common.configuration.SiteConfiguration;
@@ -71,9 +71,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Properties;
 import javax.security.auth.login.LoginException;
-import com.sun.identity.shared.ldap.LDAPConnection;
-import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.util.LDIF;
 import com.sun.identity.policy.Policy;
 import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.PolicyManager;
@@ -90,13 +87,6 @@ import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.StringTokenizer;
-import com.sun.identity.shared.ldap.LDAPAttribute;
-import com.sun.identity.shared.ldap.LDAPAttributeSet;
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.LDAPEntry;
-import com.sun.identity.shared.ldap.LDAPSearchResults;
-import com.sun.identity.shared.ldap.LDAPSearchConstraints;
-import com.sun.identity.shared.ldap.LDAPv3;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.SMSUtils;
 import java.io.ByteArrayInputStream;
@@ -107,8 +97,27 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.ldap.LdifUtils;
+import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.ByteString;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.Connections;
+import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.LDAPConnectionFactory;
+import org.forgerock.opendj.ldap.LDAPOptions;
+import org.forgerock.opendj.ldap.SearchScope;
+import org.forgerock.opendj.ldap.requests.Requests;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
+import org.forgerock.opendj.ldif.LDIF;
+import org.forgerock.opendj.ldif.LDIFChangeRecordReader;
+import org.forgerock.util.thread.listener.ShutdownListener;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -175,7 +184,7 @@ public class UpgradeUtils {
     private static String bindPasswd = null;
     private static String deployURI = null;
     private static String dsAdminPwd;
-    private static LDAPConnection ld = null;
+    private static ConnectionFactory factory;
     private static String basedir;
     private static String stagingDir;
     private static String configDir;
@@ -1399,17 +1408,13 @@ public class UpgradeUtils {
      */
     public static void loadLdif(String ldifFileName) {
         String classMethod = "UpgradeUtils:loadLdif : ";
-        try {
+        try (Connection conn = getLDAPConnection()) {
             System.out.println(bundle.getString("upg-load-ldif-file")
                 + " :" + ldifFileName);
-            LDIF ldif = new LDIF(ldifFileName);
-            ld = getLDAPConnection();
-            LDAPUtils.createSchemaFromLDIF(ldif, ld);
+            LDIFChangeRecordReader ldifChangeRecordReader = new LDIFChangeRecordReader(ldifFileName);
+            LdifUtils.createSchemaFromLDIF(ldifChangeRecordReader, conn);
         } catch (IOException ioe) {
-            debug.error(classMethod +
-                    "Cannot find file . Error loading ldif"+ldifFileName,ioe);
-        } catch (LDAPException le) {
-            debug.error(classMethod + "Error loading ldif" +ldifFileName,le);
+            debug.error("{} Cannot find file . Error loading ldif {}", classMethod, ldifFileName, ioe);
         }
     }
 
@@ -1418,39 +1423,38 @@ public class UpgradeUtils {
      *
      * @return Ldap connection
      */
-    private static LDAPConnection getLDAPConnection() {
+    private static Connection getLDAPConnection() {
         String classMethod = "UpgradeUtils:getLDAPConnection : ";
         if (debug.messageEnabled()) {
             debug.message(classMethod + "Directory Server Host: " + dsHostName);
             debug.message(classMethod + "Directory Server Port: " + dsPort);
             debug.message(classMethod + "Direcotry Server DN: " + dsManager);
         }
-        if (ld == null) {
-            try {
-                ld = new LDAPConnection();
-                ld.setConnectTimeout(300);
-                ld.connect(3, dsHostName, dsPort, dsManager, dsAdminPwd);
-            } catch (LDAPException e) {
-                disconnectDServer();
-                ld = null;
-                debug.error(classMethod + " Error getting LDAP Connection");
-            }
+        try {
+            return getLDAPConnectionFactory(dsHostName, dsPort,
+                    new LDAPOptions().setConnectTimeout(300, TimeUnit.SECONDS), dsManager, dsAdminPwd.toCharArray())
+                    .getConnection();
+        } catch (ErrorResultException e) {
+            debug.error(classMethod + " Error getting LDAP Connection");
         }
-        return ld;
+        return null;
     }
 
-    /**
-     * Helper method to disconnect from Directory Server.
-     */
-    private static void disconnectDServer() {
-        if ((ld != null) && ld.isConnected()) {
-            try {
-                ld.disconnect();
-                ld = null;
-            } catch (LDAPException e) {
-                debug.error("Error disconnecting ", e);
-            }
+    private static ConnectionFactory getLDAPConnectionFactory(String hostname, int port, LDAPOptions options,
+            String bindDN, char[] bindPassword) {
+        if (factory == null) {
+            factory = Connections.newAuthenticatedConnectionFactory(new LDAPConnectionFactory(hostname, port, options),
+                    Requests.newSimpleBindRequest(bindDN, bindPassword));
+            ShutdownManager.getInstance().addShutdownListener(new ShutdownListener() {
+                @Override
+                public void shutdown() {
+                    if (factory != null) {
+                        factory.close();
+                    }
+                }
+            });
         }
+        return factory;
     }
 
 
@@ -2406,8 +2410,8 @@ public class UpgradeUtils {
                 debug.message(classMethod + "Attribute Map is :" + aa);
             }
             String orgName = realmName;
-            if (DN.isDN(realmName)) {
-                orgName = LDAPDN.explodeDN(realmName, true)[0];
+            if (LDAPUtils.isDN(realmName)) {
+                orgName = LDAPUtils.rdnValueFromDn(realmName);
             }
             String authConfigName = orgName + "-authconfig";
             String adminAuthConfigName = orgName + "-admin-authconfig";
@@ -3046,23 +3050,17 @@ public class UpgradeUtils {
     static String getSunServiceID(ServiceConfig subConfig) {
         String classMethod = "UpgradeUtils:getSunServiceID : ";
         String serviceID = "";
-        try {
-            String dn = subConfig.getDN();
-            ld = getLDAPConnection();
-            LDAPEntry ld1 = ld.read(dn);
-            LDAPAttributeSet attrSet = ld1.getAttributeSet();
-            if (attrSet != null) {
-                for (Enumeration enums = attrSet.getAttributes();
-                        enums.hasMoreElements();) {
-                    LDAPAttribute attr = (LDAPAttribute) enums.nextElement();
-                    String attrName = attr.getName();
-                    if ((attr != null) &&
-                            attrName.equalsIgnoreCase(ATTR_SUNSERVICE_ID)) {
-                        String[] value = attr.getStringValueArray();
-                        serviceID = value[0];
-                        break;
-                    } else {
-                        continue;
+        try (Connection conn = getLDAPConnection()) {
+            if (conn != null) {
+                String dn = subConfig.getDN();
+                SearchResultEntry result = conn.readEntry(dn);
+                if (result != null) {
+                    for (Attribute attribute : result.getAllAttributes()) {
+                        String attrName = attribute.getAttributeDescriptionAsString();
+                        if (attrName != null && ATTR_SUNSERVICE_ID.equalsIgnoreCase(attrName)) {
+                            serviceID = attribute.firstValueAsString();
+                            break;
+                        }
                     }
                 }
             }
@@ -3318,36 +3316,30 @@ public class UpgradeUtils {
      */
     static Set getExistingValues(ServiceConfig subConfig,
             String attrName, Set defaultVal) {
-        Set valSet = new HashSet();
+        Set<String> valSet = new HashSet<>();
         String classMethod = "UpgradeUtils:getExistingValues : ";
-        try {
-            String dn = subConfig.getDN();
-            ld = getLDAPConnection();
-            LDAPEntry ld1 = ld.read(dn);
-            LDAPAttributeSet attrSet = ld1.getAttributeSet();
-            if (attrSet != null) {
-                for (Enumeration enums = attrSet.getAttributes();
-                enums.hasMoreElements();) {
-                    LDAPAttribute attr = (LDAPAttribute) enums.nextElement();
-                    String attName = attr.getName();
-                    if ((attName != null) &&
-                            attName.equalsIgnoreCase(ATTR_SUN_KEY_VALUE)) {
-                        String[] value = attr.getStringValueArray();
-                        for (int i = 0; i < value.length; i++) {
-                            int index = value[i].indexOf("=");
-                            if (index != -1) {
-                                String key = value[i].substring(0, index);
-                                if (key.equalsIgnoreCase(attrName)) {
-                                    String v = value[i].substring(
-                                            index + 1, value[i].length());
-                                    if (defaultVal.contains(v)) {
-                                        valSet.add(v);
+        try (Connection conn = getLDAPConnection()) {
+            if (conn != null) {
+                String dn = subConfig.getDN();
+                SearchResultEntry result = conn.readEntry(dn);
+                if (result != null) {
+                    for (Attribute attribute : result.getAllAttributes()) {
+                        String attributeName = attribute.getAttributeDescriptionAsString();
+                        if (attributeName != null && ATTR_SUN_KEY_VALUE.equalsIgnoreCase(attributeName)) {
+                            for (ByteString value : attribute) {
+                                String valueString = value.toString();
+                                int index = valueString.indexOf("=");
+                                if (index != -1) {
+                                    String key = valueString.substring(0, index);
+                                    if (attributeName.equalsIgnoreCase(key)) {
+                                        String v = valueString.substring(index + 1, valueString.length());
+                                        if (defaultVal.contains(v)) {
+                                            valSet.add(v);
+                                        }
                                     }
                                 }
                             }
                         }
-                    } else {
-                        continue;
                     }
                 }
             }
@@ -3470,20 +3462,14 @@ public class UpgradeUtils {
      * @return true if the host and port are valid else false.
      */
     public  static boolean isValidServer(String dsHost,String  dsPort) {
-       boolean isValidServer = true;
-       try {
-            LDAPConnection ldapConn = new LDAPConnection();
-            ldapConn.connect(dsHost, new Integer(dsPort).intValue());
-            ldapConn.disconnect();
-        } catch (LDAPException lde) {
-            isValidServer =false;
-        } catch (Exception e) {
-            isValidServer =false;
-        }
-        if (!isValidServer) {
+        boolean isValidServer = true;
+        try (LDAPConnectionFactory factory = new LDAPConnectionFactory(dsHost, Integer.parseInt(dsPort));
+             Connection conn = factory.getConnection();) {
+            return true;
+        } catch (Exception lde) {
             System.out.println(bundle.getString("upg-error-ds-info") + "!! ");
         }
-        return isValidServer;
+        return false;
     }
 
     /**
@@ -3497,21 +3483,12 @@ public class UpgradeUtils {
      */
     public static boolean isValidCredentials(String dsHost, String dsPort,
             String bindDN, String bindPass) {
-        boolean isValidAuth = false;
-        try {
-            LDAPConnection ldapConn = new LDAPConnection();
-            ldapConn.connect(dsHost, new Integer(dsPort).intValue());
-            ldapConn.authenticate(bindDN, bindPass);
-            ldapConn.disconnect();
-            isValidAuth = true;
+        try (Connection conn = factory.getConnection()) {
+            return true;
         } catch (Exception e) {
-            // do nothing
+            System.out.println(bundle.getString("upg-error-credentials") + " !! ");
         }
-        if (!isValidAuth) {
-            System.out.println(bundle.getString("upg-error-credentials")
-                + " !! ");
-        }
-        return isValidAuth;
+        return false;
     }
 
 
@@ -3523,46 +3500,40 @@ public class UpgradeUtils {
      * @param doDelete true if the entries really
      * are to be deleted
      */
-    public static void delete(String dn, LDAPConnection ld, boolean doDelete ) {
+    public static void delete(String dn, Connection ld, boolean doDelete ) {
         String theDN = "";
         try {
-            LDAPSearchConstraints cons = ld.getSearchConstraints();
-            // Retrieve all results at once
-            cons.setBatchSize( 0 );
-             // Find all immediate child nodes; return no
-             // attributes
-            LDAPSearchResults res = ld.search( dn, LDAPConnection.SCOPE_ONE,
-                "objectclass=*", new String[] {LDAPv3.NO_ATTRS}, false, cons );
-            // Recurse on entries under this entry
-            while ( res.hasMoreElements() ) {
-                try {
+            // Find all immediate child nodes; return no
+            // attributes
+            ConnectionEntryReader res = ld.search(dn, SearchScope.SINGLE_LEVEL, "objectclass=*");
+            while (res.hasNext()) {
+                if (res.isReference()) {
+                    //ignore
+                    res.readReference();
+                } else {
                     // Next directory entry
-                    LDAPEntry entry = res.next();
-                    theDN = entry.getDN();
+                    SearchResultEntry entry = res.readEntry();
+                    theDN = entry.getName().toString();
                     // Recurse down
-                    delete( theDN, ld, doDelete );
-                } catch ( LDAPException e ) {
-                    continue;
-                } catch ( Exception ea ) {
-                    continue;
+                    delete(theDN, ld, doDelete);
                 }
             }
             // At this point, the DN represents a leaf node,
             // so stop recursing and delete the node
             try {
-                if ( doDelete ) {
-                    ld.delete( dn );
+                if (doDelete) {
+                    ld.delete(dn);
                     if (debug.messageEnabled()) {
                         debug.message(dn + " deleted");
                     }
                 }
-            } catch (LDAPException e) {
+            } catch (ErrorResultException e) {
                 if (debug.messageEnabled()) {
-                    debug.message( e.toString() );
+                    debug.message(e.toString());
                 }
-            } catch( Exception e ) {
+            } catch(Exception e) {
                 if (debug.messageEnabled()) {
-                    debug.message( e.toString() );
+                    debug.message(e.toString());
                 }
             }
         } catch (Exception me) {

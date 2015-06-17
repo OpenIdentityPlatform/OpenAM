@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -26,10 +26,24 @@
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
+
 package com.sun.identity.policy;
 
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
+import javax.security.auth.Subject;
+import java.security.AccessController;
+import java.security.Principal;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import com.iplanet.am.sdk.AMCommonUtils;
 import com.iplanet.am.sdk.AMException;
 import com.iplanet.am.sdk.AMStoreConnection;
 import com.iplanet.am.sdk.AMUser;
@@ -51,24 +65,12 @@ import com.sun.identity.policy.interfaces.Condition;
 import com.sun.identity.policy.interfaces.PolicyListener;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.shared.stats.Stats;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.ServiceManager;
 import org.forgerock.openam.entitlement.PolicyConstants;
-
-import javax.security.auth.Subject;
-import java.security.AccessController;
-import java.security.Principal;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import org.forgerock.openam.ldap.LDAPUtils;
 
 /**
  * The class <code>PolicyEvaluator</code> evaluates policies
@@ -568,7 +570,7 @@ public class PolicyEvaluator {
         Set originalResourceNames = new HashSet(2);
         originalResourceNames.add(resourceName);
 
-        String realmName = (DN.isDN(realm)) ?
+        String realmName = LDAPUtils.isDN(realm) ?
             DNMapper.orgNameToRealmName(realm) : realm;
         try {
             Application appl = ApplicationManager.getApplication(
@@ -2527,7 +2529,7 @@ public class PolicyEvaluator {
                 while (iter.hasNext()) {
                     String role = (String) iter.next();
                     if (role != null) { 
-                        roleSet.add((new DN(role)).toRFCString().toLowerCase());
+                        roleSet.add(AMCommonUtils.formatToRFC(role));
                     }
                 }
             }

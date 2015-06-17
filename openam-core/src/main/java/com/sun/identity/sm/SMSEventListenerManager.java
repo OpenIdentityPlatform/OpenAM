@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,22 +24,24 @@
  *
  * $Id: SMSEventListenerManager.java,v 1.12 2009/01/28 05:35:03 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
+
 package com.sun.identity.sm;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.util.DN;
-
-import com.sun.identity.shared.debug.Debug;
 import com.iplanet.sso.SSOToken;
-import java.util.HashSet;
+import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.SearchScope;
 
 /**
  * Receives notifications for all SMS object changes from
@@ -50,15 +52,15 @@ import java.util.HashSet;
 class SMSEventListenerManager implements SMSObjectListener {
 
     // All Notification Objects list
-    protected static Map notificationObjects =
-        Collections.synchronizedMap(new HashMap());
+    protected static Map<String, NotificationObject> notificationObjects =
+        Collections.synchronizedMap(new HashMap<String, NotificationObject>());
     
     // CachedSMSEntry objects
-    protected static Map nodeChanges =
+    protected static Map<String, Set<?>> nodeChanges =
         Collections.synchronizedMap(new HashMap());
     
     // CachedSubEntries objects
-    protected static Map subNodeChanges =
+    protected static Map<String, Set<?>> subNodeChanges =
         Collections.synchronizedMap(new HashMap());
     
     // Static Initialization variables
@@ -103,8 +105,8 @@ class SMSEventListenerManager implements SMSObjectListener {
         }
 
         // Normalize the DN
-        DN sdn = new DN(odn);
-        String dn = sdn.toRFCString().toLowerCase();
+        DN sdn = DN.valueOf(odn);
+        String dn = sdn.toString().toLowerCase();
 
         // If event is delete, need to send notifications for sub-entries
         // Even if backend datastore notification is enabled, they woould
@@ -119,7 +121,7 @@ class SMSEventListenerManager implements SMSObjectListener {
                 Iterator keyitems = nodeChanges.keySet().iterator();
                 while (keyitems.hasNext()) {
                     String cdn = (String) keyitems.next();
-                    if ((new DN(cdn)).isDescendantOf(sdn)) {
+                    if (DN.valueOf(cdn).isInScopeOf(sdn, SearchScope.SUBORDINATES)) {
                         childDNs.add(cdn);
                     }
                 }
@@ -152,8 +154,7 @@ class SMSEventListenerManager implements SMSObjectListener {
                 debug.message("SMSEventListener::entry changed for: " + dn +
                     " sending notifications to its parents");
             }
-            sendNotifications((Set) subNodeChanges.get((new DN(dn))
-                .getParent().toRFCString().toLowerCase()), odn, event);
+            sendNotifications((Set) subNodeChanges.get(DN.valueOf(dn).parent().toString().toLowerCase()), odn, event);
         }
     }
 
@@ -162,16 +163,15 @@ class SMSEventListenerManager implements SMSObjectListener {
             debug.message("SMSEventListenerManager::allObjectsChanged called");
         }
         // Collect all the DNs from "nodeChanges" and send notifications
-        Set dns = new HashSet();
+        Set<String> dns = new HashSet<>();
         synchronized (nodeChanges) {
-            for (Iterator items = nodeChanges.keySet().iterator();
-                items.hasNext();) {
-                dns.add(items.next());
+            for (String item : nodeChanges.keySet()) {
+                dns.add(item);
             }
         }
         // Send MODIFY notifications
-        for (Iterator items = dns.iterator(); items.hasNext();) {
-            objectChanged((String) items.next(), SMSObjectListener.MODIFY);
+        for (String item : dns) {
+            objectChanged(item, SMSObjectListener.MODIFY);
         }
     }
 
@@ -181,7 +181,7 @@ class SMSEventListenerManager implements SMSObjectListener {
     protected static String notifyChangesToNode(SSOToken token, String dn,
         Method method, Object object, Object[] args) {
         initialize(token);
-        String ndn = (new DN(dn)).toRFCString().toLowerCase();
+        String ndn = DN.valueOf(dn).toString().toLowerCase();
         return (addNotificationObject(nodeChanges, ndn, method, object, args));
     }
 
@@ -191,7 +191,7 @@ class SMSEventListenerManager implements SMSObjectListener {
     protected static String notifyChangesToSubNodes(SSOToken token, String dn,
         Object o) {
         initialize(token);
-        String ndn = (new DN(dn)).toRFCString().toLowerCase();
+        String ndn = DN.valueOf(dn).toString().toLowerCase();
         return (addNotificationObject(subNodeChanges, ndn, null, o, null));
     }
 
@@ -199,8 +199,7 @@ class SMSEventListenerManager implements SMSObjectListener {
      * Removes notification objects
      */
     protected static void removeNotification(String notificationID) {
-        NotificationObject no = (NotificationObject)
-            notificationObjects.get(notificationID);
+        NotificationObject no = notificationObjects.get(notificationID);
         if (no != null) {
             no.set.remove(no);
             notificationObjects.remove(notificationID);
@@ -210,7 +209,7 @@ class SMSEventListenerManager implements SMSObjectListener {
     /**
      * Adds notification method to the map
      */
-    private static String addNotificationObject(Map nChangesMap, String dn,
+    private static String addNotificationObject(Map<String, Set<?>> nChangesMap, String dn,
         Method method, Object object, Object[] args) {
         Set nObjects = null;
         synchronized (nChangesMap) {
@@ -249,9 +248,9 @@ class SMSEventListenerManager implements SMSObjectListener {
                     // We cache only service names and policy names.
                     if (!dn.startsWith(SMSEntry.ORG_PLACEHOLDER_RDN)) {
                         if (event == SMSObjectListener.ADD) {
-                            cse.add(LDAPDN.explodeDN(dn, true)[0]);
+                            cse.add(LDAPUtils.rdnValueFromDn(dn));
                         } else {
-                            cse.remove(LDAPDN.explodeDN(dn, true)[0]);
+                            cse.remove(LDAPUtils.rdnValueFromDn(dn));
                         }
                     }
                 } else {

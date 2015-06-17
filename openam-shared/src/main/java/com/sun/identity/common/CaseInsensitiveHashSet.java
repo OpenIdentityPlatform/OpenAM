@@ -41,12 +41,12 @@ import java.util.Set;
  * that can be casted to a String, no different from an iterator from the
  * standard Hash Set.
  */
-public class CaseInsensitiveHashSet extends HashSet {
+public class CaseInsensitiveHashSet<T> extends HashSet<T> {
 
-    static private class CaseInsensitiveKeyIterator implements Iterator {
-        Iterator mIterator;
+    static private class CaseInsensitiveKeyIterator<T> implements Iterator<T> {
+        Iterator<T> mIterator;
 
-        public CaseInsensitiveKeyIterator(Iterator iterator) {
+        public CaseInsensitiveKeyIterator(Iterator<T> iterator) {
             mIterator = iterator;
         }
 
@@ -54,10 +54,10 @@ public class CaseInsensitiveHashSet extends HashSet {
             return mIterator.hasNext();
         }
 
-        public Object next() {
-            Object nextIter = mIterator.next();
+        public T next() {
+            T nextIter = mIterator.next();
             if (nextIter instanceof CaseInsensitiveKey) {
-                return ((CaseInsensitiveKey) nextIter).toString();
+                return (T) ((CaseInsensitiveKey) nextIter).toString();
             } else {
                 return nextIter;
             }
@@ -84,11 +84,11 @@ public class CaseInsensitiveHashSet extends HashSet {
         super(initialCapacity, loadFactor);
     }
 
-    public boolean add(Object o) {
+    public boolean add(T o) {
         boolean retval;
         if (o instanceof String) {
             CaseInsensitiveKey ciKey = new CaseInsensitiveKey((String) o);
-            retval = super.add(ciKey);
+            retval = super.add((T) ciKey);
         } else {
             retval = super.add(o);
         }
@@ -119,7 +119,7 @@ public class CaseInsensitiveHashSet extends HashSet {
      * @return an iterator of objects in the set, no different than iterator
      *         from the standard HashSet.
      */
-    public Iterator iterator() {
+    public Iterator<T> iterator() {
         // The CaseInsensitiveKeyIterator allows the iterator to return
         // elements as regular strings.
         return new CaseInsensitiveKeyIterator(super.iterator());

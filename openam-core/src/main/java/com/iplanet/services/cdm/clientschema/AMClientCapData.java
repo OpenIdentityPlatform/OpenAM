@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,21 @@
  *
  * $Id: AMClientCapData.java,v 1.7 2009/01/28 05:34:49 ww203982 Exp $
  *
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted [2010-2011] [ForgeRock AS]
- */
 package com.iplanet.services.cdm.clientschema;
+
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 import com.iplanet.am.sdk.AMEntity;
 import com.iplanet.am.sdk.AMOrganizationalUnit;
@@ -46,19 +55,10 @@ import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-import com.sun.identity.shared.ldap.LDAPConnection;
-import com.sun.identity.shared.ldap.controls.LDAPPersistSearchControl;
-import com.sun.identity.shared.ldap.util.DN;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.ldap.PersistentSearchChangeType;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.SearchScope;
 
 /**
  * The abstraction to get/set the clients stored in the DSAME. The Client is
@@ -232,8 +232,8 @@ public class AMClientCapData implements IDSEventListener {
     protected static final String SEARCH_FILTER = "(" + OBJECTCLASS + EQUALS
             + CLIENT_OBJECTCLASS + ")";
 
-    protected static final int OPERATIONS = LDAPPersistSearchControl.ADD
-            | LDAPPersistSearchControl.MODIFY | LDAPPersistSearchControl.DELETE;
+    protected static final int OPERATIONS = PersistentSearchChangeType.ADDED
+            | PersistentSearchChangeType.MODIFIED | PersistentSearchChangeType.REMOVED;
 
     // BEGIN: per-instance variables //
 
@@ -1016,20 +1016,19 @@ public class AMClientCapData implements IDSEventListener {
 
     public void entryChanged(DSEvent event) {
         String dn = event.getID();
-        DN dnObject = new DN(dn);
 
-        String[] dnComps = dnObject.explodeDN(true);
+        DN ldapName = DN.valueOf(dn);
 
         if (debug.messageEnabled()) {
             debug.message("entryChanged() Notification for: " + dn);
         }
 
-        if (dnComps == null || dnComps.length < 2) {
+        if (ldapName.size() < 2) {
             return; // cannot notify correctly !
         }
 
-        String ct = dnComps[0];
-        String db = dnComps[1];
+        String ct = LDAPUtils.rdnValue(ldapName.rdn());
+        String db = LDAPUtils.rdnValue(ldapName.parent().rdn());
         int type = event.getEventType();
 
         if (db == null || ct == null) {
@@ -1164,7 +1163,7 @@ public class AMClientCapData implements IDSEventListener {
      * @see com.iplanet.services.ldap.event.IDSEventListener#getScope()
      */
     public int getScope() {
-        return LDAPConnection.SCOPE_SUB;
+        return SearchScope.WHOLE_SUBTREE.intValue();
     }
 
     /*

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,30 +24,30 @@
  *
  * $Id: IdRepoListener.java,v 1.16 2009/01/28 05:34:59 ww203982 Exp $
  *
- */
-/**
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.idm;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.jaxrpc.SOAPClient;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceManager;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.controls.LDAPPersistSearchControl;
-import com.sun.identity.shared.ldap.util.DN;
+
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.ldap.PersistentSearchChangeType;
+
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.jaxrpc.SOAPClient;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceManager;
 
 /**
  * Provides methods that can be called by IdRepo plugins to notify change
@@ -153,7 +153,11 @@ public final class IdRepoListener {
         }
         // Get the list of listeners setup with idRepo
         String org = (String) configMap.get("realm");
-        ArrayList list = (ArrayList) AMIdentityRepository.listeners.get(org);
+        List<IdEventListener> list = (List<IdEventListener>) AMIdentityRepository.listeners.get(org);
+        list = list == null ? new ArrayList<IdEventListener>() : new ArrayList<>(list);
+        if (remoteListener != null) {
+            list.add(remoteListener);
+        }
 
         // Check if caching is enabled
         if (!cacheChecked) {
@@ -174,38 +178,14 @@ public final class IdRepoListener {
                         changeType, false, false, Collections.EMPTY_SET);
                 }
 
-                // Update any listeners registered with IdRepo
-                if (list != null) {
-                    int size = list.size();
-                    for (int j = 0; j < size; j++) {
-                        IdEventListener l = (IdEventListener) list.get(j);
-                        switch (changeType) {
-                        case OBJECT_CHANGED:
-                        case OBJECT_ADDED:
-                            l.identityChanged(changed[i]);
-                            break;
-                        case OBJECT_REMOVED:
-                            l.identityDeleted(changed[i]);
-                            break;
-                        case OBJECT_RENAMED:
-                            l.identityRenamed(changed[i]);
-                        }
-                    }
-                }
-                
-                // Handle remote listener, should not be mixed with
-                // IdRepo listeners, since it can null or empty
-                if (remoteListener != null) {
-                    switch (changeType) {
-                        case OBJECT_CHANGED:
-                        case OBJECT_ADDED:
-                            remoteListener.identityChanged(changed[i]);
-                            break;
-                        case OBJECT_REMOVED:
-                            remoteListener.identityDeleted(changed[i]);
-                            break;
-                        case OBJECT_RENAMED:
-                            remoteListener.identityRenamed(changed[i]);
+                for (IdEventListener l : list) {
+                    // Update any listeners registered with IdRepo
+                    if(changeType == OBJECT_CHANGED || changeType == OBJECT_ADDED) {
+                        l.identityChanged(changed[i]);
+                    } else if (changeType == OBJECT_REMOVED) {
+                        l.identityDeleted(changed[i]);
+                    } else if (changeType == OBJECT_RENAMED) {
+                        l.identityRenamed(changed[i]);
                     }
                 }
             }
@@ -296,7 +276,7 @@ public final class IdRepoListener {
         // If configMap is null, then this is a "remote" cache update
         if ((cMap == null) || cMap.isEmpty()) {
             String ct[] = new String[1];
-            if (DN.isDN(name)) {
+            if (LDAPUtils.isDN(name)) {
                 // Name should be the universal id
                 ct[0] = name;
             } else {
@@ -326,11 +306,11 @@ public final class IdRepoListener {
         }
         String realm = (String) cMap.get("realm");
         String Amsdk = (String) cMap.get("amsdk");
-        boolean isAmsdk = (Amsdk == null) ? false : true;
+        boolean isAmsdk = Amsdk != null;
 
         for (int i = 0; i < types.length; i++) {
             IdType itype = types[i];
-            String n = DN.isDN(name) ? LDAPDN.explodeDN(name, true)[0] : name;
+            String n = LDAPUtils.isDN(name) ? LDAPUtils.rdnValueFromDn(name) : name;
             String id = "id=" + n + ",ou=" + itype.getName() + "," + realm;
             if (isAmsdk) {
                 id = id + ",amsdkdn=" + name;
@@ -341,24 +321,24 @@ public final class IdRepoListener {
     }
     
     // Constants for change type recevied from the IdRepo plugins
-    
+
     /**
      * Represents an object addition event type.
      */
-    public static final int OBJECT_ADDED = LDAPPersistSearchControl.ADD;
+    public static final int OBJECT_ADDED = PersistentSearchChangeType.ADDED;
 
     /**
      * Represents an object change event type.
      */
-    public static final int OBJECT_CHANGED = LDAPPersistSearchControl.MODIFY;
+    public static final int OBJECT_CHANGED = PersistentSearchChangeType.MODIFIED;
 
     /**
      * Represents an object removal event type.
      */
-    public static final int OBJECT_REMOVED = LDAPPersistSearchControl.DELETE;
+    public static final int OBJECT_REMOVED = PersistentSearchChangeType.REMOVED;
 
     /**
      * Represents an object renaming event type.
      */
-    public static final int OBJECT_RENAMED = LDAPPersistSearchControl.MODDN;
+    public static final int OBJECT_RENAMED = PersistentSearchChangeType.RENAMED;
 }

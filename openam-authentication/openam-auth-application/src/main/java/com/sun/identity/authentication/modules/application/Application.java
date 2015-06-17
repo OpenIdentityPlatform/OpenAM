@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,16 +24,14 @@
  *
  * $Id: Application.java,v 1.9 2009/07/23 18:54:17 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.modules.application;
 
 import java.security.AccessController;
 import java.security.Principal;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -53,13 +51,17 @@ import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.plugins.ldapv3.LDAPAuthUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.security.DecodeAction;
-import com.sun.identity.shared.ldap.util.LDAPUtilException;
+import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.sm.SMSEntry;
+import org.forgerock.openam.ldap.LDAPAuthUtils;
+import org.forgerock.openam.ldap.LDAPUtilException;
+import org.forgerock.openam.ldap.ModuleState;
+import org.forgerock.opendj.ldap.ResultCode;
+import org.forgerock.opendj.ldap.SearchScope;
 
 /**
  * Application login module.<br>
@@ -224,9 +226,7 @@ public class Application extends AMLoginModule {
                     userTokenId = userName;
                 }
                 success = true;
-            } else if (authenticateToLDAP(userName, userPassword) ==
-                LDAPAuthUtils.SUCCESS
-            ) {
+            } else if (authenticateToLDAP(userName, userPassword) == ModuleState.SUCCESS) {
                 if (userTokenId == null) {
                     userTokenId = ldapUtil.getUserId();
                 }
@@ -307,17 +307,20 @@ public class Application extends AMLoginModule {
         return null;
     }
 
-    private int authenticateToLDAP(String userName, String userPassword)
+    private ModuleState authenticateToLDAP(String userName, String userPassword)
             throws AuthLoginException {
         if (debug.messageEnabled()){
             debug.message("In authenticateToLDAP with User : " +  userName);
         }
         try {
             if (isSuperAdmin(userName)) {
-                ldapUtil = new LDAPAuthUtils(AuthD.directoryHostName,
-                AuthD.directoryPort, ldapSSL, getLoginLocale(), debug);
-                ldapUtil.authenticateSuperAdmin(userName, userPassword);
-                if (ldapUtil.getState() == LDAPAuthUtils.SUCCESS) {
+                String baseDN = CollectionHelper.getServerMapAttr(currentConfig, ISAuthConstants.LDAP_BASEDN);
+                ldapUtil = new LDAPAuthUtils(Collections.singleton(AuthD.directoryHostName + ":" + AuthD.directoryPort),
+                        Collections.<String>emptySet(), ldapSSL,
+                        AMResourceBundleCache.getInstance().getResBundle(amAuthApplication, getLoginLocale()), baseDN,
+                        debug);
+                ldapUtil.authenticateUser(userName, userPassword);
+                if (ldapUtil.getState() == ModuleState.SUCCESS) {
                     userTokenId = userName;
                 } else {
                     debug.message("Invalid adminID or admin Password");
@@ -338,20 +341,15 @@ public class Application extends AMLoginModule {
             return ldapUtil.getState();
         } catch (LDAPUtilException ex) {
             setFailureID(userName);
-            switch ( ex.getLDAPResultCode() ) {
-                case LDAPUtilException.NO_SUCH_OBJECT:
-                    debug.message( "The specified user does not exist." );
-                    throw new AuthLoginException(
-                        amAuthApplication, "NoUser", null);
-                case LDAPUtilException.INVALID_CREDENTIALS:
-                    debug.message( "Invalid password." );
-                    String failureUserID = ldapUtil.getUserId();
-                    throw new InvalidPasswordException(
-                        amAuthApplication, "InvalidUP", null,
-                        failureUserID, ex);
-                default:
-                    throw new AuthLoginException(amAuthApplication,
-                    "basicLDAPex", null);
+            if (ResultCode.NO_SUCH_OBJECT.equals(ex.getResultCode())) {
+                debug.message("The specified user does not exist.");
+                throw new AuthLoginException(amAuthApplication, "NoUser", null);
+            } else if (ResultCode.INVALID_CREDENTIALS.equals(ex.getResultCode())) {
+                debug.message("Invalid password.");
+                String failureUserID = ldapUtil.getUserId();
+                throw new InvalidPasswordException(amAuthApplication, "InvalidUP", null, failureUserID, ex);
+            } else {
+                throw new AuthLoginException(amAuthApplication, "basicLDAPex", null);
             }
         }
     }
@@ -425,17 +423,16 @@ public class Application extends AMLoginModule {
             String searchFilter = CollectionHelper.getMapAttr(currentConfig,
                 ISAuthConstants.LDAP_SEARCHFILTER, "");
             boolean ssl = Boolean.valueOf(CollectionHelper.getMapAttr(
-                currentConfig, ISAuthConstants.LDAP_SSL, "false")
-                ).booleanValue();
+                currentConfig, ISAuthConstants.LDAP_SSL, "false"));
 
             String tmp = CollectionHelper.getMapAttr(currentConfig,
                 ISAuthConstants.LDAP_SEARCHSCOPE, "SUBTREE");
             
-            int searchScope = 2;// SUBTREE is the default
+            SearchScope searchScope = SearchScope.WHOLE_SUBTREE;// SUBTREE is the default
             if (tmp.equalsIgnoreCase("OBJECT")) {
-                searchScope=0;
+                searchScope = SearchScope.BASE_OBJECT;
             } else if (tmp.equalsIgnoreCase("ONELEVEL")) {
-                searchScope=1;
+                searchScope = SearchScope.SINGLE_LEVEL;
             }
 
             String returnUserDN = CollectionHelper.getMapAttr(currentConfig,
@@ -443,7 +440,7 @@ public class Application extends AMLoginModule {
             
             // set LDAP Parameters
             int index = serverHost.indexOf(':');
-            int serverPort =389;
+            int serverPort = 389;
             String port = null;
             
             if (index != -1) {
@@ -453,13 +450,15 @@ public class Application extends AMLoginModule {
             }
             
             // set the optional attributes here
-            ldapUtil = new LDAPAuthUtils(serverHost,serverPort,ssl,getLoginLocale(),
-                baseDN, debug);
+            ldapUtil = new LDAPAuthUtils(Collections.singleton(serverHost + ":" + serverPort),
+                    Collections.<String>emptySet(), ldapSSL,
+                    AMResourceBundleCache.getInstance().getResBundle(amAuthApplication, getLoginLocale()), baseDN,
+                    debug);
             ldapUtil.setScope(searchScope) ;
             ldapUtil.setFilter(searchFilter);
             ldapUtil.setUserNamingAttribute(userNamingAttr);
             ldapUtil.setUserSearchAttribute(userSearchAttrs);
-            ldapUtil.setAuthPassword(bindPassword);
+            ldapUtil.setAuthPassword(bindPassword.toCharArray());
             ldapUtil.setAuthDN(bindDN);
             ldapUtil.setReturnUserDN(returnUserDN);
             

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,19 +24,11 @@
  *
  * $Id: AMFormatUtils.java,v 1.5 2009/01/28 05:34:56 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.sun.identity.console.base.model;
 
-import com.iplanet.jato.view.html.OptionList;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdType;
-import com.sun.identity.idm.IdUtils;
-import com.sun.identity.sm.SMSEntry;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,8 +39,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import com.sun.identity.shared.ldap.util.DN;
-import com.sun.identity.shared.ldap.LDAPDN;
+
+import com.iplanet.jato.view.html.OptionList;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdType;
+import com.sun.identity.idm.IdUtils;
+import com.sun.identity.sm.SMSEntry;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
 
 /**
  * <code>AMFormatUtils</code> provides a set of formating methods
@@ -138,12 +137,11 @@ public class AMFormatUtils
      */
     public static String DNToName(AMModel model, String dn) {
         String ret = dn;
-        if (DN.isDN(dn)) {
-            if (LDAPDN.equals(dn, SMSEntry.getRootSuffix())) {
+        if (LDAPUtils.isDN(dn)) {
+            if (DN.valueOf(dn).equals(DN.valueOf(SMSEntry.getRootSuffix()))) {
                 ret = model.getLocalizedString("top.level.realm");
             } else {
-                String [] comps = LDAPDN.explodeDN(dn, true);
-                ret = comps[0];
+                ret = LDAPUtils.rdnValueFromDn(dn);
             }
         }
         return ret;
@@ -271,11 +269,9 @@ public class AMFormatUtils
 
         if (type.equals(IdType.ROLE) || type.equals(IdType.FILTEREDROLE)) {
             String dn = name.replaceAll("_", ",");
-            if (DN.isDN(dn)) {
+            if (LDAPUtils.isDN(dn)) {
                 if (dn.endsWith(SMSEntry.getRootSuffix())) {
-                    String[] rdns = LDAPDN.explodeDN(dn, true);
-                    name = rdns[0] + " " + model.getLocalizedString(
-                        "admin_suffix.name");
+                    name = LDAPUtils.rdnValueFromDn(dn) + " " + model.getLocalizedString("admin_suffix.name");
                 }
             }
         } else if (type.equals(IdType.USER)) {

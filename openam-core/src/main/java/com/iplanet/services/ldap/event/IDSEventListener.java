@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: IDSEventListener.java,v 1.4 2009/01/28 05:34:50 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.services.ldap.event;
@@ -31,7 +32,7 @@ package com.iplanet.services.ldap.event;
 import java.util.EventListener;
 import java.util.Map;
 
-import com.sun.identity.shared.ldap.controls.LDAPPersistSearchControl;
+import org.forgerock.opendj.ldap.controls.PersistentSearchChangeType;
 
 /**
  * The purpose of this interface is to allow classes that implement this
@@ -63,13 +64,13 @@ public interface IDSEventListener extends EventListener {
      */
     public void allEntriesChanged();
 
-    public static int CHANGE_ADD = LDAPPersistSearchControl.ADD;
+    public static int CHANGE_ADD = PersistentSearchChangeType.ADD.intValue();
 
-    public static int CHANGE_DELETE = LDAPPersistSearchControl.DELETE;
+    public static int CHANGE_DELETE = PersistentSearchChangeType.DELETE.intValue();
 
-    public static int CHANGE_MOD_LOCATION = LDAPPersistSearchControl.MODDN;
+    public static int CHANGE_MOD_LOCATION = PersistentSearchChangeType.MODIFY_DN.intValue();
 
-    public static int CHANGE_MODIFY = LDAPPersistSearchControl.MODIFY;
+    public static int CHANGE_MODIFY = PersistentSearchChangeType.MODIFY.intValue();
 
     public String getBase();
 

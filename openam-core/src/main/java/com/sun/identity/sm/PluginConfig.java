@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: PluginConfig.java,v 1.5 2009/01/28 05:35:03 ww203982 Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.sm;
 
@@ -37,7 +34,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import com.sun.identity.shared.ldap.util.DN;
+import org.forgerock.opendj.ldap.DN;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -344,9 +341,8 @@ public class PluginConfig {
     void delete() throws SMSException, SSOException {
         SMSEntry e = pc.getSMSEntry();
         // First remove the entry from parent
-        DN dn = new DN(e.getDN());
-        CachedSubEntries cse = CachedSubEntries.getInstance(token, dn
-                .getParent().toString());
+        DN dn = DN.valueOf(e.getDN());
+        CachedSubEntries cse = CachedSubEntries.getInstance(token, dn.parent().toString());
         cse.remove(getName());
         // Remove this entry
         e.delete(token);

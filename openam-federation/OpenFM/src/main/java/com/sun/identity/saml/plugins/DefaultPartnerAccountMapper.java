@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,25 +24,10 @@
  *
  * $Id: DefaultPartnerAccountMapper.java,v 1.7 2010/01/09 19:41:52 qcheng Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
-
 package com.sun.identity.saml.plugins;
-
-import com.sun.identity.common.SystemConfigurationUtil;
-import com.sun.identity.saml.assertion.Assertion;
-import com.sun.identity.saml.assertion.NameIdentifier;
-import com.sun.identity.saml.assertion.Statement;
-import com.sun.identity.saml.assertion.Subject;
-import com.sun.identity.saml.assertion.SubjectConfirmation;
-import com.sun.identity.saml.assertion.SubjectStatement;
-
-import com.sun.identity.saml.common.SAMLConstants;
-import com.sun.identity.saml.common.SAMLUtils;
-
-import com.sun.identity.saml.protocol.SubjectQuery;
-
-import com.sun.identity.sm.SMSEntry;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -50,7 +35,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.sun.identity.shared.ldap.util.DN; 
+import com.sun.identity.saml.assertion.Assertion;
+import com.sun.identity.saml.assertion.NameIdentifier;
+import com.sun.identity.saml.assertion.Statement;
+import com.sun.identity.saml.assertion.Subject;
+import com.sun.identity.saml.assertion.SubjectConfirmation;
+import com.sun.identity.saml.assertion.SubjectStatement;
+import com.sun.identity.saml.common.SAMLConstants;
+import com.sun.identity.saml.common.SAMLUtils;
+import com.sun.identity.saml.protocol.SubjectQuery;
+import com.sun.identity.sm.SMSEntry;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.RDN;
+import org.forgerock.opendj.ldap.SearchScope;
 
 /**
  * The class <code>DefaultPartnerAccountMapper</code> provide a default
@@ -168,12 +165,12 @@ public class DefaultPartnerAccountMapper implements PartnerAccountMapper {
                                     "SubjectQuery)");
         }
 
-        Map map = new HashMap();
+        Map<String, String> map = new HashMap<>();
         getUser(subjectQuery.getSubject(), sourceID, map);
         return map;
     }
 
-    protected void getUser(Subject subject, String sourceID, Map map) {
+    protected void getUser(Subject subject, String sourceID, Map<String, String> map) {
         // No need to check SSO in SubjectConfirmation here
         // since AssertionManager will handle it without calling account mapper
         NameIdentifier nameIdentifier = subject.getNameIdentifier();
@@ -182,16 +179,13 @@ public class DefaultPartnerAccountMapper implements PartnerAccountMapper {
             String org = nameIdentifier.getNameQualifier();
             String rootSuffix = SMSEntry.getRootSuffix();
             if (name != null && (name.length() != 0)) {
-                String temp = name; 
                 if (org != null && (org.length() != 0)) {
-                    DN dn1 = new DN(name); 
-                    DN dn2 = new DN(org); 
-                    if (dn1.isDescendantOf(dn2)) {
-                        int  num = dn1.countRDNs() - dn2.countRDNs();
-                        String[] rdns = dn1.explodeDN(false); 
-                        StringBuffer sb = new StringBuffer(50);
-                        for (int i = 0; i < num; i++) { 
-                            sb.append(rdns[i]).append(",");
+                    DN dn1 = DN.valueOf(name);
+                    DN dn2 = DN.valueOf(org);
+                    if (dn1.isInScopeOf(dn2, SearchScope.SUBORDINATES)) {
+                        StringBuilder sb = new StringBuilder(50);
+                        for (RDN rdn : dn1) {
+                            sb.append(rdn.toString()).append(",");
                         }
                         sb.append(rootSuffix);
                         if (SAMLUtils.debug.messageEnabled()) {

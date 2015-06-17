@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: OrganizationConfigManager.java,v 1.31 2010/01/20 17:01:36 veiming Exp $
  *
- * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.sm;
 
@@ -36,6 +36,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
+
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
@@ -49,7 +52,6 @@ import com.sun.identity.idm.IdConstants;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.plugins.internal.AgentsRepo;
 import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.ldap.util.DN;
 
 /**
  * The class <code>OrganizationConfigManager</code> provides interfaces to
@@ -1210,7 +1212,7 @@ public class OrganizationConfigManager {
                     + "normalizeDN()-subOrgName " + subOrgName);
         }
         String subOrgDN = null;
-        if (DN.isDN(subOrgName) && (!subOrgName.startsWith("///"))) {
+        if (LDAPUtils.isDN(subOrgName) && (!subOrgName.startsWith("///"))) {
             int ndx = subOrgName.lastIndexOf(DNMapper.serviceDN);
             if (ndx == -1) {
                 // Check for baseDN
@@ -1309,7 +1311,7 @@ public class OrganizationConfigManager {
                     // Append service name, and org name
                     d.append(serviceName);
                     if (!orgDN.equalsIgnoreCase(DNMapper.serviceDN)) {
-                        d.append(SMSEntry.COMMA).append(SMSEntry.SERVICES_NODE);
+                        d.append(SMSEntry.COMMA).append(SMSEntry.SERVICES_RDN);
                     }
                     d.append(SMSEntry.COMMA).append(orgDN);
                     try {
@@ -1490,11 +1492,11 @@ public class OrganizationConfigManager {
             throws SMSException {
         OrganizationConfigManager ocm = null;
         String parentDN = null;
-        if (DN.isDN(orgDN)) {
+        if (LDAPUtils.isDN(orgDN)) {
             if (orgDN.equalsIgnoreCase(DNMapper.serviceDN)) {
                 return (this);
             }
-            parentDN = (new DN(orgDN)).getParent().toString();
+            parentDN = DN.valueOf(orgDN).parent().toString();
             if (SMSEntry.debug.messageEnabled()) {
                 SMSEntry.debug.message("OrganizationConfigManager."
                         + "getParentOrgConfigManager() parentDN : " + parentDN);

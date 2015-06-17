@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,12 @@
  *
  * $Id: PolicyCache.java,v 1.9 2010/01/10 01:19:35 veiming Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.sun.identity.policy;
+
+import com.iplanet.am.sdk.AMCommonUtils;
 import com.sun.identity.policy.interfaces.PolicyListener;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
@@ -39,9 +39,9 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.stats.Stats;
 import com.sun.identity.shared.stats.StatsListener;
-import java.util.*;
+import org.forgerock.openam.ldap.LDAPUtils;
 
-import com.sun.identity.shared.ldap.util.DN;
+import java.util.*;
 
 /**
  * The class <code>PolicyCache</code> manages policy cache 
@@ -610,7 +610,7 @@ public class PolicyCache implements ServiceListener {
     PolicyManager getPolicyManager(String orgName) throws PolicyException, 
         SSOException 
     {
-        orgName = new DN(orgName).toRFCString().toLowerCase();
+        orgName = AMCommonUtils.formatToRFC(orgName);
         PolicyManager pm = (PolicyManager) policyManagers.get(orgName);
         if ( pm == null ) {
             pm = new PolicyManager(token, orgName);

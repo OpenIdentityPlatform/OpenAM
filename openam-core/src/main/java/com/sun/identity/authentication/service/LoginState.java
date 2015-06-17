@@ -26,11 +26,37 @@
  *
  * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
+
 package com.sun.identity.authentication.service;
 
-import static java.util.Collections.*;
+import static java.util.Collections.unmodifiableSet;
 import static org.forgerock.openam.session.SessionConstants.*;
-import static org.forgerock.openam.utils.CollectionUtils.*;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
+
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.net.InetAddress;
+import java.security.AccessController;
+import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 import com.iplanet.am.sdk.AMException;
 import com.iplanet.am.sdk.AMObject;
@@ -72,44 +98,21 @@ import com.sun.identity.shared.DateUtils;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
-import com.sun.identity.shared.ldap.util.DN;
-import com.sun.identity.shared.ldap.util.RDN;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceManager;
-import java.net.InetAddress;
-import java.security.AccessController;
-import java.security.NoSuchAlgorithmException;
-import java.security.Principal;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.forgerock.openam.authentication.service.DefaultSessionPropertyUpgrader;
 import org.forgerock.openam.authentication.service.SessionPropertyUpgrader;
+import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.utils.ClientUtils;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.SearchScope;
 
 /**
  * This class maintains the User's login state information from the time user
- * requests for authentication till the time the user either logs out of the 
+ * requests for authentication till the time the user either logs out of the
  * OpenAM system or the session is destroyed by any privileged application of
  * the OpenAM system.
  */
@@ -1023,7 +1026,7 @@ public class LoginState {
             }
 
             // Return if module returns the token in the form of DN
-            if (Misc.isDescendantOf(token, getOrgDN())) {
+            if (DN.valueOf(token).isInScopeOf(getOrgDN(), SearchScope.WHOLE_SUBTREE)) {
                 return token;
             }
 
@@ -1389,10 +1392,9 @@ public class LoginState {
             session.putProperty(ISAuthConstants.PRINCIPAL, userDN);
 
             if (userId == null && userDN != null) {
-                DN dnObj = new DN(userDN);
-                List rdn = dnObj.getRDNs();
-                if (rdn != null && rdn.size() > 0) {
-                    userId = ((RDN) rdn.get(0)).getValues()[0];
+                DN dnObj = DN.valueOf(userDN);
+                if (dnObj.size() > 0) {
+                    userId = LDAPUtils.rdnValueFromDn(dnObj);
                 }
             }
             session.putProperty(ISAuthConstants.USER_ID, userId);
@@ -4667,7 +4669,7 @@ public class LoginState {
         updateSessionProperty("Role", upgradeRoleName);
         session.setIsSessionUpgrade(true);
     }
-    
+
     /* upgrade session properties - old session and new session proeprties
      * will be concatenated , seperated by |
      */
@@ -4682,7 +4684,7 @@ public class LoginState {
             oldSession.putProperty(property, value);
         }
     }
-    
+
     /* update session with the property and value */
 
     /* Get realm qualified modules list */
@@ -5540,12 +5542,12 @@ public class LoginState {
                 StringTokenizer st = new StringTokenizer(principalList, "|");
                 while (st.hasMoreTokens()) {
                     String sToken = st.nextToken();
-                    if (DN.isDN(sToken)) {
+                    if (LDAPUtils.isDN(sToken)) {
                         returnUserDN = sToken;
                         break;
                     }
                 }
-            } else if (DN.isDN(principalList)) {
+            } else if (LDAPUtils.isDN(principalList)) {
                 returnUserDN = principalList;
             }
         }
@@ -5580,7 +5582,7 @@ public class LoginState {
             while (it.hasNext()) {
                 String containerName = (String) it.next();
                 try {
-                    if (Misc.isDescendantOf(containerName, getOrgDN())) {
+                    if (DN.valueOf(containerName).isInScopeOf(getOrgDN(), SearchScope.WHOLE_SUBTREE)) {
                         int containerType =
                                 LazyConfig.AUTHD.getSDK().getAMObjectType(containerName);
                         if (DEBUG.messageEnabled()) {

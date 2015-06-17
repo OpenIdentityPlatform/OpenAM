@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,9 @@
  *
  * $Id: DirectoryServicesImpl.java,v 1.14 2009/11/20 23:52:51 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.iplanet.am.sdk.ldap;
 
 import java.security.AccessController;
@@ -46,12 +44,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.LDAPUrl;
-import com.sun.identity.shared.ldap.util.DN;
-import com.sun.identity.shared.ldap.util.RDN;
 
 import com.iplanet.am.sdk.AMConstants;
 import com.iplanet.am.sdk.AMEntryExistsException;
@@ -78,7 +70,6 @@ import com.iplanet.am.sdk.common.IDirectoryServices;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.ldap.Attr;
 import com.iplanet.services.ldap.AttrSet;
-import com.iplanet.services.ldap.ModSet;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -123,6 +114,13 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.ModificationType;
+import org.forgerock.opendj.ldap.RDN;
+import org.forgerock.opendj.ldap.ResultCode;
+import org.forgerock.opendj.ldap.SearchScope;
 
 /**
  * A class which manages all the major Directory related operations. Contains
@@ -216,7 +214,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
         DN dn = getExceptionDN(e);
         String entryName = "";
         if (dn != null) {
-            entryName = ((RDN) dn.getRDNs().get(0)).getValues()[0];
+            entryName = LDAPUtils.rdnValueFromDn(dn);
         }
         return entryName;
     }
@@ -229,8 +227,8 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
             int index = msg.indexOf("::");
             if (index != -1) {
                 String errorDN = msg.substring(0, index);
-                dn = new DN(errorDN);
-                if (!dn.isDN()) {
+                dn = DN.valueOf(errorDN);
+                if (!LDAPUtils.isDN(errorDN)) {
                     dn = null;
                 }
             }
@@ -308,23 +306,21 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
     private void processInternalException(SSOToken token, UMSException ue,
             String defaultErrorCode) throws AMException {
         try {
-            LDAPException lex = (LDAPException) ue.getRootCause();
+            ErrorResultException lex = (ErrorResultException) ue.getRootCause();
             if (lex != null) {
-                int errorCode = lex.getLDAPResultCode();
+                ResultCode errorCode = lex.getResult().getResultCode();
                 // Check for specific error conditions
-                switch (errorCode) {
-                case LDAPException.CONSTRAINT_VIOLATION: // LDAP Constraint
-                    // Violated
+                if (ResultCode.CONSTRAINT_VIOLATION.equals(errorCode)) {
                     throw new AMException(ue.getMessage(), "19", ue);
-                case LDAPException.TIME_LIMIT_EXCEEDED:
+                } else if (ResultCode.TIME_LIMIT_EXCEEDED.equals(errorCode)) {
                     throw new AMException(token, "3", ue);
-                case LDAPException.SIZE_LIMIT_EXCEEDED:
+                } else if (ResultCode.SIZE_LIMIT_EXCEEDED.equals(errorCode)) {
                     throw new AMException(token, "4", ue);
-                case LDAPException.NOT_ALLOWED_ON_RDN:
+                } else if (ResultCode.NOT_ALLOWED_ON_RDN.equals(errorCode)) {
                     throw new AMException(token, "967", ue);
-                case LDAPException.ADMIN_LIMIT_EXCEEDED:
+                } else if (ResultCode.ADMIN_LIMIT_EXCEEDED.equals(errorCode)) {
                     throw new AMException(token, "968", ue);
-                default:
+                } else {
                     throw new AMException(token, defaultErrorCode, ue);
                 }
             } else {
@@ -530,7 +526,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
                     + "object type for: " + dn);
         }
 
-        if (!DN.isDN(dn)) {
+        if (!LDAPUtils.isDN(dn)) {
             throw new AMInvalidDNException(AMSDKBundle.getString("157"), "157");
         }
 
@@ -863,8 +859,8 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
      */
     public String getOrganizationDN(SSOToken token, String entryDN)
             throws AMException {
-        DN dnObject = new DN(entryDN);
-        if (entryDN.length() == 0 || !dnObject.isDN()) {
+        DN dnObject = DN.valueOf(entryDN);
+        if (entryDN.length() == 0 || dnObject.size() <= 0) {
             debug.error("DirectoryServicesImpl.getOrganizationDN() Invalid DN: "
                     + entryDN);
             throw new AMException(token, "157");
@@ -874,7 +870,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
         while (organizationDN == null || organizationDN.length() == 0) {
             String childDN = dnObject.toString();
             organizationDN = verifyAndGetOrgDN(token, entryDN, childDN);
-            dnObject = dnObject.getParent();
+            dnObject = dnObject.parent();
         }
         return organizationDN;
     }
@@ -899,7 +895,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
         SSOToken internalToken = CommonUtils.getInternalToken();
         String eDN;
         if (profileType == AMObject.USER) {
-            eDN = (new DN(entryDN)).getParent().toString();
+            eDN = DN.valueOf(entryDN).parent().toString();
         } else {
             eDN = entryDN;
         }
@@ -939,9 +935,9 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
                 PersistentObject po = UMSObject.getObjectHandle(token,
                         new Guid(userDN));
                 if (toAdd) {
-                    po.modify(attr, ModSet.ADD);
+                    po.modify(attr, ModificationType.ADD);
                 } else {
-                    po.modify(attr, ModSet.DELETE);
+                    po.modify(attr, ModificationType.DELETE);
                 }
                 po.save();
             } catch (UMSException e) {
@@ -1345,7 +1341,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
         AssignableDynamicGroup adgroup = new AssignableDynamicGroup(
                 creationTemp, attrSet);
         adgroup.setSearchFilter("(memberof=" + entryDN + ")");
-        adgroup.setSearchScope(com.sun.identity.shared.ldap.LDAPv2.SCOPE_SUB);
+        adgroup.setSearchScope(SearchScope.WHOLE_SUBTREE.intValue());
         adgroup.setSearchBase(new Guid(orgDN));
         parentObj.addChild(adgroup);
 
@@ -1378,11 +1374,11 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
         com.iplanet.ums.DynamicGroup dgroup = new com.iplanet.ums.DynamicGroup(
                 creationTemp, attrSet);
         String filter = dgroup.getSearchFilter();
-        if (LDAPUrl.defaultFilter.equalsIgnoreCase(filter)) {
+        if ("(objectClass=*)".equalsIgnoreCase(filter)) {
             dgroup.setSearchFilter(SearchFilterManager.getSearchFilter(
                     AMObject.USER, orgDN));
         }
-        dgroup.setSearchScope(com.sun.identity.shared.ldap.LDAPv2.SCOPE_SUB);
+        dgroup.setSearchScope(SearchScope.WHOLE_SUBTREE.intValue());
         dgroup.setSearchBase(new Guid(orgDN));
         parentObj.addChild(dgroup);
 
@@ -1598,11 +1594,10 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
             if (objectType == AMObject.ORGANIZATION
                     || objectType == AMObject.ORGANIZATIONAL_UNIT) {
                 // Get the parent oganization for this org.
-                DN rootDN = new DN(AMStoreConnection.getAMSdkBaseDN());
-                DN currentOrgDN = new DN(organizationDN);
+                DN rootDN = DN.valueOf(AMStoreConnection.getAMSdkBaseDN());
+                DN currentOrgDN = DN.valueOf(organizationDN);
                 if (!rootDN.equals(currentOrgDN)) {
-                    String parentDN = (new DN(organizationDN)).getParent()
-                            .toString();
+                    String parentDN = DN.valueOf(organizationDN).parent().toString();
                     parentOrgDN = getOrganizationDN(internalToken, parentDN);
                 }
             }
@@ -1624,11 +1619,10 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
             if (objectType == AMObject.ORGANIZATION
                     || objectType == AMObject.ORGANIZATIONAL_UNIT) {
                 // Get the parent oganization for this org.
-                DN rootDN = new DN(AMStoreConnection.getAMSdkBaseDN());
-                DN currentOrgDN = new DN(organizationDN);
+                DN rootDN = DN.valueOf(AMStoreConnection.getAMSdkBaseDN());
+                DN currentOrgDN = DN.valueOf(organizationDN);
                 if (!rootDN.equals(currentOrgDN)) {
-                    String parentDN = (new DN(organizationDN)).getParent()
-                            .toString();
+                    String parentDN = DN.valueOf(organizationDN).parent().toString();
                     parentOrgDN = getOrganizationDN(internalToken, parentDN);
                 }
             }
@@ -1702,7 +1696,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
         EmailNotificationHelper mailer = null;
         String eDN = entryDN;
         if (objectType == AMObject.USER) {
-            eDN = ((new DN(entryDN)).getParent()).toRFCString();
+            eDN = DN.valueOf(entryDN).parent().toString();
         }
         String orgDN = getOrganizationDN(internalToken, eDN);
         try {
@@ -1787,7 +1781,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
 
             List list = new ArrayList();
             // get number of RDNs in the entry itself
-            int entryRDNs = (new DN(entryDN)).countRDNs();
+            int entryRDNs = DN.valueOf(entryDN).size();
             // to count maximum level of RDNs in the search return
             int maxRDNCount = entryRDNs;
             // go through all search results, add DN to the list, and
@@ -1795,12 +1789,12 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
             SearchResults children = po.getChildren(searchFilter, control);
             while (children.hasMoreElements()) {
                 PersistentObject object = children.next();
-                DN dn = new DN(object.getDN());
+                DN dn = DN.valueOf(object.getDN());
                 if (debug.messageEnabled()) {
                     debug.message("DirectoryServicesImpl.removeEntry(): "
                             + "found child: " + object.getDN());
                 }
-                int count = dn.countRDNs();
+                int count = dn.size();
                 if (count > maxRDNCount) {
                     maxRDNCount = count;
                 }
@@ -1824,13 +1818,13 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
                 for (int j = 0; j < len; j++) {
                     DN dn = (DN) list.get(j);
                     // check if we need delete it now
-                    if (dn.countRDNs() == i) {
+                    if (dn.size() == i) {
                         // remove the entry
                         if (debug.messageEnabled()) {
                             debug.message("DirectoryServicesImpl."
-                                    + "removeEntry(): del " + dn.toRFCString());
+                                    + "removeEntry(): del " + dn.toString());
                         }
-                        String rfcDN = dn.toRFCString();
+                        String rfcDN = dn.toString();
                         type = AMObject.UNKNOWN_OBJECT_TYPE;
                         try {
                             type = getObjectType(internalToken, rfcDN);
@@ -1905,12 +1899,12 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
                     + " recursive: " + recursive);
         }
         // first find out the admin role dn for the group
-        DN ldapDN = new DN(dn);
-        String orgDN = getOrganizationDN(token, ldapDN.getParent().toString());
+        DN ldapDN = DN.valueOf(dn);
+        String orgDN = getOrganizationDN(token, ldapDN.parent().toString());
         String newdn = dn.replace(',', '_');
         String roleNameAttr = getNamingAttribute(AMObject.ROLE);
-        String roleDN = (new StringBuffer().append(roleNameAttr).append("=")
-                .append(newdn).append(",").append(orgDN)).toString();
+        String roleDN = new StringBuilder().append(roleNameAttr).append("=")
+                .append(newdn).append(",").append(orgDN).toString();
 
         Set adminRoles = Collections.EMPTY_SET;
         if (recursive) {
@@ -1985,10 +1979,10 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
             SearchResults results = po.search(searchFilter, control);
             resultSet = searchResultsToSet(results);
         } catch (UMSException ue) {
-            LDAPException lex = (LDAPException) ue.getRootCause();
-            int errorCode = lex.getLDAPResultCode();
+            ErrorResultException lex = (ErrorResultException) ue.getRootCause();
+            ResultCode errorCode = lex.getResult().getResultCode();
             if (retryErrorCodes.contains("" + errorCode)) {
-                throw new AMException(token, Integer.toString(errorCode), ue);
+                throw new AMException(token, Integer.toString(errorCode.intValue()), ue);
             }
             if (debug.warningEnabled()) {
                 debug.warning("DirectoryServicesImpl.search(token:, entryDN: "
@@ -2260,14 +2254,13 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
             debug.error("DirectoryServicesImpl.getMembers() entryDN " + entryDN
                     + " objectType: " + objectType
                     + " Unable to get members: ", e);
-            LDAPException le = (LDAPException) e.getRootCause();
-            if (le != null
-                    && (le.getLDAPResultCode() == 
-                        LDAPException.SIZE_LIMIT_EXCEEDED || 
-                        le.getLDAPResultCode() == 
-                            LDAPException.ADMIN_LIMIT_EXCEEDED)) 
-            {
-                throw new AMException(token, "505", e);
+            ErrorResultException le = (ErrorResultException) e.getRootCause();
+            if (le != null){
+                ResultCode resultCode = le.getResult().getResultCode();
+                if (ResultCode.SIZE_LIMIT_EXCEEDED.equals(resultCode)
+                        || ResultCode.ADMIN_LIMIT_EXCEEDED.equals(resultCode)) {
+                    throw new AMException(token, "505", e);
+                }
             }
             throw new AMException(token, "454", e);
         }
@@ -2357,11 +2350,10 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
                     || objectType == AMObject.ORGANIZATIONAL_UNIT) {
                 // Get the parent oganization for this org.
                 // Get the parent oganization for this org.
-                DN rootDN = new DN(AMStoreConnection.getAMSdkBaseDN());
-                DN currentOrgDN = new DN(organizationDN);
+                DN rootDN = DN.valueOf(AMStoreConnection.getAMSdkBaseDN());
+                DN currentOrgDN = DN.valueOf(organizationDN);
                 if (!rootDN.equals(currentOrgDN)) {
-                    String parentDN = (new DN(organizationDN)).getParent()
-                            .toString();
+                    String parentDN = DN.valueOf(organizationDN).parent().toString();
                     parentOrgDN = getOrganizationDN(internalToken, parentDN);
                 }
             }
@@ -2380,11 +2372,10 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
             if (objectType == AMObject.ORGANIZATION
                     || objectType == AMObject.ORGANIZATIONAL_UNIT) {
                 // Get the parent oganization for this org.
-                DN rootDN = new DN(AMStoreConnection.getAMSdkBaseDN());
-                DN currentOrgDN = new DN(organizationDN);
+                DN rootDN = DN.valueOf(AMStoreConnection.getAMSdkBaseDN());
+                DN currentOrgDN = DN.valueOf(organizationDN);
                 if (!rootDN.equals(currentOrgDN)) {
-                    String parentDN = (new DN(organizationDN)).getParent()
-                            .toString();
+                    String parentDN = DN.valueOf(organizationDN).parent().toString();
                     parentOrgDN = getOrganizationDN(internalToken, parentDN);
                 }
             }
@@ -2403,11 +2394,11 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
     private void modifyPersistentObject(PersistentObject po, Attr attr,
             boolean isAdd, boolean isDelete) {
         if (isAdd) { // Add attribute
-            po.modify(attr, ModSet.ADD);
+            po.modify(attr, ModificationType.ADD);
         } else if (isDelete) { // Remove attribute
-            po.modify(attr, ModSet.DELETE);
+            po.modify(attr, ModificationType.DELETE);
         } else { // Replace attribute
-            po.modify(attr, ModSet.REPLACE);
+            po.modify(attr, ModificationType.REPLACE);
         }
     }
 
@@ -2476,7 +2467,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
                 stringAttributes);
         String eDN = entryDN;
         if (objectType == AMObject.USER) {
-            eDN = (new DN(entryDN)).getParent().toString();
+            eDN = DN.valueOf(entryDN).parent().toString();
         }
 
         String orgDN = getOrganizationDN(internalToken, eDN);
@@ -2825,7 +2816,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
     private AMException generateMemberShipException(SSOToken token,
             String target, int objectType, EntryNotFoundException e) {
         DN errorDN = getExceptionDN(e);
-        DN targetDN = new DN(target);
+        DN targetDN = DN.valueOf(target);
         if (errorDN == null) {
             debug.error("DirectoryServicesImpl.modMemberShip", e);
             Object args[] = { target };
@@ -2833,7 +2824,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
             return new AMException(AMSDKBundle.getString("461", args, locale),
                     "461", args);
         }
-        String entryName = ((RDN) errorDN.getRDNs().get(0)).getValues()[0];
+        String entryName = LDAPUtils.rdnValueFromDn(errorDN);
 
         String errorCode = null;
         if (errorDN.equals(targetDN)) {
@@ -2883,7 +2874,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
         Iterator itr = members.iterator();
         while (itr.hasNext()) {
             String userDN = (String) itr.next();
-            if (userDN.length() == 0 || !DN.isDN(userDN)) {
+            if (userDN.isEmpty() || DN.valueOf(userDN).size() <= 0) {
                 debug.error("DirectoryServicesImpl.modifyMemberShip() " 
                         + "Invalid DN: " + userDN);
                 throw new AMException(token, "157");
@@ -3331,7 +3322,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
         int size = attrset.size();
         for (int i = 0; i < size; i++) {
             Attr attr = attrset.elementAt(i);
-            cosTemplate.modify(attr, ModSet.ADD);
+            cosTemplate.modify(attr, ModificationType.ADD);
         }
 
         return cosTemplate;
@@ -3412,20 +3403,21 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
                 // no namespace validation for these objects
                 return;
             }
-            String[] rdns = LDAPDN.explodeDN(entryDN, false);
-            int size = rdns.length;
+            DN dn = DN.valueOf(entryDN);
+            int size = dn.size();
 
             if (size < 2) {
                 return;
             }
 
-            String orgDN = rdns[size - 1];
+            String orgDN = dn.rdn().toString();
 
             AMStoreConnection amsc = new AMStoreConnection(CommonUtils
                     .getInternalToken());
-            DN rootDN = new DN(AMStoreConnection.getAMSdkBaseDN());
-            DN thisDN = new DN(orgDN);
+            DN rootDN = DN.valueOf(AMStoreConnection.getAMSdkBaseDN());
+            DN thisDN = DN.valueOf(orgDN);
 
+            Iterator<RDN> rdnIterator = dn.iterator();
             for (int i = size - 2; i >= 0; i--) {
                 if (debug.messageEnabled()) {
                     debug.message("AMObjectImpl.validateAttributeUniqueness: " 
@@ -3434,7 +3426,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
 
                 int type = -1;
 
-                if (!rootDN.isDescendantOf(thisDN)) {
+                if (!rootDN.isInScopeOf(thisDN, SearchScope.SUBORDINATES)) {
                     try {
                         type = amsc.getAMObjectType(orgDN);
                     } catch (AMException ame) {
@@ -3549,7 +3541,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
                                     attrExists = true;
                                 }
 
-                                filterSB.append("(").append(rdns[0])
+                                filterSB.append("(").append(dn.rdn().toString())
                                         .append(")");
                             }
 
@@ -3589,9 +3581,9 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
                         // the same as the one you are checking for.
                         // In that case,ignore the violation
                         if (users != null && users.size() == 1) {
-                            String dn = (String) users.iterator().next();
-                            DN dnObject = new DN(dn);
-                            if (dnObject.equals(new DN(entryDN))) {
+                            String userDN = (String) users.iterator().next();
+                            DN dnObject = DN.valueOf(userDN);
+                            if (dnObject.equals(DN.valueOf(entryDN))) {
                                 return;
                             }
                         }
@@ -3602,8 +3594,8 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
                     }
                 }
 
-                orgDN = rdns[i] + "," + orgDN;
-                thisDN = new DN(orgDN);
+                orgDN = rdnIterator.next() + "," + orgDN;
+                thisDN = DN.valueOf(orgDN);
             }
         } catch (SSOException ex) {
             if (debug.warningEnabled()) {
@@ -3698,21 +3690,21 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
 
         while (iter.hasNext()) {
             String containerDN = (String) iter.next();
-            DN cDN = new DN(containerDN);
+            DN cDN = DN.valueOf(containerDN);
             Iterator iter2 = resultSet.iterator();
             HashSet tmpSet = new HashSet();
             boolean toAdd = true;
 
             while (iter2.hasNext()) {
                 String resultDN = (String) iter2.next();
-                DN rDN = new DN(resultDN);
+                DN rDN = DN.valueOf(resultDN);
 
-                if (cDN.isDescendantOf(rDN)) {
+                if (cDN.isInScopeOf(rDN, SearchScope.SUBORDINATES)) {
                     toAdd = false;
                     tmpSet.add(resultDN);
 
                     break;
-                } else if (!rDN.isDescendantOf(cDN)) {
+                } else if (!rDN.isInScopeOf(cDN, SearchScope.SUBORDINATES)) {
                     tmpSet.add(resultDN);
                 }
             }
@@ -3758,7 +3750,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
      */
     public String verifyAndGetOrgDN(SSOToken token, String entryDN,
             String childDN) throws AMException {
-        if (entryDN.length() == 0 || !DN.isDN(entryDN)) {
+        if (entryDN.isEmpty() || DN.valueOf(entryDN).size() <= 0) {
             debug.error("DirectoryServicesImpl.verifyAndGetOrgDN() Invalid "
                     + "DN: " + entryDN);
             throw new AMException(token, "157");
@@ -3792,10 +3784,10 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
                 debug.warning("DirectoryServicesImpl.verifyAndGetOrgDN(): "
                         + "Unable to Obtain Parent Organization", ue);
             }
-            LDAPException lex = (LDAPException) ue.getRootCause();
-            int errorCode = lex.getLDAPResultCode();
+            ErrorResultException lex = (ErrorResultException) ue.getRootCause();
+            ResultCode errorCode = lex.getResult().getResultCode();
             if (retryErrorCodes.contains("" + errorCode)) {
-                throw new AMException(token, Integer.toString(errorCode), ue);
+                throw new AMException(token, Integer.toString(errorCode.intValue()), ue);
             }
         }
 

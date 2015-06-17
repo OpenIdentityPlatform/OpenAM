@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: CachedSMSEntry.java,v 1.16 2009/10/08 20:33:54 hengming Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.sm;
@@ -38,13 +39,13 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import com.sun.identity.shared.ldap.util.DN;
-
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
 import java.util.Collections;
 import java.util.HashMap;
+
+import org.forgerock.opendj.ldap.DN;
 
 /**
  * The class <code>CachedSchemaManagerImpl</code> provides interfaces to
@@ -94,9 +95,9 @@ public class CachedSMSEntry {
     // Private constructor, can be instantiated only via getInstance
     private CachedSMSEntry(SMSEntry e) {
         smsEntry = e;
-        DN dn = new DN(e.getDN());
+        DN dn = DN.valueOf(e.getDN());
         dn2Str = dn.toString();
-        dnRFCStr = dn.toRFCString().toLowerCase();
+        dnRFCStr = dn.toString().toLowerCase();
         token = e.getSSOToken();
         addPrincipal(token);
         valid = true;
@@ -373,7 +374,7 @@ public class CachedSMSEntry {
         if (SMSEntry.debug.messageEnabled()) {
             SMSEntry.debug.message("CachedSMSEntry::getInstance: " + dn);
         }
-        String cacheEntry = (new DN(dn)).toRFCString().toLowerCase();
+        String cacheEntry = DN.valueOf(dn).toString().toLowerCase();
         CachedSMSEntry answer = (CachedSMSEntry) smsEntries.get(cacheEntry);
         if ((answer == null) || !answer.isValid()) {
             // Construct the SMS entry. Should be outside the synchronized

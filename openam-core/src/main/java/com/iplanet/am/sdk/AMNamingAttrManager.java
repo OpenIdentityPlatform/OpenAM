@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,16 +24,17 @@
  *
  * $Id: AMNamingAttrManager.java,v 1.6 2009/01/28 05:34:47 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.am.sdk;
 
 import java.util.HashMap;
 import java.util.Map;
-import com.sun.identity.shared.ldap.util.DN;
 
 import com.iplanet.am.sdk.common.IDirectoryServices;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.opendj.ldap.DN;
 
 /**
  * A class to manage the naming attribute related information. This class stores
@@ -58,7 +59,7 @@ public class AMNamingAttrManager {
      */
     public static String getNamingAttr(int objectType, String orgDN) {
         String cacheKey = (new Integer(objectType)).toString() + ":"
-                + (new DN(orgDN)).toRFCString().toLowerCase();
+                + DN.valueOf(orgDN).toString().toLowerCase();
         if (namingAttrMap.containsKey(cacheKey)) {
             return ((String) namingAttrMap.get(cacheKey));
         } else {

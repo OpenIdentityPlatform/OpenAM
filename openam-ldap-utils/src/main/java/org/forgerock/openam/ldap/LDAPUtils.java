@@ -15,6 +15,8 @@
  */
 package org.forgerock.openam.ldap;
 
+import javax.naming.InvalidNameException;
+import javax.naming.NamingException;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
@@ -34,18 +36,24 @@ import java.util.concurrent.TimeUnit;
 import org.forgerock.i18n.LocalizedIllegalArgumentException;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
+import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.Connections;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.ErrorResultIOException;
 import org.forgerock.opendj.ldap.FailoverLoadBalancingAlgorithm;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.LDAPConnectionFactory;
 import org.forgerock.opendj.ldap.LDAPOptions;
 import org.forgerock.opendj.ldap.LoadBalancerEventListener;
+import org.forgerock.opendj.ldap.RDN;
 import org.forgerock.opendj.ldap.SSLContextBuilder;
+import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.requests.Requests;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
+import org.forgerock.util.Reject;
 
 /**
  * Utility methods to help interaction with the OpenDJ LDAP SDK.
@@ -65,6 +73,7 @@ import org.forgerock.opendj.ldap.requests.Requests;
  */
 public class LDAPUtils {
 
+    private static final char[] ESCAPED_CHAR = {',', '+', '"', '\\', '<', '>', ';'};
     private static final String LDAP_SCOPE_BASE = "SCOPE_BASE";
     private static final String LDAP_SCOPE_ONE = "SCOPE_ONE";
     private static final String LDAP_SCOPE_SUB = "SCOPE_SUB";
@@ -405,6 +414,157 @@ public class LDAPUtils {
         }
     }
 
+    /**
+     * When provided a DN, returns the value part of the first RDN.
+     * @param dn A DN.
+     * @return The value part of the first RDN.
+     * @throws IllegalArgumentException When the DN's RDN is multivalued, or when the DN is not a valid name.
+     */
+    public static String rdnValueFromDn(String dn) {
+        return rdnValueFromDn(DN.valueOf(dn));
+    }
+
+    /**
+     * When provided a DN, returns the value part of the first RDN.
+     * @param dn A DN.
+     * @return The value part of the first RDN.
+     * @throws IllegalArgumentException When the DN's RDN is multivalued.
+     */
+    public static String rdnValueFromDn(DN dn) {
+        if (dn.size() == 0) {
+            return "";
+        } else {
+            return rdnValue(dn.rdn());
+        }
+    }
+
+    /**
+     * When provided an RDN, returns the value part.
+     * @param rdn An RDN.
+     * @return The value part.
+     * @throws IllegalArgumentException When the RDN is multivalued.
+     */
+    public static String rdnValue(RDN rdn) {
+        Reject.ifTrue(rdn.isMultiValued(), "Multivalued RDNs not supported");
+        return rdn.getFirstAVA().getAttributeValue().toString();
+    }
+
+    /**
+     * When provided a DN, returns the attribute type name of the first RDN.
+     * @param dn A DN.
+     * @return The attribute type name of the first RDN.
+     * @throws IllegalArgumentException When the DN's RDN is multivalued.
+     */
+    public static String rdnTypeFromDn(String dn) {
+        return rdnTypeFromDn(DN.valueOf(dn));
+    }
+
+    /**
+     * When provided a DN, returns the attribute type name of the first RDN.
+     * @param dn A DN.
+     * @return The attribute type name of the first RDN.
+     * @throws IllegalArgumentException When the DN's RDN is multivalued.
+     */
+    public static String rdnTypeFromDn(DN dn) {
+        if (dn.size() == 0) {
+            return "";
+        } else {
+            return rdnType(dn.rdn());
+        }
+    }
+
+    /**
+     * When provided an RDN, returns the attribute type name.
+     * @param rdn An RDN.
+     * @return The attribute type name.
+     * @throws IllegalArgumentException When the RDN is multivalued.
+     */
+    public static String rdnType(RDN rdn) {
+        Reject.ifTrue(rdn.size() != 1, "Multivalued RDNs not supported");
+        return rdn.getFirstAVA().getAttributeType().getNameOrOID();
+    }
+
+    /**
+     * Returns a set of all the non-root DNs from the collection that are not equal to the {@code compare} parameter.
+     * @param compare
+     * @param dns
+     * @return
+     * @throws NamingException
+     */
+    public static Set<String> collectNonIdenticalValues(DN compare, Set<String> dns) throws InvalidNameException {
+        Set<String> results = new HashSet<>();
+        for (String dnString : dns) {
+            DN dn = DN.valueOf(dnString);
+            if (dn.size() > 0 && compare.compareTo(dn) != 0) {
+                results.add(rdnValueFromDn(dn));
+            }
+        }
+        return results;
+    }
+
+    public static String getDBName(String suffix, Connection ld) {
+        String filter = "cn=" + suffix;
+
+        try {
+            ConnectionEntryReader results = ld.search("cn=mapping tree,cn=config", SearchScope.WHOLE_SUBTREE, filter);
+            while (results.hasNext()) {
+                Attribute dbName = results.readEntry().getAttribute("nsslapd-backend");
+                if (dbName != null) {
+                    return dbName.firstValueAsString();
+                }
+            }
+        } catch (ErrorResultIOException e) {
+            // If not S1DS, then cn=mapping tree wouldn't exist.
+            // Hence return userRoot as DBNAME.
+        } catch (SearchResultReferenceIOException e) {
+            DEBUG.error("LDAPUtils.getDBName: Did not expect to get a reference", e);
+        }
+        return "userRoot";
+    }
+
+    /**
+     * Tests whether the supplied string is a DN, and is not the root DN.
+     * @param candidateDN
+     * @return
+     */
+    public static boolean isDN(String candidateDN) {
+        return !"/".equals(candidateDN) && candidateDN != null && candidateDN.contains("=")
+                && newDN(candidateDN).size() > 0;
+    }
+
+    public static String escapeValue( String str ) {
+        StringBuilder retbuf = new StringBuilder();
+        for (int i = 0; i < str.length(); i++) {
+            char current_char = str.charAt(i);
+            if (isEscape(current_char)) {
+                retbuf.append( '\\' );
+            }
+            retbuf.append(current_char);
+        }
+        return retbuf.toString();
+    }
+
+    private static boolean isEscape(char c) {
+        for (char escaped : ESCAPED_CHAR) {
+            if (c == escaped) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static String normalizeDN(String dn) {
+        return newDN(dn).toString().toLowerCase();
+    }
+
+    public static DN newDN(String orgName) {
+        if (orgName == null || orgName.startsWith("/") || !orgName.contains("=")) {
+            return DN.valueOf("");
+        } else {
+            return DN.valueOf(orgName);
+        }
+    }
+
     private static class LoggingLBEventListener implements LoadBalancerEventListener {
 
         public void handleConnectionFactoryOffline(ConnectionFactory factory, ErrorResultException error) {
@@ -414,5 +574,67 @@ public class LDAPUtils {
         public void handleConnectionFactoryOnline(ConnectionFactory factory) {
             DEBUG.error("Connection factory became online: " + factory);
         }
+    }
+
+    /**
+     * Creates a ConnectionFactory from the host string and associated details. The host string can be any of the
+     * following:
+     * <ul>
+     *     <li>A plain hostname/IP address</li>
+     *     <li>A hostname and port, in the format <code>[host]:[port]</code></li>
+     *     <li>A space-separated list of hostnames in priority order, e.g. <code>host1 host2 host3</code></li>
+     *     <li>
+     *         A space-separated list of hostnames with port numbers in priority order, e.g.
+     *         <code>host1:389 host2:50389</code>
+     *     </li>
+     * </ul>
+     * If a list of hosts is given, a load balanced {@code ConnectionFactory} is returned. All factories are
+     * pre-authenticated using the supplied credentials.
+     * @param host The host/host-port string.
+     * @param defaultPort The port number to use for hosts that do not specify a port in the string.
+     * @param authDN The DN to bind with.
+     * @param authPasswd The password to bind with.
+     * @param options Any additional options.
+     * @return A connection factory.
+     * @throws GeneralSecurityException If SSL cannot be initialised.
+     */
+    public static ConnectionFactory createFailoverConnectionFactory(String host, int defaultPort,
+            String authDN, String authPasswd, LDAPOptions options) throws GeneralSecurityException {
+        StringTokenizer st = new StringTokenizer( host );
+        String hostList[] = new String[st.countTokens()];
+        int portList[] = new int[st.countTokens()];
+        int hostCount = 0;
+        while(st.hasMoreTokens()) {
+            String s = st.nextToken();
+            int colon = s.indexOf(':');
+            if (colon > 0) {
+                hostList[hostCount] = s.substring( 0, colon);
+                portList[hostCount] = Integer.parseInt(s.substring(colon + 1));
+            } else {
+                hostList[hostCount] = s;
+                portList[hostCount] = defaultPort;
+            }
+            hostCount++;
+        }
+
+        if (hostCount > 1) {
+            List<ConnectionFactory> factories = new ArrayList<>();
+            for (int i = 0; i < hostCount; i++) {
+                factories.add(createSingleHostConnectionFactory(hostList[i], portList[i], authDN, authPasswd, options));
+            }
+            return Connections.newLoadBalancer(new FailoverLoadBalancingAlgorithm(factories));
+        } else {
+            return createSingleHostConnectionFactory(hostList[0], portList[0], authDN, authPasswd, options);
+        }
+    }
+
+    private static ConnectionFactory createSingleHostConnectionFactory(String host, int port,
+            String authDN, String authPasswd, LDAPOptions options) throws GeneralSecurityException {
+        ConnectionFactory ldc = new LDAPConnectionFactory(host, port, options);
+
+        ldc = Connections.newAuthenticatedConnectionFactory(ldc,
+                Requests.newSimpleBindRequest(authDN, authPasswd.getBytes()));
+
+        return ldc;
     }
 }

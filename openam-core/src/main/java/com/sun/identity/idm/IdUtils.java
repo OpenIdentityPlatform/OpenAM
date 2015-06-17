@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,20 +24,26 @@
  *
  * $Id: IdUtils.java,v 1.34 2009/11/20 23:52:54 ww203982 Exp $
  *
- */
-
-/*
  * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
+
 package com.sun.identity.idm;
 
+import java.security.AccessController;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+
+import com.iplanet.am.sdk.AMConstants;
 import com.iplanet.am.sdk.AMDirectoryAccessFactory;
 import com.iplanet.am.sdk.AMException;
 import com.iplanet.am.sdk.AMObject;
 import com.iplanet.am.sdk.AMOrganization;
 import com.iplanet.am.sdk.AMStoreConnection;
-import com.iplanet.am.sdk.AMConstants;
 import com.iplanet.am.sdk.common.IDirectoryServices;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
@@ -49,26 +55,15 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
-import com.sun.identity.sm.SMSEntry;
-import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.OrgConfigViaAMSDK;
-
+import com.sun.identity.sm.OrganizationConfigManager;
+import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManager;
-
-import java.security.AccessController;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.util.DN;
-
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
 
 /**
  * The class defines some static utilities used by other components like policy
@@ -288,8 +283,8 @@ public final class IdUtils {
      */
     public static AMIdentity getIdentity(SSOToken token, String amsdkdn,
         String realm) throws IdRepoException {
-        DN amsdkdnObject = null;
-        if (amsdkdn == null || !(amsdkdnObject = new DN(amsdkdn)).isDN()) {
+        DN amsdkdnObject = LDAPUtils.newDN(amsdkdn);
+        if (amsdkdn == null || !LDAPUtils.isDN(amsdkdn)) {
             Object[] args = { amsdkdn };
             throw (new IdRepoException(IdRepoBundle.BUNDLE_NAME,
                 "215", args));
@@ -311,9 +306,9 @@ public final class IdUtils {
 
         // Check for Special Users
         initializeSpecialUsers();
-        if (specialUsers.contains(DNUtils.normalizeDN(amsdkdnObject))) {
-            return (new AMIdentity(amsdkdnObject, token, LDAPDN.explodeDN(
-                amsdkdnObject, true)[0], IdType.USER, ROOT_SUFFIX));
+        if (specialUsers.contains(DNUtils.normalizeDN(amsdkdn))) {
+            return new AMIdentity(amsdkdnObject, token, LDAPUtils.rdnValueFromDn(
+                    amsdkdnObject), IdType.USER, ROOT_SUFFIX);
         }
 
         // Since "amsdkdn" is not a UUID, check if realm has AMSDK configured
@@ -360,7 +355,7 @@ public final class IdUtils {
             type = getType(AMStoreConnection.getObjectName(sdkType));
             name = AMConstants.CONTAINER_DEFAULT_TEMPLATE_ROLE;
             if (!type.equals(IdType.REALM)) {
-                name = LDAPDN.explodeDN(amsdkdnObject, true)[0];
+                name = LDAPUtils.rdnValueFromDn(amsdkdnObject);
             }
         } catch (AMException ame) {
             // Debug the message and return null
@@ -485,7 +480,7 @@ public final class IdUtils {
                 Object[] args = { orgIdentifier };
                 throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "401", args);
             }
-        } else if (DN.isDN(orgIdentifier)) {
+        } else if (LDAPUtils.isDN(orgIdentifier)) {
             id = orgIdentifier;
             try {
                 // Search for realms with orgIdentifier name

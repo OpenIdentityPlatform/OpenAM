@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,16 +24,16 @@
  *
  * $Id: PeopleContainer.java,v 1.4 2009/01/28 05:34:50 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.ums;
 
 import java.security.Principal;
 
-import com.sun.identity.shared.ldap.util.DN;
-
 import com.iplanet.services.ldap.Attr;
 import com.iplanet.services.ldap.AttrSet;
+import org.forgerock.opendj.ldap.DN;
 
 /**
  * Represents People Container in UMS. People Container is simply a container
@@ -268,10 +268,10 @@ public class PeopleContainer extends PersistentObject {
      * @supported.api
      */
     public boolean isMember(User user) throws UMSException {
-        DN userdn = new DN(user.getDN());
-        DN pcdn = new DN(this.getDN());
+        DN userdn = DN.valueOf(user.getDN());
+        DN pcdn = DN.valueOf(this.getDN());
 
-        if (userdn.getParent().equals(pcdn)) {
+        if (userdn.parent().equals(pcdn)) {
             return true;
         } else {
             return false;

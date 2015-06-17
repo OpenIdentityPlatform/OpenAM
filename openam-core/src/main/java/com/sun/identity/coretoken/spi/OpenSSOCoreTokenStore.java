@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -23,11 +23,10 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: OpenSSOCoreTokenStore.java,v 1.1 2009/11/19 00:07:41 qcheng Exp $
+ *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.sun.identity.coretoken.spi;
 
 import com.iplanet.sso.SSOException;
@@ -40,7 +39,6 @@ import com.sun.identity.coretoken.CoreTokenException;
 import com.sun.identity.coretoken.service.TokenCleanupRunnable;
 import com.sun.identity.coretoken.service.CoreTokenConfigService;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
-import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import java.util.Date;
@@ -52,6 +50,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import javax.security.auth.Subject;
+
+import org.forgerock.openam.ldap.LDAPUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -229,10 +229,7 @@ public class OpenSSOCoreTokenStore implements CoreTokenStore {
                     0, 0, false, false);
                 for (String dn : dns) {
                     if (!CoreTokenUtils.areDNIdentical(SERVICE_DN, dn)) {
-                        String rdns[] = LDAPDN.explodeDN(dn, true);
-                        if ((rdns != null) && rdns.length > 0) {
-                            results.put(rdns[0]);
-                        }
+                        results.put(LDAPUtils.rdnValueFromDn(dn));
                     }
                 }
             }

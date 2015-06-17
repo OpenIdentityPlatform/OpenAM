@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,13 +24,27 @@
  *
  * $Id: SMSEntry.java,v 1.53 2009/12/07 19:46:47 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.sm;
+
+import javax.naming.directory.BasicAttribute;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.ModificationItem;
+import javax.naming.ldap.Rdn;
+import java.security.AccessController;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 import com.iplanet.am.util.Cache;
 import com.iplanet.am.util.SystemProperties;
@@ -50,24 +64,10 @@ import com.sun.identity.shared.datastruct.OrderedSet;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.sm.jaxrpc.SMSJAXRPCObject;
-import java.security.AccessController;
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.StringTokenizer;
-import javax.naming.directory.BasicAttribute;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.ModificationItem;
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.util.DN;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.ResultCode;
 
 /**
  * This object represents a SMS entry in datastore, similar to UMS's equivalent
@@ -170,7 +170,7 @@ public class SMSEntry implements Cloneable {
 
     static final String MODIFY = "MODIFY";
 
-    static Set specialUserSet = new HashSet(50);
+    static final Set<String> specialUserSet = new CaseInsensitiveHashSet<>(50);
 
     static Set readActionSet = new HashSet(2);
 
@@ -262,8 +262,7 @@ public class SMSEntry implements Cloneable {
         if (smsObject != null) {
             adminUser = SystemProperties.get(AUTH_SUPER_USER, "");
             if (adminUser != null && adminUser.length() != 0) {
-                specialUserSet.add(new DN(adminUser).toRFCString()
-                    .toLowerCase());
+                specialUserSet.add(DN.valueOf(adminUser).toString());
             }
         }
 
@@ -272,14 +271,11 @@ public class SMSEntry implements Cloneable {
             // to the specialUserSet
             adminUser = com.iplanet.am.util.AdminUtils.getAdminDN();
             if (adminUser != null && adminUser.length() != 0) {
-                specialUserSet.add(new DN(adminUser).toRFCString()
-                    .toLowerCase());
+                specialUserSet.add(DN.valueOf(adminUser).toString());
             }
         }
         
-        if (debug.messageEnabled()) {
-            debug.message("SMSEntry: Special User Set: " + specialUserSet);
-        }
+        debug.message("SMSEntry: Special User Set: {}", specialUserSet);
     }
     
     private static void initSMSObject() {
@@ -360,7 +356,7 @@ public class SMSEntry implements Cloneable {
         // Get the baseDN
         String temp = smsObject.getRootSuffix();
         if (temp != null) {
-            baseDN = (new DN(temp)).toRFCString().toLowerCase();
+            baseDN = DN.valueOf(temp).toString().toLowerCase();
         } else {
             baseDN = "o=unknown-suffix";
         }
@@ -433,7 +429,7 @@ public class SMSEntry implements Cloneable {
             atemp = smsObject.getAMSdkBaseDN();
         }
         if (atemp != null) {
-            amsdkbaseDN = (new DN(atemp)).toRFCString().toLowerCase();
+            amsdkbaseDN = DN.valueOf(atemp).toString().toLowerCase();
         } else {
             amsdkbaseDN = "o=unknown-suffix";
         }
@@ -448,16 +444,15 @@ public class SMSEntry implements Cloneable {
             try {
                 SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
                     AdminTokenAction.getInstance());
-                String name = (new DN(adminToken.getPrincipal().getName())).toRFCString();
-                specialUserSet.add(name.toLowerCase());
+                String name = DN.valueOf(adminToken.getPrincipal().getName()).toString();
+                specialUserSet.add(name);
             } catch (SSOException e) {
                 debug.error("SMSEntry.initializeClass", e);
             }
             // Initialize super user also
             String adminUser = SystemProperties.get(AUTH_SUPER_USER, "");
             if (adminUser != null && adminUser.length() != 0) {
-                specialUserSet.add(new DN(adminUser).toRFCString()
-                    .toLowerCase());
+                specialUserSet.add(DN.valueOf(adminUser).toString());
             }
         }
     }
@@ -471,7 +466,7 @@ public class SMSEntry implements Cloneable {
             throw (initializationException);
         ssoToken = token;
         this.dn = dn;
-        normalizedDN = (new DN(dn)).toRFCString().toLowerCase();
+        normalizedDN = DN.valueOf(dn).toString().toLowerCase();
         read();
     }
 
@@ -524,9 +519,8 @@ public class SMSEntry implements Cloneable {
                 if (debug.messageEnabled()) {
                     debug.message("SMSEntry: Duplicate value for addition");
                 }
-                throw (new SMSException(new LDAPException(bundle
-                        .getString(IUMSConstants.SMS_ATTR_OR_VAL_EXISTS),
-                        LDAPException.ATTRIBUTE_OR_VALUE_EXISTS),
+                throw (new SMSException(ErrorResultException.newErrorResult(ResultCode.ATTRIBUTE_OR_VALUE_EXISTS,
+                        getBundleString(IUMSConstants.SMS_ATTR_OR_VAL_EXISTS)),
                         "sms-ATTR_OR_VAL_EXISTS"));
             }
         }
@@ -622,9 +616,8 @@ public class SMSEntry implements Cloneable {
         Set attr = null;
         if ((attrSet == null) || ((attr = (Set) attrSet.get(attrName)) == null)
                 || (!attr.contains(value))) {
-            throw (new SMSException(new LDAPException(bundle
-                    .getString(IUMSConstants.SMS_ATTR_OR_VAL_EXISTS),
-                    LDAPException.ATTRIBUTE_OR_VALUE_EXISTS),
+            throw (new SMSException(ErrorResultException.newErrorResult(ResultCode.ATTRIBUTE_OR_VALUE_EXISTS,
+                    getBundleString(IUMSConstants.SMS_ATTR_OR_VAL_EXISTS)),
                     "sms-ATTR_OR_VAL_EXISTS"));
         }
         // Update attr and attrSet --> will not be null
@@ -645,9 +638,8 @@ public class SMSEntry implements Cloneable {
     public void removeAttribute(String attrName) throws SMSException {
         Set attribute = (Set) attrSet.get(attrName);
         if (attribute == null) {
-            throw (new SMSException(new LDAPException(bundle
-                    .getString(IUMSConstants.SMS_ATTR_OR_VAL_EXISTS),
-                    LDAPException.ATTRIBUTE_OR_VALUE_EXISTS),
+            throw (new SMSException(ErrorResultException.newErrorResult(ResultCode.ATTRIBUTE_OR_VALUE_EXISTS,
+                    getBundleString(IUMSConstants.SMS_ATTR_OR_VAL_EXISTS)),
                     "sms-ATTR_OR_VAL_EXISTS"));
         }
         attrSet.remove(attrName);
@@ -658,6 +650,10 @@ public class SMSEntry implements Cloneable {
         for (Iterator items = attribute.iterator(); items.hasNext();)
             ba.add(items.next());
         modSet.add(new ModificationItem(DirContext.REMOVE_ATTRIBUTE, ba));
+    }
+
+    private CharSequence getBundleString(String key) {
+        return bundle.getString(key);
     }
 
     /**
@@ -1041,7 +1037,7 @@ public class SMSEntry implements Cloneable {
      * @param ascendingOrder <code>true</code> to have result sorted in
      * ascending order.
      */
-    public static Set search(SSOToken token, String dn, String filter,
+    public static Set<String> search(SSOToken token, String dn, String filter,
         int numOfEntries, int timeLimit, boolean sortResults,
         boolean ascendingOrder) throws SMSException {
         try {
@@ -1270,9 +1266,9 @@ public class SMSEntry implements Cloneable {
         if (resultSet != null) {
             Iterator Iter = resultSet.iterator();
             while (Iter.hasNext()) {
-                DN sdn = new DN((String) Iter.next());
-                String rfcDN = sdn.toRFCString();
-                String rfcDNlc = sdn.toRFCString().toLowerCase();
+                DN sdn = DN.valueOf((String) Iter.next());
+                String rfcDN = sdn.toString();
+                String rfcDNlc = sdn.toString().toLowerCase();
                 if (!rfcDNlc.equals(baseDN)
                         && !rfcDNlc.startsWith(SUN_INTERNAL_REALM_PREFIX)) {
 
@@ -1405,9 +1401,8 @@ public class SMSEntry implements Cloneable {
         }
 
         // Not in cache, parse the DN
-        if (debug.messageEnabled()) {
-            debug.message("SMSEntry:parseOrgDN:DNName " + dnName);
-        }
+        debug.message("SMSEntry:parseOrgDN:DNName {}", dnName);
+
         answer = new String[5];
         if (dnName == null || dnName.length() == 0) {
             // This is an invalid DN, return "*"s
@@ -1430,8 +1425,8 @@ public class SMSEntry implements Cloneable {
          * ou=iPlanetAMPolicyService,ou=services, dc=iplanet, dc=com the orgDN
          * would be: dc=iplanet,dc=com
          */
-        DN sdn = new DN(dnName);
-        String rfcDN = sdn.toRFCString().toLowerCase();
+        DN sdn = DN.valueOf(dnName);
+        String rfcDN = sdn.toString().toLowerCase();
         String restOfDN = null;
 
         // Get the index to the first occurance of ",ou=services,"
@@ -1483,30 +1478,24 @@ public class SMSEntry implements Cloneable {
             restOfDN = rfcDN.substring(0, oldStrIndex);
         }
 
-        if (debug.messageEnabled()) {
-            debug.message("SMSEntry:parseOrgDN: orgDN: " + answer[0]
-                    + " restOfDN: " + restOfDN);
-        }
+        debug.message("SMSEntry:parseOrgDN: orgDN: {} restOfDN: {}", answer[0], restOfDN);
 
         // Parse restOfDN to get servicename, version, type and subconfig
-        String[] rdns = null;
-        if (restOfDN.length() > 0) {
-            rdns = LDAPDN.explodeDN(restOfDN, true);
-        }
-        int size = (rdns == null) ? 0 : rdns.length;
+        DN remainingDN = DN.valueOf(restOfDN);
+        int size = remainingDN.size();
 
         // store serviceName,version,configType,subConfigNames
         // from restOfDN which will be of the format:
         // ou=default,ou=globalconfig,ou=1.0,ou=iPlanetAMAdminConsoleService
-        answer[4] = (size < 1) ? REALM_SERVICE : rdns[size - 1];
-        answer[3] = (size < 2) ? "*" : rdns[size - 2];
-        answer[2] = (size < 3) ? "*" : rdns[size - 3];
+        answer[4] = (size < 1) ? REALM_SERVICE : LDAPUtils.rdnValueFromDn(remainingDN.parent(size - 1));
+        answer[3] = (size < 2) ? "*" : LDAPUtils.rdnValueFromDn(remainingDN.parent(size - 2));
+        answer[2] = (size < 3) ? "*" : LDAPUtils.rdnValueFromDn(remainingDN.parent(size - 3));
 
         // The subconfig names should be "/" separated and left to right
         if (size >= 4) {
             StringBuilder sbr = new StringBuilder();
             for (int i = size - 4; i >= 0; i--) {
-                sbr.append('/').append(rdns[i]);
+                sbr.append('/').append(LDAPUtils.rdnValueFromDn(remainingDN.parent(i)));
             }
             answer[1] = sbr.toString();
         } else {
@@ -1592,10 +1581,9 @@ public class SMSEntry implements Cloneable {
             // eg., if root_suffix is dn=iplanet, dn=com then the normalized
             // dn is dc=iplanet,dc=com.
             String tokenName = token.getPrincipal().getName();
-            DN tokendn = new DN(tokenName);
-            if (tokendn.isDN()) {
-                String normTok = tokendn.toRFCString().toLowerCase();
-                if (specialUserSet.contains(normTok)) {
+            if (LDAPUtils.isDN(tokenName)) {
+                DN tokendn = DN.valueOf(tokenName);
+                if (specialUserSet.contains(tokendn.toString())) {
                     /* 
                     if (debug.messageEnabled()) {
                         debug.message("SMSEntry.getDelegationPermission: No "
@@ -1663,17 +1651,16 @@ public class SMSEntry implements Cloneable {
             // eg., if root_suffix is dn=iplanet, dn=com then the normalized
             // dn is dc=iplanet,dc=com.
             String tokenName = token.getPrincipal().getName();
-            DN tokendn = new DN(tokenName);
-            if (tokendn.isDN()) {
-                String normTok = tokendn.toRFCString().toLowerCase();
-                if (specialUserSet.contains(normTok)) {
+            if (LDAPUtils.isDN(tokenName)) {
+                DN tokendn = DN.valueOf(tokenName);
+                if (specialUserSet.contains(tokendn.toString())) {
                     /*
                     if (debug.messageEnabled()) {
                         debug.message("SMSEntry.isAllowed : No delegation "
                                 + "check needed for special users." + normTok);
                     }
                      */
-                    return (true);
+                    return true;
                 }
             }
         } catch (SSOException se) {
@@ -1685,10 +1672,10 @@ public class SMSEntry implements Cloneable {
         // If running in co-existence mode, return false since
         // delegation service would not have been initialized
         if (!ServiceManager.isConfigMigratedTo70()) {
-            return (false);
+            return false;
         }
 
-        return (isAllowedByDelegation(token, dnName, actions));
+        return isAllowedByDelegation(token, dnName, actions);
     }
 
     private static boolean isAllowedByDelegation(SSOToken token, String dnName,

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,16 @@
  *
  * $Id: CreateServerConfigXML.java,v 1.7 2009/11/20 23:52:53 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.sun.identity.cli.schema;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.security.AccessController;
+import java.util.Iterator;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.cli.AccessManagerConstants;
@@ -43,17 +47,9 @@ import com.sun.identity.cli.RequestContext;
 import com.sun.identity.common.DNUtils;
 import com.sun.identity.log.Level;
 import com.sun.identity.security.EncodeAction;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.security.AccessController;
-import java.util.Iterator;
-import java.util.List;
-
 import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.util.DN;
-import com.sun.identity.shared.ldap.util.RDN;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.RDN;
 
 public class CreateServerConfigXML extends AuthenticatedCommand implements Constants {
 
@@ -197,17 +193,15 @@ public class CreateServerConfigXML extends AuthenticatedCommand implements Const
     }
     
     private String canonicalize(String nSuffix) {
-        StringBuffer buff = new StringBuffer(1024);
-        DN dn = new DN(nSuffix);
-        List rdns = dn.getRDNs();
-        for (Iterator iter = rdns.iterator(); iter.hasNext();) {
-            RDN rdn = (RDN) iter.next();
-            buff.append(LDAPDN.escapeRDN(rdn.toString()));
+        StringBuilder buff = new StringBuilder(1024);
+        DN dn = DN.valueOf(nSuffix);
+        for (Iterator<RDN> iter = dn.iterator(); iter.hasNext();) {
+            RDN rdn = iter.next();
+            buff.append(DN.escapeAttributeValue(rdn.toString()));
             if (iter.hasNext()) {
                 buff.append(",");
             }
         }
         return buff.toString();
     }
-
 }

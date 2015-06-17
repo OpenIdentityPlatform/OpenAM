@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: MAPModelBase.java,v 1.3 2009/01/28 05:34:57 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.service.model;
@@ -41,26 +42,26 @@ import com.sun.identity.console.base.model.AMResBundleCacher;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import com.sun.identity.sm.SMSException;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
-import com.sun.identity.shared.ldap.util.DN;
 
-/* - NEED NOT LOG - */
+public abstract class MAPModelBase extends AMModelBase implements MAPModel {
 
-public abstract class MAPModelBase
-    extends AMModelBase
-    implements MAPModel
-{
-    private static char[] invalidCharacters =
-        new char[DN.ESCAPED_CHAR.length + 5];
+    /**
+     * Array of the characters that may be escaped in a DN.
+     */
+    private static final char[] ESCAPED_CHAR = {',', '+', '"', '\\', '<', '>', ';'};
+
+    private static char[] invalidCharacters = new char[ESCAPED_CHAR.length + 5];
 
     static {
         int i = 0;
-        for (; i < DN.ESCAPED_CHAR.length; i++) {
-            invalidCharacters[i] = DN.ESCAPED_CHAR[i];
+        for (; i < ESCAPED_CHAR.length; i++) {
+            invalidCharacters[i] = ESCAPED_CHAR[i];
         }
         invalidCharacters[i++] = ' ';
         invalidCharacters[i++] = '/';

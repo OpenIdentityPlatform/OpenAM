@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,9 @@
  *
  * $Id: DSAMERole.java,v 1.4 2009/01/28 05:35:01 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted 2011 ForgeRock AS
- */
 package com.sun.identity.policy.plugins;
 
 import com.iplanet.am.sdk.*;
@@ -37,8 +35,10 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.policy.*;
 import com.sun.identity.policy.interfaces.Subject;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.util.DN;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.ResultCode;
+
 import java.util.*;
 
 /**
@@ -199,29 +199,26 @@ public class DSAMERole implements Subject {
                 default:
                     status = ValidValues.SUCCESS;
             }
-            return(new ValidValues(status, results.getSearchResults()));
+            return new ValidValues(status, results.getSearchResults());
         } catch (AMException e) {
-            LDAPException lde = e.getLDAPException();
+            ErrorResultException lde = e.getLDAPException();
             if (lde != null) {
-                int ldapErrorCode = lde.getLDAPResultCode();
-                if (ldapErrorCode == LDAPException.INVALID_CREDENTIALS) {
-                    throw (new PolicyException(ResBundleUtils.rbName,
-                        "ldap_invalid_password", null, null));
-                } else if (ldapErrorCode == LDAPException.NO_SUCH_OBJECT) {
+                ResultCode ldapErrorCode = lde.getResult().getResultCode();
+                if (ResultCode.INVALID_CREDENTIALS.equals(ldapErrorCode)) {
+                    throw new PolicyException(ResBundleUtils.rbName,"ldap_invalid_password", null, null);
+                } else if (ResultCode.NO_SUCH_OBJECT.equals(ldapErrorCode)) {
                     String[] objs = { organizationDN };
-                    throw (new PolicyException(ResBundleUtils.rbName,
-                        "no_such_am_roles_base_dn", objs, null));
+                    throw new PolicyException(ResBundleUtils.rbName, "no_such_am_roles_base_dn", objs, null);
                 }
-                String errorMsg = lde.getLDAPErrorMessage();
-                String additionalMsg = lde.errorCodeToString();
+                String errorMsg = lde.getResult().getDiagnosticMessage();
+                String additionalMsg = lde.getResult().getResultCode().getName().toString(Locale.ROOT);
                 if (additionalMsg != null) {
-                    throw (new PolicyException(
-                            errorMsg + ": " + additionalMsg));
+                    throw new PolicyException(errorMsg + ": " + additionalMsg);
                 } else {
-                    throw (new PolicyException(errorMsg));
+                    throw new PolicyException(errorMsg);
                 }
             }
-            throw (new PolicyException(e));
+            throw new PolicyException(e);
         }
     }
 
@@ -287,8 +284,7 @@ public class DSAMERole implements Subject {
             while (iter.hasNext()) {
                 String role = (String) iter.next();
                 if (role != null) {
-                    subjectRoles.add((new DN(role)).toRFCString().
-                        toLowerCase());
+                    subjectRoles.add(DN.valueOf(role).toString().toLowerCase());
                 }
             }
         }

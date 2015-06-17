@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,9 @@
  *
  * $Id: ServerGroup.java,v 1.5 2009/01/28 05:34:49 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted 2011 ForgeRock AS
- */
 package com.iplanet.services.ldap;
 
 
@@ -43,8 +41,8 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Vector;
 import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.util.DN;
+import org.forgerock.opendj.ldap.DN;
+
 import java.util.List;
 
 public class ServerGroup implements ParseOutput {
@@ -94,14 +92,14 @@ public class ServerGroup implements ParseOutput {
                     GenericNode x = (GenericNode) obj;
                     if (x._name.equals(DSConfigMgr.BASE_DN)) {
                         if (x._pcdata != null) {
-                            if (!DN.isDN(x._pcdata)) {
+                            if (DN.valueOf(x._pcdata).size() <= 0) {
                                 throw new XMLException(
                                         DSConfigMgr.getString(
                                            IUMSConstants.DSCFG_INVALID_BASE_DN)
                                                 + x._pcdata);
                             }
                         }
-                        baseDN = LDAPDN.normalize(x._pcdata);
+                        baseDN = DN.valueOf(x._pcdata).toString();
                     } else if (x._name.equals(DSConfigMgr.MISC_CONFIG)) {
                         String attrName = (String) x._atts
                                 .get(DSConfigMgr.NAME);
@@ -230,7 +228,7 @@ public class ServerGroup implements ParseOutput {
     /**
      * The list of servers that are defined in this server group.
      */
-    public Collection getServersList() {
+    public Collection<Server> getServersList() {
         return servers;
     }
 

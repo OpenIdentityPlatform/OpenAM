@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,16 +24,17 @@
  *
  * $Id: GroupResolver.java,v 1.4 2009/01/28 05:34:50 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.ums;
 
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.LDAPUrl;
-
 import com.sun.identity.shared.debug.Debug;
 import com.iplanet.services.ldap.Attr;
 import com.iplanet.services.ldap.AttrSet;
+import org.forgerock.i18n.LocalizedIllegalArgumentException;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.LDAPUrl;
 
 public class GroupResolver extends DefaultClassResolver {
 
@@ -60,8 +61,8 @@ public class GroupResolver extends DefaultClassResolver {
 
     private boolean isAssignable(String id, String val) {
         try {
-            LDAPUrl url = new LDAPUrl(val);
-            String filter = url.getFilter().trim();
+            LDAPUrl url = LDAPUrl.valueOf(val);
+            String filter = url.getFilter().toString().trim();
             if (debug.messageEnabled()) {
                 debug.message("AssignableDynamicGroup.GroupResolver."
                         + "isAssignable: filter = <" + filter + ">");
@@ -82,16 +83,16 @@ public class GroupResolver extends DefaultClassResolver {
                 }
                 if (attrName.equalsIgnoreCase("memberof")) {
                     String attrVal = filter.substring(ind + 1).trim();
-                    String dn = LDAPDN.normalize(guidToDN(attrVal));
+                    String dn = DN.valueOf(guidToDN(attrVal)).toNormalizedString();
                     if (debug.messageEnabled()) {
                         debug.message("AssignableDynamicGroup.GroupResolver."
                                 + "isAssignable: comparing <" + dn + "> to <"
                                 + id + ">");
                     }
-                    return dn.equalsIgnoreCase(LDAPDN.normalize(guidToDN(id)));
+                    return dn.equalsIgnoreCase(DN.valueOf(guidToDN(id)).toNormalizedString());
                 }
             }
-        } catch (java.net.MalformedURLException ex) {
+        } catch (LocalizedIllegalArgumentException ex) {
             // TODO - Log Exception
             if (debug.messageEnabled()) {
                 debug.message("AssignableDynamicGroup.isAssignable : "

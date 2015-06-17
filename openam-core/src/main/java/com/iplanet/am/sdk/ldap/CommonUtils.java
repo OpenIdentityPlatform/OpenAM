@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,18 @@
  *
  * $Id: CommonUtils.java,v 1.8 2009/01/28 05:34:48 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.iplanet.am.sdk.ldap;
+
+import java.security.AccessController;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import com.iplanet.am.sdk.AMHashMap;
 import com.iplanet.am.util.SystemProperties;
@@ -38,19 +44,12 @@ import com.iplanet.services.ldap.AttrSet;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.ums.Guid;
-import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import java.security.AccessController;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import com.sun.identity.shared.ldap.util.DN;
+import org.forgerock.opendj.ldap.DN;
 
 /**
  * This class contains all the miscellaneous utility methods used in the
@@ -401,7 +400,7 @@ class CommonUtils {
      * @return a lowercase RFC fromat DN String
      */
     protected static String formatToRFC(String dn) {
-        return (new DN(dn)).toRFCString().toLowerCase();
+        return DN.valueOf(dn).toString().toLowerCase();
     }
 
     /**

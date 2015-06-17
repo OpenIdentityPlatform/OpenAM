@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: SMSJAXRPCObject.java,v 1.21 2009/10/28 04:24:26 hengming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.sun.identity.sm.jaxrpc;
@@ -46,7 +43,6 @@ import com.sun.identity.jaxrpc.JAXRPCUtil;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.jaxrpc.SOAPClient;
-import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.sm.SMSDataEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SMSNotificationManager;
@@ -54,6 +50,7 @@ import com.sun.identity.sm.SMSObject;
 import com.sun.identity.sm.SMSObjectListener;
 import com.sun.identity.sm.SMSSchema;
 import org.forgerock.openam.session.SessionCookies;
+import org.forgerock.opendj.ldap.DN;
 
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
@@ -115,14 +112,14 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
      * the ssoToken are valid. If the entry does not exist the method should
      * return <code>null</code>
      */
-    public Map read(SSOToken token, String objName) throws SMSException,
+    public Map<String, Set<String>> read(SSOToken token, String objName) throws SMSException,
             SSOException {
         try {
             String[] objs = { token.getTokenID().toString(), objName };
             Map attrs = (Map) client.send(client.encodeMessage("read", objs),
                     sessionCookies.getLBCookie(token.getTokenID().toString()), null);
             // Return CaseInsesitiveHashMap to be consistent with server side
-            return ((attrs == null) ? null : new CaseInsensitiveHashMap(attrs));
+            return ((attrs == null) ? null : new CaseInsensitiveHashMap<String, Set<String>>(attrs));
         } catch (SSOException ssoe) {
             throw ssoe;
         } catch (SMSException smse) {
@@ -199,7 +196,7 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
      * identifies the number of entries to return, if <code>0</code> returns
      * all the entries.
      */
-    public Set searchSubOrgNames(SSOToken token, String dn, String filter,
+    public Set<String> searchSubOrgNames(SSOToken token, String dn, String filter,
             int numOfEntries, boolean sortResults, boolean ascendingOrder,
             boolean recursive) throws SMSException, SSOException {
         try {
@@ -207,7 +204,7 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
                     new Integer(numOfEntries), Boolean.valueOf(sortResults),
                     Boolean.valueOf(ascendingOrder), Boolean.valueOf(recursive)
             };
-            return ((Set) client.send(client.encodeMessage("searchSubOrgNames",
+            return ((Set<String>) client.send(client.encodeMessage("searchSubOrgNames",
                     objs), sessionCookies.getLBCookie(token.getTokenID().toString()),
                     null));
         } catch (SSOException ssoe) {
@@ -226,7 +223,7 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
      * identifies the number of entries to return, if <code>0</code> returns
      * all the entries.
      */
-    public Set searchOrganizationNames(SSOToken token, String dn,
+    public Set<String> searchOrganizationNames(SSOToken token, String dn,
             int numOfEntries, boolean sortResults, boolean ascendingOrder,
             String serviceName, String attrName, Set values)
             throws SMSException, SSOException {
@@ -235,7 +232,7 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
                     new Integer(numOfEntries), Boolean.valueOf(sortResults),
                     Boolean.valueOf(ascendingOrder), serviceName, attrName, 
                     values};
-            return ((Set) client.send(client.encodeMessage(
+            return ((Set<String>) client.send(client.encodeMessage(
                     "searchOrganizationNames", objs),
                     sessionCookies.getLBCookie(token.getTokenID().toString()), null));
         } catch (SSOException ssoe) {
@@ -253,14 +250,14 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
      * sub-entries. The paramter <code>numOfEntries</code> identifies the
      * number of entries to return, if <code>0</code> returns all the entries.
      */
-    public Set subEntries(SSOToken token, String dn, String filter,
+    public Set<String> subEntries(SSOToken token, String dn, String filter,
             int numOfEntries, boolean sortResults, boolean ascendingOrder)
             throws SMSException, SSOException {
         try {
             Object[] objs = { token.getTokenID().toString(), dn, filter,
                     new Integer(numOfEntries), Boolean.valueOf(sortResults),
                     Boolean.valueOf(ascendingOrder) };
-            return ((Set) client.send(client.encodeMessage("subEntries", objs),
+            return ((Set<String>) client.send(client.encodeMessage("subEntries", objs),
                     sessionCookies.getLBCookie(token.getTokenID().toString()), null));
         } catch (SSOException ssoe) {
             throw ssoe;
@@ -277,7 +274,7 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
      * sub-entries. The paramter <code>numOfEntries</code> identifies the
      * number of entries to return, if <code>0</code> returns all the entries.
      */
-    public Set schemaSubEntries(SSOToken token, String dn, String filter,
+    public Set<String> schemaSubEntries(SSOToken token, String dn, String filter,
             String sidFilter, int numOfEntries, boolean sortResults,
             boolean ascendingOrder) throws SMSException, SSOException {
         try {
@@ -285,7 +282,7 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
                 sidFilter, new Integer(numOfEntries),
                 Boolean.valueOf(sortResults), 
                 Boolean.valueOf(ascendingOrder) };
-            return ((Set) client.send(client.encodeMessage("schemaSubEntries",
+            return ((Set<String>) client.send(client.encodeMessage("schemaSubEntries",
                 objs), sessionCookies.getLBCookie(token.getTokenID().toString()),
                 null));
         } catch (SSOException ssoe) {
@@ -302,7 +299,7 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
     /**
      * Searches the data store for objects that match the filter
      */
-    public Iterator search(SSOToken token, String startDN, String filter,
+    public Iterator<SMSDataEntry> search(SSOToken token, String startDN, String filter,
         int numOfEntries, int timeLimit, boolean sortResults,
         boolean ascendingOrder, Set excludes)
         throws SMSException, SSOException {
@@ -315,7 +312,7 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
                     sessionCookies.getLBCookie(token.getTokenID().toString()),
                     null));
             
-            Iterator result = null;
+            Iterator<SMSDataEntry> result = null;
             
             if (searchResults != null && !searchResults.isEmpty()) {
                 Set<SMSDataEntry> dataEntries = new HashSet<SMSDataEntry>(searchResults.size());
@@ -324,7 +321,7 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
                 }
                 result = dataEntries.iterator();
             } else {
-                result = Collections.EMPTY_SET.iterator();
+                result = Collections.emptyIterator();
             }
             
             return result;
@@ -341,14 +338,14 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
     /**
      * Searchs the data store for objects that match the filter
      */
-    public Set search(SSOToken token, String startDN, String filter,
+    public Set<String> search(SSOToken token, String startDN, String filter,
         int numOfEntries, int timeLimit, boolean sortResults,
         boolean ascendingOrder) throws SMSException, SSOException {
         try {
             Object[] objs = { token.getTokenID().toString(), startDN, filter,
                 new Integer(numOfEntries), new Integer(timeLimit),
                 Boolean.valueOf(sortResults), Boolean.valueOf(ascendingOrder) };
-            return ((Set) client.send(client.encodeMessage("search2", objs),
+            return ((Set<String>) client.send(client.encodeMessage("search2", objs),
                     sessionCookies.getLBCookie(token.getTokenID().toString()),
                     null));
         } catch (SSOException ssoe) {
@@ -365,7 +362,7 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
      * Checks if the provided DN exists. Used by PolicyManager.
      */
     public boolean entryExists(SSOToken token, String dn) {
-        dn = (new DN(dn)).toRFCString().toLowerCase();
+        dn = DN.valueOf(dn).toString().toLowerCase();
         // Check the caches
         if (SMSNotificationManager.isCacheEnabled() &&
             entriesPresent.contains(dn)) {
@@ -600,7 +597,7 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
     }
 
     public void objectChanged(String dn, int type) {
-        dn = (new DN(dn)).toRFCString().toLowerCase();
+        dn = DN.valueOf(dn).toString().toLowerCase();
         if (type == DELETE) {
             // Remove from entriesPresent Set
             entriesPresent.remove(dn);

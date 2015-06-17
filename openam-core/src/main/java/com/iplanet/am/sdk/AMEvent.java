@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,15 +24,15 @@
  *
  * $Id: AMEvent.java,v 1.8 2009/01/28 05:34:47 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.am.sdk;
 
 import java.util.EventObject;
 
-import com.sun.identity.shared.ldap.controls.LDAPPersistSearchControl;
-
 import com.iplanet.services.ldap.event.DSEvent;
+import org.forgerock.openam.ldap.PersistentSearchChangeType;
 
 /** <p>Represents an event fired by Sun Java System Access Manager SDK.</p>
  *
@@ -56,17 +56,17 @@ public class AMEvent extends EventObject {
     /**
      * Represents an object addition event type.
      */
-    public static final int OBJECT_ADDED = LDAPPersistSearchControl.ADD;
+    public static final int OBJECT_ADDED = PersistentSearchChangeType.ADDED;
 
     /**
      * Represents an object change event type.
      */
-    public static final int OBJECT_CHANGED = LDAPPersistSearchControl.MODIFY;
+    public static final int OBJECT_CHANGED = PersistentSearchChangeType.MODIFIED;
 
     /**
      * Represents an object removal event type.
      */
-    public static final int OBJECT_REMOVED = LDAPPersistSearchControl.DELETE;
+    public static final int OBJECT_REMOVED = PersistentSearchChangeType.REMOVED;
 
     /** Represents an object expiration event type. Occurs when the TTL for the
      *  object data is over. */
@@ -75,7 +75,7 @@ public class AMEvent extends EventObject {
     /**
      * Represents an object renaming event type.
      */
-    public static final int OBJECT_RENAMED = LDAPPersistSearchControl.MODDN;
+    public static final int OBJECT_RENAMED = PersistentSearchChangeType.RENAMED;
 
     /* The above constants OBJECT_ADDED, OBJECT_CHANGED, OBJECT_REMOVED, 
      OBJECT_RENAMED should be kept in synch with the corresponding

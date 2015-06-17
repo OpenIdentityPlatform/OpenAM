@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -23,82 +23,84 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: SearchResultIterator.java,v 1.2 2009/04/02 20:22:43 veiming Exp $
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.sm.ldap;
 
-import com.sun.identity.common.CaseInsensitiveHashMap;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.ldap.LDAPAttribute;
-import com.sun.identity.shared.ldap.LDAPAttributeSet;
-import com.sun.identity.shared.ldap.LDAPEntry;
-import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.LDAPSearchResults;
-import com.sun.identity.sm.SMSDataEntry;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
+
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ErrorResultIOException;
+import org.forgerock.opendj.ldap.ResultCode;
+import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.forgerock.opendj.ldif.ConnectionEntryReader;
+
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSDataEntry;
+import com.sun.identity.sm.SMSUtils;
 
 /**
  * This class iterates through the <code>LDAPSearchResults</code> and converts the
  * LDAPEntry to a <code>SMSDataEntry</code> object.
  */
-public class SearchResultIterator implements Iterator {
-    private LDAPSearchResults results;
-    private Set excludeDNs;
+public class SearchResultIterator implements Iterator<SMSDataEntry> {
+    private final Debug debug = Debug.getInstance("amSMSLdap");
+    private final Connection conn;
+    private ConnectionEntryReader results;
+    private Set<String> excludeDNs;
     private boolean hasExcludeDNs;
     private SMSDataEntry current;
 
     /**
      * Constructs a <code>SearchResultIterator</code>
-     *
-     * @param results LDAP Search Results object.
+     *  @param results LDAP Search Results object.
      * @param excludeDNs a set of distinguished names to be excluded
+     * @param conn
      */
-    public SearchResultIterator(LDAPSearchResults results, Set excludeDNs) {
+    public SearchResultIterator(ConnectionEntryReader results, Set<String> excludeDNs, Connection conn) {
         this.results = results;
         this.excludeDNs = excludeDNs;
         hasExcludeDNs = (excludeDNs != null) && !excludeDNs.isEmpty();
+        this.conn = conn;
     }
 
     public boolean hasNext() {
-        if (!results.hasMoreElements()) {
-            return false;
-        }
         try {
-            LDAPEntry entry = results.next();
-            String dn = entry.getDN();
-            if (hasExcludeDNs) {
-                while (excludeDNs.contains(dn)) {
-                    if (results.hasMoreElements()) {
-                        entry = results.next();
-                        dn = entry.getDN();
-                    } else {
-                        entry = null;
-                        break;
+            if (results.hasNext()) {
+                if (current == null) {
+                    if (results.isReference()) {
+                        debug.warning("SearchResultIterator: ignoring reference: {}", results.readReference());
+                        return hasNext();
                     }
-                }
-            }
+                    SearchResultEntry entry = results.readEntry();
+                    String dn = entry.getName().toString();
+                    if (hasExcludeDNs && excludeDNs.contains(dn)) {
+                        return hasNext();
+                    }
 
-            current = (entry == null) ? null :
-                new SMSDataEntry(dn, convertLDAPAttributeSetToMap(
-                    entry.getAttributeSet()));
-            
-            return (current != null);
-        } catch (LDAPException ldape) {
-            Debug.getInstance("amSMSLdap").error("SearchResultIterator.hasNext",
-                ldape);
+                    current = new SMSDataEntry(dn, SMSUtils.convertEntryToAttributesMap(entry));
+                }
+                return true;
+            }
+        } catch (ErrorResultIOException e) {
+            ResultCode errorCode = e.getCause().getResult().getResultCode();
+            if (errorCode.equals(ResultCode.SIZE_LIMIT_EXCEEDED)) {
+                debug.message("SearchResultIterator: size limit exceeded");
+            } else {
+                debug.error("SearchResultIterator.hasNext", e);
+            }
+        } catch (SearchResultReferenceIOException e) {
+            debug.error("SearchResultIterator.hasNext: reference should be already handled", e);
+            return hasNext();
         }
+        conn.close();
         return false;
     }
 
-    public Object next() {
+    public SMSDataEntry next() {
         SMSDataEntry tmp = current;
         current = null;
         return tmp;
@@ -108,24 +110,4 @@ public class SearchResultIterator implements Iterator {
         //not supported.
     }
 
-    static Map convertLDAPAttributeSetToMap(LDAPAttributeSet attrSet) {
-        Map answer = null;
-
-        if (attrSet != null) {
-            for (Enumeration enums = attrSet.getAttributes(); enums
-                    .hasMoreElements();) {
-                LDAPAttribute attr = (LDAPAttribute) enums.nextElement();
-                if (attr != null) {
-                    Set values = new HashSet();
-                    String[] value = attr.getStringValueArray();
-                    values.addAll(Arrays.asList(value));
-                    if (answer == null) {
-                        answer = new CaseInsensitiveHashMap(10);
-                    }
-                    answer.put(attr.getName(), values);
-                }
-            }
-        }
-        return (answer);
-    }
 }

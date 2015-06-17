@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,19 +24,16 @@
  *
  * $Id: PCMappingTable.java,v 1.3 2009/01/28 05:34:50 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.iplanet.ums;
 
 import java.util.Enumeration;
 
-import com.sun.identity.shared.ldap.LDAPDN;
-
 import com.iplanet.services.ldap.Attr;
 import com.iplanet.services.ldap.AttrSet;
+import org.forgerock.opendj.ldap.DN;
 
 /**
  * Package class to manage the mapping table between user and people container
@@ -154,7 +151,7 @@ class PCMappingTable implements java.io.Serializable {
      */
     public void addRule(Guid guid, String filter) throws UMSException {
         DataLayer.getInstance().addAttributeValue(_principal, _mappingGuid,
-                LDAPDN.normalize(guid.getDn()), filter);
+                DN.valueOf(guid.getDn()).toNormalizedString(), filter);
     }
 
     /**
@@ -170,7 +167,7 @@ class PCMappingTable implements java.io.Serializable {
      */
     public void removeRule(Guid guid, String filter) throws UMSException {
         DataLayer.getInstance().removeAttributeValue(_principal, _mappingGuid,
-                LDAPDN.normalize(guid.getDn()), filter);
+                DN.valueOf(guid.getDn()).toNormalizedString(), filter);
     }
 
     /**

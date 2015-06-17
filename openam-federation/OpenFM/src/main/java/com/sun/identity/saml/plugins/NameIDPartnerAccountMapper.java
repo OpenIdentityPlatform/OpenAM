@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,8 +24,8 @@
  *
  * $Id: NameIDPartnerAccountMapper.java,v 1.5 2010/01/09 19:41:52 qcheng Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
-
 
 package com.sun.identity.saml.plugins;
 
@@ -33,8 +33,9 @@ import com.sun.identity.saml.assertion.NameIdentifier;
 import com.sun.identity.saml.assertion.Subject;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.sm.SMSEntry;
+import org.forgerock.openam.ldap.LDAPUtils;
+
 import java.util.Map;
-import com.sun.identity.shared.ldap.util.DN; 
 
 /**
  * The class <code>NameIDPartnerAccountMapper</code> provide an 
@@ -45,7 +46,6 @@ import com.sun.identity.shared.ldap.util.DN;
  * whole Name ID value will be returned.
  * <p>
  */
-
 public class NameIDPartnerAccountMapper extends DefaultPartnerAccountMapper {
 
     protected void getUser(Subject subject, String sourceID, Map map) {
@@ -69,10 +69,8 @@ public class NameIDPartnerAccountMapper extends DefaultPartnerAccountMapper {
     }
 
     private String getUserName(String name) {
-        DN dn1 = new DN(name);
-        if (dn1.isDN()) {
-            String[] eDN = dn1.explodeDN(true);
-            return removeAt(eDN[0]);
+        if (LDAPUtils.isDN(name)) {
+            return removeAt(LDAPUtils.rdnValueFromDn(name));
         } else {
             return removeAt(name);
         }

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,9 @@
  *
  * $Id: AuthenticatedSharedAgents.java,v 1.3 2009/07/16 17:45:58 qcheng Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.sun.identity.policy.plugins;
 
 import java.security.AccessController;
@@ -57,9 +55,7 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceListener;
-
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.shared.ldap.util.DN;
+import org.forgerock.openam.ldap.LDAPUtils;
 
 /**
  * This subject applies to all users/agents with valid <code>SSOToken</code>.
@@ -283,8 +279,8 @@ public class AuthenticatedSharedAgents implements Subject {
             }
             if (userName != null) {
                 String agentName = userName;
-                if (DN.isDN(userName)) {
-                    agentName = LDAPDN.explodeDN(userName, true)[0];
+                if (LDAPUtils.isDN(userName)) {
+                    agentName = LDAPUtils.rdnValueFromDn(userName);
                 }
                 if (debug.messageEnabled()) {
                     debug.message("AuthenticatedSharedAgents:isSharedAgent:"+

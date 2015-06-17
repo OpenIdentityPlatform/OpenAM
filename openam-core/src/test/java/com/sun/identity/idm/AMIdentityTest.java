@@ -11,15 +11,16 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package com.sun.identity.idm;
 
+import static org.fest.assertions.Assertions.assertThat;
+import static org.mockito.Mockito.*;
+
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.ldap.util.DN;
-import static org.fest.assertions.Assertions.*;
-import static org.mockito.Mockito.*;
+import org.forgerock.opendj.ldap.DN;
 import org.testng.annotations.Test;
 
 public class AMIdentityTest {
@@ -51,7 +52,7 @@ public class AMIdentityTest {
     @Test
     public void regularCharactersWorkAsExpectedWithTokenAndDN() throws Exception {
         String uuid = "id=badger,ou=user,dc=config";
-        AMIdentity identity = new AMIdentity(new DN(uuid), null);
+        AMIdentity identity = new AMIdentity(DN.valueOf(uuid), null);
         assertThat(identity.getName()).isEqualTo("badger");
         assertThat(identity.getType()).isEqualTo(IdType.USER);
         assertThat(identity.getUniversalId()).isEqualTo(uuid);
@@ -62,7 +63,7 @@ public class AMIdentityTest {
     @Test
     public void specialCharactersAreHandledConsistently() throws Exception {
         String uuid = "id=hello\\+world,ou=user,dc=config";
-        AMIdentity identity = new AMIdentity(new DN(uuid), null);
+        AMIdentity identity = new AMIdentity(DN.valueOf(uuid), null);
         assertThat(identity.getName()).isEqualTo("hello+world");
         assertThat(identity.getType()).isEqualTo(IdType.USER);
         assertThat(identity.getUniversalId()).isEqualTo(uuid);

@@ -373,6 +373,7 @@
         <module>openam-oauth2-saml2</module>
         <module>openam-http-client</module>
         <module>openam-tokens</module>
+        <module>openam-certs</module>
         <module>openam-upgrade</module>
     </modules>
 
@@ -766,6 +767,11 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-installtools-launcher</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-certs</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

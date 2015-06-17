@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,16 +24,14 @@
  *
  * $Id: SubjectTypeManager.java,v 1.5 2009/01/28 05:35:01 ww203982 Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
-
-
-
 
 package com.sun.identity.policy;
 
 import java.util.*;
 
+import com.iplanet.am.sdk.AMCommonUtils;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.sm.*;
@@ -41,8 +39,6 @@ import com.sun.identity.policy.interfaces.Subject;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
-
-import com.sun.identity.shared.ldap.util.DN;
 
 /**
  * The class <code>SubjectTypeManager</code> provides
@@ -87,8 +83,7 @@ public class SubjectTypeManager {
      */
     protected SubjectTypeManager(PolicyManager pm)  {
         this.pm = pm;
-        pmRealmName = new DN(pm.getOrganizationDN()).toRFCString()
-                .toLowerCase();
+        pmRealmName = AMCommonUtils.formatToRFC(pm.getOrganizationDN());
         token = pm.token;
         java.util.Locale loc;
         try {

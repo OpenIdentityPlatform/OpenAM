@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: AMCommonUtils.java,v 1.7 2009/01/28 05:34:46 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.am.sdk;
@@ -39,6 +40,8 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import org.forgerock.opendj.ldap.DN;
+
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashMap;
@@ -46,7 +49,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import com.sun.identity.shared.ldap.util.DN;
 
 /**
  * This class contains all the miscellaneous utility methods used in the
@@ -353,8 +355,8 @@ public class AMCommonUtils implements AMConstants {
      *            the DN String to be formated
      * @return a lowercase RFC fromat DN String
      */
-    protected static String formatToRFC(String dn) {
-        return (new DN(dn)).toRFCString().toLowerCase();
+    public static String formatToRFC(String dn) {
+        return DN.valueOf(dn).toString().toLowerCase();
     }
 
     /**

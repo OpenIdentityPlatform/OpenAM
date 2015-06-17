@@ -117,6 +117,8 @@
                             <include>org.forgerock.openam:OpenFM</include>
                             <include>org.forgerock.openam:openam-client-sts</include>
                             <include>org.json:json</include>
+                            <include>org.forgerock.opendj:opendj-ldap-sdk</include>
+                            <include>org.forgerock.commons:i18n-core</include>
                         </includes>
                     </artifactSet>
                     <filters>
@@ -487,6 +489,18 @@
                             </includes>
                         </filter>
                         <filter>
+                            <artifact>org.forgerock.opendj:opendj-ldap-sdk</artifact>
+                            <includes>
+                                <include>**/*</include>
+                            </includes>
+                        </filter>
+                        <filter>
+                            <artifact>org.forgerock.commons:i18n-core</artifact>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                        </filter>
+                        <filter>
                             <artifact>*:*</artifact>
                             <excludes>
                                 <exclude>META-INF/*.MF</exclude>
@@ -546,6 +560,10 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-client-sts</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.opendj</groupId>
+            <artifactId>opendj-ldap-sdk</artifactId>
         </dependency>
     </dependencies>
 </project>

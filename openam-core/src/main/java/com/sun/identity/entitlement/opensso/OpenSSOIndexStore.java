@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -24,8 +24,9 @@
  *
  * $Id: OpenSSOIndexStore.java,v 1.13 2010/01/25 23:48:15 veiming Exp $
  *
- * Portions copyright 2011-2015 ForgeRock, AS
+ * Portions copyright 2011-2015 ForgeRock AS.
  */
+
 package com.sun.identity.entitlement.opensso;
 
 import com.iplanet.sso.SSOException;
@@ -53,7 +54,6 @@ import com.sun.identity.policy.PolicyConfig;
 import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.BufferedIterator;
-import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
@@ -63,6 +63,7 @@ import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.openam.entitlement.PolicyConstants;
+import org.forgerock.openam.ldap.LDAPUtils;
 
 import javax.security.auth.Subject;
 import java.security.AccessController;
@@ -72,7 +73,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
 
 public class OpenSSOIndexStore extends PrivilegeIndexStore {
     private static final int DEFAULT_CACHE_SIZE = 100000;
@@ -422,7 +422,7 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
         }
 
         if (bReferral) {
-            String tmp = DN.isDN(realm) ? DNMapper.orgNameToRealmName(realm) : realm;
+            String tmp = LDAPUtils.isDN(realm) ? DNMapper.orgNameToRealmName(realm) : realm;
 
             if (tmp.equals("/")) {
                 ReferralPrivilege ref = getOrgAliasReferral(indexes);
@@ -758,7 +758,7 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
             return Collections.EMPTY_SET;
         }
         
-        if (DN.isDN(realm)) {
+        if (LDAPUtils.isDN(realm)) {
             realm = DNMapper.orgNameToRealmName(realm);
         }
 
@@ -781,7 +781,7 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
 
             for (String rlm : referrals.keySet()) {
                 Set<ReferralPrivilege> rPrivileges = referrals.get(rlm);
-                String realmName = (DN.isDN(rlm)) ?
+                String realmName = LDAPUtils.isDN(rlm) ?
                     DNMapper.orgNameToRealmName(rlm) : rlm;
                 for (ReferralPrivilege r : rPrivileges) {
                     Map<String, Set<String>> map =

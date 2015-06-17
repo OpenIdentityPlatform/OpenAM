@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,22 +24,21 @@
  *
  * $Id: MSISDNValidation.java,v 1.3 2008/06/25 05:41:59 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.modules.msisdn;
 
+import java.util.Collections;
 import java.util.ResourceBundle;
 import java.util.Map;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.authentication.spi.AuthLoginException;
-import com.sun.identity.idm.plugins.ldapv3.LDAPAuthUtils;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
+import org.forgerock.openam.ldap.LDAPAuthUtils;
+import org.forgerock.openam.ldap.ModuleState;
 
 /**
  * A class that searches LDAP for the user having
@@ -196,9 +195,10 @@ public class MSISDNValidation {
     protected String getUserId(String msisdnNumber) throws AuthLoginException {
         String validatedUserID = null;
         try {
-            LDAPAuthUtils ldapUtil = 
-                new LDAPAuthUtils(serverHost,serverPort,useSSL,
-                          locale,startSearchLoc,debug) ;
+            LDAPAuthUtils ldapUtil =
+                new LDAPAuthUtils(Collections.singleton(serverHost + ":" + serverPort), Collections.<String>emptySet(),
+                        useSSL, AMResourceBundleCache.getInstance().getResBundle(amAuthMSISDN, locale), startSearchLoc,
+                        debug);
             String searchFilter = new StringBuffer(250).append("(")
                 .append(userSearchAttr).append("=")
                 .append(msisdnNumber).append(")").toString();
@@ -207,18 +207,18 @@ public class MSISDNValidation {
             ldapUtil.setUserNamingAttribute(userNamingAttr);
             ldapUtil.setFilter(searchFilter);
             ldapUtil.setAuthDN(principalUser);
-            ldapUtil.setAuthPassword(principalPasswd);
+            ldapUtil.setAuthPassword(principalPasswd.toCharArray());
             ldapUtil.searchForUser();
             switch  (ldapUtil.getState()) {
-                case LDAPAuthUtils.USER_FOUND:
+                case USER_FOUND:
                     debug.message("User search successful");
                     validatedUserID = ldapUtil.getUserId();
                     return validatedUserID;
-                case LDAPAuthUtils.USER_NOT_FOUND:
+                case USER_NOT_FOUND:
                     debug.error("MSISDN - Error finding user");
                     throw new AuthLoginException(amAuthMSISDN,
                             "userNotFound",null);
-                case LDAPAuthUtils.SERVER_DOWN:
+                case SERVER_DOWN:
                     debug.error("Server down");
                     throw new AuthLoginException(amAuthMSISDN,
                             "MSISDNServerDown",null);

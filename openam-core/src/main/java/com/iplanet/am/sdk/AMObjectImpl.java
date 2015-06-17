@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,9 @@
  *
  * $Id: AMObjectImpl.java,v 1.14 2009/11/20 23:52:51 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.iplanet.am.sdk;
 
 import java.util.Collections;
@@ -41,26 +39,25 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 
-import com.sun.identity.shared.ldap.LDAPUrl;
-import com.sun.identity.shared.ldap.util.DN;
-import com.sun.identity.shared.ldap.util.RDN;
-
+import com.iplanet.am.sdk.common.IDirectoryServices;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenID;
 import com.iplanet.sso.SSOTokenManager;
 import com.iplanet.ums.SearchControl;
-
 import com.sun.identity.common.DNUtils;
 import com.sun.identity.common.admin.DisplayOptionsUtils;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-
-import com.iplanet.am.sdk.common.IDirectoryServices;
-import com.sun.identity.shared.debug.Debug;
+import org.forgerock.i18n.LocalizedIllegalArgumentException;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.LDAPUrl;
+import org.forgerock.opendj.ldap.SearchScope;
 
 /**
  * This class implements the AMObject interface.
@@ -459,7 +456,7 @@ class AMObjectImpl implements AMObject {
         if (entryDN.equalsIgnoreCase(AMStoreConnection.getAMSdkBaseDN())) {
             return null;
         } else {
-            return new DN(entryDN).getParent().toString();
+            return DN.valueOf(entryDN).parent().toString();
         }
     }
 
@@ -1013,9 +1010,9 @@ class AMObjectImpl implements AMObject {
                     AMSDKBundle.getString("157", locale), "157");
         }
 
-        DN dn = new DN(entryDN);
-        String parentDN = dn.getParent().toString();
-        String name = ((RDN) dn.getRDNs().get(0)).getValues()[0];
+        DN dn = DN.valueOf(entryDN);
+        String parentDN = dn.parent().toString();
+        String name = LDAPUtils.rdnValueFromDn(dn);
 
         // validateAttributeUniqueness(true);
         if (profileType == USER) {
@@ -2367,10 +2364,9 @@ class AMObjectImpl implements AMObject {
                 String memberurl = (String) attr.iterator().next();
 
                 try {
-                    LDAPUrl ldapurl = new LDAPUrl(memberurl);
-                    filter = "(|" + adgFilter + sgFilter + ldapurl.getFilter()
-                            + ")";
-                } catch (java.net.MalformedURLException ex) {
+                    LDAPUrl ldapurl = LDAPUrl.valueOf(memberurl);
+                    filter = "(|" + adgFilter + sgFilter + ldapurl.getFilter() + ")";
+                } catch (LocalizedIllegalArgumentException ex) {
                     if (debug.messageEnabled()) {
                         debug.message("AMObject.create: "
                                 + "Invalid member url " + memberurl);
@@ -2568,7 +2564,7 @@ class AMObjectImpl implements AMObject {
         AMOrganizationImpl org = new AMOrganizationImpl(token, orgDN);
 
         Set pcSet = new HashSet();
-        DN thisDN = new DN(entryDN);
+        DN thisDN = DN.valueOf(entryDN);
 
         try {
             AMTemplate template = org.getTemplate(ADMINISTRATION_SERVICE,
@@ -2593,7 +2589,7 @@ class AMObjectImpl implements AMObject {
                     continue;
                 }
 
-                DN groupDN = new DN(groupPc.substring(0, index));
+                DN groupDN = DN.valueOf(groupPc.substring(0, index));
 
                 if (groupDN.equals(thisDN)) {
                     pcSet.add(groupPc.substring(index + 1));
@@ -2682,7 +2678,7 @@ class AMObjectImpl implements AMObject {
             int index = aci.indexOf(":aci:");
 
             if (index != -1) {
-                DN tmpDN = new DN(aci.substring(0, index));
+                DN tmpDN = DN.valueOf(aci.substring(0, index));
                 String newAci = aci.substring(index + 5).trim();
 
                 if (targetDN == null) {
@@ -2903,8 +2899,8 @@ class AMObjectImpl implements AMObject {
             debug.message("AMObject.createAdminRole : dn=" + entryDN);
         }
 
-        DN ldapDN = new DN(entryDN);
-        String orgDN = dsServices.getOrganizationDN(token, ldapDN.getParent()
+        DN ldapDN = DN.valueOf(entryDN);
+        String orgDN = dsServices.getOrganizationDN(token, ldapDN.parent()
                 .toString());
 
         String permission;
@@ -3039,7 +3035,7 @@ class AMObjectImpl implements AMObject {
             int index = aci.indexOf(":aci:");
 
             if (index != -1) {
-                DN tmpDN = new DN(aci.substring(0, index));
+                DN tmpDN = DN.valueOf(aci.substring(0, index));
                 String oldAci = aci.substring(index + 5).trim();
 
                 if (targetDN == null) {
@@ -3131,7 +3127,7 @@ class AMObjectImpl implements AMObject {
         Set aciSet = org.getAttribute("aci");
         Set newAciSet = new HashSet();
         Iterator iter = aciSet.iterator();
-        DN thisDN = new DN(entryDN);
+        DN thisDN = DN.valueOf(entryDN);
 
         while (iter.hasNext()) {
             String aci = (String) iter.next();
@@ -3160,17 +3156,16 @@ class AMObjectImpl implements AMObject {
             }
 
             int index2 = aci.lastIndexOf("\"");
-            DN roleDN = new DN(aci.substring(index + 8, index2));
-            String roleName = ((RDN) roleDN.getRDNs().get(0))
-                    .getValues()[0];
+            DN roleDN = DN.valueOf(aci.substring(index + 8, index2));
+            String roleName = LDAPUtils.rdnValueFromDn(roleDN);
 
             String tmpdn = roleName.replace('_', ',');
 
-            DN tmpDN = new DN(tmpdn);
-            if (tmpDN.isDN()) {
+            DN tmpDN = DN.valueOf(tmpdn);
+            if (!tmpDN.isRootDN()) {
 
                 if (!tmpDN.equals(thisDN)) {
-                    if (tmpDN.isDescendantOf(thisDN)) {
+                    if (tmpDN.isInScopeOf(thisDN, SearchScope.SUBORDINATES)) {
                         if (!recursive) {
                             newAciSet.add(aci);
                         }

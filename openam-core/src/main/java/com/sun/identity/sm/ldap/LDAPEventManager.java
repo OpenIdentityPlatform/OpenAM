@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,9 @@
  *
  * $Id: LDAPEventManager.java,v 1.8 2009/01/28 05:35:04 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted 2011 ForgeRock AS
- */
 package com.sun.identity.sm.ldap;
 
 import com.iplanet.am.util.SystemProperties;
@@ -38,16 +36,16 @@ import com.iplanet.services.ldap.ServerInstance;
 import com.iplanet.services.ldap.event.EventException;
 import java.util.Map;
 
-import com.sun.identity.shared.ldap.LDAPConnection;
-import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.controls.LDAPPersistSearchControl;
+import org.forgerock.openam.ldap.PersistentSearchChangeType;
+import org.forgerock.opendj.ldap.SearchScope;
+import com.iplanet.services.ldap.event.EventService;
 
 import com.sun.identity.shared.debug.Debug;
 import com.iplanet.services.ldap.event.DSEvent;
-import com.iplanet.services.ldap.event.EventService;
 import com.iplanet.services.ldap.event.IDSEventListener;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.sm.SMSObjectListener;
+import org.forgerock.opendj.ldap.ErrorResultException;
 
 /**
  * This class registers itself as a listener to <class>
@@ -91,12 +89,11 @@ public class LDAPEventManager implements IDSEventListener {
                         "property: " + Constants.EVENT_LISTENER_DISABLE_LIST);
                 }
             }
-            // Initialize Event Service for persistent search
-            EventService.getEventService().resetAllSearches(false);
+            EventService.getEventService().restartPSearches();
         } catch (EventException ex) {
             debug.error("LDAPEventManager.addObjectChangeListener " +
                 "Unable to set persistent search", ex);
-        } catch (LDAPException ex) {
+        } catch (ErrorResultException ex) {
             debug.error("LDAPEventManager.addObjectChangeListener " +
                 "Unable to set persistent search", ex);
         }
@@ -106,11 +103,11 @@ public class LDAPEventManager implements IDSEventListener {
         changeListener = null;
         // Need to call EventService to disable SMS notifications
         try {
-            EventService.getEventService().resetAllSearches(false);
+            EventService.getEventService().restartPSearches();
         } catch (EventException ex) {
             debug.error("LDAPEventManager.removeObjectChangeListener " +
                 "Unable to remove persistent search", ex);
-        } catch (LDAPException ex) {
+        } catch (ErrorResultException ex) {
             debug.error("LDAPEventManager.removeObjectChangeListener " +
                 "Unable to remove persistent search", ex);
         }
@@ -239,9 +236,8 @@ public class LDAPEventManager implements IDSEventListener {
      * @see com.iplanet.services.ldap.event.IDSEventListener#getOperations()
      */
     public int getOperations() {
-        return (LDAPPersistSearchControl.ADD
-            | LDAPPersistSearchControl.MODIFY | LDAPPersistSearchControl.DELETE
-            | LDAPPersistSearchControl.MODDN);
+        return PersistentSearchChangeType.ADDED | PersistentSearchChangeType.MODIFIED |
+                PersistentSearchChangeType.REMOVED | PersistentSearchChangeType.RENAMED;
     }
 
     /*
@@ -250,7 +246,7 @@ public class LDAPEventManager implements IDSEventListener {
      * @see com.iplanet.services.ldap.event.IDSEventListener#getScope()
      */
     public int getScope() {
-        return LDAPConnection.SCOPE_SUB;
+        return SearchScope.WHOLE_SUBTREE.intValue();
     }
 
     /*

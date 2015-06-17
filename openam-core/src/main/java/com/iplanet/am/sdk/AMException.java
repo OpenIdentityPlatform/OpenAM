@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: AMException.java,v 1.7 2009/01/28 05:34:47 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.am.sdk;
@@ -34,7 +35,7 @@ import com.sun.identity.shared.locale.L10NMessage;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import com.sun.identity.shared.ldap.LDAPException;
+import org.forgerock.opendj.ldap.ErrorResultException;
 
 /**
  * The <code>AMException</code> is thrown whenever an error is is encountered
@@ -53,7 +54,7 @@ public class AMException extends Exception implements L10NMessage {
 
     private Object args[] = null;
 
-    private LDAPException rootCause = null;
+    private ErrorResultException rootCause = null;
 
     private String ldapErrorMsg = null;
 
@@ -96,8 +97,8 @@ public class AMException extends Exception implements L10NMessage {
      */
     public AMException(String msg, String errorCode, UMSException ue) {
         try {
-            rootCause = (LDAPException) ue.getRootCause();
-            ldapErrCode = Integer.toString(rootCause.getLDAPResultCode());
+            rootCause = (ErrorResultException) ue.getRootCause();
+            ldapErrCode = Integer.toString(rootCause.getResult().getResultCode().intValue());
             ldapErrorMsg = AMSDKBundle.getString(ldapErrCode);
         } catch (Exception e) {
         }
@@ -123,8 +124,8 @@ public class AMException extends Exception implements L10NMessage {
      */
     public AMException(SSOToken token, String errorCode, UMSException ue) {
         try {
-            rootCause = (LDAPException) ue.getRootCause();
-            ldapErrCode = Integer.toString(rootCause.getLDAPResultCode());
+            rootCause = (ErrorResultException) ue.getRootCause();
+            ldapErrCode = Integer.toString(rootCause.getResult().getResultCode().intValue());
             ldapErrorMsg = AMSDKBundle.getString(ldapErrCode);
         } catch (Exception e) {
         }
@@ -173,8 +174,8 @@ public class AMException extends Exception implements L10NMessage {
     public AMException(String msg, String errorCode, Object args[],
             UMSException ue) {
         try {
-            rootCause = (LDAPException) ue.getRootCause();
-            ldapErrCode = Integer.toString(rootCause.getLDAPResultCode());
+            rootCause = (ErrorResultException) ue.getRootCause();
+            ldapErrCode = Integer.toString(rootCause.getResult().getResultCode().intValue());
             ldapErrorMsg = AMSDKBundle.getString(ldapErrCode);
         } catch (Exception e) {
             // Ignore
@@ -237,7 +238,7 @@ public class AMException extends Exception implements L10NMessage {
      *         <code>AMException</code>. If null, it means no root
      *         <code>LDAPException</code> has been set.
      */
-    public LDAPException getLDAPException() {
+    public ErrorResultException getLDAPException() {
         return rootCause;
     }
 

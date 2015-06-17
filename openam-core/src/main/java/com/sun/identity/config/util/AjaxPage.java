@@ -40,12 +40,23 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.GeneralSecurityException;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.click.Page;
 import org.apache.click.control.ActionLink;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.Connections;
+import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.LDAPConnectionFactory;
+import org.forgerock.opendj.ldap.LDAPOptions;
+import org.forgerock.opendj.ldap.ResultCode;
+import org.forgerock.opendj.ldap.SSLContextBuilder;
+import org.forgerock.opendj.ldap.requests.Requests;
 import org.publicsuffix.PSS;
 
 public abstract class AjaxPage extends Page {
@@ -145,6 +156,42 @@ public abstract class AjaxPage extends Page {
         response = response.replaceFirst("\\$\\{" + "valid" +  "\\}", String.valueOf(valid));
         response = response.replaceFirst("\\$\\{" + "body" +  "\\}", responseBody);
         writeToResponse(response);
+    }
+
+    protected Connection getConnection(String host, int port, String bindDN, char[] bindPwd, int timeout, boolean isSSl)
+            throws GeneralSecurityException, ErrorResultException {
+        LDAPOptions ldapOptions = new LDAPOptions();
+        ldapOptions.setConnectTimeout(timeout, TimeUnit.SECONDS);
+        if (isSSl) {
+            ldapOptions.setSSLContext(new SSLContextBuilder().getSSLContext());
+        }
+        ConnectionFactory factory = Connections.newAuthenticatedConnectionFactory(
+                new LDAPConnectionFactory(host, port, ldapOptions),
+                Requests.newSimpleBindRequest(bindDN, bindPwd));
+        return factory.getConnection();
+    }
+
+    protected boolean writeErrorToResponse(ResultCode resultCode) {
+        if (ResultCode.CLIENT_SIDE_CONNECT_ERROR.equals(resultCode)) {
+            writeToResponse(getLocalizedString("ldap.connect.error"));
+        } else if (ResultCode.CLIENT_SIDE_SERVER_DOWN.equals(resultCode)) {
+            writeToResponse(getLocalizedString("ldap.server.down"));
+        } else if (ResultCode.INVALID_DN_SYNTAX.equals(resultCode)) {
+            writeToResponse(getLocalizedString("ldap.invalid.dn"));
+        } else if (ResultCode.NO_SUCH_OBJECT.equals(resultCode)) {
+            writeToResponse(getLocalizedString("ldap.nosuch.object"));
+        } else if (ResultCode.INVALID_CREDENTIALS.equals(resultCode)) {
+            writeToResponse(getLocalizedString("ldap.invalid.credentials"));
+        } else if (ResultCode.UNWILLING_TO_PERFORM.equals(resultCode)) {
+            writeToResponse(getLocalizedString("ldap.unwilling"));
+        } else if (ResultCode.INAPPROPRIATE_AUTHENTICATION.equals(resultCode)) {
+            writeToResponse(getLocalizedString("ldap.inappropriate"));
+        } else if (ResultCode.CONSTRAINT_VIOLATION.equals(resultCode)) {
+            writeToResponse(getLocalizedString("ldap.constraint"));
+        } else {
+            return false;
+        }
+        return true;
     }
 
     protected void writeToResponse( String text ) {

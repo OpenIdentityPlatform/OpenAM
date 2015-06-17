@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -20,28 +20,33 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: TokenCleanupRunnable.java,v 1.1 2009/11/19 00:07:40 qcheng Exp $
+ *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.coretoken.service;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.coretoken.spi.OpenSSOCoreTokenStore;
-import com.sun.identity.common.GeneralTaskRunnable;
-import com.sun.identity.coretoken.CoreTokenException;
-import com.sun.identity.coretoken.CoreTokenConstants;
-import com.sun.identity.coretoken.CoreTokenUtils;
-import com.sun.identity.coretoken.TokenLogUtils;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.ldap.LDAPDN;
-import com.sun.identity.sm.SMSEntry;
-import com.sun.identity.sm.SMSException;
+import javax.naming.InvalidNameException;
 import java.security.AccessController;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.GeneralTaskRunnable;
+import com.sun.identity.coretoken.CoreTokenConstants;
+import com.sun.identity.coretoken.CoreTokenException;
+import com.sun.identity.coretoken.CoreTokenUtils;
+import com.sun.identity.coretoken.TokenLogUtils;
+import com.sun.identity.coretoken.spi.OpenSSOCoreTokenStore;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.sm.SMSEntry;
+import com.sun.identity.sm.SMSException;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,6 +55,8 @@ import org.json.JSONObject;
  * The class is used to cleanup expired token in the core token store.
  */
 public class TokenCleanupRunnable extends GeneralTaskRunnable {
+
+    private static final DN SERVICE_DN = DN.valueOf(OpenSSOCoreTokenStore.SERVICE_DN);
 
     // TODO : evaluate other options for cleanup based on performance
     // 1. use directory server plugin
@@ -139,28 +146,21 @@ public class TokenCleanupRunnable extends GeneralTaskRunnable {
 
         SSOToken token = (SSOToken) AccessController.doPrivileged(
             AdminTokenAction.getInstance());
-        Set<String> results = new HashSet<String>();
         if (SMSEntry.checkIfEntryExists(
             OpenSSOCoreTokenStore.SERVICE_DN, token)) {
             Set<String> dns = null;
             try {
-                dns = SMSEntry.search(token, OpenSSOCoreTokenStore.SERVICE_DN,
-                    "ou=*", 0, 0, false, false);
+                dns = SMSEntry.search(token, OpenSSOCoreTokenStore.SERVICE_DN, "ou=*", 0, 0, false, false);
             } catch (SMSException ex) {
-                CoreTokenUtils.debug.error("TokenCleanupThread.getAllTokens",
-                    ex);
+                CoreTokenUtils.debug.error("TokenCleanupThread.getAllTokens", ex);
             }
-            for (String dn : dns) {
-                if (!CoreTokenUtils.areDNIdentical(
-                    OpenSSOCoreTokenStore.SERVICE_DN, dn)) {
-                    String rdns[] = LDAPDN.explodeDN(dn, true);
-                    if ((rdns != null) && rdns.length > 0) {
-                        results.add(rdns[0]);
-                    }
-                }
+            try {
+                return LDAPUtils.collectNonIdenticalValues(SERVICE_DN, dns);
+            } catch (InvalidNameException e) {
+                CoreTokenUtils.debug.error("DN could not be parsed", e);
             }
         }
-        return results;
+        return Collections.emptySet();
     }
 
     private String getTokenExpiry (SMSEntry s) {

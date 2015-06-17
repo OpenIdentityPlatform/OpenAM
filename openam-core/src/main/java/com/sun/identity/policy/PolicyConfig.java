@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,8 @@
  *
  * $Id: PolicyConfig.java,v 1.10 2009/01/28 05:35:01 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
-
-
 
 package com.sun.identity.policy;
 
@@ -42,8 +41,8 @@ import java.util.concurrent.ConcurrentMap;
 import com.sun.identity.sm.*;
 import com.iplanet.sso.*;
 import com.sun.identity.shared.datastruct.CollectionHelper;
-
-import com.sun.identity.shared.ldap.util.DN;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
 
 /**
  * The <code>PolicyConfig</code> class manages policy configuration for 
@@ -295,7 +294,7 @@ public class PolicyConfig implements com.sun.identity.sm.ServiceListener {
      */
     public static Map getPolicyConfig(String org) throws PolicyException {
 
-        org = new DN(org).toRFCString().toLowerCase();
+        org = DN.valueOf(org).toString().toLowerCase();
         if (policyCache == null) {
             policyCache = PolicyCache.getInstance();
         }

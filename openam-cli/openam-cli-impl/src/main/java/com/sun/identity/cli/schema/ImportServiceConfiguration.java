@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,9 @@
  *
  * $Id: ImportServiceConfiguration.java,v 1.10 2010/01/11 17:34:33 veiming Exp $
  *
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted 2010-2011 ForgeRock AS
- */
 package com.sun.identity.cli.schema;
 
 import com.iplanet.am.util.SystemProperties;
@@ -43,7 +41,7 @@ import com.iplanet.services.util.JCEEncryption;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.internal.InvalidAuthContextException;
-import com.sun.identity.common.LDAPUtils;
+import org.forgerock.openam.ldap.LdifUtils;
 import com.sun.identity.cli.AuthenticatedCommand;
 import com.sun.identity.cli.CLIException;
 import com.sun.identity.cli.CLIUtil;
@@ -63,6 +61,12 @@ import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SMSSchema;
 import com.sun.identity.sm.ServiceManager;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldif.LDIF;
+import org.forgerock.opendj.ldif.LDIFChangeRecordReader;
+import org.forgerock.opendj.ldif.LDIFEntryReader;
+
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
@@ -71,9 +75,6 @@ import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.Set;
 import javax.security.auth.login.LoginException;
-import com.sun.identity.shared.ldap.LDAPConnection;
-import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.util.LDIF;
 import java.io.FileReader;
 
 /**
@@ -112,16 +113,13 @@ public class ImportServiceConfiguration extends AuthenticatedCommand {
         SystemProperties.initializeProperties(
             Constants.SYS_PROPERTY_INSTALL_TIME, "true");
 
-        LDAPConnection ldConnection = null;
         IOutput outputWriter = getOutputWriter();
-        try {
+        try (Connection ldConnection = getLDAPConnection()) {
             InitializeSystem initSys = CommandManager.initSys;
    
             SSOToken ssoToken = initSys.getSSOToken(getAdminPassword());
-            ldConnection = getLDAPConnection();
-            
-            DirectoryServerVendor.Vendor vendor = 
-                DirectoryServerVendor.getInstance().query(ldConnection);
+
+            DirectoryServerVendor.Vendor vendor = DirectoryServerVendor.getInstance().query(ldConnection);
             if (!vendor.name.equals(DirectoryServerVendor.OPENDJ)
                     && !vendor.name.equals(DirectoryServerVendor.OPENDS)
                     && !vendor.name.equals(DirectoryServerVendor.ODSEE)
@@ -155,7 +153,7 @@ public class ImportServiceConfiguration extends AuthenticatedCommand {
         } catch (SMSException e) {
             throw new CLIException(e.getMessage(),
                 ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
-        } catch (LDAPException e) {
+        } catch (ErrorResultException e) {
             throw new CLIException(e.getMessage(),
                 ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         } catch (SSOException e) {
@@ -172,8 +170,6 @@ public class ImportServiceConfiguration extends AuthenticatedCommand {
             throw new CLIException(
                 getCommandManager().getResourceBundle().getString(
                 "exception-LDAP-login-failed"), ExitCodes.LDAP_LOGIN_FAILED);
-        } finally {
-            disconnectDServer(ldConnection);
         }
     }
     
@@ -305,93 +301,48 @@ public class ImportServiceConfiguration extends AuthenticatedCommand {
         }
     }
 
-    private LDAPConnection getLDAPConnection()
-        throws CLIException {
+    private Connection getLDAPConnection() throws CLIException {
 
         IOutput outputWriter = getOutputWriter();
         if (isVerbose()) {
-            outputWriter.printlnMessage(
-                getResourceString(
-                    "import-service-configuration-connecting-to-ds"));
+            outputWriter.printlnMessage(getResourceString("import-service-configuration-connecting-to-ds"));
         }
         
-        LDAPConnection ld = null;
-
         try {
+            Connection conn;
             DSConfigMgr dsCfg = DSConfigMgr.getDSConfigMgr();
             ServerGroup sg = dsCfg.getServerGroup("sms");
             if (sg != null) {
-                ld = dsCfg.getNewConnection("sms",LDAPUser.Type.AUTH_ADMIN);
+                conn = dsCfg.getNewConnectionFactory("sms", LDAPUser.Type.AUTH_ADMIN).getConnection();
             } else  {
-                throw new CLIException(
-                    getResourceString(
-                        "import-service-configuration-not-connect-to-ds"),
+                throw new CLIException(getResourceString("import-service-configuration-not-connect-to-ds"),
                     ExitCodes.REQUEST_CANNOT_BE_PROCESSED, null);
             }
            
             if (isVerbose()) {
-                outputWriter.printlnMessage(
-                    getResourceString(
-                        "import-service-configuration-connected-to-ds"));
+                outputWriter.printlnMessage(getResourceString("import-service-configuration-connected-to-ds"));
             }
-            return ld;
-        } catch (LDAPServiceException e) {
-            throw new CLIException(
-                getResourceString(
-                    "import-service-configuration-not-connect-to-ds"),
+            return conn;
+        } catch (LDAPServiceException | ErrorResultException e) {
+            throw new CLIException(getResourceString("import-service-configuration-not-connect-to-ds"),
                 ExitCodes.REQUEST_CANNOT_BE_PROCESSED, null);
         }
     }
 
-    private void disconnectDServer(LDAPConnection ld) {
-        if ((ld != null) && ld.isConnected()) {
-            try {
-                ld.disconnect();
-            } catch (LDAPException e) {
-                debugWarning("cannot discount from directory server", e);
-            }
-        }
-    }
+    private void loadLDIF(DirectoryServerVendor.Vendor vendor, Connection ld) throws CLIException {
+        LDIFChangeRecordReader ldifReader = new LDIFChangeRecordReader(new DataInputStream(getClass().getClassLoader()
+                .getResourceAsStream(DS_LDIF)));
+        LDIFChangeRecordReader indexReader = new LDIFChangeRecordReader(new DataInputStream(getClass().getClassLoader()
+                .getResourceAsStream(DS_IDX)));
 
-    private void loadLDIF(
-        DirectoryServerVendor.Vendor vendor, 
-        LDAPConnection ld
-    ) throws CLIException {
-        DataInputStream ldif = null;
-        DataInputStream index = null;
-
-        try {
+        try (LDIFChangeRecordReader ldif = ldifReader; LDIFChangeRecordReader index = indexReader) {
             String vendorName = vendor.name;
             if (vendorName.equals(DirectoryServerVendor.ODSEE)) {
-                ldif = new DataInputStream(
-                    getClass().getClassLoader().getResourceAsStream(DS_LDIF));
-                index = new DataInputStream(
-                    getClass().getClassLoader().getResourceAsStream(DS_IDX));
-                LDAPUtils.createSchemaFromLDIF(new LDIF(ldif), ld);
-                LDAPUtils.createSchemaFromLDIF(new LDIF(index), ld);
+                LdifUtils.createSchemaFromLDIF(ldif, ld);
+                LdifUtils.createSchemaFromLDIF(index, ld);
             }
-        } catch (LDAPException e) {
-            e.printStackTrace();
-            throw new CLIException(e.getMessage(),
-                ExitCodes.REQUEST_CANNOT_BE_PROCESSED, null);
         } catch (IOException e) {
-            throw new CLIException(e.getMessage(),
-                ExitCodes.REQUEST_CANNOT_BE_PROCESSED, null);
-        } finally {
-            if (ldif != null) {
-                try {
-                    ldif.close();
-                } catch (IOException ex) {
-                    //ignore
-                }
-            }
-            if (index != null) {
-                try {
-                    index.close();
-                } catch (IOException ex) {
-                    //ignore
-                }
-            }
+            throw new CLIException(e.getMessage(), ExitCodes.REQUEST_CANNOT_BE_PROCESSED, null);
         }
     }
 

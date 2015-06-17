@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,9 @@
  *
  * $Id: EmailNotificationHelper.java,v 1.5 2009/01/28 05:34:48 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.iplanet.am.sdk.ldap;
 
 import com.iplanet.am.sdk.AMException;
@@ -45,6 +43,8 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SchemaType;
+import org.forgerock.opendj.ldap.DN;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -52,7 +52,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import javax.mail.MessagingException;
-import com.sun.identity.shared.ldap.util.DN;
 
 /**
  * This class has the functionality to send email notifications to the users
@@ -93,7 +92,7 @@ public class EmailNotificationHelper {
 
     public EmailNotificationHelper(String userDN) {
         entryDN = userDN;
-        organizationDN = (new DN(userDN)).getParent().toString();
+        organizationDN = DN.valueOf(userDN).parent().toString();
         mailer = new AMSendMail();
     }
 

@@ -29,7 +29,10 @@
 
 package com.sun.identity.config.wizard;
 
-import com.iplanet.am.util.SSLSocketFactoryManager;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Map;
+
 import com.iplanet.services.util.Crypt;
 import com.sun.identity.common.configuration.ConfigurationException;
 import com.sun.identity.config.SessionAttributeNames;
@@ -37,16 +40,13 @@ import com.sun.identity.setup.AMSetupUtils;
 import com.sun.identity.setup.BootstrapData;
 import com.sun.identity.setup.ConfiguratorException;
 import com.sun.identity.setup.SetupConstants;
-import java.util.Map;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 import com.sun.identity.shared.Constants;
-import org.apache.click.control.ActionLink;
 import org.apache.click.Context;
-import com.sun.identity.shared.ldap.LDAPConnection;
-import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.util.DN;
+import org.apache.click.control.ActionLink;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.SearchScope;
 
 /**
  * Step 3 is for selecting the embedded or external configuration store 
@@ -187,7 +187,7 @@ public class Step3 extends LDAPStoreWizardPage {
         if ((rootsuffix == null) || (rootsuffix.trim().length() == 0)) {
             writeToResponse(getLocalizedString("missing.required.field"));
         }
-        if (!DN.isDN(rootsuffix)) {
+        if (!LDAPUtils.isDN(rootsuffix)) {
             writeToResponse(getLocalizedString("invalid.dn"));
         } else {
             writeToResponse("true");
@@ -621,61 +621,17 @@ public class Step3 extends LDAPStoreWizardPage {
             rootSuffix = Constants.DEFAULT_ROOT_SUFFIX;
         }
 
-        LDAPConnection ld = null;
-        try {
-            ld = (ssl) ? new LDAPConnection(
-                SSLSocketFactoryManager.getSSLSocketFactory()) :
-                new LDAPConnection();
-            ld.setConnectTimeout(5);
-            ld.connect(3, host, port, bindDN, bindPwd);
-
+        try (Connection conn = getConnection(host, port, bindDN, bindPwd.toCharArray(), 5, ssl)) {
             String filter = "cn=" + "\"" + rootSuffix + "\"";
             String[] attrs = {""};
-            ld.search(rootSuffix, LDAPConnection.SCOPE_BASE, filter,
-                attrs, false);
+            conn.search(rootSuffix, SearchScope.BASE_OBJECT, filter, attrs);
             writeToResponse("ok");
-        } catch (LDAPException lex) {
-            switch (lex.getLDAPResultCode()) {
-                case LDAPException.CONNECT_ERROR:
-                    writeToResponse(getLocalizedString("ldap.connect.error")); 
-                    break;
-                case LDAPException.SERVER_DOWN:
-                    writeToResponse(getLocalizedString("ldap.server.down"));   
-                    break;
-                case LDAPException.INVALID_DN_SYNTAX:
-                    writeToResponse(getLocalizedString("ldap.invalid.dn"));  
-                    break;
-                case LDAPException.NO_SUCH_OBJECT:
-                    writeToResponse(getLocalizedString("ldap.nosuch.object"));
-                    break;
-                case LDAPException.INVALID_CREDENTIALS:
-                    writeToResponse(
-                            getLocalizedString("ldap.invalid.credentials"));
-                    break;
-                case LDAPException.UNWILLING_TO_PERFORM:
-                    writeToResponse(getLocalizedString("ldap.unwilling"));
-                    break;
-                case LDAPException.INAPPROPRIATE_AUTHENTICATION:
-                    writeToResponse(getLocalizedString("ldap.inappropriate"));
-                    break;
-                case LDAPException.CONSTRAINT_VIOLATION:
-                    writeToResponse(getLocalizedString("ldap.constraint"));
-                    break;
-                default:
-                    writeToResponse(
-                        getLocalizedString("cannot.connect.to.SM.datastore"));                                              
-            }           
-        } catch (Exception e) {
-            writeToResponse(
-                getLocalizedString("cannot.connect.to.SM.datastore"));
-        } finally {
-            if (ld != null) {
-                try {
-                    ld.disconnect();
-                } catch (LDAPException ex) {
-                    //ignore
-                }
+        } catch (ErrorResultException lex) {
+            if (!writeErrorToResponse(lex.getResult().getResultCode())) {
+                writeToResponse(getLocalizedString("cannot.connect.to.SM.datastore"));
             }
+        } catch (Exception e) {
+            writeToResponse(getLocalizedString("cannot.connect.to.SM.datastore"));
         }
 
         setPath(null);

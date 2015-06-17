@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,18 +24,16 @@
  *
  * $Id: UMSException.java,v 1.5 2009/01/28 05:34:51 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.iplanet.ums;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ResourceBundle;
 
-import com.sun.identity.shared.ldap.LDAPException;
+import org.forgerock.opendj.ldap.ErrorResultException;
 
 /**
  * <PRE>
@@ -216,8 +214,8 @@ public class UMSException extends java.lang.Exception {
 
         // get the root cause message
         String nestedMsg;
-        if (rootCause instanceof LDAPException) {
-            nestedMsg = ((LDAPException) rootCause).getLDAPErrorMessage();
+        if (rootCause instanceof ErrorResultException) {
+            nestedMsg = ((ErrorResultException) rootCause).getResult().getDiagnosticMessage();
         } else {
             nestedMsg = rootCause.getMessage();
         }

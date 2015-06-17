@@ -24,6 +24,9 @@
 ## "Portions Copyrighted [year] [name of copyright owner]"
 ##
 ## $Id: README,v 1.1 2009/06/03 19:04:52 goodearth Exp $
+##
+## Portions Copyrighted 2015 ForgeRock AS.
+##
 ################################################################
 
 This directory contains schema and related ldif files for supported 
@@ -40,7 +43,6 @@ opendj (OpenDJ)
  	store.
     opendj_embinit.ldif -- file used for initialization in the
 	configuration store.
-    opendj_plugin.ldif -- referential integrity plugin.
     opendj_user_schema.ldif -- schema to be loaded to user store.
     opendj_user_index.ldif -- attribute index to be loaded 
 	tj user store.
@@ -58,7 +60,6 @@ odsee (Oracle Directory Server Enterprise Edition)
     odsee_user_index.ldif -- attribute index to be loaded
 	to user store.
     odsee_userinit.ldif -- file used for initialization.
-    odsee_plugin.ldif -- referential integrity plugin.
     amsdk_plugin
     ~~~~~~~~~~~~
         amsdk_init_template.ldif -- file for amsdk initialization.

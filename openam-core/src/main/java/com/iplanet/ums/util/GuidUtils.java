@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,14 +24,14 @@
  *
  * $Id: GuidUtils.java,v 1.3 2009/01/28 05:34:51 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.ums.util;
 
-import com.sun.identity.shared.ldap.LDAPDN;
-
 import com.iplanet.ums.Guid;
 import com.sun.identity.sm.ServiceManager;
+import org.forgerock.opendj.ldap.DN;
 
 /**
  * Utilitiy Class for Guid.
@@ -60,7 +60,7 @@ public class GuidUtils {
     static String baseDN = ServiceManager.getBaseDN();
 
     public static Guid getOrgGuid(Guid guid) {
-        String dn = LDAPDN.normalize(guid.getDn());
+        String dn = DN.valueOf(guid.getDn()).toNormalizedString();
         int index = dn.indexOf("o=");
         if (index > -1) {
             return (new Guid(dn.substring(index, dn.length())));

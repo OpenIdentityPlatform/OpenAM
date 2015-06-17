@@ -52,6 +52,10 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
+
+import org.forgerock.openam.ldap.LDAPAuthUtils;
+import org.forgerock.openam.ldap.LDAPUtilException;
+import org.forgerock.openam.ldap.ModuleState;
 import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldap.SearchScope;
 
@@ -242,7 +246,7 @@ public class LDAP extends AMLoginModule {
 
             isProfileCreationEnabled = isDynamicProfileCreationEnabled();
             // set the optional attributes here
-            ldapUtil = new LDAPAuthUtils(primaryServers, secondaryServers, isSecure, bundle, baseDN);
+            ldapUtil = new LDAPAuthUtils(primaryServers, secondaryServers, isSecure, bundle, baseDN, debug);
             ldapUtil.setScope(searchScope);
             ldapUtil.setFilter(searchFilter);
             ldapUtil.setUserNamingAttribute(userNamingAttr);

@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: DSConnectValidation.java,v 1.2 2009/01/28 05:34:58 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.diagnostic.plugin.services.connect;
@@ -33,7 +34,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import com.sun.identity.shared.ldap.LDAPConnection;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.diagnostic.base.core.log.IToolOutput;
@@ -41,7 +41,7 @@ import com.sun.identity.diagnostic.plugin.services.common.ServiceBase;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-
+import org.forgerock.opendj.ldap.Connection;
 
 /**
  * This is a supporting class to validate the connectivity
@@ -175,14 +175,14 @@ public class DSConnectValidation extends ServiceBase implements
         String id,
         String pwd
     ) {
-        LDAPConnection ldc = getLDAPConnection(ldapServer,
-            ldapPort, type, id, pwd);
-        if (ldc != null) {
-            toolOutWriter.printMessage("cnt-svr-connect-status",
-                new String[] {"OK"});
-        } else {
-            toolOutWriter.printMessage("cnt-svr-connect-status",
-                new String[] {"FAILED"});
+        try (Connection conn = getLDAPConnection(ldapServer, ldapPort, type, id, pwd)) {
+            if (conn != null) {
+                toolOutWriter.printMessage("cnt-svr-connect-status",
+                        new String[]{"OK"});
+            } else {
+                toolOutWriter.printMessage("cnt-svr-connect-status",
+                        new String[]{"FAILED"});
+            }
         }
     }
 }

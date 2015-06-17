@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,27 +24,11 @@
  *
  * $Id: DSConfigMgr.java,v 1.18 2009/01/28 05:34:49 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.iplanet.services.ldap;
 
-import com.iplanet.am.util.SSLSocketFactoryManager;
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.services.util.I18n;
-import com.iplanet.services.util.XMLException;
-import com.iplanet.services.util.XMLParser;
-import com.iplanet.ums.IUMSConstants;
-import com.sun.identity.common.LDAPConnectionPool;
-import com.sun.identity.security.ServerInstanceAction;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.ldap.LDAPConnection;
-import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.LDAPv2;
-import com.sun.identity.shared.ldap.LDAPv3;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,10 +37,21 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.StringTokenizer;
-import org.forgerock.util.thread.listener.ShutdownListener;
-import org.forgerock.util.thread.listener.ShutdownManager;
 
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.services.util.I18n;
+import com.iplanet.services.util.XMLException;
+import com.iplanet.services.util.XMLParser;
+import com.iplanet.ums.IUMSConstants;
+import com.sun.identity.security.ServerInstanceAction;
+import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.ldap.LDAPURL;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.LDAPOptions;
 
 /**
  * This object is the manager of all connection information. The server
@@ -200,9 +195,9 @@ public class DSConfigMgr implements IDSConfigMgr {
      *             If there is no user in the server group with this
      *             authentication type.
      */
-    public LDAPConnection getNewProxyConnection(String serverGroupID)
+    private ConnectionFactory getNewProxyConnectionFactory(String serverGroupID)
             throws LDAPServiceException {
-        return getNewConnection(serverGroupID, LDAPUser.Type.AUTH_PROXY);
+        return getNewConnectionFactory(serverGroupID, LDAPUser.Type.AUTH_PROXY);
     }
 
     /**
@@ -214,8 +209,8 @@ public class DSConfigMgr implements IDSConfigMgr {
      *             If there is no user in the server group with this
      *             authentication type.
      */
-    public LDAPConnection getNewProxyConnection() throws LDAPServiceException {
-        return getNewProxyConnection(DEFAULT);
+    public ConnectionFactory getNewProxyConnectionFactory() throws LDAPServiceException {
+        return getNewProxyConnectionFactory(DEFAULT);
     }
 
     /**
@@ -229,15 +224,12 @@ public class DSConfigMgr implements IDSConfigMgr {
      *             If there is no user in the server group with this
      *             authentication type.
      */
-    public LDAPConnection getNewBasicConnection(String serverGroupID)
+    private ConnectionFactory getNewBasicConnectionFactory(String serverGroupID)
             throws LDAPServiceException {
-        return getNewConnection(serverGroupID, LDAPUser.Type.AUTH_BASIC);
+        return getNewConnectionFactory(serverGroupID, LDAPUser.Type.AUTH_BASIC);
     }
 
-    /**
-     * 
-     */
-    public LDAPConnection getNewAdminConnection() throws LDAPServiceException {
+    public ConnectionFactory getNewAdminConnectionFactory() throws LDAPServiceException {
 
         // This api getNewAdminConnection() is used by SMDataLayer.java and
         // EventService.java.
@@ -258,17 +250,15 @@ public class DSConfigMgr implements IDSConfigMgr {
 
         ServerInstance sCfg = getServerInstance(serverGroupID, type);
 
-        String authID = null;
-        String passwd = null;
-        authID = sCfg.getAuthID();
-        passwd = (String) AccessController.doPrivileged(
-          new ServerInstanceAction(sCfg));
+        String authID = sCfg.getAuthID();
+        String passwd = (String) AccessController.doPrivileged(new ServerInstanceAction(sCfg));
 
         // The 389 port number passed is overridden by the hostName:port
         // constructed by the getHostName method.  So, this is not
         // a hardcoded port number.
-        return getConnection(hostName, 389, sCfg.getConnectionType(),
-            authID, passwd);
+        return LDAPUtils.newFailoverConnectionFactory(
+                getLdapUrls(serverGroupID, Server.Type.CONN_SSL.equals(sCfg.getConnectionType())),
+                authID, passwd.toCharArray(), 0, null, null);
     }
 
     /**
@@ -281,8 +271,8 @@ public class DSConfigMgr implements IDSConfigMgr {
      *             If there is no user in the server group with this
      *             authentication type.
      */
-    public LDAPConnection getNewBasicConnection() throws LDAPServiceException {
-        return getNewBasicConnection(DEFAULT);
+    public ConnectionFactory getNewBasicConnectionFactory() throws LDAPServiceException {
+        return getNewBasicConnectionFactory(DEFAULT);
     }
 
     /**
@@ -295,61 +285,9 @@ public class DSConfigMgr implements IDSConfigMgr {
      * @return LDAPConnection a new ldap connection.
      * @see com.iplanet.services.ldap.LDAPUser.Type
      */
-    public LDAPConnection getNewConnection(String serverGroupID,
+    public ConnectionFactory getNewConnectionFactory(String serverGroupID,
             LDAPUser.Type authType) throws LDAPServiceException {
-
-        /*
-         * Old implementation
-         * 
-         * ServerInstance scfg = getServerInstance(serverGroupID, authType);
-         * 
-         * if(scfg == null) { throw new LDAPServiceException(
-         * getString(IUMSConstants.DSCFG_SERVER_NOT_FOUND)); }
-         * 
-         * return getConnection(scfg.getServerName(), scfg.getPort(),
-         * scfg.getConnectionType(), scfg.getAuthID(), scfg.getPasswd());
-         */
-
-        return getNewFailoverConnection(serverGroupID, authType);
-    }
-
-    /**
-     * Returns an anonymous LDAP connection using the hostname and port
-     * specified in serverconfig.xml for DEFAULT server group. Used by
-     * LocalLdapAuthModule.
-     */
-    public LDAPConnectionPool getAnonymousConnectionPool()
-            throws LDAPServiceException {
-        LDAPConnection anonymousConnection = getNewFailoverConnection(DEFAULT,
-                LDAPUser.Type.AUTH_ANONYMOUS);
-        try {
-            ServerInstance si = getServerInstance(DEFAULT,
-                    LDAPUser.Type.AUTH_ANONYMOUS);
-            LDAPConnectionPool pool = null;
-            ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
-
-            pool = new LDAPConnectionPool(
-                "DSConfigMgr", si.getMinConnections(),
-                si.getMaxConnections(), anonymousConnection);
-            final LDAPConnectionPool finalPool = pool;
-            shutdownMan.addShutdownListener(
-                new ShutdownListener() {
-                    public void shutdown() {
-                        if (finalPool != null) {
-                            finalPool.destroy();
-                        }
-                    }
-                }
-            );
-
-            return pool;
-        } catch (LDAPException le) {
-            if (debugger.messageEnabled()) {
-                debugger.message("Failed to create anon conn pool" + le);
-            }
-            throw (new LDAPServiceException(
-                    getString(IUMSConstants.DSCFG_CONNECTFAIL)));
-        }
+        return getNewFailoverConnectionFactory(serverGroupID, authType);
     }
 
     /**
@@ -362,13 +300,12 @@ public class DSConfigMgr implements IDSConfigMgr {
      *            The type of the user authentication that is required.
      * @see com.iplanet.services.ldap.LDAPUser.Type
      */
-    public LDAPConnection getNewFailoverConnection(String serverGroupID,
+    private ConnectionFactory getNewFailoverConnectionFactory(String serverGroupID,
             LDAPUser.Type type) throws LDAPServiceException {
         debugger.message("in DSConfigMgr.getNewFailoverConnection()");
         String hostName = getHostName(serverGroupID);
         if (hostName.length() == 0) {
-            throw new LDAPServiceException(
-                    getString(IUMSConstants.DSCFG_SERVER_NOT_FOUND));
+            throw new LDAPServiceException(getString(IUMSConstants.DSCFG_SERVER_NOT_FOUND));
         }
 
         if (debugger.messageEnabled()) {
@@ -385,137 +322,18 @@ public class DSConfigMgr implements IDSConfigMgr {
             passwd = (String) AccessController
                     .doPrivileged(new ServerInstanceAction(sCfg));
         }
-
-        // The 389 port number passed is overridden by the hostName:port
-        // constructed by the getHostName method. So, this is not
-        // a hardcoded port number.
-        if (type.equals(LDAPUser.Type.AUTH_ANONYMOUS)) {
-            return getConnection(hostName, 389, sCfg.getConnectionType(),
-                authID, passwd);
-        }
-        return getPrimaryConnection(hostName, 389, sCfg.getConnectionType(),
-                             authID, passwd);
+        return LDAPUtils.newFailoverConnectionFactory(
+                getLdapUrls(serverGroupID, Server.Type.CONN_SSL.equals(sCfg.getConnectionType())),
+                authID, passwd != null ? passwd.toCharArray() : null, 0, null, new LDAPOptions());
     }
 
-    private LDAPConnection getPrimaryConnection(
-        String hostName,
-        int port,
-        Server.Type type,
-        String authID,
-        String passwd
-    ) throws LDAPServiceException {
-        LDAPConnection conn = null;
-        hostName = hostName.trim();
-        if (hostName.length() == 0) {
-            throw new LDAPServiceException(getString(
-                IUMSConstants.DSCFG_SERVER_NOT_FOUND));
+    private Set<LDAPURL> getLdapUrls(String serverGroupID, boolean isSSL) {
+        Set<LDAPURL> ldapUrls = new LinkedHashSet<>();
+        ServerGroup serverGrp = getServerGroup(serverGroupID);
+        for (Server server : serverGrp.getServersList()) {
+            ldapUrls.add(LDAPURL.valueOf(server.getServerName(), server.getPort(), isSSL));
         }
-        
-        StringTokenizer st = new StringTokenizer(hostName);
-        String hpName = null;
-        LDAPServiceException exception = null;
-
-        while (st.hasMoreElements() && (conn == null)) {
-            hpName = (String)st.nextToken();
-            if ((hpName != null) && (hpName.length() != 0)) {
-                if (debugger.messageEnabled()) {
-                    debugger.message("DSConfigMgr.getPrimaryConnection: " +
-                        "host name & port number " + hpName);
-                }
-                if (hpName.trim().length() == 0) {
-                    throw new LDAPServiceException(getString(
-                        IUMSConstants.DSCFG_SERVER_NOT_FOUND));
-                }
-                
-                try {
-                    int idx = hpName.indexOf(':');
-                    if (idx != -1) {
-                        String upHost = hpName.substring(0, idx);
-                        int upPort = Integer.parseInt(hpName.substring(idx +1));
-                        conn = getConnection(upHost, upPort, type, authID, passwd);
-                        exception = null;
-                    } else {
-                        throw new LDAPServiceException(getString(
-                            IUMSConstants.DSCFG_SERVER_NOT_FOUND));
-                    }
-                } catch (LDAPServiceException e) {
-                    exception = e;
-                } catch (NumberFormatException e) {
-                    throw new LDAPServiceException(e.getMessage());
-                }
-            }
-        }
-        
-        if (exception != null) {
-            String configTime = SystemProperties.get(
-                Constants.SYS_PROPERTY_INSTALL_TIME, "false");
-            if (!configTime.equalsIgnoreCase("true")) {
-                debugger.error("Connection to LDAP server threw exception:", 
-                    exception);
-            }
-            throw exception;
-        }
-        return conn;
-    }
-
-    private LDAPConnection getConnection(String hostName, int port,
-            Server.Type type, String authID, String passwd)
-            throws LDAPServiceException {
-
-        debugger.message("in DSConfigMgr.getConnection()");
-        LDAPConnection conn = null;
-
-        if (type == Server.Type.CONN_SSL) {
-            try {
-                conn = new LDAPConnection(
-                        SSLSocketFactoryManager.getSSLSocketFactory());
-            } catch (Exception e) {
-                debugger.error("getConnection.JSSSocketFactory", e);
-                throw new LDAPServiceException(
-                        getString(IUMSConstants.DSCFG_JSSSFFAIL));
-            }
-        } else {
-            conn = new LDAPConnection();
-        }
-
-        int retry = 0;
-        while (retry <= connNumRetry) {
-            if (debugger.messageEnabled()) {
-                debugger.message("DSConfigMgr.getConnection retry: " + retry);
-            }
-
-            try {
-                if ((authID != null) && (passwd != null)) {
-                    conn.connect(3, hostName, port, authID, passwd);
-                } else {
-                    conn.setOption(LDAPv3.PROTOCOL_VERSION, new Integer(3));
-                    conn.connect(hostName, port);
-                }
-                conn.setOption(LDAPv2.SIZELIMIT, new Integer(0));
-                break;
-            } catch (LDAPException e) {
-                if (!retryErrorCodes.contains("" + e.getLDAPResultCode())
-                        || retry == connNumRetry) {
-                    if (debugger.warningEnabled()) {
-                        debugger.warning(
-                            "Connection to LDAP server threw exception:", e);
-                    }
-                   try {
-                       conn.disconnect();
-                   } catch (Exception ignored) {
-                   }
-                    throw new LDAPServiceException(
-                            getString(IUMSConstants.DSCFG_CONNECTFAIL), e);
-                }
-                retry++;
-                try {
-                    Thread.sleep(connRetryInterval);
-                } catch (InterruptedException ex) {
-                }
-            }
-        }
-
-        return conn;
+        return ldapUrls;
     }
 
     public String getHostName(String serverGroupID) {

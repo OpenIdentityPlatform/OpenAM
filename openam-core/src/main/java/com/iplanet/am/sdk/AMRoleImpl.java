@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,9 @@
  *
  * $Id: AMRoleImpl.java,v 1.6 2009/01/28 05:34:47 ww203982 Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.iplanet.am.sdk;
 
 import java.util.Collections;
@@ -38,13 +36,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import com.sun.identity.shared.ldap.util.DN;
-import com.sun.identity.shared.ldap.util.RDN;
-
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.iplanet.ums.SearchControl;
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
 
 /**
  * The <code>AMRole</code> interface provides methods to manage role
@@ -417,13 +414,12 @@ class AMRoleImpl extends AMObjectImpl implements AMRole {
         Iterator it = set.iterator();
         while (it.hasNext()) {
             // get the DN of the template entry
-            DN dn = new DN((String) it.next());
+            DN dn = DN.valueOf((String) it.next());
             if (debug.messageEnabled()) {
                 debug.message("AMRoleImpl.getTemplate: DN=" + dn);
             }
             // get the parent name of the template, which is a COS deinfition
-            String serviceName = (((RDN) dn.getParent().getRDNs().get(0))
-                    .getValues())[0];
+            String serviceName = LDAPUtils.rdnValueFromDn(dn);
 
             // check template type & service name
             int templateType = AMTemplate.DYNAMIC_TEMPLATE;
@@ -432,10 +428,10 @@ class AMRoleImpl extends AMObjectImpl implements AMRole {
                 // templates only
                 if (!policyOnly) {
                     retSet.add(new AMTemplateImpl(super.token,
-                            dn.toRFCString(), serviceName, templateType));
+                            dn.toString(), serviceName, templateType));
                 } else if (templateType == AMTemplate.POLICY_TEMPLATE) {
                     retSet.add(new AMTemplateImpl(super.token,
-                            dn.toRFCString(), serviceName, templateType));
+                            dn.toString(), serviceName, templateType));
                 }
             } else {
                 // get specified type of templates
@@ -446,7 +442,7 @@ class AMRoleImpl extends AMObjectImpl implements AMRole {
                 if (type.intValue() == AMTemplate.ALL_TEMPLATES
                         || type.intValue() == templateType) {
                     retSet.add(new AMTemplateImpl(super.token,
-                            dn.toRFCString(), serviceName, templateType));
+                            dn.toString(), serviceName, templateType));
                 }
             }
         }

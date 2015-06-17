@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,46 +24,12 @@
  *
  * $Id: AMModelBase.java,v 1.18 2009/12/11 23:25:19 veiming Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.sun.identity.console.base.model;
 
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.common.DisplayUtils;
-import com.sun.identity.common.ISLocaleContext;
-import com.sun.identity.common.configuration.AgentConfiguration;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.AMIdentityRepository;
-import com.sun.identity.idm.IdConstants;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdType;
-import com.sun.identity.idm.IdSearchResults;
-import com.sun.identity.idm.IdUtils;
-import com.sun.identity.log.messageid.LogMessageProvider;
-import com.sun.identity.log.messageid.MessageProviderFactory;
-import com.sun.identity.log.LogRecord;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.security.EncryptAction;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.Base64;
-import com.sun.identity.shared.ldap.util.DN;
-import com.sun.identity.shared.locale.L10NMessage;
-import com.sun.identity.shared.locale.Locale;
-import com.sun.identity.sm.AttributeSchema;
-import com.sun.identity.sm.DNMapper;
-import com.sun.identity.sm.OrganizationConfigManager;
-import com.sun.identity.sm.SMSEntry;
-import com.sun.identity.sm.SchemaType;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.ServiceSchemaManager;
-import com.sun.identity.sm.SMSException;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.security.AccessController;
 import java.text.Collator;
@@ -78,9 +44,40 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
-import javax.servlet.http.HttpServletRequest;
 
-/* - NEED NOT LOG - */
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.common.DisplayUtils;
+import com.sun.identity.common.ISLocaleContext;
+import com.sun.identity.common.configuration.AgentConfiguration;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.AMIdentityRepository;
+import com.sun.identity.idm.IdConstants;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdSearchResults;
+import com.sun.identity.idm.IdType;
+import com.sun.identity.idm.IdUtils;
+import com.sun.identity.log.LogRecord;
+import com.sun.identity.log.messageid.LogMessageProvider;
+import com.sun.identity.log.messageid.MessageProviderFactory;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.security.EncryptAction;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Base64;
+import com.sun.identity.shared.locale.L10NMessage;
+import com.sun.identity.shared.locale.Locale;
+import com.sun.identity.sm.AttributeSchema;
+import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.OrganizationConfigManager;
+import com.sun.identity.sm.SMSEntry;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SchemaType;
+import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.opendj.ldap.DN;
 
 /**
  * This class implements all the basic and commonly used methods used by view
@@ -1167,8 +1164,8 @@ public class AMModelBase
         if (amid.getType().equals(IdType.USER)) {
             String amadminUUID = "id=amadmin,ou=user," +
                 SMSEntry.getRootSuffix();
-            DN dn = new DN(amadminUUID);
-            DN amidDN = new DN(amid.getUniversalId());
+            DN dn = DN.valueOf(amadminUUID);
+            DN amidDN = DN.valueOf(amid.getUniversalId());
             return dn.equals(amidDN);
         }
 

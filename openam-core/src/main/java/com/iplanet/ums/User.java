@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: User.java,v 1.5 2009/01/28 05:34:51 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.ums;
@@ -32,11 +33,11 @@ import java.security.Principal;
 import java.util.Collection;
 import java.util.Iterator;
 
-import com.sun.identity.shared.ldap.util.DN;
-
 import com.sun.identity.shared.debug.Debug;
 import com.iplanet.services.ldap.Attr;
 import com.iplanet.services.ldap.AttrSet;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.SearchScope;
 
 /**
  * Represents a user entry in UMS.
@@ -179,15 +180,15 @@ public class User extends PersistentObject {
                 debug.message("User.getAccessRight : Get rights for : "
                         + guid.getDn());
             }
-            DN guidDn = new DN(guid.getDn());
+            DN guidDn = DN.valueOf(guid.getDn());
             while (it.hasNext()) {
                 Guid roleGuid = new Guid((String) it.next());
-                DN roleGuidDn = new DN(roleGuid.getDn());
+                DN roleGuidDn = DN.valueOf(roleGuid.getDn());
                 if (debug.messageEnabled()) {
                     debug.message("User.getAccessRight : Role Dn : "
                             + roleGuid.getDn());
                 }
-                if (roleGuidDn.getParent().isDescendantOf(guidDn))
+                if (roleGuidDn.parent().isInScopeOf(guidDn, SearchScope.SUBORDINATES))
                     continue;
                 BaseRole role = (BaseRole) UMSObject.getObject(getPrincipal(),
                         roleGuid);

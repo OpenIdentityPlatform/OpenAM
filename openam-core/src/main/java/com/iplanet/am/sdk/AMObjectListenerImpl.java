@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,14 +24,16 @@
  *
  * $Id: AMObjectListenerImpl.java,v 1.6 2009/01/28 05:34:47 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.am.sdk;
 
-import com.sun.identity.shared.debug.Debug;
 import java.util.Map;
 import java.util.Set;
-import com.sun.identity.shared.ldap.util.DN;
+
+import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.ldap.LDAPUtils;
 
 /**
  * This class provides the implementation for listening to change
@@ -54,7 +56,7 @@ public class AMObjectListenerImpl implements AMObjectListener {
                     + " type: " + eventType);
         }
         // Normalize the DN
-        String normalizedDN = (new DN(name)).toRFCString().toLowerCase();
+        String normalizedDN = LDAPUtils.normalizeDN(name);
         AMStoreConnection.updateCache(normalizedDN, eventType);
 
         try {
@@ -89,7 +91,7 @@ public class AMObjectListenerImpl implements AMObjectListener {
                     + "\n config map= " + configMap);
         }
         // Normalize the DN
-        String dn = (new DN(parentName)).toRFCString().toLowerCase();
+        String dn = LDAPUtils.normalizeDN(parentName);
         AMStoreConnection.updateCache(dn, eventType);
 
         try {
@@ -121,8 +123,7 @@ public class AMObjectListenerImpl implements AMObjectListener {
             debug.message("AMObjectListenerImpl.permissionsChanged(): "
                     + "orgName: " + orgName);
         }
-        // Normalize the DN
-        String dn = (new DN(orgName)).toRFCString().toLowerCase();
+        String dn = LDAPUtils.normalizeDN(orgName);
 
         // Update AMStoreConnection cache
         AMStoreConnection.updateCache(dn, AMEvent.OBJECT_CHANGED);

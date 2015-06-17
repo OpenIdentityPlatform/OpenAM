@@ -15,17 +15,17 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information:
  *
- * "Portions copyright [year] [name of copyright owner]".
+ * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * "Portions copyright [2015] [ForgeRock, AS.]".
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 package com.sun.identity.sm.ldap;
 
 
+import org.forgerock.opendj.ldap.Connection;
+
 import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.ldap.LDAPConnection;
-import com.sun.identity.shared.ldap.LDAPException;
 
 /**
  * Protected Static Helper Accessor class to Access the protected SMDataLayer.
@@ -64,7 +64,7 @@ public class CTSDataLayer {
      *
      * @return LDAPConnection - Obtained from Pool
      */
-    public LDAPConnection getConnection() {
+    public Connection getConnection() {
         return sharedSMDataLayer.getConnection();
     }
 
@@ -73,8 +73,8 @@ public class CTSDataLayer {
      *
      * @param ldapConnection
      */
-    public void releaseConnection( LDAPConnection ldapConnection) {
-        sharedSMDataLayer.releaseConnection(ldapConnection);
+    public void releaseConnection(Connection ldapConnection) {
+        ldapConnection.close();
     }
 
     /**
@@ -84,8 +84,8 @@ public class CTSDataLayer {
      * @param ldapConnection
      * @param ldapErrorCode
      */
-    public void releaseConnection(LDAPConnection ldapConnection, int ldapErrorCode ) {
-        sharedSMDataLayer.releaseConnection(ldapConnection, ldapErrorCode);
+    public void releaseConnection(Connection ldapConnection, int ldapErrorCode ) {
+        releaseConnection(ldapConnection);
     }
 
     /**
@@ -96,18 +96,8 @@ public class CTSDataLayer {
      * @param lastLDAPException - Last up Stream LDAP Exception, can be null if no issues arose
      *                          with the connection or operations.
      */
-    public void releaseConnection(LDAPConnection ldapConnection, LDAPException lastLDAPException ) {
-        if (lastLDAPException == null) {
-            sharedSMDataLayer.releaseConnection(ldapConnection);
-        } else {
-            if (lastLDAPException.getLDAPResultCode() == LDAPException.CONNECT_ERROR) {
-                // We had a connect error using the connection provided, attempt
-                // to recovery the connection if possible, before returning to
-                // the Connection pool.
-                // TODO -- Add additional logic to properly fix a broken connection.
-            }
-            sharedSMDataLayer.releaseConnection(ldapConnection, lastLDAPException.getLDAPResultCode());
-        }
+    public void releaseConnection(Connection ldapConnection, Exception lastLDAPException ) {
+        releaseConnection(ldapConnection);
     }
 
 }

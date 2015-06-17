@@ -53,7 +53,6 @@ import com.sun.identity.security.EncodeAction;
 import com.sun.identity.setup.Bootstrap;
 import com.sun.identity.setup.ConfiguratorException;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSSchema;
@@ -82,6 +81,8 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.login.LoginException;
+
+import org.forgerock.opendj.ldap.DN;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -388,8 +389,8 @@ public class ServerConfigMgr {
             dsameuser.store();
         } else {
             ServerConfigMgr scm = new ServerConfigMgr();
-            DN adminDN = new DN(scm.getUserDN(DSConfigMgr.VAL_AUTH_ADMIN));
-            DN proxyDN = new DN(scm.getUserDN(DSConfigMgr.VAL_AUTH_PROXY));
+            DN adminDN = DN.valueOf(scm.getUserDN(DSConfigMgr.VAL_AUTH_ADMIN));
+            DN proxyDN = DN.valueOf(scm.getUserDN(DSConfigMgr.VAL_AUTH_PROXY));
             if (adminDN.equals(proxyDN)) {
                 adminPassword = true;
                 proxyPassword = true;

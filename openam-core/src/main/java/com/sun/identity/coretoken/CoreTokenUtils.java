@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -24,20 +24,22 @@
  *
  * $Id: CoreTokenUtils.java,v 1.1 2009/11/19 00:07:40 qcheng Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.coretoken;
+
+import javax.security.auth.Subject;
+import java.security.AccessController;
+import java.text.ParseException;
+import java.util.Date;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.DateUtils;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.ldap.util.DN;
-import java.security.AccessController;
-import java.text.ParseException;
-import java.util.Date;
-import javax.security.auth.Subject;
+import org.forgerock.opendj.ldap.DN;
 
 /**
  * This class provides utility methods for Core Token Service.
@@ -47,8 +49,8 @@ public class CoreTokenUtils {
     public static Debug debug = Debug.getInstance("CoreToken");
 
     public static boolean areDNIdentical(String dn1, String dn2) {
-        DN dnObj1 = new DN(dn1);
-        DN dnObj2 = new DN(dn2);
+        DN dnObj1 = DN.valueOf(dn1);
+        DN dnObj2 = DN.valueOf(dn2);
         return dnObj1.equals(dnObj2);
     }
 

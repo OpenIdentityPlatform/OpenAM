@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: COSManager.java,v 1.5 2009/01/28 05:34:51 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.ums.cos;
@@ -33,14 +34,12 @@ import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.StringTokenizer;
-
-import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.util.DN;
 
 import com.iplanet.services.ldap.Attr;
 import com.iplanet.services.ldap.AttrSet;
-import com.iplanet.services.ldap.ModSet;
 import com.iplanet.services.util.I18n;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -52,6 +51,12 @@ import com.iplanet.ums.SchemaManager;
 import com.iplanet.ums.SearchResults;
 import com.iplanet.ums.UMSException;
 import com.iplanet.ums.UMSObject;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.Modification;
+import org.forgerock.opendj.ldap.ModificationType;
+import org.forgerock.opendj.ldap.ResultCode;
+import org.forgerock.opendj.ldap.SearchScope;
 
 /**
  * This class has the responsibility of adding, removing and replacing COS
@@ -438,14 +443,12 @@ public class COSManager {
             }
 
             if (attrSet.size() > 0) {
-                ModSet modSet = new ModSet(attrSet, ModSet.DELETE);
-                pObject.modify(modSet);
+                pObject.modify(toModifications(ModificationType.DELETE, attrSet));
                 pObject.save();
             }
         } catch (UMSException e) {
-            LDAPException le = (LDAPException) e.getRootCause();
-            if (le.getLDAPResultCode() == LDAPException.OBJECT_CLASS_VIOLATION) 
-            {
+            ErrorResultException le = (ErrorResultException) e.getRootCause();
+            if (ResultCode.OBJECTCLASS_VIOLATION.equals(le.getResult().getResultCode())) {
                 // Ignore... It's not a COS generated attribute's
                 // object class.
             } else {
@@ -483,9 +486,9 @@ public class COSManager {
 
         // Make sure target entry is in same tree as COS Def parent.
         //
-        DN targetDN = new DN(pObject.getGuid().getDn());
-        DN cosParentDN = new DN(cosDef.getParentGuid().getDn());
-        if (!(targetDN.isDescendantOf(cosParentDN))) {
+        DN targetDN = DN.valueOf(pObject.getGuid().getDn());
+        DN cosParentDN = DN.valueOf(cosDef.getParentGuid().getDn());
+        if (!(targetDN.isInScopeOf(cosParentDN, SearchScope.SUBORDINATES))) {
             String msg = i18n
                     .getString(IUMSConstants.COS_TARGET_OBJECT_DIFFERENT_TREE);
             throw new UMSException(msg);
@@ -552,10 +555,18 @@ public class COSManager {
                     .getName()));
 
         if (attrSet.size() > 0) {
-            ModSet modSet = new ModSet(attrSet);
-            pObject.modify(modSet);
+            pObject.modify(toModifications(ModificationType.ADD, attrSet));
             pObject.save();
         }
+    }
+
+    private Collection<Modification> toModifications(ModificationType type, AttrSet attrSet) {
+        Collection<Modification> modifications = new HashSet<>();
+        Enumeration<Attr> attributes = attrSet.getAttributes();
+        while (attributes.hasMoreElements()) {
+            modifications.add(new Modification(type, attributes.nextElement().toLDAPAttribute()));
+        }
+        return modifications;
     }
 
     /**

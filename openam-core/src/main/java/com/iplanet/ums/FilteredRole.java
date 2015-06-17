@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,17 +24,17 @@
  *
  * $Id: FilteredRole.java,v 1.4 2009/01/28 05:34:50 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.ums;
 
 import java.security.Principal;
 
-import com.sun.identity.shared.ldap.LDAPv2;
-
 import com.iplanet.services.ldap.Attr;
 import com.iplanet.services.ldap.AttrSet;
 import com.iplanet.services.util.I18n;
+import org.forgerock.opendj.ldap.SearchScope;
 
 /**
  * FilteredRole is a role implementation of the membership interface
@@ -183,7 +183,7 @@ public class FilteredRole extends BaseRole implements IFilteredMembership,
         }
 
         return DataLayer.getInstance().search(principal, bguid,
-                LDAPv2.SCOPE_SUB, getFilter(), attributes, false, null);
+                SearchScope.WHOLE_SUBTREE.intValue(), getFilter(), attributes, false, null);
     }
 
     /**
@@ -213,7 +213,7 @@ public class FilteredRole extends BaseRole implements IFilteredMembership,
         return DataLayer.getInstance().search(
                 getPrincipal(),
                 bguid,
-                LDAPv2.SCOPE_SUB,
+                SearchScope.WHOLE_SUBTREE.intValue(),
                 " ( & " + " ( " + getFilter() + ")" + " ( " + filter + " ) "
                         + " ) ", attributes, false, null);
     }

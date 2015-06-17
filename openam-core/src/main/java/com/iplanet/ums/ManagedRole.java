@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,19 +24,19 @@
  *
  * $Id: ManagedRole.java,v 1.5 2009/01/28 05:34:50 ww203982 Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.ums;
 
 import java.security.Principal;
 
-import com.sun.identity.shared.ldap.LDAPv2;
-import com.sun.identity.shared.ldap.util.DN;
-
 import com.iplanet.services.ldap.Attr;
 import com.iplanet.services.ldap.AttrSet;
-import com.iplanet.services.ldap.ModSet;
 import com.iplanet.services.util.I18n;
+import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.ModificationType;
+import org.forgerock.opendj.ldap.SearchScope;
 
 /**
  * ManagedRole is a role implementation of the membership interface
@@ -147,7 +147,7 @@ public class ManagedRole extends BaseRole implements IAssignableMembership {
      * @supported.api
      */
     public void addMember(PersistentObject member) throws UMSException {
-        member.modify(new Attr(MEMBER_ATTR_NAME, this.getDN()), ModSet.ADD);
+        member.modify(new Attr(MEMBER_ATTR_NAME, this.getDN()), ModificationType.ADD);
         this.getDN();
 
         Principal principal = getPrincipal();
@@ -224,13 +224,13 @@ public class ManagedRole extends BaseRole implements IAssignableMembership {
         // Review: PKB: The members of the role
         // must be under the role definition
         String dn = getGuid().getDn();
-        DN tdn = new DN(dn);
-        tdn = tdn.getParent();
+        DN tdn = DN.valueOf(dn);
+        tdn = tdn.parent();
 
         Guid guid = new Guid(tdn.toString());
 
         return DataLayer.getInstance().search(principal, guid,
-                LDAPv2.SCOPE_SUB, "(" + MEMBER_ATTR_NAME + "=" + getDN() + ")",
+                SearchScope.WHOLE_SUBTREE.intValue(), "(" + MEMBER_ATTR_NAME + "=" + getDN() + ")",
                 attributes, false, null);
     }
 
@@ -255,13 +255,13 @@ public class ManagedRole extends BaseRole implements IAssignableMembership {
             throw new IllegalArgumentException(i18n
                     .getString(IUMSConstants.BAD_PRINCIPAL_HDL));
         }
-        DN dn = new DN(this.getDN());
-        dn = dn.getParent();
+        DN dn = DN.valueOf(this.getDN());
+        dn = dn.parent();
         Guid guid = new Guid(dn.toString());
         return DataLayer.getInstance().search(
                 principal,
                 guid,
-                LDAPv2.SCOPE_SUB,
+                SearchScope.WHOLE_SUBTREE.intValue(),
                 "( & " + " ( " + MEMBER_ATTR_NAME + "=" + getDN() + " ) "
                         + " ( " + filter + " ) " + " ) ", attributes, false,
                 null);
@@ -358,7 +358,7 @@ public class ManagedRole extends BaseRole implements IAssignableMembership {
             throw new IllegalArgumentException(i18n
                     .getString(IUMSConstants.BAD_PRINCIPAL_HDL));
         }
-        member.modify(new Attr(MEMBER_ATTR_NAME, this.getDN()), ModSet.DELETE);
+        member.modify(new Attr(MEMBER_ATTR_NAME, this.getDN()), ModificationType.DELETE);
         // member.save();
         DataLayer.getInstance().removeAttributeValue(principal,
                 member.getGuid(), MEMBER_ATTR_NAME, this.getDN());

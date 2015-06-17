@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,9 @@
  *
  * $Id: BaseRole.java,v 1.4 2008/06/25 05:41:44 qcheng Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.iplanet.ums;
 
 import java.util.HashSet;
@@ -37,10 +35,10 @@ import java.util.Iterator;
 import com.sun.identity.shared.debug.Debug;
 import com.iplanet.services.ldap.Attr;
 import com.iplanet.services.ldap.AttrSet;
-import com.iplanet.services.ldap.ModSet;
 import com.iplanet.services.ldap.aci.ACI;
 import com.iplanet.services.ldap.aci.ACIParseException;
 import com.iplanet.services.ldap.aci.QualifiedCollection;
+import org.forgerock.opendj.ldap.ModificationType;
 
 /**
  * Abstract base class for all roles.
@@ -235,13 +233,13 @@ public abstract class BaseRole extends PersistentObject implements IRole {
             if (debug.messageEnabled()) {
                 debug.message("readaci.ACIText :" + readACI.getACIText());
             }
-            parentObject.modify(attr, ModSet.DELETE);
+            parentObject.modify(attr, ModificationType.DELETE);
             ACI newReadACI = ACI.valueOf(readACI.toString());
             QualifiedCollection readAttrs = new QualifiedCollection(accessRight
                     .getReadableAttributeNames(), false);
             newReadACI.setTargetAttributes(readAttrs);
             attr = new Attr(ACI.ACI, newReadACI.toString());
-            parentObject.modify(attr, ModSet.ADD);
+            parentObject.modify(attr, ModificationType.ADD);
         } else {
             debug.message("new read aci");
             // add new read ACI
@@ -266,7 +264,7 @@ public abstract class BaseRole extends PersistentObject implements IRole {
                 debug.message("READ " + getGuid().getDn() + "="
                         + newReadACI.toString());
             }
-            parentObject.modify(attr, ModSet.ADD);
+            parentObject.modify(attr, ModificationType.ADD);
         }
 
         if (writeACI != null) {
@@ -276,13 +274,13 @@ public abstract class BaseRole extends PersistentObject implements IRole {
             if (debug.messageEnabled()) {
                 debug.message("writeaci.ACIText :" + writeACI.getACIText());
             }
-            parentObject.modify(attr, ModSet.DELETE);
+            parentObject.modify(attr, ModificationType.DELETE);
             ACI newWriteACI = ACI.valueOf(writeACI.toString());
             QualifiedCollection qual = new QualifiedCollection(accessRight
                     .getWritableAttributeNames(), false);
             newWriteACI.setTargetAttributes(qual);
             attr = new Attr(ACI.ACI, newWriteACI.toString());
-            parentObject.modify(attr, ModSet.ADD);
+            parentObject.modify(attr, ModificationType.ADD);
         } else {
             debug.message("new write aci");
             // add new write ACI
@@ -307,7 +305,7 @@ public abstract class BaseRole extends PersistentObject implements IRole {
                 debug.message("Write " + getGuid().getDn() + "="
                         + newWriteACI.toString());
             }
-            parentObject.modify(attr, ModSet.ADD);
+            parentObject.modify(attr, ModificationType.ADD);
         }
 
         // save ACI changes to parent persistent store
