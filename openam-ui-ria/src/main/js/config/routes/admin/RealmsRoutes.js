@@ -129,11 +129,18 @@ define('config/routes/admin/RealmsRoutes', function () {
             pattern: 'realms/?/sts',
             role: 'ui-admin'
         },
-        'realmsScripts': {
+        'realmsScriptList': {
             view: 'org/forgerock/openam/ui/admin/views/realms/RealmView',
-            page: 'org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView',
-            url: scopedByRealm('scripts\/?'),
-            pattern: 'realms/?/scripts',
+            page: 'org/forgerock/openam/ui/admin/views/realms/scripts/ScriptListView',
+            url: scopedByRealm('scripts\/list'),
+            pattern: 'realms/?/scripts/list',
+            role: 'ui-admin'
+        },
+        'realmsEditScript': {
+            view: 'org/forgerock/openam/ui/admin/views/realms/RealmView',
+            page: 'org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView',
+            url: scopedByRealm('scripts\/edit\/?'),
+            pattern: 'realms/?/scripts/edit/?',
             role: 'ui-admin'
         }
     };

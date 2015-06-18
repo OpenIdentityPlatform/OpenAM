@@ -14,8 +14,8 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global, define*/
-define('org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView', [
+/*global define*/
+define('org/forgerock/openam/ui/admin/views/realms/scripts/ScriptListView', [
     'org/forgerock/commons/ui/common/main/AbstractView',
     'org/forgerock/openam/ui/common/util/RedirectToLegacyConsole'
 ], function (AbstractView, RedirectToLegacyConsole) {
