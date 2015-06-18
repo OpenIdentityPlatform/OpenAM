@@ -51,9 +51,22 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.commons.ui.libs</groupId>
-            <artifactId>selectize</artifactId>
+            <artifactId>selectize-non-standalone</artifactId>
             <version>0.12.1</version>
             <classifier>min</classifier>
+            <type>js</type>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>sifter</artifactId>
+            <version>0.4.1</version>
+            <classifier>min</classifier>
+            <type>js</type>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>microplugin</artifactId>
+            <version>0.0.3</version>
             <type>js</type>
         </dependency>
         <dependency>
@@ -160,6 +173,19 @@
                             </artifactItems>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>copy-lib-dependencies</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/classes/libs</outputDirectory>
+                            <includeArtifactIds>
+                                jquery-sortable,bootstrap-tabdrop,selectize-non-standalone,microplugin,sifter,jquery-nestingSortable,jsoneditor,qrcode
+                            </includeArtifactIds>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
@@ -225,7 +251,6 @@
                                       <delete dir="${dependency.dir}" />
 
                                       <move file="${minified.dir}" tofile="${classes.dir}" />
-
                                   </target>
                                 </configuration>
                                 <goals>
