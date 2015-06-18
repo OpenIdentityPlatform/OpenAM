@@ -153,7 +153,7 @@ public class AMIdentity {
      */
     public AMIdentity(SSOToken ssotoken, String universalId)
         throws IdRepoException {
-        this(universalId == null ? null : DN.valueOf(universalId), ssotoken);
+        this(universalId == null ? null : LDAPUtils.newDN(universalId), ssotoken);
     }
 
     public AMIdentity(DN universalId, SSOToken ssotoken) throws IdRepoException {
