@@ -27,7 +27,7 @@ define('org/forgerock/openam/ui/admin/views/realms/RealmView', [
             'click .sidenav a[href]:not([data-toggle])': 'navigateToPage'
         },
         findActiveNavItem: function (fragment) {
-            var element = this.$el.find('li a[href^="#' + fragment + '"]'),
+            var element = this.$el.find('.sidenav ol > li > a[href^="#' + fragment + '"]'),
                 parent, fragmentSections;
             if (element.length) {
                 parent = element.parent();
@@ -35,9 +35,7 @@ define('org/forgerock/openam/ui/admin/views/realms/RealmView', [
 
                 // Expand any collapsed element direct above. Only works one level up
                 if (parent.parent().hasClass('collapse')) {
-                    $.support.transition = false;
-                    parent.parent().collapse('show');
-                    $.support.transition = true;
+                    parent.parent().addClass('in');
                 }
             } else {
                 fragmentSections = fragment.split('/');
