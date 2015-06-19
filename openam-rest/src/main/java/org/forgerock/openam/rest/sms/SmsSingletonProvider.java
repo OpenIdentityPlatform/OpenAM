@@ -303,7 +303,7 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
         return result;
     }
 
-    private JsonValue convertToJson(ServiceConfig config) {
+    protected JsonValue convertToJson(ServiceConfig config) {
         if (config == null) {
             return json(object());
         } else {

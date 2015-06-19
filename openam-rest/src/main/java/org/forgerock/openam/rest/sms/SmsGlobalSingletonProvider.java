@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.rest.sms;
 
+import static org.forgerock.json.fluent.JsonValue.*;
+
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -84,6 +86,19 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
         }
         super.handleUpdate(serverContext, updateRequest, handler);
     }
+
+    @Override
+    protected void saveConfigAttributes(ServiceConfig config, Map<String, Set<String>> attributes) throws SSOException, SMSException {
+        if (attributes != null) {
+            schema.setAttributeDefaults(attributes);
+        }
+    }
+
+    @Override
+    protected JsonValue convertToJson(ServiceConfig config) {
+        return converter.toJson(schema.getAttributeDefaults());
+    }
+
 
     /**
      * Additionally adds "default" entry for realm attribute defaults, if present.

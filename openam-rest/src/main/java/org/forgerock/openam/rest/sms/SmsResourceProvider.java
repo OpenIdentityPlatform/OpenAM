@@ -74,7 +74,7 @@ abstract class SmsResourceProvider {
     protected final List<String> uriPath;
     protected final SmsJsonConverter converter;
     protected final Debug debug;
-    private final ServiceSchema schema;
+    protected final ServiceSchema schema;
 
     SmsResourceProvider(ServiceSchema schema, SchemaType type, List<ServiceSchema> subSchemaPath, String uriPath,
             boolean serviceHasInstanceName, SmsJsonConverter converter, Debug debug) {
