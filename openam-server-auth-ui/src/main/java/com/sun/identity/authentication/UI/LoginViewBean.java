@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  * Portions Copyrighted 2012 Nomura Research Institute, Ltd
  */
 package com.sun.identity.authentication.UI;
@@ -1231,52 +1231,43 @@ public class LoginViewBean extends AuthViewBeanBase {
                         choice = (String)reqDataHash.get(TOKEN_OLD
                         + Integer.toString(i));
                     }
-                    if (choice==null) {
-                        choice = "0";
-                    }
-                    
+
                     if (loginDebug.messageEnabled()) {
                         loginDebug.message("choice : " + choice);
                     }
                     
                     String[] choices = cc.getChoices();
-                    int selected = 0;
-                    
-                    if (choice.indexOf("|") != -1) {
+                    if (choice == null) {
+                        if (loginDebug.messageEnabled()) {
+                            loginDebug.message("No selected choice.");
+                        }
+                    } else if (choice.indexOf("|") != -1) {
                         StringTokenizer st = new StringTokenizer(choice, "|");
                         int cnt = st.countTokens();
                         int[] selectIndexs = new int[cnt];
                         int j = 0;
                         if (loginDebug.messageEnabled()) {
-                            loginDebug.message(
-                                "No of tokens : " + Integer.toString(cnt));
+                            loginDebug.message("No of tokens : " + Integer.toString(cnt));
                         }
                         while (st.hasMoreTokens()) {
                             choice = st.nextToken();
-                            if ((choice!=null) && (choice.length() != 0)) {
-                                selected = Integer.parseInt(choice);
+                            if (choice != null && choice.length() != 0) {
+                                int selected = Integer.parseInt(choice);
                                 choice = choices[selected];
-                                selectIndexs[j] = selected;
-                                j++;
+                                selectIndexs[j++] = selected;
                                 if (loginDebug.messageEnabled()) {
-                                    loginDebug.message(
-                                        "selected  choice : " + choice
-                                        + " & selected index : " + selected);
+                                    loginDebug.message("selected  choice : " + choice + " & selected index : " + selected);
                                 }
                             }
                         }
                         cc.setSelectedIndexes(selectIndexs);
-                        if (loginDebug.messageEnabled()) {
-                            loginDebug.message(
-                                "Selected indexes : " + selectIndexs);
-                        }
                     } else {
-                        selected = Integer.parseInt(choice);
+                        int selected = Integer.parseInt(choice);
                         cc.setSelectedIndex(selected);
                         choice = choices[selected];
                         if (loginDebug.messageEnabled()) {
-                            loginDebug.message("selected ONE choice : " + choice
-                            + " & selected ONE index : " + selected);
+                            loginDebug.message("selected ONE choice : " + choice + " & selected ONE index : "
+                                    + selected);
                         }
                     }
                 } else if (callbacks[i] instanceof ConfirmationCallback) {
@@ -2178,14 +2169,13 @@ public class LoginViewBean extends AuthViewBeanBase {
         return true;
     }
 
-   /**
-    * Enables AM session cookie time to live
-    */
+    /**
+     * Enables AM session cookie time to live
+     */
    public void enableCookieTimeToLive() {
        int cookieTimeToLive = 0;
-       String cookieTimeToLiveString = SystemProperties.get(
-            com.sun.identity.shared.Constants.AM_COOKIE_TIME_TO_LIVE);
-     if ((cookieTimeToLiveString != null)
+       String cookieTimeToLiveString = SystemProperties.get(com.sun.identity.shared.Constants.AM_COOKIE_TIME_TO_LIVE);
+       if ((cookieTimeToLiveString != null)
                && (cookieTimeToLiveString.length() != 0)) {
            try {
                cookieTimeToLive
