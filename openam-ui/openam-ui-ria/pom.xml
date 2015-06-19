@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+* The contents of this file are subject to the terms of the Common Development and
+* Distribution License (the License). You may not use this file except in compliance with the
+* License.
+*
+* You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+* specific language governing permission and limitations under the License.
+*
+* When distributing Covered Software, include this CDDL Header Notice in each file and include
+* the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+* Header, with the fields enclosed by brackets [] replaced by your own identifying
+* information: "Portions copyright [year] [name of copyright owner]".
+*
+* Copyright 2015 ForgeRock AS.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.forgerock.openam</groupId>
+        <artifactId>openam-ui</artifactId>
+        <version>13.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>openam-ui-ria</artifactId>
+    <name>OpenAM RIA Web UI</name>
+    <packaging>pom</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-ui-common</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+            <classifier>www</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.commons.ui</groupId>
+            <artifactId>forgerock-ui-user</artifactId>
+            <type>zip</type>
+            <classifier>www</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.mozilla</groupId>
+            <artifactId>rhino</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>selectize-non-standalone</artifactId>
+            <version>0.12.1</version>
+            <classifier>min</classifier>
+            <type>js</type>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>sifter</artifactId>
+            <version>0.4.1</version>
+            <classifier>min</classifier>
+            <type>js</type>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>microplugin</artifactId>
+            <version>0.0.3</version>
+            <type>js</type>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>qrcode</artifactId>
+            <version>1.0.0</version>
+            <classifier>min</classifier>
+            <type>js</type>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>jquery-nestingSortable</artifactId>
+            <version>0.9.12</version>
+            <type>js</type>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>jsoneditor</artifactId>
+            <version>0.7.9</version>
+            <classifier>min</classifier>
+            <type>js</type>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>bootstrap-tabdrop</artifactId>
+            <version>1.0</version>
+            <type>js</type>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>${basedir}/src/main/js</directory>
+            </resource>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>${basedir}/src/test/js</directory>
+            </testResource>
+            <testResource>
+                <directory>${basedir}/src/test/resources</directory>
+            </testResource>
+        </testResources>
+
+        <plugins>
+
+            <plugin>
+               <groupId>org.codehaus.mojo</groupId>
+               <artifactId>jslint-maven-plugin</artifactId>
+               <configuration>
+                   <disallowInsecureCharsInRegExp>false</disallowInsecureCharsInRegExp>
+                   <assumeConsoleAlertEtc>true</assumeConsoleAlertEtc>
+                   <excludes>
+                       <exclude>**/libs/*.js</exclude>
+                       <exclude>**/*Test.js</exclude>
+                   </excludes>
+               </configuration>
+               <executions>
+                   <execution>
+                       <phase>validate</phase>
+                       <goals>
+                           <goal>jslint</goal>
+                       </goals>
+                   </execution>
+               </executions>
+           </plugin>
+
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>resources</goal>
+                            <goal>testResources</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.forgerock.commons.ui</groupId>
+                                    <artifactId>forgerock-ui-user</artifactId>
+                                    <version>${forgerock-ui.version}</version>
+                                    <type>zip</type>
+                                    <classifier>www</classifier>
+                                </artifactItem>
+
+                                <artifactItem>
+                                    <groupId>org.forgerock.openam</groupId>
+                                    <artifactId>openam-ui-common</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                    <classifier>www</classifier>
+                                </artifactItem>
+
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-lib-dependencies</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/classes/libs</outputDirectory>
+                            <includeArtifactIds>
+                                jquery-sortable,bootstrap-tabdrop,selectize-non-standalone,microplugin,sifter,jquery-nestingSortable,jsoneditor,qrcode
+                            </includeArtifactIds>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/zip.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>js/css optimization</id>
+                                <phase>prepare-package</phase>
+
+                                <configuration>
+                                  <target name="optimize">
+                                      <property name="requirejs.dir" value="${basedir}/src/main/optimization" />
+                                      <property name="classes.dir" value="${basedir}/target/classes" />
+                                      <property name="dependency.dir" value="${basedir}/target/dependency" />
+                                      <property name="minified.dir" value="${basedir}/target/xui_minified" />
+
+                                      <copy todir="${classes.dir}">
+                                        <fileset dir="${dependency.dir}" includes="**/*" />
+                                      </copy>
+
+                                      <java classname="org.mozilla.javascript.tools.shell.Main" failonerror="true">
+                                          <classpath refid="maven.compile.classpath" />
+                                          <arg value="${requirejs.dir}/r.js" />
+                                          <arg value="-o" />
+                                          <arg value="${requirejs.dir}/app.build.js" />
+                                      </java>
+
+                                      <concat destfile="${minified.dir}/main_with_licenses.js">
+                                          <fileset file="${requirejs.dir}/license" />
+                                          <fileset file="${minified.dir}/main.js" />
+                                      </concat>
+
+                                      <move file="${minified.dir}/main_with_licenses.js" tofile="${minified.dir}/main.js" />
+
+                                      <delete dir="${classes.dir}" />
+                                      <delete dir="${dependency.dir}" />
+
+                                      <move file="${minified.dir}" tofile="${classes.dir}" />
+                                  </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>
