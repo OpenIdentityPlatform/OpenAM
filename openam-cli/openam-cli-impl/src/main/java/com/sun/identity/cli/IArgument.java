@@ -24,7 +24,7 @@
  *
  * $Id: IArgument.java,v 1.12 2009/12/18 07:13:25 dillidorai Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 
 package com.sun.identity.cli;
@@ -180,7 +180,12 @@ public interface IArgument {
     String AGENT_TYPE = "agenttype";
 
     /**
-     * Set attribute values falg.
+     * Agent include hashed password in config export option.
+     */
+    String AGENT_HASHED_PASSWORD = "includepassword";
+
+    /**
+     * Set attribute values flag.
      */
     String AGENT_SET_ATTR_VALUE = "set";
 

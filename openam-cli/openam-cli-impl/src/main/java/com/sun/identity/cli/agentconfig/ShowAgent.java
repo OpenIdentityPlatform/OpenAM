@@ -24,7 +24,7 @@
  *
  * $Id: ShowAgent.java,v 1.8 2008/06/25 05:42:10 qcheng Exp $
  *
- * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.cli.agentconfig;
 
@@ -78,6 +78,7 @@ public class ShowAgent extends AuthenticatedCommand {
         String realm = getStringOptionValue(IArgument.REALM_NAME);
         String agentName = getStringOptionValue(IArgument.AGENT_NAME);
         String outfile = getStringOptionValue(IArgument.OUTPUT_FILE);
+        boolean includeHashedPassword = isOptionSet(IArgument.AGENT_HASHED_PASSWORD);
         boolean inherit = isOptionSet(OPT_INHERIT);
         String[] params = {realm, agentName};
 
@@ -102,13 +103,20 @@ public class ShowAgent extends AuthenticatedCommand {
             Set passwords = AgentConfiguration.getAttributesSchemaNames(
                 amid, AttributeSchema.Syntax.PASSWORD);
 
+            String agentType = AgentConfiguration.getAgentType(amid);
+            // OAUTH2 agent passwords are stored in plaintext so should not be included since they are not hashed.
+            if (AgentConfiguration.AGENT_TYPE_OAUTH2.equals(agentType)) {
+                includeHashedPassword = false;
+            }
+
             if ((values != null) && !values.isEmpty()) {
                 StringBuilder buff = new StringBuilder();
                 // Used to generated a sorted list of property names for easier viewing
                 List<String> sortedKeys = new ArrayList<String>(values.keySet());
                 Collections.sort(sortedKeys);
                 for (String attrName : sortedKeys) {
-                    if (!passwords.contains(attrName)) {
+                    // Always true if user has asked to include the hashed password in the export.
+                    if (includeHashedPassword || !passwords.contains(attrName)) {
                         Set vals = (Set)values.get(attrName);
                         
                         if (vals != null) {

@@ -24,10 +24,7 @@
  *
  * $Id: AgentConfiguration.java,v 1.52 2010/01/07 18:07:39 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2012-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2012-2015 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
@@ -999,7 +996,19 @@ public class AgentConfiguration {
         return (reformat) ? unparseAttributeMap(agentType, values) :
             correctAttributeNames(agentType, values);
     }
-    
+
+    /**
+     * For the given Agent identity, return the value that represents the agent type.
+     * @param amid Identity object containing value.
+     * @return agent type or empty string if not found.
+     * @throws IdRepoException if there are Id Repository related errors.
+     * @throws SSOException if the Single Sign On token is invalid or has expired.
+     */
+    public static String getAgentType(AMIdentity amid) throws IdRepoException, SSOException {
+        Set setType = amid.getAttribute(IdConstants.AGENT_TYPE);
+        return ((setType != null) && !setType.isEmpty()) ? (String)setType.iterator().next() : "";
+    }
+
     private static boolean isPropertiesLocallyStored(AMIdentity amid)
         throws IdRepoException, SSOException {
         boolean isLocal = false;
@@ -1009,13 +1018,6 @@ public class AgentConfiguration {
             isLocal = (repo.equalsIgnoreCase(VAL_CONFIG_REPO_LOCAL));
         }
         return isLocal;
-    }
-    
-    private static String getAgentType(AMIdentity amid)
-        throws IdRepoException, SSOException {
-        Set setType = amid.getAttribute(IdConstants.AGENT_TYPE);
-        return ((setType != null) && !setType.isEmpty()) ?
-            (String)setType.iterator().next() : "";
     }
     
     private static Map parseAttributeMap(String agentType, Map attrValues)

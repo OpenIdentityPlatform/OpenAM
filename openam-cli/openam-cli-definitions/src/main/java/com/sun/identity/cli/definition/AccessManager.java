@@ -2051,7 +2051,8 @@ public class AccessManager {
           macro="authentication",
           optionalOptions={
                   "outfile|o|s|Filename where configuration is written to.",
-                  "inherit|i|u|Set this to inherit properties from parent group."},
+                  "inherit|i|u|Set this to inherit properties from parent group.",
+                  "includepassword|p|u|Include the hashed password in the export."},
           resourceStrings={
                   "show-agent-agent-does-not-exist=Agent {0} does not exist.",
                   "show-agent-to-file=Agent properties were written to file.",
