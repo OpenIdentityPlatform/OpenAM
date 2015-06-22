@@ -28,7 +28,7 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/uma/util/BackgridUtils",
+    "org/forgerock/openam/ui/common/util/BackgridUtils",
     "backgrid",
     "org/forgerock/openam/ui/common/util/RealmHelper"
 ], function(AbstractView, Configuration, Constants, BackgridUtils, Backgrid, RealmHelper) {
@@ -66,6 +66,7 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
                     name: "requestingPartyId",
                     label: $.t("uma.history.grid.header.0"),
                     headerCell: BackgridUtils.FilterHeaderCell.extend({
+                        title: 'uma.resources.all.grid.filter',
                         addClassName: "col-md-4"
                     }),
                     cell: 'string',
@@ -75,6 +76,7 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
                     name: "resourceSetName",
                     label: $.t("uma.history.grid.header.1"),
                     headerCell: BackgridUtils.FilterHeaderCell.extend({
+                        title: 'uma.resources.all.grid.filter',
                         addClassName: "col-md-4"
                     }),
                     cell: BackgridUtils.UriExtCell,

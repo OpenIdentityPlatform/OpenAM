@@ -22,12 +22,12 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define, $, _, Backgrid, Backbone*/
+/*global define, $, _, Backbone*/
 
 define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "backgrid",
-    "org/forgerock/openam/ui/uma/util/BackgridUtils",
+    "org/forgerock/openam/ui/common/util/BackgridUtils",
     "bootstrap-dialog",
     "org/forgerock/openam/ui/uma/views/share/CommonShare",
     "org/forgerock/commons/ui/common/main/Configuration",
@@ -112,6 +112,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
                     label: $.t("uma.resources.list.grid.0"),
                     cell: BackgridUtils.UriExtCell,
                     headerCell: BackgridUtils.FilterHeaderCell.extend({
+                        title: 'uma.resources.all.grid.filter',
                         addClassName: "col-md-5"
                     }),
                     href: function(rawValue, formattedValue, model){

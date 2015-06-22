@@ -32,6 +32,7 @@ require.config({
         "backgrid"          : "libs/backgrid.min",
         "backgrid.filter"   : "libs/backgrid-filter.min",
         "backgrid.paginator": "libs/backgrid-paginator.min",
+        "backgrid.selectall": "libs/backgrid-select-all.min",
 
         "bootstrap"         : "libs/bootstrap-3.3.4-custom",
         "bootstrap-dialog"  : "libs/bootstrap-dialog-1.34.4-min",
@@ -77,6 +78,9 @@ require.config({
         },
         "backgrid.paginator": {
             deps: ["backgrid", "backbone.paginator"]
+        },
+        "backgrid.selectall": {
+            deps: ["backgrid"]
         },
 
         "bootstrap": {
@@ -167,6 +171,7 @@ require([
     "backbone.paginator",
     "backgrid.paginator",
     "backgrid.filter",
+    "backgrid.selectall",
     "bootstrap",
     "bootstrap-dialog",
     "bootstrap-tabdrop",

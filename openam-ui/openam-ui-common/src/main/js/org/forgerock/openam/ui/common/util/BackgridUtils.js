@@ -1,37 +1,30 @@
 /**
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
  *
- * Copyright (c) 2015 ForgeRock AS. All rights reserved.
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
  *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
  *
- * You can obtain a copy of the License at
- * http://forgerock.org/license/CDDLv1.0.html
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at http://forgerock.org/license/CDDLv1.0.html
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
+ * Copyright 2015 ForgeRock AS.
  */
 
-/*global define Backgrid, Backbone, _, $*/
+/*global define, Backbone, _, $*/
 
-define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
+define("org/forgerock/openam/ui/common/util/BackgridUtils", [
     "backgrid",
     "moment",
+    "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/UIUtils"
-], function (Backgrid, moment, Router, UIUtils) {
+], function (Backgrid, moment, Messages, Router, UIUtils) {
     /**
-     * @exports org/forgerock/openam/ui/uma/util/BackgridUtils
+     * @exports org/forgerock/openam/ui/common/util/BackgridUtils
      */
     var obj = {};
 
@@ -68,6 +61,27 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
     });
 
     /**
+     * Clickable Row
+     * <p>
+     * You must extend this row and specify a "callback" attribute e.g.
+     * <p>
+     * MyRow = BackgridUtils.ClickableRow.extend({
+     *     callback: myCallback
+     * });
+     */
+    obj.ClickableRow = Backgrid.Row.extend({
+        events: {
+            "click": 'onClick'
+        },
+
+        onClick: function (e) {
+            if (this.callback) {
+                this.callback(e);
+            }
+        }
+    });
+
+    /**
      * Handlebars Template Cell Renderer
      * <p>
      * You must extend this renderer and specify a "template" attribute e.g.
@@ -94,8 +108,6 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
             return this;
         }
     });
-
-
 
     obj.UriExtCell = Backgrid.UriCell.extend({
         events: {
@@ -131,19 +143,21 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
 
     obj.FilterHeaderCell = Backgrid.HeaderCell.extend({
         className: 'filter-header-cell',
-        render: function() {
+        render: function () {
             var filter = new Backgrid.Extension.ServerSideFilter({
-                name: this.column.get("name"),
-                placeholder: $.t('uma.resources.all.grid.filter', { header: this.column.get("label") }),
+                name: this.column.get('name'),
+                placeholder: $.t(this.title, { header: this.column.get('label') }),
                 collection: this.collection
             });
+
             if (this.addClassName) {
                 this.$el.addClass(this.addClassName);
             }
+
             this.collection.state.filters = this.collection.state.filters ? this.collection.state.filters : [];
             this.collection.state.filters.push(filter);
             obj.FilterHeaderCell.__super__.render.apply(this);
-            this.$el.prepend(filter.render().el);
+            this.$el.append(filter.render().el);
             return this;
         }
     });
@@ -160,8 +174,12 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
     };
 
     obj.parseState = function (resp, queryParams, state, options) {
-        if (!this.state.totalRecords) { this.state.totalRecords = resp.remainingPagedResults + resp.resultCount; }
-        if (!this.state.totalPages)   { this.state.totalPages = Math.ceil(this.state.totalRecords/this.state.pageSize); }
+        if (!this.state.totalRecords) {
+            this.state.totalRecords = resp.remainingPagedResults + resp.resultCount;
+        }
+        if (!this.state.totalPages) {
+            this.state.totalPages = Math.ceil(this.state.totalRecords / this.state.pageSize);
+        }
         return this.state;
     };
 
@@ -173,29 +191,37 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
         return this.state.order === 1 ? '-' + this.state.sortKey : this.state.sortKey;
     };
 
-    obj.sync = function(method, model, options){
+    obj.sync = function (method, model, options) {
         var params = [],
-            exculdeList = ['page', 'total_pages', 'total_entries', 'order', 'per_page', 'sort_by'];
+            includeList = ['_pageSize', '_pagedResultsOffset', '_sortKeys'];
 
-        // TODO: Workaround as resourceset endpoind requires a _queryId=* to indicate a blank query,
-        // while the historyAudit endpint requires a _queryFilter=true to indicate a blank query.
-        if (options.data._queryId === '*' && options.data._queryFilter === true){
-            exculdeList.push('_queryFilter');
+        // TODO: UMA: Workaround as resource set end point requires a _queryId=* to indicate a blank query,
+        // while the historyAudit end point requires a _queryFilter=true to indicate a blank query.
+        if (options.data._queryId === '*' && options.data._queryFilter === true) {
+            includeList.push('_queryId');
         } else {
-            exculdeList.push('_queryId');
+            includeList.push('_queryFilter');
         }
 
-        _.forIn(options.data, function(val, key){
-            if(!_.include(exculdeList, key)) {
+        _.forIn(options.data, function (val, key) {
+            if (_.include(includeList, key)) {
                 params.push(key + '=' + val);
             }
         });
 
         options.data = params.join('&');
         options.processData = false;
-        options.beforeSend = function(xhr){
+        options.beforeSend = function (xhr) {
             xhr.setRequestHeader('Accept-API-Version', 'protocol=1.0,resource=1.0');
         };
+
+        options.error = function (response) {
+            Messages.messages.addMessage({
+                type: 'error',
+                message: JSON.parse(response.responseText).message
+            });
+        };
+
         return Backbone.sync(method, model, options);
     };
 
@@ -204,17 +230,16 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
     };
 
     obj.getQueryParams = function (data) {
-        var params = {
-            pageSize: "_pageSize",
-            sortKey: "_sortKeys",
-            _queryFilter: this.queryFilter,
-            _pagedResultsOffset:  this.pagedResultsOffset
-        };
+        data = data || {};
 
-        if (data && typeof data === 'object') {
-            _.extend(params,data);
-        }
-        return params;
+        return {
+            _sortKeys: this.sortKeys,
+            _queryFilter: function () {
+                return obj.queryFilter.call(this, data._queryFilter);
+            },
+            pageSize: "_pageSize",
+            _pagedResultsOffset: this.pagedResultsOffset
+        };
     };
 
     // FIXME: Workaround to fix "Double sort indicators" issue
@@ -229,6 +254,18 @@ define("org/forgerock/openam/ui/uma/util/BackgridUtils", [
         _.each(filtered, function(model) {
             model.set('direction', null);
         });
+    };
+
+    obj.getState = function (data) {
+        var state = {
+            pageSize: 10,
+            sortKey: "name"
+        };
+
+        if (data && typeof data === 'object') {
+            _.extend(state, data);
+        }
+        return state;
     };
 
     return obj;

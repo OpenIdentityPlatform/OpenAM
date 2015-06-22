@@ -23,6 +23,7 @@
  */
 
 /*global define*/
+// TODO: Move this file to the openam-ui-common after PE and SE are deleted
 define("org/forgerock/openam/ui/uma/util/URLHelper", [
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",

@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2015 ForgeRock AS. All rights reserved.
+ * Copyright 2011-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -24,9 +24,6 @@
 
 /*global define*/
 
-/**
- * @author yaromin
- */
 define("config/AppConfiguration", [
     "org/forgerock/commons/ui/common/util/Constants"
 ], function(Constants) {
@@ -102,6 +99,7 @@ define("config/AppConfiguration", [
                     moduleClass: "org/forgerock/commons/ui/common/util/UIUtils",
                     configuration: {
                         templateUrls: [
+                            "templates/admin/views/realms/scripts/ScriptListBtnToolbarTemplate.html",
                             "templates/uma/backgrid/cell/RevokeCell.html",
                             "templates/uma/backgrid/cell/SelectizeCell.html",
                             "templates/user/ConfirmPasswordDialogTemplate.html"

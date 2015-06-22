@@ -62,6 +62,10 @@ define("config/AppMessages", [
         "revokePolicyFail": {
             msg: "uma.resources.show.revokePolicyFail",
             type: "error"
+        },
+        "scriptDeleted": {
+            msg: "config.messages.AdminMessages.scripts.scriptDeleted",
+            type: "info"
         }
     };
 });

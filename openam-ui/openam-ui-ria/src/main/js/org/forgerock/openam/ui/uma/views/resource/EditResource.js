@@ -27,7 +27,7 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
     'org/forgerock/commons/ui/common/components/Messages',
     'org/forgerock/commons/ui/common/main/AbstractView',
     'backgrid',
-    'org/forgerock/openam/ui/uma/util/BackgridUtils',
+    'org/forgerock/openam/ui/common/util/BackgridUtils',
     'bootstrap-dialog',
     'org/forgerock/openam/ui/uma/views/share/CommonShare',
     'org/forgerock/commons/ui/common/util/Constants',

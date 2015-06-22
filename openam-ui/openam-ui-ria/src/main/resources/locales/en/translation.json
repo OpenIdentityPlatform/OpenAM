@@ -57,7 +57,16 @@
                 "completedTask" : "Task has been completed.",
                 "claimedTask" : "Task has been claimed.",
                 "unclaimedTask" : "Task has been unclaimed.",
-                "startedProcess" : "Process has been started"
+                "startedProcess" : "Process has been started",
+                "scripts": {
+                    "scriptCreated": "Script created successfully",
+                    "scriptUpdated": "Script updated successfully",
+                    "scriptDeleted": "Script deleted successfully",
+                    "error": {
+                        "noName": "Name is required",
+                        "noLanguage": "Language is required"
+                    }
+                }
             }
         },
         "AppConfiguration" : {
@@ -544,6 +553,45 @@
                 "dropHere" : "Drop here",
                 "processingClass": "Post Authentication Processing Class",
                 "criteria" : ["Required","Optional","Requisite","Sufficient"]
+            }
+        },
+        "scripts": {
+            "edit": {
+                "editTitle": "Edit Script",
+                "createTitle": "Create Script",
+                "name": "Name",
+                "description": "Description",
+                "language": "Language",
+                "context": "Context",
+                "script": "Script",
+                "upload": "Upload",
+                "validate": "Validate",
+                "validation": {
+                    "line": "line",
+                    "column": "column",
+                    "message": "message",
+                    "errors": "This script contains errors:",
+                    "noErrors": "No errors found."
+                },
+                "changeContext": "Change Context",
+                "dialog": {
+                    "title": {
+                        "change": "Change Context",
+                        "select": "Select Context"
+                    },
+                    "helper": "To create a new script, first select one of the available scripting contexts.",
+                    "warning": "By changing the context you will lose any unsaved data."
+                }
+            },
+            "list": {
+                "title": "Scripts List",
+                "addNew": "Add New Script",
+                "deleteSelected": "Delete Selected",
+                "grid": {
+                    "headers": ["Name", "Context", "Language", "Description"],
+                    "filterBy": "Filter by __header__",
+                    "noResults": "No results to display"
+                }
             }
         }
     }

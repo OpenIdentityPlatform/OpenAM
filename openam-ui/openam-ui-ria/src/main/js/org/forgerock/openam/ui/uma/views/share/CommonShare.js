@@ -26,7 +26,7 @@
 define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "backgrid",
-    "org/forgerock/openam/ui/uma/util/BackgridUtils",
+    "org/forgerock/openam/ui/common/util/BackgridUtils",
     "bootstrap-dialog",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
