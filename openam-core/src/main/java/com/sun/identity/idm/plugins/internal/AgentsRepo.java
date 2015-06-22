@@ -242,13 +242,16 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
             }
         }
         try {
-            Set vals = (Set) attrMap.get("userpassword");
+            Set<String> vals = (Set) attrMap.get("userpassword");
             if ((vals != null) && !AgentConfiguration.AGENT_TYPE_OAUTH2.equals(agentType)) {
-                Set hashedVals = new HashSet();
-                Iterator it = vals.iterator();
-                while (it.hasNext()) {
-                    String val = (String) it.next();
-                    hashedVals.add(hashAlgStr + Hash.hash(val));
+                Set<String> hashedVals = new HashSet<String>(vals.size());
+                for (String val : vals) {
+                    // If the password is already a hashed value, leave as is.
+                    if (val.startsWith(hashAlgStr)) {
+                        hashedVals.add(val);
+                    } else {
+                        hashedVals.add(hashAlgStr + Hash.hash(val));
+                    }
                 }
                 attrMap.remove("userpassword");
                 attrMap.put("userpassword", hashedVals);
