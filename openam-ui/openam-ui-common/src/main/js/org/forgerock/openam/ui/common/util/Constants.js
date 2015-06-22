@@ -28,9 +28,10 @@ define("org/forgerock/openam/ui/common/util/Constants", [
     "org/forgerock/commons/ui/common/util/Constants"
 ], function (commonConstants) {
 
-    var context = location.pathname.substring(1,location.pathname.indexOf('XUI')-1);
+    var path = location.pathname.replace(new RegExp("^/|/$", "g"), "").split("/");
+    path.splice(-1);
 
-    commonConstants.context = context;
+    commonConstants.context = path.join("/");
     commonConstants.THEME_CONFIG_PATH = 'themeConfig.json';
     commonConstants.CONSOLE_PATH = '/' + commonConstants.context + '/console';
     commonConstants.OPENAM_HEADER_PARAM_CUR_PASSWORD = "currentpassword";

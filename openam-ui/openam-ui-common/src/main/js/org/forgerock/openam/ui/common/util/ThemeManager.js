@@ -24,9 +24,6 @@
 
 /*global require, define, $, _, less*/
 
-/**
- * @author huck.elliott
- */
 define("ThemeManager", [
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Configuration"
@@ -106,25 +103,17 @@ define("ThemeManager", [
                     theme = $.extend(true,{}, defaultTheme, theme);
                 }
 
-                /**
-                 * Check to see if the realm has been defined yet.
-                 * If no realm call obj.getTheme() recursively until realm is defined
-                 */
-                if(realmDefined){
-                    return obj.loadThemeCSS(theme).then(function(){
-                        _.each(theme.settings.lessVars, function (value, key) {
-                            newLessVars['@' + key] = value;
-                        });
-                        less.modifyVars(newLessVars);
-
-                        conf.globalData.theme = theme;
-
-                        return theme;
+                return obj.loadThemeCSS(theme).then(function(){
+                    _.each(theme.settings.lessVars, function (value, key) {
+                        newLessVars['@' + key] = value;
                     });
-                }
-                else{
-                    return obj.getTheme();
-                }
+                    less.modifyVars(newLessVars);
+
+                    conf.globalData.theme = theme;
+
+                    return theme;
+                });
+
             });
         }
     };

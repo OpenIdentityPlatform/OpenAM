@@ -56,6 +56,13 @@
             <outputDirectory>.</outputDirectory>
         </dependencySet>
         <dependencySet>
+            <unpack>true</unpack>
+            <includes>
+                <include>org.forgerock.openam:openam-ui-common</include>
+            </includes>
+            <outputDirectory>.</outputDirectory>
+        </dependencySet>
+        <dependencySet>
             <includes>
                 <include>org.forgerock.commons.ui.libs:*</include>
             </includes>

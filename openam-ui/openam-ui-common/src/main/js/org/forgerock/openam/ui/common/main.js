@@ -26,7 +26,6 @@
 
 define([
     "./util/Constants",
-    "./util/ThemeManager",
     "./util/RealmHelper",
     "./util/RedirectToLegacyConsole",
     "./delegates/SiteConfigurationDelegate",
