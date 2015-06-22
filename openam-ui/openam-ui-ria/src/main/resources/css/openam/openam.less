@@ -69,7 +69,7 @@
     font-weight: 600;
     letter-spacing: 1px;
     margin-bottom: -1px;
-    padding: 10px 15px 7px;
+    padding: 10px 8px;
     position: relative;
     text-transform: uppercase;
     vertical-align: bottom;
@@ -113,7 +113,7 @@
     }
 
     .btn-transparent:hover, .btn-transparent:focus {
-        color: @base-theme-color;
+        color: #555;
     }
 }
 
@@ -142,6 +142,25 @@
         width: 18px;
         display: inline-block;
         text-align: left;
+    }
+}
+
+
+.btn-secondary {
+    background-color:  #fff;
+    border-color: @base-theme-color;
+    color: @base-theme-color;
+    .fa{
+        color: @base-theme-color;
+    }
+
+    &:hover{
+        border-color: darken(@base-theme-color, 5%);
+        background-color: #eee;
+        color: darken(@base-theme-color, 5%);
+        .fa{
+            color: darken(@base-theme-color, 5%);
+        }
     }
 }
 /* END of Candidate for Commons */

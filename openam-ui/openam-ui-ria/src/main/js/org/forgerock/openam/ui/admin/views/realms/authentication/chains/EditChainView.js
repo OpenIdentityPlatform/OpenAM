@@ -37,7 +37,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
         render: function(args, callback) {
 
             var self = this;
-            
+
             SMSDelegate.RealmAuthenticationChains.getChainWithType(args[1]).done(function (data) {
 
                 self.data.chainData = data.chainData;
@@ -67,6 +67,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                     self.initSortable();
 
                     PostProcessView.render(self.data.chainData);
+
+                    if (self.data.chainData.authChainConfiguration.length === 0) {
+                        self.addModuleLink();
+                    }
                 });
 
             })
@@ -104,7 +108,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
         },
 
         addModuleLink: function(e) {
-            e.preventDefault();
+            if(e){
+                e.preventDefault();
+            }
             var el = $('<li class="chain-link" />'),
                 moduleLink = new LinkView(),
                 index = this.data.chainData.authChainConfiguration.length;

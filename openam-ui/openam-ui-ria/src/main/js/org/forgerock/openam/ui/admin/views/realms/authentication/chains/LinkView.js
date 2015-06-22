@@ -36,7 +36,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
             'click #deleteItem':   'deleteItem',
             'click #moveUpBtn':    'moveUp',
             'click #moveDownBtn':  'moveDown',
-            'show.bs.dropdown' :   'setArrrowBtnStates'
+            'show.bs.dropdown' :   'setBtnStates'
         },
         // Constants used for moving item up or down.
         MOVE_UP: "moveUp",
@@ -200,21 +200,26 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
             }
         },
 
-        setArrrowBtnStates: function(){
+        setBtnStates: function(){
 
             var numLinks = this.$el.parent().children('.chain-link').length,
                 itemIndex = this.$el.index(),
                 moveUpBtn = this.$el.find('#moveUpLi'),
-                moveDownBtn = this.$el.find('#moveDownLi');
+                moveDownBtn = this.$el.find('#moveDownLi'),
+                deleteBtn = this.$el.find('#deleteItem').parent();
 
             moveUpBtn.removeClass('disabled');
             moveDownBtn.removeClass('disabled');
+            deleteBtn.removeClass('disabled');
 
             if (itemIndex === 1){
                 moveUpBtn.addClass('disabled');
             }
             if (itemIndex === numLinks){
                 moveDownBtn.addClass('disabled');
+            }
+            if(numLinks <= 1){
+                deleteBtn.addClass('disabled');
             }
         }
 
