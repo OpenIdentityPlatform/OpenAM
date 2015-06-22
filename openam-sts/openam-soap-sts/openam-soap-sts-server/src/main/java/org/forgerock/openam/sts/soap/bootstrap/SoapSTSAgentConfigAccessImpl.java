@@ -69,7 +69,7 @@ public class SoapSTSAgentConfigAccessImpl implements SoapSTSAgentConfigAccess {
         String sessionId = null;
         try {
             sessionId = accessTokenProvider.getAccessToken();
-            Map<String, String> headerMap = new HashMap<String, String>();
+            Map<String, String> headerMap = new HashMap<>();
             headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
             headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, agentsProfileServiceVersion);
             headerMap.put(AMSTSConstants.COOKIE, createAMSessionCookie(sessionId));
@@ -84,9 +84,9 @@ public class SoapSTSAgentConfigAccessImpl implements SoapSTSAgentConfigAccess {
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 return JsonValueBuilder.toJsonValue(connectionResult.getResult());
             } else {
-                throw ResourceException.getException(ResourceException.INTERNAL_ERROR,
+                throw ResourceException.getException(responseCode,
                         "non 200 response from agent config service at: " + agentProfileUrl +
-                                "; response code: " + responseCode);
+                                " : " + connectionResult.getResult());
             }
         } catch (IOException e) {
             throw ResourceException.getException(ResourceException.INTERNAL_ERROR,

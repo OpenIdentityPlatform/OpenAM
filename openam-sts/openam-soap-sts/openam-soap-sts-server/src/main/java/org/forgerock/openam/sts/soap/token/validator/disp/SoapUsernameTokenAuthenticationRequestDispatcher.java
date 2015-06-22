@@ -51,7 +51,7 @@ public class SoapUsernameTokenAuthenticationRequestDispatcher implements TokenAu
     @Override
     public String dispatch(URL url, AuthTargetMapping.AuthTarget target, UsernameToken token) throws TokenValidationException {
         try {
-            Map<String, String> headerMap = new HashMap<String, String>();
+            Map<String, String> headerMap = new HashMap<>();
             headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
             headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersionAuthNService);
             headerMap.put(AMSTSConstants.AM_REST_AUTHN_USERNAME_HEADER, token.getName());
@@ -64,7 +64,7 @@ public class SoapUsernameTokenAuthenticationRequestDispatcher implements TokenAu
             final int responseCode = connectionResult.getStatusCode();
             if (responseCode != HttpURLConnection.HTTP_OK) {
                 throw new TokenValidationException(responseCode, "Non-200 response from posting Username token " +
-                        "to rest authN.");
+                        "to rest authN: " + connectionResult.getResult());
             } else {
                 return connectionResult.getResult();
             }

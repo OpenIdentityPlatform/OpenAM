@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.publish.rest;
@@ -74,7 +74,7 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
         this.persistentStore = persistentStore;
         this.serviceListenerRegistration = serviceListenerRegistration;
         this.serviceListener = serviceListener;
-        publishedRoutes = new HashMap<String, Route>();
+        publishedRoutes = new HashMap<>();
         this.deploymentPathNormalization = deploymentPathNormalization;
         this.logger = logger;
     }
@@ -93,6 +93,7 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
      * @throws STSPublishException thrown in case a rest-sts instance has already been published at the specified
      * subPath, or in case other errors prevented a successful publish.
      */
+    @Override
     public synchronized String publishInstance(RestSTSInstanceConfig instanceConfig, RestSTS restSTSInstance,
                                              boolean republish) throws STSPublishException {
         /*
@@ -161,6 +162,7 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
      * @throws org.forgerock.openam.sts.STSPublishException if the entry in the SMS could not be removed, or if no
      * Route entry could be found in the Map corresponding to a previously-published instance.
      */
+    @Override
     public synchronized void removeInstance(String stsId, String realm, boolean removeOnlyFromRouter) throws STSPublishException {
         Route route = publishedRoutes.remove(normalizeDeploymentSubPathForRouteCache(stsId));
         if (route == null) {
@@ -197,10 +199,63 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
         }
     }
 
+    /**
+     * {@InheritDoc}
+     * The method is synchronized primarily as a sanity check, as excluding concurrent updates to published rest-sts instance
+     * state makes the system easier to reason about.
+     */
+    @Override
+    public synchronized void updateInstanceInSMS(String stsId, String realm, RestSTSInstanceConfig instanceConfig,
+                                            RestSTS instance) throws STSPublishException {
+        try {
+            persistentStore.updateSTSInstance(stsId, realm, instanceConfig);
+            logger.info("Updated rest sts instance " + stsId + " in ldap.");
+        } catch (STSPublishException e) {
+            logger.error("Update of rest-sts instance " + stsId + " failed during ldap persistence of updated attributes: " + e);
+            throw e;
+        }
+    }
+
+    /**
+     * {@InheritDoc}
+     * The method is synchronized so that two instances are not updated concurrently, as multiple configurations must be
+     * completed atomically.
+     */
+    @Override
+    public synchronized void updateInstanceInCrestRouter(String stsId, String realm, RestSTSInstanceConfig instanceConfig,
+                                                 RestSTS instance) throws STSPublishException {
+        /*
+        Remove the instance corresponding to the old state only from the router.
+         */
+        final boolean removeOnlyFromRouter = true;
+        try {
+            removeInstance(stsId, realm, removeOnlyFromRouter);
+        } catch (STSPublishException e) {
+            logger.error("Update of rest-sts instance " + stsId + " failed during router removal of old instance: " + e);
+            throw e;
+        }
+
+        /*
+        Now add the new instance instance back to the router
+        Adding the instance only to the crest router is achieved with the republish == true, as this is what is called
+        upon OpenAM startup to expose previously-published sts instances.
+         */
+        try {
+            final boolean republish = true;
+            publishInstance(instanceConfig, instance, republish);
+            logger.info("Re-exposed updated rest sts instance " + stsId + " in the crest router.");
+        } catch (STSPublishException e) {
+            logger.error("Update of rest-sts instance " + stsId + " failed during re-adding updated instance to router: " + e);
+            throw e;
+        }
+    }
+
+    @Override
     public List<RestSTSInstanceConfig> getPublishedInstances() throws STSPublishException{
         return persistentStore.getAllPublishedInstances();
     }
 
+    @Override
     public RestSTSInstanceConfig getPublishedInstance(String stsId, String realm) throws STSPublishException {
         return persistentStore.getSTSInstanceConfig(stsId, realm);
     }
@@ -209,6 +264,7 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
      * This method is only to be called by the RestSTSSetupListener, which calls it only to re-publish
      * previously-published Rest STS instances during OpenAM startup.
      */
+    @Override
     public void republishExistingInstances() throws STSPublishException {
         /*
         Do not trigger the republish if OpenAM is being installed or upgraded.
@@ -236,11 +292,13 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
         }
     }
 
+    @Override
     public boolean isInstanceExposedInCrest(String stsId) {
         return publishedRoutes.get(normalizeDeploymentSubPathForRouteCache(
                 deploymentPathNormalization.normalizeDeploymentPath(stsId))) != null;
     }
 
+    @Override
     public boolean isInstancePersistedInSMS(String stsId, String realm) throws STSPublishException {
         return persistentStore.isInstancePresent(deploymentPathNormalization.normalizeDeploymentPath(stsId), realm);
     }
@@ -249,6 +307,7 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
      * This method is only called by the RestSTSSetupListener, called during OpenAM startup by the AMSetupServlet. It
      * registers a ServiceListener to publish rest-sts instances published to servers in another site.
      */
+    @Override
     public void registerServiceListener() {
         try {
             serviceListenerRegistration.registerServiceListener(AMSTSConstants.REST_STS_SERVICE_NAME,

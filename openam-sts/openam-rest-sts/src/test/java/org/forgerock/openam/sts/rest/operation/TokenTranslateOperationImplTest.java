@@ -22,14 +22,12 @@ import com.google.inject.Injector;
 import com.google.inject.Provides;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XMLUtilitiesImpl;
-import org.forgerock.openam.sts.config.user.TokenTransformConfig;
-import org.forgerock.openam.sts.rest.marshal.TokenRequestMarshaller;
-import org.forgerock.openam.sts.rest.marshal.TokenRequestMarshallerImpl;
+import org.forgerock.openam.sts.config.user.CustomTokenOperation;
+import org.forgerock.openam.sts.rest.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.user.invocation.RestSTSServiceInvocationState;
 import org.forgerock.openam.sts.user.invocation.SAML2TokenState;
 import org.forgerock.openam.sts.user.invocation.UsernameTokenState;
@@ -77,7 +75,7 @@ public class TokenTranslateOperationImplTest {
         }
 
         @Provides
-        @Named(AMSTSConstants.REST_SUPPORTED_TOKEN_TRANSLATIONS)
+        @Named(AMSTSConstants.REST_SUPPORTED_TOKEN_TRANSFORMS)
         Set<TokenTransformConfig> getSupportedTokenTransforms() {
             HashSet<TokenTransformConfig> supportedTransforms = new HashSet<>();
             supportedTransforms.add(new TokenTransformConfig(TokenType.USERNAME, TokenType.SAML2, INVALIDATE_INTERIM_AM_SESSIONS));
@@ -111,6 +109,24 @@ public class TokenTranslateOperationImplTest {
         Set<String> getTlsOffloadEngineHosts() {
             return Collections.EMPTY_SET;
         }
+
+        @Provides
+        @Named(AMSTSConstants.REST_CUSTOM_TOKEN_VALIDATORS)
+        Set<CustomTokenOperation> getCustomTokenValidators() {
+            return Collections.emptySet();
+        }
+
+        @Provides
+        @Named(AMSTSConstants.REST_CUSTOM_TOKEN_PROVIDERS)
+        Set<CustomTokenOperation> getCustomTokenProviders() {
+            return Collections.emptySet();
+        }
+
+        @Provides
+        @Named(AMSTSConstants.REST_CUSTOM_TOKEN_TRANSLATIONS)
+        Set<TokenTransformConfig> getCustomTokenTransforms() {
+            return Collections.emptySet();
+        }
     }
 
     @Test(expectedExceptions = TokenValidationException.class)
@@ -122,7 +138,7 @@ public class TokenTranslateOperationImplTest {
         tokenTranslateOperation.translateToken(buildInvocationState(TokenType.SAML2), null, null);
     }
 
-    @Test(expectedExceptions = TokenMarshalException.class)
+    @Test(expectedExceptions = TokenValidationException.class)
     public void testUnknownTransform() throws Exception {
         TokenTranslateOperation tokenTranslateOperation = Guice.createInjector(new MyModule()).getInstance(TokenTranslateOperation.class);
         JsonValue bunkTokenState = json(object(field("token_type", "nonsense")));

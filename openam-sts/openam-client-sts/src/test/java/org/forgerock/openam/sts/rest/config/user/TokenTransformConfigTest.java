@@ -11,14 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright © 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.sts.config.user;
+package org.forgerock.openam.sts.rest.config.user;
 
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenType;
-import org.forgerock.openam.sts.config.user.TokenTransformConfig;
+import org.forgerock.openam.sts.TokenTypeId;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -26,6 +26,9 @@ import static org.testng.Assert.assertNotEquals;
 
 public class TokenTransformConfigTest {
     private static final String STRING_TRANSFORM = "USERNAME|SAML2|true";
+    private static final String CUSTOM_INPUT_STRING_TRANSFORM = "BOBO|SAML2|true";
+    private static final String CUSTOM_OUTPUT_STRING_TRANSFORM = "USERNAME|BOBO|true";
+    private static final String CUSTOM_TOKEN_NAME = "BOBO";
 
     @Test
     public void testEquals() {
@@ -49,16 +52,6 @@ public class TokenTransformConfigTest {
         assertNotEquals(ttc1.hashCode(), ttc2.hashCode());
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testInvalidInputToken() {
-        new TokenTransformConfig(TokenType.SAML2, TokenType.SAML2, AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION);
-    }
-
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testInvalidOutputToken() {
-        new TokenTransformConfig(TokenType.USERNAME, TokenType.OPENAM, AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION);
-    }
-
     @Test
     public void testJsonRoundTrip() {
         TokenTransformConfig ttc1 = new TokenTransformConfig(TokenType.OPENAM, TokenType.SAML2, AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION);
@@ -79,5 +72,26 @@ public class TokenTransformConfigTest {
         TokenTransformConfig ttc1 = TokenTransformConfig.fromSMSString(STRING_TRANSFORM);
         TokenTransformConfig ttc2 = new TokenTransformConfig(TokenType.USERNAME, TokenType.SAML2, AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION);
         assertEquals(ttc1, ttc2);
+    }
+
+    @Test
+    public void testCustomTokenTypeMarshaling() {
+        TokenTransformConfig ttc1 = TokenTransformConfig.fromSMSString(CUSTOM_INPUT_STRING_TRANSFORM);
+        assertEquals(ttc1, TokenTransformConfig.fromJson(ttc1.toJson()));
+        assertEquals(ttc1, TokenTransformConfig.fromSMSString(ttc1.toSMSString()));
+
+        ttc1 = TokenTransformConfig.fromSMSString(CUSTOM_OUTPUT_STRING_TRANSFORM);
+        assertEquals(ttc1, TokenTransformConfig.fromJson(ttc1.toJson()));
+        assertEquals(ttc1, TokenTransformConfig.fromSMSString(ttc1.toSMSString()));
+
+        TokenTypeId tokenTypeId = new TokenTypeId() {
+            @Override
+            public String getId() {
+                return CUSTOM_TOKEN_NAME;
+            }
+        };
+        ttc1 = new TokenTransformConfig(tokenTypeId, tokenTypeId, true);
+        assertEquals(CUSTOM_TOKEN_NAME, ttc1.getInputTokenType().getId());
+        assertEquals(CUSTOM_TOKEN_NAME, ttc1.getOutputTokenType().getId());
     }
 }

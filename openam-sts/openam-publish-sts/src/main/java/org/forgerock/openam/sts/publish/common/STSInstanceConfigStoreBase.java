@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.publish.common;
@@ -65,6 +65,7 @@ public abstract class STSInstanceConfigStoreBase<T extends STSInstanceConfig> im
      * @param instance The to-be-persisted state.
      * @throws STSPublishException if the SMS encounters a problem during persistence.
      */
+    @Override
     public void persistSTSInstance(String stsInstanceId, String realm, T instance) throws STSPublishException {
         /*
           Note on having to explicitly specify the realm as a parameter, when it could, theoretically, be obtained from the T instance parameter:
@@ -114,6 +115,7 @@ public abstract class STSInstanceConfigStoreBase<T extends STSInstanceConfig> im
      * @param realm the realm in which the sts instance was deployed. Necessary for SMS lookup.
      * @throws STSPublishException if the SMS encounters an error during the removal.
      */
+    @Override
     public synchronized void removeSTSInstance(String stsInstanceId, String realm) throws STSPublishException {
         /*
         Model for code below taken from AMAuthenticationManager.deleteAuthenticationInstance, as the 'multiple authN module per realm'
@@ -134,16 +136,52 @@ public abstract class STSInstanceConfigStoreBase<T extends STSInstanceConfig> im
                         "Could not create ServiceConfigManager for realm " + realm +
                                 " in order to remove " + restOrSoap() + " sts instance with id " + stsInstanceId);
             }
-        } catch (SMSException e) {
-            throw new STSPublishException(ResourceException.INTERNAL_ERROR,
-                    "Exception caught removing " + restOrSoap() + " sts instance with id " + stsInstanceId + " from realm "
-                            + realm +". Exception: " + e, e);
-        } catch (SSOException e) {
+        } catch (SMSException | SSOException e) {
             throw new STSPublishException(ResourceException.INTERNAL_ERROR,
                     "Exception caught removing " + restOrSoap() + " sts instance with id " + stsInstanceId + " from realm "
                             + realm +". Exception: " + e, e);
         }
     }
+
+    /**
+     * Updates attributes corresponding to the existing STS instance.
+     * @param stsInstanceId the identifier for the to-be-updated sts instance
+     * @param realm The realm in which the sts instance should be deployed
+     * @param instance The updated STSInstanceConfig subclass
+     * @throws STSPublishException if the SMS encounters a problem during persistence.
+     */
+    @Override
+    public synchronized void updateSTSInstance(String stsInstanceId, String realm, T instance) throws STSPublishException {
+        /*
+        Model for code below taken from AuthPropertiesModelImpl#setValues
+         */
+        ServiceConfig baseService;
+        try {
+            baseService = new ServiceConfigManager(serviceName,
+                    getAdminToken()).getOrganizationConfig(realm, null);
+            if (baseService != null) {
+                ServiceConfig serviceConfig = baseService.getSubConfig(stsInstanceId);
+                if (serviceConfig != null) {
+                    serviceConfig.setAttributes(instanceConfigMarshaller.toMap(instance));
+                    logger.debug(restOrSoap() + "sts instance " + stsInstanceId + " in realm " + realm
+                            + " updated in persistent store.");
+                } else {
+                    throw new STSPublishException(ResourceException.NOT_FOUND,
+                            "Could not create ServiceConfig for realm " + realm +
+                                    " in order to update " + restOrSoap() + " sts instance with id " + stsInstanceId);
+                }
+            } else {
+                throw new STSPublishException(ResourceException.NOT_FOUND,
+                        "Could not create ServiceConfigManager for realm " + realm +
+                                " in order to update " + restOrSoap() + " sts instance with id " + stsInstanceId);
+            }
+        } catch (SMSException | SSOException e) {
+            throw new STSPublishException(ResourceException.INTERNAL_ERROR,
+                    "Exception caught updating " + restOrSoap() + " sts instance with id " + stsInstanceId + " in realm "
+                            + realm +". Exception: " + e, e);
+        }
+    }
+
 
     /**
      * Returns the STSInstanceConfig subclass corresponding to the stsInstanceId parameter.
@@ -152,6 +190,7 @@ public abstract class STSInstanceConfigStoreBase<T extends STSInstanceConfig> im
      * @return the SoapSTSInstanceConfig or RestSTSInstanceConfig instance corresponding to this published instance.
      * @throws STSPublishException if no instance could be found, or if the SMS encountered an error during the lookup.
      */
+    @Override
     public T getSTSInstanceConfig(String stsInstanceId, String realm) throws STSPublishException {
         try {
             /*
@@ -174,13 +213,7 @@ public abstract class STSInstanceConfigStoreBase<T extends STSInstanceConfig> im
                 throw new STSPublishException(ResourceException.NOT_FOUND,
                         "Error reading " + restOrSoap() + " sts instance from SMS: no base instance state in realm " + realm);
             }
-        } catch (SSOException e) {
-            throw new STSPublishException(ResourceException.INTERNAL_ERROR,
-                    "Exception caught reading " + restOrSoap() + " sts instance from SMS: " + e, e);
-        } catch (SMSException e) {
-            throw new STSPublishException(ResourceException.INTERNAL_ERROR,
-                    "Exception caught reading " + restOrSoap() + " sts instance from SMS: " + e, e);
-        } catch (IllegalStateException e) {
+        } catch (SSOException | SMSException | IllegalStateException e) {
             throw new STSPublishException(ResourceException.INTERNAL_ERROR,
                     "Exception caught reading " + restOrSoap() + " sts instance from SMS: " + e, e);
         }
@@ -192,8 +225,9 @@ public abstract class STSInstanceConfigStoreBase<T extends STSInstanceConfig> im
      * @throws STSPublishException if the realm names, necessary to obtain the sts instances published in each, could not
      * be obtained.
      */
+    @Override
     public List<T> getAllPublishedInstances() throws STSPublishException {
-        List<T> instances = new ArrayList<T>();
+        List<T> instances = new ArrayList<>();
         for (String realm : getAllRealmNames()) {
             ServiceConfig baseService;
             try {
@@ -271,7 +305,7 @@ public abstract class STSInstanceConfigStoreBase<T extends STSInstanceConfig> im
     }
 
     private Set<String> getAllRealmNames() throws STSPublishException {
-        Set<String> realmNames = new HashSet<String>();
+        Set<String> realmNames = new HashSet<>();
         /*
         The OrganizationConfigManager#SubOrganizationNames only returns realms under the root realm. The root
         realm needs to be added separately
@@ -294,7 +328,7 @@ public abstract class STSInstanceConfigStoreBase<T extends STSInstanceConfig> im
     }
 
     private Set<String> getSubrealms(Set<String> currentRealms) throws SMSException {
-        Set<String> subrealms = new HashSet<String>();
+        Set<String> subrealms = new HashSet<>();
         for (String realm : currentRealms) {
             OrganizationConfigManager ocm = new OrganizationConfigManager(getAdminToken(), realm);
             subrealms.addAll(catenateRealmNames(realm, ocm.getSubOrganizationNames()));
@@ -303,7 +337,7 @@ public abstract class STSInstanceConfigStoreBase<T extends STSInstanceConfig> im
     }
 
     private Set<String> catenateRealmNames(String currentRealm, Set<String> subrealms) {
-        Set<String> catenatedNames = new HashSet<String>(subrealms.size());
+        Set<String> catenatedNames = new HashSet<>(subrealms.size());
         if (AMSTSConstants.ROOT_REALM.equals(currentRealm)) {
             catenatedNames.addAll(subrealms);
         } else {

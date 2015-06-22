@@ -45,6 +45,42 @@
             </cc>
             <fieldhelp name="helpTokenTransforms" defaultValue="rest.sts.tokentransforms.help" />
         </property>
+        <property>
+            <label name="lblCustomTokenValidators"
+                   defaultValue="rest.sts.custom.token.validators"
+                   labelFor="custom-token-validators"/>
+            <cc name="custom-token-validators"
+                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag">
+                <attribute name="name" value="list" />
+                <attribute name="listboxLabel" value="label.current.value" />
+                <attribute name="textboxLabel" value="label.new.value" />
+            </cc>
+            <fieldhelp name="helpCustomTokenValidators" defaultValue="rest.sts.custom.token.validators.help" />
+        </property>
+        <property>
+            <label name="lblCustomTokenProviders"
+                   defaultValue="rest.sts.custom.token.providers"
+                   labelFor="custom-token-providers"/>
+            <cc name="custom-token-providers"
+                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag">
+                <attribute name="name" value="list" />
+                <attribute name="listboxLabel" value="label.current.value" />
+                <attribute name="textboxLabel" value="label.new.value" />
+            </cc>
+            <fieldhelp name="helpCustomTokenProviders" defaultValue="rest.sts.custom.token.providers.help" />
+        </property>
+        <property>
+            <label name="lblCustomTokenTransforms"
+                   defaultValue="rest.sts.custom.token.transforms"
+                   labelFor="custom-token-transforms"/>
+            <cc name="custom-token-transforms"
+                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag">
+                <attribute name="name" value="list" />
+                <attribute name="listboxLabel" value="label.current.value" />
+                <attribute name="textboxLabel" value="label.new.value" />
+            </cc>
+            <fieldhelp name="helpCustomTokenTransforms" defaultValue="rest.sts.custom.token.transforms.help" />
+        </property>
     </section>
 
     <section name="Deployment" defaultValue="rest.sts.deployment.section.title">

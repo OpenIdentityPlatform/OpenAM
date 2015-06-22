@@ -48,25 +48,6 @@ import java.util.List;
  * generation of authentication context state, which is common to both SAML2 and OpenIdConnect tokens.
  */
 public abstract class SoapTokenProviderBase implements TokenProvider {
-    public static class AuthenticationContextState {
-        private final Object authenticatedToken;
-        private final TokenTypeId authenticatedTokenType;
-
-
-        public AuthenticationContextState(Object authenticatedToken, TokenTypeId authenticatedTokenType) {
-            this.authenticatedToken = authenticatedToken;
-            this.authenticatedTokenType = authenticatedTokenType;
-        }
-
-        public Object getAuthenticatedToken() {
-            return authenticatedToken;
-        }
-
-        public TokenTypeId getAuthenticatedTokenType() {
-            return authenticatedTokenType;
-        }
-    }
-
     protected final Logger logger;
     protected final XMLUtilities xmlUtilities;
     private final SoapSTSAccessTokenProvider soapSTSAccessTokenProvider;
@@ -362,5 +343,24 @@ public abstract class SoapTokenProviderBase implements TokenProvider {
     private boolean isIssueOperation(TokenRequirements tokenRequirements) {
         return (tokenRequirements.getRenewTarget() == null) && (tokenRequirements.getValidateTarget() == null)
                 && (tokenRequirements.getCancelTarget() == null);
+    }
+
+    protected static class AuthenticationContextState {
+        private final Object authenticatedToken;
+        private final TokenTypeId authenticatedTokenType;
+
+
+        public AuthenticationContextState(Object authenticatedToken, TokenTypeId authenticatedTokenType) {
+            this.authenticatedToken = authenticatedToken;
+            this.authenticatedTokenType = authenticatedTokenType;
+        }
+
+        public Object getAuthenticatedToken() {
+            return authenticatedToken;
+        }
+
+        public TokenTypeId getAuthenticatedTokenType() {
+            return authenticatedTokenType;
+        }
     }
 }

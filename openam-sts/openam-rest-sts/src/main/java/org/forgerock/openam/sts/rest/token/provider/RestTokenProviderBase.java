@@ -29,7 +29,7 @@ import java.security.AccessController;
 /**
  * Base class for rest token provider implementations.
  */
-public abstract class RestTokenProviderBase<T extends TokenTypeId> implements RestTokenProvider<T> {
+public abstract class RestTokenProviderBase<T> implements RestTokenProvider<T> {
     protected final TokenGenerationServiceConsumer tokenGenerationServiceConsumer;
     protected final AMSessionInvalidator amSessionInvalidator;
     protected final ThreadLocalAMTokenCache threadLocalAMTokenCache;

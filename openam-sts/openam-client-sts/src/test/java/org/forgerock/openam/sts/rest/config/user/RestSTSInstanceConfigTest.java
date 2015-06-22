@@ -41,45 +41,75 @@ public class RestSTSInstanceConfigTest {
     private static final boolean WITH_TLS_OFFLOAD_CONFIG = true;
     private static final boolean WITH_SAML2_CONFIG = true;
     private static final boolean WITH_OIDC_CONFIG = true;
+    private static final boolean WITH_CUSTOM_PROVIDER = true;
+    private static final boolean WITH_CUSTOM_VALIDATOR = true;
     private static final String TLS_OFFLOAD_HOST_IP = "16.34.22.23";
     private static final String TLS_CLIENT_CERT_HEADER = "client_cert";
+    private static final String CUSTOM_TOKEN_NAME = "BOBO";
+    private static final String CUSTOM_TOKEN_VALIDATOR = "org.forgerock.bobo.BoboValidator";
+    private static final String CUSTOM_TOKEN_PROVIDER = "org.forgerock.bobo.BoboProvider";
 
     @Test
     public void testEquals() throws UnsupportedEncodingException {
-        RestSTSInstanceConfig ric1 = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
-        RestSTSInstanceConfig ric2 = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
+        RestSTSInstanceConfig ric1 = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
+                !WITH_CUSTOM_VALIDATOR, !WITH_CUSTOM_PROVIDER);
+        RestSTSInstanceConfig ric2 = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
+                !WITH_CUSTOM_VALIDATOR, !WITH_CUSTOM_PROVIDER);
         assertEquals(ric1, ric2);
         assertEquals(ric1.hashCode(), ric2.hashCode());
 
-        ric1 = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, !WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
-        ric2 = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, !WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
+        ric1 = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, !WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
+                !WITH_CUSTOM_VALIDATOR, WITH_CUSTOM_PROVIDER);
+        ric2 = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, !WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
+                !WITH_CUSTOM_VALIDATOR, WITH_CUSTOM_PROVIDER);
         assertEquals(ric1, ric2);
         assertEquals(ric1.hashCode(), ric2.hashCode());
 
-        ric1 = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG);
-        ric2 = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG);
+        ric1 = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG,
+                WITH_CUSTOM_VALIDATOR, !WITH_CUSTOM_PROVIDER);
+        ric2 = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG,
+                WITH_CUSTOM_VALIDATOR, !WITH_CUSTOM_PROVIDER);
         assertEquals(ric1, ric2);
         assertEquals(ric1.hashCode(), ric2.hashCode());
     }
 
     @Test
     public void testNotEquals() throws UnsupportedEncodingException {
-        RestSTSInstanceConfig ric1 = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
-        RestSTSInstanceConfig ric2 = createInstanceConfig("/bobo",WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
+        RestSTSInstanceConfig ric1 = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
+                !WITH_CUSTOM_VALIDATOR, !WITH_CUSTOM_PROVIDER);
+        RestSTSInstanceConfig ric2 = createInstanceConfig("/bobo",WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
+                !WITH_CUSTOM_VALIDATOR, !WITH_CUSTOM_PROVIDER);
         assertNotEquals(ric1, ric2);
 
-        ric1 = createInstanceConfig("/bobo", !WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
-        ric2 = createInstanceConfig("/bobo", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
+        ric1 = createInstanceConfig("/bobo", !WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
+                !WITH_CUSTOM_VALIDATOR, !WITH_CUSTOM_PROVIDER);
+        ric2 = createInstanceConfig("/bobo", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
+                !WITH_CUSTOM_VALIDATOR, !WITH_CUSTOM_PROVIDER);
         assertNotEquals(ric1, ric2);
 
-        ric1 = createInstanceConfig("/bobo", WITH_TLS_OFFLOAD_CONFIG, !WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
-        ric2 = createInstanceConfig("/bobo", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
+        ric1 = createInstanceConfig("/bobo", WITH_TLS_OFFLOAD_CONFIG, !WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
+                !WITH_CUSTOM_VALIDATOR, !WITH_CUSTOM_PROVIDER);
+        ric2 = createInstanceConfig("/bobo", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
+                !WITH_CUSTOM_VALIDATOR, !WITH_CUSTOM_PROVIDER);
         assertNotEquals(ric1, ric2);
 
-        ric1 = createInstanceConfig("/bobo", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG);
-        ric2 = createInstanceConfig("/bobo", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
+        ric1 = createInstanceConfig("/bobo", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG,
+                !WITH_CUSTOM_VALIDATOR, !WITH_CUSTOM_PROVIDER);
+        ric2 = createInstanceConfig("/bobo", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
+                !WITH_CUSTOM_VALIDATOR, !WITH_CUSTOM_PROVIDER);
         assertNotEquals(ric1, ric2);
 
+        ric1 = createInstanceConfig("/bobo", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
+                !WITH_CUSTOM_VALIDATOR, WITH_CUSTOM_PROVIDER);
+        ric2 = createInstanceConfig("/bobo", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
+                !WITH_CUSTOM_VALIDATOR, !WITH_CUSTOM_PROVIDER);
+        assertNotEquals(ric1, ric2);
+
+        ric1 = createInstanceConfig("/bobo", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
+                !WITH_CUSTOM_VALIDATOR, !WITH_CUSTOM_PROVIDER);
+        ric2 = createInstanceConfig("/bobo", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
+                WITH_CUSTOM_VALIDATOR, !WITH_CUSTOM_PROVIDER);
+        assertNotEquals(ric1, ric2);
     }
 
     @Test(expectedExceptions = NullPointerException.class)
@@ -94,22 +124,27 @@ public class RestSTSInstanceConfigTest {
 
     @Test
     public void testJsonMarshalling() throws IOException {
-        RestSTSInstanceConfig origConfig = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
+        RestSTSInstanceConfig origConfig = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
+                !WITH_CUSTOM_VALIDATOR, !WITH_CUSTOM_PROVIDER);
         assertEquals(origConfig, RestSTSInstanceConfig.fromJson(origConfig.toJson()));
 
-        origConfig = createInstanceConfig("/bob", !WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
+        origConfig = createInstanceConfig("/bob", !WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
+                !WITH_CUSTOM_VALIDATOR, WITH_CUSTOM_PROVIDER);
         assertEquals(origConfig, RestSTSInstanceConfig.fromJson(origConfig.toJson()));
 
-        origConfig = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, !WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
+        origConfig = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, !WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
+                WITH_CUSTOM_VALIDATOR, WITH_CUSTOM_PROVIDER);
         assertEquals(origConfig, RestSTSInstanceConfig.fromJson(origConfig.toJson()));
 
-        origConfig = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG);
+        origConfig = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG,
+                WITH_CUSTOM_VALIDATOR, !WITH_CUSTOM_PROVIDER);
         assertEquals(origConfig, RestSTSInstanceConfig.fromJson(origConfig.toJson()));
     }
 
     @Test
     public void testJsonStringMarshalling() throws IOException {
-        RestSTSInstanceConfig origConfig = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
+        RestSTSInstanceConfig origConfig = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
+                WITH_CUSTOM_VALIDATOR, WITH_CUSTOM_PROVIDER);
         /*
         This is how the Crest HttpServletAdapter ultimately constitutes a JsonValue from a json string. See the
         org.forgerock.json.resource.servlet.HttpUtils.parseJsonBody (called from HttpServletAdapter.getJsonContent)
@@ -125,7 +160,8 @@ public class RestSTSInstanceConfigTest {
 
     @Test
     public void testOldJacksonJsonStringMarshalling() throws IOException {
-        RestSTSInstanceConfig origConfig = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
+        RestSTSInstanceConfig origConfig = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
+                WITH_CUSTOM_VALIDATOR, WITH_CUSTOM_PROVIDER);
         /*
         This is how the Crest HttpServletAdapter ultimately constitutes a JsonValue from a json string. See the
         org.forgerock.json.resource.servlet.HttpUtils.parseJsonBody (called from HttpServletAdapter.getJsonContent)
@@ -140,44 +176,53 @@ public class RestSTSInstanceConfigTest {
 
     @Test
     public void testMapMarshalRoundTrip() throws IOException {
-        RestSTSInstanceConfig config = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
+        RestSTSInstanceConfig config = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
+                !WITH_CUSTOM_VALIDATOR, !WITH_CUSTOM_PROVIDER);
         assertEquals(config, RestSTSInstanceConfig.marshalFromAttributeMap(config.marshalToAttributeMap()));
 
-        config = createInstanceConfig("/bob", !WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
+        config = createInstanceConfig("/bob", !WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
+                WITH_CUSTOM_VALIDATOR, WITH_CUSTOM_PROVIDER);
         assertEquals(config, RestSTSInstanceConfig.marshalFromAttributeMap(config.marshalToAttributeMap()));
 
-        config = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, !WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
+        config = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, !WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
+                !WITH_CUSTOM_VALIDATOR, WITH_CUSTOM_PROVIDER);
         assertEquals(config, RestSTSInstanceConfig.marshalFromAttributeMap(config.marshalToAttributeMap()));
 
-        config = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG);
+        config = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG,
+                WITH_CUSTOM_VALIDATOR, !WITH_CUSTOM_PROVIDER);
         assertEquals(config, RestSTSInstanceConfig.marshalFromAttributeMap(config.marshalToAttributeMap()));
     }
 
     @Test
     public void testJsonMapMarshalRoundTrip() throws IOException {
-        RestSTSInstanceConfig config = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
+        RestSTSInstanceConfig config = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
+                !WITH_CUSTOM_VALIDATOR, !WITH_CUSTOM_PROVIDER);
         Map<String, Set<String>> attributeMap = config.marshalToAttributeMap();
         JsonValue jsonMap = new JsonValue(attributeMap);
         assertEquals(config, RestSTSInstanceConfig.marshalFromJsonAttributeMap(jsonMap));
 
-        config = createInstanceConfig("/bob", !WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
+        config = createInstanceConfig("/bob", !WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
+                WITH_CUSTOM_VALIDATOR, WITH_CUSTOM_PROVIDER);
         attributeMap = config.marshalToAttributeMap();
         jsonMap = new JsonValue(attributeMap);
         assertEquals(config, RestSTSInstanceConfig.marshalFromJsonAttributeMap(jsonMap));
 
-        config = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, !WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
+        config = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, !WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
+                !WITH_CUSTOM_VALIDATOR, WITH_CUSTOM_PROVIDER);
         attributeMap = config.marshalToAttributeMap();
         jsonMap = new JsonValue(attributeMap);
         assertEquals(config, RestSTSInstanceConfig.marshalFromJsonAttributeMap(jsonMap));
 
-        config = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG);
+        config = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG,
+                WITH_CUSTOM_VALIDATOR, !WITH_CUSTOM_PROVIDER);
         attributeMap = config.marshalToAttributeMap();
         jsonMap = new JsonValue(attributeMap);
         assertEquals(config, RestSTSInstanceConfig.marshalFromJsonAttributeMap(jsonMap));
     }
 
     private RestSTSInstanceConfig createInstanceConfig(String uriElement, boolean withTlsOffloadConfig,
-                                                       boolean withSAML2Config, boolean withOIDCConfig)
+                                                       boolean withSAML2Config, boolean withOIDCConfig,
+                                                       boolean withCustomValidator, boolean withCustomProvider)
                                                         throws UnsupportedEncodingException {
         Map<String,String> oidcContext = new HashMap<>();
         oidcContext.put("context_key_1", "context_value_1");
@@ -244,7 +289,15 @@ public class RestSTSInstanceConfigTest {
                             .issuer("oidcTokenIssuer")
                             .build();
         }
+        if (withCustomValidator) {
+            restSTSInstanceConfigBuilder.addCustomTokenValidator(CUSTOM_TOKEN_NAME, CUSTOM_TOKEN_VALIDATOR);
+            restSTSInstanceConfigBuilder.addCustomTokenTransform(CUSTOM_TOKEN_NAME, "SAML2", true);
+        }
+        if (withCustomProvider) {
+            restSTSInstanceConfigBuilder.addCustomTokenProvider(CUSTOM_TOKEN_NAME, CUSTOM_TOKEN_PROVIDER);
+            restSTSInstanceConfigBuilder.addCustomTokenTransform("OPENAM", CUSTOM_TOKEN_NAME, true);
 
+        }
         return restSTSInstanceConfigBuilder
                 .deploymentConfig(deploymentConfig)
                 .saml2Config(saml2Config)
@@ -254,15 +307,15 @@ public class RestSTSInstanceConfigTest {
 
     private void addOutputTokenTypeTranslationSuite(TokenType outputTokenType, RestSTSInstanceConfig.RestSTSInstanceConfigBuilder builder) {
         builder
-            .addSupportedTokenTranslation(
+            .addSupportedTokenTransform(
                     TokenType.USERNAME,
                     outputTokenType,
                     AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION)
-            .addSupportedTokenTranslation(
+            .addSupportedTokenTransform(
                     TokenType.OPENAM,
                     outputTokenType,
                     !AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION)
-            .addSupportedTokenTranslation(
+            .addSupportedTokenTransform(
                     TokenType.OPENIDCONNECT,
                     outputTokenType,
                     AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION);
@@ -272,11 +325,11 @@ public class RestSTSInstanceConfigTest {
         //leave out the DeploymentConfig to test null rejection
 
         return RestSTSInstanceConfig.builder()
-                .addSupportedTokenTranslation(
+                .addSupportedTokenTransform(
                         TokenType.USERNAME,
                         TokenType.SAML2,
                         AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION)
-                .addSupportedTokenTranslation(
+                .addSupportedTokenTransform(
                         TokenType.OPENAM,
                         TokenType.SAML2,
                         !AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION)
@@ -299,19 +352,19 @@ public class RestSTSInstanceConfigTest {
 
         return RestSTSInstanceConfig.builder()
                 .deploymentConfig(deploymentConfig)
-                .addSupportedTokenTranslation(
+                .addSupportedTokenTransform(
                         TokenType.USERNAME,
                         TokenType.SAML2,
                         AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION)
-                .addSupportedTokenTranslation(
+                .addSupportedTokenTransform(
                         TokenType.OPENAM,
                         TokenType.SAML2,
                         !AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION)
-                .addSupportedTokenTranslation(
+                .addSupportedTokenTransform(
                         TokenType.OPENIDCONNECT,
                         TokenType.SAML2,
                         AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION)
-                .addSupportedTokenTranslation(
+                .addSupportedTokenTransform(
                         TokenType.X509,
                         TokenType.SAML2,
                         AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION

@@ -35,15 +35,17 @@ import javax.inject.Inject;
 /**
  * This ServiceListener implementation will be registered in RestSTSInstancePublisherImpl#registerServiceListener, which
  * is called by the RestSTSSetupListener, which is called by the AMSetupServlet upon OpenAM startup (once the current
- * configuration is valid). It will add
- * rest-sts instances to the CREST router which are published at other site servers. In other words, LDAP replication
- * will insure that rest-sts-instance-configuration written to LDAP at another site's server is replicated to the current
+ * configuration is valid). It will add rest-sts instances to the CREST router which are published at other servers in a
+ * site/multi-server deployment. In other words, LDAP replication
+ * will insure that rest-sts-instance-configuration written to LDAP at another server is replicated to the current
  * server's LDAP. Yet for the rest-sts-instance to be operational, it must be hung off of the CREST router for
  * available rest-sts instances. This ServiceListener will listen for creation events for the RestSecurityTokenService,
  * and determines if the current instance has not been published locally (by asking the RestSTSInstancePublisher whether
  * the instance exists in the CREST router), and if not, publishes this instance locally with the publication variant
  * that does not write state to the SMS (as this would trigger an endless LDAP replication/update ping-pong between the
- * servers in a site deployment).
+ * servers in a site deployment). This ServiceListener also listens for deletion events, and will remove the instance
+ * from the crest router, if present. This ServiceListener also listens for modify events, whereupon it will call
+ * the RestSTSInstancePublisher to expose the instance in the crest router.
  */
 public class RestSTSPublishServiceListener implements ServiceListener {
     /*
@@ -64,10 +66,12 @@ public class RestSTSPublishServiceListener implements ServiceListener {
         this.logger = logger;
     }
 
+    @Override
     public void schemaChanged(String serviceName, String version) {
         //do nothing - these updates not relevant
     }
 
+    @Override
     public void globalConfigChanged(String serviceName, String version, String groupName, String serviceComponent, int type) {
         //do nothing - these updates not relevant
     }
@@ -78,8 +82,8 @@ public class RestSTSPublishServiceListener implements ServiceListener {
     lower-case. This is the value I want to use to determine if it has been published on another server in a site deployment
     and thus needs to be hung off of the CREST router in the current deployment.
      */
+    @Override
     public void organizationConfigChanged(String serviceName, String version, String orgName, String groupName, String serviceComponent, int type) {
-        final String logIdentifier = "RestSTSPublishServiceListener#organizationConfigChanged";
         /*
         It seems the serviceComponent is the full realm path, and always includes a '/' at the beginning, to represent
         the root realm. This value needs to be stripped-off, as the cache uses the rest-sts id, which is normalized to
@@ -87,55 +91,99 @@ public class RestSTSPublishServiceListener implements ServiceListener {
          */
         String normalizedServiceComponent = stripLeadingForwardSlash(serviceComponent);
         if (restSTSInstanceCreated(serviceName, version, type)) {
-            if (!instancePublisher.isInstanceExposedInCrest(normalizedServiceComponent)) {
-                String realm = DNMapper.orgNameToRealmName(orgName);
-                RestSTSInstanceConfig createdInstance;
-                try {
-                    createdInstance = restSTSInstanceConfigStore.getSTSInstanceConfig(normalizedServiceComponent, realm);
-                } catch (STSPublishException e) {
-                    logger.error(logIdentifier + ":could not obtain newly created rest-sts instance " + serviceComponent + " from SMS. " +
-                            "This means this instance will not be hung off of the CREST router. Exception: " + e);
-                    return;
-                }
-                Injector instanceInjector;
-                try {
-                    instanceInjector = createInjector(createdInstance);
-                } catch (ResourceException e) {
-                    logger.error(logIdentifier + ":could not create injector corresponding to newly created rest-sts " +
-                            "instance " + serviceComponent + ". The instanceConfig " + createdInstance.toJson() +
-                            "\nThis means this instance will not be hung off of the CREST router. Exception: " + e);
-                    return;
-                }
-                try {
-                    instancePublisher.publishInstance(createdInstance, instanceInjector.getInstance(RestSTS.class), REPUBLISH_INSTANCE);
-                    logger.info(logIdentifier + ": Successfully hung rest-sts instance " + createdInstance.getDeploymentSubPath()
-                            + " published at another server in the site deployment off of CREST router.");
-                } catch (ResourceException e) {
-                    logger.error(logIdentifier + ":could not create injector corresponding to newly created rest-sts " +
-                            "instance " + serviceComponent + ". The instanceConfig " + createdInstance.toJson() +
-                            "\nThis means this instance will not be hung off of the CREST router. Exception: " + e);
-                }
-            }
+            handleInstanceCreation(normalizedServiceComponent, orgName, serviceComponent);
         } else if (restSTSInstanceDeleted(serviceName, version, type)) {
-            /*
-            Check to see if this instance still remains in the CREST router. This could occur if:
-            1. we are in a multi-server environment, and the rest-sts instance was deleted on another server
-            2. somebody just nuked the realm containing published rest-sts instances.
-             */
-            if (instancePublisher.isInstanceExposedInCrest(normalizedServiceComponent)) {
-                String realm = DNMapper.orgNameToRealmName(orgName);
-                boolean removeOnlyFromRouter = true;
-                try {
-                    instancePublisher.removeInstance(normalizedServiceComponent, realm, removeOnlyFromRouter);
-                    logger.info(logIdentifier + ": Removed rest-sts instance " + normalizedServiceComponent +
-                            " from CREST router in site deployment following the deletion of this rest-sts instance on " +
-                            "another site server.");
-                } catch (STSPublishException e) {
-                    logger.error(logIdentifier + ": Could not remove rest-sts instance " + normalizedServiceComponent +
-                            " from CREST router in site deployment following the deletion of this rest-sts instance on " +
-                            "another site server. Exception: " + e, e);
-                }
+            handleInstanceDeletion(normalizedServiceComponent, orgName);
+        } else if (restSTSInstanceModified(serviceName, version, type)) {
+            handleInstanceModification(normalizedServiceComponent, orgName, serviceComponent);
+        }
+    }
+
+    private void handleInstanceCreation(String normalizedServiceComponent, String orgName, String serviceComponent) {
+        final String logIdentifier = "RestSTSPublishServiceListener#handleInstanceCreation";
+        if (!instancePublisher.isInstanceExposedInCrest(normalizedServiceComponent)) {
+            String realm = DNMapper.orgNameToRealmName(orgName);
+            RestSTSInstanceConfig createdInstance;
+            try {
+                createdInstance = restSTSInstanceConfigStore.getSTSInstanceConfig(normalizedServiceComponent, realm);
+            } catch (STSPublishException e) {
+                logger.error(logIdentifier + ":could not obtain newly created rest-sts instance " + serviceComponent + " from SMS. " +
+                        "This means this instance will not be hung off of the CREST router. Exception: " + e);
+                return;
             }
+            Injector instanceInjector;
+            try {
+                instanceInjector = createInjector(createdInstance);
+            } catch (ResourceException e) {
+                logger.error(logIdentifier + ":could not create injector corresponding to newly created rest-sts " +
+                        "instance " + serviceComponent + ". The instanceConfig " + createdInstance.toJson() +
+                        "\nThis means this instance will not be hung off of the CREST router. Exception: " + e);
+                return;
+            }
+            try {
+                instancePublisher.publishInstance(createdInstance, instanceInjector.getInstance(RestSTS.class), REPUBLISH_INSTANCE);
+                logger.info(logIdentifier + ": Successfully hung rest-sts instance " + createdInstance.getDeploymentSubPath()
+                        + " published at another server in the site deployment off of CREST router.");
+            } catch (ResourceException e) {
+                logger.error(logIdentifier + ":could not create injector corresponding to newly created rest-sts " +
+                        "instance " + serviceComponent + ". The instanceConfig " + createdInstance.toJson() +
+                        "\nThis means this instance will not be hung off of the CREST router. Exception: " + e);
+            }
+        }
+    }
+
+    private void handleInstanceDeletion(String normalizedServiceComponent, String orgName) {
+        final String logIdentifier = "RestSTSPublishServiceListener#handleInstanceDeletion";
+        /*
+        Check to see if this instance still remains in the CREST router. This could occur if:
+        1. we are in a multi-server environment, and the rest-sts instance was deleted on another server
+        2. somebody just nuked the realm containing published rest-sts instances.
+         */
+        if (instancePublisher.isInstanceExposedInCrest(normalizedServiceComponent)) {
+            String realm = DNMapper.orgNameToRealmName(orgName);
+            boolean removeOnlyFromRouter = true;
+            try {
+                instancePublisher.removeInstance(normalizedServiceComponent, realm, removeOnlyFromRouter);
+                logger.info(logIdentifier + ": Removed rest-sts instance " + normalizedServiceComponent +
+                        " from CREST router in site deployment following the deletion of this rest-sts instance on " +
+                        "another site server.");
+            } catch (STSPublishException e) {
+                logger.error(logIdentifier + ": Could not remove rest-sts instance " + normalizedServiceComponent +
+                        " from CREST router in site deployment following the deletion of this rest-sts instance on " +
+                        "another site server. Exception: " + e, e);
+            }
+        }
+    }
+
+    private void handleInstanceModification(String normalizedServiceComponent, String orgName, String serviceComponent) {
+        final String logIdentifier = "RestSTSPublishServiceListener#handleInstanceModification";
+        String realm = DNMapper.orgNameToRealmName(orgName);
+        RestSTSInstanceConfig instanceConfig;
+        try {
+            instanceConfig = restSTSInstanceConfigStore.getSTSInstanceConfig(normalizedServiceComponent, realm);
+        } catch (STSPublishException e) {
+            logger.error(logIdentifier + ":could not obtain the modified rest-sts instance " + serviceComponent + " from SMS. " +
+                    "This means the updated instance will not be hung off of the CREST router. Exception: " + e);
+            return;
+        }
+        Injector instanceInjector;
+        try {
+            instanceInjector = createInjector(instanceConfig);
+        } catch (ResourceException e) {
+            logger.error(logIdentifier + ":could not create injector corresponding to modified rest-sts " +
+                    "instance " + serviceComponent + ". The instanceConfig " + instanceConfig.toJson() +
+                    "\nThis means the updated instance will not be hung off of the CREST router. Exception: " + e);
+            return;
+        }
+        try {
+            instancePublisher.updateInstanceInCrestRouter(instanceConfig.getDeploymentSubPath(), realm, instanceConfig,
+                    instanceInjector.getInstance(RestSTS.class));
+            logger.info(logIdentifier + ": Successfully hung updated rest-sts instance " + instanceConfig.getDeploymentSubPath()
+                    + " off of CREST router.");
+        } catch (ResourceException e) {
+            logger.error(logIdentifier + ":could not create injector corresponding to updated rest-sts " +
+                    "instance " + serviceComponent + ". The instanceConfig " + instanceConfig.toJson() +
+                    "\nThis means the updated instance will not be hung off of the CREST router. Exception: " + e);
         }
     }
 
@@ -156,6 +204,11 @@ public class RestSTSPublishServiceListener implements ServiceListener {
 
     private boolean restSTSInstanceDeleted(String serviceName, String version, int type) {
         return (ServiceListener.REMOVED == type)  &&
+                restSTSServiceTargeted(serviceName, version);
+    }
+
+    private boolean restSTSInstanceModified(String serviceName, String version, int type) {
+        return (ServiceListener.MODIFIED == type)  &&
                 restSTSServiceTargeted(serviceName, version);
     }
 

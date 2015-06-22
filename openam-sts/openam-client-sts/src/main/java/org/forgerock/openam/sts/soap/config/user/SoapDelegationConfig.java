@@ -20,9 +20,11 @@ import org.forgerock.guava.common.base.Objects;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.MapMarshallUtils;
 import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.utils.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -78,8 +80,8 @@ public class SoapDelegationConfig {
         private Set<String> customDelegationTokenHandlers;
 
         private SoapDelegationConfigBuilder() {
-            validatedDelegatedTokenConfiguration = new HashSet<TokenValidationConfig>();
-            customDelegationTokenHandlers = new HashSet<String>();
+            validatedDelegatedTokenConfiguration = new HashSet<>();
+            customDelegationTokenHandlers = new HashSet<>();
         }
 
         public SoapDelegationConfigBuilder addValidatedDelegationTokenType(TokenType tokenType, boolean invalidateInterimSession) {
@@ -174,7 +176,7 @@ public class SoapDelegationConfig {
     public JsonValue toJson() {
         JsonValue baseValue = json(object(field(CUSTOM_DELEGATION_TOKEN_HANDLERS, customDelegationTokenHandlers)));
 
-        JsonValue validatedTokenConfiguration = new JsonValue(new ArrayList<Object>(validatedDelegatedTokenConfiguration.size()));
+        JsonValue validatedTokenConfiguration = new JsonValue(new ArrayList<>(validatedDelegatedTokenConfiguration.size()));
         List<Object> validationList = validatedTokenConfiguration.asList();
         for (TokenValidationConfig config : validatedDelegatedTokenConfiguration) {
             validationList.add(config.toJson());
@@ -188,7 +190,7 @@ public class SoapDelegationConfig {
         SoapDelegationConfigBuilder builder = SoapDelegationConfig.builder();
 
         if (!json.get(DELEGATION_TOKEN_VALIDATORS).isNull()) {
-            Set<TokenValidationConfig> validationConfigs = new HashSet<TokenValidationConfig>();
+            Set<TokenValidationConfig> validationConfigs = new HashSet<>();
             for (Object obj : json.get(DELEGATION_TOKEN_VALIDATORS).asCollection()) {
                 validationConfigs.add(TokenValidationConfig.fromJson(new JsonValue(obj)));
             }
@@ -205,7 +207,7 @@ public class SoapDelegationConfig {
     public Map<String, Set<String>> marshalToAttributeMap() {
         Map<String, Set<String>> interimMap = MapMarshallUtils.toSmsMap(toJson().asMap());
         interimMap.remove(DELEGATION_TOKEN_VALIDATORS);
-        Set<String> tokenTypes = new HashSet<String>();
+        Set<String> tokenTypes = new HashSet<>();
         interimMap.put(DELEGATION_TOKEN_VALIDATORS, tokenTypes);
         for (TokenValidationConfig tvc : validatedDelegatedTokenConfiguration) {
             tokenTypes.add(tvc.toSMSString());
@@ -218,7 +220,7 @@ public class SoapDelegationConfig {
 
     public static SoapDelegationConfig marshalFromAttributeMap(Map<String, Set<String>> attributeMap) {
         //first check to see if the relevant attributes are present, indicating that a non-null instance can be created
-        if ((attributeMap.get(DELEGATION_TOKEN_VALIDATORS) == null) && (attributeMap.get(CUSTOM_DELEGATION_TOKEN_HANDLERS) == null)) {
+        if (CollectionUtils.isEmpty(attributeMap.get(DELEGATION_TOKEN_VALIDATORS)) && CollectionUtils.isEmpty(attributeMap.get(CUSTOM_DELEGATION_TOKEN_HANDLERS))) {
             return null;
         }
         Map<String, Object> jsonAttributes = MapMarshallUtils.toJsonValueMap(attributeMap);
@@ -229,7 +231,7 @@ public class SoapDelegationConfig {
          call toJson on each, and put them in a JsonValue wrapping a list.
          */
         if (attributeMap.get(DELEGATION_TOKEN_VALIDATORS) != null) {
-            ArrayList<JsonValue> jsonValidationConfigList = new ArrayList<JsonValue>();
+            ArrayList<JsonValue> jsonValidationConfigList = new ArrayList<>();
             JsonValue jsonTranslations = new JsonValue(jsonValidationConfigList);
             jsonAttributes.remove(DELEGATION_TOKEN_VALIDATORS);
             jsonAttributes.put(DELEGATION_TOKEN_VALIDATORS, jsonTranslations);
@@ -245,7 +247,7 @@ public class SoapDelegationConfig {
         have an entry if the instance was first marshaled to json, which is the first step in marshaling to an attribute map.
          */
         if (attributeMap.get(CUSTOM_DELEGATION_TOKEN_HANDLERS) != null) {
-            Set<String> jsonHandlerSet = new HashSet<String>();
+            Set<String> jsonHandlerSet = new HashSet<>();
             JsonValue jsonHandlerTypes = new JsonValue(jsonHandlerSet);
             jsonAttributes.remove(CUSTOM_DELEGATION_TOKEN_HANDLERS);
             jsonAttributes.put(CUSTOM_DELEGATION_TOKEN_HANDLERS, jsonHandlerTypes);
@@ -256,4 +258,18 @@ public class SoapDelegationConfig {
         }
         return fromJson(new JsonValue(jsonAttributes));
     }
+
+    /*
+    This method is called from SoapSTSInstanceConfig if the encapsulated SoapSTSKeystoreConfig reference is null. It should
+    return a Map<String,Set<String>> for each of the sms attributes defined for the SoapSTSKeystoreConfig object, with an empty
+    Set<String> value, so that SMS writes will over-write any previous, non-null values. This will occur in the AdminUI
+    when an admin edits a soap-sts instance to remove existing delegation configurations.
+    */
+    public static Map<String, Set<String>> getEmptySMSAttributeState() {
+        HashMap<String, Set<String>> emptyAttributeMap = new HashMap<>();
+        emptyAttributeMap.put(DELEGATION_TOKEN_VALIDATORS, Collections.<String>emptySet());
+        emptyAttributeMap.put(CUSTOM_DELEGATION_TOKEN_HANDLERS, Collections.<String>emptySet());
+        return emptyAttributeMap;
+    }
+
 }

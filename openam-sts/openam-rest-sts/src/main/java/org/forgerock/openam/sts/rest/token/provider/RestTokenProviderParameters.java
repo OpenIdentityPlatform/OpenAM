@@ -19,18 +19,20 @@ package org.forgerock.openam.sts.rest.token.provider;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.TokenTypeId;
 
+import java.security.Principal;
+
 /**
  * Parameter state passed to JsonTokenProvider instances. Generic type corresponds to the token state necessary to
- * produce a token corresponding to TokenTypeId. The token creation state necessary to create a SAML2 assertion includes
+ * produce the token produced by the RestTokenProvider. The token creation state necessary to create a SAML2 assertion includes
  * the SubjectConfirmation and the ProofTokenState (for HolderOfKey assertions). The token creation state necessary to
- * create a OIDC Id token will be different. I would like the RestTokenProviderParameters to provide the specific type,
- * yet the 'convergence' of this input token state is currently limited to an implementation of the TokenTypeId interface,
- * which specifies the type of the to-be-generated token.
+ * create a OIDC token includes a nonce and the authentication time. This state is too heterogeneous to subsume in anything
+ * other than a marker interface. Note also that this type is reflected in the RestTokenProvider interface, and it
+ * should be as generic as possible, as to support user-defined RestTokenProvider implementations.
  */
-public interface RestTokenProviderParameters<T extends TokenTypeId> {
+public interface RestTokenProviderParameters<T> {
     /**
      *
-     * @return the token state necessary to produce a token corresponding to the TokenTypeId - e.g. the SubjectConfirmation
+     * @return the token state necessary to produce the - e.g. the SubjectConfirmation
      * or proof token state for a SAML2 assertion.
      */
     T getTokenCreationState();
@@ -41,7 +43,8 @@ public interface RestTokenProviderParameters<T extends TokenTypeId> {
      * a SAML2 assertion - in general, produced tokens may have to have a representation of how the subject encapsulated
      * in the generated token was authenticated. Published sts instances allow for the specification of a Saml2JsonTokenAuthnContextMapper
      * implementation which will generate this SAML2 authentication context class ref, a plug-in interface which takes
-     * the TokenTypeId as input.
+     * the TokenTypeId as input. Published rest-sts instances which produce OpenIdConnect tokens have similar mapping
+     * implementations which produce the amr and acr claims.
      */
     TokenTypeId getInputTokenType();
 
@@ -51,8 +54,8 @@ public interface RestTokenProviderParameters<T extends TokenTypeId> {
      * a SAML2 assertion - in general, produced tokens may have to have a representation of how the subject encapsulated
      * in the generated token was authenticated. Published sts instances allow for the specification of a Saml2JsonTokenAuthnContextMapper
      * implementation which will generate this SAML2 authentication context class ref, a plug-in interface which takes the json representation
-     * of the token as input.
+     * of the token as input. Published rest-sts instances which produce OpenIdConnect tokens have similar mapping
+     * implementations which produce the amr and acr claims.
      */
     JsonValue getInputToken();
-
 }

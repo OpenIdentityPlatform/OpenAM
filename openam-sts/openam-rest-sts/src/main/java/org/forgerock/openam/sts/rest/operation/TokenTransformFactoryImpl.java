@@ -16,13 +16,18 @@
 
 package org.forgerock.openam.sts.rest.operation;
 
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
 import org.forgerock.openam.sts.STSInitializationException;
+import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.TokenTypeId;
-import org.forgerock.openam.sts.config.user.TokenTransformConfig;
+import org.forgerock.openam.sts.TokenValidationException;
+import org.forgerock.openam.sts.config.user.CustomTokenOperation;
+import org.forgerock.openam.sts.rest.config.user.TokenTransformConfig;
+import org.forgerock.openam.sts.rest.token.provider.RestTokenProviderParameters;
 import org.forgerock.openam.sts.rest.token.provider.oidc.OpenIdConnectTokenAuthMethodReferencesMapper;
 import org.forgerock.openam.sts.rest.token.provider.oidc.OpenIdConnectTokenAuthnContextMapper;
 import org.forgerock.openam.sts.rest.token.provider.oidc.RestOpenIdConnectTokenProvider;
@@ -30,6 +35,8 @@ import org.forgerock.openam.sts.rest.token.provider.saml.Saml2JsonTokenAuthnCont
 import org.forgerock.openam.sts.rest.token.provider.saml.Saml2TokenCreationState;
 import org.forgerock.openam.sts.rest.token.validator.RestAMTokenValidator;
 import org.forgerock.openam.sts.rest.token.validator.RestTokenValidator;
+import org.forgerock.openam.sts.rest.token.validator.RestTokenValidatorParameters;
+import org.forgerock.openam.sts.rest.token.validator.RestTokenValidatorResult;
 import org.forgerock.openam.sts.rest.token.validator.RestUsernameTokenValidator;
 import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
 import org.forgerock.openam.sts.token.model.RestUsernameToken;
@@ -51,6 +58,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.net.MalformedURLException;
 import java.security.cert.X509Certificate;
+import java.util.Set;
 
 import org.slf4j.Logger;
 
@@ -76,6 +84,8 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
     private final String crestVersionSessionService;
     private final OpenIdConnectTokenAuthnContextMapper oidcAuthnContextMapper;
     private final OpenIdConnectTokenAuthMethodReferencesMapper oidcAuthModeReferencesMapper;
+    private final Set<CustomTokenOperation> customTokenValidators;
+    private final Set<CustomTokenOperation> customTokenProviders;
 
     private final Logger logger;
 
@@ -99,6 +109,8 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
             @Named(AMSTSConstants.CREST_VERSION_SESSION_SERVICE) String crestVersionSessionService,
             OpenIdConnectTokenAuthnContextMapper oidcAuthnContextMapper,
             OpenIdConnectTokenAuthMethodReferencesMapper oidcAuthModeReferencesMapper,
+            @Named(AMSTSConstants.REST_CUSTOM_TOKEN_VALIDATORS) Set<CustomTokenOperation> customTokenValidators,
+            @Named(AMSTSConstants.REST_CUSTOM_TOKEN_PROVIDERS) Set<CustomTokenOperation> customTokenProviders,
             Logger logger) {
 
         this.amDeploymentUrl = amDeploymentUrl;
@@ -119,37 +131,35 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
         this.crestVersionSessionService = crestVersionSessionService;
         this.oidcAuthnContextMapper = oidcAuthnContextMapper;
         this.oidcAuthModeReferencesMapper = oidcAuthModeReferencesMapper;
+        this.customTokenValidators = customTokenValidators;
+        this.customTokenProviders = customTokenProviders;
         this.logger = logger;
     }
 
     public TokenTransform<?, ? extends TokenTypeId> buildTokenTransform(TokenTransformConfig tokenTransformConfig) throws STSInitializationException {
-        TokenType inputTokenType = tokenTransformConfig.getInputTokenType();
-        TokenType outputTokenType = tokenTransformConfig.getOutputTokenType();
+        TokenTypeId inputTokenType = tokenTransformConfig.getInputTokenType();
+        TokenTypeId outputTokenType = tokenTransformConfig.getOutputTokenType();
         RestTokenValidator<?> tokenValidator;
-        if (TokenType.USERNAME.equals(inputTokenType)) {
+        if (TokenType.USERNAME.getId().equals(inputTokenType.getId())) {
             tokenValidator = buildUsernameTokenValidator(tokenTransformConfig.invalidateInterimOpenAMSession());
-        } else if (TokenType.OPENAM.equals(inputTokenType)) {
+        } else if (TokenType.OPENAM.getId().equals(inputTokenType.getId())) {
             tokenValidator = buildOpenAMTokenValidator(tokenTransformConfig.invalidateInterimOpenAMSession());
-        } else if (TokenType.OPENIDCONNECT.equals(inputTokenType)) {
+        } else if (TokenType.OPENIDCONNECT.getId().equals(inputTokenType.getId())) {
             tokenValidator = buildOpenIdConnectValidator(tokenTransformConfig.invalidateInterimOpenAMSession());
-        } else if (TokenType.X509.equals(inputTokenType)) {
+        } else if (TokenType.X509.getId().equals(inputTokenType.getId())) {
             tokenValidator = buildX509TokenValidator(tokenTransformConfig.invalidateInterimOpenAMSession());
-        }
-        else {
-            String message = "Unexpected input token type of: " + inputTokenType;
-            logger.error(message);
-            throw new STSInitializationException(ResourceException.INTERNAL_ERROR, message);
+        } else {
+            tokenValidator = buildCustomTokenValidator(inputTokenType, ValidationInvocationContext.REST_TOKEN_TRANSFORMATION,
+                    tokenTransformConfig.invalidateInterimOpenAMSession());
         }
 
-        RestTokenProvider<? extends TokenTypeId> tokenProvider;
-        if (TokenType.SAML2.equals(outputTokenType)) {
+        RestTokenProvider<?> tokenProvider;
+        if (TokenType.SAML2.getId().equals(outputTokenType.getId())) {
             tokenProvider = buildOpenSAMLTokenProvider();
-        } else if (TokenType.OPENIDCONNECT.equals(outputTokenType)) {
+        } else if (TokenType.OPENIDCONNECT.getId().equals(outputTokenType.getId())) {
             tokenProvider = buildOpenIdConnectTokenProvider();
         } else {
-            String message = "Unexpected output token type of: " + outputTokenType;
-            logger.error(message);
-            throw new STSInitializationException(ResourceException.INTERNAL_ERROR, message);
+            tokenProvider = buildCustomTokenProvider(outputTokenType);
         }
         return new TokenTransformImpl(tokenValidator, tokenProvider, inputTokenType, outputTokenType);
     }
@@ -175,6 +185,27 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
                 ValidationInvocationContext.REST_TOKEN_TRANSFORMATION, invalidateAMSession);
     }
 
+    private RestTokenValidator<JsonValue> buildCustomTokenValidator(TokenTypeId inputTokenType,
+                                                                    ValidationInvocationContext validationInvocationContext,
+                                                                    boolean invalidateInterimAMSession) throws STSInitializationException {
+        for (CustomTokenOperation customTokenOperation : customTokenValidators) {
+            if(customTokenOperation.getCustomTokenName().equals(inputTokenType.getId())) {
+                RestTokenValidator customValidator;
+                try {
+                    customValidator = Class.forName(customTokenOperation.getCustomOperationClassName()).asSubclass(RestTokenValidator.class).newInstance();
+                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+                    throw new STSInitializationException(ResourceException.CONFLICT, "Custom token validator instantiation of class "
+                            + customTokenOperation.getCustomOperationClassName() + " failed. Correct class name, " +
+                            "or expose in classpath, and republish sts instance. Exception: " + e, e);
+                }
+                return new CustomTokenValidatorWrapper(customValidator, threadLocalAMTokenCache, validationInvocationContext,
+                        invalidateInterimAMSession);
+            }
+        }
+        throw new STSInitializationException(ResourceException.CONFLICT, "No custom token validator found for token type "
+                + inputTokenType.getId() + ". Republish rest-sts instance with custom token validator specified for custom token type.");
+    }
+
     private RestTokenProvider<Saml2TokenCreationState> buildOpenSAMLTokenProvider() throws STSInitializationException {
         try {
             final AMSessionInvalidator sessionInvalidator =
@@ -198,6 +229,86 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
                     ValidationInvocationContext.REST_TOKEN_TRANSFORMATION, logger);
         } catch (MalformedURLException e) {
             throw new STSInitializationException(ResourceException.INTERNAL_ERROR, e.getMessage(), e);
+        }
+    }
+
+    private RestTokenProvider<JsonValue> buildCustomTokenProvider(TokenTypeId outputTokenType) throws STSInitializationException {
+        for (CustomTokenOperation customTokenOperation : customTokenProviders) {
+            if (customTokenOperation.getCustomTokenName().equals(outputTokenType.getId())) {
+                RestTokenProvider customProvider;
+                try {
+                    customProvider = Class.forName(customTokenOperation.getCustomOperationClassName()).asSubclass(RestTokenProvider.class).newInstance();
+                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+                    throw new STSInitializationException(ResourceException.CONFLICT, "Custom token provider instantiation of class "
+                            + customTokenOperation.getCustomOperationClassName() + " failed. Correct class name, " +
+                            "or expose in classpath, and republish sts instance. Exception: " + e, e);
+                }
+                return new CustomTokenProviderWrapper(customProvider);
+            }
+        }
+        throw new STSInitializationException(ResourceException.CONFLICT, "No custom token provider found for token type "
+                + outputTokenType.getId() + ". Republish rest-sts instance with custom token provider specified for custom token type.");
+    }
+
+    /*
+    An instance of this class will wrap any end-user-specified custom token validate operation invoked as part of
+    a translate operation. It will serve to cache
+    the AM session id resulting from successful validation in the thread-local cache, where it can be referenced as a
+    token of the principal who will be asserted by the to-be-created token.
+    It also serves to insure generic type consistency for the RestTokenValidatorParameters<JsonValue> which will always
+    be passed to custom token validators.
+     */
+    private static class CustomTokenValidatorWrapper implements RestTokenValidator<JsonValue> {
+        private final RestTokenValidator customDelegate;
+        private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
+        private final ValidationInvocationContext validationInvocationContext;
+        private final boolean invalidateInterimAMSession;
+
+        private CustomTokenValidatorWrapper(RestTokenValidator customDelegate, ThreadLocalAMTokenCache threadLocalAMTokenCache,
+                                            ValidationInvocationContext validationInvocationContext,
+                                            boolean invalidateInterimAMSession) {
+            this.customDelegate = customDelegate;
+            this.threadLocalAMTokenCache = threadLocalAMTokenCache;
+            this.validationInvocationContext = validationInvocationContext;
+            this.invalidateInterimAMSession = invalidateInterimAMSession;
+        }
+
+        @Override
+        public RestTokenValidatorResult validateToken(RestTokenValidatorParameters<JsonValue> restTokenValidatorParameters) throws TokenValidationException {
+            RestTokenValidatorResult result = customDelegate.validateToken(restTokenValidatorParameters);
+            /*
+            Only in the case of a token transformation or a token renewal will a new token be issued, and thus the AM session id
+            corresponding to the validated principal cached.
+             */
+            if (ValidationInvocationContext.REST_TOKEN_TRANSFORMATION.equals(validationInvocationContext) ||
+                    ValidationInvocationContext.TOKEN_RENEW_OPERATION.equals(validationInvocationContext)) {
+                if (result.getAMSessionId() == null) {
+                    throw new TokenValidationException(ResourceException.CONFLICT, "The custom rest token validator of class "
+                            + customDelegate.getClass().getCanonicalName() + " invoked as part of token transformation, did " +
+                            "not set the am session string resulting from successful token validation.");
+                } else {
+                    threadLocalAMTokenCache.cacheSessionIdForContext(ValidationInvocationContext.REST_TOKEN_TRANSFORMATION,
+                            result.getAMSessionId(), invalidateInterimAMSession);
+                }
+            }
+            return result;
+        }
+    }
+
+    /*
+    A class to wrap custom token providers, primarily to provide generic type consistency between the custom token providers
+    and the RestTokenProviderParameters<JsonValue> which will always be passed to custom token providers
+     */
+    private static class CustomTokenProviderWrapper implements RestTokenProvider<JsonValue> {
+        private final RestTokenProvider customDelegate;
+
+        private CustomTokenProviderWrapper(RestTokenProvider customDelegate) {
+            this.customDelegate = customDelegate;
+        }
+
+        @Override
+        public JsonValue createToken(RestTokenProviderParameters<JsonValue> restTokenProviderParameters) throws TokenCreationException {
+            return customDelegate.createToken(restTokenProviderParameters);
         }
     }
 }

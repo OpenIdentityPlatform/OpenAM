@@ -14,16 +14,18 @@
  * Copyright 2013-2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.sts.rest.marshal;
+package org.forgerock.openam.sts.rest.operation;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Provides;
+import org.forgerock.guava.common.collect.Sets;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.TokenTypeId;
+import org.forgerock.openam.sts.config.user.CustomTokenOperation;
 import org.forgerock.openam.sts.rest.service.RestSTSServiceHttpServletContext;
 import org.forgerock.openam.sts.rest.token.provider.RestTokenProviderParameters;
 import org.forgerock.openam.sts.rest.token.provider.saml.Saml2TokenCreationState;
@@ -47,6 +49,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Set;
 
 import static org.forgerock.json.fluent.JsonValue.field;
@@ -54,9 +57,11 @@ import static org.forgerock.json.fluent.JsonValue.json;
 import static org.forgerock.json.fluent.JsonValue.object;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TokenRequestMarshallerImplTest {
+    private static final String CUSTOM_TOKEN_NAME = "BOBO";
     private TokenRequestMarshaller tokenMarshaller;
     static class MyModule extends AbstractModule {
 
@@ -83,6 +88,17 @@ public class TokenRequestMarshallerImplTest {
             return Collections.EMPTY_SET;
         }
 
+        @Provides
+        @Named(AMSTSConstants.REST_CUSTOM_TOKEN_VALIDATORS)
+        Set<CustomTokenOperation> getCustomTokenValidators() {
+            return Sets.newHashSet(new CustomTokenOperation(CUSTOM_TOKEN_NAME, "org.forgerock.bobo.BoboTokenValidator"));
+        }
+
+        @Provides
+        @Named(AMSTSConstants.REST_CUSTOM_TOKEN_PROVIDERS)
+        Set<CustomTokenOperation> getCustomTokenProviders() {
+            return Sets.newHashSet(new CustomTokenOperation(CUSTOM_TOKEN_NAME, "org.forgerock.bobo.BoboTokenProvider"));
+        }
     }
 
     @BeforeTest
@@ -95,7 +111,6 @@ public class TokenRequestMarshallerImplTest {
         JsonValue jsonUnt = json(object(field("token_type", "USERNAME"),
                 field("username", "bobo"), field("password", "cornholio")));
         RestTokenValidatorParameters<?> params = tokenMarshaller.buildTokenValidatorParameters(jsonUnt, null, null);
-        assertEquals(TokenType.USERNAME.getId(), params.getId());
         assertEquals("bobo".getBytes(AMSTSConstants.UTF_8_CHARSET_ID), ((RestUsernameToken)params.getInputToken()).getUsername());
     }
 
@@ -104,7 +119,6 @@ public class TokenRequestMarshallerImplTest {
         JsonValue jsonOpenAM = json(object(field("token_type", "OPENAM"),
                 field("session_id", "super_random")));
         RestTokenValidatorParameters<?> params = tokenMarshaller.buildTokenValidatorParameters(jsonOpenAM, null, null);
-        assertTrue(TokenType.OPENAM.getId().equals(params.getId()));
         assertTrue("super_random".equals(((OpenAMSessionToken) params.getInputToken()).getSessionId()));
     }
 
@@ -128,9 +142,9 @@ public class TokenRequestMarshallerImplTest {
                 field("username", "bobo"), field("password", "cornholio")));
         JsonValue saml2Output =
                 SAML2TokenState.builder().saml2SubjectConfirmation(SAML2SubjectConfirmation.BEARER).build().toJson();
-        RestTokenProviderParameters<? extends TokenTypeId> params =
+        RestTokenProviderParameters<?> params =
                 tokenMarshaller.buildTokenProviderParameters(TokenType.USERNAME, jsonUnt, TokenType.SAML2, saml2Output);
-        assertEquals(TokenType.SAML2.getId(), params.getTokenCreationState().getId());
+        assertEquals(TokenType.USERNAME.getId(), params.getInputTokenType().getId());
     }
 
     @Test
@@ -144,11 +158,45 @@ public class TokenRequestMarshallerImplTest {
                         .proofTokenState(ProofTokenState.builder().x509Certificate(certificate).build())
                         .build()
                         .toJson();
-        RestTokenProviderParameters<? extends TokenTypeId> params =
+        RestTokenProviderParameters<?> params =
                 tokenMarshaller.buildTokenProviderParameters(TokenType.OPENAM, jsonOpenAM, TokenType.SAML2, saml2Output);
-        assertEquals(TokenType.SAML2.getId(), params.getTokenCreationState().getId());
+        assertEquals(TokenType.OPENAM.getId(), params.getInputTokenType().getId());
         assertEquals(certificate.getEncoded(),
                 ((Saml2TokenCreationState)params.getTokenCreationState()).getProofTokenState().getX509Certificate().getEncoded());
+    }
+
+    @Test
+    public void testBuildCustomProviderParameters() throws TokenMarshalException, IOException, CertificateException {
+        JsonValue jsonUnt = json(object(field("token_type", "USERNAME"),
+                field("username", "bobo"), field("password", "cornholio")));
+        JsonValue jsonCustomOutput = json(object(field("token_type", CUSTOM_TOKEN_NAME),
+                field("whatever", "whatever")));
+        TokenTypeId customTokenType = new TokenTypeId() {
+            @Override
+            public String getId() {
+                return CUSTOM_TOKEN_NAME;
+            }
+        };
+        RestTokenProviderParameters<?> params =
+                tokenMarshaller.buildTokenProviderParameters(TokenType.USERNAME, jsonUnt, customTokenType, jsonCustomOutput);
+        assertEquals(TokenType.USERNAME.getId(), params.getInputTokenType().getId());
+        assertEquals(((JsonValue)params.getTokenCreationState()).get("token_type").asString(), CUSTOM_TOKEN_NAME);
+    }
+
+    @Test(expectedExceptions = TokenMarshalException.class)
+    public void testBuildCustomProviderParametersWithUnregisteredCustomToken() throws TokenMarshalException, IOException, CertificateException {
+        JsonValue jsonUnt = json(object(field("token_type", "USERNAME"),
+                field("username", "bobo"), field("password", "cornholio")));
+        JsonValue jsonCustomOutput = json(object(field("token_type", "NOT_REGISTERED_AS_CUSTOM_TYPE"),
+                field("whatever", "whatever")));
+        TokenTypeId customTokenType = new TokenTypeId() {
+            @Override
+            public String getId() {
+                return "NOT_REGISTERED_AS_CUSTOM_TYPE";
+            }
+        };
+        RestTokenProviderParameters<?> params =
+                tokenMarshaller.buildTokenProviderParameters(TokenType.USERNAME, jsonUnt, customTokenType, new JsonValue(new HashMap<String, Object>()));
     }
 
     private X509Certificate getCertificate() throws IOException, CertificateException {

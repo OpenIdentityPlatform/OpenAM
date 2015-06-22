@@ -27,11 +27,11 @@ import org.forgerock.openam.sts.config.user.SAML2Config;
 import org.forgerock.openam.utils.IOUtils;
 import org.testng.annotations.Test;
 
+import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -46,6 +46,10 @@ public class SoapSTSInstanceConfigTest {
     private static final boolean WITH_VALIDATE_CONFIG = true;
     private static final boolean DELEGATION_VALIDATORS_SPECIFIED = true;
     private static final boolean CUSTOM_DELEGATION_HANDLER = true;
+    private static final boolean WITH_DEPLOYMENT_CONFIG = true;
+    private static final boolean INCORRECT_SAML2_CONFIG = true;
+    private static final boolean INCORRECT_OIDC_CONFIG = true;
+
 
     @Test
     public void testEquals() throws UnsupportedEncodingException {
@@ -144,9 +148,19 @@ public class SoapSTSInstanceConfigTest {
         assertNotEquals(ric1, ric2);
     }
 
-    @Test(expectedExceptions = NullPointerException.class)
-    public void testRejectIfNull() throws UnsupportedEncodingException {
-        createIncompleteInstanceConfig();
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void testRejectIfNoDeploymentConfig() throws UnsupportedEncodingException {
+        createIncompleteInstanceConfig(!WITH_DEPLOYMENT_CONFIG, !INCORRECT_SAML2_CONFIG, !INCORRECT_OIDC_CONFIG);
+    }
+
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void testRejectIfOidcTokensIssuedButNoCorrespondingConfig() throws UnsupportedEncodingException {
+        createIncompleteInstanceConfig(WITH_DEPLOYMENT_CONFIG, !INCORRECT_SAML2_CONFIG, INCORRECT_OIDC_CONFIG);
+    }
+
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void testRejectIfSamlTokensIssuedButNoCorrespondingConfig() throws UnsupportedEncodingException {
+        createIncompleteInstanceConfig(WITH_DEPLOYMENT_CONFIG, INCORRECT_SAML2_CONFIG, !INCORRECT_OIDC_CONFIG);
     }
 
     @Test
@@ -395,28 +409,41 @@ public class SoapSTSInstanceConfigTest {
                 .build();
     }
 
-    private SoapSTSInstanceConfig createIncompleteInstanceConfig() throws UnsupportedEncodingException {
-        //leave out the AuthTargetMapping and SAML2Config
+    /*
+    the incompleteSaml and incompleteOidc indicate that oidc or saml2 tokens should be specified in the issued token types,
+    but no corresponding config should be specified.
+     */
+    private SoapSTSInstanceConfig createIncompleteInstanceConfig(boolean withDeploymentConfig, boolean incompleteSaml,
+                                                                 boolean incompleteOidc) throws UnsupportedEncodingException {
 
-        SoapDeploymentConfig deploymentConfig =
-                SoapDeploymentConfig.builder()
-                        .uriElement("whatever")
-                        .amDeploymentUrl("whatever")
-                        .build();
+        SoapDeploymentConfig deploymentConfig = null;
+        if (withDeploymentConfig) {
+            deploymentConfig =
+                    SoapDeploymentConfig.builder()
+                            .uriElement("whatever")
+                            .amDeploymentUrl("whatever")
+                            .authTargetMapping(AuthTargetMapping.builder().addMapping(TokenType.USERNAME, "module", "foo").build())
+                            .serviceQName(new QName("namespace", "localpart"))
+                            .portQName(new QName("namspace", "localpart"))
+                            .wsdlLocation("webservice.wsdl")
+                            .build();
+        }
+        SAML2Config saml2Config = null;
+        if (!incompleteSaml) {
+            saml2Config = buildSAML2Config(Collections.<String, String>emptyMap());
+        }
 
-        SoapSTSKeystoreConfig keystoreConfig =
-                SoapSTSKeystoreConfig.builder()
-                        .keystoreFileName("stsstore.jks")
-                        .keystorePassword("stsspass".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
-                        .encryptionKeyAlias("mystskey")
-                        .signatureKeyAlias("mystskey")
-                        .encryptionKeyPassword("stskpass".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
-                        .signatureKeyPassword("stskpass".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
-                        .build();
+        OpenIdConnectTokenConfig oidcConfig = null;
+        if (!incompleteOidc) {
+            oidcConfig = buildOIDCConfig(Collections.<String, String>emptyMap());
+        }
 
         return SoapSTSInstanceConfig.builder()
+                .addIssueTokenType(TokenType.OPENIDCONNECT)
+                .addIssueTokenType(TokenType.SAML2)
                 .deploymentConfig(deploymentConfig)
-                .soapSTSKeystoreConfig(keystoreConfig)
+                .oidcIdTokenConfig(oidcConfig)
+                .saml2Config(saml2Config)
                 .build();
     }
 

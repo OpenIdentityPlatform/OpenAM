@@ -39,6 +39,8 @@ import com.sun.identity.console.reststs.model.RestSTSModelResponse;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
+import org.forgerock.openam.shared.sts.SharedSTSConstants;
+import org.forgerock.openam.utils.CollectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
@@ -165,24 +167,28 @@ public class RestSTSEditViewBean extends AMPrimaryMastHeadViewBean {
         try {
             Map<String, Set<String>> configurationState = getUpdatedConfigurationState(currentRealm, instanceName);
             if (configurationState.isEmpty()) {
-                setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information", "Property values have not been updated!");
+                setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information", getModel().getLocalizedString("rest.sts.view.no.updates"));
             } else {
-                RestSTSModel model = (RestSTSModel) getModel();
-                RestSTSModelResponse validationResponse = model.validateConfigurationState(configurationState);
-                if (validationResponse.isSuccessful()) {
-                    try {
-                        RestSTSModelResponse creationResponse = model.updateInstance(configurationState, currentRealm, instanceName);
-                        if (creationResponse.isSuccessful()) {
-                            setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information", creationResponse.getMessage());
-                            disableSaveButton();
-                        } else {
-                            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", creationResponse.getMessage());
-                        }
-                    } catch (AMConsoleException e) {
-                        throw new ModelControlException(e);
-                    }
+                if (instanceNameUpdated(currentRealm, instanceName)) {
+                    setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information",
+                            MessageFormat.format(getModel().getLocalizedString("rest.sts.view.no.edit.deployment.url"), instanceName));
                 } else {
-                    setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", validationResponse.getMessage());
+                    RestSTSModel model = (RestSTSModel) getModel();
+                    RestSTSModelResponse validationResponse = model.validateConfigurationState(configurationState);
+                    if (validationResponse.isSuccessful()) {
+                        try {
+                            RestSTSModelResponse creationResponse = model.updateInstance(configurationState, currentRealm, instanceName);
+                            if (creationResponse.isSuccessful()) {
+                                forwardToSTSHomeViewBean();
+                            } else {
+                                setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", creationResponse.getMessage());
+                            }
+                        } catch (AMConsoleException e) {
+                            throw new ModelControlException(e);
+                        }
+                    } else {
+                        setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", validationResponse.getMessage());
+                    }
                 }
             }
         } catch (AMConsoleException e) {
@@ -191,6 +197,14 @@ public class RestSTSEditViewBean extends AMPrimaryMastHeadViewBean {
         }
         forwardTo();
     }
+
+    private void forwardToSTSHomeViewBean() throws AMConsoleException {
+        removePageSessionAttribute(PAGE_MODIFIED);
+        AMViewBeanBase vb = getPreviousPage();
+        passPgSessionMap(vb);
+        vb.forwardTo(getRequestContext());
+    }
+
     /**
      * Handles reset button request.
      *
@@ -242,6 +256,23 @@ public class RestSTSEditViewBean extends AMPrimaryMastHeadViewBean {
             currentPersistedInstanceState.putAll(updatedValues);
             return currentPersistedInstanceState;
         }
+    }
+
+    /*
+    The deploymentUrl of an existing sts instance cannot be edited, as it constitutes (along with the realm) the dn of the
+    rest-sts instance state. This method returns true if the changes include the deployment url.
+     */
+    private boolean instanceNameUpdated(String realm, String instanceName) throws ModelControlException, AMConsoleException {
+        RestSTSModel model = (RestSTSModel)getModel();
+        Map<String, Set<String>> currentPersistedInstanceState;
+        try {
+            currentPersistedInstanceState = model.getInstanceState(realm, instanceName);
+        } catch (AMConsoleException e) {
+            throw new ModelControlException(e.getMessage(), e);
+        }
+        AMPropertySheet ps = (AMPropertySheet)getChild(PROPERTY_ATTRIBUTE);
+        Map<String, Set<String>> updatedValues = ps.getAttributeValues(currentPersistedInstanceState, model);
+        return !CollectionUtils.isEmpty(updatedValues.get(SharedSTSConstants.DEPLOYMENT_URL_ELEMENT));
     }
 
     private AMViewBeanBase getPreviousPage() throws AMConsoleException {

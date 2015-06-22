@@ -54,6 +54,21 @@ provided for required attributes upon service registration.
                         <Value>X509|OPENIDCONNECT|true</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="custom-token-validators"
+                                 type="list"
+                                 syntax="string"
+                                 i18nKey="custom_token_validators">
+                </AttributeSchema>
+                <AttributeSchema name="custom-token-providers"
+                                 type="list"
+                                 syntax="string"
+                                 i18nKey="custom_token_providers">
+                </AttributeSchema>
+                <AttributeSchema name="custom-token-transforms"
+                                 type="list"
+                                 syntax="string"
+                                 i18nKey="custom_token_transforms">
+                </AttributeSchema>
                 <AttributeSchema name="deployment-realm"
                                  type="single" syntax="string" i18nKey="deployment_realm"
                                  validator="RequiredValueValidator">
@@ -265,6 +280,21 @@ provided for required attributes upon service registration.
                             <Value>OPENAM|OPENIDCONNECT|false</Value>
                             <Value>X509|OPENIDCONNECT|true</Value>
                         </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="custom-token-validators"
+                                     type="list"
+                                     syntax="string"
+                                     i18nKey="custom_token_validators">
+                    </AttributeSchema>
+                    <AttributeSchema name="custom-token-providers"
+                                     type="list"
+                                     syntax="string"
+                                     i18nKey="custom_token_providers">
+                    </AttributeSchema>
+                    <AttributeSchema name="custom-token-transforms"
+                                     type="list"
+                                     syntax="string"
+                                     i18nKey="custom_token_transforms">
                     </AttributeSchema>
                     <AttributeSchema name="deployment-realm"
                                      type="single" syntax="string" i18nKey="deployment_realm"

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.publish.rest;
@@ -40,8 +40,7 @@ public interface RestSTSInstancePublisher {
      * @param instance The RestSTS instance to be exposed
      * @param republish Determines whether this is an initial publish, or a re-publish. If re-publish, instanceConfig
      *                  not written to the SMS.
-     * @return the urlElement, including the realm, at which the Rest STS instance has been published. TODO: should this
-     * include the deployment information for the Rest STS service as well? Probably should
+     * @return the urlElement, including the realm, at which the Rest STS instance has been published.
      * @throws STSPublishException
      */
     String publishInstance(RestSTSInstanceConfig instanceConfig, RestSTS instance, boolean republish) throws STSPublishException;
@@ -57,6 +56,69 @@ public interface RestSTSInstancePublisher {
      * @throws STSPublishException
      */
     void removeInstance(String stsId, String realm, boolean removeOnlyFromRouter) throws STSPublishException;
+
+    /**
+     * Called by RestSTSPublishServiceRequestHandler#handleUpdate, which is ultimately called by the AdminUI when an existing
+     * rest-sts instance is edited, or via a programmatic PUT to sts-publish/rest. This method will only write the
+     * RestSTSInstanceConfig to the SMS.
+     * <p>
+     * Whenever a rest-sts instance is updated/created/removed, both SMS and Crest router state must be mutated, and this must occur to all servers in a site
+     * deployment or in a multi-AM deployment. LDAP replication ensures that SMS state is shared, but the RestSTSPublishServiceListener
+     * responds to LDAP changes to insure that Crest router state is reconciled with ldap state. However, this listener
+     * must insure that it does not duplicate, or undo, any Crest mutations, and thus must somehow know if the AM server it is
+     * running on originated/received the AdminUI/programmatic rest-sts change (rest-sts instance create, delete, or modify), as
+     * only the AM instances which did not host the original change must reconcile crest router state with the SMS.
+     * <p>
+     * The RestSTSPublishServiceListener knows whether it must reconcile SMS and crest router state by seeing if the rest-sts
+     * instance is exposed in the crest router (isInstanceExposedInCrest). However, this works for the creation and deletion
+     * of rest-sts instances. In other words, the RestSTSPublishServiceListener which handles a create knows that the
+     * newly-created instance must be exposed in the crest router if it is not currently exposed in the crest router. The
+     * converse logic can be applied to handle crest router reconciliation for rest-sts instance deletion. However, for
+     * rest-sts instance update, the instance will be in the Crest router throughout, so work cannot be predictably segmented
+     * between the implementation of this interface, and the RestSTSPublishServiceListener both on the AM instance that
+     * hosted the change, and on those which need to reconcile crest router state with SMS state.
+     * <p>
+     * Thus, in order to not duplicate the logic between the implementation of this method, and the RestSTSPublishServiceListener
+     * which handles rest-sts instance modifications, this method will only persist the modified rest-sts instance in the
+     * SMS. This method will be called by RestSTSPublishServiceRequestHandler#handleUpdate. Then, the RestSTSPublishServiceListener
+     * will respond to modify events by calling updateInstanceInCrest, which will expose the updated instance in the Crest router.
+     * @param stsId The sts id
+     * @param realm the realm in which the sts is deployed
+     * @param instanceConfig the RestSTSInstanceConfig corresponding to the updated state obtained from the PUT
+     * @param instance the RestSTS instance corresponding to the updated state
+     */
+    void updateInstanceInSMS(String stsId, String realm, RestSTSInstanceConfig instanceConfig, RestSTS instance) throws STSPublishException;
+
+    /**
+     * Called by RestSTSPublishServiceListener in response to modify events. This method will only remove the existing
+     * rest-sts instance from the Crest router, and re-expose the instance created from current SMS state.
+     * <p>
+     * Whenever a rest-sts instance
+     * is updated/created/removed, both SMS and Crest router state must be mutated, and this must occur to all servers in a site
+     * deployment or in a multi-AM deployment. LDAP replication ensures that SMS state is shared, but the RestSTSPublishServiceListener
+     * responds to LDAP changes to insure that Crest router state is reconciled with ldap state. However, this listener
+     * must insure that it does not duplicate, or undo, any Crest mutations, and thus must somehow know if the AM server it is
+     * running on originated/received the AdminUI/programmatic rest-sts change (rest-sts instance create, delete, or modify), as
+     * only the AM instances which did not host the original change must reconcile crest router state with the SMS.
+     * <p>
+     * The RestSTSPublishServiceListener knows whether it must reconcile SMS and crest router state by seeing if the rest-sts
+     * instance is exposed in the crest router (isInstanceExposedInCrest). However, this works for the creation and deletion
+     * of rest-sts instances. In other words, the RestSTSPublishServiceListener which handles a create knows that the
+     * newly-created instance must be exposed in the crest router if it is not currently exposed in the crest router. The
+     * converse logic can be applied to handle crest router reconciliation for rest-sts instance deletion. However, for
+     * rest-sts instance update, the instance will be in the Crest router throughout, so work cannot be predictably segmented
+     * between the implementation of this interface, and the RestSTSPublishServiceListener both on the AM instance that
+     * hosted the change, and on those which need to reconcile crest router state with SMS state.
+     * <p>
+     * Thus, in order to not duplicate the logic between the implementation of this method, and the RestSTSPublishServiceListener
+     * which handles rest-sts instance modifications, this method will only update crest router state with the rest-sts instance
+     * state obtained from the SMS. It is only called by the RestSTSPublishServiceListener, in response to ldap modify events.
+     * @param stsId The sts id
+     * @param realm the realm in which the sts is deployed
+     * @param instanceConfig the RestSTSInstanceConfig corresponding to the updated state as obtained from the SMS
+     * @param instance the RestSTS instance corresponding to the updated state
+     */
+    void updateInstanceInCrestRouter(String stsId, String realm, RestSTSInstanceConfig instanceConfig, RestSTS instance) throws STSPublishException;
 
     /**
      * Called to obtain the configuration elements corresponding to previously-published STS instances.

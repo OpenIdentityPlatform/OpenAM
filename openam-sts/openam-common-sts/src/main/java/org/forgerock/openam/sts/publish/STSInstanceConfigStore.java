@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.publish;
@@ -60,7 +60,16 @@ public interface STSInstanceConfigStore<T extends STSInstanceConfig> {
      * @param realm the realm in which the sts instance was deployed. Necessary for SMS lookup.
      * @return The STSInstanceConfig corresponding to this deployment url element.
      */
-    public T getSTSInstanceConfig(String stsId, String realm) throws STSPublishException;
+    T getSTSInstanceConfig(String stsId, String realm) throws STSPublishException;
+
+    /**
+     * Updates attributes corresponding to the existing STS instance.
+     * @param stsInstanceId the identifier for the to-be-updated sts instance
+     * @param realm The realm of the sts instance
+     * @param instance the instance with the updated attributes
+     * @throws STSPublishException if the SMS encounters a problem during persistence.
+     */
+    void updateSTSInstance(String stsInstanceId, String realm, T instance) throws STSPublishException;
 
     /**
      * This method will be called by some startup context in the {locally|remotely} deployed {REST|SOAP} STS context
@@ -70,7 +79,7 @@ public interface STSInstanceConfigStore<T extends STSInstanceConfig> {
      * @return The List of STSInstanceConfig instances (possibly empty) corresponding to the set of previously-published
      * instances.
      */
-    public List<T> getAllPublishedInstances() throws STSPublishException;
+    List<T> getAllPublishedInstances() throws STSPublishException;
 
     /**
      * This method returns whether STS instance config referenced by the realm and id is present in the SMS. It is called
@@ -82,5 +91,5 @@ public interface STSInstanceConfigStore<T extends STSInstanceConfig> {
      * @return true if the instance is present
      * @throws STSPublishException If an exception is encountered consulting the SMS.
      */
-    public boolean isInstancePresent(String stsId, String realm) throws STSPublishException;
+    boolean isInstancePresent(String stsId, String realm) throws STSPublishException;
 }

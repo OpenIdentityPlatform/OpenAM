@@ -17,7 +17,7 @@
 package org.forgerock.openam.sts.rest.operation;
 
 import org.forgerock.openam.sts.STSInitializationException;
-import org.forgerock.openam.sts.config.user.TokenTransformConfig;
+import org.forgerock.openam.sts.rest.config.user.TokenTransformConfig;
 
 /**
  * Factory interface to build a TokenTransform instance given a TokenTransformConfig instance. Called by the

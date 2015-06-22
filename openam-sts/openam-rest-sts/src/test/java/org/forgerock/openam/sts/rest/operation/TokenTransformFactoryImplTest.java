@@ -29,7 +29,8 @@ import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
-import org.forgerock.openam.sts.config.user.TokenTransformConfig;
+import org.forgerock.openam.sts.config.user.CustomTokenOperation;
+import org.forgerock.openam.sts.rest.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.rest.token.provider.oidc.DefaultOpenIdConnectTokenAuthMethodReferencesMapper;
 import org.forgerock.openam.sts.rest.token.provider.oidc.DefaultOpenIdConnectTokenAuthnContextMapper;
 import org.forgerock.openam.sts.rest.token.provider.oidc.OpenIdConnectTokenAuthMethodReferencesMapper;
@@ -65,6 +66,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.security.cert.X509Certificate;
+import java.util.Collections;
+import java.util.Set;
 
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
@@ -184,6 +187,24 @@ public class TokenTransformFactoryImplTest {
         @Singleton
         AMSTSConstants.STSType getSTSType() {
             return AMSTSConstants.STSType.REST;
+        }
+
+        @Provides
+        @Named(AMSTSConstants.REST_CUSTOM_TOKEN_VALIDATORS)
+        Set<CustomTokenOperation> getCustomTokenValidators() {
+            return Collections.emptySet();
+        }
+
+        @Provides
+        @Named(AMSTSConstants.REST_CUSTOM_TOKEN_PROVIDERS)
+        Set<CustomTokenOperation> getCustomTokenProviders() {
+            return Collections.emptySet();
+        }
+
+        @Provides
+        @Named(AMSTSConstants.REST_CUSTOM_TOKEN_TRANSLATIONS)
+        Set<TokenTransformConfig> getCustomTokenTransforms() {
+            return Collections.emptySet();
         }
     }
 

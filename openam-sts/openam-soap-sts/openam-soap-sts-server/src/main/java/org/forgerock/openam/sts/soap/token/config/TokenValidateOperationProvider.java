@@ -101,10 +101,10 @@ public class TokenValidateOperationProvider implements Provider<ValidateOperatio
             tokenValidateOperation.setStsProperties(stsPropertiesMBean);
             tokenValidateOperation.setTokenStore(tokenStore);
 
-            List<TokenValidator> tokenValidators = new ArrayList<TokenValidator>();
+            List<TokenValidator> tokenValidators = new ArrayList<>();
             for (TokenValidationConfig tokenValidationConfig : validatedTokenConfig) {
                 tokenValidators.add(operationFactory.getTokenValidator(tokenValidationConfig.getValidatedTokenType(),
-                        ValidationInvocationContext.SOAP_TOKEN_VALIDATION, tokenValidationConfig.invalidateInterimOpenAMSession()));
+                        ValidationInvocationContext.TOKEN_VALIDATION_OPERATION, tokenValidationConfig.invalidateInterimOpenAMSession()));
             }
             tokenValidateOperation.setTokenValidators(tokenValidators);
             return new TokenValidateOperationWrapper(tokenValidateOperation, threadLocalAMTokenCache);

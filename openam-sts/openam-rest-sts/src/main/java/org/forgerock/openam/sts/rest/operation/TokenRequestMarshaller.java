@@ -14,7 +14,7 @@
  * Copyright 2013-2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.sts.rest.marshal;
+package org.forgerock.openam.sts.rest.operation;
 
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.servlet.HttpContext;
@@ -54,7 +54,7 @@ public interface TokenRequestMarshaller {
      * @return the RestTokenProviderParameters necessary to create a token of the specified type.
      * @throws TokenMarshalException
      */
-    RestTokenProviderParameters<? extends TokenTypeId> buildTokenProviderParameters(TokenTypeId inputTokenType, JsonValue inputToken,
+    RestTokenProviderParameters<?> buildTokenProviderParameters(TokenTypeId inputTokenType, JsonValue inputToken,
                                                                 TokenTypeId desiredTokenType, JsonValue desiredTokenState) throws TokenMarshalException;
     /**
      * Returns the TokenType corresponding to the JsonValue. The JsonValue will be pulled from the RestSTSServiceInvocationState.

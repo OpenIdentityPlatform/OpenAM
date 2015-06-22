@@ -177,7 +177,7 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 return parseTokenResponse(connectionResult.getResult());
             } else {
-                throw new TokenCreationException(ResourceException.BAD_REQUEST, connectionResult.getResult());
+                throw new TokenCreationException(responseCode, connectionResult.getResult());
             }
         } catch (IOException e) {
             throw new TokenCreationException(ResourceException.INTERNAL_ERROR,

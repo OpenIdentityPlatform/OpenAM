@@ -11,17 +11,15 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.sts.config.user;
+package org.forgerock.openam.sts.rest.config.user;
 
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.TokenTypeId;
 import org.forgerock.util.Reject;
-
-import java.util.StringTokenizer;
 
 import static org.forgerock.json.fluent.JsonValue.field;
 import static org.forgerock.json.fluent.JsonValue.json;
@@ -31,40 +29,65 @@ import static org.forgerock.json.fluent.JsonValue.object;
  * This class defines the support token transformation operations supported by a REST STS deployment. The
  * invalidateInterimOpenAMSession boolean indicates whether any OpenAM session, generated via the validation of the
  * inputTokenType, should be invalidated following the generation of the outputTokenType.
+ *
+ * Internally, the input and output token types are stored as strings in order to support user-defined token
+ * transformation operations.
  */
 public class TokenTransformConfig {
     /*
     Must be same as the delimiter used in the supported-token-transforms AttributeSchema defined in restSTS.xml.
      */
     private static final String DELIMETER = AMSTSConstants.PIPE;
-    private final TokenType inputTokenType;
-    private final TokenType outputTokenType;
+    private static final String REGEX_PIPE = "\\|";
+    private static final String INPUT_TOKEN_TYPE = "inputTokenType";
+    private static final String OUTPUT_TOKEN_TYPE = "outputTokenType";
+    private static final String INVALIDATE_INTERIM_OPENAM_SESSION = "invalidateInterimOpenAMSession";
+    private static final String SEMI_COLON = ";";
+    private static final String COLON = ":";
+
+    private final String inputTokenType;
+    private final String outputTokenType;
     private final boolean invalidateInterimOpenAMSession;
-    public TokenTransformConfig(TokenType inputTokenType, TokenType outputTokenType, boolean invalidateInterimOpenAMSession) {
+
+    public TokenTransformConfig(TokenTypeId inputTokenType, TokenTypeId outputTokenType, boolean invalidateInterimOpenAMSession) {
+        this.inputTokenType = inputTokenType.getId();
+        this.outputTokenType = outputTokenType.getId();
+        this.invalidateInterimOpenAMSession = invalidateInterimOpenAMSession;
+        Reject.ifNull(inputTokenType, INPUT_TOKEN_TYPE + " cannot be null");
+        Reject.ifNull(outputTokenType, OUTPUT_TOKEN_TYPE + " cannot be null");
+    }
+
+    /*
+    Ctor to aid in json marshalling, and to allow for the creation of token transformations involving custom token types.
+     */
+    public TokenTransformConfig(String inputTokenType, String outputTokenType, boolean invalidateInterimOpenAMSession) {
         this.inputTokenType = inputTokenType;
         this.outputTokenType = outputTokenType;
         this.invalidateInterimOpenAMSession = invalidateInterimOpenAMSession;
-        Reject.ifNull(inputTokenType, "Input TokenType cannot be null");
-        Reject.ifNull(outputTokenType, "Output TokenType cannot be null");
-        if (!TokenType.SAML2.equals(outputTokenType) && !TokenType.OPENIDCONNECT.equals(outputTokenType)) {
-            throw new IllegalArgumentException("Only output token types of SAML2 and OPENIDCONNECT are currently supported. " +
-                    "Invalid output token type: " + outputTokenType);
-        }
-        if (TokenType.SAML2.equals(inputTokenType)) {
-            throw new IllegalArgumentException("SAML2 tokens are not supported as inputs to a token transformation.");
-        }
+        Reject.ifNull(inputTokenType, INPUT_TOKEN_TYPE + " cannot be null");
+        Reject.ifNull(outputTokenType, OUTPUT_TOKEN_TYPE + " cannot be null");
     }
 
-    public TokenType getOutputTokenType() {
-        return outputTokenType;
+    public TokenTypeId getOutputTokenType() {
+        return new TokenTypeId() {
+            @Override
+            public String getId() {
+                return outputTokenType;
+            }
+        };
     }
 
     public boolean invalidateInterimOpenAMSession() {
         return invalidateInterimOpenAMSession;
     }
 
-    public TokenType getInputTokenType() {
-        return inputTokenType;
+    public TokenTypeId getInputTokenType() {
+        return new TokenTypeId() {
+            @Override
+            public String getId() {
+                return inputTokenType;
+            }
+        };
     }
 
     /*
@@ -75,24 +98,29 @@ public class TokenTransformConfig {
     public boolean equals(Object other) {
         if (other instanceof TokenTransformConfig) {
             TokenTransformConfig otherConfig = (TokenTransformConfig)other;
-            return inputTokenType.equals(otherConfig.getInputTokenType()) &&
-                outputTokenType.equals(otherConfig.getOutputTokenType());
+            return inputTokenType.equals(otherConfig.getInputTokenType().getId()) &&
+                outputTokenType.equals(otherConfig.getOutputTokenType().getId());
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return (inputTokenType.name() + outputTokenType.name()).hashCode();
+        return (inputTokenType + outputTokenType).hashCode();
     }
 
     @Override
     public String toString() {
-        return new StringBuilder("inputTokenType: ")
-                .append(inputTokenType.name())
-                .append("; outputTokenType: ")
-                .append(outputTokenType.name())
-                .append("; invalidateInterimimOpenAMSession: ")
+        return new StringBuilder(INPUT_TOKEN_TYPE)
+                .append(COLON)
+                .append(inputTokenType)
+                .append(SEMI_COLON)
+                .append(OUTPUT_TOKEN_TYPE)
+                .append(COLON)
+                .append(outputTokenType)
+                .append(SEMI_COLON)
+                .append(INVALIDATE_INTERIM_OPENAM_SESSION)
+                .append(COLON)
                 .append(invalidateInterimOpenAMSession)
                 .toString();
     }
@@ -101,15 +129,15 @@ public class TokenTransformConfig {
     Map<String, Set<String>> to persist state to the SMS, all values must ultimately be stored as strings.
      */
     public JsonValue toJson() {
-        return json(object(field("inputTokenType", inputTokenType.name()), field("outputTokenType", outputTokenType.name()),
-                field("invalidateInterimOpenAMSession", invalidateInterimOpenAMSession)));
+        return json(object(field(INPUT_TOKEN_TYPE, inputTokenType), field(OUTPUT_TOKEN_TYPE, outputTokenType),
+                field(INVALIDATE_INTERIM_OPENAM_SESSION, invalidateInterimOpenAMSession)));
     }
 
     public static TokenTransformConfig fromJson(JsonValue json) {
         return new TokenTransformConfig(
-                Enum.valueOf(TokenType.class, json.get("inputTokenType").asString()),
-                Enum.valueOf(TokenType.class, json.get("outputTokenType").asString()),
-                json.get("invalidateInterimOpenAMSession").asBoolean());
+                json.get(INPUT_TOKEN_TYPE).asString(),
+                json.get(OUTPUT_TOKEN_TYPE).asString(),
+                json.get(INVALIDATE_INTERIM_OPENAM_SESSION).asBoolean());
     }
 
     /*
@@ -127,8 +155,11 @@ public class TokenTransformConfig {
     from the representation ultimately generated by the toSMSString method. This method achieves that purpose.
      */
     public static TokenTransformConfig fromSMSString(String stringRepresentation) {
-        StringTokenizer tokenizer = new StringTokenizer(stringRepresentation, DELIMETER);
-        return new TokenTransformConfig(TokenType.valueOf(tokenizer.nextToken()),
-                TokenType.valueOf(tokenizer.nextToken()), Boolean.valueOf(tokenizer.nextToken()));
+        String[] tokens = stringRepresentation.split(REGEX_PIPE);
+        if (tokens.length != 3) {
+            throw new IllegalArgumentException("The SMS String representation of the TokenTransformConfig must be of format: " +
+                    "input_token_type|output_token_type|true_or_false. The passed-in string: " + stringRepresentation);
+        }
+        return new TokenTransformConfig(tokens[0], tokens[1], Boolean.valueOf(tokens[2]));
     }
 }

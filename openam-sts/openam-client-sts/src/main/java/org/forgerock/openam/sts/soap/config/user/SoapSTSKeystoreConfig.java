@@ -24,10 +24,13 @@ import org.forgerock.guava.common.base.Objects;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.MapMarshallUtils;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.util.Reject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -220,6 +223,26 @@ public class SoapSTSKeystoreConfig {
     }
 
     public static SoapSTSKeystoreConfig marshalFromAttributeMap(Map<String, Set<String>> attributeMap) {
+        if (CollectionUtils.isEmpty(attributeMap.get(KEYSTORE_FILENAME))) {
+            return null;
+        }
         return fromJson(new JsonValue(MapMarshallUtils.toJsonValueMap(attributeMap)));
+    }
+
+    /*
+    This method is called from SoapSTSInstanceConfig if the encapsulated SoapSTSKeystoreConfig reference is null. It should
+    return a Map<String,Set<String>> for each of the sms attributes defined for the SoapSTSKeystoreConfig object, with an empty
+    Set<String> value, so that SMS writes will over-write any previous, non-null values. This will occur in the AdminUI
+    when an admin edits a soap-sts instance to having soap keystore configurations, to not having these configurations.
+    */
+    public static Map<String, Set<String>> getEmptySMSAttributeState() {
+        HashMap<String, Set<String>> emptyAttributeMap = new HashMap<>();
+        emptyAttributeMap.put(KEYSTORE_FILENAME, Collections.<String>emptySet());
+        emptyAttributeMap.put(KEYSTORE_PASSWORD, Collections.<String>emptySet());
+        emptyAttributeMap.put(SIGNATURE_KEY_ALIAS, Collections.<String>emptySet());
+        emptyAttributeMap.put(SIGNATURE_KEY_PASSWORD, Collections.<String>emptySet());
+        emptyAttributeMap.put(ENCRYPTION_KEY_ALIAS, Collections.<String>emptySet());
+        emptyAttributeMap.put(ENCRYPTION_KEY_PASSWORD, Collections.<String>emptySet());
+        return emptyAttributeMap;
     }
 }

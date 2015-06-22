@@ -58,10 +58,10 @@ import static org.forgerock.json.fluent.JsonValue.object;
 public class RestSTSModelImpl extends AMServiceProfileModelImpl implements RestSTSModel {
     private static final String COOKIE = "Cookie";
     /*
-    A string matching a regular expression which will match the '|' character (u007c), which needs to be escaped to
-    escape its regular-expression semantics. Equivalent to "\|", which is not a valid string.
+    A string matching a regular expression which will match the '|' character, which needs to be escaped to
+    escape its regular-expression semantics.
      */
-    private static final String REGEX_PIPE = "\\u007c";
+    private static final String REGEX_PIPE = "\\|";
     private static final String EQUALS = "=";
     private static final String REST_STS_PUBLISH_SERVICE_VERSION = "protocol=1.0, resource=1.0";
 

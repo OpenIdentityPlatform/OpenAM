@@ -21,13 +21,11 @@ import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenTypeId;
 
 /**
- * Interface defining token creators in the rest-sts. The generic type T corresponds to a TokenTypeId implementation
- * which provides the state necessary to produce a token of the specified type. The bottom line is that creating any
- * specific token (SAML2, OIDC) requires specific state, state which, at this point, seems too heterogeneous to
- * subsume in a specific type. Thus the 'type' is limited to a type which identifies the identifier the to-be-generated
- * token type, and each implementation will be passed an instance of this interface bound to a specific type.
+ * Interface defining token creators in the rest-sts. The generic type T corresponds to a class
+ * which provides the state necessary to produce a token of the specified type. The creation of any
+ * specific token (SAML2, OIDC) requires specific state which cannot be subsumed in a specific type.
  */
-public interface RestTokenProvider<T extends TokenTypeId> {
+public interface RestTokenProvider<T> {
     /**
      *
      * @param restTokenProviderParameters the parameters necessary to create a token of a specific type

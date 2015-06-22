@@ -34,12 +34,13 @@ import org.forgerock.openam.sts.HttpURLConnectionFactory;
 import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
 import org.forgerock.openam.sts.OpenAMHttpURLConnectionFactory;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
+import org.forgerock.openam.sts.config.user.CustomTokenOperation;
 import org.forgerock.openam.sts.rest.RestSTS;
 import org.forgerock.openam.sts.rest.RestSTSImpl;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
-import org.forgerock.openam.sts.config.user.TokenTransformConfig;
-import org.forgerock.openam.sts.rest.marshal.TokenRequestMarshaller;
-import org.forgerock.openam.sts.rest.marshal.TokenRequestMarshallerImpl;
+import org.forgerock.openam.sts.rest.config.user.TokenTransformConfig;
+import org.forgerock.openam.sts.rest.operation.TokenRequestMarshaller;
+import org.forgerock.openam.sts.rest.operation.TokenRequestMarshallerImpl;
 import org.forgerock.openam.sts.rest.operation.TokenTransformFactory;
 import org.forgerock.openam.sts.rest.operation.TokenTransformFactoryImpl;
 import org.forgerock.openam.sts.rest.operation.TokenTranslateOperation;
@@ -241,9 +242,9 @@ public class RestSTSInstanceModule extends AbstractModule {
     }
 
     @Provides
-    @Named(AMSTSConstants.REST_SUPPORTED_TOKEN_TRANSLATIONS)
-    Set<TokenTransformConfig> getSupportedTokenTranslations() {
-        return stsInstanceConfig.getSupportedTokenTranslations();
+    @Named(AMSTSConstants.REST_SUPPORTED_TOKEN_TRANSFORMS)
+    Set<TokenTransformConfig> getSupportedTokenTransforms() {
+        return stsInstanceConfig.getSupportedTokenTransforms();
     }
 
     /*
@@ -378,6 +379,24 @@ public class RestSTSInstanceModule extends AbstractModule {
             return "";
         }
         return headerKey;
+    }
+
+    @Provides
+    @Named(AMSTSConstants.REST_CUSTOM_TOKEN_VALIDATORS)
+    Set<CustomTokenOperation> getCustomTokenValidators() {
+        return stsInstanceConfig.getCustomTokenValidators();
+    }
+
+    @Provides
+    @Named(AMSTSConstants.REST_CUSTOM_TOKEN_PROVIDERS)
+    Set<CustomTokenOperation> getCustomTokenProviders() {
+        return stsInstanceConfig.getCustomTokenProviders();
+    }
+
+    @Provides
+    @Named(AMSTSConstants.REST_CUSTOM_TOKEN_TRANSLATIONS)
+    Set<TokenTransformConfig> getCustomTokenTransforms() {
+        return stsInstanceConfig.getCustomTokenTransforms();
     }
 
     /**

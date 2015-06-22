@@ -30,6 +30,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -516,16 +517,16 @@ public class OpenIdConnectTokenConfig {
     object, and the representation expected by the SMS
      */
     public static OpenIdConnectTokenConfig marshalFromAttributeMap(Map<String, Set<String>> smsAttributeMap) {
-        Set<String> attributes = smsAttributeMap.get(CLAIM_MAP);
+        Set<String> issuer = smsAttributeMap.get(ISSUER);
         /*
         The STSInstanceConfig may not have OpenIdConnectTokenConfig, if there are no defined token transformations that result
-        in a OIDC Id Token. So if we have null attributes, this means that STSInstanceConfig.marshalFromAttributeMap
-        was called. Note that we cannot check for isEmpty, as this will be the case if OpenIdConnectTokenConfig has been defined, but
-        simply without any attributes.
+        in a OIDC Id Token. An issuer name is a mandatory piece for issuing OIDC tokens, so if it is not present, no OpenIdConnectConfig
+        needs to be marshalled.
          */
-        if (attributes == null) {
+        if (CollectionUtils.isEmpty(issuer)) {
             return null;
         }
+        Set<String> attributes = smsAttributeMap.get(CLAIM_MAP);
         Map<String, Object> jsonAttributes = MapMarshallUtils.toJsonValueMap(smsAttributeMap);
         jsonAttributes.remove(CLAIM_MAP);
         Map<String, Object> jsonAttributeMap = new LinkedHashMap<>();
@@ -538,5 +539,31 @@ public class OpenIdConnectTokenConfig {
         jsonAttributes.put(AUDIENCE, new JsonValue(smsAttributeMap.get(AUDIENCE)));
 
         return fromJson(new JsonValue(jsonAttributes));
+    }
+
+    /*
+    This method is called from Rest/SoapSTSInstanceConfig if the encapsulated OpenIdConnectTokenConfig reference is null. It should
+    return a Map<String,Set<String>> for each of the sms attributes defined for the OpenIdConnectTokenConfig object, with an empty
+    Set<String> value, so that SMS writes will over-write any previous, non-null values. This will occur in the AdminUI
+    when a sts instance goes from issuing OIDC tokens, to not issuing these token types.
+    */
+    public static Map<String, Set<String>> getEmptySMSAttributeState() {
+        HashMap<String, Set<String>> emptyAttributeMap = new HashMap<>();
+        emptyAttributeMap.put(ISSUER, Collections.<String>emptySet());
+        emptyAttributeMap.put(CLAIM_MAP, Collections.<String>emptySet());
+        emptyAttributeMap.put(TOKEN_LIFETIME, Collections.<String>emptySet());
+        emptyAttributeMap.put(KEYSTORE_LOCATION, Collections.<String>emptySet());
+        emptyAttributeMap.put(KEYSTORE_PASSWORD, Collections.<String>emptySet());
+        emptyAttributeMap.put(SIGNATURE_KEY_ALIAS, Collections.<String>emptySet());
+        emptyAttributeMap.put(SIGNATURE_KEY_PASSWORD, Collections.<String>emptySet());
+        emptyAttributeMap.put(SIGNATURE_ALGORITHM, Collections.<String>emptySet());
+        emptyAttributeMap.put(AUDIENCE, Collections.<String>emptySet());
+        emptyAttributeMap.put(AUTHORIZED_PARTY, Collections.<String>emptySet());
+        emptyAttributeMap.put(CLIENT_SECRET, Collections.<String>emptySet());
+        emptyAttributeMap.put(PUBLIC_KEY_REFERENCE_TYPE, Collections.<String>emptySet());
+        emptyAttributeMap.put(CUSTOM_CLAIM_MAPPER_CLASS, Collections.<String>emptySet());
+        emptyAttributeMap.put(CUSTOM_AUTHN_CONTEXT_MAPPER_CLASS, Collections.<String>emptySet());
+        emptyAttributeMap.put(CUSTOM_AUTHN_METHOD_REFERENCES_MAPPER_CLASS, Collections.<String>emptySet());
+        return emptyAttributeMap;
     }
 }

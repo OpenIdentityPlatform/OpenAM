@@ -143,19 +143,19 @@ public class RestSTSInstanceStateServiceListenerTest {
         return RestSTSInstanceConfig.builder()
                 .deploymentConfig(deploymentConfig)
                 .saml2Config(saml2Config)
-                .addSupportedTokenTranslation(
+                .addSupportedTokenTransform(
                         TokenType.X509,
                         TokenType.SAML2,
                         !AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION)
-                .addSupportedTokenTranslation(
+                .addSupportedTokenTransform(
                         TokenType.USERNAME,
                         TokenType.SAML2,
                         AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION)
-                .addSupportedTokenTranslation(
+                .addSupportedTokenTransform(
                         TokenType.OPENAM,
                         TokenType.SAML2,
                         !AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION)
-                .addSupportedTokenTranslation(
+                .addSupportedTokenTransform(
                         TokenType.OPENIDCONNECT,
                         TokenType.SAML2,
                         AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION)

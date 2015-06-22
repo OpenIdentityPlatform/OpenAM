@@ -180,7 +180,7 @@ public class SoapSTSConsumer {
         addAMSessionTokenSupport();
     }
 
-    private SecurityToken testIssueInternal(EndpointSpecification endpointSpecification,
+    private SecurityToken checkIssueInternal(EndpointSpecification endpointSpecification,
                                             TokenSpecification tokenSpecification,
                                             boolean allowRenewing) throws SoapSTSConsumerException {
         try {
@@ -208,7 +208,7 @@ public class SoapSTSConsumer {
         }
     }
 
-    private void testValidateInternal(EndpointSpecification endpointSpecification,
+    private void checkValidateInternal(EndpointSpecification endpointSpecification,
                                       SecurityToken token) throws SoapSTSConsumerException {
         STSClient client = getSTSClient(
                 stsInstanceWsdlUrl,
@@ -230,7 +230,7 @@ public class SoapSTSConsumer {
          */
     }
 
-    private SecurityToken testRenewInternal(EndpointSpecification endpointSpecification,
+    private SecurityToken checkRenewInternal(EndpointSpecification endpointSpecification,
                                             SecurityToken token,
                                             String tokenType,
                                             String keyType) throws SoapSTSConsumerException {
@@ -248,38 +248,38 @@ public class SoapSTSConsumer {
         }
     }
 
-    private void testValidateSuiteInternal(List<EndpointSpecification> endpoints,
+    private void checkValidateSuiteInternal(List<EndpointSpecification> endpoints,
                                            List<TokenSpecification> tokenSpecs,
                                            SecurityToken token) throws SoapSTSConsumerException {
         for (EndpointSpecification endpoint : endpoints) {
             for (TokenSpecification tokenSpec : tokenSpecs) {
                 SecurityToken localToken = token;
                 if (localToken == null) {
-                    localToken = testIssueInternal(
+                    localToken = checkIssueInternal(
                             endpoint,
                             tokenSpec,
                             ALLOW_TOKEN_RENEWAL);
                 }
-                testValidateInternal(
+                checkValidateInternal(
                         endpoint,
                         localToken);
             }
         }
     }
 
-    private void testRenewSuiteInternal(List<EndpointSpecification> endpoints,
+    private void checkRenewSuiteInternal(List<EndpointSpecification> endpoints,
                                         List<TokenSpecification> tokenSpecs,
                                         SecurityToken token) throws SoapSTSConsumerException {
         for (EndpointSpecification endpoint : endpoints) {
             for (TokenSpecification tokenSpec : tokenSpecs) {
                 SecurityToken localToken = token;
                 if (localToken == null) {
-                    localToken = testIssueInternal(
+                    localToken = checkIssueInternal(
                             endpoint,
                             tokenSpec,
                             ALLOW_TOKEN_RENEWAL);
                 }
-                testRenewInternal(
+                checkRenewInternal(
                         endpoint,
                         localToken,
                         tokenSpec.tokenType,
@@ -295,11 +295,11 @@ public class SoapSTSConsumer {
      * @return the list SecurityTokens resulting from the successful invocations
      * @throws SoapSTSConsumerException if any individual issue invocation did not succeed.
      */
-    public List<SecurityToken> testIssueSuite(List<EndpointSpecification> endpoints, List<TokenSpecification> tokenSpecifications) throws SoapSTSConsumerException {
+    public List<SecurityToken> checkIssueSuite(List<EndpointSpecification> endpoints, List<TokenSpecification> tokenSpecifications) throws SoapSTSConsumerException {
         final List<SecurityToken> tokens = new ArrayList<>(endpoints.size() * tokenSpecifications.size());
         for (EndpointSpecification endpoint : endpoints) {
             for (TokenSpecification tokenSpecification : tokenSpecifications) {
-                tokens.add(testIssueInternal(
+                tokens.add(checkIssueInternal(
                         endpoint,
                         tokenSpecification,
                         ALLOW_TOKEN_RENEWAL));
@@ -308,12 +308,12 @@ public class SoapSTSConsumer {
         return tokens;
     }
 
-    private void testRenewSuite(List<EndpointSpecification> endpoints, List<TokenSpecification> tokenSpecs) throws SoapSTSConsumerException {
-        testRenewSuiteInternal(endpoints, tokenSpecs, NULL_SECURITY_TOKEN);
+    private void checkRenewSuite(List<EndpointSpecification> endpoints, List<TokenSpecification> tokenSpecs) throws SoapSTSConsumerException {
+        checkRenewSuiteInternal(endpoints, tokenSpecs, NULL_SECURITY_TOKEN);
     }
 
-    private void testValidateSuite(List<EndpointSpecification> endpoints, List<TokenSpecification> tokenSpecs) throws SoapSTSConsumerException {
-        testValidateSuiteInternal(endpoints, tokenSpecs, NULL_SECURITY_TOKEN);
+    private void checkValidateSuite(List<EndpointSpecification> endpoints, List<TokenSpecification> tokenSpecs) throws SoapSTSConsumerException {
+        checkValidateSuiteInternal(endpoints, tokenSpecs, NULL_SECURITY_TOKEN);
     }
 
     /**
@@ -324,9 +324,9 @@ public class SoapSTSConsumer {
      * @return a SecurityToken encapsulating the issued token
      * @throws SoapSTSConsumerException if an exception occurred when issuing the token
      */
-    public SecurityToken testIssue(EndpointSpecification endpointSpecification, TokenSpecification tokenSpecification)
+    public SecurityToken checkIssue(EndpointSpecification endpointSpecification, TokenSpecification tokenSpecification)
             throws SoapSTSConsumerException {
-        return testIssueInternal(
+        return checkIssueInternal(
                 endpointSpecification,
                 tokenSpecification,
                 ALLOW_TOKEN_RENEWAL);

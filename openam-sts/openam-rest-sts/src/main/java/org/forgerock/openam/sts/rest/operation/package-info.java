@@ -11,11 +11,17 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 /**
- * Contains classes related to the creation and implementation of token transformation operations, and the token issue
- * and validation operations that the token transformation operations rely upon.
+ * Contains classes related to the creation and implementation of token transformation operations, factory classes
+ * that produce the RestTokenValidator and RestTokenProvider implementations which realize a particular token transform,
+ * and marshalling classes that marshal the token transform invocation state into the parameter state needed by the
+ * RestTokenValidator and RestTokenProvider implementations.
+ *
+ * Token transformation and token translation can be considered synonyms - different names were chosen to distinguish
+ * the top-level operation(TokenTransformOperation), and the set of specific TokenTransform instances, each of which
+ * validates a specific input token type and generates a specific output token type.
  */
 package org.forgerock.openam.sts.rest.operation;

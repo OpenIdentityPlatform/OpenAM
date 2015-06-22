@@ -27,11 +27,11 @@ import org.forgerock.openam.utils.CollectionUtils;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import static org.forgerock.json.fluent.JsonValue.field;
 import static org.forgerock.json.fluent.JsonValue.json;
@@ -675,5 +675,39 @@ public class SAML2Config {
         jsonAttributes.put(ATTRIBUTE_MAP, new JsonValue(jsonAttributeMap));
 
         return fromJson(new JsonValue(jsonAttributes));
+    }
+
+    /*
+    This method is called from Rest/SoapSTSInstanceConfig if the encapsulated SAML2Config reference is null. It should
+    return a Map<String,Set<String>> for each of the sms attributes defined for the SAML2Config object, with an empty
+    Set<String> value, so that SMS writes will over-write any previous, non-null values. This will occur in the AdminUI
+    when a sts instance goes from issuing SAML2 tokens, to not issuing these token types.
+     */
+    public static Map<String, Set<String>> getEmptySMSAttributeState() {
+        HashMap<String, Set<String>> emptyAttributeMap = new HashMap<>();
+        emptyAttributeMap.put(NAME_ID_FORMAT, Collections.<String>emptySet());
+        emptyAttributeMap.put(ATTRIBUTE_MAP, Collections.<String>emptySet());
+        emptyAttributeMap.put(TOKEN_LIFETIME, Collections.<String>emptySet());
+        emptyAttributeMap.put(CUSTOM_CONDITIONS_PROVIDER_CLASS, Collections.<String>emptySet());
+        emptyAttributeMap.put(CUSTOM_SUBJECT_PROVIDER_CLASS, Collections.<String>emptySet());
+        emptyAttributeMap.put(CUSTOM_ATTRIBUTE_STATEMENTS_PROVIDER_CLASS, Collections.<String>emptySet());
+        emptyAttributeMap.put(CUSTOM_AUTHENTICATION_STATEMENTS_PROVIDER_CLASS, Collections.<String>emptySet());
+        emptyAttributeMap.put(CUSTOM_AUTHZ_DECISION_STATEMENTS_PROVIDER_CLASS, Collections.<String>emptySet());
+        emptyAttributeMap.put(CUSTOM_ATTRIBUTE_MAPPER_CLASS, Collections.<String>emptySet());
+        emptyAttributeMap.put(CUSTOM_AUTHN_CONTEXT_MAPPER_CLASS, Collections.<String>emptySet());
+        emptyAttributeMap.put(SIGN_ASSERTION, Collections.<String>emptySet());
+        emptyAttributeMap.put(ENCRYPT_ATTRIBUTES, Collections.<String>emptySet());
+        emptyAttributeMap.put(ENCRYPT_NAME_ID, Collections.<String>emptySet());
+        emptyAttributeMap.put(ENCRYPT_ASSERTION, Collections.<String>emptySet());
+        emptyAttributeMap.put(ENCRYPTION_ALGORITHM, Collections.<String>emptySet());
+        emptyAttributeMap.put(ENCRYPTION_ALGORITHM_STRENGTH, Collections.<String>emptySet());
+        emptyAttributeMap.put(KEYSTORE_FILE_NAME, Collections.<String>emptySet());
+        emptyAttributeMap.put(KEYSTORE_PASSWORD, Collections.<String>emptySet());
+        emptyAttributeMap.put(SP_ENTITY_ID, Collections.<String>emptySet());
+        emptyAttributeMap.put(SP_ACS_URL, Collections.<String>emptySet());
+        emptyAttributeMap.put(ENCRYPTION_KEY_ALIAS, Collections.<String>emptySet());
+        emptyAttributeMap.put(SIGNATURE_KEY_ALIAS, Collections.<String>emptySet());
+        emptyAttributeMap.put(SIGNATURE_KEY_PASSWORD, Collections.<String>emptySet());
+        return emptyAttributeMap;
     }
 }

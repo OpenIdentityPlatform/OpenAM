@@ -49,7 +49,7 @@ public abstract class STSInstanceStateServiceListenerBase<T extends STSInstanceS
     lower-case. This is the value I want to use to invalidate the cache entry.
      */
     public void organizationConfigChanged(String serviceName, String version, String orgName, String groupName, String serviceComponent, int type) {
-        if (instanceTargetedByDelete(serviceName, version, type)) {
+        if (instanceUpdatedOrDeleted(serviceName, version, type)) {
             /*
             It seems the serviceComponent is the full realm path, and always includes a '/' at the beginning, to represent
             the root realm. This value needs to be stripped-off, as the cache uses the rest-sts id, which is normalized to
@@ -62,14 +62,9 @@ public abstract class STSInstanceStateServiceListenerBase<T extends STSInstanceS
         }
     }
 
-    /*
-    When a rest-sts instance is 'updated', it is really a delete followed by an add. So I will simply listen for the delete,
-    as that will invalidate cache entries as part of the update cycle, and have the added benefit of preventing my cache
-    from growing too large in case many rest-sts instances are updated, but very few actually invoked after the update.
-     */
-    private boolean instanceTargetedByDelete(String serviceName, String version, int type) {
+    private boolean instanceUpdatedOrDeleted(String serviceName, String version, int type) {
         return this.serviceName.equals(serviceName) &&
                 this.serviceVersion.equals(version) &&
-                (ServiceListener.REMOVED == type);
+                ((ServiceListener.REMOVED == type) || (ServiceListener.MODIFIED == type));
     }
 }

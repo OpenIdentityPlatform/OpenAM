@@ -21,12 +21,13 @@ import org.forgerock.openam.shared.sts.SharedSTSConstants;
 import org.forgerock.openam.sts.DeploymentPathNormalizationImpl;
 import org.forgerock.openam.sts.MapMarshallUtils;
 import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.config.user.CustomTokenOperation;
 import org.forgerock.openam.sts.config.user.DeploymentConfig;
 import org.forgerock.openam.sts.config.user.OpenIdConnectTokenConfig;
 import org.forgerock.openam.sts.config.user.SAML2Config;
 import org.forgerock.openam.sts.config.user.STSInstanceConfig;
-import org.forgerock.openam.sts.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.util.Reject;
 
 import java.util.*;
@@ -49,11 +50,17 @@ import java.util.*;
  */
 public class RestSTSInstanceConfig extends STSInstanceConfig {
     public abstract static class RestSTSInstanceConfigBuilderBase<T extends RestSTSInstanceConfigBuilderBase<T>> extends STSInstanceConfig.STSInstanceConfigBuilderBase<T>  {
-        private Set<TokenTransformConfig> supportedTokenTranslations;
+        private Set<TokenTransformConfig> supportedTokenTransforms;
         private DeploymentConfig deploymentConfig;
+        private Set<CustomTokenOperation> customTokenValidators;
+        private Set<CustomTokenOperation> customTokenProviders;
+        private Set<TokenTransformConfig> customTokenTransforms;
 
         private RestSTSInstanceConfigBuilderBase() {
-            supportedTokenTranslations = new HashSet<>();
+            supportedTokenTransforms = new HashSet<>();
+            customTokenProviders = new HashSet<>();
+            customTokenValidators = new HashSet<>();
+            customTokenTransforms =  new HashSet<>();
         }
 
         public T deploymentConfig(DeploymentConfig deploymentConfig) {
@@ -61,17 +68,47 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
             return self();
         }
 
-        public T addSupportedTokenTranslation(
+        public T addSupportedTokenTransform(
                 TokenType inputType,
                 TokenType outputType,
                 boolean invalidateInterimOpenAMSession) {
-            supportedTokenTranslations.add(new TokenTransformConfig(inputType,
+            supportedTokenTransforms.add(new TokenTransformConfig(inputType,
                     outputType, invalidateInterimOpenAMSession));
             return self();
         }
 
-        public T setSupportedTokenTranslations(Collection<TokenTransformConfig> transforms) {
-            supportedTokenTranslations.addAll(transforms);
+        public T setSupportedTokenTransforms(Collection<TokenTransformConfig> transforms) {
+            supportedTokenTransforms.addAll(transforms);
+            return self();
+        }
+
+        public T setCustomTokenTransforms(Collection<TokenTransformConfig> transforms) {
+            customTokenTransforms.addAll(transforms);
+            return self();
+        }
+
+        public T setCustomValidators(Collection<CustomTokenOperation> validators) {
+            customTokenValidators.addAll(validators);
+            return self();
+        }
+
+        public T setCustomProviders(Collection<CustomTokenOperation> providers) {
+            customTokenProviders.addAll(providers);
+            return self();
+        }
+        
+        public T addCustomTokenValidator(String customTokenType, String restTokenValidatorImplClassName) {
+            customTokenValidators.add(new CustomTokenOperation(customTokenType, restTokenValidatorImplClassName));
+            return self();
+        }
+
+        public T addCustomTokenProvider(String customTokenType, String restTokenProviderImplClassName) {
+            customTokenProviders.add(new CustomTokenOperation(customTokenType, restTokenProviderImplClassName));
+            return self();
+        }
+
+        public T addCustomTokenTransform(String inputTokenType, String outputTokenType, boolean invalidateInterimOpenAMSession) {
+            customTokenTransforms.add(new TokenTransformConfig(inputTokenType, outputTokenType, invalidateInterimOpenAMSession));
             return self();
         }
 
@@ -87,37 +124,76 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
         }
     }
 
-    private final Set<TokenTransformConfig> supportedTokenTranslations;
+    private final Set<TokenTransformConfig> supportedTokenTransforms;
     private final DeploymentConfig deploymentConfig;
+    private final Set<CustomTokenOperation> customTokenValidators;
+    private final Set<CustomTokenOperation> customTokenProviders;
+    private final Set<TokenTransformConfig> customTokenTransforms;
 
     /*
     Define the names of fields to aid in json marshalling. Note that these names match the names of the AttributeSchema
     entries in restSTS.xml, as this aids in marshalling an instance of this class into the attribute map needed for
     SMS persistence.
      */
-    public static final String SUPPORTED_TOKEN_TRANSLATIONS = SharedSTSConstants.SUPPORTED_TOKEN_TRANSFORMS;
+    public static final String SUPPORTED_TOKEN_TRANSFORMS = SharedSTSConstants.SUPPORTED_TOKEN_TRANSFORMS;
+    public static final String CUSTOM_TOKEN_PROVIDERS = SharedSTSConstants.CUSTOM_TOKEN_PROVIDERS;
+    public static final String CUSTOM_TOKEN_VALIDATORS = SharedSTSConstants.CUSTOM_TOKEN_VALIDATORS;
+    public static final String CUSTOM_TOKEN_TRANSFORMS = SharedSTSConstants.CUSTOM_TOKEN_TRANSFORMS;
 
     private RestSTSInstanceConfig(RestSTSInstanceConfigBuilderBase<?> builder) {
         super(builder);
-        this.supportedTokenTranslations = Collections.unmodifiableSet(builder.supportedTokenTranslations);
+        this.supportedTokenTransforms = Collections.unmodifiableSet(builder.supportedTokenTransforms);
         this.deploymentConfig = builder.deploymentConfig;
-        Reject.ifNull(supportedTokenTranslations, "Supported token translations cannot be null");
         Reject.ifNull(deploymentConfig, "DeploymentConfig cannot be null");
+        this.customTokenValidators = Collections.unmodifiableSet(builder.customTokenValidators);
+        this.customTokenProviders = Collections.unmodifiableSet(builder.customTokenProviders);
+        this.customTokenTransforms = Collections.unmodifiableSet(builder.customTokenTransforms);
+        
+        if (CollectionUtils.isEmpty(supportedTokenTransforms) && CollectionUtils.isEmpty(customTokenTransforms)) {
+            throw new IllegalStateException("Neither standard nor custom token transforms have been specified.");        
+        }
+        
+        boolean foundValidator, foundProvider;
+        for (TokenTransformConfig tokenTransformConfig : customTokenTransforms) {
+            foundValidator = false;
+            foundProvider = false;
+            for (CustomTokenOperation customTokenOperation : customTokenValidators) {
+                if (customTokenOperation.getCustomTokenName().equals(tokenTransformConfig.getInputTokenType().getId())) {
+                    foundValidator = true;
+                    break;
+                }
+            }
+            for (CustomTokenOperation customTokenOperation : customTokenProviders) {
+                if (customTokenOperation.getCustomTokenName().equals(tokenTransformConfig.getOutputTokenType().getId())) {
+                    foundProvider = true;
+                    break;
+                }
+            }
+            /*
+            custom token transforms can reference non-custom tokens - only if neither a custom token validator or
+            custom token provider is referenced, is the configuration incorrect.
+             */
+            if (!foundProvider && !foundValidator) {
+                throw new IllegalStateException("No custom token provider or custom validator found to realize the " +
+                        "custom token transform: " + tokenTransformConfig);
+            }
+        }
+        
         /*
         throw an exception if no SAML2Config is set, but a SAML token is specified as
         output in one of the token transformations. Likewise for OIDC.
          */
         if (this.saml2Config == null) {
-            for (TokenTransformConfig tokenTransformConfig : supportedTokenTranslations) {
-                if (TokenType.SAML2.equals(tokenTransformConfig.getOutputTokenType())) {
+            for (TokenTransformConfig tokenTransformConfig : supportedTokenTransforms) {
+                if (TokenType.SAML2.getId().equals(tokenTransformConfig.getOutputTokenType().getId())) {
                     throw new IllegalStateException("A SAML2 token is a transformation output, but no Saml2Config " +
                             "state has been specified to guide the production of SAML2 tokens.");
                 }
             }
         }
         if (this.openIdConnectTokenConfig == null) {
-            for (TokenTransformConfig tokenTransformConfig : supportedTokenTranslations) {
-                if (TokenType.OPENIDCONNECT.equals(tokenTransformConfig.getOutputTokenType())) {
+            for (TokenTransformConfig tokenTransformConfig : supportedTokenTransforms) {
+                if (TokenType.OPENIDCONNECT.getId().equals(tokenTransformConfig.getOutputTokenType().getId())) {
                     throw new IllegalStateException("A OPENIDCONNECT token is a transformation output, but no OIDCTokenConfig " +
                             "state has been specified to guide the production of OIDC Id Tokens.");
                 }
@@ -140,8 +216,31 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
     /**
      * @return  The set of token transformation operations supported by this STS instance.
      */
-    public Set<TokenTransformConfig> getSupportedTokenTranslations() {
-        return supportedTokenTranslations;
+    public Set<TokenTransformConfig> getSupportedTokenTransforms() {
+        return supportedTokenTransforms;
+    }
+
+    /**
+     * @return  The set of custom token transformation operations supported by this STS instance.
+     */
+    public Set<TokenTransformConfig> getCustomTokenTransforms() {
+        return customTokenTransforms;
+    }
+
+    /**
+     *
+     * @return the set of custom token validators supported by this STS instance.
+     */
+    public Set<CustomTokenOperation> getCustomTokenValidators() {
+        return customTokenValidators;
+    }
+
+    /**
+     *
+     * @return the set of custom token providers supported by this STS instance.
+     */
+    public Set<CustomTokenOperation> getCustomTokenProviders() {
+        return customTokenProviders;
     }
 
     /**
@@ -165,8 +264,11 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
     public String toString() {
         StringBuilder sb = new StringBuilder("RestSTSInstanceConfig instance:\n");
         sb.append('\t').append("STSInstanceConfig: ").append(super.toString()).append('\n');
-        sb.append('\t').append("supportedTokenTranslations: ").append(supportedTokenTranslations).append('\n');
+        sb.append('\t').append("supportedTokenTransforms: ").append(supportedTokenTransforms).append('\n');
         sb.append('\t').append("deploymentConfig: ").append(deploymentConfig).append('\n');
+        sb.append('\t').append("customTokenValidators: ").append(customTokenValidators).append('\n');
+        sb.append('\t').append("customTokenProviders: ").append(customTokenProviders).append('\n');
+        sb.append('\t').append("customTokenTransforms: ").append(customTokenTransforms).append('\n');
         return sb.toString();
     }
 
@@ -175,8 +277,11 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
         if (other instanceof RestSTSInstanceConfig) {
             RestSTSInstanceConfig otherConfig = (RestSTSInstanceConfig)other;
             return  super.equals(otherConfig) &&
-                    supportedTokenTranslations.equals(otherConfig.getSupportedTokenTranslations())  &&
-                    deploymentConfig.equals(otherConfig.getDeploymentConfig());
+                    supportedTokenTransforms.equals(otherConfig.supportedTokenTransforms)  &&
+                    Objects.equals(customTokenValidators, otherConfig.customTokenValidators) &&
+                    Objects.equals(customTokenProviders, otherConfig.customTokenProviders) &&
+                    Objects.equals(customTokenTransforms, otherConfig.customTokenTransforms) &&
+                    deploymentConfig.equals(otherConfig.deploymentConfig);
         }
         return false;
     }
@@ -189,12 +294,43 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
     public JsonValue toJson() {
         JsonValue baseValue = super.toJson();
         baseValue.add(DEPLOYMENT_CONFIG, deploymentConfig.toJson());
-        JsonValue supportedTranslations = new JsonValue(new ArrayList<>());
-        List<Object> translationList = supportedTranslations.asList();
-        for (TokenTransformConfig tokenTransformConfig : supportedTokenTranslations) {
-            translationList.add(tokenTransformConfig.toJson());
+
+        if (!supportedTokenTransforms.isEmpty()) {
+            List<JsonValue> translationList = new ArrayList<>(supportedTokenTransforms.size());
+            for (TokenTransformConfig tokenTransformConfig : supportedTokenTransforms) {
+                translationList.add(tokenTransformConfig.toJson());
+            }
+            JsonValue supportedTranslations = new JsonValue(translationList);
+            baseValue.add(SUPPORTED_TOKEN_TRANSFORMS, supportedTranslations);
         }
-        baseValue.add(SUPPORTED_TOKEN_TRANSLATIONS, supportedTranslations);
+        
+        if (!customTokenValidators.isEmpty()) {
+            List<JsonValue> customValidatorsList = new ArrayList<>(customTokenValidators.size());
+            for (CustomTokenOperation customTokenOperation : customTokenValidators) {
+                customValidatorsList.add(customTokenOperation.toJson());
+            }
+            JsonValue customValidators = new JsonValue(customValidatorsList);
+            baseValue.add(CUSTOM_TOKEN_VALIDATORS, customValidators);
+        }
+
+        if (!customTokenProviders.isEmpty()) {
+            List<JsonValue> customProvidersList = new ArrayList<>(customTokenProviders.size());
+            for (CustomTokenOperation customTokenOperation : customTokenProviders) {
+                customProvidersList.add(customTokenOperation.toJson());
+            }
+            JsonValue customProviders = new JsonValue(customProvidersList);
+            baseValue.add(CUSTOM_TOKEN_PROVIDERS, customProviders);
+        }
+
+        if (!customTokenTransforms.isEmpty()) {
+            List<JsonValue> customTranslationsList = new ArrayList<>(customTokenTransforms.size());
+            for (TokenTransformConfig tokenTransformConfig : customTokenTransforms) {
+                customTranslationsList.add(tokenTransformConfig.toJson());
+            }
+            JsonValue customTranslations = new JsonValue(customTranslationsList);
+            baseValue.add(CUSTOM_TOKEN_TRANSFORMS, customTranslations);
+        }
+
         return baseValue;
     }
 
@@ -207,16 +343,59 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
                 .saml2Config(baseConfig.getSaml2Config())
                 .oidcIdTokenConfig(baseConfig.getOpenIdConnectTokenConfig())
                 .deploymentConfig(DeploymentConfig.fromJson(json.get(DEPLOYMENT_CONFIG)));
-        JsonValue supportedTranslations = json.get(SUPPORTED_TOKEN_TRANSLATIONS);
-        if (!supportedTranslations.isList()) {
-            throw new IllegalStateException("Unexpected value for the " + SUPPORTED_TOKEN_TRANSLATIONS + " field: "
-                    + supportedTranslations.asString());
+        
+        JsonValue supportedTranslations = json.get(SUPPORTED_TOKEN_TRANSFORMS);
+        if (!supportedTranslations.isNull()) {
+            if (!supportedTranslations.isList()) {
+                throw new IllegalStateException("Unexpected value for the " + SUPPORTED_TOKEN_TRANSFORMS + " field: "
+                        + supportedTranslations.asString());
+            }
+            List<TokenTransformConfig> transformConfigList = new ArrayList<>();
+            for (Object translation : supportedTranslations.asList()) {
+                transformConfigList.add(TokenTransformConfig.fromJson(new JsonValue(translation)));
+            }
+            builder.setSupportedTokenTransforms(transformConfigList);
         }
-        List<TokenTransformConfig> transformConfigList = new ArrayList<>();
-        for (Object translation: supportedTranslations.asList()) {
-            transformConfigList.add(TokenTransformConfig.fromJson(new JsonValue(translation)));
+
+        JsonValue customTranslations = json.get(CUSTOM_TOKEN_TRANSFORMS);
+        if (!customTranslations.isNull()) {
+            if (!customTranslations.isList()) {
+                throw new IllegalStateException("Unexpected value for the " + CUSTOM_TOKEN_TRANSFORMS + " field: "
+                        + customTranslations.asString());
+            }
+            List<TokenTransformConfig> transformConfigList = new ArrayList<>();
+            for (Object translation : customTranslations.asList()) {
+                transformConfigList.add(TokenTransformConfig.fromJson(new JsonValue(translation)));
+            }
+            builder.setCustomTokenTransforms(transformConfigList);
         }
-        builder.setSupportedTokenTranslations(transformConfigList);
+
+        JsonValue customValidators = json.get(CUSTOM_TOKEN_VALIDATORS);
+        if (!customValidators.isNull()) {
+            if (!customValidators.isList()) {
+                throw new IllegalStateException("Unexpected value for the " + CUSTOM_TOKEN_VALIDATORS + " field: "
+                        + customValidators.asString());
+            }
+            List<CustomTokenOperation> customValidatorsList = new ArrayList<>();
+            for (Object translation : customValidators.asList()) {
+                customValidatorsList.add(CustomTokenOperation.fromJson(new JsonValue(translation)));
+            }
+            builder.setCustomValidators(customValidatorsList);
+        }
+
+        JsonValue customProviders = json.get(CUSTOM_TOKEN_PROVIDERS);
+        if (!customProviders.isNull()) {
+            if (!customProviders.isList()) {
+                throw new IllegalStateException("Unexpected value for the " + CUSTOM_TOKEN_PROVIDERS + " field: "
+                        + customProviders.asString());
+            }
+            List<CustomTokenOperation> customProvidersList = new ArrayList<>();
+            for (Object translation : customProviders.asList()) {
+                customProvidersList.add(CustomTokenOperation.fromJson(new JsonValue(translation)));
+            }
+            builder.setCustomProviders(customProvidersList);
+        }
+
         return builder.build();
     }
 
@@ -225,9 +404,18 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
     is to leverage the toJson functionality, as a JsonValue is essentially a map, with the following exceptions:
     1. the non-complex objects are not Set<String>, but rather <String>, and thus must be marshaled to a Set<String>. It seems
     like I could go through all of the values in the map, and if any entry is simply a String, I could marshal it to a Set<String>
-    2. the complex objects (e.g. deploymentConfig, saml2Config, supportedTokenTranslations, etc) are themselves maps, and
+    2. the complex objects (e.g. deploymentConfig, saml2Config, supportedTokenTransforms, etc) are themselves maps, and
     thus must be 'flattened' into a single map. This is done by calling each of these encapsulated objects to provide a
     map representation, and then insert these values into the top-level map.
+    Note also, that the SMS Map<String, Set<String>> representations of optional, null objects should be set to the empty
+    values. This is to support the update operation invoked from the Admin UI when an existing rest-sts instance is
+    edited. In this case, it could be that the SAML2Config of a published rest-sts instance is removed, as it should no
+    longer issue SAML2 assertions. When the updated RestSTSInstanceConfig is marshalled from the Map<String, Set<String>>
+    dispatched from the AdminUI (necessary to generate good error messages, and necessary to create the Injector necessary
+    for rest-sts instance creation), the SAML2Config instance will be null, and thus when this method is called, to get
+    the SMS persistence state, no SAML2-related attributes will be written, thereby leaving the previous, non-empty values
+    unchanged. Thus this method should be sure to create empty Set<String> entries for all attributes defined for all
+    complex, optional, but null objects. This applies to the SAML2Config and OpenIdConnectTokenConfig objects.
      */
     public Map<String, Set<String>> marshalToAttributeMap() {
         Map<String, Set<String>> interimMap = MapMarshallUtils.toSmsMap(toJson().asMap());
@@ -239,21 +427,54 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
         then add each of the TokenTransformConfig instances in the supportTokenTranslationsSet to a Set<String>, obtaining
         a string representation for each TokenTransformConfig instance, and adding it to the Set<String>
          */
-        interimMap.remove(SUPPORTED_TOKEN_TRANSLATIONS);
+        interimMap.remove(SUPPORTED_TOKEN_TRANSFORMS);
         Set<String> supportedTransforms = new HashSet<>();
-        interimMap.put(SUPPORTED_TOKEN_TRANSLATIONS, supportedTransforms);
-        for (TokenTransformConfig ttc : supportedTokenTranslations) {
+        interimMap.put(SUPPORTED_TOKEN_TRANSFORMS, supportedTransforms);
+        for (TokenTransformConfig ttc : supportedTokenTransforms) {
             supportedTransforms.add(ttc.toSMSString());
         }
 
-        if (saml2Config != null) {
-            interimMap.remove(SAML2_CONFIG);
-            interimMap.putAll(saml2Config.marshalToAttributeMap());
+        interimMap.remove(CUSTOM_TOKEN_TRANSFORMS);
+        Set<String> customTransforms = new HashSet<>();
+        interimMap.put(CUSTOM_TOKEN_TRANSFORMS, customTransforms);
+        for (TokenTransformConfig ttc : customTokenTransforms) {
+            customTransforms.add(ttc.toSMSString());
         }
 
+        interimMap.remove(CUSTOM_TOKEN_VALIDATORS);
+        Set<String> customValidators = new HashSet<>();
+        interimMap.put(CUSTOM_TOKEN_VALIDATORS, customValidators);
+        for (CustomTokenOperation cto : customTokenValidators) {
+            customValidators.add(cto.toSMSString());
+        }
+
+        interimMap.remove(CUSTOM_TOKEN_PROVIDERS);
+        Set<String> customProviders = new HashSet<>();
+        interimMap.put(CUSTOM_TOKEN_PROVIDERS, customProviders);
+        for (CustomTokenOperation cto : customTokenProviders) {
+            customProviders.add(cto.toSMSString());
+        }
+
+        interimMap.remove(SAML2_CONFIG);
+        if (saml2Config != null) {
+            interimMap.putAll(saml2Config.marshalToAttributeMap());
+        } else {
+            /*
+            Generate empty values for all of the SAML2Config attribute keys, in case this method is called as part of
+            an update, and previous values need to be over-written.
+             */
+            interimMap.putAll(SAML2Config.getEmptySMSAttributeState());
+        }
+
+        interimMap.remove(OIDC_ID_TOKEN_CONFIG);
         if (openIdConnectTokenConfig != null) {
-            interimMap.remove(OIDC_ID_TOKEN_CONFIG);
             interimMap.putAll(openIdConnectTokenConfig.marshalToAttributeMap());
+        } else {
+            /*
+            Generate empty values for all of the OpenIdConnectTokenConfig attribute keys, in case this method is called as part of
+            an update, and previous values need to be over-written.
+             */
+            interimMap.putAll(OpenIdConnectTokenConfig.getEmptySMSAttributeState());
         }
         return interimMap;
     }
@@ -288,17 +509,45 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
         }
 
         /*
-         The SUPPORTED_TOKEN_TRANSLATIONS are currently each in a String representation in the Set<String> map entry corresponding
-         to the SUPPORTED_TOKEN_TRANSLATIONS key. I need to marshal each back into a TokenTransformConfig instance, and then
+         The SUPPORTED_TOKEN_TRANSFORMS, CUSTOM_TOKEN_TRANSFORMS, CUSTOM_TOKEN_VALIDATORS, and CUSTOM_TOKEN_PROVIDERS
+          are currently each in a String representation in the Set<String> map entry corresponding
+         to their respective key. I need to marshal each back into a TokenTransformConfig instance, and then
          call toJson on each, and put them in a JsonValue wrapping a list.
          */
         ArrayList<JsonValue> jsonTranslationsList = new ArrayList<>();
         JsonValue jsonTranslations = new JsonValue(jsonTranslationsList);
-        jsonAttributes.remove(SUPPORTED_TOKEN_TRANSLATIONS);
-        jsonAttributes.put(SUPPORTED_TOKEN_TRANSLATIONS, jsonTranslations);
-        Set<String> stringTokenTranslations = attributeMap.get(SUPPORTED_TOKEN_TRANSLATIONS);
+        jsonAttributes.remove(SUPPORTED_TOKEN_TRANSFORMS);
+        jsonAttributes.put(SUPPORTED_TOKEN_TRANSFORMS, jsonTranslations);
+        Set<String> stringTokenTranslations = attributeMap.get(SUPPORTED_TOKEN_TRANSFORMS);
         for (String translation : stringTokenTranslations) {
             jsonTranslationsList.add(TokenTransformConfig.fromSMSString(translation).toJson());
+        }
+
+        ArrayList<JsonValue> jsonCustomTranslationsList = new ArrayList<>();
+        JsonValue jsonCustomTranslations = new JsonValue(jsonCustomTranslationsList);
+        jsonAttributes.remove(CUSTOM_TOKEN_TRANSFORMS);
+        jsonAttributes.put(CUSTOM_TOKEN_TRANSFORMS, jsonCustomTranslations);
+        Set<String> stringCustomTranslations = attributeMap.get(CUSTOM_TOKEN_TRANSFORMS);
+        for (String translation : stringCustomTranslations) {
+            jsonCustomTranslationsList.add(TokenTransformConfig.fromSMSString(translation).toJson());
+        }
+
+        ArrayList<JsonValue> jsonCustomValidatorsList = new ArrayList<>();
+        JsonValue jsonCustomValidators = new JsonValue(jsonCustomValidatorsList);
+        jsonAttributes.remove(CUSTOM_TOKEN_VALIDATORS);
+        jsonAttributes.put(CUSTOM_TOKEN_VALIDATORS, jsonCustomValidators);
+        Set<String> stringCustomValidators = attributeMap.get(CUSTOM_TOKEN_VALIDATORS);
+        for (String validator : stringCustomValidators) {
+            jsonCustomValidatorsList.add(CustomTokenOperation.fromSMSString(validator).toJson());
+        }
+
+        ArrayList<JsonValue> jsonCustomProvidersList = new ArrayList<>();
+        JsonValue jsonCustomProviders = new JsonValue(jsonCustomProvidersList);
+        jsonAttributes.remove(CUSTOM_TOKEN_PROVIDERS);
+        jsonAttributes.put(CUSTOM_TOKEN_PROVIDERS, jsonCustomProviders);
+        Set<String> stringCustomProviders = attributeMap.get(CUSTOM_TOKEN_PROVIDERS);
+        for (String provider : stringCustomProviders) {
+            jsonCustomProvidersList.add(CustomTokenOperation.fromSMSString(provider).toJson());
         }
 
         return fromJson(new JsonValue(jsonAttributes));
@@ -310,9 +559,11 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
     in the ViewBean class, as this would introduce a dependency on the rest-sts into the openam-console module. Thus the
     RestSecurityTokenServiceViewBean can only invoke the rest-sts-publish service with a JsonValue wrapping the
     Map<String, Set<String>>.
-    This method will be invoked with the JsonValue generated by wrapping a Map<String, List<String>>
-    containing the user's rest-sts-configurations. It will turn the Map<String, List<String>> wrapped by the JsonValue back into
-    a raw Map<String, Set<String>>, and call marshalFromAttributeMap.
+    This method will be invoked with the JsonValue generated by wrapping a Map<String, Set<String>>
+    containing the user's rest-sts-configurations. This JsonValue is generated by the RestSTSModelImpl class, which is invoked from the
+    rest-sts ViewBean classes to compose the POST to the publish-service with the ViewBean PropertySheet yield. It would
+    be possible to simply call jsonValue.asMap, and then cast the result, but the approach in the method below is a bit
+    safer, and avoids the blind cast.
      */
     public static RestSTSInstanceConfig marshalFromJsonAttributeMap(JsonValue jsonValue) throws IllegalStateException {
         if (jsonValue ==  null) {

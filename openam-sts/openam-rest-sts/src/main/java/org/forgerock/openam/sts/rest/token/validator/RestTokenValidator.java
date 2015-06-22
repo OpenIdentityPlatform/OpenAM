@@ -19,21 +19,19 @@ package org.forgerock.openam.sts.rest.token.validator;
 import org.forgerock.openam.sts.TokenValidationException;
 
 /**
- * Defines the contract for token validators. Note that RestTokenValidator implementations have the responsibility for
- * caching the OpenAM session id in the ThreadLocalAMTokenCache, as this session id is the basis of the subjects asserted
- * by the tokens produced by the TokenGenerationService, and RestTokenProvider implementations will expect
- * to find the OpenAM session id in the ThreadLocalAMTokenCache.
+ * Defines the contract for token validators.
  *
  * The generic type T corresponds to the type of the to-be-validated token. These types are currently limited to:
  * 1. java.security.cert.X509Certificate[]
  * 2. the classes in the org.forgerock.openam.sts.token.model package of the openam-sts-client package: RestUsernameToken,
  * OpenAMSessionToken, OpenIdConnectIdToken.
+ * 3. JsonValue, which is the type common to all custom token validators.
  */
 public interface RestTokenValidator<T> {
     /**
      *
-     * @param restTokenValidatorParameters The token validation parameters - currently limited to producing the to-be-validated
-     *                                     token.
+     * @param restTokenValidatorParameters The token validation parameters which provide access to the to-be-validated
+     *                                     token
      * @return The RestTokenValidatorResult encapsulating the Principal and OpenAM session id corresponding to a
      * successfully-validated token
      * @throws TokenValidationException If the token could not be successfully validated.

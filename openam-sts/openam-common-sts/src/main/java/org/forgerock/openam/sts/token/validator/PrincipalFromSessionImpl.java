@@ -90,7 +90,7 @@ public class PrincipalFromSessionImpl implements PrincipalFromSession {
                     "the sessionId passed to PrincipalFromSession is null or empty.");
         }
         try {
-            Map<String, String> headerMap = new HashMap<String, String>();
+            Map<String, String> headerMap = new HashMap<>();
             headerMap.put(AMSTSConstants.COOKIE, amSessionCookieName + AMSTSConstants.EQUALS + sessionId);
             headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
             headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersionUsersService);
@@ -101,7 +101,8 @@ public class PrincipalFromSessionImpl implements PrincipalFromSession {
                     .makeInvocation();
             final int responseCode = connectionResult.getStatusCode();
             if (responseCode != HttpURLConnection.HTTP_OK) {
-                throw new TokenValidationException(responseCode, "Non-200 response from posting principal from session request.");
+                throw new TokenValidationException(responseCode, "Non-200 response from posting principal from session request: "
+                        + connectionResult.getResult());
             } else {
                 return parsePrincipalFromResponse(connectionResult.getResult());
             }

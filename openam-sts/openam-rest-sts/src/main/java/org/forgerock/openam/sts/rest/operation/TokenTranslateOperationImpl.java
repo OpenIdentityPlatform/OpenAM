@@ -24,8 +24,7 @@ import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenTypeId;
 import org.forgerock.openam.sts.TokenValidationException;
-import org.forgerock.openam.sts.config.user.TokenTransformConfig;
-import org.forgerock.openam.sts.rest.marshal.TokenRequestMarshaller;
+import org.forgerock.openam.sts.rest.config.user.TokenTransformConfig;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -53,17 +52,22 @@ public class TokenTranslateOperationImpl implements TokenTranslateOperation {
     @Inject
     TokenTranslateOperationImpl(
                         TokenRequestMarshaller tokenRequestMarshaller,
-                        @Named(AMSTSConstants.REST_SUPPORTED_TOKEN_TRANSLATIONS)
-                        Set<TokenTransformConfig> supportedTranslations,
+                        @Named(AMSTSConstants.REST_SUPPORTED_TOKEN_TRANSFORMS)
+                        Set<TokenTransformConfig> supportedTransforms,
+                        @Named(AMSTSConstants.REST_CUSTOM_TOKEN_TRANSLATIONS)
+                        Set<TokenTransformConfig> customTransforms,
                         TokenTransformFactory tokenTransformFactory) throws Exception {
         this.tokenRequestMarshaller = tokenRequestMarshaller;
 
-        if (supportedTranslations.isEmpty()) {
+        if (supportedTransforms.isEmpty() && customTransforms.isEmpty()) {
             throw new IllegalArgumentException("No token transform operations specified.");
         }
 
-        Set<TokenTransform> interimTransforms = new HashSet<TokenTransform>();
-        for (TokenTransformConfig tokenTransformConfig : supportedTranslations) {
+        Set<TokenTransform> interimTransforms = new HashSet<>(supportedTransforms.size() + customTransforms.size());
+        for (TokenTransformConfig tokenTransformConfig : supportedTransforms) {
+            interimTransforms.add(tokenTransformFactory.buildTokenTransform(tokenTransformConfig));
+        }
+        for (TokenTransformConfig tokenTransformConfig : customTransforms) {
             interimTransforms.add(tokenTransformFactory.buildTokenTransform(tokenTransformConfig));
         }
         tokenTransforms = Collections.unmodifiableSet(interimTransforms);
@@ -83,13 +87,13 @@ public class TokenTranslateOperationImpl implements TokenTranslateOperation {
             }
         }
         if (targetedTransform == null) {
-            String message = "The desired transformation, from " + inputTokenType + " to " + outputTokenType +
+            String message = "The desired transformation, from " + inputTokenType.getId() + " to " + outputTokenType.getId() +
                     ", is not a supported token translation.";
             throw new TokenValidationException(ResourceException.BAD_REQUEST, message);
         }
         RestTokenValidatorParameters<?> validatorParameters = tokenRequestMarshaller.buildTokenValidatorParameters(
                 invocationState.getInputTokenState(), httpContext, restSTSServiceHttpServletContext);
-        RestTokenProviderParameters<? extends TokenTypeId> providerParameters =
+        RestTokenProviderParameters<?> providerParameters =
                 tokenRequestMarshaller.buildTokenProviderParameters(inputTokenType,
                     invocationState.getInputTokenState(), outputTokenType, invocationState.getOutputTokenState());
 

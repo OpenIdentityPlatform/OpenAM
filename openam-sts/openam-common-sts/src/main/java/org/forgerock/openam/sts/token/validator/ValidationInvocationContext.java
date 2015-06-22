@@ -32,16 +32,26 @@ public enum ValidationInvocationContext {
     Token validation taking place in the context of standard rest-sts token transformation
      */
     REST_TOKEN_TRANSFORMATION,
+
     /*
     Token validation taking place in the context of soap-sts SecurityPolicy binding enforcement
      */
     SOAP_SECURITY_POLICY,
+
     /*
     Token validation taking place in the context of a delegated token - ActAs/OnBehalfOf as defined in WS-Trust
      */
     SOAP_TOKEN_DELEGATION,
+
     /*
-    Token validation taking place as part of the WS-Trust defined Validate operation
+    Token validation taking place as part of the WS-Trust defined Validate operation - either in the soap-sts or the
+    rest-sts
      */
-    SOAP_TOKEN_VALIDATION
+    TOKEN_VALIDATION_OPERATION,
+
+    /*
+    Token validation taking place as part of the WS-Trust defined Renew operation - either in the soap-sts or the
+    rest-sts
+     */
+    TOKEN_RENEW_OPERATION
 }

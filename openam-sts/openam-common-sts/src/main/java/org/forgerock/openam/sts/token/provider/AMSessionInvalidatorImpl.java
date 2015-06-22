@@ -76,7 +76,7 @@ public class AMSessionInvalidatorImpl implements AMSessionInvalidator {
         TokenCreationException tokenCreationException = null;
         for (String sessionId : sessionIds) {
             try {
-                Map<String, String> headerMap = new HashMap<String, String>();
+                Map<String, String> headerMap = new HashMap<>();
                 headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
                 headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersionSessionService);
                 headerMap.put(amSessionCookieName, sessionId);
@@ -89,7 +89,7 @@ public class AMSessionInvalidatorImpl implements AMSessionInvalidator {
                 final int responseCode = connectionResult.getStatusCode();
                 if (responseCode != HttpURLConnection.HTTP_OK) {
                     throw new TokenCreationException(responseCode, "Non-200 response from invalidating session " + sessionId +
-                            "against url " + logoutUrl);
+                            "against url " + logoutUrl + " : " + connectionResult.getResult());
                 } else {
                     if (logger.isDebugEnabled()) {
                         logger.debug("Invalidated session " + sessionId);

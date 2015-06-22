@@ -16,15 +16,13 @@
 
 package org.forgerock.openam.sts.rest.token.validator;
 
-import org.forgerock.openam.sts.TokenTypeId;
-
 /**
  *  Defines the parameter state which needs to be passed to the RestTokenValidator#validateToken instances. The generic
- *  type will correspond to the type of to-be-validated token. It is possible that additional parameter state will
- *  need to be provided, thus this interface will be maintained, though it currently serves only to produce the generic
- *  type of the to-be-validated token.
+ *  type will correspond to the to-be-validated token.
+ *
+ *  For custom RestTokenValidator implementations, this generic type will be {@link org.forgerock.json.fluent.JsonValue}
  */
-public interface RestTokenValidatorParameters<T> extends TokenTypeId {
+public interface RestTokenValidatorParameters<T> {
     /**
      *
      * @return the to-be-validated token.

@@ -101,7 +101,7 @@ public class SoapSTSAccessTokenProviderImpl implements SoapSTSAccessTokenProvide
 
     @Override
     public String getAccessToken() throws ResourceException {
-        Map<String, String> headerMap = new HashMap<String, String>();
+        Map<String, String> headerMap = new HashMap<>();
         headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
         headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, authNServiceVersion);
         headerMap.put(AMSTSConstants.AM_REST_AUTHN_USERNAME_HEADER, credentialsAccess.getAgentUsername());
@@ -115,7 +115,8 @@ public class SoapSTSAccessTokenProviderImpl implements SoapSTSAccessTokenProvide
                             .makeInvocation();
             final int responseCode = connectionResult.getStatusCode();
             if (responseCode != HttpURLConnection.HTTP_OK) {
-                throw ResourceException.getException(responseCode, "Non-200 response authenticating against " + authenticateUrl);
+                throw ResourceException.getException(responseCode, "Non-200 response authenticating against " + authenticateUrl
+                    + " : " + connectionResult.getResult());
             } else {
                 try {
                     return amTokenParser.getSessionFromAuthNResponse(connectionResult.getResult());
@@ -132,7 +133,7 @@ public class SoapSTSAccessTokenProviderImpl implements SoapSTSAccessTokenProvide
 
     @Override
     public void invalidateAccessToken(String sessionId){
-        Map<String, String> headerMap = new HashMap<String, String>();
+        Map<String, String> headerMap = new HashMap<>();
         headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
         headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, sessionServiceVersion);
         headerMap.put(amSessionCookieName, sessionId);
@@ -146,7 +147,7 @@ public class SoapSTSAccessTokenProviderImpl implements SoapSTSAccessTokenProvide
             final int responseCode = connectionResult.getStatusCode();
             if (responseCode != HttpURLConnection.HTTP_OK) {
                 logger.error("Non-200 response invalidating the soap-sts-agent token. " +
-                        "This likely means that the session was not invalidated. The return code: " + responseCode);
+                        "This likely means that the session was not invalidated: " + connectionResult.getResult());
             }
         } catch (IOException ioe) {
             logger.error("IOException caught invalidating the soap-sts-agent token: " + ioe, ioe);

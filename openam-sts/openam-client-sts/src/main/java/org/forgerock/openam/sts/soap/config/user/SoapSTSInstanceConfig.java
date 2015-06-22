@@ -28,12 +28,12 @@ import org.forgerock.openam.sts.config.user.SAML2Config;
 import org.forgerock.openam.sts.config.user.STSInstanceConfig;
 import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
 import org.forgerock.openam.utils.CollectionUtils;
-import org.forgerock.util.Reject;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -59,7 +59,7 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
 
     public abstract static class SoapSTSInstanceConfigBuilderBase <T extends SoapSTSInstanceConfigBuilderBase<T>>
             extends STSInstanceConfig.STSInstanceConfigBuilderBase<T>  {
-        private Set<TokenType> issueTokenTypes;
+        private EnumSet<TokenType> issueTokenTypes;
 
         private Set<TokenValidationConfig> securityPolicyValidatedTokenConfiguration;
 
@@ -74,7 +74,7 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         private boolean delegationRelationshipsSupported;
 
         private SoapSTSInstanceConfigBuilderBase() {
-            issueTokenTypes = new HashSet<>();
+            issueTokenTypes = EnumSet.noneOf(TokenType.class);
             securityPolicyValidatedTokenConfiguration = new HashSet<>();
         }
 
@@ -164,8 +164,10 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
                 Collections.unmodifiableSet(builder.securityPolicyValidatedTokenConfiguration) : Collections.<TokenValidationConfig>emptySet();
         this.soapDelegationConfig = builder.soapDelegationConfig;
         //Keystore config can be null if we are dealing with an unprotected SecurityPolicy binding, or just the transport binding
-        //not sure if the SecurityPolicy validator for the transport binding needs any crypto context, or if it just confirms container. TODO
-        Reject.ifNull(deploymentConfig, "DeploymentConfig cannot be null");
+        if (deploymentConfig == null) {
+            throw new IllegalStateException("SoapDeploymentConfig cannot be null");
+        }
+
         if (CollectionUtils.isEmpty(issueTokenTypes)) {
             throw new IllegalStateException("Issued token types must be specified.");
         }
@@ -179,22 +181,17 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         }
 
         if (this.saml2Config == null) {
-            for (TokenType tokenType : issueTokenTypes) {
-                if (TokenType.SAML2.equals(tokenType)) {
-                    throw new IllegalStateException("A SAML2 token is specified as an issued token type, but no SAML2Config " +
-                            "state has been specified to guide the production of SAML2 tokens.");
-                }
+            if (issueTokenTypes.contains(TokenType.SAML2)) {
+                throw new IllegalStateException("A SAML2 token is specified as an issued token type, but no SAML2Config " +
+                        "state has been specified to guide the production of SAML2 tokens.");
             }
         }
 
         if (this.openIdConnectTokenConfig == null) {
-            for (TokenType tokenType : issueTokenTypes) {
-                if (TokenType.OPENIDCONNECT.equals(tokenType)) {
-                    throw new IllegalStateException("A OPENIDCONNECT token is specified as an issued token type, but no " +
-                            "OpenIdConnectTokenConfig state has been specified to guide the production of OPENIDCONNECT tokens.");
-                }
+            if (issueTokenTypes.contains(TokenType.OPENIDCONNECT)) {
+                throw new IllegalStateException("A OPENIDCONNECT token is specified as an issued token type, but no " +
+                        "OpenIdConnectTokenConfig state has been specified to guide the production of OPENIDCONNECT tokens.");
             }
-
         }
 
         if (delegationRelationshipsSupported && (soapDelegationConfig == null)) {
@@ -396,9 +393,23 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         return builder.build();
     }
 
-    /**
-     * @return The state of this instance marshaled into the <code>Map<String>, Set<String>> </code> format required for
-     * persistence in the SMS.
+    /*
+    This method will marshal this state into the Map<String>, Set<String>> required for persistence in the SMS. The intent
+    is to leverage the toJson functionality, as a JsonValue is essentially a map, with the following exceptions:
+    1. the non-complex objects are not Set<String>, but rather <String>, and thus must be marshaled to a Set<String>. It seems
+    like I could go through all of the values in the map, and if any entry is simply a String, I could marshal it to a Set<String>
+    2. the complex objects (e.g. deploymentConfig, saml2Config, supportedTokenTransforms, etc) are themselves maps, and
+    thus must be 'flattened' into a single map. This is done by calling each of these encapsulated objects to provide a
+    map representation, and then insert these values into the top-level map.
+    Note also, that the SMS Map<String, Set<String>> representations of optional, null objects should be set to the empty
+    values. This is to support the update operation invoked from the Admin UI when an existing rest-sts instance is
+    edited. In this case, it could be that the SAML2Config of a published rest-sts instance is removed, as it should no
+    longer issue SAML2 assertions. When the updated RestSTSInstanceConfig is marshalled from the Map<String, Set<String>>
+    dispatched from the AdminUI (necessary to generate good error messages, and necessary to create the Injector necessary
+    for rest-sts instance creation), the SAML2Config instance will be null, and thus when this method is called, to get
+    the SMS persistence state, no SAML2-related attributes will be written, thereby leaving the previous, non-empty values
+    unchanged. Thus this method should be sure to create empty Set<String> entries for all attributes defined for all
+    complex, optional, but null objects. This applies to the SAML2Config and OpenIdConnectTokenConfig objects.
      */
     public Map<String, Set<String>> marshalToAttributeMap() {
         /*
@@ -418,40 +429,62 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         then add each of the TokenTransformConfig instances in the supportTokenTranslationsSet to a Set<String>, obtaining
         a string representation for each TokenTransformConfig instance, and adding it to the Set<String>
          */
-        if (securityPolicyValidatedTokenConfiguration != null) {
-            interimMap.remove(VALIDATED_TOKEN_CONFIG);
-            Set<String> validatedTokenConfig = new HashSet<>();
-            interimMap.put(VALIDATED_TOKEN_CONFIG, validatedTokenConfig);
-            for (TokenValidationConfig tvc : securityPolicyValidatedTokenConfiguration) {
-                validatedTokenConfig.add(tvc.toSMSString());
-            }
+        interimMap.remove(VALIDATED_TOKEN_CONFIG);
+        Set<String> validatedTokenConfig = new HashSet<>();
+        interimMap.put(VALIDATED_TOKEN_CONFIG, validatedTokenConfig);
+        for (TokenValidationConfig tvc : securityPolicyValidatedTokenConfiguration) {
+            validatedTokenConfig.add(tvc.toSMSString());
         }
-        if (issueTokenTypes != null) {
-            interimMap.remove(ISSUE_TOKEN_TYPES);
-            Set<String> tokenTypes = new HashSet<>();
-            interimMap.put(ISSUE_TOKEN_TYPES, tokenTypes);
-            for (TokenType tt : issueTokenTypes) {
-                tokenTypes.add(tt.toString());
-            }
+
+        interimMap.remove(ISSUE_TOKEN_TYPES);
+        Set<String> tokenTypes = new HashSet<>();
+        interimMap.put(ISSUE_TOKEN_TYPES, tokenTypes);
+        for (TokenType tt : issueTokenTypes) {
+            tokenTypes.add(tt.toString());
         }
+
+        interimMap.remove(SAML2_CONFIG);
         if (saml2Config != null) {
-            interimMap.remove(SAML2_CONFIG);
             interimMap.putAll(saml2Config.marshalToAttributeMap());
+        } else {
+            /*
+            Generate empty values for all of the SAML2Config attribute keys, in case this method is called as part of
+            an update, and previous values need to be over-written.
+             */
+            interimMap.putAll(SAML2Config.getEmptySMSAttributeState());
         }
 
+        interimMap.remove(OIDC_ID_TOKEN_CONFIG);
         if (openIdConnectTokenConfig != null) {
-            interimMap.remove(OIDC_ID_TOKEN_CONFIG);
             interimMap.putAll(openIdConnectTokenConfig.marshalToAttributeMap());
+        } else {
+            /*
+            Generate empty values for all of the OpenIdConnectTokenConfig attribute keys, in case this method is called as part of
+            an update, and previous values need to be over-written.
+             */
+            interimMap.putAll(OpenIdConnectTokenConfig.getEmptySMSAttributeState());
         }
 
+        interimMap.remove(SOAP_KEYSTORE_CONFIG);
         if (keystoreConfig != null) {
-            interimMap.remove(SOAP_KEYSTORE_CONFIG);
             interimMap.putAll(keystoreConfig.marshalToAttributeMap());
+        } else {
+            /*
+            Generate empty values for all of the SoapSTSKeystoreConfig attribute keys, in case this method is called as part of
+            an update, and previous values need to be over-written.
+             */
+            interimMap.putAll(SoapSTSKeystoreConfig.getEmptySMSAttributeState());
         }
 
+        interimMap.remove(SOAP_DELEGATION_CONFIG);
         if (soapDelegationConfig != null) {
-            interimMap.remove(SOAP_DELEGATION_CONFIG);
             interimMap.putAll(soapDelegationConfig.marshalToAttributeMap());
+        } else {
+            /*
+            Generate empty values for all of the SoapSTSKeystoreConfig attribute keys, in case this method is called as part of
+            an update, and previous values need to be over-written.
+             */
+            interimMap.putAll(SoapDelegationConfig.getEmptySMSAttributeState());
         }
 
         return interimMap;

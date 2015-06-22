@@ -243,10 +243,28 @@ public class SharedSTSConstants {
     public static final String ISSUER_NAME = "issuer-name";
 
     /*
-    This field referenced in RestSTSInstanceConfig.SUPPORTED_TOKEN_TRANSLATIONS. It is the name of the key of the json field referencing
+    This field referenced in RestSTSInstanceConfig.SUPPORTED_TOKEN_TRANSFORMS. It is the name of the key of the json field referencing
     the set of token transformations, which also matches the name of the AttributeSchema element defined in restSTS.xml
      */
     public static final String SUPPORTED_TOKEN_TRANSFORMS = "supported-token-transforms";
+
+    /*
+    This field referenced in RestSTSInstanceConfig.CUSTOM_TOKEN_PROVIDERS It is the name of the key of the json field referencing
+    the set of custom token providers, which also matches the name of the AttributeSchema element defined in restSTS.xml
+     */
+    public static final String CUSTOM_TOKEN_PROVIDERS = "custom-token-providers";
+
+    /*
+    This field referenced in RestSTSInstanceConfig.CUSTOM_TOKEN_VALIDATORS It is the name of the key of the json field referencing
+    the set of custom token validators, which also matches the name of the AttributeSchema element defined in restSTS.xml
+     */
+    public static final String CUSTOM_TOKEN_VALIDATORS = "custom-token-validators";
+
+    /*
+    This field referenced in RestSTSInstanceConfig.CUSTOM_TOKEN_TRANSFORMS It is the name of the key of the json field referencing
+    the set of custom token translations, which also matches the name of the AttributeSchema element defined in restSTS.xml
+     */
+    public static final String CUSTOM_TOKEN_TRANSFORMS = "custom-token-transforms";
 
     public static final String FORWARD_SLASH = "/";
 

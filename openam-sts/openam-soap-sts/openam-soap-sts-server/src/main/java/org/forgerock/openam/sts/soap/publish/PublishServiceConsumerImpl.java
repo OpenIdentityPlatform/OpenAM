@@ -78,7 +78,7 @@ public class PublishServiceConsumerImpl implements PublishServiceConsumer {
         String sessionId = null;
         try {
             sessionId = soapSTSAccessTokenProvider.getAccessToken();
-            Map<String, String> headerMap = new HashMap<String, String>();
+            Map<String, String> headerMap = new HashMap<>();
             headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
             headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, soapSTSPublishServiceVersion);
             headerMap.put(AMSTSConstants.COOKIE, createAMSessionCookie(sessionId));
@@ -93,9 +93,9 @@ public class PublishServiceConsumerImpl implements PublishServiceConsumer {
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 return parseResponse(connectionResult.getResult());
             } else {
-                throw new STSPublishException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR,
+                throw new STSPublishException(responseCode,
                         "Returning empty list from PublishServiceConsumerImpl#getPublishedInstances - non 200 " +
-                                "response from sts-publish service: " + responseCode);
+                                "response from sts-publish service: " + connectionResult.getResult());
             }
         } catch (IOException e) {
             throw new STSPublishException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR,
@@ -116,7 +116,7 @@ public class PublishServiceConsumerImpl implements PublishServiceConsumer {
     }
 
     private Set<SoapSTSInstanceConfig> parseResponse(String response) throws STSPublishException {
-        Set<SoapSTSInstanceConfig> instanceConfigs = new HashSet<SoapSTSInstanceConfig>();
+        Set<SoapSTSInstanceConfig> instanceConfigs = new HashSet<>();
         JsonValue json;
         try {
             json = JsonValueBuilder.toJsonValue(response);

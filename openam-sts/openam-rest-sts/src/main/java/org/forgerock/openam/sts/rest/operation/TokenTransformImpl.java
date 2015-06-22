@@ -18,7 +18,6 @@ package org.forgerock.openam.sts.rest.operation;
 
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.TokenCreationException;
-import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.TokenTypeId;
 import org.forgerock.openam.sts.TokenValidationException;
 
@@ -26,6 +25,7 @@ import org.forgerock.openam.sts.rest.token.provider.RestTokenProvider;
 import org.forgerock.openam.sts.rest.token.provider.RestTokenProviderParameters;
 import org.forgerock.openam.sts.rest.token.validator.RestTokenValidator;
 import org.forgerock.openam.sts.rest.token.validator.RestTokenValidatorParameters;
+import org.forgerock.openam.sts.rest.token.validator.RestTokenValidatorResult;
 
 /**
  * The TokenTranslateOperationImpl maintains a Set of these instances, one for each supported token transformation. These
@@ -42,7 +42,7 @@ import org.forgerock.openam.sts.rest.token.validator.RestTokenValidatorParameter
  */
 public class TokenTransformImpl implements TokenTransform {
     private final RestTokenValidator<?> tokenValidator;
-    private final RestTokenProvider<? extends TokenTypeId> tokenProvider;
+    private final RestTokenProvider<?> tokenProvider;
     private final TokenTypeId inputTokenType;
     private final TokenTypeId outputTokenType;
     private final String key;
@@ -52,8 +52,8 @@ public class TokenTransformImpl implements TokenTransform {
      */
     TokenTransformImpl(
             RestTokenValidator<?> tokenValidator,
-            RestTokenProvider<? extends TokenTypeId> tokenProvider,
-            TokenType inputTokenType, TokenType outputTokenType) {
+            RestTokenProvider<?> tokenProvider,
+            TokenTypeId inputTokenType, TokenTypeId outputTokenType) {
         this.tokenValidator = tokenValidator;
         this.tokenProvider = tokenProvider;
         this.inputTokenType = inputTokenType;
@@ -63,18 +63,32 @@ public class TokenTransformImpl implements TokenTransform {
 
     @Override
     public boolean isTransformSupported(TokenTypeId inputTokenType, TokenTypeId outputTokenType) {
-        return this.inputTokenType.equals(inputTokenType) && this.outputTokenType.equals(outputTokenType);
+        return this.inputTokenType.getId().equals(inputTokenType.getId()) && this.outputTokenType.getId().equals(outputTokenType.getId());
     }
 
     @Override
     public JsonValue transformToken(RestTokenValidatorParameters validatorParameters, RestTokenProviderParameters providerParameters)
             throws TokenValidationException, TokenCreationException {
-        tokenValidator.validateToken(validatorParameters);
-        //TODO: pending decision on supporting custom token operations (AME-6554), I may want to allow the RestTokenValidatorResult
-        //to encapsulate an 'additionalState' JsonValue, which is copied into the RestTokenProviderParameters. It may even make
-        //sense to add an 'additionalState' JsonValue to the RestSTSServiceInvocationState, which could be passed into the
-        //RestTokenValidatorParameters. This would allow rest-sts invocations to encapsulate additional state possibly required
-        //by custom token operations.
+        final RestTokenValidatorResult validatorResult = tokenValidator.validateToken(validatorParameters);
+
+        /*
+        transfer the additional state which supports Custom RestTokenProvider implementations
+         */
+        if (providerParameters instanceof CustomRestTokenProviderParametersImpl) {
+            //set the principal resulting from successful token validation
+            ((CustomRestTokenProviderParametersImpl)providerParameters).setPrincipal(validatorResult.getPrincipal());
+            /*
+            Transfer any additional state possibly produced by custom RestTokenValidator implementations to the RestTokenProviderParameters -
+            again to support custom RestTokenValidator/RestTokenProvider combinations.
+             */
+            ((CustomRestTokenProviderParametersImpl)providerParameters).setAdditionalState(validatorResult.getAdditionalState());
+
+            /*
+            I know the AM Session id returned from the validatorResult will be non-null because the the wrapper for custom
+            token validators will throw an exception if the AM session id in the RestTokenValidatorResult is null.
+             */
+            ((CustomRestTokenProviderParametersImpl)providerParameters).setAMSessionIdFromTokenValidation(validatorResult.getAMSessionId());
+        }
         return tokenProvider.createToken(providerParameters);
     }
 

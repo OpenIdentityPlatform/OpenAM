@@ -16,13 +16,10 @@
 
 package org.forgerock.openam.sts.rest.token.provider.oidc;
 
-import org.forgerock.openam.sts.TokenType;
-import org.forgerock.openam.sts.TokenTypeId;
-
 /**
  * Encapsulates the invocation-specific state necessary to create OpenIdConnect tokens.
  */
-public class OpenIdConnectTokenCreationState implements TokenTypeId {
+public class OpenIdConnectTokenCreationState {
     private final String nonce;
     private final long authenticationTimeInSeconds;
 
@@ -37,10 +34,5 @@ public class OpenIdConnectTokenCreationState implements TokenTypeId {
 
     public long getAuthenticationTimeInSeconds() {
         return authenticationTimeInSeconds;
-    }
-
-    @Override
-    public String getId() {
-        return TokenType.OPENIDCONNECT.name();
     }
 }

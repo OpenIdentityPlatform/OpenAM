@@ -14,7 +14,7 @@
  * Copyright 2013-2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.sts.rest.marshal;
+package org.forgerock.openam.sts.rest.operation;
 
 import com.sun.identity.shared.encode.Base64;
 import org.forgerock.json.fluent.JsonValue;
@@ -24,6 +24,7 @@ import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenTypeId;
+import org.forgerock.openam.sts.config.user.CustomTokenOperation;
 import org.forgerock.openam.sts.rest.service.RestSTSServiceHttpServletContext;
 import org.forgerock.openam.sts.rest.token.provider.RestTokenProviderParameters;
 import org.forgerock.openam.sts.rest.token.provider.oidc.OpenIdConnectTokenCreationState;
@@ -49,7 +50,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @see org.forgerock.openam.sts.rest.marshal.TokenRequestMarshaller
+ * @see TokenRequestMarshaller
  */
 public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
     private static final String X509_CERTIFICATE_ATTRIBUTE = "javax.servlet.request.X509Certificate";
@@ -60,14 +61,20 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
     to the TLS-offload engines fronting an OpenAM deployment.
      */
     private final Set<String> tlsOffloadEngineHosts;
+    private final Set<CustomTokenOperation> customTokenValidators;
+    private final Set<CustomTokenOperation> customTokenProviders;
     private final Logger logger;
 
     @Inject
     TokenRequestMarshallerImpl(@Named(AMSTSConstants.OFFLOADED_TWO_WAY_TLS_HEADER_KEY) String  offloadedTlsClientCertKey,
                                @Named(AMSTSConstants.TLS_OFFLOAD_ENGINE_HOSTS) Set<String> tlsOffloadEngineHosts,
+                               @Named(AMSTSConstants.REST_CUSTOM_TOKEN_VALIDATORS) Set<CustomTokenOperation> customTokenValidators,
+                               @Named(AMSTSConstants.REST_CUSTOM_TOKEN_PROVIDERS) Set<CustomTokenOperation> customTokenProviders,
                                Logger logger) {
         this.offloadedTlsClientCertKey = offloadedTlsClientCertKey;
         this.tlsOffloadEngineHosts = tlsOffloadEngineHosts;
+        this.customTokenValidators = customTokenValidators;
+        this.customTokenProviders = customTokenProviders;
         this.logger = logger;
     }
 
@@ -90,26 +97,34 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
             return buildOpenIdConnectIdTokenValidatorParameters(receivedToken);
         } else if (TokenType.X509.name().equals(tokenType)) {
             return buildX509CertTokenValidatorParameters(httpContext, restSTSServiceHttpServletContext);
+        } else {
+            for (CustomTokenOperation customTokenOperation : customTokenValidators) {
+                if (tokenType.equals(customTokenOperation.getCustomTokenName())) {
+                    return buildCustomTokenValidatorParameters(receivedToken);
+                }
+            }
         }
-
-        throw new TokenMarshalException(ResourceException.BAD_REQUEST,
-                "Unsupported token translation operation for token: " + receivedToken);
-
+        throw new TokenMarshalException(ResourceException.BAD_REQUEST, "Unsupported input token type: " + tokenType);
     }
 
     @Override
-    public RestTokenProviderParameters<? extends TokenTypeId> buildTokenProviderParameters(
+    public RestTokenProviderParameters<?> buildTokenProviderParameters(
                                                                         TokenTypeId inputTokenType,
                                                                         JsonValue inputToken,
                                                                         TokenTypeId desiredTokenType,
                                                                         JsonValue desiredTokenState) throws TokenMarshalException {
-        if (TokenType.SAML2.equals(desiredTokenType)) {
+        if (TokenType.SAML2.getId().equals(desiredTokenType.getId())) {
             return createSAML2TokenProviderParameters(inputTokenType, inputToken, desiredTokenState);
-        } else if (TokenType.OPENIDCONNECT.equals(desiredTokenType)) {
+        } else if (TokenType.OPENIDCONNECT.getId().equals(desiredTokenType.getId())) {
             return createOpenIdConnectTokenProviderParameters(inputTokenType, inputToken, desiredTokenState);
         } else {
-            throw new TokenMarshalException(ResourceException.BAD_REQUEST, "Unsupported output token type: " + desiredTokenType);
+            for (CustomTokenOperation customTokenOperation : customTokenProviders) {
+                if (desiredTokenType.getId().equals(customTokenOperation.getCustomTokenName())) {
+                    return buildCustomTokenProviderParameters(inputTokenType, inputToken, desiredTokenState);
+                }
+            }
         }
+        throw new TokenMarshalException(ResourceException.BAD_REQUEST, "Unsupported output token type: " + desiredTokenType);
     }
 
 
@@ -121,20 +136,13 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
                     " String entry. The json token: " + receivedToken;
             throw new TokenMarshalException(ResourceException.BAD_REQUEST, message);
         }
-        try {
-            return TokenType.valueOf(jsonTokenType.asString());
-        } catch (IllegalArgumentException e) {
-            //TODO: If we are dealing with a custom token type (AME-6554), we would enter this branch
-            //part of implementing a custom token type would involve some sort of function that takes a string, and returns a TokenTypeId impl-
-            //or perhaps there is simply a CustomTokenType class that takes the string as a ctor parameter??
-            String message = "Error marshalling from " + AMSTSConstants.TOKEN_TYPE_KEY +
-                    " value to token-type enum. The json token: " + receivedToken + " The exception: " + e;
-            throw new TokenMarshalException(ResourceException.BAD_REQUEST, message);
-        } catch (NullPointerException e) {
-            String message = "Error marshalling from " + AMSTSConstants.TOKEN_TYPE_KEY +
-                    " value to token-type enum. The json token: " + receivedToken + " The exception: " + e;
-            throw new TokenMarshalException(ResourceException.BAD_REQUEST, message);
-        }
+        final String tokenType = jsonTokenType.asString();
+        return new TokenTypeId() {
+            @Override
+            public String getId() {
+                return tokenType;
+            }
+        };
     }
 
     private SAML2SubjectConfirmation getSubjectConfirmation(JsonValue token) throws TokenMarshalException {
@@ -190,11 +198,6 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
                     new RestUsernameToken(username.getBytes(AMSTSConstants.UTF_8_CHARSET_ID), password.getBytes(AMSTSConstants.UTF_8_CHARSET_ID));
             return new RestTokenValidatorParameters<RestUsernameToken>() {
                 @Override
-                public String getId() {
-                    return TokenType.USERNAME.getId();
-                }
-
-                @Override
                 public RestUsernameToken getInputToken() {
                     return restUsernameToken;
                 }
@@ -218,11 +221,6 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
                 public OpenAMSessionToken getInputToken() {
                     return openAMSessionToken;
                 }
-
-                @Override
-                public String getId() {
-                    return TokenType.OPENAM.getId();
-                }
             };
         }
     }
@@ -240,11 +238,6 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
                 @Override
                 public OpenIdConnectIdToken getInputToken() {
                     return openIdConnectIdToken;
-                }
-
-                @Override
-                public String getId() {
-                    return TokenType.OPENIDCONNECT.getId();
                 }
             };
         }
@@ -330,10 +323,7 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
                 try {
                     certificates[ndx++] = (X509Certificate)certificateFactory.generateCertificate(
                             new ByteArrayInputStream(Base64.decode(headerCertValue.getBytes(AMSTSConstants.UTF_8_CHARSET_ID))));
-                } catch (CertificateException e) {
-                    throw new TokenMarshalException(ResourceException.BAD_REQUEST,
-                            "Exception caught marshalling X509 cert from value set in " + offloadedTlsClientCertKey + " header: " + e, e);
-                } catch (UnsupportedEncodingException e) {
+                } catch (CertificateException | UnsupportedEncodingException e) {
                     throw new TokenMarshalException(ResourceException.BAD_REQUEST,
                             "Exception caught marshalling X509 cert from value set in " + offloadedTlsClientCertKey + " header: " + e, e);
                 }
@@ -349,10 +339,14 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
             public X509Certificate[] getInputToken() {
                 return x509Certificates;
             }
+        };
+    }
 
+    private RestTokenValidatorParameters<JsonValue> buildCustomTokenValidatorParameters(final JsonValue inputToken) {
+        return new RestTokenValidatorParameters<JsonValue>() {
             @Override
-            public String getId() {
-                return TokenType.X509.getId();
+            public JsonValue getInputToken() {
+                return inputToken;
             }
         };
     }
@@ -366,40 +360,10 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
         if (SAML2SubjectConfirmation.HOLDER_OF_KEY.equals(subjectConfirmation)) {
             final ProofTokenState proofTokenState = getProofTokenState(desiredToken);
             final Saml2TokenCreationState saml2TokenCreationState = new Saml2TokenCreationState(subjectConfirmation, proofTokenState);
-            return new RestTokenProviderParameters<Saml2TokenCreationState>() {
-                @Override
-                public Saml2TokenCreationState getTokenCreationState() {
-                    return saml2TokenCreationState;
-                }
-
-                @Override
-                public TokenTypeId getInputTokenType() {
-                    return inputTokenType;
-                }
-
-                @Override
-                public JsonValue getInputToken() {
-                    return inputToken;
-                }
-            };
+            return new Saml2RestTokenProviderParameters(saml2TokenCreationState, inputTokenType, inputToken);
         } else {
             final Saml2TokenCreationState saml2TokenCreationState = new Saml2TokenCreationState(subjectConfirmation);
-            return new RestTokenProviderParameters<Saml2TokenCreationState>() {
-                @Override
-                public Saml2TokenCreationState getTokenCreationState() {
-                    return saml2TokenCreationState;
-                }
-
-                @Override
-                public TokenTypeId getInputTokenType() {
-                    return inputTokenType;
-                }
-
-                @Override
-                public JsonValue getInputToken() {
-                    return inputToken;
-                }
-            };
+            return new Saml2RestTokenProviderParameters(saml2TokenCreationState, inputTokenType, inputToken);
         }
     }
 
@@ -416,21 +380,12 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
         }
         final OpenIdConnectTokenCreationState openIdConnectTokenCreationState =
                 new OpenIdConnectTokenCreationState(userSpecifiedTokenCreationState.getNonce(), System.currentTimeMillis() / 1000);
-        return new RestTokenProviderParameters<OpenIdConnectTokenCreationState>() {
-            @Override
-            public OpenIdConnectTokenCreationState getTokenCreationState() {
-                return openIdConnectTokenCreationState;
-            }
+        return new OpenIdConnectRestTokenProviderParameters(openIdConnectTokenCreationState, inputTokenType, inputToken);
+    }
 
-            @Override
-            public TokenTypeId getInputTokenType() {
-                return inputTokenType;
-            }
-
-            @Override
-            public JsonValue getInputToken() {
-                return inputToken;
-            }
-        };
+    private RestTokenProviderParameters<JsonValue> buildCustomTokenProviderParameters(final TokenTypeId inputTokenType,
+                                                                                      final JsonValue inputToken,
+                                                                                      final JsonValue tokenCreationState) {
+        return new CustomRestTokenProviderParametersImpl(tokenCreationState, inputTokenType, inputToken);
     }
 }

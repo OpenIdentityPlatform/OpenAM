@@ -16,15 +16,13 @@
 
 package org.forgerock.openam.sts.rest.token.provider.saml;
 
-import org.forgerock.openam.sts.TokenType;
-import org.forgerock.openam.sts.TokenTypeId;
 import org.forgerock.openam.sts.user.invocation.ProofTokenState;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 
 /**
  * Encapsulation of the state specific to generating SAML2 assertions.
  */
-public class Saml2TokenCreationState implements TokenTypeId {
+public class Saml2TokenCreationState {
     private final SAML2SubjectConfirmation subjectConfirmation;
     private final ProofTokenState proofTokenState;
 
@@ -43,10 +41,5 @@ public class Saml2TokenCreationState implements TokenTypeId {
 
     public ProofTokenState getProofTokenState() {
         return proofTokenState;
-    }
-
-    @Override
-    public String getId() {
-        return TokenType.SAML2.getId();
     }
 }

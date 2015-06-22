@@ -227,21 +227,50 @@ public class STSInstanceConfigTest {
         assertTrue(soapSTSfileContent.contains(AuthTargetMapping.AUTH_TARGET_MAPPINGS));
         assertTrue(restSTSfileContent.contains(AuthTargetMapping.AUTH_TARGET_MAPPINGS));
 
-        assertTrue(restSTSfileContent.contains(RestSTSInstanceConfig.SUPPORTED_TOKEN_TRANSLATIONS));
+        assertTrue(restSTSfileContent.contains(RestSTSInstanceConfig.SUPPORTED_TOKEN_TRANSFORMS));
 
         assertTrue(restSTSfileContent.contains(OpenIdConnectTokenConfig.ISSUER));
+        assertTrue(soapSTSfileContent.contains(OpenIdConnectTokenConfig.ISSUER));
+
         assertTrue(restSTSfileContent.contains(OpenIdConnectTokenConfig.CLAIM_MAP));
+        assertTrue(soapSTSfileContent.contains(OpenIdConnectTokenConfig.CLAIM_MAP));
+
         assertTrue(restSTSfileContent.contains(OpenIdConnectTokenConfig.TOKEN_LIFETIME));
+        assertTrue(soapSTSfileContent.contains(OpenIdConnectTokenConfig.TOKEN_LIFETIME));
+
         assertTrue(restSTSfileContent.contains(OpenIdConnectTokenConfig.KEYSTORE_LOCATION));
+        assertTrue(soapSTSfileContent.contains(OpenIdConnectTokenConfig.KEYSTORE_LOCATION));
+
         assertTrue(restSTSfileContent.contains(OpenIdConnectTokenConfig.KEYSTORE_PASSWORD));
+        assertTrue(soapSTSfileContent.contains(OpenIdConnectTokenConfig.KEYSTORE_PASSWORD));
+
         assertTrue(restSTSfileContent.contains(OpenIdConnectTokenConfig.SIGNATURE_KEY_ALIAS));
+        assertTrue(soapSTSfileContent.contains(OpenIdConnectTokenConfig.SIGNATURE_KEY_ALIAS));
+
         assertTrue(restSTSfileContent.contains(OpenIdConnectTokenConfig.SIGNATURE_KEY_PASSWORD));
+        assertTrue(soapSTSfileContent.contains(OpenIdConnectTokenConfig.SIGNATURE_KEY_PASSWORD));
+
         assertTrue(restSTSfileContent.contains(OpenIdConnectTokenConfig.SIGNATURE_ALGORITHM));
+        assertTrue(soapSTSfileContent.contains(OpenIdConnectTokenConfig.SIGNATURE_ALGORITHM));
+
         assertTrue(restSTSfileContent.contains(OpenIdConnectTokenConfig.AUDIENCE));
+        assertTrue(soapSTSfileContent.contains(OpenIdConnectTokenConfig.AUDIENCE));
+
         assertTrue(restSTSfileContent.contains(OpenIdConnectTokenConfig.AUTHORIZED_PARTY));
+        assertTrue(soapSTSfileContent.contains(OpenIdConnectTokenConfig.AUTHORIZED_PARTY));
+
         assertTrue(restSTSfileContent.contains(OpenIdConnectTokenConfig.CUSTOM_CLAIM_MAPPER_CLASS));
+        assertTrue(soapSTSfileContent.contains(OpenIdConnectTokenConfig.CUSTOM_CLAIM_MAPPER_CLASS));
+
         assertTrue(restSTSfileContent.contains(OpenIdConnectTokenConfig.CUSTOM_AUTHN_CONTEXT_MAPPER_CLASS));
+        assertTrue(soapSTSfileContent.contains(OpenIdConnectTokenConfig.CUSTOM_AUTHN_CONTEXT_MAPPER_CLASS));
+
         assertTrue(restSTSfileContent.contains(OpenIdConnectTokenConfig.CUSTOM_AUTHN_METHOD_REFERENCES_MAPPER_CLASS));
+        assertTrue(soapSTSfileContent.contains(OpenIdConnectTokenConfig.CUSTOM_AUTHN_METHOD_REFERENCES_MAPPER_CLASS));
+
+        assertTrue(restSTSfileContent.contains(RestSTSInstanceConfig.CUSTOM_TOKEN_PROVIDERS));
+        assertTrue(restSTSfileContent.contains(RestSTSInstanceConfig.CUSTOM_TOKEN_VALIDATORS));
+        assertTrue(restSTSfileContent.contains(RestSTSInstanceConfig.CUSTOM_TOKEN_TRANSFORMS));
     }
 
 

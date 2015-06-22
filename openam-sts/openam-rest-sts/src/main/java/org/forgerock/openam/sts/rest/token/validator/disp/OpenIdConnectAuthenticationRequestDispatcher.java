@@ -64,7 +64,7 @@ public class OpenIdConnectAuthenticationRequestDispatcher implements TokenAuthen
                             " which specifies the header name which will reference the OIDC ID Token.");
         }
         try {
-            Map<String, String> headerMap = new HashMap<String, String>();
+            Map<String, String> headerMap = new HashMap<>();
             headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
             headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersionAuthNService);
             headerMap.put((String)headerKey, token.getTokenValue());
@@ -76,7 +76,7 @@ public class OpenIdConnectAuthenticationRequestDispatcher implements TokenAuthen
             final int responseCode = connectionResult.getStatusCode();
             if (responseCode != HttpURLConnection.HTTP_OK) {
                 throw new TokenValidationException(responseCode, "Non-200 response from posting OIDC token " +
-                        "to rest authN.");
+                        "to rest authN: " + connectionResult.getResult());
             } else {
                 return connectionResult.getResult();
             }

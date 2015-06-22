@@ -199,10 +199,28 @@ public class AMSTSConstants {
     public static final String AM_SESSION_TOKEN_SESSION_ID = "session_id";
 
     /*
-    Used in a @Named annotation provided to the TokenTranslateOperationImpl to specify the Map<String,String> instances
+    Used in a @Named annotation provided to the TokenTranslateOperationImpl to specify the Set<TokenTransformConfig> instances
     used to define the set of supported token transformations. This set will ultimately come from the user.
      */
-    public static final String REST_SUPPORTED_TOKEN_TRANSLATIONS = "rest_supported_token_translations";
+    public static final String REST_SUPPORTED_TOKEN_TRANSFORMS = "rest_supported_token_transforms";
+
+    /*
+    Used in a @Named annotation provided to the TokenTranslateOperationImpl to specify the Set<CustomTokenOperation> instances
+    used to define the set of custom token validators. This set will ultimately come from the user.
+     */
+    public static final String REST_CUSTOM_TOKEN_VALIDATORS = "rest_custom_token_validators";
+
+    /*
+    Used in a @Named annotation provided to the TokenTranslateOperationImpl to specify the Set<CustomTokenOperation> instances
+    used to define the set of custom token providers. This set will ultimately come from the user.
+     */
+    public static final String REST_CUSTOM_TOKEN_PROVIDERS = "rest_custom_token_providers";
+
+    /*
+    Used in a @Named annotation provided to the TokenTranslateOperationImpl to specify the Set<TokenTransformConfig> instances
+    used to define the set of supported token transformations. This set will ultimately come from the user.
+     */
+    public static final String REST_CUSTOM_TOKEN_TRANSLATIONS = "rest_custom_token_translations";
 
     /*
     Used when creating the RestSTSInstanceConfig, to specify for which token transformation operations the interim OpenAM

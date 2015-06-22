@@ -16,6 +16,10 @@
 
 package org.forgerock.openam.sts.rest.token.validator;
 
+import org.forgerock.guava.common.base.Objects;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.util.Reject;
+
 import java.security.Principal;
 
 /**
@@ -33,10 +37,17 @@ import java.security.Principal;
 public class RestTokenValidatorResult {
     private final Principal principal;
     private final String amSessionId;
+    private final JsonValue additionalState;
 
     public RestTokenValidatorResult(Principal principal, String amSessionId) {
+        this(principal, amSessionId, null);
+    }
+
+    public RestTokenValidatorResult(Principal principal, String amSessionId, JsonValue additionalState) {
         this.principal = principal;
         this.amSessionId = amSessionId;
+        this.additionalState = additionalState;
+        Reject.ifNull(amSessionId, "All RestTokenValidatorResult instances must reference a non-null amSessionId.");
     }
 
     public Principal getPrincipal() {
@@ -45,6 +56,10 @@ public class RestTokenValidatorResult {
 
     public String getAMSessionId() {
         return amSessionId;
+    }
+
+    public JsonValue getAdditionalState() {
+        return additionalState;
     }
 
     @Override
@@ -57,7 +72,17 @@ public class RestTokenValidatorResult {
         }
 
         RestTokenValidatorResult that = (RestTokenValidatorResult) o;
-        return principal.equals(that.principal) && amSessionId.equals(that.amSessionId);
+        return Objects.equal(principal, that.principal) && amSessionId.equals(that.amSessionId)
+                && additionalStateEqual(that);
+    }
+
+    private boolean additionalStateEqual(RestTokenValidatorResult that) {
+        if ((this.additionalState != null) && (that.additionalState != null)) {
+            return this.additionalState.toString().equals(that.additionalState.toString());
+        } else if ((this.additionalState == null) && (that.additionalState == null)) {
+            return true;
+        }
+        return false;
     }
 
     @Override

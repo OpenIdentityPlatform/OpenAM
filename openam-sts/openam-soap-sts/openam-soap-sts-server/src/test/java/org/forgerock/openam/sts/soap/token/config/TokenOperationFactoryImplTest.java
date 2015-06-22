@@ -34,7 +34,6 @@ import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
-import org.forgerock.openam.sts.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProvider;
 import org.forgerock.openam.sts.soap.config.user.SoapDeploymentConfig;
 import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
@@ -77,8 +76,6 @@ import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.util.HashSet;
-import java.util.Set;
 
 public class TokenOperationFactoryImplTest {
     TokenOperationFactory operationFactory;
@@ -202,13 +199,6 @@ public class TokenOperationFactoryImplTest {
                 return new AMSessionInvalidatorImpl(deploymentUrl, jsonRestRoot, realm, logoutUriElement,
                         sessionCookieName, new UrlConstituentCatenatorImpl(), "crest_session_version", httpURLConnectionWrapperFactory, logger);
             } catch (MalformedURLException e) { return null;}
-        }
-
-        @Provides
-        Set<TokenTransformConfig> getValidateTransformations() {
-            Set<TokenTransformConfig> transformConfigs = new HashSet<>();
-            transformConfigs.add(new TokenTransformConfig(TokenType.OPENAM, TokenType.SAML2, true));
-            return transformConfigs;
         }
 
         @Provides
