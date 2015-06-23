@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openam.oauth2;
@@ -393,7 +394,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
      * {@inheritDoc}
      */
     public Set<String> validateAuthorizationScope(ClientRegistration clientRegistration, Set<String> scope,
-            OAuth2Request request) throws ServerException, InvalidScopeException {
+            OAuth2Request request) throws ServerException, InvalidScopeException, InvalidRequestException {
         return getScopeValidator().validateAuthorizationScope(clientRegistration, scope, request);
     }
 
@@ -401,7 +402,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
      * {@inheritDoc}
      */
     public Set<String> validateAccessTokenScope(ClientRegistration clientRegistration, Set<String> scope,
-            OAuth2Request request) throws ServerException, InvalidScopeException {
+            OAuth2Request request) throws ServerException, InvalidScopeException, InvalidRequestException {
         return getScopeValidator().validateAccessTokenScope(clientRegistration, scope, request);
     }
 
@@ -409,7 +410,7 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
      * {@inheritDoc}
      */
     public Set<String> validateRefreshTokenScope(ClientRegistration clientRegistration, Set<String> requestedScope,
-            Set<String> tokenScope, OAuth2Request request) throws ServerException, InvalidScopeException {
+            Set<String> tokenScope, OAuth2Request request) throws ServerException, InvalidScopeException, InvalidRequestException {
         return getScopeValidator().validateRefreshTokenScope(clientRegistration, requestedScope, tokenScope, request);
     }
 

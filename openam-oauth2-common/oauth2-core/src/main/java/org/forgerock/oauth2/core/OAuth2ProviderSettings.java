@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.oauth2.core;
@@ -68,9 +69,11 @@ public interface OAuth2ProviderSettings {
      * @param scope The requested scope.
      * @return The updated scope used in the remaining OAuth2 process.
      * @throws ServerException If any internal server error occurs.
+     * @throws InvalidScopeException If the requested scope is invalid, unknown, or malformed.
+     * @throws InvalidRequestException If the request is missing any required parameters or is otherwise malformed.
      */
     Set<String> validateAuthorizationScope(ClientRegistration clientRegistration, Set<String> scope,
-            OAuth2Request request) throws ServerException, InvalidScopeException;
+            OAuth2Request request) throws ServerException, InvalidScopeException, InvalidRequestException;
 
     /**
      * Provided as an extension point to allow the OAuth2 provider to customise the scope requested when an access token
@@ -81,9 +84,11 @@ public interface OAuth2ProviderSettings {
      * @param request The OAuth2 request.
      * @return The updated scope used in the remaining OAuth2 process.
      * @throws ServerException If any internal server error occurs.
+     * @throws InvalidScopeException If the requested scope is invalid, unknown, or malformed.
+     * @throws InvalidRequestException If the request is missing any required parameters or is otherwise malformed.
      */
     Set<String> validateAccessTokenScope(ClientRegistration clientRegistration, Set<String> scope,
-            OAuth2Request request) throws ServerException, InvalidScopeException;
+            OAuth2Request request) throws ServerException, InvalidScopeException, InvalidRequestException;
 
     /**
      * Provided as an extension point to allow the OAuth2 provider to customise the scope requested when a refresh token
@@ -95,9 +100,11 @@ public interface OAuth2ProviderSettings {
      * @param request The OAuth2 request.
      * @return The updated scope used in the remaining OAuth2 process.
      * @throws ServerException If any internal server error occurs.
+     * @throws InvalidScopeException If the requested scope is invalid, unknown, or malformed.
+     * @throws InvalidRequestException If the request is missing any required parameters or is otherwise malformed.
      */
     Set<String> validateRefreshTokenScope(ClientRegistration clientRegistration, Set<String> requestedScope,
-            Set<String> tokenScope, OAuth2Request request) throws ServerException, InvalidScopeException;
+            Set<String> tokenScope, OAuth2Request request) throws ServerException, InvalidScopeException, InvalidRequestException;
 
     /**
      * Gets the resource owners information based on an issued access token or request.
