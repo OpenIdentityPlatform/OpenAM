@@ -328,6 +328,9 @@ public class ResourceTypesResource extends RealmAwareResource {
             final String realm = getRealm(context);
 
             ResourceType resourceType = resourceTypeService.getResourceType(theSubject, realm, resourceId);
+            if (resourceType == null) {
+                throw new EntitlementException(NO_SUCH_RESOURCE_TYPE, resourceId, realm);
+            }
             JsonResourceType wrapper = new JsonResourceType(resourceType);
 
             final Resource resource = new Resource(resourceId,
