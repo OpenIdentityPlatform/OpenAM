@@ -59,6 +59,7 @@ public class EntitlementException extends Exception {
     public static final int MISSING_PRIVILEGE_NAME = 12;
     public static final int POLICY_NAME_MISMATCH = 13;
     public static final int RESOURCE_LIST_EMPTY = 14;
+    public static final int RESOURCE_TYPE_ID_MISMATCH = 15;
 
     public static final int UNABLE_TO_SERIALIZE_OBJECT = 200;
     public static final int NO_SUCH_POLICY = 203;

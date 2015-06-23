@@ -413,6 +413,7 @@ public class ForgerockRestGuiceModule extends AbstractModule {
             handlers.put(EntitlementException.POLICY_DEFINES_INVALID_RESOURCE_TYPE, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.MISSING_RESOURCE_TYPE, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.CONDITION_EVALUATION_FAILED, ResourceException.INTERNAL_ERROR);
+            handlers.put(EntitlementException.RESOURCE_TYPE_ID_MISMATCH, ResourceException.BAD_REQUEST);
 
             return handlers;
         }
