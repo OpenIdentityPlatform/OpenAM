@@ -34,7 +34,6 @@ import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
-import com.iplanet.sso.SSOException;
 import com.sun.identity.console.base.AMPostViewBean;
 import com.sun.identity.console.base.AMPropertySheet;
 import com.sun.identity.console.base.AMServiceProfile;
@@ -47,15 +46,14 @@ import com.sun.identity.console.base.model.SMSubConfig;
 import com.sun.identity.console.components.view.html.SerializedField;
 import com.sun.identity.console.service.model.SubConfigModel;
 import com.sun.identity.console.service.model.SubConfigModelImpl;
-import com.sun.identity.sm.DynamicAttributeValidator;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.SMSUtils;
 import com.sun.web.ui.model.CCActionTableModel;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import com.sun.web.ui.view.table.CCActionTable;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,7 +61,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
 
 public class SubConfigEditViewBean extends DynamicRequestViewBean {
 
@@ -451,30 +448,14 @@ public class SubConfigEditViewBean extends DynamicRequestViewBean {
     }
 
     @Override
-    protected void handleDynamicValidationRequest(String attributeName) {
+    protected void handleDynamicLinkRequest(String url) {
+        submitCycle = true;
         try {
-            List<Class<DynamicAttributeValidator>> validators =
-                    SMSUtils.findDynamicValidators(serviceName, "ScriptValidator");
-            performValidation(attributeName, ((SubConfigModel)getModel()).getDisplayName(), validators);
-        } catch (SSOException e) {
-            debug.error("Failed to perform dynamic validation", e);
+            getRequestContext().getResponse().sendRedirect(url);
+        } catch (IOException e) {
             setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
-        } catch (SMSException e) {
-            debug.error("Failed to perform dynamic validation", e);
-            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
-        } catch (InstantiationException e) {
-            debug.error("Failed to perform dynamic validation", e);
-            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
-        } catch (IllegalAccessException e) {
-            debug.error("Failed to perform dynamic validation", e);
-            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
+            forwardTo();
         }
-        forwardTo();
-    }
-
-    @Override
-    protected void handleDynamicLinkRequest(String attributeName) {
-        // Not used in this class
     }
 
     @Override

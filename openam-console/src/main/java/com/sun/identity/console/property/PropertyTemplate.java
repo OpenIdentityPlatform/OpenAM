@@ -24,10 +24,7 @@
  *
  * $Id: PropertyTemplate.java,v 1.5 2008/10/02 16:31:29 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2014 ForgeRock, Inc.
+ * Portions Copyrighted 2011-2015 ForgeRock, Inc.
  */
 
 package com.sun.identity.console.property;
@@ -121,8 +118,8 @@ public interface PropertyTemplate {
 
     String COMPONENT_LINK_START_TAG = "<cc name=\"dynLink\" tagclass=\"com.sun.web.ui.taglib.html.CCHrefTag\">\n<attribute name=\"onClick\" value=\"openNewWindow();\" /><attribute name=\"queryParams\" value=\"{0}\" /><attribute name=\"target\" value=\"newwindow\" /><cc name=\"{1}\" tagclass=\"com.sun.web.ui.taglib.html.CCStaticTextFieldTag\">\n<attribute name=\"defaultValue\" value=\"{2}\" /></cc>\n";
     String COMPONENT_BUTTON_START_TAG = "<cc name=\"dynLink\" tagclass=\"com.sun.web.ui.taglib.html.CCButtonTag\">\n<attribute name=\"onClick\" value=\"openNewWindow(); submitButton(this, {0});\" /><attribute name=\"defaultValue\" value=\"{1}\" />\n";
-    String COMPONENT_VALIDATE_BUTTON_START_TAG = "<cc name=\"dynLink\" tagclass=\"com.sun.web.ui.taglib.html.CCButtonTag\">\n<attribute name=\"onClick\" value=\"submitValidate(this, {0});\" /><attribute name=\"defaultValue\" value=\"{1}\" />\n";
     String COMPONENT_UPLOAD_BUTTON_START_TAG = "<cc name=\"{0}UploadButton\" tagclass=\"com.sun.web.ui.taglib.html.CCButtonTag\">\n<attribute name=\"onClick\" value=\"submitFileUpload(this, ''{0}''); return false;\" /><attribute name=\"defaultValue\" value=\"{1}\" />\n";
+    String COMPONENT_ACTION_BUTTON_START_TAG = "<cc name=\"{0}DynLink\" tagclass=\"com.sun.web.ui.taglib.html.CCButtonTag\">\n<attribute name=\"onClick\" value=\"submitAction(''{1}'', ''{2}'');\" /><attribute name=\"defaultValue\" value=\"{3}\" />\n";
 
     String TEXTBOX_SIZE_TAG =
         "<attribute name=\"size\" value=\"{0}\" />\n";

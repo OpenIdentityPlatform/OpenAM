@@ -55,15 +55,19 @@ function submitButton(btn, val) {
 }
 
 /**
- * Submit a dynamic validation request for the specific attribute.
- * @param btn The button from which this request originated.
- * @param val The name of the attribute for which the validation is needed.
+ * Submit a dynamic request for the specific attribute.
+ * @param attrName The name of the attribute for which the action is being invoked.
+ * @param url The URL associated with the action, if any.
  */
-function submitValidate(btn, val) {
+function submitAction(attrName, url) {
     var frm = document.forms[0];
-    frm.target = '';
     origFrmAction = frm.action;
-    frm.action += '?dynamic_validation=true&attrname=' + val;
+    frm.action += '?attrname=' + attrName;
+    if (url) {
+        window.open('', 'newtab').focus();
+        frm.target = 'newtab';
+        frm.action += '&url=' + url;
+    }
     setTimeout("resetForm()", 1000);
 }
 

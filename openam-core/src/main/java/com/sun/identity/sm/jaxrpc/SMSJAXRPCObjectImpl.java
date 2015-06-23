@@ -24,43 +24,18 @@
  *
  * $Id: SMSJAXRPCObjectImpl.java,v 1.22 2009/10/28 04:24:27 hengming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS
  */
 
 package com.sun.identity.sm.jaxrpc;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.rmi.RemoteException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
-
-import javax.naming.directory.BasicAttribute;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.ModificationItem;
-
-import com.iplanet.services.naming.ServerEntryNotFoundException;
-import com.iplanet.services.naming.WebtopNaming;
-import com.sun.identity.sm.DynamicAttributeValidator;
-import org.json.JSONException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.comm.server.PLLServer;
 import com.iplanet.services.comm.server.SendNotificationException;
 import com.iplanet.services.comm.share.Notification;
 import com.iplanet.services.comm.share.NotificationSet;
+import com.iplanet.services.naming.ServerEntryNotFoundException;
+import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -78,6 +53,25 @@ import com.sun.identity.sm.SMSNotificationManager;
 import com.sun.identity.sm.SMSObjectListener;
 import com.sun.identity.sm.SMSUtils;
 import com.sun.identity.sm.ServiceAttributeValidator;
+import org.json.JSONException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.naming.directory.BasicAttribute;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.ModificationItem;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.rmi.RemoteException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
 
 public class SMSJAXRPCObjectImpl implements SMSObjectIF, SMSObjectListener {
 
@@ -466,10 +460,6 @@ public class SMSJAXRPCObjectImpl implements SMSObjectIF, SMSObjectListener {
         }
         try {
             Class clazz = Class.forName(validatorClass);
-            if (DynamicAttributeValidator.class.isAssignableFrom(clazz)) {
-                debug.message("Ignoring DynamicAttributeValidator");
-                return true;
-            }
             ServiceAttributeValidator v = (ServiceAttributeValidator) clazz.newInstance();
             return v.validate(values);
         } catch (InstantiationException ex) {

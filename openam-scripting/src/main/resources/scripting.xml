@@ -46,8 +46,9 @@
                             <Value>GROOVY</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="defaultScript"
-                                     type="single_choice" uitype="dropdown" syntax="string" i18nKey="st103">
+                    <AttributeSchema name="defaultScript" type="single_choice" uitype="scriptSelect"
+                                     propertiesViewBeanURL="../scripts/?realm={0}%23edit/{1}" syntax="string"
+                                     i18nKey="st103">
                         <ChoiceValues>
                             <ChoiceValuesClassName
                                     className="org.forgerock.openam.scripting.service.ScriptChoiceValues"/>

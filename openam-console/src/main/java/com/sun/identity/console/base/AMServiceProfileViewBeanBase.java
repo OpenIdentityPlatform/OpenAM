@@ -24,6 +24,7 @@
  *
  * $Id: AMServiceProfileViewBeanBase.java,v 1.3 2009/11/10 04:16:17 bhavnab Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 
@@ -50,7 +51,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
@@ -321,26 +321,14 @@ public abstract class AMServiceProfileViewBeanBase extends DynamicRequestViewBea
     }
 
     @Override
-    protected void handleDynamicLinkRequest(String attributeName) {
+    protected void handleDynamicLinkRequest(String url) {
         submitCycle = true;
-        AMServiceProfileModel model = (AMServiceProfileModel)getModel();
-
-        if (model != null) {
-            try {
-                String url = appendPgSession(model.getPropertiesViewBean(attributeName));
-                getRequestContext().getResponse().sendRedirect(url);
-            } catch (IOException e) {
-                setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
-                forwardTo();
-            }
-        } else {
+        try {
+            getRequestContext().getResponse().sendRedirect(url);
+        } catch (IOException e) {
+            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
             forwardTo();
         }
-    }
-
-    @Override
-    protected void handleDynamicValidationRequest(String attributeName) {
-        // Not used here and not required for all sub classes
     }
 
     @Override

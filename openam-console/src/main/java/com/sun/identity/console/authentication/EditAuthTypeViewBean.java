@@ -39,7 +39,6 @@ import com.iplanet.jato.RequestManager;
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
-import com.iplanet.sso.SSOException;
 import com.sun.identity.console.authentication.model.AuthProfileModelImpl;
 import com.sun.identity.console.authentication.model.AuthPropertiesModel;
 import com.sun.identity.console.authentication.model.AuthPropertiesModelImpl;
@@ -49,14 +48,10 @@ import com.sun.identity.console.base.AMServiceProfileViewBeanBase;
 import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModel;
-import com.sun.identity.sm.DynamicAttributeValidator;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.SMSUtils;
 import com.sun.web.ui.view.alert.CCAlert;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
-import java.util.List;
 import java.util.Map;
 
 public class EditAuthTypeViewBean extends AMServiceProfileViewBeanBase {
@@ -93,29 +88,6 @@ public class EditAuthTypeViewBean extends AMServiceProfileViewBeanBase {
             }  
             initialize(name);
         }
-    }
-
-    @Override
-    protected void handleDynamicValidationRequest(String attributeName) {
-        try {
-            String instance = (String) getPageSessionAttribute(SERVICE_TYPE);
-            List<Class<DynamicAttributeValidator>> validators =
-                    SMSUtils.findDynamicValidators(serviceName, "ScriptValidator");
-            performValidation(attributeName, instance, validators);
-        } catch (SSOException e) {
-            debug.error("Failed to perform dynamic validation", e);
-            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
-        } catch (SMSException e) {
-            debug.error("Failed to perform dynamic validation", e);
-            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
-        } catch (InstantiationException e) {
-            debug.error("Failed to perform dynamic validation", e);
-            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
-        } catch (IllegalAccessException e) {
-            debug.error("Failed to perform dynamic validation", e);
-            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
-        }
-        forwardTo();
     }
 
     /**

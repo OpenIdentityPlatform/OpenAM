@@ -98,7 +98,8 @@
 
                 <AttributeSchema name="forgerock-oauth2-provider-oidc-claims-extension-script"
                                  type="single_choice"
-                                 uitype="dropdown"
+                                 uitype="scriptSelect"
+                                 propertiesViewBeanURL="../scripts/?realm={0}%23edit/{1}"
                                  syntax="string"
                                  i18nKey="a104aa"
                                  resourceName="oidcClaimsScript">

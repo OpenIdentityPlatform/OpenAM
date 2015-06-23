@@ -33,19 +33,18 @@
 
 package com.sun.identity.console.property;
 
-import com.iplanet.sso.SSOException;
-import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.base.model.AMAdminConstants;
+import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.service.model.SubConfigModel;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.AttributeSchema;
-import com.sun.identity.sm.DynamicAttributeValidator;
-import com.sun.identity.sm.SMSUtils;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.console.ui.taglib.propertysheet.CCPropertySheetTag;
+import org.forgerock.openam.utils.CollectionUtils;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -61,8 +60,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
-import org.forgerock.openam.console.ui.taglib.propertysheet.CCPropertySheetTag;
-import org.forgerock.openam.utils.CollectionUtils;
 
 public abstract class PropertyXMLBuilderBase
     implements PropertyTemplate
@@ -104,7 +101,7 @@ public abstract class PropertyXMLBuilderBase
         mapUITypeToName.put(AttributeSchema.UIType.MAPLIST,  "maplist");
         mapUITypeToName.put(AttributeSchema.UIType.GLOBALMAPLIST,  
             "globalmaplist");
-        mapUITypeToName.put(AttributeSchema.UIType.DROPDOWN, "dropdown");
+        mapUITypeToName.put(AttributeSchema.UIType.SCRIPTSELECT, "scriptSelect");
 
         mapTypeToName.put(AttributeSchema.Type.LIST, "list");
         mapTypeToName.put(AttributeSchema.Type.MULTIPLE_CHOICE,
@@ -458,7 +455,6 @@ public abstract class PropertyXMLBuilderBase
             boolean unorderedList = tagClassName.equals(TAGNAME_UNORDERED_LIST);
             boolean mapList = tagClassName.equals(TAGNAME_MAP_LIST);
             boolean globalMapList = tagClassName.equals(TAGNAME_GLOBAL_MAP_LIST);
-            boolean dropDown = tagClassName.equals(TAGNAME_DROPDOWN_MENU);
             
             AttributeSchema.Type type = as.getType();
             AttributeSchema.UIType uitype = as.getUIType();
@@ -545,14 +541,6 @@ public abstract class PropertyXMLBuilderBase
                     } else if (globalMapList) {
                         xml.append(MessageFormat.format(
                             COMPONENT_GLOBAL_MAP_LIST_START_TAG, param));
-                    }
-                } else if (dropDown) {
-                    xml.append(MessageFormat.format(COMPONENT_START_TAG, name, tagClassName));
-                    Map<String, String> choiceValues = getSortedChoiceValueMap(as, model);
-                    for (Map.Entry<String, String> entry : choiceValues.entrySet()) {
-                        String displayName = model.getLocalizedString(entry.getValue());
-                        xml.append(MessageFormat.format(OPTION_TAG, escapeSpecialChars(displayName),
-                                escapeSpecialChars(entry.getKey())));
                     }
                 } else {
                     Object[] param = {name, tagClassName};
@@ -691,22 +679,6 @@ public abstract class PropertyXMLBuilderBase
     }
 
     /**
-     * Add a button below the last attribute added.
-     * @param as The attribute that describes this UI element.
-     * @param xml The XML document to add the element to.
-     * @param model The AMModel that stores admin constants.
-     */
-    private void buildDynamicValidationXML(AttributeSchema as, StringBuffer xml, AMModel model) {
-        final String name = getAttributeNameForPropertyXML(as);
-        final String validateString = model.getLocalizedString(VALIDATE_LABEL);
-        final Object[] pLink = {"'" + name + "'", validateString};
-        xml.append(PROPERTY_START_TAG);
-        xml.append(MessageFormat.format(COMPONENT_VALIDATE_BUTTON_START_TAG, pLink));
-        xml.append(COMPONENT_END_TAG);
-        xml.append(PROPERTY_END_TAG);
-    }
-
-    /**
      * Adds a file upload button below the last attribute added. This will dynamically upload a file and then paste
      * the contents back into the field of the previous attribute on the form.
      *
@@ -719,6 +691,34 @@ public abstract class PropertyXMLBuilderBase
         final String label = model.getLocalizedString(UPLOAD_LABEL);
         xml.append(PROPERTY_START_TAG)
            .append(MessageFormat.format(COMPONENT_UPLOAD_BUTTON_START_TAG, name, label))
+           .append(COMPONENT_END_TAG)
+           .append(PROPERTY_END_TAG);
+    }
+
+    private void buildScriptSelectXML(AttributeSchema as, StringBuffer xml, AMModel model, ResourceBundle bundle) {
+        String attrName = getAttributeNameForPropertyXML(as);
+
+        xml.append(PROPERTY_START_TAG);
+        addLabel(as, xml, bundle);
+        xml.append(MessageFormat.format(COMPONENT_START_TAG, attrName, TAGNAME_DROPDOWN_MENU));
+        Map<String, String> choiceValues = getSortedChoiceValueMap(as, model);
+        for (Map.Entry<String, String> entry : choiceValues.entrySet()) {
+            xml.append(MessageFormat.format(OPTION_TAG, escapeSpecialChars(model.getLocalizedString(entry.getValue())),
+                    escapeSpecialChars(entry.getKey())));
+        }
+        xml.append(COMPONENT_END_TAG)
+           .append(MessageFormat.format(COMPONENT_ACTION_BUTTON_START_TAG, "refresh", attrName, "",
+                   model.getLocalizedString("button.refresh")))
+           .append(COMPONENT_END_TAG);
+        getInlineHelp(as, xml, serviceBundle);
+        xml.append(PROPERTY_END_TAG);
+
+        xml.append(PROPERTY_START_TAG)
+           .append(MessageFormat.format(COMPONENT_ACTION_BUTTON_START_TAG, "create", attrName,
+                   as.getPropertiesViewBeanURL(), model.getLocalizedString("button.create")))
+           .append(COMPONENT_END_TAG)
+           .append(MessageFormat.format(COMPONENT_ACTION_BUTTON_START_TAG, "edit", attrName,
+                   as.getPropertiesViewBeanURL(), model.getLocalizedString("button.edit")))
            .append(COMPONENT_END_TAG)
            .append(PROPERTY_END_TAG);
     }
@@ -1114,10 +1114,14 @@ public abstract class PropertyXMLBuilderBase
                                                                                 
             if (allAttributesReadonly || readonly.contains(as.getName())) {
                 buildReadonlyXML(as, xml, model, serviceBundle);
+
+            } else if (AttributeSchema.UIType.SCRIPTSELECT.equals(as.getUIType())) {
+                buildScriptSelectXML(as, xml, model, serviceBundle);
+
             } else {
                 buildAttributeSchemaTypeXML(as, xml, model, serviceBundle, addSubSection);
                 String tagClassName = getTagClassName(as);
-                                                                                
+
                 if (tagClassName.equals(TAGNAME_PASSWORD)) {
                     buildConfirmPasswordXML(as, xml, model, serviceBundle);
                 }
@@ -1125,32 +1129,10 @@ public abstract class PropertyXMLBuilderBase
                 if (AttributeSchema.Syntax.SCRIPT.equals(as.getSyntax())) {
                     buildFileUploadXML(as, xml, model);
                 }
-
-                if (hasDynamicValidator(as)) {
-                    buildDynamicValidationXML(as, xml, model);
-                }
             }
         }
 
         xml.append((section ? SECTION_END_TAG : ""));
-    }
-
-    /**
-     * Investigate all the Attribute schemas to find out if the given schema has a dynamic validator associated with it.
-     * All validation classes with the same name as the one specified for the attribute will be looked up on the
-     * classpath. If any of the classes implement {@link DynamicAttributeValidator} the method will return true.
-     * @param as The attribute for which the validator was defined.
-     * @return True if a validator was found.
-     */
-    private boolean hasDynamicValidator(AttributeSchema as) {
-        try {
-            return !SMSUtils.findDynamicValidators(serviceName, as.getValidator()).isEmpty();
-        } catch (SSOException e) {
-            debug.error("PropertyXMLBuilderBase.hasDynamicValidator failed.", e);
-        } catch (SMSException e) {
-            debug.error("PropertyXMLBuilderBase.hasDynamicValidator failed.", e);
-        }
-        return false;
     }
     
     protected void buildSchemaTypeXML(
