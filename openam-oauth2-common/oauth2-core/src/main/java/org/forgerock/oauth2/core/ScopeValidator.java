@@ -18,7 +18,6 @@
 package org.forgerock.oauth2.core;
 
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
-import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
@@ -46,11 +45,10 @@ public interface ScopeValidator {
      * @param request The OAuth2 request.
      * @return The updated scope used in the remaining OAuth2 process.
      * @throws InvalidScopeException If the requested scope is invalid, unknown, or malformed.
-     * @throws InvalidRequestException If the request is missing any required parameters or is otherwise malformed.
      * @throws ServerException If any internal server error occurs.
      */
     Set<String> validateAuthorizationScope(ClientRegistration clientRegistration, Set<String> scope,
-            OAuth2Request request) throws InvalidScopeException, InvalidRequestException, ServerException;
+            OAuth2Request request) throws InvalidScopeException, ServerException;
 
     /**
      * Provided as an extension point to allow the OAuth2 provider to customise the scope requested when an access token
@@ -61,11 +59,10 @@ public interface ScopeValidator {
      * @param request The OAuth2 request.
      * @return The updated scope used in the remaining OAuth2 process.
      * @throws InvalidScopeException If the requested scope is invalid, unknown, or malformed.
-     * @throws InvalidRequestException If the request is missing any required parameters or is otherwise malformed.
      * @throws ServerException If any internal server error occurs.
      */
     Set<String> validateAccessTokenScope(ClientRegistration clientRegistration, Set<String> scope,
-            OAuth2Request request) throws InvalidScopeException, InvalidRequestException, ServerException;
+            OAuth2Request request) throws InvalidScopeException, ServerException;
 
     /**
      * Provided as an extension point to allow the OAuth2 provider to customise the scope requested when a refresh token
@@ -77,11 +74,10 @@ public interface ScopeValidator {
      * @param request The OAuth2 request.
      * @return The updated scope used in the remaining OAuth2 process.
      * @throws InvalidScopeException If the requested scope is invalid, unknown, or malformed.
-     * @throws InvalidRequestException If the request is missing any required parameters or is otherwise malformed.
      * @throws ServerException If any internal server error occurs.
      */
     Set<String> validateRefreshTokenScope(ClientRegistration clientRegistration, Set<String> requestedScope,
-            Set<String> tokenScope, OAuth2Request request) throws ServerException, InvalidScopeException, InvalidRequestException;
+            Set<String> tokenScope, OAuth2Request request) throws ServerException, InvalidScopeException;
 
     /**
      * Gets the resource owners information based on an issued access token.

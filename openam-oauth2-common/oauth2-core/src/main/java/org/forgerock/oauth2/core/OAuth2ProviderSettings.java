@@ -70,10 +70,9 @@ public interface OAuth2ProviderSettings {
      * @return The updated scope used in the remaining OAuth2 process.
      * @throws ServerException If any internal server error occurs.
      * @throws InvalidScopeException If the requested scope is invalid, unknown, or malformed.
-     * @throws InvalidRequestException If the request is missing any required parameters or is otherwise malformed.
      */
     Set<String> validateAuthorizationScope(ClientRegistration clientRegistration, Set<String> scope,
-            OAuth2Request request) throws ServerException, InvalidScopeException, InvalidRequestException;
+            OAuth2Request request) throws ServerException, InvalidScopeException;
 
     /**
      * Provided as an extension point to allow the OAuth2 provider to customise the scope requested when an access token
@@ -85,10 +84,9 @@ public interface OAuth2ProviderSettings {
      * @return The updated scope used in the remaining OAuth2 process.
      * @throws ServerException If any internal server error occurs.
      * @throws InvalidScopeException If the requested scope is invalid, unknown, or malformed.
-     * @throws InvalidRequestException If the request is missing any required parameters or is otherwise malformed.
      */
     Set<String> validateAccessTokenScope(ClientRegistration clientRegistration, Set<String> scope,
-            OAuth2Request request) throws ServerException, InvalidScopeException, InvalidRequestException;
+            OAuth2Request request) throws ServerException, InvalidScopeException;
 
     /**
      * Provided as an extension point to allow the OAuth2 provider to customise the scope requested when a refresh token
@@ -101,10 +99,9 @@ public interface OAuth2ProviderSettings {
      * @return The updated scope used in the remaining OAuth2 process.
      * @throws ServerException If any internal server error occurs.
      * @throws InvalidScopeException If the requested scope is invalid, unknown, or malformed.
-     * @throws InvalidRequestException If the request is missing any required parameters or is otherwise malformed.
      */
     Set<String> validateRefreshTokenScope(ClientRegistration clientRegistration, Set<String> requestedScope,
-            Set<String> tokenScope, OAuth2Request request) throws ServerException, InvalidScopeException, InvalidRequestException;
+            Set<String> tokenScope, OAuth2Request request) throws ServerException, InvalidScopeException;
 
     /**
      * Gets the resource owners information based on an issued access token or request.

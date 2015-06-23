@@ -49,7 +49,6 @@ import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.ScopeValidator;
 import org.forgerock.oauth2.core.Token;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
-import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
@@ -146,7 +145,7 @@ public class OpenAMScopeValidator implements ScopeValidator {
      * {@inheritDoc}
      */
     public Set<String> validateAuthorizationScope(ClientRegistration client, Set<String> scope,
-            OAuth2Request request) throws InvalidScopeException, InvalidRequestException, ServerException {
+            OAuth2Request request) throws InvalidScopeException, ServerException {
         return validateScopes(scope, client.getDefaultScopes(), client.getAllowedScopes(), request);
     }
 
@@ -154,7 +153,7 @@ public class OpenAMScopeValidator implements ScopeValidator {
      * {@inheritDoc}
      */
     public Set<String> validateAccessTokenScope(ClientRegistration client, Set<String> scope,
-            OAuth2Request request) throws InvalidScopeException, InvalidRequestException, ServerException {
+            OAuth2Request request) throws InvalidScopeException, ServerException {
         return validateScopes(scope, client.getDefaultScopes(), client.getAllowedScopes(), request);
     }
 
@@ -162,12 +161,12 @@ public class OpenAMScopeValidator implements ScopeValidator {
      * {@inheritDoc}
      */
     public Set<String> validateRefreshTokenScope(ClientRegistration clientRegistration, Set<String> requestedScope,
-            Set<String> tokenScope, OAuth2Request request) throws ServerException, InvalidScopeException, InvalidRequestException {
+            Set<String> tokenScope, OAuth2Request request) throws ServerException, InvalidScopeException {
         return validateScopes(requestedScope, tokenScope, tokenScope, request);
     }
 
     private Set<String> validateScopes(Set<String> requestedScopes, Set<String> defaultScopes,
-            Set<String> allowedScopes, OAuth2Request request) throws InvalidScopeException, InvalidRequestException, ServerException {
+            Set<String> allowedScopes, OAuth2Request request) throws InvalidScopeException, ServerException {
         Set<String> scopes;
 
         if (requestedScopes == null || requestedScopes.isEmpty()) {
@@ -183,7 +182,7 @@ public class OpenAMScopeValidator implements ScopeValidator {
         }
 
         if (scopes == null || scopes.isEmpty()) {
-            throw new InvalidRequestException("No scope requested and no default scope configured");
+            throw InvalidScopeException.create("No scope requested and no default scope configured", request);
         }
 
         return scopes;
