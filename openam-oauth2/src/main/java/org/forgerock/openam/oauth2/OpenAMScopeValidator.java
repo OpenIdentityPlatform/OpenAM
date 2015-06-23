@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openam.oauth2;
@@ -48,6 +49,7 @@ import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.ScopeValidator;
 import org.forgerock.oauth2.core.Token;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
@@ -144,7 +146,7 @@ public class OpenAMScopeValidator implements ScopeValidator {
      * {@inheritDoc}
      */
     public Set<String> validateAuthorizationScope(ClientRegistration client, Set<String> scope,
-            OAuth2Request request) throws InvalidScopeException, ServerException {
+            OAuth2Request request) throws InvalidScopeException, InvalidRequestException, ServerException {
         return validateScopes(scope, client.getDefaultScopes(), client.getAllowedScopes(), request);
     }
 
@@ -152,7 +154,7 @@ public class OpenAMScopeValidator implements ScopeValidator {
      * {@inheritDoc}
      */
     public Set<String> validateAccessTokenScope(ClientRegistration client, Set<String> scope,
-            OAuth2Request request) throws InvalidScopeException, ServerException {
+            OAuth2Request request) throws InvalidScopeException, InvalidRequestException, ServerException {
         return validateScopes(scope, client.getDefaultScopes(), client.getAllowedScopes(), request);
     }
 
@@ -160,12 +162,12 @@ public class OpenAMScopeValidator implements ScopeValidator {
      * {@inheritDoc}
      */
     public Set<String> validateRefreshTokenScope(ClientRegistration clientRegistration, Set<String> requestedScope,
-            Set<String> tokenScope, OAuth2Request request) throws ServerException, InvalidScopeException {
+            Set<String> tokenScope, OAuth2Request request) throws ServerException, InvalidScopeException, InvalidRequestException {
         return validateScopes(requestedScope, tokenScope, tokenScope, request);
     }
 
     private Set<String> validateScopes(Set<String> requestedScopes, Set<String> defaultScopes,
-            Set<String> allowedScopes, OAuth2Request request) throws InvalidScopeException, ServerException {
+            Set<String> allowedScopes, OAuth2Request request) throws InvalidScopeException, InvalidRequestException, ServerException {
         Set<String> scopes;
 
         if (requestedScopes == null || requestedScopes.isEmpty()) {
@@ -181,7 +183,7 @@ public class OpenAMScopeValidator implements ScopeValidator {
         }
 
         if (scopes == null || scopes.isEmpty()) {
-            throw InvalidScopeException.create("No scope requested and no default scope configured", request);
+            throw new InvalidRequestException("No scope requested and no default scope configured");
         }
 
         return scopes;
@@ -412,7 +414,7 @@ public class OpenAMScopeValidator implements ScopeValidator {
             for (String scope : scopes) {
                 try {
                     Set<String> attributes = id.getAttribute(scope);
-                    if (attributes != null || !attributes.isEmpty()) {
+                    if (attributes != null && !attributes.isEmpty()) {
                         Iterator<String> iter = attributes.iterator();
                         StringBuilder builder = new StringBuilder();
                         while (iter.hasNext()) {
@@ -472,12 +474,16 @@ public class OpenAMScopeValidator implements ScopeValidator {
             final String modifyTimestamp = CollectionHelper.getMapAttr(timestamps, modifyTimestampAttributeName);
 
             if (modifyTimestamp != null) {
-                return Long.toString(TIMESTAMP_DATE_FORMAT.parse(modifyTimestamp).getTime() / 1000);
+                synchronized (TIMESTAMP_DATE_FORMAT) {
+                    return Long.toString(TIMESTAMP_DATE_FORMAT.parse(modifyTimestamp).getTime() / 1000);
+                }
             } else {
                 final String createTimestamp = CollectionHelper.getMapAttr(timestamps, createdTimestampAttributeName);
 
                 if (createTimestamp != null) {
-                    return Long.toString(TIMESTAMP_DATE_FORMAT.parse(createTimestamp).getTime() / 1000);
+                    synchronized (TIMESTAMP_DATE_FORMAT) {
+                        return Long.toString(TIMESTAMP_DATE_FORMAT.parse(createTimestamp).getTime() / 1000);
+                    }
                 } else {
                     return DEFAULT_TIMESTAMP;
                 }
