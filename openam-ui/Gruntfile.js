@@ -16,8 +16,89 @@
 
 module.exports = function(grunt) {
     grunt.initConfig({
+        // please update environment variable OPENAM_VERSION after realise, for fix cache issue
+        // you can use version value from main pom file, ex. 13.0.0-SNAPSHOT
+        buildNumber: process.env.OPENAM_VERSION,
         destination: process.env.OPENAM_HOME,
         forgerockui: process.env.FORGEROCK_UI_SRC,
+        replace: {
+            ria_html: {
+                src: ['openam-ui-ria/src/main/resources/index.html'],
+                dest: '<%= destination %>/XUI/index.html',
+                replacements: [{
+                    from: '${version}',
+                    to:  '<%= buildNumber %>'
+                }]
+            },
+            ria_style: {
+                src: ['openam-ui-ria/src/main/resources/css/styles.less'],
+                dest: '<%= destination %>/XUI/css/styles.less',
+                replacements: [{
+                    from: '${version}',
+                    to:  '<%= buildNumber %>'
+                }]
+            },
+            ria_test: {
+                // temporary fix for test
+                src: ['openam-ui-ria/src/main/resources/css/styles.less'],
+                dest: '<%= destination %>/../www/css/styles.less',
+                replacements: [{
+                    from: '?v=@{openam-version}',
+                    to:  ''
+                }]
+            },
+            script_html: {
+                src: ['openam-ui-scripts/src/main/resources/index.html'],
+                dest: '<%= destination %>/scripts/index.html',
+                replacements: [{
+                    from: '${version}',
+                    to:  '<%= buildNumber %>'
+                }]
+            },
+            script_style: {
+                src: ['openam-ui-scripts/src/main/resources/css/styles.less'],
+                dest: '<%= destination %>/scripts/css/styles.less',
+                replacements: [{
+                    from: '${version}',
+                    to:  '<%= buildNumber %>'
+                }]
+            },
+            script_test: {
+                // temporary fix for test
+                src: ['openam-ui-scripts/src/main/resources/css/styles.less'],
+                dest: '<%= destination %>/../www/css/styles.less',
+                replacements: [{
+                    from: '?v=@{openam-version}',
+                    to:  ''
+                }]
+            },
+            policy_html: {
+                src: ['openam-ui-policy/src/main/resources/index.html'],
+                dest: '<%= destination %>/policyEditor/index.html',
+                replacements: [{
+                    from: '${version}',
+                    to:  '<%= buildNumber %>'
+                }]
+            },
+            policy_style: {
+                src: ['openam-ui-policy/src/main/resources/css/styles.less'],
+                dest: '<%= destination %>/policyEditor/css/styles.less',
+                replacements: [{
+                    from: '${version}',
+                    to:  '<%= buildNumber %>'
+                }]
+            },
+            policy_test: {
+                // temporary fix for test
+                src: ['openam-ui-policy/src/main/resources/css/styles.less'],
+                dest: '<%= destination %>/../www/css/styles.less',
+                replacements: [{
+                    from: '?v=@{openam-version}',
+                    to:  ''
+                }]
+            },
+            policy: {}
+        },
         sync: {
             ria: {
                 files: [
@@ -288,7 +369,7 @@ module.exports = function(grunt) {
                     'openam-ui-ria/src/main/js/**',
                     'openam-ui-ria/src/main/resources/**'
                 ],
-                tasks: ['sync']
+                tasks: ['sync', 'replace']
             },
             scripts: {
                 files: [
@@ -297,7 +378,7 @@ module.exports = function(grunt) {
                     'openam-ui-scripts/src/test/js/**',
                     'openam-ui-scripts/src/test/resources/**'
                 ],
-                tasks: ['sync']
+                tasks: ['sync', 'replace']
             },
             policy: {
                 files: [
@@ -306,13 +387,14 @@ module.exports = function(grunt) {
                     'openam-ui-policy/src/test/js/**',
                     'openam-ui-policy/src/test/resources/**'
                 ],
-                tasks: ['sync']
+                tasks: ['sync', 'replace']
             }
         }
     });
 
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-sync');
+    grunt.loadNpmTasks('grunt-text-replace');
 
-    grunt.registerTask('default', ['sync', 'watch']);
+    grunt.registerTask('default', ['sync', 'replace', 'watch']);
 };

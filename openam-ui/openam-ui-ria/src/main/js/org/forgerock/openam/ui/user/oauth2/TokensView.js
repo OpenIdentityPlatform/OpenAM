@@ -30,8 +30,9 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",
     "dataTable",
-    "org/forgerock/commons/ui/common/main/i18nManager"
-], function(AbstractView, tokensDelegate, eventManager, constants, dataTable, i18nManager) {
+    "org/forgerock/commons/ui/common/main/i18nManager",
+    'require'
+], function(AbstractView, tokensDelegate, eventManager, constants, dataTable, i18nManager, require) {
 
 
     var TokensView = AbstractView.extend({
@@ -111,7 +112,7 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
                     }
                 ],
                 "oLanguage": {
-                    "sUrl": "locales/" + i18nManager.language + "/translation.json"
+                    "sUrl": require.toUrl("locales/" + i18nManager.language + "/translation.json")
                 },
                 "sDom": 'l<"deleteSelected">f<"clear">rt<"clear">ip<"clear">',
                 "sPaginationType": "full_numbers",

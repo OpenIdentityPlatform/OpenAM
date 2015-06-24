@@ -27,12 +27,8 @@
 
     <fileSets>
         <fileSet>
-            <directory>${basedir}/src/main/js</directory>
-            <outputDirectory>.</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${basedir}/src/main/resources</directory>
-            <outputDirectory>.</outputDirectory>
+            <directory>${project.build.outputDirectory}</directory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${project.build.directory}/dependency</directory>

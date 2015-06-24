@@ -105,6 +105,7 @@
             </resource>
             <resource>
                 <directory>${basedir}/src/main/resources</directory>
+                <filtering>true</filtering>
             </resource>
         </resources>
         <testResources>
@@ -150,6 +151,13 @@
                         </goals>
                     </execution>
                 </executions>
+                <!-- this configuration added for filtering works with LESS files -->
+                <configuration>
+                    <delimiters>
+                        <delimiter>${*}</delimiter>
+                    </delimiters>
+                    <useDefaultDelimiters>false</useDefaultDelimiters>
+                </configuration>
             </plugin>
 
             <plugin>

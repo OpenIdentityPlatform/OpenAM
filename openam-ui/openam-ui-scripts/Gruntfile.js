@@ -24,8 +24,37 @@
 
 module.exports = function (grunt) {
     grunt.initConfig({
+        // please update OPENAM_VERSION after realise, for fix cache issue
+        buildNumber: process.env.OPENAM_VERSION,
         destination: process.env.OPENAM_HOME,
         forgerockui: process.env.FORGEROCK_UI_SRC,
+        replace: {
+            html: {
+                src: ['src/main/resources/index.html'],
+                dest: '<%= destination %>/scripts/index.html',
+                replacements: [{
+                    from: '${version}',
+                    to:  '<%= buildNumber %>'
+                }]
+            },
+            style: {
+                src: ['src/main/resources/css/styles.less'],
+                dest: '<%= destination %>/scripts/css/styles.less',
+                replacements: [{
+                    from: '${version}',
+                    to:  '<%= buildNumber %>'
+                }]
+            },
+            test: {
+                // temporary fix for test
+                src: ['src/main/resources/css/styles.less'],
+                dest: '<%= destination %>/../www/css/styles.less',
+                replacements: [{
+                    from: '?v=@{openam-version}',
+                    to:  ''
+                }]
+            }
+        },
         sync: {
             source_to_test: {
                 files: [
@@ -126,7 +155,7 @@ module.exports = function (grunt) {
                     'src/test/js/**',
                     'src/test/resources/**'
                 ],
-                tasks: ['sync', 'qunit']
+                tasks: ['sync', 'replace', 'qunit']
             }
         },
 
@@ -146,6 +175,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-notify');
     grunt.loadNpmTasks('grunt-sync');
+    grunt.loadNpmTasks('grunt-text-replace');
 
     grunt.task.run('notify_hooks');
 
@@ -153,6 +183,7 @@ module.exports = function (grunt) {
         'sync:source_to_test',
         'sync:source_css_to_test',
         'sync:source_to_tomcat',
+        'replace',
         'qunit',
         'watch']);
 };

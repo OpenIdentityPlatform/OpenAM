@@ -93,7 +93,7 @@ define("ThemeManager", [
         else{
             return obj.loadThemeConfig().then(function(themeConfig){
                 obj.data = themeConfig;
-                conf.globalData.themeConfig = themeConfig;
+                conf.globalData.themeConfig = obj.updateSrcProperties(themeConfig);
                 themeName = obj.mapRealmToTheme();
 
                 theme = _.reject(obj.data.themes,function(t){return t.name !== themeName;})[0];
@@ -148,6 +148,23 @@ define("ThemeManager", [
         });
 
         return theme;
+    };
+
+    obj.updateSrcProperties = function(config) {
+        var i;
+        if (config.themes && _.isArray(config.themes)) {
+            for (i = 0; i < config.themes.length; i++) {
+                _.each(config.themes[i].settings, obj.updateSrc);
+            }
+        } else {
+            _.each(config.settings, obj.updateSrc);
+        }
+    };
+
+    obj.updateSrc = function(value) {
+        if (_.has(value, 'src')) {
+            value.src = require.toUrl(value.src);
+        }
     };
 
 
