@@ -14,13 +14,13 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global, define*/
+/*global define, require*/
 define('org/forgerock/openam/ui/admin/views/realms/RealmView', [
     'jquery',
     'org/forgerock/commons/ui/common/main/AbstractView',
-    'require',
-    'org/forgerock/commons/ui/common/main/Router'
-], function ($, AbstractView, require, Router) {
+    'org/forgerock/commons/ui/common/main/Router',
+    'org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate'
+], function ($, AbstractView, Router, SMSGlobalDelegate) {
     var RealmView = AbstractView.extend({
         template: 'templates/admin/views/realms/RealmTemplate.html',
         events: {
@@ -61,18 +61,30 @@ define('org/forgerock/openam/ui/admin/views/realms/RealmView', [
                 }
             }
         },
+        realmExists: function (location) {
+            return SMSGlobalDelegate.realms.get(location);
+        },
         render: function (args, callback) {
             var self = this;
 
             this.args = args;
             this.data.realmLocation = args[0];
-            this.data.realmName = this.data.realmLocation === "/" ? "Top Level Realm" : this.data.realmLocation;
+            this.data.realmName = this.data.realmLocation === '/' ? 'Top Level Realm' : this.data.realmLocation;
 
-            this.parentRender(function () {
-                this.$el.find('li').removeClass('active');
-                this.findActiveNavItem(Router.getURIFragment());
+            this.realmExists(args[0])
+            .done(function () {
+                self.parentRender(function () {
+                    self.$el.find('li').removeClass('active');
+                    self.findActiveNavItem(Router.getURIFragment());
 
-                self.renderPage(require(this.route.page), args, callback);
+                    self.renderPage(require(self.route.page), args, callback);
+                });
+            })
+            .fail(function () {
+                Router.routeTo(Router.configuration.routes.realms, {
+                    args: [],
+                    trigger: true
+                });
             });
         },
         renderPage: function (Module, args, callback) {

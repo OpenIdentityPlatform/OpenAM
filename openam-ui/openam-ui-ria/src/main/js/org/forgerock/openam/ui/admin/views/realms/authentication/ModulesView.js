@@ -23,12 +23,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/admin/delegates/SMSDelegate",
+    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/util/UIUtils"
-], function ($, AbstractView, BootstrapDialog, Configuration, EventManager, Router, Constants, SMSDelegate, Form, FormHelper, MessageManager, UIUtils) {
+], function ($, AbstractView, BootstrapDialog, Configuration, EventManager, Router, Constants, SMSRealmDelegate, Form, FormHelper, MessageManager, UIUtils) {
     var ModulesView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/ModulesTemplate.html",
         events: {
@@ -41,7 +41,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
         addModule: function(e) {
             e.preventDefault();
             var self = this;
-            SMSDelegate.RealmAuthenticationModules.getModuleTypes()
+            SMSRealmDelegate.authentication.modules.getModuleTypes()
             .done(function(result) {
                 self.data.moduleTypes = result;
                 UIUtils.fillTemplateWithData("templates/admin/views/realms/authentication/modules/AddModuleTemplate.html", self.data, function(html) {
@@ -56,10 +56,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
                                 if (self.addModuleDialogValidation(dialog)) {
                                     var moduleName = dialog.getModalBody().find('#newModuleName').val(),
                                         moduleType = dialog.getModalBody().find('#newModuleType').val();
-                                    SMSDelegate.RealmAuthenticationModules.hasModuleName(moduleName)
+                                    SMSRealmDelegate.authentication.modules.hasModuleName(moduleName)
                                     .done(function(result) {
                                         if (result) {
-                                          SMSDelegate.RealmAuthenticationModules.saveModule({
+                                          SMSRealmDelegate.authentication.modules.saveModule({
                                               _id: moduleName,
                                               type : moduleType
                                           })
@@ -110,7 +110,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
         enableOrDisableNextButton: function(dialog) {
             var self = this;
             dialog.$modalBody
-            .on('change','#newModuleName, #newModuleType',function(e) {
+            .on('change keyup','#newModuleName, #newModuleType',function(e) {
               if (self.addModuleDialogValidation(dialog)) {
                 dialog.getButton('nextButton').enable();
               } else {
@@ -134,7 +134,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
             var self = this,
                 moduleName = $(event.currentTarget).attr('data-module-name');
 
-            SMSDelegate.RealmAuthenticationModules.removeModule(moduleName)
+            SMSRealmDelegate.authentication.modules.removeModule(moduleName)
             .done(function(data) {
                 self.renderModulesTab();
             })
@@ -148,7 +148,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
                     return $(element).attr('data-module-name');
                 }),
                 promises = moduleNames.map(function(name) {
-                    return SMSDelegate.RealmAuthenticationModules.removeModule(name);
+                    return SMSRealmDelegate.authentication.modules.removeModule(name);
                 });
 
             $.when(promises)
@@ -163,7 +163,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
             var self = this;
             this.data.realmLocation = args[0];
 
-            SMSDelegate.RealmAuthenticationModules.getModules()
+            SMSRealmDelegate.authentication.modules.getModules()
             .done(function(data) {
                 self.data.formData = data.values.result;
                 self.$el.find('[data-toggle="tooltip"]').tooltip();
@@ -179,7 +179,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
 
         },
         save: function(event) {
-            var promise = SMSDelegate.RealmAuthentication.save(this.data.form.data());
+            var promise = SMSRealmDelegate.RealmAuthentication.save(this.data.form.data());
 
             FormHelper.bindSavePromiseToElement(promise, event.target);
         }

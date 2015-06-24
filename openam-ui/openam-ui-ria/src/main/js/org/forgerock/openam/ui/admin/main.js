@@ -16,11 +16,13 @@
 
 /*global define*/
 define([
-    "./delegates/SMSDelegate",
+    "./delegates/SMSDelegateUtils",
+    "./delegates/SMSGlobalDelegate",
+    "./delegates/SMSRealmDelegate",
     "./models/Form",
     "./models/FormCollection",
     "./utils/FormHelper",
-    "./utils/JsonEditorTheme",
+    "./utils/JSONEditorTheme",
 
     "./views/commonTasks/CommonTasksView",
     "./views/configuration/ConfigurationView",
@@ -49,6 +51,7 @@ define([
 
     "./views/realms/RealmsListView",
     "./views/realms/RealmView",
+    "./views/realms/AddNewRealmDialog",
 
     "./views/sessions/SessionsView"
 ]);

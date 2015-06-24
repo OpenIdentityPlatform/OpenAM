@@ -12,21 +12,20 @@
                         <div class="card am-device-card" data-device-uuid="{{uuid}}">
                             <div class="btn-group card-menu">
                                 <button type="button" class="btn btn-link dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                    <i class="fa fa-ellipsis-v fa-lg card-menu-icon"></i>
+                                    <i class="fa fa-ellipsis-v fa-lg"></i>
                                 </button>
-                                <ul class="dropdown-menu pull-right" role="menu">
-                                    <li><a id="recoveryCodes" href="#"><i class="fa fa-list"></i>{{ t 'openam.deviceManagement.menu.recoveryCodes' }}</a></li>
+                                <ul class="dropdown-menu pull-left" role="menu">
+                                    <li><a class="recovery-codes-btn" href="#"><i class="fa fa-list"></i>{{ t 'openam.deviceManagement.menu.recoveryCodes' }}</a></li>
                                     <li class="divider"></li>
-                                    <li><a id="delete" href="#"><i class="fa fa-times"></i>{{ t 'openam.deviceManagement.menu.delete' }}</a></li>
+                                    <li><a class="delete-device-btn" href="#"><i class="fa fa-times"></i>{{ t 'openam.deviceManagement.menu.delete' }}</a></li>
                                 </ul>
                             </div>
-                            <div class="card-icon-symbol">
-                                <div class="am-device-card-circle">
-                                    <i class="fa fa-mobile card-icon"></i>
+                            <div class="card-body">
+                                <div class="card-icon-circle">
+                                    <i class="fa fa-mobile"></i>
                                 </div>
-                            </div>
-                            <div class="card-content">
-                                <h3 class="am-device-card-content-title">{{deviceName}}</h3>
+                                <h3 class="card-name">{{deviceName}}</h3>
+                                <!--<div class="card-subtext"></div>-->
                             </div>
                         </div>
                     </div>

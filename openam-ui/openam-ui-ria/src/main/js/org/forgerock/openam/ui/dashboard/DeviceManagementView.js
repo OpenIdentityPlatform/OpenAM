@@ -27,8 +27,8 @@ define('org/forgerock/openam/ui/dashboard/DeviceManagementView', [
         noBaseTemplate: true,
         element: '#deviceManagementSection',
         events: {
-            'click #delete': 'deleteDevice',
-            'click #recoveryCodes': 'showRecoveryCodes'
+            'click .delete-device-btn':  'deleteDevice',
+            'click .recovery-codes-btn': 'showRecoveryCodes'
         },
         deleteDevice: function (event) {
             event.preventDefault();
@@ -50,7 +50,7 @@ define('org/forgerock/openam/ui/dashboard/DeviceManagementView', [
             BootstrapDialog.show({
                 type: BootstrapDialog.TYPE_DEFAULT,
                 title: $.t('openam.deviceManagement.recoveryCodes.title'),
-                message: device.recoveryCodes.join('\n'),
+                message: '<pre class="text-center">' + device.recoveryCodes.join('\n') + '</pre>',
                 buttons: [{
                     label: $.t('openam.deviceManagement.recoveryCodes.download'),
                     icon: 'fa fa-download',

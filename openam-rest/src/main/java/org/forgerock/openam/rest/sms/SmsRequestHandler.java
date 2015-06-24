@@ -69,6 +69,9 @@ import org.forgerock.json.resource.Router;
 import org.forgerock.json.resource.RoutingMode;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.core.CoreWrapper;
+import org.forgerock.openam.rest.resource.CrestRealmRouter;
+import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.utils.CollectionUtils;
 
 /**
@@ -189,6 +192,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
     private void addSpecialCaseRoutes() {
         addAuthenticationModulesQueryHandler();
         addAuthenticationModuleTypesQueryHandler();
+        addRealmHandler();
     }
 
     private SmsRouteTree getAuthenticationModuleRouter() {
@@ -204,6 +208,14 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
     private void addAuthenticationModuleTypesQueryHandler() {
         if (SchemaType.ORGANIZATION.equals(schemaType)) {
             getAuthenticationModuleRouter().addRoute(RoutingMode.EQUALS, "types", authenticationModuleTypeHandler);
+        }
+    }
+
+    private void addRealmHandler() {
+        if (SchemaType.GLOBAL.equals(schemaType)) {
+            CrestRealmRouter router = new CrestRealmRouter(new RestRealmValidator(), new CoreWrapper());
+            router.addRoute(RoutingMode.EQUALS, "", new SmsRealmProvider());
+            routeTree.addRoute(RoutingMode.STARTS_WITH, "/realms", router);
         }
     }
 

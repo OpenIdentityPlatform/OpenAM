@@ -1,4 +1,4 @@
-/*
+/**
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -14,15 +14,15 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global, define*/
+/*global define*/
 define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
     "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "bootstrap-dialog",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/openam/ui/admin/delegates/SMSDelegate"
-], function ($, _, AbstractView, BootstrapDialog, Router, SMSDelegate) {
+    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate"
+], function ($, _, AbstractView, BootstrapDialog, Router, SMSRealmDelegate) {
     var ChainsView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/ChainsTemplate.html",
         events: {
@@ -57,7 +57,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
                             console.log('invalidName'); // jslinter
                         } else {
 
-                            SMSDelegate.RealmAuthenticationChains.create({_id : chainName})
+                            SMSRealmDelegate.authentication.chains.create({_id : chainName})
                             .done(function(data) {
                                 dialog.close();
                                 Router.navigate( href + dialog.getModalBody().find('#newName').val(), { trigger: true });
@@ -91,7 +91,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
             var checked = $(event.currentTarget).is(':checked');
             this.$el.find('.sorted-chains input[type=checkbox]:not(:disabled)').prop('checked', checked);
             if (checked) {
-                this.$el.find('.sorted-chains:not(.default-config-row)').addClass('selected'); 
+                this.$el.find('.sorted-chains:not(.default-config-row)').addClass('selected');
             } else {
                 this.$el.find('.sorted-chains').removeClass('selected');
             }
@@ -101,7 +101,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
             var self = this,
                 chainName = $(event.currentTarget).attr('data-chain-name');
 
-            SMSDelegate.RealmAuthenticationChain.remove(chainName)
+            SMSRealmDelegate.authentication.chain.remove(chainName)
                 .done(function(data) {
                     self.render([self.data.realmLocation]);
                 })
@@ -115,7 +115,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
                     return $(element).attr('data-chain-name');
                 }),
                 promises = chainNames.map(function(name) {
-                    return SMSDelegate.RealmAuthenticationChain.remove(name);
+                    return SMSRealmDelegate.authentication.chain.remove(name);
                 });
 
             $.when(promises)
@@ -131,7 +131,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
                 sortedChains = [];
             this.data.realmLocation = args[0];
 
-            SMSDelegate.RealmAuthenticationChains.getWithDefaults()
+            SMSRealmDelegate.authentication.chains.getWithDefaults()
                 .done(function(data) {
                     _.each(data.values.result, function(obj) {
                         // Add default chains to top of list.

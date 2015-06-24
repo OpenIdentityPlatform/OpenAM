@@ -22,10 +22,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/admin/delegates/SMSDelegate",
+    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/utils/FormHelper"
-], function ($, AbstractView, Configuration, EventManager, Router, Constants, SMSDelegate, Form, FormHelper) {
+], function ($, AbstractView, Configuration, EventManager, Router, Constants, SMSRealmDelegate, Form, FormHelper) {
     var EditModuleView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/modules/EditModuleViewTemplate.html",
         events: {
@@ -35,7 +35,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
         },
         render: function (args, callback) {
             var self = this;
-            SMSDelegate.RealmAuthenticationModules.getModule(args[1])
+            SMSRealmDelegate.authentication.modules.getModule(args[1])
             .done(function (data) {
                 self.data.formData = data;
                 self.parentRender(function () {
@@ -54,7 +54,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
         },
 
         save: function (event) {
-            var promise = SMSDelegate.RealmAuthenticationModules.saveModule(this.data.form.data());
+            var promise = SMSRealmDelegate.authentication.modules.saveModule(this.data.form.data());
             FormHelper.bindSavePromiseToElement(promise, event.target);
         },
         revert: function () {

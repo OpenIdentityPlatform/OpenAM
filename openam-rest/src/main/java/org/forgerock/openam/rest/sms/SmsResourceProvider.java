@@ -66,6 +66,8 @@ import com.sun.identity.sm.ServiceSchema;
 abstract class SmsResourceProvider {
 
     public static final List<AttributeSchema.Syntax> NUMBER_SYNTAXES = Arrays.asList(NUMBER, DECIMAL, PERCENT, NUMBER_RANGE, DECIMAL_RANGE, DECIMAL_NUMBER);
+    static final String TEMPLATE = "template";
+    static final String SCHEMA = "schema";
     protected final String serviceName;
     protected final String serviceVersion;
     protected final List<ServiceSchema> subSchemaPath;
@@ -174,9 +176,9 @@ abstract class SmsResourceProvider {
     }
 
     protected void handleAction(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-        if (request.getAction().equals("template")) {
+        if (request.getAction().equals(TEMPLATE)) {
             handler.handleResult(converter.toJson(schema.getAttributeDefaults()));
-        } else if ("schema".equals(request.getAction())) {
+        } else if (SCHEMA.equals(request.getAction())) {
             handler.handleResult(createSchema(context));
         } else {
             handler.handleError(new NotSupportedException("Action not supported: " + request.getAction()));
@@ -225,23 +227,26 @@ abstract class SmsResourceProvider {
                 result.addPermissive(new JsonPointer(path + attributePath + "/title"),
                         i18n.getString(i18NKey));
 
-                StringBuilder description = new StringBuilder();
-                if (i18n.containsKey(i18NKey + ".help")) {
-                    description.append(i18n.getString(i18NKey + ".help"));
-                }
-                if (i18n.containsKey(i18NKey + ".help.txt")) {
-                    if (description.length() > 0) {
-                        description.append("<br><br>");
-                    }
-                    description.append(i18n.getString(i18NKey + ".help.txt"));
-                }
-
-                result.addPermissive(new JsonPointer(path + attributePath + "/description"), description.toString());
+                result.addPermissive(new JsonPointer(path + attributePath + "/description"), getSchemaDescription(i18n, i18NKey));
                 result.addPermissive(new JsonPointer(path + attributePath + "/propertyOrder"), i18NKey);
                 result.addPermissive(new JsonPointer(path + attributePath + "/required"), !attribute.isOptional());
                 addType(result, path + attributePath, attribute, i18n, context);
             }
         }
+    }
+
+    static String getSchemaDescription(ResourceBundle i18n, String i18NKey) {
+        StringBuilder description = new StringBuilder();
+        if (i18n.containsKey(i18NKey + ".help")) {
+            description.append(i18n.getString(i18NKey + ".help"));
+        }
+        if (i18n.containsKey(i18NKey + ".help.txt")) {
+            if (description.length() > 0) {
+                description.append("<br><br>");
+            }
+            description.append(i18n.getString(i18NKey + ".help.txt"));
+        }
+        return description.toString();
     }
 
     protected String getConsoleString(ResourceBundle console, String key) {

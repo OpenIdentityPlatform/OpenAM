@@ -1,4 +1,4 @@
-/*
+/**
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -14,11 +14,11 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global define $*/
-
-define("org/forgerock/openam/ui/admin/utils/JsonEditorTheme", [
+/*global define*/
+define('org/forgerock/openam/ui/admin/utils/JSONEditorTheme', [
+    'jquery',
     'jsonEditor'
-], function (JSONEditor) {
+], function ($, JSONEditor) {
     var obj = {};
 
     obj.getTheme = function (gridColWidth1, gridColWidth2) {
@@ -70,15 +70,14 @@ define("org/forgerock/openam/ui/admin/utils/JsonEditorTheme", [
                 },
 
                 getFormInputField: function (type) {
-                    var input = this._super(type),
-                        group = document.createElement('div');
-                    if (type !== 'checkbox') {
+                    var input = this._super(type);
+                    if (type === 'checkbox') {
+                        input.style.marginTop = '12px';
+                    } else {
                         input.className += 'form-control';
                     }
-                    group.className += 'col-sm-' + gridColWidth1;
-                    group.appendChild(input);
 
-                    return group;
+                    return input;
                 },
 
                 getFormInputLabel: function (text) {
@@ -92,10 +91,9 @@ define("org/forgerock/openam/ui/admin/utils/JsonEditorTheme", [
                     var group = document.createElement('div'),
                         div = document.createElement('div');
 
-
                     if (label && $(input).find('input').prop('type') === 'checkbox') {
                         group.className += ' checkbox';
-                        input.style.marginTop = '6px';
+                        input.style.marginTop = '12px';
                     }
 
                     group.className = 'form-group';
@@ -236,7 +234,7 @@ define("org/forgerock/openam/ui/admin/utils/JsonEditorTheme", [
                     bar.setAttribute('aria-valuenow', start);
                     bar.setAttribute('aria-valuemin', min);
                     bar.setAttribute('aria-valuenax', max);
-                    bar.innerHTML = start + "%";
+                    bar.innerHTML = start + '%';
                     container.appendChild(bar);
 
                     return container;
@@ -248,7 +246,7 @@ define("org/forgerock/openam/ui/admin/utils/JsonEditorTheme", [
                     }
 
                     var bar = progressBar.firstChild,
-                        percentage = progress + "%";
+                        percentage = progress + '%';
                     bar.setAttribute('aria-valuenow', progress);
                     bar.style.width = percentage;
                     bar.innerHTML = percentage;

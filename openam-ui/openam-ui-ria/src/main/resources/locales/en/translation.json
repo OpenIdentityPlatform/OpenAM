@@ -73,7 +73,13 @@
             "Navigation" : {
                 "links" : {
                     "commonTasks": "Common Tasks",
-                    "realms": "Realms",
+                    "realms": {
+                        "title": "Realms",
+                        "showAll": "Show All",
+                        "newRealm": "New Realm",
+                        "topLevelRealm": "Top Level Realm",
+                        "viewAll": "View all..."
+                    },
                     "federation": "Federation",
                     "configuration": "Configuration",
                     "sessions": "Sessions",
@@ -262,6 +268,7 @@
             "addValue" : "Add Value",
             "settings" : "Settings",
             "working" : "Working...",
+            "more" : "more...",
             "empty" : "Empty",
             "help" : "Help",
             "change": "Change",
@@ -556,6 +563,46 @@
                 "dropHere" : "Drop here",
                 "processingClass": "Post Authentication Processing Class",
                 "criteria" : ["Required","Optional","Requisite","Sufficient"]
+            }
+        },
+        "realms": {
+            "title": "Realms",
+            "newRealm": "New Realm",
+            "topLevelRealm": "Top Level Realm",
+            "actions": {
+                "edit": "Edit",
+                "disable": "Disable",
+                "activate": "Activate",
+                "delete": "Delete"
+            },
+            "active": "Active",
+            "inactive": "Inactive",
+            "realmName": "Realm name",
+            "realmLocation": "Location",
+            "warningDialog": {
+                "title": "Delete \"__realmName__\"?",
+                "message": "This realm is being used as one of the default realms. Deleting may result in locking out the administrators or the users. Are you sure you want to continue?"
+            },
+            "realmPropertiesDialog": {
+                "dialogTitle": "Properties",
+                "title": "Realm attributes",
+                "status": "Realm Status",
+                "aliases": "Realm/DNS Aliases"
+            },
+            "newRealmDialog": {
+                "title": "New Realm",
+                "name": "Name",
+                "parent": "Parent",
+                "general": "General",
+                "realmAttributes": "Realm attributes"
+            },
+            "realmStatusPopover": {
+                "title": "Realm Status",
+                "content": "If the realm is disabled, all OpenAM services will be unavailable for all users in this realm."
+            },
+            "realmAliasesPopover": {
+                "title": "Realm/DNS Aliases",
+                "content": "When a request is received by the authentication user interface, OpenAM searches this attribute in all realms to find the matching realm into which the user should be authenticated. <br> OpenAM must only find one matching realm so therefore do not put duplicate entries into multiple realms. <br> Additionally if OpenAM does not find a matching realm, the user is presented with an error screen."
             }
         },
         "scripts": {

@@ -1,4 +1,4 @@
-/*
+/**
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -14,7 +14,7 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global, define*/
+/*global define*/
 define("org/forgerock/openam/ui/admin/views/realms/authentication/AdvancedView", [
     'jquery',
     "org/forgerock/commons/ui/common/main/AbstractView",
@@ -22,8 +22,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AdvancedView",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
-    "org/forgerock/openam/ui/admin/delegates/SMSDelegate"
-], function ($, AbstractView, Configuration, Constants, Form, FormHelper, SMSDelegate) {
+    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate"
+], function ($, AbstractView, Configuration, Constants, Form, FormHelper, SMSRealmDelegate) {
     var AdvancedView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/AdvancedTemplate.html",
         events: {
@@ -31,11 +31,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AdvancedView",
             'click #saveChanges': 'save',
             'show.bs.tab ul.nav.nav-tabs a': 'renderTab'
         },
-    
+
         render: function (args, callback) {
             var self = this;
 
-            SMSDelegate.RealmAuthentication.get()
+            SMSRealmDelegate.authentication.get()
             .done(function (data) {
                 self.data.formData = data;
 
@@ -67,7 +67,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AdvancedView",
             this.data.form.reset();
         },
         save: function (event) {
-            var promise = SMSDelegate.RealmAuthentication.save(this.data.form.data());
+            var promise = SMSRealmDelegate.authentication.save(this.data.form.data());
 
             FormHelper.bindSavePromiseToElement(promise, event.target);
         }

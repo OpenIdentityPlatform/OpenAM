@@ -1,4 +1,4 @@
-/*
+/**
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -15,16 +15,15 @@
  */
 
 /*global define*/
-
 define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditChainView", [
     "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/admin/delegates/SMSDelegate",
+    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
     "org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkView",
     "org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostProcessView",
     "org/forgerock/openam/ui/admin/utils/FormHelper"
-], function($, _, AbstractView, SMSDelegate, LinkView, PostProcessView, FormHelper) {
+], function($, _, AbstractView, SMSRealmDelegate, LinkView, PostProcessView, FormHelper) {
 
     var EditChainView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/chains/EditChainTemplate.html",
@@ -38,7 +37,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
 
             var self = this;
 
-            SMSDelegate.RealmAuthenticationChains.getChainWithType(args[1]).done(function (data) {
+            SMSRealmDelegate.authentication.chains.getChainWithType(args[1]).done(function (data) {
 
                 self.data.chainData = data.chainData;
                 self.data.allModules = data.modulesData;
@@ -98,7 +97,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             this.data.chainData.loginSuccessUrl[0] = this.$el.find('#loginSuccessUrl').val();
             this.data.chainData.loginFailureUrl[0] = this.$el.find('#loginFailureUrl').val();
 
-            promise = SMSDelegate.RealmAuthenticationChains.save(this.data.chainData._id, this.data.chainData);
+            promise = SMSRealmDelegate.authentication.chains.save(this.data.chainData._id, this.data.chainData);
             promise.fail(function(e) {
                 // TODO: Add failure condition
                 console.error(e);

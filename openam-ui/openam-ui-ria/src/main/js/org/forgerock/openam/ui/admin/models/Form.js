@@ -17,15 +17,15 @@
 /*global _ $ define*/
 define('org/forgerock/openam/ui/admin/models/Form', [
     'jsonEditor',
-    'org/forgerock/openam/ui/admin/utils/JsonEditorTheme'
-], function (JSONEditor, JsonEditorTheme) {
+    'org/forgerock/openam/ui/admin/utils/JSONEditorTheme'
+], function (JSONEditor, JSONEditorTheme) {
     var obj = function Form(element, schema, values) {
         this.element = element;
         this.schema = schema;
         this.values = values;
 
         JSONEditor.plugins.selectize.enable = true;
-        JSONEditor.defaults.themes.openam = JsonEditorTheme.getTheme(6, 4);
+        JSONEditor.defaults.themes.openam = JSONEditorTheme.getTheme(6, 4);
 
         this.editor = new JSONEditor(element, {
             disable_collapse: true,

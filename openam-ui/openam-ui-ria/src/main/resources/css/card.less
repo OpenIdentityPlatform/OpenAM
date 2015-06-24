@@ -1,0 +1,77 @@
+/* Candidate for Commons */
+.card {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 30px;
+    color:#999;
+
+    a:hover {
+        text-decoration:none;
+    }
+
+    .card-menu {
+        float:right;
+        button.btn-link{
+            color:#999;
+            &:hover{
+                color: darken(@base-theme-color, 5%);
+            }
+        }
+    }
+
+    .card-body {
+        clear:both;
+        text-align: center;
+        padding: 0 15px 24px;
+
+        .card-name {
+            font-size: 18px;
+            line-height: 1.2;
+            margin: 10px 0 0;
+        }
+
+        .card-subtext {
+            color:#999;
+        }
+    }
+
+    .card-footer {
+        border-top: 1px solid #ddd;
+        color: #999;
+        padding: 10px 15px;
+        text-align: center;
+        .text-success {
+            color: darken(@base-theme-color, 5%);
+        }
+    }
+
+    .card-icon-circle {
+
+        display: table;
+        text-align: center;
+        background-color: @base-theme-color;
+        border-radius: 50%;
+        color: #fff;
+        font-size: 60px;
+        overflow: hidden;
+        width: 120px;
+        height: 120px;
+        margin: 0 auto;
+
+        i.fa {
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+    }
+
+    &:hover {
+        border: 1px solid @base-theme-color;
+        transition: all 0.3s ease-in-out;
+        .card-icon-circle {
+            transition: all 0.3s ease-in-out;
+            background-color: darken(@base-theme-color, 5%);
+        }
+    }
+}

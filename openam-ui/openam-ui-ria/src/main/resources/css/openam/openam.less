@@ -15,8 +15,19 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
- /* Candidate for Commons */
+ /* should come to toolbar.less from common*/
+ .toolbar-lg {
+     margin-bottom: 30px;
+     padding: 20px 0 35px;
+ }
 
+ .tool-group-left {
+     float: left;
+     margin-right: 20px;
+ }
+ /* ENF should come to toolbar.less from common */
+
+ /* Candidate for Commons */
 #wrapper{
     padding-bottom: 50px;
 }
@@ -114,6 +125,14 @@
 
     .btn-transparent:hover, .btn-transparent:focus {
         color: #555;
+    }
+
+    a {
+        color: #2a2f32;
+    }
+
+    a:hover, a:focus {
+        color: #519387;
     }
 }
 
@@ -270,59 +289,35 @@
     }
 }
 
-.am-device-card {
-    height: 220px;
-}
 
-.am-device-card-circle {
-    border-radius: 50%;
-    overflow: hidden;
-    width: 90px;
-    background-color: #519387;
-    color: #fff;
-    font-size: 60px;
-    height: 90px;
-    margin: 0 auto;
-    display: table;
-    text-align: center;
- }
+.realm-dialog .modal-dialog{
+    width: 700px;
 
-.am-device-card-content-title {
-    font-size: 18px;
-}
+    .dialog-header{
+        border-bottom: none;
+        margin-left: 15px;
+    }
 
+    .dialog-subtitle {
+        font-weight: 600;
+        color: #519387;
+        margin: 20px 15px;
+    }
 
-// FIXME: Commons Candidate
-.card {
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-bottom: 30px;
-
-    &:hover {
-        border: 1px solid #519387;
-        transition: border-color 0.3s ease-in-out;
+    .form-group {
+        height: 34px;
     }
 }
 
-.card-menu {
-    position: absolute;
-    right: 14px;
+
+.realm-card-location{
+    padding-top:8px;
 }
 
-.card-icon {
-    display: table-cell;
-    vertical-align: middle;
-}
-
-.card-icon-symbol {
-    padding-top: 40px;
-}
-
-.card-content {
-    text-align: center;
-}
-
-.card-menu-icon {
-    color: #777;
-}
+.realm-card-aliases {
+    height: 3em;
+    overflow: hidden;
+    font-size: 85%;
+    color:#666;
+    margin-top: 8px;
+ }

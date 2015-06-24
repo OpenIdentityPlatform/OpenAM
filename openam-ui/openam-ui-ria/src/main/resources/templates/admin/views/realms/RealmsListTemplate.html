@@ -1,1 +1,106 @@
-RealmsListTemplate
+<div class="container">
+    <div class="page-header">
+        <h1>{{t "console.realms.title"}}</h1>
+    </div>
+    <div class="toolbar-lg">
+        <div class="tool-group-left" role="toolbar">
+            <a class="btn btn-primary" id="addRealm" href="#realms/"><i class="fa fa-plus"></i> {{t "console.realms.newRealm"}}</a>
+        </div>
+        <div class="tool-group-right" role="toolbar">
+            <div class="btn-group pull-right" role="group">
+                <button class="btn btn-default" data-toggle="tab" data-target="#grid"><i class="fa fa-th"></i></button>
+                <button class="btn btn-default" data-toggle="tab" data-target="#list"><i class="fa fa-list"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="tab-content clearfix">
+        <div role="tabpanel" class="tab-pane active" id="grid">
+            <div class="row">
+                {{#each realms}}
+                <div class="col-sm-6 col-md-3">
+                    <div class="card realm-name" data-realm-location="{{location}}">
+                        <div class="btn-group card-menu">
+                            <button type="button" class="btn btn-link dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-ellipsis-v fa-lg"></i>
+                            </button>
+                            <ul class="dropdown-menu pull-left" role="menu">
+                                <li><a href="#" class="edit-realm"><i class="fa fa-pencil"></i>{{t "console.realms.actions.edit"}}</a></li>
+                                {{#if active}}
+                                <li><a href="#" class="toggle-realm-active"><i class="fa fa-ban"></i>{{t "console.realms.actions.disable"}}</a></li>
+                                {{else}}
+                                <li><a href="#" class="toggle-realm-active"><i class="fa fa-check"></i>{{t "console.realms.actions.activate"}}</a></li>
+                                {{/if}}
+                                <li class="divider"></li>
+                                <li><a href="#" class="delete-realm"><i class="fa fa-times"></i>{{t "console.realms.actions.delete"}}</a></li>
+                            </ul>
+                        </div>
+                        <a href="{{routeTo 'realmDefault' location}}">
+                            <div class="card-body">
+                                <div class="card-icon-circle">
+                                    <i class="fa fa-cloud"></i>
+                                </div>
+                                <h3 class="card-name">{{name}}</h3>
+                                <div class="card-subtext">
+                                    <div class="realm-card-location">{{location}}</div>
+                                    <div class="realm-card-aliases">
+                                    {{#if aliases}}
+                                        {{aliases.[0]}}
+                                        {{#if aliases.[1]}}
+                                            {{#each aliases}}
+                                            {{#if @last}}<br><em>{{@index}} {{t 'common.form.more'}}</em>{{/if}}
+                                            {{/each}}
+                                        {{/if}}
+                                    {{/if}}
+                                </div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                {{#if active}}
+                                <span class="text-success"><i class="fa fa-check"></i> {{t 'console.realms.active'}}</span>
+                                {{else}}
+                                {{t 'console.realms.inactive'}}
+                                {{/if}}
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="list">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>{{t 'console.realms.realmName'}}</th>
+                            <th>{{t 'console.realms.realmLocation'}}</th>
+                            <th>{{t 'console.realms.realmPropertiesDialog.aliases'}}</th>
+                            <th class="col-btn"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{#each realms}}
+                        <tr>
+                            <td><a href="{{routeTo 'realmDefault' location}}">{{name}}</a></td>
+                            <td>{{location}}</td>
+                            <td>
+                                {{#each aliases}}
+                                    {{this}}{{#unless @last}}, {{/unless}}
+                                {{/each}}
+                            </td>
+                            <td>
+                                <div class="pull-right btn-group realm-name" data-realm-location="{{location}}">
+                                    <button type="button" class="btn btn-transparent edit-realm" data-realm-name="{{name}}"><i class="fa fa-pencil"></i></button>
+                                    <button type="button" class="btn btn-transparent delete-realm"><i class="fa fa-close"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

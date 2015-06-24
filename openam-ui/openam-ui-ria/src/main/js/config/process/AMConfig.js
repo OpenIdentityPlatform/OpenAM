@@ -23,12 +23,13 @@
  */
 
 /*global define, require, window, _*/
-
 define("config/process/AMConfig", [
+    "jquery",
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
+    'org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate',
     "org/forgerock/commons/ui/common/util/UIUtils"
-], function(Constants, EventManager, UIUtils) {
+], function ($, Constants, EventManager, SMSGlobalDelegate, UIUtils) {
     var obj = [
         {
             startEvent: Constants.EVENT_LOGOUT,
@@ -39,12 +40,12 @@ define("config/process/AMConfig", [
                 "org/forgerock/commons/ui/common/main/Configuration",
                 "org/forgerock/commons/ui/common/main/SessionManager"
             ],
-            processDescription: function(event, router, conf, sessionManager) {
+            processDescription: function (event, router, conf, sessionManager) {
                 var argsURLFragment = event ? (event.args ? event.args[0] : '') : '',
                     urlParams = UIUtils.convertQueryParametersToJSON(argsURLFragment),
                     gotoURL = urlParams.goto;
 
-                sessionManager.logout(function() {
+                sessionManager.logout(function () {
                     conf.setProperty('loggedUser', null);
                     EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true});
                     delete conf.gotoURL;
@@ -53,7 +54,7 @@ define("config/process/AMConfig", [
                     } else {
                         EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {route: router.configuration.routes.loggedOut });
                     }
-                }, function(){
+                }, function () {
                     conf.setProperty('loggedUser', null);
                     EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true});
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unauthorized");
@@ -72,12 +73,11 @@ define("config/process/AMConfig", [
                 "org/forgerock/commons/ui/common/main/Router",
                 "org/forgerock/commons/ui/common/main/Configuration"
             ],
-            processDescription: function(event, router, conf) {
-                if (event.error.responseJSON.message.indexOf('Invalid realm') > -1 ) {
+            processDescription: function (event, router, conf) {
+                if (event.error.responseJSON.message.indexOf('Invalid realm') > -1) {
                     if (conf.baseTemplate) {
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidRealm");
-                    }
-                    else {
+                    } else {
                         router.navigate('login', {trigger: true});
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidRealm");
                     }
@@ -85,13 +85,12 @@ define("config/process/AMConfig", [
             }
         },
         {
-
             startEvent: Constants.EVENT_SHOW_CONFIRM_PASSWORD_DIALOG,
             description: "",
             dependencies: [
                 "org/forgerock/commons/ui/user/profile/ConfirmPasswordDialog"
             ],
-            processDescription: function(event, ConfirmPasswordDialog) {
+            processDescription: function (event, ConfirmPasswordDialog) {
                 ConfirmPasswordDialog.show();
             }
         },
@@ -101,8 +100,23 @@ define("config/process/AMConfig", [
             dependencies: [
                 "org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog"
             ],
-            processDescription: function(event, ChangeSecurityDataDialog) {
+            processDescription: function (event, ChangeSecurityDataDialog) {
                 ChangeSecurityDataDialog.show(event);
+            }
+        },
+        {
+            startEvent: Constants.EVENT_ADD_NEW_REALM_DIALOG,
+            override: true,
+            dependencies: [
+                "org/forgerock/commons/ui/common/main/Router",
+                "org/forgerock/openam/ui/admin/views/realms/AddNewRealmDialog"
+            ],
+            processDescription: function (event, Router, AddNewRealmDialog) {
+                Router.routeTo(Router.configuration.routes.realms, {
+                    args: [],
+                    trigger: true
+                });
+                AddNewRealmDialog.show();
             }
         },
         {
@@ -124,41 +138,40 @@ define("config/process/AMConfig", [
                 "org/forgerock/commons/ui/common/components/Navigation"
             ],
             processDescription: function (event, Configuration, Navigation) {
-
-                /*if(_.contains(Configuration.loggedUser.roles, 'ui-admin')){
-
-                    // TODO: This is only mock data. This would be replaced with a
-                    // Delegate and call to appropriate endpoint. Possibly even
-                    // carrying out this functionality in a specific module elsewhere.
-                    var realms = [{
-                        "url": "#realms/authentication/advanced/",
-                        "name": "Top Level Realm",
-                        "cssClass": "dropdown-sub"
-                    },
-                    {
-                        "url": "#realms/authentication/chains/",
-                        "name": "My Realm",
-                        "cssClass": "dropdown-sub"
-                    },
-                    {
-                        "url": "#realms/authentication/",
-                        "name": "Another Realm",
-                        "cssClass": "dropdown-sub"
-                    }];
-
+                if (_.contains(Configuration.loggedUser.roles, 'ui-admin')) {
                     Navigation.configuration.links.admin.urls.realms.urls.push({
-                        divider: true
+                        'url': '#realms/' + encodeURIComponent('/'),
+                        'name': $.t('config.AppConfiguration.Navigation.links.realms.topLevelRealm'),
+                        'cssClass': 'dropdown-sub'
+                    }, {
+                        'url': '#realms',
+                        'name': $.t('config.AppConfiguration.Navigation.links.realms.viewAll'),
+                        'cssClass': 'dropdown-sub'
                     });
 
-                    _.each(realms, function(obj){
-                        Navigation.configuration.links.admin.urls.realms.urls.push(obj);
+                    SMSGlobalDelegate.realms.all().done(function (data) {
+                        var urls = Navigation.configuration.links.admin.urls.realms.urls,
+                            realms = [];
+
+                        _.forEach(data.result, function (realm) {
+                            if (realm.active === true && realm.location !== '/' && realms.length < 2) {
+                                realms.push({
+                                    'url': '#realms/' + encodeURIComponent(realm.location),
+                                    'name': realm.name,
+                                    'cssClass': 'dropdown-sub'
+                                });
+                            }
+                        });
+
+                        urls.splice.apply(urls, [-1, 0].concat(realms));
+
+                        Navigation.reload();
                     });
 
                     Navigation.reload();
-                }*/
+                }
             }
         }
-
 
     ];
     return obj;
