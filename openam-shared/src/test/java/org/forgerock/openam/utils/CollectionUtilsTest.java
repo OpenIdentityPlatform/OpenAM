@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.utils;
@@ -35,6 +35,37 @@ import static org.fest.assertions.Assertions.assertThat;
  * Unit test for {@link CollectionUtils}.
  */
 public class CollectionUtilsTest {
+
+    @Test
+    public void removeBlankEntriesNoChange() {
+
+        Set<String> original = CollectionUtils.asSet("A", "B", "C", " D ", "E");
+        Set<String> result = CollectionUtils.removeBlankEntries(original);
+        assertThat(result).isEqualTo(original);
+    }
+
+    @Test
+    public void removeBlankEntriesEmpty() {
+
+        Set<String> original = Collections.EMPTY_SET;
+        Set<String> result = CollectionUtils.removeBlankEntries(original);
+        assertThat(result).isEqualTo(original);
+    }
+
+    @Test
+    public void removeBlankEntriesNull() {
+
+        assertThat(CollectionUtils.removeBlankEntries(null)).isNull();
+    }
+
+    @Test
+    public void removeBlankEntries() {
+
+        Set<String> original = CollectionUtils.asSet("", "A", "B", "C", "", "D", "  ", " E ", "F", "");
+        Set<String> expected = CollectionUtils.asSet("A", "B", "C", "D", " E ", "F");
+        Set<String> result = CollectionUtils.removeBlankEntries(original);
+        assertThat(result).isEqualTo(expected);
+    }
 
     @Test
     public void mapListToSetWithinMap() {

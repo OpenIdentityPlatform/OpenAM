@@ -226,9 +226,6 @@
                                 type="list"
                                 syntax="string"
                                 i18nKey="a155">
-                    <DefaultValues>
-                        <Value></Value>
-                    </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam.auth.zero.page.login.allow.null.referer"
                                  type="single"

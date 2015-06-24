@@ -42,6 +42,27 @@ public class CollectionUtils {
     }
 
     /**
+      * From the original Set of Strings, remove any entries that are blank
+      * @param originalSet The Set of Strings to check
+      * @return A copy of the original Set less any blank String entries.
+      */
+    public static Set<String> removeBlankEntries(Set<String> originalSet) {
+
+        if (isEmpty(originalSet)) {
+             return originalSet;
+        }
+
+        Set<String> result = new HashSet<String>(originalSet.size());
+        for (String entry : originalSet) {
+            if (StringUtils.isNotBlank(entry)) {
+                 result.add(entry);
+            }
+        }
+
+        return result;
+    }
+
+    /**
      * Collects the passed in objects into a List.
      *
      * @param <T> The type of the passed in objects.
@@ -332,6 +353,18 @@ public class CollectionUtils {
         }
 
         return hc;
+    }
+
+    /**
+     * Determines whether the collections is null or empty.
+     *
+     * @param collection
+     *         the collection
+     *
+     * @return whether the collection is null or empty
+     */
+    public static boolean isEmpty(Collection<?> collection) {
+        return collection == null || collection.isEmpty();
     }
 
     /**
