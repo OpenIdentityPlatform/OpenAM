@@ -264,6 +264,9 @@
             "working" : "Working...",
             "empty" : "Empty",
             "help" : "Help",
+            "change": "Change",
+            "upload": "Upload",
+            "validate": "Validate",
             "copyright" : "Copyright &copy; 2010-15 ForgeRock AS. All rights reserved.",
             "sessionExpired" : "Session Expired",
             "enableCookies" : "Cookies must be enabled to login",
@@ -557,15 +560,12 @@
         },
         "scripts": {
             "edit": {
-                "editTitle": "Edit Script",
-                "createTitle": "Create Script",
+                "createNew": "Create New",
                 "name": "Name",
                 "description": "Description",
                 "language": "Language",
                 "context": "Context",
                 "script": "Script",
-                "upload": "Upload",
-                "validate": "Validate",
                 "validation": {
                     "line": "line",
                     "column": "column",
@@ -573,7 +573,6 @@
                     "errors": "This script contains errors:",
                     "noErrors": "No errors found."
                 },
-                "changeContext": "Change Context",
                 "dialog": {
                     "title": {
                         "change": "Change Context",

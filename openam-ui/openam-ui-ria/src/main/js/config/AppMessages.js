@@ -63,9 +63,25 @@ define("config/AppMessages", [
             msg: "uma.resources.show.revokePolicyFail",
             type: "error"
         },
+        "scriptCreated": {
+            msg: "config.messages.AdminMessages.scripts.scriptCreated",
+            type: "info"
+        },
+        "scriptUpdated": {
+            msg: "config.messages.AdminMessages.scripts.scriptUpdated",
+            type: "info"
+        },
         "scriptDeleted": {
             msg: "config.messages.AdminMessages.scripts.scriptDeleted",
             type: "info"
+        },
+        "scriptErrorNoName": {
+            msg: "config.messages.AdminMessages.scripts.error.noName",
+            type: "error"
+        },
+        "scriptErrorNoLanguage": {
+            msg: "config.messages.AdminMessages.scripts.error.noLanguage",
+            type: "error"
         }
     };
 });

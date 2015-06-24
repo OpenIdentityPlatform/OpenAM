@@ -28,6 +28,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <codemirror.version>4.10</codemirror.version>
     </properties>
 
     <dependencies>
@@ -95,6 +96,12 @@
             <artifactId>bootstrap-tabdrop</artifactId>
             <version>1.0</version>
             <type>js</type>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>CodeMirror</artifactId>
+            <version>${codemirror.version}</version>
+            <type>zip</type>
         </dependency>
     </dependencies>
 
@@ -202,6 +209,23 @@
                             <includeArtifactIds>
                                 jquery-sortable,bootstrap-tabdrop,selectize-non-standalone,microplugin,sifter,jquery-nestingSortable,jsoneditor,qrcode
                             </includeArtifactIds>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>unpack-codemirror</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.forgerock.commons.ui.libs</groupId>
+                                    <artifactId>CodeMirror</artifactId>
+                                    <type>zip</type>
+                                </artifactItem>
+                            </artifactItems>
                         </configuration>
                     </execution>
                 </executions>

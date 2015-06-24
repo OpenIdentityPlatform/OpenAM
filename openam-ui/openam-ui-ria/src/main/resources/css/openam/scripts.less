@@ -1,0 +1,52 @@
+.script-area {
+    margin: 15px 0;
+}
+
+.script-validation-message {
+    margin: 15px 0 0 0;
+
+    .fa-times {
+        vertical-align: top;
+        font-size: 14px;
+        margin: 3px 0 0;
+    }
+
+    .validation-error {
+        color: #2a2f32;
+        white-space: pre-line;
+        padding: 0 10px;
+        margin: 10px 0 0 0;
+        border: 0;
+
+        .validation-key {
+            color: @failure-color;
+        }
+    }
+
+    .alert {
+        margin-bottom: 15px;
+    }
+}
+
+.script-context {
+    position: relative;
+
+    .btn {
+        position: absolute;
+        top: 0;
+        right: 15px;
+        border-radius: 0 4px 4px 0;
+    }
+}
+
+.script-change-context {
+    .alert {
+        box-shadow: none;
+        -webkit-box-shadow: none;
+        border: 1px solid #e5e5e5;
+    }
+}
+
+.script-upload {
+    display: none;
+}

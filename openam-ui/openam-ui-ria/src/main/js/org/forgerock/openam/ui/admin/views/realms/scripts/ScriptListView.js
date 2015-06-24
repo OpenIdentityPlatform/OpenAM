@@ -17,8 +17,8 @@
 /*global define*/
 
 define('org/forgerock/openam/ui/admin/views/realms/scripts/ScriptListView', [
-    "jquery",
-    "underscore",
+    'jquery',
+    'underscore',
     'backbone',
     'backgrid',
     'org/forgerock/commons/ui/common/components/Messages',
@@ -37,6 +37,8 @@ define('org/forgerock/openam/ui/admin/views/realms/scripts/ScriptListView', [
         template: 'templates/admin/views/realms/scripts/ScriptListTemplate.html',
         toolbarTemplate: 'templates/admin/views/realms/scripts/ScriptListBtnToolbarTemplate.html',
         events: {
+            'click #addNewScript': 'addNewScript',
+            'keyup #addNewScript': 'addNewScript',
             'click #deleteRecords': 'deleteRecords'
         },
 
@@ -49,6 +51,7 @@ define('org/forgerock/openam/ui/admin/views/realms/scripts/ScriptListView', [
                 FilterHeaderCell = BackgridUtils.FilterHeaderCell.extend({title: 'console.scripts.list.grid.filterBy'}),
                 Scripts;
 
+            this.realmLocation = args[0];
             this.data.selectedUUIDs = [];
 
             Scripts = Backbone.PageableCollection.extend({
@@ -108,7 +111,10 @@ define('org/forgerock/openam/ui/admin/views/realms/scripts/ScriptListView', [
                         return;
                     }
 
-                    Router.routeTo(Router.configuration.routes.editScript, {args: [encodeURIComponent(this.model.id)], trigger: true});
+                    Router.routeTo(Router.configuration.routes.realmsEditScript, {
+                        args: [encodeURIComponent(self.realmLocation), encodeURIComponent(this.model.id)],
+                        trigger: true
+                    });
                 }
             });
 
@@ -193,6 +199,17 @@ define('org/forgerock/openam/ui/admin/views/realms/scripts/ScriptListView', [
 
         renderToolbar: function () {
             this.$el.find('#gridToolbar').html(UIUtils.fillTemplateWithData(this.toolbarTemplate, this.data));
+        },
+
+        addNewScript: function (e) {
+            if (e.type === 'keyup' && e.keyCode !== 13) {
+                return;
+            }
+
+            Router.routeTo(Router.configuration.routes.realmsEditScript, {
+                args: [encodeURIComponent(this.realmLocation)],
+                trigger: true
+            });
         }
     });
 });

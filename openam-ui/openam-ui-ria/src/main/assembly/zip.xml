@@ -2,7 +2,7 @@
 <!--
   ~ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   ~
-  ~ Copyright (c) 2011-2012 ForgeRock AS. All Rights Reserved
+  ~ Copyright 2011-2015 ForgeRock AS.
   ~
   ~ The contents of this file are subject to the terms
   ~ of the Common Development and Distribution License
@@ -40,6 +40,22 @@
         <fileSet>
             <directory>${basedir}/target/dependency</directory>
             <outputDirectory>/</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/codemirror-${codemirror.version}</directory>
+            <outputDirectory>/libs/codemirror</outputDirectory>
+            <includes>
+                <include>lib/codemirror.js</include>
+                <include>mode/javascript/javascript.js</include>
+                <include>mode/groovy/groovy.js</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/codemirror-${codemirror.version}/lib</directory>
+            <outputDirectory>/css/codemirror</outputDirectory>
+            <includes>
+                <include>codemirror.css</include>
+            </includes>
         </fileSet>
     </fileSets>
     <dependencySets>

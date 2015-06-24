@@ -1,7 +1,8 @@
-<a href="#edit/" class="btn btn-primary">
+<a id="addNewScript" class="btn btn-primary" tabindex="0">
     <span class="fa fa-plus"></span> {{t "console.scripts.list.addNew"}}
 </a>
 
 <button id="deleteRecords" class="btn btn-danger" {{#unless selectedUUIDs}} disabled {{/unless}}>
-    <span class="fa fa-close"></span> {{t "console.scripts.list.deleteSelected"}} {{#if selectedUUIDs}}({{selectedUUIDs.length}}){{/if}}
+    <span class="fa fa-close"></span>
+    {{t "console.scripts.list.deleteSelected"}} {{#if selectedUUIDs}}({{selectedUUIDs.length}}){{/if}}
 </button>

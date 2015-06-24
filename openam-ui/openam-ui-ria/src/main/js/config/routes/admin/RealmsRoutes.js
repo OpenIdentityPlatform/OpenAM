@@ -139,7 +139,7 @@ define('config/routes/admin/RealmsRoutes', function () {
         'realmsEditScript': {
             view: 'org/forgerock/openam/ui/admin/views/realms/RealmView',
             page: 'org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView',
-            url: scopedByRealm('scripts\/edit\/?'),
+            url: scopedByRealm('scripts\/edit\/([^\/]*)'),
             pattern: 'realms/?/scripts/edit/?',
             role: 'ui-admin'
         }

@@ -100,6 +100,8 @@ define("config/AppConfiguration", [
                     configuration: {
                         templateUrls: [
                             "templates/admin/views/realms/scripts/ScriptListBtnToolbarTemplate.html",
+                            "templates/admin/views/realms/scripts/ScriptValidationTemplate.html",
+                            "templates/admin/views/realms/scripts/ChangeContextTemplate.html",
                             "templates/uma/backgrid/cell/RevokeCell.html",
                             "templates/uma/backgrid/cell/SelectizeCell.html",
                             "templates/user/ConfirmPasswordDialogTemplate.html"
