@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,6 +41,27 @@ import java.util.Set;
 public class CollectionUtils {
 
     private CollectionUtils() {
+    }
+
+    /**
+     * From the original Set of Strings, remove any entries that are blank
+     * @param originalSet The Set of Strings to check
+     * @return A copy of the original Set less any blank String entries.
+     */
+    public static Set<String> removeBlankEntries(Set<String> originalSet) {
+
+        if (isEmpty(originalSet)) {
+            return originalSet;
+        }
+
+        Set<String> result = new HashSet<>(originalSet.size());
+        for (String entry : originalSet) {
+            if (StringUtils.isNotBlank(entry)) {
+                result.add(entry);
+            }
+        }
+
+        return result;
     }
 
     /**

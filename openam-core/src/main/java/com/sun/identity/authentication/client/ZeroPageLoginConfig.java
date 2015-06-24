@@ -11,12 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.client;
 
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.utils.CollectionUtils;
 
 import java.util.Collections;
 import java.util.Set;
@@ -34,7 +35,8 @@ public final class ZeroPageLoginConfig {
 
     public ZeroPageLoginConfig(final boolean enabled, final Set<String> whitelist, final boolean allowWithoutReferer) {
         this.enabled = enabled;
-        this.whitelist = whitelist == null ? Collections.<String>emptySet() : Collections.unmodifiableSet(whitelist);
+        this.whitelist = whitelist == null ? Collections.<String>emptySet() :
+                Collections.unmodifiableSet(CollectionUtils.removeBlankEntries(whitelist));
         this.allowWithoutReferer = allowWithoutReferer;
     }
 

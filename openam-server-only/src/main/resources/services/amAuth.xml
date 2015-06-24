@@ -234,9 +234,6 @@
                                  syntax="string"
                                  i18nKey="a155"
                                  resourceName="zeroPageLoginReferrerWhiteList">
-                    <DefaultValues>
-                        <Value></Value>
-                    </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam.auth.zero.page.login.allow.null.referer"
                                  type="single"
