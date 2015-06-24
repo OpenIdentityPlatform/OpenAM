@@ -96,8 +96,7 @@ module.exports = function(grunt) {
                     from: '?v=@{openam-version}',
                     to:  ''
                 }]
-            },
-            policy: {}
+            }
         },
         sync: {
             ria: {
