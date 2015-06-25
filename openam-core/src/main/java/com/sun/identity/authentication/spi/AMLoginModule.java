@@ -898,7 +898,6 @@ public abstract class AMLoginModule implements LoginModule {
         loginState = getLoginState();
         
         fileName = loginState.getFileName(moduleClass+ ".xml");
-        loginState.setSharedState(sharedState);
         
         // get resource bundle
         
@@ -2092,8 +2091,6 @@ public abstract class AMLoginModule implements LoginModule {
             debug.message("SETTING Module name.... :" + moduleName);
         }
         loginState.setSuccessModuleName(moduleName);
-        loginState.saveSharedState();
-        loginState.savePrincipalState(getPrincipal().getName());
     }
     
     /**
@@ -2276,7 +2273,6 @@ public abstract class AMLoginModule implements LoginModule {
             debug.message("SETTING Failure Module name.... :" + moduleName);
         }
         loginState.setFailureModuleName(moduleName);
-        loginState.saveSharedState();
         return ;
     }
     

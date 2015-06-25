@@ -678,10 +678,5 @@ public interface ISAuthConstants {
 
     //Property name for forcing two factor auth
     public static final String TWO_FACTOR_AUTH_MANDATORY = "forgerockTwoFactorAuthMandatory";
-    
-    /**
-     * Key for maintaining list of principals reated during login process.
-     */
-    public static final String PRINCIPALSTATE = "principalstate";
 
 }
