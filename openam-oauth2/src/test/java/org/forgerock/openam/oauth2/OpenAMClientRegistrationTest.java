@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openam.oauth2;
@@ -127,9 +128,9 @@ public class OpenAMClientRegistrationTest {
 
         // Then
         assertThat(french).includes(entry("scope2", "En français"));
-        assertThat(french.size()).isEqualTo(1);
+        assertThat(french.size()).isEqualTo(4);
         assertThat(english).includes(entry("scope2", "Default"), entry("scope3", "British, innit"), entry("scope4", "English only"));
-        assertThat(english.size()).isEqualTo(3);
+        assertThat(english.size()).isEqualTo(4);
     }
 
 }
