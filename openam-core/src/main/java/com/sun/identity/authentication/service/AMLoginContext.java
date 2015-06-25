@@ -553,6 +553,7 @@ public class AMLoginContext {
             }
 
             loginState.setSubject(subject);
+            
 
             if (!loginState.isAuthValidForInternalUser()) {
                 if (debug.warningEnabled()) {
@@ -572,6 +573,7 @@ public class AMLoginContext {
 
             debug.message("searchUserProfile for Subject :");
             boolean profileState = loginState.searchUserProfile(subject, indexType, indexName);
+            loginState.saveSubjectState();
             loginSuccess = true;
             if (!profileState) {
                 debug.error("Profile not found ");
