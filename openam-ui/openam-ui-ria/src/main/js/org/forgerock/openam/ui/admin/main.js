@@ -1,4 +1,4 @@
-/*
+/**
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -19,14 +19,19 @@ define([
     "./delegates/SMSDelegateUtils",
     "./delegates/SMSGlobalDelegate",
     "./delegates/SMSRealmDelegate",
+
     "./models/Form",
     "./models/FormCollection",
+
     "./utils/FormHelper",
     "./utils/JSONEditorTheme",
 
     "./views/commonTasks/CommonTasksView",
+
     "./views/configuration/ConfigurationView",
+
     "./views/federation/FederationView",
+
     "./views/realms/agents/AgentsView",
 
     "./views/realms/authentication/AdvancedView",
@@ -39,14 +44,25 @@ define([
     "./views/realms/authentication/ModulesView",
     "./views/realms/authentication/modules/EditModuleView",
     "./views/realms/authentication/SettingsView",
+
     "./views/realms/dataStores/DataStoresView",
+
     "./views/realms/general/GeneralView",
-    "./views/realms/policies/PoliciesView",
+
+    "./views/realms/policies/applications/ApplicationsView",
+    "./views/realms/policies/applications/EditApplicationView",
+    "./views/realms/policies/resourceTypes/ResourceTypesView",
+    "./views/realms/policies/resourceTypes/EditResourceTypeView",
+
     "./views/realms/privileges/PrivilegesView",
+
     "./views/realms/scripts/EditScriptView",
-    "./views/realms/scripts/ScriptListView",
+    "./views/realms/scripts/ScriptsView",
+
     "./views/realms/services/ServicesView",
+
     "./views/realms/sts/STSView",
+
     "./views/realms/subjects/SubjectsView",
 
     "./views/realms/RealmsListView",

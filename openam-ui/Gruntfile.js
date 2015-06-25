@@ -15,6 +15,17 @@
  */
 
 module.exports = function(grunt) {
+    grunt.registerTask('selectiveWatch', function () {
+        var targets = Array.prototype.slice.call(arguments, 0);
+        Object.keys(grunt.config('watch')).filter(function (target) {
+            return !(grunt.util._.indexOf(targets, target) !== -1);
+        }).forEach(function (target) {
+            grunt.log.writeln('Ignoring ' + target + '...');
+            grunt.config(['watch', target], {files: []});
+        });
+        grunt.task.run('watch');
+    });
+
     grunt.initConfig({
         // please update environment variable OPENAM_VERSION after realise, for fix cache issue
         // you can use version value from main pom file, ex. 13.0.0-SNAPSHOT
@@ -395,5 +406,9 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-sync');
     grunt.loadNpmTasks('grunt-text-replace');
 
-    grunt.registerTask('default', ['sync', 'replace', 'watch']);
+    grunt.registerTask('default', [
+        'sync',
+        'replace',
+        'selectiveWatch:frCommons:frUser:common:ria'
+    ]);
 };

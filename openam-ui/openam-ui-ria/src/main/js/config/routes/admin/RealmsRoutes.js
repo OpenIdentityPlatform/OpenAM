@@ -1,4 +1,4 @@
-/*
+/**
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -100,11 +100,32 @@ define('config/routes/admin/RealmsRoutes', function () {
                 pattern: 'realms/?/privileges',
                 role: 'ui-admin'
             },
-            'realmsPolicies': {
+            'realmsApplications': {
                 view: 'org/forgerock/openam/ui/admin/views/realms/RealmView',
-                page: 'org/forgerock/openam/ui/admin/views/realms/policies/PoliciesView',
-                url: scopedByRealm('policies\/?'),
-                pattern: 'realms/?/policies',
+                page: 'org/forgerock/openam/ui/admin/views/realms/policies/applications/ApplicationsView',
+                url: scopedByRealm('applications\/list'),
+                pattern: 'realms/?/applications/list',
+                role: 'ui-admin'
+            },
+            'realmsApplicationEdit': {
+                view: 'org/forgerock/openam/ui/admin/views/realms/RealmView',
+                page: 'org/forgerock/openam/ui/admin/views/realms/policies/applications/EditApplicationView',
+                url: scopedByRealm('applications\/edit\/([^\/]*)'),
+                pattern: 'realms/?/applications/edit/?',
+                role: 'ui-admin'
+            },
+            'realmsResourceTypes': {
+                view: 'org/forgerock/openam/ui/admin/views/realms/RealmView',
+                page: 'org/forgerock/openam/ui/admin/views/realms/policies/resourceTypes/ResourceTypesView',
+                url: scopedByRealm('resourceTypes\/list'),
+                pattern: 'realms/?/resourceTypes/list',
+                role: 'ui-admin'
+            },
+            'realmsResourceTypeEdit': {
+                view: 'org/forgerock/openam/ui/admin/views/realms/RealmView',
+                page: 'org/forgerock/openam/ui/admin/views/realms/policies/resourceTypes/EditResourceTypeView',
+                url: scopedByRealm('resourceTypes\/edit\/([^\/]*)'),
+                pattern: 'realms/?/resourceTypes/edit/?',
                 role: 'ui-admin'
             },
             'realmsSubjects': {
@@ -128,14 +149,14 @@ define('config/routes/admin/RealmsRoutes', function () {
                 pattern: 'realms/?/sts',
                 role: 'ui-admin'
             },
-                'realmsScriptList': {
+            'realmsScripts': {
                 view: 'org/forgerock/openam/ui/admin/views/realms/RealmView',
-                page: 'org/forgerock/openam/ui/admin/views/realms/scripts/ScriptListView',
+                page: 'org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView',
                 url: scopedByRealm('scripts\/list'),
                 pattern: 'realms/?/scripts/list',
                 role: 'ui-admin'
             },
-            'realmsEditScript': {
+            'realmsScriptEdit': {
                 view: 'org/forgerock/openam/ui/admin/views/realms/RealmView',
                 page: 'org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView',
                 url: scopedByRealm('scripts\/edit\/([^\/]*)'),

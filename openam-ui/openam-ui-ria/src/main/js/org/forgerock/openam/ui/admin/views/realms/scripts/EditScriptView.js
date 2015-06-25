@@ -183,13 +183,13 @@ define('org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView', [
             if (savePromise) {
                 if (this.model.id) {
                     savePromise.done(function (e) {
-                        Router.routeTo(Router.configuration.routes.realmsScriptList,
+                        Router.routeTo(Router.configuration.routes.realmsScripts,
                             {args: [encodeURIComponent(self.realmLocation)], trigger: true});
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, 'scriptUpdated');
                     });
                 } else {
                     savePromise.done(function (e) {
-                        Router.routeTo(Router.configuration.routes.realmsScriptList,
+                        Router.routeTo(Router.configuration.routes.realmsScripts,
                             {args: [encodeURIComponent(self.realmLocation)], trigger: true});
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, 'scriptCreated');
                     });
@@ -377,7 +377,7 @@ define('org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView', [
                 return;
             }
 
-            Router.routeTo(Router.configuration.routes.realmsScriptList, {
+            Router.routeTo(Router.configuration.routes.realmsScripts, {
                 args: [encodeURIComponent(this.realmLocation)],
                 trigger: true
             });

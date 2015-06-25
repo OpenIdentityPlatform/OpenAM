@@ -16,7 +16,7 @@
 
 /*global define*/
 
-define('org/forgerock/openam/ui/admin/views/realms/scripts/ScriptListView', [
+define('org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView', [
     'jquery',
     'underscore',
     'backbone',
@@ -111,7 +111,7 @@ define('org/forgerock/openam/ui/admin/views/realms/scripts/ScriptListView', [
                         return;
                     }
 
-                    Router.routeTo(Router.configuration.routes.realmsEditScript, {
+                    Router.routeTo(Router.configuration.routes.realmsScriptEdit, {
                         args: [encodeURIComponent(self.realmLocation), encodeURIComponent(this.model.id)],
                         trigger: true
                     });
@@ -206,7 +206,7 @@ define('org/forgerock/openam/ui/admin/views/realms/scripts/ScriptListView', [
                 return;
             }
 
-            Router.routeTo(Router.configuration.routes.realmsEditScript, {
+            Router.routeTo(Router.configuration.routes.realmsScriptEdit, {
                 args: [encodeURIComponent(this.realmLocation)],
                 trigger: true
             });
