@@ -56,6 +56,7 @@ import org.forgerock.oauth2.core.PEMDecoder;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openidconnect.Client;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
 import org.restlet.Request;
@@ -174,7 +175,12 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         Set<String[]> result = new HashSet<String[]>();
         for (String value : values) {
             if (value != null) {
-                result.add(value.split(DELIMITER));
+                if ((value.indexOf("|") == value.length())) {
+                    // If one pipe is included in and ended with.
+                    result.add(value.split(DELIMITER, 2));
+                } else {
+                    result.add(value.split(DELIMITER, 3));
+                }
             }
         }
         return result;
@@ -256,6 +262,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
     public Map<String, String> getScopeDescriptions(Locale locale) {
         final Map<String, String> descriptions = new LinkedHashMap<String, String>();
         final Map<String, String> i18nDescriptions = new LinkedHashMap<String, String>();
+        final Set<String> hiddenI18nDescriptions = new HashSet<String>();
         final Set<String> combinedScopes = new HashSet<String>();
         combinedScopes.addAll(getAllowedGrantScopes());
         combinedScopes.addAll(getDefaultGrantScopes());
@@ -270,24 +277,46 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
             Iterator<String[]> i = scopes.iterator();
             while (i.hasNext()) {
                 String[] parts = i.next();
-                if (parts.length == 1) {
-                    //no description or locale
-                    i.remove();
-                } else if (parts.length == 2) {
-                    //no locale - default description
-                    descriptions.put(parts[0], parts[1]);
-                    i.remove();
-                } else if (parts.length == 3) {
-                    //locale and description
-                    if (parts[1].equals(language) && !i18nDescriptions.containsKey(parts[0])) {
-                        i18nDescriptions.put(parts[0], parts[2]);
-                        i.remove();
+                if (parts != null && parts.length != 0) {
+                    if (parts.length == 1) {
+                        if (!descriptions.containsKey(parts[0])) {
+                            // no description or locale -> scope (e.g. email -> email)
+                            descriptions.put(parts[0], parts[0]);
+                        }
+                    } else if (parts.length == 2) {
+                        if (!StringUtils.isBlank(parts[1])) {
+                            // no locale -> default description (e.g. email|E-Mail -> E-Mail)
+                            descriptions.put(parts[0], parts[1]);
+                        } else {
+                            // end with pipe -> hidden (e.g. email| -> )
+                        }
+                    } else if (parts.length == 3) {
+                        if (!StringUtils.isBlank(parts[2])) {
+                            if (parts[1].equals(language) && !i18nDescriptions.containsKey(parts[0])) {
+                                // match locale -> localized description (e.g. email|fr|Email -> Email)
+                                i18nDescriptions.put(parts[0], parts[2]);
+                            } else if (!descriptions.containsKey(parts[0]) && !i18nDescriptions.containsKey(parts[0])) {
+                                // no match locale -> scope (e.g. email|fr|Email -> email)
+                                descriptions.put(parts[0], parts[0]);
+                            }
+                        } else {
+                            if (parts[1].equals(language) && !i18nDescriptions.containsKey(parts[0])) {
+                                // end with pipe -> hidden (e.g. email|fr| -> )
+                                hiddenI18nDescriptions.add(parts[0]);
+                            } else if (!descriptions.containsKey(parts[0]) && !i18nDescriptions.containsKey(parts[0])) {
+                                // no match locale -> scope (e.g. email|fr| -> )
+                                descriptions.put(parts[0], parts[0]);
+                            }
+                        }
                     }
                 }
             }
         }
 
         descriptions.putAll(i18nDescriptions);
+        for (String hiddenI18nDescription : hiddenI18nDescriptions) {
+            descriptions.remove(hiddenI18nDescription);
+        }
         return descriptions;
     }
 

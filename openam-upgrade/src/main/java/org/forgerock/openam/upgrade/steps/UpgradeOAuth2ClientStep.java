@@ -40,6 +40,7 @@ import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeProgress;
 import org.forgerock.openam.upgrade.UpgradeStepInfo;
+import org.forgerock.openam.upgrade.VersionUtils;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -68,7 +69,8 @@ public class UpgradeOAuth2ClientStep extends AbstractUpgradeStep {
     private static final Pattern pattern = Pattern.compile("\\[\\d+\\]=.*");
     private final Map<String, Map<AgentType, Map<String, Set<String>>>> upgradableConfigs =
             new HashMap<String, Map<AgentType, Map<String, Set<String>>>>();
-
+    private static final int AM_13 = 1300;
+    
     @Inject
     public UpgradeOAuth2ClientStep(final PrivilegedAction<SSOToken> adminTokenAction,
             @DataLayer(ConnectionType.DATA_LAYER) final ConnectionFactory factory) {
@@ -124,6 +126,18 @@ public class UpgradeOAuth2ClientStep extends AbstractUpgradeStep {
             for (Map.Entry<String, Set<String>> entry : attrs.entrySet()) {
                 final String attrName = entry.getKey();
                 if (CHANGED_PROPERTIES.contains(attrName)) {
+                    
+                    // Check if single string scopes are included in the Scope(s) or Default Scope(s).
+                    Set<String> scopes = attrs.get(attrName);
+                    if (VersionUtils.isCurrentVersionLessThan(AM_13, true) && (SCOPES.equals(attrName) || DEFAULT_SCOPES.equals(attrName))) {
+                        for (String scope : scopes) {
+                            if (!scope.contains("|")) {
+                                addAttributeToMap(map, type, subConfig, attrName, realm);
+                                break;
+                            }
+                        }
+                    }
+                    
                     String value = CollectionHelper.getMapAttr(attrs, attrName);
                     if (value == null) {
                         //this doesn't prove anything, let's advance to the next property
@@ -178,8 +192,19 @@ public class UpgradeOAuth2ClientStep extends AbstractUpgradeStep {
                         for (String attrName : subConfig.getValue()) {
                             if (CHANGED_PROPERTIES.contains(attrName)) {
                                 Set<String> values = attrs.get(attrName);
-                                if (values != null) {
-                                    attrs.put(attrName, convertValues(values));
+                                
+                                // If single string scopes are included in the Scope(s) or Default Scope(s), then apend a pipe.
+                                if (VersionUtils.isCurrentVersionLessThan(AM_13, true) && (SCOPES.equals(attrName) || DEFAULT_SCOPES.equals(attrName))) {
+                                    addScopesWithPipe(attrs, attrName, values);
+                                }
+                                
+                                String value = CollectionHelper.getMapAttr(attrs, attrName);
+                                if (value != null) {
+                                    if (!pattern.matcher(value).matches()) {
+                                        if (values != null) {
+                                            attrs.put(attrName, convertValues(values));
+                                        }
+                                    }
                                 }
                             } else if (IDTOKEN_SIGNED_RESPONSE_ALG.equals(attrName)) {
                                 String value = CollectionHelper.getMapAttr(attrs, attrName);
@@ -198,6 +223,22 @@ public class UpgradeOAuth2ClientStep extends AbstractUpgradeStep {
                 throw new UpgradeException("Unable to upgrade OAuth2 client");
             }
         }
+    }
+
+    private void addScopesWithPipe(Map<String, Set<String>> attrs, String attrName, Set<String> scopes) {
+        boolean isChanged = false;
+        Set<String> replacedScopes = new HashSet<String>();
+        for (String scope : scopes) {
+            if (!scope.contains("|")) {
+                scope = scope + "|";
+                isChanged = true;
+            }
+            replacedScopes.add(scope);
+        }
+        if (isChanged) {
+            attrs.put(attrName, replacedScopes);
+        }
+
     }
 
     private Set<String> convertValues(Set<String> values) {
