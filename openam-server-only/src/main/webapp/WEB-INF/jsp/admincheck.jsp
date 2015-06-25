@@ -24,7 +24,7 @@
    "Portions Copyrighted [year] [name of copyright owner]"
 
 
-   Portions copyright 2014 ForgeRock AS.
+   Portions copyright 2014-2015 ForgeRock AS.
 --%>
 
 <%@ page import="com.iplanet.am.util.SystemProperties" %>
@@ -35,11 +35,6 @@
 <%@ page import="com.sun.identity.idm.AMIdentity" %>
 <%@ page import="com.sun.identity.idm.IdRepoException" %>
 <%@ page import="com.sun.identity.idm.IdType" %>
-<%@ page import="com.sun.identity.idm.IdUtils" %>
-<%@ page import="com.sun.identity.shared.debug.Debug" %>
-<%@ page import="com.sun.identity.shared.encode.Hash" %>
-<%@ page import="com.sun.identity.shared.ldap.util.DN" %>
-<%@ page import="com.sun.identity.sm.SMSEntry" %>
 <%@ page import="javax.servlet.http.HttpServletRequest" %>
 <%@ page import="java.io.IOException" %>
 <%@ page import="java.util.ResourceBundle" %>
