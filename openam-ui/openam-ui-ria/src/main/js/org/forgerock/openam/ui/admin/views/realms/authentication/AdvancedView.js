@@ -35,8 +35,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AdvancedView",
         render: function (args, callback) {
             var self = this;
 
-            SMSRealmDelegate.authentication.get()
-            .done(function (data) {
+            this.data.realmLocation = args[0];
+
+            SMSRealmDelegate.authentication.get(this.data.realmLocation).done(function (data) {
                 self.data.formData = data;
 
                 self.parentRender(function () {
@@ -49,9 +50,6 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AdvancedView",
                         callback();
                     }
                 });
-            })
-            .fail(function () {
-                // TODO: Add failure condition
             });
         },
         renderTab: function (event) {
@@ -67,7 +65,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AdvancedView",
             this.data.form.reset();
         },
         save: function (event) {
-            var promise = SMSRealmDelegate.authentication.save(this.data.form.data());
+            var promise = SMSRealmDelegate.authentication.save(this.data.realmLocation, this.data.form.data());
 
             FormHelper.bindSavePromiseToElement(promise, event.target);
         }

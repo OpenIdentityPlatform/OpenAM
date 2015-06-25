@@ -15,81 +15,81 @@
  */
 
  /*global define*/
-define('org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate', [
-    'jquery',
-    'underscore',
-    'org/forgerock/commons/ui/common/main/AbstractDelegate',
-    'org/forgerock/commons/ui/common/util/Constants',
-    'org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils'
+define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
+    "jquery",
+    "underscore",
+    "org/forgerock/commons/ui/common/main/AbstractDelegate",
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils"
 ], function ($, _, AbstractDelegate, Constants, SMSDelegateUtils) {
     /**
      * @exports org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate
      */
-    var obj = new AbstractDelegate(Constants.host + '/' + Constants.context + '/json/realm-config/');
+    var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json"),
+        scopedByRealm = function (realm, path) {
+            if (realm === "/") { realm = ""; }
+
+            return realm + "/realm-config/" + path;
+        };
 
     obj.authentication = {
-        get: function () {
-            var url = 'authentication',
-                schemaPromise = obj.serviceCall({
-                    url: url + '?_action=schema',
-                    type: 'POST'
-                }).done(SMSDelegateUtils.sanitize),
-                valuesPromise = obj.serviceCall({
-                    url: url
-                });
+        get: function (realm) {
+            var url = scopedByRealm(realm, "authentication");
 
-            return $.when(schemaPromise, valuesPromise).then(function (schemaData, valuesData) {
+            return $.when(
+                obj.serviceCall({ url: url + "?_action=schema", type: "POST" }),
+                obj.serviceCall({ url: url })
+            ).then(function(schemaData, valuesData) {
                 return {
                     schema: SMSDelegateUtils.sanitizeSchema(schemaData[0]),
                     values: valuesData[0]
                 };
             });
         },
-        save: function (data) {
+        save: function (realm, data) {
             return obj.serviceCall({
-                url: 'authentication',
-                type: 'PUT',
+                url: scopedByRealm(realm, "authentication"),
+                type: "PUT",
                 data: JSON.stringify(data)
             });
         },
-
         chains: {
-            get: function () {
-                var promise = obj.serviceCall({
-                        url: 'authentication/chains?_queryFilter=true'
+            all: function (realm) {
+                var url = scopedByRealm(realm, "authentication");
+
+                return $.when(
+                    obj.serviceCall({ url: url + "/chains?_queryFilter=true" }),
+                    obj.serviceCall({ url: url })
+                ).then(function(chainsData, authenticationData) {
+                    _.each(chainsData[0].result, function (chainData) {
+                        if (chainData._id === authenticationData[0].adminAuthModule) {
+                            chainData.defaultConfig = chainData.defaultConfig || {};
+                            chainData.defaultConfig.adminAuthModule = true;
+                        }
+
+                        if (chainData._id === authenticationData[0].orgConfig) {
+                            chainData.defaultConfig = chainData.defaultConfig || {};
+                            chainData.defaultConfig.orgConfig = true;
+                        }
                     });
 
-                return $.when(promise).then(function (valuesData) {
                     return {
-                        values: valuesData
+                        values: chainsData[0]
                     };
                 });
             },
-
-            getChain: function (name) {
-                var promise = obj.serviceCall({
-                        url: 'authentication/chains/' + name
-                    });
-
-                return $.when(promise).then(function (valuesData) {
-                    // FIXME: This is a temporay client side fix until AME-7202 is completed.
-                    valuesData.authChainConfiguration = SMSDelegateUtils.authChainConfigurationToJson(valuesData.authChainConfiguration);
-                    return {
-                        values: valuesData
-                    };
+            create: function (realm, data) {
+                return obj.serviceCall({
+                    url: scopedByRealm(realm, "authentication/chains?_action=create"),
+                    type: "POST",
+                    data: JSON.stringify(data)
                 });
             },
-
-            getChainWithType: function (name) {
-                var chainData = obj.serviceCall({
-                        url: 'authentication/chains/' + name
-                    }),
-                    modulesPromise = obj.serviceCall({
-                        url: 'authentication/modules?_queryFilter=true'
-                    });
-
-                return $.when(chainData, modulesPromise).then(function (chainData, modulesData) {
-
+            get: function (realm, name) {
+                return $.when(
+                    obj.serviceCall({ url: scopedByRealm(realm, "authentication/chains/" + name) }),
+                    obj.serviceCall({ url: scopedByRealm(realm, "authentication/modules?_queryFilter=true") })
+                ).then(function (chainData, modulesData) {
                     // FIXME: This is a temporay client side fix until AME-7202 is completed.
                     chainData[0].authChainConfiguration = SMSDelegateUtils.authChainConfigurationToJson(chainData[0].authChainConfiguration);
 
@@ -103,96 +103,50 @@ define('org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate', [
                     };
                 });
             },
-
-            getWithDefaults: function () {
-                var url = 'authentication',
-                    chainsPromise = obj.serviceCall({
-                        url: url + '/chains?_queryFilter=true'
-                    }),
-                    valuesPromise = obj.serviceCall({
-                        url: url
-                    });
-
-                return $.when(chainsPromise, valuesPromise).then(function (chainsData, valuesData) {
-                    _.each(chainsData[0].result, function (obj) {
-                        if (obj._id === valuesData[0].adminAuthModule) {
-                            obj.defaultConfig = obj.defaultConfig || {};
-                            obj.defaultConfig.adminAuthModule = true;
-                        }
-
-                        if (obj._id === valuesData[0].orgConfig ) {
-                            obj.defaultConfig = obj.defaultConfig || {};
-                            obj.defaultConfig.orgConfig = true;
-                        }
-                    });
-
-                    return {
-                        values: chainsData[0]
-                    };
-                });
-            },
-            remove: function (name) {
+            remove: function (realm, name) {
                 return obj.serviceCall({
-                    url: 'authentication/chains/' + name,
-                    type: 'DELETE'
+                    url: scopedByRealm(realm, "authentication/chains/" + name),
+                    type: "DELETE"
                 });
             },
-            save: function (name, data) {
+            save: function (realm, name, data) {
                 var cleaned = SMSDelegateUtils.authChainConfigurationToXml(data);
                 return obj.serviceCall({
-                    url: 'authentication/chains/' + name,
-                    type: 'PUT',
+                    url: scopedByRealm(realm, "authentication/chains/" + name),
+                    type: "PUT",
                     data: JSON.stringify(cleaned)
-                });
-            },
-
-            create: function (data) {
-                return obj.serviceCall({
-                    url: 'authentication/chains?_action=create',
-                    type: 'POST',
-                    data: JSON.stringify(data)
                 });
             }
         },
-
         modules: {
-            getModules: function () {
-                var promise = obj.serviceCall({
-                        url: 'authentication/modules?_queryFilter=true'
-                    });
+            all: function (realm) {
+                return obj.serviceCall({
+                    url: scopedByRealm(realm, "authentication/modules?_queryFilter=true")
+                });
+            },
+            create: function (realm, data) {
+                return obj.serviceCall({
+                    url: scopedByRealm(realm, "authentication/modules/" + data.type + "?_action=create"),
+                    type: "POST",
+                    data: JSON.stringify(data)
+                });
+            },
+            get: function (realm, name, type) {
+                var url = scopedByRealm(realm, "authentication/modules/" + type + "/" + name);
 
-                return $.when(promise).then(function (valuesData) {
+                return $.when(
+                    obj.serviceCall({ url: url + "?_action=schema", type: "POST" }),
+                    obj.serviceCall({ url: url })
+                ).then(function(schemaData, valuesData) {
                     return {
-                        values: valuesData
+                        schema: SMSDelegateUtils.sanitizeSchema(schemaData[0]),
+                        values: valuesData[0]
                     };
                 });
             },
-            getModuleTypes: function () {
-                var promise = obj.serviceCall({
-                        url: 'authentication/modules/types?_queryFilter=true'
-                    });
-
-                return $.when(promise).then(function (data) {
-                    return _.sortBy(data.result, 'name');
-                });
-            },
-            getModule: function (name) {
-                return obj.serviceCall({
-                    url: 'authentication/modules/' + name,
-                    errorsHandlers: {
-                        'Not Found': { status: '404' }
-                    }
-                });
-            },
-            removeModule: function (name) {
-                return obj.serviceCall({
-                    url: 'authentication/modules/' + name,
-                    type: 'DELETE'
-                });
-            },
-            hasModuleName: function (name) {
+            has: function (realm, name) {
                 var promise = $.Deferred(),
-                    request = this.getModule(name);
+                    request = this.get(realm, name);
 
                 request.done(function () {
                     promise.resolve(false);
@@ -201,12 +155,27 @@ define('org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate', [
                 });
                 return promise;
             },
-            saveModule: function (data) {
+            remove: function (realm, name, type) {
                 return obj.serviceCall({
-                    url: 'authentication/modules/',
-                    type: 'PUT',
+                    url: scopedByRealm(realm, "authentication/modules/" + type + "/" + name),
+                    type: "DELETE"
+                });
+            },
+            save: function (realm, data) {
+                return obj.serviceCall({
+                    url: scopedByRealm(realm, "authentication/modules/" + data.type + "/" + data.name),
+                    type: "PUT",
                     data: JSON.stringify(data)
                 });
+            },
+            types: {
+                all: function (realm) {
+                    return obj.serviceCall({
+                        url: scopedByRealm(realm, "authentication/modules/types?_queryFilter=true")
+                    }).done(function(data) {
+                        data.result = _.sortBy(data.result, "name");
+                    });
+                }
             }
         }
     };

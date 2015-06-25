@@ -24,21 +24,18 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
     "org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostProcessView",
     "org/forgerock/openam/ui/admin/utils/FormHelper"
 ], function($, _, AbstractView, SMSRealmDelegate, LinkView, PostProcessView, FormHelper) {
-
     var EditChainView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/chains/EditChainTemplate.html",
         events: {
-
             'click #saveChanges':     'saveChanges',
             'click #addModuleLink':   'addModuleLink'
         },
-
         render: function(args, callback) {
-
             var self = this;
 
-            SMSRealmDelegate.authentication.chains.getChainWithType(args[1]).done(function (data) {
+            this.data.realmLocation = args[0];
 
+            SMSRealmDelegate.authentication.chains.get(this.data.realmLocation, args[1]).done(function (data) {
                 self.data.chainData = data.chainData;
                 self.data.allModules = data.modulesData;
 
@@ -97,7 +94,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             this.data.chainData.loginSuccessUrl[0] = this.$el.find('#loginSuccessUrl').val();
             this.data.chainData.loginFailureUrl[0] = this.$el.find('#loginFailureUrl').val();
 
-            promise = SMSRealmDelegate.authentication.chains.save(this.data.chainData._id, this.data.chainData);
+            promise = SMSRealmDelegate.authentication.chains.save(this.data.realmLocation, this.data.chainData._id, this.data.chainData);
             promise.fail(function(e) {
                 // TODO: Add failure condition
                 console.error(e);

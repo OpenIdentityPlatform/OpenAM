@@ -56,18 +56,15 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
                             // TODO - duplicate chain name - message or alert box
                             console.log('invalidName'); // jslinter
                         } else {
-
-                            SMSRealmDelegate.authentication.chains.create({_id : chainName})
-                            .done(function(data) {
+                            SMSRealmDelegate.authentication.chains.create(self.data.realmLocation, { _id: chainName }).done(function() {
                                 dialog.close();
                                 Router.navigate( href + dialog.getModalBody().find('#newName').val(), { trigger: true });
-                            })
-                            .fail(function() {
+                            }).fail(function() {
                                 // TODO: Add failure condition
                             });
                         }
                     }
-                },{
+                }, {
                     label: $.t("common.form.cancel"),
                     action: function(dialog) {
                         dialog.close();
@@ -101,13 +98,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
             var self = this,
                 chainName = $(event.currentTarget).attr('data-chain-name');
 
-            SMSRealmDelegate.authentication.chain.remove(chainName)
-                .done(function(data) {
-                    self.render([self.data.realmLocation]);
-                })
-                .fail(function() {
-                    // TODO: Add failure condition
-                });
+            SMSRealmDelegate.authentication.chains.remove(this.data.realmLocation, chainName).done(function() {
+                self.render([self.data.realmLocation]);
+            });
         },
         deleteChains: function() {
             var self = this,
@@ -115,42 +108,37 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
                     return $(element).attr('data-chain-name');
                 }),
                 promises = chainNames.map(function(name) {
-                    return SMSRealmDelegate.authentication.chain.remove(name);
+                    return SMSRealmDelegate.authentication.chains.remove(self.data.realmLocation, name);
                 });
 
-            $.when(promises)
-                .done(function(data) {
-                    self.render([self.data.realmLocation]);
-                })
-                .fail(function() {
-                    // TODO: Add failure condition
-                });
+            $.when(promises).done(function() {
+                self.render([self.data.realmLocation]);
+            });
         },
         render: function (args, callback) {
             var self = this,
                 sortedChains = [];
+
             this.data.realmLocation = args[0];
 
-            SMSRealmDelegate.authentication.chains.getWithDefaults()
-                .done(function(data) {
-                    _.each(data.values.result, function(obj) {
-                        // Add default chains to top of list.
-                        if ( obj.active) {
-                            sortedChains.unshift(obj);
-                        } else {
-                            sortedChains.push(obj);
-                        }
-                    });
-                    self.data.sortedChains = sortedChains;
-                    self.parentRender(function() {
-                        if (callback) {
-                            callback();
-                        }
-                    });
-                })
-                .fail(function() {
-                    // TODO: Add failure condition
+            SMSRealmDelegate.authentication.chains.all(this.data.realmLocation).done(function(data) {
+                _.each(data.values.result, function(obj) {
+                    // Add default chains to top of list.
+                    if ( obj.active) {
+                        sortedChains.unshift(obj);
+                    } else {
+                        sortedChains.push(obj);
+                    }
                 });
+                self.data.sortedChains = sortedChains;
+                self.parentRender(function() {
+                    if (callback) {
+                        callback();
+                    }
+                });
+            }).fail(function() {
+                // TODO: Add failure condition
+            });
         }
     });
 

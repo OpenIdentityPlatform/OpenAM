@@ -14,7 +14,7 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global, define*/
+/*global define*/
 define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditModuleView", [
     "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView",
@@ -35,8 +35,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
         },
         render: function (args, callback) {
             var self = this;
-            SMSRealmDelegate.authentication.modules.getModule(args[1])
-            .done(function (data) {
+
+            this.data.realmLocation = args[0];
+
+            // FIXME: Module service needs to know the module type. How to get that info into this view?
+            SMSRealmDelegate.authentication.modules.get(this.data.realmLocation, args[1]).done(function (data) {
                 self.data.formData = data;
                 self.parentRender(function () {
                     self.$el.find('ul.nav a:first').tab('show');
@@ -46,21 +49,17 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
                         callback();
                     }
                 });
-            })
-            .fail(function () {
-                //TODO: Add failure condition
+            }).fail(function () {
                 EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "notFoundError");
             });
         },
-
         save: function (event) {
-            var promise = SMSRealmDelegate.authentication.modules.saveModule(this.data.form.data());
+            var promise = SMSRealmDelegate.authentication.modules.save(this.data.form.data());
             FormHelper.bindSavePromiseToElement(promise, event.target);
         },
         revert: function () {
             this.data.form.reset();
         },
-
         renderTab: function (event) {
             var tabId = $(event.target).attr("href"),
                 schema = this.data.formData.schema.properties[tabId.slice(1)],

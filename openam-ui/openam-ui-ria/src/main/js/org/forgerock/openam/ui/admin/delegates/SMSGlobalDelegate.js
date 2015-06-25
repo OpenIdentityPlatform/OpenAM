@@ -24,7 +24,18 @@ define('org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate', [
     /**
      * @exports org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate
      */
-    var obj = new AbstractDelegate(Constants.host + '/' + Constants.context + '/json/global-config/');
+    var obj = new AbstractDelegate(Constants.host + '/' + Constants.context + '/json/global-config/'),
+        schemaWithValues = function(url) {
+            return $.when(
+                obj.serviceCall({ url: url + '?_action=schema', type: 'POST' }),
+                obj.serviceCall({ url: url })
+            ).then(function(schemaData, valuesData) {
+                return {
+                    schema: SMSDelegateUtils.sanitizeSchema(schemaData[0]),
+                    values: valuesData[0]
+                };
+            });
+        };
 
     obj.realms = {
         /**
@@ -32,106 +43,71 @@ define('org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate', [
          * @returns {Promise.<Object>} Service promise
          */
         all: function () {
-            var promise = obj.serviceCall({
+            return obj.serviceCall({
                 url: 'realms?_queryFilter=true'
-            });
-
-            promise.done(function (data) {
+            }).done(function (data) {
                 data.result = data.result.sort(function (a, b) {
                     if (a.active === b.active) {
                         // Within the active 'catagories' sort alphabetically
-                        if (a.location < b.location) {
-                            return -1;
-                        } else {
-                            return 1;
-                        }
+                        return a.location < b.location ? -1 : 1;
                     } else {
                         // Sort active realms before inactive realms
-                        if (a.active === true) {
-                            return -1;
-                        } else {
-                            return 1;
-                        }
+                        return a.active === true ? -1 : 1;
                     }
                 });
-
-                promise.done();
-            });
-
-            return promise;
-        },
-
-        /**
-         * Gets a realm.
-         * @param  {String} location Unescaped realm location (must have leading slash)
-         * @returns {Promise.<Object>} Service promise
-         */
-        get: function (location) {
-            var url = 'realms' + location,
-                schemaPromise = obj.serviceCall({
-                    url: url + '?_action=schema',
-                    type: 'POST'
-                }).done(SMSDelegateUtils.sanitize),
-                valuesPromise = obj.serviceCall({
-                    url: url
-                });
-
-            return $.when(schemaPromise, valuesPromise).then(function (schemaData, valuesData) {
-                // FIXME: Remove when server provides this correctly
-                schemaData[0].type = 'object';
-
-                return {
-                    schema: SMSDelegateUtils.sanitizeSchema(schemaData[0]),
-                    values: valuesData[0]
-                };
             });
         },
 
         /**
-         * Retrieves schema and blank template needed to create a realm.
-         */
-        schema: function () {
-            var url = 'realms',
-                schemaPromise = obj.serviceCall({
-                    url: url + '?_action=schema',
-                    type: 'POST'
-                }).done(SMSDelegateUtils.sanitize),
-                valuesPromise = obj.serviceCall({
-                    url: url
-                });
-
-            return $.when(schemaPromise, valuesPromise).then(function (schemaData, valuesData) {
-                // FIXME: Remove when server provides this correctly
-                schemaData[0].type = 'object';
-
-                return {
-                    schema: SMSDelegateUtils.sanitizeSchema(schemaData[0]),
-                    values: valuesData[0]
-                };
-            });
-        },
-
-        /**
-         * Removes a realm.
-         * @param  {String} location Unescaped realm location (must have leading slash)
+         * Creates a realm.
+         * @param  {Object} data Complete representation of realm
          * @returns {Promise} Service promise
          */
-        remove: function (location) {
-            return obj.serviceCall({
-                url: 'realms' + location,
-                type: 'DELETE'
-            });
-        },
-
-        /**
-         * Saves a realm.
-         */
-        save: function (data) {
+        create: function (data) {
             return obj.serviceCall({
                 url: 'realms?_action=create',
                 type: 'POST',
                 data: JSON.stringify(data)
             });
+        },
+
+        /**
+         * Gets a realm's schema together with it's values.
+         * @param  {String} location Unescaped realm location (must have leading slash). e.g. "/myrealm"
+         * @returns {Promise.<Object>} Service promise
+         */
+        get: function (location) {
+            return schemaWithValues('realms' + location);
+        },
+
+        /**
+         * Saves a realm.
+         * @param  {Object} data Complete representation of realm
+         * @returns {Promise} Service promise
+         */
+        save: function (location, data) {
+            return obj.serviceCall({
+                url: 'realms' + location,
+                type: 'PUT',
+                data: JSON.stringify(data)
+            });
+        },
+
+        /**
+         * Gets a blank realm's schema together with it's values.
+         * @returns {Promise.<Object>} Service promise
+         */
+        schema: function () {
+            return schemaWithValues('realms');
+        },
+
+        /**
+         * Removes a realm.
+         * @param  {String} location Unescaped realm location (must have leading slash). e.g. "/myrealm"
+         * @returns {Promise} Service promise
+         */
+        remove: function (location) {
+            return obj.serviceCall({ url: 'realms' + location, type: 'DELETE' });
         }
     };
 
