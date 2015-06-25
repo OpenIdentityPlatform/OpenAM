@@ -65,7 +65,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/AdvancedView",
             this.data.form.reset();
         },
         save: function (event) {
-            var promise = SMSRealmDelegate.authentication.save(this.data.realmLocation, this.data.form.data());
+            var promise = SMSRealmDelegate.authentication.update(this.data.realmLocation, this.data.form.data());
 
             FormHelper.bindSavePromiseToElement(promise, event.target);
         }

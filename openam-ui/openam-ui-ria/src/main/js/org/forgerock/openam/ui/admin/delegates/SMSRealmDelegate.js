@@ -46,7 +46,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
                 };
             });
         },
-        save: function (realm, data) {
+        update: function (realm, data) {
             return obj.serviceCall({
                 url: scopedByRealm(realm, "authentication"),
                 type: "PUT",
@@ -109,7 +109,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
                     type: "DELETE"
                 });
             },
-            save: function (realm, name, data) {
+            update: function (realm, name, data) {
                 var cleaned = SMSDelegateUtils.authChainConfigurationToXml(data);
                 return obj.serviceCall({
                     url: scopedByRealm(realm, "authentication/chains/" + name),
@@ -161,7 +161,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
                     type: "DELETE"
                 });
             },
-            save: function (realm, data) {
+            update: function (realm, data) {
                 return obj.serviceCall({
                     url: scopedByRealm(realm, "authentication/modules/" + data.type + "/" + data.name),
                     type: "PUT",

@@ -81,19 +81,6 @@ define('org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate', [
         },
 
         /**
-         * Saves a realm.
-         * @param  {Object} data Complete representation of realm
-         * @returns {Promise} Service promise
-         */
-        save: function (location, data) {
-            return obj.serviceCall({
-                url: 'realms' + location,
-                type: 'PUT',
-                data: JSON.stringify(data)
-            });
-        },
-
-        /**
          * Gets a blank realm's schema together with it's values.
          * @returns {Promise.<Object>} Service promise
          */
@@ -108,6 +95,19 @@ define('org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate', [
          */
         remove: function (location) {
             return obj.serviceCall({ url: 'realms' + location, type: 'DELETE' });
+        },
+
+        /**
+         * Updates a realm.
+         * @param  {Object} data Complete representation of realm
+         * @returns {Promise} Service promise
+         */
+        update: function (location, data) {
+            return obj.serviceCall({
+                url: 'realms' + location,
+                type: 'PUT',
+                data: JSON.stringify(data)
+            });
         }
     };
 

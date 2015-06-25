@@ -162,7 +162,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
             });
         },
         save: function(event) {
-            var promise = SMSRealmDelegate.RealmAuthentication.save(this.data.form.data());
+            var promise = SMSRealmDelegate.authentication.update(this.data.form.data());
 
             FormHelper.bindSavePromiseToElement(promise, event.target);
         }

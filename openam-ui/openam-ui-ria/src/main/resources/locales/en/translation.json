@@ -579,22 +579,14 @@
             "inactive": "Inactive",
             "realmName": "Realm name",
             "realmLocation": "Location",
+            "realmAliases": "Realm/DNS Aliases",
             "warningDialog": {
                 "title": "Delete \"__realmName__\"?",
                 "message": "This realm is being used as one of the default realms. Deleting may result in locking out the administrators or the users. Are you sure you want to continue?"
             },
-            "realmPropertiesDialog": {
-                "dialogTitle": "Properties",
-                "title": "Realm attributes",
-                "status": "Realm Status",
-                "aliases": "Realm/DNS Aliases"
-            },
-            "newRealmDialog": {
-                "title": "New Realm",
-                "name": "Name",
-                "parent": "Parent",
-                "general": "General",
-                "realmAttributes": "Realm attributes"
+            "createUpdateRealmDialog": {
+                "createTitle": "New Realm",
+                "updateTitle": "__realmLocation__ - Properties"
             },
             "realmStatusPopover": {
                 "title": "Realm Status",

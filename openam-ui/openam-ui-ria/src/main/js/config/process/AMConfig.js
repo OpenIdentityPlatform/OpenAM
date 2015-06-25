@@ -109,14 +109,14 @@ define("config/process/AMConfig", [
             override: true,
             dependencies: [
                 "org/forgerock/commons/ui/common/main/Router",
-                "org/forgerock/openam/ui/admin/views/realms/AddNewRealmDialog"
+                "org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog"
             ],
-            processDescription: function (event, Router, AddNewRealmDialog) {
+            processDescription: function (event, Router, CreateUpdateRealmDialog) {
                 Router.routeTo(Router.configuration.routes.realms, {
                     args: [],
                     trigger: true
                 });
-                AddNewRealmDialog.show();
+                CreateUpdateRealmDialog.show();
             }
         },
         {

@@ -94,7 +94,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             this.data.chainData.loginSuccessUrl[0] = this.$el.find('#loginSuccessUrl').val();
             this.data.chainData.loginFailureUrl[0] = this.$el.find('#loginFailureUrl').val();
 
-            promise = SMSRealmDelegate.authentication.chains.save(this.data.realmLocation, this.data.chainData._id, this.data.chainData);
+            promise = SMSRealmDelegate.authentication.chains.update(this.data.realmLocation, this.data.chainData._id, this.data.chainData);
             promise.fail(function(e) {
                 // TODO: Add failure condition
                 console.error(e);

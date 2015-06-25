@@ -67,7 +67,7 @@ define([
 
     "./views/realms/RealmsListView",
     "./views/realms/RealmView",
-    "./views/realms/AddNewRealmDialog",
+    "./views/realms/CreateUpdateRealmDialog",
 
     "./views/sessions/SessionsView"
 ]);

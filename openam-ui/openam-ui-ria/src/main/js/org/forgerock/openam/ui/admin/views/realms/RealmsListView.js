@@ -15,102 +15,56 @@
  */
 
 /*global define*/
-define('org/forgerock/openam/ui/admin/views/realms/RealmsListView', [
-    'jquery',
-    'underscore',
-    'org/forgerock/commons/ui/common/main/AbstractView',
-    'org/forgerock/openam/ui/admin/views/realms/AddNewRealmDialog',
-    'backgrid',
-    'org/forgerock/openam/ui/common/util/BackgridUtils',
-    'bootstrap-dialog',
-    'org/forgerock/openam/ui/admin/models/Form',
-    'org/forgerock/openam/ui/admin/utils/FormHelper',
-    'org/forgerock/commons/ui/common/main/Router',
-    'org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate'
-], function ($, _, AbstractView, AddNewRealmDialog, Backgrid, BackgridUtils, BootstrapDialog, Form, FormHelper, Router, SMSGlobalDelegate) {
+define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
+    "jquery",
+    "underscore",
+    "org/forgerock/commons/ui/common/main/AbstractView",
+    "backgrid",
+    "org/forgerock/openam/ui/common/util/BackgridUtils",
+    "bootstrap-dialog",
+    "org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog",
+    "org/forgerock/openam/ui/admin/models/Form",
+    "org/forgerock/openam/ui/admin/utils/FormHelper",
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate"
+], function ($, _, AbstractView, Backgrid, BackgridUtils, BootstrapDialog, CreateUpdateRealmDialog, Form, FormHelper, Router, SMSGlobalDelegate) {
     var RealmsView = AbstractView.extend({
-        template: 'templates/admin/views/realms/RealmsListTemplate.html',
-        editDetailsDialogTemplate: 'templates/admin/views/realms/RealmPropertiesDialogTemplate.html',
+        template: "templates/admin/views/realms/RealmsListTemplate.html",
+        editDetailsDialogTemplate: "templates/admin/views/realms/RealmPropertiesDialogTemplate.html",
         events: {
-            'click .delete-realm'        : 'deleteRealm',
-            'click #addRealm'            : 'addRealm',
-            'click .edit-realm'          : 'editRealm',
-            'click .toggle-realm-active' : 'toggleRealmActive'
-        },
-        dialogOnShown: function (dialog) {
-            dialog.$modalBody.find('[data-toggle="popover-realm-status"]').popover({
-                content: function () {
-                    return $.t('console.realms.realmStatusPopover.content');
-                },
-                placement: 'left',
-                title: function () {
-                    return $.t('console.realms.realmStatusPopover.title');
-                },
-                trigger: 'focus'
-            });
-            dialog.$modalBody.find('[data-toggle="popover-realm-aliases"]').popover({
-                content: function () {
-                    return $.t('console.realms.realmAliasesPopover.content');
-                },
-                html: true,
-                placement: 'left',
-                title: function () {
-                    return $.t('console.realms.realmAliasesPopover.title');
-                },
-                trigger: 'focus'
-            });
+            "click .delete-realm"        : "deleteRealm",
+            "click #addRealm"            : "addRealm",
+            "click .edit-realm"          : "editRealm",
+            "click .toggle-realm-active" : "toggleRealmActive"
         },
         getRealmFromEvent: function (event) {
-            var location = $(event.currentTarget).closest('div[data-realm-location]').data('realm-location'),
+            var location = $(event.currentTarget).closest("div[data-realm-location]").data("realm-location"),
                 realm = _.findWhere(this.data.realms, { location: location });
 
             return realm;
         },
         addRealm: function (event) {
             event.preventDefault();
-            AddNewRealmDialog.show();
+
+            CreateUpdateRealmDialog.show();
         },
         editRealm: function (event) {
             event.preventDefault();
 
-            var self = this,
-                realm = this.getRealmFromEvent(event);
+            var realm = this.getRealmFromEvent(event);
 
-            SMSGlobalDelegate.realms.get(realm.location).done(function (data) {
-                BootstrapDialog.show({
-                    title: realm.name + ' - ' + $.t('console.realms.realmPropertiesDialog.dialogTitle'),
-                    cssClass: 'realm-dialog',
-                    message: function (dialog) {
-                        var element = $('<div></div>');
-                        dialog.form = new Form(element[0], data.schema, data.values);
-                        return element;
-                    },
-                    buttons: [{
-                        label: $.t('common.form.save'),
-                        cssClass: 'btn-primary',
-                        action: function (dialog) {
-                            var promise = self.saveRealm(realm.location, dialog.form.data()).done(function () {
-                                dialog.close();
-                            });
-
-                            FormHelper.bindSavePromiseToElement(promise, this);
-                        }
-                    }, {
-                        label: $.t('common.form.cancel'),
-                        action: function (dialog) {
-                            dialog.close();
-                        }
-                    }]
-                });
-            });
+            CreateUpdateRealmDialog.show(realm.location);
         },
         toggleRealmActive: function (event) {
             event.preventDefault();
 
-            var realm = this.getRealmFromEvent(event);
+            var self = this,
+                realm = this.getRealmFromEvent(event);
             realm.active = !realm.active;
 
-            this.saveRealm(realm.location, realm);
+            SMSGlobalDelegate.realms.update(realm.location, realm).done(function () {
+                self.render();
+            });
         },
         deleteRealm: function (event) {
             event.preventDefault();
@@ -120,19 +74,19 @@ define('org/forgerock/openam/ui/admin/views/realms/RealmsListView', [
 
             if (realm.active) {
                 BootstrapDialog.show({
-                    title: $.t('console.realms.warningDialog.title', { realmName: realm.name }),
+                    title: $.t("console.realms.warningDialog.title", { realmName: realm.name }),
                     type: BootstrapDialog.TYPE_DANGER,
-                    message: $.t('console.realms.warningDialog.message'),
+                    message: $.t("console.realms.warningDialog.message"),
                     buttons: [{
-                        label: $.t('common.form.delete'),
-                        cssClass: 'btn-danger',
+                        label: $.t("common.form.delete"),
+                        cssClass: "btn-danger",
                         action: function (dialog) {
                             self.performDeleteRealm(realm.location).done(function () {
                                 dialog.close();
                             });
                         }
                     }, {
-                        label: $.t('common.form.cancel'),
+                        label: $.t("common.form.cancel"),
                         action: function (dialog) {
                             dialog.close();
                         }
@@ -149,13 +103,6 @@ define('org/forgerock/openam/ui/admin/views/realms/RealmsListView', [
                 self.render();
             });
         },
-        saveRealm: function (location, realm) {
-            var self = this;
-
-            return SMSGlobalDelegate.realms.save(location, realm).done(function () {
-                self.render();
-            });
-        },
         getRealmFromList: function (location) {
             return _.findWhere(this.data.realms, { location: location });
         },
@@ -163,9 +110,9 @@ define('org/forgerock/openam/ui/admin/views/realms/RealmsListView', [
             var self = this;
 
             SMSGlobalDelegate.realms.all().done(function (data) {
-                var result = _.findWhere(data.result, { name: '/' });
+                var result = _.findWhere(data.result, { name: "/" });
                 if (result) {
-                    result.name = $.t('console.realms.topLevelRealm');
+                    result.name = $.t("console.realms.topLevelRealm");
                 }
                 self.data.realms = data.result;
 

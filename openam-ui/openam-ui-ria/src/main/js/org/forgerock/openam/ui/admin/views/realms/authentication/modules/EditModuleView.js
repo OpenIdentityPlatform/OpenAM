@@ -54,7 +54,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
             });
         },
         save: function (event) {
-            var promise = SMSRealmDelegate.authentication.modules.save(this.data.form.data());
+            var promise = SMSRealmDelegate.authentication.modules.update(this.data.form.data());
             FormHelper.bindSavePromiseToElement(promise, event.target);
         },
         revert: function () {
