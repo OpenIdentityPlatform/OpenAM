@@ -15,19 +15,19 @@
  */
 
  /*global define*/
-define('org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate', [
-    'jquery',
-    'org/forgerock/commons/ui/common/main/AbstractDelegate',
-    'org/forgerock/commons/ui/common/util/Constants',
-    'org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils'
+define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
+    "jquery",
+    "org/forgerock/commons/ui/common/main/AbstractDelegate",
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils"
 ], function ($, AbstractDelegate, Constants, SMSDelegateUtils) {
     /**
      * @exports org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate
      */
-    var obj = new AbstractDelegate(Constants.host + '/' + Constants.context + '/json/global-config/'),
+    var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/global-config/"),
         schemaWithValues = function(url) {
             return $.when(
-                obj.serviceCall({ url: url + '?_action=schema', type: 'POST' }),
+                obj.serviceCall({ url: url + "?_action=schema", type: "POST" }),
                 obj.serviceCall({ url: url })
             ).then(function(schemaData, valuesData) {
                 return {
@@ -44,7 +44,7 @@ define('org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate', [
          */
         all: function () {
             return obj.serviceCall({
-                url: 'realms?_queryFilter=true'
+                url: "realms?_queryFilter=true"
             }).done(function (data) {
                 data.result = data.result.sort(function (a, b) {
                     if (a.active === b.active) {
@@ -65,8 +65,8 @@ define('org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate', [
          */
         create: function (data) {
             return obj.serviceCall({
-                url: 'realms?_action=create',
-                type: 'POST',
+                url: "realms?_action=create",
+                type: "POST",
                 data: JSON.stringify(data)
             });
         },
@@ -77,7 +77,7 @@ define('org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate', [
          * @returns {Promise.<Object>} Service promise
          */
         get: function (location) {
-            return schemaWithValues('realms' + location);
+            return schemaWithValues("realms" + location);
         },
 
         /**
@@ -85,7 +85,7 @@ define('org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate', [
          * @returns {Promise.<Object>} Service promise
          */
         schema: function () {
-            return schemaWithValues('realms');
+            return schemaWithValues("realms");
         },
 
         /**
@@ -94,7 +94,7 @@ define('org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate', [
          * @returns {Promise} Service promise
          */
         remove: function (location) {
-            return obj.serviceCall({ url: 'realms' + location, type: 'DELETE' });
+            return obj.serviceCall({ url: "realms" + location, type: "DELETE" });
         },
 
         /**
@@ -104,8 +104,8 @@ define('org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate', [
          */
         update: function (location, data) {
             return obj.serviceCall({
-                url: 'realms' + location,
-                type: 'PUT',
+                url: "realms" + location,
+                type: "PUT",
                 data: JSON.stringify(data)
             });
         }

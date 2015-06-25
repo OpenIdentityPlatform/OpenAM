@@ -15,16 +15,16 @@
  */
 
 /*global define*/
-define('org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView', [
-    'org/forgerock/commons/ui/common/main/AbstractView',
-    'org/forgerock/openam/ui/admin/models/Form',
-    'org/forgerock/openam/ui/admin/utils/FormHelper',
-    'org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate'
+define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView", [
+    "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/openam/ui/admin/models/Form",
+    "org/forgerock/openam/ui/admin/utils/FormHelper",
+    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate"
 ], function(AbstractView, Form, FormHelper, SMSRealmDelegate) {
     var SettingsView = AbstractView.extend({
-        template: 'templates/admin/views/realms/authentication/SettingsTemplate.html',
+        template: "templates/admin/views/realms/authentication/SettingsTemplate.html",
         events: {
-            'click #saveChanges': 'save'
+            "click #saveChanges": "save"
         },
         render: function(args, callback) {
             var self = this;
@@ -33,8 +33,8 @@ define('org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView',
 
             this.parentRender( function () {
                 SMSRealmDelegate.authentication.get(this.data.realmLocation).done(function(data) {
-                    self.data.form = new Form(self.$el.find('#tabpanel').get(0), {
-                        type: 'object',
+                    self.data.form = new Form(self.$el.find("#tabpanel").get(0), {
+                        type: "object",
                         properties: {
                             adminAuthModule: data.schema.properties.core.properties.adminAuthModule,
                             loginSuccessUrl: data.schema.properties.postauthprocess.properties.loginSuccessUrl,

@@ -15,9 +15,9 @@
  */
 
  /*global define*/
-define('org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils', [
-    'jquery',
-    'underscore'
+define("org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils", [
+    "jquery",
+    "underscore"
 ], function ($, _) {
     /**
      * @exports org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils
@@ -38,37 +38,37 @@ define('org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils', [
         schema.orderedProperties = _.sortBy(_.map(schema.properties, function (value, key) {
             value._id = key;
             return value;
-        }), 'propertyOrder');
+        }), "propertyOrder");
 
         return schema;
     };
 
     obj.addCheckboxFormatToBoolean = function (property) {
-        if (property.hasOwnProperty('type') && property.type === 'boolean') {
-            property.format = 'checkbox';
+        if (property.hasOwnProperty("type") && property.type === "boolean") {
+            property.format = "checkbox";
         }
 
-        if (property.type === 'object') {
+        if (property.type === "object") {
             _.forEach(property.properties, obj.addCheckboxFormatToBoolean);
         }
     };
 
     obj.addStringTypeToEnum = function (property) {
-        if (property.hasOwnProperty('enum')) {
-            property.type = 'string';
+        if (property.hasOwnProperty("enum")) {
+            property.type = "string";
         }
 
-        if (property.type === 'object') {
+        if (property.type === "object") {
             _.forEach(property.properties, obj.addStringTypeToEnum);
         }
     };
 
     obj.propertyOrderTransform = function (property) {
-        if (property.hasOwnProperty('propertyOrder')) {
+        if (property.hasOwnProperty("propertyOrder")) {
             property.propertyOrder = parseInt(property.propertyOrder.slice(1), 10);
         }
 
-        if (property.type === 'object') {
+        if (property.type === "object") {
             _.forEach(property.properties, obj.propertyOrderTransform);
         }
     };
@@ -83,13 +83,13 @@ define('org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils', [
             keypairs = [],
             obj = {};
 
-        _.each(xml.find('Value'), function (node) {
-            array = node.textContent.split(' ');
-            options = _.drop(array, 2)[0].split(',');
+        _.each(xml.find("Value"), function (node) {
+            array = node.textContent.split(" ");
+            options = _.drop(array, 2)[0].split(",");
             keypairs = [];
             _.each(options, function (option) {
                 if (option.length > 0) {
-                    option = option.split('=');
+                    option = option.split("=");
                     obj = {};
                     obj[option[0]] = option[1];
                     keypairs.push(obj);
@@ -108,14 +108,14 @@ define('org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils', [
 
     obj.authChainConfigurationToXml = function (data) {
         // FIXME: This is a temporay client side fix until AME-7202 is completed.
-        var xmlString = '',
+        var xmlString = "",
             xmlData = $.extend(true, {}, data);
 
         if (data.authChainConfiguration) {
             _.each(data.authChainConfiguration, function (authChain) {
-                xmlString += '<Value>' + authChain.module + ' ' + authChain.criteria + ' </Value>';
+                xmlString += "<Value>" + authChain.module + " " + authChain.criteria + " </Value>";
             });
-            xmlData.authChainConfiguration = '<AttributeValuePair>' + xmlString + '</AttributeValuePair>';
+            xmlData.authChainConfiguration = "<AttributeValuePair>" + xmlString + "</AttributeValuePair>";
         }
 
         return xmlData;

@@ -15,36 +15,36 @@
  */
 
 /*global define, require*/
-define('org/forgerock/openam/ui/admin/views/realms/RealmView', [
-    'jquery',
-    'org/forgerock/commons/ui/common/main/AbstractView',
-    'org/forgerock/commons/ui/common/main/Router',
-    'org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate'
+define("org/forgerock/openam/ui/admin/views/realms/RealmView", [
+    "jquery",
+    "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate"
 ], function ($, AbstractView, Router, SMSGlobalDelegate) {
     var RealmView = AbstractView.extend({
-        template: 'templates/admin/views/realms/RealmTemplate.html',
+        template: "templates/admin/views/realms/RealmTemplate.html",
         events: {
-            'click .sidenav a[href]:not([data-toggle])': 'navigateToPage'
+            "click .sidenav a[href]:not([data-toggle])": "navigateToPage"
         },
         findActiveNavItem: function (fragment) {
-            var element = this.$el.find('.sidenav ol > li > a[href^="#' + fragment + '"]'),
+            var element = this.$el.find(".sidenav ol > li > a[href^='#" + fragment + "']"),
                 parent, fragmentSections;
             if (element.length) {
                 parent = element.parent();
-                parent.addClass('active');
+                parent.addClass("active");
 
                 // Expand any collapsed element direct above. Only works one level up
-                if (parent.parent().hasClass('collapse')) {
-                    parent.parent().addClass('in');
+                if (parent.parent().hasClass("collapse")) {
+                    parent.parent().addClass("in");
                 }
             } else {
-                fragmentSections = fragment.split('/');
-                this.findActiveNavItem(fragmentSections.slice(0, -1).join('/'));
+                fragmentSections = fragment.split("/");
+                this.findActiveNavItem(fragmentSections.slice(0, -1).join("/"));
             }
         },
         navigateToPage: function (event) {
-            this.$el.find('li').removeClass('active');
-            $(event.currentTarget).parent().addClass('active');
+            this.$el.find("li").removeClass("active");
+            $(event.currentTarget).parent().addClass("active");
 
             this.nextRenderPage = true;
         },
@@ -57,7 +57,7 @@ define('org/forgerock/openam/ui/admin/views/realms/RealmView', [
                     this.nextRenderPage = false;
                     this.renderPage(module, this.args);
                 } else {
-                    throw 'Unable to render realm page for module ' + this.route.page;
+                    throw "Unable to render realm page for module " + this.route.page;
                 }
             }
         },
@@ -69,12 +69,12 @@ define('org/forgerock/openam/ui/admin/views/realms/RealmView', [
 
             this.args = args;
             this.data.realmLocation = args[0];
-            this.data.realmName = this.data.realmLocation === '/' ? 'Top Level Realm' : this.data.realmLocation;
+            this.data.realmName = this.data.realmLocation === "/" ? "Top Level Realm" : this.data.realmLocation;
 
             this.realmExists(args[0])
             .done(function () {
                 self.parentRender(function () {
-                    self.$el.find('li').removeClass('active');
+                    self.$el.find("li").removeClass("active");
                     self.findActiveNavItem(Router.getURIFragment());
 
                     self.renderPage(require(self.route.page), args, callback);
@@ -90,7 +90,7 @@ define('org/forgerock/openam/ui/admin/views/realms/RealmView', [
         renderPage: function (Module, args, callback) {
             var page = new Module();
 
-            page.element = '#realmsPageContent';
+            page.element = "#realmsPageContent";
             page.render(args, callback);
             this.delegateEvents();
         }
