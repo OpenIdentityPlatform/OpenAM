@@ -40,7 +40,11 @@
                 </AttributeSchema>
                 <SubSchema name="scriptContext" inheritance="multiple" resourceName="contexts">
                     <AttributeSchema name="i18nKey" type="single"/>
-                    <AttributeSchema name="languages" type="list" syntax="string" i18nKey="st101">
+                    <AttributeSchema name="languages" type="multiple_choice" syntax="string" i18nKey="st101">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="language-01">JAVASCRIPT</ChoiceValue>
+                            <ChoiceValue i18nKey="language-02">GROOVY</ChoiceValue>
+                        </ChoiceValues>
                         <DefaultValues>
                             <Value>JAVASCRIPT</Value>
                             <Value>GROOVY</Value>
@@ -268,6 +272,10 @@
                     <AttributeValuePair>
                         <Attribute name="i18nKey"/>
                         <Value>script-type-03</Value>
+                    </AttributeValuePair>
+                    <AttributeValuePair>
+                        <Attribute name="languages"/>
+                        <Value>JAVASCRIPT</Value>
                     </AttributeValuePair>
                     <AttributeValuePair>
                         <Attribute name="defaultScript"/>
