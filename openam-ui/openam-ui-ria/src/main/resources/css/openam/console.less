@@ -181,7 +181,32 @@ div.default-config {
     }
 }
 
+ul.btn-realms-tab {
+    list-style: none;
+    padding: 0;
 
+    li {
+        float: left;
+        display: block;
+    }
+
+    li:not(:last-child) a {
+        border-bottom-right-radius: 0;
+        border-top-right-radius: 0;
+    }
+
+    li:last-child a {
+        margin-left: -1px;
+        border-bottom-left-radius: 0;
+        border-top-left-radius: 0;
+    }
+
+    li.active .btn-default {
+        color: #333;
+        background-color: #e6e6e6;
+        border-color: #adadad;
+    }
+}
 
 @chaining-success-color:#517A93;
 @chaining-failure-color:#FF8784;
