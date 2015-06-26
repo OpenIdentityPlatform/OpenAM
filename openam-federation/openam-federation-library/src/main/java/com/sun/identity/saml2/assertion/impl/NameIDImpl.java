@@ -24,6 +24,7 @@
  *
  * $Id: NameIDImpl.java,v 1.3 2008/06/25 05:47:44 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 
@@ -40,7 +41,6 @@ import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2SDKUtils;
 import com.sun.identity.saml2.xmlenc.EncManager;
-import java.io.Serializable;
 
 /**
  *  The <code>NameID</code> is used in various SAML assertion constructs
@@ -202,7 +202,7 @@ public class NameIDImpl extends NameIDTypeImpl implements NameID {
         sb.append(">");
         String value = getValue();
         if ((value != null) && (value.trim().length() != 0)) {
-            sb.append(value);
+            sb.append(XMLUtils.escapeSpecialCharacters(value));
         } else {
             SAML2SDKUtils.debug.error(
                 "NameIDImpl.processElement(): name identifier is missing");
