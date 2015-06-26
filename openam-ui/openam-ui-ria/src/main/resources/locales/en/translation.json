@@ -603,7 +603,7 @@
                 "name": "Name",
                 "description": "Description",
                 "language": "Language",
-                "context": "Context",
+                "context": "Script Type",
                 "script": "Script",
                 "validation": {
                     "line": "line",
@@ -614,11 +614,11 @@
                 },
                 "dialog": {
                     "title": {
-                        "change": "Change Context",
-                        "select": "Select Context"
+                        "change": "Change Script Type",
+                        "select": "Select Script Type"
                     },
-                    "helper": "To create a new script, first select one of the available scripting contexts.",
-                    "warning": "By changing the context you will lose any unsaved data."
+                    "helper": "To create a new script, first select one of the available script types.",
+                    "warning": "By changing the script type you will lose any unsaved data."
                 }
             },
             "list": {
@@ -626,7 +626,7 @@
                 "addNew": "Add New Script",
                 "deleteSelected": "Delete Selected",
                 "grid": {
-                    "headers": ["Name", "Context", "Language", "Description"],
+                    "headers": ["Name", "Script Type", "Language", "Description"],
                     "filterBy": "Filter by __header__",
                     "noResults": "No results to display"
                 }

@@ -39,7 +39,7 @@ public class ScriptExceptionTest {
         se = new ScriptException(CONTEXT_NOT_RECOGNISED, context);
         //then
         assertEquals(se.getMessage(),
-                MessageFormat.format("Scripting context not recognised: {0}", context));
+                MessageFormat.format("Script type not recognised: {0}", context));
 
         // when
         se = new ScriptException(LANGUAGE_NOT_SUPPORTED, language);
@@ -106,7 +106,7 @@ public class ScriptExceptionTest {
         // when
         se = new ScriptException(MISSING_SCRIPT_CONTEXT);
         //then
-        assertEquals(se.getMessage(), "Script context must be specified");
+        assertEquals(se.getMessage(), "Script type must be specified");
 
         // when
         se = new ScriptException(SCRIPT_NAME_EXISTS, scriptName, realm);
