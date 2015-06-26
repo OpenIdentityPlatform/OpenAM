@@ -124,17 +124,11 @@ final public class RestUtils {
     }
 
     static public void hasPermission(final ServerContext context) throws SSOException, IdRepoException, ForbiddenException {
-        //Checks to see if User is amadmin, currently only amAdmin can access realms
-        Token admin = new Token();
-        admin.setId(getCookieFromServerContext(context));
-        SSOToken ssotok = null;
-        AMIdentity amIdentity = null;
-
         SSOTokenManager mgr = SSOTokenManager.getInstance();
-        ssotok = mgr.createSSOToken(getCookieFromServerContext(context));
+        SSOToken ssotok = mgr.createSSOToken(getCookieFromServerContext(context));
         mgr.validateToken(ssotok);
         mgr.refreshSession(ssotok);
-        amIdentity = new AMIdentity(ssotok);
+        AMIdentity amIdentity = new AMIdentity(ssotok);
 
         if (!(amIdentity.equals(AdminUserIdHolder.adminUserId))) {
             debug.error("Unauthorized user.");
