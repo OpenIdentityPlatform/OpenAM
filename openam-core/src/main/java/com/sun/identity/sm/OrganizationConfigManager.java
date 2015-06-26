@@ -697,8 +697,13 @@ public class OrganizationConfigManager {
                             Set values = (Set) map.get(name);
                             // Remove the serviceName and '-' and return only
                             // the attribute name,value.
-                            String key = name
-                                    .substring(serviceName.length() + 1);
+                            String key;
+
+                            if (!serviceName.isEmpty()) {
+                                key = name.substring(serviceName.length() + 1);
+                            } else {
+                                key = name;
+                            }
                             if (attrValues == null) {
                                 attrValues = new HashMap();
                             }
