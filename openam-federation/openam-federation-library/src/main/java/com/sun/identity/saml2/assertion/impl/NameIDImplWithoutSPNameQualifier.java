@@ -24,25 +24,17 @@
  *
  * $Id: NameIDImplWithoutSPNameQualifier.java,v 1.2 2008/06/25 05:47:44 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.assertion.impl;
 
-import java.security.Key;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import com.sun.identity.shared.xml.XMLUtils;
-
 import com.sun.identity.saml2.assertion.NameID;
-import com.sun.identity.saml2.assertion.EncryptedID;
-import com.sun.identity.saml2.assertion.AssertionFactory;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2SDKUtils;
-import com.sun.identity.saml2.xmlenc.EncManager;
 
 /**
  *  The <code>NameID</code> is used in various SAML assertion constructs
@@ -130,7 +122,7 @@ public class NameIDImplWithoutSPNameQualifier extends NameIDImpl
         sb.append(">");
         String value = getValue();
         if ((value != null) && (value.trim().length() != 0)) {
-            sb.append(value);
+            sb.append(XMLUtils.escapeSpecialCharacters(value));
         } else {
             SAML2SDKUtils.debug.error(
                 "NameIDImplWithoutSPNameQualifier.toXMLString(): " +
