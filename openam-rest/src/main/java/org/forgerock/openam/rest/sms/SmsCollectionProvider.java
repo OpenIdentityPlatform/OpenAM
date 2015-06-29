@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openam.rest.sms;
@@ -30,12 +31,15 @@ import com.iplanet.sso.SSOException;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
+import com.sun.identity.sm.ServiceAlreadyExistsException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceNotFoundException;
 import com.sun.identity.sm.ServiceSchema;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CollectionResourceProvider;
+import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
@@ -104,6 +108,9 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
             JsonValue result = getJsonValue(created);
             handler.handleResult(new Resource(dn.substring(dn.lastIndexOf("=") + 1), String.valueOf(result.hashCode()),
                     result));
+        } catch (ServiceAlreadyExistsException e) {
+            debug.warning("::SmsCollectionProvider:: ServiceAlreadyExistsException on create", e);
+            handler.handleError(new ConflictException("Unable to create SMS config: " + e.getMessage()));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on create", e);
             handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
@@ -130,12 +137,15 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
 
             Resource resource = new Resource(resourceId, "0", json(object(field("success", true))));
             handler.handleResult(resource);
+        } catch (ServiceNotFoundException e) {
+            debug.warning("::SmsCollectionProvider:: ServiceNotFoundException on delete", e);
+            handler.handleError(new NotFoundException("Unable to delete SMS config: " + e.getMessage()));
         } catch (SMSException e) {
-            debug.warning("::SmsCollectionProvider:: SMSException on create", e);
-            handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            debug.warning("::SmsCollectionProvider:: SMSException on delete", e);
+            handler.handleError(new InternalServerErrorException("Unable to delete SMS config: " + e.getMessage()));
         } catch (SSOException e) {
-            debug.warning("::SmsCollectionProvider:: SSOException on create", e);
-            handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            debug.warning("::SmsCollectionProvider:: SSOException on delete", e);
+            handler.handleError(new InternalServerErrorException("Unable to delete SMS config: " + e.getMessage()));
         } catch (NotFoundException e) {
             handler.handleError(e);
         }
@@ -156,11 +166,11 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
             JsonValue result = getJsonValue(item);
             handler.handleResult(new Resource(resourceId, String.valueOf(result.hashCode()), result));
         } catch (SMSException e) {
-            debug.warning("::SmsCollectionProvider:: SMSException on create", e);
-            handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            debug.warning("::SmsCollectionProvider:: SMSException on read", e);
+            handler.handleError(new InternalServerErrorException("Unable to read SMS config: " + e.getMessage()));
         } catch (SSOException e) {
-            debug.warning("::SmsCollectionProvider:: SSOException on create", e);
-            handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            debug.warning("::SmsCollectionProvider:: SSOException on read", e);
+            handler.handleError(new InternalServerErrorException("Unable to read SMS config: " + e.getMessage()));
         } catch (NotFoundException e) {
             handler.handleError(e);
         }
@@ -183,12 +193,15 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
             node.setAttributes(attrs);
             JsonValue result = getJsonValue(node);
             handler.handleResult(new Resource(resourceId, String.valueOf(result.hashCode()), result));
+        } catch (ServiceNotFoundException e) {
+            debug.warning("::SmsCollectionProvider:: ServiceNotFoundException on update", e);
+            handler.handleError(new NotFoundException("Unable to update SMS config: " + e.getMessage()));
         } catch (SMSException e) {
-            debug.warning("::SmsCollectionProvider:: SMSException on create", e);
-            handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            debug.warning("::SmsCollectionProvider:: SMSException on update", e);
+            handler.handleError(new InternalServerErrorException("Unable to update SMS config: " + e.getMessage()));
         } catch (SSOException e) {
-            debug.warning("::SmsCollectionProvider:: SSOException on create", e);
-            handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            debug.warning("::SmsCollectionProvider:: SSOException on update", e);
+            handler.handleError(new InternalServerErrorException("Unable to update SMS config: " + e.getMessage()));
         } catch (NotFoundException e) {
             handler.handleError(e);
         }
@@ -240,11 +253,11 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
 
             handler.handleResult(new QueryResult());
         } catch (SMSException e) {
-            debug.warning("::SmsCollectionProvider:: SMSException on create", e);
-            handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            debug.warning("::SmsCollectionProvider:: SMSException on query", e);
+            handler.handleError(new InternalServerErrorException("Unable to query SMS config: " + e.getMessage()));
         } catch (SSOException e) {
-            debug.warning("::SmsCollectionProvider:: SSOException on create", e);
-            handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            debug.warning("::SmsCollectionProvider:: SSOException on query", e);
+            handler.handleError(new InternalServerErrorException("Unable to query SMS config: " + e.getMessage()));
         }
     }
 
