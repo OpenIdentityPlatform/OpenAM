@@ -232,7 +232,7 @@ public class ServiceConfig {
      * @throws SMSException
      *             if an error occurred while performing the operation.
      */
-    public Set getSubConfigNames(String pattern) throws SMSException {
+    public Set<String> getSubConfigNames(String pattern) throws SMSException {
         validateServiceConfigImpl();
         try {
             return (sc.getSubConfigNames(token, pattern));
@@ -240,7 +240,7 @@ public class ServiceConfig {
             SMSEntry.debug.error("ServiceConfigManager: Unable to "
                     + "get subConfig Names for filter: " + pattern, s);
         }
-        return (Collections.EMPTY_SET);
+        return Collections.emptySet();
 
     }
 

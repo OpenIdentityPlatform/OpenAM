@@ -18,6 +18,7 @@ package org.forgerock.openam.rest.sms;
 
 import static com.sun.identity.sm.AttributeSchema.Syntax.*;
 import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.openam.rest.sms.SmsJsonSchema.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -198,7 +199,8 @@ abstract class SmsResourceProvider {
             sections.addAll(Arrays.asList(sectionOrder.split("\\s+")));
         }
 
-        addAttributeSchema(result, "/properties/", schema, sections, attributeSectionMap, console, serviceType, context);
+        addAttributeSchema(result, "/" + PROPERTIES + "/", schema, sections, attributeSectionMap, console, serviceType,
+                context);
 
         return result;
     }
@@ -216,20 +218,20 @@ abstract class SmsResourceProvider {
                 if (!sections.isEmpty()) {
                     String section = attributeSectionMap.get(attribute.getName());
                     String sectionLabel = "section.label." + serviceName + "." + serviceType + "." + section;
-                    attributePath = section + "/properties/" + attributePath;
-                    result.putPermissive(new JsonPointer(path + section + "/type"), "object");
+                    attributePath = section + "/" + PROPERTIES + "/" + attributePath;
+                    result.putPermissive(new JsonPointer(path + section + "/" + TYPE), OBJECT_TYPE);
 
-                    result.putPermissive(new JsonPointer(path + section + "/title"),
+                    result.putPermissive(new JsonPointer(path + section + "/" + TITLE),
                             getConsoleString(console, sectionLabel));
-                    result.putPermissive(new JsonPointer(path + section + "/propertyOrder"),
+                    result.putPermissive(new JsonPointer(path + section + "/" + PROPERTY_ORDER),
                             "z" + sectionFormat.format(sections.indexOf(section)));
                 }
-                result.addPermissive(new JsonPointer(path + attributePath + "/title"),
+                result.addPermissive(new JsonPointer(path + attributePath + "/" + TITLE),
                         i18n.getString(i18NKey));
 
-                result.addPermissive(new JsonPointer(path + attributePath + "/description"), getSchemaDescription(i18n, i18NKey));
-                result.addPermissive(new JsonPointer(path + attributePath + "/propertyOrder"), i18NKey);
-                result.addPermissive(new JsonPointer(path + attributePath + "/required"), !attribute.isOptional());
+                result.addPermissive(new JsonPointer(path + attributePath + "/" + DESCRIPTION), getSchemaDescription(i18n, i18NKey));
+                result.addPermissive(new JsonPointer(path + attributePath + "/" + PROPERTY_ORDER), i18NKey);
+                result.addPermissive(new JsonPointer(path + attributePath + "/" + REQUIRED), !attribute.isOptional());
                 addType(result, path + attributePath, attribute, i18n, context);
             }
         }
@@ -264,34 +266,34 @@ abstract class SmsResourceProvider {
         if (attributeType == AttributeSchema.Type.LIST && (
                 attribute.getUIType() == AttributeSchema.UIType.GLOBALMAPLIST ||
                 attribute.getUIType() == AttributeSchema.UIType.MAPLIST)) {
-            type = "object";
+            type = OBJECT_TYPE;
             JsonValue fieldType = json(object());
             if (attribute.hasChoiceValues()) {
                 addEnumChoices(fieldType, attribute, i18n, context);
             } else {
-                fieldType.add("type", "string");
+                fieldType.add(TYPE, STRING_TYPE);
             }
-            result.addPermissive(new JsonPointer(pointer + "/patternProperties"),
+            result.addPermissive(new JsonPointer(pointer + "/" + PATTERN_PROPERTIES),
                     object(field(".*", fieldType.getObject())));
         } else if (attributeType == AttributeSchema.Type.LIST) {
-            type = "array";
-            result.addPermissive(new JsonPointer(pointer + "/items"),
-                    object(field("type", getTypeFromSyntax(attribute.getSyntax()))));
+            type = ARRAY_TYPE;
+            result.addPermissive(new JsonPointer(pointer + "/" + ITEMS),
+                    object(field(TYPE, getTypeFromSyntax(attribute.getSyntax()))));
             if (attribute.hasChoiceValues()) {
-                addEnumChoices(result.get(new JsonPointer(pointer + "/items")), attribute, i18n, context);
+                addEnumChoices(result.get(new JsonPointer(pointer + "/" + ITEMS)), attribute, i18n, context);
             }
         } else if (attributeType.equals(AttributeSchema.Type.MULTIPLE_CHOICE)) {
-            type = "array";
-            result.addPermissive(new JsonPointer(pointer + "/items"),
-                    object(field("type", getTypeFromSyntax(attribute.getSyntax()))));
-            addEnumChoices(result.get(new JsonPointer(pointer + "/items")), attribute, i18n, context);
+            type = ARRAY_TYPE;
+            result.addPermissive(new JsonPointer(pointer + "/" + ITEMS),
+                    object(field(TYPE, getTypeFromSyntax(attribute.getSyntax()))));
+            addEnumChoices(result.get(new JsonPointer(pointer + "/" + ITEMS)), attribute, i18n, context);
         } else if (attributeType.equals(AttributeSchema.Type.SINGLE_CHOICE)) {
             addEnumChoices(result.get(new JsonPointer(pointer)), attribute, i18n, context);
         } else {
             type = getTypeFromSyntax(syntax);
         }
         if (type != null) {
-            result.addPermissive(new JsonPointer(pointer + "/type"), type);
+            result.addPermissive(new JsonPointer(pointer + "/" + TYPE), type);
         }
     }
 
@@ -310,18 +312,18 @@ abstract class SmsResourceProvider {
                 descriptions.add(value.getKey());
             }
         }
-        jsonValue.add("enum", values);
+        jsonValue.add(ENUM, values);
         jsonValue.putPermissive(new JsonPointer("options/enum_titles"), descriptions);
     }
 
     private String getTypeFromSyntax(AttributeSchema.Syntax syntax) {
         String type;
         if (syntax == BOOLEAN) {
-            type = "boolean";
+            type = BOOLEAN_TYPE;
         } else if (NUMBER_SYNTAXES.contains(syntax)) {
-            type = "number";
+            type = NUMBER_TYPE;
         } else {
-            type = "string";
+            type = STRING_TYPE;
         }
         return type;
     }

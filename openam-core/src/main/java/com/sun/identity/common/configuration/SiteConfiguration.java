@@ -159,9 +159,9 @@ public class SiteConfiguration extends ConfigurationBase {
      *         datastore.
      * @throws SSOException if the <code>ssoToken</code> is not valid.
      */
-    public static Set getSites(SSOToken ssoToken)
+    public static Set<String> getSites(SSOToken ssoToken)
         throws SMSException, SSOException {
-        Set sites = new HashSet();
+        Set<String> sites = new HashSet<>();
 
         ServiceConfig sc = getRootSiteConfig(ssoToken);
         if (sc != null) {
@@ -762,18 +762,17 @@ public class SiteConfiguration extends ConfigurationBase {
      *         datastore.
      * @throws SSOException if the <code>ssoToken</code> is not valid.
      */
-    public static Set listServers(
+    public static Set<String> listServers(
         SSOToken ssoToken,
         String siteName
     ) throws SMSException, SSOException, ConfigurationException {
-        Set members = new HashSet();
+        Set<String> members = new HashSet<>();
         String siteId = getSiteId(ssoToken, siteName);
 
         if (siteId != null) {
-            Set allServers = ServerConfiguration.getServers(ssoToken);
+            Set<String> allServers = ServerConfiguration.getServers(ssoToken);
 
-            for (Iterator i = allServers.iterator(); i.hasNext();){
-                String svr = (String)i.next();
+            for (String svr : allServers) {
                 if (ServerConfiguration.belongToSite(ssoToken, svr, siteName)) {
                     members.add(svr);
                 }

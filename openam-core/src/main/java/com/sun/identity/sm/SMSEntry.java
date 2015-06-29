@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -879,7 +880,7 @@ public class SMSEntry implements Cloneable {
         return (answer);
     }
 
-    Set subEntries(SSOToken token, String filter, int numOfEntries,
+    Set<String> subEntries(SSOToken token, String filter, int numOfEntries,
             boolean sortResults, boolean ascendingOrder) throws SMSException,
             SSOException {
         // If backend has proxy enabled, check for delegation
@@ -888,10 +889,7 @@ public class SMSEntry implements Cloneable {
         if (backendProxyEnabled && !SMSJAXRPCObjectFlg) {
             if (isAllowed(token, normalizedDN, readActionSet)) {
                 if (adminSSOToken == null) {
-                    adminSSOToken = (SSOToken) 
-                        AccessController.doPrivileged(
-                                com.sun.identity.security.AdminTokenAction
-                                    .getInstance());
+                    adminSSOToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
                 }
                 token = adminSSOToken;
             }
@@ -900,25 +898,24 @@ public class SMSEntry implements Cloneable {
             // permission is denied
             getDelegationPermission(token, normalizedDN, readActionSet);
         }
-        Set subEntries = smsObject.subEntries(token, dn, filter, numOfEntries,
+        Set<String> subEntries = smsObject.subEntries(token, dn, filter, numOfEntries,
                 sortResults, ascendingOrder);
         
         // Check for remote client using JAX-RPC
         if (SMSJAXRPCObjectFlg) {
             // Since this is a JAX-RPC call, the permission checking and
             // parsing would be done at the server
-            return (subEntries);
+            return subEntries;
         }
         
         // Need to check if the user has permissions before returning
-        Set answer = new OrderedSet();
-        for (Iterator items = subEntries.iterator(); items.hasNext();) {
-            String subEntry = (String) items.next();
+        Set<String> answer = new LinkedHashSet<>();
+        for (String subEntry : subEntries) {
             if (hasReadPermission(token, "ou=" + subEntry + "," + dn)) {
                 answer.add(subEntry);
             }
         }
-        return (answer);
+        return answer;
     }
     
     Set schemaSubEntries(SSOToken token, String filter, String sidFilter,

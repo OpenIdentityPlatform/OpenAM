@@ -24,10 +24,7 @@
  *
  * $Id: CachedSubEntries.java,v 1.10 2008/07/11 01:46:21 arviranga Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 package com.sun.identity.sm;
 
@@ -132,14 +129,13 @@ public class CachedSubEntries {
      * @throws com.sun.identity.sm.SMSException
      * @throws com.iplanet.sso.SSOException
      */
-    public Set getSubEntries(SSOToken token, String pattern)
+    public Set<String> getSubEntries(SSOToken token, String pattern)
             throws SMSException, SSOException {
         if (debug.messageEnabled()) {
             debug.message("CachedSubEntries: reading sub-entries DN: " + 
                cachedEntry.getDN() + " pattern: " + pattern);
         }
-        return (cachedEntry.getSMSEntry().subEntries(
-            token, pattern, 0, false, true));
+        return cachedEntry.getSMSEntry().subEntries(token, pattern, 0, false, true);
     }
 
     /**

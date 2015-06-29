@@ -183,15 +183,15 @@ class ServiceConfigImpl implements ServiceListener {
      * Returns the names of service's sub-configurations that match the given
      * pattern.
      */
-    Set getSubConfigNames(SSOToken t, String pattern) throws SMSException,
+    Set<String> getSubConfigNames(SSOToken t, String pattern) throws SMSException,
             SSOException {
         if (subEntries == null) {
             subEntries = CachedSubEntries.getInstance(t, smsEntry.getDN());
         }
         if (pattern.equals("*")) {
-            return (getSubConfigNames(t));
+            return getSubConfigNames(t);
         }
-        return (subEntries.getSubEntries(t, pattern));
+        return subEntries.getSubEntries(t, pattern);
     }
 
     /**

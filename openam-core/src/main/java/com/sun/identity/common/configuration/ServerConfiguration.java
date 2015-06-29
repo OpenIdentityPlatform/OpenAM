@@ -180,9 +180,9 @@ public class ServerConfiguration extends ConfigurationBase {
      *         datastore.
      * @throws SSOException if the <code>ssoToken</code> is not valid.
      */
-    public static Set getServers(SSOToken ssoToken) 
+    public static Set<String> getServers(SSOToken ssoToken)
         throws SMSException, SSOException {
-        Set servers = new HashSet();
+        Set<String> servers = new HashSet<>();
         ServiceConfig sc = getRootServerConfig(ssoToken);
         if (sc != null) {
             servers.addAll(sc.getSubConfigNames("*"));

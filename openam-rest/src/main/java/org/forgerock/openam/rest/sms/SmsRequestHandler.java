@@ -154,6 +154,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
             new HashMap<SchemaType, Collection<Function<String, Boolean>>>();
     private final Map<SchemaType, Collection<Function<String, Boolean>>> excludedServiceCollections =
             new HashMap<SchemaType, Collection<Function<String, Boolean>>>();
+    private final SitesResourceProvider sitesResourceProvider;
     private Map<String, Map<SmsRouteTree, Set<Route>>> serviceRoutes = new HashMap<String, Map<SmsRouteTree, Set<Route>>>();
     private final SmsRouteTree routeTree;
 
@@ -163,12 +164,14 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
             SmsGlobalSingletonProviderFactory globalSingletonProviderFactory, @Named("frRest") Debug debug,
             ExcludedServicesFactory excludedServicesFactory,
             AuthenticationModuleCollectionHandler authenticationModuleCollectionHandler,
-            AuthenticationModuleTypeHandler authenticationModuleTypeHandler) throws SMSException,
+            AuthenticationModuleTypeHandler authenticationModuleTypeHandler,
+            SitesResourceProvider sitesResourceProvider) throws SMSException,
             SSOException {
         this.schemaType = type;
         this.collectionProviderFactory = collectionProviderFactory;
         this.singletonProviderFactory = singletonProviderFactory;
         this.globalSingletonProviderFactory = globalSingletonProviderFactory;
+        this.sitesResourceProvider = sitesResourceProvider;
         this.debug = debug;
         this.excludedServices = excludedServicesFactory.get(type);
         this.authenticationModuleCollectionHandler = authenticationModuleCollectionHandler;
@@ -193,6 +196,13 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
         addAuthenticationModulesQueryHandler();
         addAuthenticationModuleTypesQueryHandler();
         addRealmHandler();
+        addSitesHandler();
+    }
+
+    private void addSitesHandler() {
+        if (SchemaType.GLOBAL.equals(schemaType)) {
+            routeTree.addRoute(RoutingMode.STARTS_WITH, "sites", Resources.newCollection(sitesResourceProvider));
+        }
     }
 
     private SmsRouteTree getAuthenticationModuleRouter() {
@@ -256,7 +266,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
                     removeService(svcName);
                     serviceRoutes.put(svcName, addService(getServiceManager(), svcName, svcVersion));
                     if (ISAuthConstants.PLATFORM_SERVICE_NAME.equals(svcName)) {
-                        addServersAndSitesRoutes(getServiceManager(), serviceRoutes);
+                        addServersRoutes(getServiceManager(), serviceRoutes);
                     }
                     break;
                 default:
@@ -300,26 +310,25 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
             }
         }
         if (schemaType == SchemaType.GLOBAL) {
-            addServersAndSitesRoutes(sm, serviceRoutes);
+            addServersRoutes(sm, serviceRoutes);
         }
         this.serviceRoutes = serviceRoutes;
     }
 
-    private void addServersAndSitesRoutes(ServiceManager sm, Map<String, Map<SmsRouteTree, Set<Route>>> serviceRoutes)
+    private void addServersRoutes(ServiceManager sm, Map<String, Map<SmsRouteTree, Set<Route>>> serviceRoutes)
             throws SSOException, SMSException {
         ServiceSchemaManager ssm = sm.getSchemaManager(ISAuthConstants.PLATFORM_SERVICE_NAME, DEFAULT_VERSION);
         HashSet<Route> rootRoutes = new HashSet<Route>();
         serviceRoutes.get(ISAuthConstants.PLATFORM_SERVICE_NAME).put(routeTree, rootRoutes);
-        addServersAndSitesRoutes(ssm, rootRoutes, ConfigurationBase.CONFIG_SITES, ConfigurationBase.SUBSCHEMA_SITE);
-        addServersAndSitesRoutes(ssm, rootRoutes, ConfigurationBase.CONFIG_SERVERS, ConfigurationBase.SUBSCHEMA_SERVER);
+        addServersRoutes(ssm, rootRoutes, ConfigurationBase.CONFIG_SERVERS, ConfigurationBase.SUBSCHEMA_SERVER);
     }
 
-    private void addServersAndSitesRoutes(ServiceSchemaManager ssm, Set<Route> serviceRoutes, String parentName,
+    private void addServersRoutes(ServiceSchemaManager ssm, Set<Route> serviceRoutes, String parentName,
             String schemaName) throws SSOException, SMSException {
         ServiceSchema parentSchema = ssm.getGlobalSchema().getSubSchema(parentName);
         ServiceSchema schema = parentSchema.getSubSchema(schemaName);
-        HashMap<SmsRouteTree, Set<Route>> routes = new HashMap<SmsRouteTree, Set<Route>>();
-        addPaths("", new ArrayList<ServiceSchema>(Collections.singletonList(parentSchema)), schema,
+        HashMap<SmsRouteTree, Set<Route>> routes = new HashMap<>();
+        addPaths("", new ArrayList<>(Collections.singletonList(parentSchema)), schema,
                 null, routes, Collections.<Pattern>emptyList(), routeTree);
         serviceRoutes.addAll(routes.get(routeTree));
     }
