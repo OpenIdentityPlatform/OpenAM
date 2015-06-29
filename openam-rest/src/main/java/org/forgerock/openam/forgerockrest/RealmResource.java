@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2014 ForgeRock AS
+ * Copyright 2012-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest;
@@ -63,7 +63,11 @@ import org.forgerock.openam.utils.StringUtils;
 
 /**
  * A simple {@code Map} based collection resource provider.
+ *
+ * @deprecated Has been replaced by
+ * {@link org.forgerock.openam.rest.sms.SmsRealmProvider}.
  */
+@Deprecated
 public class RealmResource implements CollectionResourceProvider {
 
     private static final String ACTIVE = "Active";
