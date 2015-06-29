@@ -119,7 +119,7 @@ public class AuthenticateToServiceConditionTest {
 
         //Then
         assertThat(decision.isSatisfied()).isTrue();
-        assertThat(decision.getAdvices()).isEmpty();
+        assertThat(decision.getAdvice()).isEmpty();
     }
 
     @Test
@@ -144,7 +144,7 @@ public class AuthenticateToServiceConditionTest {
 
         //Then
         assertThat(decision.isSatisfied()).isFalse();
-        assertThat(decision.getAdvices()).containsOnly(entry(AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE,
+        assertThat(decision.getAdvice()).containsOnly(entry(AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE,
                 Collections.singleton("REALM:SERVICE_NAME")));
     }
 
@@ -170,7 +170,7 @@ public class AuthenticateToServiceConditionTest {
 
         //Then
         assertThat(decision.isSatisfied()).isFalse();
-        assertThat(decision.getAdvices()).containsOnly(entry(AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE,
+        assertThat(decision.getAdvice()).containsOnly(entry(AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE,
                 Collections.singleton("REALM:SERVICE_NAME")));
     }
 
@@ -196,7 +196,7 @@ public class AuthenticateToServiceConditionTest {
 
         //Then
         assertThat(decision.isSatisfied()).isTrue();
-        assertThat(decision.getAdvices()).isEmpty();
+        assertThat(decision.getAdvice()).isEmpty();
     }
 
     @Test
@@ -221,7 +221,7 @@ public class AuthenticateToServiceConditionTest {
 
         //Then
         assertThat(decision.isSatisfied()).isFalse();
-        assertThat(decision.getAdvices()).containsOnly(entry(AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE,
+        assertThat(decision.getAdvice()).containsOnly(entry(AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE,
                 Collections.singleton("REALM:SERVICE_NAME")));
     }
 
@@ -249,7 +249,7 @@ public class AuthenticateToServiceConditionTest {
 
         //Then
         assertThat(decision.isSatisfied()).isTrue();
-        assertThat(decision.getAdvices()).isEmpty();
+        assertThat(decision.getAdvice()).isEmpty();
     }
 
     @Test
@@ -276,7 +276,7 @@ public class AuthenticateToServiceConditionTest {
 
         //Then
         assertThat(decision.isSatisfied()).isFalse();
-        assertThat(decision.getAdvices()).containsOnly(entry(AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE,
+        assertThat(decision.getAdvice()).containsOnly(entry(AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE,
                 Collections.singleton("REALM:SERVICE_NAME")));
     }
 
@@ -304,7 +304,7 @@ public class AuthenticateToServiceConditionTest {
 
         //Then
         assertThat(decision.isSatisfied()).isTrue();
-        assertThat(decision.getAdvices()).isEmpty();
+        assertThat(decision.getAdvice()).isEmpty();
     }
 
     @Test
@@ -331,7 +331,7 @@ public class AuthenticateToServiceConditionTest {
 
         //Then
         assertThat(decision.isSatisfied()).isFalse();
-        assertThat(decision.getAdvices()).containsOnly(entry(AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE,
+        assertThat(decision.getAdvice()).containsOnly(entry(AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE,
                 Collections.singleton("REALM:SERVICE_NAME")));
     }
 }

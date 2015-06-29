@@ -147,13 +147,17 @@ public class NotCondition extends LogicalCondition {
         String resourceName,
         Map<String, Set<String>> environment
     ) throws EntitlementException {
+
         if (eCondition == null) {
             return new ConditionDecision(false, Collections.EMPTY_MAP);
         }
 
-        ConditionDecision d = eCondition.evaluate(realm, subject, resourceName,
-            environment);
-        return new ConditionDecision(!d.isSatisfied(), Collections.EMPTY_MAP);
+        ConditionDecision decision = eCondition.evaluate(realm, subject, resourceName, environment);
+
+        return ConditionDecision
+                .newBuilder(!decision.isSatisfied())
+                .setResponseAttributes(decision.getResponseAttributes())
+                .build();
     }
 
     /**

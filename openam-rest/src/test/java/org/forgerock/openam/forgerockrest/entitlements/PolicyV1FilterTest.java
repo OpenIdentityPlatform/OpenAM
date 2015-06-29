@@ -21,6 +21,7 @@ import static org.forgerock.json.fluent.JsonValue.json;
 import static org.forgerock.json.fluent.JsonValue.object;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Matchers.isNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -85,6 +86,8 @@ public class PolicyV1FilterTest {
     private Debug debug;
 
     @Captor
+    private ArgumentCaptor<ResultHandler<JsonValue>> jsonResultHandlerCaptor;
+    @Captor
     private ArgumentCaptor<ResultHandler<Resource>> resourceResultHandlerCaptor;
     @Captor
     private ArgumentCaptor<QueryResultHandler> queryResultHandlerCaptor;
@@ -114,7 +117,9 @@ public class PolicyV1FilterTest {
         filter.filterAction(context, actionRequest, jsonResultHandler, requestHandler);
 
         // Then
-        verify(requestHandler).handleAction(context, actionRequest, jsonResultHandler);
+        verify(requestHandler).handleAction(eq(context), eq(actionRequest), jsonResultHandlerCaptor.capture());
+        ResultHandler<JsonValue> jsonValueResultHandler = jsonResultHandlerCaptor.getValue();
+        assertThat(jsonValueResultHandler).isNotNull();
     }
 
     /**

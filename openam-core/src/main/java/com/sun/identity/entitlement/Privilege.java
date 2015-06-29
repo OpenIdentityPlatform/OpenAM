@@ -702,7 +702,7 @@ public abstract class Privilege implements IPrivilege {
                 PolicyConstants.DEBUG.message("[PolicyEval] Privilege.doesConditionMatch: true");
             } else {
                 PolicyConstants.DEBUG.message("[PolicyEval] Privilege.doesConditionMatch: false");
-                PolicyConstants.DEBUG.message("[PolicyEval] Advices: " + decision.getAdvices());
+                PolicyConstants.DEBUG.message("[PolicyEval] Advices: " + decision.getAdvice());
             }
         }
 

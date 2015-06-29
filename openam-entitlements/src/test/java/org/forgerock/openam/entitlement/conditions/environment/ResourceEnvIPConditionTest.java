@@ -11,7 +11,7 @@ package org.forgerock.openam.entitlement.conditions.environment;/*
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 import com.iplanet.sso.SSOToken;
@@ -103,7 +103,7 @@ public class ResourceEnvIPConditionTest {
 
         //Then
         assertThat(result.isSatisfied()).isTrue();
-        assertThat(result.getAdvices()).isEmpty();
+        assertThat(result.getAdvice()).isEmpty();
     }
 
 }

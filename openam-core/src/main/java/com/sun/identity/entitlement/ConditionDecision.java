@@ -36,14 +36,14 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Class to represent {@link EntitlementCondition} evaluation match result and - if applicable - its advices.
+ * Class to represent {@link EntitlementCondition} evaluation match result and - if applicable - its advice.
  *
  * @supported.all.api
  */
 public class ConditionDecision {
 
     private final Map<String, Set<String>> responseAttributes;
-    private final Map<String, Set<String>> advices;
+    private final Map<String, Set<String>> advice;
     private final long timeToLive;
     private final boolean satisfied;
 
@@ -78,14 +78,14 @@ public class ConditionDecision {
     @Deprecated
     public ConditionDecision(boolean satisfied, Map<String, Set<String>> advices, long ttl) {
         this.satisfied = satisfied;
-        this.advices = new HashMap<>(advices);
+        this.advice = new HashMap<>(advices);
         this.responseAttributes = new HashMap<>();
         this.timeToLive = ttl;
     }
 
     private ConditionDecision(Builder builder) {
         satisfied = builder.satisfied;
-        advices = builder.advices;
+        advice = builder.advice;
         responseAttributes = builder.responseAttributes;
         timeToLive = builder.timeToLive;
     }
@@ -102,10 +102,10 @@ public class ConditionDecision {
     /**
      * Advices associated with this <code>ConditionDecision</code>.
      *
-     * @return advices of <code>ConditionDecision</code>.
+     * @return advice of <code>ConditionDecision</code>.
      */
-    public Map<String, Set<String>> getAdvices() {
-        return Collections.unmodifiableMap(advices);
+    public Map<String, Set<String>> getAdvice() {
+        return Collections.unmodifiableMap(advice);
     }
 
     /**
@@ -127,13 +127,13 @@ public class ConditionDecision {
     }
 
     /**
-     * Clears the current advices associated with this <code>ConditionDecision</code>.
+     * Clears the current advice associated with this <code>ConditionDecision</code>.
      * <p/>
      * Deprecated method as a given instance should be immutable.
      */
     @Deprecated
     public void clearAdvices() {
-        advices.clear();
+        advice.clear();
     }
 
     /**
@@ -142,15 +142,15 @@ public class ConditionDecision {
      * Deprecated method as a given instance should be immutable.
      *
      * @param decision
-     *         The <code>ConditionDecision</code> whose advices should be added to this
+     *         The <code>ConditionDecision</code> whose advice should be added to this
      *         <code>ConditionDecision</code>.
      */
     @Deprecated
     public void addAdvices(ConditionDecision decision) {
         if (decision != null) {
-            Map<String, Set<String>> otherAdvices = decision.getAdvices();
+            Map<String, Set<String>> otherAdvices = decision.getAdvice();
             if (otherAdvices != null && !otherAdvices.isEmpty()) {
-                advices.putAll(otherAdvices);
+                advice.putAll(otherAdvices);
             }
         }
     }
@@ -191,28 +191,28 @@ public class ConditionDecision {
     public static final class Builder {
 
         private final boolean satisfied;
-        private Map<String, Set<String>> advices;
+        private Map<String, Set<String>> advice;
         private Map<String, Set<String>> responseAttributes;
         private long timeToLive;
 
         private Builder(boolean success) {
             this.satisfied = success;
-            advices = new HashMap<>();
+            advice = new HashMap<>();
             responseAttributes = new HashMap<>();
             timeToLive = Long.MAX_VALUE;
         }
 
         /**
-         * Sets the advices.
+         * Sets the advice.
          *
-         * @param advices
-         *         the advices
+         * @param advice
+         *         the advice
          *
          * @return this builder instance
          */
-        public Builder setAdvices(Map<String, Set<String>> advices) {
-            Reject.ifNull(advices);
-            this.advices = advices;
+        public Builder setAdvice(Map<String, Set<String>> advice) {
+            Reject.ifNull(advice);
+            this.advice = advice;
             return this;
         }
 

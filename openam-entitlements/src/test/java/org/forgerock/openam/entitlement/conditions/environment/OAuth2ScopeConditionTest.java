@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.conditions.environment;
@@ -82,7 +82,7 @@ public class OAuth2ScopeConditionTest {
 
         //Then
         assertThat(decision.isSatisfied()).isFalse();
-        assertThat(decision.getAdvices()).isEmpty();
+        assertThat(decision.getAdvice()).isEmpty();
     }
 
     @Test
@@ -102,7 +102,7 @@ public class OAuth2ScopeConditionTest {
 
         //Then
         assertThat(decision.isSatisfied()).isFalse();
-        assertThat(decision.getAdvices()).isEmpty();
+        assertThat(decision.getAdvice()).isEmpty();
     }
 
     @Test
@@ -123,7 +123,7 @@ public class OAuth2ScopeConditionTest {
 
         //Then
         assertThat(decision.isSatisfied()).isFalse();
-        assertThat(decision.getAdvices()).isEmpty();
+        assertThat(decision.getAdvice()).isEmpty();
     }
 
     @Test
@@ -143,7 +143,7 @@ public class OAuth2ScopeConditionTest {
 
         //Then
         assertThat(decision.isSatisfied()).isTrue();
-        assertThat(decision.getAdvices()).isEmpty();
+        assertThat(decision.getAdvice()).isEmpty();
     }
 
     @Test
@@ -164,7 +164,7 @@ public class OAuth2ScopeConditionTest {
 
         //Then
         assertThat(decision.isSatisfied()).isTrue();
-        assertThat(decision.getAdvices()).isEmpty();
+        assertThat(decision.getAdvice()).isEmpty();
     }
 
     @Test
@@ -188,7 +188,7 @@ public class OAuth2ScopeConditionTest {
 
         //Then
         assertThat(decision.isSatisfied()).isFalse();
-        assertThat(decision.getAdvices()).isEmpty();
+        assertThat(decision.getAdvice()).isEmpty();
     }
 
     @Test
@@ -212,6 +212,6 @@ public class OAuth2ScopeConditionTest {
 
         //Then
         assertThat(decision.isSatisfied()).isTrue();
-        assertThat(decision.getAdvices()).isEmpty();
+        assertThat(decision.getAdvice()).isEmpty();
     }
 }

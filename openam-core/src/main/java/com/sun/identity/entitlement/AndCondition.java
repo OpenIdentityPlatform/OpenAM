@@ -82,19 +82,25 @@ public class AndCondition extends LogicalCondition {
                     .build();
         }
 
-        Map<String, Set<String>> advices = new HashMap<>();
+        Map<String, Set<String>> advice = new HashMap<>();
         Map<String, Set<String>> responseAttributes = new HashMap<>();
+        long ttl = Long.MAX_VALUE;
 
         for (EntitlementCondition condition : conditions) {
 
             ConditionDecision decision = condition.evaluate(realm, subject, resourceName, environment);
-            advices.putAll(decision.getAdvices());
+            advice.putAll(decision.getAdvice());
             responseAttributes.putAll(decision.getResponseAttributes());
+
+            if (decision.getTimeToLive() < ttl) {
+                ttl = decision.getTimeToLive();
+            }
 
             if (!decision.isSatisfied()) {
                 return ConditionDecision
                         .newFailureBuilder()
-                        .setAdvices(advices)
+                        .setAdvice(advice)
+                        .setResponseAttributes(responseAttributes)
                         .build();
             }
         }
@@ -102,6 +108,7 @@ public class AndCondition extends LogicalCondition {
         return ConditionDecision
                 .newSuccessBuilder()
                 .setResponseAttributes(responseAttributes)
+                .setTimeToLive(ttl)
                 .build();
     }
 

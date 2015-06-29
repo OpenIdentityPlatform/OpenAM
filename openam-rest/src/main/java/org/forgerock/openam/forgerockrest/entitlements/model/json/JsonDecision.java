@@ -56,4 +56,13 @@ public final class JsonDecision {
                 entitlement.getAdvices() : Collections.<String, Set<String>>emptyMap();
     }
 
+    /**
+     * Gets the TTL value.
+     *
+     * @return the TTL value.
+     */
+    public long getTTL() {
+        return entitlement.getTTL();
+    }
+
 }

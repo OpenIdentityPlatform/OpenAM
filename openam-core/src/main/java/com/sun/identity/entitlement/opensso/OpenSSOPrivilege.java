@@ -151,7 +151,7 @@ public class OpenSSOPrivilege extends Privilege {
         if (!conditionDecision.isSatisfied()) {
             Entitlement entitlement = new Entitlement(originalEntitlement.getApplicationName(),
                     originalEntitlement.getResourceName(), Collections.<String>emptySet());
-            entitlement.setAdvices(conditionDecision.getAdvices());
+            entitlement.setAdvices(conditionDecision.getAdvice());
             entitlement.setTTL(conditionDecision.getTimeToLive());
             return Arrays.asList(entitlement);
         }
@@ -173,7 +173,7 @@ public class OpenSSOPrivilege extends Privilege {
         for (String matchedResource : matchedResources) {
             Entitlement entitlement = new Entitlement(originalEntitlement.getApplicationName(),
                     matchedResource, originalEntitlement.getActionValues());
-            entitlement.setAdvices(conditionDecision.getAdvices());
+            entitlement.setAdvices(conditionDecision.getAdvice());
             entitlement.setAttributes(attributes);
             entitlement.setTTL(conditionDecision.getTimeToLive());
             results.add(entitlement);

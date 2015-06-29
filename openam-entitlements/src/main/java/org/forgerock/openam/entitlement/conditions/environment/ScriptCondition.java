@@ -17,6 +17,7 @@ package org.forgerock.openam.entitlement.conditions.environment;
 
 import static org.forgerock.json.fluent.JsonValue.field;
 import static org.forgerock.json.fluent.JsonValue.object;
+import static org.forgerock.openam.utils.CollectionUtils.transformMap;
 
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
@@ -47,12 +48,16 @@ import org.forgerock.openam.scripting.service.ScriptingService;
 import org.forgerock.openam.scripting.service.ScriptingServiceFactory;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
+import org.forgerock.util.promise.Function;
+import org.forgerock.util.promise.NeverThrowsException;
 
 import javax.script.Bindings;
 import javax.script.SimpleBindings;
 import javax.security.auth.Subject;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -63,6 +68,7 @@ import java.util.Set;
  */
 public class ScriptCondition extends EntitlementConditionAdaptor {
 
+    private static final ListToSetTransformation<String> LIST_TO_SET = new ListToSetTransformation<>();
     private static final String SCRIPT_ID = "scriptId";
 
     private final ScriptingServiceFactory<ScriptConfiguration> scriptingServiceFactory;
@@ -74,7 +80,8 @@ public class ScriptCondition extends EntitlementConditionAdaptor {
 
     public ScriptCondition() {
         scriptingServiceFactory = InjectorHolder.getInstance(
-                Key.get(new TypeLiteral<ScriptingServiceFactory<ScriptConfiguration>>() {}));
+                Key.get(new TypeLiteral<ScriptingServiceFactory<ScriptConfiguration>>() {
+                }));
         evaluator = InjectorHolder.getInstance(
                 Key.get(ScriptEvaluator.class, Names.named(ScriptContext.POLICY_CONDITION.name())));
         coreWrapper = InjectorHolder.getInstance(CoreWrapper.class);
@@ -121,16 +128,19 @@ public class ScriptCondition extends EntitlementConditionAdaptor {
             ScriptObject script = new ScriptObject(
                     configuration.getName(), configuration.getScript(), configuration.getLanguage());
 
-            Map<String, Set<String>> responseAttributes = new HashMap<>();
+            Map<String, List<String>> advice = new HashMap<>();
+            Map<String, List<String>> responseAttributes = new HashMap<>();
 
             Bindings scriptVariables = new SimpleBindings();
             scriptVariables.put("logger", PolicyConstants.DEBUG);
             scriptVariables.put("username", SubjectUtils.getPrincipalId(subject));
             scriptVariables.put("resourceURI", resourceName);
             scriptVariables.put("environment", environment);
+            scriptVariables.put("advice", advice);
             scriptVariables.put("responseAttributes", responseAttributes);
             scriptVariables.put("httpClient", getHttpClient(configuration.getLanguage()));
-            scriptVariables.put("authorised", Boolean.FALSE);
+            scriptVariables.put("authorized", Boolean.FALSE);
+            scriptVariables.put("ttl", Long.MAX_VALUE);
 
             SSOToken ssoToken = SubjectUtils.getSSOToken(subject);
 
@@ -141,11 +151,21 @@ public class ScriptCondition extends EntitlementConditionAdaptor {
             }
 
             evaluator.evaluateScript(script, scriptVariables);
-            boolean authorised = (Boolean)scriptVariables.get("authorised");
+            boolean authorized = (Boolean)scriptVariables.get("authorized");
 
+            if (!authorized) {
+                return ConditionDecision
+                        .newFailureBuilder()
+                        .setAdvice(transformMap(advice, LIST_TO_SET))
+                        .setResponseAttributes(transformMap(responseAttributes, LIST_TO_SET))
+                        .build();
+            }
+
+            long ttl = ((Number)scriptVariables.get("ttl")).longValue();
             return ConditionDecision
-                    .newBuilder(authorised)
-                    .setResponseAttributes(responseAttributes)
+                    .newSuccessBuilder()
+                    .setResponseAttributes(transformMap(responseAttributes, LIST_TO_SET))
+                    .setTimeToLive(ttl)
                     .build();
 
         } catch (ScriptException | javax.script.ScriptException | IdRepoException | SSOException ex) {
@@ -186,6 +206,16 @@ public class ScriptCondition extends EntitlementConditionAdaptor {
      */
     public void setScriptId(String scriptId) {
         this.scriptId = scriptId;
+    }
+
+    // Simple function to transform a list into a set.
+    private static final class ListToSetTransformation<T> implements Function<List<T>, Set<T>, NeverThrowsException> {
+
+        @Override
+        public Set<T> apply(List<T> list) {
+            return new HashSet<>(list);
+        }
+
     }
 
 }

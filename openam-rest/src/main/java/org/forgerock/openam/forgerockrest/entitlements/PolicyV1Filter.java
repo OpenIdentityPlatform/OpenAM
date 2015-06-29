@@ -84,9 +84,24 @@ public class PolicyV1Filter implements Filter {
      */
     @Override
     public void filterAction(ServerContext context, ActionRequest request,
-                             ResultHandler<JsonValue> handler, RequestHandler next) {
+                             final ResultHandler<JsonValue> handler, RequestHandler next) {
         // Forward onto next handler.
-        next.handleAction(context, request, handler);
+        next.handleAction(context, request, new ResultHandler<JsonValue>() {
+
+            @Override
+            public void handleResult(JsonValue jsonValue) {
+                for (JsonValue entry : jsonValue) {
+                    entry.remove("ttl");
+                }
+                handler.handleResult(jsonValue);
+            }
+
+            @Override
+            public void handleError(ResourceException e) {
+                handler.handleError(e);
+            }
+
+        });
     }
 
     /**

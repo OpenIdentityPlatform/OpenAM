@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.conditions.environment;
@@ -103,7 +103,7 @@ public class SessionConditionTest {
 
         //Then
         assertThat(decision.isSatisfied()).isTrue();
-        assertThat(decision.getAdvices()).isEmpty();
+        assertThat(decision.getAdvice()).isEmpty();
         assertThat(decision.getTimeToLive()).isEqualTo(Long.MAX_VALUE);
         verify(coreWrapper, never()).destroyToken(Matchers.<SSOToken>anyObject());
     }
@@ -131,7 +131,7 @@ public class SessionConditionTest {
 
         //Then
         assertThat(decision.isSatisfied()).isTrue();
-        assertThat(decision.getAdvices()).isEmpty();
+        assertThat(decision.getAdvice()).isEmpty();
         assertThat(decision.getTimeToLive()).isEqualTo(tokenCreationTime + (5 * 60000));
         verify(coreWrapper, never()).destroyToken(ssoToken);
     }
@@ -159,7 +159,7 @@ public class SessionConditionTest {
 
         //Then
         assertThat(decision.isSatisfied()).isFalse();
-        assertThat(decision.getAdvices()).containsOnly(entry(SESSION_CONDITION_ADVICE,
+        assertThat(decision.getAdvice()).containsOnly(entry(SESSION_CONDITION_ADVICE,
                 Collections.singleton(ADVICE_DENY)));
         assertThat(decision.getTimeToLive()).isEqualTo(Long.MAX_VALUE);
         verify(coreWrapper, never()).destroyToken(ssoToken);
@@ -191,7 +191,7 @@ public class SessionConditionTest {
         Set<String> expectedAdvice = new HashSet<String>();
         expectedAdvice.add(ADVICE_DENY);
         expectedAdvice.add(ADVICE_TERMINATE_SESSION);
-        assertThat(decision.getAdvices()).containsOnly(entry(SESSION_CONDITION_ADVICE, expectedAdvice));
+        assertThat(decision.getAdvice()).containsOnly(entry(SESSION_CONDITION_ADVICE, expectedAdvice));
         assertThat(decision.getTimeToLive()).isEqualTo(Long.MAX_VALUE);
         verify(coreWrapper).destroyToken(ssoToken);
     }
@@ -219,7 +219,7 @@ public class SessionConditionTest {
 
         //Then
         assertThat(decision.isSatisfied()).isTrue();
-        assertThat(decision.getAdvices()).isEmpty();
+        assertThat(decision.getAdvice()).isEmpty();
         assertThat(decision.getTimeToLive())
                 .isEqualTo(DateUtils.stringToDate(tokenCreationTime).getTime() + (5 * 60000));
         verify(coreWrapper, never()).destroyToken(ssoToken);
@@ -248,7 +248,7 @@ public class SessionConditionTest {
 
         //Then
         assertThat(decision.isSatisfied()).isFalse();
-        assertThat(decision.getAdvices()).containsOnly(entry(SESSION_CONDITION_ADVICE,
+        assertThat(decision.getAdvice()).containsOnly(entry(SESSION_CONDITION_ADVICE,
                 Collections.singleton(ADVICE_DENY)));
         assertThat(decision.getTimeToLive()).isEqualTo(Long.MAX_VALUE);
         verify(coreWrapper, never()).destroyToken(ssoToken);
@@ -280,7 +280,7 @@ public class SessionConditionTest {
         Set<String> expectedAdvice = new HashSet<String>();
         expectedAdvice.add(ADVICE_DENY);
         expectedAdvice.add(ADVICE_TERMINATE_SESSION);
-        assertThat(decision.getAdvices()).containsOnly(entry(SESSION_CONDITION_ADVICE, expectedAdvice));
+        assertThat(decision.getAdvice()).containsOnly(entry(SESSION_CONDITION_ADVICE, expectedAdvice));
         assertThat(decision.getTimeToLive()).isEqualTo(Long.MAX_VALUE);
         verify(coreWrapper).destroyToken(ssoToken);
     }
