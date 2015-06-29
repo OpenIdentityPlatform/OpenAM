@@ -1,4 +1,4 @@
-/*
+/**
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -14,17 +14,14 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global, define*/
-define('org/forgerock/openam/ui/admin/views/realms/policies/PoliciesView', [
-    'org/forgerock/commons/ui/common/main/AbstractView',
-    'org/forgerock/openam/ui/common/util/RedirectToLegacyConsole'
-], function (AbstractView, RedirectToLegacyConsole) {
-    var PoliciesView = AbstractView.extend({
-        template: 'templates/admin/views/realms/policies/PoliciesTemplate.html',
-        render: function (args, callback) {
-            RedirectToLegacyConsole.realm.policies();
-        }
+/*global define*/
+define("org/forgerock/openam/ui/admin/models/policies/ApplicationModel", [
+    "backbone",
+    // TODO: switch to 'org/forgerock/openam/ui/common/util/URLHelper' after PE and SE are deleted
+    "org/forgerock/openam/ui/uma/util/URLHelper"
+], function (Backbone, URLHelper) {
+    return Backbone.Model.extend({
+        idAttribute: "name",
+        urlRoot: URLHelper.substitute("__api__/applications")
     });
-
-    return PoliciesView;
 });

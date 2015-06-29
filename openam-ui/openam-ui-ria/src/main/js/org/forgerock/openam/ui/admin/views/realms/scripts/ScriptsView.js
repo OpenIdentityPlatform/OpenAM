@@ -16,30 +16,30 @@
 
 /*global define*/
 
-define('org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView', [
-    'jquery',
-    'underscore',
-    'backbone',
-    'backgrid',
-    'org/forgerock/commons/ui/common/components/Messages',
-    'org/forgerock/commons/ui/common/main/AbstractView',
-    'org/forgerock/commons/ui/common/main/EventManager',
-    'org/forgerock/commons/ui/common/main/Router',
-    'org/forgerock/commons/ui/common/util/Constants',
-    'org/forgerock/commons/ui/common/util/UIUtils',
+define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
+    "jquery",
+    "underscore",
+    "backbone",
+    "backgrid",
+    "org/forgerock/commons/ui/common/components/Messages",
+    "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/util/UIUtils",
     // TODO: switch to 'org/forgerock/openam/ui/common/util/URLHelper' after PE and SE are deleted
-    'org/forgerock/openam/ui/uma/util/URLHelper',
-    'org/forgerock/openam/ui/common/util/BackgridUtils',
-    'org/forgerock/openam/ui/admin/models/scripts/ScriptModel'
+    "org/forgerock/openam/ui/uma/util/URLHelper",
+    "org/forgerock/openam/ui/common/util/BackgridUtils",
+    "org/forgerock/openam/ui/admin/models/scripts/ScriptModel"
 ], function ($, _, Backbone, Backgrid, Messages, AbstractView, EventManager, Router, Constants, UIUtils, URLHelper, BackgridUtils, Script) {
 
     return AbstractView.extend({
-        template: 'templates/admin/views/realms/scripts/ScriptListTemplate.html',
-        toolbarTemplate: 'templates/admin/views/realms/scripts/ScriptListBtnToolbarTemplate.html',
+        template: "templates/admin/views/realms/scripts/ScriptsTemplate.html",
+        toolbarTemplate: "templates/admin/views/realms/scripts/ScriptsToolbarTemplate.html",
         events: {
-            'click #addNewScript': 'addNewScript',
-            'keyup #addNewScript': 'addNewScript',
-            'click #deleteRecords': 'deleteRecords'
+            "click #addNewScript": "addNewScript",
+            "keyup #addNewScript": "addNewScript",
+            "click #deleteRecords": "deleteRecords"
         },
 
         render: function (args, callback) {
@@ -48,14 +48,13 @@ define('org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView', [
                 grid,
                 paginator,
                 ClickableRow,
-                FilterHeaderCell = BackgridUtils.FilterHeaderCell.extend({title: 'console.scripts.list.grid.filterBy'}),
                 Scripts;
 
             this.realmLocation = args[0];
             this.data.selectedUUIDs = [];
 
             Scripts = Backbone.PageableCollection.extend({
-                url: URLHelper.substitute('__api__/scripts'),
+                url: URLHelper.substitute("__api__/scripts"),
                 model: Script,
                 state: BackgridUtils.getState(),
                 queryParams: BackgridUtils.getQueryParams(),
@@ -66,38 +65,38 @@ define('org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView', [
 
             columns = [
                 {
-                    name: '',
-                    cell: 'select-row',
-                    headerCell: 'select-all'
+                    name: "",
+                    cell: "select-row",
+                    headerCell: "select-all"
                 },
                 {
-                    name: 'name',
-                    label: $.t('console.scripts.list.grid.headers.0'),
-                    cell: 'string',
-                    headerCell: FilterHeaderCell,
+                    name: "name",
+                    label: $.t("console.scripts.list.grid.headers.0"),
+                    cell: "string",
+                    headerCell: BackgridUtils.FilterHeaderCell,
                     sortType: "toggle",
                     editable: false
                 },
                 {
-                    name: 'context',
-                    label: $.t('console.scripts.list.grid.headers.1'),
-                    cell: 'string',
-                    headerCell: FilterHeaderCell,
-                    sortType: 'toggle',
+                    name: "context",
+                    label: $.t("console.scripts.list.grid.headers.1"),
+                    cell: "string",
+                    headerCell: BackgridUtils.FilterHeaderCell,
+                    sortType: "toggle",
                     editable: false
                 },
                 {
-                    name: 'language',
-                    label: $.t('console.scripts.list.grid.headers.2'),
-                    cell: 'string',
-                    headerCell: FilterHeaderCell,
-                    sortType: 'toggle',
+                    name: "language",
+                    label: $.t("console.scripts.list.grid.headers.2"),
+                    cell: "string",
+                    headerCell: BackgridUtils.FilterHeaderCell,
+                    sortType: "toggle",
                     editable: false
                 },
                 {
-                    name: 'description',
-                    label: $.t('console.scripts.list.grid.headers.3'),
-                    cell: 'string',
+                    name: "description",
+                    label: $.t("console.scripts.list.grid.headers.3"),
+                    cell: "string",
                     sortable: false,
                     editable: false
                 }
@@ -107,7 +106,7 @@ define('org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView', [
                 callback: function (e) {
                     var $target = $(e.target);
 
-                    if ($target.is('input') || $target.is('.select-row-cell')) {
+                    if ($target.is("input") || $target.is(".select-row-cell")) {
                         return;
                     }
 
@@ -120,17 +119,18 @@ define('org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView', [
 
             this.data.scripts = new Scripts();
 
-            this.data.scripts.on('backgrid:selected', function (model, selected) {
+            this.data.scripts.on("backgrid:selected", function (model, selected) {
                 self.onRowSelect(model, selected);
             });
 
-            this.data.scripts.on('backgrid:sort', BackgridUtils.doubleSortFix);
+            this.data.scripts.on("backgrid:sort", BackgridUtils.doubleSortFix);
 
             grid = new Backgrid.Grid({
                 columns: columns,
                 row: ClickableRow,
                 collection: self.data.scripts,
-                emptyText: $.t('console.scripts.list.grid.noResults')
+                className: "backgrid table",
+                emptyText: $.t("console.scripts.list.grid.noResults")
             });
 
             paginator = new Backgrid.Extension.Paginator({
@@ -141,8 +141,8 @@ define('org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView', [
             this.parentRender(function () {
                 this.renderToolbar();
 
-                this.$el.find('#backgridContainer').append(grid.render().el);
-                this.$el.find('#paginationContainer').append(paginator.render().el);
+                this.$el.find("#backgridContainer").append(grid.render().el);
+                this.$el.find("#paginationContainer").append(paginator.render().el);
 
                 this.data.scripts.fetch({reset: true});
 
@@ -163,16 +163,16 @@ define('org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView', [
                     self.data.scripts.fetch({reset: true});
 
                     UIUtils.fillTemplateWithData(self.toolbarTemplate, self.data, function (tpl) {
-                        self.$el.find('#gridToolbar').html(tpl);
+                        self.$el.find("#gridToolbar").html(tpl);
                     });
                 },
                 onSuccess = function (model, response, options) {
                     onDestroy();
-                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, 'scriptDeleted');
+                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                 },
                 onError = function (model, response, options) {
                     onDestroy();
-                    Messages.messages.addMessage({message: response.responseJSON.message, type: 'error'});
+                    Messages.messages.addMessage({message: response.responseJSON.message, type: "error"});
                 };
 
             for (; i < this.data.selectedUUIDs.length; i++) {
@@ -198,11 +198,11 @@ define('org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView', [
         },
 
         renderToolbar: function () {
-            this.$el.find('#gridToolbar').html(UIUtils.fillTemplateWithData(this.toolbarTemplate, this.data));
+            this.$el.find("#gridToolbar").html(UIUtils.fillTemplateWithData(this.toolbarTemplate, this.data));
         },
 
         addNewScript: function (e) {
-            if (e.type === 'keyup' && e.keyCode !== 13) {
+            if (e.type === "keyup" && e.keyCode !== 13) {
                 return;
             }
 

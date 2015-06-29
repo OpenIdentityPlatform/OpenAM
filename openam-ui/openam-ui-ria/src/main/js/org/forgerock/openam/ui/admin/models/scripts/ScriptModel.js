@@ -15,33 +15,33 @@
  */
 
 /*global define*/
-define('org/forgerock/openam/ui/admin/models/scripts/ScriptModel', [
-    'backbone',
-    'org/forgerock/commons/ui/common/components/Messages',
-    'org/forgerock/commons/ui/common/util/Base64',
+define("org/forgerock/openam/ui/admin/models/scripts/ScriptModel", [
+    "backbone",
+    "org/forgerock/commons/ui/common/components/Messages",
+    "org/forgerock/commons/ui/common/util/Base64",
     // TODO: switch to 'org/forgerock/openam/ui/common/util/URLHelper' after PE and SE are deleted
-    'org/forgerock/openam/ui/uma/util/URLHelper'
+    "org/forgerock/openam/ui/uma/util/URLHelper"
 ], function (Backbone, Messages, Base64, URLHelper) {
     return Backbone.Model.extend({
-        idAttribute: '_id',
-        urlRoot: URLHelper.substitute('__api__/scripts'),
+        idAttribute: "_id",
+        urlRoot: URLHelper.substitute("__api__/scripts"),
         defaults: function () {
             return {
                 _id: null,
-                name: '',
-                script: '',
-                language: '',
-                context: ''
+                name: "",
+                script: "",
+                language: "",
+                context: ""
             };
         },
 
         validate: function (attrs, options) {
-            if (attrs.name.trim() === '') {
-                return 'scriptErrorNoName';
+            if (attrs.name.trim() === "") {
+                return "scriptErrorNoName";
             }
 
-            if (attrs.language === '') {
-                return 'scriptErrorNoLanguage';
+            if (attrs.language === "") {
+                return "scriptErrorNoLanguage";
             }
         },
 
@@ -54,24 +54,24 @@ define('org/forgerock/openam/ui/admin/models/scripts/ScriptModel', [
 
         sync: function (method, model, options) {
             options.beforeSend = function (xhr) {
-                xhr.setRequestHeader('Accept-API-Version', 'protocol=1.0,resource=1.0');
+                xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=1.0");
             };
 
             options.error = function (response) {
                 Messages.messages.addMessage({
-                    type: 'error',
+                    type: "error",
                     message: JSON.parse(response.responseText).message
                 });
             };
 
             method = method.toLowerCase();
-            if (method === 'create') {
+            if (method === "create") {
                 options = options || {};
-                options.url = this.urlRoot() + '/?_action=create';
+                options.url = this.urlRoot() + "/?_action=create";
             }
 
-            if (method === 'create' || method === 'update') {
-                model.set('script', Base64.encodeUTF8(model.get('script')));
+            if (method === "create" || method === "update") {
+                model.set("script", Base64.encodeUTF8(model.get("script")));
             }
 
             return Backbone.Model.prototype.sync.call(this, method, model, options);

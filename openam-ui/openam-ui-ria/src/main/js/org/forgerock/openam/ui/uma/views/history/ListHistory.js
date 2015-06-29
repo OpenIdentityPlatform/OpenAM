@@ -66,7 +66,6 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
                     name: "requestingPartyId",
                     label: $.t("uma.history.grid.header.0"),
                     headerCell: BackgridUtils.FilterHeaderCell.extend({
-                        title: 'uma.resources.all.grid.filter',
                         addClassName: "col-md-4"
                     }),
                     cell: 'string',
@@ -76,7 +75,6 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
                     name: "resourceSetName",
                     label: $.t("uma.history.grid.header.1"),
                     headerCell: BackgridUtils.FilterHeaderCell.extend({
-                        title: 'uma.resources.all.grid.filter',
                         addClassName: "col-md-4"
                     }),
                     cell: BackgridUtils.UriExtCell,

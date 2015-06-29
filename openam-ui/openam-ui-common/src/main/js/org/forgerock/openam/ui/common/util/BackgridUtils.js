@@ -34,28 +34,58 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
      * Displays human friendly date time text (e.g. 4 "hours ago") with a tooltip of the exact time
      */
     obj.DatetimeAgoCell = Backgrid.Cell.extend({
-        className: 'date-time-ago-cell',
+        className: "date-time-ago-cell",
         formatter: {
-            fromRaw: function(rawData, model) {
+            fromRaw: function (rawData, model) {
                 return moment(rawData).fromNow();
             }
         },
-        render: function() {
+        render: function () {
             obj.DatetimeAgoCell.__super__.render.apply(this);
-            this.$el.attr('title', moment(this.model.get(this.column.get('name'))).format('Do MMMM YYYY, h:mm:ssa'));
+            this.$el.attr("title", moment(this.model.get(this.column.get("name"))).format("Do MMMM YYYY, h:mm:ssa"));
+            return this;
+        }
+    });
+
+    obj.ArrayCell = Backgrid.Cell.extend({
+        className: "array-formatter-cell",
+
+        buildHtml: function (arrayVal) {
+            var result = "<ul>",
+                i = 0;
+
+            for (; i < arrayVal.length; i++) {
+                if (_.isString(arrayVal[i])) {
+                    result += "<li>" + arrayVal[i] + "</li>";
+                } else {
+                    result += "<li>" + JSON.stringify(arrayVal[i]) + "</li>";
+                }
+            }
+            result += "</ul>";
+
+            return result;
+        },
+
+        render: function () {
+            this.$el.empty();
+
+            var arrayVal = this.model.get(this.column.attributes.name);
+            this.$el.append(this.buildHtml(arrayVal));
+
+            this.delegateEvents();
             return this;
         }
     });
 
     obj.UniversalIdToUsername = Backgrid.Cell.extend({
         formatter: {
-            fromRaw: function(rawData, model) {
-                return rawData.substring(3,rawData.indexOf(',ou=user'));
+            fromRaw: function (rawData, model) {
+                return rawData.substring(3, rawData.indexOf(",ou=user"));
             }
         },
-        render: function() {
+        render: function () {
             obj.UniversalIdToUsername.__super__.render.apply(this);
-            this.$el.attr('title', this.model.get(this.column.get('name')));
+            this.$el.attr("title", this.model.get(this.column.get("name")));
             return this;
         }
     });
@@ -71,7 +101,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
      */
     obj.ClickableRow = Backgrid.Row.extend({
         events: {
-            "click": 'onClick'
+            "click": "onClick"
         },
 
         onClick: function (e) {
@@ -91,7 +121,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
      * });
      */
     obj.TemplateCell = Backgrid.Cell.extend({
-        className: 'template-cell',
+        className: "template-cell",
         render: function () {
             UIUtils.renderTemplate(this.template, this.$el);
             this.delegateEvents();
@@ -111,13 +141,14 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
 
     obj.UriExtCell = Backgrid.UriCell.extend({
         events: {
-            'click': 'gotoUrl'
+            "click": "gotoUrl"
         },
         render: function () {
             this.$el.empty();
             var rawValue = this.model.get(this.column.get("name")),
                 formattedValue = this.formatter.fromRaw(rawValue, this.model),
-                href = _.isFunction(this.column.get("href")) ? this.column.get('href')(rawValue, formattedValue, this.model) : this.column.get('href');
+                href = _.isFunction(this.column.get("href")) ?
+                    this.column.get("href")(rawValue, formattedValue, this.model) : this.column.get('href');
 
             this.$el.append($("<a>", {
                 href: href || rawValue,
@@ -125,28 +156,28 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
             }).text(formattedValue));
 
             if (href) {
-                this.$el.data('href', href);
-                this.$el.prop('title', this.title || formattedValue);
+                this.$el.data("href", href);
+                this.$el.prop("title", this.title || formattedValue);
             }
 
             this.delegateEvents();
             return this;
         },
 
-        gotoUrl: function(e){
+        gotoUrl: function (e) {
             e.preventDefault();
-            var href = $(e.currentTarget).data('href');
-            Router.navigate( href, {trigger: true});
+            var href = $(e.currentTarget).data("href");
+            Router.navigate(href, {trigger: true});
         }
 
     });
 
     obj.FilterHeaderCell = Backgrid.HeaderCell.extend({
-        className: 'filter-header-cell',
+        className: "filter-header-cell",
         render: function () {
             var filter = new Backgrid.Extension.ServerSideFilter({
-                name: this.column.get('name'),
-                placeholder: $.t(this.title, { header: this.column.get('label') }),
+                name: this.column.get("name"),
+                placeholder: $.t("common.form.filter"),
                 collection: this.collection
             });
 
@@ -157,20 +188,31 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
             this.collection.state.filters = this.collection.state.filters ? this.collection.state.filters : [];
             this.collection.state.filters.push(filter);
             obj.FilterHeaderCell.__super__.render.apply(this);
-            this.$el.append(filter.render().el);
+            this.$el.prepend(filter.render().el);
             return this;
         }
     });
 
-    obj.queryFilter = function () {
-        var params = [];
-        _.each(this.state.filters, function(filter){
+    obj.queryFilter = function (data) {
+        var params = [],
+            getFilter = (function () {
+                return data && data.filterName && data.filterName === "eq" ?
+                    function (filterName, filterQuery) {
+                        // Policies endpoints do not support 'co', so we emulate it using 'eq' and wildcards
+                        return filterName + "+eq+" + encodeURIComponent('"*' + filterQuery + '*"');
+                    } :
+                    function (filterName, filterQuery) {
+                        return filterName + "+co+" + encodeURIComponent('"' + filterQuery + '"');
+                    };
+            }());
+
+        _.each(this.state.filters, function (filter) {
             if (filter.query() !== '') {
-                // FIXME: No server side support for 'co' ATM, this is effectively an 'eq'
-                params.push( filter.name + '+co+' + encodeURIComponent('"' +filter.query() + '"') );
+                params.push(getFilter(filter.name, filter.query()));
             }
         });
-        return params.length === 0 ? true : params.join('+AND+');
+
+        return params.length === 0 ? true : params.join("+AND+");
     };
 
     obj.parseState = function (resp, queryParams, state, options) {
@@ -187,37 +229,40 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
         return (this.state.currentPage - 1) * this.state.pageSize;
     };
 
-    obj.sortKeys = function() {
-        return this.state.order === 1 ? '-' + this.state.sortKey : this.state.sortKey;
+    obj.sortKeys = function () {
+        return this.state.order === 1 ? "-" + this.state.sortKey : this.state.sortKey;
     };
 
     obj.sync = function (method, model, options) {
         var params = [],
-            includeList = ['_pageSize', '_pagedResultsOffset', '_sortKeys'];
+            includeList = ["_pageSize", "_pagedResultsOffset", "_sortKeys"];
 
         // TODO: UMA: Workaround as resource set end point requires a _queryId=* to indicate a blank query,
         // while the historyAudit end point requires a _queryFilter=true to indicate a blank query.
-        if (options.data._queryId === '*' && options.data._queryFilter === true) {
-            includeList.push('_queryId');
+        if (options.data._queryId === "*" && options.data._queryFilter === true) {
+            includeList.push("_queryId");
         } else {
-            includeList.push('_queryFilter');
+            includeList.push("_queryFilter");
         }
 
         _.forIn(options.data, function (val, key) {
             if (_.include(includeList, key)) {
-                params.push(key + '=' + val);
+                params.push(key + "=" + val);
             }
         });
 
-        options.data = params.join('&');
+        options.data = params.join("&");
         options.processData = false;
-        options.beforeSend = function (xhr) {
-            xhr.setRequestHeader('Accept-API-Version', 'protocol=1.0,resource=1.0');
-        };
+
+        if (!options.beforeSend) {
+            options.beforeSend = function (xhr) {
+                xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=1.0");
+            };
+        }
 
         options.error = function (response) {
             Messages.messages.addMessage({
-                type: 'error',
+                type: "error",
                 message: JSON.parse(response.responseText).message
             });
         };
@@ -235,7 +280,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
         return {
             _sortKeys: this.sortKeys,
             _queryFilter: function () {
-                return obj.queryFilter.call(this, data._queryFilter);
+                return obj.queryFilter.call(this, data);
             },
             pageSize: "_pageSize",
             _pagedResultsOffset: this.pagedResultsOffset
@@ -244,15 +289,15 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
 
     // FIXME: Workaround to fix "Double sort indicators" issue
     // @see https://github.com/wyuenho/backgrid/issues/453
-    obj.doubleSortFix = function(model) {
+    obj.doubleSortFix = function (model) {
         // No ids so identify model with CID
         var cid = model.cid,
-            filtered = model.collection.filter(function(model) {
+            filtered = model.collection.filter(function (model) {
                 return model.cid !== cid;
             });
 
-        _.each(filtered, function(model) {
-            model.set('direction', null);
+        _.each(filtered, function (model) {
+            model.set("direction", null);
         });
     };
 
@@ -262,7 +307,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
             sortKey: "name"
         };
 
-        if (data && typeof data === 'object') {
+        if (data && typeof data === "object") {
             _.extend(state, data);
         }
         return state;

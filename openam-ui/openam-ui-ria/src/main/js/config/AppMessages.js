@@ -25,12 +25,31 @@
 /*global define*/
 
 define("config/AppMessages", [
-], function() {
+], function () {
     return {
+        /**
+         * Common Messages.
+         */
         "invalidRealm": {
             msg: "config.messages.AppMessages.invalidRealm",
             type: "error"
         },
+        "duplicateRealm": {
+            msg: "config.messages.AppMessages.duplicateRealm",
+            type: "error"
+        },
+        "deleteFail": {
+            msg: "config.messages.AppMessages.deleteFail",
+            type: "error"
+        },
+        "changesSaved": {
+            msg: "config.messages.AppMessages.changesSaved",
+            type: "info"
+        },
+
+        /**
+         * UMA Messages.
+         */
         "policyCreatedSuccess": {
             msg: "uma.share.messages.success",
             type: "info"
@@ -63,18 +82,10 @@ define("config/AppMessages", [
             msg: "uma.resources.show.revokePolicyFail",
             type: "error"
         },
-        "scriptCreated": {
-            msg: "config.messages.AdminMessages.scripts.scriptCreated",
-            type: "info"
-        },
-        "scriptUpdated": {
-            msg: "config.messages.AdminMessages.scripts.scriptUpdated",
-            type: "info"
-        },
-        "scriptDeleted": {
-            msg: "config.messages.AdminMessages.scripts.scriptDeleted",
-            type: "info"
-        },
+
+        /**
+         * Scripts messages.
+         */
         "scriptErrorNoName": {
             msg: "config.messages.AdminMessages.scripts.error.noName",
             type: "error"
@@ -83,5 +94,10 @@ define("config/AppMessages", [
             msg: "config.messages.AdminMessages.scripts.error.noLanguage",
             type: "error"
         }
+
+        /**
+         * Policies messages.
+         */
+        // TODO policy messages will go here
     };
 });

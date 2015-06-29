@@ -112,7 +112,6 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
                     label: $.t("uma.resources.list.grid.0"),
                     cell: BackgridUtils.UriExtCell,
                     headerCell: BackgridUtils.FilterHeaderCell.extend({
-                        title: 'uma.resources.all.grid.filter',
                         addClassName: "col-md-5"
                     }),
                     href: function(rawValue, formattedValue, model){

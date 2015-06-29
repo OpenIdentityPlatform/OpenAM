@@ -8,7 +8,12 @@
         },
         "messages" : {
             "AppMessages" : {
-                "invalidRealm": "The realm doesn't exist"
+                "invalidRealm": "The realm doesn't exist",
+                "duplicateRealm": "Duplicate realm",
+                "deleteFail": "Failed to delete",
+                "duplicateItem": "Duplicate item",
+                "invalidItem": "Invalid item",
+                "changesSaved": "Changes saved"
             },
             "CommonMessages" : {
                 "authenticationFailed" : "User name/password combination is invalid.",
@@ -59,13 +64,22 @@
                 "unclaimedTask" : "Task has been unclaimed.",
                 "startedProcess" : "Process has been started",
                 "scripts": {
-                    "scriptCreated": "Script created successfully",
-                    "scriptUpdated": "Script updated successfully",
-                    "scriptDeleted": "Script deleted successfully",
                     "error": {
                         "noName": "Name is required",
                         "noLanguage": "Language is required"
                     }
+                },
+                "policies": {
+                    "ruleErrorFullLogical": "The parent logical container can only accept one child.",
+                    "ruleHelperTryAndOr": "If more than one child is required, try changing<br>the type, or adding a child of type AND or OR.",
+                    "unableToRetrievePolicy": "Unable to retrieve policy",
+                    "invalidResource": "Invalid resource",
+                    "duplicateResource": "Duplicate resource",
+                    "duplicateAttribute": "Duplicate attribute",
+                    "unableToPersistPolicy": "Unable to persist policy in datastore",
+                    "policiesUploaded": "Policies uploaded successfully",
+                    "policiesUploadFailed": "Failed to upload policies",
+                    "importFailed": "Import Failed: __applicationName__ application not found in realm"
                 }
             }
         },
@@ -274,6 +288,7 @@
             "change": "Change",
             "upload": "Upload",
             "validate": "Validate",
+            "filter": "Filter...",
             "copyright" : "Copyright &copy; 2010-15 ForgeRock AS. All rights reserved.",
             "sessionExpired" : "Session Expired",
             "enableCookies" : "Cookies must be enabled to login",
@@ -465,11 +480,6 @@
             "advanced" : "Advanced"
         },
         "resources": {
-            "all": {
-                "grid": {
-                    "filter": "Filter by __header__"
-                }
-            },
             "list": {
                 "title": "Resources",
                 "subtitle": "All your shared resources",
@@ -623,11 +633,24 @@
             },
             "list": {
                 "title": "Scripts List",
-                "addNew": "Add New Script",
-                "deleteSelected": "Delete Selected",
+                "addNew": "New Script",
                 "grid": {
                     "headers": ["Name", "Script Type", "Language", "Description"],
-                    "filterBy": "Filter by __header__",
+                    "noResults": "No results to display"
+                }
+            }
+        },
+        "policies": {
+            "applications":{
+                "edit": {
+
+                },
+                "list": {
+                    "addNew": "New Application",
+                    "importPolicies": "Import Policies",
+                    "exportPolicies": "Export Policies",
+                    "title": "Applications",
+                    "grid": ["Name", "Description", "Resource Types"],
                     "noResults": "No results to display"
                 }
             }
