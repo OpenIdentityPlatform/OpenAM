@@ -67,8 +67,8 @@ public class ScriptingSchemaStep extends AbstractUpgradeStep {
     private static final String SERVER_SIDE_SCRIPT = "iplanet-am-auth-scripted-server-script";
     private static final String SERVER_SCRIPT_TYPE = "iplanet-am-auth-scripted-script-type";
 
-    private final Map<ScriptContext, Map<String, String>> globalSchemaKeys = new HashMap<>();
-    private final Map<ScriptContext, Map<String, Set<String>>> contextEngineConfigurations = new HashMap<>();
+    private final Map<String, String> globalSchemaKeys = new HashMap<>();
+    private final Map<String, Set<String>> contextEngineConfigurations = new HashMap<>();
     private final Map<GlobalScript, Map<String, Set<String>>> globalScriptConfigurations = new HashMap<>();
 
     @Inject
@@ -76,16 +76,14 @@ public class ScriptingSchemaStep extends AbstractUpgradeStep {
                                @DataLayer(ConnectionType.DATA_LAYER) ConnectionFactory connectionFactory) {
 
         super(adminTokenAction, connectionFactory);
-        Map<String, String> attributeKeys = new HashMap<>();
-        attributeKeys.put("iplanet-am-auth-scripted-server-timeout", SCRIPT_TIMEOUT);
-        attributeKeys.put("iplanet-am-auth-scripted-core-threads", THREAD_POOL_CORE_SIZE);
-        attributeKeys.put("iplanet-am-auth-scripted-max-threads", THREAD_POOL_MAX_SIZE);
-        attributeKeys.put("iplanet-am-auth-scripted-queue-size", THREAD_POOL_QUEUE_SIZE);
-        attributeKeys.put("iplanet-am-auth-scripted-idle-timeout", THREAD_POOL_IDLE_TIMEOUT);
-        attributeKeys.put("iplanet-am-auth-scripted-white-list", WHITE_LIST);
-        attributeKeys.put("iplanet-am-auth-scripted-black-list", BLACK_LIST);
-        attributeKeys.put("iplanet-am-auth-scripted-use-security-manager", USE_SECURITY_MANAGER);
-        globalSchemaKeys.put(ScriptContext.AUTHENTICATION_SERVER_SIDE, attributeKeys);
+        globalSchemaKeys.put("iplanet-am-auth-scripted-server-timeout", SCRIPT_TIMEOUT);
+        globalSchemaKeys.put("iplanet-am-auth-scripted-core-threads", THREAD_POOL_CORE_SIZE);
+        globalSchemaKeys.put("iplanet-am-auth-scripted-max-threads", THREAD_POOL_MAX_SIZE);
+        globalSchemaKeys.put("iplanet-am-auth-scripted-queue-size", THREAD_POOL_QUEUE_SIZE);
+        globalSchemaKeys.put("iplanet-am-auth-scripted-idle-timeout", THREAD_POOL_IDLE_TIMEOUT);
+        globalSchemaKeys.put("iplanet-am-auth-scripted-white-list", WHITE_LIST);
+        globalSchemaKeys.put("iplanet-am-auth-scripted-black-list", BLACK_LIST);
+        globalSchemaKeys.put("iplanet-am-auth-scripted-use-security-manager", USE_SECURITY_MANAGER);
     }
 
     @Override
@@ -132,12 +130,8 @@ public class ScriptingSchemaStep extends AbstractUpgradeStep {
         DEBUG.message("Capture global schema attributes for {}", AUTH_MODULE_SERVICE_NAME);
         @SuppressWarnings("unchecked")
         Map<String, Set<String>> schemaAttributes = globalSchema.getAttributeDefaults();
-        for (Map.Entry<ScriptContext, Map<String, String>> contextEntry : globalSchemaKeys.entrySet()) {
-            Map<String, Set<String>> engineAttributes = new HashMap<>();
-            for (Map.Entry<String, String> attributeEntry : contextEntry.getValue().entrySet()) {
-                engineAttributes.put(attributeEntry.getValue(), schemaAttributes.get(attributeEntry.getKey()));
-            }
-            contextEngineConfigurations.put(contextEntry.getKey(), engineAttributes);
+        for (Map.Entry<String, String> attributeEntry : globalSchemaKeys.entrySet()) {
+            contextEngineConfigurations.put(attributeEntry.getValue(), schemaAttributes.get(attributeEntry.getKey()));
         }
     }
 
@@ -212,15 +206,28 @@ public class ScriptingSchemaStep extends AbstractUpgradeStep {
     }
 
     private void upgradeEngineConfiguration(ServiceConfig globalConfig) throws SMSException, SSOException {
-        for (Map.Entry<ScriptContext, Map<String, Set<String>>> entry : contextEngineConfigurations.entrySet()) {
-            String contextName = entry.getKey().name();
-            DEBUG.message("Upgrading engine configuration for script context: {}", contextName);
-            UpgradeProgress.reportStart("upgrade.scripting.global.engine.start", contextName);
-            ServiceConfig contextConfig = globalConfig.getSubConfig(contextName);
-            ServiceConfig engineConfig = contextConfig.getSubConfig("engineConfiguration");
-            engineConfig.setAttributes(entry.getValue());
-            DEBUG.message("Saved engine configuration: {}", entry.getValue().toString());
-            UpgradeProgress.reportEnd("upgrade.success");
+        replaceObsoleteWhiteListEntries();
+        String contextName = AUTHENTICATION_SERVER_SIDE.name();
+        DEBUG.message("Upgrading engine configuration for script context: {}", contextName);
+        UpgradeProgress.reportStart("upgrade.scripting.global.engine.start", contextName);
+        ServiceConfig contextConfig = globalConfig.getSubConfig(contextName);
+        ServiceConfig engineConfig = contextConfig.getSubConfig("engineConfiguration");
+        engineConfig.setAttributes(contextEngineConfigurations);
+        DEBUG.message("Saved engine configuration: {}", contextEngineConfigurations.toString());
+        UpgradeProgress.reportEnd("upgrade.success");
+    }
+
+    private void replaceObsoleteWhiteListEntries() {
+        Set<String> whiteList = contextEngineConfigurations.get(WHITE_LIST);
+        if (whiteList != null) {
+            if (whiteList.remove("org.forgerock.openam.authentication.modules.scripted.http.*")) {
+                whiteList.add("org.forgerock.openam.scripting.api.http.GroovyHttpClient");
+                whiteList.add("org.forgerock.openam.scripting.api.http.JavaScriptHttpClient");
+            }
+            if (whiteList.contains("org.forgerock.openam.authentication.modules.scripted.*")) {
+                whiteList.add("org.forgerock.openam.scripting.api.ScriptedIdentity");
+                whiteList.add("org.forgerock.openam.scripting.api.ScriptedSession");
+            }
         }
     }
 
