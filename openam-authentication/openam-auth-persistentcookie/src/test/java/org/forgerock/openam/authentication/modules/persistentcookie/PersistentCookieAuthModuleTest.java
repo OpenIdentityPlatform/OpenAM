@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.authentication.modules.persistentcookie;
@@ -111,8 +111,8 @@ public class PersistentCookieAuthModuleTest {
         assertEquals(config.get(JwtSessionModule.KEYSTORE_TYPE_KEY), "KEYSTORE_TYPE");
         assertEquals(config.get(JwtSessionModule.KEYSTORE_FILE_KEY), "KEYSTORE_FILE_PATH");
         assertEquals(config.get(JwtSessionModule.KEYSTORE_PASSWORD_KEY), "KEYSTORE_PASS");
-        assertEquals(config.get(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY), "0");
-        assertEquals(config.get(JwtSessionModule.MAX_TOKEN_LIFE_KEY), "300");
+        assertEquals(config.get(JwtSessionModule.TOKEN_IDLE_TIME_IN_MINUTES_CLAIM_KEY), "0");
+        assertEquals(config.get(JwtSessionModule.MAX_TOKEN_LIFE_IN_MINUTES_KEY), "300");
     }
 
     @Test
@@ -137,8 +137,8 @@ public class PersistentCookieAuthModuleTest {
         assertEquals(config.get(JwtSessionModule.KEYSTORE_TYPE_KEY), "KEYSTORE_TYPE");
         assertEquals(config.get(JwtSessionModule.KEYSTORE_FILE_KEY), "KEYSTORE_FILE_PATH");
         assertEquals(config.get(JwtSessionModule.KEYSTORE_PASSWORD_KEY), "KEYSTORE_PASS");
-        assertEquals(config.get(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY), "60");
-        assertEquals(config.get(JwtSessionModule.MAX_TOKEN_LIFE_KEY), "0");
+        assertEquals(config.get(JwtSessionModule.TOKEN_IDLE_TIME_IN_MINUTES_CLAIM_KEY), "60");
+        assertEquals(config.get(JwtSessionModule.MAX_TOKEN_LIFE_IN_MINUTES_KEY), "0");
     }
 
     @Test
@@ -165,8 +165,8 @@ public class PersistentCookieAuthModuleTest {
         assertEquals(config.get(JwtSessionModule.KEYSTORE_TYPE_KEY), "KEYSTORE_TYPE");
         assertEquals(config.get(JwtSessionModule.KEYSTORE_FILE_KEY), "KEYSTORE_FILE_PATH");
         assertEquals(config.get(JwtSessionModule.KEYSTORE_PASSWORD_KEY), "KEYSTORE_PASS");
-        assertEquals(config.get(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY), "60");
-        assertEquals(config.get(JwtSessionModule.MAX_TOKEN_LIFE_KEY), "300");
+        assertEquals(config.get(JwtSessionModule.TOKEN_IDLE_TIME_IN_MINUTES_CLAIM_KEY), "60");
+        assertEquals(config.get(JwtSessionModule.MAX_TOKEN_LIFE_IN_MINUTES_KEY), "300");
     }
 
     @Test
@@ -212,8 +212,8 @@ public class PersistentCookieAuthModuleTest {
         }
 
         //Then
-        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY, "60");
-        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.MAX_TOKEN_LIFE_KEY, "300");
+        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.TOKEN_IDLE_TIME_IN_MINUTES_CLAIM_KEY, "60");
+        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.MAX_TOKEN_LIFE_IN_MINUTES_KEY, "300");
         verify(jwtSessionModule).validateJwtSessionCookie(Matchers.<MessageInfo>anyObject());
         assertTrue(exceptionCaught);
         assertEquals(exception.getErrorCode(), "cookieNotValid");
@@ -245,8 +245,8 @@ public class PersistentCookieAuthModuleTest {
         }
 
         //Then
-        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY, "60");
-        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.MAX_TOKEN_LIFE_KEY, "300");
+        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.TOKEN_IDLE_TIME_IN_MINUTES_CLAIM_KEY, "60");
+        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.MAX_TOKEN_LIFE_IN_MINUTES_KEY, "300");
         verify(jwtSessionModule).validateJwtSessionCookie(Matchers.<MessageInfo>anyObject());
         assertTrue(exceptionCaught);
         assertEquals(exception.getErrorCode(), "jaspiContextNotFound");
@@ -282,8 +282,8 @@ public class PersistentCookieAuthModuleTest {
         }
 
         //Then
-        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY, "60");
-        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.MAX_TOKEN_LIFE_KEY, "300");
+        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.TOKEN_IDLE_TIME_IN_MINUTES_CLAIM_KEY, "60");
+        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.MAX_TOKEN_LIFE_IN_MINUTES_KEY, "300");
         verify(jwtSessionModule).validateJwtSessionCookie(Matchers.<MessageInfo>anyObject());
         assertTrue(exceptionCaught);
         assertEquals(exception.getErrorCode(), "authFailedDiffRealm");
@@ -313,8 +313,8 @@ public class PersistentCookieAuthModuleTest {
         int returnedState = persistentCookieAuthModule.process(callbacks, state);
 
         //Then
-        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY, "60");
-        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.MAX_TOKEN_LIFE_KEY, "300");
+        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.TOKEN_IDLE_TIME_IN_MINUTES_CLAIM_KEY, "60");
+        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.MAX_TOKEN_LIFE_IN_MINUTES_KEY, "300");
         verify(jwtSessionModule).validateJwtSessionCookie(Matchers.<MessageInfo>anyObject());
         verify(amLoginModuleBinder).setUserSessionProperty("jwtValidated", "true");
         assertEquals(returnedState, ISAuthConstants.LOGIN_SUCCEED);
@@ -329,8 +329,8 @@ public class PersistentCookieAuthModuleTest {
         HttpServletResponse response = mock(HttpServletResponse.class);
         SSOToken ssoToken = mock(SSOToken.class);
 
-        given(ssoToken.getProperty(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY)).willReturn("TOKEN_IDLE_TIME");
-        given(ssoToken.getProperty(JwtSessionModule.MAX_TOKEN_LIFE_KEY)).willReturn("TOKEN_MAX_LIFE");
+        given(ssoToken.getProperty(JwtSessionModule.TOKEN_IDLE_TIME_IN_MINUTES_CLAIM_KEY)).willReturn("TOKEN_IDLE_TIME");
+        given(ssoToken.getProperty(JwtSessionModule.MAX_TOKEN_LIFE_IN_MINUTES_KEY)).willReturn("TOKEN_MAX_LIFE");
         given(ssoToken.getProperty("openam-auth-persistent-cookie-domains")).willReturn("");
 
         //When
@@ -343,8 +343,8 @@ public class PersistentCookieAuthModuleTest {
         assertEquals(config.get(JwtSessionModule.KEYSTORE_TYPE_KEY), "KEYSTORE_TYPE");
         assertEquals(config.get(JwtSessionModule.KEYSTORE_FILE_KEY), "KEYSTORE_FILE_PATH");
         assertEquals(config.get(JwtSessionModule.KEYSTORE_PASSWORD_KEY), "KEYSTORE_PASS");
-        assertEquals(config.get(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY), "TOKEN_IDLE_TIME");
-        assertEquals(config.get(JwtSessionModule.MAX_TOKEN_LIFE_KEY), "TOKEN_MAX_LIFE");
+        assertEquals(config.get(JwtSessionModule.TOKEN_IDLE_TIME_IN_MINUTES_CLAIM_KEY), "TOKEN_IDLE_TIME");
+        assertEquals(config.get(JwtSessionModule.MAX_TOKEN_LIFE_IN_MINUTES_KEY), "TOKEN_MAX_LIFE");
     }
 
     @Test

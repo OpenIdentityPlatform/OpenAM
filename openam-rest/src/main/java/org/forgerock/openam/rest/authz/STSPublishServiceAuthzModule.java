@@ -91,19 +91,19 @@ public class STSPublishServiceAuthzModule extends AdminOnlyAuthzModule {
     }
 
     private Promise<AuthorizationResult, ResourceException> rejectConsumption() {
-        return Promises.newSuccessfulPromise(AuthorizationResult.accessDenied("STSPublishServiceAuthzModule: " +
+        return Promises.newResultPromise(AuthorizationResult.accessDenied("STSPublishServiceAuthzModule: " +
                 "invoked functionality is not authorized for any user."));
     }
 
     Promise<AuthorizationResult, ResourceException> authorizeSoapSTSAgentOrAdmin(ServerContext context) {
         try {
             if (isSoapSTSAgent(context)) {
-                return Promises.newSuccessfulPromise(AuthorizationResult.accessPermitted());
+                return Promises.newResultPromise(AuthorizationResult.accessPermitted());
             } else {
                 return authorizeAdmin(context);
             }
         } catch (ResourceException e) {
-            return Promises.newFailedPromise(ResourceException
+            return Promises.newExceptionPromise(ResourceException
                     .getException(HttpURLConnection.HTTP_UNAUTHORIZED, e.getMessage(), e));
         }
     }

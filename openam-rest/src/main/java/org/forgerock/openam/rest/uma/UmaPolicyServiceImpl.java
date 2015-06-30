@@ -61,10 +61,10 @@ import org.forgerock.openam.uma.audit.UmaAuditLogger;
 import org.forgerock.openam.uma.audit.UmaAuditType;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.Pair;
-import org.forgerock.util.promise.AsyncFunction;
+import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
-import org.forgerock.util.promise.SuccessHandler;
+import org.forgerock.util.promise.ResultHandler;
 
 /**
  * Implementation of the {@code UmaPolicyService}.
@@ -141,7 +141,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
             validateScopes(resourceSet, umaPolicy.getScopes());
             verifyPolicyDoesNotAlreadyExist(context, resourceSet);
         } catch (ResourceException e) {
-            return Promises.newFailedPromise(e);
+            return Promises.newExceptionPromise(e);
         }
         return policyResourceDelegate.createPolicies(context, umaPolicy.asUnderlyingPolicies())
                 .thenAsync(new AsyncFunction<List<Resource>, UmaPolicy, ResourceException>() {
@@ -152,15 +152,15 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                             String userId = getLoggedInUserId(context);
                             auditLogger.get().log(resourceSet.getId(), resourceSet.getName(), userId,
                                     UmaAuditType.POLICY_CREATED, userId);
-                            return Promises.newSuccessfulPromise(umaPolicy);
+                            return Promises.newResultPromise(umaPolicy);
                         } catch (ResourceException e) {
-                            return Promises.newFailedPromise(e);
+                            return Promises.newExceptionPromise(e);
                         }
                     }
                 }, new AsyncFunction<ResourceException, UmaPolicy, ResourceException>() {
                     @Override
                     public Promise<UmaPolicy, ResourceException> apply(ResourceException error)  {
-                        return Promises.newFailedPromise(error);
+                        return Promises.newExceptionPromise(error);
                     }
                 });
     }
@@ -193,17 +193,17 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                     public Promise<UmaPolicy, ResourceException> apply(Pair<QueryResult, List<Resource>> value) {
                         try {
                             if (value.getSecond().isEmpty()) {
-                                return Promises.newFailedPromise(
+                                return Promises.newExceptionPromise(
                                         (ResourceException) new NotFoundException("UMA Policy not found, "
                                                 + resourceSetId));
                             } else {
                                 ResourceSetDescription resourceSet = getResourceSetDescription(resourceSetId, resourceOwnerId, context);
                                 UmaPolicy umaPolicy = UmaPolicy.fromUnderlyingPolicies(resourceSet, value.getSecond());
                                 resolveUIDToUsername(umaPolicy.asJson());
-                                return Promises.newSuccessfulPromise(umaPolicy);
+                                return Promises.newResultPromise(umaPolicy);
                             }
                         } catch (ResourceException e) {
-                            return Promises.newFailedPromise(e);
+                            return Promises.newExceptionPromise(e);
                         }
                     }
                 });
@@ -224,10 +224,10 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
             updatedUmaPolicy = UmaPolicy.valueOf(resourceSet, resolveUsernameToUID(context, policy));
             validateScopes(resourceSet, updatedUmaPolicy.getScopes());
         } catch (ResourceException e) {
-            return Promises.newFailedPromise(e);
+            return Promises.newExceptionPromise(e);
         }
         return readPolicy(context, resourceSetId)
-                .onSuccess(new SuccessHandler<UmaPolicy>() {
+                .thenOnResult(new ResultHandler<UmaPolicy>() {
                     @Override
                     public void handleResult(UmaPolicy currentUmaPolicy) {
                         Set<String> modifiedScopes = new HashSet<String>(updatedUmaPolicy.getScopes());
@@ -247,14 +247,14 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                                                     for (Resource resource : result.getSecond()) {
                                                         policyResourceDelegate.deletePolicies(context, Collections.singleton(resource.getId()));
                                                     }
-                                                    return Promises.newSuccessfulPromise(null);
+                                                    return Promises.newResultPromise(null);
                                                 }
                                             });
                                 }
                             }
                         }
                     }
-                }).onSuccess(new SuccessHandler<UmaPolicy>() {
+                }).thenOnResult(new ResultHandler<UmaPolicy>() {
                     @Override
                     public void handleResult(UmaPolicy currentUmaPolicy) {
                         Set<String> modifiedScopes = new HashSet<String>(currentUmaPolicy.getScopes());
@@ -279,12 +279,12 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                                         String userId = getLoggedInUserId(context);
                                         auditLogger.get().log(resourceSetId, resourceSet.getName(), userId, UmaAuditType.POLICY_UPDATED, userId);
                                         resolveUIDToUsername(updatedUmaPolicy.asJson());
-                                        return Promises.newSuccessfulPromise(updatedUmaPolicy);
+                                        return Promises.newResultPromise(updatedUmaPolicy);
                                     }
                                 }, new AsyncFunction<ResourceException, UmaPolicy, ResourceException>() {
                                     @Override
                                     public Promise<UmaPolicy, ResourceException> apply(ResourceException error) {
-                                        return Promises.newFailedPromise(error);
+                                        return Promises.newExceptionPromise(error);
                                     }
                                 });
                     }
@@ -306,7 +306,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                 .thenAsync(new AsyncFunction<List<Resource>, Void, ResourceException>() {
                     @Override
                     public Promise<Void, ResourceException> apply(List<Resource> value) {
-                        return Promises.newSuccessfulPromise(null);
+                        return Promises.newResultPromise(null);
                     }
                 });
     }
@@ -320,9 +320,9 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
 
 
         if (umaQueryRequest.getQueryExpression() != null) {
-            return Promises.newFailedPromise((ResourceException) new BadRequestException("Query expressions not supported"));
+            return Promises.newExceptionPromise((ResourceException) new BadRequestException("Query expressions not supported"));
         } else if (umaQueryRequest.getQueryId() != null) {
-            return Promises.newFailedPromise((ResourceException) new BadRequestException("Query expressions not supported"));
+            return Promises.newExceptionPromise((ResourceException) new BadRequestException("Query expressions not supported"));
         }
 
         final AggregateQuery<QueryFilter, QueryFilter> filter = umaQueryRequest.getQueryFilter()
@@ -366,9 +366,9 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                                 resolveUIDToUsername(umaPolicy.asJson());
                                 umaPolicies.add(umaPolicy);
                             }
-                            return Promises.newSuccessfulPromise(umaPolicies);
+                            return Promises.newResultPromise(umaPolicies);
                         } catch (ResourceException e) {
-                            return Promises.newFailedPromise(e);
+                            return Promises.newExceptionPromise(e);
                         }
                     }
                 })
@@ -400,7 +400,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                             remainingPagedResults /= pageSize;
                         }
 
-                        return Promises.newSuccessfulPromise(Pair.of(
+                        return Promises.newResultPromise(Pair.of(
                                 new QueryResult(pagedResultsCookie, remainingPagedResults), pagedPolicies));
                     }
                 });

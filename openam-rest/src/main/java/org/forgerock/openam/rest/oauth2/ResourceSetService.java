@@ -40,11 +40,11 @@ import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.uma.UmaPolicy;
 import org.forgerock.openam.uma.UmaPolicyService;
 import org.forgerock.util.Pair;
-import org.forgerock.util.promise.AsyncFunction;
+import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.PromiseImpl;
 import org.forgerock.util.promise.Promises;
-import org.forgerock.util.promise.SuccessHandler;
+import org.forgerock.util.promise.ResultHandler;
 import org.forgerock.util.query.QueryFilter;
 
 /**
@@ -82,7 +82,7 @@ public class ResourceSetService {
     Promise<ResourceSetDescription, ResourceException> getResourceSet(final ServerContext context,
             String realm, final String resourceSetId, String resourceOwnerId, final boolean augmentWithPolicy) {
         return getResourceSet(realm, resourceSetId, resourceOwnerId)
-                .onSuccess(new SuccessHandler<ResourceSetDescription>() {
+                .thenOnResult(new ResultHandler<ResourceSetDescription>() {
                     @Override
                     public void handleResult(ResourceSetDescription resourceSet) {
                         if (augmentWithPolicy) {
@@ -111,7 +111,7 @@ public class ResourceSetService {
                     query.getResourceSetQuery(),
                     QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, resourceOwnerId)));
         } catch (ServerException e) {
-            return Promises.newFailedPromise((ResourceException) new InternalServerErrorException(e));
+            return Promises.newExceptionPromise((ResourceException) new InternalServerErrorException(e));
         }
 
         Promise<Collection<ResourceSetDescription>, ResourceException> resourceSetsPromise;
@@ -122,13 +122,13 @@ public class ResourceSetService {
                         @Override
                         public Promise<Collection<ResourceSetDescription>, ResourceException> apply(Pair<QueryResult, Collection<UmaPolicy>> result) throws ResourceException {
                             try {
-                                return Promises.newSuccessfulPromise(combine(context, query, resourceSets,
+                                return Promises.newResultPromise(combine(context, query, resourceSets,
                                         result.getSecond(), augmentWithPolicies, resourceOwnerId));
                             } catch (org.forgerock.oauth2.core.exceptions.NotFoundException e) {
-                                return Promises.newFailedPromise(
+                                return Promises.newExceptionPromise(
                                         (ResourceException) new InternalServerErrorException(e));
                             } catch (ServerException e) {
-                                return Promises.newFailedPromise(
+                                return Promises.newExceptionPromise(
                                         (ResourceException) new InternalServerErrorException(e));
                             }
                         }
@@ -153,12 +153,12 @@ public class ResourceSetService {
                                         resourceSetDescriptions.add(rs);
                                     }
                                 }
-                                return Promises.newSuccessfulPromise(resourceSetDescriptions);
+                                return Promises.newResultPromise(resourceSetDescriptions);
                             }
                         });
                 kicker.handleResult(null);
             } else {
-                resourceSetsPromise = Promises.newSuccessfulPromise((Collection<ResourceSetDescription>) resourceSets);
+                resourceSetsPromise = Promises.newResultPromise((Collection<ResourceSetDescription>) resourceSets);
             }
         }
         return resourceSetsPromise;
@@ -192,7 +192,7 @@ public class ResourceSetService {
                         return when.thenAsync(new AsyncFunction<List<Void>, Void, ResourceException>() {
                             @Override
                             public Promise<Void, ResourceException> apply(List<Void> voids) {
-                                return Promises.newSuccessfulPromise(null);
+                                return Promises.newResultPromise(null);
                             }
                         });
                     }
@@ -204,13 +204,13 @@ public class ResourceSetService {
         try {
             ResourceSetDescription resourceSet = resourceSetStoreFactory.create(realm)
                     .read(resourceSetId, resourceOwnerId);
-            return Promises.newSuccessfulPromise(resourceSet);
+            return Promises.newResultPromise(resourceSet);
         } catch (NotFoundException e) {
-            return Promises.newFailedPromise(
+            return Promises.newExceptionPromise(
                     (ResourceException) new org.forgerock.json.resource.NotFoundException(
                             "No resource set with id, " + resourceSetId + ", found."));
         } catch (ServerException e) {
-            return Promises.newFailedPromise((ResourceException) new InternalServerErrorException(e));
+            return Promises.newExceptionPromise((ResourceException) new InternalServerErrorException(e));
         }
     }
 
@@ -221,12 +221,12 @@ public class ResourceSetService {
                     @Override
                     public Promise<ResourceSetDescription, ResourceException> apply(UmaPolicy result) throws ResourceException {
                         resourceSet.setPolicy(result.asJson());
-                        return Promises.newSuccessfulPromise(resourceSet);
+                        return Promises.newResultPromise(resourceSet);
                     }
                 }, new AsyncFunction<ResourceException, ResourceSetDescription, ResourceException>() {
                     @Override
                     public Promise<ResourceSetDescription, ResourceException> apply(ResourceException e) throws ResourceException {
-                        return Promises.newSuccessfulPromise(resourceSet);
+                        return Promises.newResultPromise(resourceSet);
                     }
                 });
     }

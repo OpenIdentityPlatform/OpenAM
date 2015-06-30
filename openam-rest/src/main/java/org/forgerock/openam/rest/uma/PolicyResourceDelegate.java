@@ -35,11 +35,11 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.openam.rest.resource.PromisedRequestHandler;
 import org.forgerock.util.Pair;
-import org.forgerock.util.promise.AsyncFunction;
+import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.PromiseImpl;
 import org.forgerock.util.promise.Promises;
-import org.forgerock.util.promise.SuccessHandler;
+import org.forgerock.util.promise.ResultHandler;
 
 /**
  * Delegate that provide methods to create, update, delete and query sets of underlying backend policies.
@@ -80,7 +80,7 @@ public class PolicyResourceDelegate {
         List<Promise<Resource, ResourceException>> promises = new ArrayList<Promise<Resource, ResourceException>>();
         for (JsonValue policy : policies) {
             promises.add(policyResource.handleCreate(context, Requests.newCreateRequest("", policy))
-                    .then(new SuccessHandler<Resource>() {
+                    .thenOnResult(new ResultHandler<Resource>() {
                         @Override
                         public void handleResult(Resource result) {
                             //Save ids of created policies, in case a latter policy fails to be created,
@@ -93,7 +93,7 @@ public class PolicyResourceDelegate {
                 .thenAsync(new AsyncFunction<List<Resource>, List<Resource>, ResourceException>() {
                     @Override
                     public Promise<List<Resource>, ResourceException> apply(List<Resource> value) {
-                        return Promises.newSuccessfulPromise(value);
+                        return Promises.newResultPromise(value);
                     }
                 }, new UmaPolicyCreateFailureHandler(context, policyIds));
     }
@@ -186,7 +186,7 @@ public class PolicyResourceDelegate {
                         @Override
                         public Promise<List<Resource>, ResourceException> apply(List<Resource> value) {
                             //If we succeed in deleting then return the original error
-                            return Promises.newFailedPromise(error);
+                            return Promises.newExceptionPromise(error);
                         }
                     });
             kicker.handleResult(null);

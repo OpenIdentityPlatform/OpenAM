@@ -57,14 +57,14 @@ public class UmaPolicyResourceAuthzFilter extends ResourceOwnerOrSuperUserAuthzM
     public Promise<AuthorizationResult, ResourceException> authorizeCreate(ServerContext context, CreateRequest request) {
         try {
             if (!getUserId(context).equalsIgnoreCase(getUserIdFromUri(context))) {
-                return Promises.newSuccessfulPromise(
+                return Promises.newResultPromise(
                         AuthorizationResult.accessDenied("Only resource owner of resource set can create UMA "
                                 + "policies for it."));
             } else {
                 return authorize(context);
             }
         } catch (ResourceException e) {
-            return Promises.newFailedPromise(e);
+            return Promises.newExceptionPromise(e);
         }
     }
 }

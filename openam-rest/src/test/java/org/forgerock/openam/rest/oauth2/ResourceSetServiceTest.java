@@ -98,7 +98,7 @@ public class ResourceSetServiceTest {
         boolean augmentWithPolicy = true;
         ResourceSetDescription resourceSetDescription = mock(ResourceSetDescription.class);
         UmaPolicy policy = mock(UmaPolicy.class);
-        Promise<UmaPolicy, ResourceException> policyPromise = Promises.newSuccessfulPromise(policy);
+        Promise<UmaPolicy, ResourceException> policyPromise = Promises.newResultPromise(policy);
         JsonValue policyJson = mock(JsonValue.class);
 
         given(resourceSetStore.read(resourceSetId, resourceOwnerId)).willReturn(resourceSetDescription);
@@ -131,7 +131,7 @@ public class ResourceSetServiceTest {
         Collection<UmaPolicy> queriedPolicies = new HashSet<UmaPolicy>();
         Pair<QueryResult, Collection<UmaPolicy>> queriedPoliciesPair = Pair.of(new QueryResult(), queriedPolicies);
         Promise<Pair<QueryResult, Collection<UmaPolicy>>, ResourceException> queriedPoliciesPromise
-                = Promises.newSuccessfulPromise(queriedPoliciesPair);
+                = Promises.newResultPromise(queriedPoliciesPair);
 
         query.setResourceSetQuery(resourceSetQuery);
         query.setPolicyQuery(policyQuery);
@@ -209,8 +209,8 @@ public class ResourceSetServiceTest {
         UmaPolicy policyTwo = mock(UmaPolicy.class);
         JsonValue policyOneJson = mock(JsonValue.class);
         JsonValue policyTwoJson = mock(JsonValue.class);
-        Promise<UmaPolicy, ResourceException> policyOnePromise = Promises.newSuccessfulPromise(policyOne);
-        Promise<UmaPolicy, ResourceException> policyTwoPromise = Promises.newSuccessfulPromise(policyTwo);
+        Promise<UmaPolicy, ResourceException> policyOnePromise = Promises.newResultPromise(policyOne);
+        Promise<UmaPolicy, ResourceException> policyTwoPromise = Promises.newResultPromise(policyTwo);
 
         query.setResourceSetQuery(resourceSetQuery);
         queriedResourceSets.add(resourceSetOne);
@@ -261,7 +261,7 @@ public class ResourceSetServiceTest {
         UmaPolicy policyTwo = mock(UmaPolicy.class);
         Pair<QueryResult, Collection<UmaPolicy>> queriedPoliciesPair = Pair.of(new QueryResult(), queriedPolicies);
         Promise<Pair<QueryResult, Collection<UmaPolicy>>, ResourceException> queriedPoliciesPromise
-                = Promises.newSuccessfulPromise(queriedPoliciesPair);
+                = Promises.newResultPromise(queriedPoliciesPair);
 
         query.setResourceSetQuery(resourceSetQuery);
         query.setPolicyQuery(policyQuery);
@@ -314,7 +314,7 @@ public class ResourceSetServiceTest {
         UmaPolicy policyTwo = mock(UmaPolicy.class);
         Pair<QueryResult, Collection<UmaPolicy>> queriedPoliciesPair = Pair.of(new QueryResult(), queriedPolicies);
         Promise<Pair<QueryResult, Collection<UmaPolicy>>, ResourceException> queriedPoliciesPromise
-                = Promises.newSuccessfulPromise(queriedPoliciesPair);
+                = Promises.newResultPromise(queriedPoliciesPair);
 
         query.setResourceSetQuery(resourceSetQuery);
         query.setPolicyQuery(policyQuery);
@@ -372,9 +372,9 @@ public class ResourceSetServiceTest {
         JsonValue policyThreeJson = mock(JsonValue.class);
         Pair<QueryResult, Collection<UmaPolicy>> queriedPoliciesPair = Pair.of(new QueryResult(), queriedPolicies);
         Promise<Pair<QueryResult, Collection<UmaPolicy>>, ResourceException> queriedPoliciesPromise
-                = Promises.newSuccessfulPromise(queriedPoliciesPair);
-        Promise<UmaPolicy, ResourceException> policyOnePromise = Promises.newSuccessfulPromise(policyOne);
-        Promise<UmaPolicy, ResourceException> policyTwoPromise = Promises.newSuccessfulPromise(policyTwo);
+                = Promises.newResultPromise(queriedPoliciesPair);
+        Promise<UmaPolicy, ResourceException> policyOnePromise = Promises.newResultPromise(policyOne);
+        Promise<UmaPolicy, ResourceException> policyTwoPromise = Promises.newResultPromise(policyTwo);
 
         query.setResourceSetQuery(resourceSetQuery);
         query.setPolicyQuery(policyQuery);
@@ -437,7 +437,7 @@ public class ResourceSetServiceTest {
         JsonValue policyThreeJson = mock(JsonValue.class);
         Pair<QueryResult, Collection<UmaPolicy>> queriedPoliciesPair = Pair.of(new QueryResult(), queriedPolicies);
         Promise<Pair<QueryResult, Collection<UmaPolicy>>, ResourceException> queriedPoliciesPromise
-                = Promises.newSuccessfulPromise(queriedPoliciesPair);
+                = Promises.newResultPromise(queriedPoliciesPair);
 
         query.setResourceSetQuery(resourceSetQuery);
         query.setPolicyQuery(policyQuery);
@@ -486,7 +486,7 @@ public class ResourceSetServiceTest {
         Collection<UmaPolicy> queriedPolicies = new HashSet<UmaPolicy>();
         Pair<QueryResult, Collection<UmaPolicy>> queriedPoliciesPair = Pair.of(new QueryResult(), queriedPolicies);
         Promise<Pair<QueryResult, Collection<UmaPolicy>>, ResourceException> queriedPoliciesPromise
-                = Promises.newSuccessfulPromise(queriedPoliciesPair);
+                = Promises.newResultPromise(queriedPoliciesPair);
 
         queriedResourceSets.add(resourceSetOne);
         queriedResourceSets.add(resourceSetTwo);
@@ -495,9 +495,9 @@ public class ResourceSetServiceTest {
         given(policyService.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(queriedPoliciesPromise);
         given(policyService.deletePolicy(context, "RS_ID_ONE"))
-                .willReturn(Promises.<Void, ResourceException>newSuccessfulPromise(null));
+                .willReturn(Promises.<Void, ResourceException>newResultPromise(null));
         given(policyService.deletePolicy(context, "RS_ID_TWO"))
-                .willReturn(Promises.<Void, ResourceException>newSuccessfulPromise(null));
+                .willReturn(Promises.<Void, ResourceException>newResultPromise(null));
 
         //When
         service.revokeAllPolicies(context, realm, resourceOwnerId).getOrThrowUninterruptibly();

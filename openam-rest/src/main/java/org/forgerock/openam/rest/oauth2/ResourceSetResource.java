@@ -51,8 +51,7 @@ import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
 import org.forgerock.openam.rest.resource.ContextHelper;
-import org.forgerock.util.promise.FailureHandler;
-import org.forgerock.util.promise.SuccessHandler;
+import org.forgerock.util.promise.ExceptionHandler;
 
 /**
  * <p>Resource Set resource to expose registered Resource Sets for a given user.</p>
@@ -101,16 +100,16 @@ public class ResourceSetResource implements CollectionResourceProvider {
         String realm = getRealm(context);
         String resourceOwnerId = getResourceOwnerId(context);
         resourceSetService.getResourceSet(context, realm, resourceId, resourceOwnerId, augmentWithPolicies)
-                .onSuccess(new SuccessHandler<ResourceSetDescription>() {
+                .thenOnResult(new org.forgerock.util.promise.ResultHandler<ResourceSetDescription>() {
                     @Override
                     public void handleResult(ResourceSetDescription result) {
                         JsonValue content = getResourceSetJson(result);
                         handler.handleResult(newResource(result.getId(), content));
                     }
                 })
-                .onFailure(new FailureHandler<ResourceException>() {
+                .thenOnException(new ExceptionHandler<ResourceException>() {
                     @Override
-                    public void handleError(ResourceException error) {
+                    public void handleException(ResourceException error) {
                         handler.handleError(error);
                     }
                 });
@@ -130,15 +129,15 @@ public class ResourceSetResource implements CollectionResourceProvider {
             String realm = getRealm(context);
             String resourceOwnerId = getResourceOwnerId(context);
             resourceSetService.revokeAllPolicies(context, realm, resourceOwnerId)
-                    .onSuccess(new SuccessHandler<Void>() {
+                    .thenOnResult(new org.forgerock.util.promise.ResultHandler<Void>() {
                         @Override
                         public void handleResult(Void aVoid) {
                             handler.handleResult(json(object()));
                         }
                     })
-                    .onFailure(new FailureHandler<ResourceException>() {
+                    .thenOnException(new ExceptionHandler<ResourceException>() {
                         @Override
-                        public void handleError(ResourceException e) {
+                        public void handleException(ResourceException e) {
                             handler.handleError(e);
                         }
                     });
@@ -179,7 +178,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
         String realm = getRealm(context);
         String resourceOwnerId = getResourceOwnerId(context);
         resourceSetService.getResourceSets(context, realm, query, resourceOwnerId, augmentWithPolicies)
-                .onSuccess(new SuccessHandler<Collection<ResourceSetDescription>>() {
+                .thenOnResult(new org.forgerock.util.promise.ResultHandler<Collection<ResourceSetDescription>>() {
                     @Override
                     public void handleResult(Collection<ResourceSetDescription> resourceSets) {
                         for (ResourceSetDescription resourceSet : resourceSets) {
@@ -189,9 +188,9 @@ public class ResourceSetResource implements CollectionResourceProvider {
                         queryHandler.handleResult(new QueryResult());
                     }
                 })
-                .onFailure(new FailureHandler<ResourceException>() {
+                .thenOnException(new ExceptionHandler<ResourceException>() {
                     @Override
-                    public void handleError(ResourceException e) {
+                    public void handleException(ResourceException e) {
                         queryHandler.handleError(e);
                     }
                 });

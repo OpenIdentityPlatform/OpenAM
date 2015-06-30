@@ -101,18 +101,18 @@ public class SpecialUserOnlyAuthzModule implements CrestAuthorizationModule {
                 if (debug.messageEnabled()) {
                     debug.message("SpecialUserOnlyAuthzModule :: User, " + userId + " accepted as Special user.");
                 }
-                return Promises.newSuccessfulPromise(AuthorizationResult.accessPermitted());
+                return Promises.newResultPromise(AuthorizationResult.accessPermitted());
             } else {
                 if (debug.warningEnabled()) {
                     debug.warning("SpecialUserOnlyAuthzModule :: Denied access to " + userId);
                 }
-                return Promises.newSuccessfulPromise(AuthorizationResult.accessDenied("User is not a Special user."));
+                return Promises.newResultPromise(AuthorizationResult.accessDenied("User is not a Special user."));
             }
         } catch (SSOException e) {
             if (debug.messageEnabled()) {
                 debug.message("SpecialUserOnlyAuthzModule :: Unable to authorize as Special user using SSO Token.", e);
             }
-            return Promises.newFailedPromise(ResourceException
+            return Promises.newExceptionPromise(ResourceException
                     .getException(HttpURLConnection.HTTP_UNAUTHORIZED, e.getMessage(), e));
         }
     }

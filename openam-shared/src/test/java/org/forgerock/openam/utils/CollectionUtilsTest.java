@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.utils;
 
-import org.forgerock.util.promise.Function;
+import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.testng.annotations.Test;
 

@@ -40,7 +40,7 @@ import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ErrorResultException;
 import org.forgerock.opendj.ldap.LDAPOptions;
 import org.forgerock.opendj.ldap.ResultHandler;
-import org.forgerock.util.promise.Function;
+import org.forgerock.util.Function;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.PromiseImpl;
 
@@ -183,7 +183,7 @@ public class LdapConnectionFactoryProvider implements ConnectionFactoryProvider<
 
             @Override
             public void handleErrorResult(ErrorResultException error) {
-                promise.tryHandleError(error);
+                promise.tryHandleException(error);
             }
 
             @Override

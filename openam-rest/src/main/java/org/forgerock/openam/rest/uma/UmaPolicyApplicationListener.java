@@ -56,8 +56,8 @@ import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.openam.utils.OpenAMSettingsImpl;
 import org.forgerock.util.Pair;
 import org.forgerock.util.Reject;
-import org.forgerock.util.promise.AsyncFunction;
-import org.forgerock.util.promise.FailureHandler;
+import org.forgerock.util.AsyncFunction;
+import org.forgerock.util.promise.ExceptionHandler;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.PromiseImpl;
 import org.forgerock.util.promise.Promises;
@@ -313,9 +313,9 @@ public class UmaPolicyApplicationListener implements IdEventListener {
                         return when;
                     }
                 })
-                .onFailure(new FailureHandler<ResourceException>() {
+                .thenOnException(new ExceptionHandler<ResourceException>() {
                     @Override
-                    public void handleError(ResourceException error) {
+                    public void handleException(ResourceException error) {
                         logger.error(error.getReason());
                     }
                 });

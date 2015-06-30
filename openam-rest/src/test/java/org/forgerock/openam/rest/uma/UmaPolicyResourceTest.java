@@ -75,7 +75,7 @@ public class UmaPolicyResourceTest {
         CreateRequest request = Requests.newCreateRequest("/policies", json(object()));
         ResultHandler<Resource> handler = mock(ResultHandler.class);
         UmaPolicy policy = mock(UmaPolicy.class);
-        Promise<UmaPolicy, ResourceException> promise = Promises.newSuccessfulPromise(policy);
+        Promise<UmaPolicy, ResourceException> promise = Promises.newResultPromise(policy);
 
         given(policy.getId()).willReturn("ID");
         given(policy.getRevision()).willReturn("REVISION");
@@ -101,7 +101,7 @@ public class UmaPolicyResourceTest {
         CreateRequest request = Requests.newCreateRequest("/policies", json(object()));
         ResultHandler<Resource> handler = mock(ResultHandler.class);
         ResourceException resourceException = mock(ResourceException.class);
-        Promise<UmaPolicy, ResourceException> promise = Promises.newFailedPromise(resourceException);
+        Promise<UmaPolicy, ResourceException> promise = Promises.newExceptionPromise(resourceException);
 
         given(policyService.createPolicy(context, request.getContent())).willReturn(promise);
 
@@ -122,7 +122,7 @@ public class UmaPolicyResourceTest {
         ResultHandler<Resource> handler = mock(ResultHandler.class);
         UmaPolicy policy = mock(UmaPolicy.class);
         JsonValue policyJson = json(object());
-        Promise<UmaPolicy, ResourceException> promise = Promises.newSuccessfulPromise(policy);
+        Promise<UmaPolicy, ResourceException> promise = Promises.newResultPromise(policy);
 
         given(policy.getId()).willReturn("ID");
         given(policy.getRevision()).willReturn("REVISION");
@@ -149,7 +149,7 @@ public class UmaPolicyResourceTest {
         ReadRequest request = Requests.newReadRequest("/policies");
         ResultHandler<Resource> handler = mock(ResultHandler.class);
         ResourceException resourceException = mock(ResourceException.class);
-        Promise<UmaPolicy, ResourceException> promise = Promises.newFailedPromise(resourceException);
+        Promise<UmaPolicy, ResourceException> promise = Promises.newExceptionPromise(resourceException);
 
         given(policyService.readPolicy(context, "RESOURCE_SET_UID")).willReturn(promise);
 
@@ -170,7 +170,7 @@ public class UmaPolicyResourceTest {
         ResultHandler<Resource> handler = mock(ResultHandler.class);
         UmaPolicy policy = mock(UmaPolicy.class);
         JsonValue policyJson = json(object());
-        Promise<UmaPolicy, ResourceException> promise = Promises.newSuccessfulPromise(policy);
+        Promise<UmaPolicy, ResourceException> promise = Promises.newResultPromise(policy);
 
         given(policy.getId()).willReturn("ID");
         given(policy.getRevision()).willReturn("REVISION");
@@ -197,7 +197,7 @@ public class UmaPolicyResourceTest {
         UpdateRequest request = Requests.newUpdateRequest("/policies", json(object()));
         ResultHandler<Resource> handler = mock(ResultHandler.class);
         ResourceException resourceException = mock(ResourceException.class);
-        Promise<UmaPolicy, ResourceException> promise = Promises.newFailedPromise(resourceException);
+        Promise<UmaPolicy, ResourceException> promise = Promises.newExceptionPromise(resourceException);
 
         given(policyService.updatePolicy(context, "RESOURCE_SET_UID", request.getContent())).willReturn(promise);
 
@@ -216,7 +216,7 @@ public class UmaPolicyResourceTest {
         ServerContext context = mock(ServerContext.class);
         DeleteRequest request = Requests.newDeleteRequest("/policies");
         ResultHandler<Resource> handler = mock(ResultHandler.class);
-        Promise<Void, ResourceException> promise = Promises.newSuccessfulPromise(null);
+        Promise<Void, ResourceException> promise = Promises.newResultPromise(null);
 
         given(policyService.deletePolicy(context, "RESOURCE_SET_UID")).willReturn(promise);
 
@@ -240,7 +240,7 @@ public class UmaPolicyResourceTest {
         DeleteRequest request = Requests.newDeleteRequest("/policies");
         ResultHandler<Resource> handler = mock(ResultHandler.class);
         ResourceException resourceException = mock(ResourceException.class);
-        Promise<Void, ResourceException> promise = Promises.newFailedPromise(resourceException);
+        Promise<Void, ResourceException> promise = Promises.newExceptionPromise(resourceException);
 
         given(policyService.deletePolicy(context, "RESOURCE_SET_UID")).willReturn(promise);
 
@@ -319,7 +319,7 @@ public class UmaPolicyResourceTest {
         umaPolicies.add(policy1);
         umaPolicies.add(policy2);
         Promise<Pair<QueryResult, Collection<UmaPolicy>>, ResourceException> promise =
-                Promises.newSuccessfulPromise(Pair.of(queryResult, umaPolicies));
+                Promises.newResultPromise(Pair.of(queryResult, umaPolicies));
 
         given(policyService.queryPolicies(context, request)).willReturn(promise);
 
@@ -340,7 +340,7 @@ public class UmaPolicyResourceTest {
         QueryResultHandler handler = mock(QueryResultHandler.class);
         ResourceException resourceException = mock(ResourceException.class);
         Promise<Pair<QueryResult, Collection<UmaPolicy>>, ResourceException> promise =
-                Promises.newFailedPromise(resourceException);
+                Promises.newExceptionPromise(resourceException);
 
         given(policyService.queryPolicies(context, request)).willReturn(promise);
 

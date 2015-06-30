@@ -197,8 +197,8 @@ public class UmaPolicyServiceImplTest {
         createdPolicies.add(createdPolicy1);
         createdPolicies.add(createdPolicy2);
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> queryPromise =
-                Promises.newFailedPromise((ResourceException) new NotFoundException());
-        Promise<List<Resource>, ResourceException> createPolicyPromise = Promises.newSuccessfulPromise(createdPolicies);
+                Promises.newExceptionPromise((ResourceException) new NotFoundException());
+        Promise<List<Resource>, ResourceException> createPolicyPromise = Promises.newResultPromise(createdPolicies);
 
         given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(queryPromise);
@@ -230,7 +230,7 @@ public class UmaPolicyServiceImplTest {
         JsonValue policy = createUmaPolicyJson();
         Resource policyResource = new Resource("ID_1", "REVISION_1", createBackendScopeAPolicyJson());
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> queryPromise =
-                Promises.newSuccessfulPromise(
+                Promises.newResultPromise(
                         Pair.of(new QueryResult(), Collections.singletonList(policyResource)));
 
         given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
@@ -254,8 +254,8 @@ public class UmaPolicyServiceImplTest {
         JsonValue policy = createUmaPolicyJson();
         ResourceException exception = mock(ResourceException.class);
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> queryPromise =
-                Promises.newFailedPromise((ResourceException) new NotFoundException());
-        Promise<List<Resource>, ResourceException> createPoliciesPromise = Promises.newFailedPromise(exception);
+                Promises.newExceptionPromise((ResourceException) new NotFoundException());
+        Promise<List<Resource>, ResourceException> createPoliciesPromise = Promises.newExceptionPromise(exception);
 
         given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(queryPromise);
@@ -330,7 +330,7 @@ public class UmaPolicyServiceImplTest {
         UmaPolicy expectedUmaPolicy = UmaPolicy.fromUnderlyingPolicies(resourceSet, policies);
 
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> queryPromise =
-                Promises.newSuccessfulPromise(Pair.of(queryResult, policies));
+                Promises.newResultPromise(Pair.of(queryResult, policies));
 
         given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(queryPromise);
@@ -351,7 +351,7 @@ public class UmaPolicyServiceImplTest {
 
         ResourceException exception = mock(ResourceException.class);
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> queryPromise =
-                Promises.newFailedPromise(exception);
+                Promises.newExceptionPromise(exception);
 
         given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(queryPromise);
@@ -375,7 +375,7 @@ public class UmaPolicyServiceImplTest {
         Resource updatedPolicy3 = new Resource("ID_3", "REVISION_1", createBackendScopeCPolicyJson());
         updatedPolicies.add(updatedPolicy1);
         updatedPolicies.add(updatedPolicy3);
-        Promise<List<Resource>, ResourceException> updatePolicyPromise = Promises.newSuccessfulPromise(updatedPolicies);
+        Promise<List<Resource>, ResourceException> updatePolicyPromise = Promises.newResultPromise(updatedPolicies);
 
 
         List<Resource> currentPolicies = new ArrayList<Resource>();
@@ -384,7 +384,7 @@ public class UmaPolicyServiceImplTest {
         currentPolicies.add(currentPolicy1);
         currentPolicies.add(currentPolicy2);
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> currentPolicyPromise
-                = Promises.newSuccessfulPromise(Pair.of((QueryResult) null, currentPolicies));
+                = Promises.newResultPromise(Pair.of((QueryResult) null, currentPolicies));
 
         given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(currentPolicyPromise);
@@ -411,8 +411,8 @@ public class UmaPolicyServiceImplTest {
         JsonValue policy = createUmaPolicyJson("SCOPE_A", "SCOPE_B");
         ResourceException exception = mock(ResourceException.class);
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> currentPolicyPromise
-                = Promises.newSuccessfulPromise(Pair.of((QueryResult) null, Collections.<Resource>emptyList()));
-        Promise<List<Resource>, ResourceException> updatePoliciesPromise = Promises.newFailedPromise(exception);
+                = Promises.newResultPromise(Pair.of((QueryResult) null, Collections.<Resource>emptyList()));
+        Promise<List<Resource>, ResourceException> updatePoliciesPromise = Promises.newExceptionPromise(exception);
 
         given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(currentPolicyPromise);
@@ -483,8 +483,8 @@ public class UmaPolicyServiceImplTest {
         readPolicies.add(readPolicy1);
         readPolicies.add(readPolicy2);
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> currentPolicyPromise
-                = Promises.newSuccessfulPromise(Pair.of((QueryResult) null, readPolicies));
-        Promise<List<Resource>, ResourceException> deletePoliciesPromise = Promises.newSuccessfulPromise(readPolicies);
+                = Promises.newResultPromise(Pair.of((QueryResult) null, readPolicies));
+        Promise<List<Resource>, ResourceException> deletePoliciesPromise = Promises.newResultPromise(readPolicies);
 
         given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(currentPolicyPromise);
@@ -506,7 +506,7 @@ public class UmaPolicyServiceImplTest {
         ServerContext context = createContext();
         ResourceException exception = mock(ResourceException.class);
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> readPoliciesPromise =
-                Promises.newFailedPromise(exception);
+                Promises.newExceptionPromise(exception);
 
         given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(readPoliciesPromise);
@@ -534,8 +534,8 @@ public class UmaPolicyServiceImplTest {
         readPolicies.add(readPolicy1);
         readPolicies.add(readPolicy2);
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> currentPolicyPromise
-                = Promises.newSuccessfulPromise(Pair.of((QueryResult) null, readPolicies));
-        Promise<List<Resource>, ResourceException> deletePoliciesPromise = Promises.newFailedPromise(exception);
+                = Promises.newResultPromise(Pair.of((QueryResult) null, readPolicies));
+        Promise<List<Resource>, ResourceException> deletePoliciesPromise = Promises.newExceptionPromise(exception);
 
         given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(currentPolicyPromise);
@@ -560,7 +560,7 @@ public class UmaPolicyServiceImplTest {
         }
 
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> backendQueryPromise
-                = Promises.newSuccessfulPromise(Pair.of(queryResult, policyResources));
+                = Promises.newResultPromise(Pair.of(queryResult, policyResources));
 
         given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(backendQueryPromise);

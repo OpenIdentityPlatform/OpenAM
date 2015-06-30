@@ -60,7 +60,7 @@ public class PromisedRequestHandlerImpl implements PromisedRequestHandler {
         return new ResultHandler<T>() {
             @Override
             public void handleError(ResourceException error) {
-                promise.handleError(error);
+                promise.handleException(error);
             }
 
             @Override
@@ -76,7 +76,7 @@ public class PromisedRequestHandlerImpl implements PromisedRequestHandler {
             private final List<Resource> resources = new ArrayList<Resource>();
             @Override
             public void handleError(ResourceException error) {
-                promise.handleError(error);
+                promise.handleException(error);
             }
 
             @Override

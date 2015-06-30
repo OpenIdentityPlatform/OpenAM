@@ -70,22 +70,22 @@ public class ResourceOwnerOrSuperUserAuthzModule extends AdminOnlyAuthzModule {
                     debug.message("ResourceOwnerOrSuperUserAuthzModule :: User, " + loggedInUserId
                             + " accepted as Super user.");
                 }
-                return Promises.newSuccessfulPromise(AuthorizationResult.accessPermitted());
+                return Promises.newResultPromise(AuthorizationResult.accessPermitted());
             } else if (loggedInUserId.equalsIgnoreCase(getUserIdFromUri(context))) {
                 if (debug.messageEnabled()) {
                     debug.message("ResourceOwnerOrSuperUserAuthzModule :: User, " + loggedInUserId
                             + " accepted as Resource Owner.");
                 }
-                return Promises.newSuccessfulPromise(AuthorizationResult.accessPermitted());
+                return Promises.newResultPromise(AuthorizationResult.accessPermitted());
             } else {
                 if (debug.warningEnabled()) {
                     debug.warning("ResourceOwnerOrSuperUserAuthzModule :: Denied access to " + loggedInUserId);
                 }
-                return Promises.newSuccessfulPromise(AuthorizationResult.accessDenied("User, " + loggedInUserId
+                return Promises.newResultPromise(AuthorizationResult.accessDenied("User, " + loggedInUserId
                         + ", not authorized."));
             }
         } catch (ResourceException e) {
-            return Promises.newFailedPromise(e);
+            return Promises.newExceptionPromise(e);
         }
     }
 

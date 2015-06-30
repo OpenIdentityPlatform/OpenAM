@@ -17,7 +17,7 @@ package org.forgerock.openam.utils;
 
 import com.sun.identity.common.CaseInsensitiveHashSet;
 import org.forgerock.util.Reject;
-import org.forgerock.util.promise.Function;
+import org.forgerock.util.Function;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -39,7 +39,7 @@ import org.forgerock.openam.upgrade.UpgradeServices;
 import org.forgerock.openam.upgrade.UpgradeStepInfo;
 import org.forgerock.openam.upgrade.UpgradeUtils;
 import org.forgerock.openam.utils.IOUtils;
-import org.forgerock.util.promise.Function;
+import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;

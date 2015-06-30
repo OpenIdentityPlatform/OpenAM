@@ -42,8 +42,7 @@ import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerB
 import org.forgerock.openam.uma.UmaPolicy;
 import org.forgerock.openam.uma.UmaPolicyService;
 import org.forgerock.util.Pair;
-import org.forgerock.util.promise.FailureHandler;
-import org.forgerock.util.promise.SuccessHandler;
+import org.forgerock.util.promise.ExceptionHandler;
 
 /**
  * REST endpoint for UMA policy management.
@@ -70,14 +69,15 @@ public class UmaPolicyResource implements CollectionResourceProvider {
     @Override
     public void createInstance(ServerContext context, CreateRequest request, final ResultHandler<Resource> handler) {
         umaPolicyService.createPolicy(context, request.getContent())
-                .then(new SuccessHandler<UmaPolicy>() {
+                .thenOnResult(new org.forgerock.util.promise.ResultHandler<UmaPolicy>() {
                     @Override
                     public void handleResult(UmaPolicy result) {
                         handler.handleResult(new Resource(result.getId(), result.getRevision(), json(object())));
                     }
-                }, new FailureHandler<ResourceException>() {
+                })
+                .thenOnException(new ExceptionHandler<ResourceException>() {
                     @Override
-                    public void handleError(ResourceException error) {
+                    public void handleException(ResourceException error) {
                         handler.handleError(error);
                     }
                 });
@@ -90,14 +90,15 @@ public class UmaPolicyResource implements CollectionResourceProvider {
     public void readInstance(ServerContext context, final String resourceId, ReadRequest request,
             final ResultHandler<Resource> handler) {
         umaPolicyService.readPolicy(context, resourceId)
-                .then(new SuccessHandler<UmaPolicy>() {
+                .thenOnResult(new org.forgerock.util.promise.ResultHandler<UmaPolicy>() {
                     @Override
                     public void handleResult(UmaPolicy result) {
                         handler.handleResult(new Resource(result.getId(), result.getRevision(), result.asJson()));
                     }
-                }, new FailureHandler<ResourceException>() {
+                })
+                .thenOnException(new ExceptionHandler<ResourceException>() {
                     @Override
-                    public void handleError(ResourceException error) {
+                    public void handleException(ResourceException error) {
                         handler.handleError(error);
                     }
                 });
@@ -110,14 +111,15 @@ public class UmaPolicyResource implements CollectionResourceProvider {
     public void updateInstance(ServerContext context, String resourceId, UpdateRequest request,
             final ResultHandler<Resource> handler) {
         umaPolicyService.updatePolicy(context, resourceId, request.getContent())
-                .then(new SuccessHandler<UmaPolicy>() {
+                .thenOnResult(new org.forgerock.util.promise.ResultHandler<UmaPolicy>() {
                     @Override
                     public void handleResult(UmaPolicy result) {
                         handler.handleResult(new Resource(result.getId(), result.getRevision(), result.asJson()));
                     }
-                }, new FailureHandler<ResourceException>() {
+                })
+                .thenOnException(new ExceptionHandler<ResourceException>() {
                     @Override
-                    public void handleError(ResourceException error) {
+                    public void handleException(ResourceException error) {
                         handler.handleError(error);
                     }
                 });
@@ -130,14 +132,15 @@ public class UmaPolicyResource implements CollectionResourceProvider {
     public void deleteInstance(ServerContext context, final String resourceId, DeleteRequest request,
             final ResultHandler<Resource> handler) {
         umaPolicyService.deletePolicy(context, resourceId)
-                .then(new SuccessHandler<Void>() {
+                .thenOnResult(new org.forgerock.util.promise.ResultHandler<Void>() {
                     @Override
                     public void handleResult(Void result) {
                         handler.handleResult(new Resource(resourceId, "0", json(object())));
                     }
-                }, new FailureHandler<ResourceException>() {
+                })
+                .thenOnException(new ExceptionHandler<ResourceException>() {
                     @Override
-                    public void handleError(ResourceException error) {
+                    public void handleException(ResourceException error) {
                         handler.handleError(error);
                     }
                 });
@@ -178,7 +181,7 @@ public class UmaPolicyResource implements CollectionResourceProvider {
         final QueryResultHandler resultHandler = new QueryResultHandlerBuilder(handler)
                 .withPaging(request.getPageSize(), request.getPagedResultsOffset()).build();
         umaPolicyService.queryPolicies(context, request)
-                .then(new SuccessHandler<Pair<QueryResult, Collection<UmaPolicy>>>() {
+                .thenOnResult(new org.forgerock.util.promise.ResultHandler<Pair<QueryResult, Collection<UmaPolicy>>>() {
                     @Override
                     public void handleResult(Pair<QueryResult, Collection<UmaPolicy>> result) {
                         for (UmaPolicy policy : result.getSecond()) {
@@ -186,9 +189,10 @@ public class UmaPolicyResource implements CollectionResourceProvider {
                         }
                         resultHandler.handleResult(result.getFirst());
                     }
-                }, new FailureHandler<ResourceException>() {
+                })
+                .thenOnException(new ExceptionHandler<ResourceException>() {
                     @Override
-                    public void handleError(ResourceException error) {
+                    public void handleException(ResourceException error) {
                         resultHandler.handleError(error);
                     }
                 });

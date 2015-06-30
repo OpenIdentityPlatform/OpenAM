@@ -181,8 +181,8 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
         config.put(JwtSessionModule.KEYSTORE_TYPE_KEY, amKeyProvider.getKeystoreType());
         config.put(JwtSessionModule.KEYSTORE_FILE_KEY, amKeyProvider.getKeystoreFilePath());
         config.put(JwtSessionModule.KEYSTORE_PASSWORD_KEY, new String(amKeyProvider.getKeystorePass()));
-        config.put(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY, tokenIdleTime);
-        config.put(JwtSessionModule.MAX_TOKEN_LIFE_KEY, maxTokenLife);
+        config.put(JwtSessionModule.TOKEN_IDLE_TIME_IN_MINUTES_CLAIM_KEY, tokenIdleTime);
+        config.put(JwtSessionModule.MAX_TOKEN_LIFE_IN_MINUTES_KEY, maxTokenLife);
         config.put(JwtSessionModule.SECURE_COOKIE_KEY, secureCookie);
         config.put(JwtSessionModule.HTTP_ONLY_COOKIE_KEY, httpOnlyCookie);
         config.put(ENFORCE_CLIENT_IP_SETTING_KEY, enforceClientIP);
@@ -205,8 +205,8 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
 
         switch (state) {
         case ISAuthConstants.LOGIN_START: {
-            setUserSessionProperty(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY, tokenIdleTime.toString());
-            setUserSessionProperty(JwtSessionModule.MAX_TOKEN_LIFE_KEY, maxTokenLife.toString());
+            setUserSessionProperty(JwtSessionModule.TOKEN_IDLE_TIME_IN_MINUTES_CLAIM_KEY, tokenIdleTime.toString());
+            setUserSessionProperty(JwtSessionModule.MAX_TOKEN_LIFE_IN_MINUTES_KEY, maxTokenLife.toString());
             setUserSessionProperty(ENFORCE_CLIENT_IP_SETTING_KEY, Boolean.toString(enforceClientIP));
             setUserSessionProperty(SECURE_COOKIE_KEY, Boolean.toString(secureCookie));
             setUserSessionProperty(HTTP_ONLY_COOKIE_KEY, Boolean.toString(httpOnlyCookie));
@@ -329,8 +329,8 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
             HttpServletResponse response, SSOToken ssoToken) throws AuthenticationException {
 
         try {
-            final String tokenIdleTime = ssoToken.getProperty(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY);
-            final String maxTokenLife = ssoToken.getProperty(JwtSessionModule.MAX_TOKEN_LIFE_KEY);
+            final String tokenIdleTime = ssoToken.getProperty(JwtSessionModule.TOKEN_IDLE_TIME_IN_MINUTES_CLAIM_KEY);
+            final String maxTokenLife = ssoToken.getProperty(JwtSessionModule.MAX_TOKEN_LIFE_IN_MINUTES_KEY);
             final boolean enforceClientIP = Boolean.parseBoolean(ssoToken.getProperty(ENFORCE_CLIENT_IP_SETTING_KEY));
             final String realm = ssoToken.getProperty(SSO_TOKEN_ORGANIZATION_PROPERTY_KEY);
             boolean secureCookie = Boolean.parseBoolean(ssoToken.getProperty(SECURE_COOKIE_KEY));

@@ -92,7 +92,7 @@ public class STSTokenGenerationServiceAuthzModule extends SpecialUserOnlyAuthzMo
     }
 
     private Promise<AuthorizationResult, ResourceException> rejectConsumption() {
-        return Promises.newSuccessfulPromise(AuthorizationResult.accessDenied("TokenGenerationServiceAuthzModule: " +
+        return Promises.newResultPromise(AuthorizationResult.accessDenied("TokenGenerationServiceAuthzModule: " +
                 "invoked functionality is not authorized for any user."));
     }
 
@@ -107,7 +107,7 @@ public class STSTokenGenerationServiceAuthzModule extends SpecialUserOnlyAuthzMo
             if (debug.messageEnabled()) {
                 debug.message("TokenGenerationServiceAuthzModule :: Unable to obtain SSOToken or principal", e);
             }
-            return Promises.newFailedPromise(ResourceException
+            return Promises.newExceptionPromise(ResourceException
                     .getException(HttpURLConnection.HTTP_UNAUTHORIZED, e.getMessage(), e));
         }
 
@@ -115,7 +115,7 @@ public class STSTokenGenerationServiceAuthzModule extends SpecialUserOnlyAuthzMo
             if (debug.messageEnabled()) {
                 debug.message("TokenGenerationServiceAuthzModule :: User, " + userId + " accepted as Soap STS Agent.");
             }
-            return Promises.newSuccessfulPromise(AuthorizationResult.accessPermitted());
+            return Promises.newResultPromise(AuthorizationResult.accessPermitted());
         } else {
             return super.authorize(context);
         }

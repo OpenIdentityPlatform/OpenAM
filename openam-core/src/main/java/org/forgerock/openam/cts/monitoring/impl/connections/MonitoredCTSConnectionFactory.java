@@ -19,9 +19,9 @@ package org.forgerock.openam.cts.monitoring.impl.connections;
 import org.forgerock.openam.cts.monitoring.CTSConnectionMonitoringStore;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
-import org.forgerock.util.promise.FailureHandler;
+import org.forgerock.util.promise.ExceptionHandler;
 import org.forgerock.util.promise.Promise;
-import org.forgerock.util.promise.SuccessHandler;
+import org.forgerock.util.promise.ResultHandler;
 
 /**
  * A wrapper for the CTSConnectionFactory which tracks the success/failure
@@ -32,13 +32,13 @@ public class MonitoredCTSConnectionFactory<C> implements ConnectionFactory<C> {
 
     private final CTSConnectionMonitoringStore monitorStore;
     private final ConnectionFactory<C> connectionFactory;
-    private final FailureHandler<DataLayerException> creationFailureHandler = new FailureHandler<DataLayerException>() {
+    private final ExceptionHandler<DataLayerException> creationFailureHandler = new ExceptionHandler<DataLayerException>() {
         @Override
-        public void handleError(DataLayerException error) {
+        public void handleException(DataLayerException error) {
             monitorStore.addConnection(false);
         }
     };
-    private final SuccessHandler<C> creationSuccessHandler = new SuccessHandler<C>() {
+    private final ResultHandler<C> creationSuccessHandler = new ResultHandler<C>() {
         @Override
         public void handleResult(C result) {
             monitorStore.addConnection(true);
@@ -78,7 +78,9 @@ public class MonitoredCTSConnectionFactory<C> implements ConnectionFactory<C> {
 
     @Override
     public Promise<C, DataLayerException> createAsync() {
-        return connectionFactory.createAsync().onFailure(creationFailureHandler).onSuccess(creationSuccessHandler);
+        return connectionFactory.createAsync()
+                .thenOnException(creationFailureHandler)
+                .thenOnResult(creationSuccessHandler);
     }
 
     @Override

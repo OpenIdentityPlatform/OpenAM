@@ -35,7 +35,7 @@ import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jose.utils.Utils;
 import org.forgerock.openam.utils.MapHelper;
-import org.forgerock.util.promise.Function;
+import org.forgerock.util.Function;
 
 import java.io.IOException;
 import java.net.MalformedURLException;

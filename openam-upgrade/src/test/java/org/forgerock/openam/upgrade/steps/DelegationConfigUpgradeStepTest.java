@@ -33,7 +33,7 @@ import java.util.Set;
 
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.util.promise.Function;
+import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;

@@ -48,7 +48,7 @@ import org.forgerock.openam.upgrade.UpgradeProgress;
 import org.forgerock.openam.upgrade.UpgradeServices;
 import org.forgerock.openam.upgrade.UpgradeStepInfo;
 import org.forgerock.openam.utils.StringUtils;
-import org.forgerock.util.promise.Function;
+import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.query.QueryFilter;
 import org.w3c.dom.Document;

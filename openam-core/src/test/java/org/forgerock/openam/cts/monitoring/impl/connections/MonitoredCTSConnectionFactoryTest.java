@@ -88,7 +88,7 @@ public class MonitoredCTSConnectionFactoryTest {
         //then
         verify(connectionFactory).createAsync();
         verifyZeroInteractions(monitoringStore);
-        promise.handleError(new DataLayerException("reason"));
+        promise.handleException(new DataLayerException("reason"));
         verify(monitoringStore).addConnection(false);
     }
 

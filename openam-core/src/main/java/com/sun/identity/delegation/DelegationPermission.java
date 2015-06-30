@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,17 +24,14 @@
  *
  * $Id: DelegationPermission.java,v 1.5 2008/06/25 05:43:24 qcheng Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.delegation;
 
 import com.sun.identity.sm.DNMapper;
 import java.util.Map;
 import java.util.Set;
-import org.forgerock.util.promise.Function;
+import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 
 /**

@@ -60,7 +60,7 @@ public class CoreTokenResourceAuthzModule extends AdminOnlyAuthzModule {
             if (debug.messageEnabled()) {
                 debug.message("CoreTokenResourceAuthzModule :: Restricted access to CoreTokenResource");
             }
-            return Promises.newSuccessfulPromise(AuthorizationResult.failure("CoreTokenResource not enabled."));
+            return Promises.newResultPromise(AuthorizationResult.failure("CoreTokenResource not enabled."));
         }
 
         if (debug.messageEnabled()) {

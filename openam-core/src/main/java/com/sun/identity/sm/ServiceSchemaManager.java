@@ -42,7 +42,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.forgerock.util.promise.Function;
+import org.forgerock.util.Function;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 

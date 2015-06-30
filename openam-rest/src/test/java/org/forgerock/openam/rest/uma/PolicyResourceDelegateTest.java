@@ -73,8 +73,8 @@ public class PolicyResourceDelegateTest {
         Resource createdPolicyTwo = new Resource("ID_2", "REVISION_2", json(object()));
         createdPolicies.add(createdPolicyOne);
         createdPolicies.add(createdPolicyTwo);
-        Promise<Resource, ResourceException> createPolicyOnePromise = Promises.newSuccessfulPromise(createdPolicyOne);
-        Promise<Resource, ResourceException> createPolicyTwoPromise = Promises.newSuccessfulPromise(createdPolicyTwo);
+        Promise<Resource, ResourceException> createPolicyOnePromise = Promises.newResultPromise(createdPolicyOne);
+        Promise<Resource, ResourceException> createPolicyTwoPromise = Promises.newResultPromise(createdPolicyTwo);
 
         given(policyResource.handleCreate(eq(context), Matchers.<CreateRequest>anyObject()))
                 .willReturn(createPolicyOnePromise)
@@ -101,9 +101,9 @@ public class PolicyResourceDelegateTest {
         policies.add(policyTwo);
         Resource createdPolicyOne = new Resource("ID_1", "REVISION_1", json(object()));
         ResourceException exception = mock(ResourceException.class);
-        Promise<Resource, ResourceException> createPolicyOnePromise = Promises.newSuccessfulPromise(createdPolicyOne);
-        Promise<Resource, ResourceException> createPolicyTwoPromise = Promises.newFailedPromise(exception);
-        Promise<Resource, ResourceException> deletePolicyOnePromise = Promises.newSuccessfulPromise(createdPolicyOne);
+        Promise<Resource, ResourceException> createPolicyOnePromise = Promises.newResultPromise(createdPolicyOne);
+        Promise<Resource, ResourceException> createPolicyTwoPromise = Promises.newExceptionPromise(exception);
+        Promise<Resource, ResourceException> deletePolicyOnePromise = Promises.newResultPromise(createdPolicyOne);
 
         given(policyResource.handleCreate(eq(context), Matchers.<CreateRequest>anyObject()))
                 .willReturn(createPolicyOnePromise)
@@ -137,9 +137,9 @@ public class PolicyResourceDelegateTest {
         Resource createdPolicyOne = new Resource("ID_1", "REVISION_1", json(object()));
         ResourceException createException = mock(ResourceException.class);
         ResourceException deleteException = mock(ResourceException.class);
-        Promise<Resource, ResourceException> createPolicyOnePromise = Promises.newSuccessfulPromise(createdPolicyOne);
-        Promise<Resource, ResourceException> createPolicyTwoPromise = Promises.newFailedPromise(createException);
-        Promise<Resource, ResourceException> deletePolicyOnePromise = Promises.newFailedPromise(deleteException);
+        Promise<Resource, ResourceException> createPolicyOnePromise = Promises.newResultPromise(createdPolicyOne);
+        Promise<Resource, ResourceException> createPolicyTwoPromise = Promises.newExceptionPromise(createException);
+        Promise<Resource, ResourceException> deletePolicyOnePromise = Promises.newExceptionPromise(deleteException);
 
         given(policyResource.handleCreate(eq(context), Matchers.<CreateRequest>anyObject()))
                 .willReturn(createPolicyOnePromise)
@@ -175,8 +175,8 @@ public class PolicyResourceDelegateTest {
         Resource updatedPolicyTwo = new Resource("ID_1", "REVISION_1", json(object()));
         updatedPolicies.add(updatedPolicyOne);
         updatedPolicies.add(updatedPolicyTwo);
-        Promise<Resource, ResourceException> updatePolicyOnePromise = Promises.newSuccessfulPromise(updatedPolicyOne);
-        Promise<Resource, ResourceException> updatePolicyTwoPromise = Promises.newSuccessfulPromise(updatedPolicyTwo);
+        Promise<Resource, ResourceException> updatePolicyOnePromise = Promises.newResultPromise(updatedPolicyOne);
+        Promise<Resource, ResourceException> updatePolicyTwoPromise = Promises.newResultPromise(updatedPolicyTwo);
 
         given(policyResource.handleUpdate(eq(context), Matchers.<UpdateRequest>anyObject()))
                 .willReturn(updatePolicyOnePromise)
@@ -201,8 +201,8 @@ public class PolicyResourceDelegateTest {
         policies.add(policyTwo);
         Resource updatedPolicyOne = new Resource("ID_1", "REVISION_1", json(object()));
         ResourceException exception = mock(ResourceException.class);
-        Promise<Resource, ResourceException> updatePolicyOnePromise = Promises.newSuccessfulPromise(updatedPolicyOne);
-        Promise<Resource, ResourceException> updatePolicyTwoPromise = Promises.newFailedPromise(exception);
+        Promise<Resource, ResourceException> updatePolicyOnePromise = Promises.newResultPromise(updatedPolicyOne);
+        Promise<Resource, ResourceException> updatePolicyTwoPromise = Promises.newExceptionPromise(exception);
 
         given(policyResource.handleUpdate(eq(context), Matchers.<UpdateRequest>anyObject()))
                 .willReturn(updatePolicyOnePromise)
@@ -242,8 +242,8 @@ public class PolicyResourceDelegateTest {
         Set<String> policyIds = new HashSet<String>();
         policyIds.add("ID_1");
         policyIds.add("ID_2");
-        Promise<Resource, ResourceException> deletePolicyOnePromise = Promises.newSuccessfulPromise(policyOne);
-        Promise<Resource, ResourceException> deletePolicyTwoPromise = Promises.newSuccessfulPromise(policyTwo);
+        Promise<Resource, ResourceException> deletePolicyOnePromise = Promises.newResultPromise(policyOne);
+        Promise<Resource, ResourceException> deletePolicyTwoPromise = Promises.newResultPromise(policyTwo);
 
         given(policyResource.handleDelete(eq(context), Matchers.<DeleteRequest>anyObject()))
                 .willReturn(deletePolicyOnePromise)
@@ -266,8 +266,8 @@ public class PolicyResourceDelegateTest {
         policyIds.add("ID_1");
         policyIds.add("ID_2");
         ResourceException exception = mock(ResourceException.class);
-        Promise<Resource, ResourceException> deletePolicyOnePromise = Promises.newSuccessfulPromise(policyOne);
-        Promise<Resource, ResourceException> deletePolicyTwoPromise = Promises.newFailedPromise(exception);
+        Promise<Resource, ResourceException> deletePolicyOnePromise = Promises.newResultPromise(policyOne);
+        Promise<Resource, ResourceException> deletePolicyTwoPromise = Promises.newExceptionPromise(exception);
 
         given(policyResource.handleDelete(eq(context), Matchers.<DeleteRequest>anyObject()))
                 .willReturn(deletePolicyOnePromise)

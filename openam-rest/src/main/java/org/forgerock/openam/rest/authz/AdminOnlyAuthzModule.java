@@ -104,15 +104,15 @@ public class AdminOnlyAuthzModule implements CrestAuthorizationModule {
                 if (debug.messageEnabled()) {
                     debug.message("AdminOnlyAuthZModule :: User, " + userId + " accepted as Administrator.");
                 }
-                return Promises.newSuccessfulPromise(AuthorizationResult.accessPermitted());
+                return Promises.newResultPromise(AuthorizationResult.accessPermitted());
             } else {
                 if (debug.messageEnabled()) {
                     debug.message("AdminOnlyAuthZModule :: Restricted access to " + userId);
                 }
-                return Promises.newSuccessfulPromise(AuthorizationResult.accessDenied("User is not an administrator."));
+                return Promises.newResultPromise(AuthorizationResult.accessDenied("User is not an administrator."));
             }
         } catch (ResourceException e) {
-            return Promises.newFailedPromise(e);
+            return Promises.newExceptionPromise(e);
         }
     }
 

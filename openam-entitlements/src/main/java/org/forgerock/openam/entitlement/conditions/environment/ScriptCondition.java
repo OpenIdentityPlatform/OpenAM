@@ -48,7 +48,7 @@ import org.forgerock.openam.scripting.service.ScriptingService;
 import org.forgerock.openam.scripting.service.ScriptingServiceFactory;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
-import org.forgerock.util.promise.Function;
+import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 
 import javax.script.Bindings;

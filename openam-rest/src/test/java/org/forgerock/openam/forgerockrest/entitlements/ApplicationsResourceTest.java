@@ -64,7 +64,7 @@ import org.forgerock.openam.rest.resource.SSOTokenContext;
 import static org.forgerock.openam.utils.CollectionUtils.asOrderedSet;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.forgerock.openam.utils.CollectionUtils.transformList;
-import org.forgerock.util.promise.Function;
+import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.mockito.ArgumentCaptor;
 import static org.mockito.BDDMockito.given;

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest.authz;
@@ -35,7 +35,7 @@ import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
-import org.forgerock.util.promise.Function;
+import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
@@ -125,7 +125,7 @@ public class PrivilegeAuthzModule implements CrestAuthorizationModule {
         final PrivilegeDefinition definition = actionToDefinition.get(crestAction);
 
         if (definition == null) {
-            return Promises.newSuccessfulPromise(
+            return Promises.newResultPromise(
                     AuthorizationResult.failure("No privilege mapping for requested action " + crestAction));
         }
 
@@ -163,17 +163,17 @@ public class PrivilegeAuthzModule implements CrestAuthorizationModule {
                     Collections.<String, Set<String>>emptyMap())) {
 
                 // Authorisation has been approved.
-                return Promises.newSuccessfulPromise(AuthorizationResult.success());
+                return Promises.newResultPromise(AuthorizationResult.success());
             }
         } catch (DelegationException dE) {
-            return Promises.newFailedPromise(
+            return Promises.newExceptionPromise(
                     ResourceException.getException(500, "Attempt to authorise the user has failed", dE));
         } catch (SSOException ssoE) {
-            return Promises.newFailedPromise(
+            return Promises.newExceptionPromise(
                     ResourceException.getException(500, "Attempt to authorise the user has failed", ssoE));
         }
 
-        return Promises.newSuccessfulPromise(AuthorizationResult.failure("The user has insufficient privileges"));
+        return Promises.newResultPromise(AuthorizationResult.failure("The user has insufficient privileges"));
     }
 
 

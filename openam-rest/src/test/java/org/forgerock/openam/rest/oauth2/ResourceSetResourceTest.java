@@ -80,7 +80,7 @@ public class ResourceSetResourceTest {
         ResourceSetDescription resourceSet = new ResourceSetDescription();
         resourceSet.setDescription(json(object()));
         Promise<ResourceSetDescription, ResourceException> resourceSetPromise
-                = Promises.newSuccessfulPromise(resourceSet);
+                = Promises.newResultPromise(resourceSet);
 
         given(contextHelper.getRealm(context)).willReturn("REALM");
         given(contextHelper.getUserId(context)).willReturn("RESOURCE_OWNER_ID");
@@ -214,7 +214,7 @@ public class ResourceSetResourceTest {
                 QueryFilter.equalTo("/resourceServer", "myclient"),
                 QueryFilter.equalTo("/policy/permissions/subject", "SUBJECT"));
         Promise<Collection<ResourceSetDescription>, ResourceException> resourceSetsPromise
-                = Promises.newSuccessfulPromise((Collection<ResourceSetDescription>) asSet(resourceSet));
+                = Promises.newResultPromise((Collection<ResourceSetDescription>) asSet(resourceSet));
 
         given(contextHelper.getRealm(context)).willReturn("REALM");
         given(contextHelper.getUserId(context)).willReturn("RESOURCE_OWNER_ID");
@@ -251,7 +251,7 @@ public class ResourceSetResourceTest {
         given(contextHelper.getUserId(context)).willReturn("RESOURCE_OWNER_ID");
         given(request.getAction()).willReturn("revokeAll");
         given(resourceSetService.revokeAllPolicies(context, "REALM", "RESOURCE_OWNER_ID"))
-                .willReturn(Promises.<Void, ResourceException>newSuccessfulPromise(null));
+                .willReturn(Promises.<Void, ResourceException>newResultPromise(null));
 
         //When
         resource.actionCollection(context, request, handler);
@@ -275,7 +275,7 @@ public class ResourceSetResourceTest {
         given(contextHelper.getUserId(context)).willReturn("RESOURCE_OWNER_ID");
         given(request.getAction()).willReturn("revokeAll");
         given(resourceSetService.revokeAllPolicies(context, "REALM", "RESOURCE_OWNER_ID"))
-                .willReturn(Promises.<Void, ResourceException>newFailedPromise(new NotFoundException()));
+                .willReturn(Promises.<Void, ResourceException>newExceptionPromise(new NotFoundException()));
 
         //When
         resource.actionCollection(context, request, handler);
