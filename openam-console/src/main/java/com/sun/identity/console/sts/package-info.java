@@ -16,7 +16,7 @@
 
 
 /**
- * Contains the model, or data access functionality, consumed by the ViewBean context displaying rest-sts instance state
- * to be created, edited, or deleted.
+ * Contains the ViewBean classes and model package defining the Admin console UI used to create, delete, and edit
+ * instances of the rest sts service, defined in restSTS.xml.
  */
-package com.sun.identity.console.reststs.model;
+package com.sun.identity.console.sts;

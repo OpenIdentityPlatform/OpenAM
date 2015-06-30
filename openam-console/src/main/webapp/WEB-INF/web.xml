@@ -59,8 +59,8 @@
         <param-value>../webservices</param-value>
     </context-param>
     <context-param>
-        <param-name>jato:com.sun.identity.console.reststs.*:moduleURL</param-name>
-        <param-value>../reststs</param-value>
+        <param-name>jato:com.sun.identity.console.sts.*:moduleURL</param-name>
+        <param-value>../sts</param-value>
     </context-param>
 
     <servlet>
@@ -120,8 +120,8 @@
         <servlet-class>com.sun.identity.console.webservices.WSServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>RestSTSServlet</servlet-name>
-        <servlet-class>com.sun.identity.console.reststs.RestSTSServlet</servlet-class>
+        <servlet-name>STSServlet</servlet-name>
+        <servlet-class>com.sun.identity.console.sts.STSServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -181,7 +181,7 @@
         <url-pattern>/webservices/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>RestSTSServlet</servlet-name>
-        <url-pattern>/reststs/*</url-pattern>
+        <servlet-name>STSServlet</servlet-name>
+        <url-pattern>/sts/*</url-pattern>
     </servlet-mapping>
 </web-app>

@@ -70,7 +70,7 @@ class SoapSTSPublishServiceRequestHandler implements RequestHandler {
     private final Logger logger;
 
     /*
-    No Injection, as ctor called from the STSPublishServiceConnectionFactory (params obtained from RestSTSPublishInjectorHolder).
+    No Injection, as ctor called from the STSPublishServiceConnectionFactory (params obtained from SoapSTSPublishInjectorHolder).
      */
     SoapSTSPublishServiceRequestHandler(SoapSTSInstancePublisher publisher, RestRealmValidator realmValidator,
                                         InstanceConfigMarshaller<SoapSTSInstanceConfig> instanceConfigMarshaller,
@@ -86,11 +86,11 @@ class SoapSTSPublishServiceRequestHandler implements RequestHandler {
     }
 
     /*
-     This method will be invoked by either a programmatic client, in which case a RestSTSInstanceConfig has emitted
-     properly-formatted json, or from the RestSecurityTokenServiceViewBean, in which case the configuration state is
+     This method will be invoked by either a programmatic client, in which case a SoapSTSInstanceConfig has emitted
+     properly-formatted json, or from the SoapSTSAddViewBean, in which case the configuration state is
      in the sms-centric Map<String, Set<String>> format. This method needs to be able to handle both invocation types,
-     and marshal the invocation state in to a RestSTSInstanceConfig instance either way. It also needs to return an accurate
-     error message, so that in the case of RestSecurityTokenServiceViewBean invocation, the user can make appropriate
+     and marshal the invocation state in to a SoapSTSInstanceConfig instance either way. It also needs to return an accurate
+     error message, so that in the case of SoapSecurityTokenServiceViewBean invocation, the user can make appropriate
       corrections to the configuration state.
       */
     public void handleCreate(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
@@ -102,7 +102,7 @@ class SoapSTSPublishServiceRequestHandler implements RequestHandler {
             return;
         }
         if (!realmValidator.isRealm(instanceConfig.getDeploymentConfig().getRealm())) {
-            logger.warn("Publish of Rest STS instance " + instanceConfig.getDeploymentSubPath() + " to realm "
+            logger.warn("Publish of Soap STS instance " + instanceConfig.getDeploymentSubPath() + " to realm "
                     + instanceConfig.getDeploymentConfig().getRealm() + " rejected because realm does not exist.");
             handler.handleError(new NotFoundException("The specified realm does not exist."));
             return;
@@ -120,7 +120,7 @@ class SoapSTSPublishServiceRequestHandler implements RequestHandler {
         /*
         Don't reject invocation for specious realm here. It is possible that a user deletes a realm, and then
         re-creates it, and wants to re-publish a soap-sts instance with the same id. Not rejecting this invocation
-        allows the RestSTSInstancePublisherImpl to purge its Route cache referencing previously published instances.
+        allows the SoapSTSInstancePublisherImpl to purge its Route cache referencing previously published instances.
         And a specious delete that is not occurring in the context of this scenario will result in a 404 exception.
          */
         try {
@@ -159,7 +159,7 @@ class SoapSTSPublishServiceRequestHandler implements RequestHandler {
                 }
                 /*
                 Note that the revision etag is not set, as this is not a resource which should really be cached.
-                If caching becomes necessary, a string composed of the hash codes of each of the RestSTSInstanceConfig
+                If caching becomes necessary, a string composed of the hash codes of each of the SoapSTSInstanceConfig
                 instances could be used (or a hash of that string).
                  */
                 handler.handleResult(new Resource(PUBLISHED_INSTANCES, EMPTY_STRING, jsonObject.build()));
@@ -187,7 +187,7 @@ class SoapSTSPublishServiceRequestHandler implements RequestHandler {
 
     /*
      * A PUT to the url composed of the publish endpont + the sts instance id with a payload corresponding to a
-     * RestSTSInstanceId (wrapped in invocation context information) will result in republishing the existing instance
+     * SoapSTSInstanceId (wrapped in invocation context information) will result in republishing the existing instance
      * (which is a delete followed by a create).
      */
     public void handleUpdate(ServerContext context, UpdateRequest request, ResultHandler<Resource> handler) {
@@ -206,7 +206,7 @@ class SoapSTSPublishServiceRequestHandler implements RequestHandler {
         try {
             publishedToSMS = (publisher.getPublishedInstance(stsId, realm) != null);
         } catch (STSPublishException e) {
-            logger.error("In RestSTSPublishServiceRequestHandler#handleUpdate, exception caught determining whether " +
+            logger.error("In SoapSTSPublishServiceRequestHandler#handleUpdate, exception caught determining whether " +
                     "instance persisted in SMS. Instance not updated. Exception: " + e, e);
             handler.handleError(e);
             return;
@@ -217,8 +217,8 @@ class SoapSTSPublishServiceRequestHandler implements RequestHandler {
             try {
                 instanceConfig = marshalInstanceConfigFromInvocation(request.getContent());
             } catch (BadRequestException e) {
-                logger.error("In RestSTSPublishServiceRequestHandler#handleUpdate, exception caught marshalling " +
-                        "invocation state to RestSTSInstanceConfig. Instance not updated. The state: "
+                logger.error("In SoapSTSPublishServiceRequestHandler#handleUpdate, exception caught marshalling " +
+                        "invocation state to SoapSTSInstanceConfig. Instance not updated. The state: "
                         + request.getContent() + "Exception: " + e, e);
                 handler.handleError(e);
                 return;
@@ -226,7 +226,7 @@ class SoapSTSPublishServiceRequestHandler implements RequestHandler {
             try {
                 publisher.removeInstance(stsId, realm);
             } catch (STSPublishException e) {
-                logger.error("In RestSTSPublishServiceRequestHandler#handleUpdate, exception caught removing " +
+                logger.error("In SoapSTSPublishServiceRequestHandler#handleUpdate, exception caught removing " +
                         "soap sts instance " + instanceConfig.getDeploymentSubPath() + ". This means instance is" +
                         "in indeterminate state, and has not been updated. The instance config: " +  instanceConfig
                         + "; Exception: " + e, e);
@@ -234,10 +234,10 @@ class SoapSTSPublishServiceRequestHandler implements RequestHandler {
             }
             try {
                 publishInstance(instanceConfig, handler);
-                logger.info("Rest STS instance " + instanceConfig.getDeploymentSubPath() + " updated to state " +
+                logger.info("Soap STS instance " + instanceConfig.getDeploymentSubPath() + " updated to state " +
                         instanceConfig.toJson());
             } catch (ResourceException e) {
-                logger.error("In RestSTSPublishServiceRequestHandler#handleUpdate, exception caught publishing " +
+                logger.error("In SoapSTSPublishServiceRequestHandler#handleUpdate, exception caught publishing " +
                         "soap sts instance " + instanceConfig.getDeploymentSubPath() + ". This means instance is" +
                         "in indeterminate state, having been removed, but not successfully published with updated " +
                         "state. The instance config: " +  instanceConfig + "; Exception: " + e, e);

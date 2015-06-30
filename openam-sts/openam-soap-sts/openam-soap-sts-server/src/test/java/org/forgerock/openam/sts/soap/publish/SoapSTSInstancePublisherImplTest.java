@@ -148,8 +148,8 @@ public class SoapSTSInstancePublisherImplTest {
 
         SoapDeploymentConfig deploymentConfig =
                 SoapDeploymentConfig.builder()
-                        .portQName(AMSTSConstants.AM_TRANSPORT_STS_SERVICE_PORT)
-                        .serviceQName(AMSTSConstants.AM_TRANSPORT_STS_SERVICE)
+                        .portQName(AMSTSConstants.STANDARD_STS_PORT_QNAME)
+                        .serviceQName(AMSTSConstants.STANDARD_STS_SERVICE_NAME)
                         .wsdlLocation("wsdl_loc")
                         .realm("realm")
                         .amDeploymentUrl(amDeploymentUrl)

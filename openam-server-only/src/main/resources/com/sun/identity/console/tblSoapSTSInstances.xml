@@ -1,7 +1,7 @@
 <!--
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright 2014-2015 ForgeRock AS.
+    Copyright 2015 ForgeRock AS.
 
     The contents of this file are subject to the terms of the Common Development and
     Distribution License (the License). You may not use this file except in compliance with the
@@ -20,20 +20,20 @@
 
 <table>
     <actions>
-        <cc name="tblRestSTSInstancesButtonAdd"
+        <cc name="tblSoapSTSInstancesButtonAdd"
             tagclass="com.sun.web.ui.taglib.html.CCButtonTag" />
-        <cc name="tblRestSTSInstancesButtonDelete"
+        <cc name="tblSoapSTSInstancesButtonDelete"
             tagclass="com.sun.web.ui.taglib.html.CCButtonTag">
             <attribute name="dynamic" value="true" />
             <attribute name="disabled" value="true" />
         </cc>
     </actions>
 
-    <column name="tblRestSTSInstancesColName"
-            sortname="tblRestSTSInstancesDataName"
+    <column name="tblSoapSTSInstancesColName"
+            sortname="tblSoapSTSInstancesDataName"
             rowheader="true">
-        <cc name="tblRestSTSInstancesDataActionHref" tagclass="com.sun.web.ui.taglib.html.CCHrefTag">
-            <cc name="tblRestSTSInstancesDataName"
+        <cc name="tblSoapSTSInstancesDataActionHref" tagclass="com.sun.web.ui.taglib.html.CCHrefTag">
+            <cc name="tblSoapSTSInstancesDataName"
                 tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" ><attribute name="bundleID" value="" /></cc>
         </cc>
     </column>

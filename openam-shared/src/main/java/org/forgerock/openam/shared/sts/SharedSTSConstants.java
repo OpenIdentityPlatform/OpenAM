@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.shared.sts;
 
+import javax.xml.namespace.QName;
+
 /**
  * Defines some constants shared between the openam-sts module and the sts ViewBean/Model in openam-console.
  */
@@ -269,16 +271,22 @@ public class SharedSTSConstants {
     public static final String FORWARD_SLASH = "/";
 
     /*
-    The url element at which the rest publish service is exposed. The rest-sts-publish corresponds to the entry in web.xml
-    defining the servlet-mapping for the rest-sts-publish servlet.
+    The url element at which the rest publish service is exposed. Corresponds to the entry in web.xml
+    defining the servlet-mapping for the sts-publish servlet.
      */
     public static final String REST_PUBLISH_SERVICE_URL_ELEMENT = "/sts-publish/rest";
+
+    /*
+    The url element at which the soap publish service is exposed. Corresponds to the entry in web.xml
+    defining the servlet-mapping for the sts-publish servlet.
+     */
+    public static final String SOAP_PUBLISH_SERVICE_URL_ELEMENT = "/sts-publish/soap";
 
     /*
     The url constituent, appended to the REST_PUBLISH_SERVICE_URL_ELEMENT, which will trigger a POST to the rest-sts-publish
     crest service to create a new rest sts instance.
      */
-    public static final String REST_PUBLISH_SERVICE_CREATE_ACTION_URL_ELEMENT = "?_action=create";
+    public static final String PUBLISH_SERVICE_CREATE_ACTION_URL_ELEMENT = "?_action=create";
 
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String APPLICATION_JSON = "application/json";
@@ -287,4 +295,85 @@ public class SharedSTSConstants {
      * The name of the CREST header identifying the version of a targeted service.
      */
     public static final String CREST_VERSION_HEADER_KEY = "Accept-API-Version";
+
+    /**
+     * Name of configuration key referencing a custom wsdl file
+     */
+    public static final String CUSTOM_WSDL_LOCATION = "deployment-custom-wsdl-location";
+
+    /**
+     * Name of configuration key referencing a custom service name specified in a custom wsdl file
+     */
+    public static final String CUSTOM_SERVICE_QNAME = "deployment-custom-service-name";
+
+    /**
+     * Name of configuration key referencing a custom service port specified in a custom wsdl file
+     */
+    public static final String CUSTOM_PORT_QNAME = "deployment-custom-service-port";
+
+    /**
+     * Name of configuration key referencing the type of SupportingToken specified in the SecurityPolicy bindings
+     * protecting a soap-sts instance.
+     */
+    public static final String SECURITY_POLICY_VALIDATED_TOKEN_CONFIG = "security-policy-validated-token-config";
+
+    /**
+     * Name of configuration key referencing the name of the service defined in the wsdl which should be exposed.
+     */
+    public static final String SERVICE_QNAME = "deployment-service-name";
+
+    /**
+     * Name of configuration key referencing the name of the port defined in the wsdl which should be exposed.
+     */
+    public static final String PORT_QNAME = "deployment-service-port";
+
+    /**
+     * Name of configuration key referencing the wsdl location
+     */
+    public static final String WSDL_LOCATION = "deployment-wsdl-location";
+
+    /**
+     * Name of configuration key referencing the url of the OpenAM deployment
+     */
+    public static final String AM_DEPLOYMENT_URL = "deployment-am-url";
+
+    /**
+     * One of the possible selections defined in propertySoapSecurityTokenService.xml, under the deployment-wsdl-location
+     * property, which allows the user to indicate that they wish to specify a custom wsdl location.
+     */
+    public static final String CUSTOM_WSDL_FILE_INDICATOR = "custom_wsdl_file";
+
+    /**
+    The namespace defined by the WS-Trust specification.
+     */
+    public static final String WS_TRUST_NAMESPACE = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/";
+
+    /**
+     * The name of the sts service in all of the standard wsdl definitions
+     */
+    public static final QName STANDARD_STS_SERVICE_QNAME = new QName(WS_TRUST_NAMESPACE, "sts_service");
+
+    /**
+     * The name of the sts service port in all of the standard wsdl definitions
+     */
+    public static final QName STANDARD_STS_PORT_QNAME = new QName(WS_TRUST_NAMESPACE, "sts_service_port");
+
+    /**
+     * Name of a property defined in propertySoapSecurityTokenService.xml and soapSTS.xml which indicates whether
+     * the soap-sts instance will plug-in token validators for ActAs/OnBehalfOf elements included in RequestSecurityToken
+     * invocations.
+     */
+    public static final String DELEGATION_RELATIONSHIP_SUPPORTED = "delegation-relationship-supported";
+
+    /**
+     * Corresponds to entries in propertySoapSecurityTokenService.xml and soapSTS.xml which indicate which tokens can be
+     * included as ActAs/OnBehalfOf elements in a RST
+     */
+    public static final String DELEGATION_TOKEN_VALIDATORS = "delegation-validated-token-types";
+
+    /**
+     * Corresponds to entries in propertySoapSecurityTokenService.xml and soapSTS.xml which specify custom TokenDelegationHandler
+     * implementations which will validate token elements included as ActAs/OnBehalfOf elements in a RST
+     */
+    public static final String CUSTOM_DELEGATION_TOKEN_HANDLERS = "delegation-custom-token-handlers";
 }

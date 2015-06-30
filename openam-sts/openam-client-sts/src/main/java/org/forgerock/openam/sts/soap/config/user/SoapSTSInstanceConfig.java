@@ -18,6 +18,7 @@ package org.forgerock.openam.sts.soap.config.user;
 
 import org.forgerock.guava.common.base.Objects;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.shared.sts.SharedSTSConstants;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.DeploymentPathNormalizationImpl;
 import org.forgerock.openam.sts.MapMarshallUtils;
@@ -48,14 +49,21 @@ import java.util.Set;
  *
  */
 public class SoapSTSInstanceConfig extends STSInstanceConfig {
+    /*
+    If new wsdl files are added which define x509 SupportingTokens, then these .wsdl files have to be added here. These
+    values are used to do some configuration validation - see areSTSClientsAssertedViaX509 below.
+     */
+    private static final String X509_SYMMETRIC_WSDL = "sts_x509_symmetric.wsdl";
+    private static final String X509_ASYMMETRIC_WSDL = "sts_x509_asymmetric.wsdl";
+
     private static final String SOAP_KEYSTORE_CONFIG = "soap-keystore-config";
     private static final String SOAP_DELEGATION_CONFIG = "soap-delegation-config";
     /*
     The following three names correspond to entries defined in soapSTS.xml
      */
     static final String ISSUE_TOKEN_TYPES = "issued-token-types";
-    static final String VALIDATED_TOKEN_CONFIG = "security-policy-validated-token-config";
-    static final String DELEGATION_RELATIONSHIP_SUPPORTED = "delegation-relationship-supported";
+    static final String SECURITY_POLICY_VALIDATED_TOKEN_CONFIG = SharedSTSConstants.SECURITY_POLICY_VALIDATED_TOKEN_CONFIG;
+    static final String DELEGATION_RELATIONSHIP_SUPPORTED = SharedSTSConstants.DELEGATION_RELATIONSHIP_SUPPORTED;
 
     public abstract static class SoapSTSInstanceConfigBuilderBase <T extends SoapSTSInstanceConfigBuilderBase<T>>
             extends STSInstanceConfig.STSInstanceConfigBuilderBase<T>  {
@@ -221,8 +229,8 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
      * mandate client x509-certificate presentation.
      */
     private boolean areSTSClientsAssertedViaX509() {
-        final QName serviceName = deploymentConfig.getService();
-        return (AMSTSConstants.X509_ASYMMETRIC_STS_SERVICE.equals(serviceName) || AMSTSConstants.X509_SYMMETRIC_STS_SERVICE.equals(serviceName));
+        final String wsdlLocation = deploymentConfig.getWsdlLocation();
+        return (X509_ASYMMETRIC_WSDL.equals(wsdlLocation) || X509_SYMMETRIC_WSDL.equals(wsdlLocation));
     }
 
     private boolean isX509TokenValidatorPresent() {
@@ -327,7 +335,7 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         for (TokenValidationConfig tokenValidationConfig : securityPolicyValidatedTokenConfiguration) {
             translationList.add(tokenValidationConfig.toJson());
         }
-        baseValue.add(VALIDATED_TOKEN_CONFIG, validatedTokenConfiguration);
+        baseValue.add(SECURITY_POLICY_VALIDATED_TOKEN_CONFIG, validatedTokenConfiguration);
 
         baseValue.add(SOAP_KEYSTORE_CONFIG, keystoreConfig != null ? keystoreConfig.toJson(): null);
 
@@ -364,10 +372,10 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
                 .oidcIdTokenConfig(baseConfig.getOpenIdConnectTokenConfig())
                 .deploymentConfig(SoapDeploymentConfig.fromJson(json.get(DEPLOYMENT_CONFIG)));
 
-        JsonValue validatedTokenConfiguration = json.get(VALIDATED_TOKEN_CONFIG);
+        JsonValue validatedTokenConfiguration = json.get(SECURITY_POLICY_VALIDATED_TOKEN_CONFIG);
         if (!validatedTokenConfiguration.isNull()) {
             if (!validatedTokenConfiguration.isList()) {
-                throw new IllegalStateException("Unexpected value for the " + VALIDATED_TOKEN_CONFIG + " field: "
+                throw new IllegalStateException("Unexpected value for the " + SECURITY_POLICY_VALIDATED_TOKEN_CONFIG + " field: "
                         + validatedTokenConfiguration.asString());
             }
             Set<TokenValidationConfig> validationConfigs = new HashSet<>();
@@ -429,9 +437,9 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         then add each of the TokenTransformConfig instances in the supportTokenTranslationsSet to a Set<String>, obtaining
         a string representation for each TokenTransformConfig instance, and adding it to the Set<String>
          */
-        interimMap.remove(VALIDATED_TOKEN_CONFIG);
+        interimMap.remove(SECURITY_POLICY_VALIDATED_TOKEN_CONFIG);
         Set<String> validatedTokenConfig = new HashSet<>();
-        interimMap.put(VALIDATED_TOKEN_CONFIG, validatedTokenConfig);
+        interimMap.put(SECURITY_POLICY_VALIDATED_TOKEN_CONFIG, validatedTokenConfig);
         for (TokenValidationConfig tvc : securityPolicyValidatedTokenConfiguration) {
             validatedTokenConfig.add(tvc.toSMSString());
         }
@@ -533,15 +541,15 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         }
 
         /*
-         The VALIDATED_TOKEN_CONFIG are currently each in a String representation in the Set<String> map entry corresponding
-         to the VALIDATED_TOKEN_CONFIG key. I need to marshal each back into a TokenValidationConfig instance, and then
+         The SECURITY_POLICY_VALIDATED_TOKEN_CONFIG are currently each in a String representation in the Set<String> map entry corresponding
+         to the SECURITY_POLICY_VALIDATED_TOKEN_CONFIG key. I need to marshal each back into a TokenValidationConfig instance, and then
          call toJson on each, and put them in a JsonValue wrapping a list.
          */
         ArrayList<JsonValue> jsonValidationConfigList = new ArrayList<>();
         JsonValue jsonTranslations = new JsonValue(jsonValidationConfigList);
-        jsonAttributes.remove(VALIDATED_TOKEN_CONFIG);
-        jsonAttributes.put(VALIDATED_TOKEN_CONFIG, jsonTranslations);
-        Set<String> stringTokenTranslations = attributeMap.get(VALIDATED_TOKEN_CONFIG);
+        jsonAttributes.remove(SECURITY_POLICY_VALIDATED_TOKEN_CONFIG);
+        jsonAttributes.put(SECURITY_POLICY_VALIDATED_TOKEN_CONFIG, jsonTranslations);
+        Set<String> stringTokenTranslations = attributeMap.get(SECURITY_POLICY_VALIDATED_TOKEN_CONFIG);
         for (String translation : stringTokenTranslations) {
             jsonValidationConfigList.add(TokenValidationConfig.fromSMSString(translation).toJson());
         }

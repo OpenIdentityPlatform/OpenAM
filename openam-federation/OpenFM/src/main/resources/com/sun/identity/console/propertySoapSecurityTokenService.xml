@@ -1,7 +1,7 @@
 <!--
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright 2014-2015 ForgeRock AS.
+    Copyright 2015 ForgeRock AS.
 
     The contents of this file are subject to the terms of the Common Development and
     Distribution License (the License). You may not use this file except in compliance with the
@@ -20,83 +20,55 @@
 <propertysheet>
     <section name="General" defaultValue="rest.sts.general.section.title">
         <property>
-            <label name="lblTokenTransforms"
-                   defaultValue="rest.sts.tokentransforms"
-                   labelFor="supported-token-transforms"/>
-            <cc name="supported-token-transforms"
+            <label name="lblIssuedTokenTypes"
+                   defaultValue="soap.sts.issued.token.types"
+                   labelFor="issued-token-types"/>
+            <cc name="issued-token-types"
                 tagclass="com.sun.web.ui.taglib.html.CCSelectableListTag">
-                <option label="rest.sts.transform.unt.saml2.true" value="USERNAME|SAML2|true"/>
-                <option label="rest.sts.transform.unt.saml2.false" value="USERNAME|SAML2|false"/>
-                <option label="rest.sts.transform.oidc.saml2.true" value="OPENIDCONNECT|SAML2|true"/>
-                <option label="rest.sts.transform.oidc.saml2.false" value="OPENIDCONNECT|SAML2|false"/>
-                <option label="rest.sts.transform.openam.saml2.true" value="OPENAM|SAML2|true"/>
-                <option label="rest.sts.transform.openam.saml2.false" value="OPENAM|SAML2|false"/>
-                <option label="rest.sts.transform.x509.saml2.true" value="X509|SAML2|true"/>
-                <option label="rest.sts.transform.x509.saml2.false" value="X509|SAML2|false"/>
-                <option label="rest.sts.transform.unt.oidc.true" value="USERNAME|OPENIDCONNECT|true"/>
-                <option label="rest.sts.transform.unt.oidc.false" value="USERNAME|OPENIDCONNECT|false"/>
-                <option label="rest.sts.transform.oidc.oidc.true" value="OPENIDCONNECT|OPENIDCONNECT|true"/>
-                <option label="rest.sts.transform.oidc.oidc.false" value="OPENIDCONNECT|OPENIDCONNECT|false"/>
-                <option label="rest.sts.transform.openam.oidc.true" value="OPENAM|OPENIDCONNECT|true"/>
-                <option label="rest.sts.transform.openam.oidc.false" value="OPENAM|OPENIDCONNECT|false"/>
-                <option label="rest.sts.transform.x509.oidc.true" value="X509|OPENIDCONNECT|true"/>
-                <option label="rest.sts.transform.x509.oidc.false" value="X509|OPENIDCONNECT|false"/>
+                <option label="soap.sts.issued.token.saml2" value="SAML2"/>
+                <option label="soap.sts.issued.token.oidc" value="OPENIDCONNECT"/>
                 <attribute name="multiple" value="true" />
             </cc>
-            <fieldhelp name="helpTokenTransforms" defaultValue="rest.sts.tokentransforms.help" />
+            <fieldhelp name="helpIssuedTokenTypes" defaultValue="soap.sts.issued.token.help" />
         </property>
+        <!--
+        Note that the out-of-the-box .wsdl files deployed with the soap-sts .war file support only a single SecurityPolicy
+        binding. However, in order to support customers who wish to deploy a custom wsdl file in which the SecurityPolicy
+        references a choice of bindings, the selection of multiple validated token config must be supported, as these
+        definitions trigger the plugging in of wss4j Validator instances into the wss4j SecurityPolicy enforcement runtime.
+        -->
         <property>
-            <label name="lblCustomTokenValidators"
-                   defaultValue="rest.sts.custom.token.validators"
-                   labelFor="custom-token-validators"/>
-            <cc name="custom-token-validators"
-                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag">
-                <attribute name="name" value="list" />
-                <attribute name="listboxLabel" value="label.current.value" />
-                <attribute name="textboxLabel" value="label.new.value" />
+            <label name="lblSecurityPolicyValidatedTokenConfig"
+                   defaultValue="soap.sts.security.policy.validated.token.config"
+                   labelFor="security-policy-validated-token-config"/>
+            <cc name="security-policy-validated-token-config"
+                tagclass="com.sun.web.ui.taglib.html.CCSelectableListTag">
+                <option label="soap.sts.security.policy.validated.token.config.unt.true" value="USERNAME|true"/>
+                <option label="soap.sts.security.policy.validated.token.config.unt.false" value="USERNAME|false"/>
+                <option label="soap.sts.security.policy.validated.token.config.openam.true" value="OPENAM|true"/>
+                <option label="soap.sts.security.policy.validated.token.config.openam.false" value="OPENAM|false"/>
+                <option label="soap.sts.security.policy.validated.token.config.x509.true" value="X509|true"/>
+                <option label="soap.sts.security.policy.validated.token.config.x509.false" value="X509|false"/>
+                <attribute name="multiple" value="true" />
             </cc>
-            <fieldhelp name="helpCustomTokenValidators" defaultValue="rest.sts.custom.token.validators.help" />
-        </property>
-        <property>
-            <label name="lblCustomTokenProviders"
-                   defaultValue="rest.sts.custom.token.providers"
-                   labelFor="custom-token-providers"/>
-            <cc name="custom-token-providers"
-                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag">
-                <attribute name="name" value="list" />
-                <attribute name="listboxLabel" value="label.current.value" />
-                <attribute name="textboxLabel" value="label.new.value" />
-            </cc>
-            <fieldhelp name="helpCustomTokenProviders" defaultValue="rest.sts.custom.token.providers.help" />
-        </property>
-        <property>
-            <label name="lblCustomTokenTransforms"
-                   defaultValue="rest.sts.custom.token.transforms"
-                   labelFor="custom-token-transforms"/>
-            <cc name="custom-token-transforms"
-                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag">
-                <attribute name="name" value="list" />
-                <attribute name="listboxLabel" value="label.current.value" />
-                <attribute name="textboxLabel" value="label.new.value" />
-            </cc>
-            <fieldhelp name="helpCustomTokenTransforms" defaultValue="rest.sts.custom.token.transforms.help" />
+            <fieldhelp name="helpSecurityPolicyValidatedTokenConfig" defaultValue="soap.sts.security.policy.validated.token.config.help" />
         </property>
     </section>
 
-    <section name="Deployment" defaultValue="rest.sts.deployment.section.title">
+    <section name="Deployment" defaultValue="soap.sts.deployment.section.title">
         <property>
             <label name="lblDeploymentUrlElement"
-                   defaultValue="rest.sts.deployment.UrlElement"
+                   defaultValue="soap.sts.deployment.url.element"
                    labelFor="deployment-url-element"/>
             <cc name="deployment-url-element"
                 tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
             </cc>
-            <fieldhelp name="helpDeploymentUrlElement" defaultValue="rest.sts.deployment.UrlElement.help" />
+            <fieldhelp name="helpDeploymentUrlElement" defaultValue="soap.sts.deployment.url.element.help" />
         </property>
 
         <property>
             <label name="lblAuthTargetMappings"
-                   defaultValue="rest.sts.deployment.AuthTargetMappings"
+                   defaultValue="soap.sts.deployment.auth.target.mappings"
                    labelFor="deployment-auth-target-mappings"/>
             <cc name="deployment-auth-target-mappings"
                 tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag">
@@ -104,32 +76,109 @@
                 <attribute name="listboxLabel" value="label.current.value" />
                 <attribute name="textboxLabel" value="label.new.value" />
             </cc>
-            <fieldhelp name="helpAuthTargetMappings" defaultValue="rest.sts.deployment.AuthTargetMappings.help" />
+            <fieldhelp name="helpAuthTargetMappings" defaultValue="soap.sts.deployment.auth.target.mappings.help" />
         </property>
 
         <property>
-            <label name="lblDeploymentTwoWayTLSHeaderKey"
-                   defaultValue="rest.sts.deployment.TwoWayTLSHeaderKey"
-                   labelFor="deployment-offloaded-two-way-tls-header-key"/>
-            <cc name="deployment-offloaded-two-way-tls-header-key"
+            <label name="lblDeploymentAMUrl"
+                   defaultValue="soap.sts.deployment.am.url"
+                   labelFor="deployment-am-url"/>
+            <cc name="deployment-am-url"
                 tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
             </cc>
-            <fieldhelp name="helpDeploymentTwoWayTLSHeaderKey" defaultValue="rest.sts.deployment.TwoWayTLSHeaderKey.help" />
+            <fieldhelp name="helpDeploymentAMUrl" defaultValue="soap.sts.deployment.am.url.help" />
         </property>
 
         <property>
-            <label name="lblDeploymentTLSOffloadEngineHosts"
-                   defaultValue="rest.sts.deployment.TLSOffloadEngineHosts"
-                   labelFor="deployment-tls-offload-engine-hosts"/>
-            <cc name="deployment-tls-offload-engine-hosts"
+            <label name="lblDeploymentWsdlLocation"
+                   defaultValue="soap.sts.deployment.wsdl.location"
+                   labelFor="deployment-wsdl-location"/>
+            <cc name="deployment-wsdl-location"
+                tagclass="com.sun.web.ui.taglib.html.CCSelectableListTag">
+                <option label="soap.sts.deployment.wsdl.location.ut.transport" value="sts_ut_transport.wsdl"/>
+                <option label="soap.sts.deployment.wsdl.location.ut.symmetric" value="sts_ut_symmetric.wsdl"/>
+                <option label="soap.sts.deployment.wsdl.location.ut.asymmetric" value="sts_ut_asymmetric.wsdl"/>
+                <option label="soap.sts.deployment.wsdl.location.am.bare" value="sts_am_bare.wsdl"/>
+                <option label="soap.sts.deployment.wsdl.location.am.transport" value="sts_am_transport.wsdl"/>
+                <option label="soap.sts.deployment.wsdl.location.x509.symmetric" value="sts_x509_symmetric.wsdl"/>
+                <option label="soap.sts.deployment.wsdl.location.x509.asymmetric" value="sts_x509_asymmetric.wsdl"/>
+                <option label="soap.sts.deployment.wsdl.location.custom" value="custom_wsdl_file"/>
+                <attribute name="multiple" value="false" />
+            </cc>
+            <fieldhelp name="helpDeploymentWsdlLocation" defaultValue="soap.sts.deployment.wsdl.location.help" />
+        </property>
+
+
+        <property>
+            <label name="lblDeploymentCustomWsdlLocation"
+                   defaultValue="soap.sts.deployment.custom.wsdl.location"
+                   labelFor="deployment-custom-wsdl-location"/>
+            <cc name="deployment-custom-wsdl-location"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpDeploymentCustomWsdlLocation" defaultValue="soap.sts.deployment.custom.wsdl.location.help" />
+        </property>
+
+        <property>
+            <label name="lblDeploymentCustomServiceName"
+                   defaultValue="soap.sts.deployment.custom.service.name"
+                   labelFor="deployment-custom-service-name"/>
+            <cc name="deployment-custom-service-name"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpDeploymentCustomServiceName" defaultValue="soap.sts.deployment.custom.service.name.help" />
+        </property>
+
+        <property>
+            <label name="lblDeploymentCustomServicePort"
+                   defaultValue="soap.sts.deployment.custom.port.name"
+                   labelFor="deployment-custom-service-port"/>
+            <cc name="deployment-custom-service-port"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpDeploymentCustomServicePort" defaultValue="soap.sts.deployment.custom.port.name.help" />
+        </property>
+
+        <property>
+            <label name="lblDelegationRelationshipSupported"
+                   defaultValue="soap.sts.delegation.relationship.supported"
+                   labelFor="delegation-relationship-supported"/>
+            <cc name="delegation-relationship-supported"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+            </cc>
+            <fieldhelp name="helpDeploymentDelegationRelationshipSupported" defaultValue="soap.sts.delegation.relationship.supported.help" />
+        </property>
+
+        <property>
+            <label name="lblDeploymentValidatedDelegatedTokenConfig"
+                   defaultValue="soap.sts.delegation.validated.token.config"
+                   labelFor="delegation-validated-token-types"/>
+            <cc name="delegation-validated-token-types"
+                tagclass="com.sun.web.ui.taglib.html.CCSelectableListTag">
+                <option label="soap.sts.delegation.validated.token.config.unt.true" value="USERNAME|true"/>
+                <option label="soap.sts.delegation.validated.token.config.unt.false" value="USERNAME|false"/>
+                <option label="soap.sts.delegation.validated.token.config.openam.true" value="OPENAM|true"/>
+                <option label="soap.sts.delegation.validated.token.config.openam.false" value="OPENAM|false"/>
+                <attribute name="multiple" value="true" />
+            </cc>
+            <fieldhelp name="helpDeploymentValidatedDelegatedTokenConfig" defaultValue="soap.sts.delegation.validated.token.config.help" />
+        </property>
+
+        <property>
+            <label name="lblDelegationCustomTokenHandlers"
+                   defaultValue="soap.sts.delgation.custom.token.handlers"
+                   labelFor="delegation-custom-token-handlers"/>
+            <cc name="delegation-custom-token-handlers"
                 tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag">
                 <attribute name="name" value="list" />
                 <attribute name="listboxLabel" value="label.current.value" />
                 <attribute name="textboxLabel" value="label.new.value" />
             </cc>
-            <fieldhelp name="helpDeploymentTLSOffloadEngineHosts" defaultValue="rest.sts.deployment.TLSOffloadEngineHosts.help" />
+            <fieldhelp name="helpDelegationCustomTokenHandlers" defaultValue="soap.sts.delgation.custom.token.handlers.help" />
         </property>
+
     </section>
+
     <section name="SAML2" defaultValue="sts.saml2.section.title">
         <property>
             <label name="lblSAML2IssuerName"

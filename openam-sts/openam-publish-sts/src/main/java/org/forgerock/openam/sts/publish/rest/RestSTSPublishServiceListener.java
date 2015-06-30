@@ -28,6 +28,7 @@ import org.forgerock.openam.sts.publish.STSInstanceConfigStore;
 import org.forgerock.openam.sts.rest.RestSTS;
 import org.forgerock.openam.sts.rest.config.RestSTSInstanceModule;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
+import org.forgerock.openam.utils.StringUtils;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
@@ -101,6 +102,15 @@ public class RestSTSPublishServiceListener implements ServiceListener {
 
     private void handleInstanceCreation(String normalizedServiceComponent, String orgName, String serviceComponent) {
         final String logIdentifier = "RestSTSPublishServiceListener#handleInstanceCreation";
+        if (StringUtils.isBlank(normalizedServiceComponent)) {
+            logger.warn("In RestSTSPublishServiceListener#handleInstanceCreation, the normalized name of the rest-sts service for " +
+                    "which the creation event was received is blank. The un-normalized name: " + serviceComponent + ". This happens " +
+                    "the first time a rest-sts instance is published in a newly-created realm, as the first step in this creation " +
+                    "is the addition of a new service configuration object for this subrealm, which also triggers the invocation " +
+                    "of this listener. If this message is appearing after the first creation of a rest-sts instance in a new realm, " +
+                    "then something is wrong.");
+            return;
+        }
         if (!instancePublisher.isInstanceExposedInCrest(normalizedServiceComponent)) {
             String realm = DNMapper.orgNameToRealmName(orgName);
             RestSTSInstanceConfig createdInstance;
@@ -191,7 +201,7 @@ public class RestSTSPublishServiceListener implements ServiceListener {
         if (AMSTSConstants.ROOT_REALM.equals(unstripped)) {
             return unstripped;
         }
-        if (unstripped.startsWith(AMSTSConstants.FORWARD_SLASH)) {
+        if (unstripped.startsWith(AMSTSConstants.ROOT_REALM)) {
             return unstripped.substring(1);
         }
         return unstripped;

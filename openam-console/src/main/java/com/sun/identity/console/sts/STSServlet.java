@@ -14,17 +14,17 @@
  * Copyright 2014 ForgeRock AS. All rights reserved.
  */
 
-package com.sun.identity.console.reststs;
+package com.sun.identity.console.sts;
 
 import com.iplanet.jato.RequestContext;
 import com.iplanet.jato.RequestContextImpl;
 import com.iplanet.jato.ViewBeanManager;
 import com.sun.identity.console.base.ConsoleServletBase;
 
-public class RestSTSServlet extends ConsoleServletBase {
-    public static final String DEFAULT_MODULE_URL = "../reststs";
+public class STSServlet extends ConsoleServletBase {
+    public static final String DEFAULT_MODULE_URL = "../sts";
     public static String PACKAGE_NAME =
-            getPackageName(RestSTSServlet.class.getName());
+            getPackageName(STSServlet.class.getName());
 
     /**
      * Initialize request context and set the viewbean manager

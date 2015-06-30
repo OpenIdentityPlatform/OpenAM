@@ -1,7 +1,7 @@
 <%--
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2014 ForgeRock AS. All Rights Reserved
+    Copyright 2014-2015 ForgeRock AS.
 
     The contents of this file are subject to the terms of the Common Development and
     Distribution License (the License). You may not use this file except in compliance with the
@@ -23,7 +23,7 @@
 <%@taglib uri="/WEB-INF/jato.tld" prefix="jato" %>
 <%@taglib uri="/WEB-INF/cc.tld" prefix="cc" %>
 <jato:useViewBean
-        className="com.sun.identity.console.reststs.RestSTSHomeViewBean"
+        className="com.sun.identity.console.sts.STSHomeViewBean"
         fireChildDisplayEvents="true" >
 
     <cc:i18nbundle baseName="amConsole" id="amConsole"
@@ -33,7 +33,7 @@
 
         <script language="javascript" src="../console/js/am.js"></script>
 
-        <cc:form name="RestSTSHome" method="post" defaultCommandChild="/tblButtonAdd">
+        <cc:form name="STSHome" method="post" defaultCommandChild="/tblButtonAdd">
             <jato:hidden name="szCache" />
 
             <script language="javascript">
@@ -79,7 +79,7 @@
             <cc:spacer name="spacer" height="10" newline="true" />
 
             <cc:actiontable
-                    name="tblSearch"
+                    name="tblRestSTSInstances"
                     title="rest.sts.home.instances.table.name"
                     bundleID="amConsole"
                     summary="rest.sts.home.instances.table.summary"
@@ -90,7 +90,25 @@
                     showPaginationControls="false"
                     showPaginationIcon="false"
                     showSelectionIcons="true"
-                    selectionJavascript="toggleTblButtonState('RestSTSHome', 'RestSTSHome.tblSearch', 'tblButton', 'RestSTSHome.tblButtonDelete', this)"
+                    selectionJavascript="toggleTblButtonState('STSHome', 'STSHome.tblRestSTSInstances', 'tblButton', 'STSHome.tblRestSTSInstancesButtonDelete', this)"
+                    showSelectionSortIcon="false"
+                    showSortingRow="false" />
+
+            <cc:spacer name="spacer" height="15" newline="true" />
+
+            <cc:actiontable
+                    name="tblSoapSTSInstances"
+                    title="soap.sts.home.instances.table.name"
+                    bundleID="amConsole"
+                    summary="soap.sts.home.instances.table.summary"
+                    empty="soap.sts.home.instances.table.empty.message"
+                    selectionType="multiple"
+                    showAdvancedSortingIcon="false"
+                    showLowerActions="false"
+                    showPaginationControls="false"
+                    showPaginationIcon="false"
+                    showSelectionIcons="true"
+                    selectionJavascript="toggleTblButtonState('STSHome', 'STSHome.tblSoapSTSInstances', 'tblButton', 'STSHome.tblSoapSTSInstancesButtonDelete', this)"
                     showSelectionSortIcon="false"
                     showSortingRow="false" />
         </cc:form>

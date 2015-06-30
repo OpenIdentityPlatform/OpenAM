@@ -21,8 +21,8 @@ import org.forgerock.openam.sts.AMSTSConstants;
 import javax.xml.namespace.QName;
 
 /**
- * Encapsulates the targeting of a specific soap-sts endpoint, with convenience methods to target the standard set of
- * sts instances published by OpenAM.
+ * Encapsulates the service and port specification of a single sts instance, with a convenience method (getStandardEndpointSpecification)
+ * to target the standard set of sts instances published by OpenAM.
  */
 public class EndpointSpecification {
     final QName serviceQName;
@@ -33,76 +33,10 @@ public class EndpointSpecification {
         this.portQName = portQName;
     }
 
-    /**
-     * @return an EndpointSpecification instance specifying service and port QNames corresponding to UsernameToken
-     * SupportingTokens protected by the Symmetric binding
-     */
-    public static EndpointSpecification  utSymmetric() {
+    public static EndpointSpecification getStandardEndpointSpecification() {
         return new EndpointSpecification(
-                AMSTSConstants.UT_SYMMETRIC_STS_SERVICE_PORT,
-                AMSTSConstants.UT_SYMMETRIC_STS_SERVICE);
-    }
-
-    /**
-     * @return an EndpointSpecification instance specifying service and port QNames corresponding to UsernameToken
-     * SupportingTokens protected by the Asymmetric binding
-     */
-    public static EndpointSpecification utAsymmetric() {
-        return new EndpointSpecification(
-                AMSTSConstants.UT_ASYMMETRIC_STS_SERVICE_PORT,
-                AMSTSConstants.UT_ASYMMETRIC_STS_SERVICE);
-    }
-
-    /**
-     * @return an EndpointSpecification instance specifying service and port QNames corresponding to UsernameToken
-     * SupportingTokens protected by the Transport binding
-     */
-    public static EndpointSpecification utTransport() {
-        return new EndpointSpecification(
-                AMSTSConstants.UT_TRANSPORT_STS_SERVICE_PORT,
-                AMSTSConstants.UT_TRANSPORT_STS_SERVICE);
-    }
-
-    /**
-     * @return an EndpointSpecification instance specifying service and port QNames corresponding to OpenAMSessionToken
-     * SupportingTokens protected by the Transport binding
-     */
-    public static EndpointSpecification amTransport() {
-        return new EndpointSpecification(
-                AMSTSConstants.AM_TRANSPORT_STS_SERVICE_PORT,
-                AMSTSConstants.AM_TRANSPORT_STS_SERVICE);
-    }
-
-    /**
-     * @return an EndpointSpecification instance specifying service and port QNames corresponding to OpenAMSessionToken
-     * SupportingTokens unprotected by any binding
-     */
-    public static EndpointSpecification amBare() {
-        return new EndpointSpecification(
-                AMSTSConstants.AM_BARE_STS_SERVICE_PORT,
-                AMSTSConstants.AM_BARE_STS_SERVICE);
-    }
-
-    /**
-     * @return an EndpointSpecification instance specifying service and port QNames corresponding to section 2.2.4 of
-     * the WS-SecurityPolicy-Examples specification:
-     * http://docs.oasis-open.org/ws-sx/security-policy/examples/ws-sp-usecases-examples.html#_Toc274723250
-     */
-    public static EndpointSpecification  x509Symmetric() {
-        return new EndpointSpecification(
-                AMSTSConstants.X509_SYMMETRIC_STS_SERVICE_PORT,
-                AMSTSConstants.X509_SYMMETRIC_STS_SERVICE);
-    }
-
-    /**
-     * @return an EndpointSpecification instance specifying service and port QNames corresponding to section 2.2.2 of
-     * the WS-SecurityPolicy-Examples specification:
-     * http://docs.oasis-open.org/ws-sx/security-policy/examples/ws-sp-usecases-examples.html#_Toc274723247
-     */
-    public static EndpointSpecification x509Asymmetric() {
-        return new EndpointSpecification(
-                AMSTSConstants.X509_ASYMMETRIC_STS_SERVICE_PORT,
-                AMSTSConstants.X509_ASYMMETRIC_STS_SERVICE);
+                AMSTSConstants.STANDARD_STS_PORT_QNAME,
+                AMSTSConstants.STANDARD_STS_SERVICE_NAME);
     }
 
     @Override

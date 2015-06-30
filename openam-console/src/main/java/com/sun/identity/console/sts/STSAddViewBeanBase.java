@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 /*
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
-package com.sun.identity.console.reststs;
+package com.sun.identity.console.sts;
 
 import com.iplanet.jato.RequestContext;
 import com.iplanet.jato.RequestManager;
@@ -27,14 +27,13 @@ import com.sun.identity.console.base.AMPropertySheet;
 import com.sun.identity.console.base.AMServiceProfileViewBeanBase;
 import com.sun.identity.console.base.AMViewBeanBase;
 import com.sun.identity.console.base.model.AMAdminConstants;
-import com.sun.identity.console.base.model.AMAdminUtils;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModel;
-import com.sun.identity.console.base.model.AMPropertySheetModel;
 import com.sun.identity.console.base.model.AMServiceProfileModel;
-import com.sun.identity.console.reststs.model.RestSTSModel;
-import com.sun.identity.console.reststs.model.RestSTSModelImpl;
-import com.sun.identity.console.reststs.model.RestSTSModelResponse;
+import com.sun.identity.console.sts.model.RestSTSInstanceModel;
+import com.sun.identity.console.sts.model.STSInstanceModel;
+import com.sun.identity.console.sts.model.STSInstanceModelResponse;
+import com.sun.identity.console.sts.model.SoapSTSInstanceModel;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 
@@ -42,19 +41,21 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 import java.util.Set;
 
+import static com.sun.identity.console.sts.model.STSInstanceModel.STSType;
+
+
 /**
  * The ViewBean used to create new Rest STS instances. Extends the AMServiceProfileViewBeanBase class as this class
  * provides for automatic constitution of propertySheet values based on model state.
  */
-public class RestSTSAddViewBean extends AMServiceProfileViewBeanBase {
-
-    public static final String DEFAULT_DISPLAY_URL =
-            "/console/reststs/RestSTSAdd.jsp";
-
+public class STSAddViewBeanBase extends AMServiceProfileViewBeanBase {
     public static final String PAGE_MODIFIED = "pageModified";
+    private final STSType stsType;
 
-    public RestSTSAddViewBean() {
-        super("RestSTSAdd", DEFAULT_DISPLAY_URL, AMAdminConstants.REST_STS_SERVICE);
+    public STSAddViewBeanBase(String viewBeanName, String defaultDisplayUrl, String serviceName,
+                              STSType stsType) {
+        super(viewBeanName, defaultDisplayUrl, serviceName);
+        this.stsType = stsType;
     }
 
     protected void initialize() {
@@ -75,23 +76,18 @@ public class RestSTSAddViewBean extends AMServiceProfileViewBeanBase {
         ptModel.setValue("button2", "button.cancel");
     }
 
-    protected void createPropertyModel() {
-        String xmlFileName = "com/sun/identity/console/propertyRestSecurityTokenService.xml";
-        String xml = AMAdminUtils.getStringFromInputStream(
-                getClass().getClassLoader().getResourceAsStream(xmlFileName));
-
-        propertySheetModel = new AMPropertySheetModel(xml);
-        propertySheetModel.clear();
-    }
-
     protected AMModel getModelInternal() {
         RequestContext rc = RequestManager.getRequestContext();
         HttpServletRequest req = rc.getRequest();
         try {
-            return new RestSTSModelImpl(req, getPageSessionAttributes());
+            if (stsType.isRestSTS()) {
+                return new RestSTSInstanceModel(req, getPageSessionAttributes());
+            } else {
+                return new SoapSTSInstanceModel(req, getPageSessionAttributes());
+            }
         } catch (AMConsoleException e) {
             setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
-            throw new IllegalStateException("Exception getting model in RestSTSAddViewBean: " + e.getMessage(), e);
+            throw new IllegalStateException("Exception getting model in STSAddViewBeanBase: " + e.getMessage(), e);
         }
     }
 
@@ -104,12 +100,13 @@ public class RestSTSAddViewBean extends AMServiceProfileViewBeanBase {
         submitCycle = true;
         try {
             Map<String, Set<String>> configurationState = (Map<String, Set<String>>) getAttributeSettings();
-            RestSTSModel model = (RestSTSModel) getModel();
-            RestSTSModelResponse validationResponse = model.validateConfigurationState(configurationState);
+            STSInstanceModel model = (STSInstanceModel) getModel();
+
+            STSInstanceModelResponse validationResponse = model.validateConfigurationState(stsType, configurationState);
             if (validationResponse.isSuccessful()) {
                 final String currentRealm = (String) getPageSessionAttribute(AMAdminConstants.CURRENT_REALM);
                 try {
-                    RestSTSModelResponse creationResponse = model.createInstance(configurationState, currentRealm);
+                    STSInstanceModelResponse creationResponse = model.createInstance(stsType, configurationState, currentRealm);
                     if (creationResponse.isSuccessful()) {
                         setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information", creationResponse.getMessage());
                         forwardToAMViewBean();
@@ -131,7 +128,7 @@ public class RestSTSAddViewBean extends AMServiceProfileViewBeanBase {
 
     /**
      * Handles cancel button request.
-     * 
+     *
      * @param event Request invocation event
      */
     public void handleButton2Request(RequestInvocationEvent event) throws ModelControlException {
@@ -148,7 +145,7 @@ public class RestSTSAddViewBean extends AMServiceProfileViewBeanBase {
         passPgSessionMap(vb);
         vb.forwardTo(getRequestContext());
     }
-    
+
     /*
     Returns a map of all settings, including those not changed from the default values in the model.
     AMConsoleException will be thrown if passwords are mis-matched.
@@ -181,7 +178,7 @@ public class RestSTSAddViewBean extends AMServiceProfileViewBeanBase {
                         + name + ". Exception: " + e);
             }
         } else {
-            return (AMViewBeanBase) getViewBean(RestSTSHomeViewBean.class);
+            return (AMViewBeanBase) getViewBean(STSHomeViewBean.class);
         }
     }
 }

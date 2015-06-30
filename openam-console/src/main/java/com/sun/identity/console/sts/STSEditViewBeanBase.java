@@ -17,7 +17,7 @@
 /*
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
-package com.sun.identity.console.reststs;
+package com.sun.identity.console.sts;
 
 import com.iplanet.jato.RequestContext;
 import com.iplanet.jato.RequestManager;
@@ -33,9 +33,10 @@ import com.sun.identity.console.base.model.AMAdminUtils;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.base.model.AMPropertySheetModel;
-import com.sun.identity.console.reststs.model.RestSTSModel;
-import com.sun.identity.console.reststs.model.RestSTSModelImpl;
-import com.sun.identity.console.reststs.model.RestSTSModelResponse;
+import com.sun.identity.console.sts.model.RestSTSInstanceModel;
+import com.sun.identity.console.sts.model.STSInstanceModel;
+import com.sun.identity.console.sts.model.STSInstanceModelResponse;
+import com.sun.identity.console.sts.model.SoapSTSInstanceModel;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
@@ -47,13 +48,20 @@ import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Set;
 
+import static com.sun.identity.console.sts.model.STSInstanceModel.STSType;
+
 /**
- * ViewBean invoked to edit an existing Rest STS instance. The AMServiceProfileViewBeanBase class is not extended here
+ * Base class ViewBean invoked to edit an existing STS instance. The AMServiceProfileViewBeanBase class is not extended here
  * as for the RestSTSAddViewBean because the generic propertySheet constitution logic in the AMServiceProfileViewBeanBase
- * class does not work for SubConfig state, which is where Rest STS instance state is stored.
+ * class does not work for SubConfig state, which is where STS instance state is stored.
  */
-public class RestSTSEditViewBean extends AMPrimaryMastHeadViewBean {
-    public static final String DEFAULT_DISPLAY_URL = "/console/reststs/RestSTSEdit.jsp";
+class STSEditViewBeanBase extends AMPrimaryMastHeadViewBean {
+
+    private static final String REST_DEFAULT_DISPLAY_URL = "/console/sts/RestSTSEdit.jsp";
+    private static final String SOAP_DEFAULT_DISPLAY_URL = "/console/sts/SoapSTSEdit.jsp";
+
+    private static final String REST_PROPERTY_MODEL_DEFINITION_FILE = "com/sun/identity/console/propertyRestSecurityTokenService.xml";
+    private static final String SOAP_PROPERTY_MODEL_DEFINITION_FILE = "com/sun/identity/console/propertySoapSecurityTokenService.xml";
 
     private static final String PAGE_MODIFIED = "pageModified";
     private static final String PGTITLE = "pgtitle";
@@ -62,10 +70,16 @@ public class RestSTSEditViewBean extends AMPrimaryMastHeadViewBean {
     protected CCPageTitleModel ptModel;
     protected boolean submitCycle;
     protected AMPropertySheetModel propertySheetModel;
+    protected STSInstanceModel.STSType stsType;
 
-    public RestSTSEditViewBean() {
-        super("RestSTSEdit");
-        setDefaultDisplayURL(DEFAULT_DISPLAY_URL);
+    protected STSEditViewBeanBase(String viewBeanName, STSType stsType) {
+        super(viewBeanName);
+        this.stsType = stsType;
+        if (stsType.isRestSTS()) {
+            setDefaultDisplayURL(REST_DEFAULT_DISPLAY_URL);
+        } else {
+            setDefaultDisplayURL(SOAP_DEFAULT_DISPLAY_URL);
+        }
     }
 
     protected void initialize() {
@@ -113,7 +127,12 @@ public class RestSTSEditViewBean extends AMPrimaryMastHeadViewBean {
     }
 
     protected void createPropertyModel() {
-        String xmlFileName = "com/sun/identity/console/propertyRestSecurityTokenService.xml";
+        String xmlFileName;
+        if (stsType.isRestSTS()) {
+            xmlFileName = REST_PROPERTY_MODEL_DEFINITION_FILE;
+        } else {
+            xmlFileName = SOAP_PROPERTY_MODEL_DEFINITION_FILE;
+        }
         String xml = AMAdminUtils.getStringFromInputStream(
                 getClass().getClassLoader().getResourceAsStream(xmlFileName));
 
@@ -123,35 +142,39 @@ public class RestSTSEditViewBean extends AMPrimaryMastHeadViewBean {
 
     public void beginDisplay(DisplayEvent event) throws ModelControlException {
         super.beginDisplay(event);
-        final String instanceName = (String)getPageSessionAttribute(RestSTSHomeViewBean.INSTANCE_NAME);
+        final String instanceName = (String)getPageSessionAttribute(STSHomeViewBean.INSTANCE_NAME);
         final String currentRealm = (String)getPageSessionAttribute(AMAdminConstants.CURRENT_REALM);
-            if (!submitCycle) {
-                RestSTSModel model = (RestSTSModel)getModel();
-                Map map;
-                try {
-                    map = model.getInstanceState(currentRealm, instanceName);
-                } catch (AMConsoleException e) {
-                    throw new ModelControlException(e);
-                }
-                if (!map.isEmpty()) {
-                    AMPropertySheet ps = (AMPropertySheet)getChild(PROPERTY_ATTRIBUTE);
-                    propertySheetModel.clear();
-                    ps.setAttributeValues(map, getModel());
-                } else {
-                    setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error",
-                            MessageFormat.format(model.getLocalizedString("rest.sts.view.no.instance.message"), instanceName));
-                }
+        if (!submitCycle) {
+            STSInstanceModel model = (STSInstanceModel)getModel();
+            Map map;
+            try {
+                map = model.getInstanceState(stsType, currentRealm, instanceName);
+            } catch (AMConsoleException e) {
+                throw new ModelControlException(e);
             }
+            if (!map.isEmpty()) {
+                AMPropertySheet ps = (AMPropertySheet)getChild(PROPERTY_ATTRIBUTE);
+                propertySheetModel.clear();
+                ps.setAttributeValues(map, getModel());
+            } else {
+                setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error",
+                        MessageFormat.format(model.getLocalizedString("rest.sts.view.no.instance.message"), instanceName));
+            }
+        }
     }
 
     protected AMModel getModelInternal() {
         RequestContext rc = RequestManager.getRequestContext();
         HttpServletRequest req = rc.getRequest();
         try {
-            return new RestSTSModelImpl(req, getPageSessionAttributes());
+            if (stsType.isRestSTS()) {
+                return new RestSTSInstanceModel(req, getPageSessionAttributes());
+            } else {
+                return new SoapSTSInstanceModel(req, getPageSessionAttributes());
+            }
         } catch (AMConsoleException e) {
             setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
-            throw new IllegalStateException("Exception getting model in RestSTSAddViewBean: " + e.getMessage(), e);
+            throw new IllegalStateException("Exception getting model in STSEditViewBeanBase: " + e.getMessage(), e);
         }
     }
 
@@ -163,7 +186,7 @@ public class RestSTSEditViewBean extends AMPrimaryMastHeadViewBean {
     public void handleButton1Request(RequestInvocationEvent event) throws ModelControlException {
         submitCycle = true;
         final String currentRealm = (String)getPageSessionAttribute(AMAdminConstants.CURRENT_REALM);
-        final String instanceName = (String)getPageSessionAttribute(RestSTSHomeViewBean.INSTANCE_NAME);
+        final String instanceName = (String)getPageSessionAttribute(STSHomeViewBean.INSTANCE_NAME);
         try {
             Map<String, Set<String>> configurationState = getUpdatedConfigurationState(currentRealm, instanceName);
             if (configurationState.isEmpty()) {
@@ -173,11 +196,11 @@ public class RestSTSEditViewBean extends AMPrimaryMastHeadViewBean {
                     setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information",
                             MessageFormat.format(getModel().getLocalizedString("rest.sts.view.no.edit.deployment.url"), instanceName));
                 } else {
-                    RestSTSModel model = (RestSTSModel) getModel();
-                    RestSTSModelResponse validationResponse = model.validateConfigurationState(configurationState);
+                    STSInstanceModel model = (STSInstanceModel) getModel();
+                    STSInstanceModelResponse validationResponse = model.validateConfigurationState(stsType, configurationState);
                     if (validationResponse.isSuccessful()) {
                         try {
-                            RestSTSModelResponse creationResponse = model.updateInstance(configurationState, currentRealm, instanceName);
+                            STSInstanceModelResponse creationResponse = model.updateInstance(stsType, configurationState, currentRealm, instanceName);
                             if (creationResponse.isSuccessful()) {
                                 forwardToSTSHomeViewBean();
                             } else {
@@ -241,10 +264,10 @@ public class RestSTSEditViewBean extends AMPrimaryMastHeadViewBean {
      * @throws AMConsoleException thrown by AMPropertySheet#getAttributeValues if passwords are mis-matched.
      */
     private Map<String, Set<String>> getUpdatedConfigurationState(String realm, String instanceName) throws ModelControlException, AMConsoleException {
-        RestSTSModel model = (RestSTSModel)getModel();
+        STSInstanceModel model = (STSInstanceModel)getModel();
         Map<String, Set<String>> currentPersistedInstanceState;
         try {
-            currentPersistedInstanceState = model.getInstanceState(realm, instanceName);
+            currentPersistedInstanceState = model.getInstanceState(stsType, realm, instanceName);
         } catch (AMConsoleException e) {
             throw new ModelControlException(e.getMessage(), e);
         }
@@ -263,10 +286,10 @@ public class RestSTSEditViewBean extends AMPrimaryMastHeadViewBean {
     rest-sts instance state. This method returns true if the changes include the deployment url.
      */
     private boolean instanceNameUpdated(String realm, String instanceName) throws ModelControlException, AMConsoleException {
-        RestSTSModel model = (RestSTSModel)getModel();
+        STSInstanceModel model = (STSInstanceModel)getModel();
         Map<String, Set<String>> currentPersistedInstanceState;
         try {
-            currentPersistedInstanceState = model.getInstanceState(realm, instanceName);
+            currentPersistedInstanceState = model.getInstanceState(stsType, realm, instanceName);
         } catch (AMConsoleException e) {
             throw new ModelControlException(e.getMessage(), e);
         }
@@ -288,7 +311,7 @@ public class RestSTSEditViewBean extends AMPrimaryMastHeadViewBean {
                         + name + ". Exception: " + e);
             }
         } else {
-            return (AMViewBeanBase) getViewBean(RestSTSHomeViewBean.class);
+            return (AMViewBeanBase) getViewBean(STSHomeViewBean.class);
         }
     }
 }

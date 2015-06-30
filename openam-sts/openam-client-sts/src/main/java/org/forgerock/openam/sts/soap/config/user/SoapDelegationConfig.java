@@ -18,6 +18,7 @@ package org.forgerock.openam.sts.soap.config.user;
 
 import org.forgerock.guava.common.base.Objects;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.shared.sts.SharedSTSConstants;
 import org.forgerock.openam.sts.MapMarshallUtils;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.utils.CollectionUtils;
@@ -63,8 +64,8 @@ public class SoapDelegationConfig {
     /*
     The following two names correspond to the entries defined in soapSTS.xml
      */
-    static final String DELEGATION_TOKEN_VALIDATORS = "validated-delegated-token-types";
-    static final String CUSTOM_DELEGATION_TOKEN_HANDLERS = "custom-delegation-token-handlers";
+    static final String DELEGATION_TOKEN_VALIDATORS = SharedSTSConstants.DELEGATION_TOKEN_VALIDATORS;
+    static final String CUSTOM_DELEGATION_TOKEN_HANDLERS = SharedSTSConstants.CUSTOM_DELEGATION_TOKEN_HANDLERS;
     public static class SoapDelegationConfigBuilder {
         /*
         The set of Tokens for which TokenValidators will be created to validate OnBehalfOf and ActAs tokens sent in a

@@ -93,6 +93,11 @@ public interface AMAdminConstants {
     String REST_STS_SERVICE = "RestSecurityTokenService";
 
     /**
+     * Name of the Soap STS Service.
+     */
+    String SOAP_STS_SERVICE = "SoapSecurityTokenService";
+
+    /**
      * Locale SSO Token property
      */
     String SSO_TOKEN_LOCALE_ATTRIBUTE_NAME = "Locale";

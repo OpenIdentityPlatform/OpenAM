@@ -24,7 +24,7 @@
                 serviceHierarchy="/DSAMEConfig/RestSecurityTokenService"
                 i18nFileName="restSTS" revisionNumber="1"
                 i18nKey="rest_security_token_service_description"
-                propertiesViewBeanURL="../reststs/RestSTSEdit">
+                propertiesViewBeanURL="../sts/RestSTSEdit">
 
             <Organization>
 <!--

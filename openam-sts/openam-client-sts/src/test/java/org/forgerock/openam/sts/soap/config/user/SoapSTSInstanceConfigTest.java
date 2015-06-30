@@ -297,39 +297,20 @@ public class SoapSTSInstanceConfigTest {
         assertTrue(fileContent.contains(SoapSTSKeystoreConfig.ENCRYPTION_KEY_PASSWORD));
 
         assertTrue(fileContent.contains(SoapDeploymentConfig.SERVICE_QNAME));
-        assertTrue(fileContent.contains(SoapDeploymentConfig.SERVICE_PORT));
+        assertTrue(fileContent.contains(SoapDeploymentConfig.PORT_QNAME));
         assertTrue(fileContent.contains(SoapDeploymentConfig.WSDL_LOCATION));
         assertTrue(fileContent.contains(SoapDeploymentConfig.AM_DEPLOYMENT_URL));
         assertTrue(fileContent.contains(SoapDeploymentConfig.CUSTOM_PORT_QNAME));
         assertTrue(fileContent.contains(SoapDeploymentConfig.CUSTOM_SERVICE_QNAME));
         assertTrue(fileContent.contains(SoapDeploymentConfig.CUSTOM_WSDL_LOCATION));
-        assertTrue(fileContent.contains(SoapDeploymentConfig.CUSTOM_SOAP_STS_SERVICE_NAME_INDICATOR));
-        assertTrue(fileContent.contains(SoapDeploymentConfig.CUSTOM_SOAP_STS_SERVICE_PORT_INDICATOR));
         assertTrue(fileContent.contains(SoapDeploymentConfig.CUSTOM_SOAP_STS_WSDL_FILE_INDICATOR));
 
         assertTrue(fileContent.contains(SoapDelegationConfig.DELEGATION_TOKEN_VALIDATORS));
         assertTrue(fileContent.contains(SoapDelegationConfig.CUSTOM_DELEGATION_TOKEN_HANDLERS));
 
         assertTrue(fileContent.contains(SoapSTSInstanceConfig.ISSUE_TOKEN_TYPES));
-        assertTrue(fileContent.contains(SoapSTSInstanceConfig.VALIDATED_TOKEN_CONFIG));
+        assertTrue(fileContent.contains(SoapSTSInstanceConfig.SECURITY_POLICY_VALIDATED_TOKEN_CONFIG));
         assertTrue(fileContent.contains(SoapSTSInstanceConfig.DELEGATION_RELATIONSHIP_SUPPORTED));
-
-        assertTrue(fileContent.contains(AMSTSConstants.UT_ASYMMETRIC_STS_SERVICE.toString()));
-        assertTrue(fileContent.contains(AMSTSConstants.UT_SYMMETRIC_STS_SERVICE.toString()));
-        assertTrue(fileContent.contains(AMSTSConstants.UT_TRANSPORT_STS_SERVICE.toString()));
-        assertTrue(fileContent.contains(AMSTSConstants.UT_ASYMMETRIC_STS_SERVICE_PORT.toString()));
-        assertTrue(fileContent.contains(AMSTSConstants.UT_SYMMETRIC_STS_SERVICE_PORT.toString()));
-        assertTrue(fileContent.contains(AMSTSConstants.UT_TRANSPORT_STS_SERVICE_PORT.toString()));
-
-        assertTrue(fileContent.contains(AMSTSConstants.X509_ASYMMETRIC_STS_SERVICE.toString()));
-        assertTrue(fileContent.contains(AMSTSConstants.X509_SYMMETRIC_STS_SERVICE.toString()));
-        assertTrue(fileContent.contains(AMSTSConstants.X509_ASYMMETRIC_STS_SERVICE_PORT.toString()));
-        assertTrue(fileContent.contains(AMSTSConstants.X509_SYMMETRIC_STS_SERVICE_PORT.toString()));
-
-        assertTrue(fileContent.contains(AMSTSConstants.AM_TRANSPORT_STS_SERVICE.toString()));
-        assertTrue(fileContent.contains(AMSTSConstants.AM_TRANSPORT_STS_SERVICE_PORT.toString()));
-        assertTrue(fileContent.contains(AMSTSConstants.AM_BARE_STS_SERVICE.toString()));
-        assertTrue(fileContent.contains(AMSTSConstants.AM_BARE_STS_SERVICE_PORT.toString()));
     }
 
     private SoapSTSInstanceConfig createInstanceConfig(String uriElement, String amDeploymentUrl,
@@ -345,8 +326,8 @@ public class SoapSTSInstanceConfigTest {
 
         SoapDeploymentConfig deploymentConfig =
                 SoapDeploymentConfig.builder()
-                        .portQName(AMSTSConstants.AM_TRANSPORT_STS_SERVICE_PORT)
-                        .serviceQName(AMSTSConstants.AM_TRANSPORT_STS_SERVICE)
+                        .portQName(AMSTSConstants.STANDARD_STS_PORT_QNAME)
+                        .serviceQName(AMSTSConstants.STANDARD_STS_SERVICE_NAME)
                         .wsdlLocation("wsdl_loc")
                         .realm("realm")
                         .amDeploymentUrl(amDeploymentUrl)

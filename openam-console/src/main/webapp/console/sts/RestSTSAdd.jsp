@@ -20,7 +20,7 @@
 <%@taglib uri="/WEB-INF/jato.tld" prefix="jato" %>
 <%@taglib uri="/WEB-INF/cc.tld" prefix="cc" %>
 <jato:useViewBean
-        className="com.sun.identity.console.reststs.RestSTSAddViewBean"
+        className="com.sun.identity.console.sts.RestSTSAddViewBean"
         fireChildDisplayEvents="true" >
 
     <cc:i18nbundle baseName="amConsole" id="amConsole"

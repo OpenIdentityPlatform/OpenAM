@@ -27,32 +27,13 @@ public class AMSTSConstants {
     STS instance.
      */
     public enum STSType {REST, SOAP}
-    /*
-    The namespace defined by the WS-Trust specification.
-     */
-    public static final String WS_TRUST_NAMESPACE = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/";
 
     /*
     These constants define the QNames referencing services and ports in wsdl documents which define the semantics and
     SecurityPolicy bindings of published STS instances.
      */
-    public static final QName UT_SYMMETRIC_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "ut_symmetric_sts_service");
-    public static final QName UT_SYMMETRIC_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "ut_symmetric_sts_service_port");
-    public static final QName UT_ASYMMETRIC_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "ut_asymmetric_sts_service");
-    public static final QName UT_ASYMMETRIC_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "ut_asymmetric_sts_service_port");
-    public static final QName UT_TRANSPORT_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "ut_transport_sts_service");
-    public static final QName UT_TRANSPORT_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "ut_transport_sts_service_port");
-
-    public static final QName AM_TRANSPORT_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "am_transport_sts_service");
-    public static final QName AM_TRANSPORT_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "am_transport_sts_service_port");
-    public static final QName AM_BARE_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "am_bare_sts_service");
-    public static final QName AM_BARE_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "am_bare_sts_service_port");
-
-
-    public static final QName X509_ASYMMETRIC_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "x509_asymmetric_sts_service");
-    public static final QName X509_ASYMMETRIC_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "x509_asymmetric_sts_service_port");
-    public static final QName X509_SYMMETRIC_STS_SERVICE = new QName(WS_TRUST_NAMESPACE, "x509_symmetric_sts_service");
-    public static final QName X509_SYMMETRIC_STS_SERVICE_PORT = new QName(WS_TRUST_NAMESPACE, "x509_symmetric_sts_service_port");
+    public static final QName STANDARD_STS_SERVICE_NAME = SharedSTSConstants.STANDARD_STS_SERVICE_QNAME;
+    public static final QName STANDARD_STS_PORT_QNAME = SharedSTSConstants.STANDARD_STS_PORT_QNAME;
 
     /*
     Used in conjunction with com.google.inject.Names.named to distinguish e.g. a Provider of the token types for
@@ -71,7 +52,6 @@ public class AMSTSConstants {
     The following values are used by the AMTokenValidator.
      */
     public static final String CONTENT_TYPE = SharedSTSConstants.CONTENT_TYPE;
-    public static final String ACCEPT = "Accept";
     public static final String APPLICATION_JSON = SharedSTSConstants.APPLICATION_JSON;
     public static final String COOKIE = "Cookie";
     public static final String POST = "POST";

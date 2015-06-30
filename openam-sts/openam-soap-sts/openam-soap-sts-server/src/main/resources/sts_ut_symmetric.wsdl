@@ -196,8 +196,8 @@
         </wsp:ExactlyOne>
     </wsp:Policy>
 
-    <wsdl:service name="ut_symmetric_sts_service">
-        <wsdl:port name="ut_symmetric_sts_service_port" binding="tns:username_token_symmetric_binding">
+    <wsdl:service name="sts_service">
+        <wsdl:port name="sts_service_port" binding="tns:username_token_symmetric_binding">
             <soap:address location=""/>
         </wsdl:port>
     </wsdl:service>

@@ -194,12 +194,12 @@
                  status="tab.configuration.agentconfig.status"
                  permissions="sunIdentityRepositoryService/1.0/application/agent"/>
             <tab id="19"
-                 viewbean="com.sun.identity.console.reststs.RestSTSHomeViewBean"
-                 url="../reststs/RestSTSHome"
+                 viewbean="com.sun.identity.console.sts.STSHomeViewBean"
+                 url="../sts/STSHome"
                  label="tab.configuration.reststs.label"
                  tooltip="tab.configuration.reststs.tooltip"
                  status="tab.configuration.reststs.status"
-                 permissions="RestSecurityTokenService"/>
+                 permissions="RestSecurityTokenService, SoapSecurityTokenService"/>
             <tab id="20"
                  viewbean="com.sun.identity.console.scripts.ScriptsViewBean"
                  url="../scripts/Scripts"

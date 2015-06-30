@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.soap.config.user;
@@ -150,22 +150,14 @@ public class SoapDeploymentConfigTest {
      */
     private Map<String, Set<String>> getAttributeMapWithCustomWsdl() {
         Map<String, Set<String>> attributeMap = soapDeploymentConfig(!WITH_TLS_OFFLOAD_CONFIG).marshalToAttributeMap();
-
         Set<String> wsdlLocation = attributeMap.get(SoapDeploymentConfig.WSDL_LOCATION);
         wsdlLocation.clear();
         wsdlLocation.add(SoapDeploymentConfig.CUSTOM_SOAP_STS_WSDL_FILE_INDICATOR);
+        attributeMap.put(SoapDeploymentConfig.SERVICE_QNAME, CollectionUtils.asSet((String) null));
+        attributeMap.put(SoapDeploymentConfig.PORT_QNAME, CollectionUtils.asSet((String)null));
         attributeMap.put(SoapDeploymentConfig.CUSTOM_WSDL_LOCATION, CollectionUtils.asSet(CUSTOM_WSDL));
-
-        Set<String> serviceName = attributeMap.get(SoapDeploymentConfig.SERVICE_QNAME);
-        serviceName.clear();
-        serviceName.add(SoapDeploymentConfig.CUSTOM_SOAP_STS_SERVICE_NAME_INDICATOR);
         attributeMap.put(SoapDeploymentConfig.CUSTOM_SERVICE_QNAME, CollectionUtils.asSet(CUSTOM_SERVICE.toString()));
-
-        Set<String> servicePort = attributeMap.get(SoapDeploymentConfig.SERVICE_PORT);
-        servicePort.clear();
-        servicePort.add(SoapDeploymentConfig.CUSTOM_SOAP_STS_SERVICE_PORT_INDICATOR);
         attributeMap.put(SoapDeploymentConfig.CUSTOM_PORT_QNAME, CollectionUtils.asSet(CUSTOM_PORT.toString()));
-
         return attributeMap;
     }
 }
