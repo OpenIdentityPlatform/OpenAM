@@ -302,7 +302,7 @@ public class RestEndpoints {
                 .forVersion("1.0").to(CoreTokenResource.class);
 
         rootRealmRouter.route("/global-config")
-                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(RoutingMode.STARTS_WITH, smsRequestHandlerFactory.create(SchemaType.GLOBAL));
 
         rootRealmRouter.route("/global-config/servers/{serverName}/properties/{tab}")

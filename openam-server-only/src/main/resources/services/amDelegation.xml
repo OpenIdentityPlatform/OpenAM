@@ -475,6 +475,17 @@
                             <Value>READ</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
+                    <SubConfiguration name="GlobalConfigRead" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource"/>
+                            <Value>@SM_CONFIG_ROOT_SUFFIX@/rest/1.0/global-config*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions"/>
+                            <Value>READ</Value>
+                            <Value>MODIFY</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
                 </SubConfiguration>
 
 
@@ -483,6 +494,7 @@
                         <AttributeValuePair>
                             <Attribute name="listOfPermissions" />
                             <Value>RealmAdmin</Value>
+                            <Value>GlobalConfigRead</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="defaultSubjectInLegacyMode" />

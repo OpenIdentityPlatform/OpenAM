@@ -177,8 +177,6 @@ public class SmsRealmProvider implements RequestHandler {
         String realmName = jsonContent.get(REALM_NAME_ATTRIBUTE_NAME).asString();
 
         try {
-            hasPermission(serverContext);
-
             if (StringUtils.isBlank(realmName)) {
                 throw new BadRequestException("No realm name provided");
             }
@@ -224,11 +222,9 @@ public class SmsRealmProvider implements RequestHandler {
         } catch (SSOException sso) {
             debug.error("RealmResource.createInstance() : Cannot CREATE " + realmName, sso);
             resultHandler.handleError(new PermanentException(401, "Access Denied", null));
-        } catch (ForbiddenException | BadRequestException fe) {
+        } catch (BadRequestException fe) {
             debug.error("RealmResource.createInstance() : Cannot CREATE " + realmName, fe);
             resultHandler.handleError(fe);
-        } catch (IdRepoException e) {
-            resultHandler.handleError(new BadRequestException(e.getMessage(), e));
         }
     }
 
@@ -265,7 +261,6 @@ public class SmsRealmProvider implements RequestHandler {
         String realmPath = realmContext.getResolvedRealm();
 
         try {
-            hasPermission(serverContext);
             OrganizationConfigManager realmManager = new OrganizationConfigManager(getSSOToken(), realmPath);
             realmManager.deleteSubOrganization(null, false);
             String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(serverContext);
@@ -284,12 +279,6 @@ public class SmsRealmProvider implements RequestHandler {
             } catch (Exception e) {
                 resultHandler.handleError(new BadRequestException(e.getMessage(), e));
             }
-        } catch (SSOException sso) {
-            debug.error("RealmResource.updateInstance() : Cannot DELETE " + realmPath + ":" + sso);
-            resultHandler.handleError(new PermanentException(401, "Access Denied", null));
-        } catch (ForbiddenException fe) {
-            debug.error("RealmResource.updateInstance() : Cannot DELETE " + realmPath + ":" + fe);
-            resultHandler.handleError(fe);
         } catch (Exception e) {
             resultHandler.handleError(new BadRequestException(e.getMessage(), e));
         }
@@ -358,19 +347,12 @@ public class SmsRealmProvider implements RequestHandler {
         String realmPath = realmContext.getResolvedRealm();
 
         try {
-            hasPermission(context);
             JsonValue jsonResponse = getJsonValue(realmPath);
             if (debug.messageEnabled()) {
                 debug.message("RealmResource.readInstance :: READ : Successfully read realm, " +
                         realmPath + " performed by " + PrincipalRestUtils.getPrincipalNameFromServerContext(context));
             }
             resultHandler.handleResult(new Resource(realmPath, String.valueOf(System.currentTimeMillis()), jsonResponse));
-        } catch (SSOException sso) {
-            debug.error("RealmResource.updateInstance() : Cannot READ " + realmPath, sso);
-            resultHandler.handleError(new PermanentException(401, "Access Denied", null));
-        } catch (ForbiddenException fe) {
-            debug.error("RealmResource.readInstance() : Cannot READ " + realmPath + ":" + fe);
-            resultHandler.handleError(fe);
         } catch (SMSException smse) {
             debug.error("RealmResource.readInstance() : Cannot READ " + realmPath, smse);
             try {
