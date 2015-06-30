@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: CreateHostedSPViewBean.java,v 1.8 2008/10/29 00:02:39 veiming Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.task;
@@ -281,6 +282,11 @@ public class CreateHostedSPViewBean
             Set realms = model.getRealms();
             CCDropDownMenu menuRealm = (CCDropDownMenu)getChild(REALM);
             menuRealm.setOptions(createOptionList(realms));
+
+            String realm = getRequestContext().getRequest().getParameter("realm");
+            if (realm != null && !realm.trim().isEmpty()) {
+                setDisplayFieldValue(REALM, realm);
+            }
         } catch (AMConsoleException ex) {
             setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error",
                 ex.getMessage());

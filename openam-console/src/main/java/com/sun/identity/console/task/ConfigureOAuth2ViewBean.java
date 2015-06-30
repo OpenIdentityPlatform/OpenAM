@@ -102,6 +102,11 @@ public class ConfigureOAuth2ViewBean
             Set realms = model.getRealms();
             CCDropDownMenu menuRealm = (CCDropDownMenu) getChild(REALM);
             menuRealm.setOptions(createOptionList(realms));
+
+            String realm = getRequestContext().getRequest().getParameter("realm");
+            if (realm != null && !realm.trim().isEmpty()) {
+                setDisplayFieldValue(REALM, realm);
+            }
         } catch (AMConsoleException ex) {
             setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error",
                     ex.getMessage());

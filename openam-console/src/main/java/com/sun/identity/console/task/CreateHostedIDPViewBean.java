@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: CreateHostedIDPViewBean.java,v 1.9 2008/10/29 00:02:39 veiming Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.task;
@@ -276,7 +277,12 @@ public class CreateHostedIDPViewBean
             Set realms = model.getRealms();
             CCDropDownMenu menuRealm = (CCDropDownMenu)getChild(REALM);
             menuRealm.setOptions(createOptionList(realms));
-            
+
+            String realm = getRequestContext().getRequest().getParameter("realm");
+            if (realm != null && !realm.trim().isEmpty()) {
+                setDisplayFieldValue(REALM, realm);
+            }
+
             Set keys = model.getSigningKeys();
             OptionList optionList = createOptionList(keys);
             optionList.add(0, 
