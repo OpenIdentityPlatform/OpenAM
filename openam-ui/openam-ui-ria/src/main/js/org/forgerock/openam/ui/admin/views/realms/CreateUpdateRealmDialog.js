@@ -25,23 +25,25 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
     "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate"
 ], function ($, _, AbstractView, BootstrapDialog, Form, FormHelper, SMSGlobalDelegate) {
     var CreateUpdateRealmDialog = AbstractView.extend({
-        show: function (realmLocation) {
+        show: function (realmPath, propertiesOnly) {
             var self = this,
                 promise,
-                newRealm = _.isEmpty(realmLocation);
+                newRealm = _.isEmpty(realmPath),
+                realmName = realmPath === '/' ? $.t("console.common.topLevelRealm") : realmPath;
 
+            this.data.propertiesOnly = propertiesOnly;
             if (newRealm) {
                 promise = SMSGlobalDelegate.realms.schema();
             } else {
-                promise = SMSGlobalDelegate.realms.get(realmLocation);
+                promise = SMSGlobalDelegate.realms.get(realmPath);
             }
-
+            
             promise.done(function(data) {
                 var i18nTitleKey = newRealm ? "createTitle" : "updateTitle",
                     i18nButtonKey = newRealm ? "create" : "save";
+
                 BootstrapDialog.show({
-                    title: $.t("console.realms.createUpdateRealmDialog." + i18nTitleKey, { realmLocation: realmLocation }),
-                    cssClass: "realm-dialog",
+                    title: $.t("console.realms.createUpdateRealmDialog." + i18nTitleKey, { realmPath: data.values.name }),
                     message: function (dialog) {
                         var element = $("<div></div>");
                         dialog.form = new Form(element[0], data.schema, data.values);
@@ -56,7 +58,7 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
                             if (newRealm) {
                                 promise = SMSGlobalDelegate.realms.create(dialog.form.data());
                             } else {
-                                promise = SMSGlobalDelegate.realms.update(dialog.form.data().location, dialog.form.data());
+                                promise = SMSGlobalDelegate.realms.update(dialog.form.data().path, dialog.form.data());
                             }
 
                             promise.done(function() {
@@ -71,6 +73,12 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
                             dialog.close();
                         }
                     }],
+                    onshow: function (dialog) {
+                        if (self.data.propertiesOnly) {
+                            dialog.$modalBody.find(".container-path").hide();
+                            dialog.$modalBody.find(".container-name").hide();
+                        }
+                    },
                     onshown: function (dialog) {
                         self.dialogOnShown(dialog);
                     }

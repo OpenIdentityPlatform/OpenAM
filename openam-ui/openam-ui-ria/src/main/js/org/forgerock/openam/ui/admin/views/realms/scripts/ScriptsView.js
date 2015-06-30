@@ -50,7 +50,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
                 ClickableRow,
                 Scripts;
 
-            this.realmLocation = args[0];
+            this.realmPath = args[0];
             this.data.selectedUUIDs = [];
 
             Scripts = Backbone.PageableCollection.extend({
@@ -111,7 +111,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
                     }
 
                     Router.routeTo(Router.configuration.routes.realmsScriptEdit, {
-                        args: [encodeURIComponent(self.realmLocation), encodeURIComponent(this.model.id)],
+                        args: [encodeURIComponent(self.realmPath), encodeURIComponent(this.model.id)],
                         trigger: true
                     });
                 }
@@ -207,7 +207,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
             }
 
             Router.routeTo(Router.configuration.routes.realmsScriptEdit, {
-                args: [encodeURIComponent(this.realmLocation)],
+                args: [encodeURIComponent(this.realmPath)],
                 trigger: true
             });
         }

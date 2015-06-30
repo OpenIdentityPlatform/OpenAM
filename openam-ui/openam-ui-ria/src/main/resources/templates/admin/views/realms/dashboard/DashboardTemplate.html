@@ -1,0 +1,16 @@
+<div class="page-header">
+    <h1>{{t 'console.dashboard.title'}}</h1>
+</div>
+
+<a href="#" id="editProperties" class="btn btn-primary pull-right">{{t 'console.dashboard.realmProperties'}}</a>
+<div class="page-description">
+    <ul class="list-unstyled">
+        <li><span>{{t 'console.common.realmStatus'}}: </span><strong>{{realm.status}}</strong></li>
+        <li><span>{{t 'console.common.realmDnsAliases'}}: </span>
+            {{#each realm.aliases}}
+                <strong>{{this}}{{#unless @last}}, {{/unless}}</strong>
+            {{/each}}
+        </li>
+    </ul>
+</div>
+<div id="commonTasks" class="panel panel-default"></div>

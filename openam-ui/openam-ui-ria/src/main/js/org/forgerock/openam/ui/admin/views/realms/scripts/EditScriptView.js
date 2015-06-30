@@ -64,7 +64,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
         render: function (args, callback) {
             var uuid = null;
 
-            this.realmLocation  = args[0];
+            this.realmPath  = args[0];
 
             // As we interrupt render to update the model, we need to remember the callback
             if (callback) {
@@ -183,7 +183,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             if (savePromise) {
                 savePromise.done(function (e) {
                     Router.routeTo(Router.configuration.routes.realmsScripts,
-                        {args: [encodeURIComponent(self.realmLocation)], trigger: true});
+                        {args: [encodeURIComponent(self.realmPath)], trigger: true});
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                 });
             } else {
@@ -370,7 +370,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             }
 
             Router.routeTo(Router.configuration.routes.realmsScripts, {
-                args: [encodeURIComponent(this.realmLocation)],
+                args: [encodeURIComponent(this.realmPath)],
                 trigger: true
             });
         }

@@ -141,7 +141,7 @@ define("config/process/AMConfig", [
                 if (_.contains(Configuration.loggedUser.roles, 'ui-admin')) {
                     Navigation.configuration.links.admin.urls.realms.urls.push({
                         'url': '#realms/' + encodeURIComponent('/'),
-                        'name': $.t('config.AppConfiguration.Navigation.links.realms.topLevelRealm'),
+                        'name': $.t('console.common.topLevelRealm'),
                         'cssClass': 'dropdown-sub'
                     }, {
                         'url': '#realms',
@@ -154,9 +154,9 @@ define("config/process/AMConfig", [
                             realms = [];
 
                         _.forEach(data.result, function (realm) {
-                            if (realm.active === true && realm.location !== '/' && realms.length < 2) {
+                            if (realm.active === true && realm.path !== '/' && realms.length < 2) {
                                 realms.push({
-                                    'url': '#realms/' + encodeURIComponent(realm.location),
+                                    'url': '#realms/' + encodeURIComponent(realm.path),
                                     'name': realm.name,
                                     'cssClass': 'dropdown-sub'
                                 });

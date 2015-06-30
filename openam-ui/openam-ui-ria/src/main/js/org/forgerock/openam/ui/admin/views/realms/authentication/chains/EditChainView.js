@@ -33,9 +33,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
         render: function(args, callback) {
             var self = this;
 
-            this.data.realmLocation = args[0];
+            this.data.realmPath = args[0];
 
-            SMSRealmDelegate.authentication.chains.get(this.data.realmLocation, args[1]).done(function (data) {
+            SMSRealmDelegate.authentication.chains.get(this.data.realmPath, args[1]).done(function (data) {
                 self.data.chainData = data.chainData;
                 self.data.allModules = data.modulesData;
 
@@ -94,7 +94,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             this.data.chainData.loginSuccessUrl[0] = this.$el.find('#loginSuccessUrl').val();
             this.data.chainData.loginFailureUrl[0] = this.$el.find('#loginFailureUrl').val();
 
-            promise = SMSRealmDelegate.authentication.chains.update(this.data.realmLocation, this.data.chainData._id, this.data.chainData);
+            promise = SMSRealmDelegate.authentication.chains.update(this.data.realmPath, this.data.chainData._id, this.data.chainData);
             promise.fail(function(e) {
                 // TODO: Add failure condition
                 console.error(e);

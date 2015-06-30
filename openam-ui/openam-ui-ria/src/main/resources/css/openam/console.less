@@ -46,18 +46,18 @@ h3.block-header {
     background-image: none;
     border-color: transparent;
     box-shadow: none;
-    color:#519387;
+    color:@base-theme-color;
 
     &:hover{
         background-color:transparent;
         border-color:transparent;
-        color:#3f7269;
+        color: darken(@base-theme-color, 5%);
     }
 
     &:focus{
         outline:none;
         box-shadow:none;
-        color:#3f7269;
+        color: darken(@base-theme-color, 5%);
 
         background-color: transparent;
         background-image: none;
@@ -160,6 +160,11 @@ div[data-schemaid] {
             }
         }
     }
+}
+
+#sidePageContent .page-header{
+    margin: -6px 0 11px;
+    border-bottom:none;
 }
 
 
@@ -379,7 +384,7 @@ ul.btn-realms-tab {
     .fa-link {
         font-size: 32px;
         color: #FFFFFF;
-        background:  #519387;
+        background:  @base-theme-color;
         border-radius: 50%;
         padding: 17px 14px 13px 14px;
         margin: 0 10px 0 0;
@@ -494,3 +499,32 @@ div.dropdown-subtitle{
         }
     }
 }
+
+.grid-list{
+    padding-top:15px;
+}
+
+
+.realm-card-location{
+    padding-top:8px;
+}
+
+.realm-card-aliases {
+    height: 35px; // 2 lines
+    overflow: hidden;
+    font-size: 85%;
+    color:#666;
+    margin-top: 8px;
+ }
+
+ .dashboard-card-name {
+    height: 60px; // three lines
+ }
+
+ #commonTasksBtn {
+    cursor:pointer;
+    color: @base-theme-color;
+    &:hover, &:focus {
+        color: darken(@base-theme-color, 5%);
+    }
+ }

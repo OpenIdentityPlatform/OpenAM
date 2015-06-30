@@ -6,7 +6,7 @@
     margin-bottom: 30px;
     color:#999;
 
-    a:hover {
+    a:hover, a:focus{
         text-decoration:none;
     }
 
@@ -23,16 +23,25 @@
     .card-body {
         clear:both;
         text-align: center;
-        padding: 0 15px 24px;
+        padding: 24px 15px;
 
         .card-name {
             font-size: 18px;
             line-height: 1.2;
             margin: 10px 0 0;
+
+            &.card-name-sm {
+                font-weight: 300;
+                font-size: 16px;
+            }
         }
 
         .card-subtext {
             color:#999;
+        }
+
+        &.card-body-with-menu {
+            padding-top: 0;
         }
     }
 
@@ -48,22 +57,14 @@
 
     .card-icon-circle {
 
-        display: table;
-        text-align: center;
         background-color: @base-theme-color;
-        border-radius: 50%;
         color: #fff;
-        font-size: 60px;
-        overflow: hidden;
-        width: 120px;
-        height: 120px;
         margin: 0 auto;
+        .icon-circle(120px);
 
-        i.fa {
-            display: table-cell;
-            vertical-align: middle;
+        &.card-icon-circle-sm {
+            .icon-circle(60px);
         }
-
     }
 
     &:hover {

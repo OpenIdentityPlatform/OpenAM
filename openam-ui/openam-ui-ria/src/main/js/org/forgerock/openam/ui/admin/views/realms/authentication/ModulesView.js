@@ -43,7 +43,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
 
             var self = this;
 
-            SMSRealmDelegate.authentication.modules.types.all(this.data.realmLocation).done(function(data) {
+            SMSRealmDelegate.authentication.modules.types.all(this.data.realmPath).done(function(data) {
                 self.data.moduleTypes = data.result;
                 UIUtils.fillTemplateWithData("templates/admin/views/realms/authentication/modules/AddModuleTemplate.html", self.data, function(html) {
                     BootstrapDialog.show({
@@ -57,15 +57,15 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
                                 if (self.addModuleDialogValidation(dialog)) {
                                     var moduleName = dialog.getModalBody().find("#newModuleName").val(),
                                         moduleType = dialog.getModalBody().find("#newModuleType").val();
-                                    SMSRealmDelegate.authentication.modules.has(self.data.realmLocation, moduleName).done(function(result) {
+                                    SMSRealmDelegate.authentication.modules.has(self.data.realmPath, moduleName).done(function(result) {
                                         if (result) {
-                                            SMSRealmDelegate.authentication.modules.create(self.data.realmLocation, {
+                                            SMSRealmDelegate.authentication.modules.create(self.data.realmPath, {
                                                 _id: moduleName,
                                                 type: moduleType
                                             }).done(function() {
                                                 dialog.close();
                                                 Router.routeTo(Router.configuration.routes.realmsAuthenticationModuleEdit, {
-                                                    args: [encodeURIComponent(self.data.realmLocation), encodeURIComponent(moduleName)],
+                                                    args: [encodeURIComponent(self.data.realmPath), encodeURIComponent(moduleName)],
                                                     trigger: true
                                                 });
                                             });
@@ -149,9 +149,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
         render: function(args, callback) {
             var self = this;
 
-            this.data.realmLocation = args[0];
+            this.data.realmPath = args[0];
 
-            SMSRealmDelegate.authentication.modules.all(this.data.realmLocation).done(function(data) {
+            SMSRealmDelegate.authentication.modules.all(this.data.realmPath).done(function(data) {
                 self.data.formData = data.result;
                 self.$el.find("[data-toggle='tooltip']").tooltip();
                 self.parentRender(function () {

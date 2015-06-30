@@ -38,8 +38,8 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
             "click .toggle-realm-active" : "toggleRealmActive"
         },
         getRealmFromEvent: function (event) {
-            var location = $(event.currentTarget).closest("div[data-realm-location]").data("realm-location"),
-                realm = _.findWhere(this.data.realms, { location: location });
+            var path = $(event.currentTarget).closest("div[data-realm-path]").data("realm-path"),
+                realm = _.findWhere(this.data.realms, { path: path });
 
             return realm;
         },
@@ -53,7 +53,7 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
 
             var realm = this.getRealmFromEvent(event);
 
-            CreateUpdateRealmDialog.show(realm.location);
+            CreateUpdateRealmDialog.show(realm.path);
         },
         toggleRealmActive: function (event) {
             event.preventDefault();
@@ -62,7 +62,7 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
                 realm = this.getRealmFromEvent(event);
             realm.active = !realm.active;
 
-            SMSGlobalDelegate.realms.update(realm.location, realm).done(function () {
+            SMSGlobalDelegate.realms.update(realm.path, realm).done(function () {
                 self.render();
             });
         },
@@ -81,7 +81,7 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
                         label: $.t("common.form.delete"),
                         cssClass: "btn-danger",
                         action: function (dialog) {
-                            self.performDeleteRealm(realm.location).done(function () {
+                            self.performDeleteRealm(realm.path).done(function () {
                                 dialog.close();
                             });
                         }
@@ -93,18 +93,18 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
                     }]
                 });
             } else {
-                self.performDeleteRealm(realm.location);
+                self.performDeleteRealm(realm.path);
             }
         },
-        performDeleteRealm: function (location) {
+        performDeleteRealm: function (path) {
             var self = this;
 
-            return SMSGlobalDelegate.realms.remove(location).done(function () {
+            return SMSGlobalDelegate.realms.remove(path).done(function () {
                 self.render();
             });
         },
-        getRealmFromList: function (location) {
-            return _.findWhere(this.data.realms, { location: location });
+        getRealmFromList: function (path) {
+            return _.findWhere(this.data.realms, { path: path });
         },
         render: function (args, callback) {
             var self = this;
@@ -112,7 +112,7 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
             SMSGlobalDelegate.realms.all().done(function (data) {
                 var result = _.findWhere(data.result, { name: "/" });
                 if (result) {
-                    result.name = $.t("console.realms.topLevelRealm");
+                    result.name = $.t("console.common.topLevelRealm");
                 }
                 self.data.realms = data.result;
 

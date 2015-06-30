@@ -26,6 +26,8 @@ import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.Filter;
+import org.forgerock.json.resource.FilterChain;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResultHandler;
@@ -64,7 +66,7 @@ class SmsRouteTree implements RequestHandler {
         for (SmsRouteTreeBuilder subTreeBuilder : subTreeBuilders) {
             subTrees.add(subTreeBuilder.build(router));
         }
-        return new SmsRouteTree(isRoot, router, subTrees);
+        return new SmsRouteTree(isRoot, router, subTrees, null);
     }
 
     /**
@@ -104,9 +106,14 @@ class SmsRouteTree implements RequestHandler {
         return new SmsRouteTreeLeafBuilder(new Router(), uriTemplate, handlesFunction);
     }
 
+    static SmsRouteTreeBuilder filter(String uriTemplate, Function<String, Boolean> handlesFunction, Filter filter) {
+        return new SmsRouteTreeLeafBuilder(new Router(), uriTemplate, handlesFunction, filter);
+    }
+
     private final boolean isRoot;
     private final Router router;
     private final Set<SmsRouteTree> subTrees;
+    private final Filter filter;
 
     /**
      * Creates a {@code SmsRouteTree} instance.
@@ -114,11 +121,13 @@ class SmsRouteTree implements RequestHandler {
      * @param isRoot {@code true} if this {@code SmsRouteTree} is the root of the tree.
      * @param router The {@code Router} instance.
      * @param subTrees Sub trees of this tree node.
+     * @param filter The filter to wrap around all routes.
      */
-    SmsRouteTree(boolean isRoot, Router router, Set<SmsRouteTree> subTrees) {
+    SmsRouteTree(boolean isRoot, Router router, Set<SmsRouteTree> subTrees, Filter filter) {
         this.isRoot = isRoot;
         this.router = router;
         this.subTrees = subTrees;
+        this.filter = filter;
     }
 
     /**
@@ -151,7 +160,13 @@ class SmsRouteTree implements RequestHandler {
      * @return An opaque handle for the route which may be used for removing the route later.
      */
     final Route addRoute(RoutingMode mode, String uriTemplate, RequestHandler handler) {
-        return router.addRoute(mode, uriTemplate, handler);
+        RequestHandler routeHandler;
+        if (filter == null) {
+            routeHandler = handler;
+        } else {
+            routeHandler = new FilterChain(handler, filter);
+        }
+        return router.addRoute(mode, uriTemplate, routeHandler);
     }
 
     /**
@@ -239,12 +254,19 @@ class SmsRouteTree implements RequestHandler {
         private final Router router;
         private final String uriTemplate;
         private final Function<String, Boolean> handlesFunction;
+        private final Filter filter;
 
         private SmsRouteTreeLeafBuilder(Router router, String uriTemplate, Function<String, Boolean> handlesFunction) {
+            this(router, uriTemplate, handlesFunction, null);
+        }
+
+        private SmsRouteTreeLeafBuilder(Router router, String uriTemplate, Function<String, Boolean> handlesFunction,
+                Filter filter) {
             super(router, uriTemplate);
             this.router = router;
             this.uriTemplate = uriTemplate;
             this.handlesFunction = handlesFunction;
+            this.filter = filter;
         }
 
         @Override
@@ -252,7 +274,7 @@ class SmsRouteTree implements RequestHandler {
             if (StringUtils.isNotEmpty(uriTemplate)) {
                 parent.addRoute(RoutingMode.STARTS_WITH, uriTemplate, router);
             }
-            return new SmsRouteTreeLeaf(router, handlesFunction);
+            return new SmsRouteTreeLeaf(router, handlesFunction, filter);
         }
     }
 }

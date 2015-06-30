@@ -307,8 +307,10 @@ public class SmsRealmProvider implements RequestHandler {
 
         try {
             final OrganizationConfigManager ocm = new OrganizationConfigManager(getUserSsoToken(context), realmPath);
-            final List<String> realmsInSubTree = new ArrayList<>();
-            realmsInSubTree.add(realmPath);
+
+            //Return realm query is being performed on
+            handler.handleResource(new Resource(realmPath, "0", getJsonValue(realmPath)));
+
             for (final Object subRealmRelativePath : ocm.getSubOrganizationNames("*", true)) {
                 String realmName;
                 if (realmPath.endsWith("/")) {
@@ -316,10 +318,7 @@ public class SmsRealmProvider implements RequestHandler {
                 } else {
                     realmName = realmPath + "/" + subRealmRelativePath;
                 }
-
-                JsonValue val = getJsonValue(realmName);
-                Resource resource = new Resource(realmName, "0", val);
-                handler.handleResource(resource);
+                handler.handleResource(new Resource(realmName, "0", getJsonValue(realmName)));
             }
             debug.message("RealmResource :: QUERY : performed by " + principalName);
             handler.handleResult(new QueryResult());
@@ -373,7 +372,7 @@ public class SmsRealmProvider implements RequestHandler {
         OrganizationConfigManager realmManager = new OrganizationConfigManager(getSSOToken(), realmPath);
         String realmName = getRealmName(realmManager);
         return json(object(
-                field(PATH_ATTRIBUTE_NAME, realmPath.substring(0, realmPath.length() - realmName.length())),
+                field(PATH_ATTRIBUTE_NAME, realmPath),
                 field(ACTIVE_ATTRIBUTE_NAME, isActive(realmManager)),
                 field(REALM_NAME_ATTRIBUTE_NAME, realmName),
                 field(ALIASES_ATTRIBUTE_NAME, getAliases(realmManager))));

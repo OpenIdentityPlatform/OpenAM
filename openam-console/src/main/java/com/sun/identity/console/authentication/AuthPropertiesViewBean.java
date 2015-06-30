@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  *
  * $Id: AuthPropertiesViewBean.java,v 1.5 2008/07/07 20:39:19 veiming Exp $
  *
@@ -31,14 +31,28 @@
 package com.sun.identity.console.authentication;
 
 
-import com.iplanet.jato.RequestManager;
+import static com.sun.identity.console.XuiRedirectHelper.isXuiAdminConsoleEnabled;
+import static com.sun.identity.console.XuiRedirectHelper.redirectToXui;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import com.iplanet.jato.NavigationException;
 import com.iplanet.jato.RequestContext;
+import com.iplanet.jato.RequestManager;
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
 import com.iplanet.jato.view.html.OptionList;
-
 import com.sun.identity.authentication.config.AMAuthenticationInstance;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.authentication.config.AMConfigurationException;
@@ -55,23 +69,12 @@ import com.sun.identity.console.base.model.AMPropertySheetModel;
 import com.sun.identity.console.delegation.model.DelegationConfig;
 import com.sun.identity.console.realm.RealmPropertiesBase;
 import com.sun.identity.shared.datastruct.OrderedSet;
-
 import com.sun.web.ui.model.CCActionTableModel;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.html.CCDropDownMenu;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import com.sun.web.ui.view.table.CCActionTable;
-
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.Iterator;
-
-import javax.servlet.http.HttpServletRequest;
-import com.iplanet.jato.NavigationException;
 
 /**
  * This is the main authentication properties view page which displays the
@@ -189,32 +192,15 @@ public  class AuthPropertiesViewBean
         return view;
     }
 
-    public void beginDisplay(DisplayEvent event)
-        throws ModelControlException
-    {
-        super.beginDisplay(event);
-        resetButtonState(DELETE_CONFIG_BUTTON);
-        resetButtonState(DELETE_INSTANCE_BUTTON);
-
-        AuthPropertiesModel model = (AuthPropertiesModel)getModel();
-        if (model != null) {
-            AMPropertySheet ps = 
-                (AMPropertySheet)getChild(PROPERTY_ATTRIBUTE);
+    public void beginDisplay(DisplayEvent event) throws ModelControlException {
+        if (isXuiAdminConsoleEnabled()) {
             try {
-                ps.setAttributeValues(model.getValues(), model);
-                populateConfigTable();
-                populateInstanceTable();
-                populateConfigMenu();
-            } catch (AMConsoleException a) {
-                setInlineAlertMessage(CCAlert.TYPE_WARNING, 
-                    "message.warning", "noproperties.message");
+                String redirectRealm = (String) getPageSessionAttribute(AMAdminConstants.CURRENT_PROFILE);
+                redirectToXui(redirectRealm, MessageFormat.format("realms/{0}/authentication",
+                        URLEncoder.encode(redirectRealm, "UTF-8")));
+            } catch (UnsupportedEncodingException e) {
+                throw new IllegalStateException("UTF-8 encoding not supported", e);
             }
-            setPageTitle(getModel(), "page.title.realms.authentication");
-        }
-        String msg = (String)removePageSessionAttribute(INSTANCE_MSG);
-        if (msg != null) {
-            setInlineAlertMessage(
-                CCAlert.TYPE_WARNING, "message.warning", msg);
         }
     }
 

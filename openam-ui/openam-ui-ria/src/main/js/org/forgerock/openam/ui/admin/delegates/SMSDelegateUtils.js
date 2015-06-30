@@ -73,53 +73,5 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils", [
         }
     };
 
-    obj.authChainConfigurationToJson = function (data) {
-        // FIXME: This is a temporay client side fix until AME-7202 is completed.
-        var xmlDoc = $.parseXML(data),
-            xml = $(xmlDoc),
-            array = [],
-            cleaned = [],
-            options = [],
-            keypairs = [],
-            obj = {};
-
-        _.each(xml.find("Value"), function (node) {
-            array = node.textContent.split(" ");
-            options = _.drop(array, 2)[0].split(",");
-            keypairs = [];
-            _.each(options, function (option) {
-                if (option.length > 0) {
-                    option = option.split("=");
-                    obj = {};
-                    obj[option[0]] = option[1];
-                    keypairs.push(obj);
-                }
-            });
-
-            cleaned.push({
-                module: array[0],
-                criteria: array[1],
-                options: keypairs
-            });
-        });
-
-        return cleaned;
-    };
-
-    obj.authChainConfigurationToXml = function (data) {
-        // FIXME: This is a temporay client side fix until AME-7202 is completed.
-        var xmlString = "",
-            xmlData = $.extend(true, {}, data);
-
-        if (data.authChainConfiguration) {
-            _.each(data.authChainConfiguration, function (authChain) {
-                xmlString += "<Value>" + authChain.module + " " + authChain.criteria + " </Value>";
-            });
-            xmlData.authChainConfiguration = "<AttributeValuePair>" + xmlString + "</AttributeValuePair>";
-        }
-
-        return xmlData;
-    };
-
     return obj;
 });

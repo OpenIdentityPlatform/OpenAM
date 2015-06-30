@@ -121,84 +121,12 @@ span.item-button-panel {
     }
 }
 
-.selectize-control.multi .selectize-input {
-
-
-    &.has-items {
-      padding-left: 5px;
-      padding-right: 5px;
-    }
-
-     > div {
-         cursor: pointer;
-         margin: 0 2px 2px 0;
-         padding: 1px 5px 0;
-         background: #A4CAE7;
-         color: #095390;
-         border: 1px solid #90A7BA;
-         border-radius: 2px;
-
-         &:hover, &.active{
-             background: #EFB6BE;
-             border: 1px solid #DD7785;
-             color: #CA3232;
-         }
-    }
-}
-
-.selectize-dropdown-content > div{
-    border-top: 1px solid #eee;
-
-    &:first-of-type{
-        border-top:none;
-    }
-}
-
-
-.backgrid-readonly{
-
-    .selectize-control.multi .selectize-input > div {
-        &:hover, &.active{
-            background: #A4CAE7;
-            color: #095390;
-            border: 1px solid #90A7BA;
-            cursor: auto;
-        }
-    }
-
-    .selectize-control.multi .selectize-input, .selectize-control.single .selectize-input{
-        background: none;
-        border: none;
-        box-shadow: none;
-    }
-
-}
-
-
-
 #lastFSlash, select {
     .transition(opacity, 300ms, linear);
     &.fade{
         opacity:0;
     }
 }
-
-/* XUI Overrides */
-body, .modal-open {
-    /* This will prevent to sudden shift of content which can sometimes occur
-    * when navigating between them long views which require a scroll bar and
-    * short ones which do not.
-    */
-    overflow-y: scroll;
-
-
-    // To remove the empty space at the bottom of the footer which causes the
-    // scroll bar to always be present.
-    .footer .container {
-        padding-bottom: 0;
-    }
-}
-
 
 #umaShareImage.header-icon {
     display:block;
@@ -227,6 +155,7 @@ body, .modal-open {
 
 
 #uma {
+
     input[type="text"]:invalid:required, input[type="text"].invalid {
         .invalid-background;
         .transition(background-color, 200ms, linear);

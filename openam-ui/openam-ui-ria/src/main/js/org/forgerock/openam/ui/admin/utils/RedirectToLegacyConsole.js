@@ -15,7 +15,7 @@
  */
 
 /*global define, window*/
-define('org/forgerock/openam/ui/common/util/RedirectToLegacyConsole', [
+define('org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole', [
     'jquery',
     'org/forgerock/commons/ui/common/main/AbstractDelegate',
     'org/forgerock/commons/ui/common/main/Configuration',
@@ -24,7 +24,6 @@ define('org/forgerock/openam/ui/common/util/RedirectToLegacyConsole', [
     var obj = new AbstractDelegate(Constants.host + '/' + Constants.context);
 
     obj.global = {
-        commonTasks  : function () { obj.global.redirectToTab(0); },
         accessControl: function () { obj.global.redirectToTab(1); },
         federation   : function () { obj.global.redirectToTab(2); },
         configuration: function () { obj.global.redirectToTab(4); },
@@ -33,9 +32,14 @@ define('org/forgerock/openam/ui/common/util/RedirectToLegacyConsole', [
             obj.getJATOPageSession().done(function (session) {
                 window.location.href = '/' + Constants.context + '/task/Home?' +
                 'Home.tabCommon.TabHref=' + tabIndex +
-                '&jato.pageSession=' + session;
+                '&jato.pageSession=' + session + '&requester=XUI';
             });
         }
+    };
+
+    obj.commonTasks = function (realm, link) {
+        var query = link.indexOf('?') === -1 ? '?' : '&';
+        window.location.href = '/' + Constants.context + '/' + link + query + 'realm=' + encodeURIComponent(realm);
     };
 
     obj.realm = {
@@ -55,14 +59,14 @@ define('org/forgerock/openam/ui/common/util/RedirectToLegacyConsole', [
                 window.location.href = '/' + Constants.context + '/realm/RealmProperties?' +
                 'RMRealm.tblDataActionHref=' + realm +
                 '&RealmProperties.tabCommon.TabHref=' + tabIndex +
-                '&jato.pageSession=' + session;
+                '&jato.pageSession=' + session + '&requester=XUI';
             });
         }
     };
 
     obj.getJATOPageSession = function () {
         var promise = obj.serviceCall({
-            url: '/realm/RMRealm?RMRealm.tblDataActionHref=/',
+            url: '/realm/RMRealm?RMRealm.tblDataActionHref=/&requester=XUI',
             dataType: 'html'
         });
 

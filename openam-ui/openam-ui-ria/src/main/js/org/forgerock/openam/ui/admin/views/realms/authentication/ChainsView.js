@@ -56,7 +56,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
                             // TODO - duplicate chain name - message or alert box
                             console.log('invalidName'); // jslinter
                         } else {
-                            SMSRealmDelegate.authentication.chains.create(self.data.realmLocation, { _id: chainName }).done(function() {
+                            SMSRealmDelegate.authentication.chains.create(self.data.realmPath, { _id: chainName }).done(function() {
                                 dialog.close();
                                 Router.navigate( href + dialog.getModalBody().find('#newName').val(), { trigger: true });
                             }).fail(function() {
@@ -98,8 +98,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
             var self = this,
                 chainName = $(event.currentTarget).attr('data-chain-name');
 
-            SMSRealmDelegate.authentication.chains.remove(this.data.realmLocation, chainName).done(function() {
-                self.render([self.data.realmLocation]);
+            SMSRealmDelegate.authentication.chains.remove(this.data.realmPath, chainName).done(function() {
+                self.render([self.data.realmPath]);
             });
         },
         deleteChains: function() {
@@ -108,20 +108,20 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
                     return $(element).attr('data-chain-name');
                 }),
                 promises = chainNames.map(function(name) {
-                    return SMSRealmDelegate.authentication.chains.remove(self.data.realmLocation, name);
+                    return SMSRealmDelegate.authentication.chains.remove(self.data.realmPath, name);
                 });
 
             $.when(promises).done(function() {
-                self.render([self.data.realmLocation]);
+                self.render([self.data.realmPath]);
             });
         },
         render: function (args, callback) {
             var self = this,
                 sortedChains = [];
 
-            this.data.realmLocation = args[0];
+            this.data.realmPath = args[0];
 
-            SMSRealmDelegate.authentication.chains.all(this.data.realmLocation).done(function(data) {
+            SMSRealmDelegate.authentication.chains.all(this.data.realmPath).done(function(data) {
                 _.each(data.values.result, function(obj) {
                     // Add default chains to top of list.
                     if ( obj.active) {

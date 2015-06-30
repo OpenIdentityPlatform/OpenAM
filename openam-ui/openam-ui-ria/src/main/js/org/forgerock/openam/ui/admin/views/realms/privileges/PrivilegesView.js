@@ -17,7 +17,7 @@
 /*global, define*/
 define('org/forgerock/openam/ui/admin/views/realms/privileges/PrivilegesView', [
     'org/forgerock/commons/ui/common/main/AbstractView',
-    'org/forgerock/openam/ui/common/util/RedirectToLegacyConsole'
+    'org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole'
 ], function (AbstractView, RedirectToLegacyConsole) {
     var PrivilegesView = AbstractView.extend({
         template: 'templates/admin/views/realms/privileges/PrivilegesTemplate.html',

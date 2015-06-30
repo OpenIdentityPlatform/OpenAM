@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,9 +24,14 @@
  *
  * $Id: RealmPropertiesViewBean.java,v 1.2 2008/06/25 05:43:12 qcheng Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.realm;
+
+import static com.sun.identity.console.XuiRedirectHelper.isJatoSessionRequestFromXUI;
+import static com.sun.identity.console.XuiRedirectHelper.isXuiAdminConsoleEnabled;
+import static com.sun.identity.console.XuiRedirectHelper.redirectToXui;
 
 import com.iplanet.jato.RequestManager;
 import com.iplanet.jato.RequestContext;
@@ -44,6 +49,10 @@ import com.sun.identity.console.realm.model.RMRealmModelImpl;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.text.MessageFormat;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
@@ -106,9 +115,18 @@ public class RealmPropertiesViewBean
         return view;
     }
 
-    public void beginDisplay(DisplayEvent event)
-        throws ModelControlException
-    {
+    public void beginDisplay(DisplayEvent event) throws ModelControlException {
+        if (!isJatoSessionRequestFromXUI(getRequestContext().getRequest()) && isXuiAdminConsoleEnabled()) {
+            String redirectRealm = (String) getPageSessionAttribute(AMAdminConstants.CURRENT_PROFILE);
+            try {
+                redirectToXui(redirectRealm, MessageFormat.format("realms/{0}/dashboard",
+                        URLEncoder.encode(redirectRealm, "UTF-8")));
+            } catch (UnsupportedEncodingException e) {
+                throw new IllegalStateException("UTF-8 encoding not supported", e);
+            }
+            return;
+        }
+
         super.beginDisplay(event);
         RMRealmModel model = (RMRealmModel)getModel();
         if (model != null) {

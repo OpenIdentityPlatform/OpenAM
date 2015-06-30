@@ -24,7 +24,7 @@
 
 /*global define*/
 define("config/AppConfiguration", [
-    "org/forgerock/commons/ui/common/util/Constants"
+    "org/forgerock/openam/ui/common/util/Constants"
 ], function (Constants) {
     var obj = {
             moduleDefinition: [
@@ -153,11 +153,6 @@ define("config/AppConfiguration", [
                             "admin": {
                                 "role": "ui-admin",
                                 "urls": {
-                                    "commonTasks": {
-                                        "url": "#commonTasks",
-                                        "name": "config.AppConfiguration.Navigation.links.commonTasks",
-                                        "icon": "fa fa-check"
-                                    },
                                     "realms": {
                                         "url": "#realms",
                                         "name": "config.AppConfiguration.Navigation.links.realms.title",

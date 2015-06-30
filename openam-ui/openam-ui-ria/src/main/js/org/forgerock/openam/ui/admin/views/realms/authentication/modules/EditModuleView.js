@@ -36,10 +36,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
         render: function (args, callback) {
             var self = this;
 
-            this.data.realmLocation = args[0];
+            this.data.realmPath = args[0];
 
             // FIXME: Module service needs to know the module type. How to get that info into this view?
-            SMSRealmDelegate.authentication.modules.get(this.data.realmLocation, args[1]).done(function (data) {
+            SMSRealmDelegate.authentication.modules.get(this.data.realmPath, args[1]).done(function (data) {
                 self.data.formData = data;
                 self.parentRender(function () {
                     self.$el.find('ul.nav a:first').tab('show');

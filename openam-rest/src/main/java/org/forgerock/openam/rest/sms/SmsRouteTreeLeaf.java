@@ -19,6 +19,7 @@ package org.forgerock.openam.rest.sms;
 import java.util.Collections;
 
 import org.forgerock.guava.common.base.Function;
+import org.forgerock.json.resource.Filter;
 import org.forgerock.json.resource.Router;
 
 /**
@@ -38,9 +39,10 @@ class SmsRouteTreeLeaf extends SmsRouteTree {
      * @param router The {@code Router} instance.
      * @param handlesFunction A {@code Function} that determines whether this router should handle
      *                        the route.
+     * @param filter The filter to wrap around all routes.
      */
-    SmsRouteTreeLeaf(Router router, Function<String, Boolean> handlesFunction) {
-        super(false, router, Collections.<SmsRouteTree>emptySet());
+    SmsRouteTreeLeaf(Router router, Function<String, Boolean> handlesFunction, Filter filter) {
+        super(false, router, Collections.<SmsRouteTree>emptySet(), filter);
         this.handlesFunction = handlesFunction;
     }
 

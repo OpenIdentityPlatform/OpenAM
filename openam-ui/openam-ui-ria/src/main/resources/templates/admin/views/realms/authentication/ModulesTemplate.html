@@ -1,7 +1,7 @@
 <div class="page-header">
     <h1>{{t 'console.authentication.modules.title'}}</h1>
 </div>
-<p class="panel-description">{{t "console.authentication.modules.description"}}</p>
+<p class="page-description">{{t "console.authentication.modules.description"}}</p>
 <div class="btn-toolbar page-toolbar">
     <a class="btn btn-primary" id="addModule" href="#console/realms/authentication/modules/"><i class="fa fa-plus"></i>{{t 'console.authentication.modules.addModule'}}</a>
     <button id="deleteModules" disabled class="btn btn-default" type="button"><i class="fa fa-times"></i>{{t 'common.form.delete'}}</button>
@@ -22,11 +22,11 @@
               {{#each this.formData}}
               <tr>
                   <td><input data-module-name="{{_id}}" type="checkbox"/></td>
-                  <td>{{_id}}</td>
+                  <td><a href="{{routeTo 'realmsAuthenticationModuleEdit' ../realmPath _id}}" title="{{t 'common.form.edit'}}">{{_id}}</a></td>
                   <td>{{type}}</td>
                   <td>
                       <div class="pull-right">
-                          <a class="btn btn-transparent" href="{{routeTo 'realmsAuthenticationModuleEdit' ../realmLocation _id}}" title="{{t 'common.form.edit'}}"><i class="fa fa-pencil"></i></a>
+                          <a class="btn btn-transparent" href="{{routeTo 'realmsAuthenticationModuleEdit' ../realmPath _id}}" title="{{t 'common.form.edit'}}"><i class="fa fa-pencil"></i></a>
                           <button type="button" id="deleteModule" class="btn btn-transparent" data-module-name="{{_id}}"><i class="fa fa-close" data-toggle="tooltip" title="{{t "common.form.delete"}}"></i></button>
                       </div>
                   </td>

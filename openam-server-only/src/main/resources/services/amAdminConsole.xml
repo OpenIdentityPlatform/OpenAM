@@ -58,6 +58,14 @@
                         <Value>true</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="xuiAdminConsoleEnabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 i18nKey="">
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <AttributeSchema name="iplanet-am-admin-console-um-enabled"
                     type="single"
                     syntax="boolean"

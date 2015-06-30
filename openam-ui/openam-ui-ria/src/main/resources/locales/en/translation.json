@@ -91,7 +91,6 @@
                         "title": "Realms",
                         "showAll": "Show All",
                         "newRealm": "New Realm",
-                        "topLevelRealm": "Top Level Realm",
                         "viewAll": "View all..."
                     },
                     "federation": "Federation",
@@ -525,6 +524,12 @@
         }
     },
     "console": {
+        "common": {
+            "topLevelRealm" : "Top Level Realm",
+            "realmStatus": "Status",
+            "realmDnsAliases": "Aliases/DNS Aliases"
+
+        },
         "authentication": {
             "advancedSettings": {
                 "revert": "Revert",
@@ -575,10 +580,15 @@
                 "criteria" : ["Required","Optional","Requisite","Sufficient"]
             }
         },
+        "dashboard":{
+            "realmProperties" : "Realm Properties",
+            "dashboard" : "Dashboard",
+            "title" : "Realm Overview",
+            "quickStart" : "Common Tasks"
+        },
         "realms": {
             "title": "Realms",
             "newRealm": "New Realm",
-            "topLevelRealm": "Top Level Realm",
             "actions": {
                 "edit": "Edit",
                 "disable": "Disable",
@@ -588,7 +598,7 @@
             "active": "Active",
             "inactive": "Inactive",
             "realmName": "Realm name",
-            "realmLocation": "Location",
+            "realmPath": "Path",
             "realmAliases": "Realm/DNS Aliases",
             "warningDialog": {
                 "title": "Delete \"__realmName__\"?",
@@ -596,7 +606,7 @@
             },
             "createUpdateRealmDialog": {
                 "createTitle": "New Realm",
-                "updateTitle": "__realmLocation__ - Properties"
+                "updateTitle": "__realmPath__ - Properties"
             },
             "realmStatusPopover": {
                 "title": "Realm Status",

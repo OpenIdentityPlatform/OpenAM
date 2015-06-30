@@ -54,6 +54,7 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
     // other attributes
     private final static String XUI = "openam-xui-interface-enabled";
     private final static String XUI_REVERSE_PROXY_SUPPORT = "openam-xui-reverseproxy-support";
+    private final static String XUI_ADMIN_CONSOLE_ENABLED = "xuiAdminConsoleEnabled";
     private static final String GOTO_DOMAINS = "iplanet-am-auth-valid-goto-domains";
 
     public AuthServiceHelper() {
@@ -104,6 +105,9 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
 
         if (newAttr.getName().equals(XUI)) {
             // XUI should not be default for upgraded systems
+            newAttr = updateDefaultValues(newAttr, asSet("false"));
+        } else if (XUI_ADMIN_CONSOLE_ENABLED.equals(newAttr.getName())) {
+            // XUI admin console should not be default for upgraded systems
             newAttr = updateDefaultValues(newAttr, asSet("false"));
         } else if (newAttr.getName().equals(XUI_REVERSE_PROXY_SUPPORT) && VersionUtils.isCurrentVersionEqualTo(1200)) {
             newAttr = updateDefaultValues(newAttr, asSet("false"));

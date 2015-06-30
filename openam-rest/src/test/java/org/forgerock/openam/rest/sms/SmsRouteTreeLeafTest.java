@@ -41,7 +41,7 @@ public class SmsRouteTreeLeafTest {
             }
         };
 
-        routeTree = new SmsRouteTreeLeaf(router, handlesFunction);
+        routeTree = new SmsRouteTreeLeaf(router, handlesFunction, null);
     }
 
     @DataProvider(name = "handlesFunction")

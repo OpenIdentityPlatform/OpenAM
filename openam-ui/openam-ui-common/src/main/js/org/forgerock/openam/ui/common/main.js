@@ -27,7 +27,6 @@
 define([
     "./util/Constants",
     "./util/RealmHelper",
-    "./util/RedirectToLegacyConsole",
     "./delegates/SiteConfigurationDelegate",
     "./delegates/PolicyDelegate"
 ]);

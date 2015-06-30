@@ -25,6 +25,7 @@ define([
 
     "./utils/FormHelper",
     "./utils/JSONEditorTheme",
+    "./utils/RedirectToLegacyConsole",
 
     "./views/commonTasks/CommonTasksView",
 
@@ -44,10 +45,9 @@ define([
     "./views/realms/authentication/ModulesView",
     "./views/realms/authentication/modules/EditModuleView",
     "./views/realms/authentication/SettingsView",
-
+    "./views/realms/dashboard/DashboardView",
+    "./views/realms/dashboard/DashboardTasksView",
     "./views/realms/dataStores/DataStoresView",
-
-    "./views/realms/general/GeneralView",
 
     "./views/realms/policies/applications/ApplicationsView",
     "./views/realms/policies/applications/EditApplicationView",

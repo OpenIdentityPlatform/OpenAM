@@ -11,14 +11,16 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.xui;
 
+import java.security.AccessController;
+import java.util.Map;
+
 import com.google.inject.Singleton;
 import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
@@ -27,82 +29,88 @@ import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 
-import java.security.AccessController;
-import java.util.Map;
-
 @Singleton
-public class XUIState implements ServiceListener {
+public class XUIState {
 
-    private static final String XUI_INTERFACE = "openam-xui-interface-enabled";
-    private static final String SERVICE_NAME = "iPlanetAMAuthService";
-    private static final Debug DEBUG = Debug.getInstance("Configuration");
-    private String listenerID;
-    private boolean initialized;
-    private ServiceSchemaManager scm;
-    private boolean xuiEnabled;
+    enum XUIMode implements ServiceListener {
+        XUI_MODE("iPlanetAMAuthService", "openam-xui-interface-enabled"),
+        XUI_ADMIN_MODE("iPlanetAMAdminConsoleService", "xuiAdminConsoleEnabled");
 
-    public boolean isXUIEnabled() {
-        if (!initialized) {
-            synchronized (this) {
-                if (!initialized) {
-                    detectXUIMode();
+        private final Debug DEBUG = Debug.getInstance("Configuration");
+        private final String service;
+        private final String attribute;
+        private final ServiceSchemaManager schemaManager;
+        private boolean enabled;
+        private String listenerId;
+
+        XUIMode(String service, String attribute) {
+            try {
+                this.service = service;
+                this.attribute = attribute;
+                this.schemaManager = new ServiceSchemaManager(service,
+                        AccessController.doPrivileged(AdminTokenAction.getInstance()));
+                detectMode(service, attribute);
+            } catch (SMSException | SSOException e) {
+                DEBUG.error("Could not get " + service, e);
+                throw new IllegalStateException("Could not get " + service, e);
+            }
+        }
+
+        private void detectMode(String service, String attribute) {
+            try {
+                ServiceSchema schema = schemaManager.getGlobalSchema();
+                Map defaults = schema.getAttributeDefaults();
+                enabled = Boolean.parseBoolean(CollectionHelper.getMapAttr(defaults, attribute, ""));
+                listenerId = schemaManager.addListener(this);
+            } catch (SMSException e) {
+                DEBUG.error("Could not get " + service, e);
+                throw new IllegalStateException("Could not get " + service, e);
+            }
+        }
+
+        public static void destroy() {
+            for (XUIMode state : XUIMode.values()) {
+                if (state.listenerId != null) {
+                    state.schemaManager.removeListener(state.listenerId);
+                    state.listenerId = null;
                 }
             }
         }
 
-        return xuiEnabled;
+        @Override
+        public void organizationConfigChanged(String serviceName, String version, String orgName, String groupName,
+                String serviceComponent, int type) {
+            // no op
+        }
+
+        @Override
+        public void globalConfigChanged(String serviceName, String version,
+                String groupName, String serviceComponent, int type) {
+            detectMode(XUI_MODE.service, XUI_MODE.attribute);
+            detectMode(XUI_ADMIN_MODE.service, XUI_ADMIN_MODE.attribute);
+        }
+
+        @Override
+        public void schemaChanged(String serviceName, String version) {
+            detectMode(XUI_MODE.service, XUI_MODE.attribute);
+            detectMode(XUI_ADMIN_MODE.service, XUI_ADMIN_MODE.attribute);
+        }
     }
 
-    /**
-     * detectXUIMode will detect if XUI is enabled or disabled by inspecting the service
-     */
-    protected void detectXUIMode() {
-        try {
-            SSOToken dUserToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
-            scm = new ServiceSchemaManager(SERVICE_NAME, dUserToken);
-            ServiceSchema schema = scm.getGlobalSchema();
-            Map attrs = schema.getAttributeDefaults();
-            xuiEnabled = Boolean.parseBoolean(CollectionHelper.getMapAttr(attrs, XUI_INTERFACE, ""));
-            if (listenerID == null) {
-                listenerID = scm.addListener(this);
-            }
-            initialized = true;
-        } catch (SMSException smse) {
-            DEBUG.error("Could not get iPlanetAMAuthService", smse);
-        } catch (SSOException ssoe) {
-            DEBUG.error("Could not get iPlanetAMAuthService", ssoe);
-        }
+    public boolean isXUIEnabled() {
+        return XUIMode.XUI_MODE.enabled;
+    }
+
+    public boolean isXUIAdminEnabled() {
+        return XUIMode.XUI_ADMIN_MODE.enabled;
     }
 
     public void destroy() {
-        if (listenerID != null && scm != null) {
-            scm.removeListener(listenerID);
-            listenerID = null;
-            initialized = false;
+        for (XUIMode state : XUIMode.values()) {
+            if (state.listenerId != null) {
+                state.schemaManager.removeListener(state.listenerId);
+                state.listenerId = null;
+            }
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void organizationConfigChanged(String serviceName, String version,
-            String orgName, String groupName, String serviceComponent,
-            int type) {
-        // no op
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void globalConfigChanged(String serviceName, String version,
-            String groupName, String serviceComponent, int type) {
-        detectXUIMode();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void schemaChanged(String serviceName, String version) {
-        detectXUIMode();
     }
 }

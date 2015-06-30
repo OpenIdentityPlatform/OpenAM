@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
@@ -24,12 +24,21 @@
  *
  * $Id: RMRealmViewBean.java,v 1.3 2008/07/07 20:39:20 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.console.realm;
+
+import static com.sun.identity.console.XuiRedirectHelper.isJatoSessionRequestFromXUI;
+import static com.sun.identity.console.XuiRedirectHelper.isXuiAdminConsoleEnabled;
+import static com.sun.identity.console.XuiRedirectHelper.redirectToXui;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
@@ -45,20 +54,13 @@ import com.sun.identity.console.components.view.html.SerializedField;
 import com.sun.identity.console.realm.model.RMRealmModel;
 import com.sun.identity.console.realm.model.RMRealmModelImpl;
 import com.sun.identity.sm.SMSSchema;
+import com.sun.web.ui.model.CCActionTableModel;
+import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.html.CCButton;
 import com.sun.web.ui.view.html.CCTextField;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import com.sun.web.ui.view.table.CCActionTable;
-import com.sun.web.ui.model.CCActionTableModel;
-import com.sun.web.ui.model.CCPageTitleModel;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
 
 public class RMRealmViewBean
     extends RMRealmViewBeanBase
@@ -128,9 +130,11 @@ public class RMRealmViewBean
         return view;
     }
 
-    public void beginDisplay(DisplayEvent event)
-        throws ModelControlException
-    {
+    public void beginDisplay(DisplayEvent event) throws ModelControlException {
+        if (!isJatoSessionRequestFromXUI(getRequestContext().getRequest()) && isXuiAdminConsoleEnabled()) {
+            redirectToXui((String) getPageSessionAttribute(AMAdminConstants.CURRENT_PROFILE), "realms/");
+            return;
+        }
         super.beginDisplay(event);
         resetButtonState(TBL_BUTTON_DELETE);
         getRealmNames();

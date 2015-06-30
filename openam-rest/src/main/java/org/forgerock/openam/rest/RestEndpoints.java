@@ -15,15 +15,16 @@
  */
 package org.forgerock.openam.rest;
 
-import static org.forgerock.openam.rest.service.RestletUtils.*;
+import static org.forgerock.openam.rest.service.RestletUtils.wrap;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.Set;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import com.sun.identity.sm.InvalidRealmNameManager;
 import com.sun.identity.sm.SchemaType;
-import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.RoutingMode;
 import org.forgerock.json.resource.VersionSelector;
@@ -62,8 +63,8 @@ import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
 import org.forgerock.openam.rest.authz.ResourceOwnerOrSuperUserAuthzModule;
 import org.forgerock.openam.rest.authz.SessionResourceAuthzModule;
 import org.forgerock.openam.rest.dashboard.DashboardResource;
-import org.forgerock.openam.rest.devices.TrustedDevicesResource;
 import org.forgerock.openam.rest.devices.OathDevicesResource;
+import org.forgerock.openam.rest.devices.TrustedDevicesResource;
 import org.forgerock.openam.rest.fluent.FluentRealmRouter;
 import org.forgerock.openam.rest.fluent.FluentRoute;
 import org.forgerock.openam.rest.fluent.FluentRouter;
@@ -302,7 +303,8 @@ public class RestEndpoints {
                 .forVersion("1.0").to(CoreTokenResource.class);
 
         rootRealmRouter.route("/global-config")
-                .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
+//                .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
+                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
                 .forVersion("1.0").to(RoutingMode.STARTS_WITH, smsRequestHandlerFactory.create(SchemaType.GLOBAL));
 
         rootRealmRouter.route("/global-config/servers/{serverName}/properties/{tab}")

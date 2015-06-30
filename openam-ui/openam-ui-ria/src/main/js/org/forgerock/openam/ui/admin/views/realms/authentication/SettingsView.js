@@ -29,10 +29,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
         render: function(args, callback) {
             var self = this;
 
-            this.data.realmLocation = args[0];
+            this.data.realmPath = args[0];
 
             this.parentRender( function () {
-                SMSRealmDelegate.authentication.get(this.data.realmLocation).done(function(data) {
+                SMSRealmDelegate.authentication.get(this.data.realmPath).done(function(data) {
                     self.data.form = new Form(self.$el.find("#tabpanel").get(0), {
                         type: "object",
                         properties: {
@@ -49,7 +49,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
             });
         },
         save: function(event) {
-            var promise = SMSRealmDelegate.authentication.update(this.data.realmLocation, this.data.form.data());
+            var promise = SMSRealmDelegate.authentication.update(this.data.realmPath, this.data.form.data());
 
             FormHelper.bindSavePromiseToElement(promise, event.target);
         }

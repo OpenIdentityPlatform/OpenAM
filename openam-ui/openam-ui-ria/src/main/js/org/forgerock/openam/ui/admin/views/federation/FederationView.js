@@ -17,7 +17,7 @@
 /*global, define*/
 define("org/forgerock/openam/ui/admin/views/federation/FederationView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/common/util/RedirectToLegacyConsole"
+    "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
 ], function (AbstractView, RedirectToLegacyConsole) {
     var FederationView = AbstractView.extend({
         render: function (args, callback) {

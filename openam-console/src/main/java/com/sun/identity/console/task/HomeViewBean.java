@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,14 +24,23 @@
  *
  * $Id: HomeViewBean.java,v 1.2 2008/06/25 05:43:21 qcheng Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.task;
 
+import static com.sun.identity.console.XuiRedirectHelper.isJatoSessionRequestFromXUI;
+import static com.sun.identity.console.XuiRedirectHelper.isXuiAdminConsoleEnabled;
+import static com.sun.identity.console.XuiRedirectHelper.redirectToXui;
+
+import javax.servlet.http.HttpServletRequest;
+
+import com.iplanet.jato.model.ModelControlException;
+import com.iplanet.jato.view.event.DisplayEvent;
 import com.sun.identity.console.base.AMPrimaryMastHeadViewBean;
+import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.base.model.AMModelBase;
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Placement for Common task Home page
@@ -57,4 +66,10 @@ public class HomeViewBean
         return new AMModelBase(req, getPageSessionAttributes());
     }
 
+    @Override
+    public void beginDisplay(DisplayEvent event) throws ModelControlException {
+        if (!isJatoSessionRequestFromXUI(getRequestContext().getRequest()) && isXuiAdminConsoleEnabled()) {
+            redirectToXui((String) getPageSessionAttribute(AMAdminConstants.CURRENT_PROFILE), "realms");
+        }
+    }
 }

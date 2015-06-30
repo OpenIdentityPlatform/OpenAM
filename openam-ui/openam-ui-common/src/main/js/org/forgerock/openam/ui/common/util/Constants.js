@@ -36,8 +36,10 @@ define("org/forgerock/openam/ui/common/util/Constants", [
     commonConstants.OPENAM_HEADER_PARAM_CUR_PASSWORD = "currentpassword";
 
     // Realm
-    commonConstants.EVENT_ADD_NEW_REALM_DIALOG = 'main.EVENT_ADD_NEW_REALM_DIALOG';
     commonConstants.EVENT_INVALID_REALM = "main.EVENT_INVALID_REALM";
+
+    // Admin
+    commonConstants.EVENT_ADD_NEW_REALM_DIALOG = "admin.realms.EVENT_ADD_NEW_REALM_DIALOG";
 
     return commonConstants;
 });

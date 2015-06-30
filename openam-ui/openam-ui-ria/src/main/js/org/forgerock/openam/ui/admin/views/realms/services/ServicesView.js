@@ -17,7 +17,7 @@
 /*global, define*/
 define('org/forgerock/openam/ui/admin/views/realms/services/ServicesView', [
     'org/forgerock/commons/ui/common/main/AbstractView',
-    'org/forgerock/openam/ui/common/util/RedirectToLegacyConsole'
+    'org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole'
 ], function (AbstractView, RedirectToLegacyConsole) {
     var ServicesView = AbstractView.extend({
         template: 'templates/admin/views/realms/services/ServicesTemplate.html',

@@ -11,10 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.restlet;
+
+import static org.mockito.Mockito.*;
+
+import java.util.Collections;
 
 import org.forgerock.oauth2.core.AuthorizationService;
 import org.forgerock.oauth2.core.AuthorizationToken;
@@ -28,11 +32,6 @@ import org.restlet.representation.EmptyRepresentation;
 import org.restlet.routing.Router;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.util.Collections;
-
-import static org.fest.assertions.Assertions.*;
-import static org.mockito.Mockito.*;
 
 public class AuthorizeResourceTest {
 

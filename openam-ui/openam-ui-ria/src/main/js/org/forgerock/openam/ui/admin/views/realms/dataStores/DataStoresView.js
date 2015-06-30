@@ -17,7 +17,7 @@
 /*global, define*/
 define('org/forgerock/openam/ui/admin/views/realms/dataStores/DataStoresView', [
     'org/forgerock/commons/ui/common/main/AbstractView',
-    'org/forgerock/openam/ui/common/util/RedirectToLegacyConsole'
+    'org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole'
 ], function (AbstractView, RedirectToLegacyConsole) {
     var DataStoresView = AbstractView.extend({
         template: 'templates/admin/views/realms/dataStores/DataStoresTemplate.html',

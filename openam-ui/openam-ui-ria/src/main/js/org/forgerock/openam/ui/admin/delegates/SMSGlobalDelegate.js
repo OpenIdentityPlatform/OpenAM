@@ -49,7 +49,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
                 data.result = data.result.sort(function (a, b) {
                     if (a.active === b.active) {
                         // Within the active 'catagories' sort alphabetically
-                        return a.location < b.location ? -1 : 1;
+                        return a.path < b.path ? -1 : 1;
                     } else {
                         // Sort active realms before inactive realms
                         return a.active === true ? -1 : 1;
@@ -73,11 +73,11 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
 
         /**
          * Gets a realm's schema together with it's values.
-         * @param  {String} location Unescaped realm location (must have leading slash). e.g. "/myrealm"
+         * @param  {String} path Unescaped realm path (must have leading slash). e.g. "/myrealm"
          * @returns {Promise.<Object>} Service promise
          */
-        get: function (location) {
-            return schemaWithValues("realms" + location);
+        get: function (path) {
+            return schemaWithValues("realms" + path);
         },
 
         /**
@@ -90,11 +90,11 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
 
         /**
          * Removes a realm.
-         * @param  {String} location Unescaped realm location (must have leading slash). e.g. "/myrealm"
+         * @param  {String} path Unescaped realm path (must have leading slash). e.g. "/myrealm"
          * @returns {Promise} Service promise
          */
-        remove: function (location) {
-            return obj.serviceCall({ url: "realms" + location, type: "DELETE" });
+        remove: function (path) {
+            return obj.serviceCall({ url: "realms" + path, type: "DELETE" });
         },
 
         /**
@@ -102,9 +102,9 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
          * @param  {Object} data Complete representation of realm
          * @returns {Promise} Service promise
          */
-        update: function (location, data) {
+        update: function (path, data) {
             return obj.serviceCall({
-                url: "realms" + location,
+                url: "realms" + path,
                 type: "PUT",
                 data: JSON.stringify(data)
             });

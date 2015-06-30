@@ -31,7 +31,9 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmView", [
                 parent, fragmentSections;
             if (element.length) {
                 parent = element.parent();
-                parent.addClass("active");
+
+                this.$el.find('li').removeClass('active');
+                element.parentsUntil( this.$el.find('.sidenav'), 'li' ).addClass('active');
 
                 // Expand any collapsed element direct above. Only works one level up
                 if (parent.parent().hasClass("collapse")) {
@@ -43,8 +45,8 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmView", [
             }
         },
         navigateToPage: function (event) {
-            this.$el.find("li").removeClass("active");
-            $(event.currentTarget).parent().addClass("active");
+            this.$el.find('li').removeClass('active');
+            $(event.currentTarget).parentsUntil( this.$el.find('.sidenav'), 'li' ).addClass('active');
 
             this.nextRenderPage = true;
         },
@@ -61,22 +63,21 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmView", [
                 }
             }
         },
-        realmExists: function (location) {
-            return SMSGlobalDelegate.realms.get(location);
+        realmExists: function (path) {
+            return SMSGlobalDelegate.realms.get(path);
         },
         render: function (args, callback) {
             var self = this;
 
             this.args = args;
-            this.data.realmLocation = args[0];
-            this.data.realmName = this.data.realmLocation === "/" ? "Top Level Realm" : this.data.realmLocation;
+            this.data.realmPath = args[0];
+            this.data.realmName = this.data.realmPath === "/" ? $.t('console.common.topLevelRealm') : this.data.realmPath;
 
             this.realmExists(args[0])
             .done(function () {
                 self.parentRender(function () {
                     self.$el.find("li").removeClass("active");
                     self.findActiveNavItem(Router.getURIFragment());
-
                     self.renderPage(require(self.route.page), args, callback);
                 });
             })
@@ -90,7 +91,7 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmView", [
         renderPage: function (Module, args, callback) {
             var page = new Module();
 
-            page.element = "#realmsPageContent";
+            page.element = '#sidePageContent';
             page.render(args, callback);
             this.delegateEvents();
         }

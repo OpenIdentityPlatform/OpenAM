@@ -52,6 +52,7 @@ import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.guava.common.base.Function;
 import org.forgerock.guava.common.collect.Maps;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
@@ -102,13 +103,22 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
         }
     };
 
-    private static final Function<String, Boolean> AUTHENTICATION_AND_CHAINS_HANDLES_FUNCTION = new Function<String, Boolean>() {
+    private static final Function<String, Boolean> AUTHENTICATION_HANDLES_FUNCTION = new Function<String, Boolean>() {
         @Nullable
         @Override
         public Boolean apply(@Nullable String s) {
-            return ISAuthConstants.AUTH_SERVICE_NAME.equals(s) || ISAuthConstants.AUTHCONFIG_SERVICE_NAME.equals(s);
+            return ISAuthConstants.AUTH_SERVICE_NAME.equals(s);
         }
     };
+
+    private static final Function<String, Boolean> AUTHENTICATION_CHAINS_HANDLES_FUNCTION = new Function<String, Boolean>() {
+        @Nullable
+        @Override
+        public Boolean apply(@Nullable String s) {
+            return ISAuthConstants.AUTHCONFIG_SERVICE_NAME.equals(s);
+        }
+    };
+
     private static final Function<String, Boolean> AUTHENTICATION_MODULE_HANDLES_FUNCTION = new Function<String, Boolean>() {
         @Override
         public Boolean apply(String serviceName) {
@@ -121,7 +131,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
      */
     private static final Function<String, Boolean> SERVICES_HANDLES_FUNCTION = new Function<String, Boolean>() {
         private final List<Function<String, Boolean>> ALREADY_HANDLED = Arrays.asList(
-                AUTHENTICATION_AND_CHAINS_HANDLES_FUNCTION,
+                AUTHENTICATION_HANDLES_FUNCTION,
+                AUTHENTICATION_CHAINS_HANDLES_FUNCTION,
                 AUTHENTICATION_MODULE_HANDLES_FUNCTION,
                 CIRCLES_OF_TRUST_HANDLES_FUNCTION,
                 ENTITYPROVIDER_HANDLES_FUNCTION
@@ -165,8 +176,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
             ExcludedServicesFactory excludedServicesFactory,
             AuthenticationModuleCollectionHandler authenticationModuleCollectionHandler,
             AuthenticationModuleTypeHandler authenticationModuleTypeHandler,
-            SitesResourceProvider sitesResourceProvider) throws SMSException,
-            SSOException {
+            SitesResourceProvider sitesResourceProvider, AuthenticationChainsFilter authenticationChainsFilter)
+            throws SMSException, SSOException {
         this.schemaType = type;
         this.collectionProviderFactory = collectionProviderFactory;
         this.singletonProviderFactory = singletonProviderFactory;
@@ -179,8 +190,9 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
         this.schemaDnPattern = Pattern.compile("^ou=([.0-9]+),ou=([^,]+)," +
                 Pattern.quote(ServiceManager.getServiceDN()) + "$");
         routeTree = tree(
-                branch("/authentication", AUTHENTICATION_AND_CHAINS_HANDLES_FUNCTION,
-                        leaf("/modules", AUTHENTICATION_MODULE_HANDLES_FUNCTION)),
+                branch("/authentication", AUTHENTICATION_HANDLES_FUNCTION,
+                        leaf("/modules", AUTHENTICATION_MODULE_HANDLES_FUNCTION),
+                        filter("/chains", AUTHENTICATION_CHAINS_HANDLES_FUNCTION, authenticationChainsFilter)),
                 branch("/federation", CIRCLES_OF_TRUST_HANDLES_FUNCTION,
                         leaf("/entityproviders", ENTITYPROVIDER_HANDLES_FUNCTION)),
                 leaf("/services", SERVICES_HANDLES_FUNCTION)
@@ -196,6 +208,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
         addAuthenticationModulesQueryHandler();
         addAuthenticationModuleTypesQueryHandler();
         addRealmHandler();
+        addCommonTasksHandler();
         addSitesHandler();
     }
 
@@ -226,6 +239,13 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
             CrestRealmRouter router = new CrestRealmRouter(new RestRealmValidator(), new CoreWrapper());
             router.addRoute(RoutingMode.EQUALS, "", new SmsRealmProvider());
             routeTree.addRoute(RoutingMode.STARTS_WITH, "/realms", router);
+        }
+    }
+
+    private void addCommonTasksHandler() {
+        if (SchemaType.ORGANIZATION.equals(schemaType)) {
+            routeTree.addRoute(RoutingMode.STARTS_WITH, "/commontasks",
+                    Resources.newCollection(InjectorHolder.getInstance(CommonTasksResource.class)));
         }
     }
 

@@ -39,31 +39,29 @@
     {{/if}}
     <tbody>
         {{#each linkConfig.options}}
-        {{#each this}}
         <tr>
             <td>{{@key}}</td>
             <td>{{this}}</td>
             <td>
-                <!--<div class="btn-group pull-right">
+                <div class="btn-group pull-right">
                     <button class="btn btn-transparent delete-option"><i class="fa fa-times"></i></button>
-                </div>-->
+                </div>
             </td>
         </tr>
-        {{/each}}
         {{/each}}
 
         <tr class="tr-row">
             <td>
                 <label class="sr-only" for="optionsKey">{{t 'common.form.key'}}</label>
-                <input disabled type="text" class="form-control" id="optionsKey" placeholder="{{t 'common.form.addKey'}}">
+                <input type="text" class="form-control" id="optionsKey" placeholder="{{t 'common.form.addKey'}}">
             </td>
             <td>
                 <label class="sr-only" for="optionsKey">{{t 'common.form.value'}}</label>
-                <input disabled type="text" class="form-control" id="optionsKey" placeholder="{{t 'common.form.addValue'}}">
+                <input type="text" class="form-control" id="optionsKey" placeholder="{{t 'common.form.addValue'}}">
             </td>
             <td>
                 <div class="btn-group pull-right">
-                    <button disabled id="addOption" type="submit" class="btn btn-secondary"><i class="fa fa-plus"></i></button>
+                    <button id="addOption" type="submit" class="btn btn-secondary"><i class="fa fa-plus"></i></button>
                 </div>
             </td>
         </tr>

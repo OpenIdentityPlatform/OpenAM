@@ -90,8 +90,6 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
                     obj.serviceCall({ url: scopedByRealm(realm, "authentication/chains/" + name) }),
                     obj.serviceCall({ url: scopedByRealm(realm, "authentication/modules?_queryFilter=true") })
                 ).then(function (chainData, modulesData) {
-                    // FIXME: This is a temporay client side fix until AME-7202 is completed.
-                    chainData[0].authChainConfiguration = SMSDelegateUtils.authChainConfigurationToJson(chainData[0].authChainConfiguration);
 
                     _.each(chainData[0].authChainConfiguration, function (chainLink, index) {
                         chainData[0].authChainConfiguration[index].type = _.findWhere(modulesData[0].result, { _id: chainLink.module }).type;
@@ -110,11 +108,10 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
                 });
             },
             update: function (realm, name, data) {
-                var cleaned = SMSDelegateUtils.authChainConfigurationToXml(data);
                 return obj.serviceCall({
                     url: scopedByRealm(realm, "authentication/chains/" + name),
                     type: "PUT",
-                    data: JSON.stringify(cleaned)
+                    data: JSON.stringify(data)
                 });
             }
         },
@@ -176,6 +173,16 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
                         data.result = _.sortBy(data.result, "name");
                     });
                 }
+            }
+        }
+    };
+
+    obj.dashboard = {
+        commonTasks: {
+            all: function (realm) {
+                return obj.serviceCall({
+                    url: scopedByRealm(realm, "commontasks?_queryFilter=true")
+                });
             }
         }
     };

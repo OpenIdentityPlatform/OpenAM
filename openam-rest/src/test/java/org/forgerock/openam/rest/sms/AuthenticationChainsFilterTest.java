@@ -14,17 +14,22 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global, define*/
-define('org/forgerock/openam/ui/admin/views/realms/general/GeneralView', [
-    'org/forgerock/commons/ui/common/main/AbstractView',
-    'org/forgerock/openam/ui/common/util/RedirectToLegacyConsole'
-], function (AbstractView, RedirectToLegacyConsole) {
-    var GeneralView = AbstractView.extend({
-        template: 'templates/admin/views/realms/general/GeneralTemplate.html',
-        render: function (args, callback) {
-            RedirectToLegacyConsole.realm.general();
-        }
-    });
+package org.forgerock.openam.rest.sms;
 
-    return GeneralView;
-});
+import org.testng.annotations.Test;
+
+public class AuthenticationChainsFilterTest {
+
+    @Test(enabled = false)
+    public void should() {
+
+        //Given
+
+
+        //When
+
+
+        //Then
+
+    }
+}

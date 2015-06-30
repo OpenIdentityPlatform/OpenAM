@@ -47,7 +47,7 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/applications/Applica
                 ClickableRow,
                 resourceTypesPromise = PolicyDelegate.listResourceTypes();
 
-            this.realmLocation = args[0];
+            this.realmPath = args[0];
             this.data.selectedItems = [];
 
             _.extend(this.events, {
