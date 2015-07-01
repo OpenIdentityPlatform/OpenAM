@@ -280,7 +280,7 @@ public class RestEndpoints {
                 .forVersion("1.0").to(ScriptResource.class);
 
         dynamicRealmRouter.route("/realm-config")
-                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(RoutingMode.STARTS_WITH, smsRequestHandlerFactory.create(SchemaType.ORGANIZATION));
 
         // ------------------
@@ -303,12 +303,11 @@ public class RestEndpoints {
                 .forVersion("1.0").to(CoreTokenResource.class);
 
         rootRealmRouter.route("/global-config")
-//                .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
-                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(RoutingMode.STARTS_WITH, smsRequestHandlerFactory.create(SchemaType.GLOBAL));
 
         rootRealmRouter.route("/global-config/servers/{serverName}/properties/{tab}")
-                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(InjectorHolder.getInstance(SmsServerPropertiesResource.class));
 
         VersionBehaviourConfigListener.bindToServiceConfigManager(rootRealmRouter);
