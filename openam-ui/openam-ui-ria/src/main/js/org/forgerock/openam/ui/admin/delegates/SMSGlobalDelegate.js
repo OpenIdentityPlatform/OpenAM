@@ -35,6 +35,17 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
                     values: valuesData[0]
                 };
             });
+        },
+        schemaWithDefaults = function(url) {
+            return $.when(
+                obj.serviceCall({url: url + "?_action=schema", type: "POST"}),
+                obj.serviceCall({url: url + "?_action=template", type: "POST"})
+            ).then(function (schemaData, templateData) {
+                    return {
+                        schema: SMSDelegateUtils.sanitizeSchema(schemaData[0]),
+                        values: templateData[0]
+                    };
+                });
         };
 
     obj.realms = {
@@ -85,7 +96,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
          * @returns {Promise.<Object>} Service promise
          */
         schema: function () {
-            return schemaWithValues("realms");
+            return schemaWithDefaults("realms");
         },
 
         /**

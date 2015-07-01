@@ -189,7 +189,9 @@ public class SmsRealmProvider implements RequestHandler {
 
             RealmContext realmContext = serverContext.asContext(RealmContext.class);
             String realmPath = realmContext.getResolvedRealm();
-            realmPath = realmPath + "/";
+            if (!realmPath.endsWith("/")) {
+                realmPath = realmPath + "/";
+            }
 
             String location = jsonContent.get(new JsonPointer(PATH_ATTRIBUTE_NAME)).asString();
 
