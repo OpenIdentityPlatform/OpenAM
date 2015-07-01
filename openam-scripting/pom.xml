@@ -122,6 +122,7 @@
                         sharedState,fontDetector,output,autoSubmitDelay,submit</predefinedVars>
                     <excludes>
                         <exclude>**/authentication-server-side.js</exclude>
+                        <exclude>**/policy-condition.js</exclude>
                     </excludes>
                 </configuration>
                 <executions>
@@ -152,6 +153,7 @@
                     <sourceExcludes>
                         <sourceExclude>**/fontdetector.js</sourceExclude>
                         <sourceExclude>**/authentication-server-side.js</sourceExclude>
+                        <sourceExclude>**/policy-condition.js</sourceExclude>
                     </sourceExcludes>
                 </configuration>
             </plugin>
@@ -190,6 +192,10 @@
                                 <content>
                                     <id>oidc-claims-extension-groovy</id>
                                     <file>${project.build.sourceDirectory}/../groovy/oidc-claims-extension.groovy</file>
+                                </content>
+                                <content>
+                                    <id>policy-condition-js</id>
+                                    <file>${project.build.sourceDirectory}/../js/policy-condition.js</file>
                                 </content>
                             </contents>
                             <destinationFile>${project.build.outputDirectory}/scripting.xml</destinationFile>

@@ -349,7 +349,7 @@
                         <AttributeValuePair>
                             <Attribute name="script"/>
                             <Value>
-                                // Server-side Policy Condition script
+                                ${inject.content.policy-condition-js}
                             </Value>
                         </AttributeValuePair>
                     </SubConfiguration>

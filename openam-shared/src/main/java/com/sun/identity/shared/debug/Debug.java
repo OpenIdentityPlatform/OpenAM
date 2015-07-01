@@ -478,7 +478,7 @@ public class Debug {
         IDebug debug = getDebugServiceInstance();
         if (debug.messageEnabled()) {
             String message = MessageFormatter.arrayFormat(msg, params).getMessage();
-            if (params[params.length - 1] instanceof Throwable) {
+            if (params.length > 0 && params[params.length - 1] instanceof Throwable) {
                 debug.message(message, (Throwable) params[params.length - 1]);
             } else {
                 debug.message(message, null);
@@ -579,7 +579,7 @@ public class Debug {
         IDebug debug = getDebugServiceInstance();
         if (debug.warningEnabled()) {
             String message = MessageFormatter.arrayFormat(msg, params).getMessage();
-            if (params[params.length - 1] instanceof Throwable) {
+            if (params.length > 0 && params[params.length - 1] instanceof Throwable) {
                 debug.warning(message, (Throwable) params[params.length - 1]);
             } else {
                 debug.warning(message, null);
@@ -654,7 +654,7 @@ public class Debug {
         IDebug debug = getDebugServiceInstance();
         if (debug.errorEnabled()) {
             String message = MessageFormatter.arrayFormat(msg, params).getMessage();
-            if (params[params.length - 1] instanceof Throwable) {
+            if (params.length > 0 && params[params.length - 1] instanceof Throwable) {
                 debug.error(message, (Throwable) params[params.length - 1]);
             } else {
                 debug.error(message, null);
