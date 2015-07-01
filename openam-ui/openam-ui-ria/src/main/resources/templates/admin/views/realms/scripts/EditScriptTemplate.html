@@ -41,7 +41,7 @@
                 <label class="col-sm-3 control-label">{{t "console.scripts.edit.context"}}</label>
 
                 <div class="col-sm-7 script-context">
-                    <span class="form-control" id="context">{{entity.context}}</span>
+                    <span class="form-control" id="context">{{contextName}}</span>
                     <a class="btn btn-default pull-right" id="changeContext" role="button">
                         <span class="fa fa-gear"></span> {{t 'common.form.change'}}
                     </a>
@@ -56,8 +56,8 @@
                     {{#each languages}}
                     <div class="radio">
                         <label>
-                            <input type="radio" name="language" id="{{this}}" value="{{this}}" data-field="language"
-                                {{#equals ../entity.language this}} checked {{/equals}}> {{this}}
+                            <input type="radio" name="language" id="{{id}}" value="{{id}}" data-field="language"
+                                {{#equals ../entity.language id}} checked {{/equals}}> {{name}}
                         </label>
                     </div>
                     {{/each}}

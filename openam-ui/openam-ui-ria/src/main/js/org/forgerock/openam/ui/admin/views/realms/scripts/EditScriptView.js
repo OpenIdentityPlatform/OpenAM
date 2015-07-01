@@ -30,9 +30,10 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/admin/models/scripts/ScriptModel",
-    "org/forgerock/openam/ui/admin/delegates/ScriptsDelegate"
+    "org/forgerock/openam/ui/admin/delegates/ScriptsDelegate",
+    "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate"
 ], function ($, _, BootstrapDialog, CodeMirror, Groovy, Javascript, AbstractView, EventManager, Router, Base64,
-             Constants, UIUtils, Script, ScriptsDelegate) {
+             Constants, UIUtils, Script, ScriptsDelegate, SMSGlobalDelegate) {
 
     return AbstractView.extend({
         initialize: function (options) {
@@ -76,8 +77,10 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                 uuid = args[1];
             }
 
-            this.contextsPromise = ScriptsDelegate.getAllContexts();
-            this.defaultContextPromise = ScriptsDelegate.getDefaultGlobalContext();
+            this.contextsPromise = SMSGlobalDelegate.scripts.getAllContexts();
+            this.defaultContextPromise = SMSGlobalDelegate.scripts.getDefaultGlobalContext();
+            this.contextSchemaPromise = SMSGlobalDelegate.scripts.getSchema();
+            this.languageSchemaPromise = SMSGlobalDelegate.scripts.getContextSchema();
 
             /**
              * Guard clause to check if model requires sync'ing/updating
@@ -108,22 +111,30 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             this.data.entity = _.pick(this.model.attributes, "uuid", "name", "description", "language", "context", "script");
 
             if (!this.data.contexts) {
-                this.contextsPromise.done(function (contexts) {
-                    self.data.contexts = contexts.result;
+                $.when(self.contextsPromise, self.contextSchemaPromise, self.languageSchemaPromise).done(function (contexts, contextSchema, langSchema) {
+                    self.data.contexts = contexts[0].result;
+                    self.addContextNames(self.data.contexts, contextSchema[0]);
+                    self.langSchema = langSchema[0];
                     self.renderScript();
                 });
             } else {
-                self.renderScript();
+                self.languageSchemaPromise.done(function (langSchema) {
+                    self.langSchema = langSchema;
+                    self.renderScript();
+                });
             }
         },
 
         renderScript: function () {
-            var self = this;
+            var self = this,
+                context;
 
             if (this.model.id) {
-                this.data.languages = _.findWhere(this.data.contexts,function (context) {
+                context = _.findWhere(this.data.contexts, function (context) {
                     return context._id === self.data.entity.context;
-                }).languages;
+                });
+                self.data.contextName = context.name;
+                this.data.languages = this.addLanguageNames(context.languages);
             } else {
                 this.data.languages = [];
                 this.data.newScript = true;
@@ -293,9 +304,11 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                 label: self.data.newScript ? $.t("common.form.save") : $.t("common.form.change"),
                 cssClass: self.data.newScript ? "btn-primary" : "btn-danger",
                 action: function (dialog) {
-                    var newContext = dialog.$modalContent.find("[name=changeContext]:checked").val();
+                    var newContext = dialog.$modalContent.find("[name=changeContext]:checked").val(),
+                        newContextName = dialog.$modalContent.find("[name=changeContext]:checked").parent().text().trim();
                     if (self.data.entity.context !== newContext) {
                         self.data.entity.context = newContext;
+                        self.data.contextName = newContextName;
                         self.changeContext().done(function () {
                             self.parentRender(function () {
                                 self.showUploadButton();
@@ -321,7 +334,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                 defaultScript,
                 promise = $.Deferred();
 
-            this.data.languages = selectedContext.languages;
+            this.data.languages = this.addLanguageNames(selectedContext.languages);
 
             if (selectedContext.defaultScript === "[Empty]") {
                 this.data.entity.script = "";
@@ -373,6 +386,48 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                 args: [encodeURIComponent(this.realmPath)],
                 trigger: true
             });
+        },
+
+        /**
+         * Update context's array using translation from Schema.
+         * @param  {Array} contexts Array with script contexts
+         * @param  {Object} schema Script schema with translations
+         * @returns {Array} result combined array
+         */
+        addContextNames: function (contexts, schema) {
+            var i,
+                index,
+                length = contexts.length;
+            if (schema && schema.properties && schema.properties.defaultContext) {
+                for (i = 0; i < length; i++) {
+                    index = _.indexOf(schema.properties.defaultContext["enum"], contexts[i]._id);
+                    contexts[i].name = schema.properties.defaultContext.options.enum_titles[index];
+                }
+            }
+        },
+
+        /**
+         * Merge script IDs from Context and translation from Schema to the Language array.
+         * @param  {Array} languages Language IDs from Context
+         * @returns {Array} result combined array
+         */
+        addLanguageNames: function (languages) {
+            var result,
+                i,
+                length = languages.length,
+                index;
+            if (this.langSchema && this.langSchema.properties && this.langSchema.properties.languages
+                && this.langSchema.properties.languages.items) {
+                result = [];
+                for (i = 0; i < length; i++) {
+                    index = _.indexOf(this.langSchema.properties.languages.items["enum"], languages[i]);
+                    result[i] = {
+                        id: languages[i],
+                        name: this.langSchema.properties.languages.items.options.enum_titles[index]
+                    };
+                }
+            }
+            return result;
         }
     });
 });

@@ -30,8 +30,9 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
     // TODO: switch to 'org/forgerock/openam/ui/common/util/URLHelper' after PE and SE are deleted
     "org/forgerock/openam/ui/uma/util/URLHelper",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
-    "org/forgerock/openam/ui/admin/models/scripts/ScriptModel"
-], function ($, _, Backbone, Backgrid, Messages, AbstractView, EventManager, Router, Constants, UIUtils, URLHelper, BackgridUtils, Script) {
+    "org/forgerock/openam/ui/admin/models/scripts/ScriptModel",
+    "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate"
+], function ($, _, Backbone, Backgrid, Messages, AbstractView, EventManager, Router, Constants, UIUtils, URLHelper, BackgridUtils, Script, SMSGlobalDelegate) {
 
     return AbstractView.extend({
         template: "templates/admin/views/realms/scripts/ScriptsTemplate.html",
@@ -48,10 +49,13 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
                 grid,
                 paginator,
                 ClickableRow,
-                Scripts;
+                Scripts,
+                renderTranslatedCell;
 
             this.realmPath = args[0];
             this.data.selectedUUIDs = [];
+            this.contextSchemaPromise = SMSGlobalDelegate.scripts.getSchema();
+            this.languageSchemaPromise = SMSGlobalDelegate.scripts.getContextSchema();
 
             Scripts = Backbone.PageableCollection.extend({
                 url: URLHelper.substitute("__api__/scripts"),
@@ -62,6 +66,14 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
                 parseRecords: BackgridUtils.parseRecords,
                 sync: BackgridUtils.sync
             });
+
+            renderTranslatedCell = function () {
+                var id = this.model.get(this.column.get("name")),
+                    translation = (this.map && self[this.map]) ? self[this.map][id] : id;
+
+                this.$el.text(translation);
+                return this;
+            };
 
             columns = [
                 {
@@ -80,7 +92,10 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
                 {
                     name: "context",
                     label: $.t("console.scripts.list.grid.headers.1"),
-                    cell: "string",
+                    cell: Backgrid.StringCell.extend({
+                        map: "contextMap",
+                        render: renderTranslatedCell
+                    }),
                     headerCell: BackgridUtils.FilterHeaderCell,
                     sortType: "toggle",
                     editable: false
@@ -88,7 +103,10 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
                 {
                     name: "language",
                     label: $.t("console.scripts.list.grid.headers.2"),
-                    cell: "string",
+                    cell: Backgrid.StringCell.extend({
+                        map: "langMap",
+                        render: renderTranslatedCell
+                    }),
                     headerCell: BackgridUtils.FilterHeaderCell,
                     sortType: "toggle",
                     editable: false
@@ -144,11 +162,19 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
                 this.$el.find("#backgridContainer").append(grid.render().el);
                 this.$el.find("#paginationContainer").append(paginator.render().el);
 
-                this.data.scripts.fetch({reset: true});
+                $.when(this.contextSchemaPromise, this.languageSchemaPromise).done(function (contSchema, langSchema) {
+                    var languageSchema = langSchema[0] ? langSchema[0].properties.languages.items : undefined,
+                        contextSchema = contSchema[0] ? contSchema[0].properties.defaultContext : undefined;
+                    self.langMap = self.createMapBySchema(languageSchema);
+                    self.contextMap = self.createMapBySchema(contextSchema);
 
-                if (callback) {
-                    callback();
-                }
+                    self.data.scripts.fetch({reset: true}).done(function () {
+                        if (callback) {
+                            callback();
+                        }
+                    });
+
+                });
             });
         },
 
@@ -210,6 +236,21 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
                 args: [encodeURIComponent(this.realmPath)],
                 trigger: true
             });
+        },
+
+        // TODO: server side fix is needed instead of this function
+        createMapBySchema: function (schema) {
+            var map, i, length;
+
+            if (schema && schema["enum"]) {
+                map = {};
+                length = schema["enum"].length;
+
+                for (i = 0; i < length; i++) {
+                    map[schema["enum"][i]] = schema.options.enum_titles[i];
+                }
+            }
+            return map;
         }
     });
 });

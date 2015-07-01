@@ -12,14 +12,14 @@
 {{#each contexts}}
 <div class="radio">
     <label>
-        <input type="radio" name="changeContext" id="{{this._id}}" value="{{this._id}}"
+        <input type="radio" name="changeContext" id="{{_id}}" value="{{_id}}"
         {{#if ../newScript}}
-            {{#equals ../../defaultContext this._id}} checked {{/equals}}
+            {{#equals ../../defaultContext _id}} checked {{/equals}}
         {{else}}
-            {{#equals ../../entity.context this._id}} checked {{/equals}}
+            {{#equals ../../entity.context _id}} checked {{/equals}}
         {{/if}}
         >
-        {{this._id}}
+        {{name}}
     </label>
 </div>
 {{/each}}

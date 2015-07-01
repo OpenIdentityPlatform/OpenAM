@@ -19,8 +19,9 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
     "jquery",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils"
-], function ($, AbstractDelegate, Constants, SMSDelegateUtils) {
+    "org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils",
+    "org/forgerock/openam/ui/common/util/RealmHelper"
+], function ($, AbstractDelegate, Constants, SMSDelegateUtils, RealmHelper) {
     /**
      * @exports org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate
      */
@@ -118,6 +119,50 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
                 url: "realms" + path,
                 type: "PUT",
                 data: JSON.stringify(data)
+            });
+        }
+    };
+
+    obj.scripts = {
+        /**
+         * Gets all script's contexts.
+         * @returns {Promise.<Object>} Service promise
+         */
+        getAllContexts: function () {
+            return obj.serviceCall({
+                url: RealmHelper.decorateURLWithOverrideRealm("services/scripting/contexts?_queryFilter=true")
+            });
+        },
+
+        /**
+         * Gets a default global script's context.
+         * @returns {Promise.<Object>} Service promise
+         */
+        getDefaultGlobalContext: function () {
+            return obj.serviceCall({
+                url: RealmHelper.decorateURLWithOverrideRealm("services/scripting")
+            });
+        },
+
+        /**
+         * Gets a script's schema.
+         * @returns {Promise.<Object>} Service promise
+         */
+        getSchema: function() {
+            return obj.serviceCall({
+                url: RealmHelper.decorateURLWithOverrideRealm("services/scripting?_action=schema"),
+                type: "POST"
+            });
+        },
+
+        /**
+         * Gets a script context's schema.
+         * @returns {Promise.<Object>} Service promise
+         */
+        getContextSchema: function() {
+            return obj.serviceCall({
+                url: RealmHelper.decorateURLWithOverrideRealm("services/scripting/contexts?_action=schema"),
+                type: "POST"
             });
         }
     };
