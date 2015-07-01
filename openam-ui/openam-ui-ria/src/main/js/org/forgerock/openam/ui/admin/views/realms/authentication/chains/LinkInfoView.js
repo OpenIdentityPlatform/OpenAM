@@ -15,16 +15,17 @@
  */
 
 /*global define*/
-
 define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkInfoView", [
+    "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView"
-], function(AbstractView) {
-
+], function(_, AbstractView) {
     var LinkInfoView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/chains/LinkInfoTemplate.html",
 
         render: function (data, element) {
             this.data = data;
+            this.data.optionsLength = _.keys(data.options).length;
+
             this.parentRender();
         }
     });
