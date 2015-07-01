@@ -25,7 +25,7 @@
 # $Id: ssoadm,v 1.20 2010/01/28 00:49:05 bigfatrat Exp $
 #
 
-# Portions Copyrighted 2010-2014 ForgeRock AS.
+# Portions Copyrighted 2010-2015 ForgeRock AS.
 
 if [ -z "$JAVA_HOME" ] ; then
         JAVA_HOME="\@JAVA_HOME@"
@@ -40,8 +40,8 @@ for JAR in ${TOOLS_HOME}/lib/*.jar; do
 done
 
 CLASSPATH="@CONFIG_DIR@"
-CLASSPATH="${CLASSPATH}:${LIB_CP}"
 CLASSPATH="$CLASSPATH:$TOOLS_HOME/classes:$TOOLS_HOME/resources"
+CLASSPATH="${CLASSPATH}:${LIB_CP}"
 
 if [ -n "$EXT_CLASSPATH" ] ; then
     CLASSPATH=$EXT_CLASSPATH:$CLASSPATH
