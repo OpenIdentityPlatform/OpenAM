@@ -83,8 +83,6 @@ public final class XuiRedirectHelper {
      * @return {@code true} if the XUI admin console is enabled, {@code false} otherwise.
      */
     public static boolean isXuiAdminConsoleEnabled() {
-        //TODO temporary until sanity checked the new XUI Admin Console
-        return false;
-//        return InjectorHolder.getInstance(XUIState.class).isXUIAdminEnabled();
+        return InjectorHolder.getInstance(XUIState.class).isXUIAdminEnabled();
     }
 }
