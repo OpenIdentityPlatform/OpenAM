@@ -24,11 +24,13 @@
 
    $Id: ValidateSAML2Setup.jsp,v 1.9 2009/07/20 23:03:23 asyhuang Exp $
 
+   Portions Copyrighted 2015 ForgeRock AS.
 --%>
 
 <%@ page info="ValidateSAML2Setup" language="java" %>
 <%@taglib uri="/WEB-INF/jato.tld" prefix="jato" %>
 <%@taglib uri="/WEB-INF/cc.tld" prefix="cc" %>
+<%@taglib tagdir="/WEB-INF/tags" prefix="console"%>
 <%
     request.setCharacterEncoding("UTF-8");
     response.setContentType("text/html; charset=utf-8");
@@ -71,7 +73,7 @@
     }
 
     function cancelOp() {
-        document.location.replace("../task/Home");
+        redirectToXui();
         return false;
     }
 
@@ -79,6 +81,9 @@
         document.location.replace("../task/ValidateSAML2Setup?realm=" + escapeEx(radio.value));
     }
 </script>
+
+<console:redirectToXui realm="encodeURIComponent(frm.elements['ValidateSAML2Setup.tfRealm'].value)"
+                       xuiPath="../XUI#realms/{realm}/dashboard"/>
 
 <cc:primarymasthead name="mhCommon" bundleID="amConsole"  logoutOnClick="return confirmLogout();" locale="<%=((com.sun.identity.console.base.AMViewBeanBase)viewBean).getUserLocale()%>"/>
 <table border="0" cellpadding="10" cellspacing="0" width="100%">
@@ -144,11 +149,6 @@
     function hideCannotValidateDiv() {
         var vdiv = document.getElementById('cannotValidateDiv');
         vdiv.style.display = 'none';
-    }
-
-    function cancelOp() {
-        document.location.replace("../task/Home");
-        return false;
     }
 
     function validate() {

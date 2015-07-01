@@ -24,9 +24,6 @@
 
    $Id: CreateFedlet.jsp,v 1.13 2009/08/14 18:32:47 asyhuang Exp $
 
---%>
-
-<%--
    Portions Copyrighted 2013-2015 ForgeRock AS.
    Portions Copyrighted 2015 Nomura Research Institute, Ltd.
 --%>
@@ -35,6 +32,7 @@
 <%@ page info="CreateFedlet" language="java" %>
 <%@taglib uri="/WEB-INF/jato.tld" prefix="jato" %>
 <%@taglib uri="/WEB-INF/cc.tld" prefix="cc" %>
+<%@taglib tagdir="/WEB-INF/tags" prefix="console"%>
 <%
     request.setCharacterEncoding("UTF-8");
 %>
@@ -71,7 +69,7 @@
     }
 
     function cancelOp() {
-        document.location.replace("../task/Home");
+        redirectToXui();
         return false;
     }
 
@@ -138,6 +136,9 @@
 
 </script>
 
+<console:redirectToXui realm="encodeURIComponent(frm.elements['CreateFedlet.tfRealm'].value)"
+                       xuiPath="../XUI#realms/{realm}/dashboard"/>
+
 <cc:primarymasthead name="mhCommon" bundleID="amConsole"  logoutOnClick="return confirmLogout();" locale="<%=((com.sun.identity.console.base.AMViewBeanBase)viewBean).getUserLocale()%>"/>
 <table border="0" cellpadding="10" cellspacing="0" width="100%">
     <tr>
@@ -168,7 +169,7 @@
 
     var msgCreating = "<p><img src=\"../console/images/processing.gif\" width=\"66\" height\"66\"/></p><cc:text name="txtConfiguring" defaultValue="creating.fedlet.waiting" bundleID="amConsole" escape="false" />";
     var ttlCreated = "<h3><cc:text name="txtTtlCreated" defaultValue="fedlet.created.title" escape="false" bundleID="amConsole" /></h3>";
-    var msgCreated = "<p>&nbsp;</p><input name=\"btnOK\" type=\"submit\" class=\"Btn1\" value=\"<cc:text name="txtOKBtn" defaultValue="ajax.ok.button" bundleID="amConsole" />\" onClick=\"document.location.replace(\'../task/Home\');return false;\" /></div></p>";
+    var msgCreated = "<p>&nbsp;</p><input name=\"btnOK\" type=\"submit\" class=\"Btn1\" value=\"<cc:text name="txtOKBtn" defaultValue="ajax.ok.button" bundleID="amConsole" />\" onClick=\"redirectToXui();return false;\" /></div></p>";
     var closeBtn = "<p>&nbsp;</p><p><div class=\"TtlBtnDiv\"><input name=\"btnClose\" type=\"submit\" class=\"Btn1\" value=\"<cc:text name="txtCloseBtn" defaultValue="ajax.close.button" bundleID="amConsole" />\" onClick=\"focusMain();return false;\" /></div></p>";
 
 var msgMissingAttrMappingValues = "<cc:text name="txtMissingAttrValues" defaultValue="configure.provider.missing.attribute.mapping.values" bundleID="amConsole" escape="false" />" + "<p>" + closeBtn + "</p>";

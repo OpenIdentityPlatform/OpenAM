@@ -24,11 +24,13 @@
 
    $Id: CompleteCreateHostedIDP.jsp,v 1.6 2009/07/06 21:58:43 babysunil Exp $
 
+   Portions Copyrighted 2015 ForgeRock AS.
 --%>
 
 <%@ page info="CompleteCreateHostedIDP" language="java" %>
 <%@taglib uri="/WEB-INF/jato.tld" prefix="jato" %>
 <%@taglib uri="/WEB-INF/cc.tld" prefix="cc" %>
+<%@taglib tagdir="/WEB-INF/tags" prefix="console"%>
 <%
     request.setCharacterEncoding("UTF-8");
 %>
@@ -86,7 +88,10 @@
     function modifyIDP() {
         top.location.replace('../federation/Federation');
     }
+
 </script>
+<console:redirectToXui realm="encodeURIComponent(frm.elements['CompleteCreateHostedIDP.tfrealm'].value)"
+                       xuiPath="../XUI#realms/{realm}/dashboard"/>
 <blockquote>
 <blockquote>
 <cc:form name="CompleteCreateHostedIDP" method="post">
@@ -121,7 +126,7 @@
 <table border=0 cellpadding="0" width="100%">
 <tr>
 <td align="right">
-<input name="btnFinish" type="button" class="Btn1" value="<cc:text name="txtFinishBtn" defaultValue="button.finish" bundleID="amConsole" escape="false" />" onClick="document.location.replace('../task/Home');return false;" />
+<input name="btnFinish" type="button" class="Btn1" value="<cc:text name="txtFinishBtn" defaultValue="button.finish" bundleID="amConsole" escape="false" />" onClick="redirectToXui();return false;" />
 </td>
 </tr>
 </table>

@@ -24,15 +24,13 @@
 
    $Id: CreateRemoteIDP.jsp,v 1.9 2009/07/20 23:03:23 asyhuang Exp $
 
---%>
-
-<%--
-   Portions Copyrighted 2012 ForgeRock Inc
+   Portions Copyrighted 2012-2015 ForgeRock AS.
 --%>
 
 <%@ page info="CreateRemoteIDP" language="java" %>
 <%@taglib uri="/WEB-INF/jato.tld" prefix="jato" %>
 <%@taglib uri="/WEB-INF/cc.tld" prefix="cc" %>
+<%@taglib tagdir="/WEB-INF/tags" prefix="console"%>
 <%
     request.setCharacterEncoding("UTF-8");
 %>
@@ -88,7 +86,7 @@
     }
 
     function cancelOp() {
-        document.location.replace("../task/Home");
+        redirectToXui();
         return false;
     }
 
@@ -123,7 +121,10 @@
 
 </script>
 
-<cc:primarymasthead name="mhCommon" bundleID="amConsole"  logoutOnClick="return confirmLogout();" locale="<%=((com.sun.identity.console.base.AMViewBeanBase)viewBean).getUserLocale()%>"/>
+<console:redirectToXui realm="encodeURIComponent(frm.elements['CreateRemoteIDP.tfRealm'].value)"
+                       xuiPath="../XUI#realms/{realm}/dashboard"/>
+
+    <cc:primarymasthead name="mhCommon" bundleID="amConsole"  logoutOnClick="return confirmLogout();" locale="<%=((com.sun.identity.console.base.AMViewBeanBase)viewBean).getUserLocale()%>"/>
 <table border="0" cellpadding="10" cellspacing="0" width="100%">
     <tr>
         <td>
@@ -154,7 +155,7 @@
 
     var msgConfiguring = "<cc:text name="txtConfiguring" defaultValue="configure.provider.waiting" bundleID="amConsole" escape="false" />";
 
-    var msgConfigured = "<p>&nbsp;</p><input name=\"btnOK\" type=\"submit\" class=\"Btn1\" value=\"<cc:text name="txtOKBtn" defaultValue="ajax.ok.button" bundleID="amConsole" />\" onClick=\"document.location.replace(\'../task/Home\');return false;\" /></div></p>";
+    var msgConfigured = "<p>&nbsp;</p><input name=\"btnOK\" type=\"submit\" class=\"Btn1\" value=\"<cc:text name="txtOKBtn" defaultValue="ajax.ok.button" bundleID="amConsole" />\" onClick=\"redirectToXui();return false;\" /></div></p>";
     var closeBtn = "<p>&nbsp;</p><p><div class=\"TtlBtnDiv\"><input name=\"btnClose\" type=\"submit\" class=\"Btn1\" value=\"<cc:text name="txtCloseBtn" defaultValue="ajax.close.button" bundleID="amConsole" />\" onClick=\"focusMain();return false;\" /></div></p>";
 
     var frm = document.forms['CreateRemoteIDP'];

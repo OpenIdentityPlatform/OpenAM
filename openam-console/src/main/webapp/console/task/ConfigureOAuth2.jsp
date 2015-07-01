@@ -1,4 +1,4 @@
-<!--
+<%--
 /*
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
@@ -20,18 +20,16 @@
 * If applicable, add the following below the CDDL Header,
 * with the fields enclosed by brackets [] replaced by
 * your own identifying information:
-* "Portions Copyrighted [2012] [ForgeRock Inc]"
-*/
--->
+* Portions Copyrighted 2012 [ForgeRock Inc]"
 
-<%--
-   Portions Copyrighted 2015 ForgeRock AS.
+   Portions Copyrighted 2012-2015 ForgeRock AS.
    Portions Copyrighted 2015 Nomura Research Institute, Ltd.
 --%>
 
 <%@ page info="ConfigureOAuth2" language="java" %>
 <%@taglib uri="/WEB-INF/jato.tld" prefix="jato" %>
 <%@taglib uri="/WEB-INF/cc.tld" prefix="cc" %>
+<%@taglib tagdir="/WEB-INF/tags" prefix="console"%>
 <%
     request.setCharacterEncoding("UTF-8");
 %>
@@ -68,7 +66,7 @@
            }
  
            function cancelOp() {
-               document.location.replace("../task/Home");
+               redirectToXui();
                return false;
            }
  
@@ -100,11 +98,13 @@
 </div>
 <div id="dlg" class="dvs"></div>
  
+<console:redirectToXui realm="encodeURIComponent(frm.elements['ConfigureOAuth2.tfRealm'].value)"
+                       xuiPath="../XUI#realms/{realm}/dashboard"/>
+
 <script language="javascript">
- 
 var msgCreating = "<p><img src=\"../console/images/processing.gif\" width=\"66\" height\"66\"/></p><cc:text name="txtConfiguring" defaultValue="configuring.oauth2.waiting" bundleID="amConsole" escape="false" />";
 var ttlCreated = "<h3><cc:text name="txtTtlCreated" defaultValue="oauth2.configured.title" escape="false" bundleID="amConsole" /></h3>";
-var msgCreated = "<p>&nbsp;</p><input name=\"btnOK\" type=\"submit\" class=\"Btn1\" value=\"<cc:text name="txtOKBtn" defaultValue="ajax.ok.button" bundleID="amConsole" />\" onClick=\"document.location.replace(\'../task/Home\');return false;\" /></div></p>";
+var msgCreated = "<p>&nbsp;</p><input name=\"btnOK\" type=\"submit\" class=\"Btn1\" value=\"<cc:text name="txtOKBtn" defaultValue="ajax.ok.button" bundleID="amConsole" />\" onClick=\"redirectToXui();return false;\" /></div></p>";
 var closeBtn = "<p>&nbsp;</p><p><div class=\"TtlBtnDiv\"><input name=\"btnClose\" type=\"submit\" class=\"Btn1\" value=\"<cc:text name="txtCloseBtn" defaultValue="ajax.close.button" bundleID="amConsole" />\" onClick=\"focusMain();return false;\" /></div></p>";
  
 var frm = document.forms['ConfigureOAuth2'];
@@ -158,7 +158,6 @@ function configured() {
        document.getElementById('dlg').innerHTML = msg;
    }
 }
- 
+
 </script>
- 
 </jato:useViewBean>

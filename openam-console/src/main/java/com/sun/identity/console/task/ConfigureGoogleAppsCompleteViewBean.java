@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,14 +24,17 @@
  *
  * $Id: ConfigureGoogleAppsCompleteViewBean.java,v 1.7 2009/05/07 21:31:45 asyhuang Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 package com.sun.identity.console.task;
 
 import com.iplanet.jato.RequestContext;
+import com.iplanet.jato.RequestManager;
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
+import com.sun.identity.console.XuiRedirectHelper;
 import com.sun.identity.console.base.AMPrimaryMastHeadViewBean;
 import com.sun.identity.console.base.AMPropertySheet;
 import com.sun.identity.console.base.model.AMConsoleException;
@@ -62,7 +65,7 @@ import javax.servlet.http.HttpServletResponse;
  * Create register product UI.
  */
 public class ConfigureGoogleAppsCompleteViewBean
-        extends AMPrimaryMastHeadViewBean {
+        extends RedirectToRealmHomeViewBean {
 
     public static final String DEFAULT_DISPLAY_URL =
             "/console/task/ConfigureGoogleAppsComplete.jsp";
@@ -178,10 +181,7 @@ public class ConfigureGoogleAppsCompleteViewBean
      */
     public void handleButton1Request(RequestInvocationEvent event)
             throws ModelControlException {
-        HomeViewBean vb = (HomeViewBean) getViewBean(HomeViewBean.class);
-        backTrail();
-        passPgSessionMap(vb);
-        vb.forwardTo(getRequestContext());
+        redirectToHome();
     }
 
     /**

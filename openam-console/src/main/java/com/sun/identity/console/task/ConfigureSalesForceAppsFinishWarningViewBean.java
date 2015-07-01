@@ -24,12 +24,18 @@
  *
  * $Id: ConfigureSalesForceAppsFinishWarningViewBean.java,v 1.1 2009/07/28 17:45:20 babysunil Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.task;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
+import com.iplanet.jato.RequestManager;
 import com.iplanet.jato.view.event.ChildContentDisplayEvent;
 import com.iplanet.jato.view.event.DisplayEvent;
+import com.sun.identity.console.XuiRedirectHelper;
 import com.sun.identity.console.base.AMPrimaryMastHeadViewBean;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.task.model.TaskModel;
@@ -71,6 +77,18 @@ public class ConfigureSalesForceAppsFinishWarningViewBean
         TaskModel model = (TaskModel) getModel();
         String html = event.getContent();
         int idx = html.lastIndexOf("</div>");
+        String redirectUrl;
+        if (XuiRedirectHelper.isXuiAdminConsoleEnabled()) {
+            String realm = RequestManager.getRequestContext().getRequest().getParameter("realm");
+            try {
+                redirectUrl = "../XUI#realms/" + URLEncoder.encode(realm, "UTF-8") + "/dashboard";
+            } catch (UnsupportedEncodingException e) {
+                throw new IllegalStateException("UTF-8 not supported", e);
+            }
+        } else {
+            redirectUrl = "../task/Home";
+        }
+
         html = html.substring(0, idx + 6) +
                 "<p>&nbsp;<p><center><div class=\"TtlBtnDiv\">" +
                 "<input name=\"button1\" type=\"submit\" " + "" +
@@ -80,7 +98,7 @@ public class ConfigureSalesForceAppsFinishWarningViewBean
                 "onmouseout=\"javascript: this.className='Btn1'\" " +
                 "onblur=\"javascript: this.className='Btn1'\" " +
                 "onfocus=\"javascript: this.className='Btn1Hov'\" " +
-                "onClick=\"top.location.replace('../task/Home'); return false;\" " +
+                "onClick=\"top.location.replace('" + redirectUrl + "'); return false;\" " +
                 "/></div></center>" + html.substring(idx + 6);
         return html;
     }

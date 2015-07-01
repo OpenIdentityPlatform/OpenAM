@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,7 @@
  *
  * $Id: ConfigureSalesForceAppsCompleteViewBean.java,v 1.3 2009/07/28 17:45:40 babysunil Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2013 ForgeRock Inc.
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 package com.sun.identity.console.task;
 
@@ -65,7 +62,7 @@ import javax.servlet.http.HttpServletResponse;
  * Create register product UI.
  */
 public class ConfigureSalesForceAppsCompleteViewBean
-        extends AMPrimaryMastHeadViewBean {
+        extends RedirectToRealmHomeViewBean {
 
     public static final String DEFAULT_DISPLAY_URL =
             "/console/task/ConfigureSalesForceAppsComplete.jsp";
@@ -189,10 +186,7 @@ public class ConfigureSalesForceAppsCompleteViewBean
                 String entityId = (String) getPageSessionAttribute(ENTITY_ID);
                 TaskModel model = (TaskModel) getModelInternal();
                 model.setAcsUrl(realm, entityId, acsUrl);
-                HomeViewBean vb = (HomeViewBean) getViewBean(HomeViewBean.class);
-                backTrail();
-                passPgSessionMap(vb);
-                vb.forwardTo(getRequestContext());
+                redirectToHome();
             } else if ((acsUrl == null) || !(acsUrl.length() > 0)) {
                 ConfigureSalesForceAppsFinishWarningViewBean vb =
                         (ConfigureSalesForceAppsFinishWarningViewBean) getViewBean(

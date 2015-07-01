@@ -11,13 +11,14 @@
   ~ Header, with the fields enclosed by brackets [] replaced by your own identifying
   ~ information: "Portions copyright [year] [name of copyright owner]".
   ~
-  ~ Copyright 2014 ForgeRock AS.
+  ~ Copyright 2014-2015 ForgeRock AS.
 --%>
 
 <%@page info="ConfigureSocialAuthN" contentType="text/html;charset=UTF-8" language="java" %>
 <%@page import="org.owasp.esapi.ESAPI" %>
 <%@taglib uri="/WEB-INF/jato.tld" prefix="jato" %>
 <%@taglib uri="/WEB-INF/cc.tld" prefix="cc" %>
+<%@taglib tagdir="/WEB-INF/tags" prefix="console"%>
 <%
     request.setCharacterEncoding("UTF-8");
 %>
@@ -80,7 +81,7 @@
             var ajaxObj = getXmlHttpRequestObject();
             var userLocale = "<%= viewBean.getUserLocale().toString() %>";
             var msgConfiguring = "<p><img src=\"../console/images/processing.gif\" width=\"66\" height\"66\"/></p><cc:text name="txtConfiguring" defaultValue="social.configuration.waiting" bundleID="amConsole" escape="false" />";
-            var msgConfigured = "<p>&nbsp;</p><input name=\"btnOK\" type=\"submit\" class=\"Btn1\" value=\"<cc:text name="txtOKBtn" defaultValue="ajax.ok.button" bundleID="amConsole" />\" onClick=\"document.location.replace(\'../task/Home\');return false;\" /></div></p>";
+            var msgConfigured = "<p>&nbsp;</p><input name=\"btnOK\" type=\"submit\" class=\"Btn1\" value=\"<cc:text name="txtOKBtn" defaultValue="ajax.ok.button" bundleID="amConsole" />\" onClick=\"redirectToXui();return false;\" /></div></p>";
             var closeBtn = "<p>&nbsp;</p><p><div class=\"TtlBtnDiv\"><input name=\"btnClose\" type=\"submit\" class=\"Btn1\" value=\"<cc:text name="txtCloseBtn" defaultValue="ajax.close.button" bundleID="amConsole" />\" onClick=\"focusMain();return false;\" /></div></p>";
 
             var frm = document.forms['ConfigureSocialAuthN'];
@@ -110,7 +111,7 @@
             }
 
             function cancelOp() {
-                document.location.replace("../task/Home");
+                redirectToXui();
                 return false;
             }
 
@@ -155,8 +156,12 @@
                     document.getElementById('dlg').innerHTML = msg;
                 }
             }
+
             -->
         </script>
         <%-- END CONTENT --%>
+        <console:redirectToXui realm="encodeURIComponent(frm.elements['ConfigureSocialAuthN.tfRealm'].value)"
+                               xuiPath="../XUI#realms/{realm}/dashboard"/>
+
     </cc:header>
 </jato:useViewBean>
