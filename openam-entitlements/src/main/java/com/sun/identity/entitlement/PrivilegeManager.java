@@ -32,6 +32,7 @@ import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
 import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.shared.debug.Debug;
+import org.apache.bcel.generic.I2F;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.entitlement.ResourceType;
@@ -39,6 +40,8 @@ import org.forgerock.openam.entitlement.constraints.ConstraintValidator;
 import org.forgerock.openam.entitlement.service.ApplicationService;
 import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.StringUtils;
 
 import javax.security.auth.Subject;
 import java.security.Principal;
@@ -168,8 +171,19 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
             throw new EntitlementException(EntitlementException.APP_RETRIEVAL_ERROR, entitlement.getApplicationName());
         }
 
+        if (CollectionUtils.isEmpty(application.getResourceTypeUuids())) {
+
+            if (StringUtils.isNotEmpty(privilege.getResourceTypeUuid())) {
+                throw new EntitlementException(EntitlementException.NO_RESOURCE_TYPE_EXPECTED);
+            }
+
+            // If no resource types have been defined then the following resource type validation is irrelevant.
+            return;
+        }
+
         if (!application.getResourceTypeUuids().contains(privilege.getResourceTypeUuid())) {
-            throw new EntitlementException(EntitlementException.POLICY_DEFINES_INVALID_RESOURCE_TYPE, privilege.getResourceTypeUuid());
+            throw new EntitlementException(
+                    EntitlementException.POLICY_DEFINES_INVALID_RESOURCE_TYPE, privilege.getResourceTypeUuid());
         }
 
         final ResourceType resourceType = resourceTypeService

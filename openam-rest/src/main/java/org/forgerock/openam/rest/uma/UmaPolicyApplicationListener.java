@@ -241,7 +241,7 @@ public class UmaPolicyApplicationListener implements IdEventListener {
                         UmaConstants.UMA_POLICY_APPLICATION_TYPE);
                 application = new Application(realm, resourceServerId, applicationType);
                 application.setEntitlementCombiner(DenyOverride.class);
-                applicationManager.saveUmaApplication(adminSubject, application);
+                applicationManager.saveApplication(adminSubject, application);
             }
         } catch (EntitlementException e) {
             logger.error("Failed to create policy application", e);

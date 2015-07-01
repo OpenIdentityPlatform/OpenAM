@@ -43,19 +43,6 @@ public class ApplicationManagerWrapper {
 
     /**
      * Wrapper for the static method
-     * {@link ApplicationManager#saveUmaApplication(Subject, String, Application)}.
-     *
-     * @param adminSubject An admin-level {@link Subject}.
-     * @param application The {@link Application} to save
-     * @throws EntitlementException If there was an issue saving the application
-     */
-    public void saveUmaApplication(Subject adminSubject, Application application)
-            throws EntitlementException {
-        ApplicationManager.saveUmaApplication(adminSubject, application.getRealm(), application);
-    }
-
-    /**
-     * Wrapper for the static method
      * {@link ApplicationManager#deleteApplication(javax.security.auth.Subject, String, String)}.
      *
      * @param adminSubject An admin-level {@link Subject}.

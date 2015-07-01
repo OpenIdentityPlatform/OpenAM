@@ -342,30 +342,6 @@ public final class ApplicationManager {
             String realm,
             Application application
     ) throws EntitlementException {
-        saveApplication(adminSubject, realm, application, true);
-    }
-
-    /**
-     * Saves an UMA application - does not require a resource type.
-     *
-     * @param adminSubject Admin Subject who has the rights to access
-     *        configuration datastore.
-     * @param realm Realm Name.
-     * @param application Application object.
-     */
-    public static void saveUmaApplication(
-            Subject adminSubject,
-            String realm,
-            Application application
-    ) throws EntitlementException {
-        saveApplication(adminSubject, realm, application, false);
-    }
-
-    private static void saveApplication(
-            Subject adminSubject,
-            String realm,
-            Application application,
-            boolean requireResourceTypes) throws EntitlementException {
         boolean allow = (adminSubject == PolicyConstants.SUPER_ADMIN_SUBJECT);
         
         if (!allow) {
@@ -387,12 +363,8 @@ public final class ApplicationManager {
             throw new EntitlementException(228);
         }
 
-        if (requireResourceTypes) {
+        if (CollectionUtils.isNotEmpty(application.getResourceTypeUuids())) {
             Set<String> resourceTypeIds = application.getResourceTypeUuids();
-
-            if (CollectionUtils.isEmpty(resourceTypeIds)) {
-                throw new EntitlementException(EntitlementException.MISSING_RESOURCE_TYPE);
-            }
 
             // When this class is refactored (AME-6287) this dependency should be injected.
             ResourceTypeService resourceTypeService = InjectorHolder.getInstance(ResourceTypeService.class);
