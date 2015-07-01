@@ -31,6 +31,8 @@ package com.sun.identity.saml2.profile;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -44,20 +46,24 @@ import java.util.Set;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.ServletException;
-import java.security.cert.X509Certificate;
 
 import javax.xml.soap.SOAPConnection;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
-import com.sun.identity.plugin.datastore.DataStoreProviderException;
-import com.sun.identity.saml2.common.*;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.liberty.ws.soapbinding.Message;
 import com.sun.identity.liberty.ws.soapbinding.SOAPBindingException;
 import com.sun.identity.liberty.ws.soapbinding.SOAPFaultException;
+import com.sun.identity.plugin.datastore.DataStoreProviderException;
+import com.sun.identity.plugin.monitoring.FedMonAgent;
+import com.sun.identity.plugin.monitoring.FedMonSAML2Svc;
+import com.sun.identity.plugin.monitoring.MonitorManager;
+import com.sun.identity.plugin.session.SessionException;
+import com.sun.identity.plugin.session.SessionManager;
+import com.sun.identity.plugin.session.SessionProvider;
+import com.sun.identity.saml2.common.SAML2FailoverUtils;
+import com.sun.identity.saml2.plugins.SAML2PluginsUtils;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.URLEncDec;
@@ -72,7 +78,13 @@ import com.sun.identity.saml2.assertion.AttributeStatement;
 import com.sun.identity.saml2.assertion.NameID;
 import com.sun.identity.saml2.assertion.EncryptedID;
 import com.sun.identity.saml2.assertion.EncryptedAttribute;
-
+import com.sun.identity.saml2.common.AccountUtils;
+import com.sun.identity.saml2.common.NameIDInfo;
+import com.sun.identity.saml2.common.NameIDInfoKey;
+import com.sun.identity.saml2.common.SAML2Constants;
+import com.sun.identity.saml2.common.SAML2Exception;
+import com.sun.identity.saml2.common.SAML2SDKUtils;
+import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.ecp.ECPFactory;
 import com.sun.identity.saml2.ecp.ECPRelayState;
 import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
@@ -86,6 +98,9 @@ import com.sun.identity.saml2.logging.LogUtil;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
+import com.sun.identity.saml2.plugins.SAML2ServiceProviderAdapter;
+import com.sun.identity.saml2.plugins.SPAccountMapper;
+import com.sun.identity.saml2.plugins.SPAttributeMapper;
 import com.sun.identity.saml2.protocol.Artifact;
 import com.sun.identity.saml2.protocol.ArtifactResolve;
 import com.sun.identity.saml2.protocol.ArtifactResponse;
@@ -93,21 +108,10 @@ import com.sun.identity.saml2.protocol.AuthnRequest;
 import com.sun.identity.saml2.protocol.ProtocolFactory;
 import com.sun.identity.saml2.protocol.Response;
 import com.sun.identity.saml2.protocol.Status;
-import com.sun.identity.saml2.plugins.SAML2ServiceProviderAdapter;
-import com.sun.identity.saml2.plugins.SPAccountMapper;
-import com.sun.identity.saml2.plugins.SPAttributeMapper;
-
-import com.sun.identity.plugin.monitoring.FedMonAgent;
-import com.sun.identity.plugin.monitoring.FedMonSAML2Svc;
-import com.sun.identity.plugin.monitoring.MonitorManager;
-import com.sun.identity.plugin.session.SessionException;
-import com.sun.identity.plugin.session.SessionManager;
-import com.sun.identity.plugin.session.SessionProvider;
-
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.forgerock.openam.utils.ClientUtils;
-
-import java.security.PrivateKey;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * This class is used by a service provider (SP) to process the response from  
@@ -1172,12 +1176,11 @@ public class SPACSUtils {
 
         boolean isTransient = SAML2Constants.NAMEID_TRANSIENT_FORMAT.equals(nameIDFormat);
         boolean isPersistent = SAML2Constants.PERSISTENT.equals(nameIDFormat);
-        boolean ignoreProfile;
+        boolean ignoreProfile = SAML2PluginsUtils.isIgnoredProfile(realm);
         String existUserName = null;
         SessionProvider sessionProvider = null;
         try {
             sessionProvider = SessionManager.getProvider();
-            ignoreProfile = SAML2Utils.isIgnoreProfileSet(session);
         } catch (SessionException se) {
             // invoke SPAdapter for failure
             SAML2Exception se2 = new SAML2Exception(se);
@@ -1467,7 +1470,7 @@ public class SPACSUtils {
         return session;
     }
 
-   
+
     private static void invokeSPAdapterForSSOFailure(String hostEntityId,
         String realm, HttpServletRequest request, HttpServletResponse response,
         Map smap, ResponseInfo respInfo, int errorCode, 

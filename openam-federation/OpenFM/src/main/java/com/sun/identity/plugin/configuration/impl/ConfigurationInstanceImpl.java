@@ -24,6 +24,7 @@
  *
  * $Id: ConfigurationInstanceImpl.java,v 1.12 2009/10/29 00:03:50 exu Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.plugin.configuration.impl;
@@ -83,6 +84,7 @@ public class ConfigurationInstanceImpl implements ConfigurationInstance {
         serviceNameMap.put("SOAP_BINDING", "sunIdentityServerSOAPBinding");
         serviceNameMap.put("PLATFORM", "iPlanetAMPlatformService");
         serviceNameMap.put("NAMING", "iPlanetAMNamingService");
+        serviceNameMap.put("AUTHN", "iPlanetAMAuthService");
         serviceNameMap.put("SAML2_SOAP_BINDING","sunfmSAML2SOAPBindingService");
         serviceNameMap.put("MULTI_PROTOCOL","sunMultiFederationProtocol");
         serviceNameMap.put("STS_CONFIG","sunFAMSTSService");
