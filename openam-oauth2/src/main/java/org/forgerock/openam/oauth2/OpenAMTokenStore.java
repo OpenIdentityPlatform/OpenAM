@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
@@ -83,7 +84,7 @@ import org.restlet.ext.servlet.ServletUtils;
 @Singleton
 public class OpenAMTokenStore implements OpenIdConnectTokenStore {
 
-    private final Debug logger = Debug.getInstance("OAuth2Provider");
+    private final Debug logger;
     private final OAuth2AuditLogger auditLogger;
     private final OAuthTokenStore tokenStore;
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
@@ -106,7 +107,8 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     @Inject
     public OpenAMTokenStore(OAuthTokenStore tokenStore, OAuth2ProviderSettingsFactory providerSettingsFactory,
             OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
-            SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor, OAuth2AuditLogger auditLogger) {
+            SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor, OAuth2AuditLogger auditLogger,
+                            @Named(OAuth2Constants.DEBUG_LOG_NAME) Debug logger) {
         this.tokenStore = tokenStore;
         this.providerSettingsFactory = providerSettingsFactory;
         this.clientRegistrationStore = clientRegistrationStore;
@@ -114,6 +116,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         this.ssoTokenManager = ssoTokenManager;
         this.cookieExtractor = cookieExtractor;
         this.auditLogger = auditLogger;
+        this.logger = logger;
     }
 
     /**
@@ -137,7 +140,15 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         // Store in CTS
         try {
             tokenStore.create(authorizationCode);
+            if (auditLogger.isAuditLogEnabled()) {
+                String[] obs = {"CREATED_AUTHORIZATION_CODE", authorizationCode.toString()};
+                auditLogger.logAccessMessage("CREATED_AUTHORIZATION_CODE", obs, null);
+            }
         } catch (CoreTokenException e) {
+            if (auditLogger.isAuditLogEnabled()) {
+                String[] obs = {"FAILED_CREATE_AUTHORIZATION_CODE", authorizationCode.toString()};
+                auditLogger.logErrorMessage("FAILED_CREATE_AUTHORIZATION_CODE", obs, null);
+            }
             logger.error("Unable to create authorization code " + authorizationCode.getTokenInfo(), e);
             throw new ServerException("Could not create token in CTS");
         }
@@ -438,9 +449,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
                 auditLogger.logAccessMessage("CREATED_TOKEN", obs, null);
             }
         } catch (CoreTokenException e) {
-            if (logger.errorEnabled()) {
-                logger.error("Could not create token in CTS: " + e.getMessage());
-            }
+            logger.error("Could not create token in CTS: " + e.getMessage());
             if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"FAILED_CREATE_TOKEN", accessToken.toString()};
                 auditLogger.logErrorMessage("FAILED_CREATE_TOKEN", obs, null);
@@ -479,7 +488,15 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
 
         try {
             tokenStore.create(refreshToken);
+            if (auditLogger.isAuditLogEnabled()) {
+                String[] obs = {"CREATED_REFRESH_TOKEN", refreshToken.toString()};
+                auditLogger.logAccessMessage("CREATED_REFRESH_TOKEN", obs, null);
+            }
         } catch (CoreTokenException e) {
+            if (auditLogger.isAuditLogEnabled()) {
+                String[] obs = {"FAILED_CREATE_REFRESH_TOKEN", refreshToken.toString()};
+                auditLogger.logErrorMessage("FAILED_CREATE_REFRESH_TOKEN", obs, null);
+            }
             logger.error("Unable to create refresh token: " + refreshToken.getTokenInfo(), e);
             throw new ServerException("Could not create token in CTS: " + e.getMessage());
         }
@@ -528,7 +545,15 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         // Store in CTS
         try {
             tokenStore.create(authorizationCode);
+            if (auditLogger.isAuditLogEnabled()) {
+                String[] obs = {"UPDATED_AUTHORIZATION_CODE", authorizationCode.toString()};
+                auditLogger.logAccessMessage("CREATED_AUTHORIZATION_CODE", obs, null);
+            }
         } catch (CoreTokenException e) {
+            if (auditLogger.isAuditLogEnabled()) {
+                String[] obs = {"FAILED_UPDATE_AUTHORIZATION_CODE", authorizationCode.toString()};
+                auditLogger.logErrorMessage("FAILED_UPDATE_AUTHORIZATION_CODE", obs, null);
+            }
             logger.error("DefaultOAuthTokenStoreImpl::Unable to create authorization code "
                     + authorizationCode.getTokenInfo(), e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),

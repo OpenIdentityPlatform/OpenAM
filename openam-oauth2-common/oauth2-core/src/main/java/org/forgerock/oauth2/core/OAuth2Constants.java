@@ -856,6 +856,7 @@ public class OAuth2Constants {
      */
     public static final String ACCESS_LOG_NAME = "OAuth2Provider.access";
     public static final String ERROR_LOG_NAME = "OAuth2Provider.error";
+    public static final String DEBUG_LOG_NAME = "OAuth2Provider";
 
     public class OAuth2Client {
         public static final String REDIRECT_URI = "com.forgerock.openam.oauth2provider.redirectionURIs";

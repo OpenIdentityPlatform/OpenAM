@@ -67,7 +67,6 @@ import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.oauth2.IdentityManager;
-import org.forgerock.openam.oauth2.OAuth2AuditLogger;
 import org.forgerock.openam.oauth2.OAuthTokenStore;
 import org.forgerock.openam.oauth2.OpenAMOAuth2ProviderSettingsFactory;
 import org.forgerock.openam.tokens.CoreTokenField;
@@ -108,7 +107,6 @@ public class TokenResource implements CollectionResourceProvider {
     private final OAuthTokenStore tokenStore;
     private final OpenAMOAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory;
     private final Debug debug;
-    private final OAuth2AuditLogger auditLogger;
     private static SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
     private static String adminUser = SystemProperties.get(Constants.AUTHENTICATION_SUPER_USER);
     private static AMIdentity adminUserId = null;
@@ -124,14 +122,12 @@ public class TokenResource implements CollectionResourceProvider {
 
     @Inject
     public TokenResource(OAuthTokenStore tokenStore, ClientDAO clientDao, IdentityManager identityManager,
-            OpenAMOAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory, @Named("frRest") Debug debug,
-                         OAuth2AuditLogger auditLogger) {
+            OpenAMOAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory, @Named("frRest") Debug debug) {
         this.tokenStore = tokenStore;
         this.clientDao = clientDao;
         this.identityManager = identityManager;
         this.oAuth2ProviderSettingsFactory = oAuth2ProviderSettingsFactory;
         this.debug = debug;
-        this.auditLogger = auditLogger;
     }
 
     @Override
@@ -200,10 +196,6 @@ public class TokenResource implements CollectionResourceProvider {
                     deleteAccessTokensRefreshToken(token);
                 }
                 tokenStore.delete(tokenId);
-                if (auditLogger.isAuditLogEnabled()) {
-                    String[] obs = {"DELETED_TOKEN", token.toString()};
-                    auditLogger.logAccessMessage("DELETED_TOKEN", obs, null);
-                }
             } else {
                 String realm = getAttributeValue(token, REALM);
                 AMIdentity uid2 = identityManager.getResourceOwnerIdentity(username, realm);
@@ -212,10 +204,6 @@ public class TokenResource implements CollectionResourceProvider {
                         deleteAccessTokensRefreshToken(token);
                     }
                     tokenStore.delete(tokenId);
-                    if (auditLogger.isAuditLogEnabled()) {
-                        String[] obs = {"DELETED_TOKEN", token.toString()};
-                        auditLogger.logAccessMessage("DELETED_TOKEN", obs, null);
-                    }
                 } else {
                     if (debug.errorEnabled()) {
                         debug.error("TokenResource :: DELETE : Only the resource owner or an administrator may perform "
@@ -241,10 +229,7 @@ public class TokenResource implements CollectionResourceProvider {
             debug.error("TokenResource :: DELETE : Requesting user is unauthorized.");
             handler.handleError(new PermanentException(401, "Unauthorized", e));
         }
-        if (auditLogger.isAuditLogEnabled()) {
-            String[] obs = {"FAILED_DELETE_TOKEN", tokenId};
-            auditLogger.logErrorMessage("FAILED_DELETE_TOKEN", obs, null);
-        }
+
         return false;
     }
 

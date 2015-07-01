@@ -25,6 +25,8 @@ import static org.mockito.Mockito.mock;
 import com.iplanet.sso.SSOTokenManager;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
+
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
@@ -51,6 +53,7 @@ public class OpenAMTokenStoreTest {
     private SSOTokenManager ssoTokenManager;
     private Request request;
     private OAuth2AuditLogger auditLogger;
+    private Debug debug;
 
     @BeforeMethod
     public void setUp() {
@@ -62,9 +65,11 @@ public class OpenAMTokenStoreTest {
         ssoTokenManager = mock(SSOTokenManager.class);
         request = mock(Request.class);
         CookieExtractor cookieExtractor = mock(CookieExtractor.class);
+        auditLogger = mock(OAuth2AuditLogger.class);
+        debug = mock(Debug.class);
 
         openAMtokenStore = new OpenAMTokenStore(tokenStore, providerSettingsFactory, clientRegistrationStore,
-                realmNormaliser, ssoTokenManager, cookieExtractor, auditLogger);
+                realmNormaliser, ssoTokenManager, cookieExtractor, auditLogger, debug);
     }
 
     @Test

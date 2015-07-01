@@ -13,7 +13,7 @@
             <item>token info</item>
         </datainfo>
         <triggers>
-            <item>Creating a new oauth 2.0 token</item>
+            <item>Created a new oauth 2.0 token</item>
         </triggers>
         <actions />
     </logmessage>
@@ -25,7 +25,7 @@
             <item>token info</item>
         </datainfo>
         <triggers>
-            <item>Deleteing an oauth 2.0 token</item>
+            <item>Deleted an oauth 2.0 token</item>
         </triggers>
         <actions />
     </logmessage>
@@ -47,7 +47,57 @@
         </triggers>
         <actions />
     </logmessage>
-
+    <logmessage name="CREATED_REFRESH_TOKEN" id="5"
+                loglevel="LL_INFO"
+                description="Created an oauth 2.0 refresh token">
+        <datainfo>
+            <item>message</item>
+            <item>token info</item>
+        </datainfo>
+        <triggers>
+            <item>Created an oauth 2.0 refresh token</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="FAILED_CREATE_REFRESH_TOKEN" id="6"
+                loglevel="LL_INFO"
+                description="Failed creating an oauth 2.0 refresh token">
+        <datainfo />
+        <triggers>
+            <item>Failed creating an oauth 2.0 refresh token</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="CREATED_AUTHORIZATION_CODE" id="7"
+                loglevel="LL_INFO"
+                description="Created an oauth 2.0 authorization code">
+        <datainfo>
+            <item>message</item>
+            <item>token info</item>
+        </datainfo>
+        <triggers>
+            <item>Created an oauth 2.0 authorization code refresh token</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="FAILED_CREATE_AUTHORIZATION_CODE" id="8"
+                loglevel="LL_INFO"
+                description="Failed creating an oauth 2.0 authorization code">
+        <datainfo />
+        <triggers>
+            <item>Failed creating an oauth 2.0 authorization code</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="FAILED_UPDATE_AUTHORIZATION_CODE" id="9"
+                loglevel="LL_INFO"
+                description="Failed updating an oauth 2.0 authorization code">
+        <datainfo />
+        <triggers>
+            <item>Failed updating an oauth 2.0 authorization code</item>
+        </triggers>
+        <actions />
+    </logmessage>
     <!-- Client Operations -->
     <logmessage name="CREATED_CLIENT" id="11"
                 loglevel="LL_INFO"
@@ -57,7 +107,7 @@
             <item>token info</item>
         </datainfo>
         <triggers>
-            <item>Creating a new oauth 2.0 client</item>
+            <item>Created a new oauth 2.0 client</item>
         </triggers>
         <actions />
     </logmessage>
@@ -69,7 +119,7 @@
             <item>token info</item>
         </datainfo>
         <triggers>
-            <item>Deleteing an oauth 2.0 client</item>
+            <item>Deleted an oauth 2.0 client</item>
         </triggers>
         <actions />
     </logmessage>
@@ -98,7 +148,7 @@
             <item>client id</item>
         </datainfo>
         <triggers>
-            <item>Authenticating a oauth 2.0 client</item>
+            <item>Authenticated an oauth 2.0 client</item>
         </triggers>
         <actions />
     </logmessage>
