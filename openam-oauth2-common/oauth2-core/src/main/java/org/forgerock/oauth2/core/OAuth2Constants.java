@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2014 ForgeRock AS.
+ * Copyright 2012-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
@@ -807,6 +807,7 @@ public class OAuth2Constants {
      */
     public static final String ACCESS_LOG_NAME = "OAuth2Provider.access";
     public static final String ERROR_LOG_NAME = "OAuth2Provider.error";
+    public static final String DEBUG_LOG_NAME = "OAuth2Provider";
 
     public class OAuth2Client {
         public static final String REDIRECT_URI = "com.forgerock.openam.oauth2provider.redirectionURIs";

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.core.guice;
 
@@ -49,6 +49,7 @@ import com.sun.identity.sm.ServiceManagementDAOWrapper;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.CTSPersistentStoreImpl;
 import org.forgerock.openam.cts.CoreTokenConfig;
@@ -150,6 +151,8 @@ public class CoreGuiceModule extends AbstractModule {
 
         bind(Debug.class).annotatedWith(Names.named(PolicyMonitor.POLICY_MONITOR_DEBUG))
                 .toInstance(Debug.getInstance(PolicyMonitor.POLICY_MONITOR_DEBUG));
+        bind(Debug.class).annotatedWith(Names.named(OAuth2Constants.DEBUG_LOG_NAME))
+                .toInstance(Debug.getInstance(OAuth2Constants.DEBUG_LOG_NAME));
 
         bind(CoreTokenConstants.class).in(Singleton.class);
         bind(CoreTokenConfig.class).in(Singleton.class);

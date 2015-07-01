@@ -11,12 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2014 ForgeRock AS.
+ * Copyright 2012-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
 
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
@@ -27,6 +29,7 @@ import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.HashSet;
@@ -45,6 +48,8 @@ public class OAuthTokenStore {
     private final CTSPersistentStore cts;
     private final TokenAdapter<JsonValue> tokenAdapter;
     private final TokenIdFactory tokenIdFactory;
+    private final OAuth2AuditLogger auditLogger;
+    private final Debug logger;
 
     /**
      * Constructs a new OAuthTokenStore instance.
@@ -55,10 +60,13 @@ public class OAuthTokenStore {
      */
     @Inject
     public OAuthTokenStore(CTSPersistentStore cts, TokenAdapter<JsonValue> tokenAdapter,
-            TokenIdFactory tokenIdFactory) {
+            TokenIdFactory tokenIdFactory, OAuth2AuditLogger auditLogger,
+                           @Named(OAuth2Constants.DEBUG_LOG_NAME) Debug logger) {
         this.cts = cts;
         this.tokenAdapter = tokenAdapter;
         this.tokenIdFactory = tokenIdFactory;
+        this.auditLogger = auditLogger;
+        this.logger = logger;
     }
 
     /**
@@ -104,7 +112,20 @@ public class OAuthTokenStore {
      * @throws CoreTokenException If there is a problem deleting the token.
      */
     public void delete(String id) throws CoreTokenException {
-        cts.delete(id);
+        try {
+            cts.delete(id);
+            if (auditLogger.isAuditLogEnabled()) {
+                String[] obs = {"DELETED_TOKEN", id};
+                auditLogger.logAccessMessage("DELETED_TOKEN", obs, null);
+            }
+        } catch (CoreTokenException e) {
+            if (auditLogger.isAuditLogEnabled()) {
+                String[] obs = {"FAILED_DELETE_TOKEN", id};
+                auditLogger.logErrorMessage("FAILED_DELETE_TOKEN", obs, null);
+            }
+            logger.error("Could not delete token " + e.getMessage());
+            throw e;
+        }
     }
 
     /**
