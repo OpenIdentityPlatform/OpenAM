@@ -1,14 +1,25 @@
 <div class="page-header">
-    <h1>Authentication Settings</h1>
+    <h1>{{t "console.authentication.settings.title"}}</h1>
 </div>
-<p class="page-description">Configure authentication modules to use when assembling your authentication trees.</p>
+<p class="panel-description">{{t 'console.authentication.settings.description'}}</p>
+
+<div class="tab-menu">
+    <ul class="nav nav-tabs" role="tablist">
+        {{#each formData.schema.orderedProperties}}
+        <li><a href="#{{this._id}}" role="tab" data-toggle="tab" aria-expanded="false">{{this.title}}</a></li>
+        {{/each}}
+    </ul>
+</div>
 
 <div class="nav-tab-content clearfix">
+
     <div id="tabpanel"></div>
 
     <div class="col-sm-offset-4 col-sm-8">
         <div class="btn-action-group">
-            <button id="saveChanges" type="button" class="btn btn-primary">{{t "console.authentication.settings.saveChanges"}}</button>
+            <button id="revert" class="btn btn-default" type="button">{{t "console.authentication.settings.revert"}}</button>
+            <button id="saveChanges" class="btn btn-primary" type="button">{{t 'console.authentication.settings.saveChanges'}}</button>
         </div>
     </div>
+
 </div>

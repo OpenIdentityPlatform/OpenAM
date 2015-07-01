@@ -1,4 +1,4 @@
-/*
+/**
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -16,40 +16,56 @@
 
 /*global define*/
 define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView", [
+    'jquery',
     "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/commons/ui/common/main/Configuration",
+    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate"
-], function(AbstractView, Form, FormHelper, SMSRealmDelegate) {
+], function ($, AbstractView, Configuration, Constants, Form, FormHelper, SMSRealmDelegate) {
     var SettingsView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/SettingsTemplate.html",
         events: {
-            "click #saveChanges": "save"
+            'click #revert': 'revert',
+            'click #saveChanges': 'save',
+            'show.bs.tab ul.nav.nav-tabs a': 'renderTab'
         },
-        render: function(args, callback) {
+
+        render: function (args, callback) {
             var self = this;
 
-            this.data.realmPath = args[0];
+            this.data.realmLocation = args[0];
 
-            this.parentRender( function () {
-                SMSRealmDelegate.authentication.get(this.data.realmPath).done(function(data) {
-                    self.data.form = new Form(self.$el.find("#tabpanel").get(0), {
-                        type: "object",
-                        properties: {
-                            adminAuthModule: data.schema.properties.core.properties.adminAuthModule,
-                            loginSuccessUrl: data.schema.properties.postauthprocess.properties.loginSuccessUrl,
-                            orgConfig: data.schema.properties.core.properties.orgConfig
-                        }
-                    }, data.values);
+            SMSRealmDelegate.authentication.get(this.data.realmLocation).done(function (data) {
+                self.data.formData = data;
+
+                self.parentRender(function () {
+                    self.$el.find("div.tab-pane").show(); // FIXME: To remove
+                    self.$el.find('ul.nav a:first').tab('show');
+
+                    self.$el.find('.tab-menu .nav-tabs').tabdrop();
+
+                    if (callback) {
+                        callback();
+                    }
                 });
-
-                if(callback) {
-                    callback();
-                }
             });
         },
-        save: function(event) {
-            var promise = SMSRealmDelegate.authentication.update(this.data.realmPath, this.data.form.data());
+        renderTab: function (event) {
+            this.$el.find("#tabpanel").empty();
+
+            var id = $(event.target).attr('href').slice(1),
+                schema = this.data.formData.schema.properties[id],
+                element = this.$el.find("#tabpanel").get(0);
+
+            this.data.form = new Form(element, schema, this.data.formData.values);
+        },
+        revert: function () {
+            this.data.form.reset();
+        },
+        save: function (event) {
+            var promise = SMSRealmDelegate.authentication.update(this.data.realmLocation, this.data.form.data());
 
             FormHelper.bindSavePromiseToElement(promise, event.target);
         }
@@ -57,3 +73,4 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
 
     return SettingsView;
 });
+

@@ -531,12 +531,10 @@
 
         },
         "authentication": {
-            "advancedSettings": {
-                "revert": "Revert",
-                "saveChanges": "Save Changes"
-            },
             "settings": {
-                "advancedSettings": "Advanced Settings",
+                "title": "Settings",
+                "description": "Realm Settings",
+                "revert": "Revert",
                 "saveChanges": "Save Changes"
             },
             "modules": {
