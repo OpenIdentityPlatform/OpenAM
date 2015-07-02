@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package com.sun.identity.shared;
 
@@ -27,9 +27,6 @@ import java.util.TimeZone;
 
 import static org.fest.assertions.Assertions.*;
 
-/**
- * Created by tonybamford on 31/10/2014.
- */
 public class DateUtilsTest {
 
     private Date dateWithoutMilliseconds;
@@ -39,6 +36,41 @@ public class DateUtilsTest {
     public void setup() {
         dateWithoutMilliseconds = utcDate(2013, 1, 28, 13, 24, 56, 0);
         dateWithMilliseconds = utcDate(2013, 1, 28, 13, 24, 56, 666);
+    }
+
+    @Test
+    public void testStringToDateIssueInstantWithTooManyMilliseconds() throws Exception {
+        String testDate = "2015-06-12T20:23:26.48000Z";
+        Date date = DateUtils.stringToDate(testDate);
+        assertThat(date).isEqualTo(utcDate(2015, 5, 12, 20, 23, 26, 480));
+    }
+
+    @Test
+    public void testStringToDateIssueInstantWithThreeMilliseconds() throws Exception {
+        String testDate = "2015-06-12T20:23:26.480Z";
+        Date date = DateUtils.stringToDate(testDate);
+        assertThat(date).isEqualTo(utcDate(2015, 5, 12, 20, 23, 26, 480));
+    }
+
+    @Test
+    public void testStringToDateIssueInstantWithTwoMilliseconds() throws Exception {
+        String testDate = "2015-06-12T20:23:26.48Z";
+        Date date = DateUtils.stringToDate(testDate);
+        assertThat(date).isEqualTo(utcDate(2015, 5, 12, 20, 23, 26, 480));
+    }
+
+    @Test
+    public void testStringToDateIssueInstantWithOneMillisecond() throws Exception {
+        String testDate = "2015-06-12T20:23:26.4Z";
+        Date date = DateUtils.stringToDate(testDate);
+        assertThat(date).isEqualTo(utcDate(2015, 5, 12, 20, 23, 26, 400));
+    }
+
+    @Test
+    public void testStringToDateIssueInstantWithoutMilliseconds() throws Exception {
+        String testDate = "2015-06-12T20:23:26Z";
+        Date date = DateUtils.stringToDate(testDate);
+        assertThat(date).isEqualTo(utcDate(2015, 5, 12, 20, 23, 26, 0));
     }
 
     @Test

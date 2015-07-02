@@ -24,7 +24,7 @@
  *
  * $Id: DateUtils.java,v 1.2 2008/06/25 05:53:00 qcheng Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  * Portions Copyrighted 2013 Cybernetica AS
  */
 
@@ -278,11 +278,15 @@ public class DateUtils {
 
             int milliSeconds = 0;
             if (strDate.length() > 19 && strDate.charAt(19) == '.') {
-                milliSeconds = Integer.parseInt(strDate.substring(20, 23));
+                // Take up to 3 digits of the remainder (including .) of the string as the fraction of a second
+                String fraction = strDate.substring(19);
+                if (fraction.length() > 4) {
+                    fraction = fraction.substring(0, 4);
+                }
+                milliSeconds = (int)(Float.parseFloat(fraction) * 1000);
             }
 
-            GregorianCalendar cal = new GregorianCalendar(year, month, day,
-                    hour, minute, second);
+            GregorianCalendar cal = new GregorianCalendar(year, month, day, hour, minute, second);
             cal.setTimeZone(UTC_TIME_ZONE);
 
             if (timeDiff != null) {
