@@ -123,16 +123,7 @@ public class AuthenticationChainsFilter implements Filter {
                 for (JsonValue entry : body.get("authChainConfiguration")) {
                     String module = entry.get("module").asString();
                     String criteria = entry.get("criteria").asString();
-                    String options;
-                    if (entry.get("options").isString()) {
-                        options = entry.get("options").asString();
-                    } else {
-                        StringBuilder optionsBuilder = new StringBuilder();
-                        for (Map.Entry<String, String> option : entry.get("options").asMap(String.class).entrySet()) {
-                            optionsBuilder.append(option.getKey()).append("=").append(option.getValue()).append(",");
-                        }
-                        options = optionsBuilder.substring(0, optionsBuilder.length() - 1);
-                    }
+                    String options = getOptions(entry);
                     entries.add(new AuthConfigurationEntry(module, criteria, options));
                 }
                 body.put("authChainConfiguration", AMAuthConfigUtils.authConfigurationEntryToXMLString(entries));
@@ -141,6 +132,22 @@ public class AuthenticationChainsFilter implements Filter {
             }
         }
         return body;
+    }
+
+    private String getOptions(JsonValue entry) {
+        JsonValue options = entry.get("options");
+        if (options.isNull()) {
+            return "";
+        } else if (options.isString()) {
+            return options.asString();
+        } else if (options.isMap() && !options.asMap().isEmpty()) {
+            StringBuilder optionsBuilder = new StringBuilder();
+            for (Map.Entry<String, String> option : options.asMap(String.class).entrySet()) {
+                optionsBuilder.append(option.getKey()).append("=").append(option.getValue()).append(",");
+            }
+            return optionsBuilder.substring(0, optionsBuilder.length() - 1);
+        }
+        return "";
     }
 
     private QueryResultHandler wrap(final QueryResultHandler handler) {
@@ -197,8 +204,8 @@ public class AuthenticationChainsFilter implements Filter {
     private static final Pattern KEY_VALUE_PAIR_REGEX = Pattern.compile("(\\w+\\s*=\\s*[\\w\\s]+,?)+");
 
     private JsonValue parseOptions(String options) {
-        if (options == null) {
-            return json("");
+        if (options == null || options.isEmpty()) {
+            return json(object());
         }
         if (KEY_VALUE_PAIR_REGEX.matcher(options).matches()) {
             JsonValue optionsValue = json(object());
