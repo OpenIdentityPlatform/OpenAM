@@ -37,11 +37,11 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
 
     return AbstractView.extend({
         initialize: function (options) {
+            AbstractView.prototype.initialize.call(this);
             this.model = null;
         },
 
         template: "templates/admin/views/realms/scripts/EditScriptTemplate.html",
-        data: {},
         events: {
             "click #upload": "uploadScript",
             "keyup #upload": "uploadScript",
@@ -103,7 +103,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
          * 2. the render function is called from the function onModelSync
          * Then there is a conflict in the function syncModel.
          * In the first case we should to create a new model, in second case is not create.
-         * So I divided the render function into two parts, so as not to cause a re-check and avoid the second case.
+         * So the render function is divided into two parts, so as not to cause a re-check and avoid the second case.
          */
         renderAfterSyncModel: function () {
             var self = this;

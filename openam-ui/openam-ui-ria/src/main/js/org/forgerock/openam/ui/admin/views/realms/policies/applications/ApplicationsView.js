@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2014-2015 ForgeRock AS.
  */
 
 /*global define, FileReader*/
@@ -31,8 +31,7 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/applications/Applica
     "org/forgerock/openam/ui/admin/views/realms/policies/common/AbstractListView",
     "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate",
     "org/forgerock/openam/ui/common/util/BackgridUtils"
-], function ($, _, Backbone, Backgrid, Configuration, EventManager, Router, Constants, UIUtils, URLHelper,
-             ApplicationModel, AbstractListView, PolicyDelegate, BackgridUtils) {
+], function ($, _, Backbone, Backgrid, Configuration, EventManager, Router, Constants, UIUtils, URLHelper, ApplicationModel, AbstractListView, PolicyDelegate, BackgridUtils) {
 
     return AbstractListView.extend({
         template: "templates/admin/views/realms/policies/applications/ApplicationsTemplate.html",
@@ -48,9 +47,11 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/applications/Applica
                 resourceTypesPromise = PolicyDelegate.listResourceTypes();
 
             this.realmPath = args[0];
+
             this.data.selectedItems = [];
 
             _.extend(this.events, {
+                "click #addNewApp": "addNewApplication",
                 "click #importPolicies": "startImportPolicies",
                 "click #exportPolicies": "exportPolicies",
                 "change [name=upload]": "readImportFile"
@@ -78,12 +79,14 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/applications/Applica
                 callback: function (e) {
                     var $target = $(e.target);
 
-                    if ($target.is("a") || $target.is("input") || $target.is(".select-row-cell") ||
-                        $target.is(".fa") || $target.is(".template-cell")) {
+                    if ($target.is("input") || $target.is(".select-row-cell")) {
                         return;
                     }
-                    Router.routeTo(Router.configuration.routes.managePolicies, {args: [encodeURIComponent(this.model.id)],
-                        trigger: true});
+
+                    Router.routeTo(Router.configuration.routes.realmsApplicationEdit, {
+                        args: [encodeURIComponent(self.realmPath), encodeURIComponent(this.model.id)],
+                        trigger: true
+                    });
                 }
             });
 
@@ -141,8 +144,8 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/applications/Applica
                 columns: columns,
                 row: ClickableRow,
                 collection: self.data.items,
-                className:"backgrid table",
-                emptyText: $.t("console.policies.applications.list.noResults")
+                className: "backgrid table",
+                emptyText: $.t("console.common.noResults")
             });
 
             paginator = new Backgrid.Extension.Paginator({
@@ -228,6 +231,13 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/applications/Applica
 
         exportPolicies: function () {
             this.$el.find("#exportPolicies").attr("href", Constants.host + "/" + Constants.context + "/xacml/policies");
+        },
+
+        addNewApplication: function (e) {
+            Router.routeTo(Router.configuration.routes.realmsApplicationEdit, {
+                args: [encodeURIComponent(this.realmPath)],
+                trigger: true
+            });
         }
     });
 });

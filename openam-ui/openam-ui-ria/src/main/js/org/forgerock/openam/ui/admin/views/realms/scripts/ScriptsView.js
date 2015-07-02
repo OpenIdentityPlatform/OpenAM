@@ -83,7 +83,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
                 },
                 {
                     name: "name",
-                    label: $.t("console.scripts.list.grid.headers.0"),
+                    label: $.t("console.scripts.list.grid.0"),
                     cell: "string",
                     headerCell: BackgridUtils.FilterHeaderCell,
                     sortType: "toggle",
@@ -91,7 +91,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
                 },
                 {
                     name: "context",
-                    label: $.t("console.scripts.list.grid.headers.1"),
+                    label: $.t("console.scripts.list.grid.1"),
                     cell: Backgrid.StringCell.extend({
                         map: "contextMap",
                         render: renderTranslatedCell
@@ -102,7 +102,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
                 },
                 {
                     name: "language",
-                    label: $.t("console.scripts.list.grid.headers.2"),
+                    label: $.t("console.scripts.list.grid.2"),
                     cell: Backgrid.StringCell.extend({
                         map: "langMap",
                         render: renderTranslatedCell
@@ -113,7 +113,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
                 },
                 {
                     name: "description",
-                    label: $.t("console.scripts.list.grid.headers.3"),
+                    label: $.t("console.scripts.list.grid.3"),
                     cell: "string",
                     sortable: false,
                     editable: false
@@ -148,7 +148,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
                 row: ClickableRow,
                 collection: self.data.scripts,
                 className: "backgrid table",
-                emptyText: $.t("console.scripts.list.grid.noResults")
+                emptyText: $.t("console.common.noResults")
             });
 
             paginator = new Backgrid.Extension.Paginator({

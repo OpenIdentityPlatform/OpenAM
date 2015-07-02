@@ -1,0 +1,10 @@
+<div class="list-table {{#if created}} created-items {{/if}} {{#if cssClass}} {{cssClass}} {{/if}}">
+
+    {{#if filter}}
+    <input tabindex="0" placeholder="{{t 'common.form.filter'}}"
+           class="form-control striped-list-filter">
+    {{/if}}
+
+    <h5 class="list-group-header">{{title}}</h5>
+    <ul class="list-group"></ul>
+</div>

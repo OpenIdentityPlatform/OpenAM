@@ -1,0 +1,14 @@
+{{#if items}}
+{{#each items}}
+<li {{#unless ../created}}tabindex="0"{{/unless}} class="list-group-item clearfix" data-list-item="{{this}}">
+    <span class="list-item-text">{{this}}</span>
+    <span class="fa-container">
+        <span {{#if ../created}}tabindex="0"{{/if}} class="fa {{#if ../created}}fa-close {{else}} fa-chevron-right {{/if}} pull-right"></span>
+    </span>
+</li>
+{{/each}}
+{{else}}
+<li class="list-group-item list-no-items {{#if created}} text-danger {{else}} text-info {{/if}}">
+    {{t "console.policies.common.stripedList.noItems"}}
+</li>
+{{/if}}

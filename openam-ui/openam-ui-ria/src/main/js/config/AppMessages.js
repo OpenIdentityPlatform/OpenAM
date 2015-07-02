@@ -93,11 +93,22 @@ define("config/AppMessages", [
         "scriptErrorNoLanguage": {
             msg: "config.messages.AdminMessages.scripts.error.noLanguage",
             type: "error"
-        }
+        },
 
         /**
          * Policies messages.
          */
-        // TODO policy messages will go here
+        "applicationErrorCantStartWithHash": {
+            msg: "config.messages.AdminMessages.policies.error.cantStartWithHash",
+            type: "error"
+        },
+        "applicationErrorNoName": {
+            msg: "config.messages.AdminMessages.policies.error.noName",
+            type: "error"
+        },
+        "applicationErrorNoResourceTypes": {
+            msg: "config.messages.AdminMessages.policies.error.noResourceTypes",
+            type: "error"
+        }
     };
 });

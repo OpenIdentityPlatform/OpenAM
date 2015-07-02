@@ -11,37 +11,267 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2014-2015 ForgeRock AS.
  */
 
 /*global define*/
 
-define('org/forgerock/openam/ui/admin/views/realms/policies/applications/EditApplicationView', [
-    'jquery',
-    'underscore',
-    'backbone',
-    'backgrid',
-    'org/forgerock/commons/ui/common/components/Messages',
-    'org/forgerock/commons/ui/common/main/AbstractView',
-    'org/forgerock/commons/ui/common/main/EventManager',
-    'org/forgerock/commons/ui/common/main/Router',
-    'org/forgerock/commons/ui/common/util/Constants',
-    'org/forgerock/commons/ui/common/util/UIUtils',
-    // TODO: switch to 'org/forgerock/openam/ui/common/util/URLHelper' after PE and SE are deleted
-    'org/forgerock/openam/ui/uma/util/URLHelper',
-    'org/forgerock/openam/ui/common/util/BackgridUtils'
-], function ($, _, Backbone, Backgrid, Messages, AbstractView, EventManager, Router, Constants, UIUtils, URLHelper, BackgridUtils) {
+define("org/forgerock/openam/ui/admin/views/realms/policies/applications/EditApplicationView", [
+    "jquery",
+    "underscore",
+    "org/forgerock/openam/ui/admin/models/policies/ApplicationModel",
+    "org/forgerock/openam/ui/admin/views/realms/policies/common/StripedListView",
+    "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate",
+    "org/forgerock/commons/ui/common/components/Messages",
+    "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/commons/ui/common/util/Constants"
+], function ($, _, Application, StripedListView, PoliciesDelegate, Messages, AbstractView, EventManager, Router, Constants) {
 
     return AbstractView.extend({
-        template: 'templates/admin/views/realms/policies/applications/EditApplicationTemplate.html',
+        template: "templates/admin/views/realms/policies/applications/EditApplicationTemplate.html",
+        APPLICATION_TYPE: "iPlanetAMWebAgentService",
+        validationFields: ["name", "resourceTypeUuids"],
         events: {
+            "click #saveChanges": "submitForm",
+            "click #revertChanges": "revertChanges",
+            "click #deleteApp": "deleteApplication"
+        },
 
+        initialize: function (options) {
+            AbstractView.prototype.initialize.call(this);
+            this.model = null;
+        },
+
+        onModelSync: function (model, response) {
+            this.renderAfterSyncModel();
         },
 
         render: function (args, callback) {
-            this.parentRender(function () {
-                if (callback) {
-                    callback();
+            var name = null;
+
+            this.realmPath = args[0];
+
+            if (callback) {
+                this.renderCallback = callback;
+            }
+
+            // Realm location is the first argument, second one is the application name
+            if (args.length === 2) {
+                name = args[1];
+            }
+
+            this.appTypePromise = PoliciesDelegate.getApplicationType(this.APPLICATION_TYPE);
+            this.envConditionsPromise = PoliciesDelegate.getEnvironmentConditions();
+            this.subjConditionsPromise = PoliciesDelegate.getSubjectConditions();
+            this.decisionCombinersPromise = PoliciesDelegate.getDecisionCombiners();
+            this.resourceTypesPromise = PoliciesDelegate.listResourceTypes();
+
+            if (name) {
+                this.model = new Application({name: name});
+                this.listenTo(this.model, "sync", this.onModelSync);
+                this.model.fetch();
+            } else {
+                this.model = new Application();
+                this.listenTo(this.model, "sync", this.onModelSync);
+                this.renderAfterSyncModel();
+            }
+        },
+
+        renderAfterSyncModel: function () {
+            this.data.entity = this.model.attributes;
+
+            if (!this.data.entity.realm) {
+                this.data.entity.realm = this.realmPath;
+            }
+
+            this.renderApplication();
+        },
+
+        renderApplication: function () {
+            var self = this,
+                parentRenderCallback = function () {
+                    self.parentRender(function () {
+                        self.buildResourceTypesList();
+
+                        if (self.renderCallback) {
+                            self.renderCallback();
+                        }
+                    });
+                },
+                populateAvailableResourceTypes = function (resourceTypes) {
+                    var options = {};
+
+                    options.allResourceTypes = resourceTypes;
+                    options.availableResourceTypes = _.filter(resourceTypes, function (item) {
+                        return !_.contains(self.data.entity.resourceTypeUuids, item.uuid);
+                    });
+
+                    return options;
+                };
+
+            if (!this.model.id) {
+                // Fill in the necessary information about application
+                $.when(this.appTypePromise, this.envConditionsPromise, this.subjConditionsPromise,
+                       this.decisionCombinersPromise,  this.resourceTypesPromise)
+                    .done(function (appType, envConditions, subjConditions, decisionCombiners, resourceTypes) {
+                        self.data.entity.applicationType = self.APPLICATION_TYPE;
+                        self.processConditions(self.data, envConditions[0].result, subjConditions[0].result);
+                        self.data.entity.entitlementCombiner = decisionCombiners[0].result[0].title;
+                        _.extend(self.data, {options: populateAvailableResourceTypes(resourceTypes[0].result)});
+                        parentRenderCallback();
+                    });
+            } else {
+                this.resourceTypesPromise.done(function (resourceTypes) {
+                    _.extend(self.data, {options: populateAvailableResourceTypes(resourceTypes.result)});
+                    parentRenderCallback();
+                });
+            }
+        },
+
+        buildResourceTypesList: function () {
+            var selected = _.findByValues(this.data.options.allResourceTypes, "uuid", this.data.entity.resourceTypeUuids);
+
+            this.availableResourceTypesUUIDS = this.data.entity.resourceTypeUuids;
+            this.availableResourceTypesInitial = _.pluck(this.data.options.availableResourceTypes, "name");
+            this.selectedResourceTypesInitial = _.pluck(selected, "name").sort();
+
+            this.data.options.selectedResourceTypeNames = this.selectedResourceTypesInitial;
+
+            this.resourceTypesListView = new StripedListView();
+            this.resourceTypesListView.render({
+                items: this.availableResourceTypesInitial,
+                title: $.t("console.policies.applications.edit.resourceTypes.availableResourceTypes"),
+                filter: true,
+                clickItem: this.selectResourceType.bind(this)
+            }, "#availableResTypes");
+
+            this.resourceTypesListSelectedView = new StripedListView();
+            this.resourceTypesListSelectedView.render({
+                items: this.data.options.selectedResourceTypeNames,
+                title: $.t("console.policies.applications.edit.resourceTypes.selectedResourceTypes"),
+                created: true,
+                clickItem: this.deselectResourceType.bind(this)
+            }, "#selectedResTypes");
+        },
+
+        selectResourceType: function (item) {
+            this.moveSelected(item, this.resourceTypesListView, this.resourceTypesListSelectedView);
+
+            // todo for now two RTs in the same realm are not allowed to have the same name, but the following should be changed to use UUIDs, not names
+            var selected = _.findWhere(this.data.options.allResourceTypes, {name: item});
+            this.data.entity.resourceTypeUuids = this.data.entity.resourceTypeUuids.concat(selected.uuid);
+            this.data.options.selectedResourceTypeNames = this.data.options.selectedResourceTypeNames.concat(selected.name).sort();
+        },
+
+        deselectResourceType: function (item) {
+            this.resourceTypesListView.emptyFilter();
+            this.moveSelected(item, this.resourceTypesListSelectedView, this.resourceTypesListView);
+
+            // todo for now two RTs in the same realm are not allowed to have the same name, but the following should be changed to use UUIDs, not names
+            var selected = _.findWhere(this.data.options.allResourceTypes, {name: item});
+            this.data.entity.resourceTypeUuids = _.without(this.data.entity.resourceTypeUuids, selected.uuid);
+            this.data.options.selectedResourceTypeNames = _.without(this.data.options.selectedResourceTypeNames, selected.name);
+        },
+
+        moveSelected: function (item, fromView, toView) {
+            fromView.removeItem(item);
+            fromView.renderItems();
+
+            toView.addItem(item);
+            toView.renderItems();
+        },
+
+        processConditions: function (data, envConditions, subjConditions) {
+            if (!data.entityName) {
+                data.entity.conditions = this.populateConditions(envConditions, envConditions);
+                data.entity.subjects = this.populateConditions(subjConditions, subjConditions);
+            }
+        },
+
+        populateConditions: function (selected, available) {
+            var result = [];
+            _.each(available, function (cond) {
+                result.push(cond.title);
+            });
+            return result;
+        },
+
+        revertChanges: function (e) {
+            this.data.entity.resourceTypeUuids = this.availableResourceTypesUUIDS;
+
+            this.resourceTypesListView.emptyFilter();
+            this.resourceTypesListView.setItems(this.availableResourceTypesInitial);
+            this.resourceTypesListView.renderItems();
+
+            this.resourceTypesListSelectedView.emptyFilter();
+            this.resourceTypesListSelectedView.setItems(this.selectedResourceTypesInitial);
+            this.resourceTypesListSelectedView.renderItems();
+        },
+
+        submitForm: function (e) {
+            e.preventDefault();
+
+            var self = this,
+                savePromise,
+                nonModifiedAttributes = _.clone(this.model.attributes);
+
+            this.updateFields();
+
+            _.extend(this.model.attributes, this.data.entity);
+            savePromise = this.model.save();
+
+            if (savePromise) {
+                savePromise
+                    .done(function (response) {
+                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
+                    })
+                    .fail(function (response) {
+                        _.extend(self.model.attributes, nonModifiedAttributes);
+                        Messages.messages.addMessage({message: response.responseJSON.message, type: "error"});
+                    });
+            } else {
+                _.extend(this.model.attributes, nonModifiedAttributes);
+                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, this.model.validationError);
+            }
+        },
+
+        deleteApplication: function (e) {
+            e.preventDefault();
+
+            var self = this,
+                onSuccess = function (model, response, options) {
+                    Router.routeTo(Router.configuration.routes.realmsApplications, {
+                        args: [encodeURIComponent(self.realmPath)],
+                        trigger: true
+                    });
+                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
+                },
+                onError = function (model, response, options) {
+                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "deleteFail");
+                };
+
+            this.model.destroy({
+                success: onSuccess,
+                error: onError
+            });
+        },
+
+        updateFields: function () {
+            var app = this.data.entity,
+                dataFields = this.$el.find("[data-field]"),
+                dataField;
+
+            _.each(dataFields, function (field, key, list) {
+                dataField = field.getAttribute("data-field");
+
+                if (field.type === "checkbox") {
+                    if (field.checked) {
+                        app[dataField].push(field.value);
+                    }
+                } else {
+                    app[dataField] = field.value;
                 }
             });
         }

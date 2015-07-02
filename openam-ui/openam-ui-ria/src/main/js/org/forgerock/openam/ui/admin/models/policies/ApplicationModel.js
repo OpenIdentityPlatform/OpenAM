@@ -22,6 +22,44 @@ define("org/forgerock/openam/ui/admin/models/policies/ApplicationModel", [
 ], function (Backbone, URLHelper) {
     return Backbone.Model.extend({
         idAttribute: "name",
-        urlRoot: URLHelper.substitute("__api__/applications")
+        urlRoot: URLHelper.substitute("__api__/applications"),
+
+        defaults: function () {
+            return {
+                name: "",
+                description: "",
+                resourceTypeUuids: [],
+                realm: ""
+            };
+        },
+
+        validate: function (attrs, options) {
+            if (attrs.name.trim() === "") {
+                return "applicationErrorNoName";
+            }
+
+            // entities that are stored in LDAP can't start with '#'. http://www.jguru.com/faq/view.jsp?EID=113588
+            if (attrs.name.startsWith("#")) {
+                return "applicationErrorCantStartWithHash";
+            }
+
+            if (attrs.resourceTypeUuids.length === 0) {
+                return "applicationErrorNoResourceTypes";
+            }
+        },
+
+        sync: function (method, model, options) {
+            options.beforeSend = function (xhr) {
+                xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=2.0");
+            };
+
+            if (model.id === null) {
+                method = "create";
+                options = options || {};
+                options.url = this.urlRoot() + "/?_action=create";
+            }
+
+            return Backbone.Model.prototype.sync.call(this, method, model, options);
+        }
     });
 });

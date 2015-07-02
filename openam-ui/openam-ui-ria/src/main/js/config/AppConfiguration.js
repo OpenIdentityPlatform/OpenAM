@@ -98,6 +98,7 @@ define("config/AppConfiguration", [
                     moduleClass: "org/forgerock/commons/ui/common/util/UIUtils",
                     configuration: {
                         templateUrls: [
+                            "templates/admin/views/realms/policies/common/StripedListItemTemplate.html",
                             "templates/admin/views/realms/policies/applications/ApplicationsToolbarTemplate.html",
                             "templates/admin/views/realms/scripts/ScriptsToolbarTemplate.html",
                             "templates/admin/views/realms/scripts/ScriptValidationTemplate.html",

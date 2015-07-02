@@ -79,7 +79,12 @@
                     "unableToPersistPolicy": "Unable to persist policy in datastore",
                     "policiesUploaded": "Policies uploaded successfully",
                     "policiesUploadFailed": "Failed to upload policies",
-                    "importFailed": "Import Failed: __applicationName__ application not found in realm"
+                    "importFailed": "Import Failed: __applicationName__ application not found in realm",
+                    "error": {
+                        "cantStartWithHash": "LDAP entity can't start with #",
+                        "noName": "Name is required",
+                        "noResourceTypes": "Please select one or more resource types"
+                    }
                 }
             }
         },
@@ -527,8 +532,8 @@
         "common": {
             "topLevelRealm" : "Top Level Realm",
             "realmStatus": "Status",
-            "realmDnsAliases": "Aliases/DNS Aliases"
-
+            "realmDnsAliases": "Aliases/DNS Aliases",
+            "noResults": "No results to display"
         },
         "authentication": {
             "settings": {
@@ -642,24 +647,93 @@
             "list": {
                 "title": "Scripts List",
                 "addNew": "New Script",
-                "grid": {
-                    "headers": ["Name", "Script Type", "Language", "Description"],
-                    "noResults": "No results to display"
-                }
+                "grid": ["Name", "Script Type", "Language", "Description"]
             }
         },
         "policies": {
+            "common": {
+                "realm": "Realm",
+                "realms": "Realms",
+                "application": "Application",
+                "applications": "Applications",
+                "pattern": "Pattern",
+                "patterns": "Patterns",
+                "responseAttributes": "Response attributes",
+                "subjectAttributes": "Subject attributes",
+                "availablePatterns": "Available patterns",
+                "staticAttributes": "Static attributes",
+                "actions": "Actions",
+                "resources": "Resources",
+                "subjects": "Subjects",
+                "environments": "Environments",
+                "resourceTypes": "Resource Types",
+
+                "noRealms": "There are no selected realms...",
+                "noActions": "There are no actions...",
+                "noActionsSelected": "There are no selected actions...",
+                "noResources": "There are no selected resources...",
+                "noResourceTypes": "There are no selected resources types...",
+                "noStaticAttributes": "There are no static attributes...",
+                "noSubjectAttributes": "There are no subject attributes...",
+                "noApplications": "There are no selected applications...",
+                "noPatterns": "There are no patterns...",
+                "noResourceTypesAvailable": "There are no available resource types...",
+                "noApplicationsAvailable": "There are no available applications...",
+
+                "weekdays": {
+                    "Monday": {
+                        "short": "mon",
+                        "full": "Monday"
+                    },
+                    "Tuesday": {
+                        "short": "tue",
+                        "full": "Tuesday"
+                    },
+                    "Wednesday": {
+                        "short": "wed",
+                        "full": "Wednesday"
+                    },
+                    "Thursday": {
+                        "short": "thu",
+                        "full": "Thursday"
+                    },
+                    "Friday": {
+                        "short": "fri",
+                        "full": "Friday"
+                    },
+                    "Saturday": {
+                        "short": "sat",
+                        "full": "Saturday"
+                    },
+                    "Sunday": {
+                        "short": "sun",
+                        "full": "Sunday"
+                    }
+                },
+                "stripedList": {
+                    "filterPlaceholder": "Select or search for available items",
+                    "noItems": "There are no items ..."
+                }
+            },
+
             "applications":{
                 "edit": {
-
+                    "name": "Name",
+                    "description": "Description",
+                    "application": "Application",
+                    "createNew": "Create New",
+                    "policies": "Policies",
+                    "resourceTypes": {
+                        "availableResourceTypes": "Available Resource Types",
+                        "selectedResourceTypes": "Selected Resource Types"
+                    }
                 },
                 "list": {
                     "addNew": "New Application",
                     "importPolicies": "Import Policies",
                     "exportPolicies": "Export Policies",
                     "title": "Applications",
-                    "grid": ["Name", "Description", "Resource Types"],
-                    "noResults": "No results to display"
+                    "grid": ["Name", "Description", "Resource Types"]
                 }
             }
         }

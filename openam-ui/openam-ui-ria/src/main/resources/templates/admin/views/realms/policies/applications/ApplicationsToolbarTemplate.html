@@ -1,9 +1,9 @@
-<a id="addNewApp" class="btn btn-primary pull-left" tabindex="0">
-    <span class="fa fa-plus"></span>{{t "console.policies.applications.list.addNew"}}
-</a>
+<button type="button" id="addNewApp" class="btn btn-primary pull-left">
+    <i class="fa fa-plus"></i>{{t "console.policies.applications.list.addNew"}}
+</button>
 
-<button id="deleteRecords" class="btn btn-default pull-left" {{#unless selectedItems}} disabled {{/unless}}>
-    <span class="fa fa-close"></span>{{t "common.form.delete"}} {{#if selectedItems}}({{selectedItems.length}}){{/if}}
+<button type="button" id="deleteRecords" class="btn btn-default pull-left" {{#unless selectedItems}} disabled {{/unless}}>
+    <i class="fa fa-close"></i>{{t "common.form.delete"}} {{#if selectedItems}}({{selectedItems.length}}){{/if}}
 </button>
 
 <div class="pull-right">

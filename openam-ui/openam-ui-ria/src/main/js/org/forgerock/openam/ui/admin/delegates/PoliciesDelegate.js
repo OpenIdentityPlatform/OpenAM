@@ -1,25 +1,17 @@
 /**
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
  *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
  *
- * You can obtain a copy of the License at
- * http://forgerock.org/license/CDDLv1.0.html
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at http://forgerock.org/license/CDDLv1.0.html
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
+ * Portions copyright 2014-2015 ForgeRock AS.
  */
 
 /*global define*/
@@ -30,15 +22,6 @@ define("org/forgerock/openam/ui/admin/delegates/PoliciesDelegate", [
     "org/forgerock/openam/ui/common/util/RealmHelper"
 ], function (_, AbstractDelegate, Constants, RealmHelper) {
     var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json");
-
-    obj.ERROR_HANDLERS = {
-        "Bad Request": { status: "400" },
-        "Not found": { status: "404" },
-        "Gone": { status: "410" },
-        "Conflict": { status: "409" },
-        "Internal Server Error": { status: "500" },
-        "Service Unavailable": { status: "503" }
-    };
 
     obj.getApplicationType = function (type) {
         return obj.serviceCall({
@@ -59,8 +42,7 @@ define("org/forgerock/openam/ui/admin/delegates/PoliciesDelegate", [
             url: RealmHelper.decorateURLWithOverrideRealm("/applications/" + encodeURIComponent(name)),
             headers: {"Accept-API-Version": "protocol=1.0,resource=2.0"},
             type: "PUT",
-            data: JSON.stringify(data),
-            errorsHandlers: obj.ERROR_HANDLERS
+            data: JSON.stringify(data)
         });
     };
 
@@ -69,8 +51,7 @@ define("org/forgerock/openam/ui/admin/delegates/PoliciesDelegate", [
             url: RealmHelper.decorateURLWithOverrideRealm("/applications/?_action=create"),
             headers: {"Accept-API-Version": "protocol=1.0,resource=2.0"},
             type: "POST",
-            data: JSON.stringify(data),
-            errorsHandlers: obj.ERROR_HANDLERS
+            data: JSON.stringify(data)
         });
     };
 
@@ -107,8 +88,7 @@ define("org/forgerock/openam/ui/admin/delegates/PoliciesDelegate", [
             url: RealmHelper.decorateURLWithOverrideRealm("/policies/" + encodeURIComponent(name)),
             headers: {"Accept-API-Version": "protocol=1.0,resource=2.0"},
             type: "PUT",
-            data: JSON.stringify(data),
-            errorsHandlers: obj.ERROR_HANDLERS
+            data: JSON.stringify(data)
         });
     };
 
@@ -117,8 +97,7 @@ define("org/forgerock/openam/ui/admin/delegates/PoliciesDelegate", [
             url: RealmHelper.decorateURLWithOverrideRealm("/policies/" + encodeURIComponent(data.name)),
             headers: { "If-None-Match": "*", "Accept-API-Version": "protocol=1.0,resource=2.0" },
             type: "PUT",
-            data: JSON.stringify(data),
-            errorsHandlers: obj.ERROR_HANDLERS
+            data: JSON.stringify(data)
         });
     };
 
@@ -169,8 +148,7 @@ define("org/forgerock/openam/ui/admin/delegates/PoliciesDelegate", [
             serviceUrl: Constants.host + "/" + Constants.context,
             url: RealmHelper.decorateURLWithOverrideRealm("/xacml/policies"),
             type: "POST",
-            data: data,
-            errorsHandlers: obj.ERROR_HANDLERS
+            data: data
         });
     };
 
@@ -186,8 +164,7 @@ define("org/forgerock/openam/ui/admin/delegates/PoliciesDelegate", [
             url: RealmHelper.decorateURLWithOverrideRealm("/resourcetypes?_action=create"),
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             type: "POST",
-            data: JSON.stringify(data),
-            errorsHandlers: obj.ERROR_HANDLERS
+            data: JSON.stringify(data)
         });
     };
 
@@ -196,8 +173,7 @@ define("org/forgerock/openam/ui/admin/delegates/PoliciesDelegate", [
             url: RealmHelper.decorateURLWithOverrideRealm("/resourcetypes/" + data.uuid),
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             type: "PUT",
-            data: JSON.stringify(data),
-            errorsHandlers: obj.ERROR_HANDLERS
+            data: JSON.stringify(data)
         });
     };
 
