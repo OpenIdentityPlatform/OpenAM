@@ -26,7 +26,7 @@ import java.util.Set;
  *
  * @since 13.0.0
  */
-public interface ScriptingService<T> {
+public interface ScriptingService {
 
     /**
      * Create the scripting configuration and persist it.
@@ -34,7 +34,7 @@ public interface ScriptingService<T> {
      * @return The created configuration object.
      * @throws ScriptException if the operation was not successful
      */
-    public T create(T config) throws ScriptException;
+    public ScriptConfiguration create(ScriptConfiguration config) throws ScriptException;
 
     /**
      * Delete the configuration with the given UUID.
@@ -48,21 +48,21 @@ public interface ScriptingService<T> {
      * @return A set of configuration objects.
      * @throws ScriptException if the operation was not successful
      */
-    public Set<T> getAll() throws ScriptException;
+    public Set<ScriptConfiguration> getAll() throws ScriptException;
 
     /**
      * Retrieve the stored configuration.
      * @return The configuration object with the given UUID or null if it cannot be found.
      * @throws ScriptException if the operation was not successful
      */
-    public Set<T> get(QueryFilter<String> queryFilter) throws ScriptException;
+    public Set<ScriptConfiguration> get(QueryFilter<String> queryFilter) throws ScriptException;
 
     /**
      * Retrieve the stored configuration.
      * @return The configuration object with the given UUID or null if it cannot be found.
      * @throws ScriptException if the operation was not successful
      */
-    public T get(String uuid) throws ScriptException;
+    public ScriptConfiguration get(String uuid) throws ScriptException;
 
     /**
      * Update the given scripting configuration and persist it.
@@ -70,6 +70,6 @@ public interface ScriptingService<T> {
      * @return The updated configuration object.
      * @throws ScriptException if the operation was not successful
      */
-    public T update(T config) throws ScriptException;
+    public ScriptConfiguration update(ScriptConfiguration config) throws ScriptException;
 
 }

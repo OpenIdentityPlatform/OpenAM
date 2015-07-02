@@ -79,7 +79,7 @@ public class Scripted extends AMLoginModule {
     private String userName;
     private boolean clientSideScriptEnabled;
     private ScriptEvaluator scriptEvaluator;
-    private ScriptingService<ScriptConfiguration> scriptingService;
+    private ScriptingService scriptingService;
     public Map moduleConfiguration;
 
     /** Debug logger instance used by scripts to log error/debug messages. */
@@ -115,9 +115,9 @@ public class Scripted extends AMLoginModule {
         return getAMIdentityRepository(getRequestOrg());
     }
 
-    private ScriptingService<ScriptConfiguration> initialiseScriptingService() {
-        ScriptingServiceFactory<ScriptConfiguration> scriptingServiceFactory =
-                InjectorHolder.getInstance(Key.get(new TypeLiteral<ScriptingServiceFactory<ScriptConfiguration>>() {}));
+    private ScriptingService initialiseScriptingService() {
+        ScriptingServiceFactory scriptingServiceFactory =
+                InjectorHolder.getInstance(Key.get(new TypeLiteral<ScriptingServiceFactory>() {}));
         return scriptingServiceFactory.create(SubjectUtils.createSuperAdminSubject(), getRequestOrg());
     }
 

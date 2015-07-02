@@ -45,7 +45,7 @@ public class ScriptConfigurationServiceTest {
         }
     };
     private ScriptConfigurationService service;
-    private ScriptingDataStore<ScriptConfiguration> dataStore;
+    private ScriptingDataStore dataStore;
 
     @BeforeMethod
     public void setUp() throws ResourceException {
@@ -53,7 +53,7 @@ public class ScriptConfigurationServiceTest {
         Subject subject = new Subject();
         subject.getPrincipals().add(testUserPrinciple);
         dataStore = mock(ScriptingDataStore.class);
-        ScriptingDataStoreFactory<ScriptConfiguration> dataStoreFactory = mock(ScriptingDataStoreFactory.class);
+        ScriptingDataStoreFactory dataStoreFactory = mock(ScriptingDataStoreFactory.class);
         when(dataStoreFactory.create(any(Subject.class), anyString())).thenReturn(dataStore);
         service = new ScriptConfigurationService(logger, subject, "/", dataStoreFactory);
     }

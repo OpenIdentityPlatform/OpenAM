@@ -71,7 +71,7 @@ public class ScriptCondition extends EntitlementConditionAdaptor {
     private static final ListToSetTransformation<String> LIST_TO_SET = new ListToSetTransformation<>();
     private static final String SCRIPT_ID = "scriptId";
 
-    private final ScriptingServiceFactory<ScriptConfiguration> scriptingServiceFactory;
+    private final ScriptingServiceFactory scriptingServiceFactory;
     private final ScriptEvaluator evaluator;
 
     private final CoreWrapper coreWrapper;
@@ -80,7 +80,7 @@ public class ScriptCondition extends EntitlementConditionAdaptor {
 
     public ScriptCondition() {
         scriptingServiceFactory = InjectorHolder.getInstance(
-                Key.get(new TypeLiteral<ScriptingServiceFactory<ScriptConfiguration>>() {
+                Key.get(new TypeLiteral<ScriptingServiceFactory>() {
                 }));
         evaluator = InjectorHolder.getInstance(
                 Key.get(ScriptEvaluator.class, Names.named(ScriptContext.POLICY_CONDITION.name())));
@@ -118,7 +118,7 @@ public class ScriptCondition extends EntitlementConditionAdaptor {
     public ConditionDecision evaluate(String realm, Subject subject, String resourceName,
                                       Map<String, Set<String>> environment) throws EntitlementException {
         try {
-            ScriptingService<ScriptConfiguration> scriptingService = scriptingServiceFactory.create(subject, realm);
+            ScriptingService scriptingService = scriptingServiceFactory.create(subject, realm);
             ScriptConfiguration configuration = scriptingService.get(scriptId);
 
             if (configuration == null) {

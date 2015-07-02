@@ -19,9 +19,7 @@ package org.forgerock.openam.scripting;
 import static com.sun.identity.shared.datastruct.CollectionHelper.getBooleanMapAttr;
 import static com.sun.identity.shared.datastruct.CollectionHelper.getMapAttr;
 import static org.forgerock.openam.scripting.ScriptConstants.*;
-import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.AUTHENTICATION_SERVER_SIDE;
-import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.OIDC_CLAIMS;
-import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.POLICY_CONDITION;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.*;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;

@@ -40,12 +40,12 @@ import java.util.Set;
  *
  * @since 13.0.0
  */
-public class ScriptConfigurationService implements ScriptingService<ScriptConfiguration> {
+public class ScriptConfigurationService implements ScriptingService {
 
     private final Logger logger;
     private final Subject subject;
     private final String realm;
-    private final ScriptingDataStore<ScriptConfiguration> dataStore;
+    private final ScriptingDataStore dataStore;
 
     /**
      * Construct a new instance of {@code ScriptConfigurationService}.
@@ -57,7 +57,7 @@ public class ScriptConfigurationService implements ScriptingService<ScriptConfig
     @Inject
     public ScriptConfigurationService(@Named("ScriptLogger") Logger logger,
                                       @Assisted Subject subject, @Assisted String realm,
-                                      ScriptingDataStoreFactory<ScriptConfiguration> dataStoreFactory) {
+                                      ScriptingDataStoreFactory dataStoreFactory) {
         Reject.ifNull(subject, realm);
         this.logger = logger;
         this.subject = subject;

@@ -70,13 +70,13 @@ public class ScriptedAuthModulesStep extends AbstractUpgradeStep {
         ScriptConfiguration serverSideScript;
     }
     private final Map<String, Set<ScriptData>> scriptsToMove = new HashMap<>();
-    private final ScriptingServiceFactory<ScriptConfiguration> serviceFactory;
+    private final ScriptingServiceFactory serviceFactory;
     private int moduleCount = 0;
 
     @Inject
     public ScriptedAuthModulesStep(final PrivilegedAction<SSOToken> adminTokenAction,
                                    @DataLayer(ConnectionType.DATA_LAYER) final ConnectionFactory factory,
-                                   ScriptingServiceFactory<ScriptConfiguration> scriptingServiceFactory) {
+                                   ScriptingServiceFactory scriptingServiceFactory) {
         super(adminTokenAction, factory);
         this.serviceFactory = scriptingServiceFactory;
     }
@@ -161,7 +161,7 @@ public class ScriptedAuthModulesStep extends AbstractUpgradeStep {
     private void upgradeScriptedAuthModules(String realm, Set<ScriptData> scriptDataSet)
             throws AMConfigurationException, ScriptException, SSOException, SMSException {
 
-        ScriptingService<ScriptConfiguration> service = serviceFactory.create(getAdminSubject(), realm);
+        ScriptingService service = serviceFactory.create(getAdminSubject(), realm);
         AMAuthenticationManager authManager = new AMAuthenticationManager(getAdminToken(), realm);
         for (ScriptData scriptData : scriptDataSet) {
             Map<String, Set<String>> attributes = new HashMap<>();

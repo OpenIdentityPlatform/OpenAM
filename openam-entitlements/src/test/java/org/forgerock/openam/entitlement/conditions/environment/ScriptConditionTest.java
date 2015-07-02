@@ -69,9 +69,9 @@ public class ScriptConditionTest extends GuiceTestCase {
     private ScriptCondition scriptCondition;
 
     @Mock
-    private ScriptingServiceFactory<ScriptConfiguration> scriptingServiceFactory;
+    private ScriptingServiceFactory scriptingServiceFactory;
     @Mock
-    private ScriptingService<ScriptConfiguration> scriptingService;
+    private ScriptingService scriptingService;
     @Mock
     private ScriptEvaluator scriptEvaluator;
     @Mock
@@ -101,7 +101,7 @@ public class ScriptConditionTest extends GuiceTestCase {
     @Override
     public void configure(Binder binder) {
         binder
-                .bind(new TypeLiteral<ScriptingServiceFactory<ScriptConfiguration>>() {})
+                .bind(new TypeLiteral<ScriptingServiceFactory>() {})
                 .toInstance(scriptingServiceFactory);
 
         binder

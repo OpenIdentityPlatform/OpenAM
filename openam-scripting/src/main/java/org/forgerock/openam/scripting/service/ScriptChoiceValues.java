@@ -72,7 +72,7 @@ public class ScriptChoiceValues extends ChoiceValues {
             }
         }
 
-        ScriptingService<ScriptConfiguration> scriptingService = getScriptingService(realm);
+        ScriptingService scriptingService = getScriptingService(realm);
         Map<String, String> choiceValues = new LinkedHashMap<>();
         try {
             Set<ScriptConfiguration> scriptConfigs;
@@ -96,11 +96,11 @@ public class ScriptChoiceValues extends ChoiceValues {
      * @param realm The realm in which to scripting service should be created.
      * @return the scripting service.
      */
-    private ScriptingService<ScriptConfiguration> getScriptingService(String realm) {
+    private ScriptingService getScriptingService(String realm) {
         final Subject admin = SubjectUtils.createSuperAdminSubject();
-        return new ScriptConfigurationService(LOGGER, admin, realm, new ScriptingDataStoreFactory<ScriptConfiguration>() {
+        return new ScriptConfigurationService(LOGGER, admin, realm, new ScriptingDataStoreFactory() {
             @Override
-            public ScriptingDataStore<ScriptConfiguration> create(Subject subject, String realm) {
+            public ScriptingDataStore create(Subject subject, String realm) {
                 return new ScriptConfigurationDataStore(LOGGER, admin, realm);
             }
         });

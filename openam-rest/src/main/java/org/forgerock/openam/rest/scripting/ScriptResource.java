@@ -63,7 +63,7 @@ import java.util.Set;
 public class ScriptResource extends RealmAwareResource {
 
     private final Logger logger;
-    private final ScriptingServiceFactory<ScriptConfiguration> serviceFactory;
+    private final ScriptingServiceFactory serviceFactory;
     private final ExceptionMappingHandler<ScriptException, ResourceException> exceptionMappingHandler;
     private final ScriptValidator scriptValidator;
 
@@ -75,7 +75,7 @@ public class ScriptResource extends RealmAwareResource {
      */
     @Inject
     public ScriptResource(@Named("ScriptLogger") Logger logger,
-                          ScriptingServiceFactory<ScriptConfiguration> scriptConfigService,
+                          ScriptingServiceFactory scriptConfigService,
                           ExceptionMappingHandler<ScriptException, ResourceException> exceptionMappingHandler,
                           ScriptValidator scriptValidator) {
         this.logger = logger;

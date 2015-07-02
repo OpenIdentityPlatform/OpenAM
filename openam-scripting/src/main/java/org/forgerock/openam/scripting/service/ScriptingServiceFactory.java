@@ -20,10 +20,8 @@ import javax.security.auth.Subject;
 
 /**
  * A factory for providing new scripting service instances.
- *
- * @param <T> The type of object managed by the service.
  */
-public interface ScriptingServiceFactory<T> {
+public interface ScriptingServiceFactory {
 
     /**
      * Creates a new scripting service instance based on the calling subject for the passed realm.
@@ -31,6 +29,6 @@ public interface ScriptingServiceFactory<T> {
      * @param realm the realm
      * @return a scripting service instance
      */
-    ScriptingService<T> create(Subject subject, String realm);
+    ScriptingService create(Subject subject, String realm);
 
 }

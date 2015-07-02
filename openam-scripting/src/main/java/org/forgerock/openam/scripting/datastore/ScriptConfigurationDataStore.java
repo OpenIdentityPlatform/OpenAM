@@ -49,7 +49,7 @@ import java.util.Set;
  *
  * @since 13.0.0
  */
-public class ScriptConfigurationDataStore implements ScriptingDataStore<ScriptConfiguration> {
+public class ScriptConfigurationDataStore implements ScriptingDataStore {
 
     private ServiceConfigManager configManager;
     private final Subject subject;

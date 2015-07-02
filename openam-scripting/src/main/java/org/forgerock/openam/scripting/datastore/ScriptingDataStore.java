@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.scripting.datastore;
 
+import org.forgerock.openam.scripting.service.ScriptConfiguration;
 import org.forgerock.util.query.QueryFilter;
 import org.forgerock.openam.scripting.ScriptException;
 
@@ -25,14 +26,14 @@ import java.util.Set;
  *
  * @since 13.0.0
  */
-public interface ScriptingDataStore<T> {
+public interface ScriptingDataStore {
 
     /**
      * Save the scripting data in the data store.
      * @param data The data to save.
      * @throws ScriptException if the operation was not successful
      */
-    public void save(T data) throws ScriptException;
+    public void save(ScriptConfiguration data) throws ScriptException;
 
     /**
      * Delete the data with the given UUID from the data store.
@@ -46,14 +47,14 @@ public interface ScriptingDataStore<T> {
      * @return A set of data objects.
      * @throws ScriptException if the operation was not successful
      */
-    public Set<T> getAll() throws ScriptException;
+    public Set<ScriptConfiguration> getAll() throws ScriptException;
 
     /**
      * Retrieve the data stored from the data store.
      * @return The data object with the given UUID or null if it cannot be found.
      * @throws ScriptException if the operation was not successful
      */
-    public T get(String uuid) throws ScriptException;
+    public ScriptConfiguration get(String uuid) throws ScriptException;
 
     /**
      * Check to see if data with the given UUID already.
@@ -77,5 +78,5 @@ public interface ScriptingDataStore<T> {
      * @return a set of matching data objects.
      * @throws ScriptException should an error occur during lookup
      */
-    public Set<T> get(QueryFilter<String> filter) throws ScriptException;
+    public Set<ScriptConfiguration> get(QueryFilter<String> filter) throws ScriptException;
 }

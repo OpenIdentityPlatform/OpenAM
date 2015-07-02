@@ -16,14 +16,20 @@
 
 package org.forgerock.openam.scripting.guice;
 
-import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.*;
 import static org.forgerock.openam.scripting.ScriptConstants.*;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.*;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.http.client.RestletHttpClient;
 import org.forgerock.openam.scripting.ScriptConstants;
@@ -36,24 +42,16 @@ import org.forgerock.openam.scripting.StandardScriptEvaluator;
 import org.forgerock.openam.scripting.StandardScriptValidator;
 import org.forgerock.openam.scripting.SupportedScriptingLanguage;
 import org.forgerock.openam.scripting.ThreadPoolScriptEvaluator;
+import org.forgerock.openam.scripting.api.http.JavaScriptHttpClient;
 import org.forgerock.openam.scripting.datastore.ScriptConfigurationDataStore;
 import org.forgerock.openam.scripting.datastore.ScriptingDataStore;
 import org.forgerock.openam.scripting.datastore.ScriptingDataStoreFactory;
-import org.forgerock.openam.scripting.api.http.JavaScriptHttpClient;
-import org.forgerock.openam.scripting.service.ScriptConfiguration;
 import org.forgerock.openam.scripting.service.ScriptConfigurationService;
 import org.forgerock.openam.scripting.service.ScriptingService;
 import org.forgerock.openam.scripting.service.ScriptingServiceFactory;
 import org.forgerock.util.thread.ExecutorServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -70,14 +68,14 @@ public class ScriptingGuiceModule extends AbstractModule {
                 .toInstance(LoggerFactory.getLogger(ScriptConstants.LOGGER_NAME));
 
         install(new FactoryModuleBuilder()
-                .implement(new TypeLiteral<ScriptingService<ScriptConfiguration>>() {},
+                .implement(new TypeLiteral<ScriptingService>() {},
                         ScriptConfigurationService.class)
-                .build(new TypeLiteral<ScriptingServiceFactory<ScriptConfiguration>>() {}));
+                .build(new TypeLiteral<ScriptingServiceFactory>() {}));
 
         install(new FactoryModuleBuilder()
-                .implement(new TypeLiteral<ScriptingDataStore<ScriptConfiguration>>() {},
+                .implement(new TypeLiteral<ScriptingDataStore>() {},
                         ScriptConfigurationDataStore.class)
-                .build(new TypeLiteral<ScriptingDataStoreFactory<ScriptConfiguration>>() {}));
+                .build(new TypeLiteral<ScriptingDataStoreFactory>() {}));
 
         bind(StandardScriptEngineManager.class)
                 .annotatedWith(Names.named(AUTHENTICATION_SERVER_SIDE.name()))

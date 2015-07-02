@@ -19,10 +19,8 @@ import javax.security.auth.Subject;
 
 /**
  * A factory for providing new scripting data store instances.
- *
- * @param <T> The type of object managed by the data store.
  */
-public interface ScriptingDataStoreFactory<T> {
+public interface ScriptingDataStoreFactory {
 
     /**
      * Creates a new scripting data store instance based on the calling subject for the passed realm.
@@ -30,6 +28,6 @@ public interface ScriptingDataStoreFactory<T> {
      * @param realm the realm
      * @return a scripting data store instance
      */
-    ScriptingDataStore<T> create(Subject subject, String realm);
+    ScriptingDataStore create(Subject subject, String realm);
 
 }

@@ -66,9 +66,9 @@ public class ScriptResourceTest {
 
     private ScriptResource scriptResource;
     private ServerContext serverContext;
-    private Map<String, ScriptConfiguration> scriptConfigSet = new LinkedHashMap<String, ScriptConfiguration>();
+    private Map<String, ScriptConfiguration> scriptConfigSet = new LinkedHashMap<>();
 
-    private class MockScriptingService implements ScriptingService<ScriptConfiguration> {
+    private class MockScriptingService implements ScriptingService {
 
         @Override
         public ScriptConfiguration create(ScriptConfiguration config) throws ScriptException {
@@ -81,13 +81,13 @@ public class ScriptResourceTest {
 
         @Override
         public Set<ScriptConfiguration> getAll() throws ScriptException {
-            return new LinkedHashSet<ScriptConfiguration>(scriptConfigSet.values());
+            return new LinkedHashSet<>(scriptConfigSet.values());
         }
 
         @Override
         public Set<ScriptConfiguration> get(org.forgerock.util.query.QueryFilter<String> queryFilter)
                 throws ScriptException {
-            return new LinkedHashSet<ScriptConfiguration>(scriptConfigSet.values());
+            return new LinkedHashSet<>(scriptConfigSet.values());
         }
 
         @Override
@@ -141,8 +141,8 @@ public class ScriptResourceTest {
     @BeforeMethod
     public void setUp() throws ResourceException {
         Logger logger = mock(Logger.class);
-        ScriptingService<ScriptConfiguration> scriptingService = new MockScriptingService();
-        ScriptingServiceFactory<ScriptConfiguration> serviceFactory = mock(ScriptingServiceFactory.class);
+        ScriptingService scriptingService = new MockScriptingService();
+        ScriptingServiceFactory serviceFactory = mock(ScriptingServiceFactory.class);
         when(serviceFactory.create(any(Subject.class), anyString())).thenReturn(scriptingService);
         ExceptionMappingHandler<ScriptException, ResourceException> errorHandler = new ScriptExceptionMappingHandler();
         scriptResource = new ScriptResource(logger, serviceFactory, errorHandler,

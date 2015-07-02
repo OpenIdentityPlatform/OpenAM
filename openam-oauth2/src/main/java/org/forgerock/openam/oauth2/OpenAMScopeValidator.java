@@ -111,7 +111,7 @@ public class OpenAMScopeValidator implements ScopeValidator {
     private final OpenAMSettings openAMSettings;
     private final ScriptEvaluator scriptEvaluator;
     private final OpenIdConnectClientRegistrationStore clientRegistrationStore;
-    private final ScriptingServiceFactory<ScriptConfiguration> scriptingServiceFactory;
+    private final ScriptingServiceFactory scriptingServiceFactory;
 
     private Subject adminSubject;
 
@@ -131,7 +131,7 @@ public class OpenAMScopeValidator implements ScopeValidator {
             OAuth2ProviderSettingsFactory providerSettingsFactory, OpenAMSettings openAMSettings,
             @Named(OIDC_CLAIMS_NAME) ScriptEvaluator scriptEvaluator,
             OpenIdConnectClientRegistrationStore clientRegistrationStore,
-            ScriptingServiceFactory<ScriptConfiguration> scriptingServiceFactory) {
+            ScriptingServiceFactory scriptingServiceFactory) {
         this.identityManager = identityManager;
         this.openIDTokenIssuer = openIDTokenIssuer;
         this.providerSettingsFactory = providerSettingsFactory;
