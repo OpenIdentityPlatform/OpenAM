@@ -102,7 +102,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
                 return;
             }
             config.addSubConfig(name, lastSchemaNodeName(), 0, attrs);
-            ServiceConfig created = checkedInstanceSubConfig(name, config);
+            ServiceConfig created = checkedInstanceSubConfig(context, name, config);
 
             String dn = created.getDN();
             JsonValue result = getJsonValue(created);
@@ -132,7 +132,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
         try {
             ServiceConfigManager scm = getServiceConfigManager(context);
             ServiceConfig config = parentSubConfigFor(context, scm);
-            checkedInstanceSubConfig(resourceId, config);
+            checkedInstanceSubConfig(context, resourceId, config);
             config.removeSubConfig(resourceId);
 
             Resource resource = new Resource(resourceId, "0", json(object(field("success", true))));
@@ -161,7 +161,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
         try {
             ServiceConfigManager scm = getServiceConfigManager(context);
             ServiceConfig config = parentSubConfigFor(context, scm);
-            ServiceConfig item = checkedInstanceSubConfig(resourceId, config);
+            ServiceConfig item = checkedInstanceSubConfig(context, resourceId, config);
 
             JsonValue result = getJsonValue(item);
             handler.handleResult(new Resource(resourceId, String.valueOf(result.hashCode()), result));
@@ -188,7 +188,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
         try {
             ServiceConfigManager scm = getServiceConfigManager(context);
             ServiceConfig config = parentSubConfigFor(context, scm);
-            ServiceConfig node = checkedInstanceSubConfig(resourceId, config);
+            ServiceConfig node = checkedInstanceSubConfig(context, resourceId, config);
 
             node.setAttributes(attrs);
             JsonValue result = getJsonValue(node);

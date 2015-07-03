@@ -28,14 +28,27 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.config.AMAuthenticationManager;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.AttributeSchema;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.SchemaType;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceSchema;
 import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -48,23 +61,29 @@ import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.StringUtils;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.AttributeSchema;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.SchemaType;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceSchema;
-
 /**
  * A base class for resource providers for the REST SMS services - provides common utility methods for
  * navigating SMS schemas.
  * @since 13.0.0
  */
 abstract class SmsResourceProvider {
+
+    /**
+     * Contains the mapping of auto created authentication modules and their type so that
+     * requests to the authentication module endpoint can check if they need to check the
+     * special place that these auto created modules are stored.
+     */
+    private static final Map<String, String> AUTO_CREATED_AUTHENTICATION_MODULES = new HashMap<>();
+
+    static {
+        AUTO_CREATED_AUTHENTICATION_MODULES.put("hotp", "hotp");
+        AUTO_CREATED_AUTHENTICATION_MODULES.put("sae", "sae");
+        AUTO_CREATED_AUTHENTICATION_MODULES.put("oath", "oath");
+        AUTO_CREATED_AUTHENTICATION_MODULES.put("ldap", "ldap");
+        AUTO_CREATED_AUTHENTICATION_MODULES.put("datastore", "datastore");
+        AUTO_CREATED_AUTHENTICATION_MODULES.put("federation", "federation");
+        AUTO_CREATED_AUTHENTICATION_MODULES.put("wssauthmodule", "wssauthmodule");
+    }
 
     public static final List<AttributeSchema.Syntax> NUMBER_SYNTAXES = Arrays.asList(NUMBER, DECIMAL, PERCENT, NUMBER_RANGE, DECIMAL_RANGE, DECIMAL_NUMBER);
     static final String TEMPLATE = "template";
@@ -149,6 +168,7 @@ abstract class SmsResourceProvider {
     /**
      * Retrieves the {@link ServiceConfig} instance for the provided resource ID within the provided ServiceConfig
      * parent instance, and checks whether it exists.
+     * @param context The request context.
      * @param resourceId The identifier for the config.
      * @param config The parent config instance.
      * @return The found instance.
@@ -156,17 +176,33 @@ abstract class SmsResourceProvider {
      * @throws SSOException From downstream service manager layer.
      * @throws NotFoundException If the ServiceConfig does not exist.
      */
-    protected ServiceConfig checkedInstanceSubConfig(String resourceId, ServiceConfig config)
+    protected ServiceConfig checkedInstanceSubConfig(ServerContext context, String resourceId, ServiceConfig config)
             throws SSOException, SMSException, NotFoundException {
-        if (!config.getSubConfigNames().contains(resourceId) && config.exists()) {
-            return config;
-        } else {
+        if (config.getSubConfigNames().contains(resourceId)) {
             ServiceConfig subConfig = config.getSubConfig(resourceId);
             if (subConfig == null || !subConfig.getSchemaID().equals(lastSchemaNodeName()) || !subConfig.exists()) {
                 throw new NotFoundException();
             }
             return subConfig;
+        } else {
+            /*
+             * Use case: The default created auth modules on a fresh install aren't stored in the same
+             * place as auth modules created by the user. Therefore if the auth module is not found in
+             * the organisation schema we need to check if is one of these auth created modules.
+             */
+            if (!isDefaultCreatedAuthModule(context, resourceId) || !config.exists()) {
+                throw new NotFoundException();
+            }
+            return config;
         }
+    }
+
+    private boolean isDefaultCreatedAuthModule(ServerContext context, String resourceId) throws SSOException,
+            SMSException {
+        String lastedMatchedUri = context.asContext(RouterContext.class).getMatchedUri();
+        return AMAuthenticationManager.getAuthenticationServiceNames().contains(serviceName)
+                && AUTO_CREATED_AUTHENTICATION_MODULES.containsKey(resourceId.toLowerCase())
+                && AUTO_CREATED_AUTHENTICATION_MODULES.get(resourceId.toLowerCase()).equalsIgnoreCase(lastedMatchedUri);
     }
 
     /**
