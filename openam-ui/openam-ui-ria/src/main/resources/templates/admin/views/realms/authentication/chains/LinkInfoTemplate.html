@@ -13,8 +13,11 @@
             {{else}}{{t 'console.authentication.editChains.selectCriteria'}}{{/if}}
         </div>
         <div class="module-options">
-            {{#if options}}{{t 'console.authentication.editChains.options'}} <span class="badge">{{optionsLength}}</span>
-            {{else}}{{t 'console.authentication.editChains.noOptions'}}{{/if}}
+            {{#if optionsLength}}
+                {{t 'console.authentication.editChains.options'}} <span class="badge">{{optionsLength}}</span>
+            {{else}}
+                {{t 'console.authentication.editChains.noOptions'}}
+            {{/if}}
         </div>
     </div>
 </div>
