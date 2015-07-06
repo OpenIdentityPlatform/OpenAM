@@ -21,13 +21,14 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/applications/EditApp
     "underscore",
     "org/forgerock/openam/ui/admin/models/policies/ApplicationModel",
     "org/forgerock/openam/ui/admin/views/realms/policies/common/StripedListView",
+    "org/forgerock/openam/ui/admin/views/realms/policies/policies/PoliciesView",
     "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants"
-], function ($, _, Application, StripedListView, PoliciesDelegate, Messages, AbstractView, EventManager, Router, Constants) {
+], function ($, _, Application, StripedListView, PoliciesView, PoliciesDelegate, Messages, AbstractView, EventManager, Router, Constants) {
 
     return AbstractView.extend({
         template: "templates/admin/views/realms/policies/applications/EditApplicationTemplate.html",
@@ -93,6 +94,10 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/applications/EditApp
             var self = this,
                 parentRenderCallback = function () {
                     self.parentRender(function () {
+                        PoliciesView.render({
+                            application: self.model
+                        });
+
                         self.buildResourceTypesList();
 
                         if (self.renderCallback) {
@@ -114,7 +119,7 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/applications/EditApp
             if (!this.model.id) {
                 // Fill in the necessary information about application
                 $.when(this.appTypePromise, this.envConditionsPromise, this.subjConditionsPromise,
-                       this.decisionCombinersPromise,  this.resourceTypesPromise)
+                        this.decisionCombinersPromise, this.resourceTypesPromise)
                     .done(function (appType, envConditions, subjConditions, decisionCombiners, resourceTypes) {
                         self.data.entity.applicationType = self.APPLICATION_TYPE;
                         self.processConditions(self.data, envConditions[0].result, subjConditions[0].result);
@@ -249,7 +254,7 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/applications/EditApp
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                 },
                 onError = function (model, response, options) {
-                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "deleteFail");
+                    Messages.messages.addMessage({message: response.responseJSON.message, type: "error"});
                 };
 
             this.model.destroy({

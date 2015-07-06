@@ -735,6 +735,16 @@
                     "title": "Applications",
                     "grid": ["Name", "Description", "Resource Types"]
                 }
+            },
+
+            "policies": {
+                "edit": {
+
+                },
+                "list": {
+                    "grid": ["Name", "Description", "Resources", "Actions"],
+                    "addNew": "New Policy"
+                }
             }
         }
     }

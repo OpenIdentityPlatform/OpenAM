@@ -44,18 +44,13 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
         template: "templates/admin/views/realms/scripts/EditScriptTemplate.html",
         events: {
             "click #upload": "uploadScript",
-            "keyup #upload": "uploadScript",
             "change [name=upload]": "readUploadedFile",
             "click #validateScript": "validateScript",
-            "keyup #validateScript": "validateScript",
             "click #changeContext": "openDialog",
-            "keyup #changeContext": "openDialog",
             "click input[name=save]": "submitForm",
-            "keyup input[name=save]": "submitForm",
             "change input[name=language]": "changeLanguage",
             "submit form": "submitForm",
-            "click #cancelEdit": "cancelEdit",
-            "keyup #cancelEdit": "cancelEdit"
+            "click #cancelEdit": "cancelEdit"
         },
 
         onModelSync: function (model, response) {
@@ -178,10 +173,6 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
         submitForm: function (e) {
             e.preventDefault();
 
-            if (e.type === "keyup" && e.keyCode !== 13) {
-                return;
-            }
-
             var savePromise,
                 nonModifiedAttributes = _.clone(this.model.attributes),
                 self = this;
@@ -223,10 +214,6 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
         },
 
         validateScript: function (e) {
-            if (e.type === "keyup" && e.keyCode !== 13) {
-                return;
-            }
-
             var scriptText = this.scriptEditor.getValue(),
                 language = this.$el.find("input[name=language]:checked"),
                 script,
@@ -378,10 +365,6 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
         },
 
         cancelEdit: function (e) {
-            if (e.type === "keyup" && e.keyCode !== 13) {
-                return;
-            }
-
             Router.routeTo(Router.configuration.routes.realmsScripts, {
                 args: [encodeURIComponent(this.realmPath)],
                 trigger: true

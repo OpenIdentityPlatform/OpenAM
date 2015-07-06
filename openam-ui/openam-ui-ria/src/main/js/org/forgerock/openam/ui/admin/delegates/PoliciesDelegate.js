@@ -30,31 +30,6 @@ define("org/forgerock/openam/ui/admin/delegates/PoliciesDelegate", [
         });
     };
 
-    obj.getApplicationByName = function (name) {
-        return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm("/applications/" + encodeURIComponent(name)),
-            headers: {"Accept-API-Version": "protocol=1.0,resource=2.0"}
-        });
-    };
-
-    obj.updateApplication = function (name, data) {
-        return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm("/applications/" + encodeURIComponent(name)),
-            headers: {"Accept-API-Version": "protocol=1.0,resource=2.0"},
-            type: "PUT",
-            data: JSON.stringify(data)
-        });
-    };
-
-    obj.createApplication = function (data) {
-        return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm("/applications/?_action=create"),
-            headers: {"Accept-API-Version": "protocol=1.0,resource=2.0"},
-            type: "POST",
-            data: JSON.stringify(data)
-        });
-    };
-
     obj.getDecisionCombiners = function () {
         return obj.serviceCall({
             url: RealmHelper.decorateURLWithOverrideRealm("/decisioncombiners/?_queryId=&_fields=title"),

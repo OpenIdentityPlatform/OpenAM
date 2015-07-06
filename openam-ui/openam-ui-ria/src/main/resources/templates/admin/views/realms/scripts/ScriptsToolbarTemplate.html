@@ -1,7 +1,7 @@
-<a id="addNewScript" class="btn btn-primary" tabindex="0">
+<button type="button" id="addNewScript" class="btn btn-primary">
     <span class="fa fa-plus"></span>{{t "console.scripts.list.addNew"}}
-</a>
+</button>
 
-<button id="deleteRecords" class="btn btn-default" {{#unless selectedUUIDs}} disabled {{/unless}}>
+<button type="button" id="deleteRecords" class="btn btn-default" {{#unless selectedUUIDs}} disabled {{/unless}}>
     <span class="fa fa-close"></span>{{t "common.form.delete"}} {{#if selectedUUIDs}}({{selectedUUIDs.length}}){{/if}}
 </button>

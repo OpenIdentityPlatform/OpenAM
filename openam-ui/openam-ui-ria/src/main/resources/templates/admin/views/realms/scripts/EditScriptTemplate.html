@@ -42,9 +42,9 @@
 
                 <div class="col-sm-7 script-context">
                     <span class="form-control" id="context">{{contextName}}</span>
-                    <a class="btn btn-default pull-right" id="changeContext" role="button">
-                        <span class="fa fa-gear"></span> {{t 'common.form.change'}}
-                    </a>
+                    <button type="button" id="changeContext" class="btn btn-default pull-right">
+                        <i class="fa fa-gear"></i> {{t "common.form.change"}}
+                    </button>
                 </div>
             </div>
 
@@ -84,7 +84,7 @@
 
         <div class="panel-footer clearfix">
             <div class="pull-right">
-                <a id="cancelEdit" class="btn btn-default" tabindex="0" role="button">{{t 'common.form.cancel'}}</a>
+                <button id="cancelEdit" class="btn btn-default" type="button">{{t "common.form.cancel"}}</button>
                 <input type="button" name="save" value="{{t 'common.form.save'}}" class="btn btn-primary">
             </div>
         </div>

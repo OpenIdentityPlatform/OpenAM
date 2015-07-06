@@ -39,7 +39,6 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
         toolbarTemplate: "templates/admin/views/realms/scripts/ScriptsToolbarTemplate.html",
         events: {
             "click #addNewScript": "addNewScript",
-            "keyup #addNewScript": "addNewScript",
             "click #deleteRecords": "deleteRecords"
         },
 
@@ -179,8 +178,6 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
         },
 
         deleteRecords: function (e) {
-            e.preventDefault();
-
             var self = this,
                 i = 0,
                 item,
@@ -228,10 +225,6 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
         },
 
         addNewScript: function (e) {
-            if (e.type === "keyup" && e.keyCode !== 13) {
-                return;
-            }
-
             Router.routeTo(Router.configuration.routes.realmsScriptEdit, {
                 args: [encodeURIComponent(this.realmPath)],
                 trigger: true

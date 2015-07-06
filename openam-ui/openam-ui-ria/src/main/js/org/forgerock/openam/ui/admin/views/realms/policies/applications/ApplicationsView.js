@@ -26,18 +26,24 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/applications/Applica
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/UIUtils",
+    // TODO: switch to 'org/forgerock/openam/ui/common/util/URLHelper' after PE and SE are deleted
     "org/forgerock/openam/ui/uma/util/URLHelper",
+    "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole",
     "org/forgerock/openam/ui/admin/models/policies/ApplicationModel",
     "org/forgerock/openam/ui/admin/views/realms/policies/common/AbstractListView",
     "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate",
     "org/forgerock/openam/ui/common/util/BackgridUtils"
-], function ($, _, Backbone, Backgrid, Configuration, EventManager, Router, Constants, UIUtils, URLHelper, ApplicationModel, AbstractListView, PolicyDelegate, BackgridUtils) {
+], function ($, _, Backbone, Backgrid, Configuration, EventManager, Router, Constants, UIUtils, URLHelper,
+             RedirectToLegacyConsole, ApplicationModel, AbstractListView, PolicyDelegate, BackgridUtils) {
 
     return AbstractListView.extend({
         template: "templates/admin/views/realms/policies/applications/ApplicationsTemplate.html",
         toolbarTemplate: "templates/admin/views/realms/policies/applications/ApplicationsToolbarTemplate.html",
 
         render: function (args, callback) {
+            // TODO temporary solution until this is ready
+            RedirectToLegacyConsole.realm.policies();
+
             var self = this,
                 Apps,
                 columns,
