@@ -119,36 +119,26 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
             all: function (realm) {
                 return obj.serviceCall({
                     url: scopedByRealm(realm, "authentication/modules?_queryFilter=true")
-                });
+                }).done(SMSDelegateUtils.sortResultBy("_id"));
             },
-            create: function (realm, data) {
+            create: function (realm, data, type) {
                 return obj.serviceCall({
-                    url: scopedByRealm(realm, "authentication/modules/" + data.type + "?_action=create"),
+                    url: scopedByRealm(realm, "authentication/modules/" + type + "?_action=create"),
                     type: "POST",
                     data: JSON.stringify(data)
                 });
             },
             get: function (realm, name, type) {
-                var url = scopedByRealm(realm, "authentication/modules/" + type + "/" + name);
-
-                return $.when(
-                    obj.serviceCall({ url: url + "?_action=schema", type: "POST" }),
-                    obj.serviceCall({ url: url })
-                ).then(function(schemaData, valuesData) {
-                    return {
-                        schema: SMSDelegateUtils.sanitizeSchema(schemaData[0]),
-                        values: valuesData[0]
-                    };
-                });
+                return obj.serviceCall({ url: scopedByRealm(realm, "authentication/modules/" + type + "/" + name) });
             },
-            has: function (realm, name) {
+            exists: function (realm, name) {
                 var promise = $.Deferred(),
-                    request = this.get(realm, name);
+                    request = obj.serviceCall({
+                        url: scopedByRealm(realm, 'authentication/modules?_queryFilter=_id eq "' + name + '"&_fields=_id')
+                    });
 
-                request.done(function () {
-                    promise.resolve(false);
-                }).fail(function () {
-                    promise.resolve(true);
+                request.done(function (data) {
+                    promise.resolve(data.result.length > 0);
                 });
                 return promise;
             },
@@ -158,9 +148,9 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
                     type: "DELETE"
                 });
             },
-            update: function (realm, data) {
+            update: function (realm, name, type, data) {
                 return obj.serviceCall({
-                    url: scopedByRealm(realm, "authentication/modules/" + data.type + "/" + data.name),
+                    url: scopedByRealm(realm, "authentication/modules/" + type + "/" + name),
                     type: "PUT",
                     data: JSON.stringify(data)
                 });
@@ -169,9 +159,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
                 all: function (realm) {
                     return obj.serviceCall({
                         url: scopedByRealm(realm, "authentication/modules/types?_queryFilter=true")
-                    }).done(function(data) {
-                        data.result = _.sortBy(data.result, "name");
-                    });
+                    }).done(SMSDelegateUtils.sortResultBy("name"));
                 }
             }
         }

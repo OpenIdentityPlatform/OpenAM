@@ -21,6 +21,7 @@ import static org.forgerock.json.fluent.JsonValue.*;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.security.AccessController;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 
@@ -36,6 +37,7 @@ import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.BadRequestException;
@@ -44,6 +46,8 @@ import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.QueryFilter;
+import org.forgerock.json.resource.QueryFilterVisitor;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
@@ -79,7 +83,11 @@ public class AuthenticationModuleCollectionHandler implements RequestHandler {
      */
     @Override
     public void handleQuery(ServerContext context, QueryRequest request, QueryResultHandler handler) {
-        if (!"true".equals(request.getQueryFilter().toString())) {
+
+        String searchForId;
+        try {
+            searchForId = request.getQueryFilter().accept(new AuthenticationModuleQueryFilterVisitor(), null);
+        } catch (UnsupportedOperationException e) {
             handler.handleError(new NotSupportedException("Query not supported: " + request.getQueryFilter()));
             return;
         }
@@ -97,14 +105,16 @@ public class AuthenticationModuleCollectionHandler implements RequestHandler {
 
             for (AMAuthenticationInstance instance : moduleInstances) {
                 String name = instance.getName();
-                ServiceSchemaManager schemaManager = getSchemaManager(instance.getType());
-                String typePath = schemaManager.getResourceName();
-                String typeI18N = getI18NValue(schemaManager, instance.getType(), debug);
-                JsonValue result = json(object(
-                        field(Resource.FIELD_CONTENT_ID, name),
-                        field("type", typeI18N),
-                        field("path", typePath + "/" + name)));
-                handler.handleResource(new Resource(name, String.valueOf(result.hashCode()), result));
+                if (searchForId == null || searchForId.equalsIgnoreCase(name)) {
+                    ServiceSchemaManager schemaManager = getSchemaManager(instance.getType());
+                    String type = schemaManager.getResourceName();
+                    String typeDescription = getI18NValue(schemaManager, instance.getType(), debug);
+                    JsonValue result = json(object(
+                            field(Resource.FIELD_CONTENT_ID, name),
+                            field("typeDescription", typeDescription),
+                            field("type", type)));
+                    handler.handleResource(new Resource(name, String.valueOf(result.hashCode()), result));
+                }
             }
 
             handler.handleResult(new QueryResult());
@@ -181,5 +191,84 @@ public class AuthenticationModuleCollectionHandler implements RequestHandler {
         // TODO: i18n
         handler.handleError(new BadRequestException(
                 "The resource collection " + request.getResourceName() + " cannot be updated"));
+    }
+
+    private static final class AuthenticationModuleQueryFilterVisitor implements QueryFilterVisitor<String, Void> {
+
+        @Override
+        public String visitAndFilter(Void aVoid, List<QueryFilter> subFilters) {
+            throw new UnsupportedOperationException("And is not supported");
+        }
+
+        @Override
+        public String visitBooleanLiteralFilter(Void aVoid, boolean value) {
+            if (value) {
+                return null;
+            } else {
+                throw new UnsupportedOperationException("Boolean literal 'false' is not supported");
+            }
+        }
+
+        @Override
+        public String visitContainsFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
+            throw new UnsupportedOperationException("Contains is not supported");
+        }
+
+        @Override
+        public String visitEqualsFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
+            if ("_id".equalsIgnoreCase(field.leaf())) {
+                if (!(valueAssertion instanceof String)) {
+                    throw new IllegalArgumentException("Invalid value assertion type: "
+                            + valueAssertion.getClass().getSimpleName());
+                }
+                return (String) valueAssertion;
+            }
+            throw new UnsupportedOperationException("Equals is not supported");
+        }
+
+        @Override
+        public String visitExtendedMatchFilter(Void aVoid, JsonPointer field, String operator, Object valueAssertion) {
+            throw new UnsupportedOperationException("Extended match is not supported");
+        }
+
+        @Override
+        public String visitGreaterThanFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
+            throw new UnsupportedOperationException("Greater than is not supported");
+        }
+
+        @Override
+        public String visitGreaterThanOrEqualToFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
+            throw new UnsupportedOperationException("Greater than or equal to is not supported");
+        }
+
+        @Override
+        public String visitLessThanFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
+            throw new UnsupportedOperationException("Less than is not supported");
+        }
+
+        @Override
+        public String visitLessThanOrEqualToFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
+            throw new UnsupportedOperationException("Less than or equal to is not supported");
+        }
+
+        @Override
+        public String visitNotFilter(Void aVoid, QueryFilter subFilter) {
+            throw new UnsupportedOperationException("Not is not supported");
+        }
+
+        @Override
+        public String visitOrFilter(Void aVoid, List<QueryFilter> subFilters) {
+            throw new UnsupportedOperationException("Or is not supported");
+        }
+
+        @Override
+        public String visitPresentFilter(Void aVoid, JsonPointer field) {
+            throw new UnsupportedOperationException("Present is not supported");
+        }
+
+        @Override
+        public String visitStartsWithFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
+            throw new UnsupportedOperationException("Starts with is not supported");
+        }
     }
 }

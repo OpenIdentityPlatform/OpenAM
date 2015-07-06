@@ -71,8 +71,8 @@ define('config/routes/admin/RealmsRoutes', function () {
         'realmsAuthenticationModuleEdit': {
             view: 'org/forgerock/openam/ui/admin/views/realms/RealmView',
             page: 'org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditModuleView',
-            url: scopedByRealm('authentication\/modules\/([^\/]+)'),
-            pattern: 'realms/?/authentication/modules/?',
+            url: scopedByRealm('authentication\/modules\/([^\/]+)\/([^\/]+)'),
+            pattern: 'realms/?/authentication/modules/?/?',
             role: 'ui-admin'
         },
         'realmsServices': {

@@ -197,7 +197,7 @@ abstract class SmsResourceProvider {
         }
     }
 
-    private boolean isDefaultCreatedAuthModule(ServerContext context, String resourceId) throws SSOException,
+    boolean isDefaultCreatedAuthModule(ServerContext context, String resourceId) throws SSOException,
             SMSException {
         String lastedMatchedUri = context.asContext(RouterContext.class).getMatchedUri();
         return AMAuthenticationManager.getAuthenticationServiceNames().contains(serviceName)

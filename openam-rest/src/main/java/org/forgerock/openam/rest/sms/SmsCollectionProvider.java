@@ -133,7 +133,11 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
             ServiceConfigManager scm = getServiceConfigManager(context);
             ServiceConfig config = parentSubConfigFor(context, scm);
             checkedInstanceSubConfig(context, resourceId, config);
-            config.removeSubConfig(resourceId);
+            if (isDefaultCreatedAuthModule(context, resourceId)) {
+                scm.removeOrganizationConfiguration(realmFor(context), null);
+            } else {
+                config.removeSubConfig(resourceId);
+            }
 
             Resource resource = new Resource(resourceId, "0", json(object(field("success", true))));
             handler.handleResult(resource);

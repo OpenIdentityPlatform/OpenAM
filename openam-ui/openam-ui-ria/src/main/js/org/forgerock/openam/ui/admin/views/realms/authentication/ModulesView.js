@@ -57,17 +57,18 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
                                 if (self.addModuleDialogValidation(dialog)) {
                                     var moduleName = dialog.getModalBody().find("#newModuleName").val(),
                                         moduleType = dialog.getModalBody().find("#newModuleType").val();
-                                    SMSRealmDelegate.authentication.modules.has(self.data.realmPath, moduleName).done(function(result) {
-                                        if (result) {
+                                    SMSRealmDelegate.authentication.modules.exists(self.data.realmPath, moduleName).done(function(result) {
+                                        if (!result) {
                                             SMSRealmDelegate.authentication.modules.create(self.data.realmPath, {
-                                                _id: moduleName,
-                                                type: moduleType
-                                            }).done(function() {
+                                                _id: moduleName
+                                            }, moduleType).done(function() {
                                                 dialog.close();
                                                 Router.routeTo(Router.configuration.routes.realmsAuthenticationModuleEdit, {
-                                                    args: [encodeURIComponent(self.data.realmPath), encodeURIComponent(moduleName)],
+                                                    args: [encodeURIComponent(self.data.realmPath), encodeURIComponent(moduleName), encodeURIComponent(moduleType)],
                                                     trigger: true
                                                 });
+                                            }).fail(function(error) {
+                                                //TODO
                                             });
                                         } else {
                                             MessageManager.messages.addMessage({
@@ -123,25 +124,25 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
         },
         deleteModule: function(event) {
             var self = this,
-                moduleName = $(event.currentTarget).attr("data-module-name");
+                moduleName = $(event.currentTarget).attr("data-module-name"),
+                moduleType = $(event.currentTarget).attr("data-module-type");
 
-            SMSRealmDelegate.authentication.modules.remove(moduleName).done(function() {
-                self.renderModulesTab();
+            SMSRealmDelegate.authentication.modules.remove(self.data.realmPath, moduleName, moduleType).done(function() {
+                $(event.currentTarget).parents("tr").remove();
             }).fail(function() {
                 // TODO: Add failure condition
             });
         },
         deleteModules: function() {
             var self = this,
-                moduleNames = self.$el.find("input[type=checkbox]:checked").toArray().map(function(element) {
-                    return $(element).attr("data-module-name");
-                }),
-                promises = moduleNames.map(function(name) {
-                    return SMSRealmDelegate.authentication.modules.remove(name);
+                promises = self.$el.find("input[type=checkbox]:checked").toArray().map(function(element) {
+                    var name = element.dataset.moduleName,
+                        type = element.dataset.moduleType;
+                    return SMSRealmDelegate.authentication.modules.remove(self.data.realmPath, name, type);
                 });
 
-            $.when(promises).done(function() {
-                self.render();
+            $.when(promises).then(function() {
+                self.render(self.data.args);
             }).fail(function() {
                 // TODO: Add failure condition
             });
@@ -149,6 +150,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
         render: function(args, callback) {
             var self = this;
 
+            this.data.args = args;
             this.data.realmPath = args[0];
 
             SMSRealmDelegate.authentication.modules.all(this.data.realmPath).done(function(data) {

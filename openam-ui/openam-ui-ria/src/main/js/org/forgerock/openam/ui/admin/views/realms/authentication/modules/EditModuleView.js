@@ -23,9 +23,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
+    "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/utils/FormHelper"
-], function ($, AbstractView, Configuration, EventManager, Router, Constants, SMSRealmDelegate, Form, FormHelper) {
+], function ($, AbstractView, Configuration, EventManager, Router, Constants, SMSRealmDelegate, SMSGlobalDelegate, Form, FormHelper) {
     var EditModuleView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/modules/EditModuleViewTemplate.html",
         events: {
@@ -37,13 +38,22 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
             var self = this;
 
             this.data.realmPath = args[0];
+            this.data.name = args[1];
+            this.data.type = args[2];
 
-            // FIXME: Module service needs to know the module type. How to get that info into this view?
-            SMSRealmDelegate.authentication.modules.get(this.data.realmPath, args[1]).done(function (data) {
-                self.data.formData = data;
+            $.when(
+                SMSGlobalDelegate.authentication.modules.schema(args[2]),
+                SMSRealmDelegate.authentication.modules.get(this.data.realmPath, args[1], args[2])
+            ).done(function (schemaData, valuesData) {
+                self.data.schemaData = schemaData[0];
+                self.data.valuesData = valuesData[0];
                 self.parentRender(function () {
                     self.$el.find('ul.nav a:first').tab('show');
                     self.$el.find('.tab-menu .nav-tabs').tabdrop();
+
+                    //TODO either add this to the server generated schema (preferred) or this get's moved into the JS sanitising functions for JSON Schemas
+                    self.data.schemaData.type = "object";
+                    self.data.form = new Form(self.$el.find("#moduleContent")[0], self.data.schemaData, self.data.valuesData);
 
                     if (callback) {
                         callback();
@@ -54,7 +64,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
             });
         },
         save: function (event) {
-            var promise = SMSRealmDelegate.authentication.modules.update(this.data.form.data());
+            var promise = SMSRealmDelegate.authentication.modules.update(this.data.realmPath,
+                                                                         this.data.name,
+                                                                         this.data.type,
+                                                                         this.data.form.data());
             FormHelper.bindSavePromiseToElement(promise, event.target);
         },
         revert: function () {
@@ -62,11 +75,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
         },
         renderTab: function (event) {
             var tabId = $(event.target).attr("href"),
-                schema = this.data.formData.schema.properties[tabId.slice(1)],
                 element = $(tabId).get(0);
 
             this.$el.find(tabId).empty();
-            this.data.form = new Form(element, schema, this.data.formData.values);
+            //TODO either add this to the server generated schema (preferred) or this get's moved into the JS sanitising functions for JSON Schemas
+            this.data.schemaData.type = "object";
+            this.data.form = new Form(element, this.data.schemaData, this.data.valuesData);
         }
 
     });

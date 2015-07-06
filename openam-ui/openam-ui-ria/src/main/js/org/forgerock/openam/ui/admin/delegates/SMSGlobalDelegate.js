@@ -123,6 +123,22 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
         }
     };
 
+    obj.authentication = {
+        modules: {
+            /**
+             * Gets the schema for a authentication module type.
+             * @param type Authentication module type
+             * @returns {Promise} Service promise
+             */
+            schema: function(type) {
+                return obj.serviceCall({ url: "authentication/modules/" + type + "?_action=schema", type: "POST" })
+                    .done(function(data) {
+                        data = SMSDelegateUtils.sanitizeSchema(data);
+                    });
+            }
+        }
+    };
+
     obj.scripts = {
         /**
          * Gets all script's contexts.

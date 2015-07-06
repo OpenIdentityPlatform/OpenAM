@@ -73,5 +73,11 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils", [
         }
     };
 
+    obj.sortResultBy = function (attribute) {
+        return function(data) {
+            data.result = _.sortBy(data.result, attribute);
+        };
+    };
+
     return obj;
 });
