@@ -19,11 +19,11 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
     "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
+    "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkView",
     "org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostProcessView",
-    "org/forgerock/openam/ui/admin/utils/FormHelper"
-], function($, _, AbstractView, SMSRealmDelegate, LinkView, PostProcessView, FormHelper) {
+    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate"
+], function($, _, AbstractView, FormHelper, LinkView, PostProcessView, SMSRealmDelegate) {
     var EditChainView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/chains/EditChainTemplate.html",
         events: {
@@ -94,13 +94,15 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             this.data.chainData.loginSuccessUrl[0] = this.$el.find('#loginSuccessUrl').val();
             this.data.chainData.loginFailureUrl[0] = this.$el.find('#loginFailureUrl').val();
 
-            promise = SMSRealmDelegate.authentication.chains.update(this.data.realmPath, this.data.chainData._id, this.data.chainData);
-            promise.fail(function(e) {
-                // TODO: Add failure condition
-                console.error(e);
+            PostProcessView.addClassNameDialog().done(function(){
+                promise = SMSRealmDelegate.authentication.chains.update(self.data.realmPath, self.data.chainData._id, self.data.chainData);
+                promise.fail(function(e) {
+                    // TODO: Add failure condition
+                    console.error(e);
+                });
+                FormHelper.bindSavePromiseToElement(promise, e.target);
             });
 
-            FormHelper.bindSavePromiseToElement(promise, event.target);
         },
 
         addModuleLink: function(e) {

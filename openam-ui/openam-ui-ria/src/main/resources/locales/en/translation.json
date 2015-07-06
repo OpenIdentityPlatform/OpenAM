@@ -579,7 +579,14 @@
                 "failUrl" : "Failed Login URL",
                 "addUrl" : "Add URL",
                 "dropHere" : "Drop here",
-                "processingClass": "Post Authentication Processing Class",
+                "processingClass": {
+                    "title": "Post Authentication Processing Class",
+                    "className": "Class Name",
+                    "addClassNameDialog": {
+                        "title": "Add new Class Name",
+                        "message": "New Class Name \"__newClassName__\" for Post Authentication Processing Class has not been saved. Do you want to save it?"
+                    }
+                },
                 "criteria" : ["Required","Optional","Requisite","Sufficient"]
             }
         },

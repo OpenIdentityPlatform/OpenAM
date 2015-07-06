@@ -19,8 +19,9 @@
 define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostProcessView", [
     "jquery",
     "underscore",
-    "org/forgerock/commons/ui/common/main/AbstractView"
-], function($, _, AbstractView) {
+    "org/forgerock/commons/ui/common/main/AbstractView",
+    "bootstrap-dialog"
+], function($, _, AbstractView, BootstrapDialog) {
 
     var PostProcessView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/chains/PostProcessTemplate.html",
@@ -47,6 +48,43 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostPro
 
         change: function(e){
             this.$el.find('#addBtn').prop('disabled', (e.currentTarget.value.length === 0));
+        },
+
+        addClassNameDialog: function(){
+            var self = this,
+                promise = $.Deferred(),
+                newProcessClass = this.$el.find('#newProcessClass').val().trim();
+            if (newProcessClass === "") {
+                self.$el.find('#newProcessClass').val("");
+                promise.resolve();
+            } else {
+                BootstrapDialog.show({
+                    title: $.t("console.authentication.editChains.processingClass.addClassNameDialog.title"),
+                    message: $.t("console.authentication.editChains.processingClass.addClassNameDialog.message", { newClassName: newProcessClass }),
+                    closable: false,
+                    buttons: [
+                        {
+                            id: "btnOk",
+                            label: $.t("common.form.ok"),
+                            cssClass: "btn-primary",
+                            action: function (dialog) {
+                                self.add();
+                                dialog.close();
+                                promise.resolve();
+                            }
+                        },
+                        {
+                            label: $.t("common.form.cancel"),
+                            action: function (dialog) {
+                                self.$el.find('#newProcessClass').val("");
+                                dialog.close();
+                                promise.resolve();
+                            }
+                        }
+                    ]
+                });
+            }
+            return promise;
         },
 
         render: function (chainData) {
