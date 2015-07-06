@@ -24,10 +24,7 @@
  *
  * $Id: ShutdownManager.java,v 1.7 2008/10/04 00:36:44 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.common;
 
@@ -38,6 +35,8 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.thread.listener.ShutdownPriority;
+
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * ShutdownManager is a static instance which is used to trigger all the
@@ -206,13 +205,10 @@ public final class ShutdownManager implements org.forgerock.util.thread.listener
         if (acquireValidLock()) {
             try {
                 shutdownCalled = true;
-                List priorities = ShutdownPriority.getPriorities();
-                for (Iterator i = priorities.iterator(); i.hasNext();) {
-                    int index = ((ShutdownPriority) i.next()).getIntValue();
-                    for (Iterator j = listeners[index - 1].iterator();
-                        j.hasNext();) {
-                        ShutdownListener element = (ShutdownListener) j.next();
-                        element.shutdown();
+                List<ShutdownPriority> priorities = ShutdownPriority.getPriorities();
+                for (ShutdownPriority i : priorities) {
+                    for (Iterator<ShutdownListener> j = listeners[i.getIntValue() - 1].iterator(); j.hasNext(); ) {
+                        j.next().shutdown();
                         // remove the components which have been shutdown to avoid
                         // problem when the shutdown function is called twice.
                         j.remove();
@@ -223,6 +219,9 @@ public final class ShutdownManager implements org.forgerock.util.thread.listener
                     appSSOTokenDestroyer = null;
                 }
                 instance = null;
+            } catch (RuntimeException t) {
+                Debug.getInstance("amUtil").error("Error during shutdown", t);
+                throw t;
             } finally {
                 releaseLockAndNotify();
             }

@@ -203,6 +203,7 @@ public class EventService {
     public synchronized void stopPSearches() {
         isShutdownCalled = true;
         for (ListenerSearch pSearch : persistentSearches.values()) {
+            pSearch.search.removeListener(pSearch.listener);
             pSearch.search.stopSearch();
         }
     }

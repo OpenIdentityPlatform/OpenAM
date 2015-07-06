@@ -28,8 +28,11 @@
  */
 package com.sun.identity.sm.ldap;
 
+import static com.sun.identity.shared.Constants.LDAP_CONN_IDLE_TIME_IN_SECS;
+
 import java.util.concurrent.TimeUnit;
 
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.Connections;
@@ -43,7 +46,6 @@ import com.iplanet.services.ldap.LDAPServiceException;
 import com.iplanet.services.ldap.LDAPUser;
 import com.iplanet.services.ldap.ServerGroup;
 import com.iplanet.services.ldap.ServerInstance;
-import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 
 /**
@@ -166,9 +168,11 @@ class SMDataLayer {
             debug.message("SMDataLayer:initLdapPool(): Creating ldap connection pool with: poolMin {} poolMax {}",
                     poolMin, poolMax);
 
-            int idleTimeout = SystemProperties.getAsInt(Constants.LDAP_CONN_IDLE_TIME_IN_SECS, 0);
-            if (idleTimeout == 0) {
-                debug.error("LDAPConnectionPools: Idle timeout could not be parsed, connection reaping is disabled");
+            int idleTimeout = SystemProperties.getAsInt(LDAP_CONN_IDLE_TIME_IN_SECS, 0);
+            if (idleTimeout == 0 && StringUtils.isNotBlank(SystemProperties.get(LDAP_CONN_IDLE_TIME_IN_SECS))) {
+                debug.error("SMDataLayer: Idle timeout could not be parsed, connection reaping is disabled");
+            } else if (idleTimeout == 0) {
+                debug.error("SMDataLayer: Idle timeout is set to 0 - connection reaping is disabled");
             }
             _ldapPool = Connections.newCachedConnectionPool(baseFactory, poolMin, poolMax,
                     idleTimeout, TimeUnit.SECONDS);

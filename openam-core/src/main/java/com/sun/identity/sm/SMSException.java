@@ -149,7 +149,7 @@ public class SMSException extends Exception implements L10NMessage {
      *            Key to resource bundle.
      */
     public SMSException(Throwable t, String errorCode) {
-        // super(t); (can be used with JDK 1.4 and higher)
+        super(t);
         rootCause = t;
         this.errorCode = errorCode;
         this.message = getL10NMessage(java.util.Locale.ENGLISH);
@@ -168,7 +168,7 @@ public class SMSException extends Exception implements L10NMessage {
      *            Key to resource bundle.
      */
     public SMSException(String message, Throwable t, String errorCode) {
-        // super(message, t); (can be used with JDK 1.4 and higher)
+        super(message, t);
         rootCause = t;
         this.errorCode = errorCode;
         this.message = message + ": " +
@@ -192,7 +192,7 @@ public class SMSException extends Exception implements L10NMessage {
      */
     public SMSException(String rbName, String message, Throwable t,
             String errorCode) {
-        // super(message, t); (can be used with JDK 1.4 and higher)
+        super(message, t);
         rootCause = t;
         this.errorCode = errorCode;
         this.bundleName = rbName;
