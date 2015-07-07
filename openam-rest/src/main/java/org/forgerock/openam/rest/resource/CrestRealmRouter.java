@@ -123,6 +123,8 @@ public class CrestRealmRouter extends CrestRouter<CrestRealmRouter> implements V
         }
     }
 
+    private static final String NO_ORGANISATION_MAPPING_FOUND_ERROR_CODE = "401";
+
     private boolean getRealmFromServerName(ServerContext context, RealmContext realmContext)
             throws InternalServerErrorException, BadRequestException {
         String serverName = URI.create(context.asContext(HttpContext.class).getPath()).getHost();
@@ -133,7 +135,11 @@ public class CrestRealmRouter extends CrestRouter<CrestRealmRouter> implements V
             realmContext.addDnsAlias(serverName, realmPath);
             return true;
         } catch (IdRepoException e) {
-            throw new InternalServerErrorException(e);
+            if (NO_ORGANISATION_MAPPING_FOUND_ERROR_CODE.equals(e.getErrorCode())) {
+                return true;
+            } else {
+                throw new InternalServerErrorException(e);
+            }
         } catch (SSOException e) {
             throw new InternalServerErrorException(e);
         }
