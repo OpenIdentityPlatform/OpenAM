@@ -29,9 +29,7 @@
 
 package com.sun.identity.console.task;
 
-import static com.sun.identity.console.XuiRedirectHelper.isJatoSessionRequestFromXUI;
-import static com.sun.identity.console.XuiRedirectHelper.isXuiAdminConsoleEnabled;
-import static com.sun.identity.console.XuiRedirectHelper.redirectToXui;
+import static com.sun.identity.console.XuiRedirectHelper.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -69,7 +67,8 @@ public class HomeViewBean
     @Override
     public void beginDisplay(DisplayEvent event) throws ModelControlException {
         if (!isJatoSessionRequestFromXUI(getRequestContext().getRequest()) && isXuiAdminConsoleEnabled()) {
-            redirectToXui((String) getPageSessionAttribute(AMAdminConstants.CURRENT_PROFILE), "realms");
+            String redirectRealm = getRedirectRealm(this);
+            redirectToXui(getRequestContext().getRequest(), redirectRealm, "realms");
         }
     }
 }

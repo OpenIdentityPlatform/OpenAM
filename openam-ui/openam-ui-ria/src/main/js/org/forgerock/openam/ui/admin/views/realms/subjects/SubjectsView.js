@@ -22,7 +22,7 @@ define('org/forgerock/openam/ui/admin/views/realms/subjects/SubjectsView', [
     var SubjectsView = AbstractView.extend({
         template: 'templates/admin/views/realms/subjects/SubjectsTemplate.html',
         render: function (args, callback) {
-            RedirectToLegacyConsole.realm.subjects();
+            RedirectToLegacyConsole.realm.subjects(args[0]);
         }
     });
 

@@ -28,9 +28,7 @@
  */
 package com.sun.identity.console.realm;
 
-import static com.sun.identity.console.XuiRedirectHelper.isJatoSessionRequestFromXUI;
-import static com.sun.identity.console.XuiRedirectHelper.isXuiAdminConsoleEnabled;
-import static com.sun.identity.console.XuiRedirectHelper.redirectToXui;
+import static com.sun.identity.console.XuiRedirectHelper.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -132,7 +130,8 @@ public class RMRealmViewBean
 
     public void beginDisplay(DisplayEvent event) throws ModelControlException {
         if (!isJatoSessionRequestFromXUI(getRequestContext().getRequest()) && isXuiAdminConsoleEnabled()) {
-            redirectToXui((String) getPageSessionAttribute(AMAdminConstants.CURRENT_PROFILE), "realms/");
+            String redirectRealm = getRedirectRealm(this);
+            redirectToXui(getRequestContext().getRequest(), redirectRealm, "realms/");
             return;
         }
         super.beginDisplay(event);
@@ -168,8 +167,7 @@ public class RMRealmViewBean
         }
 
         try {
-            String curRealm = (String)getPageSessionAttribute(
-                AMAdminConstants.CURRENT_REALM);
+            String curRealm = (String)getPageSessionAttribute(AMAdminConstants.CURRENT_REALM);
             populateTableModel(model.getRealmNames(curRealm, filter));
         } catch (AMConsoleException e) {
             setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error",

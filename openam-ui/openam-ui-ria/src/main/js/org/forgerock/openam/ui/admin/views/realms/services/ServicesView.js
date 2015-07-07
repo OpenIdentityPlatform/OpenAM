@@ -22,7 +22,7 @@ define('org/forgerock/openam/ui/admin/views/realms/services/ServicesView', [
     var ServicesView = AbstractView.extend({
         template: 'templates/admin/views/realms/services/ServicesTemplate.html',
         render: function (args, callback) {
-            RedirectToLegacyConsole.realm.services();
+            RedirectToLegacyConsole.realm.services(args[0]);
         }
     });
 

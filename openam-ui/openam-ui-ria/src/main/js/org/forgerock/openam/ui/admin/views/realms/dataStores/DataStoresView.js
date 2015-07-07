@@ -22,7 +22,7 @@ define('org/forgerock/openam/ui/admin/views/realms/dataStores/DataStoresView', [
     var DataStoresView = AbstractView.extend({
         template: 'templates/admin/views/realms/dataStores/DataStoresTemplate.html',
         render: function (args, callback) {
-            RedirectToLegacyConsole.realm.dataStores();
+            RedirectToLegacyConsole.realm.dataStores(args[0]);
         }
     });
 

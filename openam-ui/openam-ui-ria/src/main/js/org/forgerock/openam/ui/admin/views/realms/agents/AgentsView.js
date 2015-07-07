@@ -22,7 +22,7 @@ define('org/forgerock/openam/ui/admin/views/realms/agents/AgentsView', [
     var AgentsView = AbstractView.extend({
         template: 'templates/admin/views/realms/agents/AgentsTemplate.html',
         render: function (args, callback) {
-            RedirectToLegacyConsole.realm.agents();
+            RedirectToLegacyConsole.realm.agents(args[0]);
         }
     });
 

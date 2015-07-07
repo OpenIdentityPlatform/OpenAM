@@ -31,6 +31,7 @@
 package com.sun.identity.console.authentication;
 
 
+import static com.sun.identity.console.XuiRedirectHelper.getRedirectRealm;
 import static com.sun.identity.console.XuiRedirectHelper.isXuiAdminConsoleEnabled;
 import static com.sun.identity.console.XuiRedirectHelper.redirectToXui;
 
@@ -195,9 +196,9 @@ public  class AuthPropertiesViewBean
     public void beginDisplay(DisplayEvent event) throws ModelControlException {
         if (isXuiAdminConsoleEnabled()) {
             try {
-                String redirectRealm = (String) getPageSessionAttribute(AMAdminConstants.CURRENT_PROFILE);
-                redirectToXui(redirectRealm, MessageFormat.format("realms/{0}/authentication",
-                        URLEncoder.encode(redirectRealm, "UTF-8")));
+                String redirectRealm = getRedirectRealm(this);
+                redirectToXui(getRequestContext().getRequest(), redirectRealm,
+                        MessageFormat.format("realms/{0}/authentication", URLEncoder.encode(redirectRealm, "UTF-8")));
             } catch (UnsupportedEncodingException e) {
                 throw new IllegalStateException("UTF-8 encoding not supported", e);
             }

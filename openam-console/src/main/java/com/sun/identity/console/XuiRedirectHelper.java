@@ -24,8 +24,11 @@ import com.iplanet.am.util.SystemProperties;
 import com.iplanet.jato.CompleteRequestException;
 import com.iplanet.jato.RequestContext;
 import com.iplanet.jato.RequestManager;
+import com.iplanet.jato.view.ViewBeanBase;
+import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.shared.Constants;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.xui.XUIState;
 
 /**
@@ -44,12 +47,13 @@ public final class XuiRedirectHelper {
     /**
      * Redirects to the XUI to the specified realm and hash.
      *
+     * @param request Used to determine the OpenAM deployment URI.
      * @param redirectRealm The realm.
      * @param xuiHash The XUI location hash.
      */
-    public static void redirectToXui(String redirectRealm, String xuiHash) {
-        String deploymentUri = SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
-
+    public static void redirectToXui(HttpServletRequest request, String redirectRealm, String xuiHash) {
+        String deploymentUri = InjectorHolder.getInstance(BaseURLProviderFactory.class).get(redirectRealm)
+                .getURL(request);
         String redirect;
         if (!"/".equals(redirectRealm)) {
             redirect = MessageFormat.format(XUI_CONSOLE_BASE_PAGE, deploymentUri,
@@ -65,6 +69,20 @@ public final class XuiRedirectHelper {
         } catch (IOException e) {
             //never thrown, empty catch
         }
+    }
+
+    /**
+     * Gets the realm to redirect to from the JATO page session.
+     *
+     * @param viewBean The view bean.
+     * @return The redirect realm.
+     */
+    public static String getRedirectRealm(ViewBeanBase viewBean) {
+        String redirectRealm = (String) viewBean.getPageSessionAttribute(AMAdminConstants.CURRENT_REALM);
+        if (redirectRealm == null) {
+            redirectRealm = (String) viewBean.getPageSessionAttribute(AMAdminConstants.CURRENT_PROFILE);
+        }
+        return redirectRealm;
     }
 
     /**

@@ -29,7 +29,7 @@ define('org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole', [
         configuration: function () { obj.global.redirectToTab(4); },
         sessions     : function () { obj.global.redirectToTab(5); },
         redirectToTab: function (tabIndex) {
-            obj.getJATOPageSession().done(function (session) {
+            obj.getJATOPageSession('/').done(function (session) {
                 window.location.href = '/' + Constants.context + '/task/Home?' +
                 'Home.tabCommon.TabHref=' + tabIndex +
                 '&jato.pageSession=' + session + '&requester=XUI';
@@ -42,20 +42,25 @@ define('org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole', [
         window.location.href = '/' + Constants.context + '/' + link + query + 'realm=' + encodeURIComponent(realm);
     };
 
+    var redirector = function (tab) {
+        return function (realm) {
+            obj.realm.redirectToTab(tab, realm);
+        };
+    };
+
     obj.realm = {
-        general       : function () { obj.realm.redirectToTab(11); },
-        authentication: function () { obj.realm.redirectToTab(12); },
-        services      : function () { obj.realm.redirectToTab(13); },
-        dataStores    : function () { obj.realm.redirectToTab(14); },
-        privileges    : function () { obj.realm.redirectToTab(15); },
-        policies      : function () { obj.realm.redirectToTab(16); },
-        subjects      : function () { obj.realm.redirectToTab(17); },
-        agents        : function () { obj.realm.redirectToTab(18); },
-        sts           : function () { obj.realm.redirectToTab(19); },
-        scripts       : function () { obj.realm.redirectToTab(20); },
-        redirectToTab : function (tabIndex) {
-            obj.getJATOPageSession().done(function (session) {
-                var realm = Configuration.globalData.auth.subRealm || '/';
+        general       : redirector(11),
+        authentication: redirector(12),
+        services      : redirector(13),
+        dataStores    : redirector(14),
+        privileges    : redirector(15),
+        policies      : redirector(16),
+        subjects      : redirector(17),
+        agents        : redirector(18),
+        sts           : redirector(19),
+        scripts       : redirector(20),
+        redirectToTab : function (tabIndex, realm) {
+            obj.getJATOPageSession(realm).done(function (session) {
                 window.location.href = '/' + Constants.context + '/realm/RealmProperties?' +
                 'RMRealm.tblDataActionHref=' + realm +
                 '&RealmProperties.tabCommon.TabHref=' + tabIndex +
@@ -64,9 +69,9 @@ define('org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole', [
         }
     };
 
-    obj.getJATOPageSession = function () {
+    obj.getJATOPageSession = function (realm) {
         var promise = obj.serviceCall({
-            url: '/realm/RMRealm?RMRealm.tblDataActionHref=/&requester=XUI',
+            url: '/realm/RMRealm?RMRealm.tblDataActionHref=' + realm + '&requester=XUI',
             dataType: 'html'
         });
 

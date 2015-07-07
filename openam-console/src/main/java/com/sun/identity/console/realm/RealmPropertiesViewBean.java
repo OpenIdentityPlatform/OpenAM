@@ -29,9 +29,7 @@
 
 package com.sun.identity.console.realm;
 
-import static com.sun.identity.console.XuiRedirectHelper.isJatoSessionRequestFromXUI;
-import static com.sun.identity.console.XuiRedirectHelper.isXuiAdminConsoleEnabled;
-import static com.sun.identity.console.XuiRedirectHelper.redirectToXui;
+import static com.sun.identity.console.XuiRedirectHelper.*;
 
 import com.iplanet.jato.RequestManager;
 import com.iplanet.jato.RequestContext;
@@ -117,10 +115,10 @@ public class RealmPropertiesViewBean
 
     public void beginDisplay(DisplayEvent event) throws ModelControlException {
         if (!isJatoSessionRequestFromXUI(getRequestContext().getRequest()) && isXuiAdminConsoleEnabled()) {
-            String redirectRealm = (String) getPageSessionAttribute(AMAdminConstants.CURRENT_PROFILE);
+            String redirectRealm = getRedirectRealm(this);
             try {
-                redirectToXui(redirectRealm, MessageFormat.format("realms/{0}/dashboard",
-                        URLEncoder.encode(redirectRealm, "UTF-8")));
+                redirectToXui(getRequestContext().getRequest(), redirectRealm,
+                        MessageFormat.format("realms/{0}/dashboard", URLEncoder.encode(redirectRealm, "UTF-8")));
             } catch (UnsupportedEncodingException e) {
                 throw new IllegalStateException("UTF-8 encoding not supported", e);
             }
