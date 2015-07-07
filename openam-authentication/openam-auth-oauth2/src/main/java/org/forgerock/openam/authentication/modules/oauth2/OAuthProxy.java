@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2011-2014 ForgeRock AS.
+ * Copyright © 2011-2015 ForgeRock AS.
  * Copyright 2011 Cybernetica AS.
  * 
  * The contents of this file are subject to the terms
@@ -80,6 +80,8 @@ public class OAuthProxy  {
             } else {
                 action += "?" + req.getQueryString();
             }
+
+            action = ESAPI.encoder().encodeForHTMLAttribute(action);
 
             String onLoad = "document.postform.submit()";
 
