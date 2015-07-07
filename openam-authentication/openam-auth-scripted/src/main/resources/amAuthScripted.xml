@@ -45,7 +45,7 @@
                 <AttributeSchema name="iplanet-am-auth-scripted-client-script"
                                  type="single_choice"
                                  uitype="scriptSelect"
-                                 propertiesViewBeanURL="../scripts/?realm={0}%23edit/{1}"
+                                 propertiesViewBeanURL="../XUI/%23realms/{0}/scripts/edit/{1}"
                                  syntax="string"
                                  i18nKey="a102"
                                  resourceName="clientScript">
@@ -64,7 +64,7 @@
                 <AttributeSchema name="iplanet-am-auth-scripted-server-script"
                                  type="single_choice"
                                  uitype="scriptSelect"
-                                 propertiesViewBeanURL="../scripts/?realm={0}%23edit/{1}"
+                                 propertiesViewBeanURL="../XUI/%23realms/{0}/scripts/edit/{1}"
                                  syntax="string"
                                  i18nKey="a104"
                                  resourceName="serverScript">
@@ -107,7 +107,7 @@
                     <AttributeSchema name="iplanet-am-auth-scripted-client-script"
                                      type="single_choice"
                                      uitype="scriptSelect"
-                                     propertiesViewBeanURL="../scripts/?realm={0}%23edit/{1}"
+                                     propertiesViewBeanURL="../XUI/%23realms/{0}/scripts/edit/{1}"
                                      syntax="string"
                                      i18nKey="a102"
                                      resourceName="clientScript">
@@ -126,7 +126,7 @@
                     <AttributeSchema name="iplanet-am-auth-scripted-server-script"
                                      type="single_choice"
                                      uitype="scriptSelect"
-                                     propertiesViewBeanURL="../scripts/?realm={0}%23edit/{1}"
+                                     propertiesViewBeanURL="../XUI/%23realms/{0}/scripts/edit/{1}"
                                      syntax="string"
                                      i18nKey="a104"
                                      resourceName="serverScript">

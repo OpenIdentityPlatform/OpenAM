@@ -72,7 +72,8 @@ public class ServiceConfigQueryFilterVisitor extends BaseQueryFilterVisitor<Bool
         if (!(valueAssertion instanceof String)) {
             return false;
         }
-        return StringUtils.contains(getMapAttr(getConfigData(serviceConfig), field), (String)valueAssertion);
+        return StringUtils.containsCaseInsensitive(getMapAttr(getConfigData(serviceConfig), field),
+                (String)valueAssertion);
     }
 
     @Override

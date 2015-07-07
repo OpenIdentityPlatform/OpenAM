@@ -69,7 +69,7 @@ public abstract class DynamicRequestViewBean extends AMPrimaryMastHeadViewBean {
      */
     public void handleCreateDynLinkRequest(RequestInvocationEvent event) {
         HttpServletRequest request = event.getRequestContext().getRequest();
-        handleDynamicLinkRequest(MessageFormat.format(request.getParameter("url"), getCurrentRealm(), ""));
+        handleDynamicLinkRequest(MessageFormat.format(request.getParameter("url"), getCurrentRealmEncoded(), ""));
     }
 
     /**
@@ -82,7 +82,7 @@ public abstract class DynamicRequestViewBean extends AMPrimaryMastHeadViewBean {
         HttpServletRequest request = event.getRequestContext().getRequest();
         String attrValue = CollectionHelper.getMapAttr(getAttributeValueMap(), request.getParameter("attrname"));
         attrValue = "[Empty]".equals(attrValue) ? "" : attrValue;
-        handleDynamicLinkRequest(MessageFormat.format(request.getParameter("url"), getCurrentRealm(), attrValue));
+        handleDynamicLinkRequest(MessageFormat.format(request.getParameter("url"), getCurrentRealmEncoded(), attrValue));
     }
 
     /**

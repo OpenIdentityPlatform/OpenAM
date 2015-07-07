@@ -16,9 +16,7 @@ if (validateAndInitializeParameters()) {
 
     if (countryFromUserAddress === countryFromUserIP && countryFromUserAddress === countryFromResourceURI) {
         logger.message("Authorization Succeeded");
-        var list = new java.util.ArrayList();
-        list.add(countryFromUserAddress);
-        responseAttributes.put("countryOfOrigin", list);
+        responseAttributes.put("countryOfOrigin", [countryFromUserAddress]);
         authorized = true;
     } else {
         logger.message("Authorization Failed");
@@ -62,7 +60,7 @@ function getCountryFromUserAddress() {
  * @returns {*} The country from which the request originated.
  */
 function getCountryFromUserIP() {
-    var response = httpClient.get("http://freegeoip.net/json/" + userIP, {
+    var response = httpClient.get("http://ip-api.com/json/" + userIP, {
         cookies: [],
         headers: []
     });
@@ -70,7 +68,7 @@ function getCountryFromUserIP() {
 
     var result = JSON.parse(response.getEntity());
     if (result) {
-        return result.country_name;
+        return result.country;
     }
 }
 
@@ -80,7 +78,7 @@ function getCountryFromUserIP() {
  * @returns {*} The country in which the resource is hosted.
  */
 function getCountryFromResourceURI() {
-    response = httpClient.get("http://freegeoip.net/json/" + encodeURIComponent(resourceHost), {
+    response = httpClient.get("http://ip-api.com/json/" + encodeURIComponent(resourceHost), {
         cookies: [],
         headers: []
     });
@@ -88,7 +86,7 @@ function getCountryFromResourceURI() {
 
     var result = JSON.parse(response.getEntity());
     if (result) {
-        return result.country_name;
+        return result.country;
     }
 }
 

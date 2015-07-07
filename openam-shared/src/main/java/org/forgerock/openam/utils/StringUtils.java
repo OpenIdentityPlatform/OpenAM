@@ -223,6 +223,19 @@ public final class StringUtils {
     }
 
     /**
+     * Check if one string contains another string in a case insensitive manner.
+     * @param s1 The string to check in.
+     * @param s2 The string to check for.
+     * @return False if either string is null or if the first does not contain the second, otherwise true.
+     */
+    public static boolean containsCaseInsensitive(String s1, String s2) {
+        if (s1 == null || s2 == null) {
+            return false;
+        }
+        return s1.toLowerCase().contains(s2.toLowerCase());
+    }
+
+    /**
      * Check if one string starts with another string.
      * @param s1 The string to check in.
      * @param s2 The string to check for.

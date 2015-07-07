@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 /*
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd.
@@ -22,6 +22,7 @@ package org.forgerock.openam.utils;
 import static org.fest.assertions.Assertions.assertThat;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Locale;
 
 import org.testng.annotations.Test;
 
@@ -117,5 +118,22 @@ public class StringUtilsTest {
         assertThat(StringUtils.getParameter("a=1,b=,c=5", ",", "b").size() == 0);
         assertThat(StringUtils.getParameter("a=1,b,c=5", ",", "b").size() == 0);
     }
+
+    @Test
+    public void shouldMatchCaseInsensitiveContains() {
+        assertThat(StringUtils.containsCaseInsensitive("Hello world", "WO")).isTrue();
+        assertThat(StringUtils.containsCaseInsensitive("HELLO world", "llo")).isTrue();
+        assertThat(StringUtils.containsCaseInsensitive("Hello world?", "O W")).isTrue();
+    }
+
+    @Test
+    public void shouldNotMatchCaseInsensitiveContains() {
+        assertThat(StringUtils.containsCaseInsensitive("Hello world", ".*ll.*")).isFalse();
+        assertThat(StringUtils.containsCaseInsensitive("Hello world", "AAA")).isFalse();
+        assertThat(StringUtils.containsCaseInsensitive("Hello world", "Hello world?")).isFalse();
+        assertThat(StringUtils.containsCaseInsensitive("AardVark", "[ardvk]+")).isFalse();
+    }
+
+
 
 }

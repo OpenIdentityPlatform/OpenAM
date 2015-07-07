@@ -71,10 +71,13 @@ import com.sun.web.ui.view.html.CCStaticTextField;
 import com.sun.web.ui.view.html.CCTextField;
 import com.sun.web.ui.view.table.CCActionTable;
 import com.sun.web.ui.common.CCI18N;
+
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URLEncoder;
 import java.rmi.server.UID;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -942,6 +945,21 @@ public abstract class AMViewBeanBase extends ConsoleViewBeanBase {
             setPageSessionAttribute(AMAdminConstants.CURRENT_REALM, curRealm);
         }
         return curRealm;
+    }
+
+    /**
+     * Get the current realm, UTF-8 encoded.
+     *
+     * @return The current realm encoded in UTF-8.
+     */
+    protected String getCurrentRealmEncoded() {
+        String currentRealm = getCurrentRealm();
+        try {
+            return URLEncoder.encode(currentRealm, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            debug.warning("Encoding not supported", e);
+            return currentRealm;
+        }
     }
 
     // this builds a display string only

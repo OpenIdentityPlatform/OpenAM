@@ -51,7 +51,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="defaultScript" type="single_choice" uitype="scriptSelect"
-                                     propertiesViewBeanURL="../scripts/?realm={0}%23edit/{1}" syntax="string"
+                                     propertiesViewBeanURL="../XUI/%23realms/{0}/scripts/edit/{1}" syntax="string"
                                      i18nKey="st103">
                         <ChoiceValues>
                             <ChoiceValuesClassName

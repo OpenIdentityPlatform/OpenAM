@@ -15,21 +15,17 @@
  */
 package com.sun.identity.console.scripts;
 
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.jato.CompleteRequestException;
+import static com.sun.identity.console.XuiRedirectHelper.redirectToXui;
+
 import com.iplanet.jato.RequestContext;
 import com.iplanet.jato.RequestManager;
 import com.iplanet.jato.view.event.DisplayEvent;
-import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.base.model.AMModelBase;
 import com.sun.identity.console.realm.HasEntitiesTabs;
 import com.sun.identity.console.realm.RealmPropertiesBase;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.text.MessageFormat;
 
 /**
@@ -39,12 +35,6 @@ import java.text.MessageFormat;
 public class ScriptsViewBean extends RealmPropertiesBase implements HasEntitiesTabs {
 
     public static final String DEFAULT_DISPLAY_URL = "/console/scripts/Scripts.jsp";
-
-    public static final String ROOT_REALM = "/";
-    public static final String SCRIPTS_EDITOR = "{0}/scripts/{1}#list";
-    public static final String SCRIPTS_REALM = "?realm={0}";
-
-    private static final Debug debug = Debug.getInstance("amConsole");
 
     /**
      * Creates a scripts view bean.
@@ -70,29 +60,7 @@ public class ScriptsViewBean extends RealmPropertiesBase implements HasEntitiesT
      * @param event The display event.
      */
     public void beginDisplay(DisplayEvent event) {
-
-        String redirectRealm = (String) getPageSessionAttribute(AMAdminConstants.CURRENT_REALM);
-        String deploymentUri = SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
-
-        String redirect;
-        if (!ROOT_REALM.equals(redirectRealm)) {
-            redirect = MessageFormat.format(SCRIPTS_EDITOR, deploymentUri,
-                        MessageFormat.format(SCRIPTS_REALM, redirectRealm));
-        } else {
-            redirect = MessageFormat.format(SCRIPTS_EDITOR, deploymentUri, "");
-        }
-
-        RequestContext rc = RequestManager.getRequestContext();
-        try {
-            rc.getResponse().sendRedirect(redirect);
-
-            // throwing this exception here causes the redirect to occur.  This is more appropriate for error
-            // handling, but it works, so we use it.
-            //
-            throw new CompleteRequestException();
-        } catch (IOException e) {
-            debug.warning("ScriptsViewBean.beginDisplay unexpectedly caught exception", e);
-        }
+        redirectToXui(getCurrentRealm(), MessageFormat.format("realms/{0}/scripts/list", getCurrentRealmEncoded()));
     }
 
     @Override
