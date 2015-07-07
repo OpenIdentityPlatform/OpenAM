@@ -103,6 +103,50 @@
   </variablelist>
  </refsect1>
  <refsect1>
+  <title>JVM Properties for ssoadm</title>
+   <para>
+     You can specifically set the authentication module or chain for administrator
+     logins using two JVM settings. These settings provide more control to select
+     the exact authentication mechanisms to be used when
+     <command>ssoadm</command> authenticates administrators in the top-level realm.
+    </para>
+    <para>
+     To set these properties, manually edit the following two JVM settings in the
+     <command>ssoadm</command> or <command>ssoadm.bat</command> script.
+    </para>
+   <variablelist>
+     <varlistentry>
+      <term>
+       <literal>org.forgerock.openam.ssoadm.auth.indexType</literal>
+      </term>
+      <listitem>
+       <para>
+        Specifies the module or chain-based authentication in
+        the top level realm.
+        If the property is set, OpenAM uses only <emphasis>that</emphasis>
+        authentication mechanism.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>
+       <literal>org.forgerock.openam.ssoadm.auth.indexName</literal>
+      </term>
+      <listitem>
+       <para>
+        Specifies the actual name of the authentication module/chain as
+        controlled by the <literal>indexName</literal> setting. For example, if the
+        <literal>indexType</literal> is set to <literal>module_instance</literal> 
+        and <literal>indexName</literal> is set to <literal>LDAP</literal>, then
+        <command>ssoadm</command> authenticates
+        using the LDAP authentication module.
+       </para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+ </refsect1>
+
+ <refsect1>
   <title>Subcommands: By Category</title>
   <para>This section lists subcommands by category. The subsequent section
   lists subcommands in alphabetical order with a short description.</para>
