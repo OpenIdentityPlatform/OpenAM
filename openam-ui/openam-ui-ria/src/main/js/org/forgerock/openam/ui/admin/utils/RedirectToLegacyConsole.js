@@ -21,7 +21,12 @@ define('org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole', [
     'org/forgerock/commons/ui/common/main/Configuration',
     'org/forgerock/commons/ui/common/util/Constants'
 ], function ($, AbstractDelegate, Configuration, Constants) {
-    var obj = new AbstractDelegate(Constants.host + '/' + Constants.context);
+    var obj = new AbstractDelegate(Constants.host + '/' + Constants.context),
+        redirector = function (tab) {
+            return function (realm) {
+                obj.realm.redirectToTab(tab, realm);
+            };
+        };
 
     obj.global = {
         accessControl: function () { obj.global.redirectToTab(1); },
@@ -40,12 +45,6 @@ define('org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole', [
     obj.commonTasks = function (realm, link) {
         var query = link.indexOf('?') === -1 ? '?' : '&';
         window.location.href = '/' + Constants.context + '/' + link + query + 'realm=' + encodeURIComponent(realm);
-    };
-
-    var redirector = function (tab) {
-        return function (realm) {
-            obj.realm.redirectToTab(tab, realm);
-        };
     };
 
     obj.realm = {
