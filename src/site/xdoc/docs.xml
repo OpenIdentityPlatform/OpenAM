@@ -74,6 +74,12 @@
      <a href="./doc/OpenAM-Dev-Guide.pdf">PDF</a>
     </dd>
 
+    <dt>OpenAM Deployment Planning Guide</dt>
+    <dd>
+     <a href="./doc/bootstrap/deployment-planning/index.html">HTML</a>,
+     <a href="./doc/OpenAM-Deployment-Planning.pdf">PDF</a>
+    </dd>
+
     <dt>OpenAM Reference</dt>
     <dd>
      <a href="./doc/bootstrap/reference/index.html">HTML</a>,
