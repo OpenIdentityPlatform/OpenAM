@@ -21,7 +21,6 @@ import static org.forgerock.openam.uma.UmaConstants.BackendPolicy.*;
 import static org.forgerock.openam.uma.UmaConstants.UMA_POLICY_SCHEME;
 import static org.forgerock.openam.uma.UmaConstants.UmaPolicy.*;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -222,10 +221,10 @@ public class UmaPolicy {
      *
      * @return The set of underlying backend policies that represent this UMA policy.
      */
-    public Set<JsonValue> asUnderlyingPolicies() {
+    public Set<JsonValue> asUnderlyingPolicies(String policyOwnerName) {
         Set<JsonValue> underlyingPolicies = new HashSet<JsonValue>();
         for (JsonValue p : policy.get(PERMISSIONS_KEY)) {
-            underlyingPolicies.add(createPolicyJson(p));
+            underlyingPolicies.add(createPolicyJson(policyOwnerName, p));
         }
         return underlyingPolicies;
     }
@@ -239,15 +238,15 @@ public class UmaPolicy {
      * }
      * </pre>
      */
-    private JsonValue createPolicyJson(JsonValue permission) {
+    private JsonValue createPolicyJson(String policyOwnerName, JsonValue permission) {
         String subject = permission.get(SUBJECT_KEY).asString();
-        String policyName = resourceSet.getName() + " - " + resourceSet.getId() + "-" + subject.hashCode();
+        String policyName = resourceSet.getName() + " - " + policyOwnerName + " - " + resourceSet.getId()
+                + "-" + subject.hashCode();
 
         Map<String, Object> actions = new HashMap<>();
         for (String scope : permission.get(SCOPES_KEY).asCollection(String.class)) {
             actions.put(scope, true);
         }
-
         return json(object(
                 field(BACKEND_POLICY_NAME_KEY, policyName),
                 field("applicationName", getResourceServerId().toLowerCase()), //Lowercase as ldap is case insensitive

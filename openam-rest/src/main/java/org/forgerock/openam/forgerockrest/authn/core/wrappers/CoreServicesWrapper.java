@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn.core.wrappers;
@@ -25,6 +25,7 @@ import com.sun.identity.authentication.server.AuthContextLocal;
 import com.sun.identity.authentication.service.AuthException;
 import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.util.AMAuthUtils;
+import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.AdminTokenAction;
@@ -250,5 +251,16 @@ public class CoreServicesWrapper {
     public void setLbCookie(AuthContextLocal authContext, HttpServletRequest request, HttpServletResponse response)
             throws AuthException {
         AuthUtils.setlbCookie(authContext, request, response);
+    }
+
+    /**
+     * Gets the AMIdentity of a user with username equal to {@literal username} that exists in realm
+     *
+     * @param username username of the user to get.
+     * @param realm realm the user belongs to.
+     * @return The AMIdentity of user with username equal to {@literal username}.
+     */
+    public AMIdentity getIdentity(String username, String realm) {
+        return IdUtils.getIdentity(username, realm);
     }
 }

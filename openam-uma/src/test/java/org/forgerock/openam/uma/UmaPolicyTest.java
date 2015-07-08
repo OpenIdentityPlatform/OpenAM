@@ -56,20 +56,20 @@ public class UmaPolicyTest {
         ));
     }
 
-    private Set<Resource> createUnderlyingPolicies() {
+    private Set<Resource> createUnderlyingPolicies(String resourceOwnerId) {
         Set<Resource> policies = new HashSet<Resource>();
-        policies.add(new Resource("ID_1", "REVISION_1", createUnderlyingSubjectOnePolicyJson()));
-        policies.add(new Resource("ID_2", "REVISION_2", createUnderlyingSubjectTwoPolicyJson()));
+        policies.add(new Resource("ID_1", "REVISION_1", createUnderlyingSubjectOnePolicyJson(resourceOwnerId)));
+        policies.add(new Resource("ID_2", "REVISION_2", createUnderlyingSubjectTwoPolicyJson(resourceOwnerId)));
         return policies;
     }
 
-    private JsonValue createUnderlyingSubjectOnePolicyJson() {
-        return createUnderlyingSubjectOnePolicyJson("POLICY_ID");
+    private JsonValue createUnderlyingSubjectOnePolicyJson(String resourceOwnerId) {
+        return createUnderlyingSubjectOnePolicyJson(resourceOwnerId, "POLICY_ID");
     }
 
-    private JsonValue createUnderlyingSubjectOnePolicyJson(String id) {
+    private JsonValue createUnderlyingSubjectOnePolicyJson(String resourceOwnerId, String id) {
         return json(object(
-                field("name", "NAME - " + id + "-" + "SUBJECT_ONE".hashCode()),
+                field("name", "NAME - " + resourceOwnerId + " - " + id + "-" + "SUBJECT_ONE".hashCode()),
                 field("applicationName", "client_id"),
                 field("resourceTypeUuid", "RESOURCE_SET_ID"),
                 field("resources", array("uma://POLICY_ID")),
@@ -84,13 +84,13 @@ public class UmaPolicyTest {
         ));
     }
 
-    private JsonValue createUnderlyingSubjectTwoPolicyJson() {
-        return createUnderlyingSubjectTwoPolicyJson("POLICY_ID");
+    private JsonValue createUnderlyingSubjectTwoPolicyJson(String resourceOwnerId) {
+        return createUnderlyingSubjectTwoPolicyJson(resourceOwnerId, "POLICY_ID");
     }
 
-    private JsonValue createUnderlyingSubjectTwoPolicyJson(String id) {
+    private JsonValue createUnderlyingSubjectTwoPolicyJson(String resourceOwnerId, String id) {
         return json(object(
-                field("name", "NAME - " + id + "-" + "SUBJECT_TWO".hashCode()),
+                field("name", "NAME - " + resourceOwnerId + " - " + id + "-" + "SUBJECT_TWO".hashCode()),
                 field("applicationName", "client_id"),
                 field("resourceTypeUuid", "RESOURCE_SET_ID"),
                 field("resources", array("uma://POLICY_ID")),
@@ -338,7 +338,7 @@ public class UmaPolicyTest {
     public void shouldCreateUmaPolicyFromUnderlyingPolicies() throws BadRequestException {
 
         //Given
-        Set<Resource> policies = createUnderlyingPolicies();
+        Set<Resource> policies = createUnderlyingPolicies("RESOURCE_OWNER_ID");
 
         //When
         UmaPolicy umaPolicy = UmaPolicy.fromUnderlyingPolicies(resourceSet, policies);
@@ -376,17 +376,17 @@ public class UmaPolicyTest {
         UmaPolicy umaPolicy = UmaPolicy.valueOf(resourceSet, createUmaPolicyJson());
 
         //When
-        Set<JsonValue> underlyingPolicies = umaPolicy.asUnderlyingPolicies();
+        Set<JsonValue> underlyingPolicies = umaPolicy.asUnderlyingPolicies("RESOURCE_OWNER_ID");
 
         //Then
         boolean foundScopeAPolicy = false;
         boolean foundScopeBPolicy = false;
         for (JsonValue policy : underlyingPolicies) {
-            if (policy.contains("NAME - RESOURCE_SET_ID-" + "SUBJECT_ONE".hashCode())) {
-                assertThat(policy.asMap()).isEqualTo(createUnderlyingSubjectOnePolicyJson("RESOURCE_SET_ID").asMap());
+            if (policy.contains("NAME - RESOURCE_OWNER_ID - RESOURCE_SET_ID-" + "SUBJECT_ONE".hashCode())) {
+                assertThat(policy.asMap()).isEqualTo(createUnderlyingSubjectOnePolicyJson("RESOURCE_OWNER_ID", "RESOURCE_SET_ID").asMap());
                 foundScopeAPolicy = true;
-            } else if (policy.contains("NAME - RESOURCE_SET_ID-"+ "SUBJECT_TWO".hashCode())) {
-                assertThat(policy.asMap()).isEqualTo(createUnderlyingSubjectTwoPolicyJson("RESOURCE_SET_ID").asMap());
+            } else if (policy.contains("NAME - RESOURCE_OWNER_ID - RESOURCE_SET_ID-"+ "SUBJECT_TWO".hashCode())) {
+                assertThat(policy.asMap()).isEqualTo(createUnderlyingSubjectTwoPolicyJson("RESOURCE_OWNER_ID", "RESOURCE_SET_ID").asMap());
                 foundScopeBPolicy = true;
             }
         }

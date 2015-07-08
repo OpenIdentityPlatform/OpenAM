@@ -23,6 +23,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.eq;
 
+import javax.security.auth.Subject;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +34,8 @@ import java.util.Set;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.entitlement.Evaluator;
+import com.sun.identity.idm.AMIdentity;
 import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
@@ -46,9 +49,10 @@ import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ServerContext;
-import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
+import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
+import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.rest.resource.RealmContext;
@@ -69,48 +73,70 @@ public class UmaPolicyServiceImplTest {
     private UmaPolicyServiceImpl policyService;
 
     private PolicyResourceDelegate policyResourceDelegate;
+    private ResourceSetStore resourceSetStore;
     private ResourceSetDescription resourceSet;
+    private UmaAuditLogger auditLogger;
+    private ContextHelper contextHelper;
+    private Evaluator policyEvaluator;
+    private CoreServicesWrapper coreServicesWrapper;
 
     @BeforeMethod
-    public void setup() throws org.forgerock.oauth2.core.exceptions.NotFoundException, ServerException {
+    public void setup() throws Exception {
 
         policyResourceDelegate = mock(PolicyResourceDelegate.class);
         ResourceSetStoreFactory resourceSetStoreFactory = mock(ResourceSetStoreFactory.class);
         Config<UmaAuditLogger> lazyAuditLogger = mock(Config.class);
-        UmaAuditLogger auditLogger = mock(UmaAuditLogger.class);
-        ContextHelper contextHelper = mock(ContextHelper.class);
+        auditLogger = mock(UmaAuditLogger.class);
+        contextHelper = mock(ContextHelper.class);
+        UmaPolicyEvaluatorFactory policyEvaluatorFactory = mock(UmaPolicyEvaluatorFactory.class);
+        policyEvaluator = mock(Evaluator.class);
+        given(policyEvaluatorFactory.getEvaluator(any(Subject.class), anyString())).willReturn(policyEvaluator);
+        coreServicesWrapper = mock(CoreServicesWrapper.class);
         policyService = new UmaPolicyServiceImpl(policyResourceDelegate, resourceSetStoreFactory, lazyAuditLogger,
-                contextHelper);
+                contextHelper, policyEvaluatorFactory, coreServicesWrapper);
 
         given(contextHelper.getRealm(Matchers.<ServerContext>anyObject())).willReturn("REALM");
         given(contextHelper.getUserId(Matchers.<ServerContext>anyObject())).willReturn("RESOURCE_OWNER_ID");
         given(contextHelper.getUserUid(Matchers.<ServerContext>anyObject())).willReturn("RESOURCE_OWNER_UID");
 
-        ResourceSetStore resourceSetStore = mock(ResourceSetStore.class);
+        resourceSetStore = mock(ResourceSetStore.class);
         resourceSet = new ResourceSetDescription("RESOURCE_SET_ID",
                 "CLIENT_ID", "RESOURCE_OWNER_ID", Collections.<String, Object>emptyMap());
         resourceSet.setDescription(json(object(field("name", "NAME"), field("scopes", array("SCOPE_A", "SCOPE_B", "SCOPE_C")))));
 
         given(resourceSetStoreFactory.create(anyString())).willReturn(resourceSetStore);
         given(resourceSetStore.read("RESOURCE_SET_ID", "RESOURCE_OWNER_ID")).willReturn(resourceSet);
+        given(resourceSetStore.query(org.forgerock.util.query.QueryFilter.and(
+                org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RESOURCE_SET_ID"))))
+                .willReturn(Collections.singleton(resourceSet));
         doThrow(org.forgerock.oauth2.core.exceptions.NotFoundException.class).when(resourceSetStore).read("OTHER_ID", "RESOURCE_OWNER_ID");
         doThrow(org.forgerock.oauth2.core.exceptions.ServerException.class).when(resourceSetStore).read("FAILING_ID", "RESOURCE_OWNER_ID");
+        doThrow(org.forgerock.oauth2.core.exceptions.ServerException.class).when(resourceSetStore).query(org.forgerock.util.query.QueryFilter.and(
+                org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "FAILING_ID")));
         given(lazyAuditLogger.get()).willReturn(auditLogger);
+
+        AMIdentity identity = mock(AMIdentity.class);
+        given(identity.getUniversalId()).willReturn("uid=RESOURCE_OWNER_ID,ou=REALM,dc=forgerock,dc=org");
+        given(coreServicesWrapper.getIdentity("RESOURCE_OWNER_ID", "REALM")).willReturn(identity);
     }
 
     private ServerContext createContext() throws SSOException {
+        return createContextForLoggedInUser("RESOURCE_OWNER_ID");
+    }
+
+    private ServerContext createContextForLoggedInUser(String userShortName) throws SSOException {
         SubjectContext subjectContext = mock(SSOTokenContext.class);
         SSOToken ssoToken = mock(SSOToken.class);
         Principal principal = mock(Principal.class);
         given(subjectContext.getCallerSSOToken()).willReturn(ssoToken);
         given(ssoToken.getPrincipal()).willReturn(principal);
-        given(principal.getName()).willReturn("RESOURCE_OWNER_ID");
+        given(principal.getName()).willReturn(userShortName);
         return new ServerContext(new RealmContext(subjectContext));
     }
 
-    private JsonValue createUmaPolicyJson(String... subjectTwoScopes) {
+    private static JsonValue createUmaPolicyJson(String resourceSetId, String... subjectTwoScopes) {
         return json(object(
-                field("policyId", "RESOURCE_SET_ID"),
+                field("policyId", resourceSetId),
                 field("permissions", array(
                         object(
                                 field("subject", "id=SUBJECT_ONE"),
@@ -122,11 +148,11 @@ public class UmaPolicyServiceImplTest {
         ));
     }
 
-    private JsonValue createUmaPolicyJson() {
-        return createUmaPolicyJson("SCOPE_A");
+    static JsonValue createUmaPolicyJson(String resourceSetId) {
+        return createUmaPolicyJson(resourceSetId, "SCOPE_A");
     }
 
-    private JsonValue createBackendSubjectOnePolicyJson() {
+    static JsonValue createBackendSubjectOnePolicyJson() {
         return json(object(
                 field("name", "RESOURCE_SET_ID - SUBJECT_ONE"),
                 field("resources", array("uma://RESOURCE_SET_ID")),
@@ -142,7 +168,7 @@ public class UmaPolicyServiceImplTest {
         ));
     }
 
-    private JsonValue createBackendSubjectTwoPolicyJson() {
+    static JsonValue createBackendSubjectTwoPolicyJson() {
         return json(object(
                 field("name", "RESOURCE_SET_ID - SUBJECT_TWO"),
                 field("resources", array("uma://RESOURCE_SET_ID")),
@@ -157,7 +183,7 @@ public class UmaPolicyServiceImplTest {
         ));
     }
 
-    private JsonValue createBackendSubjectOneUpdatedPolicyJson() {
+    static JsonValue createBackendSubjectOneUpdatedPolicyJson() {
         return json(object(
                 field("name", "RESOURCE_SET_ID - SUBJECT_ONE"),
                 field("resources", array("uma://RESOURCE_SET_ID")),
@@ -180,7 +206,7 @@ public class UmaPolicyServiceImplTest {
 
         //Given
         ServerContext context = createContext();
-        JsonValue policy = createUmaPolicyJson();
+        JsonValue policy = createUmaPolicyJson("RESOURCE_SET_ID");
         List<Resource> createdPolicies = new ArrayList<Resource>();
         Resource createdPolicy1 = new Resource("ID_1", "REVISION_1", createBackendSubjectOnePolicyJson());
         Resource createdPolicy2 = new Resource("ID_1", "REVISION_1", createBackendSubjectTwoPolicyJson());
@@ -217,7 +243,7 @@ public class UmaPolicyServiceImplTest {
 
         //Given
         ServerContext context = createContext();
-        JsonValue policy = createUmaPolicyJson();
+        JsonValue policy = createUmaPolicyJson("RESOURCE_SET_ID");
         Resource policyResource = new Resource("ID_1", "REVISION_1", createBackendSubjectOnePolicyJson());
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> queryPromise =
                 Promises.newResultPromise(
@@ -241,7 +267,7 @@ public class UmaPolicyServiceImplTest {
 
         //Given
         ServerContext context = createContext();
-        JsonValue policy = createUmaPolicyJson();
+        JsonValue policy = createUmaPolicyJson("RESOURCE_SET_ID");
         ResourceException exception = mock(ResourceException.class);
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> queryPromise =
                 Promises.newExceptionPromise((ResourceException) new NotFoundException());
@@ -264,7 +290,7 @@ public class UmaPolicyServiceImplTest {
 
         //Given
         ServerContext context = createContext();
-        JsonValue policy = createUmaPolicyJson("SCOPE_D");
+        JsonValue policy = createUmaPolicyJson("RESOURCE_SET_ID", "SCOPE_D");
 
         //When
         policyService.createPolicy(context, policy).getOrThrowUninterruptibly();
@@ -279,7 +305,7 @@ public class UmaPolicyServiceImplTest {
 
         //Given
         ServerContext context = createContext();
-        JsonValue policy = createUmaPolicyJson().put("policyId", "OTHER_ID");
+        JsonValue policy = createUmaPolicyJson("RESOURCE_SET_ID").put("policyId", "OTHER_ID");
 
         //When
         policyService.createPolicy(context, policy).getOrThrowUninterruptibly();
@@ -294,7 +320,7 @@ public class UmaPolicyServiceImplTest {
 
         //Given
         ServerContext context = createContext();
-        JsonValue policy = createUmaPolicyJson().put("policyId", "FAILING_ID");
+        JsonValue policy = createUmaPolicyJson("RESOURCE_SET_ID").put("policyId", "FAILING_ID");
 
         //When
         policyService.createPolicy(context, policy).getOrThrowUninterruptibly();
@@ -358,7 +384,7 @@ public class UmaPolicyServiceImplTest {
 
         //Given
         ServerContext context = createContext();
-        JsonValue policy = createUmaPolicyJson("SCOPE_A", "SCOPE_C");
+        JsonValue policy = createUmaPolicyJson("RESOURCE_SET_ID", "SCOPE_A", "SCOPE_C");
         policy.remove(new JsonPointer("/permissions/0/scopes/1"));
         List<Resource> updatedPolicies = new ArrayList<Resource>();
         Resource updatedPolicy1 = new Resource("ID_1", "REVISION_1", createBackendSubjectOneUpdatedPolicyJson());
@@ -388,7 +414,7 @@ public class UmaPolicyServiceImplTest {
         //Then
         assertThat(umaPolicy.getId()).isEqualTo("RESOURCE_SET_ID");
         assertThat(umaPolicy.getRevision()).isNotNull();
-        JsonValue expectedPolicyJson = createUmaPolicyJson("SCOPE_A", "SCOPE_C");
+        JsonValue expectedPolicyJson = createUmaPolicyJson("RESOURCE_SET_ID", "SCOPE_A", "SCOPE_C");
         expectedPolicyJson.remove(new JsonPointer("/permissions/0/scopes/1"));
         assertThat(umaPolicy.asJson().asMap()).isEqualTo(expectedPolicyJson.asMap());
     }
@@ -398,7 +424,7 @@ public class UmaPolicyServiceImplTest {
 
         //Given
         ServerContext context = createContext();
-        JsonValue policy = createUmaPolicyJson("SCOPE_A", "SCOPE_B");
+        JsonValue policy = createUmaPolicyJson("RESOURCE_SET_ID", "SCOPE_A", "SCOPE_B");
         ResourceException exception = mock(ResourceException.class);
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> currentPolicyPromise
                 = Promises.newResultPromise(Pair.of((QueryResult) null, Collections.<Resource>emptyList()));
@@ -421,7 +447,7 @@ public class UmaPolicyServiceImplTest {
 
         //Given
         ServerContext context = createContext();
-        JsonValue policy = createUmaPolicyJson("SCOPE_D");
+        JsonValue policy = createUmaPolicyJson("RESOURCE_SET_ID", "SCOPE_D");
 
         //When
         policyService.updatePolicy(context, "RESOURCE_SET_ID", policy).getOrThrowUninterruptibly();
@@ -436,7 +462,7 @@ public class UmaPolicyServiceImplTest {
 
         //Given
         ServerContext context = createContext();
-        JsonValue policy = createUmaPolicyJson();
+        JsonValue policy = createUmaPolicyJson("RESOURCE_SET_ID");
 
         //When
         policyService.updatePolicy(context, "OTHER_ID", policy).getOrThrowUninterruptibly();
@@ -451,7 +477,7 @@ public class UmaPolicyServiceImplTest {
 
         //Given
         ServerContext context = createContext();
-        JsonValue policy = createUmaPolicyJson();
+        JsonValue policy = createUmaPolicyJson("RESOURCE_SET_ID");
 
         //When
         policyService.updatePolicy(context, "FAILING_ID", policy).getOrThrowUninterruptibly();
