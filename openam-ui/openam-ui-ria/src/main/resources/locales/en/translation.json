@@ -254,6 +254,7 @@
             "register" : "Register",
             "home" : "Home",
             "start" : "Start",
+            "name" : "Name",
             "continue" : "Continue",
             "next" : "Next",
             "back" : "Back",
@@ -293,6 +294,8 @@
             "upload": "Upload",
             "validate": "Validate",
             "filter": "Filter...",
+            "pass" : "Pass",
+            "fail" : "Fail",
             "copyright" : "Copyright &copy; 2010-15 ForgeRock AS. All rights reserved.",
             "sessionExpired" : "Session Expired",
             "enableCookies" : "Cookies must be enabled to login",
@@ -537,8 +540,8 @@
         },
         "authentication": {
             "settings": {
-                "title": "Settings",
-                "description": "Realm Settings",
+                "title": "Authentication Settings",
+                "description": "",
                 "revert": "Revert",
                 "saveChanges": "Save Changes"
             },
@@ -549,16 +552,18 @@
                 "addModuleDialogError": "Authentication instance already exists.",
                 "selectModuleType" : "Select Module type",
                 "addModule": "Add Module",
-                "moduleName": "Name",
+                "moduleName": "Module Name",
                 "moduleType": "Type"
             },
             "chains": {
                 "title" : "Authentication Chains",
                 "action" : "Add Chain",
-                "chainName" : "Name",
+                "chainName" : "Chain Name",
                 "description" : "OpenAM uses authentication chains to control the authentication flow the user. Use this section to add, configure or remove the realms set of authentication chains.",
                 "defaultAdminAuthConfiguration" : "Default Administrator Authentication Chain",
-                "defaultOrgAuthConfiguration" : "Default Organization Authentication Chain"
+                "defaultOrgAuthConfiguration" : "Default Organization Authentication Chain",
+                "duplicateChain" : "A chain with this name already exists. Please use a different name",
+                "createNewChain" : "Create new chain"
             },
             "editChains": {
                 "options" : "Options",
@@ -584,14 +589,14 @@
                     "className": "Class Name",
                     "addClassNameDialog": {
                         "title": "Add new Class Name",
-                        "message": "New Class Name \"__newClassName__\" for Post Authentication Processing Class has not been saved. Do you want to save it?"
+                        "message": "The new class name <mark>__newClassName__</mark> for Post Authentication Processing has not been saved. Do you want to save it?"
                     }
                 },
                 "criteria" : ["Required","Optional","Requisite","Sufficient"]
             }
         },
         "dashboard":{
-            "realmProperties" : "Realm Properties",
+            "realmProperties" : "Properties",
             "dashboard" : "Dashboard",
             "title" : "Realm Overview",
             "quickStart" : "Common Tasks"

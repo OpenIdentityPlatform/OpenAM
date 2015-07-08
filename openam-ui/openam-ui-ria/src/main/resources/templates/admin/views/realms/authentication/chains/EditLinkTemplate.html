@@ -6,7 +6,7 @@
             <label class="block-header">{{t 'console.authentication.editChains.selectModule'}}</label>
             <select id="selectModule" type="text" class="form-control" single value="{{linkConfig.module}}">
                 <option value="" selected disabled >{{t 'common.form.select'}}...</option>
-                {{#each formData.allModules}}
+                {{#each allModules}}
                 <option value="{{this._id}}" {{#equals ../linkConfig.module this._id}} selected{{/equals}}>{{this.type}}</option>
                 {{/each}}
             </select>
@@ -16,7 +16,7 @@
             <label class="block-header">{{t 'console.authentication.editChains.selectCriteria'}}</label>
             <select id="selectCriteria" type="text" class="form-control" single value="{{linkConfig.module}}">
                 <option value="" selected disabled >{{t 'common.form.select'}}...</option>
-                {{#each formData.allCriteria}}
+                {{#each allCriteria}}
                 {{#each this}}<option value="{{@key}}" {{#equals ../../linkConfig.criteria @key}} selected{{/equals}}>{{this}}</option>{{/each}}
                 {{/each}}
             </select>

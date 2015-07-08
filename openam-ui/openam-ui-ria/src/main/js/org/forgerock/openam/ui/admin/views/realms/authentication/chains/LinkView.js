@@ -29,25 +29,26 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
     var LinkView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/chains/LinkTemplate.html",
         mode: "append",
-        //data: {},
         events: {
-            'dblclick .panel':     'editItem',
-            'click #editItem':     'editItem',
-            'click #deleteItem':   'deleteItem',
-            'click #moveUpBtn':    'moveUp',
-            'click #moveDownBtn':  'moveDown',
-            'show.bs.dropdown' :   'setBtnStates'
+            "dblclick .panel":     "editItem",
+            "click #editItem":     "editItem",
+            "show.bs.dropdown" :   "setBtnStates",
+            "click .move-btn":     "moveBtnClick",
+            "click #deleteBtn":    "deleteBtnClick",
+            "click .criteria-btn-container button": "selectCriteria"
         },
-        // Constants used for moving item up or down.
-        MOVE_UP: "moveUp",
-        MOVE_DOWN: "moveDown",
 
-        deleteItem: function(e) {
-            if(e){e.preventDefault();}
-            var self = this;
-            _.remove(self.data.formData.chainData.authChainConfiguration, {
-                id: self.data.id
-            });
+        deleteBtnClick: function(e){
+            if(e){
+                e.preventDefault();
+            }
+            this.deleteItem(e.currentTarget.dataset.mapId);
+        },
+
+        deleteItem: function(mapId) {
+            this.parent.data.form.chainData.authChainConfiguration.splice(this.$el.index(), 1);
+            this.parent.data.linkViewMap[mapId].remove();
+            this.parent.setArrows();
             this.remove();
         },
 
@@ -56,60 +57,52 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
                 e.preventDefault();
             }
             var self = this,
-                linkConfig = _.find( this.data.formData.chainData.authChainConfiguration, function(config){
-                    return config.id === self.data.id;
-                }),
-                title = linkConfig.module ? $.t('console.authentication.editChains.editModule') : $.t('console.authentication.editChains.newModule'); // TODO i18n
+                title = this.data.linkConfig.module ? $.t("console.authentication.editChains.editModule") : $.t("console.authentication.editChains.newModule");
 
-            // FIXME: Refactor this code as a separate view. Enable adding and deletion of options.
-            UIUtils.fillTemplateWithData("templates/admin/views/realms/authentication/chains/EditLinkTemplate.html", { linkConfig:linkConfig, formData:this.data.formData }, function(template) {
+            UIUtils.fillTemplateWithData("templates/admin/views/realms/authentication/chains/EditLinkTemplate.html", self.data, function(template) {
                 var options = {
-
                     message: function (dialog) {
-                        return $('<div></div>').append(template);
+                        return $("<div></div>").append(template);
                     },
-
                     title: title,
                     type: BootstrapDialog.TYPE_DEFAULT,
                     closable: false,
                     buttons: [{
-                        label: "Ok",
+                        label: $.t("common.form.ok"),
                         cssClass: "btn-primary",
                         id: "saveBtn",
                         action: function(dialog) {
-                            var moduleSelectize = dialog.getModalBody().find('#selectModule')[0].selectize,
-                                criteriaValue = dialog.getModalBody().find('#selectCriteria')[0].selectize.getValue();
+                            var moduleSelectize = dialog.getModalBody().find("#selectModule")[0].selectize,
+                                criteriaValue = dialog.getModalBody().find("#selectCriteria")[0].selectize.getValue();
 
-                            linkConfig.module = moduleSelectize.getValue();
-                            linkConfig.type = _.findWhere(moduleSelectize.options, { _id: linkConfig.module }).type;
-
+                            self.data.linkConfig.module = moduleSelectize.getValue();
+                            self.data.linkConfig.type = _.findWhere(moduleSelectize.options, { _id: self.data.linkConfig.module }).type;
                             self.linkInfoView.parentRender();
                             self.criteriaView.setCriteria(criteriaValue);
-
+                            self.parent.setArrows();
                             dialog.close();
                         }
                     }, {
-                        label: "Cancel",
+                        label: $.t("common.form.cancel"),
                         action: function(dialog) {
-                            if (!linkConfig.module) {
-                                self.deleteItem();
+                            if (self.data.linkConfig.module) {
+                                self.parent.setArrows();
+                            } else {
+                                self.deleteItem(self.data.id);
                             }
                             dialog.close();
                         }
                     }],
-
                     onshow: function (dialog) {
-
-                        dialog.getButton('saveBtn').disable();
-                        dialog.getModalBody().find('#selectModule').selectize({
-
-                            options:self.data.formData.allModules,
+                        dialog.getButton("saveBtn").disable();
+                        dialog.getModalBody().find("#selectModule").selectize({
+                            options:self.data.allModules,
                             render: {
                                 item: function(item) {
-                                    return '<div>' + item._id + ' <span class="dropdown-subtitle">'+ item.type + '</span></div>';
+                                    return "<div>" + item._id + " <span class='dropdown-subtitle'>"+ item.type + "</span></div>";
                                 },
                                 option: function(item) {
-                                    return '<div><div>' + item._id + '</div><div class="dropdown-subtitle">'+ item.type + '</div></div>';
+                                    return "<div><div>" + item._id + "</div><div class='dropdown-subtitle'>"+ item.type + "</div></div>";
                                 }
                             },
                             onChange: function (value) {
@@ -117,112 +110,107 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
                             }
 
                         });
-
-                        dialog.getModalBody().find('#selectCriteria').selectize({
+                        dialog.getModalBody().find("#selectCriteria").selectize({
                             onChange: function (value) {
                                 dialog.options.validateDialog(dialog);
                             }
                         });
-
                         dialog.options.validateDialog(dialog);
-                        dialog.getModalBody().find('#selectModule');
-
+                        dialog.getModalBody().find("#selectModule");
                     },
 
                     validateDialog: function(dialog){
-                        var moduleValue = dialog.getModalBody().find('#selectModule')[0].selectize.getValue(),
-                            criteriaValue = dialog.getModalBody().find('#selectCriteria')[0].selectize.getValue();
+                        var moduleValue = dialog.getModalBody().find("#selectModule")[0].selectize.getValue(),
+                            criteriaValue = dialog.getModalBody().find("#selectCriteria")[0].selectize.getValue();
 
                         if( moduleValue.length === 0 || criteriaValue.length === 0 ){
-                            dialog.getButton('saveBtn').disable();
+                            dialog.getButton("saveBtn").disable();
                         } else {
-                            dialog.getButton('saveBtn').enable();
+                            dialog.getButton("saveBtn").enable();
                         }
                     }
                 };
-
                 BootstrapDialog.show(options);
             });
         },
 
-        render: function (data, index, li) {
+        moveBtnClick: function(e) {
+            e.preventDefault();
 
-            var self = this,
-                linkConfig = {};
+            var direction = parseInt(e.currentTarget.dataset.direction, 10),
+                chainlinks = this.$el.parent().children(".chain-link"),
+                originalIndex = this.$el.index(),
+                targetIndex = originalIndex + direction;
 
-            self.el = li;
-            self.element = li;
+            this.parent.sortChainData(originalIndex, targetIndex);
 
-            //self.data = {};
-            self.data.formData = data;
-            self.data.id = _.uniqueId('id-');
+            // The buttons contain the directions -1 for up and +1 for down.
+            if (direction === -1 ) {
+                this.$el.insertBefore(chainlinks.eq(targetIndex));
+            } else {
+                this.$el.insertAfter(chainlinks.eq(targetIndex));
+            }
+            this.parent.setArrows();
+        },
 
-            linkConfig = self.data.formData.chainData.authChainConfiguration[index];
-            linkConfig.id = self.data.id;
+        render: function () {
+            var self = this;
+            this.data.id = this.cid;
 
             self.parentRender(function(){
 
-                if (!linkConfig.module) {
-                    self.editItem();
-                }
-
                 self.criteriaView = new CriteriaView();
                 self.criteriaView.element = "#criteria-" + self.data.id;
-                self.criteriaView.render(linkConfig, self.data.formData.allCriteria);
+                self.criteriaView.render(self.data.linkConfig, self.data.allCriteria, self.data.id);
 
                 self.linkInfoView = new LinkInfoView();
                 self.linkInfoView.element = "#link-info-" + self.data.id;
-                self.linkInfoView.render(linkConfig);
+                self.linkInfoView.render(self.data.linkConfig);
 
+                if (!self.data.linkConfig.module && !self.data.linkConfig.criteria) {
+                    self.editItem();
+                } else {
+                    self.setArrows();
+                }
             });
         },
 
-        moveUp: function(e) {
-            e.preventDefault();
-            this.move(this.MOVE_UP);
-        },
-
-        moveDown: function(e) {
-            e.preventDefault();
-            this.move(this.MOVE_DOWN);
-        },
-
-        move: function(direction) {
-
-            var chainlinks = this.$el.parent().children('.chain-link'),
-                itemIndex = this.$el.index();
-
-            if (direction === this.MOVE_UP) {
-                this.$el.insertBefore(chainlinks.eq(itemIndex-2));
-
-            } else if (direction === this.MOVE_DOWN) {
-                this.$el.insertAfter(chainlinks.eq(itemIndex));
+        setArrows: function(){
+            if (this.data.linkConfig.criteria.toLowerCase() === this.criteriaView.REQUIRED && this.parent.data.firstRequiredIndex === -1) {
+                this.parent.data.firstRequiredIndex = this.$el.index();
+            }
+            if (this.parent.data.firstRequiredIndex > -1 && this.$el.index() > this.parent.data.firstRequiredIndex){
+                this.criteriaView.setPassThroughAndFailArrows(true);
+            } else {
+                this.criteriaView.setPassThroughAndFailArrows(false);
             }
         },
-
         setBtnStates: function(){
-
-            var numLinks = this.$el.parent().children('.chain-link').length,
+            var numLinks = this.$el.parent().children(".chain-link").length - 1,
                 itemIndex = this.$el.index(),
-                moveUpBtn = this.$el.find('#moveUpLi'),
-                moveDownBtn = this.$el.find('#moveDownLi'),
-                deleteBtn = this.$el.find('#deleteItem').parent();
+                moveUpBtn = this.$el.find("#moveUpLi"),
+                moveDownBtn = this.$el.find("#moveDownLi"),
+                deleteBtn = this.$el.find("#deleteBtn").parent();
 
-            moveUpBtn.removeClass('disabled');
-            moveDownBtn.removeClass('disabled');
-            deleteBtn.removeClass('disabled');
+            moveUpBtn.removeClass("disabled");
+            moveDownBtn.removeClass("disabled");
+            deleteBtn.removeClass("disabled");
 
-            if (itemIndex === 1){
-                moveUpBtn.addClass('disabled');
+            if (itemIndex === 0){
+                moveUpBtn.addClass("disabled");
             }
             if (itemIndex === numLinks){
-                moveDownBtn.addClass('disabled');
+                moveDownBtn.addClass("disabled");
             }
-            if(numLinks <= 1){
-                deleteBtn.addClass('disabled');
+            if(numLinks < 1){
+                deleteBtn.addClass("disabled");
             }
+        },
+        selectCriteria: function(e){
+            var criteria = e.currentTarget.dataset.criteria;
+            this.criteriaView.setCriteria(criteria);
+            this.parent.setArrows();
         }
-
     });
 
     return LinkView;

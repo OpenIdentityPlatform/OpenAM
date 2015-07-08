@@ -1,14 +1,14 @@
 <div class="page-header clearfix">
     <span class="header-icon pull-left"><i class="fa fa-link"></i></span>
     <h4 class="page-type">{{t 'console.authentication.editChains.chains'}}</h4>
-    <h1>{{chainData._id}}</h1>
+    <h1>{{form.chainData._id}}</h1>
 </div>
 
 
 <div class="tab-menu">
     <ul class="nav nav-tabs" role="tablist">
-        <li class="active"><a href="#chains" role="tab"  data-toggle="tab" aria-expanded="true">{{t 'console.authentication.editChains.editChain'}}</a></li>
-        <li><a href="#settings" role="tab" data-toggle="tab" aria-expanded="true">{{t 'common.form.settings'}}</a></li>
+        <li class="active"><a href="#chains" role="tab"  data-toggle="tab" aria-expanded="true"> {{t 'console.authentication.editChains.editChain'}}</a></li>
+        <li><a href="#settings" role="tab" data-toggle="tab" aria-expanded="true"> {{t 'common.form.settings'}}</a></li>
     </ul>
 </div>
 
@@ -29,27 +29,21 @@
             <button type="button" id="addModuleLink" class="btn btn-secondary"><i class="fa fa-plus"></i> {{t 'console.authentication.editChains.addModule'}}</button>
 
             <div id="sortableContainer">
-                <ol id="sortable" class="{{#unless chainData.authChainConfiguration}} empty{{/unless}}">
-                    <li class="placeholder not-draggable" id="noItemsPlaceholder"><i class="fa fa-inbox"></i>{{t 'common.form.empty'}}</li>
-                </ol>
+                <ol id="sortable"></ol>
             </div>
 
             <ol class="pull-left list-unstyled" id="editChainLegend">
 
-                <li id="nextModuleKey">
-                    <i class="fa fa-arrow-down"></i> {{t 'console.authentication.editChains.gotoNextModule'}}
+                <li id="failUrlKey">
+                    <i class="fa fa-arrow-down"></i> {{t 'console.authentication.editChains.gotoFailUrl'}}
                 </li>
-
-                <!--<li id="nextModuleAndFailKey">
-                    <i class="fa fa-arrow-down"></i> Pass through to next module, but goto fail url at end of chain
-                </li>-->
 
                 <li id="successUrlKey">
-                    <i class="fa fa-external-link"></i> {{t 'console.authentication.editChains.gotoSuccessUrl'}}
+                    <i class="fa fa-arrow-down"></i> {{t 'console.authentication.editChains.gotoSuccessUrl'}}
                 </li>
 
-                <li id="failUrlKey">
-                    <i class="fa fa-external-link"></i> {{t 'console.authentication.editChains.gotoFailUrl'}}
+                <li id="nextModuleKey">
+                    <i class="fa fa-arrow-down"></i> {{t 'console.authentication.editChains.gotoNextModule'}}
                 </li>
 
             </ol>
@@ -59,13 +53,6 @@
         <div role="tabpanel" class="tab-pane" id="settings">
 
              <div class="block clearfix">
-                 <a  data-toggle="popover"
-                     data-placement="top"
-                     data-trigger="focus"
-                     data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Dic in quovis conventu te omnia facere, ne doleas. Duo Reges: constructio interrete. Illud dico, ea, quae dicat, praeclare inter se cohaerere."
-                     tabindex="0"
-                     title="{{t 'console.authentication.editChains.redirectUrls'}}"
-                     class="pull-right">{{t 'common.form.help'}} <i class="fa fa-question-circle"></i></a>
         	    <h3 class="block-header">{{t 'console.authentication.editChains.redirectUrls'}}</h3>
                 <div class="form-horizontal">
 
@@ -88,18 +75,8 @@
             </div>
 
             <div class="block clearfix">
-                <a  data-toggle="popover"
-                    data-placement="top"
-                    data-trigger="focus"
-                    data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Dic in quovis conventu te omnia facere, ne doleas. Duo Reges: constructio interrete. Illud dico, ea, quae dicat, praeclare inter se cohaerere."
-                    tabindex="0"
-                    title="Post Authentication Processing Class"
-                    class="pull-right">{{t 'common.form.help'}} <i class="fa fa-question-circle"></i></a>
         	    <h3 class="block-header">{{t 'console.authentication.editChains.processingClass.title'}}</h3>
-
-
                 <table class="table table-striped" id="postProcessView"></table>
-
             </div>
 
         </div>

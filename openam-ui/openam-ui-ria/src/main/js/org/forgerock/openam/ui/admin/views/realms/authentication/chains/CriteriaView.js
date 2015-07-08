@@ -22,23 +22,30 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/Criteri
 
     var CriteriaView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/chains/CriteriaTemplate.html",
-        events: {
-            'click #criteriaButtonsContainer button': 'selectCriteria'
-        },
+        REQUIRED: "required",
 
-        selectCriteria: function(e){
-            this.setCriteria(e.currentTarget.dataset.criteria);
-        },
-
+        /**
+         * sets the criteria and re-renders the template.
+         */
         setCriteria: function(criteria){
             this.data.linkConfig.criteria = criteria;
             this.parentRender();
         },
 
-        render: function (linkConfig, allCriteria) {
+        /**
+         * sets the passThroughFail data object and re-renders the template. 
+         */
+        setPassThroughAndFailArrows: function(boolean){
+            this.data.passThroughFail = boolean;
+            this.parentRender();
+        },
+
+        render: function (linkConfig, allCriteria, id) {
             this.data = {};
             this.data.allCriteria = allCriteria;
             this.data.linkConfig = linkConfig;
+            this.data.id = id;
+            this.data.passThroughFail = linkConfig.criteria.toLowerCase() === this.REQUIRED ? true : false;
             this.parentRender();
         }
     });

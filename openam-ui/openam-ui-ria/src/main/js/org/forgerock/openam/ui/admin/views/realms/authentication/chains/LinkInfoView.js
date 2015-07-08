@@ -23,7 +23,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkInf
         template: "templates/admin/views/realms/authentication/chains/LinkInfoTemplate.html",
 
         render: function (data, element) {
-            this.data = data;
+            this.data.linkConfig = data;
             this.data.optionsLength = _.keys(data.options).length;
 
             this.parentRender();

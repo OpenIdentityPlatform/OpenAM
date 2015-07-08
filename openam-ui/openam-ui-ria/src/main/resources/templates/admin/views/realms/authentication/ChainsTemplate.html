@@ -3,12 +3,12 @@
 </div>
 <p class="page-description">{{t 'console.authentication.chains.description'}}</p>
 <div class="btn-toolbar page-toolbar">
-    <a class="btn btn-primary" id="addChain" href="{{routeTo 'realmsAuthenticationChainEdit' realmPath}}"><i class="fa fa-plus"></i>{{t 'console.authentication.chains.action'}}</a>
-    <button id="deleteChains" disabled class="btn btn-default" type="button"><i class="fa fa-times"></i>{{t 'common.form.delete'}}</button>
+    <a class="btn btn-primary" id="addChain" href="{{routeTo 'realmsAuthenticationChainEdit' realmPath}}"><i class="fa fa-plus"></i> {{t 'console.authentication.chains.action'}}</a>
+    <button id="deleteChains" disabled class="btn btn-default" type="button"><i class="fa fa-times"></i> {{t 'common.form.delete'}}</button>
 </div>
 <div class="panel panel-default">
     <div class="panel-body">
-        <table class="table table-striped table-hover">
+        <table class="table table-striped">
             <thead>
             <tr>
                 <th class="col-check"><input id="selectAll" type="checkbox" /></th>
@@ -21,7 +21,7 @@
             <tr class="sorted-chains {{#if defaultConfig}}default-config-row{{/if}}">
                 <td class="col-check"><input data-chain-name="{{_id}}" type="checkbox" {{#if defaultConfig}}disabled{{/if}}/></td>
                 <td>
-                    <a class="edit-chain-btn" href="{{routeTo 'realmsAuthenticationChainEdit' ../realmPath}}{{_id}}">{{_id}}</a>
+                    <a class="edit-chain-btn" href="{{routeTo 'realmsAuthenticationChainEdit' ../realmPath _id}}">{{_id}}</a>
                     {{#if defaultConfig}}
                     <div class="default-config">
                         {{#if defaultConfig.adminAuthModule}}{{t 'console.authentication.chains.defaultAdminAuthConfiguration'}} {{#if defaultConfig.orgConfig}}/ {{/if}}{{/if}}

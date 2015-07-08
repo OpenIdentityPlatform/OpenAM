@@ -21,82 +21,100 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "bootstrap-dialog",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate"
-], function ($, _, AbstractView, BootstrapDialog, Router, SMSRealmDelegate) {
+    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
+    "org/forgerock/commons/ui/common/util/UIUtils"
+], function ($, _, AbstractView, BootstrapDialog, Router, SMSRealmDelegate, UIUtils) {
     var ChainsView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/ChainsTemplate.html",
         events: {
-            'change input[data-chain-name]' : 'chainSelected',
-            'click  button.delete-chain-btn': 'deleteChain',
-            'click  #deleteChains'          : 'deleteChains',
-            'click  #selectAll'             : 'selectAll',
-            'click  #addChain'              : 'addChain'
+            "change input[data-chain-name]" : "chainSelected",
+            "click  button.delete-chain-btn": "deleteChain",
+            "click  #deleteChains"          : "deleteChains",
+            "click  #selectAll"             : "selectAll",
+            "click  #addChain"              : "addChain"
         },
         addChain: function(e) {
             e.preventDefault();
             var self = this,
                 chainName,
                 invalidName = false,
-                href = $(e.currentTarget).attr('href');
+                href = $(e.currentTarget).attr("href");
 
-            BootstrapDialog.show({
-                title: "Enter the chain name",
-                message: '<p>Some helpful text here explaining that you need to name your chain before you can configure it</p><br/><input type="text" id="newName" class="form-control" placeholder="Enter Name"  value="">',
-                buttons: [{
-                    label: $.t("common.form.next"),
-                    cssClass: "btn-primary",
-                    action: function(dialog) {
-                        chainName = dialog.getModalBody().find('#newName').val();
+            UIUtils.fillTemplateWithData("templates/admin/views/realms/authentication/chains/AddChainTemplate.html", self.data, function(html) {
 
-                        invalidName = _.find(self.data.sortedChains, function(chain){
-                            return chain._id === chainName;
-                        });
+                BootstrapDialog.show({
+                    title: $.t("console.authentication.chains.createNewChain"),
+                    message: $(html),
+                    buttons: [{
+                        label: $.t("common.form.next"),
+                        cssClass: "btn-primary",
+                        action: function(dialog) {
+                            chainName = dialog.getModalBody().find("#newName").val().trim();
 
-                        if (invalidName){
-                            // TODO - duplicate chain name - message or alert box
-                            console.log('invalidName'); // jslinter
-                        } else {
-                            SMSRealmDelegate.authentication.chains.create(self.data.realmPath, { _id: chainName }).done(function() {
-                                dialog.close();
-                                Router.navigate( href + dialog.getModalBody().find('#newName').val(), { trigger: true });
-                            }).fail(function() {
-                                // TODO: Add failure condition
+                            // TODO : More client side validation here
+                            invalidName = _.findWhere(self.data.sortedChains, function(chain){
+                                return chain._id === chainName;
                             });
+
+                            if (invalidName){
+                                // FIXME:  This needs to come from a template or partial. This is a temporay fix.
+                                var alert = "<div class='alert alert-warning' role='alert'>"+
+                                                "<div class='media'>"+
+                                                    "<button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>×</span><span class='sr-only'>"+$.t("common.form.close")+"</span></button>"+
+                                                    "<div class='media-left' href=#'>"+
+                                                        "<i class='fa fa-exclamation-circle'></i>"+
+                                                    "</div>"+
+                                                    "<div class='media-body'>"+ $.t("console.authentication.chains.duplicateChain") +"</div>"+
+                                                "</div>"+
+                                            "</div>";
+
+                                dialog.getModalBody().find("#alertContainer").html(alert);
+                            } else {
+                                SMSRealmDelegate.authentication.chains.create(self.data.realmPath, { _id: chainName }).done(function() {
+                                    dialog.close();
+                                    Router.routeTo(Router.configuration.routes.realmsAuthenticationChainEdit, {
+                                        args: [encodeURIComponent(self.data.realmPath), encodeURIComponent(chainName)],
+                                        trigger: true
+                                    });
+                                }).fail(function() {
+                                    // TODO: Add failure condition
+                                });
+                            }
                         }
-                    }
-                }, {
-                    label: $.t("common.form.cancel"),
-                    action: function(dialog) {
-                        dialog.close();
-                    }
-                }]
+                    }, {
+                        label: $.t("common.form.cancel"),
+                        action: function(dialog) {
+                            dialog.close();
+                        }
+                    }]
+                });
             });
         },
         chainSelected: function(event) {
-            var hasChainsSelected = this.$el.find('input[type=checkbox]').is(':checked'),
-                row = $(event.currentTarget).closest('tr'),
-                checked = $(event.currentTarget).is(':checked');
+            var hasChainsSelected = this.$el.find("input[type=checkbox]").is(":checked"),
+                row = $(event.currentTarget).closest("tr"),
+                checked = $(event.currentTarget).is(":checked");
 
-            this.$el.find('#deleteChains').prop('disabled', !hasChainsSelected);
+            this.$el.find("#deleteChains").prop("disabled", !hasChainsSelected);
             if (checked) {
-                row.addClass('selected');
+                row.addClass("selected");
             } else {
-                row.removeClass('selected');
+                row.removeClass("selected");
             }
         },
         selectAll: function(event) {
-            var checked = $(event.currentTarget).is(':checked');
-            this.$el.find('.sorted-chains input[type=checkbox]:not(:disabled)').prop('checked', checked);
+            var checked = $(event.currentTarget).is(":checked");
+            this.$el.find(".sorted-chains input[type=checkbox]:not(:disabled)").prop("checked", checked);
             if (checked) {
-                this.$el.find('.sorted-chains:not(.default-config-row)').addClass('selected');
+                this.$el.find(".sorted-chains:not(.default-config-row)").addClass("selected");
             } else {
-                this.$el.find('.sorted-chains').removeClass('selected');
+                this.$el.find(".sorted-chains").removeClass("selected");
             }
-            this.$el.find('#deleteChains').prop('disabled', !checked);
+            this.$el.find("#deleteChains").prop("disabled", !checked);
         },
         deleteChain: function(event) {
             var self = this,
-                chainName = $(event.currentTarget).attr('data-chain-name');
+                chainName = $(event.currentTarget).attr("data-chain-name");
 
             SMSRealmDelegate.authentication.chains.remove(this.data.realmPath, chainName).done(function() {
                 self.render([self.data.realmPath]);
@@ -104,8 +122,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
         },
         deleteChains: function() {
             var self = this,
-                chainNames = self.$el.find('input[type=checkbox]:checked').toArray().map(function(element) {
-                    return $(element).attr('data-chain-name');
+                chainNames = self.$el.find("input[type=checkbox]:checked").toArray().map(function(element) {
+                    return $(element).attr("data-chain-name");
                 }),
                 promises = chainNames.map(function(name) {
                     return SMSRealmDelegate.authentication.chains.remove(self.data.realmPath, name);

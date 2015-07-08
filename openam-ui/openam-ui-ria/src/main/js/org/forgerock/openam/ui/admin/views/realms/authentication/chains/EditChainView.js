@@ -27,44 +27,131 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
     var EditChainView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/chains/EditChainTemplate.html",
         events: {
-            'click #saveChanges':     'saveChanges',
-            'click #addModuleLink':   'addModuleLink'
+            "click #saveChanges":       "saveChanges",
+            "click #addModuleLink":     "addModuleLink"
         },
+
+        addModuleLink: function(e) {
+            if (e) {
+                e.preventDefault();
+            }
+            var li = $("<li class='chain-link' />"),
+                index = this.data.form.chainData.authChainConfiguration.length,
+                linkView = this.createLinkView(li, index);
+            linkView.render();
+        },
+
+        createLinkView: function(li, index){
+            var linkView = new LinkView();
+
+            // A new list item is being dynamically created and added to the current EditChainView as a child View.
+            // In order to do this we must create the element here,  parent and pass it to the child so that it has something to render inside of.
+            linkView.el = li;
+            linkView.element = li;
+            linkView.parent = this;
+            this.$el.find("ol#sortable").append(li);
+            this.data.linkViewMap[linkView.cid] = linkView;
+
+            // The authChainConfiguration is an array of authentication objects with modules, options and criteria.
+            // Below we add an empty object to the array if there is not already one at authChainConfiguration[index].
+            // This will result in an empty module being created, which will trigger the Edit Link dialog to open
+            // upon LinkView render.
+            if (this.data.form.chainData.authChainConfiguration.length <= index){
+                this.data.form.chainData.authChainConfiguration.push({ module: '', options: '', criteria: '' });
+            }
+
+            linkView.data = {
+                // Each linkview instance requires allCriteria and allModules to render. These values are never changed
+                // Because multiple instances require this same data, I grab it only in this parent view, then pass it
+                // on to to all the child linkview instances.
+                allModules : this.data.allModules,
+                allCriteria : this.data.allCriteria,
+                linkConfig : this.data.form.chainData.authChainConfiguration[index]
+            };
+
+            return linkView;
+        },
+
+        initSortable: function(){
+
+            var self = this;
+
+            this.$el.find("ol#sortable").nestingSortable({
+                exclude:"li:not(.chain-link)",
+                delay: 100,
+                vertical:true,
+                placeholder: "<li class='placeholder'><i class='fa fa-download'></i>"+ $.t("console.authentication.editChains.dropHere") +"</li>",
+
+                onDrag: function (item, position) {
+                    item.css({
+                        left: position.left - self.adjustment.left,
+                        top: position.top - self.adjustment.top
+                    });
+                },
+
+                onDragStart: function (item, container, _super) {
+                    var offset = item.offset(),
+                        pointer = container.rootGroup.pointer;
+                    self.adjustment = {
+                        left: pointer.left - offset.left + 5,
+                        top: pointer.top - offset.top
+                    };
+                    self.originalIndex = item.index();
+                    item.addClass("dragged");
+                    $("body").addClass("dragging");
+                },
+
+                onDrop: function  (item, container, _super, event) {
+                    var clonedItem = $("<li/>").css({height: item.height() + 6, backgroundColor: "transparent", borderColor: "transparent"});
+                    self.sortChainData( self.originalIndex, item.index());
+                    item.before(clonedItem);
+                    item.animate( clonedItem.position(), 300, function  () {
+                        clonedItem.detach();
+                        _super(item, container);
+                        self.setArrows();
+                    });
+                }
+            });
+        },
+
         render: function(args, callback) {
             var self = this;
 
-            this.data.realmPath = args[0];
+            SMSRealmDelegate.authentication.chains.get(args[0], args[1]).done(function (data) {
 
-            SMSRealmDelegate.authentication.chains.get(this.data.realmPath, args[1]).done(function (data) {
-                self.data.chainData = data.chainData;
-                self.data.allModules = data.modulesData;
-
-                self.data.allCriteria = [{
-                    REQUIRED : $.t('console.authentication.editChains.criteria.0')
-                },{
-                    OPTIONAL : $.t('console.authentication.editChains.criteria.1')
-                },{
-                    REQUISITE : $.t('console.authentication.editChains.criteria.2')
-                },{
-                    SUFFICIENT : $.t('console.authentication.editChains.criteria.3')
-                }];
+                self.data = {
+                    // firstRequiredIndex is used in linkView.setArrows() which renders itself differently
+                    // if the linkView's index is greater than the first required module's index.
+                    firstRequiredIndex : -1,
+                    realmPath : args[0],
+                    linkViewMap : {},
+                    allModules : data.modulesData,
+                    allCriteria : [{
+                        REQUIRED : $.t("console.authentication.editChains.criteria.0")
+                    },{
+                        OPTIONAL : $.t("console.authentication.editChains.criteria.1")
+                    },{
+                        REQUISITE : $.t("console.authentication.editChains.criteria.2")
+                    },{
+                        SUFFICIENT : $.t("console.authentication.editChains.criteria.3")
+                    }],
+                    form : {  chainData: data.chainData }
+                };
 
                 self.parentRender(function(){
-
                     var sortable = self.$el.find("ol#sortable");
 
-                    _.each(self.data.chainData.authChainConfiguration, function(linkConfig, index){
-                        var el = $('<li class="chain-link" />');
-                        sortable.append(el);
-                        new LinkView().render(self.data, index, el);
+                    _.each(self.data.form.chainData.authChainConfiguration, function(linkConfig, index){
+                        var li = $("<li class='chain-link' />"),
+                            linkView = self.createLinkView(li, index);
+                        linkView.render();
                     });
 
-                    self.$el.find('[data-toggle="popover"]').popover();
+                    self.$el.find("[data-toggle='popover']").popover();
                     self.initSortable();
+                    PostProcessView.render(self.data.form.chainData);
 
-                    PostProcessView.render(self.data.chainData);
-
-                    if (self.data.chainData.authChainConfiguration.length === 0) {
+                    if (self.data.form.chainData.authChainConfiguration.length === 0) {
                         self.addModuleLink();
                     }
                 });
@@ -77,90 +164,39 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
 
         saveChanges: function(e){
             e.preventDefault();
-
             var self = this,
-                sorted = [],
-                promise,
-                chainlinks = this.$el.find('.chain-link');
+                promise = null,
+                chainData = this.data.form.chainData;
 
-            _.each(chainlinks, function(chainlink){
-                sorted.push(_.findWhere(self.data.chainData.authChainConfiguration, {
-                    id: $(chainlink).children().data().id
-                }));
-
-            });
-
-            this.data.chainData.authChainConfiguration = sorted;
-            this.data.chainData.loginSuccessUrl[0] = this.$el.find('#loginSuccessUrl').val();
-            this.data.chainData.loginFailureUrl[0] = this.$el.find('#loginFailureUrl').val();
+            chainData.loginSuccessUrl[0] = this.$el.find("#loginSuccessUrl").val();
+            chainData.loginFailureUrl[0] = this.$el.find("#loginFailureUrl").val();
 
             PostProcessView.addClassNameDialog().done(function(){
-                promise = SMSRealmDelegate.authentication.chains.update(self.data.realmPath, self.data.chainData._id, self.data.chainData);
+                promise = SMSRealmDelegate.authentication.chains.update(self.data.realmPath, chainData._id, chainData);
                 promise.fail(function(e) {
                     // TODO: Add failure condition
                     console.error(e);
                 });
                 FormHelper.bindSavePromiseToElement(promise, e.target);
             });
-
         },
 
-        addModuleLink: function(e) {
-            if(e){
-                e.preventDefault();
-            }
-            var el = $('<li class="chain-link" />'),
-                moduleLink = new LinkView(),
-                index = this.data.chainData.authChainConfiguration.length;
-            this.data.chainData.authChainConfiguration.push({});
+        setArrows: function(){
+            var chainlinks = this.$el.find(".chain-link"),
+                linkView = null,
+                self = this;
 
-            this.$el.find("ol#sortable").removeClass("empty").append(el);
-            moduleLink.render(this.data, index, el);
-        },
-
-        initSortable: function(){
-
-            var self = this,
-                dropText = $.t('console.authentication.editChains.dropHere');
-
-            this.$el.find("ol#sortable").nestingSortable({
-                exclude:'li:not(.chain-link)',
-                delay: 100,
-                vertical:true,
-                placeholder:'<li class="placeholder"><i class="fa fa-download"></i>'+ dropText +'</li>',
-
-                onDrag: function (item, position) {
-                    item.css({
-                        left: position.left - self.adjustment.left,
-                        top: position.top - self.adjustment.top
-                    });
-                },
-
-                onDragStart: function (item, container, _super) {
-
-                    var offset = item.offset(),
-                        pointer = container.rootGroup.pointer;
-
-                    self.adjustment = {
-                        left: pointer.left - offset.left + 5,
-                        top: pointer.top - offset.top
-                    };
-
-                    item.addClass("dragged");
-                    $("body").addClass("dragging");
-
-                },
-
-                onDrop: function  (item, container, _super, event) {
-                    var clonedItem = $('<li/>').css({height: item.height() + 6, backgroundColor: 'transparent', borderColor: 'transparent'});
-
-                    item.before(clonedItem);
-                    item.animate( clonedItem.position(), 300, function  () {
-                        clonedItem.detach();
-                        _super(item, container);
-                    });
-                }
+            // firstRequiredIndex is used in linkView.setArrows() which renders itself differently
+            // if the linkView's index is greater than the first required module's index.
+            this.data.firstRequiredIndex = -1;
+            _.each(chainlinks, function(chainlink){
+                linkView = self.data.linkViewMap[$(chainlink).children().data().id];
+                linkView.setArrows();
             });
+        },
+
+        sortChainData: function(from, to) {
+            this.data.form.chainData.authChainConfiguration.splice(to, 0, this.data.form.chainData.authChainConfiguration.splice(from, 1)[0]);
         }
     });
 
