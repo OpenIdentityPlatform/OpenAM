@@ -752,6 +752,16 @@
                     "grid": ["Name", "Description", "Resources", "Actions"],
                     "addNew": "New Policy"
                 }
+            },
+
+            "resourceTypes": {
+                "list": {
+                    "add": "New Resource Type",
+                    "title": "Resource Types",
+                    "grid": ["Name", "Description", "Patterns", "Actions"]
+                },
+                "edit": {
+                }
             }
         }
     }

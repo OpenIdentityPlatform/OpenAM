@@ -100,6 +100,7 @@ define("config/AppConfiguration", [
                         templateUrls: [
                             "templates/admin/views/realms/policies/common/StripedListItemTemplate.html",
                             "templates/admin/views/realms/policies/applications/ApplicationsToolbarTemplate.html",
+                            "templates/admin/views/realms/policies/resourceTypes/ResourceTypesToolbarTemplate.html",
                             "templates/admin/views/realms/scripts/ScriptsToolbarTemplate.html",
                             "templates/admin/views/realms/scripts/ScriptValidationTemplate.html",
                             "templates/admin/views/realms/scripts/ChangeContextTemplate.html",
