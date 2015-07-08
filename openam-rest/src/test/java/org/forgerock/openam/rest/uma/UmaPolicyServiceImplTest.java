@@ -126,60 +126,50 @@ public class UmaPolicyServiceImplTest {
         return createUmaPolicyJson("SCOPE_A");
     }
 
-    private JsonValue createBackendScopeAPolicyJson() {
+    private JsonValue createBackendSubjectOnePolicyJson() {
         return json(object(
-                field("name", "RESOURCE_SET_ID - SCOPE_A"),
+                field("name", "RESOURCE_SET_ID - SUBJECT_ONE"),
                 field("resources", array("uma://RESOURCE_SET_ID")),
                 field("resourceTypeUuid", "76656a38-5f8e-401b-83aa-4ccb74ce88d2"),
-                field("actionValues", object(field("SCOPE_A", true))),
+                field("actionValues", object(
+                        field("SCOPE_A", true),
+                        field("SCOPE_B", true))),
                 field("subject", object(
-                        field("type", "OR"),
-                        field("subjects", array(
-                                object(
-                                        field("type", "JwtClaim"),
-                                        field("claimName", "sub"),
-                                        field("claimValue", "id=SUBJECT_ONE")
-                                ), object(
-                                        field("type", "JwtClaim"),
-                                        field("claimName", "sub"),
-                                        field("claimValue", "id=SUBJECT_TWO")
-                                )))
+                        field("type", "JwtClaim"),
+                        field("claimName", "sub"),
+                        field("claimValue", "id=SUBJECT_ONE")
                 ))
         ));
     }
 
-    private JsonValue createBackendScopeBPolicyJson() {
+    private JsonValue createBackendSubjectTwoPolicyJson() {
         return json(object(
-                field("name", "RESOURCE_SET_ID - SCOPE_B"),
+                field("name", "RESOURCE_SET_ID - SUBJECT_TWO"),
                 field("resources", array("uma://RESOURCE_SET_ID")),
                 field("resourceTypeUuid", "76656a38-5f8e-401b-83aa-4ccb74ce88d2"),
-                field("actionValues", object(field("SCOPE_B", true))),
+                field("actionValues", object(
+                        field("SCOPE_A", true))),
                 field("subject", object(
-                        field("type", "OR"),
-                        field("subjects", array(
-                                object(
-                                        field("type", "JwtClaim"),
-                                        field("claimName", "sub"),
-                                        field("claimValue", "id=SUBJECT_ONE")
-                                )))
+                        field("type", "JwtClaim"),
+                        field("claimName", "sub"),
+                        field("claimValue", "id=SUBJECT_TWO")
                 ))
         ));
     }
 
-    private JsonValue createBackendScopeCPolicyJson() {
+    private JsonValue createBackendSubjectOneUpdatedPolicyJson() {
         return json(object(
-                field("name", "RESOURCE_SET_ID - SCOPE_C"),
+                field("name", "RESOURCE_SET_ID - SUBJECT_ONE"),
                 field("resources", array("uma://RESOURCE_SET_ID")),
                 field("resourceTypeUuid", "76656a38-5f8e-401b-83aa-4ccb74ce88d2"),
-                field("actionValues", object(field("SCOPE_C", true))),
+                field("actionValues", object(
+                        field("SCOPE_A", true),
+                        field("SCOPE_B", true),
+                        field("SCOPE_C", true))),
                 field("subject", object(
-                        field("type", "OR"),
-                        field("subjects", array(
-                                object(
-                                        field("type", "JwtClaim"),
-                                        field("claimName", "sub"),
-                                        field("claimValue", "id=SUBJECT_ONE")
-                                )))
+                        field("type", "JwtClaim"),
+                        field("claimName", "sub"),
+                        field("claimValue", "id=SUBJECT_ONE")
                 ))
         ));
     }
@@ -192,8 +182,8 @@ public class UmaPolicyServiceImplTest {
         ServerContext context = createContext();
         JsonValue policy = createUmaPolicyJson();
         List<Resource> createdPolicies = new ArrayList<Resource>();
-        Resource createdPolicy1 = new Resource("ID_1", "REVISION_1", createBackendScopeAPolicyJson());
-        Resource createdPolicy2 = new Resource("ID_1", "REVISION_1", createBackendScopeBPolicyJson());
+        Resource createdPolicy1 = new Resource("ID_1", "REVISION_1", createBackendSubjectOnePolicyJson());
+        Resource createdPolicy2 = new Resource("ID_1", "REVISION_1", createBackendSubjectTwoPolicyJson());
         createdPolicies.add(createdPolicy1);
         createdPolicies.add(createdPolicy2);
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> queryPromise =
@@ -228,7 +218,7 @@ public class UmaPolicyServiceImplTest {
         //Given
         ServerContext context = createContext();
         JsonValue policy = createUmaPolicyJson();
-        Resource policyResource = new Resource("ID_1", "REVISION_1", createBackendScopeAPolicyJson());
+        Resource policyResource = new Resource("ID_1", "REVISION_1", createBackendSubjectOnePolicyJson());
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> queryPromise =
                 Promises.newResultPromise(
                         Pair.of(new QueryResult(), Collections.singletonList(policyResource)));
@@ -323,8 +313,8 @@ public class UmaPolicyServiceImplTest {
 
         QueryResult queryResult = new QueryResult();
         List<Resource> policies = new ArrayList<Resource>();
-        Resource readPolicy1 = new Resource("ID_1", "REVISION_1", createBackendScopeAPolicyJson());
-        Resource readPolicy2 = new Resource("ID_1", "REVISION_1", createBackendScopeBPolicyJson());
+        Resource readPolicy1 = new Resource("ID_1", "REVISION_1", createBackendSubjectOnePolicyJson());
+        Resource readPolicy2 = new Resource("ID_1", "REVISION_1", createBackendSubjectTwoPolicyJson());
         policies.add(readPolicy1);
         policies.add(readPolicy2);
         UmaPolicy expectedUmaPolicy = UmaPolicy.fromUnderlyingPolicies(resourceSet, policies);
@@ -371,16 +361,16 @@ public class UmaPolicyServiceImplTest {
         JsonValue policy = createUmaPolicyJson("SCOPE_A", "SCOPE_C");
         policy.remove(new JsonPointer("/permissions/0/scopes/1"));
         List<Resource> updatedPolicies = new ArrayList<Resource>();
-        Resource updatedPolicy1 = new Resource("ID_1", "REVISION_1", createBackendScopeAPolicyJson());
-        Resource updatedPolicy3 = new Resource("ID_3", "REVISION_1", createBackendScopeCPolicyJson());
+        Resource updatedPolicy1 = new Resource("ID_1", "REVISION_1", createBackendSubjectOneUpdatedPolicyJson());
+        Resource updatedPolicy3 = new Resource("ID_3", "REVISION_1", createBackendSubjectTwoPolicyJson());
         updatedPolicies.add(updatedPolicy1);
         updatedPolicies.add(updatedPolicy3);
         Promise<List<Resource>, ResourceException> updatePolicyPromise = Promises.newResultPromise(updatedPolicies);
 
 
         List<Resource> currentPolicies = new ArrayList<Resource>();
-        Resource currentPolicy1 = new Resource("ID_1", "REVISION_1", createBackendScopeAPolicyJson());
-        Resource currentPolicy2 = new Resource("ID_2", "REVISION_1", createBackendScopeBPolicyJson());
+        Resource currentPolicy1 = new Resource("ID_1", "REVISION_1", createBackendSubjectOnePolicyJson());
+        Resource currentPolicy2 = new Resource("ID_2", "REVISION_1", createBackendSubjectTwoPolicyJson());
         currentPolicies.add(currentPolicy1);
         currentPolicies.add(currentPolicy2);
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> currentPolicyPromise
@@ -478,8 +468,8 @@ public class UmaPolicyServiceImplTest {
         //Given
         ServerContext context = createContext();
         List<Resource> readPolicies = new ArrayList<Resource>();
-        Resource readPolicy1 = new Resource("ID_1", "REVISION_1", createBackendScopeAPolicyJson());
-        Resource readPolicy2 = new Resource("ID_2", "REVISION_2", createBackendScopeBPolicyJson());
+        Resource readPolicy1 = new Resource("ID_1", "REVISION_1", createBackendSubjectOnePolicyJson());
+        Resource readPolicy2 = new Resource("ID_2", "REVISION_2", createBackendSubjectTwoPolicyJson());
         readPolicies.add(readPolicy1);
         readPolicies.add(readPolicy2);
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> currentPolicyPromise
@@ -529,8 +519,8 @@ public class UmaPolicyServiceImplTest {
         ServerContext context = createContext();
         ResourceException exception = mock(ResourceException.class);
         List<Resource> readPolicies = new ArrayList<Resource>();
-        Resource readPolicy1 = new Resource("ID_1", "REVISION_1", createBackendScopeAPolicyJson());
-        Resource readPolicy2 = new Resource("ID_2", "REVISION_2", createBackendScopeBPolicyJson());
+        Resource readPolicy1 = new Resource("ID_1", "REVISION_1", createBackendSubjectOnePolicyJson());
+        Resource readPolicy2 = new Resource("ID_2", "REVISION_2", createBackendSubjectTwoPolicyJson());
         readPolicies.add(readPolicy1);
         readPolicies.add(readPolicy2);
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> currentPolicyPromise
@@ -575,7 +565,7 @@ public class UmaPolicyServiceImplTest {
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.equalTo("/permissions/subject", "id=SUBJECT_ONE"));
 
-        mockBackendQuery(context, createBackendScopeAPolicyJson(), createBackendScopeBPolicyJson());
+        mockBackendQuery(context, createBackendSubjectOnePolicyJson(), createBackendSubjectTwoPolicyJson());
 
         //When
         Pair<QueryResult, Collection<UmaPolicy>> queryResult = policyService.queryPolicies(context, request)
@@ -613,7 +603,7 @@ public class UmaPolicyServiceImplTest {
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.equalTo("resourceServer", "CLIENT_ID"));
 
-        mockBackendQuery(context, createBackendScopeAPolicyJson(), createBackendScopeBPolicyJson());
+        mockBackendQuery(context, createBackendSubjectOnePolicyJson(), createBackendSubjectTwoPolicyJson());
 
         //When
         Pair<QueryResult, Collection<UmaPolicy>> queryResult = policyService.queryPolicies(context, request)
@@ -654,7 +644,7 @@ public class UmaPolicyServiceImplTest {
                         QueryFilter.equalTo("resourceServer", "CLIENT_ID")
                 ));
 
-        mockBackendQuery(context, createBackendScopeAPolicyJson(), createBackendScopeBPolicyJson());
+        mockBackendQuery(context, createBackendSubjectOnePolicyJson(), createBackendSubjectTwoPolicyJson());
 
         //When
         Pair<QueryResult, Collection<UmaPolicy>> queryResult = policyService.queryPolicies(context, request)
@@ -676,7 +666,7 @@ public class UmaPolicyServiceImplTest {
                         QueryFilter.equalTo("resourceServer", "CLIENT_ID")
                 ));
 
-        mockBackendQuery(context, createBackendScopeAPolicyJson(), createBackendScopeBPolicyJson());
+        mockBackendQuery(context, createBackendSubjectOnePolicyJson(), createBackendSubjectTwoPolicyJson());
 
         //When
         Pair<QueryResult, Collection<UmaPolicy>> queryResult = policyService.queryPolicies(context, request)
@@ -720,7 +710,7 @@ public class UmaPolicyServiceImplTest {
                         QueryFilter.equalTo("resourceServer", "OTHER_CLIENT_ID")
                 ));
 
-        mockBackendQuery(context, createBackendScopeAPolicyJson(), createBackendScopeBPolicyJson());
+        mockBackendQuery(context, createBackendSubjectOnePolicyJson(), createBackendSubjectTwoPolicyJson());
 
         //When
         Pair<QueryResult, Collection<UmaPolicy>> queryResult = policyService.queryPolicies(context, request)
@@ -742,7 +732,7 @@ public class UmaPolicyServiceImplTest {
                         QueryFilter.equalTo("resourceServer", "CLIENT_ID")
                 ));
 
-        mockBackendQuery(context, createBackendScopeAPolicyJson(), createBackendScopeBPolicyJson());
+        mockBackendQuery(context, createBackendSubjectOnePolicyJson(), createBackendSubjectTwoPolicyJson());
 
         //When
         Pair<QueryResult, Collection<UmaPolicy>> queryResult = policyService.queryPolicies(context, request)
@@ -764,7 +754,7 @@ public class UmaPolicyServiceImplTest {
                         QueryFilter.equalTo("resourceServer", "CLIENT_ID")
                 ));
 
-        mockBackendQuery(context, createBackendScopeAPolicyJson(), createBackendScopeBPolicyJson());
+        mockBackendQuery(context, createBackendSubjectOnePolicyJson(), createBackendSubjectTwoPolicyJson());
 
         //When
         Pair<QueryResult, Collection<UmaPolicy>> queryResult = policyService.queryPolicies(context, request)
@@ -786,7 +776,7 @@ public class UmaPolicyServiceImplTest {
                         QueryFilter.equalTo("resourceServer", "OTHER_CLIENT_ID")
                 ));
 
-        mockBackendQuery(context, createBackendScopeAPolicyJson(), createBackendScopeBPolicyJson());
+        mockBackendQuery(context, createBackendSubjectOnePolicyJson(), createBackendSubjectTwoPolicyJson());
 
         //When
         Pair<QueryResult, Collection<UmaPolicy>> queryResult = policyService.queryPolicies(context, request)

@@ -59,7 +59,7 @@ public class UmaPolicy {
      * Parses the UMA policy JSON into a {@code UmaPolicy} instance.
      *
      * @param resourceSet The resource set the policy relates to.
-     * @param policy The UMA policy in JSON format.
+     * @param policy      The UMA policy in JSON format.
      * @return A {@code UmaPolicy} instance.
      * @throws BadRequestException If the UMA policy JSON is not valid.
      */
@@ -120,39 +120,31 @@ public class UmaPolicy {
         }
     }
 
-    private static Set<String> getPolicySubjects(JsonValue subjectsContent) {
-        Set<String> subjects = new HashSet<String>();
-        for (JsonValue subject : subjectsContent.get(BACKEND_POLICY_SUBJECTS_KEY)) {
-            subjects.add(subject.get(BACKEND_POLICY_SUBJECT_CLAIM_VALUE_KEY).asString());
-        }
-        return subjects;
+    private static String getPolicySubject(JsonValue content) {
+        return content.get(SUBJECT_KEY).get(BACKEND_POLICY_SUBJECT_CLAIM_VALUE_KEY).asString();
     }
 
     /**
      * Converts underlying backend policies into an {@code UmaPolicy}.
      *
      * @param resourceSet The resource set the policy relates to.
-     * @param policies The collection of underlying backend policies.
+     * @param policies    The collection of underlying backend policies.
      * @return A {@code UmaPolicy} instance.
      * @throws BadRequestException If the underlying policies do not underpin a valid UMA policy.
      */
     public static UmaPolicy fromUnderlyingPolicies(ResourceSetDescription resourceSet, Collection<Resource> policies)
             throws BadRequestException {
 
-        Set<String> underlyingPolicyIds = new HashSet<String>();
-        Map<String, Set<String>> subjectPermissions = new HashMap<String, Set<String>>();
+        Set<String> underlyingPolicyIds = new HashSet<>();
+        Map<String, Set<String>> subjectPermissions = new HashMap<>();
         for (Resource policy : policies) {
             underlyingPolicyIds.add(policy.getId());
-            String scope = policy.getContent().get(BACKEND_POLICY_ACTION_VALUES_KEY).asMap()
-                    .keySet().iterator().next();
-            for (String subject : getPolicySubjects(policy.getContent().get(BACKEND_POLICY_SUBJECT_KEY))) {
-                Set<String> scopes = subjectPermissions.get(subject);
-                if (scopes == null) {
-                    scopes = new HashSet<String>();
-                    subjectPermissions.put(subject, scopes);
-                }
-                scopes.add(scope);
+            String subject = getPolicySubject(policy.getContent());
+            Set<String> scopes = new HashSet<>();
+            for (Map.Entry<String, Object> scopeEntry : policy.getContent().get(BACKEND_POLICY_ACTION_VALUES_KEY).asMap().entrySet()) {
+                scopes.add(scopeEntry.getKey());
             }
+            subjectPermissions.put(subject, scopes);
         }
         List<Object> permissions = array();
         JsonValue umaPolicy = json(object(
@@ -217,7 +209,10 @@ public class UmaPolicy {
      */
     public synchronized Set<String> getScopes() {
         if (scopes == null) {
-            scopes = convertFromUmaPolicy().asMap().keySet();
+            scopes = new HashSet<>();
+            for (JsonValue permission : policy.get(PERMISSIONS_KEY)) {
+                scopes.addAll(permission.get(SCOPES_KEY).asList(String.class));
+            }
         }
         return scopes;
     }
@@ -229,46 +224,40 @@ public class UmaPolicy {
      */
     public Set<JsonValue> asUnderlyingPolicies() {
         Set<JsonValue> underlyingPolicies = new HashSet<JsonValue>();
-        for (JsonValue p : convertFromUmaPolicy()) {
+        for (JsonValue p : policy.get(PERMISSIONS_KEY)) {
             underlyingPolicies.add(createPolicyJson(p));
         }
         return underlyingPolicies;
     }
 
-    private JsonValue convertFromUmaPolicy() {
-        JsonValue policies = json(object());
-        for (JsonValue permission : policy.get(PERMISSIONS_KEY)) {
-            for (JsonValue scope : permission.get(SCOPES_KEY)) {
-                if (!policies.isDefined(scope.asString())) {
-                    policies.add(scope.asString(), array());
-                }
-                policies.get(scope.asString()).add(permission.get(SUBJECT_KEY).asString());
-            }
-        }
-        return policies;
-    }
+    /**
+     * Receives policy in the structure:
+     * <pre>
+     * {
+     *    "scopes" : [ "scope1", ... ],
+     *    "subject" : "theSubject"
+     * }
+     * </pre>
+     */
+    private JsonValue createPolicyJson(JsonValue permission) {
+        String subject = permission.get(SUBJECT_KEY).asString();
+        String policyName = resourceSet.getName() + " - " + resourceSet.getId() + "-" + subject.hashCode();
 
-    private JsonValue createPolicyJson(JsonValue aggregatePolicy) {
-        String policyName = resourceSet.getName() + " - " + resourceSet.getId() + "-"
-                + aggregatePolicy.getPointer().get(0).hashCode();
-        List<Object> subjects = new ArrayList<Object>();
-        for (String subject : aggregatePolicy.asList(String.class)) {
-            subjects.add(object(
-                    field(BACKEND_POLICY_SUBJECT_TYPE_KEY, BACKEND_POLICY_SUBJECT_TYPE_JWT_CLAIM),
-                    field(BACKEND_POLICY_SUBJECT_CLAIM_NAME_KEY, BACKEND_POLICY_SUBJECT_CLAIM_NAME),
-                    field(BACKEND_POLICY_SUBJECT_CLAIM_VALUE_KEY, subject)));
+        Map<String, Object> actions = new HashMap<>();
+        for (String scope : permission.get(SCOPES_KEY).asCollection(String.class)) {
+            actions.put(scope, true);
         }
+
         return json(object(
                 field(BACKEND_POLICY_NAME_KEY, policyName),
                 field("applicationName", getResourceServerId().toLowerCase()), //Lowercase as ldap is case insensitive
                 field(BACKEND_POLICY_RESOURCE_TYPE_KEY, resourceSet.getId()),
                 field(BACKEND_POLICY_RESOURCES_KEY, array(UMA_POLICY_SCHEME + getId())),
-                field(BACKEND_POLICY_ACTION_VALUES_KEY, object(
-                                field(aggregatePolicy.getPointer().get(0), true))
-                ),
+                field(BACKEND_POLICY_ACTION_VALUES_KEY, actions),
                 field(BACKEND_POLICY_SUBJECT_KEY, object(
-                                field(BACKEND_POLICY_SUBJECT_TYPE_KEY, BACKEND_POLICY_SUBJECT_TYPE_OR),
-                                field(BACKEND_POLICY_SUBJECTS_KEY, subjects))
+                        field(BACKEND_POLICY_SUBJECT_TYPE_KEY, BACKEND_POLICY_SUBJECT_TYPE_JWT_CLAIM),
+                        field(BACKEND_POLICY_SUBJECT_CLAIM_NAME_KEY, BACKEND_POLICY_SUBJECT_CLAIM_NAME),
+                        field(BACKEND_POLICY_SUBJECT_CLAIM_VALUE_KEY, subject))
                 )
         ));
     }
