@@ -86,6 +86,7 @@ public class ScriptEngineConfigurator implements ServiceListener {
                 updateConfig(POLICY_CONDITION);
                 updateConfig(AUTHENTICATION_SERVER_SIDE);
                 updateConfig(OIDC_CLAIMS);
+                updateConfig(SDK);
                 initialised = true;
 
             } catch (SSOException | SMSException e) {

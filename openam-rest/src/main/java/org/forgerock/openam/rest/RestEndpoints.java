@@ -62,6 +62,7 @@ import org.forgerock.openam.rest.authz.CoreTokenResourceAuthzModule;
 import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
 import org.forgerock.openam.rest.authz.ResourceOwnerOrSuperUserAuthzModule;
 import org.forgerock.openam.rest.authz.SessionResourceAuthzModule;
+import org.forgerock.openam.rest.batch.BatchResource;
 import org.forgerock.openam.rest.dashboard.DashboardResource;
 import org.forgerock.openam.rest.devices.OathDevicesResource;
 import org.forgerock.openam.rest.devices.TrustedDevicesResource;
@@ -282,6 +283,10 @@ public class RestEndpoints {
         dynamicRealmRouter.route("/realm-config")
                 .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(RoutingMode.STARTS_WITH, smsRequestHandlerFactory.create(SchemaType.ORGANIZATION));
+
+        dynamicRealmRouter.route("/batch")
+                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .forVersion("1.0").to(BatchResource.class);
 
         // ------------------
         // Global routes

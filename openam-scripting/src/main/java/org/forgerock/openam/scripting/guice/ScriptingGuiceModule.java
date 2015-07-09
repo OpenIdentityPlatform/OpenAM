@@ -89,6 +89,10 @@ public class ScriptingGuiceModule extends AbstractModule {
                 .annotatedWith(Names.named(OIDC_CLAIMS.name()))
                 .toInstance(new StandardScriptEngineManager());
 
+        bind(StandardScriptEngineManager.class)
+                .annotatedWith(Names.named(SDK.name()))
+                .toInstance(new StandardScriptEngineManager());
+
         bind(RestletHttpClient.class)
                 .annotatedWith(Names.named(SupportedScriptingLanguage.JAVASCRIPT.name()))
                 .to(JavaScriptHttpClient.class);
@@ -153,6 +157,26 @@ public class ScriptingGuiceModule extends AbstractModule {
     @Named(OIDC_CLAIMS_NAME)
     ScriptEvaluator getOidcClaimsScriptEvaluator(
             @Named(OIDC_CLAIMS_NAME) StandardScriptEngineManager scriptEngineManager,
+            ExecutorServiceFactory executorServiceFactory, ScriptEngineConfigurator configurator) {
+
+        return createEvaluator(scriptEngineManager, executorServiceFactory, configurator);
+    }
+
+    /**
+     * Creates the script evaluator to use for evaluating SDK-originating scripts. The evaluator returned uses a
+     * thread pool to evaluate scripts (supporting script interruption), delegating to a sandboxed script evaluator.
+     *
+     * @param scriptEngineManager the script engine manager to use.
+     * @param executorServiceFactory the factory for creating managed thread pools for script execution.
+     * @param configurator the service configuration listener.
+     * @return an appropriately configured script evaluator for use with OIDC Claims scripts.
+     */
+    @Provides
+    @Singleton
+    @Inject
+    @Named(SDK_NAME)
+    ScriptEvaluator getSDKScriptEvaluator(
+            @Named(SDK_NAME) StandardScriptEngineManager scriptEngineManager,
             ExecutorServiceFactory executorServiceFactory, ScriptEngineConfigurator configurator) {
 
         return createEvaluator(scriptEngineManager, executorServiceFactory, configurator);

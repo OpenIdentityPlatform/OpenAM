@@ -16,20 +16,8 @@
 
 package org.forgerock.openam.forgerockrest.guice;
 
-import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.STRING;
-import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.TIMESTAMP;
-import static org.forgerock.openam.uma.UmaConstants.UMA_BACKEND_POLICY_RESOURCE_HANDLER;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.security.auth.Subject;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.*;
+import static org.forgerock.openam.uma.UmaConstants.*;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
@@ -49,10 +37,19 @@ import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.opensso.PolicyPrivilegeManager;
 import com.sun.identity.idm.IdRepoCreationListener;
+import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-
-import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.security.auth.Subject;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.RequestType;
@@ -87,6 +84,8 @@ import org.forgerock.openam.rest.RestEndpointServlet;
 import org.forgerock.openam.rest.RestEndpoints;
 import org.forgerock.openam.rest.authz.CoreTokenResourceAuthzModule;
 import org.forgerock.openam.rest.authz.PrivilegeDefinition;
+import org.forgerock.openam.rest.batch.helpers.Requester;
+import org.forgerock.openam.rest.resource.CrestRouter;
 import org.forgerock.openam.rest.resource.PromisedRequestHandler;
 import org.forgerock.openam.rest.resource.PromisedRequestHandlerImpl;
 import org.forgerock.openam.rest.router.CTSPersistentStoreProxy;
@@ -331,6 +330,13 @@ public class ForgerockRestGuiceModule extends AbstractModule {
 
     public static Map<Integer, Integer> getEntitlementsErrorHandlers() {
         return new EntitlementsResourceErrorMappingProvider().get();
+    }
+
+    @Provides
+    @Named(Requester.ROUTER)
+    @Inject
+    public CrestRouter getRealmRouterProvider(RestEndpoints restEndpoints) {
+        return restEndpoints.getResourceRouter();
     }
 
     @Provides

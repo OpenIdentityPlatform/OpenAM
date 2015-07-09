@@ -194,6 +194,10 @@
                                     <file>${project.build.sourceDirectory}/../groovy/oidc-claims-extension.groovy</file>
                                 </content>
                                 <content>
+                                    <id>sdk-groovy</id>
+                                    <file>${project.build.sourceDirectory}/../groovy/sdk.groovy</file>
+                                </content>
+                                <content>
                                     <id>policy-condition-js</id>
                                     <file>${project.build.sourceDirectory}/../js/policy-condition.js</file>
                                 </content>
