@@ -37,6 +37,7 @@ define([
 
     "./views/realms/authentication/chains/CriteriaView",
     "./views/realms/authentication/chains/EditChainView",
+    "./views/realms/authentication/chains/EditLinkView",
     "./views/realms/authentication/chains/LinkView",
     "./views/realms/authentication/chains/LinkInfoView",
     "./views/realms/authentication/chains/PostProcessView",

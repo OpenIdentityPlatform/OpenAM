@@ -18,7 +18,7 @@
 define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkInfoView", [
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView"
-], function(_, AbstractView) {
+], function (_, AbstractView) {
     var LinkInfoView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/chains/LinkInfoTemplate.html",
 

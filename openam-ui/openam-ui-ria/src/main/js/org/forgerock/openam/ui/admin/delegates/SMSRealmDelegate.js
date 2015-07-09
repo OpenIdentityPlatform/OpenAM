@@ -97,7 +97,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate", [
 
                     return {
                         chainData: chainData[0],
-                        modulesData: modulesData[0].result
+                        modulesData: _.sortBy(modulesData[0].result, "_id")
                     };
                 });
             },

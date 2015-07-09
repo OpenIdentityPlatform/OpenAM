@@ -1,0 +1,41 @@
+<label class="block-header">{{t 'console.authentication.editChains.options'}}</label>
+<table class="table table-striped">
+    {{#if linkConfig.options}}
+    <thead>
+        <tr>
+            <th>{{t "common.form.key"}}</th>
+            <th>{{t "common.form.value"}}</th>
+            <th class="col-check"></th>
+        </tr>
+    </thead>
+    {{/if}}
+    <tbody>
+        {{#each linkConfig.options}}
+        <tr>
+            <td class="optionsKey">{{@key}}</td>
+            <td class="optionsValue">{{this}}</td>
+            <td>
+                <div class="btn-group pull-right">
+                    <button class="btn btn-transparent delete-option"><i class="fa fa-times"></i></button>
+                </div>
+            </td>
+        </tr>
+        {{/each}}
+
+        <tr class="tr-row">
+            <td>
+                <label class="sr-only" for="optionsKey">{{t "common.form.key"}}</label>
+                <input type="text" class="form-control" id="optionsKey" placeholder="{{t 'common.form.addKey'}}">
+            </td>
+            <td>
+                <label class="sr-only" for="optionsKey">{{t "common.form.value"}}</label>
+                <input type="text" class="form-control" id="optionsValue" placeholder="{{t 'common.form.addValue'}}">
+            </td>
+            <td>
+                <div class="btn-group pull-right">
+                    <button id="addOption" type="submit" class="btn btn-secondary"><i class="fa fa-plus"></i></button>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>

@@ -23,8 +23,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
     "bootstrap-dialog",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/admin/views/realms/authentication/chains/CriteriaView",
+    "org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLinkView",
     "org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkInfoView"
-], function($, _, AbstractView, BootstrapDialog, UIUtils, CriteriaView, LinkInfoView) {
+], function ($, _, AbstractView, BootstrapDialog, UIUtils, CriteriaView, EditLinkView, LinkInfoView) {
 
     var LinkView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/chains/LinkTemplate.html",
@@ -56,82 +57,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
             if (e) {
                 e.preventDefault();
             }
-            var self = this,
-                title = this.data.linkConfig.module ? $.t("console.authentication.editChains.editModule") : $.t("console.authentication.editChains.newModule");
-
-            UIUtils.fillTemplateWithData("templates/admin/views/realms/authentication/chains/EditLinkTemplate.html", self.data, function(template) {
-                var options = {
-                    message: function (dialog) {
-                        return $("<div></div>").append(template);
-                    },
-                    title: title,
-                    type: BootstrapDialog.TYPE_DEFAULT,
-                    closable: false,
-                    buttons: [{
-                        label: $.t("common.form.ok"),
-                        cssClass: "btn-primary",
-                        id: "saveBtn",
-                        action: function(dialog) {
-                            var moduleSelectize = dialog.getModalBody().find("#selectModule")[0].selectize,
-                                criteriaValue = dialog.getModalBody().find("#selectCriteria")[0].selectize.getValue();
-
-                            self.data.linkConfig.module = moduleSelectize.getValue();
-                            self.data.linkConfig.type = _.findWhere(moduleSelectize.options, { _id: self.data.linkConfig.module }).type;
-                            self.linkInfoView.parentRender();
-                            self.criteriaView.setCriteria(criteriaValue);
-                            self.parent.setArrows();
-                            dialog.close();
-                        }
-                    }, {
-                        label: $.t("common.form.cancel"),
-                        action: function(dialog) {
-                            if (self.data.linkConfig.module) {
-                                self.parent.setArrows();
-                            } else {
-                                self.deleteItem(self.data.id);
-                            }
-                            dialog.close();
-                        }
-                    }],
-                    onshow: function (dialog) {
-                        dialog.getButton("saveBtn").disable();
-                        dialog.getModalBody().find("#selectModule").selectize({
-                            options:self.data.allModules,
-                            render: {
-                                item: function(item) {
-                                    return "<div>" + item._id + " <span class='dropdown-subtitle'>"+ item.type + "</span></div>";
-                                },
-                                option: function(item) {
-                                    return "<div><div>" + item._id + "</div><div class='dropdown-subtitle'>"+ item.type + "</div></div>";
-                                }
-                            },
-                            onChange: function (value) {
-                                dialog.options.validateDialog(dialog);
-                            }
-
-                        });
-                        dialog.getModalBody().find("#selectCriteria").selectize({
-                            onChange: function (value) {
-                                dialog.options.validateDialog(dialog);
-                            }
-                        });
-                        dialog.options.validateDialog(dialog);
-                        dialog.getModalBody().find("#selectModule");
-                    },
-
-                    validateDialog: function(dialog){
-                        var moduleValue = dialog.getModalBody().find("#selectModule")[0].selectize.getValue(),
-                            criteriaValue = dialog.getModalBody().find("#selectCriteria")[0].selectize.getValue();
-
-                        if( moduleValue.length === 0 || criteriaValue.length === 0 ){
-                            dialog.getButton("saveBtn").disable();
-                        } else {
-                            dialog.getButton("saveBtn").enable();
-                        }
-                    }
-                };
-                BootstrapDialog.show(options);
-            });
+            EditLinkView.show(this);
         },
 
         moveBtnClick: function(e) {
