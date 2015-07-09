@@ -491,6 +491,8 @@
                 "title": "Resources",
                 "subtitle": "All your shared resources",
                 "grid": ["Resources", "Host", "Type"],
+                "myResources": "My Resources",
+                "sharedResources": "Shared with me",
                 "revokeAllResourcesSuccess" : "All resources successfully revoked",
                 "revokeAllResourcesFail" : "We have been unable revoke access to your resources. Please contact your Administrator"
             },

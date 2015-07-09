@@ -99,7 +99,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
 
                 parseState: BackgridUtils.parseState,
                 parseRecords: function(data, options){
-                    self.$el.find("button#revokeAll").attr("disabled", data.result.length === 0);
+                    self.$el.find("button#revokeAll").prop("disabled", data.result.length === 0);
 
                     return data.result;
                 },
@@ -182,10 +182,11 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
 
             self.parentRender(function() {
                 self.$el.find('[data-toggle="tooltip"]').tooltip();
-                self.$el.find("#backgridContainer").append( grid.render().el );
-                self.$el.find("#paginationContainer").append( paginator.render().el );
-                self.data.resourceSetCollection.fetch({reset: true, processData: false});
-                if (callback) { callback();}
+                self.$el.find("#myResources .backgrid-container").append( grid.render().el );
+                self.$el.find("#myResources .pagination-container").append( paginator.render().el );
+                self.data.resourceSetCollection.fetch({reset: true, processData: false}).done(function(){
+                    if (callback) { callback();}
+                });
             });
         }
 
