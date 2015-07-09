@@ -678,5 +678,15 @@ public interface ISAuthConstants {
 
     //Property name for forcing two factor auth
     public static final String TWO_FACTOR_AUTH_MANDATORY = "forgerockTwoFactorAuthMandatory";
+    
+    /**
+     * Key for the list of principals present at the end of a successful login process.
+     */
+    public static final String PRINCIPAL_LIST = "org.forgerock.openam.auth.principals";
+    
+    /**
+     * Key for maintaining list of principals created during login process.
+     */
+    public static final String AUTHENTICATED_PRINCIPALS = "org.forgerock.openam.auth.authenticatedprincipals";
 
 }
