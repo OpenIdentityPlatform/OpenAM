@@ -46,6 +46,7 @@ import com.sun.identity.authentication.config.AMAuthenticationInstance;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.authentication.config.AMConfigurationException;
 import com.sun.identity.authentication.server.AuthContextLocal;
+import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
 import com.sun.identity.authentication.spi.AuthenticationException;
 import com.sun.identity.authentication.util.AMAuthUtils;
@@ -86,6 +87,7 @@ import java.security.Principal;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
@@ -97,12 +99,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.authentication.service.DefaultSessionPropertyUpgrader;
 import org.forgerock.openam.authentication.service.SessionPropertyUpgrader;
 import org.forgerock.openam.utils.ClientUtils;
@@ -124,6 +129,8 @@ public class LoginState {
     
     private static String pCookieName = AuthUtils.getPersistentCookieName();
     private static Set userAttributes = new HashSet();
+    private static final List<String> SHARED_STATE_ATTRIBUTES = 
+            Arrays.asList(ISAuthConstants.SHARED_STATE_PASSWORD, ISAuthConstants.SHARED_STATE_USERNAME);
     
     Callback[] receivedCallbackInfo;
     Callback[] prevCallback;
@@ -373,6 +380,17 @@ public class LoginState {
     boolean postProcessInSession = false;
     boolean modulesInSession = false;
     
+    /**
+     * The sharedState Map of the {@link AMLoginModule} and subclasses.
+     */
+    private Map<Object, Object> sharedState;
+
+    /**
+     * Stores the principals corresponding to the successful authentication modules within the current authentication
+     * session.
+     */
+    private final Set<String> authenticatedPrincipals = new HashSet<String>();
+
     public static Set internalUsers = new HashSet();
     
     private static SecureRandom secureRandom = null;
@@ -2984,7 +3002,7 @@ public class LoginState {
     Set getTokenFromPrincipal(Subject subject) {
         Set principal = subject.getPrincipals();
         Set tokenSet = new HashSet();
-        StringBuffer pList = new StringBuffer();
+        StringBuilder pList = new StringBuilder();
         Iterator p = principal.iterator();
 
         while (p.hasNext()) {
@@ -3117,15 +3135,15 @@ public class LoginState {
             debug.message("authethName" + authMethName);
             debug.message("pAuthMethName " + pAuthMethName);
         }
-        StringBuffer sb = null;
+        StringBuilder sb = null;
         if ((this.pAuthMethName != null) && (this.pAuthMethName.length() > 0)){
-            sb=new StringBuffer().append(this.pAuthMethName);
+            sb=new StringBuilder().append(this.pAuthMethName);
         }
         if ((authMethName != null) && (authMethName.length() > 0)) {
             if (sb !=null) {
                 sb.append(ISAuthConstants.PIPE_SEPARATOR).append(authMethName);
             } else {
-                sb = new StringBuffer().append(authMethName);
+                sb = new StringBuilder().append(authMethName);
             }
         }
         if (sb != null) {
@@ -5702,7 +5720,7 @@ public class LoginState {
         return ignoreUserProfile;
     }
 
-    boolean containsToken(StringBuffer principalBuffer, String token) {
+    boolean containsToken(StringBuilder principalBuffer, String token) {
         String principalString = principalBuffer.toString();
         if (debug.messageEnabled()) {
             debug.message("principalString : " + principalString);
@@ -6036,6 +6054,7 @@ public class LoginState {
             userContainerDN=null;
             userNamingAttr=null;
         }
+        sharedState = null;
         
         /**
          * The rest variables are all url related.
@@ -6620,5 +6639,65 @@ public class LoginState {
             debug.message("Restoring old session");
             setSession(oldSession);
         }
+    }
+    
+    /**
+     * Sets a shared state map from the {@link AMLoginModule}.
+     * 
+     * @param sharedState
+     */
+    public void setSharedState(Map sharedState) {
+        this.sharedState = sharedState;
+    }
+
+    /**
+     * The shared state map.
+     * 
+     * @return sharedState
+     */
+    public Map getSharedState() {
+        return sharedState;
+    }
+
+    /**
+     * Saves the attributes specified by the sharedStateAttributes into requestMap.
+     */
+    public void saveSharedStateAttributes() {
+        if (sharedState != null) {
+            for (String sharedStateKey : SHARED_STATE_ATTRIBUTES) {
+                requestMap.put(sharedStateKey, (String) sharedState.get(sharedStateKey));
+            }
+        }
+    }
+
+    /**
+     * Save the principalList that is generated by successful LoginContext authentication, to the requestMap.
+     */
+    public void saveSubjectState() {
+        if (principalList != null) {
+            requestMap.put(ISAuthConstants.PRINCIPAL_LIST, principalList);
+        }
+    }
+
+    /**
+     * Saves the principals successfully created in the authentication process whether all modules or identity searches
+     * are successful or not. This differs from the principalList which is generated by the logincontext as that is only
+     * generated when all modules have been completed successfully.
+     * 
+     * @param principalName
+     */
+    public void saveAuthenticatedPrincipal(String principalName) {
+        authenticatedPrincipals.add(principalName);
+        // store in the requestmap
+        requestMap.put(ISAuthConstants.AUTHENTICATED_PRINCIPALS, StringUtils.join(authenticatedPrincipals, "|"));
+    }
+
+    /**
+     * Returns a list of the authenticated principals in the current authentication process.
+     * 
+     * @return authenticatedPrincipals
+     */
+    public Set<String> getAuthenticatedPrincipals() {
+        return authenticatedPrincipals;
     }
 }

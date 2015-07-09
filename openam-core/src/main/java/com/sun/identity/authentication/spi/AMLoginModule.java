@@ -897,6 +897,7 @@ public abstract class AMLoginModule implements LoginModule {
         loginState = getLoginState();
         
         fileName = loginState.getFileName(moduleClass+ ".xml");
+        loginState.setSharedState(sharedState);
         
         // get resource bundle
         
@@ -1319,7 +1320,7 @@ public abstract class AMLoginModule implements LoginModule {
     
     /**
      * Returns the authentication <code>LoginState</code>
-     * @param methodName Name of the required methd in 
+     * @param methodName Name of the required method in 
      *        <code>LoginState</code> object
      * @return <code>com.sun.identity.authentication.service.LoginState</code>
      *         for this authentication method.
@@ -2135,6 +2136,10 @@ public abstract class AMLoginModule implements LoginModule {
             debug.message("SETTING Module name.... :" + moduleName);
         }
         loginState.setSuccessModuleName(moduleName);
+        loginState.saveSharedStateAttributes();
+        if (getPrincipal() != null && getPrincipal().getName() != null) {
+            loginState.saveAuthenticatedPrincipal(getPrincipal().getName());
+        }
     }
     
     /**
@@ -2317,7 +2322,8 @@ public abstract class AMLoginModule implements LoginModule {
             debug.message("SETTING Failure Module name.... :" + moduleName);
         }
         loginState.setFailureModuleName(moduleName);
-        return ;
+        loginState.saveSharedStateAttributes();
+        return;
     }
     
     /**
@@ -2784,5 +2790,24 @@ public abstract class AMLoginModule implements LoginModule {
             }
         }
         return aliasAttrNames;
+    }
+    
+    /**
+     * Returns the principals authenticated in the current authentication process or an empty set if login state is
+     * unavailable or no authenticated principals are present.
+     * 
+     * @return a set of authenticated principals.
+     */
+    protected Set<String> getAuthenticatedPrincipals() {
+        if (loginState == null) {
+            loginState = getLoginState();
+        }
+        if (loginState == null) {
+            if (debug.messageEnabled()) {
+                debug.message("AMLoginModule.getAuthenticatedPrincipals: ubable to get loginState");
+            }
+            return Collections.emptySet();
+        }
+        return loginState.getAuthenticatedPrincipals();
     }
 }

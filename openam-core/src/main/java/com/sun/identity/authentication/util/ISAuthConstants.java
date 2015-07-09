@@ -694,4 +694,14 @@ public interface ISAuthConstants {
      * The AuthType string for persistent cookie based logins.
      */
     public static final String PCOOKIE_AUTH_TYPE = "PCookie";
+    
+    /**
+     * Key for the list of principals present at the end of a successful login process.
+     */
+    public static final String PRINCIPAL_LIST = "org.forgerock.openam.auth.principals";
+    
+    /**
+     * Key for maintaining list of principals created during login process.
+     */
+    public static final String AUTHENTICATED_PRINCIPALS = "org.forgerock.openam.auth.authenticatedprincipals";
 }
