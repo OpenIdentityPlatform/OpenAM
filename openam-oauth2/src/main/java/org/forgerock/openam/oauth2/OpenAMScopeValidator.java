@@ -58,6 +58,7 @@ import org.forgerock.openam.scripting.ScriptObject;
 import org.forgerock.openam.scripting.SupportedScriptingLanguage;
 import org.forgerock.openam.scripting.service.ScriptConfiguration;
 import org.forgerock.openam.scripting.service.ScriptingServiceFactory;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.openam.utils.OpenAMSettingsImpl;
 import org.forgerock.openam.utils.StringUtils;
@@ -413,17 +414,17 @@ public class OpenAMScopeValidator implements ScopeValidator {
             for (String scope : scopes) {
                 try {
                     Set<String> attributes = id.getAttribute(scope);
-                    if (attributes != null && !attributes.isEmpty()) {
+                    StringBuilder builder = new StringBuilder();
+                    if (CollectionUtils.isNotEmpty(attributes)) {
                         Iterator<String> iter = attributes.iterator();
-                        StringBuilder builder = new StringBuilder();
                         while (iter.hasNext()) {
                             builder.append(iter.next());
                             if (iter.hasNext()) {
                                 builder.append(MULTI_ATTRIBUTE_SEPARATOR);
                             }
                         }
-                        map.put(scope, builder.toString());
                     }
+                    map.put(scope, builder.toString());
                 } catch (Exception e) {
                     logger.error("Unable to get attribute", e);
                 }
