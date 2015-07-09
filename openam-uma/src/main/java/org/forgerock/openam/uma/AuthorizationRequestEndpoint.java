@@ -147,12 +147,12 @@ public class AuthorizationRequestEndpoint extends ServerResource {
                 throw new NotFoundException("Could not find Resource Set, " + resourceSetId);
             }
             resourceName += results.iterator().next().getId();
-            resourceOwnerSubject = createSubject(results.iterator().next().getResourceOwnerId(), realm);
+            resourceOwnerSubject = UmaUtils.createSubject(createIdentity(results.iterator().next().getResourceOwnerId(), realm));
         } catch (NotFoundException e) {
             debug.message("Couldn't find resource that permission ticket is registered for", e);
             throw new ServerException("Couldn't find resource that permission ticket is registered for");
         }
-        Subject requestingPartySubject = createSubject(authorisationApiToken.getResourceOwnerId(), realm);
+        Subject requestingPartySubject = UmaUtils.createSubject(createIdentity(authorisationApiToken.getResourceOwnerId(), realm));
 
         // Implicitly grant access to the resource owner
         if (isRequestingPartyResourceOwner(requestingPartySubject, resourceOwnerSubject)) {
@@ -181,12 +181,8 @@ public class AuthorizationRequestEndpoint extends ServerResource {
         return resourceOwner.equals(requestingParty);
     }
 
-    protected Subject createSubject(String username, String realm) {
-        AMIdentity identity = IdUtils.getIdentity(username, realm);
-        JwtPrincipal principal = new JwtPrincipal(json(object(field("sub", identity.getUniversalId()))));
-        Set<Principal> principals = new HashSet<Principal>();
-        principals.add(principal);
-        return new Subject(false, principals, Collections.emptySet(), Collections.emptySet());
+    protected AMIdentity createIdentity(String username, String realm) {
+        return IdUtils.getIdentity(username, realm);
     }
 
     private Representation createJsonRpt(UmaTokenStore umaTokenStore, PermissionTicket permissionTicket, AccessToken authorisationApiToken) throws ServerException {

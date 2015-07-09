@@ -43,6 +43,7 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Evaluator;
 import com.sun.identity.entitlement.JwtPrincipal;
 import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.shared.debug.Debug;
 import org.assertj.core.api.Assertions;
 import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
@@ -117,8 +118,9 @@ public class UmaPolicyServiceImplDelegationTest {
         UmaPolicyEvaluatorFactory policyEvaluatorFactory = mock(UmaPolicyEvaluatorFactory.class);
         given(policyEvaluatorFactory.getEvaluator(any(Subject.class), anyString())).willReturn(policyEvaluator);
 
+        Debug debug = mock(Debug.class);
         policyService = new UmaPolicyServiceImpl(policyResourceDelegate, resourceSetStoreFactory, lazyAuditLogger,
-                contextHelper, policyEvaluatorFactory, coreServicesWrapper);
+                contextHelper, policyEvaluatorFactory, coreServicesWrapper, debug);
 
         given(contextHelper.getRealm(Matchers.<ServerContext>anyObject())).willReturn("REALM");
     }

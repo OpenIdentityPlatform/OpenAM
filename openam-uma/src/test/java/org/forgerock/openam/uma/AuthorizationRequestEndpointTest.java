@@ -8,7 +8,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
 import javax.security.auth.Subject;
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,6 +18,7 @@ import java.util.Set;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Evaluator;
+import com.sun.identity.idm.AMIdentity;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
@@ -78,19 +78,14 @@ public class AuthorizationRequestEndpointTest {
         }
 
         @Override
-        protected Subject createSubject(final String username, final String realm) {
+        protected AMIdentity createIdentity(final String username, final String realm) {
+            AMIdentity identity = mock(AMIdentity.class);
             if (!RESOURCE_OWNER_ID.equals(username)) {
-                return subject;
+                given(identity.getUniversalId()).willReturn("RESOURCE_OWNER_ID");
             } else {
-                final Subject subject = new Subject();
-                subject.getPrincipals().add(new Principal() {
-                    @Override
-                    public String getName() {
-                        return realm + ":" + username;
-                    }
-                });
-                return subject;
+                given(identity.getUniversalId()).willReturn(realm + ":" + username);
             }
+            return identity;
         }
 
         @Override
@@ -132,7 +127,7 @@ public class AuthorizationRequestEndpointTest {
 
         umaProviderSettings = mock(UmaProviderSettings.class);
         policyEvaluator = mock(Evaluator.class);
-        given(umaProviderSettings.getPolicyEvaluator(subject, RS_CLIENT_ID.toLowerCase())).willReturn(policyEvaluator);
+        given(umaProviderSettings.getPolicyEvaluator(any(Subject.class), eq(RS_CLIENT_ID.toLowerCase()))).willReturn(policyEvaluator);
         given(umaProviderSettings.getUmaTokenStore()).willReturn(umaTokenStore);
 
         umaProviderSettingsFactory = mock(UmaProviderSettingsFactory.class);

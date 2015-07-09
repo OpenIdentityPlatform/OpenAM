@@ -36,6 +36,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Evaluator;
 import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
@@ -92,8 +93,9 @@ public class UmaPolicyServiceImplTest {
         policyEvaluator = mock(Evaluator.class);
         given(policyEvaluatorFactory.getEvaluator(any(Subject.class), anyString())).willReturn(policyEvaluator);
         coreServicesWrapper = mock(CoreServicesWrapper.class);
+        Debug debug = mock(Debug.class);
         policyService = new UmaPolicyServiceImpl(policyResourceDelegate, resourceSetStoreFactory, lazyAuditLogger,
-                contextHelper, policyEvaluatorFactory, coreServicesWrapper);
+                contextHelper, policyEvaluatorFactory, coreServicesWrapper, debug);
 
         given(contextHelper.getRealm(Matchers.<ServerContext>anyObject())).willReturn("REALM");
         given(contextHelper.getUserId(Matchers.<ServerContext>anyObject())).willReturn("RESOURCE_OWNER_ID");

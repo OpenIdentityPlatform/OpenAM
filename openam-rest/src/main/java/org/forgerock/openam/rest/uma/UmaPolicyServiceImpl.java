@@ -16,13 +16,12 @@
 
 package org.forgerock.openam.rest.uma;
 
-import static org.forgerock.json.fluent.JsonValue.*;
 import static org.forgerock.openam.uma.UmaConstants.UMA_POLICY_SCHEME;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.security.auth.Subject;
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -37,9 +36,9 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Evaluator;
-import com.sun.identity.entitlement.JwtPrincipal;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
@@ -67,6 +66,7 @@ import org.forgerock.openam.uma.UmaConstants;
 import org.forgerock.openam.uma.UmaPolicy;
 import org.forgerock.openam.uma.UmaPolicyQueryFilterVisitor;
 import org.forgerock.openam.uma.UmaPolicyService;
+import org.forgerock.openam.uma.UmaUtils;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
 import org.forgerock.openam.uma.audit.UmaAuditType;
 import org.forgerock.openam.utils.Config;
@@ -90,6 +90,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
     private final ContextHelper contextHelper;
     private final UmaPolicyEvaluatorFactory policyEvaluatorFactory;
     private final CoreServicesWrapper coreServicesWrapper;
+    private final Debug debug;
 
     /**
      * Creates an instance of the {@code UmaPolicyServiceImpl}.
@@ -100,18 +101,20 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
      * @param contextHelper An instance of the {@code ContextHelper}.
      * @param policyEvaluatorFactory An instance of the {@code UmaPolicyEvaluatorFactory}.
      * @param coreServicesWrapper An instance of the {@code CoreServicesWrapper}.
+     * @param debug An instance of the REST {@code Debug}.
      */
     @Inject
     public UmaPolicyServiceImpl(PolicyResourceDelegate policyResourceDelegate,
             ResourceSetStoreFactory resourceSetStoreFactory, Config<UmaAuditLogger> auditLogger,
             ContextHelper contextHelper, UmaPolicyEvaluatorFactory policyEvaluatorFactory,
-            CoreServicesWrapper coreServicesWrapper) {
+            CoreServicesWrapper coreServicesWrapper, @Named("frRest") Debug debug) {
         this.policyResourceDelegate = policyResourceDelegate;
         this.resourceSetStoreFactory = resourceSetStoreFactory;
         this.auditLogger = auditLogger;
         this.contextHelper = contextHelper;
         this.policyEvaluatorFactory = policyEvaluatorFactory;
         this.coreServicesWrapper = coreServicesWrapper;
+        this.debug = debug;
     }
 
     private JsonValue resolveUsernameToUID(final ServerContext context, JsonValue policy) {
@@ -147,8 +150,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
     private ResourceSetDescription getResourceSet(String realm, String policyId) throws ResourceException {
         try {
             Set<ResourceSetDescription> results = resourceSetStoreFactory.create(realm).query(
-                    org.forgerock.util.query.QueryFilter.and(
-                            org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, policyId)));
+                            org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, policyId));
             if (results.isEmpty()) {
                 throw new BadRequestException("Invalid ResourceSet UID" + policyId);
             } else if (results.size() > 1) {
@@ -163,8 +165,8 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
 
     private boolean canUserShareResourceSet(String resourceOwnerId, String username, String clientId, String realm,
             String resourceSetId, Set<String> requestedScopes) {
-        Subject resourceOwner = createSubject(resourceOwnerId, realm);
-        Subject user = createSubject(username, realm);
+        Subject resourceOwner = UmaUtils.createSubject(coreServicesWrapper.getIdentity(resourceOwnerId, realm));
+        Subject user = UmaUtils.createSubject(coreServicesWrapper.getIdentity(username, realm));
         if (resourceOwner.equals(user)) {
             return true;
         }
@@ -186,16 +188,9 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
             }
             return requiredScopes.isEmpty();
         } catch (EntitlementException e) {
+            debug.error("Failed to evaluate UAM policies", e);
             return false;
         }
-    }
-
-    protected Subject createSubject(String username, String realm) {
-        AMIdentity identity = coreServicesWrapper.getIdentity(username, realm);
-        JwtPrincipal principal = new JwtPrincipal(json(object(field("sub", identity.getUniversalId()))));
-        Set<Principal> principals = new HashSet<Principal>();
-        principals.add(principal);
-        return new Subject(false, principals, Collections.emptySet(), Collections.emptySet());
     }
 
     /**
