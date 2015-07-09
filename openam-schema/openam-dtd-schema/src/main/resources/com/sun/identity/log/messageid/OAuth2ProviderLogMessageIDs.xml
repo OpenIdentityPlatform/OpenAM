@@ -32,7 +32,10 @@
     <logmessage name="FAILED_CREATE_TOKEN" id="3"
                 loglevel="LL_INFO"
                 description="Failed to creating an oauth 2.0 token">
-        <datainfo />
+        <datainfo>
+            <item>message</item>
+            <item>token info</item>
+        </datainfo>
         <triggers>
             <item>Failed creating an oauth 2.0 token</item>
         </triggers>
@@ -41,7 +44,10 @@
     <logmessage name="FAILED_DELETE_TOKEN" id="4"
                 loglevel="LL_INFO"
                 description="Failed deleting an oauth 2.0 token">
-        <datainfo />
+        <datainfo>
+            <item>message</item>
+            <item>token info</item>
+        </datainfo>
         <triggers>
             <item>Failed deleting an oauth 2.0 token</item>
         </triggers>
@@ -62,7 +68,10 @@
     <logmessage name="FAILED_CREATE_REFRESH_TOKEN" id="6"
                 loglevel="LL_INFO"
                 description="Failed creating an oauth 2.0 refresh token">
-        <datainfo />
+        <datainfo>
+            <item>message</item>
+            <item>token info</item>
+        </datainfo>
         <triggers>
             <item>Failed creating an oauth 2.0 refresh token</item>
         </triggers>
@@ -83,7 +92,10 @@
     <logmessage name="FAILED_CREATE_AUTHORIZATION_CODE" id="8"
                 loglevel="LL_INFO"
                 description="Failed creating an oauth 2.0 authorization code">
-        <datainfo />
+        <datainfo>
+            <item>message</item>
+            <item>token info</item>
+        </datainfo>
         <triggers>
             <item>Failed creating an oauth 2.0 authorization code</item>
         </triggers>
@@ -92,7 +104,10 @@
     <logmessage name="FAILED_UPDATE_AUTHORIZATION_CODE" id="9"
                 loglevel="LL_INFO"
                 description="Failed updating an oauth 2.0 authorization code">
-        <datainfo />
+        <datainfo>
+            <item>message</item>
+            <item>token info</item>
+        </datainfo>
         <triggers>
             <item>Failed updating an oauth 2.0 authorization code</item>
         </triggers>
