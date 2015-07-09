@@ -115,6 +115,24 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         return redirectionURIs;
     }
 
+    @Override
+    public Set<URI> getPostLogoutRedirectUris() {
+        Set<URI> redirectionURIs = new HashSet<>();
+        try {
+            @SuppressWarnings("unchecked")
+            Set<String> redirectionURIsSet = convertAttributeValues(
+                    amIdentity.getAttribute(OAuth2Constants.OAuth2Client.POST_LOGOUT_URI));
+            for (String uri : redirectionURIsSet){
+                redirectionURIs.add(URI.create(uri));
+            }
+        } catch (Exception e){
+            logger.error("Unable to get {} from repository", OAuth2Constants.OAuth2Client.POST_LOGOUT_URI, e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.POST_LOGOUT_URI +" from repository");
+        }
+        return redirectionURIs;
+    }
+
     /**
      * {@inheritDoc}
      */

@@ -11,24 +11,37 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openidconnect.restlet;
 
+import org.forgerock.json.jose.common.JwtReconstruction;
+import org.forgerock.json.jose.jws.SignedJwt;
+import org.forgerock.json.jose.jwt.JwtClaimsSet;
+import org.forgerock.oauth2.core.ClientRegistration;
+import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
+import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
+import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
+import org.forgerock.oauth2.core.exceptions.RelativeRedirectUriException;
 import org.forgerock.oauth2.restlet.ExceptionHandler;
 import org.forgerock.oauth2.restlet.OAuth2RestletException;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openidconnect.OpenIDConnectEndSession;
 import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.data.Reference;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
+import org.restlet.routing.Redirector;
 
 import javax.inject.Inject;
+import java.net.URI;
 
 /**
  * Handles requests to the OpenId Connect end session endpoint for ending OpenId Connect user sessions.
@@ -40,6 +53,7 @@ public class EndSession extends ServerResource {
     private final OAuth2RequestFactory<Request> requestFactory;
     private final OpenIDConnectEndSession openIDConnectEndSession;
     private final ExceptionHandler exceptionHandler;
+    private final ClientRegistrationStore clientRegistrationStore;
 
     /**
      * Constructs a new EndSession.
@@ -50,10 +64,11 @@ public class EndSession extends ServerResource {
      */
     @Inject
     public EndSession(OAuth2RequestFactory<Request> requestFactory, OpenIDConnectEndSession openIDConnectEndSession,
-            ExceptionHandler exceptionHandler) {
+            ExceptionHandler exceptionHandler, ClientRegistrationStore clientRegistrationStore) {
         this.requestFactory = requestFactory;
         this.openIDConnectEndSession = openIDConnectEndSession;
         this.exceptionHandler = exceptionHandler;
+        this.clientRegistrationStore = clientRegistrationStore;
     }
 
     /**
@@ -67,8 +82,12 @@ public class EndSession extends ServerResource {
 
         final OAuth2Request request = requestFactory.create(getRequest());
         final String idToken = request.getParameter(OAuth2Constants.Params.END_SESSION_ID_TOKEN_HINT);
+        final String redirectUri = request.getParameter(OAuth2Constants.Params.POST_LOGOUT_REDIRECT_URI);
         try {
             openIDConnectEndSession.endSession(idToken);
+            if (StringUtils.isNotEmpty(redirectUri)) {
+                return handleRedirect(request, idToken, redirectUri);
+            }
         } catch (OAuth2Exception e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(), null);
         }
@@ -84,4 +103,32 @@ public class EndSession extends ServerResource {
     protected void doCatch(Throwable throwable) {
         exceptionHandler.handle(throwable, getResponse());
     }
+
+    private Representation handleRedirect(OAuth2Request request, String idToken, String redirectUri)
+            throws RedirectUriMismatchException, InvalidClientException, RelativeRedirectUriException {
+
+        validateRedirect(request, idToken, redirectUri);
+        Response response = getResponse();
+        new Redirector(getContext(), new Reference(redirectUri).toString(), Redirector.MODE_CLIENT_FOUND).
+                handle(getRequest(), response);
+        return response == null ? null : response.getEntity();
+    }
+
+    private void validateRedirect(OAuth2Request request, String idToken, String redirectUri)
+            throws InvalidClientException, RedirectUriMismatchException, RelativeRedirectUriException {
+
+        SignedJwt jwt = new JwtReconstruction().reconstructJwt(idToken, SignedJwt.class);
+        JwtClaimsSet claims = jwt.getClaimsSet();
+        String clientId = (String) claims.getClaim(OAuth2Constants.JWTTokenParams.AZP);
+        ClientRegistration client = clientRegistrationStore.get(clientId, request);
+        URI requestedUri = URI.create(redirectUri);
+
+        if (!requestedUri.isAbsolute()) {
+            throw new RelativeRedirectUriException();
+        }
+        if (!client.getPostLogoutRedirectUris().contains(requestedUri)) {
+            throw new RedirectUriMismatchException();
+        }
+    }
+
 }

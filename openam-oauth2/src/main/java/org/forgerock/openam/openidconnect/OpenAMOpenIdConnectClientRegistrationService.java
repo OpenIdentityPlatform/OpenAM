@@ -59,6 +59,7 @@ import org.forgerock.openidconnect.ClientBuilder;
 import org.forgerock.openidconnect.ClientDAO;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationService;
 import org.forgerock.openidconnect.exceptions.InvalidClientMetadata;
+import org.forgerock.openidconnect.exceptions.InvalidPostLogoutRedirectUri;
 import org.forgerock.openidconnect.exceptions.InvalidRedirectUri;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,7 +113,7 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
      */
     public JsonValue createRegistration(String accessToken, String deploymentUrl, OAuth2Request request)
             throws InvalidRedirectUri, InvalidClientMetadata, ServerException, UnsupportedResponseTypeException,
-            AccessDeniedException, NotFoundException {
+            AccessDeniedException, NotFoundException, InvalidPostLogoutRedirectUri {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
 
@@ -331,8 +332,20 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
             }
 
             if (input.get(POST_LOGOUT_REDIRECT_URIS.getType()).asList() != null) {
-                clientBuilder.setPostLogoutRedirectionURIs(input.get(POST_LOGOUT_REDIRECT_URIS.getType())
-                        .asList(String.class));
+                List<String> logoutRedirectUris = input.get(POST_LOGOUT_REDIRECT_URIS.getType()).asList(String.class);
+                boolean isValidUris = true;
+                for (String logoutRedirectUri : logoutRedirectUris) {
+                    try {
+                        urlValidator.validate(logoutRedirectUri);
+                    } catch (ValidationException e) {
+                        isValidUris = false;
+                        logger.error("The post_logout_redirect_uris: {} is invalid.", logoutRedirectUri);
+                    }
+                }
+                if (!isValidUris) {
+                    throw new InvalidPostLogoutRedirectUri();
+                }
+                clientBuilder.setPostLogoutRedirectionURIs(logoutRedirectUris);
             }
 
             if (input.get(REGISTRATION_ACCESS_TOKEN.getType()).asString() != null) {

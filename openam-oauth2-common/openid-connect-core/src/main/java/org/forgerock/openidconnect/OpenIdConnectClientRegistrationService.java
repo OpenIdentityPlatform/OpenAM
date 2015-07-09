@@ -26,6 +26,7 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
 import org.forgerock.openidconnect.exceptions.InvalidClientMetadata;
+import org.forgerock.openidconnect.exceptions.InvalidPostLogoutRedirectUri;
 import org.forgerock.openidconnect.exceptions.InvalidRedirectUri;
 
 /**
@@ -50,7 +51,8 @@ public interface OpenIdConnectClientRegistrationService {
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
     JsonValue createRegistration(String accessToken, String deploymentURL, OAuth2Request request)
-            throws InvalidRedirectUri, InvalidClientMetadata, ServerException, UnsupportedResponseTypeException, AccessDeniedException, NotFoundException;
+            throws InvalidRedirectUri, InvalidClientMetadata, ServerException, UnsupportedResponseTypeException,
+            AccessDeniedException, NotFoundException, InvalidPostLogoutRedirectUri;
 
     /**
      * Gets an OpenId Connect client registration from the OAuth2 provider.

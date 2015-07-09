@@ -294,9 +294,7 @@ public class OpenAMClientDAO implements ClientDAO {
         }
 
         if (client.getPostLogoutRedirectionURIs() != null) {
-            Set<String> temp = new HashSet<String>();
-            temp.addAll(client.getPostLogoutRedirectionURIs());
-            clientAttributeMap.put(POST_LOGOUT_URI, temp);
+            clientAttributeMap.put(POST_LOGOUT_URI, formatSet(new HashSet<>(client.getPostLogoutRedirectionURIs())));
         }
 
         if (client.getResponseTypes() != null) {

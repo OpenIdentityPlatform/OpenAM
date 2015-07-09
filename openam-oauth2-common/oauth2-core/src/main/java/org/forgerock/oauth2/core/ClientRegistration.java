@@ -36,6 +36,13 @@ public interface ClientRegistration {
     Set<URI> getRedirectUris();
 
     /**
+     * Gets the registered post logout redirect uris for the client.
+     *
+     * @return The redirect uris.
+     */
+    Set<URI> getPostLogoutRedirectUris();
+
+    /**
      * Gets the allowed response types.
      *
      * @return The allowed response types.
