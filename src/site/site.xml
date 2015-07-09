@@ -71,7 +71,8 @@
    <item name="Installation Guide" href="./doc/bootstrap/install-guide/index.html" />
    <item name="Upgrade Guide" href="./doc/bootstrap/upgrade-guide/index.html" />
    <item name="Admin Guide" href="./doc/bootstrap/admin-guide/index.html" />
-   <item name="Developer Guide" href="./doc/bootstrap/dev-guide/index.html" />
+   <item name="Developer's Guide" href="./doc/bootstrap/dev-guide/index.html" />
+   <item name="Deployment Planning" href="./doc/bootstrap/deployment-planning/index.html" />
    <item name="Reference" href="./doc/bootstrap/reference/index.html" />
    <item name="Javadoc" href="./apidocs/index.html" />
   </menu>
