@@ -493,8 +493,8 @@ public class FSUtils {
         if (orgDN == null || orgDN.length() == 0) {
             return "/";
         }
-        DN orgdn = DN.valueOf(orgDN);
         if (LDAPUtils.isDN(orgDN)) {
+            DN orgdn = DN.valueOf(orgDN);
             return orgdn.rdn().toString();
         } else {
             // should be realm name

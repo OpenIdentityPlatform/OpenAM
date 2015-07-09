@@ -431,11 +431,10 @@ public class LDAPUtils {
      * @throws IllegalArgumentException When the DN's RDN is multivalued.
      */
     public static String rdnValueFromDn(DN dn) {
-        if (dn.size() == 0) {
-            return "";
-        } else {
+        if (dn.size() > 0) {
             return rdnValue(dn.rdn());
         }
+        return "";
     }
 
     /**
@@ -466,11 +465,10 @@ public class LDAPUtils {
      * @throws IllegalArgumentException When the DN's RDN is multivalued.
      */
     public static String rdnTypeFromDn(DN dn) {
-        if (dn.size() == 0) {
-            return "";
-        } else {
+        if (dn.size() > 0) {
             return rdnType(dn.rdn());
         }
+        return "";
     }
 
     /**
@@ -528,15 +526,14 @@ public class LDAPUtils {
      * @return
      */
     public static boolean isDN(String candidateDN) {
-        return !"/".equals(candidateDN) && candidateDN != null && candidateDN.contains("=")
-                && newDN(candidateDN).size() > 0;
+        return newDN(candidateDN).size() > 0;
     }
 
     public static String escapeValue( String str ) {
         StringBuilder retbuf = new StringBuilder();
         for (int i = 0; i < str.length(); i++) {
             char current_char = str.charAt(i);
-            if (isEscape(current_char)) {
+            if (shouldEscapeCharacter(current_char)) {
                 retbuf.append( '\\' );
             }
             retbuf.append(current_char);
@@ -544,7 +541,7 @@ public class LDAPUtils {
         return retbuf.toString();
     }
 
-    private static boolean isEscape(char c) {
+    private static boolean shouldEscapeCharacter(char c) {
         for (char escaped : ESCAPED_CHAR) {
             if (c == escaped) {
                 return true;
@@ -559,10 +556,27 @@ public class LDAPUtils {
 
     public static DN newDN(String orgName) {
         if (orgName == null || orgName.startsWith("/") || !orgName.contains("=")) {
-            return DN.valueOf("");
+            return DN.rootDN();
         } else {
             return DN.valueOf(orgName);
         }
+    }
+
+    /**
+     * Converts a DN String to a RFC format and lowers case.
+     *
+     * @param dn
+     *            the DN String to be formated
+     * @return a lowercase RFC fromat DN String
+     */
+    public static String formatToRFC(String dn) {
+        return DN.valueOf(dn).toString().toLowerCase();
+    }
+
+    public static boolean dnEquals(String dn1, String dn2) {
+        DN dnObj1 = DN.valueOf(dn1);
+        DN dnObj2 = DN.valueOf(dn2);
+        return dnObj1.equals(dnObj2);
     }
 
     private static class LoggingLBEventListener implements LoadBalancerEventListener {
@@ -596,11 +610,10 @@ public class LDAPUtils {
      * @param authPasswd The password to bind with.
      * @param options Any additional options.
      * @return A connection factory.
-     * @throws GeneralSecurityException If SSL cannot be initialised.
      */
     public static ConnectionFactory createFailoverConnectionFactory(String host, int defaultPort,
-            String authDN, String authPasswd, LDAPOptions options) throws GeneralSecurityException {
-        StringTokenizer st = new StringTokenizer( host );
+            String authDN, String authPasswd, LDAPOptions options) {
+        StringTokenizer st = new StringTokenizer(host);
         String hostList[] = new String[st.countTokens()];
         int portList[] = new int[st.countTokens()];
         int hostCount = 0;
@@ -629,12 +642,9 @@ public class LDAPUtils {
     }
 
     private static ConnectionFactory createSingleHostConnectionFactory(String host, int port,
-            String authDN, String authPasswd, LDAPOptions options) throws GeneralSecurityException {
+            String authDN, String authPasswd, LDAPOptions options) {
         ConnectionFactory ldc = new LDAPConnectionFactory(host, port, options);
-
-        ldc = Connections.newAuthenticatedConnectionFactory(ldc,
+        return Connections.newAuthenticatedConnectionFactory(ldc,
                 Requests.newSimpleBindRequest(authDN, authPasswd.getBytes()));
-
-        return ldc;
     }
 }

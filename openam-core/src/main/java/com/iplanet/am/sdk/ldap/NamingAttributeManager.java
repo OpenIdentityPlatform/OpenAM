@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,17 +24,19 @@
  *
  * $Id: NamingAttributeManager.java,v 1.3 2008/06/25 05:41:25 qcheng Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.iplanet.am.sdk.ldap;
 
 import com.iplanet.am.sdk.AMObject;
-import com.iplanet.am.sdk.common.MiscUtils;
 import com.iplanet.ums.CreationTemplate;
 import com.iplanet.ums.Guid;
 import com.iplanet.ums.TemplateManager;
 import com.iplanet.ums.UMSException;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.ldap.LDAPUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -114,7 +116,7 @@ class NamingAttributeManager {
      */
     static String getNamingAttribute(int objectType, String orgDN) {
         String key = (new Integer(objectType)).toString() + ":"
-                + MiscUtils.formatToRFC(orgDN);
+                + LDAPUtils.formatToRFC(orgDN);
         String namingAttribute = (String) namingAttrMap.get(key);
         if (namingAttribute == null) {
             namingAttribute = getNamingAttributeFromTemplate(objectType, orgDN);

@@ -610,7 +610,7 @@ public class PolicyCache implements ServiceListener {
     PolicyManager getPolicyManager(String orgName) throws PolicyException, 
         SSOException 
     {
-        orgName = AMCommonUtils.formatToRFC(orgName);
+        orgName = LDAPUtils.formatToRFC(orgName);
         PolicyManager pm = (PolicyManager) policyManagers.get(orgName);
         if ( pm == null ) {
             pm = new PolicyManager(token, orgName);

@@ -30,12 +30,14 @@
 package com.iplanet.ums;
 
 import java.security.AccessController;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -839,8 +841,12 @@ public class ConfigManagerUMS implements java.io.Serializable {
         }
         DN dn = DN.valueOf(guid.getDn());
         String org = "";
-
+        List<RDN> rdns = new ArrayList<>();
         for (RDN rdn : dn) {
+            rdns.add(0, rdn);
+        }
+
+        for (RDN rdn : rdns) {
             org = org + "/" + LDAPUtils.rdnValue(rdn);
         }
 

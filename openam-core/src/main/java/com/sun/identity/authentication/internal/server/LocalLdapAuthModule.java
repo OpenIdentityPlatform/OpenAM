@@ -276,9 +276,8 @@ public class LocalLdapAuthModule implements LoginModule {
             }
         }
 
-        try (ConnectionFactory factory = Connections.newAuthenticatedConnectionFactory(
-                new LDAPConnectionFactory(host, port, ldapOptions),
-                Requests.newSimpleBindRequest(dn, passwd.toCharArray()));
+
+        try (ConnectionFactory factory = LDAPUtils.createFailoverConnectionFactory(host, port, dn, passwd, ldapOptions);
              Connection conn = factory.getConnection()) {
             return true;
         } catch (ErrorResultException e) {

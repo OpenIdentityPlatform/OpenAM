@@ -283,12 +283,12 @@ public final class IdUtils {
      */
     public static AMIdentity getIdentity(SSOToken token, String amsdkdn,
         String realm) throws IdRepoException {
-        DN amsdkdnObject = LDAPUtils.newDN(amsdkdn);
         if (amsdkdn == null || !LDAPUtils.isDN(amsdkdn)) {
             Object[] args = { amsdkdn };
             throw (new IdRepoException(IdRepoBundle.BUNDLE_NAME,
                 "215", args));
         }
+        DN amsdkdnObject = LDAPUtils.newDN(amsdkdn);
 
         // Try constructing the identity object
         if (amsdkdn.toLowerCase().startsWith("id=")) {

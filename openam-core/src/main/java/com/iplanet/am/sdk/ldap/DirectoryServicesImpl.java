@@ -220,20 +220,18 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
     }
 
     private DN getExceptionDN(UMSException e) {
-        DN dn = null;
         String msg = e.getMessage();
         if (msg != null) {
             // This is hack??
             int index = msg.indexOf("::");
             if (index != -1) {
                 String errorDN = msg.substring(0, index);
-                dn = DN.valueOf(errorDN);
-                if (!LDAPUtils.isDN(errorDN)) {
-                    dn = null;
+                if (LDAPUtils.isDN(errorDN)) {
+                    return DN.valueOf(errorDN);
                 }
             }
         }
-        return dn;
+        return null;
     }
 
     private String getEntryNotFoundMsgID(int objectType) {
@@ -612,7 +610,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
         // Already an RFC String
         String rootDN = AMStoreConnection.getAMSdkBaseDN();
         if (dcTreeImpl.isRequired() && (objectType == AMObject.ORGANIZATION)
-                && (!CommonUtils.formatToRFC(entryDN).equalsIgnoreCase(rootDN)))
+                && (!LDAPUtils.formatToRFC(entryDN).equalsIgnoreCase(rootDN)))
         {
             String dcNode = dcTreeImpl.getCanonicalDomain(internalToken,
                     entryDN);
@@ -1722,7 +1720,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
             // deleteSubtree(token, entryDN, softDelete);
             // } else {
             if (dcTreeImpl.isRequired()) {
-                String rfcDN = CommonUtils.formatToRFC(entryDN);
+                String rfcDN = LDAPUtils.formatToRFC(entryDN);
                 dcTreeImpl.removeDomain(internalToken, rfcDN);
             }
             Guid guid = new Guid(entryDN);
@@ -3410,14 +3408,18 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
                 return;
             }
 
-            String orgDN = dn.rdn().toString();
+            List<RDN> rdns = new ArrayList<>();
+            for (Iterator<RDN> iter = dn.iterator(); iter.hasNext(); ) {
+                rdns.add(iter.next());
+            }
+
+            String orgDN = rdns.get(rdns.size() - 1).toString();
 
             AMStoreConnection amsc = new AMStoreConnection(CommonUtils
                     .getInternalToken());
             DN rootDN = DN.valueOf(AMStoreConnection.getAMSdkBaseDN());
             DN thisDN = DN.valueOf(orgDN);
 
-            Iterator<RDN> rdnIterator = dn.iterator();
             for (int i = size - 2; i >= 0; i--) {
                 if (debug.messageEnabled()) {
                     debug.message("AMObjectImpl.validateAttributeUniqueness: " 
@@ -3541,7 +3543,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
                                     attrExists = true;
                                 }
 
-                                filterSB.append("(").append(dn.rdn().toString())
+                                filterSB.append("(").append(rdns.get(0))
                                         .append(")");
                             }
 
@@ -3550,8 +3552,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
 
                                 while (itr.hasNext()) {
                                     filterSB.append("(").append(attrName);
-                                    filterSB.append("=").append(
-                                            (String) itr.next());
+                                    filterSB.append("=").append(itr.next());
                                     filterSB.append(")");
                                 }
                             } // if
@@ -3594,7 +3595,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
                     }
                 }
 
-                orgDN = rdnIterator.next() + "," + orgDN;
+                orgDN = rdns.get(i).toString() + "," + orgDN;
                 thisDN = DN.valueOf(orgDN);
             }
         } catch (SSOException ex) {

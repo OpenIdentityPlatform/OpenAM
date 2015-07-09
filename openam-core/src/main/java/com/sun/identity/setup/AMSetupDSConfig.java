@@ -154,7 +154,7 @@ public class AMSetupDSConfig {
             map.put(SetupConstants.NORMALIZED_ORG_BASE, escapedDN); 
             map.put(SetupConstants.ORG_ROOT_SUFFIX, suffix); 
             String rdn = getRDNfromDN(normalizedDN);
-            map.put(SetupConstants.RS_RDN, SMSSchema.escapeSpecialCharacters(rdn));
+            map.put(SetupConstants.RS_RDN, rdn);
             map.put(SetupConstants.DEFAULT_ORG, normalizedDN);
             map.put(SetupConstants.ORG_BASE, normalizedDN);
             map.put(SetupConstants.SM_CONFIG_ROOT_SUFFIX, suffix);

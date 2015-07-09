@@ -86,7 +86,7 @@ public class AuthenticateToServiceConditionTest {
             throws EntitlementException {
 
         //Given
-        String realm = "id=REALM";
+        String realm = "REALM";
         Subject subject = new Subject();
         String resourceName = "RESOURCE_NAME";
         Map<String, Set<String>> env = new HashMap<String, Set<String>>();
@@ -102,14 +102,14 @@ public class AuthenticateToServiceConditionTest {
     public void conditionShouldEvaluateToTrueWhenEnvironmentContainsServicesAndMatches() throws EntitlementException {
 
         //Given
-        String realm = "id=REALM";
+        String realm = "REALM";
         Subject subject = new Subject();
         String resourceName = "RESOURCE_NAME";
         Map<String, Set<String>> env = new HashMap<String, Set<String>>();
         Set<String> services = new HashSet<String>();
 
         given(coreWrapper.getRealmFromRealmQualifiedData("SERVICE_NAME")).willReturn("REALM");
-        given(coreWrapper.convertOrgNameToRealmName("id=REALM")).willReturn("REALM");
+        given(coreWrapper.convertOrgNameToRealmName("REALM")).willReturn("REALM");
         services.add("SERVICE_NAME");
         env.put(REQUEST_AUTHENTICATED_TO_SERVICES, services);
         condition.setState("{\"authenticateToService\": \"SERVICE_NAME\"}");
@@ -127,14 +127,14 @@ public class AuthenticateToServiceConditionTest {
             throws EntitlementException {
 
         //Given
-        String realm = "id=REALM";
+        String realm = "REALM";
         Subject subject = new Subject();
         String resourceName = "RESOURCE_NAME";
         Map<String, Set<String>> env = new HashMap<String, Set<String>>();
         Set<String> services = new HashSet<String>();
 
         given(coreWrapper.getRealmFromRealmQualifiedData("SERVICE_NAME")).willReturn("REALM");
-        given(coreWrapper.convertOrgNameToRealmName("id=REALM")).willReturn("REALM");
+        given(coreWrapper.convertOrgNameToRealmName("REALM")).willReturn("REALM");
         services.add("OTHER_SERVICE_NAME");
         env.put(REQUEST_AUTHENTICATED_TO_SERVICES, services);
         condition.setState("{\"authenticateToService\": \"SERVICE_NAME\"}");
@@ -153,14 +153,14 @@ public class AuthenticateToServiceConditionTest {
             throws EntitlementException {
 
         //Given
-        String realm = "id=REALM";
+        String realm = "REALM";
         Subject subject = new Subject();
         String resourceName = "RESOURCE_NAME";
         Map<String, Set<String>> env = new HashMap<String, Set<String>>();
         Set<String> services = new HashSet<String>();
 
         given(coreWrapper.getRealmFromRealmQualifiedData("SERVICE_NAME")).willReturn("REALM");
-        given(coreWrapper.convertOrgNameToRealmName("id=REALM")).willReturn("REALM");
+        given(coreWrapper.convertOrgNameToRealmName("REALM")).willReturn("REALM");
         services.add("OTHER_SERVICE_NAME");
         env.put(REQUEST_AUTHENTICATED_TO_SERVICES, services);
         condition.setState("{\"authenticateToService\": \"REALM:SERVICE_NAME\"}");
@@ -179,14 +179,14 @@ public class AuthenticateToServiceConditionTest {
             throws EntitlementException {
 
         //Given
-        String realm = "id=REALM";
+        String realm = "REALM";
         Subject subject = new Subject();
         String resourceName = "RESOURCE_NAME";
         Map<String, Set<String>> env = new HashMap<String, Set<String>>();
         Set<String> services = new HashSet<String>();
 
         given(coreWrapper.getDataFromRealmQualifiedData("OTHER_SERVICE_NAME")).willReturn("SERVICE_NAME");
-        given(coreWrapper.convertOrgNameToRealmName("id=REALM")).willReturn("REALM");
+        given(coreWrapper.convertOrgNameToRealmName("REALM")).willReturn("REALM");
         services.add("OTHER_SERVICE_NAME");
         env.put(REQUEST_AUTHENTICATED_TO_SERVICES, services);
         condition.setState("{\"authenticateToService\": \"SERVICE_NAME\"}");
@@ -204,14 +204,14 @@ public class AuthenticateToServiceConditionTest {
             throws EntitlementException {
 
         //Given
-        String realm = "id=REALM";
+        String realm = "REALM";
         Subject subject = new Subject();
         String resourceName = "RESOURCE_NAME";
         Map<String, Set<String>> env = new HashMap<String, Set<String>>();
         Set<String> services = new HashSet<String>();
 
         given(coreWrapper.getDataFromRealmQualifiedData("OTHER_SERVICE_NAME")).willReturn("OTHER_SERVICE_NAME");
-        given(coreWrapper.convertOrgNameToRealmName("id=REALM")).willReturn("REALM");
+        given(coreWrapper.convertOrgNameToRealmName("REALM")).willReturn("REALM");
         services.add("OTHER_SERVICE_NAME");
         env.put(REQUEST_AUTHENTICATED_TO_SERVICES, services);
         condition.setState("{\"authenticateToService\": \"SERVICE_NAME\"}");
@@ -230,7 +230,7 @@ public class AuthenticateToServiceConditionTest {
             throws EntitlementException {
 
         //Given
-        String realm = "id=REALM";
+        String realm = "REALM";
         Subject subject = new Subject();
         String resourceName = "RESOURCE_NAME";
         Map<String, Set<String>> env = new HashMap<String, Set<String>>();
@@ -238,7 +238,7 @@ public class AuthenticateToServiceConditionTest {
         SSOToken ssoToken = mock(SSOToken.class);
 
         given(coreWrapper.getRealmFromRealmQualifiedData("SERVICE_NAME")).willReturn("REALM");
-        given(coreWrapper.convertOrgNameToRealmName("id=REALM")).willReturn("REALM");
+        given(coreWrapper.convertOrgNameToRealmName("REALM")).willReturn("REALM");
         services.add("SERVICE_NAME");
         subject.getPrivateCredentials().add(ssoToken);
         given(entitlementCoreWrapper.getRealmQualifiedAuthenticatedServices(ssoToken)).willReturn(services);
@@ -257,7 +257,7 @@ public class AuthenticateToServiceConditionTest {
             throws EntitlementException {
 
         //Given
-        String realm = "id=REALM";
+        String realm = "REALM";
         Subject subject = new Subject();
         String resourceName = "RESOURCE_NAME";
         Map<String, Set<String>> env = new HashMap<String, Set<String>>();
@@ -265,7 +265,7 @@ public class AuthenticateToServiceConditionTest {
         SSOToken ssoToken = mock(SSOToken.class);
 
         given(coreWrapper.getRealmFromRealmQualifiedData("SERVICE_NAME")).willReturn("REALM");
-        given(coreWrapper.convertOrgNameToRealmName("id=REALM")).willReturn("REALM");
+        given(coreWrapper.convertOrgNameToRealmName("REALM")).willReturn("REALM");
         services.add("OTHER_SERVICE_NAME");
         subject.getPrivateCredentials().add(ssoToken);
         given(entitlementCoreWrapper.getRealmQualifiedAuthenticatedServices(ssoToken)).willReturn(services);
@@ -285,7 +285,7 @@ public class AuthenticateToServiceConditionTest {
             throws EntitlementException {
 
         //Given
-        String realm = "id=REALM";
+        String realm = "REALM";
         Subject subject = new Subject();
         String resourceName = "RESOURCE_NAME";
         Map<String, Set<String>> env = new HashMap<String, Set<String>>();
@@ -293,7 +293,7 @@ public class AuthenticateToServiceConditionTest {
         SSOToken ssoToken = mock(SSOToken.class);
 
         given(coreWrapper.getDataFromRealmQualifiedData("OTHER_SERVICE_NAME")).willReturn("SERVICE_NAME");
-        given(coreWrapper.convertOrgNameToRealmName("id=REALM")).willReturn("REALM");
+        given(coreWrapper.convertOrgNameToRealmName("REALM")).willReturn("REALM");
         services.add("OTHER_SERVICE_NAME");
         subject.getPrivateCredentials().add(ssoToken);
         given(entitlementCoreWrapper.getRealmQualifiedAuthenticatedServices(ssoToken)).willReturn(services);
@@ -312,7 +312,7 @@ public class AuthenticateToServiceConditionTest {
             throws EntitlementException {
 
         //Given
-        String realm = "id=REALM";
+        String realm = "REALM";
         Subject subject = new Subject();
         String resourceName = "RESOURCE_NAME";
         Map<String, Set<String>> env = new HashMap<String, Set<String>>();
@@ -320,7 +320,7 @@ public class AuthenticateToServiceConditionTest {
         SSOToken ssoToken = mock(SSOToken.class);
 
         given(coreWrapper.getDataFromRealmQualifiedData("OTHER_SERVICE_NAME")).willReturn("OTHER_SERVICE_NAME");
-        given(coreWrapper.convertOrgNameToRealmName("id=REALM")).willReturn("REALM");
+        given(coreWrapper.convertOrgNameToRealmName("REALM")).willReturn("REALM");
         services.add("OTHER_SERVICE_NAME");
         subject.getPrivateCredentials().add(ssoToken);
         given(entitlementCoreWrapper.getRealmQualifiedAuthenticatedServices(ssoToken)).willReturn(services);

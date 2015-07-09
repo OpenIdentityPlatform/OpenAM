@@ -48,12 +48,6 @@ import org.forgerock.opendj.ldap.DN;
 public class CoreTokenUtils {
     public static Debug debug = Debug.getInstance("CoreToken");
 
-    public static boolean areDNIdentical(String dn1, String dn2) {
-        DN dnObj1 = DN.valueOf(dn1);
-        DN dnObj2 = DN.valueOf(dn2);
-        return dnObj1.equals(dnObj2);
-    }
-
     public static Subject getAdminSubject() {
         SSOToken dsameUserToken = (SSOToken) AccessController.doPrivileged(
                 AdminTokenAction.getInstance());

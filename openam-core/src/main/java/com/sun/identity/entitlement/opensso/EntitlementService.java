@@ -280,7 +280,7 @@ public class EntitlementService extends EntitlementConfiguration {
             Set<String> results = new HashSet<String>();
 
             for (String dn : dns) {
-                if (!areDNIdentical(baseDN, dn)) {
+                if (!LDAPUtils.dnEquals(baseDN, dn)) {
                     results.add(LDAPUtils.rdnValueFromDn(dn));
                 }
             }
@@ -288,12 +288,6 @@ public class EntitlementService extends EntitlementConfiguration {
         } catch (SMSException e) {
             throw new EntitlementException(450, e);
         }
-    }
-
-    private static boolean areDNIdentical(String dn1, String dn2) {
-        DN dnObj1 = DN.valueOf(dn1);
-        DN dnObj2 = DN.valueOf(dn2);
-        return dnObj1.equals(dnObj2);
     }
 
     private SSOToken getSSOToken(Subject subject) {

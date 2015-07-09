@@ -363,11 +363,10 @@ public class SessionCommand extends AuthenticatedCommand {
     }
 
     private String dnToName(String dn) {
-        String ret = dn;
         if (LDAPUtils.isDN(dn)) {
-            ret = LDAPUtils.rdnValueFromDn(dn);
+            return LDAPUtils.rdnValueFromDn(dn);
         }
-        return ret;
+        return dn;
     }
 
 }

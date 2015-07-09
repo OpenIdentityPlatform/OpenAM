@@ -773,34 +773,28 @@ public class AMAdminUtils {
      * @param originalSet Original Set.
      * @param toDelete Collection of entries to be deleted.
      */
-    public static void removeAllByDN(Set originalSet, Collection toDelete) {
+    public static void removeAllByDN(Set<String> originalSet, Collection<String> toDelete) {
         Set<DN> setDNs = toDNs(toDelete);
 
-        for (Iterator iter = originalSet.iterator(); iter.hasNext(); ) {
-            String strDN = (String)iter.next();
-            DN dn = DN.valueOf(strDN.toLowerCase());
+        for (Iterator<String> iter = originalSet.iterator(); iter.hasNext(); ) {
+            String strDN = iter.next();
+            DN dn = DN.valueOf(strDN);
             if (containsDN(setDNs, dn)) {
                 iter.remove();
             }
         }
     }
 
-    private static Set<DN> toDNs(Collection set) {
+    private static Set<DN> toDNs(Collection<String> collection) {
         Set<DN> setDNs = new HashSet<>();
-        for (Iterator i = set.iterator(); i.hasNext(); ) {
-            String strDN = (String) i.next();
-            DN dn = DN.valueOf(strDN.toLowerCase());
-            setDNs.add(dn);
+        for (String strDN : collection) {
+            setDNs.add(DN.valueOf(strDN));
         }
         return setDNs;
     }
 
     private static boolean containsDN(Set<DN> set, DN dn) {
-        boolean contain = false;
-        for (DN d : set) {
-            contain = d.equals(dn);
-        }
-        return contain;
+        return set.contains(dn);
     }
 
     public static Set getUserAttributeNames() {

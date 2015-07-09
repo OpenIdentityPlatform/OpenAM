@@ -139,11 +139,10 @@ public class ConfigureData {
     }
     
     private static String DNToName(String dn) {
-        String ret = dn;
         if (LDAPUtils.isDN(dn)) {
-            ret = LDAPUtils.rdnValueFromDn(dn);
+            return LDAPUtils.rdnValueFromDn(dn);
         }
-        return ret;
+        return dn;
     }
 
 

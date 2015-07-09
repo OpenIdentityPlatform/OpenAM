@@ -219,6 +219,22 @@ public class LDAPAuthUtils {
     /**
      * Constructor initializing the basic parameters.
      *
+     * @param host Primary server host name.
+     * @param port Primary server port.
+     * @param secondaryServers List of secondary servers.
+     * @param isSecure <code>true</code> if connection to server is secured.
+     * @param bundle ResourceBundle to be used for getting localized messages.
+     * @param baseDN Directory Base DN.
+     * @throws LDAPUtilException If the provided search base was invalid.
+     */
+    public LDAPAuthUtils(String host, int port, Set<String> secondaryServers, boolean isSecure,
+            ResourceBundle bundle, String baseDN, Debug debug) throws LDAPUtilException {
+        this(Collections.singleton(host + ":" + port), secondaryServers, isSecure, bundle, baseDN, debug);
+    }
+
+    /**
+     * Constructor initializing the basic parameters.
+     *
      * @param primaryServers List of primary servers.
      * @param secondaryServers List of secondary servers.
      * @param isSecure <code>true</code> if connection to server is secured.

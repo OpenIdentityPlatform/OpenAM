@@ -29,6 +29,7 @@
 
 package com.sun.identity.policy.plugins;
 
+import com.iplanet.services.ldap.LDAPUser;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.ShutdownManager;
@@ -44,6 +45,8 @@ import com.sun.identity.policy.Syntax;
 import com.sun.identity.policy.interfaces.Condition;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.ldap.LDAPUtilException;
+import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.ConnectionPool;
@@ -528,13 +531,7 @@ public class LDAPFilterCondition implements Condition {
 
         userSearchFilter = (String) configParams.get(PolicyConfig.LDAP_USERS_SEARCH_FILTER);
         String scope = (String) configParams.get(PolicyConfig.LDAP_USERS_SEARCH_SCOPE);
-        if (scope.equalsIgnoreCase(LDAP_SCOPE_BASE)) {
-            userSearchScope = SearchScope.BASE_OBJECT;
-        } else if (scope.equalsIgnoreCase(LDAP_SCOPE_ONE)) {
-            userSearchScope = SearchScope.SINGLE_LEVEL;
-        } else {
-            userSearchScope = SearchScope.WHOLE_SUBTREE;
-        }
+        userSearchScope = LDAPUtils.getSearchScope(scope, SearchScope.WHOLE_SUBTREE);
 
         userRDNAttrName = (String) configParams.get(PolicyConfig.LDAP_USER_SEARCH_ATTRIBUTE);
         try {

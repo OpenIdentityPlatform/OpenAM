@@ -680,8 +680,6 @@ public class AMSetupServlet extends HttpServlet {
             Debug.getInstance(SetupConstants.DEBUG_NAME).error("AMSetupServlet.processRequest: error", e);
             Object[] params = {e.getMessage(), basedir};
             throw new ConfiguratorException("configuration.failed", params, configLocale);
-        } catch (Error e) {
-            int a = 1;
         } finally {
             installLog.write("\n\nDumping all configuration parameters...\n");
             installLog.write("\nRequest Parameters:\n");

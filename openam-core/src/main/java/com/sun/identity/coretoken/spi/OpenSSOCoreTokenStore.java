@@ -228,7 +228,7 @@ public class OpenSSOCoreTokenStore implements CoreTokenStore {
                 Set<String> dns = SMSEntry.search(token, SERVICE_DN, filter,
                     0, 0, false, false);
                 for (String dn : dns) {
-                    if (!CoreTokenUtils.areDNIdentical(SERVICE_DN, dn)) {
+                    if (!LDAPUtils.dnEquals(SERVICE_DN, dn)) {
                         results.put(LDAPUtils.rdnValueFromDn(dn));
                     }
                 }

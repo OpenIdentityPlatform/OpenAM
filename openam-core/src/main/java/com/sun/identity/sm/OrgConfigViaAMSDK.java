@@ -898,9 +898,9 @@ public class OrgConfigViaAMSDK {
         for (int i = rdns.size() - 1; i >= 0; i--) {
             RDN rdn = rdns.parent(i).rdn();
             if(rdnType(rdn).equals(ou)) {
-                result.child(new RDN(ou, SMSEntry.SUN_INTERNAL_REALM_NAME + rdnValue(rdn)));
+                result = result.child(new RDN(ou, SMSEntry.SUN_INTERNAL_REALM_NAME + rdnValue(rdn)));
             } else {
-                result.child(rdn);
+                result = result.child(rdn);
             }
         }
         return result.toString();

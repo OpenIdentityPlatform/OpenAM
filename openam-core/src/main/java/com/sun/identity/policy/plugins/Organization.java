@@ -309,11 +309,8 @@ public class Organization implements Subject {
                         reader.readReference();
                     } else {
                         SearchResultEntry entry = reader.readEntry();
-                        if (entry != null) {
-                            validOrgDNs.add(entry.getName().toString());
-                            debug.message("Organization.getValidValues(): found org name = {}",
-                                    entry.getName().toString());
-                        }
+                        validOrgDNs.add(entry.getName().toString());
+                        debug.message("Organization.getValidValues(): found org name = {}", entry.getName().toString());
                     }
                 }
             }

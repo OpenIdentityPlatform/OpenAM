@@ -52,6 +52,7 @@ import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
+import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.ldap.PersistentSearchChangeType;
 import org.forgerock.opendj.ldap.DN;
 
@@ -221,7 +222,7 @@ public class CachedRemoteServicesImpl extends RemoteServicesImpl implements
             boolean aciChange, Set attrNames) {
         CacheBlock cb;
         String origdn = dn;
-        dn = MiscUtils.formatToRFC(dn);
+        dn = LDAPUtils.formatToRFC(dn);
         switch (eventType) {
         case PersistentSearchChangeType.ADDED:
             cb = (CacheBlock) sdkCache.get(dn);
@@ -286,12 +287,12 @@ public class CachedRemoteServicesImpl extends RemoteServicesImpl implements
     }
 
     private synchronized void removeFromCache(String dn) {
-        String key = MiscUtils.formatToRFC(dn);
+        String key = LDAPUtils.formatToRFC(dn);
         sdkCache.remove(key);
     }
 
     private void dirtyCache(String dn) {
-        String key = MiscUtils.formatToRFC(dn);
+        String key = LDAPUtils.formatToRFC(dn);
         CacheBlock cb = (CacheBlock) sdkCache.get(key);
         if (cb != null) {
             cb.clear();
@@ -302,7 +303,7 @@ public class CachedRemoteServicesImpl extends RemoteServicesImpl implements
         Iterator itr = entries.iterator();
         while (itr.hasNext()) {
             String entryDN = (String) itr.next();
-            String key = MiscUtils.formatToRFC(entryDN);
+            String key = LDAPUtils.formatToRFC(entryDN);
             CacheBlock cb = (CacheBlock) sdkCache.get(key);
             if (cb != null) {
                 cb.clear();
@@ -316,7 +317,7 @@ public class CachedRemoteServicesImpl extends RemoteServicesImpl implements
      */
     private void updateCache(SSOToken token, String dn, Map stringAttributes,
             Map byteAttributes) throws SSOException {
-        String key = MiscUtils.formatToRFC(dn);
+        String key = LDAPUtils.formatToRFC(dn);
         CacheBlock cb = (CacheBlock) sdkCache.get(key);
         if (cb != null && !cb.hasExpiredAndUpdated() && cb.isExists()) {
             String pDN = MiscUtils.getPrincipalDN(token);
@@ -361,7 +362,7 @@ public class CachedRemoteServicesImpl extends RemoteServicesImpl implements
                 // else throw '461' exception/error message.
                 // This is for certain containers created dynamically.
                 // eg. ou=agents,ou=container,ou=agents.
-                String dn = MiscUtils.formatToRFC(params[0]);
+                String dn = LDAPUtils.formatToRFC(params[0]);
                 cb = new CacheBlock(params[0], isPresent);
                 sdkCache.put(dn, cb);
             } else {
@@ -373,7 +374,7 @@ public class CachedRemoteServicesImpl extends RemoteServicesImpl implements
     }
 
     public boolean doesEntryExists(SSOToken token, String entryDN) {
-        String dn = MiscUtils.formatToRFC(entryDN);
+        String dn = LDAPUtils.formatToRFC(entryDN);
         CacheBlock cb = (CacheBlock) sdkCache.get(dn);
         if (cb != null && !cb.hasExpiredAndUpdated()) {
             if (getDebug().messageEnabled()) {
@@ -538,7 +539,7 @@ public class CachedRemoteServicesImpl extends RemoteServicesImpl implements
     public int getObjectType(SSOToken token, String dn) throws AMException,
             SSOException {
         int objectType = AMObject.UNDETERMINED_OBJECT_TYPE;
-        String entryDN = MiscUtils.formatToRFC(dn);
+        String entryDN = LDAPUtils.formatToRFC(dn);
         CacheBlock cb = (CacheBlock) sdkCache.get(entryDN);
         if (cb != null) {
             // Check if the entry exists, if not present throw an exception
@@ -672,7 +673,7 @@ public class CachedRemoteServicesImpl extends RemoteServicesImpl implements
         cacheStats.incrementRequestCount(getSize());
 
         String principalDN = MiscUtils.getPrincipalDN(token);
-        String dn = MiscUtils.formatToRFC(entryDN);
+        String dn = LDAPUtils.formatToRFC(entryDN);
 
         if (getDebug().messageEnabled()) {
             getDebug().message("In CachedRemoteServicesImpl.getAttributes("
@@ -817,7 +818,7 @@ public class CachedRemoteServicesImpl extends RemoteServicesImpl implements
                     + " method.");
         }   
 
-        String dn = MiscUtils.formatToRFC(entryDN);
+        String dn = LDAPUtils.formatToRFC(entryDN);
         CacheBlock cb = (CacheBlock) sdkCache.get(dn);
         if (cb == null) { // Entry not present in cache
             if (getDebug().messageEnabled()) {
@@ -945,9 +946,9 @@ public class CachedRemoteServicesImpl extends RemoteServicesImpl implements
         // NOTE: We should have the code to remove the entry for rename
         // operation as the operation could have been performed by some other
         // process such as amadmin.
-        String oldDN = MiscUtils.formatToRFC(entryDN);
+        String oldDN = LDAPUtils.formatToRFC(entryDN);
         CacheBlock cb = (CacheBlock) sdkCache.remove(oldDN);
-        newDN = MiscUtils.formatToRFC(newDN);
+        newDN = LDAPUtils.formatToRFC(newDN);
         sdkCache.put(newDN, cb);
         return newDN;
     }
@@ -1032,7 +1033,7 @@ public class CachedRemoteServicesImpl extends RemoteServicesImpl implements
         String templateDN = super.createAMTemplate(token, entryDN, objectType,
                 serviceName, attributes, priority);
         // Mark the entry as exists in cache
-        String dn = MiscUtils.formatToRFC(templateDN);
+        String dn = LDAPUtils.formatToRFC(templateDN);
         CacheBlock cb = (CacheBlock) sdkCache.get(dn);
         if (cb != null) {
             cb.setExists(true);

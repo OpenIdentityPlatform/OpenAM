@@ -294,7 +294,7 @@ public class PolicyConfig implements com.sun.identity.sm.ServiceListener {
      */
     public static Map getPolicyConfig(String org) throws PolicyException {
 
-        org = DN.valueOf(org).toString().toLowerCase();
+        org = LDAPUtils.formatToRFC(org);
         if (policyCache == null) {
             policyCache = PolicyCache.getInstance();
         }

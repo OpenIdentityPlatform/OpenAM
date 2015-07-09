@@ -63,6 +63,7 @@ import com.sun.identity.security.cert.AMLDAPCertStoreParameters;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.encode.Base64;
+import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.LDAPUrl;
 import org.mozilla.jss.CryptoManager;
@@ -342,7 +343,9 @@ public class Cert extends AMLoginModule {
             }
 
             if (amAuthCert_startSearchLoc != null) {
-                DN.valueOf(amAuthCert_startSearchLoc);
+                if (!LDAPUtils.isDN(amAuthCert_startSearchLoc)) {
+                    throw new AuthLoginException(amAuthCert, "wrongStartDN", null);
+                }
             }
 
             if (debug.messageEnabled()) {

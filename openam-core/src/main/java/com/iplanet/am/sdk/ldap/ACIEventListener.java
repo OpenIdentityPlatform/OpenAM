@@ -35,6 +35,7 @@ import com.iplanet.am.sdk.common.IDirectoryServices;
 import com.iplanet.services.ldap.event.DSEvent;
 import com.iplanet.services.ldap.event.IDSEventListener;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.ldap.PersistentSearchChangeType;
 
 import java.util.Collections;
@@ -90,7 +91,7 @@ public class ACIEventListener implements IDSEventListener {
             return; // Ignore Event.COS entries should'nt contain ACI's
         }
 
-        String affectedDNs = CommonUtils.formatToRFC(dsEvent.getID());
+        String affectedDNs = LDAPUtils.formatToRFC(dsEvent.getID());
         IDirectoryServices dsServices = DirectoryServicesFactory.getInstance();
         if (DirectoryServicesFactory.isCachingEnabled()) {
             ((ICachedDirectoryServices) dsServices).dirtyCache(affectedDNs,

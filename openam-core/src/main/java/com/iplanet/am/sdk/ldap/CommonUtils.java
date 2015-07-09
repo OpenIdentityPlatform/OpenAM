@@ -49,6 +49,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.DN;
 
 /**
@@ -393,17 +394,6 @@ class CommonUtils {
     }
 
     /**
-     * Converts a DN String to a RFC format and lowers case.
-     * 
-     * @param dn
-     *            the DN String to be formated
-     * @return a lowercase RFC fromat DN String
-     */
-    protected static String formatToRFC(String dn) {
-        return DN.valueOf(dn).toString().toLowerCase();
-    }
-
-    /**
      * Gets the principal DN String in RFC lowercase format from the SSOToken
      * 
      * @param token
@@ -414,7 +404,7 @@ class CommonUtils {
      */
     protected static String getPrincipalDN(SSOToken token) throws SSOException {
         String principalName = token.getPrincipal().getName();
-        return formatToRFC(principalName);
+        return LDAPUtils.formatToRFC(principalName);
     }
 
     /**

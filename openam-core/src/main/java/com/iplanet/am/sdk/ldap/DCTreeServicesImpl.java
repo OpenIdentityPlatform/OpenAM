@@ -55,6 +55,7 @@ import com.iplanet.ums.dctree.DomainComponent;
 import com.iplanet.ums.dctree.DomainComponentTree;
 import com.iplanet.ums.dctree.InvalidDCRootException;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.ModificationType;
 
 /**
@@ -345,7 +346,7 @@ public class DCTreeServicesImpl extends DCTreeServicesHelper implements
                 DomainComponentTree dcTree = new DomainComponentTree(token,
                         new Guid(DCTREE_START_DN));
                 String dcNodeDN = dcTree.mapDomainToDN(domainName);
-                return CommonUtils.formatToRFC(dcNodeDN);
+                return LDAPUtils.formatToRFC(dcNodeDN);
             } else {
                 return null;
             }
@@ -463,7 +464,7 @@ public class DCTreeServicesImpl extends DCTreeServicesHelper implements
 
     protected String getCanonicalDomain(SSOToken token, String orgDN)
             throws AMException {
-        String canonOrgDN = CommonUtils.formatToRFC(orgDN);
+        String canonOrgDN = LDAPUtils.formatToRFC(orgDN);
         return updateCacheAndReturnDomain(token, canonOrgDN);
     }
 

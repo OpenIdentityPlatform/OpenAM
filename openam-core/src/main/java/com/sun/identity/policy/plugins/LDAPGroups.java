@@ -173,13 +173,7 @@ public class LDAPGroups implements Subject {
                            PolicyConfig.LDAP_USERS_SEARCH_FILTER);
         scope = (String) configParams.get(
                            PolicyConfig.LDAP_USERS_SEARCH_SCOPE);
-        if (scope.equalsIgnoreCase(LDAP_SCOPE_BASE)) {
-            userSearchScope = SearchScope.BASE_OBJECT;
-        } else if (scope.equalsIgnoreCase(LDAP_SCOPE_ONE)) {
-            userSearchScope = SearchScope.SINGLE_LEVEL;
-        } else {
-            userSearchScope = SearchScope.WHOLE_SUBTREE;
-        }
+        userSearchScope = LDAPUtils.getSearchScope(scope, SearchScope.WHOLE_SUBTREE);
 
         userRDNAttrName = (String) configParams.get(
                            PolicyConfig.LDAP_USER_SEARCH_ATTRIBUTE);

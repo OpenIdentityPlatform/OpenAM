@@ -136,15 +136,14 @@ public class AMFormatUtils
      * @return name of relative distinguished name
      */
     public static String DNToName(AMModel model, String dn) {
-        String ret = dn;
         if (LDAPUtils.isDN(dn)) {
             if (DN.valueOf(dn).equals(DN.valueOf(SMSEntry.getRootSuffix()))) {
-                ret = model.getLocalizedString("top.level.realm");
+                return model.getLocalizedString("top.level.realm");
             } else {
-                ret = LDAPUtils.rdnValueFromDn(dn);
+                return LDAPUtils.rdnValueFromDn(dn);
             }
         }
-        return ret;
+        return dn;
     }
 
     /**

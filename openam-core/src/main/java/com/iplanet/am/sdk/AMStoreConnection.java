@@ -1713,7 +1713,7 @@ public final class AMStoreConnection implements AMConstants {
             return;
         }
 
-        String rfcDN = AMCommonUtils.formatToRFC(dn);
+        String rfcDN = LDAPUtils.formatToRFC(dn);
         switch (eventType) {
         case AMEvent.OBJECT_ADDED:
             // nothing to do

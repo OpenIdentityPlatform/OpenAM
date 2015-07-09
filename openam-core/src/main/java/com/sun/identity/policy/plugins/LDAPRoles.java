@@ -54,6 +54,7 @@ import com.sun.identity.policy.Syntax;
 import com.sun.identity.policy.ValidValues;
 import com.sun.identity.policy.interfaces.Subject;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.Connection;
@@ -183,13 +184,7 @@ public class LDAPRoles implements Subject {
         userSearchFilter = (String) configParams.get(
             PolicyConfig.LDAP_USERS_SEARCH_FILTER);
         scope = (String) configParams.get(PolicyConfig.LDAP_USERS_SEARCH_SCOPE);
-        if (scope.equalsIgnoreCase(LDAP_SCOPE_BASE)) {
-            userSearchScope = SearchScope.BASE_OBJECT;
-        } else if (scope.equalsIgnoreCase(LDAP_SCOPE_ONE)) {
-            userSearchScope = SearchScope.SINGLE_LEVEL;
-        } else {
-            userSearchScope = SearchScope.WHOLE_SUBTREE;
-        }
+        userSearchScope = LDAPUtils.getSearchScope(scope, SearchScope.WHOLE_SUBTREE);
 
         userRDNAttrName = (String) configParams.get(
             PolicyConfig.LDAP_USER_SEARCH_ATTRIBUTE);
@@ -241,7 +236,7 @@ public class LDAPRoles implements Subject {
         }
 
         // initialize the connection pool for the ldap server
-        LDAPOptions options = new LDAPOptions().setConnectTimeout(timeLimit, TimeUnit.SECONDS);
+        LDAPOptions options = new LDAPOptions().setTimeout(timeLimit, TimeUnit.SECONDS);
         LDAPConnectionPools.initConnectionPool(ldapServer, authid, authpw, sslEnabled, minPoolSize, maxPoolSize,
                 options);
         connPool = LDAPConnectionPools.getConnectionPool(ldapServer);
@@ -725,10 +720,7 @@ public class LDAPRoles implements Subject {
                     //Ignore
                     reader.readReference();
                 } else {
-                    SearchResultEntry entry = reader.readEntry();
-                    if (entry != null) {
-                        qualifiedUsers.add(entry);
-                    }
+                    qualifiedUsers.add(reader.readEntry());
                 }
             }
         } catch (ErrorResultException le) {

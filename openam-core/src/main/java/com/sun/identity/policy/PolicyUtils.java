@@ -932,7 +932,7 @@ public class PolicyUtils {
             StringBuilder buff = new StringBuilder(1024);
             for (int i = 0; i < rdns.size(); i++) {
                 RDN rdn = rdns.get(i);
-                buff.append(rdn.getFirstAVA().getAttributeValue().toString());
+                buff.append(LDAPUtils.rdnValue(rdn));
                 if (i < rdns.size() - 1) {
                     buff.append(" > ");
                 }

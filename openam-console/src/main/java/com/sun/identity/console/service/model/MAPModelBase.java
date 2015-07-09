@@ -51,14 +51,11 @@ import javax.servlet.http.HttpServletRequest;
 
 public abstract class MAPModelBase extends AMModelBase implements MAPModel {
 
-    /**
-     * Array of the characters that may be escaped in a DN.
-     */
-    private static final char[] ESCAPED_CHAR = {',', '+', '"', '\\', '<', '>', ';'};
-
-    private static char[] invalidCharacters = new char[ESCAPED_CHAR.length + 5];
+    private static char[] invalidCharacters;
 
     static {
+        char[] ESCAPED_CHAR = {',', '+', '"', '\\', '<', '>', ';'};
+        invalidCharacters = new char[ESCAPED_CHAR.length + 5];
         int i = 0;
         for (; i < ESCAPED_CHAR.length; i++) {
             invalidCharacters[i] = ESCAPED_CHAR[i];

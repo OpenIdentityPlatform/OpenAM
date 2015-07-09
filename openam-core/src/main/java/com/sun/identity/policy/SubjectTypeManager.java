@@ -39,6 +39,7 @@ import com.sun.identity.policy.interfaces.Subject;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
+import org.forgerock.openam.ldap.LDAPUtils;
 
 /**
  * The class <code>SubjectTypeManager</code> provides
@@ -83,7 +84,7 @@ public class SubjectTypeManager {
      */
     protected SubjectTypeManager(PolicyManager pm)  {
         this.pm = pm;
-        pmRealmName = AMCommonUtils.formatToRFC(pm.getOrganizationDN());
+        pmRealmName = LDAPUtils.formatToRFC(pm.getOrganizationDN());
         token = pm.token;
         java.util.Locale loc;
         try {

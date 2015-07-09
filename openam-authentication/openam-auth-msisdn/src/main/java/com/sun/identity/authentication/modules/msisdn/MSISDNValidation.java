@@ -196,7 +196,7 @@ public class MSISDNValidation {
         String validatedUserID = null;
         try {
             LDAPAuthUtils ldapUtil =
-                new LDAPAuthUtils(Collections.singleton(serverHost + ":" + serverPort), Collections.<String>emptySet(),
+                new LDAPAuthUtils(serverHost, serverPort, Collections.<String>emptySet(),
                         useSSL, AMResourceBundleCache.getInstance().getResBundle(amAuthMSISDN, locale), startSearchLoc,
                         debug);
             String searchFilter = new StringBuffer(250).append("(")

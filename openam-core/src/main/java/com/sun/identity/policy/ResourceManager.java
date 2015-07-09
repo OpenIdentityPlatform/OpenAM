@@ -53,6 +53,7 @@ import com.sun.identity.sm.SMSSchema;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManager;
+import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.DN;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -111,10 +112,8 @@ public class ResourceManager {
         org = orgName;
         this.scm = new ServiceConfigManager(PolicyManager.POLICY_SERVICE_NAME,
             token);
-        DN orgDN = DN.valueOf(org);
-        DN baseDN = DN.valueOf(ServiceManager.getBaseDN());
         stm = ServiceTypeManager.getServiceTypeManager();
-        canCreateNewRes = orgDN.equals(baseDN);
+        canCreateNewRes = LDAPUtils.dnEquals(org, ServiceManager.getBaseDN());
     }
 
     /**

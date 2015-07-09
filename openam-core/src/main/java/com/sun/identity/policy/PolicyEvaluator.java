@@ -2529,7 +2529,7 @@ public class PolicyEvaluator {
                 while (iter.hasNext()) {
                     String role = (String) iter.next();
                     if (role != null) { 
-                        roleSet.add(AMCommonUtils.formatToRFC(role));
+                        roleSet.add(LDAPUtils.formatToRFC(role));
                     }
                 }
             }

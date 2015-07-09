@@ -226,7 +226,7 @@ public class CachedDirectoryServicesImpl extends DirectoryServicesImpl
             boolean aciChange, Set attrNames) {
         CacheBlock cb;
         String origdn = dn;
-        dn = CommonUtils.formatToRFC(dn);
+        dn = LDAPUtils.formatToRFC(dn);
         switch (eventType) {
         case PersistentSearchChangeType.ADDED:
             cb = (CacheBlock) sdkCache.get(dn);
@@ -290,12 +290,12 @@ public class CachedDirectoryServicesImpl extends DirectoryServicesImpl
     }
 
     private synchronized void removeFromCache(String dn) {
-        String key = CommonUtils.formatToRFC(dn);
+        String key = LDAPUtils.formatToRFC(dn);
         sdkCache.remove(key);
     }
 
     private void dirtyCache(String dn) {
-        String key = CommonUtils.formatToRFC(dn);
+        String key = LDAPUtils.formatToRFC(dn);
         CacheBlock cb = (CacheBlock) sdkCache.get(key);
         if (cb != null) {
             cb.clear();
@@ -306,7 +306,7 @@ public class CachedDirectoryServicesImpl extends DirectoryServicesImpl
         Iterator itr = entries.iterator();
         while (itr.hasNext()) {
             String entryDN = (String) itr.next();
-            String key = CommonUtils.formatToRFC(entryDN);
+            String key = LDAPUtils.formatToRFC(entryDN);
             CacheBlock cb = (CacheBlock) sdkCache.get(key);
             if (cb != null) {
                 cb.clear();
@@ -320,7 +320,7 @@ public class CachedDirectoryServicesImpl extends DirectoryServicesImpl
      */
     private void updateCache(SSOToken token, String dn, Map stringAttributes,
             Map byteAttributes) throws SSOException {
-        String key = CommonUtils.formatToRFC(dn);
+        String key = LDAPUtils.formatToRFC(dn);
         CacheBlock cb = (CacheBlock) sdkCache.get(key);
         if (cb != null && !cb.hasExpiredAndUpdated() && cb.isExists()) {
             String pDN = CommonUtils.getPrincipalDN(token);
@@ -363,7 +363,7 @@ public class CachedDirectoryServicesImpl extends DirectoryServicesImpl
                 // else throw '461' exception/error message.
                 // This is for certain containers created dynamically.
                 // eg. ou=agents,ou=container,ou=agents.
-                String rfcDN = CommonUtils.formatToRFC(dn);
+                String rfcDN = LDAPUtils.formatToRFC(dn);
                 cb = new CacheBlock(rfcDN, isPresent);
                 sdkCache.put(rfcDN, cb);
             } else {
@@ -376,7 +376,7 @@ public class CachedDirectoryServicesImpl extends DirectoryServicesImpl
     }
 
     public boolean doesEntryExists(SSOToken token, String entryDN) {
-        String dn = CommonUtils.formatToRFC(entryDN);
+        String dn = LDAPUtils.formatToRFC(entryDN);
         CacheBlock cb = (CacheBlock) sdkCache.get(dn);
         if (cb != null && !cb.hasExpiredAndUpdated()) {
             if (debug.messageEnabled()) {
@@ -456,7 +456,6 @@ public class CachedDirectoryServicesImpl extends DirectoryServicesImpl
      */
     public String getOrganizationDN(SSOToken token, String entryDN)
             throws AMException {
-        DN dnObject = DN.valueOf(entryDN);
         if (!LDAPUtils.isDN(entryDN)) {
             debug.error("CachedDirectoryServicesImpl.getOrganizationDN() "
                     + "Invalid DN: " + entryDN);
@@ -468,6 +467,7 @@ public class CachedDirectoryServicesImpl extends DirectoryServicesImpl
         boolean errorCondition = false;
         boolean found = false;
         while (!errorCondition && !found) {
+            DN dnObject = DN.valueOf(entryDN);
             boolean lookupDirectory = true;
             String childDN = dnObject.toString().toLowerCase();
             if (debug.messageEnabled()) {
@@ -538,7 +538,7 @@ public class CachedDirectoryServicesImpl extends DirectoryServicesImpl
     public int getObjectType(SSOToken token, String dn) throws AMException,
             SSOException {
         int objectType = AMObject.UNDETERMINED_OBJECT_TYPE;
-        String entryDN = CommonUtils.formatToRFC(dn);
+        String entryDN = LDAPUtils.formatToRFC(dn);
         CacheBlock cb = (CacheBlock) sdkCache.get(entryDN);
         if (cb != null) {
             validateEntry(token, cb);
@@ -669,7 +669,7 @@ public class CachedDirectoryServicesImpl extends DirectoryServicesImpl
         cacheStats.incrementRequestCount(getSize());
 
         String principalDN = CommonUtils.getPrincipalDN(token);
-        String dn = CommonUtils.formatToRFC(entryDN);
+        String dn = LDAPUtils.formatToRFC(entryDN);
 
         if (debug.messageEnabled()) {
             debug.message("In CachedDirectoryServicesImpl.getAttributes("
@@ -810,7 +810,7 @@ public class CachedDirectoryServicesImpl extends DirectoryServicesImpl
                     + byteValues + " method.");
         }
 
-        String dn = CommonUtils.formatToRFC(entryDN);
+        String dn = LDAPUtils.formatToRFC(entryDN);
         CacheBlock cb = (CacheBlock) sdkCache.get(dn);
         if (cb == null) { // Entry not present in cache
             if (debug.messageEnabled()) {
@@ -935,9 +935,9 @@ public class CachedDirectoryServicesImpl extends DirectoryServicesImpl
         // NOTE: We should have the code to remove the entry for rename
         // operation as the operation could have been performed by some other
         // process such as amadmin.
-        String oldDN = CommonUtils.formatToRFC(entryDN);
+        String oldDN = LDAPUtils.formatToRFC(entryDN);
         CacheBlock cb = (CacheBlock) sdkCache.remove(oldDN);
-        newDN = CommonUtils.formatToRFC(newDN);
+        newDN = LDAPUtils.formatToRFC(newDN);
         sdkCache.put(newDN, cb);
         return newDN;
     }
@@ -1022,7 +1022,7 @@ public class CachedDirectoryServicesImpl extends DirectoryServicesImpl
         String templateDN = super.createAMTemplate(token, entryDN, objectType,
                 serviceName, attributes, priority);
         // Mark the entry as exists in cache
-        String dn = CommonUtils.formatToRFC(templateDN);
+        String dn = LDAPUtils.formatToRFC(templateDN);
         CacheBlock cb = (CacheBlock) sdkCache.get(dn);
         if (cb != null) {
             cb.setExists(true);

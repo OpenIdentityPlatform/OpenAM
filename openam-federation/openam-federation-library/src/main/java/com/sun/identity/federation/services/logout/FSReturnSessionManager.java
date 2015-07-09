@@ -34,6 +34,7 @@ import java.util.Map;
 
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.IFSConstants;
+import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.DN;
 
 /**
@@ -73,16 +74,14 @@ public final class FSReturnSessionManager{
      */
     public void setLogoutStatus(String logoutStatus,String userDN){
         FSUtils.debug.message("FSReturnSessionManager::setLogoutStatus");
-        userDN = DN.valueOf(userDN).toString().toLowerCase();
-        if(userDN != null) {
-            HashMap userMap =  (HashMap)userAndProviderMap.get(userDN);
-            if (userMap != null) {
-                userMap.remove(IFSConstants.LOGOUT_STATUS);
-                userMap.put(IFSConstants.LOGOUT_STATUS, logoutStatus);
-                removeUserProviderInfo(userDN);
-                synchronized (userAndProviderMap) {
-                    userAndProviderMap.put(userDN, userMap);
-                }
+        userDN = LDAPUtils.formatToRFC(userDN);
+        HashMap userMap =  (HashMap)userAndProviderMap.get(userDN);
+        if (userMap != null) {
+            userMap.remove(IFSConstants.LOGOUT_STATUS);
+            userMap.put(IFSConstants.LOGOUT_STATUS, logoutStatus);
+            removeUserProviderInfo(userDN);
+            synchronized (userAndProviderMap) {
+                userAndProviderMap.put(userDN, userMap);
             }
         }
     }

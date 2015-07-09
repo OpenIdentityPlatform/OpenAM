@@ -330,12 +330,13 @@ public class ImportServiceConfiguration extends AuthenticatedCommand {
     }
 
     private void loadLDIF(DirectoryServerVendor.Vendor vendor, Connection ld) throws CLIException {
-        LDIFChangeRecordReader ldifReader = new LDIFChangeRecordReader(new DataInputStream(getClass().getClassLoader()
-                .getResourceAsStream(DS_LDIF)));
-        LDIFChangeRecordReader indexReader = new LDIFChangeRecordReader(new DataInputStream(getClass().getClassLoader()
-                .getResourceAsStream(DS_IDX)));
+        LDIFChangeRecordReader ldifReader = new LDIFChangeRecordReader(getClass().getClassLoader()
+                .getResourceAsStream(DS_LDIF));
+        LDIFChangeRecordReader indexReader = new LDIFChangeRecordReader(getClass().getClassLoader()
+                .getResourceAsStream(DS_IDX));
 
-        try (LDIFChangeRecordReader ldif = ldifReader; LDIFChangeRecordReader index = indexReader) {
+        try (LDIFChangeRecordReader ldif = ldifReader;
+             LDIFChangeRecordReader index = indexReader) {
             String vendorName = vendor.name;
             if (vendorName.equals(DirectoryServerVendor.ODSEE)) {
                 LdifUtils.createSchemaFromLDIF(ldif, ld);

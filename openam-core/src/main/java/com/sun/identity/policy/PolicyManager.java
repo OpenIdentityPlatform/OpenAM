@@ -571,7 +571,7 @@ public final class PolicyManager {
         String realmName = getOrganizationDN();
 
         //TODO: handle non DNs/
-        realmName = AMCommonUtils.formatToRFC(realmName);
+        realmName = LDAPUtils.formatToRFC(realmName);
         String subjectRealm = policy.getSubjectRealm();
         String[] realmNames = {realmName, subjectRealm};
         if ((subjectRealm != null) && !subjectRealm.equals(realmName)) {

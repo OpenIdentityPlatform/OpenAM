@@ -55,6 +55,7 @@ import com.sun.identity.authentication.internal.util.AuthI18n;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceManager;
+import org.forgerock.i18n.LocalizedIllegalArgumentException;
 import org.forgerock.opendj.ldap.DN;
 
 
@@ -754,7 +755,11 @@ public final class AuthContext extends Object {
      */
     public String getOrganizationName() {
         if (organizationName == null) {
-            organizationName = DN.valueOf(ServiceManager.getBaseDN()).toString().toLowerCase();
+            try {
+                organizationName = DN.valueOf(ServiceManager.getBaseDN()).toString().toLowerCase();
+            } catch (LocalizedIllegalArgumentException e) {
+                throw new IllegalStateException("AuthContext.getOrganizationName: Base DN cannot be parsed", e);
+            }
         }
         return organizationName;
     }

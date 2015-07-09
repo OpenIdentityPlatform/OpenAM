@@ -172,26 +172,34 @@ public abstract class AjaxPage extends Page {
     }
 
     protected boolean writeErrorToResponse(ResultCode resultCode) {
-        if (ResultCode.CLIENT_SIDE_CONNECT_ERROR.equals(resultCode)) {
-            writeToResponse(getLocalizedString("ldap.connect.error"));
-        } else if (ResultCode.CLIENT_SIDE_SERVER_DOWN.equals(resultCode)) {
-            writeToResponse(getLocalizedString("ldap.server.down"));
-        } else if (ResultCode.INVALID_DN_SYNTAX.equals(resultCode)) {
-            writeToResponse(getLocalizedString("ldap.invalid.dn"));
-        } else if (ResultCode.NO_SUCH_OBJECT.equals(resultCode)) {
-            writeToResponse(getLocalizedString("ldap.nosuch.object"));
-        } else if (ResultCode.INVALID_CREDENTIALS.equals(resultCode)) {
-            writeToResponse(getLocalizedString("ldap.invalid.credentials"));
-        } else if (ResultCode.UNWILLING_TO_PERFORM.equals(resultCode)) {
-            writeToResponse(getLocalizedString("ldap.unwilling"));
-        } else if (ResultCode.INAPPROPRIATE_AUTHENTICATION.equals(resultCode)) {
-            writeToResponse(getLocalizedString("ldap.inappropriate"));
-        } else if (ResultCode.CONSTRAINT_VIOLATION.equals(resultCode)) {
-            writeToResponse(getLocalizedString("ldap.constraint"));
-        } else {
-            return false;
+        String msg = getMessage(resultCode);
+        if (msg != null) {
+            writeToResponse(getLocalizedString(msg));
+            return true;
         }
-        return true;
+        return false;
+    }
+
+    private String getMessage(ResultCode resultCode) {
+        if (ResultCode.CLIENT_SIDE_CONNECT_ERROR.equals(resultCode)) {
+            return "ldap.connect.error";
+        } else if (ResultCode.CLIENT_SIDE_SERVER_DOWN.equals(resultCode)) {
+            return "ldap.server.down";
+        } else if (ResultCode.INVALID_DN_SYNTAX.equals(resultCode)) {
+            return "ldap.invalid.dn";
+        } else if (ResultCode.NO_SUCH_OBJECT.equals(resultCode)) {
+            return "ldap.nosuch.object";
+        } else if (ResultCode.INVALID_CREDENTIALS.equals(resultCode)) {
+            return "ldap.invalid.credentials";
+        } else if (ResultCode.UNWILLING_TO_PERFORM.equals(resultCode)) {
+            return "ldap.unwilling";
+        } else if (ResultCode.INAPPROPRIATE_AUTHENTICATION.equals(resultCode)) {
+            return "ldap.inappropriate";
+        } else if (ResultCode.CONSTRAINT_VIOLATION.equals(resultCode)) {
+            return "ldap.constraint";
+        } else {
+            return null;
+        }
     }
 
     protected void writeToResponse( String text ) {

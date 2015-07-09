@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,11 +24,9 @@
  *
  * $Id: EventListener.java,v 1.12 2008/06/27 20:56:23 arviranga Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 
-/**
- * Portions Copyrighted 2011-2013 ForgeRock AS
- */
 package com.iplanet.am.sdk.remote;
 
 import com.iplanet.am.sdk.AMEvent;
@@ -36,7 +34,6 @@ import com.iplanet.am.sdk.AMEventManagerException;
 import com.iplanet.am.sdk.AMObjectListener;
 import com.iplanet.am.sdk.common.ICachedDirectoryServices;
 import com.iplanet.am.sdk.common.IDirectoryServices;
-import com.iplanet.am.sdk.common.MiscUtils;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.comm.client.NotificationHandler;
 import com.iplanet.services.comm.client.PLLClient;
@@ -60,6 +57,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+
+import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.util.thread.listener.ShutdownListener;
 
 /**
@@ -296,7 +295,7 @@ class EventListener {
             if (entityName == null) {
                 handleError("invalid entity Name: " + attrs.get(ENTITY_NAME));
             }
-            String entryDN = MiscUtils.formatToRFC(entityName);
+            String entryDN = LDAPUtils.formatToRFC(entityName);
             IDirectoryServices dsServices = RemoteServicesFactory.getInstance();
             // Switch based on method
             if (method.equalsIgnoreCase(OBJECT_CHANGED)) {

@@ -50,6 +50,7 @@ import com.sun.identity.policy.plugins.OrgReferral;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.AttributeSchema;
+import org.forgerock.openam.ldap.LDAPUtils;
 import org.w3c.dom.Node;
 
 /**
@@ -760,7 +761,7 @@ public class Policy implements Cloneable {
             throws NameAlreadyExistsException, InvalidNameException,
             PolicyException, SSOException {
         String realmName = stm.getPolicyManager().getOrganizationDN();
-        realmName = AMCommonUtils.formatToRFC(realmName);
+        realmName = LDAPUtils.formatToRFC(realmName);
         if ((subjectRealm != null) && !subjectRealm.equals(realmName)) {
             String[] objs = {realmName, subjectRealm};
             if (DEBUG.messageEnabled()) {

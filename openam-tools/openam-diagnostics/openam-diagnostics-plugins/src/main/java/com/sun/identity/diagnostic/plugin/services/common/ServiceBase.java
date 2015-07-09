@@ -434,7 +434,7 @@ public abstract class ServiceBase implements ToolConstants, ServiceConstants {
     protected static Connection getLDAPConnection(String dsHostName, int dsPort, String dsProtocol, String dsManager,
             String dsAdminPwd) {
         try {
-            LDAPOptions options = new LDAPOptions().setTimeout(300, TimeUnit.SECONDS);
+            LDAPOptions options = new LDAPOptions().setConnectTimeout(3, TimeUnit.SECONDS);
             if (dsProtocol.equalsIgnoreCase("ldaps")) {
                 options.setSSLContext(new SSLContextBuilder().getSSLContext());
             }

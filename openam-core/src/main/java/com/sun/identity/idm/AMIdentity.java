@@ -52,6 +52,7 @@ import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceNotFoundException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.i18n.LocalizedIllegalArgumentException;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.RDN;
@@ -215,10 +216,14 @@ public class AMIdentity {
             name = LDAPUtils.rdnValueFromDn(name);
         }
 
-        univIdWithoutDN = LDAPUtils.newDN(this.orgName)
-                .child(new RDN("ou", type.getName()))
-                .child(new RDN("id", name))
-                .toString();
+        try {
+            univIdWithoutDN = LDAPUtils.newDN(this.orgName)
+                    .child(new RDN("ou", type.getName()))
+                    .child(new RDN("id", name))
+                    .toString();
+        } catch (LocalizedIllegalArgumentException e) {
+            throw new IllegalArgumentException("Cannot parse orgName: " + orgName, e);
+        }
     }
 
     // General APIs

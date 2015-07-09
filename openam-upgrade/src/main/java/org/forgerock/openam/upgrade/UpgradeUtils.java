@@ -1432,7 +1432,7 @@ public class UpgradeUtils {
         }
         try {
             return getLDAPConnectionFactory(dsHostName, dsPort,
-                    new LDAPOptions().setConnectTimeout(300, TimeUnit.SECONDS), dsManager, dsAdminPwd.toCharArray())
+                    new LDAPOptions().setConnectTimeout(3, TimeUnit.SECONDS), dsManager, dsAdminPwd.toCharArray())
                     .getConnection();
         } catch (ErrorResultException e) {
             debug.error(classMethod + " Error getting LDAP Connection");
@@ -3051,16 +3051,14 @@ public class UpgradeUtils {
         String classMethod = "UpgradeUtils:getSunServiceID : ";
         String serviceID = "";
         try (Connection conn = getLDAPConnection()) {
-            if (conn != null) {
-                String dn = subConfig.getDN();
-                SearchResultEntry result = conn.readEntry(dn);
-                if (result != null) {
-                    for (Attribute attribute : result.getAllAttributes()) {
-                        String attrName = attribute.getAttributeDescriptionAsString();
-                        if (attrName != null && ATTR_SUNSERVICE_ID.equalsIgnoreCase(attrName)) {
-                            serviceID = attribute.firstValueAsString();
-                            break;
-                        }
+            String dn = subConfig.getDN();
+            SearchResultEntry result = conn.readEntry(dn);
+            if (result != null) {
+                for (Attribute attribute : result.getAllAttributes()) {
+                    String attrName = attribute.getAttributeDescriptionAsString();
+                    if (attrName != null && ATTR_SUNSERVICE_ID.equalsIgnoreCase(attrName)) {
+                        serviceID = attribute.firstValueAsString();
+                        break;
                     }
                 }
             }
