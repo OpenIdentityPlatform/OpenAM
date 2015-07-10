@@ -135,11 +135,11 @@
       <listitem>
        <para>
         Specifies the actual name of the authentication module/chain as
-        controlled by the <literal>indexName</literal> setting. For example, if the
-        <literal>indexType</literal> is set to <literal>module_instance</literal> 
+        controlled by the <literal>indexType</literal> setting. For example, if the
+        <literal>indexType</literal> is set to <literal>module_instance</literal>
         and <literal>indexName</literal> is set to <literal>LDAP</literal>, then
         <command>ssoadm</command> authenticates
-        using the LDAP authentication module.
+        using only the LDAP authentication module.
        </para>
       </listitem>
      </varlistentry>
