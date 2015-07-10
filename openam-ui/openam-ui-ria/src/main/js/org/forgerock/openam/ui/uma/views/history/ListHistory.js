@@ -107,7 +107,7 @@ define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
                         className: "col-md-2"
                     })
                 }],
-                emptyText: $.t("uma.all.grid.empty"),
+                emptyText: $.t("console.common.noResults"),
                 className:"backgrid table table-striped",
                 collection: collection
             });

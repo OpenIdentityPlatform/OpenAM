@@ -18,9 +18,6 @@
 define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
     "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "backbone",
-    "backgrid",
-    "org/forgerock/openam/ui/common/util/BackgridUtils",
     "bootstrap-dialog",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -28,7 +25,8 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
     "org/forgerock/openam/ui/uma/views/resource/MyResourcesTab",
     "org/forgerock/openam/ui/uma/views/resource/SharedResourcesTab",
     "org/forgerock/openam/ui/uma/delegates/UMADelegate"
-], function($, AbstractView, Backbone, Backgrid, BackgridUtils, BootstrapDialog, CommonShare, Configuration, Constants, EventManager, MessageManager, RealmHelper, Router, MyResourcesTab, SharedResourcesTab, UMADelegate) {
+], function($, AbstractView, BootstrapDialog, Constants, EventManager, Messages, MyResourcesTab, SharedResourcesTab,
+            UMADelegate) {
     var ListResource = AbstractView.extend({
         template: "templates/uma/views/resource/ListResource.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
@@ -51,7 +49,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
                         UMADelegate.revokeAllResources().done(function() {
                             EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "revokeAllResourcesSuccess");
                         }).fail(function(error) {
-                            MessageManager.messages.addMessage({ message: JSON.parse(error.responseText).message, type: "error"});
+                            Messages.messages.addMessage({ message: JSON.parse(error.responseText).message, type: "error"});
                         }).always(function() {
                             dialog.close();
                         });

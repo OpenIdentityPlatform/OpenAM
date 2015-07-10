@@ -465,11 +465,6 @@
         }
     },
     "uma": {
-        "all": {
-            "grid": {
-                "empty": "No results..."
-            }
-        },
         "share": {
             "shareResource": "Share the resource",
             "people": "Add or select people to share your resource with",

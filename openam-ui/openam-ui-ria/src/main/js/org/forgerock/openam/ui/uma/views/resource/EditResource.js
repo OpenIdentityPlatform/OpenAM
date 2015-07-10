@@ -226,7 +226,7 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
                         })
                     }],
                 collection: collection,
-                emptyText: $.t("uma.all.grid.empty"),
+                emptyText: $.t("console.common.noResults"),
                 className:"backgrid table table-striped"
             });
 

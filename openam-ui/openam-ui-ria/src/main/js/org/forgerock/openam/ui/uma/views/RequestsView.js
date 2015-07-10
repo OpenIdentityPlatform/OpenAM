@@ -129,7 +129,7 @@ define("org/forgerock/openam/ui/uma/views/RequestsView", [
                 columns: columns,
                 className: "backgrid table table-striped",
                 collection: self.data.requests,
-                emptyText: $.t("uma.all.grid.empty")
+                emptyText: $.t("console.common.noResults")
             });
 
             paginator = new Backgrid.Extension.Paginator({
