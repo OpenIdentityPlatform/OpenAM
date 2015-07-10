@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-15 ForgeRock AS.
+ * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openidconnect;
@@ -20,6 +21,7 @@ import java.net.URI;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.OAuth2Jwt;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
+import org.forgerock.oauth2.core.exceptions.ServerException;
 
 /**
  * Models an OpenId Connect client registration in the OAuth2 provider.
@@ -61,5 +63,39 @@ public interface OpenIdConnectClientRegistration extends ClientRegistration {
      */
     String getSubValue(String id, OAuth2ProviderSettings providerSettings);
 
+    /**
+     * Gets the authorization code life time in milliseconds.
+     * 
+     * @param providerSettings An instance of the OAuth2ProviderSettings.
+     * @return The authorization code life time in milliseconds.
+     * @throws ServerException If any internal server error occurs.
+     */
+    long getAuthorizationCodeLifeTime(OAuth2ProviderSettings providerSettings) throws ServerException;
+         
+    /**
+     * Gets the access token life time in milliseconds.
+     * 
+     * @param providerSettings An instance of the OAuth2ProviderSettings.
+     * @return The access token life time in milliseconds.
+     * @throws ServerException If any internal server error occurs.
+     */
+    long getAccessTokenLifeTime(OAuth2ProviderSettings providerSettings) throws ServerException;
 
+    /**
+     * Gets the refresh token life time in milliseconds.
+     * 
+     * @param providerSettings An instance of the OAuth2ProviderSettings.
+     * @return The refresh token life time in milliseconds.
+     * @throws ServerException If any internal server error occurs.
+     */
+    long getRefreshTokenLifeTime(OAuth2ProviderSettings providerSettings) throws ServerException;
+
+    /**
+     * Gets the JWT token life time in milliseconds.
+     * 
+     * @param providerSettings An instance of the OAuth2ProviderSettings.
+     * @return The JWT token life time in milliseconds.
+     * @throws ServerException If any internal server error occurs.
+     */
+    long getJwtTokenLifeTime(OAuth2ProviderSettings providerSettings) throws ServerException;
 }

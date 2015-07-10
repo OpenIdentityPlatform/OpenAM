@@ -12,9 +12,6 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
- */
-
-/*
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
 
@@ -126,9 +123,13 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
             String clientId, String redirectUri, String nonce, OAuth2Request request) throws ServerException, NotFoundException {
 
         logger.message("DefaultOAuthTokenStoreImpl::Creating Authorization code");
+
+        OpenIdConnectClientRegistration clientRegistration = getClientRegistration(clientId, request);
+        
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final String code = UUID.randomUUID().toString();
-        final long expiryTime = (providerSettings.getAuthorizationCodeLifetime() * 1000) + System.currentTimeMillis();
+
+        final long expiryTime = clientRegistration.getAuthorizationCodeLifeTime(providerSettings) + System.currentTimeMillis();
         final String ssoTokenId = getSsoTokenId(request);
 
 
@@ -156,6 +157,18 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         request.setToken(AuthorizationCode.class, authorizationCode);
 
         return authorizationCode;
+    }
+
+    private OpenIdConnectClientRegistration getClientRegistration(String clientId, OAuth2Request request)
+            throws ServerException {
+        OpenIdConnectClientRegistration clientRegistration = null;
+        try {
+            clientRegistration = clientRegistrationStore.get(clientId, request);
+        } catch (InvalidClientException e) {
+            logger.error(e.getMessage(), e);
+            throw new ServerException(e.getMessage());
+        }
+        return clientRegistration;
     }
 
     private String getClaimsFromRequest(OAuth2Request request) {
@@ -197,8 +210,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         final String algorithm = clientRegistration.getIDTokenSignedResponseAlgorithm();
 
         final long currentTimeInSeconds = System.currentTimeMillis() / 1000;
-        final long tokenLifetimeInSeconds = providerSettings.getOpenIdTokenLifetime();
-        final long exp = currentTimeInSeconds + tokenLifetimeInSeconds;
+        final long exp = clientRegistration.getJwtTokenLifeTime(providerSettings) / 1000 + currentTimeInSeconds;
 
         final String realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
 
@@ -429,9 +441,11 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
             RefreshToken refreshToken, String nonce, String claims, OAuth2Request request)
             throws ServerException, NotFoundException {
 
+        OpenIdConnectClientRegistration clientRegistration = getClientRegistration(clientId, request);
+        
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final String id = UUID.randomUUID().toString();
-        final long expiryTime = (providerSettings.getAccessTokenLifetime() * 1000) + System.currentTimeMillis();
+        final long expiryTime = clientRegistration.getAccessTokenLifeTime(providerSettings) + System.currentTimeMillis();
         final AccessToken accessToken;
         if (refreshToken == null) {
             accessToken = new OpenAMAccessToken(id, authorizationCode, resourceOwnerId, clientId, redirectUri,
@@ -470,10 +484,13 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         final String realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
 
         logger.message("Create refresh token");
+        
+        OpenIdConnectClientRegistration clientRegistration = getClientRegistration(clientId, request);
+        
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
 
         final String id = UUID.randomUUID().toString();
-        final long expiryTime = (providerSettings.getRefreshTokenLifetime() * 1000) + System.currentTimeMillis();
+        final long expiryTime = clientRegistration.getRefreshTokenLifeTime(providerSettings) + System.currentTimeMillis();
         AuthorizationCode token = request.getToken(AuthorizationCode.class);
         String authModules = null;
         String acr = null;

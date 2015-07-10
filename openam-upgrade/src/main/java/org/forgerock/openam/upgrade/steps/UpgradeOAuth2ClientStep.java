@@ -66,6 +66,8 @@ public class UpgradeOAuth2ClientStep extends AbstractUpgradeStep {
     private static final String OAUTH2_DATA = "%OAUTH2_DATA%";
     public static final List<String> CHANGED_PROPERTIES = Arrays.asList(
             REDIRECT_URI, SCOPES, DEFAULT_SCOPES, NAME, DESCRIPTION, POST_LOGOUT_URI, CLIENT_NAME);
+    public static final List<String> ADDED_LIFETIME_PROPERTIES = Arrays.asList(
+            AUTHORIZATION_CODE_LIFE_TIME, ACCESS_TOKEN_LIFE_TIME, REFRESH_TOKEN_LIFE_TIME, JWT_TOKEN_LIFE_TIME);
     private static final Pattern pattern = Pattern.compile("\\[\\d+\\]=.*");
     private final Map<String, Map<AgentType, Map<String, Set<String>>>> upgradableConfigs =
             new HashMap<String, Map<AgentType, Map<String, Set<String>>>>();
@@ -158,6 +160,12 @@ public class UpgradeOAuth2ClientStep extends AbstractUpgradeStep {
                     }
                 }
             }
+            attrs = oauth2Config.getAttributes();
+            for (String addedLifetimeProps : ADDED_LIFETIME_PROPERTIES) {
+                if (!attrs.containsKey(addedLifetimeProps)) {
+                    addAttributeToMap(map, type, subConfig, addedLifetimeProps, realm);
+                }
+            }
         }
     }
 
@@ -211,6 +219,8 @@ public class UpgradeOAuth2ClientStep extends AbstractUpgradeStep {
                                 if (ALGORITHM_NAMES.containsKey(value)) {
                                     attrs.put(attrName, Collections.singleton(ALGORITHM_NAMES.get(value)));
                                 }
+                            } else if (ADDED_LIFETIME_PROPERTIES.contains(attrName)) {
+                                attrs.put(attrName, Collections.singleton("0"));
                             }
                         }
                         oauth2Config.setAttributes(attrs);
