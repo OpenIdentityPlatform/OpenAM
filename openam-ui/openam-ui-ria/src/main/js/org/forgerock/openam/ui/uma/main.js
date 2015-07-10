@@ -32,6 +32,7 @@ define([
     "./models/User",
 
     "./views/RequestsView",
+    "./views/backgrid/cells/PermissionsCell",
     "./views/history/ListHistory",
     "./views/resource/EditResource",
     "./views/resource/ListResource",

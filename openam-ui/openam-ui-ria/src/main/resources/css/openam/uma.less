@@ -167,10 +167,6 @@ span.item-button-panel {
 
 
     .backgrid {
-        .template-cell a {
-            float: right;
-        }
-
         td.uri-cell {
             // TODO: BOOTSTRAP: Removed due to build issues. Will need re-adding
             .transition(background, 0.1s);
@@ -180,6 +176,18 @@ span.item-button-panel {
 
                 a {
                     color:#f7f7f7;
+                }
+            }
+        }
+
+        td.permissions-cell {
+            a {
+                background-color: white;
+                color: black;
+
+                &:hover {
+                    background-color: inherit;
+                    color: inherit;
                 }
             }
         }

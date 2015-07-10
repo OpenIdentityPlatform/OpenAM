@@ -23,8 +23,9 @@ define("org/forgerock/openam/ui/uma/views/RequestsView", [
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/common/util/RealmHelper"
-], function ($, AbstractView, Backbone, Backgrid, BackgridUtils, Configuration, Constants, RealmHelper) {
+    "org/forgerock/openam/ui/common/util/RealmHelper",
+    "org/forgerock/openam/ui/uma/views/backgrid/cells/PermissionsCell"
+], function ($, AbstractView, Backbone, Backgrid, BackgridUtils, Configuration, Constants, RealmHelper, PermissionsCell) {
     var RequestsView = AbstractView.extend({
         template: "templates/uma/views/RequestsTemplate.html",
 
@@ -84,30 +85,10 @@ define("org/forgerock/openam/ui/uma/views/RequestsView", [
                 headerCell: BackgridUtils.ClassHeaderCell.extend({
                     className: "col-md-3"
                 }),
-                // TODO: To be removed and replaced with improved permissions control AME-7644
-                cell: BackgridUtils.TemplateCell.extend({
-                    template: "templates/uma/backgrid/cell/SelectizeCell.html",
-                    rendered: function () {
-                        var items = ["delete"],
-                            options = [{
-                                id: "view",
-                                name: "View"
-                            }, {
-                                id: "delete",
-                                name: "Delete"
-                            }];
-
-                        this.$el.find("select").selectize({
-                            create: false,
-                            delimiter: ",",
-                            dropdownParent: "#uma",
-                            hideSelected: true,
-                            persist: false,
-                            labelField: "name",
-                            valueField: "id",
-                            items: items,
-                            options: options
-                        });
+                cell: PermissionsCell.extend({
+                    onChange: function () {
+                        var anySelected = this.$el.find("li.active").length > 0;
+                        this.$el.parent().find(".permissionAllow").prop("disabled", !anySelected);
                     }
                 }),
                 editable: false
@@ -140,9 +121,8 @@ define("org/forgerock/openam/ui/uma/views/RequestsView", [
             this.data.requests.add({
                 user: "Bob",
                 resource: "Photo1",
-                when: "Recently",
-                permissions: ["View", "Delete"],
-                actions: "test"
+                when: "",
+                permissions: ["View", "Delete", "Read", "Update", "Execute"]
             });
 
             grid = new Backgrid.Grid({

@@ -34,26 +34,27 @@ require.config({
         "backgrid.paginator": "libs/backgrid-paginator.min",
         "backgrid.selectall": "libs/backgrid-select-all.min",
 
-        "bootstrap"         : "libs/bootstrap-3.3.4-custom",
-        "bootstrap-dialog"  : "libs/bootstrap-dialog-1.34.4-min",
-        "bootstrap-tabdrop" : "libs/bootstrap-tabdrop-1.0",
+        "bootstrap"            : "libs/bootstrap-3.3.4-custom",
+        "bootstrap-dialog"     : "libs/bootstrap-dialog-1.34.4-min",
+        "bootstrap-multiselect": "libs/bootstrap-multiselect.0.9.13.min",
+        "bootstrap-tabdrop"    : "libs/bootstrap-tabdrop-1.0",
 
-        "doTimeout"       : "libs/jquery.ba-dotimeout-1.0-min",
-        "form2js"         : "libs/form2js-2.0",
-        "handlebars"      : "libs/handlebars-1.3.0-min",
-        "i18next"         : "libs/i18next-1.7.3-min",
-        "jquery"          : "libs/jquery-2.1.1-min",
-        "js2form"         : "libs/js2form-2.0",
-        "jsonEditor"      : "libs/jsoneditor-custom.min",
-        "moment"          : "libs/moment-2.8.1-min",
-        "qrcode"          : "libs/qrcode-1.0.0-min",
-        "sortable"        : "libs/jquery-nestingSortable-0.9.12",
-        "spin"            : "libs/spin-2.0.1-min",
-        "underscore"      : "libs/lodash-2.4.1-min",
-        "xdate"           : "libs/xdate-0.8-min",
-        "selectize"       : "libs/selectize-non-standalone-0.12.1-min",
-        "sifter"          : "libs/sifter-0.4.1-min",
-        "microplugin"     : "libs/microplugin-0.0.3",
+        "doTimeout"   : "libs/jquery.ba-dotimeout-1.0-min",
+        "form2js"     : "libs/form2js-2.0",
+        "handlebars"  : "libs/handlebars-1.3.0-min",
+        "i18next"     : "libs/i18next-1.7.3-min",
+        "jquery"      : "libs/jquery-2.1.1-min",
+        "js2form"     : "libs/js2form-2.0",
+        "jsonEditor"  : "libs/jsoneditor-custom.min",
+        "moment"      : "libs/moment-2.8.1-min",
+        "qrcode"      : "libs/qrcode-1.0.0-min",
+        "sortable"    : "libs/jquery-nestingSortable-0.9.12",
+        "spin"        : "libs/spin-2.0.1-min",
+        "underscore"  : "libs/lodash-2.4.1-min",
+        "xdate"       : "libs/xdate-0.8-min",
+        "selectize"   : "libs/selectize-non-standalone-0.12.1-min",
+        "sifter"      : "libs/sifter-0.4.1-min",
+        "microplugin" : "libs/microplugin-0.0.3",
         "ThemeManager": "org/forgerock/openam/ui/common/util/ThemeManager",
         "UserDelegate": "org/forgerock/openam/ui/user/delegates/UserDelegate"
     },
@@ -89,9 +90,13 @@ require.config({
         "bootstrap-dialog": {
             deps: ["jquery", "underscore", "backbone", "bootstrap"]
         },
+        "bootstrap-multiselect": {
+            deps: ["jquery", "bootstrap"]
+        },
         "bootstrap-tabdrop": {
             deps: ["jquery", "bootstrap"]
         },
+
         "doTimeout": {
             deps: ["jquery"],
             exports: "doTimeout"
@@ -175,6 +180,7 @@ require([
     "bootstrap",
     "bootstrap-dialog",
     "bootstrap-tabdrop",
+    "bootstrap-multiselect",
     "org/forgerock/openam/ui/uma/main",
     "org/forgerock/openam/ui/admin/main",
     "sortable",

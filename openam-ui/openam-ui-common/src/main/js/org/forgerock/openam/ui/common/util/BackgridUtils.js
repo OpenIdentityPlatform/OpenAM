@@ -159,13 +159,17 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
     obj.TemplateCell = Backgrid.Cell.extend({
         className: "template-cell",
         render: function () {
-            UIUtils.renderTemplate(this.template, this.$el);
+            var self = this;
 
-            if (this.rendered) {
-                this.rendered();
-            }
+            UIUtils.fillTemplateWithData(this.template, this.model, function (content) {
+                self.$el.html(content);
+                if (self.rendered) {
+                    self.rendered();
+                }
 
-            this.delegateEvents();
+                self.delegateEvents();
+            });
+
             return this;
         }
     });
