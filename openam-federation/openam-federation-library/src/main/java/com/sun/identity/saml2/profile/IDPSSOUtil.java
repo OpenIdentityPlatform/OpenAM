@@ -100,6 +100,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.security.PrivateKey;
+import java.util.LinkedHashSet;
 import java.util.logging.Level;
 import java.util.ArrayList;
 import java.util.Date;
@@ -445,7 +446,7 @@ public class IDPSSOUtil {
         //end of request proxy
 
         // generate a response for the authn request
-        Response res = getResponse(session, authnReq, spEntityID, idpEntityID,
+        Response res = getResponse(request, session, authnReq, spEntityID, idpEntityID,
                 idpMetaAlias, realm, nameIDFormat, acsURL, affiliationID,
                 matchingAuthnContext);
 
@@ -739,22 +740,23 @@ public class IDPSSOUtil {
     }
 
     /**
-     * Returns a <code>SAML Response</code> object
+     * Returns a <code>SAML Response</code> object.
      *
-     * @param session              the user's session object
-     * @param authnReq             the <code>AuthnRequest</code> object
-     * @param recipientEntityID    the entity id of the response recipient
-     * @param idpEntityID          the entity id of the identity provider
-     * @param realm                the realm name
-     * @param nameIDFormat         the <code>NameIDFormat</code>
-     * @param acsURL               the <code>ACS</code> service <code>url</code>
-     * @param affiliationID        affiliationID for IDP initiated SSO
-     * @param matchingAuthnContext the <code>AuthnContext</code> used to find
-     *                             authentication type and scheme.
-     * @return the <code>SAML Response</code> object
-     * @throws SAML2Exception if the operation is not successful
+     * @param request The HTTP request.
+     * @param session The user's session object.
+     * @param authnReq The <code>AuthnRequest</code> object.
+     * @param recipientEntityID The entity ID of the response recipient.
+     * @param idpEntityID The entity ID of the identity provider.
+     * @param realm The realm name.
+     * @param nameIDFormat The <code>NameIDFormat</code>.
+     * @param acsURL The <code>ACS</code> service <code>url</code>.
+     * @param affiliationID AffiliationID for IDP initiated SSO.
+     * @param matchingAuthnContext the <code>AuthnContext</code> used to find authentication type and scheme.
+     * @return the <code>SAML Response</code> object.
+     * @throws SAML2Exception if the operation is not successful.
      */
     public static Response getResponse(
+            HttpServletRequest request,
             Object session,
             AuthnRequest authnReq,
             String recipientEntityID,
@@ -782,7 +784,7 @@ public class IDPSSOUtil {
         try {
             List assertionList = new ArrayList();
 
-            Assertion assertion = getAssertion(session, authnReq,
+            Assertion assertion = getAssertion(request, session, authnReq,
                     recipientEntityID, idpEntityID, idpMetaAlias, realm,
                     nameIDFormat, acsURL, affiliationID, matchingAuthnContext);
 
@@ -827,20 +829,22 @@ public class IDPSSOUtil {
     /**
      * Returns a <code>SAML Assertion</code> object
      *
-     * @param session              the user's session object
-     * @param authnReq             the <code>AuthnRequest</code> object
-     * @param recipientEntityID    the entity id of the response recipient
-     * @param idpEntityID          the entity id of the identity provider
-     * @param realm                the realm name
-     * @param nameIDFormat         the <code>NameIDFormat</code>
-     * @param acsURL               the <code>ACS</code> service <code>url</code>
-     * @param affiliationID        affiliationID for IDP initiated SSO
-     * @param matchingAuthnContext the <code>AuthnContext</code> used to find
-     *                             authentication type and scheme.
-     * @return the <code>SAML Assertion</code> object
      * @throws SAML2Exception if the operation is not successful
+     * @param request The HTTP request.
+     * @param session The user's session object.
+     * @param authnReq The <code>AuthnRequest</code> object.
+     * @param recipientEntityID The entity ID of the response recipient.
+     * @param idpEntityID The entity ID of the identity provider.
+     * @param realm The realm name.
+     * @param nameIDFormat The <code>NameIDFormat</code>.
+     * @param acsURL The <code>ACS</code> service <code>url</code>.
+     * @param affiliationID AffiliationID for IDP initiated SSO.
+     * @param matchingAuthnContext the <code>AuthnContext</code> used to find authentication type and scheme.
+     * @return the <code>SAML Assertion</code> object.
+     * @throws SAML2Exception if the operation is not successful.
      */
     private static Assertion getAssertion(
+            HttpServletRequest request,
             Object session,
             AuthnRequest authnReq,
             String recipientEntityID,
@@ -872,8 +876,7 @@ public class IDPSSOUtil {
         String sessionIndex = null;
         String sessionID = sessionProvider.getSessionID(session);
         synchronized (sessionID) {
-            authnStatement = getAuthnStatement(
-                session, isNewSessionIndex, authnReq, idpEntityID, realm,
+            authnStatement = getAuthnStatement(request, session, isNewSessionIndex, authnReq, idpEntityID, realm,
                 matchingAuthnContext);
             if (authnStatement == null) {
                 return null;
@@ -1092,21 +1095,21 @@ public class IDPSSOUtil {
 
 
     /**
-     * Returns a <code>SAML AuthnStatement</code> object
+     * Returns a <code>SAML AuthnStatement</code> object.
      *
-     * @param session              the user's session
-     * @param isNewSessionIndex    a returned flag from which the caller
-     *                             knows if the session index in the returned
-     *                             <code>AuthnStatement</code> is a new session index
-     * @param authnReq             the <code>AuthnRequest</code> object
-     * @param idpEntityID          the entity id of the identity provider
-     * @param realm                the realm name
-     * @param matchingAuthnContext the <code>AuthnContext</code> used to find
-     *                             authentication type and scheme.
-     * @return the <code>SAML AuthnStatement</code> object
-     * @throws SAML2Exception if the operation is not successful
+     * @param request The HTTP request.
+     * @param session The user's session.
+     * @param isNewSessionIndex A returned flag from which the caller knows if the session index in the returned
+     *                          <code>AuthnStatement</code> is a new session index.
+     * @param authnReq The <code>AuthnRequest</code> object.
+     * @param idpEntityID The entity ID of the identity provider.
+     * @param realm The realm name.
+     * @param matchingAuthnContext The <code>AuthnContext</code> used to find authentication type and scheme.
+     * @return The <code>SAML AuthnStatement</code> object.
+     * @throws SAML2Exception If the operation is not successful.
      */
     private static AuthnStatement getAuthnStatement(
+            HttpServletRequest request,
             Object session,
             NewBoolean isNewSessionIndex,
             AuthnRequest authnReq,
@@ -1165,6 +1168,20 @@ public class IDPSSOUtil {
                             authLevel, realm, idpEntityID);
         }
 
+        final Response idpResponse = (Response) request.getAttribute(SAML2Constants.SAML_PROXY_IDP_RESPONSE_KEY);
+        if (idpResponse != null) {
+            // IdP proxy case: we already received an assertion from the remote IdP and now the IdP proxy is generating
+            // a new SAML response for the SP.
+            Set<String> authenticatingAuthorities = new LinkedHashSet<String>();
+            final List<Assertion> assertions = idpResponse.getAssertion();
+            for (Assertion assertion : assertions) {
+                authenticatingAuthorities.addAll(extractAuthenticatingAuthorities(assertion));
+            }
+            // According to SAML profile 4.1.4.2 each assertion within the SAML Response MUST have the same issuer, so
+            // this should suffice. We should have at least one assertion, since the IdP proxy's SP already accepted it.
+            authenticatingAuthorities.add(assertions.iterator().next().getIssuer().getValue());
+            authnContext.setAuthenticatingAuthority(new ArrayList<String>(authenticatingAuthorities));
+        }
         authnStatement.setAuthnContext(authnContext);
 
         String sessionIndex = getSessionIndex(session);
@@ -2993,5 +3010,19 @@ public class IDPSSOUtil {
             SAML2Utils.debug.error(classMethod + "Could not retrieve the session information", ex);
         }
         return isValidSessionInRealm;
+    }
+
+    private static List<String> extractAuthenticatingAuthorities(Assertion assertion) {
+        final List<String> authenticatingAuthorities = new ArrayList<String>();
+        final List<AuthnStatement> authnStatements = assertion.getAuthnStatements();
+        if (authnStatements != null) {
+            for (AuthnStatement authnStatement : authnStatements) {
+                final List<String> authorities = authnStatement.getAuthnContext().getAuthenticatingAuthority();
+                if (authorities != null) {
+                    authenticatingAuthorities.addAll(authorities);
+                }
+            }
+        }
+        return authenticatingAuthorities;
     }
 }

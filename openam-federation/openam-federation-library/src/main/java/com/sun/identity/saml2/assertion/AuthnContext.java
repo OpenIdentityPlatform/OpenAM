@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,8 @@
  *
  * $Id: AuthnContext.java,v 1.2 2008/06/25 05:47:40 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
-
-
 package com.sun.identity.saml2.assertion;
 
 import java.util.List;
@@ -150,7 +148,7 @@ public interface AuthnContext {
      * @throws SAML2Exception if the object is immutable.
      * @see #getAuthenticatingAuthority()
      */
-    public void setAuthenticatingAuthority(List value)
+    public void setAuthenticatingAuthority(List<String> value)
         throws SAML2Exception;
 
     /**
@@ -160,7 +158,7 @@ public interface AuthnContext {
      *                <code>AuthenticatingAuthority</code>.
      * @see #setAuthenticatingAuthority(List)
      */
-    public List getAuthenticatingAuthority();
+    public List<String> getAuthenticatingAuthority();
 
     /**
      * Returns a String representation of the element.
