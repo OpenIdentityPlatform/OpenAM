@@ -35,6 +35,8 @@ define([
     "./views/history/ListHistory",
     "./views/resource/EditResource",
     "./views/resource/ListResource",
+    "./views/resource/MyResourcesTab",
+    "./views/resource/SharedResourcesTab",
     "./views/share/BaseShare",
     "./views/share/CommonShare",
     "./views/share/ShareCounter"

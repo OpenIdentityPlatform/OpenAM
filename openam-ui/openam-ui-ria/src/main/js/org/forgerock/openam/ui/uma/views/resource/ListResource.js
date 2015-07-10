@@ -26,18 +26,14 @@
 
 define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "backgrid",
-    "org/forgerock/openam/ui/common/util/BackgridUtils",
     "bootstrap-dialog",
-    "org/forgerock/openam/ui/uma/views/share/CommonShare",
-    "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/components/Messages",
-    "org/forgerock/openam/ui/common/util/RealmHelper",
-    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/openam/ui/uma/views/resource/MyResourcesTab",
+    "org/forgerock/openam/ui/uma/views/resource/SharedResourcesTab",
     "org/forgerock/openam/ui/uma/delegates/UMADelegate"
-], function(AbstractView, Backgrid, BackgridUtils, BootstrapDialog, CommonShare, Configuration, Constants, EventManager, MessageManager, RealmHelper, Router, UMADelegate) {
+], function(AbstractView, BootstrapDialog, Constants, EventManager, MessageManager, MyResourcesTab, SharedResourcesTab, UMADelegate) {
 
     var ListResource = AbstractView.extend({
         template: "templates/uma/views/resource/ListResource.html",
@@ -76,120 +72,12 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
         },
 
         render: function(args, callback) {
-            var self = this,
-                columns,
-                grid,
-                paginator,
-                ResourceSetCollection;
-
-            ResourceSetCollection = Backbone.PageableCollection.extend({
-                url: RealmHelper.decorateURIWithRealm("/" + Constants.context + "/json/__subrealm__/users/" + Configuration.loggedUser.username + '/oauth2/resourcesets'),
-                state: {
-                    pageSize: 10,
-                    sortKey: "name"
-                },
-                queryParams: {
-                    pageSize: "_pageSize",
-                    _sortKeys: BackgridUtils.sortKeys,
-                    _queryId: "*",
-                    _queryFilter: BackgridUtils.queryFilter,
-                    _pagedResultsOffset:  BackgridUtils.pagedResultsOffset,
-                    _fields: ['_id', 'icon_uri', 'name', 'resourceServer', 'type']
-                },
-
-                parseState: BackgridUtils.parseState,
-                parseRecords: function(data, options){
-                    self.$el.find("button#revokeAll").prop("disabled", data.result.length === 0);
-
-                    return data.result;
-                },
-                sync: BackgridUtils.sync
-            });
-
-            columns = [
-                {
-                    name: "name",
-                    label: $.t("uma.resources.list.grid.0"),
-                    cell: BackgridUtils.UriExtCell,
-                    headerCell: BackgridUtils.FilterHeaderCell.extend({
-                        addClassName: "col-md-5"
-                    }),
-                    href: function(rawValue, formattedValue, model){
-                        return "#uma/resources/" + model.get('_id');
-                    },
-                    editable: false
-                },
-                {
-                    name: "resourceServer",
-                    label: $.t("uma.resources.list.grid.1"),
-                    /*cell: BackgridUtils.UriExtCell,
-                    cheaderCell: BackgridUtils.FilterHeaderCell,
-                    href: function(rawValue, formattedValue, model){
-                        return "#uma/apps/" + encodeURIComponent(model.get('resourceServer'));
-                    },*/
-                    cell: "string",
-                    editable: false,
-                    headerCell : BackgridUtils.ClassHeaderCell.extend({
-                        className: "col-md-1"
-                    })
-                },
-                {
-                    name: "type",
-                    label: $.t("uma.resources.list.grid.2"),
-                    cell: "string",
-                    headerCell : BackgridUtils.ClassHeaderCell.extend({
-                        className: "col-md-4"
-                    }),
-                    editable: false
-                },
-                {
-                    name: "share",
-                    label: "",
-                    cell: Backgrid.Cell.extend({
-                        className: "fa fa-share-alt",
-                        events: { "click": "share" },
-                        share: function(e) {
-                            var shareView = new CommonShare();
-                            shareView.renderDialog(this.model.get('_id'));
-                        },
-                        render: function () {
-                            this.$el.attr({"title": $.t("uma.share.shareResource")});
-                            this.delegateEvents();
-                            return this;
-                        }
-                    }),
-                    editable: false,
-                    headerCell : BackgridUtils.ClassHeaderCell.extend({
-                        className: "col-md-1"
-                    })
-                }
-            ];
-
-            self.data.resourceSetCollection = new ResourceSetCollection();
-            self.data.resourceSetCollection.on("backgrid:sort", BackgridUtils.doubleSortFix);
-
-            grid = new Backgrid.Grid({
-                columns: columns,
-                className:"backgrid table table-striped",
-                collection: self.data.resourceSetCollection,
-                emptyText: $.t("uma.all.grid.empty")
-            });
-
-            paginator = new Backgrid.Extension.Paginator({
-                collection: self.data.resourceSetCollection,
-                windowSize: 3
-            });
-
-            self.parentRender(function() {
-                self.$el.find('[data-toggle="tooltip"]').tooltip();
-                self.$el.find("#myResources .backgrid-container").append( grid.render().el );
-                self.$el.find("#myResources .pagination-container").append( paginator.render().el );
-                self.data.resourceSetCollection.fetch({reset: true, processData: false}).done(function(){
-                    if (callback) { callback();}
-                });
+            this.parentRender(function() {
+                this.$el.find('[data-toggle="tooltip"]').tooltip();
+                MyResourcesTab.render();
+                SharedResourcesTab.render();
             });
         }
-
     });
 
     return new ListResource();
