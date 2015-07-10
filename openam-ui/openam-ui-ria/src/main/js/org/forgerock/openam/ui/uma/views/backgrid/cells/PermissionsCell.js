@@ -25,7 +25,11 @@ define("org/forgerock/openam/ui/uma/views/backgrid/cells/PermissionsCell", [
         onChange: function () {},
         rendered: function() {
             this.$el.find("select").multiselect({
-                allSelectedText: $.t("All selected"),
+                allSelectedText: $.t("common.select.allSelected"),
+                nonSelectedText: $.t("common.select.noneSelected"),
+                nSelectedText: $.t("common.select.nSelected"),
+                selectAllText: $.t("common.select.selectAll"),
+                includeSelectAllOption: true,
                 onChange: this.onChange.bind(this)
             });
         }

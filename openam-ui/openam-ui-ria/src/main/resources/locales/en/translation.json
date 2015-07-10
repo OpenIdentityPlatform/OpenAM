@@ -420,6 +420,12 @@
                 "warning" : "Warning",
                 "error" : "Error"
             }
+        },
+        "select": {
+            "allSelected": "All selected",
+            "noneSelected": "None selected",
+            "nSelected": "selected",
+            "selectAll": "Select all"
         }
     },
     "openam" : {

@@ -88,7 +88,7 @@ define("org/forgerock/openam/ui/uma/views/RequestsView", [
                 cell: PermissionsCell.extend({
                     onChange: function () {
                         var anySelected = this.$el.find("li.active").length > 0;
-                        this.$el.parent().find(".permissionAllow").prop("disabled", !anySelected);
+                        this.$el.parent().find(".permission-allow").prop("disabled", !anySelected);
                     }
                 }),
                 editable: false
