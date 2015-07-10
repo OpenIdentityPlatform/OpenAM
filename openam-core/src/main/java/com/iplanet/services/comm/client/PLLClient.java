@@ -55,8 +55,8 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 import javax.servlet.http.Cookie;
 
-import org.forgerock.openam.shared.audit.context.AuditRequestContext;
-import org.forgerock.openam.shared.audit.context.TransactionId;
+import org.forgerock.openam.audit.context.AuditRequestContext;
+import org.forgerock.openam.audit.context.TransactionId;
 import org.forgerock.openam.utils.IOUtils;
 
 /**

@@ -1,0 +1,6 @@
+{
+  "config" : {
+    "location" : "/tmp/audit"
+  },
+  "events" : [ "access", "activity", "authentication", "config" ]
+}

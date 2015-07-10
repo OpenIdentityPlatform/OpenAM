@@ -1,0 +1,98 @@
+{
+  "access": {
+    "schema": {
+      "$schema": "http://json-schema.org/draft-04/schema#",
+      "id": "/",
+      "type": "object",
+      "properties": {
+        "component": {
+          "type": "string"
+        },
+        "contextId": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "extraInfo": {
+          "type": "array",
+          "items": {
+            "id": "auto-generated-schema-525"
+          }
+        }
+      }
+    }
+  },
+  "activity": {
+    "schema": {
+      "$schema": "http://json-schema.org/draft-04/schema#",
+      "id": "/",
+      "type": "object",
+      "properties": {
+        "component": {
+          "type": "string"
+        },
+        "contextId": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "extraInfo": {
+          "type": "array",
+          "items": {
+            "id": "auto-generated-schema-525"
+          }
+        }
+      }
+    }
+  },
+  "authentication": {
+    "schema": {
+      "$schema": "http://json-schema.org/draft-04/schema#",
+      "id": "/",
+      "type": "object",
+      "properties": {
+        "component": {
+          "type": "string"
+        },
+        "contextId": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "extraInfo": {
+          "type": "array",
+          "items": {
+            "id": "auto-generated-schema-525"
+          }
+        }
+      }
+    }
+  },
+  "config": {
+    "schema": {
+      "$schema": "http://json-schema.org/draft-04/schema#",
+      "id": "/",
+      "type": "object",
+      "properties": {
+        "component": {
+          "type": "string"
+        },
+        "contextId": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "extraInfo": {
+          "type": "array",
+          "items": {
+            "id": "auto-generated-schema-525"
+          }
+        }
+      }
+    }
+  }
+}

@@ -32,7 +32,7 @@
 package com.iplanet.am.util;
 
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.shared.audit.context.AuditRequestContextPropagatingRunnable;
+import org.forgerock.openam.audit.context.AuditRequestContextPropagatingRunnable;
 
 /**
  * <p>

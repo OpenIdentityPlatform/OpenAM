@@ -34,8 +34,8 @@ import java.util.concurrent.TimeUnit;
 import javax.script.Bindings;
 import javax.script.SimpleBindings;
 
-import org.forgerock.openam.shared.audit.context.ConfigurableExecutorService;
-import org.forgerock.openam.shared.audit.context.AuditRequestContextPropagatingExecutorService;
+import org.forgerock.openam.audit.context.ConfigurableExecutorService;
+import org.forgerock.openam.audit.context.AuditRequestContextPropagatingExecutorService;
 import org.forgerock.util.thread.ExecutorServiceFactory;
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.thread.listener.ShutdownManager;

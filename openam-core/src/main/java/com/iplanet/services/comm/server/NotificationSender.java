@@ -43,8 +43,8 @@ import com.iplanet.services.comm.share.NotificationSet;
 import com.iplanet.services.comm.share.PLLBundle;
 import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.shared.Constants;
-import org.forgerock.openam.shared.audit.context.AuditRequestContext;
-import org.forgerock.openam.shared.audit.context.TransactionId;
+import org.forgerock.openam.audit.context.AuditRequestContext;
+import org.forgerock.openam.audit.context.TransactionId;
 
 public class NotificationSender {
 

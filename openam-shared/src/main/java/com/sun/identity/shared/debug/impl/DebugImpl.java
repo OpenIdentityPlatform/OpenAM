@@ -38,7 +38,7 @@ import com.sun.identity.shared.debug.IDebug;
 import com.sun.identity.shared.debug.file.DebugFile;
 import com.sun.identity.shared.debug.file.DebugFileProvider;
 import com.sun.identity.shared.debug.file.impl.StdDebugFile;
-import org.forgerock.openam.shared.audit.context.AuditRequestContext;
+import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.utils.IOUtils;
 
 import java.io.IOException;

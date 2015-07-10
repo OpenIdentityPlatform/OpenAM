@@ -184,6 +184,7 @@
         <json.version>20090211</json.version>
         <javax.inject.version>1</javax.inject.version>
         <forgerock.guava.version>18.0.1</forgerock.guava.version>
+        <forgerock.audit.version>0.1.0</forgerock.audit.version>
 
         <openam.version>OpenAM ${project.version}</openam.version>
         <!--  Project web site -->
@@ -369,6 +370,7 @@
         <module>openam-tokens</module>
         <module>openam-certs</module>
         <module>openam-upgrade</module>
+        <module>openam-audit</module>
     </modules>
 
     <!-- Mailing Lists -->
@@ -485,6 +487,11 @@
     <dependencyManagement>
         <dependencies>
             <!-- OpenAM project dependencies -->
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-audit-context</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-shared</artifactId>
@@ -1719,6 +1726,16 @@
                 <groupId>org.forgerock.commons.guava</groupId>
                 <artifactId>forgerock-guava-cache</artifactId>
                 <version>${forgerock.guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-audit-core</artifactId>
+                <version>${forgerock.audit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-audit-handler-csv</artifactId>
+                <version>${forgerock.audit.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.code.findbugs</groupId>

@@ -77,6 +77,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-audit-context</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
             <classifier>no_aop</classifier>

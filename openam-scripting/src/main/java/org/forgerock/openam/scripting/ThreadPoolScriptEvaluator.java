@@ -16,8 +16,8 @@
 
 package org.forgerock.openam.scripting;
 
-import org.forgerock.openam.shared.audit.context.ConfigurableExecutorService;
-import org.forgerock.openam.shared.audit.context.ExecutorServiceConfigurator;
+import org.forgerock.openam.audit.context.ConfigurableExecutorService;
+import org.forgerock.openam.audit.context.ExecutorServiceConfigurator;
 import org.forgerock.util.Reject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
