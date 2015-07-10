@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,8 @@
  *
  * $Id: AuthnContextImpl.java,v 1.3 2008/06/25 05:47:43 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
-
-
-
 package com.sun.identity.saml2.assertion.impl;
 
 import java.util.ArrayList;
@@ -92,7 +90,7 @@ public class AuthnContextImpl implements AuthnContext {
     private String authnContextClassRef = null;
     private String authnContextDecl = null;
     private String authnContextDeclRef = null;
-    private List authenticatingAuthority = null;
+    private List<String> authenticatingAuthority = null;
     private boolean mutable = true;
 
     // verify the data according to the schema.
@@ -254,7 +252,7 @@ public class AuthnContextImpl implements AuthnContext {
                                 getString("missingElementValue"));
                     }
                     if (authenticatingAuthority == null) {
-                        authenticatingAuthority = new ArrayList();
+                        authenticatingAuthority = new ArrayList<String>();
                     }
                     authenticatingAuthority.add(authority);
                 } else {
@@ -413,16 +411,12 @@ public class AuthnContextImpl implements AuthnContext {
     /**
      * Sets the value of the <code>AuthenticatingAuthority</code> property.
      *
-     * @param value List of Strings representing authenticating authority
-     * @throws com.sun.identity.saml2.common.SAML2Exception
-     *                 if the object is immutable.
+     * @param value List of Strings representing authenticating authority.
+     * @throws SAML2Exception If the object is immutable.
      */
-    public void setAuthenticatingAuthority(java.util.List value)
-        throws com.sun.identity.saml2.common.SAML2Exception
-    {
+    public void setAuthenticatingAuthority(List<String> value) throws SAML2Exception {
         if (!mutable) {
-            throw new SAML2Exception(
-                SAML2SDKUtils.bundle.getString("objectImmutable"));
+            throw new SAML2Exception(SAML2SDKUtils.bundle.getString("objectImmutable"));
         }
         authenticatingAuthority = value;
     }
@@ -433,7 +427,7 @@ public class AuthnContextImpl implements AuthnContext {
      * @return List of Strings representing
      *                <code>AuthenticatingAuthority</code>.
      */
-    public java.util.List getAuthenticatingAuthority() {
+    public List<String> getAuthenticatingAuthority() {
         return authenticatingAuthority;
     }
 
@@ -497,9 +491,7 @@ public class AuthnContextImpl implements AuthnContext {
                 append("</").append(prefix).append("AuthnContextDeclRef>");
         }
         if (authenticatingAuthority != null) {
-            Iterator iter = authenticatingAuthority.iterator();
-            while (iter.hasNext()) {
-                String authority = (String) iter.next();
+            for (String authority : authenticatingAuthority) {
                 if (authority != null && authority.trim().length() != 0) {
                     result.append("<").append(prefix).
                         append("AuthenticatingAuthority").append(uri).

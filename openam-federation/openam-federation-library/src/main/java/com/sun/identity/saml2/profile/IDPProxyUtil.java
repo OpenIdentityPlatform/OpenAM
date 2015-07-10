@@ -543,7 +543,7 @@ public class IDPProxyUtil {
         }*/
 
         String relayState = (String) 
-            IDPCache.relayStateCache.get(origRequest.getID()); 
+            IDPCache.relayStateCache.get(origRequest.getID());
         IDPSSOUtil.doSSOFederate( request,
                                   response,
                                   out,
@@ -576,34 +576,30 @@ public class IDPProxyUtil {
     }
 
     /**
-     * Generates the AuthnResponse by the IDP Proxy and send to the 
-     * service provider. 
-     * @param request HttpServletRequest 
-     * @param response HttpServletResponse
-     * @param out the print writer for writing out presentation
-     * @param metaAlias meta Alias 
-     * @param respInfo ResponseInfo object
-     * @param newSession Session object 
-     * @exception SAML2Exception for any SAML2 failure.
+     * Generates the AuthnResponse by the IDP Proxy and send to the service provider.
+     *
+     * @param request HttpServletRequest The HTTP request.
+     * @param response HttpServletResponse The HTTP response.
+     * @param out The print writer for writing out presentation.
+     * @param metaAlias The meta alias.
+     * @param respInfo ResponseInfo object.
+     * @param newSession Session object.
+     * @throws SAML2Exception for any SAML2 failure.
      */
-    public static void generateProxyResponse(
-        HttpServletRequest request, HttpServletResponse response, PrintWriter out,
-        String metaAlias, ResponseInfo respInfo,
-        Object newSession)
-        throws SAML2Exception 
-    {    
+    public static void generateProxyResponse(HttpServletRequest request, HttpServletResponse response, PrintWriter out,
+            String metaAlias, ResponseInfo respInfo, Object newSession) throws SAML2Exception {
         Response saml2Resp = respInfo.getResponse();
         String requestID = saml2Resp.getInResponseTo();
-        //if (isIDPProxyEnabled(requestID)) {
-            String nameidFormat = getNameIDFormat(saml2Resp); 
-            if (nameidFormat != null && SAML2Utils.debug.messageEnabled()) {
-                SAML2Utils.debug.message("NAME ID Format= " + nameidFormat ); 
-            }
-            sendProxyResponse(request, response, out, requestID, metaAlias,
-                newSession, nameidFormat);
-            return ;
-        // } 
-    }     
+        String nameidFormat = getNameIDFormat(saml2Resp);
+        if (nameidFormat != null && SAML2Utils.debug.messageEnabled()) {
+            SAML2Utils.debug.message("NAME ID Format= " + nameidFormat);
+        }
+
+        // Save the SAML response received from the IdP in the request object, so that we can access the original
+        // assertion when generating the new one.
+        request.setAttribute(SAML2Constants.SAML_PROXY_IDP_RESPONSE_KEY, saml2Resp);
+        sendProxyResponse(request, response, out, requestID, metaAlias, newSession, nameidFormat);
+    }
     
     private static String getNameIDFormat(Response res)  
     {

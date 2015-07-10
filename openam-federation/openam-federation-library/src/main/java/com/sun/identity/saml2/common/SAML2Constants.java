@@ -1619,4 +1619,9 @@ public interface SAML2Constants {
      * Property to determine whether SAML SP Decryption Debug mode has been enabled.
      */
     static final String SAML_DECRYPTION_DEBUG_MODE = "openam.saml.decryption.debug.mode";
+
+    /**
+     * Property name used to store the remote IdP's SAML response as an attribute of the HttpServletRequest.
+     */
+    String SAML_PROXY_IDP_RESPONSE_KEY = "openam.saml.idpproxy.idp.response";
 } 
