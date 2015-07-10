@@ -160,8 +160,12 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
         className: "template-cell",
         render: function () {
             UIUtils.renderTemplate(this.template, this.$el);
-            this.delegateEvents();
 
+            if (this.rendered) {
+                this.rendered();
+            }
+
+            this.delegateEvents();
             return this;
         }
     });

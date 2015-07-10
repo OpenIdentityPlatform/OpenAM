@@ -31,7 +31,7 @@ define([
     "./models/UMAResourceSetWithPolicy",
     "./models/User",
 
-    "./views/application/ListApplication",
+    "./views/RequestsView",
     "./views/history/ListHistory",
     "./views/resource/EditResource",
     "./views/resource/ListResource",

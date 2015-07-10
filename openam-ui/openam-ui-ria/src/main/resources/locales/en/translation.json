@@ -116,8 +116,7 @@
                     "umaLinks": {
                         "history" : "History",
                         "resources" : "Resources",
-                        "users" : "Users",
-                        "apps" : "Apps"
+                        "requests" : "Requests"
                     },
                     "console": "Console"
                 }
@@ -529,13 +528,11 @@
                 }
             }
         },
-        "users": {
-            "title": "Users",
-            "subtitle": "..."
-        },
-        "apps": {
-            "title": "Apps",
-            "subtitle": "..."
+        "requests": {
+            "title": "Requests",
+            "grid": {
+                "header": ["User", "Resource", "When", "Permissions", "Actions"]
+            }
         }
     },
     "console": {
