@@ -32,8 +32,13 @@ define("org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardView", [
         },
         editProperties: function (event) {
             event.preventDefault();
-            var propertiesOnly = true;
-            CreateUpdateRealmDialog.show(this.data.realmPath, propertiesOnly);
+            var self = this;
+            CreateUpdateRealmDialog.show({
+                realmPath : this.data.realmPath,
+                callback : function(){
+                    self.render(self.data.realmPath);
+                }
+            });
         },
         render: function (args, callback) {
             var self = this,

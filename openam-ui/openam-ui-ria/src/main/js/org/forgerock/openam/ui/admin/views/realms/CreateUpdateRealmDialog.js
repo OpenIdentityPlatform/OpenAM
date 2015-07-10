@@ -25,25 +25,64 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
     "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate"
 ], function ($, _, AbstractView, BootstrapDialog, Form, FormHelper, SMSGlobalDelegate) {
     var CreateUpdateRealmDialog = AbstractView.extend({
-        show: function (realmPath, propertiesOnly) {
+        /**
+         * CreateUpdateRealmDialog.show(options);
+         * The options object can contain up to 3 parameters, realmPath, allRealmPaths, callback.
+         * If you are editing an exsisting realm then pass in the option.realmPath. It is used by this
+         * view to determine if the realm is a new one or not.
+         * If option.allRealmPaths are used to populate the parent dropdown. Not all views have this list availiable,
+         * so if none are passed in this view will make another call to get this data.
+         * If option.callback called after the new changes are saved the the server. The call back fires regardless as to
+         * whether the call was sucessfull or not. This being used to re-render the parent view.
+         * @example
+         * CreateUpdateRealmDialog.show({
+         *    allRealmPaths :  this.data.allRealmPaths,
+         *      realmPath : realm.path,
+         *      callback : function(){
+         *          self.render();
+         *      }
+         * });
+         */
+        show: function (options) {
             var self = this,
                 promise,
-                newRealm = _.isEmpty(realmPath),
-                realmName = realmPath === '/' ? $.t("console.common.topLevelRealm") : realmPath;
+                newRealm,
+                allRealmsPromise = $.Deferred();
 
-            this.data.propertiesOnly = propertiesOnly;
+            options = options ? options : {};
+            newRealm = _.isEmpty(options.realmPath);
+
+            this.data.newRealm = newRealm;
+
+            if (options.allRealmPaths) {
+                allRealmsPromise.resolve();
+            } else {
+                allRealmsPromise = SMSGlobalDelegate.realms.all();
+            }
+
             if (newRealm) {
                 promise = SMSGlobalDelegate.realms.schema();
             } else {
-                promise = SMSGlobalDelegate.realms.get(realmPath);
+                promise = SMSGlobalDelegate.realms.get(options.realmPath);
             }
-            
-            promise.done(function(data) {
+
+            $.when(promise, allRealmsPromise).done(function(data, allRealmsData) {
                 var i18nTitleKey = newRealm ? "createTitle" : "updateTitle",
-                    i18nButtonKey = newRealm ? "create" : "save";
+                    i18nButtonKey = newRealm ? "create" : "save",
+                    realmName = data.values.name === "/" ? $.t("console.common.topLevelRealm") : data.values.name;
+
+                    if (!options.allRealmPaths) {
+                        options.allRealmPaths = [];
+                        _.each(allRealmsData[0].result, function(realm){
+                            options.allRealmPaths.push(realm.path);
+                        });
+                    }
+
+                    data.schema.properties.path["enum"] = options.allRealmPaths;
+                    data.schema.properties.path.options = {enum_titles: options.allRealmPaths};
 
                 BootstrapDialog.show({
-                    title: $.t("console.realms.createUpdateRealmDialog." + i18nTitleKey, { realmPath: data.values.name }),
+                    title: $.t("console.realms.createUpdateRealmDialog." + i18nTitleKey, { realmPath: realmName }),
                     message: function (dialog) {
                         var element = $("<div></div>");
                         dialog.form = new Form(element[0], data.schema, data.values);
@@ -62,6 +101,15 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
                             }
 
                             promise.done(function() {
+                                if (options.callback) {
+                                    options.callback();
+                                }
+                                dialog.close();
+                            }).fail(function(e) {
+                                console.error(e);
+                                if (options.callback) {
+                                    options.callback();
+                                }
                                 dialog.close();
                             });
 
@@ -74,7 +122,7 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
                         }
                     }],
                     onshow: function (dialog) {
-                        if (self.data.propertiesOnly) {
+                        if (!self.data.newRealm) {
                             dialog.$modalBody.find(".container-path").hide();
                             dialog.$modalBody.find(".container-name").hide();
                         }

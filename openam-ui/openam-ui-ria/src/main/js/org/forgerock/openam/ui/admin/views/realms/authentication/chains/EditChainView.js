@@ -79,7 +79,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             this.$el.find("ol#sortable").nestingSortable({
                 exclude:"li:not(.chain-link)",
                 delay: 100,
-                vertical:true,
+                vertical: true,
                 placeholder: "<li class='placeholder'><i class='fa fa-download'></i>"+ $.t("console.authentication.editChains.dropHere") +"</li>",
 
                 onDrag: function (item, position) {

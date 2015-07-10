@@ -36,9 +36,9 @@ define('org/forgerock/openam/ui/admin/models/Form', [
             theme: "openam"
         });
 
-        $(element).find('.help-block').hide().each(function () {
+        $(element).find('.help-block').addClass("hidden-lg hidden-md").each(function () {
             var group = $(this).parent(),
-                element = $('<a class="btn btn-default info-button" tabindex="0" data-toggle="popover" data-trigger="focus"><i class="fa fa-info-circle"></i></a>');
+                element = $('<a class="btn info-button visible-lg-inline-block visible-md-inline-block" tabindex="0" data-toggle="popover" data-trigger="focus"><i class="fa fa-info-circle"></i></a>');
 
             $(group).append(element);
 

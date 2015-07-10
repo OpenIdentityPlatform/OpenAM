@@ -26,36 +26,55 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostPro
     var PostProcessView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/chains/PostProcessTemplate.html",
         events: {
-            'click .delete-btn': 'remove',
-            'click #addBtn': 'add',
-            'change #newProcessClass': 'change',
-            'keyup  #newProcessClass': 'change'
+            "click .delete-btn": "remove",
+            "click #addBtn": "add",
+            "change #newProcessClass": "change",
+            "keyup  #newProcessClass": "change"
         },
         element: "#postProcessView",
 
         add: function(e){
-            var newProcessClass = this.$el.find('#newProcessClass').val();
-            //TODO - check for duplicates
-            this.data.chainData.loginPostProcessClass.push(newProcessClass);
-            this.render(this.data.chainData);
+            var newProcessClass = this.$el.find("#newProcessClass").val().trim(),
+                invalidName = _.findWhere(this.data.chainData.loginPostProcessClass, function(className) {
+                    return className === newProcessClass;
+                }),
+                alert;
+
+            if (invalidName){
+                // FIXME:  This needs to come from a template or partial. This is a temporay fix.
+                alert = "<div class='alert alert-warning' role='alert'>"+
+                            "<div class='media'>"+
+                                "<button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>×</span><span class='sr-only'>"+$.t("common.form.close")+"</span></button>"+
+                                "<div class='media-left' href='#'>"+
+                                    "<i class='fa fa-exclamation-circle'></i>"+
+                                "</div>"+
+                                "<div class='media-body'>"+ $.t("console.authentication.editChains.processingClass.duplicateClass") +"</div>"+
+                            "</div>"+
+                        "</div>";
+
+                this.$el.find("#alertContainer").html(alert);
+            } else {
+                this.data.chainData.loginPostProcessClass.push(newProcessClass);
+                this.render(this.data.chainData);
+            }
         },
 
         remove: function(e){
-            var index = $(e.currentTarget).closest('tr').index();
+            var index = $(e.currentTarget).closest("tr").index();
             this.data.chainData.loginPostProcessClass[index] = "";
             this.render(this.data.chainData);
         },
 
         change: function(e){
-            this.$el.find('#addBtn').prop('disabled', (e.currentTarget.value.length === 0));
+            this.$el.find("#addBtn").prop("disabled", (e.currentTarget.value.length === 0));
         },
 
         addClassNameDialog: function(){
             var self = this,
                 promise = $.Deferred(),
-                newProcessClass = this.$el.find('#newProcessClass').val().trim();
+                newProcessClass = this.$el.find("#newProcessClass").val().trim();
             if (newProcessClass === "") {
-                self.$el.find('#newProcessClass').val("");
+                self.$el.find("#newProcessClass").val("");
                 promise.resolve();
             } else {
                 BootstrapDialog.show({
@@ -76,7 +95,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostPro
                         {
                             label: $.t("common.form.cancel"),
                             action: function (dialog) {
-                                self.$el.find('#newProcessClass').val("");
+                                self.$el.find("#newProcessClass").val("");
                                 dialog.close();
                                 promise.resolve();
                             }

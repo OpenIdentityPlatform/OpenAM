@@ -87,7 +87,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLin
                                 options: formData.allModules,
                                 render: {
                                     item: function (item) {
-                                        return "<div>" + item._id + " <span class='dropdown-subtitle'>" + item.type + "</span></div>";
+                                        return "<div>" + item._id + " <span class='dropdown-subtitle'>" + item.typeDescription + "</span></div>";
                                     },
                                     option: function (item) {
                                         return "<div><div>" + item._id + "</div><div class='dropdown-subtitle'>" + item.typeDescription + "</div></div>";

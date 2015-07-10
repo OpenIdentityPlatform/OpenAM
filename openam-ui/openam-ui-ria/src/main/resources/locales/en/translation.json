@@ -567,7 +567,7 @@
                 "description" : "OpenAM uses authentication chains to control the authentication flow the user. Use this section to add, configure or remove the realms set of authentication chains.",
                 "defaultAdminAuthConfiguration" : "Default Administrator Authentication Chain",
                 "defaultOrgAuthConfiguration" : "Default Organization Authentication Chain",
-                "duplicateChain" : "A chain with this name already exists. Please use a different name",
+                "duplicateChain" : "A Chain with the same name already exists",
                 "createNewChain" : "Create new chain"
             },
             "editChains": {
@@ -595,7 +595,8 @@
                     "addClassNameDialog": {
                         "title": "Add new Class Name",
                         "message": "The new class name <mark>__newClassName__</mark> for Post Authentication Processing has not been saved. Do you want to save it?"
-                    }
+                    },
+                    "duplicateClass" : "A Class with the same name already exists"
                 },
                 "criteria" : ["Required","Optional","Requisite","Sufficient"]
             }

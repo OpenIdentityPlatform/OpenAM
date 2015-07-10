@@ -91,20 +91,22 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
             });
         },
         chainSelected: function(event) {
-            var hasChainsSelected = this.$el.find("input[type=checkbox]").is(":checked"),
+            var hasChainsSelected = this.$el.find("input[type=checkbox][data-chain-name]").is(":checked"),
                 row = $(event.currentTarget).closest("tr"),
                 checked = $(event.currentTarget).is(":checked");
 
             this.$el.find("#deleteChains").prop("disabled", !hasChainsSelected);
+
             if (checked) {
                 row.addClass("selected");
             } else {
                 row.removeClass("selected");
+                this.$el.find("#selectAll").prop("checked", false);
             }
         },
         selectAll: function(event) {
             var checked = $(event.currentTarget).is(":checked");
-            this.$el.find(".sorted-chains input[type=checkbox]:not(:disabled)").prop("checked", checked);
+            this.$el.find(".sorted-chains input[type=checkbox][data-chain-name]:not(:disabled)").prop("checked", checked);
             if (checked) {
                 this.$el.find(".sorted-chains:not(.default-config-row)").addClass("selected");
             } else {
@@ -114,7 +116,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
         },
         deleteChain: function(event) {
             var self = this,
-                chainName = $(event.currentTarget).attr("data-chain-name");
+                chainName = event.currentTarget.dataset.chainName;
 
             SMSRealmDelegate.authentication.chains.remove(this.data.realmPath, chainName).done(function() {
                 self.render([self.data.realmPath]);
@@ -122,8 +124,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
         },
         deleteChains: function() {
             var self = this,
-                chainNames = self.$el.find("input[type=checkbox]:checked").toArray().map(function(element) {
-                    return $(element).attr("data-chain-name");
+                chainNames = self.$el.find(".sorted-chains input[type=checkbox][data-chain-name]:checked").toArray().map(function(element) {
+                    return element.dataset.chainName;
                 }),
                 promises = chainNames.map(function(name) {
                     return SMSRealmDelegate.authentication.chains.remove(self.data.realmPath, name);
