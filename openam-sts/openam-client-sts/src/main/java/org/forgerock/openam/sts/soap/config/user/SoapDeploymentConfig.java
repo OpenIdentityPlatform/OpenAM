@@ -27,6 +27,7 @@ import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -317,12 +318,12 @@ public class SoapDeploymentConfig extends DeploymentConfig {
      */
     public Map<String, Set<String>> marshalToAttributeMap() {
         Map<String, Set<String>> baseMap = super.marshalToAttributeMap();
-        baseMap.put(SERVICE_QNAME, CollectionUtils.asSet(serviceQName != null ? serviceQName.toString() : null));
-        baseMap.put(PORT_QNAME, CollectionUtils.asSet(serviceQName != null ? portQName.toString() : null));
+        baseMap.put(SERVICE_QNAME, serviceQName != null ? CollectionUtils.asSet(serviceQName.toString()) : Collections.<String>emptySet());
+        baseMap.put(PORT_QNAME, portQName != null ? CollectionUtils.asSet(portQName.toString()) : Collections.<String>emptySet());
         baseMap.put(WSDL_LOCATION, CollectionUtils.asSet(wsdlLocation));
-        baseMap.put(CUSTOM_WSDL_LOCATION, CollectionUtils.asSet(customWsdlLocation));
-        baseMap.put(CUSTOM_PORT_QNAME, CollectionUtils.asSet(customPortQName != null ? customPortQName.toString() : null));
-        baseMap.put(CUSTOM_SERVICE_QNAME, CollectionUtils.asSet(customServiceQName != null ? customServiceQName.toString() : null));
+        baseMap.put(CUSTOM_WSDL_LOCATION, customWsdlLocation != null ? CollectionUtils.asSet(customWsdlLocation) : Collections.<String>emptySet());
+        baseMap.put(CUSTOM_PORT_QNAME, customPortQName != null ? CollectionUtils.asSet(customPortQName.toString()) : Collections.<String>emptySet());
+        baseMap.put(CUSTOM_SERVICE_QNAME, customServiceQName != null ? CollectionUtils.asSet(customServiceQName.toString()) : Collections.<String>emptySet());
         baseMap.put(AM_DEPLOYMENT_URL, CollectionUtils.asSet(amDeploymentUrl));
         return baseMap;
     }
