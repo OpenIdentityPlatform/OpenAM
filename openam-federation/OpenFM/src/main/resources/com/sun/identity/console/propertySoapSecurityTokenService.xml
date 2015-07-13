@@ -179,6 +179,103 @@
 
     </section>
 
+    <section name="SOAP Keystore" defaultValue="soap.sts.keystore.section.title">
+        <property>
+            <label name="lblSoapKeystoreFilename"
+                   defaultValue="soap.sts.keystore.filename"
+                   labelFor="soap-keystore-filename"/>
+            <cc name="soap-keystore-filename"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpSoapKeystoreFilename" defaultValue="soap.sts.keystore.filename.help" />
+        </property>
+
+        <property>
+            <label name="lblSoapKeystorePassword"
+                   defaultValue="soap.sts.keystore.password"
+                   labelFor="soap-keystore-password"/>
+            <cc name="soap-keystore-password"
+                tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
+            </cc>
+        </property>
+        <!--
+            note that the name of the password confirmation field must be the name of the password field + _confirm.
+            See AMPropertySheet.getAttributeValues for details.
+        -->
+        <property>
+            <label name="lblSoapKeystorePasswordConfirm"
+                   defaultValue="soap.sts.keystore.password.confirm"
+                   labelFor="soap-keystore-password_confirm"/>
+            <cc name="soap-keystore-password_confirm"
+                tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
+            </cc>
+        </property>
+
+        <property>
+            <label name="lblSoapKeystoreSignatureKeyAlias"
+                   defaultValue="soap.sts.keystore.signature.key.alias"
+                   labelFor="soap-signature-key-alias"/>
+            <cc name="soap-signature-key-alias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpSoapKeystoreSignatureKeyAlias" defaultValue="soap.sts.keystore.signature.key.alias.help" />
+        </property>
+
+        <property>
+            <label name="lblSoapKeystoreSignatureKeyPassword"
+                   defaultValue="soap.sts.keystore.signature.key.password"
+                   labelFor="soap-signature-key-password"/>
+            <cc name="soap-signature-key-password"
+                tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
+            </cc>
+        </property>
+
+        <!--
+            note that the name of the password confirmation field must be the name of the password field + _confirm.
+            See AMPropertySheet.getAttributeValues for details.
+        -->
+        <property>
+            <label name="lblSoapKeystoreSignatureKeyPasswordConfirm"
+                   defaultValue="soap.sts.keystore.signature.key.password.confirm"
+                   labelFor="soap-signature-key-password_confirm"/>
+            <cc name="soap-signature-key-password_confirm"
+                tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
+            </cc>
+        </property>
+
+        <property>
+            <label name="lblSoapKeystoreEncryptionKeyAlias"
+                   defaultValue="soap.sts.keystore.encryption.key.alias"
+                   labelFor="soap-encryption-key-alias"/>
+            <cc name="soap-encryption-key-alias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpSoapKeystoreSignatureKeyAlias" defaultValue="soap.sts.keystore.signature.key.alias.help" />
+        </property>
+
+        <property>
+            <label name="lblSoapKeystoreEncryptionKeyPassword"
+                   defaultValue="soap.sts.keystore.encryption.key.password"
+                   labelFor="soap-encryption-key-password"/>
+            <cc name="soap-encryption-key-password"
+                tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
+            </cc>
+        </property>
+
+        <!--
+            note that the name of the password confirmation field must be the name of the password field + _confirm.
+            See AMPropertySheet.getAttributeValues for details.
+        -->
+        <property>
+            <label name="lblSoapKeystoreEncryptionKeyPasswordConfirm"
+                   defaultValue="soap.sts.keystore.encryption.key.password.confirm"
+                   labelFor="soap-encryption-key-password_confirm"/>
+            <cc name="soap-encryption-key-password_confirm"
+                tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
+            </cc>
+        </property>
+    </section>
+
     <section name="SAML2" defaultValue="sts.saml2.section.title">
         <property>
             <label name="lblSAML2IssuerName"
