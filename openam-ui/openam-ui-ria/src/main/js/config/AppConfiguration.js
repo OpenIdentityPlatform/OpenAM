@@ -125,9 +125,9 @@ define("config/AppConfiguration", [
                 {
                     moduleClass: "org/forgerock/commons/ui/common/main/ValidatorsManager",
                     configuration: {
-                         policyDelegate: "org/forgerock/openam/ui/common/delegates/PolicyDelegate",
-                         validators: { },
-                         loader: [
+                        policyDelegate: "org/forgerock/openam/ui/common/delegates/PolicyDelegate",
+                        validators: { },
+                        loader: [
                              {"validators": "config/validators/UserValidators"},
                              {"validators": "config/validators/CommonValidators"}
                          ]
@@ -160,17 +160,17 @@ define("config/AppConfiguration", [
                                         "name": "config.AppConfiguration.Navigation.links.realms.title",
                                         "icon": "fa fa-cloud",
                                         "dropdown" : true,
-                                        "urls": [{
-                                            "url": "#realms",
+                                        "urls": [{
+                                            "url": "#realms",
                                             "name": "config.AppConfiguration.Navigation.links.realms.showAll",
                                             "icon": "fa fa-th"
                                         }, {
                                             "event": Constants.EVENT_ADD_NEW_REALM_DIALOG,
                                             "name": "config.AppConfiguration.Navigation.links.realms.newRealm",
-                                            "icon": "fa fa-plus"
+                                            "icon": "fa fa-plus"
                                         }, {
                                             divider: true
-                                        }]
+                                        }]
                                     },
                                     "federation": {
                                         "url": "#federation",
@@ -198,9 +198,9 @@ define("config/AppConfiguration", [
                                         "inactive": false
                                     },
                                     "uma": {
-                                        "url": "#uma/resources/",
                                         "icon": "fa fa-user",
                                         "name": "config.AppConfiguration.Navigation.links.uma",
+                                        "dropdown" : true,
                                         "urls": {
                                             "listResource": {
                                                 "url": "#uma/resources/",
