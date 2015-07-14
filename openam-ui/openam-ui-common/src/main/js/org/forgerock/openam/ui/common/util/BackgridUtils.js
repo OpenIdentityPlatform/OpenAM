@@ -14,15 +14,18 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global define, Backbone, _, $*/
+/*global define*/
 
 define("org/forgerock/openam/ui/common/util/BackgridUtils", [
+    "jquery",
+    "underscore",
+    "backbone",
     "backgrid",
     "moment",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/UIUtils"
-], function (Backgrid, moment, Messages, Router, UIUtils) {
+], function ($, _, Backbone, Backgrid, moment, Messages, Router, UIUtils) {
     /**
      * @exports org/forgerock/openam/ui/common/util/BackgridUtils
      */

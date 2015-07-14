@@ -31,7 +31,7 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/openam/ui/common/util/URLHelper",
+    "org/forgerock/openam/ui/policy/util/URLHelper",
     "org/forgerock/openam/ui/policy/applications/ApplicationModel",
     "org/forgerock/openam/ui/policy/common/AbstractListView",
     "org/forgerock/openam/ui/policy/delegates/PolicyDelegate",
@@ -163,6 +163,7 @@ define("org/forgerock/openam/ui/policy/applications/ApplicationsListView", [
                 columns: columns,
                 row: ClickableRow,
                 collection: self.data.items,
+                className: "backgrid table",
                 emptyText: $.t("policy.applications.list.noResults")
             });
 

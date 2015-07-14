@@ -28,8 +28,8 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/applications/EditApp
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants"
-], function ($, _, Application, StripedListView, PoliciesView, PoliciesDelegate, Messages, AbstractView, EventManager, Router, Constants) {
-
+], function ($, _, ApplicationModel, StripedListView, PoliciesView, PoliciesDelegate, Messages, AbstractView,
+             EventManager, Router, Constants) {
     return AbstractView.extend({
         template: "templates/admin/views/realms/policies/applications/EditApplicationTemplate.html",
         APPLICATION_TYPE: "iPlanetAMWebAgentService",
@@ -70,11 +70,11 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/applications/EditApp
             this.resourceTypesPromise = PoliciesDelegate.listResourceTypes();
 
             if (name) {
-                this.model = new Application({name: name});
+                this.model = new ApplicationModel({name: name});
                 this.listenTo(this.model, "sync", this.onModelSync);
                 this.model.fetch();
             } else {
-                this.model = new Application();
+                this.model = new ApplicationModel();
                 this.listenTo(this.model, "sync", this.onModelSync);
                 this.renderAfterSyncModel();
             }
@@ -95,7 +95,7 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/applications/EditApp
                 parentRenderCallback = function () {
                     self.parentRender(function () {
                         PoliciesView.render({
-                            application: self.model
+                            applicationModel: self.model
                         });
 
                         self.buildResourceTypesList();
@@ -234,7 +234,10 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/applications/EditApp
                     })
                     .fail(function (response) {
                         _.extend(self.model.attributes, nonModifiedAttributes);
-                        Messages.messages.addMessage({message: response.responseJSON.message, type: "error"});
+                        Messages.addMessage({
+                            message: response.responseJSON.message,
+                            type: Messages.TYPE_DANGER
+                        });
                     });
             } else {
                 _.extend(this.model.attributes, nonModifiedAttributes);
@@ -254,7 +257,10 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/applications/EditApp
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                 },
                 onError = function (model, response, options) {
-                    Messages.messages.addMessage({message: response.responseJSON.message, type: "error"});
+                    Messages.addMessage({
+                        message: response.responseJSON.message,
+                        type: Messages.TYPE_DANGER
+                    });
                 };
 
             this.model.destroy({

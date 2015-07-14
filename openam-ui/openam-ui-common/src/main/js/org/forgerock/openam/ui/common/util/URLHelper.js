@@ -17,19 +17,18 @@
 /*global define*/
 define("org/forgerock/openam/ui/common/util/URLHelper", [
     "org/forgerock/commons/ui/common/main/Configuration",
+    "org/forgerock/openam/ui/admin/utils/AdministeredRealmsHelper",
     "org/forgerock/commons/ui/common/util/Constants"
-], function (Configuration, Constants) {
+], function (Configuration, AdministeredRealmsHelper, Constants) {
     return {
         substitute: function (url) {
             return function () {
-                var realm = Configuration.globalData.auth.realm !== "/" ? Configuration.globalData.auth.realm : "";
+                var realm = AdministeredRealmsHelper.getCurrentRealm();
 
-                url = url.replace("__api__", Constants.host + "/" + Constants.context + "/json" + realm)
+                return url.replace("__api__", Constants.host + "/" + Constants.context + "/json" + (realm !== "/" ? realm : ""))
                     .replace("__host__", Constants.host)
                     .replace("__context__", Constants.context)
                     .replace("__username__", Configuration.loggedUser.username);
-
-                return url;
             };
         }
     };

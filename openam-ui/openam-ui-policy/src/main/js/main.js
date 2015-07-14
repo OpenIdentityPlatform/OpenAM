@@ -39,7 +39,7 @@ require.config({
         "bootstrap"         : "libs/bootstrap-3.3.4-custom",
         "bootstrap-dialog"  : "libs/bootstrap-dialog-1.34.4-min",
 
-        "clockPicker": "libs/jquery-clockpicker.0.0.7.min",
+        "clockPicker": "libs/bootstrap-clockpicker-0.0.7-min",
         "doTimeout": "libs/jquery.ba-dotimeout-1.0-min",
         "form2js": "libs/form2js-2.0",
         "handlebars": "libs/handlebars-1.3.0-min",

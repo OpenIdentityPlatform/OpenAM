@@ -24,7 +24,7 @@ define("org/forgerock/openam/ui/editor/views/ScriptListView", [
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/openam/ui/common/util/URLHelper",
+    "org/forgerock/openam/ui/editor/util/URLHelper",
     "org/forgerock/openam/ui/editor/util/BackgridUtils",
     "org/forgerock/openam/ui/editor/models/ScriptModel"
 ], function (Backgrid, Messages, AbstractView, EventManager, Router, Constants, UIUtils, URLHelper, BackgridUtils, Script) {
@@ -119,6 +119,7 @@ define("org/forgerock/openam/ui/editor/views/ScriptListView", [
                 columns: columns,
                 row: ClickableRow,
                 collection: self.data.scripts,
+                className: "backgrid table",
                 emptyText: $.t("scripts.grid.noResults")
             });
 

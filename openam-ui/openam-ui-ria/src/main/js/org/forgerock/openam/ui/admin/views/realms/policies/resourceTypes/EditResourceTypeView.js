@@ -27,10 +27,8 @@ define('org/forgerock/openam/ui/admin/views/realms/policies/resourceTypes/EditRe
     'org/forgerock/commons/ui/common/main/Router',
     'org/forgerock/commons/ui/common/util/Constants',
     'org/forgerock/commons/ui/common/util/UIUtils',
-    // TODO: switch to 'org/forgerock/openam/ui/common/util/URLHelper' after PE and SE are deleted
-    'org/forgerock/openam/ui/uma/util/URLHelper',
     'org/forgerock/openam/ui/common/util/BackgridUtils'
-], function ($, _, Backbone, Backgrid, Messages, AbstractView, EventManager, Router, Constants, UIUtils, URLHelper, BackgridUtils) {
+], function ($, _, Backbone, Backgrid, Messages, AbstractView, EventManager, Router, Constants, UIUtils, BackgridUtils) {
 
     return AbstractView.extend({
         template: 'templates/admin/views/realms/policies/resourceTypes/EditResourceTypeTemplate.html',

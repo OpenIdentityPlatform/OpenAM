@@ -65,5 +65,11 @@
             </includes>
             <outputDirectory>/libs</outputDirectory>
         </dependencySet>
+        <dependencySet>
+            <includes>
+                <include>org.forgerock.commons.ui.libs:*:css</include>
+            </includes>
+            <outputDirectory>/css/common</outputDirectory>
+        </dependencySet>
     </dependencySets>
 </assembly>

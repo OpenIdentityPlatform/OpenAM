@@ -17,8 +17,7 @@
 /*global define*/
 define("org/forgerock/openam/ui/admin/models/policies/ResourceTypeModel", [
     "backbone",
-    // TODO: switch to 'org/forgerock/openam/ui/common/util/URLHelper' after PE and SE are deleted
-    "org/forgerock/openam/ui/uma/util/URLHelper"
+    "org/forgerock/openam/ui/common/util/URLHelper"
 ], function (Backbone, URLHelper) {
     return Backbone.Model.extend({
         idAttribute: 'uuid',

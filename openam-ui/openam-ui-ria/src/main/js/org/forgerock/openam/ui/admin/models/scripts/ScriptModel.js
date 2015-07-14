@@ -19,8 +19,7 @@ define("org/forgerock/openam/ui/admin/models/scripts/ScriptModel", [
     "backbone",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/util/Base64",
-    // TODO: switch to 'org/forgerock/openam/ui/common/util/URLHelper' after PE and SE are deleted
-    "org/forgerock/openam/ui/uma/util/URLHelper"
+    "org/forgerock/openam/ui/common/util/URLHelper"
 ], function (Backbone, Messages, Base64, URLHelper) {
     return Backbone.Model.extend({
         idAttribute: "_id",

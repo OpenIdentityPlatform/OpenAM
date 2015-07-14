@@ -26,34 +26,27 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/applications/Applica
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/UIUtils",
-    // TODO: switch to 'org/forgerock/openam/ui/common/util/URLHelper' after PE and SE are deleted
-    "org/forgerock/openam/ui/uma/util/URLHelper",
-    "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole",
+    "org/forgerock/openam/ui/common/util/BackgridUtils",
+    "org/forgerock/openam/ui/common/util/URLHelper",
     "org/forgerock/openam/ui/admin/models/policies/ApplicationModel",
     "org/forgerock/openam/ui/admin/views/realms/policies/common/AbstractListView",
-    "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate",
-    "org/forgerock/openam/ui/common/util/BackgridUtils"
-], function ($, _, Backbone, Backgrid, Configuration, EventManager, Router, Constants, UIUtils, URLHelper,
-             RedirectToLegacyConsole, ApplicationModel, AbstractListView, PolicyDelegate, BackgridUtils) {
-
+    "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate"
+], function ($, _, Backbone, Backgrid, Configuration, EventManager, Router, Constants, UIUtils, BackgridUtils, URLHelper,
+             ApplicationModel, AbstractListView, PoliciesDelegate) {
     return AbstractListView.extend({
         template: "templates/admin/views/realms/policies/applications/ApplicationsTemplate.html",
         toolbarTemplate: "templates/admin/views/realms/policies/applications/ApplicationsToolbarTemplate.html",
 
         render: function (args, callback) {
-            // TODO temporary solution until this is ready
-            RedirectToLegacyConsole.realm.policies();
-
             var self = this,
                 Apps,
                 columns,
                 grid,
                 paginator,
                 ClickableRow,
-                resourceTypesPromise = PolicyDelegate.listResourceTypes();
+                resourceTypesPromise = PoliciesDelegate.listResourceTypes();
 
             this.realmPath = args[0];
-
             this.data.selectedItems = [];
 
             _.extend(this.events, {
@@ -181,8 +174,9 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/applications/Applica
             });
         },
 
+        // TODO: this configuration is not present, need to delete these applications on server
         getDefaultFilter: function () {
-            var exceptions = '',
+            var exceptions = "",
                 defaultApplications,
                 returnList = [];
 
@@ -207,7 +201,7 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/applications/Applica
         },
 
         importPolicies: function (e) {
-            PolicyDelegate.importPolicies(e.target.result)
+            PoliciesDelegate.importPolicies(e.target.result)
                 .done(function () {
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policiesUploaded");
                 })

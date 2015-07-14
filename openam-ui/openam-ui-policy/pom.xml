@@ -104,6 +104,20 @@
             <classifier>min</classifier>
             <type>js</type>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>bootstrap-clockpicker</artifactId>
+            <version>0.0.7</version>
+            <classifier>min</classifier>
+            <type>js</type>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>bootstrap-clockpicker</artifactId>
+            <version>0.0.7</version>
+            <classifier>min</classifier>
+            <type>css</type>
+        </dependency>
     </dependencies>
 
     <build>

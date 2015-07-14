@@ -83,7 +83,8 @@
                     "error": {
                         "cantStartWithHash": "LDAP entity can't start with #",
                         "noName": "Name is required",
-                        "noResourceTypes": "Please select one or more resource types"
+                        "noResourceTypes": "Please select one or more resource types",
+                        "noResources": "Please select one or more resources"
                     }
                 }
             }
@@ -249,6 +250,7 @@
             "cancel" : "Cancel",
             "reset" : "Reset",
             "close" : "Close",
+            "clear": "Clear",
             "logout" : "Log out",
             "register" : "Register",
             "home" : "Home",
@@ -266,6 +268,7 @@
             "accept" : "Accept",
             "reject" : "Reject",
             "createdAt" : "Created at",
+            "createNew": "Create New",
             "search" : "Search",
             "submit" : "Submit",
             "actions" : "Actions",
@@ -295,6 +298,9 @@
             "filter": "Filter...",
             "pass" : "Pass",
             "fail" : "Fail",
+            "allow": "Allow",
+            "deny": "Deny",
+            "notApplicable": "n/a",
             "copyright" : "Copyright &copy; 2010-15 ForgeRock AS. All rights reserved.",
             "sessionExpired" : "Session Expired",
             "enableCookies" : "Cookies must be enabled to login",
@@ -541,7 +547,10 @@
             "topLevelRealm" : "Top Level Realm",
             "realmStatus": "Status",
             "realmDnsAliases": "Aliases/DNS Aliases",
-            "noResults": "No results to display"
+            "noResults": "No results to display",
+            "name": "Name",
+            "description": "Description",
+            "type": "Type"
         },
         "authentication": {
             "settings": {
@@ -641,12 +650,9 @@
         },
         "scripts": {
             "edit": {
-                "createNew": "Create New",
-                "name": "Name",
-                "description": "Description",
                 "language": "Language",
-                "context": "Script Type",
                 "script": "Script",
+                "scriptType": "Script Type",
                 "validation": {
                     "line": "line",
                     "column": "column",
@@ -737,10 +743,6 @@
 
             "applications":{
                 "edit": {
-                    "name": "Name",
-                    "description": "Description",
-                    "application": "Application",
-                    "createNew": "Create New",
                     "policies": "Policies",
                     "resourceTypes": {
                         "availableResourceTypes": "Available Resource Types",
@@ -758,7 +760,189 @@
 
             "policies": {
                 "edit": {
+                    "createNew": "New Policy",
+                    "step1": "Name the Policy",
+                    "step2": "Specify Resources",
+                    "step3": "Select Actions",
+                    "step4": "Define Subject Conditions",
+                    "step5": "Define Environment Conditions",
+                    "step6": "Specify Response Attributes",
+                    "step7": "Review Configuration and Finish",
+                    "deleteLogical": "Deleting will also remove any child objects",
+                    "manageRulesDescription": "To define rules, click the Condition or Logical buttons above, enter the relevant options, and then drag the block into place in the rule set above. Each block can be configured both before and after is has been moved. Only rules inside the rule set section will be included in the created policy. To edit a Condition, click the pencil icon, or double-click the item.",
+                    "logical": "Logical",
+                    "selectResourceTypeHelper": "In order to define resources please select resource type first.",
+                    "selectResourceType": "Select Resource Type",
+                    "noResourceTypeNoActions": "In order to select actions please select resource type first.",
+                    "addNewAction": "Add new action",
+                    "availableActions": "Available Resource Type Actions",
+                    "selectedActions": "Selected Actions",
+                    "subjectAttributesPlaceholder": "Select or search for subject attributes",
 
+                    "summaryReview": {
+                        "noName": "There is no name...",
+                        "invalidName": "Invalid name...",
+                        "noDescription": "There is no description...",
+                        "noSubjectConditions": "There are no subject conditions...",
+                        "noSubjectAttributes": "There are no subject attributes...",
+                        "noEnvironmentConditions": "There are no environment conditions...",
+                        "switchView": "Switch to <a href='#' id='toggleAdvanced'></a> view.",
+                        "maximized": "maximized",
+                        "minimized": "minimized"
+                    },
+
+                    "operators": {
+                        "NOT": "NOT",
+                        "OR": "OR",
+                        "AND": "AND"
+                    },
+
+                    "subjectTypes": {
+                        "AuthenticatedUsers": {
+                            "title": "Authenticated Users",
+                            "props": {}
+                        },
+                        "Identity": {
+                            "title": "Users & Groups",
+                            "props": {
+                                "subjectValues": "Subject Values",
+                                "users": "User Subjects",
+                                "groups": "Group Subjects"
+                            },
+                            "placeholder": "Search for subjects"
+                        },
+                        "JwtClaim": {
+                            "title": "OpenID Connect/JWT Claim",
+                            "props": {
+                                "claimName": "Claim Name",
+                                "claimValue": "Claim Value"
+                            }
+                        },
+                        "NONE": {
+                            "title": "Never Match",
+                            "props": {}
+                        }
+                    },
+
+                    "conditionTypes": {
+                        "AMIdentityMembership": {
+                            "title": "Identity Membership",
+                            "props": {
+                                "amIdentityName": "AM Identity Name"
+                            }
+                        },
+                        "AuthLevel": {
+                            "title": "Authentication Level (greater than or equal to)",
+                            "props": {
+                                "authLevel": "Authentication Level"
+                            }
+                        },
+                        "AuthScheme": {
+                            "title": "Authentication by Module Instance",
+                            "props": {
+                                "authScheme": "Authentication Scheme",
+                                "applicationIdleTimeout": "Application Idle Timeout Scheme",
+                                "applicationName": "Application Name"
+                            }
+                        },
+                        "AuthenticateToRealm": {
+                            "title": "Authentication to a Realm",
+                            "props": {
+                                "authenticateToRealm": "Authenticate to a Realm"
+                            }
+                        },
+                        "AuthenticateToService": {
+                            "title": "Authentication by Module Chain",
+                            "props": {
+                                "authenticateToService": "Authenticate To Service"
+                            }
+                        },
+                        "IPv4": {
+                            "title": "IPv4 Address/DNS Name",
+                            "props": {
+                                "ipRange": "IP Range",
+                                "dnsName": "DNS Name",
+                                "startIp": "Start IP",
+                                "endIp": "End IP"
+                            }
+                        },
+                        "IPv6": {
+                            "title": "IPv6 Address/DNS Name",
+                            "props": {
+                                "ipRange": "IP Range",
+                                "dnsName": "DNS Name",
+                                "startIp": "Start IP",
+                                "endIp": "End IP"
+                            }
+                        },
+                        "LDAPFilter": {
+                            "title": "LDAP Filter Condition",
+                            "props": {
+                                "ldapFilter": "LDAP Filter"
+                            }
+                        },
+                        "LEAuthLevel": {
+                            "title": "Authentication Level (less than or equal to)",
+                            "props": {
+                                "authLevel": "Authentication Level"
+                            }
+                        },
+                        "OAuth2Scope": {
+                            "title": "OAuth2 Scope",
+                            "props": {
+                                "requiredScopes": "Scopes"
+                            }
+                        },
+                        "ResourceEnvIP": {
+                            "title": "Resource/Environment/IP Address",
+                            "props": {
+                                "resourceEnvIPConditionValue": "Resource/Environment/IP Address"
+                            }
+                        },
+                        "Session": {
+                            "title": "Active Session Time",
+                            "props": {
+                                "maxSessionTime": "Max Session Time",
+                                "terminateSession": "Terminate Session"
+                            }
+                        },
+                        "SessionProperty": {
+                            "title": "Current Session Properties",
+                            "props": {
+                                "ignoreValueCase": "Ignore Value Case",
+                                "properties": "Properties"
+                            }
+                        },
+                        "SimpleTime": {
+                            "title": "Time (day, date, time, and timezone)",
+                            "props": {
+                                "startTime": "Start Time",
+                                "endTime": "End Time",
+                                "startDay": "Start Day",
+                                "endDay": "End Day",
+                                "startDate": "Start Date",
+                                "endDate": "End Date",
+                                "enforcementTimeZone": "Time Zone",
+                                "enterTimeZone": "Enter Time Zone"
+                            },
+                            "helperTitle": "Time condition",
+                            "helperContent": "Must contain one or more of the following values: Time (Start and End), Day (Start and End), Date (Start and End) and/or Time Zone."
+                        },
+                        "Script": {
+                            "title": "Script",
+                            "props": {
+                                "scriptId": "Script Name"
+                            },
+                            "placeholder": "Select from scripts"
+                        },
+                        "ipHelperTitle": "IP Condition",
+                        "ipHelperContent": "Enter at least one of Start IP, End IP or DNS Name. To match a single IP, enter it in either Start IP or End IP. Start IP must be less than or equal to End IP. DNS Name is an explicit match, or you can use a wildcard in the lowest sub-domain.",
+                        "legacyFormat": "This condition is in a legacy format, and should be replaced.",
+                        "nothingSelected": "Nothing selected",
+                        "attributes": {
+                            "object": "key:value[,value2,...]"
+                        }
+                    }
                 },
                 "list": {
                     "grid": ["Name", "Description", "Resources", "Actions"],

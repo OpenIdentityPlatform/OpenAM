@@ -1,30 +1,24 @@
 /**
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
  *
- * Copyright 2011-2015 ForgeRock AS.
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
  *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
  *
- * You can obtain a copy of the License at
- * http://forgerock.org/license/CDDLv1.0.html
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at http://forgerock.org/license/CDDLv1.0.html
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
+ * Portions copyright 2011-2015 ForgeRock AS.
  */
 
 /*global require, define, window */
 require.config({
     paths: {
+        "autosizeInput": "libs/jquery.autosize.input.min",
+
         "backbone"           : "libs/backbone-1.1.2-min",
         "backbone.paginator" : "libs/backbone-paginator.min",
         "backbone-relational": "libs/backbone-relational",
@@ -39,11 +33,13 @@ require.config({
         "bootstrap-multiselect": "libs/bootstrap-multiselect.0.9.13",
         "bootstrap-tabdrop"    : "libs/bootstrap-tabdrop-1.0",
 
+        "clockPicker" : "libs/bootstrap-clockpicker-0.0.7-min",
         "doTimeout"   : "libs/jquery.ba-dotimeout-1.0-min",
         "form2js"     : "libs/form2js-2.0",
         "handlebars"  : "libs/handlebars-1.3.0-min",
         "i18next"     : "libs/i18next-1.7.3-min",
         "jquery"      : "libs/jquery-2.1.1-min",
+        "jqueryui"    : "libs/jquery-ui-1.11.1-min", // TODO this is used only for date picker, remove it and use something more lightweight
         "js2form"     : "libs/js2form-2.0",
         "jsonEditor"  : "libs/jsoneditor-custom.min",
         "moment"      : "libs/moment-2.8.1-min",
@@ -59,6 +55,10 @@ require.config({
         "UserDelegate": "org/forgerock/openam/ui/user/delegates/UserDelegate"
     },
     shim: {
+        "autosizeInput": {
+            deps: ["jquery"],
+            exports: "autosizeInput"
+        },
         "backbone": {
             deps: ["underscore"],
             exports: "Backbone"
@@ -96,7 +96,11 @@ require.config({
         "bootstrap-tabdrop": {
             deps: ["jquery", "bootstrap"]
         },
-
+        
+        "clockPicker": {
+            deps: ["jquery"],
+            exports: "clockPicker"
+        },
         "doTimeout": {
             deps: ["jquery"],
             exports: "doTimeout"
@@ -116,6 +120,10 @@ require.config({
         },
         "jsonEditor": {
             exports: "JSONEditor"
+        },
+        "jqueryui": {
+            deps: ["jquery"],
+            exports: "jqueryui"
         },
         "moment": {
             exports: "moment"
@@ -152,7 +160,9 @@ require([
     "jquery",
     "underscore",
     "backbone",
+    "autosizeInput",
     "backgrid",
+    "clockPicker",
     "form2js",
     "js2form",
     "jsonEditor",

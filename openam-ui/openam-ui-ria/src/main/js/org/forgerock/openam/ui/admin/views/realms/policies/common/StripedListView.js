@@ -14,7 +14,7 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global window, define */
+/*global define */
 
 define("org/forgerock/openam/ui/admin/views/realms/policies/common/StripedListView", [
     "jquery",

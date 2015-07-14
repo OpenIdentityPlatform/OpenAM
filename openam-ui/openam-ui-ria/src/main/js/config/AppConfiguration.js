@@ -1,25 +1,17 @@
 /**
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
  *
- * Copyright 2011-2015 ForgeRock AS.
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
  *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
  *
- * You can obtain a copy of the License at
- * http://forgerock.org/license/CDDLv1.0.html
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at http://forgerock.org/license/CDDLv1.0.html
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
+ * Portions copyright 2011-2015 ForgeRock AS.
  */
 
 /*global define*/
@@ -100,6 +92,22 @@ define("config/AppConfiguration", [
                         templateUrls: [
                             "templates/admin/views/realms/policies/common/StripedListItemTemplate.html",
                             "templates/admin/views/realms/policies/applications/ApplicationsToolbarTemplate.html",
+                            "templates/admin/views/realms/policies/policies/EditPolicyTemplate.html",
+                            "templates/admin/views/realms/policies/policies/conditions/EditSubjectTemplate.html",
+                            "templates/admin/views/realms/policies/policies/conditions/EditEnvironmentTemplate.html",
+                            "templates/admin/views/realms/policies/policies/conditions/OperatorRulesTemplate.html",
+                            "templates/admin/views/realms/policies/policies/conditions/ConditionAttrEnum.html",
+                            "templates/admin/views/realms/policies/policies/conditions/ConditionAttrString.html",
+                            "templates/admin/views/realms/policies/policies/conditions/ConditionAttrBoolean.html",
+                            "templates/admin/views/realms/policies/policies/conditions/ConditionAttrArray.html",
+                            "templates/admin/views/realms/policies/policies/conditions/ConditionAttrObject.html",
+                            "templates/admin/views/realms/policies/policies/conditions/ConditionAttrTime.html",
+                            "templates/admin/views/realms/policies/policies/conditions/ConditionAttrDay.html",
+                            "templates/admin/views/realms/policies/policies/conditions/ConditionAttrDate.html",
+                            "templates/admin/views/realms/policies/policies/conditions/ConditionAttrTimeZone.html",
+                            "templates/admin/views/realms/policies/policies/conditions/ListItem.html",
+                            "templates/admin/views/realms/policies/policies/conditions/LegacyListItem.html",
+                            "templates/admin/views/realms/policies/policies/StripedListActionItemTemplate.html",
                             "templates/admin/views/realms/policies/resourceTypes/ResourceTypesToolbarTemplate.html",
                             "templates/admin/views/realms/scripts/ScriptsToolbarTemplate.html",
                             "templates/admin/views/realms/scripts/ScriptValidationTemplate.html",
@@ -222,7 +230,7 @@ define("config/AppConfiguration", [
                     }
                 }
             ],
-            loggerLevel: 'debug'
+            loggerLevel: "debug"
         };
     return obj;
 });

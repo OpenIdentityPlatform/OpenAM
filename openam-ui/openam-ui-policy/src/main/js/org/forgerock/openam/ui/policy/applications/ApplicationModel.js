@@ -17,7 +17,7 @@
 /*global define*/
 define("org/forgerock/openam/ui/policy/applications/ApplicationModel", [
     "backbone",
-    "org/forgerock/openam/ui/common/util/URLHelper"
+    "org/forgerock/openam/ui/policy/util/URLHelper"
 ], function (Backbone, URLHelper) {
     return Backbone.Model.extend({
         idAttribute: 'name',

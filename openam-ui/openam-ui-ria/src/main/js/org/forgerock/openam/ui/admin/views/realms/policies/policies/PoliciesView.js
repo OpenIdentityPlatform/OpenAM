@@ -23,14 +23,15 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/PoliciesVie
     "backgrid",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/commons/ui/common/util/UIUtils",
-    // TODO: switch to 'org/forgerock/openam/ui/common/util/URLHelper' after PE and SE are deleted
-    "org/forgerock/openam/ui/uma/util/URLHelper",
-    "org/forgerock/openam/ui/admin/models/policies/PolicyModel",
-    "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
-    "org/forgerock/openam/ui/admin/views/realms/policies/common/AbstractListView"
-], function ($, _, Backbone, Backgrid, Configuration, Router, UIUtils, URLHelper, PolicyModel, PoliciesDelegate, BackgridUtils, AbstractListView) {
+    "org/forgerock/commons/ui/common/util/UIUtils",
+    "org/forgerock/openam/ui/common/util/URLHelper",
+    "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate",
+    "org/forgerock/openam/ui/admin/models/policies/PolicyModel",
+    "org/forgerock/openam/ui/admin/views/realms/policies/common/AbstractListView",
+    "org/forgerock/openam/ui/admin/views/realms/policies/policies/EditPolicyView"
+], function ($, _, Backbone, Backgrid, Configuration, Router, BackgridUtils, UIUtils, URLHelper, PoliciesDelegate,
+             PolicyModel, AbstractListView, EditPolicyView) {
 
     var PoliciesListView = AbstractListView.extend({
         element: "#policies",
@@ -49,13 +50,17 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/PoliciesVie
 
             this.data.selectedItems = [];
 
+            _.extend(this.events, {
+                "click #addNewPolicy": "addNewPolicy"
+            });
+
             Policies = Backbone.PageableCollection.extend({
                 url: URLHelper.substitute("__api__/policies"),
                 model: PolicyModel,
                 state: BackgridUtils.getState(),
                 queryParams: BackgridUtils.getQueryParams({
                     filterName: "eq",
-                    _queryFilter: ['applicationName+eq+"' + this.data.application.id + '"']
+                    _queryFilter: ['applicationName+eq+"' + this.data.applicationModel.id + '"']
                 }),
                 parseState: BackgridUtils.parseState,
                 parseRecords: BackgridUtils.parseRecords,
@@ -75,7 +80,13 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/PoliciesVie
                         return;
                     }
 
-                    // TODO implement click
+                    EditPolicyView.render({
+                        applicationModel: self.data.applicationModel,
+                        policyModel: this.model,
+                        savePolicyCallback: function () {
+                            self.data.items.fetch({reset: true});
+                        }
+                    });
                 }
             });
 
@@ -148,6 +159,19 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/PoliciesVie
                     }
                 });
             });
+        },
+
+        addNewPolicy: function () {
+            var self = this;
+            EditPolicyView.render({
+                    savePolicyCallback: function () {
+                        self.data.items.fetch({reset: true});
+                    },
+                    applicationModel: this.data.applicationModel
+                },
+                function () {
+                    self.data.items.fetch({reset: true});
+                });
         }
     });
 

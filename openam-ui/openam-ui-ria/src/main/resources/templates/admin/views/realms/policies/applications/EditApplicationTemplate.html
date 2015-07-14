@@ -3,18 +3,18 @@
         <i class="fa fa-list-alt"></i>
     </span>
 
-    <h4 class="page-type">{{t "console.policies.applications.edit.application"}}</h4>
+    <h4 class="page-type">{{t "console.policies.common.application"}}</h4>
 
     <div class="page-header-button-group">
         <button id="deleteApp" class="btn btn-primary" type="button" {{#unless entity.name}}disabled{{/unless}}>
-            <i class="fa fa-times"></i>{{t "common.form.delete"}}</button>
+            <i class="fa fa-times"></i> {{t "common.form.delete"}}</button>
     </div>
 
     <h1>
         {{#if entity.name}}
         {{entity.name}}
         {{else}}
-        {{t "console.policies.applications.edit.createNew"}}
+        {{t "common.form.createNew"}}
         {{/if}}
     </h1>
 </div>
@@ -42,7 +42,7 @@
                     <h3 class="block-header">{{t "general"}}</h3>
 
                     <div class="form-group clearfix">
-                        <label class="col-sm-2 control-label">{{t "console.policies.applications.edit.name"}}</label>
+                        <label class="col-sm-2 control-label">{{t "console.common.name"}}</label>
 
                         <div class="col-sm-9">
                             <input type="text" id="appName" class="form-control" value="{{entity.name}}"
@@ -52,7 +52,7 @@
                     </div>
 
                     <div class="form-group clearfix">
-                        <label class="col-sm-2 control-label" for="appDescription">{{t "console.policies.applications.edit.description"}}</label>
+                        <label class="col-sm-2 control-label" for="appDescription">{{t "console.common.description"}}</label>
                         <div class="col-sm-9">
                             <textarea class="form-control" id="appDescription" data-field="description">{{entity.description}}</textarea>
                         </div>

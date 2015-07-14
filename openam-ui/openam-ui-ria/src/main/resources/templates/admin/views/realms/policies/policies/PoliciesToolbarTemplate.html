@@ -1,4 +1,4 @@
-<button type="button" id="addNewPolicy" class="btn btn-primary">
+<button type="button" id="addNewPolicy" class="btn btn-primary" {{#unless applicationModel.id}}disabled{{/unless}}>
     <i class="fa fa-plus"></i> {{t "console.policies.policies.list.addNew"}}
 </button>
 

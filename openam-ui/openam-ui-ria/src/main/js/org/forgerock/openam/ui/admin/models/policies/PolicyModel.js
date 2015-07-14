@@ -18,8 +18,7 @@
 define("org/forgerock/openam/ui/admin/models/policies/PolicyModel", [
     "underscore",
     "backbone",
-    // TODO: switch to 'org/forgerock/openam/ui/common/util/URLHelper' after PE and SE are deleted
-    "org/forgerock/openam/ui/uma/util/URLHelper"
+    "org/forgerock/openam/ui/common/util/URLHelper"
 ], function (_, Backbone, URLHelper) {
     return Backbone.Model.extend({
         idAttribute: "name",
@@ -36,20 +35,16 @@ define("org/forgerock/openam/ui/admin/models/policies/PolicyModel", [
 
         validate: function (attrs, options) {
             if (attrs.name.trim() === "") {
-                return "policyErrorNoName";
+                return "errorNoName";
             }
 
             // entities that are stored in LDAP can't start with '#'. http://www.jguru.com/faq/view.jsp?EID=113588
             if (attrs.name.startsWith("#")) {
-                return "policyErrorCantStartWithHash";
+                return "errorCantStartWithHash";
             }
 
             if (attrs.resources.length === 0) {
                 return "policyErrorNoResources";
-            }
-
-            if (_.isEmpty(attrs.actionValues)) {
-                return "policyErrorNoActions";
             }
         },
 

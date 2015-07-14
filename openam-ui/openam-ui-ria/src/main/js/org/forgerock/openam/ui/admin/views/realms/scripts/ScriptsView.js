@@ -27,12 +27,12 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/UIUtils",
-    // TODO: switch to 'org/forgerock/openam/ui/common/util/URLHelper' after PE and SE are deleted
-    "org/forgerock/openam/ui/uma/util/URLHelper",
+    "org/forgerock/openam/ui/common/util/URLHelper",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/openam/ui/admin/models/scripts/ScriptModel",
     "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate"
-], function ($, _, Backbone, Backgrid, Messages, AbstractView, EventManager, Router, Constants, UIUtils, URLHelper, BackgridUtils, Script, SMSGlobalDelegate) {
+], function ($, _, Backbone, Backgrid, Messages, AbstractView, EventManager, Router, Constants, UIUtils, URLHelper,
+             BackgridUtils, Script, SMSGlobalDelegate) {
 
     return AbstractView.extend({
         template: "templates/admin/views/realms/scripts/ScriptsTemplate.html",
@@ -172,7 +172,6 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
                             callback();
                         }
                     });
-
                 });
             });
         },

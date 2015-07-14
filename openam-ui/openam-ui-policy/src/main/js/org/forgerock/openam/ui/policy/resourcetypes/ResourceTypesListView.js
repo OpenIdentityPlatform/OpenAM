@@ -29,7 +29,7 @@ define("org/forgerock/openam/ui/policy/resourcetypes/ResourceTypesListView", [
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/openam/ui/common/util/URLHelper",
+    "org/forgerock/openam/ui/policy/util/URLHelper",
     "org/forgerock/openam/ui/policy/common/AbstractListView",
     "org/forgerock/openam/ui/policy/resourcetypes/ResourceTypeModel",
     "org/forgerock/openam/ui/policy/util/BackgridUtils"
@@ -120,6 +120,7 @@ define("org/forgerock/openam/ui/policy/resourcetypes/ResourceTypesListView", [
                 columns: columns,
                 row: ClickableRow,
                 collection: self.data.items,
+                className: "backgrid table",
                 emptyText: $.t("policy.resourceTypes.list.noResults")
             });
 

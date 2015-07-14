@@ -8,7 +8,7 @@
         {{#if entity.name}}
         {{entity.name}}
         {{else}}
-        {{t "console.scripts.edit.createNew"}}
+        {{t "common.form.createNew"}}
         {{/if}}
     </h1>
 </div>
@@ -18,7 +18,7 @@
         <div class="panel-body">
             <!-- NAME -->
             <div class="form-group">
-                <label class="col-sm-3 control-label">{{t "console.scripts.edit.name"}}</label>
+                <label class="col-sm-3 control-label">{{t "console.common.name"}}</label>
 
                 <div class="col-sm-7">
                     <input type="text" id="name" name="scriptName" class="form-control" value="{{entity.name}}"
@@ -28,7 +28,7 @@
 
             <!-- DESCRIPTION -->
             <div class="form-group">
-                <label class="col-sm-3 control-label">{{t "console.scripts.edit.description"}}</label>
+                <label class="col-sm-3 control-label">{{t "console.common.description"}}</label>
 
                 <div class="col-sm-7">
                     <textarea id="description" class="form-control pull-left script-text" rows="3"
@@ -38,7 +38,7 @@
 
             <!-- CONTEXT -->
             <div class="form-group">
-                <label class="col-sm-3 control-label">{{t "console.scripts.edit.context"}}</label>
+                <label class="col-sm-3 control-label">{{t "console.scripts.edit.scriptType"}}</label>
 
                 <div class="col-sm-7 script-context">
                     <span class="form-control" id="context">{{contextName}}</span>

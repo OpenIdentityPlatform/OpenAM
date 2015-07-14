@@ -1,0 +1,12 @@
+<h5 class="list-group-header">{{t "console.policies.common.subjectAttributes"}}</h5>
+
+{{#if allUserAttributes}}
+<select multiple id="avaliableUserAttributes" class="selectize">
+    <option disabled selected value="">{{t "console.policies.policies.edit.subjectAttributesPlaceholder"}}</option>
+    {{#each allUserAttributes}}
+    <option {{#if selected}}selected{{/if}} value="{{propertyName}}">{{propertyName}}</option>
+    {{/each}}
+</select>
+{{else}}
+{{t "console.policies.common.noSubjectAttributes"}}
+{{/if}}

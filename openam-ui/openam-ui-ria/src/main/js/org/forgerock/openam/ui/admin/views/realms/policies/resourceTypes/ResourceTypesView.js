@@ -23,18 +23,22 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/resourceTypes/Resour
     "backgrid",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/UIUtils",
-    // TODO: switch to 'org/forgerock/openam/ui/common/util/URLHelper' after PE and SE are deleted
-    "org/forgerock/openam/ui/uma/util/URLHelper",
+    "org/forgerock/openam/ui/common/util/URLHelper",
     "org/forgerock/openam/ui/admin/views/realms/policies/common/AbstractListView",
     "org/forgerock/openam/ui/admin/models/policies/ResourceTypeModel",
-    "org/forgerock/openam/ui/common/util/BackgridUtils"
-], function ($, _, Backbone, Backgrid, Router, UIUtils, URLHelper, AbstractListView, ResourceTypeModel, BackgridUtils) {
-
+    "org/forgerock/openam/ui/common/util/BackgridUtils",
+    "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
+], function ($, _, Backbone, Backgrid, Router, UIUtils, URLHelper, AbstractListView, ResourceTypeModel, BackgridUtils,
+             RedirectToLegacyConsole) {
     return AbstractListView.extend({
         template: "templates/admin/views/realms/policies/resourceTypes/ResourceTypesTemplate.html",
         toolbarTemplate: "templates/admin/views/realms/policies/resourceTypes/ResourceTypesToolbarTemplate.html",
 
         render: function (args, callback) {
+
+            // TODO temporary solution until this is ready
+            RedirectToLegacyConsole.realm.policies(args[0]);
+
             var self = this,
                 ResourceTypes,
                 columns,
