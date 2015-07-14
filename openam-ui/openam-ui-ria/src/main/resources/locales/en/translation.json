@@ -84,7 +84,9 @@
                         "cantStartWithHash": "LDAP entity can't start with #",
                         "noName": "Name is required",
                         "noResourceTypes": "Please select one or more resource types",
-                        "noResources": "Please select one or more resources"
+                        "noResources": "Please select one or more resources",
+                        "noActions": "Please add one or more actions",
+                        "noPatterns": "Please add one or more patterns"
                     }
                 }
             }
@@ -962,6 +964,10 @@
                     "grid": ["Name", "Description", "Patterns", "Actions"]
                 },
                 "edit": {
+                    "resourceType": "Resource Type",
+                    "patternsAndActions": "Patterns and Actions",
+                    "newAction": "New action",
+                    "newPattern": "New pattern"
                 }
             }
         }

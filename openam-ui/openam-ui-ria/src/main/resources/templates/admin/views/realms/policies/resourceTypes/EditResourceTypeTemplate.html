@@ -1,9 +1,65 @@
-<div class="page-header">
-    <h1>Edit Resource Type</h1>
+<div class="page-header clearfix">
+    <span class="header-icon pull-left">
+        <span class="fa fa-list"></span>
+    </span>
+
+    <h4 class="page-type">{{t "console.policies.resourceTypes.edit.resourceType"}}</h4>
+    <div class="page-header-button-group">
+        <button id="deleteResType" class="btn btn-primary" type="button" {{#unless entity.name}}disabled{{/unless}}>
+            <i class="fa fa-times"></i> {{t "common.form.delete"}}
+        </button>
+    </div>
+    <h1>
+        {{#if entity.name}}
+        {{entity.name}}
+        {{else}}
+        {{t "common.form.createNew"}}
+        {{/if}}
+    </h1>
 </div>
 
-<div class="btn-toolbar page-toolbar" role="toolbar" aria-label="toolbar"></div>
 
-<div class="panel panel-default">
+
+
+<div class="panel panel-default panel-content">
+    <form class="form-horizontal" role="form">
+        <div class="panel-body">
+            <div class="block clearfix">
+                <h3 class="block-header">{{t "general"}}</h3>
+
+                <div class="form-group clearfix">
+                    <label class="col-sm-2 control-label" for="resTypeName">{{t "console.common.name"}}</label>
+
+                    <div class="col-sm-9">
+                        <input type="text" id="resTypeName" class="form-control" value="{{entity.name}}"
+                               data-field="name" autofocus required
+                               placeholder="{{t 'common.form.validation.required'}}" name="entityName">
+                    </div>
+                </div>
+
+                <div class="form-group clearfix">
+                    <label class="col-sm-2 control-label" for="resTypeDescription">{{t "console.common.description"}}</label>
+                    <div class="col-sm-9">
+                        <textarea class="form-control" id="resTypeDescription" data-field="description">{{entity.description}}</textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="block clearfix">
+                <h3 class="block-header">{{t "console.policies.resourceTypes.edit.patternsAndActions"}}</h3>
+
+                <div class="row">
+                    <div class="col-sm-6" id="resTypePatterns"></div>
+                    <div class="col-sm-6" id="resTypeActions"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-footer clearfix">
+            <div class="pull-right">
+                <button id="revertChanges" class="btn btn-default" type="reset">{{t "common.form.revert"}}</button>
+                <button id="saveChanges" class="btn btn-primary" type="submit">{{t "common.form.save"}}</button>
+            </div>
+        </div>
+    </form>
 
 </div>

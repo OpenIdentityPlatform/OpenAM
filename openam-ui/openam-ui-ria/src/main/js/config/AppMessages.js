@@ -113,6 +113,14 @@ define("config/AppMessages", [
         "policyErrorNoResources": {
             msg: "config.messages.AdminMessages.policies.error.noResources",
             type: "error"
+        },
+        "resTypeErrorNoPatterns": {
+            msg: "config.messages.AdminMessages.policies.error.noPatterns",
+            type: "error"
+        },
+        "resTypeErrorNoActions": {
+            msg: "config.messages.AdminMessages.policies.error.noActions",
+            type: "error"
         }
     };
 });

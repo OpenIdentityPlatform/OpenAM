@@ -35,10 +35,6 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/resourceTypes/Resour
         toolbarTemplate: "templates/admin/views/realms/policies/resourceTypes/ResourceTypesToolbarTemplate.html",
 
         render: function (args, callback) {
-
-            // TODO temporary solution until this is ready
-            RedirectToLegacyConsole.realm.policies(args[0]);
-
             var self = this,
                 ResourceTypes,
                 columns,
