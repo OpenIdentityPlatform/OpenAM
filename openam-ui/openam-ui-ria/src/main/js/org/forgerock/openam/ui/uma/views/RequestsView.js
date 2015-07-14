@@ -58,32 +58,23 @@ define("org/forgerock/openam/ui/uma/views/RequestsView", [
             columns = [{
                 name: "user",
                 label: $.t("uma.requests.grid.header.0"),
-                headerCell: BackgridUtils.FilterHeaderCell.extend({
-                    addClassName: "col-md-2"
-                }),
                 cell: "string",
                 editable: false
             }, {
                 name: "resource",
                 label: $.t("uma.requests.grid.header.1"),
-                headerCell: BackgridUtils.ClassHeaderCell.extend({
-                    className: "col-md-2"
-                }),
                 cell: "string",
                 editable: false
             }, {
                 name: "when",
                 label: $.t("uma.requests.grid.header.2"),
-                headerCell: BackgridUtils.ClassHeaderCell.extend({
-                    className: "col-md-2"
-                }),
                 cell: BackgridUtils.DatetimeAgoCell,
                 editable: false
             }, {
                 name: "permissions",
                 label: $.t("uma.requests.grid.header.3"),
                 headerCell: BackgridUtils.ClassHeaderCell.extend({
-                    className: "col-md-3"
+                    className: "col-xs-7 col-md-6"
                 }),
                 cell: PermissionsCell.extend({
                     onChange: function () {
@@ -95,9 +86,6 @@ define("org/forgerock/openam/ui/uma/views/RequestsView", [
             }, {
                 name: "actions",
                 label: "",
-                headerCell: BackgridUtils.ClassHeaderCell.extend({
-                    className: "col-md-1"
-                }),
                 cell: BackgridUtils.TemplateCell.extend({
                     template: "templates/uma/backgrid/cell/ActionsCell.html",
                     events: {
