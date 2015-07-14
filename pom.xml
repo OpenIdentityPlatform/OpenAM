@@ -1866,6 +1866,12 @@
                 <version>${javax.inject.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.jgrapht</groupId>
+                <artifactId>jgrapht-core</artifactId>
+                <version>0.9.1</version>
+            </dependency>
+
             <!--
               required by the STS and SAML libraries
               -->
