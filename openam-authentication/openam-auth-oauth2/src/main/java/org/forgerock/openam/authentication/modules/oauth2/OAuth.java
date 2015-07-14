@@ -227,7 +227,7 @@ public class OAuth extends AMLoginModule {
 
                 try {
                     Token csrfStateToken = ctsStore.read(OAuthUtil.findCookie(request, NONCE_TOKEN_ID));
-                    ctsStore.delete(csrfStateToken);
+                    ctsStore.deleteAsync(csrfStateToken);
                     String expectedCsrfState = csrfStateToken.getValue(CoreTokenField.STRING_ONE);
                     if (!expectedCsrfState.equals(csrfState)) {
                         OAuthUtil.debugError("OAuth.process(): Authorization call-back failed because the state parameter "

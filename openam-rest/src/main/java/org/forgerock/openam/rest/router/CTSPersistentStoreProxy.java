@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.rest.router;
 
@@ -56,72 +56,67 @@ public class CTSPersistentStoreProxy implements CTSPersistentStore {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void create(Token token) throws CoreTokenException {
         CTSHolder.get().create(token);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
+    public void createAsync(Token token) throws CoreTokenException {
+        CTSHolder.get().createAsync(token);
+    }
+
     @Override
     public Token read(String tokenId) throws CoreTokenException {
         return CTSHolder.get().read(tokenId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void update(Token token) throws CoreTokenException {
         CTSHolder.get().update(token);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
+    public void updateAsync(Token token) throws CoreTokenException {
+        CTSHolder.get().updateAsync(token);
+    }
+
     @Override
     public void delete(Token token) throws CoreTokenException {
         CTSHolder.get().delete(token);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
+    public void deleteAsync(Token token) throws CoreTokenException {
+        CTSHolder.get().deleteAsync(token);
+    }
+
     @Override
     public void delete(String tokenId) throws CoreTokenException {
         CTSHolder.get().delete(tokenId);
     }
+    @Override
+    public void deleteAsync(String tokenId) throws CoreTokenException {
+        CTSHolder.get().deleteAsync(tokenId);
+    }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int delete(Map<CoreTokenField, Object> query) throws CoreTokenException {
         return CTSHolder.get().delete(query);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collection<Token> query(TokenFilter filter) throws CoreTokenException {
         return CTSHolder.get().query(filter);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collection<PartialToken> attributeQuery(TokenFilter tokenFilter) throws CoreTokenException {
         return CTSHolder.get().attributeQuery(tokenFilter);
     }
 
     @Override
-    public void deleteOnQuery(TokenFilter tokenFilter) throws CoreTokenException {
-        CTSHolder.get().deleteOnQuery(tokenFilter);
+    public void deleteOnQueryAsync(TokenFilter tokenFilter) throws CoreTokenException {
+        CTSHolder.get().deleteOnQueryAsync(tokenFilter);
     }
 }
