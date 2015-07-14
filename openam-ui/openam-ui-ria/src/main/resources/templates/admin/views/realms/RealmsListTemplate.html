@@ -2,7 +2,7 @@
     <div class="page-header page-header-list-page">
         <h1>{{t "console.realms.title"}}</h1>
     </div>
-    <p class="page-description">A realm is the unit that OpenSSO Enterprise uses to organize configuration information. Authentication properties, authorization policies, data stores, subjects (including a user, a group of users, or a collection of protected resources) and other data can be defined within the realm.</p>
+    <p class="page-description">{{t "console.realms.description"}}</p>
     <div class="btn-toolbar page-toolbar"  role="toolbar" aria-label="toolbar">
         <a class="btn btn-primary" id="addRealm" href="#realms/"><i class="fa fa-plus"></i> {{t "console.realms.newRealm"}}</a>
         <ul class="btn-group pull-right btn-icon btn-realms-tab" role="group">
@@ -29,7 +29,7 @@
                                 <li><a href="#" class="toggle-realm-active"><i class="fa fa-check"></i>{{t "console.realms.actions.activate"}}</a></li>
                                 {{/if}}
                                 <li class="divider"></li>
-                                <li><a href="#" class="delete-realm"><i class="fa fa-times"></i>{{t "console.realms.actions.delete"}}</a></li>
+                                <li {{#equals path "/" }} class="disabled" {{/equals}}><a href="#" class="delete-realm"><i class="fa fa-times"></i>{{t "console.realms.actions.delete"}}</a></li>
                             </ul>
                         </div>
                         <a href="{{routeTo 'realmDefault' path}}">
