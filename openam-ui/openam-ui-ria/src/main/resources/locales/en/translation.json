@@ -573,7 +573,7 @@
                 "title" : "Authentication Chains",
                 "action" : "Add Chain",
                 "chainName" : "Chain Name",
-                "description" : "OpenAM uses authentication chains to control the authentication flow the user. Use this section to add, configure or remove the realms set of authentication chains.",
+                "description" : "Use authentication chains to define the steps a subject takes to authenticate. Authentication chains consist of a series of one or more authentication modules, with credentials being passed down the chain to each module instance.",
                 "defaultAdminAuthConfiguration" : "Default Administrator Authentication Chain",
                 "defaultOrgAuthConfiguration" : "Default Organization Authentication Chain",
                 "duplicateChain" : "A Chain with the same name already exists",
@@ -594,10 +594,12 @@
                 "gotoSuccessUrl" : "Go to Successful Login URL",
                 "gotoFailUrl" : "Go to Failed Login URL",
                 "redirectUrls" : "Redirect URLS",
+                "redirectUrlsHelp" : "Specify the URL to which the subject is redirected. You can specify separate URLs for authenticating successfully and when authentication fails.",
                 "successUrl" : "Successful Login URL",
                 "failUrl" : "Failed Login URL",
                 "addUrl" : "Add URL",
                 "dropHere" : "Drop here",
+                "moduleHelp" : "Add modules to the authentication chain, and select the continuation and failure semantics with one of the following four flags: required, optional, requisite, or sufficient.",
                 "processingClass": {
                     "title": "Post Authentication Processing Class",
                     "className": "Class Name",
@@ -605,7 +607,8 @@
                         "title": "Add new Class Name",
                         "message": "The new class name <mark>__newClassName__</mark> for Post Authentication Processing has not been saved. Do you want to save it?"
                     },
-                    "duplicateClass" : "A Class with the same name already exists"
+                    "duplicateClass" : "A Class with the same name already exists",
+                    "help" : "Specify the name of a Java class to execute at the end of the authentication process."
                 },
                 "criteria" : ["Required","Optional","Requisite","Sufficient"]
             }
@@ -618,7 +621,7 @@
         },
         "realms": {
             "title": "Realms",
-            "description": "A realm is the unit that OpenSSO Enterprise uses to organize configuration information. Authentication properties, authorization policies, data stores, subjects (including a user, a group of users, or a collection of protected resources) and other data can be defined within the realm.",
+            "description" : "Use realms to organize subjects and configuration data. Within each realm you can configure data stores, administration privileges, authentication chains, authorization policies, and other realm-specific settings.",
             "newRealm": "New Realm",
             "actions": {
                 "edit": "Edit",
@@ -633,7 +636,9 @@
             "realmAliases": "Realm/DNS Aliases",
             "warningDialog": {
                 "title": "Delete \"__realmName__\"?",
-                "message": "This realm is being used as one of the default realms. Deleting may result in locking out the administrators or the users. Are you sure you want to continue?"
+                "activeMessage": "This is an active realm. All configuration data will be lost if deleted. You can set the realm as inactive to prevent login but retain configuration data. <br>Do you want to delete the realm?",
+                "inactiveMessage": "This is an inactive realm. No one can currently login. All configuration data will be lost if deleted. <br>Are you sure you want to delete the realm?",
+                "deactivate" : "Deactivate"
             },
             "createUpdateRealmDialog": {
                 "createTitle": "New Realm",

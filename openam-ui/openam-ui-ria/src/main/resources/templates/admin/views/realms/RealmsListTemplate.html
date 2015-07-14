@@ -74,7 +74,7 @@
                             <th>{{t 'console.realms.realmName'}}</th>
                             <th>{{t 'console.realms.realmPath'}}</th>
                             <th>{{t 'console.realms.realmAliases'}}</th>
-                            <th class="col-btn"></th>
+                            <th class="col-btn-2"></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -87,10 +87,10 @@
                                     {{this}}{{#unless @last}}, {{/unless}}
                                 {{/each}}
                             </td>
-                            <td>
-                                <div class="pull-right btn-group realm-name" data-realm-path="{{path}}">
-                                    <button type="button" class="btn btn-transparent edit-realm" data-realm-name="{{name}}"><i class="fa fa-pencil"></i></button>
-                                    <button type="button" class="btn btn-transparent delete-realm"><i class="fa fa-close"></i></button>
+                            <td class="col-btn-2">
+                                <div class="pull-right btn-group btn-group-sm realm-name" data-realm-path="{{path}}">
+                                    <button type="button" class="btn btn-link edit-realm" data-realm-name="{{name}}"><i class="fa fa-pencil"></i></button>
+                                    <button type="button" class="btn btn-link delete-realm"><i class="fa fa-close"></i></button>
                                 </div>
                             </td>
                         </tr>

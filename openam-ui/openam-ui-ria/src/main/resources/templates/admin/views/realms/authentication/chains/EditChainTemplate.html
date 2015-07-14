@@ -21,10 +21,10 @@
             <a  data-toggle="popover"
                 data-placement="top"
                 data-trigger="focus"
-                data-content="OpenAM uses authentication chains to control the authentication flow for the user. Use this section to add, configure or remove this realms set of authentication chains. To add an instance to the chain you the add button below or hover your mouse over the position in the chain where you what to add the instance and press the add which is displayed."
+                data-content="{{t 'console.authentication.editChains.moduleHelp'}}"
                 tabindex="0"
                 title="Modules"
-                class="pull-right">Help <i class="fa fa-question-circle"></i></a>
+                class="pull-right">{{t 'common.form.help'}} <i class="fa fa-question-circle"></i></a>
 
             <button type="button" id="addModuleLink" class="btn btn-secondary"><i class="fa fa-plus"></i> {{t 'console.authentication.editChains.addModule'}}</button>
 
@@ -53,6 +53,15 @@
         <div role="tabpanel" class="tab-pane" id="settings">
 
              <div class="block clearfix">
+
+                 <a data-toggle="popover"
+                    data-placement="top"
+                    data-trigger="focus"
+                    data-content="{{t 'console.authentication.editChains.redirectUrlsHelp'}}"
+                    tabindex="0"
+                    title="Modules"
+                    class="pull-right">{{t 'common.form.help'}} <i class="fa fa-question-circle"></i></a>
+
         	    <h3 class="block-header">{{t 'console.authentication.editChains.redirectUrls'}}</h3>
                 <div class="form-horizontal">
 
@@ -75,6 +84,14 @@
             </div>
 
             <div class="block clearfix">
+                 <a data-toggle="popover"
+                    data-placement="top"
+                    data-trigger="focus"
+                    data-content="{{t 'console.authentication.editChains.processingClass.help'}}"
+                    tabindex="0"
+                    title="Modules"
+                    class="pull-right">{{t 'common.form.help'}} <i class="fa fa-question-circle"></i></a>
+
         	    <h3 class="block-header">{{t 'console.authentication.editChains.processingClass.title'}}</h3>
                 <table class="table table-striped" id="postProcessView"></table>
             </div>

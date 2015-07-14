@@ -84,31 +84,46 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmsListView", [
             event.preventDefault();
 
             var self = this,
-                realm = this.getRealmFromEvent(event);
-
-            if (realm.active) {
-                BootstrapDialog.show({
-                    title: $.t("console.realms.warningDialog.title", { realmName: realm.name }),
-                    type: BootstrapDialog.TYPE_DANGER,
-                    message: $.t("console.realms.warningDialog.message"),
-                    buttons: [{
-                        label: $.t("common.form.delete"),
-                        cssClass: "btn-danger",
-                        action: function (dialog) {
-                            self.performDeleteRealm(realm.path).done(function () {
-                                dialog.close();
-                            });
-                        }
-                    }, {
-                        label: $.t("common.form.cancel"),
-                        action: function (dialog) {
+                realm = this.getRealmFromEvent(event),
+                buttons = [{
+                    label: $.t("common.form.cancel"),
+                    action: function (dialog) {
+                        dialog.close();
+                    }
+                },{
+                    label: $.t("common.form.delete"),
+                    cssClass: "btn-danger",
+                    action: function (dialog) {
+                        self.performDeleteRealm(realm.path).done(function () {
                             dialog.close();
-                        }
-                    }]
+                        });
+                    }
+                }];
+
+            if(realm.active){
+                buttons.splice(1, 0, {
+                    label: $.t("console.realms.warningDialog.deactivate"),
+                    action: function (dialog) {
+                        realm.active = false;
+                        SMSGlobalDelegate.realms.update(realm.path, realm).done(function () {
+                            self.render();
+                            dialog.close();
+                        }).fail(function(e) {
+                            console.error(e);
+                            self.render();
+                            dialog.close();
+                        });
+                    }
                 });
-            } else {
-                self.performDeleteRealm(realm.path);
             }
+
+            BootstrapDialog.show({
+                title: $.t("console.realms.warningDialog.title", { realmName: realm.name }),
+                type: BootstrapDialog.TYPE_DANGER,
+                message: realm.active ? $.t("console.realms.warningDialog.activeMessage") :  $.t("console.realms.warningDialog.inactiveMessage"),
+                buttons: buttons
+            });
+
         },
         performDeleteRealm: function (path) {
             var self = this;

@@ -76,7 +76,7 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmView", [
             this.realmExists(args[0])
             .done(function () {
                 self.parentRender(function () {
-                    self.$el.find("li").removeClass("active");
+                    self.$el.find(".sidenav li").removeClass("active");
                     self.findActiveNavItem(Router.getURIFragment());
                     self.renderPage(require(self.route.page), args, callback);
                 });
