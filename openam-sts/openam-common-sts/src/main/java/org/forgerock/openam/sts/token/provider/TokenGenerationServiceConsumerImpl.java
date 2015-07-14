@@ -174,7 +174,7 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
                     .setRequestPayload(invocationString)
                     .makeInvocation();
             final int responseCode = connectionResult.getStatusCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
+            if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED) {
                 return parseTokenResponse(connectionResult.getResult());
             } else {
                 throw new TokenCreationException(responseCode, connectionResult.getResult());

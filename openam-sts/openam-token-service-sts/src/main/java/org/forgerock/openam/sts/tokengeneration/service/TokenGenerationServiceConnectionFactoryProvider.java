@@ -19,9 +19,9 @@ package org.forgerock.openam.sts.tokengeneration.service;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.Resources;
-import org.forgerock.json.resource.SingletonResourceProvider;
 import org.forgerock.openam.rest.authz.STSTokenGenerationServiceAuthzModule;
 import org.forgerock.openam.rest.fluent.FluentRouter;
 import org.forgerock.openam.sts.tokengeneration.config.TokenGenerationServiceInjectorHolder;
@@ -40,7 +40,7 @@ public class TokenGenerationServiceConnectionFactoryProvider {
     private static final String VERSION_STRING = "1.0";
     public static ConnectionFactory getConnectionFactory() {
         final FluentRouter router = InjectorHolder.getInstance(FluentRouter.class);
-        final SingletonResourceProvider tokenGenerationService =
+        final CollectionResourceProvider tokenGenerationService =
                 new TokenGenerationService(
                         TokenGenerationServiceInjectorHolder.getInstance(Key.get(SAML2TokenGeneration.class)),
                         TokenGenerationServiceInjectorHolder.getInstance(Key.get(OpenIdConnectTokenGeneration.class)),

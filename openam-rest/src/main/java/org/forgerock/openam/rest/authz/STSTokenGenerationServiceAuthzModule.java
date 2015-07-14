@@ -58,7 +58,7 @@ public class STSTokenGenerationServiceAuthzModule extends SpecialUserOnlyAuthzMo
 
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeCreate(ServerContext context, CreateRequest request) {
-        return rejectConsumption();
+        return authorize(context);
     }
 
     @Override
@@ -83,7 +83,7 @@ public class STSTokenGenerationServiceAuthzModule extends SpecialUserOnlyAuthzMo
 
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeAction(ServerContext context, ActionRequest request) {
-        return authorize(context);
+        return rejectConsumption();
     }
 
     @Override

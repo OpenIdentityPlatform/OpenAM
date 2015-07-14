@@ -15,9 +15,6 @@
 */
 package org.forgerock.openam.rest.fluent;
 
-import static org.apache.commons.lang.ArrayUtils.isNotEmpty;
-import static org.forgerock.openam.utils.CollectionUtils.isNotEmpty;
-
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.forgerock.authz.filter.crest.AuthorizationFilters;
@@ -34,6 +31,9 @@ import org.forgerock.util.Reject;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.apache.commons.lang.ArrayUtils.isNotEmpty;
+import static org.forgerock.openam.utils.CollectionUtils.isNotEmpty;
+
 /**
  * Used to chain
  */
@@ -46,7 +46,7 @@ public final class FluentTo {
     FluentTo(FluentRoute route, String version) {
         this.route = route;
         this.version = version;
-        filters = new ArrayList<Filter>();
+        filters = new ArrayList<>();
     }
 
     /**
@@ -80,7 +80,7 @@ public final class FluentTo {
      *
      * @return a route to the provider
      */
-    private FluentVersion to(CollectionResourceProvider provider) {
+    public FluentVersion to(CollectionResourceProvider provider) {
         handleFiltersAndRoute(RoutingMode.STARTS_WITH, Resources.newCollection(provider));
         return route;
     }

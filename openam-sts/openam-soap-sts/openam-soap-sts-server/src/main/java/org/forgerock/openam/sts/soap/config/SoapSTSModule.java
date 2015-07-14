@@ -175,7 +175,7 @@ public class SoapSTSModule extends PrivateModule {
     @Named(AMSTSConstants.REST_TOKEN_GENERATION_SERVICE_URI_ELEMENT)
     @Exposed
     String tokenGenerationServiceUriElement() {
-        return "/sts-tokengen/issue?_action=issue";
+        return "/sts-tokengen/issue?_action=create";
     }
 
     @Provides

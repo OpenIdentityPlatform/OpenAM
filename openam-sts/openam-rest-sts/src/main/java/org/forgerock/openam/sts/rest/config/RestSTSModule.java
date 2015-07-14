@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.sts.rest.config;
@@ -105,7 +105,7 @@ public class RestSTSModule extends AbstractModule {
     @Singleton
     @Named(AMSTSConstants.REST_TOKEN_GENERATION_SERVICE_URI_ELEMENT)
     String tokenGenerationServiceUriElement() {
-        return "/sts-tokengen/issue?_action=issue";
+        return "/sts-tokengen/issue?_action=create";
     }
 
     @Provides

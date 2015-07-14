@@ -150,7 +150,7 @@ public class TokenTransformFactoryImplTest {
         @Provides
         @Named(AMSTSConstants.REST_TOKEN_GENERATION_SERVICE_URI_ELEMENT)
         String getTokenGenServiceUriElement() {
-            return "/token-gen/issue?_action=issue";
+            return "/token-gen/issue?_action=create";
         }
 
         @Provides

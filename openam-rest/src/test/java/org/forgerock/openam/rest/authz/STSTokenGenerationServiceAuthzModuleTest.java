@@ -89,7 +89,8 @@ public class STSTokenGenerationServiceAuthzModuleTest {
         given(mockSoapSTSAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(true);
         given(mockSpecialUserIdentity.isSpecialUser(mockSSOToken)).willReturn(false);
         //when
-        Promise<AuthorizationResult, ResourceException> result = authzModule.authorizeAction(mockSSOTokenContext, mockActionRequest);
+        Promise<AuthorizationResult, ResourceException> result = authzModule.authorizeCreate(mockSSOTokenContext,
+                mockCreateRequest);
         //then
         assertTrue(result.get().isAuthorized());
     }
@@ -100,7 +101,8 @@ public class STSTokenGenerationServiceAuthzModuleTest {
         given(mockSoapSTSAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(false);
         given(mockSpecialUserIdentity.isSpecialUser(mockSSOToken)).willReturn(true);
         //when
-        Promise<AuthorizationResult, ResourceException> result = authzModule.authorizeAction(mockSSOTokenContext, mockActionRequest);
+        Promise<AuthorizationResult, ResourceException> result = authzModule.authorizeCreate(mockSSOTokenContext,
+                mockCreateRequest);
         //then
         assertTrue(result.get().isAuthorized());
     }
@@ -111,7 +113,8 @@ public class STSTokenGenerationServiceAuthzModuleTest {
         given(mockSoapSTSAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(false);
         given(mockSpecialUserIdentity.isSpecialUser(mockSSOToken)).willReturn(false);
         //when
-        Promise<AuthorizationResult, ResourceException> result = authzModule.authorizeAction(mockSSOTokenContext, mockActionRequest);
+        Promise<AuthorizationResult, ResourceException> result = authzModule.authorizeCreate(mockSSOTokenContext,
+                mockCreateRequest);
         //then
         assertFalse(result.get().isAuthorized());
     }
@@ -149,9 +152,10 @@ public class STSTokenGenerationServiceAuthzModuleTest {
     }
 
     @Test
-    public void testCreateRejected() throws ExecutionException, InterruptedException {
+    public void testActionRejected() throws ExecutionException, InterruptedException {
         //when
-        Promise<AuthorizationResult, ResourceException> result = authzModule.authorizeCreate(mockSSOTokenContext, mockCreateRequest);
+        Promise<AuthorizationResult, ResourceException> result = authzModule.authorizeAction(mockSSOTokenContext,
+                mockActionRequest);
         //then
         assertFalse(result.get().isAuthorized());
     }
