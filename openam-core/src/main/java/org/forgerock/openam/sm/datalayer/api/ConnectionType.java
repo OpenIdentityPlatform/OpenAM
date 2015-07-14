@@ -23,6 +23,7 @@ import org.forgerock.openam.cts.reaper.CTSReaper;
 import org.forgerock.openam.sm.SMSConnectionModule;
 import org.forgerock.openam.sm.datalayer.impl.ResourceSetConnectionModule;
 import org.forgerock.openam.sm.datalayer.impl.UmaAuditConnectionModule;
+import org.forgerock.openam.sm.datalayer.impl.UmaPendingRequestConnectionModule;
 import org.forgerock.openam.utils.StringUtils;
 
 /**
@@ -59,7 +60,9 @@ public enum ConnectionType {
     /**
      * @see org.forgerock.openam.uma.audit.UmaAuditLogger
      */
-    UMA_AUDIT_ENTRY(UmaAuditConnectionModule.class);
+    UMA_AUDIT_ENTRY(UmaAuditConnectionModule.class),
+
+    UMA_PENDING_REQUESTS(UmaPendingRequestConnectionModule.class);
 
     private static final String CONFIGURATION_CLASS_PROPERTY_PREFIX = "org.forgerock.openam.sm.datalayer.module.";
     private final Class<? extends DataLayerConnectionModule> configurationClass;

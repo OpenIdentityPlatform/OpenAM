@@ -99,6 +99,7 @@ public class DirectoryContentUpgrader {
             upgraders.add(new AddDevicePrintSchema());
             upgraders.add(new AddUmaAuditSchema());
             upgraders.add(new AddResourceSetsSchema());
+            upgraders.add(new AddUmaPendingRequestsSchema());
             upgraders.add(new AddOATHDeviceSchema());
             upgraders.add(new OATH2FASchema());
         }
@@ -365,6 +366,19 @@ public class DirectoryContentUpgrader {
         @Override
         public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
             return !schema.hasObjectClass("resource_sets");
+        }
+    }
+
+    private class AddUmaPendingRequestsSchema implements Upgrader {
+
+        @Override
+        public String getLDIFPath() {
+            return "/WEB-INF/template/ldif/opendj/opendj_uma_pending_requests.ldif";
+        }
+
+        @Override
+        public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
+            return !schema.hasObjectClass("uma_pending_requests");
         }
     }
 

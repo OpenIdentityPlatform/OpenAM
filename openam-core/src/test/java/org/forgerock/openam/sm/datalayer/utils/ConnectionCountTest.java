@@ -16,6 +16,7 @@
 package org.forgerock.openam.sm.datalayer.utils;
 
 import static org.fest.assertions.Assertions.*;
+import static org.forgerock.openam.sm.datalayer.utils.ConnectionCount.MINIMUM_CONNECTIONS;
 import static org.mockito.Mockito.*;
 
 import java.text.MessageFormat;
@@ -27,6 +28,7 @@ import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.StoreMode;
 import org.forgerock.openam.sm.datalayer.impl.ResourceSetDataLayerConfiguration;
 import org.forgerock.openam.sm.datalayer.impl.UmaAuditDataLayerConfiguration;
+import org.forgerock.openam.sm.datalayer.impl.UmaPendingRequestDataLayerConfiguration;
 import org.forgerock.openam.sm.datalayer.impl.ldap.LdapDataLayerConfiguration;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -37,29 +39,35 @@ public class ConnectionCountTest {
 
     @BeforeMethod
     public void setup() {
+        LdapDataLayerConfiguration dataLayerConfiguration = mock(LdapDataLayerConfiguration.class);
         LdapDataLayerConfiguration ctsConfiguration = mock(LdapDataLayerConfiguration.class);
         LdapDataLayerConfiguration resourceSetConfiguration = mock(LdapDataLayerConfiguration.class);
         LdapDataLayerConfiguration umaAuditConfiguration = mock(UmaAuditDataLayerConfiguration.class);
+        LdapDataLayerConfiguration umaPendingRequestsConfiguration = mock(UmaPendingRequestDataLayerConfiguration.class);
+        when(dataLayerConfiguration.getStoreMode()).thenReturn(StoreMode.DEFAULT);
         when(ctsConfiguration.getStoreMode()).thenReturn(StoreMode.DEFAULT);
         when(resourceSetConfiguration.getStoreMode()).thenReturn(StoreMode.DEFAULT);
         when(umaAuditConfiguration.getStoreMode()).thenReturn(StoreMode.DEFAULT);
+        when(umaPendingRequestsConfiguration.getStoreMode()).thenReturn(StoreMode.DEFAULT);
         Map<ConnectionType, LdapDataLayerConfiguration> configMap = new HashMap<ConnectionType, LdapDataLayerConfiguration>();
+        configMap.put(ConnectionType.DATA_LAYER, dataLayerConfiguration);
         configMap.put(ConnectionType.CTS_ASYNC, ctsConfiguration);
         configMap.put(ConnectionType.CTS_REAPER, ctsConfiguration);
         configMap.put(ConnectionType.RESOURCE_SETS, resourceSetConfiguration);
         configMap.put(ConnectionType.UMA_AUDIT_ENTRY, umaAuditConfiguration);
+        configMap.put(ConnectionType.UMA_PENDING_REQUESTS, umaPendingRequestsConfiguration);
         count = new ConnectionCount(configMap);
     }
 
     @Test
     public void shouldReturnASingleConnectionForReaper() {
-        assertThat(count.getConnectionCount(10, ConnectionType.CTS_REAPER)).isEqualTo(1);
+        assertThat(count.getConnectionCount(MINIMUM_CONNECTIONS, ConnectionType.CTS_REAPER)).isEqualTo(1);
         assertThat(count.getConnectionCount(100, ConnectionType.CTS_REAPER)).isEqualTo(1);
     }
 
     @Test
     public void shouldReturnAPowerOfTwoForCTSAsync() {
-        int max = 10;
+        int max = MINIMUM_CONNECTIONS;
         int result = count.getConnectionCount(max, ConnectionType.CTS_ASYNC);
         assertThat(ConnectionCount.findPowerOfTwo(result)).isLessThan(max);
     }
@@ -71,22 +79,22 @@ public class ConnectionCountTest {
 
     @Test
     public void shouldReturnAPositiveValueForDataLayer() {
-        for (int ii = ConnectionCount.MINIMUM_CONNECTIONS; ii < 1000; ii++) {
+        for (int ii = MINIMUM_CONNECTIONS; ii < 1000; ii++) {
             assertThat(count.getConnectionCount(ii, ConnectionType.DATA_LAYER)).isGreaterThanOrEqualTo(1);
         }
     }
 
     @Test
     public void shouldAddUpToTheMax() {
-        int max = 10;
+        int max = MINIMUM_CONNECTIONS;
         int total = count.getConnectionCount(max, ConnectionType.CTS_ASYNC) +
                 count.getConnectionCount(max, ConnectionType.CTS_REAPER) +
                 count.getConnectionCount(max, ConnectionType.RESOURCE_SETS) +
                 count.getConnectionCount(max, ConnectionType.DATA_LAYER) +
-                count.getConnectionCount(max, ConnectionType.UMA_AUDIT_ENTRY);
+                count.getConnectionCount(max, ConnectionType.UMA_AUDIT_ENTRY) +
+                count.getConnectionCount(max, ConnectionType.UMA_PENDING_REQUESTS);
         assertThat(total).isEqualTo(max);
     }
-
 
     @Test
     public void shouldFindPowerOfTwo() {
@@ -104,13 +112,18 @@ public class ConnectionCountTest {
         Map<ConnectionType, LdapDataLayerConfiguration> configMap = new HashMap<ConnectionType, LdapDataLayerConfiguration>();
         configMap.put(ConnectionType.CTS_ASYNC, new CTSDataLayerConfiguration("ou=root-dn"));
         configMap.put(ConnectionType.RESOURCE_SETS, new ResourceSetDataLayerConfiguration("ou=root-dn"));
+        configMap.put(ConnectionType.UMA_AUDIT_ENTRY, new ResourceSetDataLayerConfiguration("ou=root-dn"));
+        configMap.put(ConnectionType.UMA_PENDING_REQUESTS, new ResourceSetDataLayerConfiguration("ou=root-dn"));
         ConnectionCount count = new ConnectionCount(configMap);
         System.out.println("Total = Async:Reaper:Data");
-        for (int ii = ConnectionCount.MINIMUM_CONNECTIONS; ii < 1000; ii++) {
+        for (int ii = MINIMUM_CONNECTIONS; ii < 1000; ii++) {
             int a = count.getConnectionCount(ii, ConnectionType.CTS_ASYNC);
             int r = count.getConnectionCount(ii, ConnectionType.CTS_REAPER);
             int d = count.getConnectionCount(ii, ConnectionType.DATA_LAYER);
-            System.out.println(MessageFormat.format("Total: {0} = {1}:{2}:{3}", ii, a, r, d));
+            int rs = count.getConnectionCount(ii, ConnectionType.RESOURCE_SETS);
+            int ae = count.getConnectionCount(ii, ConnectionType.UMA_AUDIT_ENTRY);
+            int pr = count.getConnectionCount(ii, ConnectionType.UMA_PENDING_REQUESTS);
+            System.out.println(MessageFormat.format("Total: {0} = {1}:{2}:{3}:{4}:{5}:{6}", ii, a, r, d, rs, ae, pr));
         }
     }
 }

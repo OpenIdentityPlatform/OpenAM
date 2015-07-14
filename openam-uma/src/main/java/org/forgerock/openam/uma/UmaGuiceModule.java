@@ -36,6 +36,7 @@ import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
 import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
 import org.forgerock.openam.oauth2.AccessTokenProtectionFilter;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaAuditEntry;
+import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
 import org.forgerock.openam.utils.Config;
 import org.restlet.Request;
@@ -89,6 +90,12 @@ public class UmaGuiceModule extends AbstractModule {
     @Inject
     public JavaBeanAdapter<UmaAuditEntry> getAuditEntryAdapter(TokenIdGenerator idFactory) {
         return new JavaBeanAdapter<UmaAuditEntry>(UmaAuditEntry.class, idFactory);
+    }
+
+    @Provides
+    @Inject
+    public JavaBeanAdapter<UmaPendingRequest> getPendingRequestAdapter(TokenIdGenerator idFactory) {
+        return new JavaBeanAdapter<>(UmaPendingRequest.class, idFactory);
     }
 
     @Provides

@@ -31,7 +31,7 @@ import org.forgerock.util.Reject;
  * @see ConnectionType
  */
 public class ConnectionCount {
-    static final int MINIMUM_CONNECTIONS = 9;
+    static final int MINIMUM_CONNECTIONS = 11;
     private final Map<ConnectionType, LdapDataLayerConfiguration> dataLayerConfiguration;
 
     /**
@@ -48,7 +48,7 @@ public class ConnectionCount {
     /**
      * Returns the number of connections that should be allocated to for each ConnectionFactory type.
      *
-     * When used in embedded mode, all three types are applicable. When used in External mode only
+     * When used in embedded mode, all types are applicable. When used in External mode only
      * the CTS Async and CTS Reaper modes are applicable.
      *
      * @param max Non negative maximum number of connections allowed.
@@ -61,10 +61,14 @@ public class ConnectionCount {
      */
     public int getConnectionCount(int max, ConnectionType type) {
         Reject.ifTrue(max < MINIMUM_CONNECTIONS);
+        int numberTypesSharingSMSConnections = -1;
+        if (dataLayerConfiguration.get(type).getStoreMode() == StoreMode.DEFAULT) {
+            numberTypesSharingSMSConnections = findNumberTypesSharingSMSConnections();
+        }
         switch (type) {
             case CTS_ASYNC:
                 if (dataLayerConfiguration.get(type).getStoreMode() == StoreMode.DEFAULT) {
-                    max = (max - 1) / 4;
+                    max = (max - 1) / numberTypesSharingSMSConnections;
                 } else {
                     max = max - 2;
                 }
@@ -72,13 +76,10 @@ public class ConnectionCount {
             case CTS_REAPER:
                 return 1;
             case RESOURCE_SETS:
-                if (dataLayerConfiguration.get(type).getStoreMode() == StoreMode.DEFAULT) {
-                    max = (max - 1) / 4;
-                }
-                return max;
             case UMA_AUDIT_ENTRY:
+            case UMA_PENDING_REQUESTS:
                 if (dataLayerConfiguration.get(type).getStoreMode() == StoreMode.DEFAULT) {
-                    max = (max - 1) / 4;
+                    max = (max - 1) / numberTypesSharingSMSConnections;
                 }
                 return max;
             case DATA_LAYER:
@@ -90,10 +91,21 @@ public class ConnectionCount {
                 int reaper = getSMSConnectionCount(max, ConnectionType.CTS_REAPER);
                 int resourceSets = getSMSConnectionCount(max, ConnectionType.RESOURCE_SETS);
                 int auditEntry = getSMSConnectionCount(max, ConnectionType.UMA_AUDIT_ENTRY);
-                return max - (async + reaper + resourceSets + auditEntry);
+                int umaPendingRequests = getSMSConnectionCount(max, ConnectionType.UMA_PENDING_REQUESTS);
+                return max - (async + reaper + resourceSets + auditEntry + umaPendingRequests);
             default:
                 throw new IllegalStateException();
         }
+    }
+
+    private int findNumberTypesSharingSMSConnections() {
+        int count = 0;
+        for (ConnectionType type : ConnectionType.values()) {
+            if (type != ConnectionType.CTS_REAPER && dataLayerConfiguration.get(type).getStoreMode() == StoreMode.DEFAULT) {
+                count++;
+            }
+        }
+        return count;
     }
 
     /**

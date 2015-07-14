@@ -26,11 +26,12 @@
 
    $Id: serverconfig.xml,v 1.15 2008/11/06 05:31:02 veiming Exp $
 
+   Portions Copyright 2015 ForgeRock AS.
 -->
 
 
 <iPlanetDataAccessLayer>
-    <ServerGroup name="default" minConnPool="1" maxConnPool="10">
+    <ServerGroup name="default" minConnPool="1" maxConnPool="11">
         <Server name="Server1" host="@DIRECTORY_SERVER@" port="@DIRECTORY_PORT@" type="@DIRECTORY_SSL@" />
         <User name="User1" type="proxy">
             <DirDN>
@@ -59,7 +60,7 @@
     REALM mode and the property "com.sun.identity.sm.ldap.enableProxy" must be
     set to "false".
     -->
-    <ServerGroup name="sms" minConnPool="1" maxConnPool="10">
+    <ServerGroup name="sms" minConnPool="1" maxConnPool="11">
         <Server name="Server1" host="@DIRECTORY_SERVER@" port="@DIRECTORY_PORT@"
              type="@DIRECTORY_SSL@" />
              <User name="User2" type="admin">

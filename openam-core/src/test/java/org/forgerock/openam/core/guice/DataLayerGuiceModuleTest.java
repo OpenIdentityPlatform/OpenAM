@@ -41,6 +41,7 @@ import org.forgerock.openam.sm.datalayer.impl.ldap.ExternalLdapConfig;
 import org.forgerock.openam.sm.datalayer.impl.tasks.TaskFactory;
 import org.forgerock.openam.sm.datalayer.providers.LdapConnectionFactoryProvider;
 import org.forgerock.openam.sm.datalayer.store.TokenDataStore;
+import org.forgerock.openam.sm.datalayer.utils.ConnectionCount;
 import org.forgerock.openam.sm.utils.ConfigurationValidator;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -72,6 +73,16 @@ public class DataLayerGuiceModuleTest extends GuiceTestCase {
                 new Object[]{QueryFactory.class, ConnectionType.RESOURCE_SETS},
                 new Object[]{ConnectionFactory.class, ConnectionType.RESOURCE_SETS},
                 new Object[]{TokenDataStore.class, ConnectionType.RESOURCE_SETS},
+                new Object[]{TaskExecutor.class, ConnectionType.UMA_AUDIT_ENTRY},
+                new Object[]{TaskFactory.class, ConnectionType.UMA_AUDIT_ENTRY},
+                new Object[]{QueryFactory.class, ConnectionType.UMA_AUDIT_ENTRY},
+                new Object[]{ConnectionFactory.class, ConnectionType.UMA_AUDIT_ENTRY},
+                new Object[]{TokenDataStore.class, ConnectionType.UMA_AUDIT_ENTRY},
+                new Object[]{TaskExecutor.class, ConnectionType.UMA_PENDING_REQUESTS},
+                new Object[]{TaskFactory.class, ConnectionType.UMA_PENDING_REQUESTS},
+                new Object[]{QueryFactory.class, ConnectionType.UMA_PENDING_REQUESTS},
+                new Object[]{ConnectionFactory.class, ConnectionType.UMA_PENDING_REQUESTS},
+                new Object[]{TokenDataStore.class, ConnectionType.UMA_PENDING_REQUESTS},
         };
     }
 
@@ -114,7 +125,7 @@ public class DataLayerGuiceModuleTest extends GuiceTestCase {
             ConnectionConfigFactory connectionConfigFactory = mock(ConnectionConfigFactory.class);
             ConnectionConfig config = mock(ConnectionConfig.class);
             when(connectionConfigFactory.getConfig()).thenReturn(config);
-            when(config.getMaxConnections()).thenReturn(10);
+            when(config.getMaxConnections()).thenReturn(11);
             bind(ConnectionConfigFactory.class).toInstance(connectionConfigFactory);
 
             bind(ObjectMapper.class).annotatedWith(Names.named("cts-json-object-mapper")).toInstance(new ObjectMapper());
