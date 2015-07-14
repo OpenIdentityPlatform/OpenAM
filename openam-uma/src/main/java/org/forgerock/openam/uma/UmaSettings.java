@@ -139,4 +139,22 @@ public interface UmaSettings {
      * @throws ServerException If there is a problem reading the configuration.
      */
     boolean onDeleteResourceServerDeleteResourceSets() throws ServerException;
+
+    /**
+     * Gets whether the Resource Owner should be emailed when a Pending Request
+     * is created when a Requesting Party requests authorization for a resource.
+     *
+     * @return {@code true} if the Resource Owner should be emailed.
+     * @throws ServerException If there is a problem reading the configuration.
+     */
+    boolean isEmailResourceOwnerOnPendingRequestCreationEnabled() throws ServerException;
+
+    /**
+     * Gets whether the Requesting Party should be emailed when a Pending Request
+     * is approved by the Resource Owner.
+     *
+     * @return {@code true} if the Requesting Party should be emailed.
+     * @throws ServerException If there is a problem reading the configuration.
+     */
+    boolean isEmailRequestingPartyOnPendingRequestApprovalEnabled() throws ServerException;
 }

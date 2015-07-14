@@ -16,10 +16,9 @@
 
 package org.forgerock.openam.uma;
 
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.fluent.JsonValue.json;
 
 import javax.security.auth.Subject;
-import java.security.Principal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,7 +29,6 @@ import java.util.Set;
 import com.google.inject.Inject;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.JwtPrincipal;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.shared.debug.Debug;

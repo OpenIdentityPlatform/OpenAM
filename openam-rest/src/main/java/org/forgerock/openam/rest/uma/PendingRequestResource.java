@@ -20,13 +20,8 @@ import static org.forgerock.json.fluent.JsonValue.json;
 import static org.forgerock.json.fluent.JsonValue.object;
 
 import javax.inject.Inject;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CollectionResourceProvider;
@@ -35,8 +30,6 @@ import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.json.resource.QueryFilter;
-import org.forgerock.json.resource.QueryFilterVisitor;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
@@ -51,7 +44,6 @@ import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
 import org.forgerock.openam.uma.PendingRequestsService;
-import org.forgerock.openam.uma.audit.UmaAuditLogger;
 
 /**
  * CREST resource for UMA Pending Requests.
@@ -78,7 +70,7 @@ public class PendingRequestResource implements CollectionResourceProvider {
         if (APPROVE_ACTION_ID.equalsIgnoreCase(request.getAction())) {
             try {
                 for (UmaPendingRequest pendingRequest : queryResourceOwnerPendingRequests(context)) {
-                    service.approvePendingRequest(pendingRequest.getId());
+                    service.approvePendingRequest(pendingRequest.getId(), getRealm(context));
                 }
             } catch (ResourceException e) {
                 handler.handleError(e);
@@ -87,7 +79,7 @@ public class PendingRequestResource implements CollectionResourceProvider {
         } else if (DENY_ACTION_ID.equalsIgnoreCase(request.getAction())) {
             try {
                 for (UmaPendingRequest pendingRequest : queryResourceOwnerPendingRequests(context)) {
-                    service.denyPendingRequest(pendingRequest.getId());
+                    service.denyPendingRequest(pendingRequest.getId(), getRealm(context));
                 }
             } catch (ResourceException e) {
                 handler.handleError(e);
@@ -103,10 +95,10 @@ public class PendingRequestResource implements CollectionResourceProvider {
             ResultHandler<JsonValue> handler) {
         try {
             if (APPROVE_ACTION_ID.equalsIgnoreCase(request.getAction())) {
-                service.approvePendingRequest(resourceId);
+                service.approvePendingRequest(resourceId, getRealm(context));
                 handler.handleResult(json(object()));
             } else if (DENY_ACTION_ID.equalsIgnoreCase(request.getAction())) {
-                service.denyPendingRequest(resourceId);
+                service.denyPendingRequest(resourceId, getRealm(context));
                 handler.handleResult(json(object()));
             } else {
                 handler.handleError(new NotSupportedException("Action, " + request.getAction() + ", is not supported."));

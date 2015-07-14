@@ -19,6 +19,7 @@ package org.forgerock.openam.uma;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -45,6 +46,7 @@ public class PendingRequestsServiceTest {
     private TokenDataStore<UmaPendingRequest> store;
     private UmaAuditLogger auditLogger;
     private CoreWrapper coreWrapper;
+    private UmaProviderSettings settings;
 
     @SuppressWarnings("unchecked")
     @BeforeMethod
@@ -52,8 +54,11 @@ public class PendingRequestsServiceTest {
         store = mock(TokenDataStore.class);
         auditLogger = mock(UmaAuditLogger.class);
         coreWrapper = mock(CoreWrapper.class);
+        settings = mock(UmaProviderSettings.class);
+        UmaProviderSettingsFactory settingsFactory = mock(UmaProviderSettingsFactory.class);
+        given(settingsFactory.get(anyString())).willReturn(settings);
 
-        service = new PendingRequestsService(store, auditLogger, coreWrapper);
+        service = new PendingRequestsService(store, auditLogger, coreWrapper, settingsFactory);
     }
 
     @Test
@@ -129,7 +134,7 @@ public class PendingRequestsServiceTest {
                 "REALM", "REQUESTING_PARTY_ID", Collections.singleton("SCOPE"));
 
         //When
-        service.approvePendingRequest("PENDING_REQUEST_ID");
+        service.approvePendingRequest("PENDING_REQUEST_ID", "REALM");
 
         //Then
         verify(store).delete("PENDING_REQUEST_ID");
@@ -145,7 +150,7 @@ public class PendingRequestsServiceTest {
                 "REALM", "REQUESTING_PARTY_ID", Collections.singleton("SCOPE"));
 
         //When
-        service.denyPendingRequest("PENDING_REQUEST_ID");
+        service.denyPendingRequest("PENDING_REQUEST_ID", "REALM");
 
         //Then
         ArgumentCaptor<UmaPendingRequest> pendingRequestCaptor = ArgumentCaptor.forClass(UmaPendingRequest.class);

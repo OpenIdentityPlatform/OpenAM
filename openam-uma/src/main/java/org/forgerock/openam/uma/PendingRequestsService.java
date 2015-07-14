@@ -45,18 +45,24 @@ public class PendingRequestsService {
     private final TokenDataStore<UmaPendingRequest> store;
     private final UmaAuditLogger auditLogger;
     private final CoreWrapper coreWrapper;
+    private final UmaProviderSettingsFactory settingsFactory;
 
     @Inject
     public PendingRequestsService(@DataLayer(ConnectionType.UMA_PENDING_REQUESTS) TokenDataStore store,
-            UmaAuditLogger auditLogger, CoreWrapper coreWrapper) {
+            UmaAuditLogger auditLogger, CoreWrapper coreWrapper, UmaProviderSettingsFactory settingsFactory) {
         this.store = store;
         this.auditLogger = auditLogger;
         this.coreWrapper = coreWrapper;
+        this.settingsFactory = settingsFactory;
     }
 
     public void createPendingRequest(String resourceSetId, String resourceSetName, String resourceOwnerId,
             String requestingUserId, String realm, Set<String> scopes) throws ServerException {
-        //TODO email RO
+
+        if (isEmailResourceOwnerOnPendingRequestCreationEnabled(realm)) {
+            //TODO email RO
+        }
+
         UmaPendingRequest pendingRequest = new UmaPendingRequest(resourceSetId, resourceSetName,
                 coreWrapper.getIdentity(resourceOwnerId, realm).getUniversalId(), realm,
                 coreWrapper.getIdentity(requestingUserId, realm).getUniversalId(), scopes);
@@ -95,9 +101,11 @@ public class PendingRequestsService {
                 ));
     }
 
-    public void approvePendingRequest(String id) throws ResourceException {
-        //TODO email RqP
+    public void approvePendingRequest(String id, String realm) throws ResourceException {
         try {
+            if (isEmailRequestingPartyOnPendingRequestApprovalEnabled(realm)) {
+                //TODO email RqP
+            }
             UmaPendingRequest request = store.read(id);
             store.delete(id);
             auditLogger.log(request.getResourceSetId(), request.getResourceSetName(), request.getResourceOwnerId(),
@@ -109,7 +117,7 @@ public class PendingRequestsService {
         }
     }
 
-    public void denyPendingRequest(String id) throws ResourceException {
+    public void denyPendingRequest(String id, String realm) throws ResourceException {
         try {
             UmaPendingRequest request = store.read(id);
             request.setState(STATE_DENIED);
@@ -120,6 +128,22 @@ public class PendingRequestsService {
             throw new org.forgerock.json.resource.NotFoundException("Pending request, " + id + ", not found", e);
         } catch (ServerException e) {
             throw new InternalServerErrorException("Failed to mark pending request, " + id + ", as denied", e);
+        }
+    }
+
+    private boolean isEmailResourceOwnerOnPendingRequestCreationEnabled(String realm) throws ServerException {
+        try {
+            return settingsFactory.get(realm).isEmailResourceOwnerOnPendingRequestCreationEnabled();
+        } catch (org.forgerock.oauth2.core.exceptions.ServerException e) {
+            throw new ServerException("Failed to read UMA Provider settings", e);
+        }
+    }
+
+    private boolean isEmailRequestingPartyOnPendingRequestApprovalEnabled(String realm) throws ServerException {
+        try {
+            return settingsFactory.get(realm).isEmailRequestingPartyOnPendingRequestApprovalEnabled();
+        } catch (org.forgerock.oauth2.core.exceptions.ServerException e) {
+            throw new ServerException("Failed to read UMA Provider settings", e);
         }
     }
 }

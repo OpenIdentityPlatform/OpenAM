@@ -243,6 +243,32 @@ public class UmaSettingsImpl extends OpenAMSettingsImpl implements UmaSettings {
         }
     }
 
+    @Override
+    public boolean isEmailResourceOwnerOnPendingRequestCreationEnabled() throws ServerException {
+        try {
+            return getBooleanSetting(realm, EMAIL_RESOURCE_OWNER_ON_PENDING_REQUEST_CREATION);
+        } catch (SMSException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        } catch (SSOException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        }
+    }
+
+    @Override
+    public boolean isEmailRequestingPartyOnPendingRequestApprovalEnabled() throws ServerException {
+        try {
+            return getBooleanSetting(realm, EMAIL_REQUESTING_PARTY_ON_PENDING_REQUEST_APPROVAL);
+        } catch (SMSException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        } catch (SSOException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        }
+    }
+
     /**
      * ServiceListener implementation to clear cache when it changes.
      */

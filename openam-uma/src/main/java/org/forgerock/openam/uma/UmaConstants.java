@@ -42,9 +42,14 @@ public final class UmaConstants {
 
     static final String RPT_LIFETIME_ATTR_NAME = "uma-rpt-lifetime";
     static final String PERMISSION_TIKCET_LIFETIME_ATTR_NAME = "uma-permission-ticket-lifetime";
-    public static final String DELETE_POLICIES_ON_RESOURCE_SERVER_DELETION = "uma-delete-policies-on-resource-server-deletion";
+    public static final String DELETE_POLICIES_ON_RESOURCE_SERVER_DELETION =
+            "uma-delete-policies-on-resource-server-deletion";
     public static final String DELETE_RESOURCE_SETS_ON_RESOURCE_SERVER_DELETION
             = "uma-delete-resource-sets-on-resource-server-deletion";
+    public static final String EMAIL_RESOURCE_OWNER_ON_PENDING_REQUEST_CREATION =
+            "emailResourceOwnerOnPendingRequestCreation";
+    public static final String EMAIL_REQUESTING_PARTY_ON_PENDING_REQUEST_APPROVAL
+            = "emailRequestingPartyOnPendingRequestApproval";
     static final String SUPPORTED_PAT_PROFILES_ATTR_NAME = "uma-supported-pat-profiles";
     static final String SUPPORTED_AAT_PROFILES_ATTR_NAME = "uma-supported-aat-profiles";
     static final String SUPPORTED_RPT_PROFILES_ATTR_NAME = "uma-supported-rpt-profiles";

@@ -97,7 +97,7 @@ public class PendingRequestResourceTest {
         resource.actionCollection(context, request, handler);
 
         //Then
-        verify(service, times(2)).approvePendingRequest(anyString());
+        verify(service, times(2)).approvePendingRequest(anyString(), anyString());
         verify(handler).handleResult(any(JsonValue.class));
     }
 
@@ -116,7 +116,7 @@ public class PendingRequestResourceTest {
         resource.actionCollection(context, request, handler);
 
         //Then
-        verify(service, times(2)).denyPendingRequest(anyString());
+        verify(service, times(2)).denyPendingRequest(anyString(), anyString());
         verify(handler).handleResult(any(JsonValue.class));
     }
 
@@ -153,7 +153,7 @@ public class PendingRequestResourceTest {
         resource.actionCollection(context, request, handler);
 
         //Then
-        verify(service).approvePendingRequest(anyString());
+        verify(service).approvePendingRequest(anyString(), anyString());
         verify(handler).handleResult(any(JsonValue.class));
     }
 
@@ -172,7 +172,7 @@ public class PendingRequestResourceTest {
         resource.actionCollection(context, request, handler);
 
         //Then
-        verify(service).denyPendingRequest(anyString());
+        verify(service).denyPendingRequest(anyString(), anyString());
         verify(handler).handleResult(any(JsonValue.class));
     }
 
