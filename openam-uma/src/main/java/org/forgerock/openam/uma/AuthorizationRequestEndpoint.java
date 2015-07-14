@@ -48,6 +48,7 @@ import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
+import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
 import org.forgerock.openam.uma.audit.UmaAuditType;
 import org.forgerock.openam.utils.JsonValueBuilder;
@@ -60,9 +61,12 @@ import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AuthorizationRequestEndpoint extends ServerResource {
 
+    private final Logger logger = LoggerFactory.getLogger("UmaProvider");
     private final UmaProviderSettingsFactory umaProviderSettingsFactory;
     private final Debug debug = Debug.getInstance("UmaProvider");
     private final OAuth2RequestFactory<Request> requestFactory;
@@ -72,6 +76,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
     private final OAuth2ProviderSettingsFactory oauth2ProviderSettingsFactory;
 
     private final UmaAuditLogger auditLogger;
+    private final PendingRequestsService pendingRequestsService;
 
     /**
      * Constructs a new AuthorizationRequestEndpoint
@@ -79,12 +84,14 @@ public class AuthorizationRequestEndpoint extends ServerResource {
     @Inject
     public AuthorizationRequestEndpoint(UmaProviderSettingsFactory umaProviderSettingsFactory,
             TokenStore oauth2TokenStore, OAuth2RequestFactory<Request> requestFactory,
-            OAuth2ProviderSettingsFactory oauth2ProviderSettingsFactory, UmaAuditLogger auditLogger) {
+            OAuth2ProviderSettingsFactory oauth2ProviderSettingsFactory, UmaAuditLogger auditLogger,
+            PendingRequestsService pendingRequestsService) {
         this.umaProviderSettingsFactory = umaProviderSettingsFactory;
         this.requestFactory = requestFactory;
         this.oauth2TokenStore = oauth2TokenStore;
         this.oauth2ProviderSettingsFactory = oauth2ProviderSettingsFactory;
         this.auditLogger = auditLogger;
+        this.pendingRequestsService = pendingRequestsService;
     }
 
     @Post
@@ -114,12 +121,52 @@ public class AuthorizationRequestEndpoint extends ServerResource {
             auditLogger.log(resourceSetId, resourceOwnerId, UmaAuditType.GRANTED, request, requestingUserId);
             return createJsonRpt(umaProviderSettings.getUmaTokenStore(), permissionTicket, authorisationApiToken);
         } else {
-            auditLogger.log(resourceSetId, resourceOwnerId, UmaAuditType.DENIED, request, requestingUserId);
-            throw new UmaException(400, UmaConstants.NOT_AUTHORISED_ERROR_CODE, "The client is not authorised to " +
-                    "access the requested resource set");
+            try {
+                if (verifyPendingRequestDoesNotAlreadyExist(resourceSetId, resourceOwnerId, permissionTicket.getRealm(),
+                        requestingUserId, permissionTicket.getScopes())) {
+                    auditLogger.log(resourceSetId, resourceOwnerId, UmaAuditType.DENIED, request, requestingUserId);
+                    throw new UmaException(403, UmaConstants.NOT_AUTHORISED_ERROR_CODE,
+                            "The client is not authorised to access the requested resource set");
+                } else {
+                    pendingRequestsService.createPendingRequest(resourceSetId,
+                            auditLogger.getResourceName(resourceSetId, request), resourceOwnerId, requestingUserId,
+                            permissionTicket.getRealm(), permissionTicket.getScopes());
+                    auditLogger.log(resourceSetId, resourceOwnerId, UmaAuditType.REQUEST_SUBMITTED, request, requestingUserId);
+                }
+            } catch (org.forgerock.openam.sm.datalayer.store.ServerException e) {
+                logger.error("Failed to create pending request", e);
+                throw new UmaException(403, UmaConstants.NOT_AUTHORISED_ERROR_CODE, "Failed to create pending request");
+            }
+            throw newRequestSubmittedException();
         }
 
         //TODO not sure where "need_info" error fits in....
+    }
+
+    private boolean verifyPendingRequestDoesNotAlreadyExist(String resourceSetId, String resourceOwnerId,
+            String realm, String requestingUserId, Set<String> scopes)
+            throws org.forgerock.openam.sm.datalayer.store.ServerException, UmaException {
+        Set<UmaPendingRequest> pendingRequests = pendingRequestsService.queryPendingRequests(resourceSetId,
+                resourceOwnerId, requestingUserId, realm);
+        if (!pendingRequests.isEmpty()) {
+            for (UmaPendingRequest pendingRequest : pendingRequests) {
+                if (pendingRequest.getScopes().containsAll(scopes)) {
+                    if ("DENIED".equals(pendingRequest.getState())) {
+                        return true;
+                    } else {
+                        throw newRequestSubmittedException();
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private UmaException newRequestSubmittedException() {
+        return new UmaException(403, UmaConstants.REQUEST_SUBMITTED_ERROR_CODE,
+                "The client is not authorised to access the requested resource set. A request has "
+                        + "been submitted to the resource owner requesting access to the resource");
     }
 
     private String getResourceOwnerId(String resourceSetId) throws NotFoundException, UmaException {

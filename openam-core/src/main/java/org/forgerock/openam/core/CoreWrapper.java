@@ -242,4 +242,15 @@ public class CoreWrapper {
     public Collection<String> getCookieDomains() {
         return AuthUtils.getCookieDomains();
     }
+
+    /**
+     * Gets the AMIdentity of a user with username equal to {@literal username} that exists in realm
+     *
+     * @param username username of the user to get.
+     * @param realm realm the user belongs to.
+     * @return The AMIdentity of user with username equal to {@literal username}.
+     */
+    public AMIdentity getIdentity(String username, String realm) {
+        return IdUtils.getIdentity(username, realm);
+    }
 }

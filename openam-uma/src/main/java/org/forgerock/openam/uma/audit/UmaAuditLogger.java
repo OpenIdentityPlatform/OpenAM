@@ -100,7 +100,7 @@ public class UmaAuditLogger {
                 .accept(new UmaAuditQueryFilterVisitor(), null);
     }
 
-    private String getResourceName(String resourceSetId, Request request) throws NotFoundException, UmaException,
+    public String getResourceName(String resourceSetId, Request request) throws NotFoundException, UmaException,
             org.forgerock.oauth2.core.exceptions.ServerException {
         OAuth2ProviderSettings providerSettings = oauth2ProviderSettingsFactory.get(requestFactory.create(request));
         ResourceSetDescription resourceSetDescription = getResourceSet(resourceSetId, providerSettings);

@@ -79,6 +79,7 @@ import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openam.rest.service.ServiceRouter;
 import org.forgerock.openam.rest.sms.SmsRequestHandlerFactory;
 import org.forgerock.openam.rest.sms.SmsServerPropertiesResource;
+import org.forgerock.openam.rest.uma.PendingRequestResource;
 import org.forgerock.openam.rest.uma.UmaConfigurationResource;
 import org.forgerock.openam.rest.uma.UmaPolicyResource;
 import org.forgerock.openam.rest.uma.UmaPolicyResourceAuthzFilter;
@@ -234,6 +235,10 @@ public class RestEndpoints {
         dynamicRealmRouter.route("/users/{user}/uma/auditHistory")
                 .through(ResourceOwnerOrSuperUserAuthzModule.class, ResourceOwnerOrSuperUserAuthzModule.NAME)
                 .forVersion("1.0").to(AuditHistory.class);
+
+        dynamicRealmRouter.route("/users/{user}/uma/pendingrequests")
+                .through(ResourceOwnerOrSuperUserAuthzModule.class, ResourceOwnerOrSuperUserAuthzModule.NAME)
+                .forVersion("1.0").to(PendingRequestResource.class);
 
         //protected
         dynamicRealmRouter.route("/policies")

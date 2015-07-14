@@ -1,6 +1,7 @@
 package org.forgerock.openam.uma;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest.STATE_DENIED;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
@@ -9,6 +10,7 @@ import static org.mockito.Mockito.spy;
 
 import javax.security.auth.Subject;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,7 +33,9 @@ import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
+import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
+import org.forgerock.openam.uma.audit.UmaAuditType;
 import org.forgerock.util.query.QueryFilter;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -67,14 +71,16 @@ public class AuthorizationRequestEndpointTest {
     private ResourceSetStore resourceSetStore;
     private Subject subject = new Subject();
     private UmaAuditLogger umaAuditLogger;
+    private PendingRequestsService pendingRequestsService;
 
     private class AuthorizationRequestEndpoint2 extends AuthorizationRequestEndpoint {
 
         public AuthorizationRequestEndpoint2(UmaProviderSettingsFactory umaProviderSettingsFactory,
                 TokenStore oauth2TokenStore, OAuth2RequestFactory<Request> requestFactory,
                 OAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory,
-                UmaAuditLogger auditLogger) {
-            super(umaProviderSettingsFactory, oauth2TokenStore, requestFactory, oAuth2ProviderSettingsFactory, auditLogger);
+                UmaAuditLogger auditLogger, PendingRequestsService pendingRequestsService) {
+            super(umaProviderSettingsFactory, oauth2TokenStore, requestFactory, oAuth2ProviderSettingsFactory,
+                    auditLogger, pendingRequestsService);
         }
 
         @Override
@@ -139,8 +145,10 @@ public class AuthorizationRequestEndpointTest {
         given(oauth2ProviderSettingsFactory.get(any(OAuth2Request.class))).willReturn(oauth2ProviderSettings);
         given(oauth2ProviderSettings.getResourceSetStore()).willReturn(resourceSetStore);
 
+        pendingRequestsService = mock(PendingRequestsService.class);
+
         endpoint = spy(new AuthorizationRequestEndpoint2(umaProviderSettingsFactory, oauth2TokenStore,
-                requestFactory, oauth2ProviderSettingsFactory, umaAuditLogger));
+                requestFactory, oauth2ProviderSettingsFactory, umaAuditLogger, pendingRequestsService));
         request = mock(Request.class);
         given(endpoint.getRequest()).willReturn(request);
 
@@ -155,7 +163,7 @@ public class AuthorizationRequestEndpointTest {
     }
 
     @Test(expectedExceptions = UmaException.class)
-    public void shouldThrowNotAuthorizedErrorWhenScopeDoesNotExistInPermissionTicket() throws Exception {
+    public void shouldThrowRequestSubmittedErrorWhenScopeDoesNotExistInPermissionTicket() throws Exception {
         //Given
         ArrayList<Entitlement> entitlements = new ArrayList<Entitlement>();
         entitlements.add(createEntitlement("Read"));
@@ -172,14 +180,14 @@ public class AuthorizationRequestEndpointTest {
         try {
             endpoint.requestAuthorization(entity);
         } catch (UmaException e) {
-            assertThat(e.getStatusCode()).isEqualTo(400);
-            assertThat(e.getError()).isEqualTo("not_authorised");
+            assertThat(e.getStatusCode()).isEqualTo(403);
+            assertThat(e.getError()).isEqualTo("request_submitted");
             throw e;
         }
     }
 
     @Test(expectedExceptions = UmaException.class)
-    public void shouldThrowNotAuthorizedErrorWhenScopeDoesNotExistInPermissionTicket2() throws Exception {
+    public void shouldThrowRequestSubmittedErrorWhenScopeDoesNotExistInPermissionTicket2() throws Exception {
         //Given
         ArrayList<Entitlement> entitlements = new ArrayList<Entitlement>();
         entitlements.add(createEntitlement("Read"));
@@ -195,8 +203,8 @@ public class AuthorizationRequestEndpointTest {
         try {
             endpoint.requestAuthorization(entity);
         } catch (UmaException e) {
-            assertThat(e.getStatusCode()).isEqualTo(400);
-            assertThat(e.getError()).isEqualTo("not_authorised");
+            assertThat(e.getStatusCode()).isEqualTo(403);
+            assertThat(e.getError()).isEqualTo("request_submitted");
             throw e;
         }
     }
@@ -236,11 +244,158 @@ public class AuthorizationRequestEndpointTest {
         assertThat(endpoint.requestAuthorization(entity)).isNotNull();
     }
 
+    @Test(expectedExceptions = UmaException.class)
+    public void shouldCreatePendingRequestAndThrowRequestSubmittedExceptionWhenNoEntitlementsForRequestedScopes()
+            throws Exception {
+        //Given
+        ArrayList<Entitlement> entitlements = new ArrayList<>();
+
+        given(policyEvaluator.evaluate(anyString(), Matchers.<Subject>anyObject(), eq(RESOURCE_NAME), Matchers.<Map<String,
+                Set<String>>>anyObject(), anyBoolean())).willReturn(entitlements);
+
+        Set<String> requestedScopes = new HashSet<>();
+        requestedScopes.add("Read");
+        requestedScopes.add("Create");
+        given(permissionTicket.getScopes()).willReturn(requestedScopes);
+
+        given(permissionTicket.getResourceSetId()).willReturn("RESOURCE_SET_ID");
+        given(permissionTicket.getRealm()).willReturn("REALM");
+
+        mockPendingRequestsQuery();
+
+        //Then
+        try {
+            endpoint.requestAuthorization(entity);
+        } catch (UmaException e) {
+            verify(pendingRequestsService).createPendingRequest(eq("RESOURCE_SET_ID"), anyString(), anyString(),
+                    anyString(), eq("REALM"), eq(requestedScopes));
+            verify(umaAuditLogger).log(eq("RESOURCE_SET_ID"), anyString(), eq(UmaAuditType.REQUEST_SUBMITTED),
+                    any(Request.class), anyString());
+            assertThat(e.getStatusCode()).isEqualTo(403);
+            assertThat(e.getError()).isEqualTo("request_submitted");
+            throw e;
+        }
+    }
+
+    @Test(expectedExceptions = UmaException.class)
+    public void shouldCreatePendingRequestForAuthorizationRequestWithDifferentScopes() throws Exception {
+        //Given
+        ArrayList<Entitlement> entitlements = new ArrayList<>();
+
+        given(policyEvaluator.evaluate(anyString(), Matchers.<Subject>anyObject(), eq(RESOURCE_NAME), Matchers.<Map<String,
+                Set<String>>>anyObject(), anyBoolean())).willReturn(entitlements);
+
+        Set<String> requestedScopes = new HashSet<>();
+        requestedScopes.add("Read");
+        requestedScopes.add("Delete");
+        given(permissionTicket.getScopes()).willReturn(requestedScopes);
+
+        given(permissionTicket.getResourceSetId()).willReturn("RESOURCE_SET_ID");
+        given(permissionTicket.getRealm()).willReturn("REALM");
+
+        mockPendingRequestsQuery(createPendingRequest("Read", "Create"));
+
+        //Then
+        try {
+            endpoint.requestAuthorization(entity);
+        } catch (UmaException e) {
+            verify(pendingRequestsService).createPendingRequest(eq("RESOURCE_SET_ID"), anyString(), anyString(),
+                    anyString(), eq("REALM"), eq(requestedScopes));
+            verify(umaAuditLogger).log(eq("RESOURCE_SET_ID"), anyString(), eq(UmaAuditType.REQUEST_SUBMITTED),
+                    any(Request.class), anyString());
+            assertThat(e.getStatusCode()).isEqualTo(403);
+            assertThat(e.getError()).isEqualTo("request_submitted");
+            throw e;
+        }
+    }
+
+    @Test(expectedExceptions = UmaException.class)
+    public void shouldThrowRequestSubmittedExceptionWhenNoEntitlementsForRequestedScopes() throws Exception {
+        //Given
+        ArrayList<Entitlement> entitlements = new ArrayList<>();
+
+        given(policyEvaluator.evaluate(anyString(), Matchers.<Subject>anyObject(), eq(RESOURCE_NAME), Matchers.<Map<String,
+                Set<String>>>anyObject(), anyBoolean())).willReturn(entitlements);
+
+        Set<String> requestedScopes = new HashSet<>();
+        requestedScopes.add("Read");
+        requestedScopes.add("Create");
+        given(permissionTicket.getScopes()).willReturn(requestedScopes);
+
+        given(permissionTicket.getResourceSetId()).willReturn("RESOURCE_SET_ID");
+        given(permissionTicket.getRealm()).willReturn("REALM");
+
+        mockPendingRequestsQuery(createPendingRequest("Read", "Create"));
+
+        //Then
+        try {
+            endpoint.requestAuthorization(entity);
+        } catch (UmaException e) {
+            verify(pendingRequestsService, never()).createPendingRequest(eq("RESOURCE_SET_ID"), anyString(), anyString(),
+                    anyString(), eq("REALM"), eq(requestedScopes));
+            verify(umaAuditLogger, never()).log(eq("RESOURCE_SET_ID"), anyString(), eq(UmaAuditType.REQUEST_SUBMITTED),
+                    any(Request.class), anyString());
+            assertThat(e.getStatusCode()).isEqualTo(403);
+            assertThat(e.getError()).isEqualTo("request_submitted");
+            throw e;
+        }
+    }
+
+    @Test(expectedExceptions = UmaException.class)
+    public void shouldThrowNotAuthorizedExceptionWhenPendingRequestHasBeenDenied() throws Exception {
+        //Given
+        ArrayList<Entitlement> entitlements = new ArrayList<>();
+
+        given(policyEvaluator.evaluate(anyString(), Matchers.<Subject>anyObject(), eq(RESOURCE_NAME), Matchers.<Map<String,
+                Set<String>>>anyObject(), anyBoolean())).willReturn(entitlements);
+
+        Set<String> requestedScopes = new HashSet<>();
+        requestedScopes.add("Read");
+        requestedScopes.add("Create");
+        given(permissionTicket.getScopes()).willReturn(requestedScopes);
+
+        given(permissionTicket.getResourceSetId()).willReturn("RESOURCE_SET_ID");
+        given(permissionTicket.getRealm()).willReturn("REALM");
+
+        mockPendingRequestsQuery(createDeniedPendingRequest("Read", "Create"));
+
+        //Then
+        try {
+            endpoint.requestAuthorization(entity);
+        } catch (UmaException e) {
+            verify(pendingRequestsService, never()).createPendingRequest(eq("RESOURCE_SET_ID"), anyString(), anyString(),
+                    anyString(), eq("REALM"), eq(requestedScopes));
+            verify(umaAuditLogger).log(eq("RESOURCE_SET_ID"), anyString(), eq(UmaAuditType.DENIED),
+                    any(Request.class), anyString());
+            assertThat(e.getStatusCode()).isEqualTo(403);
+            assertThat(e.getError()).isEqualTo("not_authorised");
+            throw e;
+        }
+    }
+
     private Entitlement createEntitlement(String action) {
         Entitlement entitlement = new Entitlement();
         Map<String, Boolean> actionValues = new HashMap<String, Boolean>();
         actionValues.put(action, true);
         entitlement.setActionValues(actionValues);
         return entitlement;
+    }
+
+    private UmaPendingRequest createPendingRequest(String... scopes) {
+        UmaPendingRequest pendingRequest = mock(UmaPendingRequest.class);
+        given(pendingRequest.getScopes()).willReturn(new HashSet<>(Arrays.asList(scopes)));
+        return pendingRequest;
+    }
+
+    private UmaPendingRequest createDeniedPendingRequest(String... scopes) {
+        UmaPendingRequest pendingRequest = createPendingRequest(scopes);
+        given(pendingRequest.getState()).willReturn(STATE_DENIED);
+        return pendingRequest;
+    }
+
+    private void mockPendingRequestsQuery(UmaPendingRequest... pendingRequests)
+            throws org.forgerock.openam.sm.datalayer.store.ServerException {
+        given(pendingRequestsService.queryPendingRequests(anyString(), anyString(), anyString(), anyString()))
+                .willReturn(new HashSet<>(Arrays.asList(pendingRequests)));
     }
 }

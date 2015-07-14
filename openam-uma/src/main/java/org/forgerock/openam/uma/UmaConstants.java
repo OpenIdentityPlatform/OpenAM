@@ -59,6 +59,7 @@ public final class UmaConstants {
     public static final String AUTHORIZATION_REQUEST_ENDPOINT = "authz-request-endpoint";
 
     static final String NOT_AUTHORISED_ERROR_CODE = "not_authorised";
+    static final String REQUEST_SUBMITTED_ERROR_CODE = "request_submitted";
     static final String INVALID_TICKET_ERROR_CODE = "invalid_ticket";
     static final String EXPIRED_TICKET_ERROR_CODE = "expired_ticket";
 

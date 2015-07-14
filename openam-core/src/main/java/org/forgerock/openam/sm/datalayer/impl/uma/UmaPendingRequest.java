@@ -36,24 +36,39 @@ import org.forgerock.opendj.ldap.GeneralizedTime;
  */
 @Type(TokenType.UMA_PENDING_REQUEST)
 public class UmaPendingRequest {
+
+    public static final String RESOURCE_SET_ID_FIELD = "resourceSetId";
+    public static final String RESOURCE_OWNER_ID_FIELD = "resourceOwnerId";
+    public static final String REALM_FIELD = "realm";
+    public static final String REQUESTING_PARTY_ID_FIELD = "requestingPartyId";
+    public static final String STATE_DENIED = "DENIED";
+
     @Field(field = CoreTokenField.TOKEN_ID, generated = true)
     private String id;
     @Field(field = CoreTokenField.STRING_ONE)
     private String resourceSetId;
     @Field(field = CoreTokenField.STRING_TWO)
+    private String resourceSetName;
+    @Field(field = CoreTokenField.USER_ID)
     private String resourceOwnerId;
     @Field(field = CoreTokenField.STRING_THREE)
+    private String realm;
+    @Field(field = CoreTokenField.STRING_FOUR)
     private String requestingPartyId;
     @Field(field = CoreTokenField.BLOB, converter = SetToJsonBytesConverter.class)
     private JsonValue blob;
+    @Field(field = CoreTokenField.STRING_FIVE)
+    private String state;
 
     public UmaPendingRequest() {
     }
 
-    public UmaPendingRequest(String resourceSetId, String resourceOwnerId, String requestingPartyId,
-            Set<String> scopes) {
+    public UmaPendingRequest(String resourceSetId, String resourceSetName, String resourceOwnerId, String realm,
+            String requestingPartyId, Set<String> scopes) {
         this.resourceSetId = resourceSetId;
+        this.resourceSetName = resourceSetName;
         this.resourceOwnerId = resourceOwnerId;
+        this.realm = realm;
         this.requestingPartyId = requestingPartyId;
         this.blob = json(object(
                 field("scopes", scopes),
@@ -76,12 +91,28 @@ public class UmaPendingRequest {
         this.resourceSetId = resourceSetId;
     }
 
+    public String getResourceSetName() {
+        return resourceSetName;
+    }
+
+    public void setResourceSetName(String resourceSetName) {
+        this.resourceSetName = resourceSetName;
+    }
+
     public String getResourceOwnerId() {
         return resourceOwnerId;
     }
 
     public void setResourceOwnerId(String resourceOwnerId) {
         this.resourceOwnerId = resourceOwnerId;
+    }
+
+    public String getRealm() {
+        return realm;
+    }
+
+    public void setRealm(String realm) {
+        this.realm = realm;
     }
 
     public String getRequestingPartyId() {
@@ -106,6 +137,14 @@ public class UmaPendingRequest {
 
     public void setRequestedAt(Calendar requestedAt) {
         blob.put("requestedAt", GeneralizedTime.valueOf(requestedAt).toString());
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 
     public JsonValue asJson() {

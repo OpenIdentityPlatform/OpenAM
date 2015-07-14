@@ -18,6 +18,9 @@ package org.forgerock.openam.uma.audit;
 
 public enum UmaAuditType {
     REQUEST ("Authorisation_Requested"),
+    REQUEST_SUBMITTED ("Authorisation_Requested"),
+    REQUEST_APPROVED ("Authorisation_Request_Approved"),
+    REQUEST_DENIED ("Authorisation_Request_Denied"),
     GRANTED ("Authorisation_Granted"),
     DENIED ("Authorisation_Denied"),
     POLICY_CREATED("Policy_Created"),
