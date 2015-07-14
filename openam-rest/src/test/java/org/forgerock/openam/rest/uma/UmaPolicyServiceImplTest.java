@@ -62,6 +62,8 @@ import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.openam.uma.UmaPolicy;
+import org.forgerock.openam.uma.UmaSettings;
+import org.forgerock.openam.uma.UmaSettingsFactory;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.Pair;
@@ -85,6 +87,7 @@ public class UmaPolicyServiceImplTest {
     private ContextHelper contextHelper;
     private Evaluator policyEvaluator;
     private CoreServicesWrapper coreServicesWrapper;
+    private UmaSettings umaSettings;
 
     @BeforeMethod
     public void setup() throws Exception {
@@ -99,8 +102,11 @@ public class UmaPolicyServiceImplTest {
         given(policyEvaluatorFactory.getEvaluator(any(Subject.class), anyString())).willReturn(policyEvaluator);
         coreServicesWrapper = mock(CoreServicesWrapper.class);
         Debug debug = mock(Debug.class);
+        UmaSettingsFactory umaSettingsFactory = mock(UmaSettingsFactory.class);
+        UmaSettings umaSettings = mock(UmaSettings.class);
+        given(umaSettingsFactory.create(anyString())).willReturn(umaSettings);
         policyService = new UmaPolicyServiceImpl(policyResourceDelegate, resourceSetStoreFactory, lazyAuditLogger,
-                contextHelper, policyEvaluatorFactory, coreServicesWrapper, debug);
+                contextHelper, policyEvaluatorFactory, coreServicesWrapper, debug, umaSettingsFactory);
 
         given(contextHelper.getRealm(Matchers.<ServerContext>anyObject())).willReturn("REALM");
         given(contextHelper.getUserId(Matchers.<ServerContext>anyObject())).willReturn(RESOURCE_OWNER_ID);

@@ -18,7 +18,8 @@ package org.forgerock.openam.rest.uma;
 
 import static org.forgerock.json.fluent.JsonValue.*;
 import static org.forgerock.openam.rest.uma.UmaPolicyServiceImplTest.*;
-import static org.forgerock.util.promise.Promises.*;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 import static org.forgerock.util.test.assertj.AssertJPromiseAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
@@ -56,6 +57,7 @@ import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ServerContext;
+import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
@@ -65,14 +67,16 @@ import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
+import org.forgerock.openam.uma.ResharingMode;
 import org.forgerock.openam.uma.UmaConstants;
 import org.forgerock.openam.uma.UmaPolicy;
+import org.forgerock.openam.uma.UmaSettings;
+import org.forgerock.openam.uma.UmaSettingsFactory;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
 import org.forgerock.openam.uma.audit.UmaAuditType;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.Pair;
 import org.forgerock.util.promise.Promise;
-import org.forgerock.util.promise.Promises;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.mockito.Mock;
@@ -99,6 +103,8 @@ public class UmaPolicyServiceImplDelegationTest {
     private Evaluator policyEvaluator;
     @Mock
     private CoreServicesWrapper coreServicesWrapper;
+    @Mock
+    UmaSettings umaSettings;
 
     private String loggedInUser;
     private String loggedInRealm;
@@ -123,8 +129,11 @@ public class UmaPolicyServiceImplDelegationTest {
         given(policyEvaluatorFactory.getEvaluator(any(Subject.class), anyString())).willReturn(policyEvaluator);
 
         Debug debug = mock(Debug.class);
+        UmaSettingsFactory umaSettingsFactory = mock(UmaSettingsFactory.class);
+        given(umaSettingsFactory.create(anyString())).willReturn(umaSettings);
+
         policyService = new UmaPolicyServiceImpl(policyResourceDelegate, resourceSetStoreFactory, lazyAuditLogger,
-                contextHelper, policyEvaluatorFactory, coreServicesWrapper, debug);
+                contextHelper, policyEvaluatorFactory, coreServicesWrapper, debug, umaSettingsFactory);
 
         given(contextHelper.getRealm(Matchers.<ServerContext>anyObject())).willReturn("REALM");
     }
@@ -166,6 +175,7 @@ public class UmaPolicyServiceImplDelegationTest {
         String resourceSetId = registerResourceSet("alice");
         createPolicyFor("bob", resourceSetId, "SCOPE_A", "SCOPE_B");
         JsonValue policy = policyToCreate(resourceSetId);
+        setResharingModeToImplicit();
         ServerContext context = getContext();
 
         //When
@@ -243,6 +253,7 @@ public class UmaPolicyServiceImplDelegationTest {
         String resourceSetId = registerResourceSet("alice");
         createPolicyFor("bob", resourceSetId, "SCOPE_A", "SCOPE_B");
         createPolicyFor("charlie", resourceSetId, "SCOPE_A", "SCOPE_B");
+        setResharingModeToImplicit();
         JsonValue policy = policyToUpdate(resourceSetId);
         ServerContext context = getContext();
 
@@ -418,6 +429,10 @@ public class UmaPolicyServiceImplDelegationTest {
                 return newResultPromise(new QueryResult());
             }
         });
+    }
+
+    private void setResharingModeToImplicit() throws ServerException {
+        given(umaSettings.getResharingMode()).willReturn(ResharingMode.IMPLICIT);
     }
 
     private ServerContext getContext() throws Exception {
