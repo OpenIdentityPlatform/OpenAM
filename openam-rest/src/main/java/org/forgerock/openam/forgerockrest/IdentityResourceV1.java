@@ -307,7 +307,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                     tokenLifeTime, realm);
 
             // Store token in datastore
-            CTSHolder.getCTS().create(ctsToken);
+            CTSHolder.getCTS().createAsync(ctsToken);
             tokenID = ctsToken.getTokenId();
 
             // Create confirmationId
@@ -723,7 +723,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                 org.forgerock.openam.cts.api.tokens.Token ctsToken = generateToken(email, username, tokenLifeTime, realm);
 
                 // Store token in datastore
-                CTSHolder.getCTS().create(ctsToken);
+                CTSHolder.getCTS().createAsync(ctsToken);
 
                 // Create confirmationId
                 String confirmationId = Hash.hash(
@@ -832,7 +832,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                 try {
                     // Even though the generated token will eventually timeout, delete it after a successful read
                     // so that the reset password request cannot be made again using the same token.
-                    CTSHolder.getCTS().delete(tokenID);
+                    CTSHolder.getCTS().deleteAsync(tokenID);
                 } catch (DeleteFailedException e) {
                     // Catch this rather than letting it stop the process as it is possible that between successfully
                     // reading and deleting, the token has expired.
@@ -944,7 +944,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                 try {
                     // Even though the generated token will eventually timeout, delete it after a successful read
                     // so that the completed registration request cannot be made again using the same token.
-                    CTSHolder.getCTS().delete(tokenID);
+                    CTSHolder.getCTS().deleteAsync(tokenID);
                 } catch (DeleteFailedException e) {
                     // Catch this rather than letting it stop the process as it is possible that between successfully
                     // reading and deleting, the token has expired.

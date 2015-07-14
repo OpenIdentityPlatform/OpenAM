@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock, Inc.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,6 +10,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2015 ForgeRock AS.
  */
 package org.forgerock.openam.forgerockrest.cts;
 
@@ -75,7 +75,7 @@ public class CoreTokenResourceTest {
         resource.createInstance(null, request, mockHandler);
 
         // Then
-        verify(mockStore).create(mockToken);
+        verify(mockStore).createAsync(mockToken);
     }
 
     @Test
@@ -83,7 +83,7 @@ public class CoreTokenResourceTest {
         // Given
         CreateRequest request = mock(CreateRequest.class);
         given(request.getContent()).willReturn(new JsonValue(""));
-        doThrow(IllegalArgumentException.class).when(mockStore).create(any(Token.class));
+        doThrow(IllegalArgumentException.class).when(mockStore).createAsync(any(Token.class));
 
         // When
         resource.createInstance(null, request, mockHandler);
@@ -101,7 +101,7 @@ public class CoreTokenResourceTest {
         resource.deleteInstance(null, one, mock(DeleteRequest.class), mockHandler);
 
         // Then
-        verify(mockStore).delete(one);
+        verify(mockStore).deleteAsync(one);
     }
 
     @Test
@@ -163,6 +163,6 @@ public class CoreTokenResourceTest {
         resource.updateInstance(null, "badger", updateRequest, mockHandler);
 
         // Then
-        verify(mockStore).update(any(Token.class));
+        verify(mockStore).updateAsync(any(Token.class));
     }
 }

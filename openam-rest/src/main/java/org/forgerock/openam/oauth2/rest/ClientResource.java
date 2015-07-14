@@ -21,7 +21,6 @@
  * your own identifying information:
  * "Portions copyright [year] [name of copyright owner]"
  */
-
 package org.forgerock.openam.oauth2.rest;
 
 import javax.inject.Named;
@@ -60,7 +59,8 @@ import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.openam.cts.CTSPersistentStore;
-import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.openam.cts.api.filter.TokenFilter;
+import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.fields.OAuthTokenField;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.forgerockrest.RestUtils;
@@ -300,12 +300,12 @@ public class ClientResource implements CollectionResourceProvider {
             }
             manager.deleteIdentity(resourceId, realm);
 
-            //delete the tokens associated with that client_id
-            Map<CoreTokenField, Object> query = new HashMap<CoreTokenField, Object>();
-            query.put(OAuthTokenField.CLIENT_ID.getField(), resourceId);
-            query.put(OAuthTokenField.REALM.getField(), realm);
             try {
-                store.delete(query);
+                //delete the tokens associated with that client_id
+                final TokenFilter tokenFilter = new TokenFilterBuilder().and()
+                        .withAttribute(OAuthTokenField.CLIENT_ID.getField(), resourceId)
+                        .withAttribute(OAuthTokenField.REALM.getField(), realm).build();
+                store.deleteOnQueryAsync(tokenFilter);
             } catch (CoreTokenException e) {
                 if (auditLogger.isAuditLogEnabled()) {
                     String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};

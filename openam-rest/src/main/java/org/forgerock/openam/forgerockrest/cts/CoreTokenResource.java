@@ -1,6 +1,4 @@
 /*
- * Copyright 2013-2014 ForgeRock, Inc.
- *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,8 +10,9 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2015 ForgeRock AS.
  */
-
 package org.forgerock.openam.forgerockrest.cts;
 
 import com.sun.identity.shared.debug.Debug;
@@ -93,7 +92,7 @@ public class CoreTokenResource implements CollectionResourceProvider {
         String json = createRequest.getContent().toString();
         Token token = serialisation.deserialise(json, Token.class);
         try {
-            store.create(token);
+            store.createAsync(token);
 
             Map<String, String> result = new HashMap<String, String>();
             result.put(TOKEN_ID, token.getTokenId());
@@ -127,7 +126,7 @@ public class CoreTokenResource implements CollectionResourceProvider {
         String principal = PrincipalRestUtils.getPrincipalNameFromServerContext(serverContext);
 
         try {
-            store.delete(tokenId);
+            store.deleteAsync(tokenId);
 
             Map<String, String> result = new HashMap<String, String>();
             result.put(TOKEN_ID, tokenId);
@@ -199,7 +198,7 @@ public class CoreTokenResource implements CollectionResourceProvider {
         Token newToken = serialisation.deserialise(value, Token.class);
 
         try {
-            store.update(newToken);
+            store.updateAsync(newToken);
 
             Resource resource = new Resource(
                     newToken.getTokenId(),

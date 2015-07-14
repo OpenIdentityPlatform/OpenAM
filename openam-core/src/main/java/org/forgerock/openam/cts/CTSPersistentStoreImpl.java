@@ -19,6 +19,7 @@ import com.google.inject.name.Named;
 import com.sun.identity.shared.debug.Debug;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
@@ -27,8 +28,6 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.exceptions.DeleteFailedException;
 import org.forgerock.openam.cts.impl.CoreTokenAdapter;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
-import org.forgerock.openam.cts.utils.blob.TokenBlobStrategy;
-import org.forgerock.openam.cts.utils.blob.TokenStrategyFailedException;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -40,10 +39,9 @@ import java.util.Map;
 /**
  * Implementation of the CTS (Core Token Store) persistence layer.
  *
- * This implementation uses the an asynchronous approach to decouple callers from the processing
- * of the task. This is detailed in the {@link CoreTokenAdapter} in more detail.
- *
- * Responsible for managing the detail about the binary object part of a Token.
+ * This implementation offers synchronous and asynchronous approaches to decouple callers from the processing of token
+ * related tasks.
+ * This is detailed in the {@link CoreTokenAdapter} in more detail.
  *
  * @see Token
  * @see CoreTokenAdapter
@@ -51,140 +49,85 @@ import java.util.Map;
 @Singleton
 public class CTSPersistentStoreImpl implements CTSPersistentStore {
 
-    private final Debug debug;
-
     // Injected
-    private final TokenBlobStrategy strategy;
     private final CoreTokenAdapter adapter;
+    private final Debug debug;
 
     /**
      * Creates a default implementation of the CTSPersistentStoreImpl.
      * @param adapter Required for CTS operations.
-     * @param strategy Required for binary object transformations.
      * @param debug Required for debugging.
      */
     @Inject
-    public CTSPersistentStoreImpl(TokenBlobStrategy strategy,
-                                  CoreTokenAdapter adapter,
-                                  @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
-
-        this.strategy = strategy;
+    public CTSPersistentStoreImpl(CoreTokenAdapter adapter, @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
         this.adapter = adapter;
         this.debug = debug;
     }
 
-    /**
-     * Create a Token in the persistent store. This operation assumes that the
-     * Token does not exist in the store. It is generally advisable to use update
-     * instead.
-     *
-     * @see CTSPersistentStore#update(Token)
-     *
-     * @param token Non null Token to create.
-     *
-     * @throws CoreTokenException If there was a problem queuing the task to be performed.
-     */
     @Override
     public void create(Token token) throws CoreTokenException {
-        try {
-            token.setBlob(strategy.perform(token.getBlob()));
-        } catch (TokenStrategyFailedException e) {
-            throw new CoreTokenException("Failed to perform Token Blob strategy.", e);
-        }
-
-        adapter.create(token);
+        final ResultHandler<Token, CoreTokenException> createHandler = adapter.create(token);
+        //block until we get the results, and ignore non-exception results
+        createHandler.getResults();
+        debug("Token {0} created", token.getTokenId());
     }
 
-    /**
-     * Read a Token from the persistent store. The Token will be located based on its Token ID.
-     *
-     * Note: This operation will block until the read has returned.
-     *
-     * @param tokenId The non null Token Id that the Token was created with.
-     * @return Null if there was no matching Token. Otherwise a fully populated Token will be returned.
-     *
-     * * @throws CoreTokenException If there was a problem queuing the task to be performed.
-     */
+    @Override
+    public void createAsync(Token token) throws CoreTokenException {
+        adapter.create(token);
+        debug("Token {0} queued for creation", token.getTokenId());
+    }
+
     @Override
     public Token read(String tokenId) throws CoreTokenException {
         Token token = adapter.read(tokenId);
         if (token == null) {
-            debug("Read: {0} did not exist", tokenId);
+            debug("Token {0} did not exist", tokenId);
             return null;
         }
 
-        try {
-            token.setBlob(strategy.reverse(token.getBlob()));
-        } catch (TokenStrategyFailedException e) {
-            throw new CoreTokenException("Failed to reverse Token Blob strategy.", e);
-        }
-
-        debug("Read: {0} read", tokenId);
+        debug("Token {0} read", tokenId);
         return token;
     }
 
-    /**
-     * Update an existing Token in the store. If the Token does not exist in the store then a
-     * Token is created. If the Token did exist in the store then it is updated.
-     *
-     * Not all fields on the Token can be updated, see the Token class for more details.
-     *
-     * @see Token#isFieldReadOnly(org.forgerock.openam.tokens.CoreTokenField)
-     *
-     * @param token Non null Token to update.
-     *
-     * @throws CoreTokenException If there was a problem queuing the task to be performed.
-     */
     @Override
     public void update(Token token) throws CoreTokenException {
-        try {
-            token.setBlob(strategy.perform(token.getBlob()));
-        } catch (TokenStrategyFailedException e) {
-            throw new CoreTokenException("Failed to perform Token Blob strategy.", e);
-        }
-
-        adapter.updateOrCreate(token);
-        debug("Update: {0} updated", token.getTokenId());
+        final ResultHandler<Token, CoreTokenException> updateHandler = adapter.updateOrCreate(token);
+        //block until we get the results, and ignore non-exception results
+        updateHandler.getResults();
+        debug("Token {0} updated", token.getTokenId());
     }
 
-    /**
-     * Delete the Token from the store.
-     *
-     * @param token Non null Token to be deleted from the store.
-     *
-     * @throws CoreTokenException If there was a problem queuing the task to be performed.
-     */
+    @Override
+    public void updateAsync(Token token) throws CoreTokenException {
+        adapter.updateOrCreate(token);
+        debug("Token {0} queued for update", token.getTokenId());
+    }
+
     @Override
     public void delete(Token token) throws CoreTokenException {
         delete(token.getTokenId());
     }
 
-    /**
-     * Delete the Token from the store based on its Token ID.
-     *
-     * @param tokenId The non null Token Id of the token to remove.
-     *
-     * @throws CoreTokenException If there was a problem queuing the task to be performed.
-     */
     @Override
-    public void delete(String tokenId) throws CoreTokenException {
-        adapter.delete(tokenId);
-        debug("Delete: {0} deleted", tokenId);
+    public void deleteAsync(Token token) throws CoreTokenException {
+        deleteAsync(token.getTokenId());
     }
 
-    /**
-     * Delete a collection of Tokens from the Token Store using a filter to narrow down the
-     * Tokens to be deleted.
-     *
-     * Note: This operation is linear in its execution time so the more Tokens being deleted, the
-     * longer it will take.
-     *
-     * @param query Non null filters which will be combined logically using AND.
-     *
-     * @return total number of tokens deleted by query, excluding any deletion requests that could not be queued.
-     *
-     * @throws DeleteFailedException If there was a problem queuing the tasks to be performed.
-     */
+    @Override
+    public void delete(String tokenId) throws CoreTokenException {
+        final ResultHandler<String, CoreTokenException> deleteHandler = adapter.delete(tokenId);
+        //block until we get the results, and ignore non-exception results
+        deleteHandler.getResults();
+        debug("Token {0} deleted", tokenId);
+    }
+
+    @Override
+    public void deleteAsync(String tokenId) throws CoreTokenException {
+        adapter.delete(tokenId);
+        debug("Token {0} queued for deletion", tokenId);
+    }
+
     @Override
     public int delete(Map<CoreTokenField, Object> query) throws DeleteFailedException {
         TokenFilterBuilder.FilterAttributeBuilder builder = new TokenFilterBuilder()
@@ -201,7 +144,7 @@ public class CTSPersistentStoreImpl implements CTSPersistentStore {
 
         try {
             Collection<PartialToken> partialTokens = attributeQuery(filter);
-            debug("Delete: queried {0} partial Tokens", Integer.toString(partialTokens.size()));
+            debug("Found {0} partial Tokens for deletion", Integer.toString(partialTokens.size()));
 
             for (PartialToken token : partialTokens) {
                 String tokenId = token.getValue(CoreTokenField.TOKEN_ID);
@@ -223,81 +166,22 @@ public class CTSPersistentStoreImpl implements CTSPersistentStore {
         }
     }
 
-    /**
-     * Queries the persistent store for all Tokens that match the given TokenFilter.
-     *
-     * The Tokens returned will be contained within a collection. Care should be taken to ensure
-     * that the number of Tokens requested will not exhaust the given heap.
-     *
-     * The returned collection contains fully initialised Token instances from the persistence
-     * store. If only partial details are required, see {@link #attributeQuery(TokenFilter)}
-     *
-     * @see org.forgerock.openam.cts.api.filter.TokenFilterBuilder
-     *
-     * @param tokenFilter No null TokenFilter to use for the query.
-     * @return Non null but possibly empty collection of Tokens.
-     *
-     * @throws CoreTokenException If there was a problem queuing the task to be performed.
-     */
     @Override
     public Collection<Token> query(TokenFilter tokenFilter) throws CoreTokenException {
-        Collection<Token> tokens = adapter.query(tokenFilter);
-        decryptTokens(tokens);
-        return tokens;
+        debug("Query: {0}", tokenFilter.toString());
+        return adapter.query(tokenFilter);
     }
 
-    /**
-     * Performs a partial Token query against the store. That is, a query which is aimed at
-     * specific attributes of a Token, rather than whole Tokens. The return result will consist
-     * of PartialTokens for this purpose.
-     *
-     * This function is useful for example, finding all Token IDs that match a certain criteria.
-     *
-     * @see org.forgerock.openam.sm.datalayer.api.query.PartialToken
-     *
-     * @param tokenFilter Non null TokenFilter, with the return attributes defined.
-     * @return A non null, but possibly empty collection.
-     *
-     * @throws CoreTokenException If there was a problem queuing the task to be performed.
-     */
     @Override
     public Collection<PartialToken> attributeQuery(TokenFilter tokenFilter) throws CoreTokenException {
-        Collection<PartialToken> partialTokens = adapter.attributeQuery(tokenFilter);
-        Collection<PartialToken> results = new ArrayList<PartialToken>();
-        for (PartialToken p : partialTokens) {
-            if (p.getFields().contains(CoreTokenField.BLOB)) {
-                try {
-                    byte[] value = p.getValue(CoreTokenField.BLOB);
-                    results.add(new PartialToken(p, CoreTokenField.BLOB, strategy.reverse(value)));
-                } catch (TokenStrategyFailedException e) {
-                    throw new CoreTokenException("Failed to reverse Blob strategy", e);
-                }
-            } else {
-                results.add(p);
-            }
-        }
-        return results;
+        debug("AttributeQuery: {0}", tokenFilter.toString());
+        return adapter.attributeQuery(tokenFilter);
     }
 
     @Override
-    public void deleteOnQuery(TokenFilter tokenFilter) throws CoreTokenException {
-        adapter.deleteOnQuery(tokenFilter);
+    public void deleteOnQueryAsync(TokenFilter tokenFilter) throws CoreTokenException {
         debug("DeleteOnQuery: with query {0}", tokenFilter.toString());
-    }
-
-    /**
-     * Handles the decrypting of tokens when needed.
-     *
-     * @param tokens A non null collection of Tokens which will be modified by this call.
-     */
-    private void decryptTokens(Collection<Token> tokens) throws CoreTokenException {
-        for (Token token : tokens) {
-            try {
-                token.setBlob(strategy.reverse(token.getBlob()));
-            } catch (TokenStrategyFailedException e) {
-                throw new CoreTokenException("Failed to reverse Token Blob strategy.", e);
-            }
-        }
+        adapter.deleteOnQuery(tokenFilter);
     }
 
     private void debug(String format, String... args) {

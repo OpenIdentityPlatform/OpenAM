@@ -27,10 +27,13 @@ import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
 import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
 import org.forgerock.openam.cts.reaper.CTSReaperInit;
+import org.forgerock.openam.cts.utils.blob.TokenBlobStrategy;
+import org.forgerock.openam.cts.utils.blob.TokenStrategyFailedException;
 import org.forgerock.util.Reject;
 
 import javax.inject.Inject;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -44,20 +47,23 @@ import java.util.Collection;
  */
 public class CoreTokenAdapter {
     // Injected
+    private final TokenBlobStrategy strategy;
     private final TaskDispatcher dispatcher;
     private final ResultHandlerFactory handlerFactory;
     private final Debug debug;
 
     /**
      * Create a new instance of the CoreTokenAdapter with dependencies.
+     * @param strategy Required for binary object transformations.
      * @param dispatcher Non null TaskDispatcher to use for CTS operations.
      * @param handlerFactory Factory used to generate ResultHandlers for CTS operations.
      * @param reaperInit Required for starting the CTS Reaper.
      * @param debug Required for debug logging
      */
     @Inject
-    public CoreTokenAdapter(TaskDispatcher dispatcher, ResultHandlerFactory handlerFactory,
+    public CoreTokenAdapter(TokenBlobStrategy strategy, TaskDispatcher dispatcher, ResultHandlerFactory handlerFactory,
                             CTSReaperInit reaperInit, @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
+        this.strategy = strategy;
         this.handlerFactory = handlerFactory;
         this.dispatcher = dispatcher;
         this.debug = debug;
@@ -70,12 +76,16 @@ public class CoreTokenAdapter {
      * Create a token in the persistent store.
      *
      * @param token Token to create.
+     * @return The ResultHandler for the asynchronous operation.
      * @throws CoreTokenException If the Token exists already or there was
      * an error as a result of this operation.
      */
-    public void create(Token token) throws CoreTokenException {
+    public ResultHandler<Token, CoreTokenException> create(Token token) throws CoreTokenException {
+        applyBlobStrategy(token);
         debug("Create: queued {0} Token {1}\n{2}", token.getType(), token.getTokenId(), token);
-        dispatcher.create(token, handlerFactory.getCreateHandler());
+        final ResultHandler<Token, CoreTokenException> createHandler = handlerFactory.getCreateHandler();
+        dispatcher.create(token, createHandler);
+        return createHandler;
     }
 
     /**
@@ -95,6 +105,7 @@ public class CoreTokenAdapter {
             if (token == null) {
                 debug("Read: no Token found for {0}", tokenId);
             } else {
+                reverseBlobStrategy(token);
                 debug("Read: returned for {0}\n{1}", tokenId, token);
             }
             return token;
@@ -115,24 +126,29 @@ public class CoreTokenAdapter {
      * If this difference has no changes, then there is nothing to be done.
      *
      * @param token Token to update or create.
-     * @return True if the token was created or false if it already existed.
+     * @return The ResultHandler for the asynchronous operation.
      * @throws CreateFailedException If an error occurs attempting to create the token.
      * @throws SetFailedException If an error occurs updating an existing token.
      */
-    public boolean updateOrCreate(Token token) throws CoreTokenException {
+    public ResultHandler<Token, CoreTokenException> updateOrCreate(Token token) throws CoreTokenException {
+        applyBlobStrategy(token);
         debug("UpdateOrCreate: queued {0} Token {1}\n{2}", token.getType(), token.getTokenId(), token);
-        dispatcher.update(token, handlerFactory.getUpdateHandler());
-        return false;
+        final ResultHandler<Token, CoreTokenException> updateHandler = handlerFactory.getUpdateHandler();
+        dispatcher.update(token, updateHandler);
+        return updateHandler;
     }
 
     /**
      * Deletes a token from the store based on its token id.
      * @param tokenId Non null token id.
+     * @return The ResultHandler for the asynchronous operation.
      * @throws CoreTokenException If there was an error while trying to remove the token with the given Id.
      */
-    public void delete(String tokenId) throws CoreTokenException {
+    public ResultHandler<String, CoreTokenException> delete(String tokenId) throws CoreTokenException {
         debug("Delete: queued delete {0}", tokenId);
-        dispatcher.delete(tokenId, handlerFactory.getDeleteHandler());
+        final ResultHandler<String, CoreTokenException> deleteHandler = handlerFactory.getDeleteHandler();
+        dispatcher.delete(tokenId, deleteHandler);
+        return deleteHandler;
     }
 
     /**
@@ -150,6 +166,9 @@ public class CoreTokenAdapter {
         dispatcher.query(tokenFilter, handler);
         try {
             Collection<Token> tokens = handler.getResults();
+            for (Token token : tokens) {
+                reverseBlobStrategy(token);
+            }
             debug("Query: returned {0} Tokens with Filter: {1}", tokens.size(), tokenFilter);
             return tokens;
         } catch (CoreTokenException e) {
@@ -177,8 +196,21 @@ public class CoreTokenAdapter {
         try {
             attributeQueryWithHandler(filter, handler);
             Collection<PartialToken> partialTokens = handler.getResults();
-            debug("AttributeQuery: returned {0} Partial Tokens: {1}", partialTokens.size(), filter);
-            return partialTokens;
+            Collection<PartialToken> results = new ArrayList<PartialToken>();
+            if (filter.getReturnFields().contains(CoreTokenField.BLOB)) {
+                for (PartialToken p : partialTokens) {
+                    try {
+                        byte[] value = p.getValue(CoreTokenField.BLOB);
+                        results.add(new PartialToken(p, CoreTokenField.BLOB, strategy.reverse(value)));
+                    } catch (TokenStrategyFailedException e) {
+                        throw new CoreTokenException("Failed to reverse Blob strategy", e);
+                    }
+                }
+            } else {
+                results = partialTokens;
+            }
+            debug("AttributeQuery: returned {0} Partial Tokens: {1}", results.size(), filter);
+            return results;
         } catch (CoreTokenException e) {
             throw new QueryFailedException(filter, e);
         }
@@ -216,6 +248,22 @@ public class CoreTokenAdapter {
             debug.message(MessageFormat.format(
                     CoreTokenConstants.DEBUG_HEADER + format,
                     args));
+        }
+    }
+
+    private void applyBlobStrategy(Token token) throws CoreTokenException {
+        try {
+            token.setBlob(strategy.perform(token.getBlob()));
+        } catch (TokenStrategyFailedException e) {
+            throw new CoreTokenException("Failed to perform Token Blob strategy.", e);
+        }
+    }
+
+    private void reverseBlobStrategy(Token token) throws CoreTokenException {
+        try {
+            token.setBlob(strategy.reverse(token.getBlob()));
+        } catch (TokenStrategyFailedException e) {
+            throw new CoreTokenException("Failed to reverse Token Blob strategy.", e);
         }
     }
 }

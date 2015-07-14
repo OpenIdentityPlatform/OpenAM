@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -406,7 +406,7 @@ public class SessionService {
             if (serviceConfig.isUseInternalRequestRoutingEnabled()) {
                 try {
                     String tokenId = tokenIdFactory.toSessionTokenId(session);
-                    getRepository().delete(tokenId);
+                    getRepository().deleteAsync(tokenId);
                 } catch (Exception e) {
                     sessionDebug.error(
                             "SessionService : failed deleting session ", e);
@@ -423,7 +423,7 @@ public class SessionService {
         if (serviceConfig.isSessionFailoverEnabled()) {
             try {
                 String tokenId = tokenIdFactory.toSessionTokenId(sid);
-                getRepository().delete(tokenId);
+                getRepository().deleteAsync(tokenId);
             } catch (Exception e) {
                 sessionDebug.error("SessionService : failed deleting session ",
                         e);
@@ -1771,7 +1771,7 @@ public class SessionService {
                 return;
             }
             try {
-                getRepository().update(tokenAdapter.toToken(session));
+                getRepository().updateAsync(tokenAdapter.toToken(session));
             } catch (Exception e) {
                 sessionDebug.error("SessionService.saveForFailover: " + "exception encountered", e);
                 // handleReleaseSession(session.getID());

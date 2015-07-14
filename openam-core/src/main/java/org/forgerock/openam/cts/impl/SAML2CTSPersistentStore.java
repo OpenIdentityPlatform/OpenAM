@@ -130,7 +130,7 @@ public class SAML2CTSPersistentStore implements SAML2TokenRepository {
         primaryKey = tokenIdFactory.toSAMLPrimaryTokenId(primaryKey);
 
         try {
-            persistentStore.delete(primaryKey);
+            persistentStore.deleteAsync(primaryKey);
         } catch (CoreTokenException e) {
             debug.error("SAML2CTSPersistentStore.deleteSAML2Token(): failed to delete SAML2 " +
                     "token using primary key:" + primaryKey, e);
@@ -150,7 +150,7 @@ public class SAML2CTSPersistentStore implements SAML2TokenRepository {
             // Perform the Save of the Token to the Token Repository.
             SAMLToken samlToken = new SAMLToken(primaryKey, secondaryKey, expirationTime, samlObj);
             Token token = tokenAdapter.toToken(samlToken);
-            persistentStore.create(token);
+            persistentStore.createAsync(token);
         } catch (CoreTokenException e) {
             debug.error("SAML2CTSPersistentStore.saveSAML2Token(): failed to save SAML2 " +
                     "token using primary key:" + primaryKey, e);

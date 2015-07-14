@@ -27,6 +27,7 @@ import org.forgerock.openam.sm.datalayer.api.ResultHandler;
 import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
 import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
 import org.forgerock.openam.cts.reaper.CTSReaperInit;
+import org.forgerock.openam.cts.utils.blob.TokenBlobStrategy;
 import org.forgerock.opendj.ldap.ErrorResultException;
 import org.mockito.ArgumentCaptor;
 import org.testng.annotations.BeforeMethod;
@@ -41,6 +42,7 @@ import static org.mockito.BDDMockito.*;
 public class CoreTokenAdapterTest {
     protected CoreTokenAdapter adapter;
 
+    private TokenBlobStrategy mockStrategy;
     private TaskDispatcher mockTaskDispatcher;
     private ResultHandlerFactory mockResultHandlerFactory;
     private Debug mockDebug;
@@ -48,15 +50,13 @@ public class CoreTokenAdapterTest {
 
     @BeforeMethod
     public void setup() {
+        mockStrategy = mock(TokenBlobStrategy.class);
         mockTaskDispatcher = mock(TaskDispatcher.class);
         mockResultHandlerFactory = mock(ResultHandlerFactory.class);
         mockReaperInit = mock(CTSReaperInit.class);
         mockDebug = mock(Debug.class);
 
-        adapter = new CoreTokenAdapter(
-                mockTaskDispatcher,
-                mockResultHandlerFactory,
-                mockReaperInit,
+        adapter = new CoreTokenAdapter(mockStrategy, mockTaskDispatcher, mockResultHandlerFactory, mockReaperInit,
                 mockDebug);
     }
 
