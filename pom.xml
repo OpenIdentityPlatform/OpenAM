@@ -118,6 +118,7 @@
 
         <commons.forgerock-util.version>2.0.0-SNAPSHOT</commons.forgerock-util.version>
         <forgerock.bloomfilter.version>1.0.0-SNAPSHOT</forgerock.bloomfilter.version>
+        <forgerock.http.version>0.0.1-SNAPSHOT</forgerock.http.version>
         <commons.authfilter.version>1.6.0-SNAPSHOT</commons.authfilter.version>
         <forgerock.json.version>2.5.0-SNAPSHOT</forgerock.json.version>
         <forgerock-ui.version>2.1.0-SNAPSHOT</forgerock-ui.version>
@@ -1652,6 +1653,16 @@
             </dependency>
 
             <!-- Commons Dependencies -->
+            <dependency>
+                <groupId>org.forgerock.http</groupId>
+                <artifactId>chf-http-core</artifactId>
+                <version>${forgerock.http.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.http</groupId>
+                <artifactId>chf-client-apache-sync</artifactId>
+                <version>${forgerock.http.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>json-fluent</artifactId>

@@ -58,6 +58,10 @@
             <artifactId>oauth2-restlet</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.forgerock.http</groupId>
+            <artifactId>chf-http-core</artifactId>
+        </dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <scope>provided</scope>

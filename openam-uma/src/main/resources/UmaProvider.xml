@@ -105,11 +105,20 @@
                     </DefaultValues>
                 </AttributeSchema>
 
+                <AttributeSchema name="userProfileLocaleAttribute"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a107">
+                    <DefaultValues>
+                        <Value>inetOrgPerson</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
                 <!-- TODO bearer MUST always be supported so should we just added it always and not have here? or have here as well? -->
                 <AttributeSchema name="uma-supported-pat-profiles"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a107"
+                                 i18nKey="a108"
                                  resourceName="supportedPatProfiles">
                     <DefaultValues>
                         <Value>bearer</Value>
@@ -120,7 +129,7 @@
                 <AttributeSchema name="uma-supported-aat-profiles"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a108"
+                                 i18nKey="a109"
                                  resourceName="supportedAatProfiles">
                     <DefaultValues>
                         <Value>bearer</Value>
@@ -131,7 +140,7 @@
                 <AttributeSchema name="uma-supported-rpt-profiles"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a109"
+                                 i18nKey="a110"
                                  resourceName="supportedRptProfiles">
                     <DefaultValues>
                         <Value>bearer</Value>
@@ -141,7 +150,7 @@
                 <AttributeSchema name="uma-supported-claim-token-profiles"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a110"
+                                 i18nKey="a111"
                                  resourceName="supportedClaimTokenProfiles">
                     <DefaultValues>
                     </DefaultValues>
@@ -150,7 +159,7 @@
                 <AttributeSchema name="uma-supported-uma-profiles"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a111"
+                                 i18nKey="a112"
                                  resourceName="supportedUmaProfiles">
                     <DefaultValues>
                     </DefaultValues>

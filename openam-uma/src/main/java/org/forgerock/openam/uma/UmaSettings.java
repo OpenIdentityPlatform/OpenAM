@@ -157,4 +157,12 @@ public interface UmaSettings {
      * @throws ServerException If there is a problem reading the configuration.
      */
     boolean isEmailRequestingPartyOnPendingRequestApprovalEnabled() throws ServerException;
+
+    /**
+     * Gets the attribute on the user's profile which stores the user's preferred locale.
+     *
+     * @return The user profile attribute for the user's preferred locale.
+     * @throws ServerException If there is a problem reading the configuration.
+     */
+    String getUserProfilePreferredLocaleAttribute() throws ServerException;
 }

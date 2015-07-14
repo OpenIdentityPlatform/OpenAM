@@ -1,7 +1,6 @@
 package org.forgerock.openam.uma;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest.STATE_DENIED;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
@@ -341,38 +340,6 @@ public class AuthorizationRequestEndpointTest {
         }
     }
 
-    @Test(expectedExceptions = UmaException.class)
-    public void shouldThrowNotAuthorizedExceptionWhenPendingRequestHasBeenDenied() throws Exception {
-        //Given
-        ArrayList<Entitlement> entitlements = new ArrayList<>();
-
-        given(policyEvaluator.evaluate(anyString(), Matchers.<Subject>anyObject(), eq(RESOURCE_NAME), Matchers.<Map<String,
-                Set<String>>>anyObject(), anyBoolean())).willReturn(entitlements);
-
-        Set<String> requestedScopes = new HashSet<>();
-        requestedScopes.add("Read");
-        requestedScopes.add("Create");
-        given(permissionTicket.getScopes()).willReturn(requestedScopes);
-
-        given(permissionTicket.getResourceSetId()).willReturn("RESOURCE_SET_ID");
-        given(permissionTicket.getRealm()).willReturn("REALM");
-
-        mockPendingRequestsQuery(createDeniedPendingRequest("Read", "Create"));
-
-        //Then
-        try {
-            endpoint.requestAuthorization(entity);
-        } catch (UmaException e) {
-            verify(pendingRequestsService, never()).createPendingRequest(eq("RESOURCE_SET_ID"), anyString(), anyString(),
-                    anyString(), eq("REALM"), eq(requestedScopes));
-            verify(umaAuditLogger).log(eq("RESOURCE_SET_ID"), anyString(), eq(UmaAuditType.DENIED),
-                    any(Request.class), anyString());
-            assertThat(e.getStatusCode()).isEqualTo(403);
-            assertThat(e.getError()).isEqualTo("not_authorised");
-            throw e;
-        }
-    }
-
     private Entitlement createEntitlement(String action) {
         Entitlement entitlement = new Entitlement();
         Map<String, Boolean> actionValues = new HashMap<String, Boolean>();
@@ -384,12 +351,6 @@ public class AuthorizationRequestEndpointTest {
     private UmaPendingRequest createPendingRequest(String... scopes) {
         UmaPendingRequest pendingRequest = mock(UmaPendingRequest.class);
         given(pendingRequest.getScopes()).willReturn(new HashSet<>(Arrays.asList(scopes)));
-        return pendingRequest;
-    }
-
-    private UmaPendingRequest createDeniedPendingRequest(String... scopes) {
-        UmaPendingRequest pendingRequest = createPendingRequest(scopes);
-        given(pendingRequest.getState()).willReturn(STATE_DENIED);
         return pendingRequest;
     }
 

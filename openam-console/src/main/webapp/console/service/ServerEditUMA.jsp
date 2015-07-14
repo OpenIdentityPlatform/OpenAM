@@ -42,12 +42,23 @@
                         passwordFieldName: 'ServerEditUMA.cscorg-forgerock-services-umaaudit-store-password',
                         maxConnectionsFieldName: 'ServerEditUMA.cscorg-forgerock-services-umaaudit-store-max-connections',
                         heartbeat: 'ServerEditUMA.cscorg-forgerock-services-umaaudit-store-heartbeat'
+                },
+                pendingrequests: {
+                        storeLocationRadioButtonName: 'ServerEditUMA.cscorg-forgerock-services-uma-pendingrequests-store-location',
+                        sslEnableCheckBoxName: 'ServerEditUMA.cscorg-forgerock-services-uma-pendingrequests-store-ssl-enabled',
+                        directoryNameFieldName: 'ServerEditUMA.cscorg-forgerock-services-uma-pendingrequests-store-directory-name',
+                        portFieldName: 'ServerEditUMA.cscorg-forgerock-services-uma-pendingrequests-store-port',
+                        loginIdFieldName: 'ServerEditUMA.cscorg-forgerock-services-uma-pendingrequests-store-loginid',
+                        passwordFieldName: 'ServerEditUMA.cscorg-forgerock-services-uma-pendingrequests-store-password',
+                        maxConnectionsFieldName: 'ServerEditUMA.cscorg-forgerock-services-uma-pendingrequests-store-max-connections',
+                        heartbeat: 'ServerEditUMA.cscorg-forgerock-services-uma-pendingrequests-store-heartbeat'
                 }
             };
 
             window.onload = function() {
                 setState(fields.audit);
                 setState(fields.resourcesets);
+                setState(fields.pendingrequests);
             };
 
             function setState(fieldset) {

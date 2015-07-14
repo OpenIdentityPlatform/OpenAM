@@ -539,6 +539,18 @@
         </dependency>
 
         <dependency>
+            <groupId>org.forgerock.http</groupId>
+            <artifactId>chf-http-core</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.http</groupId>
+            <artifactId>chf-client-apache-sync</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.forgerock.commons</groupId>
             <artifactId>forgerock-guice-servlet</artifactId>
         </dependency>

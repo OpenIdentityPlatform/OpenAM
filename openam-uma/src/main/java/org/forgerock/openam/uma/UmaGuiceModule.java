@@ -29,6 +29,10 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.http.Client;
+import org.forgerock.http.HttpApplicationException;
+import org.forgerock.http.context.RootContext;
+import org.forgerock.http.handler.HttpClientHandler;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.TokenIntrospectionHandler;
 import org.forgerock.oauth2.core.TokenStore;
@@ -118,4 +122,14 @@ public class UmaGuiceModule extends AbstractModule {
                         wrap(AuthorizationRequestEndpoint.class)));
     }
 
+    @Provides
+    @Named("UMA")
+    Client getHttpClient() {
+        try {
+            return new Client(new HttpClientHandler(), new RootContext());
+        } catch (HttpApplicationException e) {
+            throw new RuntimeException("Failed to create HTTP Client. "
+                    + "Is the HTTP Client binding present on the classpath?", e);
+        }
+    }
 }

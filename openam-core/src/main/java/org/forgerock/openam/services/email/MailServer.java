@@ -1,8 +1,6 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2013 ForgeRock Inc. All rights reserved.
- *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
  * (the License). You may not use this file except in
@@ -20,13 +18,40 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions copyright [year] [name of copyright owner]"
+ *
+ * Copyright 2013-2015 ForgeRock AS.
  */
+
 package org.forgerock.openam.services.email;
 
 import java.util.Map;
 import javax.mail.*;
 
 public interface MailServer {
+
+    /**
+     * Sends an email message, containing HTML, using default MailServer settings.
+     *
+     * @param to The address that the E-mail message is sent.
+     * @param subject The E-mail subject.
+     * @param message The content contained in the E-mail message.
+     * @throws MessagingException in the case where the module was unable to send the e-mail.
+     */
+    void sendHtmlEmail(String to, String subject, String message) throws MessagingException;
+
+    /**
+     * Sends an email message, containing HTML, using specified options given
+     * for the MailServer settings.
+     *
+     * @param from The address that sends the E-mail message.
+     * @param to The address that the E-mail message is sent.
+     * @param subject The E-mail subject.
+     * @param message The content contained in the E-mail message.
+     * @param options SMTPHostName, SMTPPort, SMTPUser, SMTPUserPassword.
+     * @throws MessagingException in case where the module was unable to send the e-mail.
+     */
+    void sendHtmlEmail(String from, String to, String subject, String message, Map options)
+            throws MessagingException;
 
     /**
      * Sends an email  message using specified

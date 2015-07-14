@@ -1,8 +1,6 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2013 ForgeRock Inc. All rights reserved.
- *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
  * (the License). You may not use this file except in
@@ -20,9 +18,11 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions copyright [year] [name of copyright owner]"
+ *
+ * Copyright 2013-2015 ForgeRock AS.
  */
-package org.forgerock.openam.services.email;
 
+package org.forgerock.openam.services.email;
 
 import com.iplanet.am.util.AMSendMail;
 import com.sun.identity.shared.debug.Debug;
@@ -69,8 +69,7 @@ public class MailServerImplTest extends PowerMockTestCase {
         try {
             mailServerMock.sendEmail("to@gmail.com", "Subject", "Message");
             verify(sendMailMock, times(1)).postMail(eq(recipients), anyString(), anyString(), anyString(), anyString(), anyString(),
-                    anyString(), anyString(), anyString(),
-                    anyBoolean());
+                    anyString(), anyString(), anyString(), anyString(), anyBoolean());
         } catch (MessagingException e){
             assert(false);
         }
@@ -82,8 +81,7 @@ public class MailServerImplTest extends PowerMockTestCase {
         try {
             mailServerMock.sendEmail("from@gmail.com", "to@gmail.com", "Subject", "Message", createOptionsMap());
             verify(sendMailMock, times(1)).postMail(eq(recipients), anyString(), anyString(), anyString(), anyString(), anyString(),
-                    anyString(), anyString(), anyString(),
-                    anyBoolean());
+                    anyString(), anyString(), anyString(), anyString(), anyBoolean());
         } catch (MessagingException e){
             assert(false);
         }

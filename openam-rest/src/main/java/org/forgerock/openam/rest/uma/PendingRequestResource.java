@@ -110,7 +110,7 @@ public class PendingRequestResource implements CollectionResourceProvider {
 
     @Override
     public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
-        if (!"true".equalsIgnoreCase(request.getQueryFilter().toString())) {
+        if (request.getQueryFilter() == null || !"true".equalsIgnoreCase(request.getQueryFilter().toString())) {
             handler.handleError(new NotSupportedException("Only query filter 'true' is supported."));
             return;
         }
@@ -135,7 +135,6 @@ public class PendingRequestResource implements CollectionResourceProvider {
         } catch (ResourceException e) {
             handler.handleError(e);
         }
-        handler.handleError(new InternalServerErrorException());
     }
 
     private Set<UmaPendingRequest> queryResourceOwnerPendingRequests(ServerContext context) throws ResourceException {

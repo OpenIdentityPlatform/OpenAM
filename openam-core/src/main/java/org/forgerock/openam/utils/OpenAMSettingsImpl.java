@@ -58,7 +58,7 @@ public class OpenAMSettingsImpl implements OpenAMSettings {
 
     private static final MapValueParser MAP_VALUE_PARSER = new MapValueParser();
 
-    private final Debug logger = Debug.getInstance("OAuth2Provider");
+    private final Debug logger = Debug.getInstance("amSMS");
     private final String serviceName;
     private final String serviceVersion;
 

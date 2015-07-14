@@ -149,11 +149,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
         if (!pendingRequests.isEmpty()) {
             for (UmaPendingRequest pendingRequest : pendingRequests) {
                 if (pendingRequest.getScopes().containsAll(scopes)) {
-                    if ("DENIED".equals(pendingRequest.getState())) {
-                        return true;
-                    } else {
-                        throw newRequestSubmittedException();
-                    }
+                    throw newRequestSubmittedException();
                 }
             }
         }

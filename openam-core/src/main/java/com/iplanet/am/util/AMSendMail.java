@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,10 +24,9 @@
  *
  * $Id: AMSendMail.java,v 1.6 2009/12/22 19:57:19 qcheng Exp $
  *
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
-/**
- * Portions Copyrighted 2011-2014 ForgeRock AS
- */
+
 package com.iplanet.am.util;
 
 import com.sun.identity.shared.Constants;
@@ -64,6 +63,23 @@ public class AMSendMail {
      * when the specified host is down. Use this method in a separate thread so
      * that it will not hang when the mail server is down.
      *
+     * @param recipients A String array of e-mail addresses to be sent to
+     * @param subject The e-mail subject
+     * @param message The content contained in the e-mail
+     * @param from The sending e-mail address
+     * @param charset The charset used in e-mail encoding
+     * @exception MessagingException if there is any error in sending e-mail
+     */
+    public void postMail(String recipients[], String subject, String message,
+            String from, String charset) throws MessagingException {
+        postMail(recipients, subject, message, from, "text/plain", charset);
+    }
+
+    /**
+     * Posts e-mail messages to users. This method will wait on for the timeouts
+     * when the specified host is down. Use this method in a separate thread so
+     * that it will not hang when the mail server is down.
+     *
      * @param recipients A String array of e-mail addresses to be sent to 
      * @param subject The e-mail subject
      * @param message The content contained in the e-mail
@@ -72,7 +88,7 @@ public class AMSendMail {
      */
     public void postMail(String recipients[], String subject, String message,
             String from) throws MessagingException {
-        postMail(recipients, subject, message, from, "UTF-8");
+        postMail(recipients, subject, message, from, "text/plain", "UTF-8");
     }
 
     /**
@@ -83,13 +99,14 @@ public class AMSendMail {
      * @param recipients A String array of e-mail addresses to be sent to
      * @param subject The e-mail subject
      * @param message The content contained in the e-mail
-     * @param from The sending e-mail address 
+     * @param from The sending e-mail address
+     * @param mimeType The MIME type of the e-mail
      * @param charset The charset used in e-mail encoding
      * @exception MessagingException if there is any error in sending e-mail
      */
 
     public void postMail(String recipients[], String subject, String message,
-            String from, String charset) throws MessagingException {
+            String from, String mimeType, String charset) throws MessagingException {
         boolean debug = false;
 
         // create some properties and get the default mail Session
@@ -114,15 +131,39 @@ public class AMSendMail {
         // Setting the Subject and Content Type
         if (charset == null) {
             msg.setSubject(subject);
-            msg.setContent(message, "text/plain");
+            msg.setContent(message, mimeType);
         } else {
             charset = BrowserEncoding.mapHttp2JavaCharset(charset);
             msg.setSubject(subject, charset);
-            msg.setContent(message, "text/plain; charset=" + charset);
+            msg.setContent(message, mimeType + "; charset=" + charset);
         }
 
         // Transport the message now
         Transport.send(msg);
+    }
+
+    /**
+     * Posts e-mail messages to users. This method will wait on for the timeouts
+     * when the specified host is down. Use this method in a separate thread so
+     * that it will not hang when the mail server is down.
+     *
+     * @param recipients A String array of e-mail addresses to be sent to
+     * @param subject The e-mail subject
+     * @param message The content contained in the e-mail
+     * @param from The sending e-mail address
+     * @param charset The charset used in e-mail encoding
+     * @param host The host name to connect to send e-mail
+     * @param port The host port to connect to send e-mail
+     * @param user The user name used to authenticate to the host
+     * @param password The user password used to authenticate to the host
+     * @param ssl A boolean to indicate whether SSL is needed to connect to the host
+     * @exception MessagingException if there is any error in sending e-mail
+     */
+    public void postMail(String recipients[], String subject, String message,
+            String from, String charset, String host, String port,
+            String user, String password, boolean ssl)
+            throws MessagingException {
+        postMail(recipients, subject, message, from, "text/plain", charset, host, port, user, password, ssl);
     }
 
     /**
@@ -134,6 +175,7 @@ public class AMSendMail {
      * @param subject The e-mail subject
      * @param message The content contained in the e-mail
      * @param from The sending e-mail address
+     * @param mimeType The MIME type of the e-mail
      * @param charset The charset used in e-mail encoding
      * @param host The host name to connect to send e-mail
      * @param port The host port to connect to send e-mail 
@@ -142,9 +184,8 @@ public class AMSendMail {
      * @param ssl A boolean to indicate whether SSL is needed to connect to the host 
      * @exception MessagingException if there is any error in sending e-mail
      */
-
     public void postMail(String recipients[], String subject, String message,
-            String from, String charset, String host, String port,
+            String from, String mimeType, String charset, String host, String port,
             String user, String password, boolean ssl)
             throws MessagingException {
 
@@ -191,11 +232,11 @@ public class AMSendMail {
         // Setting the Subject and Content Type
         if (charset == null) {
             msg.setSubject(subject);
-            msg.setContent(message, "text/plain");
+            msg.setContent(message, mimeType);
         } else {
             charset = BrowserEncoding.mapHttp2JavaCharset(charset);
             msg.setSubject(subject, charset);
-            msg.setContent(message, "text/plain; charset=" + charset);
+            msg.setContent(message, mimeType + "; charset=" + charset);
         }
 
         // Transport the message now

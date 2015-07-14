@@ -1,8 +1,6 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2013-2014 ForgeRock AS. All rights reserved.
- *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
  * (the License). You may not use this file except in
@@ -20,7 +18,10 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions copyright [year] [name of copyright owner]"
+ *
+ * Copyright 2013-2015 ForgeRock AS.
  */
+
 package org.forgerock.openam.services.email;
 
 import com.iplanet.am.util.AMSendMail;
@@ -158,21 +159,35 @@ public class MailServerImpl implements MailServer {
         return message;
     }
 
-    /* * {@inheritDoc}
-     */
-    public void sendEmail(String to, String subject, String message) throws MessagingException{
-        sendEmail(null,to, subject, message, null);
+    @Override
+    public void sendHtmlEmail(String to, String subject, String message) throws MessagingException {
+        sendHtmlEmail(null, to, subject, message, null);
     }
 
-    /* * {@inheritDoc}
-     */
-    public void sendEmail(String from, String to, String subject,
-                          String message, Map options) throws MessagingException{
+    @Override
+    public void sendHtmlEmail(String from, String to, String subject, String message, Map options)
+            throws MessagingException {
+        sendEmail(from, to, subject, message, options, true);
+    }
+
+    @Override
+    public void sendEmail(String to, String subject, String message) throws MessagingException {
+        sendEmail(null, to, subject, message, null);
+    }
+
+    @Override
+    public void sendEmail(String from, String to, String subject, String message, Map options)
+            throws MessagingException {
+        sendEmail(from, to, subject, message, options, false);
+    }
+
+    private void sendEmail(String from, String to, String subject, String message, Map options, boolean isHtml)
+            throws MessagingException {
         if (to == null) {
             return;
         }
         try {
-            if(options != null && !options.isEmpty()){
+            if(options != null && !options.isEmpty()) {
                 setOptions(options);
                 // make sure that all options are available or updates from global map..
             } else {
@@ -184,11 +199,21 @@ public class MailServerImpl implements MailServer {
             tos[0] = to;
 
             if (smtpHostName == null || smtpHostPort == null) {
-                sendMail.postMail(tos, subject, message, from);
+                if (isHtml) {
+                    sendMail.postMail(tos, subject, message, from, "text/html", "UTF-8");
+                } else {
+                    sendMail.postMail(tos, subject, message, from);
+                }
             } else {
-                sendMail.postMail(tos, subject, message, from, "UTF-8", smtpHostName,
-                        smtpHostPort, smtpUserName, smtpUserPassword,
-                        sslEnabled);
+                if (isHtml) {
+                    sendMail.postMail(tos, subject, message, from, "text/html", "UTF-8", smtpHostName,
+                            smtpHostPort, smtpUserName, smtpUserPassword,
+                            sslEnabled);
+                } else {
+                    sendMail.postMail(tos, subject, message, from, "text/plain", "UTF-8", smtpHostName,
+                            smtpHostPort, smtpUserName, smtpUserPassword,
+                            sslEnabled);
+                }
             }
             if (debug.messageEnabled()) {
                 debug.message(DEBUG_TAG + "Email sent to : " + to + ".");

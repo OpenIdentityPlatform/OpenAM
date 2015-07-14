@@ -108,6 +108,8 @@ import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
 import org.forgerock.openam.sm.datalayer.api.QueueConfiguration;
 import org.forgerock.openam.utils.Config;
+import org.forgerock.openam.utils.OpenAMSettings;
+import org.forgerock.openam.utils.OpenAMSettingsImpl;
 import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.thread.ExecutorServiceFactory;
@@ -218,7 +220,8 @@ public class CoreGuiceModule extends AbstractModule {
          */
         bind(SessionOperationStrategy.class).to(ServerSessionOperationStrategy.class);
         // TODO: Investigate whether or not this lazy-loading "Config<SessionService>" wrapper is still needed
-        bind(new TypeLiteral<Config<SessionService>>() {}).toInstance(new Config<SessionService>() {
+        bind(new TypeLiteral<Config<SessionService>>() {
+        }).toInstance(new Config<SessionService>() {
             @Override
             public boolean isReady() {
                 return true;
@@ -260,6 +263,12 @@ public class CoreGuiceModule extends AbstractModule {
         bind(SessionCookies.class).toInstance(SessionCookies.getInstance());
         bind(SessionURL.class).toInstance(SessionURL.getInstance());
         bind(SessionServiceURLService.class).toInstance(SessionServiceURLService.getInstance());
+    }
+
+    @Provides
+    @Named("iPlanetAMAuthService")
+    OpenAMSettings getSmsAuthServiceSettings() {
+        return new OpenAMSettingsImpl("iPlanetAMAuthService", "1.0");
     }
 
     /**

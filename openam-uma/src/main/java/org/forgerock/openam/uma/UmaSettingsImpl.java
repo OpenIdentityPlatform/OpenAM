@@ -269,6 +269,19 @@ public class UmaSettingsImpl extends OpenAMSettingsImpl implements UmaSettings {
         }
     }
 
+    @Override
+    public String getUserProfilePreferredLocaleAttribute() throws ServerException {
+        try {
+            return getStringSetting(realm, USER_PROFILE_PREFERRED_LOCAL_ATTRIBUTE);
+        } catch (SMSException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        } catch (SSOException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        }
+    }
+
     /**
      * ServiceListener implementation to clear cache when it changes.
      */

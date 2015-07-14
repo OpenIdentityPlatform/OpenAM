@@ -41,7 +41,6 @@ public class UmaPendingRequest {
     public static final String RESOURCE_OWNER_ID_FIELD = "resourceOwnerId";
     public static final String REALM_FIELD = "realm";
     public static final String REQUESTING_PARTY_ID_FIELD = "requestingPartyId";
-    public static final String STATE_DENIED = "DENIED";
 
     @Field(field = CoreTokenField.TOKEN_ID, generated = true)
     private String id;
@@ -57,10 +56,10 @@ public class UmaPendingRequest {
     private String requestingPartyId;
     @Field(field = CoreTokenField.BLOB, converter = SetToJsonBytesConverter.class)
     private JsonValue blob;
-    @Field(field = CoreTokenField.STRING_FIVE)
-    private String state;
 
     public UmaPendingRequest() {
+        this.blob = json(object(
+                field("requestedAt", GeneralizedTime.valueOf(Calendar.getInstance()).toString())));
     }
 
     public UmaPendingRequest(String resourceSetId, String resourceSetName, String resourceOwnerId, String realm,
@@ -137,14 +136,6 @@ public class UmaPendingRequest {
 
     public void setRequestedAt(Calendar requestedAt) {
         blob.put("requestedAt", GeneralizedTime.valueOf(requestedAt).toString());
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public void setState(String state) {
-        this.state = state;
     }
 
     public JsonValue asJson() {

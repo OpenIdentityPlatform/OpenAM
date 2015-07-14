@@ -19,21 +19,23 @@ package org.forgerock.openam.uma;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 
-import com.sun.identity.idm.AMIdentity;
-import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
 import org.forgerock.openam.sm.datalayer.store.NotFoundException;
 import org.forgerock.openam.sm.datalayer.store.ServerException;
 import org.forgerock.openam.sm.datalayer.store.TokenDataStore;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
 import org.forgerock.openam.uma.audit.UmaAuditType;
+import org.forgerock.util.Pair;
 import org.forgerock.util.query.QueryFilter;
 import org.mockito.ArgumentCaptor;
 import org.testng.annotations.BeforeMethod;
@@ -45,28 +47,27 @@ public class PendingRequestsServiceTest {
 
     private TokenDataStore<UmaPendingRequest> store;
     private UmaAuditLogger auditLogger;
-    private CoreWrapper coreWrapper;
     private UmaProviderSettings settings;
+    private UmaEmailService emailService;
+    private PendingRequestEmailTemplate pendingRequestEmailTemplate;
 
     @SuppressWarnings("unchecked")
     @BeforeMethod
     public void setup() {
         store = mock(TokenDataStore.class);
         auditLogger = mock(UmaAuditLogger.class);
-        coreWrapper = mock(CoreWrapper.class);
         settings = mock(UmaProviderSettings.class);
         UmaProviderSettingsFactory settingsFactory = mock(UmaProviderSettingsFactory.class);
         given(settingsFactory.get(anyString())).willReturn(settings);
+        emailService = mock(UmaEmailService.class);
+        pendingRequestEmailTemplate = mock(PendingRequestEmailTemplate.class);
 
-        service = new PendingRequestsService(store, auditLogger, coreWrapper, settingsFactory);
+        service = new PendingRequestsService(store, auditLogger, settingsFactory, emailService,
+                pendingRequestEmailTemplate);
     }
 
     @Test
     public void shouldCreatePendingRequest() throws Exception {
-
-        //Given
-        mockResourceOwnerIdentity("RESOURCE_OWNER_ID", "REALM");
-        mockRequestingPartyIdentity("REQUESTING_PARTY_ID", "REALM");
 
         //When
         service.createPendingRequest("RESOURCE_SET_ID", "RESOURCE_SET_NAME", "RESOURCE_OWNER_ID", "REQUESTING_PARTY_ID",
@@ -78,11 +79,29 @@ public class PendingRequestsServiceTest {
         UmaPendingRequest pendingRequest = pendingRequestCaptor.getValue();
         assertThat(pendingRequest.getResourceSetId()).isEqualTo("RESOURCE_SET_ID");
         assertThat(pendingRequest.getResourceSetName()).isEqualTo("RESOURCE_SET_NAME");
-        assertThat(pendingRequest.getResourceOwnerId()).isEqualTo("RESOURCE_OWNER_ID_UNIVERSAL_ID");
-        assertThat(pendingRequest.getRequestingPartyId()).isEqualTo("REQUESTING_PARTY_ID_UNIVERSAL_ID");
+        assertThat(pendingRequest.getResourceOwnerId()).isEqualTo("RESOURCE_OWNER_ID");
+        assertThat(pendingRequest.getRequestingPartyId()).isEqualTo("REQUESTING_PARTY_ID");
         assertThat(pendingRequest.getRealm()).isEqualTo("REALM");
         assertThat(pendingRequest.getScopes()).containsExactly("SCOPE");
         assertThat(pendingRequest.getRequestedAt()).isNotNull();
+    }
+
+    @Test
+    public void shouldSendEmailOnPendingRequestCreation() throws Exception {
+
+        //Given
+        given(settings.isEmailResourceOwnerOnPendingRequestCreationEnabled()).willReturn(true);
+        mockPendingRequestCreationEmailTemplate("RESOURCE_OWNER_ID", "REALM");
+
+        //When
+        service.createPendingRequest("RESOURCE_SET_ID", "RESOURCE_SET_NAME", "RESOURCE_OWNER_ID", "REQUESTING_PARTY_ID",
+                "REALM", Collections.singleton("SCOPE"));
+
+        //Then
+        verify(emailService).email("REALM", "RESOURCE_OWNER_ID", "CREATION_SUBJECT",
+                "CREATION_BODY REQUESTING_PARTY_ID RESOURCE_SET_NAME SCOPE");
+        ArgumentCaptor<UmaPendingRequest> pendingRequestCaptor = ArgumentCaptor.forClass(UmaPendingRequest.class);
+        verify(store).create(pendingRequestCaptor.capture());
     }
 
     @Test
@@ -143,6 +162,26 @@ public class PendingRequestsServiceTest {
     }
 
     @Test
+    public void shouldSendEmailOnPendingRequestApproval() throws Exception {
+
+        //Given
+        createPendingRequest("PENDING_REQUEST_ID", "RESOURCE_SET_ID", "RESOURCE_SET_NAME", "RESOURCE_OWNER_ID",
+                "REALM", "REQUESTING_PARTY_ID", Collections.singleton("SCOPE"));
+        given(settings.isEmailRequestingPartyOnPendingRequestApprovalEnabled()).willReturn(true);
+        mockPendingRequestApprovalEmailTemplate("REQUESTING_PARTY_ID", "REALM");
+
+        //When
+        service.approvePendingRequest("PENDING_REQUEST_ID", "REALM");
+
+        //Then
+        verify(emailService).email("REALM", "REQUESTING_PARTY_ID", "APPROVAL_SUBJECT",
+                "APPROVAL_BODY RESOURCE_OWNER_ID RESOURCE_SET_NAME SCOPE");
+        verify(store).delete("PENDING_REQUEST_ID");
+        verify(auditLogger).log("RESOURCE_SET_ID", "RESOURCE_SET_NAME", "RESOURCE_OWNER_ID",
+                UmaAuditType.REQUEST_APPROVED, "REQUESTING_PARTY_ID");
+    }
+
+    @Test
     public void shouldDenyPendingRequest() throws Exception {
 
         //Given
@@ -153,25 +192,9 @@ public class PendingRequestsServiceTest {
         service.denyPendingRequest("PENDING_REQUEST_ID", "REALM");
 
         //Then
-        ArgumentCaptor<UmaPendingRequest> pendingRequestCaptor = ArgumentCaptor.forClass(UmaPendingRequest.class);
-        verify(store).update(pendingRequestCaptor.capture());
-        assertThat(pendingRequestCaptor.getValue().getState()).isEqualTo(STATE_DENIED);
+        verify(store).delete("PENDING_REQUEST_ID");
         verify(auditLogger).log("RESOURCE_SET_ID", "RESOURCE_SET_NAME", "RESOURCE_OWNER_ID",
                 UmaAuditType.REQUEST_DENIED, "REQUESTING_PARTY_ID");
-    }
-
-    private void mockResourceOwnerIdentity(String resourceOwnerId, String realm) {
-        mockIdentity(resourceOwnerId, resourceOwnerId + "_UNIVERSAL_ID", realm);
-    }
-
-    private void mockRequestingPartyIdentity(String requestingPartyId, String realm) {
-        mockIdentity(requestingPartyId, requestingPartyId + "_UNIVERSAL_ID", realm);
-    }
-
-    private void mockIdentity(String username, String universalId, String realm) {
-        AMIdentity identity = mock(AMIdentity.class);
-        given(identity.getUniversalId()).willReturn(universalId);
-        given(coreWrapper.getIdentity(username, realm)).willReturn(identity);
     }
 
     private void createPendingRequest(String id, String resourceSetId, String resourceSetName, String resourceOwnerId,
@@ -180,5 +203,19 @@ public class PendingRequestsServiceTest {
                 realm, requestingPartyId, scopes);
         pendingRequest.setId(id);
         given(store.read(id)).willReturn(pendingRequest);
+    }
+
+    private void mockPendingRequestCreationEmailTemplate(String resourceOwnerId, String realm) {
+        given(pendingRequestEmailTemplate.getCreationTemplate(resourceOwnerId, realm))
+                .willReturn(Pair.of("CREATION_SUBJECT", "CREATION_BODY {0} {1} {2}"));
+        given(pendingRequestEmailTemplate.buildScopeString(anySetOf(String.class), eq(resourceOwnerId), eq(realm)))
+                .willReturn("SCOPE");
+    }
+
+    private void mockPendingRequestApprovalEmailTemplate(String resourceOwnerId, String realm) {
+        given(pendingRequestEmailTemplate.getApprovalTemplate(resourceOwnerId, realm))
+                .willReturn(Pair.of("APPROVAL_SUBJECT", "APPROVAL_BODY {0} {1} {2}"));
+        given(pendingRequestEmailTemplate.buildScopeString(anySetOf(String.class), eq(resourceOwnerId), eq(realm)))
+                .willReturn("SCOPE");
     }
 }

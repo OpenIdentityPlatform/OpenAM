@@ -19,11 +19,13 @@ package org.forgerock.openam.uma;
 import static org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest.*;
 
 import javax.inject.Inject;
+import javax.mail.MessagingException;
+import java.text.MessageFormat;
 import java.util.Set;
 
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
@@ -32,6 +34,7 @@ import org.forgerock.openam.sm.datalayer.store.ServerException;
 import org.forgerock.openam.sm.datalayer.store.TokenDataStore;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
 import org.forgerock.openam.uma.audit.UmaAuditType;
+import org.forgerock.util.Pair;
 import org.forgerock.util.query.QueryFilter;
 
 /**
@@ -42,33 +45,71 @@ import org.forgerock.util.query.QueryFilter;
  */
 public class PendingRequestsService {
 
+    private final Debug debug = Debug.getInstance("UmaProvider");
     private final TokenDataStore<UmaPendingRequest> store;
     private final UmaAuditLogger auditLogger;
-    private final CoreWrapper coreWrapper;
     private final UmaProviderSettingsFactory settingsFactory;
+    private final UmaEmailService emailService;
+    private final PendingRequestEmailTemplate pendingRequestEmailTemplate;
 
+    /**
+     * Constructs a new {@code PendingRequestsService} instance.
+     *
+     * @param store An instance of the UMA Pending Requests {@code TokenDataStore}.
+     * @param auditLogger An instance of the {@code UmaAuditLogger}.
+     * @param settingsFactory An instance of the {@code UmaProviderSettingsFactory}.
+     * @param emailService An instance of the {@code UmaEmailService}.
+     * @param pendingRequestEmailTemplate An instance of the {@code PendingRequestEmailTemplate}.
+     */
     @Inject
     public PendingRequestsService(@DataLayer(ConnectionType.UMA_PENDING_REQUESTS) TokenDataStore store,
-            UmaAuditLogger auditLogger, CoreWrapper coreWrapper, UmaProviderSettingsFactory settingsFactory) {
+            UmaAuditLogger auditLogger, UmaProviderSettingsFactory settingsFactory,
+            UmaEmailService emailService,
+            PendingRequestEmailTemplate pendingRequestEmailTemplate) {
         this.store = store;
         this.auditLogger = auditLogger;
-        this.coreWrapper = coreWrapper;
         this.settingsFactory = settingsFactory;
+        this.emailService = emailService;
+        this.pendingRequestEmailTemplate = pendingRequestEmailTemplate;
     }
 
+    /**
+     * Creates a pending request.
+     *
+     * @param resourceSetId The resource set id.
+     * @param resourceSetName The resource set name.
+     * @param resourceOwnerId The resource owner id.
+     * @param requestingPartyId The requesting party id.
+     * @param realm The realm.
+     * @param scopes The requested scopes.
+     * @throws ServerException If the pending request could not be created.
+     */
     public void createPendingRequest(String resourceSetId, String resourceSetName, String resourceOwnerId,
-            String requestingUserId, String realm, Set<String> scopes) throws ServerException {
+            String requestingPartyId, String realm, Set<String> scopes) throws ServerException {
 
         if (isEmailResourceOwnerOnPendingRequestCreationEnabled(realm)) {
-            //TODO email RO
+            Pair<String, String> template = pendingRequestEmailTemplate.getCreationTemplate(resourceOwnerId, realm);
+            try {
+                emailService.email(realm, resourceOwnerId, template.getFirst(),
+                        MessageFormat.format(template.getSecond(), requestingPartyId, resourceSetName,
+                                pendingRequestEmailTemplate.buildScopeString(scopes, resourceOwnerId, realm)));
+            } catch (MessagingException e) {
+                debug.warning("Pending Request Creation email could not be sent", e);
+            }
         }
 
-        UmaPendingRequest pendingRequest = new UmaPendingRequest(resourceSetId, resourceSetName,
-                coreWrapper.getIdentity(resourceOwnerId, realm).getUniversalId(), realm,
-                coreWrapper.getIdentity(requestingUserId, realm).getUniversalId(), scopes);
+        UmaPendingRequest pendingRequest = new UmaPendingRequest(resourceSetId, resourceSetName, resourceOwnerId, realm,
+                requestingPartyId, scopes);
         store.create(pendingRequest);
     }
 
+    /**
+     * Gets a pending request.
+     *
+     * @param id The id of the request.
+     * @return The pending request.
+     * @throws ResourceException If the pending request could not be read or does not exist.
+     */
     public UmaPendingRequest readPendingRequest(String id) throws ResourceException {
         try {
             return store.read(id);
@@ -79,6 +120,14 @@ public class PendingRequestsService {
         }
     }
 
+    /**
+     * Queries pending requests for the specified {@literal resourceOwnerId} and {@literal realm}.
+     *
+     * @param resourceOwnerId The resource owner id.
+     * @param realm The realm.
+     * @return A {@code Set} of pending requests.
+     * @throws ResourceException If the pending requests query failed.
+     */
     public Set<UmaPendingRequest> queryPendingRequests(String resourceOwnerId, String realm) throws ResourceException {
         try {
             return store.query(QueryFilter.and(
@@ -86,10 +135,21 @@ public class PendingRequestsService {
                     QueryFilter.equalTo(REALM_FIELD, realm)));
         } catch (ServerException e) {
             throw new InternalServerErrorException("Failed to query pending request for resource owner, "
-                    + resourceOwnerId, e); //TODO be consistent with exception types
+                    + resourceOwnerId, e);
         }
     }
 
+    /**
+     * Queries pending requests for the specified {@literal resourceSetId},
+     * {@literal resourceOwnerId}, {@literal realm} and {@literal requestingPartyId}.
+     *
+     * @param resourceSetId The resource set id.
+     * @param resourceOwnerId The resource owner id.
+     * @param realm The realm.
+     * @param requestingPartyId The requesting party id.
+     * @return A {@code Set} of pending requests.
+     * @throws ServerException If the pending requests query failed.
+     */
     public Set<UmaPendingRequest> queryPendingRequests(String resourceSetId, String resourceOwnerId, String realm,
             String requestingPartyId) throws ServerException {
         return store.query(
@@ -101,12 +161,29 @@ public class PendingRequestsService {
                 ));
     }
 
+    /**
+     * Approves the pending request with the specified {@literal id}.
+     *
+     * @param id The pending request id.
+     * @param realm The current realm.
+     * @throws ResourceException If the pending request is not found or could not be marked as approved.
+     */
     public void approvePendingRequest(String id, String realm) throws ResourceException {
         try {
-            if (isEmailRequestingPartyOnPendingRequestApprovalEnabled(realm)) {
-                //TODO email RqP
-            }
             UmaPendingRequest request = store.read(id);
+            if (isEmailRequestingPartyOnPendingRequestApprovalEnabled(realm)) {
+                Pair<String, String> template = pendingRequestEmailTemplate.getApprovalTemplate(
+                        request.getRequestingPartyId(), realm);
+                try {
+                    emailService.email(realm, request.getRequestingPartyId(), template.getFirst(),
+                            MessageFormat.format(template.getSecond(), request.getResourceOwnerId(),
+                                    request.getResourceSetName(),
+                                    pendingRequestEmailTemplate.buildScopeString(request.getScopes(),
+                                            request.getRequestingPartyId(), realm)));
+                } catch (MessagingException e) {
+                    debug.warning("Pending Request Approval email could not be sent", e);
+                }
+            }
             store.delete(id);
             auditLogger.log(request.getResourceSetId(), request.getResourceSetName(), request.getResourceOwnerId(),
                     UmaAuditType.REQUEST_APPROVED, request.getRequestingPartyId());
@@ -117,11 +194,17 @@ public class PendingRequestsService {
         }
     }
 
+    /**
+     * Denies the pending request with the specified {@literal id}.
+     *
+     * @param id The pending request id.
+     * @param realm The current realm.
+     * @throws ResourceException If the pending request is not found or could not be marked as denied.
+     */
     public void denyPendingRequest(String id, String realm) throws ResourceException {
         try {
             UmaPendingRequest request = store.read(id);
-            request.setState(STATE_DENIED);
-            store.update(request);
+            store.delete(id);
             auditLogger.log(request.getResourceSetId(), request.getResourceSetName(), request.getResourceOwnerId(),
                     UmaAuditType.REQUEST_DENIED, request.getRequestingPartyId());
         } catch (NotFoundException e) {
