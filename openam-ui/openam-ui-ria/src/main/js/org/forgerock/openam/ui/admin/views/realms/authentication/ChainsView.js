@@ -114,9 +114,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
             }
             this.$el.find("#deleteChains").prop("disabled", !checked);
         },
-        deleteChain: function(event) {
+        deleteChain: function(e) {
             var self = this,
-                chainName = event.currentTarget.dataset.chainName;
+                chainName = $(e.currentTarget).data().chainName;
 
             SMSRealmDelegate.authentication.chains.remove(this.data.realmPath, chainName).done(function() {
                 self.render([self.data.realmPath]);
@@ -125,7 +125,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
         deleteChains: function() {
             var self = this,
                 chainNames = self.$el.find(".sorted-chains input[type=checkbox][data-chain-name]:checked").toArray().map(function(element) {
-                    return element.dataset.chainName;
+                    return $(element).data().chainName;
                 }),
                 promises = chainNames.map(function(name) {
                     return SMSRealmDelegate.authentication.chains.remove(self.data.realmPath, name);

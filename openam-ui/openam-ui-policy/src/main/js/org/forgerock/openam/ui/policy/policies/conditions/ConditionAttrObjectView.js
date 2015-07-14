@@ -63,13 +63,13 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrObjectVi
                     persist: false,
                     delimiter: ';',
                     onItemRemove: function (value) {
-                        title = this.$input.parent().find('label')[0].dataset.title;
+                        title = this.$input.parent().find('label').data().title;
                         itemData = view.data.itemData;
                         keyValPair = value.split(':');
                         delete itemData[title][keyValPair[0]];
                     },
                     onItemAdd: function (value) {
-                        title = this.$input.parent().find('label')[0].dataset.title;
+                        title = this.$input.parent().find('label').data().title;
                         itemData = view.data.itemData;
                         keyValPair = value.split(':');
                         propName = keyValPair[0];
@@ -88,7 +88,7 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrObjectVi
                         };
                     },
                     onChange: function (value) {
-                        title = this.$input.parent().find('label')[0].dataset.title;
+                        title = this.$input.parent().find('label').data().title;
                         itemData = view.data.itemData;
                     },
                     createFilter: function (text) {

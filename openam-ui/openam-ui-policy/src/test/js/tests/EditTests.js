@@ -128,7 +128,7 @@ define([
                         correctResources = true;
 
                     _.each(createdResources, function (item) {
-                        correctResources = correctResources && $(item).text().trim() === item.dataset.resource && _.contains(entity.resources, item.dataset.resource);
+                        correctResources = correctResources && $(item).text().trim() === $(item).data().resource && _.contains(entity.resources, $(item).data().resource);
                     });
 
                     QUnit.equal(createdResources.length, entity.resources.length, "Correct number of resources are displayed");
@@ -159,8 +159,8 @@ define([
                             INVALID_STR = 'invalid/Resource';
 
                         _.each(listItems, function (item) {
-                            values.push(item.dataset.resource);
-                            if ($(item).text().trim() !== item.dataset.resource) {
+                            values.push($(item).data().resource);
+                            if ($(item).text().trim() !== $(item).data().resource) {
                                 valid = false;
                             }
                         });
@@ -168,7 +168,7 @@ define([
                         valid = _.difference(values, entity.resources).length === 0 ? valid : false;
 
                         _.each(listItems, function (item) {
-                            valid = valid && $(item).text().trim() === item.dataset.resource && _.contains(entity.resources, item.dataset.resource);
+                            valid = valid && $(item).text().trim() === $(item).data().resource && _.contains(entity.resources, $(item).data().resource);
                         });
 
                         QUnit.ok(valid, "All resources are displayed correctly");
@@ -461,7 +461,7 @@ define([
                         resTypeActionsCorrect = true;
 
                     _.each(resTypeActions, function (item) {
-                        resTypeActionsCorrect = resTypeActionsCorrect && $(item).text().trim() === item.dataset.itemName;
+                        resTypeActionsCorrect = resTypeActionsCorrect && $(item).text().trim() === item.data().itemName;
                     });
 
                     // last item is 'add new' item
@@ -476,7 +476,7 @@ define([
                     // last item is 'add new' item
                     QUnit.equal(resTypePatterns.length - 1, entity.patterns.length, "Correct number of patterns are displayed");
                     _.each(resTypePatterns, function (item) {
-                        resTypePatternsCorrect = resTypePatternsCorrect && $(item).text().trim() === item.dataset.itemName;
+                        resTypePatternsCorrect = resTypePatternsCorrect && $(item).text().trim() === item.data().itemName;
                     });
                     QUnit.ok(resTypePatternsCorrect, "Patterns are displayed correctly");
 
@@ -508,7 +508,7 @@ define([
                         var valid = true;
 
                         _.each(EditResourceTypeView.$el.find('ul#reviewActions').find('li'), function (item) {
-                            valid = valid && $(item).text().trim() === item.dataset.itemName;
+                            valid = valid && $(item).text().trim() === item.data().itemName;
                         });
 
                         QUnit.ok(valid, "Correct actions are displayed in the review step");

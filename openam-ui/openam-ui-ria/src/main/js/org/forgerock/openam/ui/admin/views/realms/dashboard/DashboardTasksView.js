@@ -17,10 +17,11 @@
 /*global define*/
 
 define("org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardTasksView", [
+    "jquery",
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
-], function (_, AbstractView, RedirectToLegacyConsole) {
+], function ($, _, AbstractView, RedirectToLegacyConsole) {
     var DashboardTasksView = AbstractView.extend({
         template: "templates/admin/views/realms/dashboard/DashboardTasksTemplate.html",
         data: {},
@@ -36,11 +37,12 @@ define("org/forgerock/openam/ui/admin/views/realms/dashboard/DashboardTasksView"
 
         cardClick: function(e){
             e.preventDefault();
-            if (e.currentTarget.dataset.taskGroup) {
-                this.data.taskGroup = _.findWhere(this.data.allTasks, { _id: e.currentTarget.dataset.taskGroup});
+            var dataset = $(e.currentTarget).data();
+            if (dataset.taskGroup) {
+                this.data.taskGroup = _.findWhere(this.data.allTasks, { _id: dataset.taskGroup});
                 this.parentRender();
             } else {
-                RedirectToLegacyConsole.commonTasks(this.realmPath, e.currentTarget.dataset.taskLink);
+                RedirectToLegacyConsole.commonTasks(this.realmPath, dataset.taskLink);
             }
         },
 

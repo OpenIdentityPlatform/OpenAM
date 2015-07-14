@@ -56,11 +56,11 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrArrayVie
                 this.$el.find('select.selectize').each(function () {
                     item = this;
                     $item = $(this);
-                    type = $item.parent().find('label')[0].dataset.title;
+                    type = $item.parent().find('label').data().title;
                     options = {};
 
                     // special case for items with added data sets.
-                    if (item.dataset && item.dataset.source) {
+                    if ($item.data().source) {
                         if (type === view.SCRIPT_TYPE) {
                             _.extend(options, {
                                 placeholder: $.t(view.SCRIPT_PLACEHOLDER),
@@ -72,7 +72,7 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrArrayVie
                                     view.loadFromDataSource.call(this, item, callback);
                                 },
                                 onChange: function (value) {
-                                    title = this.$input.parent().find('label')[0].dataset.title;
+                                    title = this.$input.parent().find('label').data().title;
                                     text = this.$input.find(':selected').text();
                                     view.data.itemData[title] = value ? value : '';
                                     view.data.hiddenData[view.data.itemData.type] = text ? text : '';
@@ -114,7 +114,7 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrArrayVie
                                 };
                             },
                             onChange: function (value) {
-                                title = this.$input.parent().find('label')[0].dataset.title;
+                                title = this.$input.parent().find('label').data().title;
                                 itemData = view.data.itemData;
                                 itemData[title] = value ? value : [];
                             }});
@@ -137,7 +137,7 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrArrayVie
 
         queryIdentities: function (item, query, callback) {
             var selectize = this;
-            PolicyDelegate.queryIdentities(item.dataset.source, query)
+            PolicyDelegate.queryIdentities($(item).data().source, query)
                 .done(function (data) {
                     _.each(data.result, function (value) {
                         selectize.addOption({value: value, text: value});
@@ -159,7 +159,7 @@ define("org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrArrayVie
 
         loadFromDataSource: function(item, callback) {
             var selectize = this;
-            PolicyDelegate.getDataByType(item.dataset.source)
+            PolicyDelegate.getDataByType($(item).data().source)
                 .done(function (data) {
                     _.each(data.result, function (value) {
                         selectize.addOption({value: value._id, text: value.name});

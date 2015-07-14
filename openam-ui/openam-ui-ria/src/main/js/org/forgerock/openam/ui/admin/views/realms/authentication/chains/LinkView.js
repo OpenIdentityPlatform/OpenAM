@@ -43,7 +43,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
             if(e){
                 e.preventDefault();
             }
-            this.deleteItem(e.currentTarget.dataset.mapId);
+            this.deleteItem($(e.currentTarget).data().mapId);
         },
 
         deleteItem: function(mapId) {
@@ -63,7 +63,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
         moveBtnClick: function(e) {
             e.preventDefault();
 
-            var direction = parseInt(e.currentTarget.dataset.direction, 10),
+            var direction = parseInt($(e.currentTarget).data().direction, 10),
                 chainlinks = this.$el.parent().children(".chain-link"),
                 originalIndex = this.$el.index(),
                 targetIndex = originalIndex + direction;
@@ -133,7 +133,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
             }
         },
         selectCriteria: function(e){
-            var criteria = e.currentTarget.dataset.criteria;
+            var criteria = $(e.currentTarget).data().criteria;
             this.criteriaView.setCriteria(criteria);
             this.parent.setArrows();
         }

@@ -136,8 +136,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
         deleteModules: function() {
             var self = this,
                 promises = self.$el.find("input[type=checkbox]:checked").toArray().map(function(element) {
-                    var name = element.dataset.moduleName,
-                        type = element.dataset.moduleType;
+                    var dataset = $(element).data(),
+                        name = dataset.moduleName,
+                        type = dataset.moduleType;
                     return SMSRealmDelegate.authentication.modules.remove(self.data.realmPath, name, type);
                 });
 
