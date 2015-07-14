@@ -24,15 +24,11 @@ define("org/forgerock/openam/ui/uma/views/backgrid/cells/PermissionsCell", [
         template: "templates/uma/backgrid/cell/PermissionsCell.html",
         onChange: function () {},
         rendered: function() {
-            this.$el.find("select").multiselect({
-                allSelectedText: $.t("common.select.allSelected"),
-                nonSelectedText: $.t("common.select.noneSelected"),
-                nSelectedText: $.t("common.select.nSelected"),
-                selectAllText: $.t("common.select.selectAll"),
-                includeSelectAllOption: true,
-                onChange: this.onChange.bind(this)
+            this.$el.find("select").selectize({
+                dropdownParent: "body"
             });
         }
+
     });
 });
 
