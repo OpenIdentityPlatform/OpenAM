@@ -143,7 +143,7 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
         }
 
         ResourceSetStore store = providerSettingsFactory.get(requestFactory.create(getRequest())).getResourceSetStore();
-        ResourceSetDescription resourceSetDescription = store.read(getResourceSetId(), getResourceOwnerId())
+        ResourceSetDescription resourceSetDescription = store.read(getResourceSetId())
                 .update(validator.validate(toMap(entity)));
         store.update(resourceSetDescription);
         return createJsonResponse(resourceSetDescription, false, true);
@@ -169,7 +169,7 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
 
     private Representation readResourceSet(String resourceSetId) throws NotFoundException, ServerException {
         ResourceSetStore store = providerSettingsFactory.get(requestFactory.create(getRequest())).getResourceSetStore();
-        return createJsonResponse(store.read(resourceSetId, getResourceOwnerId()), true, true);
+        return createJsonResponse(store.read(resourceSetId), true, true);
     }
 
     private Representation listResourceSets() throws ServerException, NotFoundException {

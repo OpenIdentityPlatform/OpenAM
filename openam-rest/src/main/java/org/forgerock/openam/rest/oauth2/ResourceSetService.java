@@ -16,16 +16,24 @@
 
 package org.forgerock.openam.rest.oauth2;
 
-import javax.inject.Inject;
+import com.sun.identity.entitlement.Entitlement;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.Evaluator;
+import com.sun.identity.entitlement.JwtPrincipal;
+import com.sun.identity.idm.AMIdentity;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import javax.inject.Inject;
+import javax.security.auth.Subject;
 import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.Requests;
@@ -34,18 +42,24 @@ import org.forgerock.json.resource.ServerContext;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
+import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.uma.UmaPolicy;
 import org.forgerock.openam.uma.UmaPolicyService;
-import org.forgerock.util.Pair;
+import org.forgerock.openam.uma.UmaProviderSettingsFactory;
 import org.forgerock.util.AsyncFunction;
+import org.forgerock.util.Pair;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.PromiseImpl;
 import org.forgerock.util.promise.Promises;
 import org.forgerock.util.promise.ResultHandler;
-import org.forgerock.util.query.QueryFilter;
+import org.forgerock.util.query.QueryFilterVisitor;
+
+import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.util.query.QueryFilter.and;
+import static org.forgerock.util.query.QueryFilter.equalTo;
 
 /**
  * Services for getting Resource Sets and optionally augmenting them with an associated UMA policy.
@@ -56,6 +70,8 @@ public class ResourceSetService {
 
     private final ResourceSetStoreFactory resourceSetStoreFactory;
     private final UmaPolicyService policyService;
+    private final CoreWrapper coreWrapper;
+    private final UmaProviderSettingsFactory umaProviderSettingsFactory;
 
     /**
      * Creates an instance of a ResourceSetService.
@@ -64,23 +80,25 @@ public class ResourceSetService {
      * @param policyService An instance of the UmaPolicyService.
      */
     @Inject
-    public ResourceSetService(ResourceSetStoreFactory resourceSetStoreFactory, UmaPolicyService policyService) {
+    public ResourceSetService(ResourceSetStoreFactory resourceSetStoreFactory, UmaPolicyService policyService, CoreWrapper coreWrapper, UmaProviderSettingsFactory umaProviderSettingsFactory) {
         this.resourceSetStoreFactory = resourceSetStoreFactory;
         this.policyService = policyService;
+        this.coreWrapper = coreWrapper;
+        this.umaProviderSettingsFactory = umaProviderSettingsFactory;
     }
 
     /**
      * Gets a Resource Set, optionally with its associated policy, if one exists.
      *
-     * @param context The context.
-     * @param realm The realm.
-     * @param resourceSetId The resource set Id.
-     * @param resourceOwnerId The resource owner Id.
+     * @param context           The context.
+     * @param realm             The realm.
+     * @param resourceSetId     The resource set Id.
+     * @param resourceOwnerId   The resource owner Id.
      * @param augmentWithPolicy {@code true} to pull in UMA policies into the resource set.
      * @return A Promise containing the Resource Set or a ResourceException.
      */
     Promise<ResourceSetDescription, ResourceException> getResourceSet(final ServerContext context,
-            String realm, final String resourceSetId, String resourceOwnerId, final boolean augmentWithPolicy) {
+                                                                      String realm, final String resourceSetId, String resourceOwnerId, final boolean augmentWithPolicy) {
         return getResourceSet(realm, resourceSetId, resourceOwnerId)
                 .thenOnResult(new ResultHandler<ResourceSetDescription>() {
                     @Override
@@ -92,88 +110,218 @@ public class ResourceSetService {
                 });
     }
 
+    protected Subject createSubject(String username, String realm) {
+        AMIdentity identity = coreWrapper.getIdentity(username, realm);
+        JwtPrincipal principal = new JwtPrincipal(json(object(field("sub", identity.getUniversalId()))));
+        Set<Principal> principals = new HashSet<>();
+        principals.add(principal);
+        return new Subject(false, principals, Collections.emptySet(), Collections.emptySet());
+    }
+
+    private Promise<Collection<ResourceSetDescription>, ResourceException> getPolicies(final ServerContext context, QueryRequest policyQuery, final String resourceOwnerId, final Set<ResourceSetDescription> resourceSets, final boolean augmentWithPolicies, final ResourceSetWithPolicyQuery query) {
+        return policyService.queryPolicies(context, policyQuery)
+                .thenAsync(new AsyncFunction<Pair<QueryResult, Collection<UmaPolicy>>, Collection<ResourceSetDescription>, ResourceException>() {
+                    @Override
+                    public Promise<Collection<ResourceSetDescription>, ResourceException> apply(final Pair<QueryResult, Collection<UmaPolicy>> result) {
+                        final Set<ResourceSetDescription> filteredResourceSets = new HashSet<>();
+                        try {
+                            String realm = context.asContext(RealmContext.class).getResolvedRealm();
+                            Subject subject = createSubject(resourceOwnerId, realm);
+                            Evaluator evaluator = umaProviderSettingsFactory.get(realm).getPolicyEvaluator(subject);
+
+                            //check to see which of these policies apply to the subject
+                            for (UmaPolicy sharedPolicy : result.getSecond()) {
+                                String sharedResourceName = sharedPolicy.getResourceSet().getName();
+                                List<Entitlement> entitlements = evaluator.evaluate(realm, subject, sharedResourceName, null, false);
+
+                                if (!entitlements.isEmpty()) {
+                                    resourceSets.add(sharedPolicy.getResourceSet());
+                                }
+                            }
+
+                            filteredResourceSets.addAll(query.getResourceSetQuery().accept(new QueryFilterVisitor<Set<ResourceSetDescription>, Set<ResourceSetDescription>, String>() {
+                                @Override
+                                public Set<ResourceSetDescription> visitAndFilter(Set<ResourceSetDescription> resourceSetDescriptions, List<org.forgerock.util.query.QueryFilter<String>> list) {
+                                    throw new UnsupportedOperationException("'And' not supported");
+                                }
+
+                                @Override
+                                public Set<ResourceSetDescription> visitBooleanLiteralFilter(Set<ResourceSetDescription> resourceSetDescriptions, boolean value) {
+                                    if (value) {
+                                        return resourceSetDescriptions;
+                                    } else {
+                                        return Collections.EMPTY_SET;
+                                    }
+                                }
+
+                                @Override
+                                public Set<ResourceSetDescription> visitContainsFilter(Set<ResourceSetDescription> resourceSetDescriptions, String fieldName, Object value) {
+                                    throw new UnsupportedOperationException("'Contains' not supported");
+                                }
+
+                                @Override
+                                public Set<ResourceSetDescription> visitEqualsFilter(Set<ResourceSetDescription> resourceSetDescriptions, String fieldName, Object value) {
+                                    Set<ResourceSetDescription> results = new HashSet<>();
+
+                                    for (ResourceSetDescription resourceSetDescription : resourceSetDescriptions) {
+                                        if (fieldName.equals("resourceOwnerId")) {
+                                            if (resourceSetDescription.getResourceOwnerId().equals(value)) {
+                                                results.add(resourceSetDescription);
+                                            }
+                                        }
+                                    }
+
+                                    return results;
+                                }
+
+                                @Override
+                                public Set<ResourceSetDescription> visitExtendedMatchFilter(Set<ResourceSetDescription> resourceSetDescriptions, String s, String s2, Object o) {
+                                    throw new UnsupportedOperationException("'Extended Match' not supported");
+                                }
+
+                                @Override
+                                public Set<ResourceSetDescription> visitGreaterThanFilter(Set<ResourceSetDescription> resourceSetDescriptions, String s, Object o) {
+                                    throw new UnsupportedOperationException("'Greater Than' not supported");
+                                }
+
+                                @Override
+                                public Set<ResourceSetDescription> visitGreaterThanOrEqualToFilter(Set<ResourceSetDescription> resourceSetDescriptions, String s, Object o) {
+                                    throw new UnsupportedOperationException("'Greater Than or Equal to' not supported");
+                                }
+
+                                @Override
+                                public Set<ResourceSetDescription> visitLessThanFilter(Set<ResourceSetDescription> resourceSetDescriptions, String s, Object o) {
+                                    throw new UnsupportedOperationException("'Less Than' not supported");
+                                }
+
+                                @Override
+                                public Set<ResourceSetDescription> visitLessThanOrEqualToFilter(Set<ResourceSetDescription> resourceSetDescriptions, String s, Object o) {
+                                    throw new UnsupportedOperationException("'Less Than Or Equal to' not supported");
+                                }
+
+                                @Override
+                                public Set<ResourceSetDescription> visitNotFilter(Set<ResourceSetDescription> resourceSetDescriptions, org.forgerock.util.query.QueryFilter<String> queryFilter) {
+                                    Set<ResourceSetDescription> excludedResourceSets = queryFilter.accept(this, resourceSetDescriptions);
+                                    resourceSetDescriptions.removeAll(excludedResourceSets);
+
+                                    return resourceSetDescriptions;
+                                }
+
+                                @Override
+                                public Set<ResourceSetDescription> visitOrFilter(Set<ResourceSetDescription> resourceSetDescriptions, List<org.forgerock.util.query.QueryFilter<String>> list) {
+                                    throw new UnsupportedOperationException("'Or' not supported");
+                                }
+
+                                @Override
+                                public Set<ResourceSetDescription> visitPresentFilter(Set<ResourceSetDescription> resourceSetDescriptions, String s) {
+                                    throw new UnsupportedOperationException("'Present' not supported");
+                                }
+
+                                @Override
+                                public Set<ResourceSetDescription> visitStartsWithFilter(Set<ResourceSetDescription> resourceSetDescriptions, String s, Object o) {
+                                    throw new UnsupportedOperationException("'Starts With' not supported");
+                                }
+                            }, resourceSets));
+
+                            return Promises.newResultPromise((Collection<ResourceSetDescription>) filteredResourceSets);
+                        } catch (EntitlementException e) {
+                            return Promises.newExceptionPromise(
+                                    (ResourceException) new InternalServerErrorException(e));
+                        }
+                    }
+                });
+    }
+
     /**
      * Queries resource sets across the resource set store and UMA policy store.
      *
-     * @param context The context.
-     * @param realm The realm.
-     * @param query The aggregated query.
-     * @param resourceOwnerId The resource owner id.
+     * @param context             The context.
+     * @param realm               The realm.
+     * @param query               The aggregated query.
+     * @param resourceOwnerId     The resource owner id.
      * @param augmentWithPolicies {@code true} to pull in UMA policies into the resource set.
      * @return A Promise containing the Resource Sets or a ResourceException.
      */
     Promise<Collection<ResourceSetDescription>, ResourceException> getResourceSets(final ServerContext context,
-            String realm, final ResourceSetWithPolicyQuery query, final String resourceOwnerId,
-            final boolean augmentWithPolicies) {
+                                                                                   String realm, final ResourceSetWithPolicyQuery query, final String resourceOwnerId,
+                                                                                   final boolean augmentWithPolicies) {
         final Set<ResourceSetDescription> resourceSets;
         try {
-            resourceSets = resourceSetStoreFactory.create(realm).query(QueryFilter.and(
+            resourceSets = resourceSetStoreFactory.create(realm).query(and(
                     query.getResourceSetQuery(),
-                    QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, resourceOwnerId)));
+                    equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, resourceOwnerId)));
         } catch (ServerException e) {
             return Promises.newExceptionPromise((ResourceException) new InternalServerErrorException(e));
         }
 
-        Promise<Collection<ResourceSetDescription>, ResourceException> resourceSetsPromise;
-        if (query.getPolicyQuery() != null) {
-            QueryRequest policyQuery = Requests.newQueryRequest("").setQueryFilter(query.getPolicyQuery());
-            resourceSetsPromise = policyService.queryPolicies(context, policyQuery)
-                    .thenAsync(new AsyncFunction<Pair<QueryResult, Collection<UmaPolicy>>, Collection<ResourceSetDescription>, ResourceException>() {
-                        @Override
-                        public Promise<Collection<ResourceSetDescription>, ResourceException> apply(Pair<QueryResult, Collection<UmaPolicy>> result) throws ResourceException {
-                            try {
-                                return Promises.newResultPromise(combine(context, query, resourceSets,
-                                        result.getSecond(), augmentWithPolicies, resourceOwnerId));
-                            } catch (org.forgerock.oauth2.core.exceptions.NotFoundException e) {
-                                return Promises.newExceptionPromise(
-                                        (ResourceException) new InternalServerErrorException(e));
-                            } catch (ServerException e) {
-                                return Promises.newExceptionPromise(
-                                        (ResourceException) new InternalServerErrorException(e));
+        QueryRequest policyQuery = Requests.newQueryRequest("").setQueryId("searchAll");
+        policyQuery.setQueryFilter(QueryFilter.alwaysTrue());
+        return getPolicies(context, policyQuery, resourceOwnerId, resourceSets, augmentWithPolicies, query)
+                .thenAsync(new AsyncFunction<Collection<ResourceSetDescription>, Collection<ResourceSetDescription>, ResourceException>() {
+                    @Override
+                    public Promise<Collection<ResourceSetDescription>, ResourceException> apply(final Collection<ResourceSetDescription> filteredResourceSets) {
+                        Promise<Collection<ResourceSetDescription>, ResourceException> resourceSetsPromise;
+                        if (query.getPolicyQuery() != null) {
+                            QueryRequest policyQuery = Requests.newQueryRequest("").setQueryFilter(query.getPolicyQuery());
+                            resourceSetsPromise = policyService.queryPolicies(context, policyQuery)
+                                    .thenAsync(new AsyncFunction<Pair<QueryResult, Collection<UmaPolicy>>, Collection<ResourceSetDescription>, ResourceException>() {
+                                        @Override
+                                        public Promise<Collection<ResourceSetDescription>, ResourceException> apply(Pair<QueryResult, Collection<UmaPolicy>> result) throws ResourceException {
+                                            try {
+                                                return Promises.newResultPromise(combine(context, query, filteredResourceSets,
+                                                        result.getSecond(), augmentWithPolicies, resourceOwnerId));
+                                            } catch (org.forgerock.oauth2.core.exceptions.NotFoundException e) {
+                                                return Promises.newExceptionPromise(
+                                                        (ResourceException) new InternalServerErrorException(e));
+                                            } catch (ServerException e) {
+                                                return Promises.newExceptionPromise(
+                                                        (ResourceException) new InternalServerErrorException(e));
+                                            }
+                                        }
+                                    });
+                        } else {
+                            if (augmentWithPolicies) {
+                                List<Promise<ResourceSetDescription, ResourceException>> promises
+                                        = new ArrayList<>();
+                                PromiseImpl<ResourceSetDescription, ResourceException> kicker = PromiseImpl.create();
+                                promises.add(kicker);
+                                for (ResourceSetDescription resourceSet : filteredResourceSets) {
+                                    promises.add(augmentResourceSetWithPolicy(context, resourceSet.getId(), resourceSet));
+                                }
+                                resourceSetsPromise = Promises.when(promises)
+                                        .thenAsync(new AsyncFunction<List<ResourceSetDescription>, Collection<ResourceSetDescription>, ResourceException>() {
+                                            @Override
+                                            public Promise<Collection<ResourceSetDescription>, ResourceException> apply(List<ResourceSetDescription> resourceSets) {
+                                                Collection<ResourceSetDescription> resourceSetDescriptions
+                                                        = new HashSet<>();
+                                                for (ResourceSetDescription rs : filteredResourceSets) {
+                                                    if (rs != null) {
+                                                        resourceSetDescriptions.add(rs);
+                                                    }
+                                                }
+                                                return Promises.newResultPromise(resourceSetDescriptions);
+                                            }
+                                        });
+                                kicker.handleResult(null);
+                            } else {
+                                resourceSetsPromise = Promises.newResultPromise((Collection<ResourceSetDescription>) filteredResourceSets);
                             }
                         }
-                    });
-        } else {
-            if (augmentWithPolicies) {
-                List<Promise<ResourceSetDescription, ResourceException>> promises
-                        = new ArrayList<Promise<ResourceSetDescription, ResourceException>>();
-                PromiseImpl<ResourceSetDescription, ResourceException> kicker = PromiseImpl.create();
-                promises.add(kicker);
-                for (ResourceSetDescription resourceSet : resourceSets) {
-                    promises.add(augmentResourceSetWithPolicy(context, resourceSet.getId(), resourceSet));
-                }
-                resourceSetsPromise = Promises.when(promises)
-                        .thenAsync(new AsyncFunction<List<ResourceSetDescription>, Collection<ResourceSetDescription>, ResourceException>() {
-                            @Override
-                            public Promise<Collection<ResourceSetDescription>, ResourceException> apply(List<ResourceSetDescription> resourceSets) {
-                                Collection<ResourceSetDescription> resourceSetDescriptions
-                                        = new HashSet<ResourceSetDescription>();
-                                for (ResourceSetDescription rs : resourceSets) {
-                                    if (rs != null) {
-                                        resourceSetDescriptions.add(rs);
-                                    }
-                                }
-                                return Promises.newResultPromise(resourceSetDescriptions);
-                            }
-                        });
-                kicker.handleResult(null);
-            } else {
-                resourceSetsPromise = Promises.newResultPromise((Collection<ResourceSetDescription>) resourceSets);
-            }
-        }
-        return resourceSetsPromise;
+                        return resourceSetsPromise;
+                    }
+                });
     }
 
     /**
      * Revokes all UMA policies for a user's resource sets.
      *
-     * @param context The context.
-     * @param realm The realm.
+     * @param context         The context.
+     * @param realm           The realm.
      * @param resourceOwnerId The resource owner id.
      * @return A Promise containing {@code null} or a ResourceException.
      */
     Promise<Void, ResourceException> revokeAllPolicies(final ServerContext context, String realm,
-            String resourceOwnerId) {
+                                                       String resourceOwnerId) {
         ResourceSetWithPolicyQuery query = new ResourceSetWithPolicyQuery();
         query.setResourceSetQuery(org.forgerock.util.query.QueryFilter.<String>alwaysTrue());
         return getResourceSets(context, realm, query, resourceOwnerId, false)
@@ -200,10 +348,10 @@ public class ResourceSetService {
     }
 
     private Promise<ResourceSetDescription, ResourceException> getResourceSet(String realm, String resourceSetId,
-            String resourceOwnerId) {
+                                                                              String resourceOwnerId) {
         try {
             ResourceSetDescription resourceSet = resourceSetStoreFactory.create(realm)
-                    .read(resourceSetId, resourceOwnerId);
+                    .read(resourceSetId);
             return Promises.newResultPromise(resourceSet);
         } catch (NotFoundException e) {
             return Promises.newExceptionPromise(
@@ -215,7 +363,7 @@ public class ResourceSetService {
     }
 
     private Promise<ResourceSetDescription, ResourceException> augmentResourceSetWithPolicy(ServerContext context,
-            final String resourceSetId, final ResourceSetDescription resourceSet) {
+                                                                                            final String resourceSetId, final ResourceSetDescription resourceSet) {
         return policyService.readPolicy(context, resourceSetId)
                 .thenAsync(new AsyncFunction<UmaPolicy, ResourceSetDescription, ResourceException>() {
                     @Override
@@ -232,8 +380,8 @@ public class ResourceSetService {
     }
 
     private Collection<ResourceSetDescription> combine(ServerContext context,
-            ResourceSetWithPolicyQuery resourceSetWithPolicyQuery, Set<ResourceSetDescription> resourceSets,
-            Collection<UmaPolicy> policies, boolean augmentWithPolicies, String resourceOwnerId)
+                                                       ResourceSetWithPolicyQuery resourceSetWithPolicyQuery, Collection<ResourceSetDescription> resourceSets,
+                                                       Collection<UmaPolicy> policies, boolean augmentWithPolicies, String resourceOwnerId)
             throws org.forgerock.oauth2.core.exceptions.NotFoundException, ServerException {
 
         Map<String, ResourceSetDescription> resourceSetsById = new HashMap<String, ResourceSetDescription>();
@@ -269,7 +417,7 @@ public class ResourceSetService {
                 } else {
                     RealmContext realmContext = context.asContext(RealmContext.class);
                     resourceSet = resourceSetStoreFactory.create(realmContext.getResolvedRealm())
-                            .read(entry.getKey(), resourceOwnerId);
+                            .read(entry.getKey());
                 }
                 if (augmentWithPolicies) {
                     resourceSet.setPolicy(entry.getValue().asJson());

@@ -96,5 +96,7 @@ public interface UmaProviderSettings extends UmaSettings {
 
     Evaluator getPolicyEvaluator(Subject subject, String clientId) throws EntitlementException;
 
+    Evaluator getPolicyEvaluator(Subject subject) throws EntitlementException;
+
     UmaTokenStore getUmaTokenStore();
 }

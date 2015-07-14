@@ -80,7 +80,7 @@ public class UmaProviderSettingsFactory {
      * @return A UmaProviderSettings instance.
      * @throws java.lang.IllegalStateException if the realm has not been initialised yet.
      */
-    UmaProviderSettings get(String realm) {
+    public UmaProviderSettings get(String realm) {
         if (providerSettingsMap.containsKey(realm)) {
             return providerSettingsMap.get(realm);
         }
@@ -218,6 +218,11 @@ public class UmaProviderSettingsFactory {
         @Override
         public Evaluator getPolicyEvaluator(Subject subject, String clientId) throws EntitlementException {
             return new Evaluator(subject, clientId);
+        }
+
+        @Override
+        public Evaluator getPolicyEvaluator(Subject subject) throws EntitlementException {
+            return new Evaluator(subject);
         }
 
         @Override

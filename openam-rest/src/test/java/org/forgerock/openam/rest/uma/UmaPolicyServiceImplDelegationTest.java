@@ -327,7 +327,7 @@ public class UmaPolicyServiceImplDelegationTest {
         String resourceSetId = UUID.randomUUID().toString();
         ResourceSetDescription resourceSet = new ResourceSetDescription(resourceSetId, "CLIENT_ID", resourceOwner,
                 json(object(field("name", "RESOURCE_SET_NAME"), field("scopes", array("SCOPE_A", "SCOPE_B")))).asMap());
-        given(resourceSetStore.read(resourceSetId, resourceOwner)).willReturn(resourceSet);
+        given(resourceSetStore.read(resourceSetId)).willReturn(resourceSet);
         given(resourceSetStore.query(org.forgerock.util.query.QueryFilter.and(
                 org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId))))
                 .willReturn(Collections.singleton(resourceSet));

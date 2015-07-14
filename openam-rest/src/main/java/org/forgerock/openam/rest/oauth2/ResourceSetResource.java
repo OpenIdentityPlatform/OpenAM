@@ -216,6 +216,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
         HashMap<String, Object> content = new HashMap<String, Object>(resourceSet.asMap());
         content.put("_id", resourceSet.getId());
         content.put("resourceServer", resourceSet.getClientId());
+        content.put("resourceOwnerId", resourceSet.getResourceOwnerId());
         if (resourceSet.getPolicy() != null) {
             JsonValue policy = new JsonValue(new HashMap<String, Object>(resourceSet.getPolicy().asMap()));
             policy.remove("policyId");
@@ -234,6 +235,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
         private ResourceSetQueryFilter() {
             queryableFields.put(new JsonPointer("/name"), ResourceSetTokenField.NAME);
             queryableFields.put(new JsonPointer("/resourceServer"), ResourceSetTokenField.CLIENT_ID);
+            queryableFields.put(new JsonPointer("/resourceOwnerId"), "resourceOwnerId");
         }
 
         private void increaseQueryDepth() {
@@ -370,8 +372,77 @@ public class ResourceSetResource implements CollectionResourceProvider {
         }
 
         @Override
-        public ResourceSetWithPolicyQuery visitNotFilter(ResourceSetWithPolicyQuery query, QueryFilter subFilter) {
-            throw unsupportedFilterOperation("Not");
+        public ResourceSetWithPolicyQuery visitNotFilter(final ResourceSetWithPolicyQuery query, QueryFilter subFilter) {
+            query.setResourceSetQuery(org.forgerock.util.query.QueryFilter.not(
+                    subFilter.accept(new QueryFilterVisitor<org.forgerock.util.query.QueryFilter, QueryFilter>() {
+
+                        @Override
+                        public org.forgerock.util.query.QueryFilter visitAndFilter(QueryFilter queryFilter, List<QueryFilter> list) {
+                            throw unsupportedFilterOperation("And");
+                        }
+
+                        @Override
+                        public org.forgerock.util.query.QueryFilter visitBooleanLiteralFilter(QueryFilter queryFilter, boolean b) {
+                            throw unsupportedFilterOperation("Boolean");
+                        }
+
+                        @Override
+                        public org.forgerock.util.query.QueryFilter visitContainsFilter(QueryFilter queryFilter, JsonPointer jsonPointer, Object o) {
+                            throw unsupportedFilterOperation("Contains");
+                        }
+
+                        @Override
+                        public org.forgerock.util.query.QueryFilter visitEqualsFilter(QueryFilter queryFilter, JsonPointer jsonPointer, Object o) {
+                            org.forgerock.util.query.QueryFilter query = org.forgerock.util.query.QueryFilter.equalTo(verifyFieldIsQueryable(jsonPointer), o);
+                            return query;
+                        }
+
+                        @Override
+                        public org.forgerock.util.query.QueryFilter visitExtendedMatchFilter(QueryFilter queryFilter, JsonPointer jsonPointer, String s, Object o) {
+                            throw unsupportedFilterOperation("Extended Match");
+                        }
+
+                        @Override
+                        public org.forgerock.util.query.QueryFilter visitGreaterThanFilter(QueryFilter queryFilter, JsonPointer jsonPointer, Object o) {
+                            throw unsupportedFilterOperation("Greater Than");
+                        }
+
+                        @Override
+                        public org.forgerock.util.query.QueryFilter visitGreaterThanOrEqualToFilter(QueryFilter queryFilter, JsonPointer jsonPointer, Object o) {
+                            throw unsupportedFilterOperation("Greater Than Equal To");
+                        }
+
+                        @Override
+                        public org.forgerock.util.query.QueryFilter visitLessThanFilter(QueryFilter queryFilter, JsonPointer jsonPointer, Object o) {
+                            throw unsupportedFilterOperation("Less Than");
+                        }
+
+                        @Override
+                        public org.forgerock.util.query.QueryFilter visitLessThanOrEqualToFilter(QueryFilter queryFilter, JsonPointer jsonPointer, Object o) {
+                            throw unsupportedFilterOperation("Less Than Equal To");
+                        }
+
+                        @Override
+                        public org.forgerock.util.query.QueryFilter visitNotFilter(QueryFilter queryFilter, QueryFilter queryFilter2) {
+                            throw unsupportedFilterOperation("Not");
+                        }
+
+                        @Override
+                        public org.forgerock.util.query.QueryFilter visitOrFilter(QueryFilter queryFilter, List<QueryFilter> list) {
+                            throw unsupportedFilterOperation("Or");
+                        }
+
+                        @Override
+                        public org.forgerock.util.query.QueryFilter visitPresentFilter(QueryFilter queryFilter, JsonPointer jsonPointer) {
+                            throw unsupportedFilterOperation("Present");
+                        }
+
+                        @Override
+                        public org.forgerock.util.query.QueryFilter visitStartsWithFilter(QueryFilter queryFilter, JsonPointer jsonPointer, Object o) {
+                            throw unsupportedFilterOperation("Starts with");
+                        }
+                    }, subFilter)));
+            return query;
         }
 
         @Override

@@ -46,12 +46,11 @@ public interface ResourceSetStore {
      * Reads a {@code ResourceSetDescription} out of the store using its OpenAM Unique ID.
      *
      * @param resourceSetId The resource set ID.
-     * @param resourceOwnerId The resource owner id.
      * @return The {@code ResourceSetDescription}.
      * @throws NotFoundException If the resource set is not found.
      * @throws ServerException When the resource set description cannot be loaded.
      */
-    ResourceSetDescription read(String resourceSetId, String resourceOwnerId) throws NotFoundException, ServerException;
+    ResourceSetDescription read(String resourceSetId) throws NotFoundException, ServerException;
 
     /**
      * Update a given {@code ResourceSetDescription} instance.

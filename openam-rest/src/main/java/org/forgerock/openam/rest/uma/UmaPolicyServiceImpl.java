@@ -469,28 +469,35 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
 
         if (umaQueryRequest.getQueryExpression() != null) {
             return newExceptionPromise((ResourceException) new BadRequestException("Query expressions not supported"));
-        } else if (umaQueryRequest.getQueryId() != null) {
-            return newExceptionPromise((ResourceException) new BadRequestException("Query expressions not supported"));
         }
 
+        QueryRequest request = Requests.newQueryRequest("");
         final AggregateQuery<QueryFilter, QueryFilter> filter = umaQueryRequest.getQueryFilter()
                 .accept(new AggregateUmaPolicyQueryFilter(), new AggregateQuery<QueryFilter, QueryFilter>());
 
-        String resourceOwnerUid = getResourceOwnerUid(context);
-        QueryRequest request = Requests.newQueryRequest("");
-        if (filter.getFirstQuery() == null) {
-            request.setQueryFilter(QueryFilter.equalTo("/createdBy", resourceOwnerUid));
+        String queryId = umaQueryRequest.getQueryId();
+        if (queryId != null && queryId.equals("searchAll")) {
+            request.setQueryFilter(QueryFilter.alwaysTrue());
         } else {
-            request.setQueryFilter(QueryFilter.and(QueryFilter.equalTo("/createdBy", resourceOwnerUid), filter.getFirstQuery()));
+            String resourceOwnerUid = getResourceOwnerUid(context);
+            if (filter.getFirstQuery() == null) {
+                request.setQueryFilter(QueryFilter.equalTo("/createdBy", resourceOwnerUid));
+            } else {
+                request.setQueryFilter(QueryFilter.and(QueryFilter.equalTo("/createdBy", resourceOwnerUid), filter.getFirstQuery()));
+            }
         }
         return policyResourceDelegate.queryPolicies(context, request)
                 .thenAsync(new AsyncFunction<Pair<QueryResult, List<Resource>>, Collection<UmaPolicy>, ResourceException>() {
                     @Override
                     public Promise<Collection<UmaPolicy>, ResourceException> apply(Pair<QueryResult, List<Resource>> value) {
-                        Map<String, Set<Resource>> policyMapping = new HashMap<String, Set<Resource>>();
+                        Map<String, Set<Resource>> policyMapping = new HashMap<>();
                         for (Resource policy : value.getSecond()) {
 
                             String resource = policy.getContent().get("resources").asList(String.class).get(0);
+
+                            if (!resource.startsWith(UMA_POLICY_SCHEME)) {
+                                continue;
+                            }
                             resource = resource.replaceFirst(UMA_POLICY_SCHEME, "");
                             if (resource.indexOf(":") > 0) {
                                 resource = resource.substring(0, resource.indexOf(":"));
@@ -498,7 +505,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
 
                             Set<Resource> mapping = policyMapping.get(resource);
                             if (mapping == null) {
-                                mapping = new HashSet<Resource>();
+                                mapping = new HashSet<>();
                                 policyMapping.put(resource, mapping);
                             }
 
@@ -506,7 +513,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                         }
 
                         try {
-                            Collection<UmaPolicy> umaPolicies = new HashSet<UmaPolicy>();
+                            Collection<UmaPolicy> umaPolicies = new HashSet<>();
                             String resourceOwnerId = getResourceOwnerId(context);
                             for (Map.Entry<String, Set<Resource>> entry : policyMapping.entrySet()) {
                                 ResourceSetDescription resourceSet = getResourceSetDescription(entry.getKey(), resourceOwnerId, context);
@@ -705,7 +712,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
             ServerContext context) throws ResourceException {
         try {
             String realm = getRealm(context);
-            return resourceSetStoreFactory.create(realm).read(resourceSetId, resourceOwnerId);
+            return resourceSetStoreFactory.create(realm).read(resourceSetId);
         } catch (org.forgerock.oauth2.core.exceptions.NotFoundException e) {
             throw new BadRequestException("Invalid ResourceSet UID");
         } catch (ServerException e) {
