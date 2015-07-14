@@ -25,6 +25,7 @@ import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
+import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
@@ -110,6 +111,21 @@ public interface PromisedRequestHandler {
      */
     Promise<Pair<QueryResult, List<Resource>>, ResourceException> handleQuery(ServerContext context,
             QueryRequest request);
+
+    /**
+     * Searches for all JSON resources matching a user specified set of
+     * criteria, setting the resulting query result on the
+     * returned promise, and using the supplied handler for resources found.
+     *
+     * @param context The request server context, such as associated principal.
+     * @param request The query request.
+     * @param resultHandler The handler for query results.
+     * @return A promise containing the query result and list of resources or a {@code ResourceException}.
+     * @see org.forgerock.json.resource.RequestHandler#handlePatch(ServerContext,
+     * PatchRequest, org.forgerock.json.resource.ResultHandler)
+     */
+    Promise<QueryResult, ResourceException> handleQuery(ServerContext context,
+            QueryRequest request, QueryResultHandler resultHandler);
 
     /**
      * Reads a JSON resource, setting the resulting resource on the returned

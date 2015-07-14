@@ -76,19 +76,20 @@ public final class UmaConstants {
         static final String PERMISSIONS = "permissions";
     }
 
-    static final class UmaPolicy {
-        static final String POLICY_ID_KEY = "policyId";
+    public static final class UmaPolicy {
+        public static final String POLICY_ID_KEY = "policyId";
+        public static final String PERMISSIONS_KEY = "permissions";
+        public static final String SUBJECT_KEY = "subject";
+        public static final String SCOPES_KEY = "scopes";
         static final String POLICY_NAME = "name";
-        static final String PERMISSIONS_KEY = "permissions";
-        static final String SUBJECT_KEY = "subject";
-        static final String SCOPES_KEY = "scopes";
     }
 
-    static final class BackendPolicy {
+    public static final class BackendPolicy {
+        public static final String BACKEND_POLICY_RESOURCE_TYPE_KEY = "resourceTypeUuid";
+        public static final String BACKEND_POLICY_ACTION_VALUES_KEY = "actionValues";
+        public static final String BACKEND_POLICY_SUBJECT_CLAIM_VALUE_KEY = "claimValue";
         static final String BACKEND_POLICY_NAME_KEY = "name";
         static final String BACKEND_POLICY_RESOURCES_KEY = "resources";
-        static final String BACKEND_POLICY_RESOURCE_TYPE_KEY = "resourceTypeUuid";
-        static final String BACKEND_POLICY_ACTION_VALUES_KEY = "actionValues";
         static final String BACKEND_POLICY_SUBJECT_KEY = "subject";
         static final String BACKEND_POLICY_SUBJECT_TYPE_KEY = "type";
         static final String BACKEND_POLICY_SUBJECT_TYPE_OR = "OR";
@@ -96,6 +97,5 @@ public final class UmaConstants {
         static final String BACKEND_POLICY_SUBJECTS_KEY = "subjects";
         static final String BACKEND_POLICY_SUBJECT_CLAIM_NAME_KEY = "claimName";
         static final String BACKEND_POLICY_SUBJECT_CLAIM_NAME = "sub";
-        static final String BACKEND_POLICY_SUBJECT_CLAIM_VALUE_KEY = "claimValue";
     }
 }

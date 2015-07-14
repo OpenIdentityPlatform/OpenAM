@@ -92,6 +92,28 @@ public class PromisedRequestHandlerImpl implements PromisedRequestHandler {
         };
     }
 
+    private QueryResultHandler newQueryHandler(final PromiseImpl<QueryResult, ResourceException> promise,
+            final QueryResultHandler handler) {
+        return new QueryResultHandler() {
+            @Override
+            public void handleError(ResourceException error) {
+                handler.handleError(error);
+                promise.handleException(error);
+            }
+
+            @Override
+            public boolean handleResource(Resource resource) {
+                return handler.handleResource(resource);
+            }
+
+            @Override
+            public void handleResult(QueryResult result) {
+                handler.handleResult(result);
+                promise.handleResult(result);
+            }
+        };
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -140,6 +162,17 @@ public class PromisedRequestHandlerImpl implements PromisedRequestHandler {
             QueryRequest request) {
         PromiseImpl<Pair<QueryResult, List<Resource>>, ResourceException> promise = PromiseImpl.create();
         handler.handleQuery(context, request, newQueryHandler(promise));
+        return promise;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Promise<QueryResult, ResourceException> handleQuery(ServerContext context,
+            QueryRequest request, QueryResultHandler resultHandler) {
+        PromiseImpl<QueryResult, ResourceException> promise = PromiseImpl.create();
+        handler.handleQuery(context, request, newQueryHandler(promise, resultHandler));
         return promise;
     }
 

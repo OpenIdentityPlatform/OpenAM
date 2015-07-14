@@ -32,6 +32,7 @@ import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ServerContext;
@@ -227,6 +228,21 @@ public class PolicyResourceDelegateTest {
 
         //Then
         verify(policyResource).handleQuery(context, request);
+    }
+
+    @Test
+    public void shouldQueryPoliciesWithHandler() throws ResourceException {
+
+        //Given
+        ServerContext context = mock(ServerContext.class);
+        QueryRequest request = mock(QueryRequest.class);
+        QueryResultHandler handler = mock(QueryResultHandler.class);
+
+        //When
+        delegate.queryPolicies(context, request, handler);
+
+        //Then
+        verify(policyResource).handleQuery(context, request, handler);
     }
 
     @Test

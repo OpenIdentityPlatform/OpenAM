@@ -18,6 +18,7 @@ package org.forgerock.openam.rest.uma;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.util.promise.Promises.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
@@ -46,6 +47,7 @@ import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
+import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
@@ -66,11 +68,14 @@ import org.forgerock.util.Pair;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 import org.mockito.Matchers;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class UmaPolicyServiceImplTest {
 
+    static final String RESOURCE_OWNER_ID = "alice";
     private UmaPolicyServiceImpl policyService;
 
     private PolicyResourceDelegate policyResourceDelegate;
@@ -85,7 +90,7 @@ public class UmaPolicyServiceImplTest {
     public void setup() throws Exception {
 
         policyResourceDelegate = mock(PolicyResourceDelegate.class);
-        ResourceSetStoreFactory resourceSetStoreFactory = mock(ResourceSetStoreFactory.class);
+        final ResourceSetStoreFactory resourceSetStoreFactory = mock(ResourceSetStoreFactory.class);
         Config<UmaAuditLogger> lazyAuditLogger = mock(Config.class);
         auditLogger = mock(UmaAuditLogger.class);
         contextHelper = mock(ContextHelper.class);
@@ -98,32 +103,32 @@ public class UmaPolicyServiceImplTest {
                 contextHelper, policyEvaluatorFactory, coreServicesWrapper, debug);
 
         given(contextHelper.getRealm(Matchers.<ServerContext>anyObject())).willReturn("REALM");
-        given(contextHelper.getUserId(Matchers.<ServerContext>anyObject())).willReturn("RESOURCE_OWNER_ID");
+        given(contextHelper.getUserId(Matchers.<ServerContext>anyObject())).willReturn(RESOURCE_OWNER_ID);
         given(contextHelper.getUserUid(Matchers.<ServerContext>anyObject())).willReturn("RESOURCE_OWNER_UID");
 
         resourceSetStore = mock(ResourceSetStore.class);
         resourceSet = new ResourceSetDescription("RESOURCE_SET_ID",
-                "CLIENT_ID", "RESOURCE_OWNER_ID", Collections.<String, Object>emptyMap());
+                "CLIENT_ID", RESOURCE_OWNER_ID, Collections.<String, Object>emptyMap());
         resourceSet.setDescription(json(object(field("name", "NAME"), field("scopes", array("SCOPE_A", "SCOPE_B", "SCOPE_C")))));
 
         given(resourceSetStoreFactory.create(anyString())).willReturn(resourceSetStore);
-        given(resourceSetStore.read("RESOURCE_SET_ID", "RESOURCE_OWNER_ID")).willReturn(resourceSet);
+        given(resourceSetStore.read("RESOURCE_SET_ID", RESOURCE_OWNER_ID)).willReturn(resourceSet);
         given(resourceSetStore.query(org.forgerock.util.query.QueryFilter.and(
                 org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RESOURCE_SET_ID"))))
                 .willReturn(Collections.singleton(resourceSet));
-        doThrow(org.forgerock.oauth2.core.exceptions.NotFoundException.class).when(resourceSetStore).read("OTHER_ID", "RESOURCE_OWNER_ID");
-        doThrow(org.forgerock.oauth2.core.exceptions.ServerException.class).when(resourceSetStore).read("FAILING_ID", "RESOURCE_OWNER_ID");
+        doThrow(org.forgerock.oauth2.core.exceptions.NotFoundException.class).when(resourceSetStore).read("OTHER_ID", RESOURCE_OWNER_ID);
+        doThrow(org.forgerock.oauth2.core.exceptions.ServerException.class).when(resourceSetStore).read("FAILING_ID", RESOURCE_OWNER_ID);
         doThrow(org.forgerock.oauth2.core.exceptions.ServerException.class).when(resourceSetStore).query(org.forgerock.util.query.QueryFilter.and(
                 org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "FAILING_ID")));
         given(lazyAuditLogger.get()).willReturn(auditLogger);
 
         AMIdentity identity = mock(AMIdentity.class);
         given(identity.getUniversalId()).willReturn("uid=RESOURCE_OWNER_ID,ou=REALM,dc=forgerock,dc=org");
-        given(coreServicesWrapper.getIdentity("RESOURCE_OWNER_ID", "REALM")).willReturn(identity);
+        given(coreServicesWrapper.getIdentity(RESOURCE_OWNER_ID, "REALM")).willReturn(identity);
     }
 
     private ServerContext createContext() throws SSOException {
-        return createContextForLoggedInUser("RESOURCE_OWNER_ID");
+        return createContextForLoggedInUser(RESOURCE_OWNER_ID);
     }
 
     private ServerContext createContextForLoggedInUser(String userShortName) throws SSOException {
@@ -157,6 +162,8 @@ public class UmaPolicyServiceImplTest {
     static JsonValue createBackendSubjectOnePolicyJson() {
         return json(object(
                 field("name", "RESOURCE_SET_ID - SUBJECT_ONE"),
+                field("createdBy", RESOURCE_OWNER_ID),
+                field("active", true),
                 field("resources", array("uma://RESOURCE_SET_ID")),
                 field("resourceTypeUuid", "76656a38-5f8e-401b-83aa-4ccb74ce88d2"),
                 field("actionValues", object(
@@ -173,6 +180,8 @@ public class UmaPolicyServiceImplTest {
     static JsonValue createBackendSubjectTwoPolicyJson() {
         return json(object(
                 field("name", "RESOURCE_SET_ID - SUBJECT_TWO"),
+                field("createdBy", RESOURCE_OWNER_ID),
+                field("active", true),
                 field("resources", array("uma://RESOURCE_SET_ID")),
                 field("resourceTypeUuid", "76656a38-5f8e-401b-83aa-4ccb74ce88d2"),
                 field("actionValues", object(
@@ -188,6 +197,8 @@ public class UmaPolicyServiceImplTest {
     static JsonValue createBackendSubjectOneUpdatedPolicyJson() {
         return json(object(
                 field("name", "RESOURCE_SET_ID - SUBJECT_ONE"),
+                field("createdBy", RESOURCE_OWNER_ID),
+                field("active", true),
                 field("resources", array("uma://RESOURCE_SET_ID")),
                 field("resourceTypeUuid", "76656a38-5f8e-401b-83aa-4ccb74ce88d2"),
                 field("actionValues", object(
@@ -214,12 +225,12 @@ public class UmaPolicyServiceImplTest {
         Resource createdPolicy2 = new Resource("ID_1", "REVISION_1", createBackendSubjectTwoPolicyJson());
         createdPolicies.add(createdPolicy1);
         createdPolicies.add(createdPolicy2);
+
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> queryPromise =
                 Promises.newExceptionPromise((ResourceException) new NotFoundException());
-        Promise<List<Resource>, ResourceException> createPolicyPromise = Promises.newResultPromise(createdPolicies);
+        setupQueries(queryPromise, createdPolicy1, createdPolicy2);
 
-        given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
-                .willReturn(queryPromise);
+        Promise<List<Resource>, ResourceException> createPolicyPromise = newResultPromise(createdPolicies);
         given(policyResourceDelegate.createPolicies(eq(context), Matchers.<Set<JsonValue>>anyObject()))
                 .willReturn(createPolicyPromise);
 
@@ -248,7 +259,7 @@ public class UmaPolicyServiceImplTest {
         JsonValue policy = createUmaPolicyJson("RESOURCE_SET_ID");
         Resource policyResource = new Resource("ID_1", "REVISION_1", createBackendSubjectOnePolicyJson());
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> queryPromise =
-                Promises.newResultPromise(
+                newResultPromise(
                         Pair.of(new QueryResult(), Collections.singletonList(policyResource)));
 
         given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
@@ -348,7 +359,7 @@ public class UmaPolicyServiceImplTest {
         UmaPolicy expectedUmaPolicy = UmaPolicy.fromUnderlyingPolicies(resourceSet, policies);
 
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> queryPromise =
-                Promises.newResultPromise(Pair.of(queryResult, policies));
+                newResultPromise(Pair.of(queryResult, policies));
 
         given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(queryPromise);
@@ -388,24 +399,24 @@ public class UmaPolicyServiceImplTest {
         ServerContext context = createContext();
         JsonValue policy = createUmaPolicyJson("RESOURCE_SET_ID", "SCOPE_A", "SCOPE_C");
         policy.remove(new JsonPointer("/permissions/0/scopes/1"));
-        List<Resource> updatedPolicies = new ArrayList<Resource>();
+        List<Resource> updatedPolicies = new ArrayList<>();
         Resource updatedPolicy1 = new Resource("ID_1", "REVISION_1", createBackendSubjectOneUpdatedPolicyJson());
-        Resource updatedPolicy3 = new Resource("ID_3", "REVISION_1", createBackendSubjectTwoPolicyJson());
+        Resource updatedPolicy2 = new Resource("ID_2", "REVISION_1", createBackendSubjectTwoPolicyJson());
         updatedPolicies.add(updatedPolicy1);
-        updatedPolicies.add(updatedPolicy3);
-        Promise<List<Resource>, ResourceException> updatePolicyPromise = Promises.newResultPromise(updatedPolicies);
+        updatedPolicies.add(updatedPolicy2);
+        Promise<List<Resource>, ResourceException> updatePolicyPromise = newResultPromise(updatedPolicies);
 
 
-        List<Resource> currentPolicies = new ArrayList<Resource>();
+        List<Resource> currentPolicies = new ArrayList<>();
         Resource currentPolicy1 = new Resource("ID_1", "REVISION_1", createBackendSubjectOnePolicyJson());
         Resource currentPolicy2 = new Resource("ID_2", "REVISION_1", createBackendSubjectTwoPolicyJson());
         currentPolicies.add(currentPolicy1);
         currentPolicies.add(currentPolicy2);
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> currentPolicyPromise
-                = Promises.newResultPromise(Pair.of((QueryResult) null, currentPolicies));
+                = newResultPromise(Pair.of((QueryResult) null, currentPolicies));
 
-        given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
-                .willReturn(currentPolicyPromise);
+        setupQueries(currentPolicyPromise, updatedPolicy1, updatedPolicy2);
+
         given(policyResourceDelegate.updatePolicies(eq(context), Matchers.<Set<JsonValue>>anyObject()))
                 .willReturn(updatePolicyPromise);
 
@@ -429,7 +440,7 @@ public class UmaPolicyServiceImplTest {
         JsonValue policy = createUmaPolicyJson("RESOURCE_SET_ID", "SCOPE_A", "SCOPE_B");
         ResourceException exception = mock(ResourceException.class);
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> currentPolicyPromise
-                = Promises.newResultPromise(Pair.of((QueryResult) null, Collections.<Resource>emptyList()));
+                = newResultPromise(Pair.of((QueryResult) null, Collections.<Resource>emptyList()));
         Promise<List<Resource>, ResourceException> updatePoliciesPromise = Promises.newExceptionPromise(exception);
 
         given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
@@ -500,12 +511,13 @@ public class UmaPolicyServiceImplTest {
         Resource readPolicy2 = new Resource("ID_2", "REVISION_2", createBackendSubjectTwoPolicyJson());
         readPolicies.add(readPolicy1);
         readPolicies.add(readPolicy2);
-        Promise<Pair<QueryResult, List<Resource>>, ResourceException> currentPolicyPromise
-                = Promises.newResultPromise(Pair.of((QueryResult) null, readPolicies));
-        Promise<List<Resource>, ResourceException> deletePoliciesPromise = Promises.newResultPromise(readPolicies);
 
-        given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
-                .willReturn(currentPolicyPromise);
+        Promise<Pair<QueryResult, List<Resource>>, ResourceException> currentPolicyPromise
+                = newResultPromise(Pair.of((QueryResult) null, readPolicies));
+        setupQueries(currentPolicyPromise);
+
+        Promise<List<Resource>, ResourceException> deletePoliciesPromise = newResultPromise(readPolicies);
+
         given(policyResourceDelegate.deletePolicies(eq(context), anyListOf(String.class)))
                 .willReturn(deletePoliciesPromise);
 
@@ -552,7 +564,7 @@ public class UmaPolicyServiceImplTest {
         readPolicies.add(readPolicy1);
         readPolicies.add(readPolicy2);
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> currentPolicyPromise
-                = Promises.newResultPromise(Pair.of((QueryResult) null, readPolicies));
+                = newResultPromise(Pair.of((QueryResult) null, readPolicies));
         Promise<List<Resource>, ResourceException> deletePoliciesPromise = Promises.newExceptionPromise(exception);
 
         given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
@@ -570,6 +582,24 @@ public class UmaPolicyServiceImplTest {
         }
     }
 
+    private void setupQueries(Promise<Pair<QueryResult, List<Resource>>, ResourceException> initialQuery,
+            final Resource... updatedPolicies) {
+        given(policyResourceDelegate.queryPolicies(any(ServerContext.class), any(QueryRequest.class)))
+                .willReturn(initialQuery);
+        given(policyResourceDelegate.queryPolicies(any(ServerContext.class), any(QueryRequest.class),
+                any(QueryResultHandler.class))).willAnswer(new Answer<Promise<QueryResult, ResourceException>>() {
+            @Override
+            public Promise<QueryResult, ResourceException> answer(InvocationOnMock invocation) throws Throwable {
+                final PolicyGraph policyGraph = (PolicyGraph) invocation.getArguments()[2];
+                for (Resource r : updatedPolicies) {
+                    policyGraph.handleResource(r);
+                }
+                policyGraph.handleResult(new QueryResult());
+                return newResultPromise(new QueryResult());
+            }
+        });
+    }
+
     private void mockBackendQuery(ServerContext context, JsonValue... policies) {
         QueryResult queryResult = new QueryResult();
         List<Resource> policyResources = new ArrayList<Resource>();
@@ -578,7 +608,7 @@ public class UmaPolicyServiceImplTest {
         }
 
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> backendQueryPromise
-                = Promises.newResultPromise(Pair.of(queryResult, policyResources));
+                = newResultPromise(Pair.of(queryResult, policyResources));
 
         given(policyResourceDelegate.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(backendQueryPromise);

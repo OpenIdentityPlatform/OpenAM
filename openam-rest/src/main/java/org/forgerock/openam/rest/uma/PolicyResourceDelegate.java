@@ -29,6 +29,7 @@ import java.util.Set;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
+import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
@@ -130,6 +131,20 @@ public class PolicyResourceDelegate {
     public Promise<Pair<QueryResult, List<Resource>>, ResourceException> queryPolicies(ServerContext context,
             QueryRequest request) {
         return policyResource.handleQuery(context, request);
+    }
+
+    /**
+     * Queries the underlying backend policies.
+     *
+     * @param context The request context.
+     * @param request The query request to execute on the backend policies.
+     * @param resultHandler The handler for results.
+     * @return A promise contain the {@code QueryResult} and list of underlying policies or a {@code ResourceException}
+     * if the query failed.
+     */
+    public Promise<QueryResult, ResourceException> queryPolicies(ServerContext context,
+            QueryRequest request, QueryResultHandler resultHandler) {
+        return policyResource.handleQuery(context, request, resultHandler);
     }
 
     /**

@@ -20,6 +20,7 @@ import static org.forgerock.json.fluent.JsonValue.*;
 import static org.forgerock.openam.uma.UmaConstants.BackendPolicy.*;
 import static org.forgerock.openam.uma.UmaConstants.UMA_POLICY_SCHEME;
 import static org.forgerock.openam.uma.UmaConstants.UmaPolicy.*;
+import static org.forgerock.openam.uma.UmaPolicyUtils.*;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -119,10 +120,6 @@ public class UmaPolicy {
         }
     }
 
-    private static String getPolicySubject(JsonValue content) {
-        return content.get(SUBJECT_KEY).get(BACKEND_POLICY_SUBJECT_CLAIM_VALUE_KEY).asString();
-    }
-
     /**
      * Converts underlying backend policies into an {@code UmaPolicy}.
      *
@@ -138,12 +135,9 @@ public class UmaPolicy {
         Map<String, Set<String>> subjectPermissions = new HashMap<>();
         for (Resource policy : policies) {
             underlyingPolicyIds.add(policy.getId());
-            String subject = getPolicySubject(policy.getContent());
-            Set<String> scopes = new HashSet<>();
-            for (Map.Entry<String, Object> scopeEntry : policy.getContent().get(BACKEND_POLICY_ACTION_VALUES_KEY).asMap().entrySet()) {
-                scopes.add(scopeEntry.getKey());
-            }
-            subjectPermissions.put(subject, scopes);
+            JsonValue policyContent = policy.getContent();
+            String subject = getPolicySubject(policyContent);
+            subjectPermissions.put(subject, getPolicyScopes(policyContent));
         }
         List<Object> permissions = array();
         JsonValue umaPolicy = json(object(
@@ -222,7 +216,7 @@ public class UmaPolicy {
      * @return The set of underlying backend policies that represent this UMA policy.
      */
     public Set<JsonValue> asUnderlyingPolicies(String policyOwnerName) {
-        Set<JsonValue> underlyingPolicies = new HashSet<JsonValue>();
+        Set<JsonValue> underlyingPolicies = new HashSet<>();
         for (JsonValue p : policy.get(PERMISSIONS_KEY)) {
             underlyingPolicies.add(createPolicyJson(policyOwnerName, p));
         }
