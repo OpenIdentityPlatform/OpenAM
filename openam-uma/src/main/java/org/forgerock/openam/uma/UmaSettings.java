@@ -165,4 +165,12 @@ public interface UmaSettings {
      * @throws ServerException If there is a problem reading the configuration.
      */
     String getUserProfilePreferredLocaleAttribute() throws ServerException;
+
+    /**
+     * Gets the configured re-sharing mode.
+     *
+     * @return The re-sharing mode.
+     * @throws ServerException If there is a problem reading the configuration.
+     */
+    ResharingMode getResharingMode() throws ServerException;
 }

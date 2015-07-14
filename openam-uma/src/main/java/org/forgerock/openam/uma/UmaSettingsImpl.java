@@ -282,6 +282,19 @@ public class UmaSettingsImpl extends OpenAMSettingsImpl implements UmaSettings {
         }
     }
 
+    @Override
+    public ResharingMode getResharingMode() throws ServerException {
+        try {
+            return ResharingMode.valueOf(getStringSetting(realm, RESHARING_MODE));
+        } catch (SMSException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        } catch (SSOException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        }
+    }
+
     /**
      * ServiceListener implementation to clear cache when it changes.
      */

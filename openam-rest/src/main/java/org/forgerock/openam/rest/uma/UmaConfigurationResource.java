@@ -20,8 +20,10 @@ import static org.forgerock.json.fluent.JsonValue.*;
 
 import javax.inject.Inject;
 
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.ReadRequest;
@@ -30,12 +32,14 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.SingletonResourceProvider;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.uma.UmaSettings;
 import org.forgerock.openam.uma.UmaSettingsFactory;
 
 public class UmaConfigurationResource implements SingletonResourceProvider {
 
+    private final Debug logger = Debug.getInstance("UmaProvider");
     private final UmaSettingsFactory settingsFactory;
 
     @Inject
@@ -59,9 +63,16 @@ public class UmaConfigurationResource implements SingletonResourceProvider {
         String realm = context.asContext(RealmContext.class).getResolvedRealm();
         UmaSettings settings = settingsFactory.create(realm);
 
-        JsonValue config = json(object(field("version", settings.getVersion())));
+        try {
+            JsonValue config = json(object(
+                    field("version", settings.getVersion()),
+                    field("resharingMode", settings.getResharingMode())));
 
-        handler.handleResult(new Resource("UmaConfiguration", Integer.toString(config.hashCode()), config));
+            handler.handleResult(new Resource("UmaConfiguration", Integer.toString(config.hashCode()), config));
+        } catch (ServerException e) {
+            logger.error("Failed to get UMA Configuration", e);
+            handler.handleError(new InternalServerErrorException("Failed to get UMA Configuration", e));
+        }
     }
 
     @Override

@@ -51,6 +51,7 @@ public final class UmaConstants {
     public static final String EMAIL_REQUESTING_PARTY_ON_PENDING_REQUEST_APPROVAL
             = "emailRequestingPartyOnPendingRequestApproval";
     public static final String USER_PROFILE_PREFERRED_LOCAL_ATTRIBUTE = "userProfileLocaleAttribute";
+    public static final String RESHARING_MODE = "resharingMode";
     static final String SUPPORTED_PAT_PROFILES_ATTR_NAME = "uma-supported-pat-profiles";
     static final String SUPPORTED_AAT_PROFILES_ATTR_NAME = "uma-supported-aat-profiles";
     static final String SUPPORTED_RPT_PROFILES_ATTR_NAME = "uma-supported-rpt-profiles";

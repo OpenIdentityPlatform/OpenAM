@@ -61,11 +61,13 @@ import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.rest.oauth2.AggregateQuery;
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.rest.resource.SubjectContext;
+import org.forgerock.openam.uma.ResharingMode;
 import org.forgerock.openam.uma.PolicySearch;
 import org.forgerock.openam.uma.UmaConstants;
 import org.forgerock.openam.uma.UmaPolicy;
 import org.forgerock.openam.uma.UmaPolicyQueryFilterVisitor;
 import org.forgerock.openam.uma.UmaPolicyService;
+import org.forgerock.openam.uma.UmaSettingsFactory;
 import org.forgerock.openam.uma.UmaUtils;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
 import org.forgerock.openam.uma.audit.UmaAuditType;
@@ -91,6 +93,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
     private final UmaPolicyEvaluatorFactory policyEvaluatorFactory;
     private final CoreServicesWrapper coreServicesWrapper;
     private final Debug debug;
+    private final UmaSettingsFactory umaSettingsFactory;
 
     /**
      * Creates an instance of the {@code UmaPolicyServiceImpl}.
@@ -102,12 +105,14 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
      * @param policyEvaluatorFactory An instance of the {@code UmaPolicyEvaluatorFactory}.
      * @param coreServicesWrapper An instance of the {@code CoreServicesWrapper}.
      * @param debug An instance of the REST {@code Debug}.
+     * @param umaSettingsFactory An instance of the {@code UmaSettingsFactory}.
      */
     @Inject
     public UmaPolicyServiceImpl(PolicyResourceDelegate policyResourceDelegate,
             ResourceSetStoreFactory resourceSetStoreFactory, Config<UmaAuditLogger> auditLogger,
             ContextHelper contextHelper, UmaPolicyEvaluatorFactory policyEvaluatorFactory,
-            CoreServicesWrapper coreServicesWrapper, @Named("frRest") Debug debug) {
+            CoreServicesWrapper coreServicesWrapper, @Named("frRest") Debug debug,
+            UmaSettingsFactory umaSettingsFactory) {
         this.policyResourceDelegate = policyResourceDelegate;
         this.resourceSetStoreFactory = resourceSetStoreFactory;
         this.auditLogger = auditLogger;
@@ -115,6 +120,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         this.policyEvaluatorFactory = policyEvaluatorFactory;
         this.coreServicesWrapper = coreServicesWrapper;
         this.debug = debug;
+        this.umaSettingsFactory = umaSettingsFactory;
     }
 
     private JsonValue resolveUsernameToUID(final ServerContext context, JsonValue policy) {
@@ -163,12 +169,24 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         }
     }
 
+    private boolean isDelegationOn(String realm) {
+        try {
+            return ResharingMode.IMPLICIT.equals(umaSettingsFactory.create(realm).getResharingMode());
+        } catch (ServerException e) {
+            debug.error("Could not read UMA Delegation mode for realm: " + realm, e);
+            return false;
+        }
+    }
+
     private boolean canUserShareResourceSet(String resourceOwnerId, String username, String clientId, String realm,
             String resourceSetId, Set<String> requestedScopes) {
         Subject resourceOwner = UmaUtils.createSubject(coreServicesWrapper.getIdentity(resourceOwnerId, realm));
         Subject user = UmaUtils.createSubject(coreServicesWrapper.getIdentity(username, realm));
         if (resourceOwner.equals(user)) {
             return true;
+        }
+        if (!isDelegationOn(realm)) {
+            return false;
         }
 
         try {
