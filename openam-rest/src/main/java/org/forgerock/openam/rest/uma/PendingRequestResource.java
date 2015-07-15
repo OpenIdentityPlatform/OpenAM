@@ -20,6 +20,9 @@ import static org.forgerock.json.fluent.JsonValue.json;
 import static org.forgerock.json.fluent.JsonValue.object;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.forgerock.json.fluent.JsonValue;
@@ -27,7 +30,6 @@ import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
@@ -44,6 +46,9 @@ import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
 import org.forgerock.openam.uma.PendingRequestsService;
+import org.forgerock.util.promise.ExceptionHandler;
+import org.forgerock.util.promise.Promise;
+import org.forgerock.util.promise.Promises;
 
 /**
  * CREST resource for UMA Pending Requests.
@@ -67,26 +72,26 @@ public class PendingRequestResource implements CollectionResourceProvider {
 
     @Override
     public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-        if (APPROVE_ACTION_ID.equalsIgnoreCase(request.getAction())) {
-            try {
+        try {
+            if (APPROVE_ACTION_ID.equalsIgnoreCase(request.getAction())) {
+                List<Promise<Void, ResourceException>> promises = new ArrayList<>();
+                JsonValue content = request.getContent();
                 for (UmaPendingRequest pendingRequest : queryResourceOwnerPendingRequests(context)) {
-                    service.approvePendingRequest(pendingRequest.getId(), getRealm(context));
+                    promises.add(service.approvePendingRequest(context, pendingRequest.getId(),
+                            content.get(pendingRequest.getId()), getRealm(context)));
                 }
-            } catch (ResourceException e) {
-                handler.handleError(e);
-            }
-            handler.handleResult(json(object()));
-        } else if (DENY_ACTION_ID.equalsIgnoreCase(request.getAction())) {
-            try {
+                handlePendingRequestApproval(promises, handler);
+            } else if (DENY_ACTION_ID.equalsIgnoreCase(request.getAction())) {
                 for (UmaPendingRequest pendingRequest : queryResourceOwnerPendingRequests(context)) {
                     service.denyPendingRequest(pendingRequest.getId(), getRealm(context));
                 }
-            } catch (ResourceException e) {
-                handler.handleError(e);
+                handler.handleResult(json(object()));
+            } else {
+                handler.handleError(new NotSupportedException("Action, " + request.getAction()
+                        + ", is not supported."));
             }
-            handler.handleResult(json(object()));
-        } else {
-            handler.handleError(new NotSupportedException("Action, " + request.getAction() + ", is not supported."));
+        } catch (ResourceException e) {
+            handler.handleError(e);
         }
     }
 
@@ -95,8 +100,8 @@ public class PendingRequestResource implements CollectionResourceProvider {
             ResultHandler<JsonValue> handler) {
         try {
             if (APPROVE_ACTION_ID.equalsIgnoreCase(request.getAction())) {
-                service.approvePendingRequest(resourceId, getRealm(context));
-                handler.handleResult(json(object()));
+                handlePendingRequestApproval(service.approvePendingRequest(context, resourceId, request.getContent(),
+                                getRealm(context)), handler);
             } else if (DENY_ACTION_ID.equalsIgnoreCase(request.getAction())) {
                 service.denyPendingRequest(resourceId, getRealm(context));
                 handler.handleResult(json(object()));
@@ -106,6 +111,28 @@ public class PendingRequestResource implements CollectionResourceProvider {
         } catch (ResourceException e) {
             handler.handleError(e);
         }
+    }
+
+    private void handlePendingRequestApproval(Promise<Void, ResourceException> promise,
+            final ResultHandler<JsonValue> handler) {
+        handlePendingRequestApproval(Collections.singletonList(promise), handler);
+    }
+
+    private void handlePendingRequestApproval(List<Promise<Void, ResourceException>> promises,
+            final ResultHandler<JsonValue> handler) {
+        Promises.when(promises)
+                .thenOnResult(new org.forgerock.util.promise.ResultHandler<List<Void>>() {
+                    @Override
+                    public void handleResult(List<Void> result) {
+                        handler.handleResult(json(object()));
+                    }
+                })
+                .thenOnException(new ExceptionHandler<ResourceException>() {
+                    @Override
+                    public void handleException(ResourceException exception) {
+                        handler.handleError(exception);
+                    }
+                });
     }
 
     @Override

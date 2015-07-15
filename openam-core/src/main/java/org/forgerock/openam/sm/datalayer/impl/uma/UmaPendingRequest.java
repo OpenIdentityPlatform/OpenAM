@@ -24,7 +24,7 @@ import java.util.Set;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.Field;
-import org.forgerock.openam.tokens.SetToJsonBytesConverter;
+import org.forgerock.openam.tokens.JsonValueToJsonBytesConverter;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.tokens.Type;
 import org.forgerock.opendj.ldap.GeneralizedTime;
@@ -54,7 +54,7 @@ public class UmaPendingRequest {
     private String realm;
     @Field(field = CoreTokenField.STRING_FOUR)
     private String requestingPartyId;
-    @Field(field = CoreTokenField.BLOB, converter = SetToJsonBytesConverter.class)
+    @Field(field = CoreTokenField.BLOB, converter = JsonValueToJsonBytesConverter.class)
     private JsonValue blob;
 
     public UmaPendingRequest() {
@@ -122,20 +122,20 @@ public class UmaPendingRequest {
         this.requestingPartyId = requestingPartyId;
     }
 
+    public JsonValue getBlob() {
+        return blob;
+    }
+
+    public void setBlob(JsonValue blob) {
+        this.blob = blob;
+    }
+
     public Set<String> getScopes() {
         return blob.get("scopes").asSet(String.class);
     }
 
-    public void setScopes(Set<String> scopes) {
-        blob.put("scopes", scopes);
-    }
-
     public Calendar getRequestedAt() {
         return GeneralizedTime.valueOf(blob.get("requestedAt").asString()).toCalendar();
-    }
-
-    public void setRequestedAt(Calendar requestedAt) {
-        blob.put("requestedAt", GeneralizedTime.valueOf(requestedAt).toString());
     }
 
     public JsonValue asJson() {

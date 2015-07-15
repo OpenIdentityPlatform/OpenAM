@@ -44,6 +44,8 @@ import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
 import org.forgerock.openam.uma.PendingRequestsService;
+import org.forgerock.util.promise.Promise;
+import org.forgerock.util.promise.Promises;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.testng.annotations.BeforeMethod;
@@ -92,12 +94,13 @@ public class PendingRequestResourceTest {
         ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 
         mockPendingRequestsForUser("alice", "REALM", 2);
+        mockPendingRequestApprovalService();
 
         //When
         resource.actionCollection(context, request, handler);
 
         //Then
-        verify(service, times(2)).approvePendingRequest(anyString(), anyString());
+        verify(service, times(2)).approvePendingRequest(eq(context), anyString(), any(JsonValue.class), anyString());
         verify(handler).handleResult(any(JsonValue.class));
     }
 
@@ -148,12 +151,13 @@ public class PendingRequestResourceTest {
         ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 
         mockPendingRequestsForUser("alice", "REALM", 1);
+        mockPendingRequestApprovalService();
 
         //When
         resource.actionCollection(context, request, handler);
 
         //Then
-        verify(service).approvePendingRequest(anyString(), anyString());
+        verify(service).approvePendingRequest(eq(context), anyString(), any(JsonValue.class), anyString());
         verify(handler).handleResult(any(JsonValue.class));
     }
 
@@ -236,5 +240,11 @@ public class PendingRequestResourceTest {
         pendingRequest.setId("PENDING_REQUEST_ID");
         given(service.readPendingRequest("PENDING_REQUEST_ID")).willReturn(pendingRequest);
         return "PENDING_REQUEST_ID";
+    }
+
+    private void mockPendingRequestApprovalService() throws ResourceException {
+        Promise<Void, ResourceException> promise = Promises.newResultPromise(null);
+        given(service.approvePendingRequest(any(ServerContext.class), anyString(), any(JsonValue.class), anyString()))
+                .willReturn(promise);
     }
 }

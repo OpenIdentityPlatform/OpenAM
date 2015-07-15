@@ -16,16 +16,21 @@
 
 package org.forgerock.openam.uma;
 
+import static org.forgerock.json.fluent.JsonValue.*;
 import static org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest.*;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
 import javax.mail.MessagingException;
 import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.Set;
 
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ServerContext;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
@@ -34,7 +39,9 @@ import org.forgerock.openam.sm.datalayer.store.ServerException;
 import org.forgerock.openam.sm.datalayer.store.TokenDataStore;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
 import org.forgerock.openam.uma.audit.UmaAuditType;
+import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.Pair;
+import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
 
 /**
@@ -51,6 +58,7 @@ public class PendingRequestsService {
     private final UmaProviderSettingsFactory settingsFactory;
     private final UmaEmailService emailService;
     private final PendingRequestEmailTemplate pendingRequestEmailTemplate;
+    private final UmaPolicyService policyService;
 
     /**
      * Constructs a new {@code PendingRequestsService} instance.
@@ -60,17 +68,19 @@ public class PendingRequestsService {
      * @param settingsFactory An instance of the {@code UmaProviderSettingsFactory}.
      * @param emailService An instance of the {@code UmaEmailService}.
      * @param pendingRequestEmailTemplate An instance of the {@code PendingRequestEmailTemplate}.
+     * @param policyService An instance of the {@code UmaPolicyService}.
      */
     @Inject
     public PendingRequestsService(@DataLayer(ConnectionType.UMA_PENDING_REQUESTS) TokenDataStore store,
             UmaAuditLogger auditLogger, UmaProviderSettingsFactory settingsFactory,
             UmaEmailService emailService,
-            PendingRequestEmailTemplate pendingRequestEmailTemplate) {
+            PendingRequestEmailTemplate pendingRequestEmailTemplate, UmaPolicyService policyService) {
         this.store = store;
         this.auditLogger = auditLogger;
         this.settingsFactory = settingsFactory;
         this.emailService = emailService;
         this.pendingRequestEmailTemplate = pendingRequestEmailTemplate;
+        this.policyService = policyService;
     }
 
     /**
@@ -164,34 +174,74 @@ public class PendingRequestsService {
     /**
      * Approves the pending request with the specified {@literal id}.
      *
+     * @param context The request context.
      * @param id The pending request id.
-     * @param realm The current realm.
+     * @param content The content of the approval request.
+     * @param realm The current realm.  @return {@code Promise} which is completed successfully or failed with a {@code ResourceException}.
      * @throws ResourceException If the pending request is not found or could not be marked as approved.
      */
-    public void approvePendingRequest(String id, String realm) throws ResourceException {
+    public Promise<Void, ResourceException> approvePendingRequest(ServerContext context, final String id,
+            JsonValue content, final String realm) throws ResourceException {
         try {
-            UmaPendingRequest request = store.read(id);
-            if (isEmailRequestingPartyOnPendingRequestApprovalEnabled(realm)) {
-                Pair<String, String> template = pendingRequestEmailTemplate.getApprovalTemplate(
-                        request.getRequestingPartyId(), realm);
-                try {
-                    emailService.email(realm, request.getRequestingPartyId(), template.getFirst(),
-                            MessageFormat.format(template.getSecond(), request.getResourceOwnerId(),
-                                    request.getResourceSetName(),
-                                    pendingRequestEmailTemplate.buildScopeString(request.getScopes(),
-                                            request.getRequestingPartyId(), realm)));
-                } catch (MessagingException e) {
-                    debug.warning("Pending Request Approval email could not be sent", e);
-                }
-            }
-            store.delete(id);
-            auditLogger.log(request.getResourceSetId(), request.getResourceSetName(), request.getResourceOwnerId(),
-                    UmaAuditType.REQUEST_APPROVED, request.getRequestingPartyId());
+            final UmaPendingRequest request = store.read(id);
+            return createUmaPolicy(context, request, content)
+                    .thenAsync(new AsyncFunction<UmaPolicy, Void, ResourceException>() {
+                        @Override
+                        public Promise<Void, ResourceException> apply(UmaPolicy value) throws ResourceException {
+                            try {
+                                if (isEmailRequestingPartyOnPendingRequestApprovalEnabled(realm)) {
+                                    Pair<String, String> template = pendingRequestEmailTemplate.getApprovalTemplate(
+                                            request.getRequestingPartyId(), realm);
+                                    try {
+                                        emailService.email(realm, request.getRequestingPartyId(), template.getFirst(),
+                                                MessageFormat.format(template.getSecond(),
+                                                        request.getResourceOwnerId(), request.getResourceSetName(),
+                                                        pendingRequestEmailTemplate.buildScopeString(
+                                                                request.getScopes(), request.getRequestingPartyId(),
+                                                                realm)));
+                                    } catch (MessagingException e) {
+                                        debug.warning("Pending Request Approval email could not be sent", e);
+                                    }
+                                }
+                                store.delete(id);
+                                auditLogger.log(request.getResourceSetId(), request.getResourceSetName(),
+                                        request.getResourceOwnerId(), UmaAuditType.REQUEST_APPROVED,
+                                        request.getRequestingPartyId());
+
+                                return newResultPromise(null);
+                            } catch (NotFoundException e) {
+                                throw new org.forgerock.json.resource.NotFoundException("Pending request, " + id
+                                        + ", not found", e);
+                            } catch (ServerException e) {
+                                throw new InternalServerErrorException("Failed to mark pending request, " + id
+                                        + ", as approved", e);
+                            }
+                        }
+                    });
         } catch (NotFoundException e) {
             throw new org.forgerock.json.resource.NotFoundException("Pending request, " + id + ", not found", e);
         } catch (ServerException e) {
             throw new InternalServerErrorException("Failed to mark pending request, " + id + ", as approved", e);
         }
+    }
+
+    private Promise<UmaPolicy, ResourceException> createUmaPolicy(ServerContext context, UmaPendingRequest request,
+            JsonValue content) {
+        Collection<String> scopes;
+        if (content != null && !content.isNull() && content.isDefined("scopes")) {
+            scopes = content.get("scopes").asList(String.class);
+        } else {
+            scopes = request.getScopes();
+        }
+        JsonValue policy = json(object(
+                field("policyId", request.getResourceSetId()),
+                field("permissions", array(
+                        object(
+                                field("subject", request.getRequestingPartyId()),
+                                field("scopes", scopes)
+                        )
+                ))));
+        return policyService.createPolicy(context, policy);
     }
 
     /**

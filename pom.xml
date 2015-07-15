@@ -892,8 +892,8 @@
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
-                <artifactId>json-test</artifactId>
-                <version>${forgerock.json.version}</version>
+                <artifactId>forgerock-test-utils</artifactId>
+                <version>${commons.forgerock-util.version}</version>
                 <scope>test</scope>
             </dependency>
 
