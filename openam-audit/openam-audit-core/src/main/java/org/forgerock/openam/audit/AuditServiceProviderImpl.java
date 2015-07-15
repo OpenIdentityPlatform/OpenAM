@@ -28,6 +28,7 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.openam.utils.JsonValueBuilder;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -68,13 +69,17 @@ public class AuditServiceProviderImpl implements AuditServiceProvider {
         JsonValue csvConfig = readJsonFile("/org/forgerock/openam/audit/csv-handler-config.json");
 
         CSVAuditEventHandlerConfiguration csvHandlerConfiguration = new CSVAuditEventHandlerConfiguration();
-        csvHandlerConfiguration.setLogDirectory(csvConfig.get("config").get("location").asString());
+        csvHandlerConfiguration.setLogDirectory(getTmpAuditDirectory());
         csvHandlerConfiguration.setRecordDelimiter(csvConfig.get("config").get("recordDelimiter").asString());
 
         CSVAuditEventHandler csvAuditEventHandler = new CSVAuditEventHandler();
         csvAuditEventHandler.configure(csvHandlerConfiguration);
 
         auditService.register(csvAuditEventHandler, "csv", csvConfig.get("events").asSet(String.class));
+    }
+
+    private String getTmpAuditDirectory() {
+        return new File(System.getProperty("java.io.tmpdir"), "audit").getAbsolutePath();
     }
 
     private JsonValue readJsonFile(String path) throws AuditException {

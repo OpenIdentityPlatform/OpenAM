@@ -26,13 +26,6 @@ import org.forgerock.audit.events.AuthenticationAuditEventBuilder;
 public final class AMAuthenticationAuditEventBuilder extends AuthenticationAuditEventBuilder<AMAuthenticationAuditEventBuilder> {
 
     /**
-     * @return A new instance of this builder.
-     */
-    public static AMAuthenticationAuditEventBuilder amAuthenticationEvent() {
-        return new AMAuthenticationAuditEventBuilder();
-    }
-
-    /**
      * Provide value for "extraInfo" audit log field.
      *
      * @param values String sequence of valAMAuthenticationAuditEventBuilderues that should be stored in the 'extraInfo' audit log field.

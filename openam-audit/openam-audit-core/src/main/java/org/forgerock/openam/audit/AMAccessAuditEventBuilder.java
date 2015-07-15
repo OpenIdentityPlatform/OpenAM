@@ -23,14 +23,7 @@ import org.forgerock.audit.events.AccessAuditEventBuilder;
  *
  * @since 13.0.0
  */
-public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMAccessAuditEventBuilder> {
-
-    /**
-     * @return A new instance of this builder.
-     */
-    public static AMAccessAuditEventBuilder amAccessEvent() {
-        return new AMAccessAuditEventBuilder();
-    }
+public class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMAccessAuditEventBuilder> {
 
     /**
      * Provide value for "extraInfo" audit log field.

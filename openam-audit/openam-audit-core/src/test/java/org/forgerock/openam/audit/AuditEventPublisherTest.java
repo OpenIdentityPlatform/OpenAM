@@ -15,7 +15,6 @@
  */
 package org.forgerock.openam.audit;
 
-import static org.forgerock.openam.audit.AMAccessAuditEventBuilder.amAccessEvent;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -58,7 +57,7 @@ public class AuditEventPublisherTest {
     @Test
     public void publishesProvidedAuditEventToAuditService() throws Exception {
         // Given
-        AuditEvent auditEvent = amAccessEvent()
+        AuditEvent auditEvent = new AMAccessAuditEventBuilder()
                 .eventName("AM-REST-1")
                 .transactionId(UUID.randomUUID().toString())
                 .authentication("id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org")

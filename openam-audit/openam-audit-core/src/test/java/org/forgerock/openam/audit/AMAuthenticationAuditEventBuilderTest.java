@@ -15,7 +15,6 @@
  */
 package org.forgerock.openam.audit;
 
-import static org.forgerock.openam.audit.AMAuthenticationAuditEventBuilder.amAuthenticationEvent;
 import static org.forgerock.openam.audit.JsonUtils.*;
 
 import org.forgerock.audit.events.AuditEvent;
@@ -30,7 +29,7 @@ public class AMAuthenticationAuditEventBuilderTest {
 
     @Test
     public void canBuildAccessAuditEvent() throws Exception {
-        AuditEvent accessEvent = amAuthenticationEvent()
+        AuditEvent accessEvent = new AMAuthenticationAuditEventBuilder()
                 .timestamp(1436389263629L)
                 .eventName("AM-AUTHENTICATION-105")
                 .component("AUTHENTICATION")

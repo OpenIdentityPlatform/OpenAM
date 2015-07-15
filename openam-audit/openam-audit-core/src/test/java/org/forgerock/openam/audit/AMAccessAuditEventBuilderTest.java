@@ -15,7 +15,6 @@
  */
 package org.forgerock.openam.audit;
 
-import static org.forgerock.openam.audit.AMAccessAuditEventBuilder.amAccessEvent;
 import static org.forgerock.openam.audit.JsonUtils.*;
 
 import org.forgerock.audit.events.AuditEvent;
@@ -31,7 +30,7 @@ public class AMAccessAuditEventBuilderTest {
 
     @Test
     public void canBuildAccessAuditEvent() throws Exception {
-        AuditEvent accessEvent = amAccessEvent()
+        AuditEvent accessEvent = new AMAccessAuditEventBuilder()
                 .timestamp(1436389263629L)
                 .eventName("AM-REST-1")
                 .component("REST")

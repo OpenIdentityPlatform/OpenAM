@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.audit;
 
+import static org.forgerock.audit.events.AuditEventBuilder.EVENT_NAME;
 import static org.forgerock.json.resource.Requests.newCreateRequest;
 
 import com.google.inject.Inject;
@@ -22,6 +23,7 @@ import com.sun.identity.shared.debug.Debug;
 import org.forgerock.audit.AuditException;
 import org.forgerock.audit.AuditService;
 import org.forgerock.audit.events.AuditEvent;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.Connection;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.ResourceException;
@@ -49,20 +51,68 @@ public class AuditEventPublisher {
 
     /**
      * Publishes the provided AuditEvent to the specified topic of the AuditService.
+     * <p/>
+     * If an error occurs that prevents the AuditEvent from being published, then details regarding the error
+     * are recorded in the debug logs. However, the debug logs are not be treated as the fallback destination
+     * for audit information. If we need guaranteed capture of audit information then this needs to be a feature
+     * of the audit service itself. Also, the audit event may contain sensitive information that shouldn't be
+     * stored in debug logs.
+     * <p/>
+     * After recording details of the error, the exception will only be propagated back to the caller if the
+     * 'suppress exceptions' configuration option is set to false.
      *
      * @param topic Coarse-grained categorization of the AuditEvent's type.
      * @param auditEvent The AuditEvent to publish.
+     *
+     * @throws AuditException if an exception occurs while trying to publish the audit event.
      */
     public void publish(String topic, AuditEvent auditEvent) throws AuditException {
+
         try {
 
             Connection connection = auditServiceConnectionFactory.getConnection();
             connection.create(new RootContext(), newCreateRequest(topic, auditEvent.getValue()));
 
         } catch (ResourceException e) {
-            debug.error("Unable to publish audit event", e);
-            throw new AuditException("Unable to publish audit event", e);
+
+            final String eventName = getValue(auditEvent.getValue(), EVENT_NAME, "-unknown-");
+            debug.error("Unable to publish {} audit event '{}' due to error: {} [{}]",
+                    topic, eventName, e.getMessage(), e.getReason(), e);
+
+            if (!isSuppressExceptions()) {
+                throw new AuditException("Unable to publish " + topic + " audit event '" + eventName + "'", e);
+            }
         }
     }
 
+    /**
+     * Tries to publish the provided AuditEvent to the specified topic of the AuditService.
+     * <p/>
+     * If an exception occurs, details are logged but the exception is suppressed.
+     *
+     * @param topic Coarse-grained categorization of the AuditEvent's type.
+     * @param auditEvent The AuditEvent to publish.
+     */
+    public void tryPublish(String topic, AuditEvent auditEvent) {
+        try {
+            publish(topic, auditEvent);
+        } catch (AuditException e) {
+            // suppress
+        }
+    }
+
+    private String getValue(JsonValue jsonValue, String key, String defaultValue) {
+        return jsonValue.isDefined(key) ? jsonValue.get(key).asString() : defaultValue;
+    }
+
+    public boolean isAuditing(String topic) {
+        return true; // TODO: Check AuditService SMS configuration
+    }
+
+    /**
+     * @return True if the operation being audited can proceed if an exception occurs while publishing an audit event.
+     */
+    public boolean isSuppressExceptions() {
+        return false; // TODO: Check AuditService SMS configuration
+    }
 }

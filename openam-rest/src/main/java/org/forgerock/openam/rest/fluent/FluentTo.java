@@ -47,6 +47,7 @@ public final class FluentTo {
         this.route = route;
         this.version = version;
         filters = new ArrayList<>();
+        filters.add(get(AuditFilter.class));
     }
 
     /**

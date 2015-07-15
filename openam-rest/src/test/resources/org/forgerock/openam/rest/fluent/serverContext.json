@@ -1,0 +1,20 @@
+{
+  "class": "org.forgerock.json.resource.servlet.HttpContext",
+  "method": "GET",
+  "path": "http://product.example.com:8080/path",
+  "parameters": {
+    "p1": [ "p1_v1", "p1_v2" ],
+    "p2": [ "p2_v1", "p2_v2" ]
+  },
+  "headers": {
+    "h1": [ "h1_v1", "h1_v2" ],
+    "h2": [ "h2_v1", "h2_v2" ],
+    "Host" : ["product.example.com:8080"]
+  },
+  "remoteAddress": "168.0.0.10",
+  "parent": {
+    "class": "org.forgerock.json.resource.RootContext",
+    "id": "08a39103-91aa-41e1-aac7-c1d01d502ddf",
+    "parent": null
+  }
+}

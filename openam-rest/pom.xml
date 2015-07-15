@@ -104,6 +104,12 @@
             <artifactId>openam-slf4j</artifactId>
         </dependency>
 
+        <!-- OpenAM Audit -->
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-audit-core</artifactId>
+        </dependency>
+
         <!-- OpenAM Shared -->
         <dependency>
             <groupId>org.forgerock.openam</groupId>
