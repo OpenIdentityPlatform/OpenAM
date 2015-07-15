@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
@@ -24,17 +24,16 @@
  *
  * $Id: SupportedAPIDoclet.java,v 1.2 2008/06/25 05:48:04 qcheng Exp $
  *
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
-/*
- * Portions Copyrighted [2010-2011] [ForgeRock AS]
- */
-
 package com.sun.identity.tools.javadocs;
 
 import com.sun.javadoc.Doc;
+import com.sun.javadoc.ParameterizedType;
 import com.sun.javadoc.RootDoc;
 import com.sun.tools.doclets.standard.Standard;
 import com.sun.tools.javadoc.Main;
+
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -61,11 +60,10 @@ public class SupportedAPIDoclet extends Standard {
     }
  
     /**
-     * Goes through the parameter array, and checks for supported.all.api
-     * tags. If the given doc entry has the tag, then we store the name
-     * of the class/interface.
+     * Goes through the parameter array, and checks for supported.all.api tags. If the given doc entry has the tag, then
+     * we store the name of the class/interface.
      *
-     * @param array array of objects deriving from a Doc entry
+     * @param array Array of objects deriving from a Doc entry.
      */
     private static void setIncludeAll(Object[] array) {
         for (Object entry : array) {
@@ -73,7 +71,7 @@ public class SupportedAPIDoclet extends Standard {
                 Doc doc = (Doc) entry;
                 if (doc.isClass() || doc.isInterface()) {
                     if (doc.tags(SUPPORTED_ALL_API).length > 0) {
-                        includeAll.add(entry.toString());
+                        includeAll.add(removeGenericTypes(entry.toString()));
                     }
                 }
             }
@@ -81,18 +79,14 @@ public class SupportedAPIDoclet extends Standard {
     }
 
     /**
-     * Returns <code>true</code> if the class for the given Doc 
-     * is part of the public JavaDoc.
-     * 
-     * @param doc A JavaDoc item for a class/constructor/method/
-     * field
-     * @return <code>true</code> if this class is part of the 
-     * public JavaDoc
+     * Returns <code>true</code> if the class for the given Doc is part of the public JavaDoc.
+     *
+     * @param doc A JavaDoc item for a class/constructor/method/field.
+     * @return <code>true</code> if this class is part of the public JavaDoc
      */
     private static boolean toIncludeMe(Doc doc) {
         //does this doc item have at least one of the supported tags?
-        boolean includeMe = (doc.tags(SUPPORTED_ALL_API).length > 0) ||
-            (doc.tags(SUPPORTED_API).length > 0);
+        boolean includeMe = doc.tags(SUPPORTED_ALL_API).length > 0 || doc.tags(SUPPORTED_API).length > 0;
 
         if (!includeMe) {
             String name = doc.toString();
@@ -118,9 +112,8 @@ public class SupportedAPIDoclet extends Standard {
 
         if (obj != null) {
             Class cls = obj.getClass();
-            if (cls.getName().startsWith("com.sun.tools.")) {
-                retObj = Proxy.newProxyInstance(cls.getClassLoader(),
-                    cls.getInterfaces(), new StandardHandler(obj));
+            if (cls.getName().startsWith("com.sun.tools.") && !ParameterizedType.class.isAssignableFrom(cls)) {
+                retObj = Proxy.newProxyInstance(cls.getClassLoader(), cls.getInterfaces(), new StandardHandler(obj));
             } else if (obj instanceof Object[]) {
                 Class componentType = expect.getComponentType();
                 Object[] array = (Object[]) obj;
@@ -134,15 +127,20 @@ public class SupportedAPIDoclet extends Standard {
                     }
                     list.add(process(entry, componentType));
                 }
-                retObj = list.toArray(
-                    (Object[]) Array.newInstance(componentType, list.size()));
+                retObj = list.toArray((Object[]) Array.newInstance(componentType, list.size()));
             }
         }
 
         return retObj;
     }
 
+    private static String removeGenericTypes(String className) {
+        int idx = className.indexOf('<');
+        return idx != -1 ? className.substring(0, idx) : className;
+    }
+
     private static class StandardHandler implements InvocationHandler {
+
         private Object target;
                                                                                 
         public StandardHandler(Object target) {
@@ -153,25 +151,20 @@ public class SupportedAPIDoclet extends Standard {
             throws Throwable {
             if (args != null) {
                 String methodName = method.getName();
-                if (methodName.equals("compareTo") ||
-                    methodName.equals("equals") ||
-                    methodName.equals("overrides") ||
-                    methodName.equals("subclassOf")) {
+                if (methodName.equals("compareTo") || methodName.equals("equals") || methodName.equals("overrides")
+                        || methodName.equals("subclassOf")) {
                     args[0] = unwrap(args[0]);
                 }
             }
             try {
-                return process(method.invoke(target, args),
-                    method.getReturnType());
+                return process(method.invoke(target, args), method.getReturnType());
             } catch (InvocationTargetException e) {
                 throw e.getTargetException();
             }
         }
                                                                                 
         private Object unwrap(Object proxy) {
-            return (proxy instanceof Proxy) ?
-                ((StandardHandler) Proxy.getInvocationHandler(proxy)).target :
-                proxy;
+            return (proxy instanceof Proxy) ? ((StandardHandler) Proxy.getInvocationHandler(proxy)).target : proxy;
         }
     }
 }
