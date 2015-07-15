@@ -80,17 +80,15 @@ public class UmaResourceSetRegistrationListener implements ResourceSetRegistrati
         Subject adminSubject = SubjectUtils.createSuperAdminSubject();
         try {
             resourceTypeService.saveResourceType(adminSubject, realm, resourceType);
-        } catch (EntitlementException e) {
-            if (logger.errorEnabled()) {
-                logger.error("Failed to create resource type for resource set, " + resourceSet, e);
-            }
+        } catch (EntitlementException | RuntimeException e) {
+            logger.error("Failed to create resource type for resource set, {}", resourceSet, e);
         }
         try {
             Application application = applicationManager.getApplication(adminSubject, realm,
                     resourceSet.getClientId().toLowerCase());
             application.addAllResourceTypeUuids(Collections.singleton(resourceType.getUUID()));
             applicationManager.saveApplication(adminSubject, application);
-        } catch (EntitlementException e) {
+        } catch (EntitlementException | RuntimeException e) {
             if (logger.errorEnabled()) {
                 logger.error("Failed to add Resource Type, " + resourceType.getUUID() + " to application, "
                         + resourceSet.getClientId(), e);
