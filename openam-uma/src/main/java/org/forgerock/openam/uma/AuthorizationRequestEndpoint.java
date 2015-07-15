@@ -56,6 +56,7 @@ import org.restlet.data.ChallengeResponse;
 import org.restlet.data.Status;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.ext.json.JsonRepresentation;
+import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
@@ -126,7 +127,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
                     throw new UmaException(403, UmaConstants.NOT_AUTHORISED_ERROR_CODE,
                             "The client is not authorised to access the requested resource set");
                 } else {
-                    pendingRequestsService.createPendingRequest(resourceSetId,
+                    pendingRequestsService.createPendingRequest(ServletUtils.getRequest(getRequest()), resourceSetId,
                             auditLogger.getResourceName(resourceSetId, request), resourceOwnerId, requestingUserId,
                             permissionTicket.getRealm(), permissionTicket.getScopes());
                     auditLogger.log(resourceSetId, resourceOwnerId, UmaAuditType.REQUEST_SUBMITTED, request, requestingUserId);

@@ -26,12 +26,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.Set;
 
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ServerContext;
+import org.forgerock.openam.services.baseurl.BaseURLProvider;
+import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
 import org.forgerock.openam.sm.datalayer.store.NotFoundException;
 import org.forgerock.openam.sm.datalayer.store.ServerException;
@@ -49,6 +52,14 @@ import org.testng.annotations.Test;
 
 public class PendingRequestsServiceTest {
 
+    private static final String PENDING_REQUEST_ID = "PENDING_REQUEST_ID";
+    private static final String RESOURCE_SET_ID = "RESOURCE_SET_ID";
+    private static final String RESOURCE_SET_NAME = "RESOURCE_SET_NAME";
+    private static final String RESOURCE_OWNER_ID = "RESOURCE_OWNER_ID";
+    private static final String REQUESTING_PARTY_ID = "REQUESTING_PARTY_ID";
+    private static final String REALM = "REALM";
+    private static final String SCOPE = "SCOPE";
+
     private PendingRequestsService service;
 
     @Mock
@@ -63,6 +74,8 @@ public class PendingRequestsServiceTest {
     private PendingRequestEmailTemplate pendingRequestEmailTemplate;
     @Mock
     private UmaPolicyService policyService;
+    @Mock
+    private BaseURLProvider baseUrlProvider;
 
     @SuppressWarnings("unchecked")
     @BeforeMethod
@@ -70,28 +83,33 @@ public class PendingRequestsServiceTest {
         initMocks(this);
         UmaProviderSettingsFactory settingsFactory = mock(UmaProviderSettingsFactory.class);
         given(settingsFactory.get(anyString())).willReturn(settings);
+        BaseURLProviderFactory baseUrlProviderFactory = mock(BaseURLProviderFactory.class);
+        given(baseUrlProviderFactory.get(anyString())).willReturn(baseUrlProvider);
 
         service = new PendingRequestsService(store, auditLogger, settingsFactory, emailService,
-                pendingRequestEmailTemplate, policyService);
+                pendingRequestEmailTemplate, policyService, baseUrlProviderFactory);
     }
 
     @Test
     public void shouldCreatePendingRequest() throws Exception {
 
+        //Given
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+
         //When
-        service.createPendingRequest("RESOURCE_SET_ID", "RESOURCE_SET_NAME", "RESOURCE_OWNER_ID", "REQUESTING_PARTY_ID",
-                "REALM", Collections.singleton("SCOPE"));
+        service.createPendingRequest(httpRequest, RESOURCE_SET_ID, RESOURCE_SET_NAME, RESOURCE_OWNER_ID,
+                REQUESTING_PARTY_ID, REALM, Collections.singleton(SCOPE));
 
         //Then
         ArgumentCaptor<UmaPendingRequest> pendingRequestCaptor = ArgumentCaptor.forClass(UmaPendingRequest.class);
         verify(store).create(pendingRequestCaptor.capture());
         UmaPendingRequest pendingRequest = pendingRequestCaptor.getValue();
-        assertThat(pendingRequest.getResourceSetId()).isEqualTo("RESOURCE_SET_ID");
-        assertThat(pendingRequest.getResourceSetName()).isEqualTo("RESOURCE_SET_NAME");
-        assertThat(pendingRequest.getResourceOwnerId()).isEqualTo("RESOURCE_OWNER_ID");
-        assertThat(pendingRequest.getRequestingPartyId()).isEqualTo("REQUESTING_PARTY_ID");
-        assertThat(pendingRequest.getRealm()).isEqualTo("REALM");
-        assertThat(pendingRequest.getScopes()).containsExactly("SCOPE");
+        assertThat(pendingRequest.getResourceSetId()).isEqualTo(RESOURCE_SET_ID);
+        assertThat(pendingRequest.getResourceSetName()).isEqualTo(RESOURCE_SET_NAME);
+        assertThat(pendingRequest.getResourceOwnerId()).isEqualTo(RESOURCE_OWNER_ID);
+        assertThat(pendingRequest.getRequestingPartyId()).isEqualTo(REQUESTING_PARTY_ID);
+        assertThat(pendingRequest.getRealm()).isEqualTo(REALM);
+        assertThat(pendingRequest.getScopes()).containsExactly(SCOPE);
         assertThat(pendingRequest.getRequestedAt()).isNotNull();
     }
 
@@ -99,16 +117,17 @@ public class PendingRequestsServiceTest {
     public void shouldSendEmailOnPendingRequestCreation() throws Exception {
 
         //Given
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
         given(settings.isEmailResourceOwnerOnPendingRequestCreationEnabled()).willReturn(true);
-        mockPendingRequestCreationEmailTemplate("RESOURCE_OWNER_ID", "REALM");
+        mockPendingRequestCreationEmailTemplate(RESOURCE_OWNER_ID, REALM);
 
         //When
-        service.createPendingRequest("RESOURCE_SET_ID", "RESOURCE_SET_NAME", "RESOURCE_OWNER_ID", "REQUESTING_PARTY_ID",
-                "REALM", Collections.singleton("SCOPE"));
+        service.createPendingRequest(httpRequest, RESOURCE_SET_ID, RESOURCE_SET_NAME, RESOURCE_OWNER_ID,
+                REQUESTING_PARTY_ID, REALM, Collections.singleton(SCOPE));
 
         //Then
-        verify(emailService).email("REALM", "RESOURCE_OWNER_ID", "CREATION_SUBJECT",
-                "CREATION_BODY REQUESTING_PARTY_ID RESOURCE_SET_NAME SCOPE");
+        verify(emailService).email(REALM, RESOURCE_OWNER_ID, "CREATION_SUBJECT",
+                "CREATION_BODY " + REQUESTING_PARTY_ID + " " + RESOURCE_SET_NAME + " " + SCOPE);
         ArgumentCaptor<UmaPendingRequest> pendingRequestCaptor = ArgumentCaptor.forClass(UmaPendingRequest.class);
         verify(store).create(pendingRequestCaptor.capture());
     }
@@ -117,10 +136,10 @@ public class PendingRequestsServiceTest {
     public void shouldReadPendingRequest() throws Exception {
 
         //When
-        service.readPendingRequest("PENDING_REQUEST_ID");
+        service.readPendingRequest(PENDING_REQUEST_ID);
 
         //Then
-        verify(store).read("PENDING_REQUEST_ID");
+        verify(store).read(PENDING_REQUEST_ID);
     }
 
     @SuppressWarnings("unchecked")
@@ -128,14 +147,14 @@ public class PendingRequestsServiceTest {
     public void shouldQueryPendingRequestByResourceOwner() throws Exception {
 
         //When
-        service.queryPendingRequests("RESOURCE_OWNER_ID", "REALM");
+        service.queryPendingRequests(RESOURCE_OWNER_ID, REALM);
 
         //Then
         ArgumentCaptor<QueryFilter> queryFilterCaptor = ArgumentCaptor.forClass(QueryFilter.class);
         verify(store).query(queryFilterCaptor.capture());
         QueryFilter<String> queryFilter = queryFilterCaptor.getValue();
-        assertThat(queryFilter.toString()).contains(RESOURCE_OWNER_ID_FIELD + " eq \"RESOURCE_OWNER_ID\" and "
-                + REALM_FIELD + " eq \"REALM\"");
+        assertThat(queryFilter.toString()).contains(RESOURCE_OWNER_ID_FIELD + " eq \"" + RESOURCE_OWNER_ID + "\" and "
+                + REALM_FIELD + " eq \"" + REALM + "\"");
     }
 
     @SuppressWarnings("unchecked")
@@ -143,15 +162,15 @@ public class PendingRequestsServiceTest {
     public void shouldQueryPendingRequestByResourceOwnerAndRequestingParty() throws Exception {
 
         //When
-        service.queryPendingRequests("RESOURCE_SET_ID", "RESOURCE_OWNER_ID", "REALM", "REQUESTING_PARTY_ID");
+        service.queryPendingRequests(RESOURCE_SET_ID, RESOURCE_OWNER_ID, REALM, REQUESTING_PARTY_ID);
 
         //Then
         ArgumentCaptor<QueryFilter> queryFilterCaptor = ArgumentCaptor.forClass(QueryFilter.class);
         verify(store).query(queryFilterCaptor.capture());
         QueryFilter<String> queryFilter = queryFilterCaptor.getValue();
         assertThat(queryFilter.toString()).contains(RESOURCE_SET_ID_FIELD + " eq \"RESOURCE_SET_ID\" and "
-                + RESOURCE_OWNER_ID_FIELD + " eq \"RESOURCE_OWNER_ID\" and " + REALM_FIELD + " eq \"REALM\" and "
-                + REQUESTING_PARTY_ID_FIELD + " eq \"REQUESTING_PARTY_ID\"");
+                + RESOURCE_OWNER_ID_FIELD + " eq \"" + RESOURCE_OWNER_ID + "\" and " + REALM_FIELD + " eq \"REALM\" and "
+                + REQUESTING_PARTY_ID_FIELD + " eq \"" + REQUESTING_PARTY_ID + "\"");
     }
 
     @Test
@@ -159,25 +178,25 @@ public class PendingRequestsServiceTest {
 
         //Given
         ServerContext context = mock(ServerContext.class);
-        createPendingRequest("PENDING_REQUEST_ID", "RESOURCE_SET_ID", "RESOURCE_SET_NAME", "RESOURCE_OWNER_ID",
-                "REALM", "REQUESTING_PARTY_ID", Collections.singleton("SCOPE"));
+        createPendingRequest(PENDING_REQUEST_ID, RESOURCE_SET_ID, RESOURCE_SET_NAME, RESOURCE_OWNER_ID,
+                REALM, REQUESTING_PARTY_ID, Collections.singleton(SCOPE));
         mockSuccessfulPolicyCreationForPendingRequest();
         JsonValue content = json(object());
 
         //When
-        service.approvePendingRequest(context, "PENDING_REQUEST_ID", content, "REALM");
+        service.approvePendingRequest(context, PENDING_REQUEST_ID, content, REALM);
 
         //Then
         ArgumentCaptor<JsonValue> policyCaptor = ArgumentCaptor.forClass(JsonValue.class);
         verify(policyService).createPolicy(eq(context), policyCaptor.capture());
         JsonValue policy = policyCaptor.getValue();
-        assertThat(policy).stringAt("policyId").isEqualTo("RESOURCE_SET_ID");
+        assertThat(policy).stringAt("policyId").isEqualTo(RESOURCE_SET_ID);
         assertThat(policy).hasArray("permissions").hasSize(1);
-        assertThat(policy).stringAt("permissions/0/subject").isEqualTo("REQUESTING_PARTY_ID");
-        assertThat(policy).hasArray("permissions/0/scopes").containsOnly("SCOPE");
-        verify(store).delete("PENDING_REQUEST_ID");
-        verify(auditLogger).log("RESOURCE_SET_ID", "RESOURCE_SET_NAME", "RESOURCE_OWNER_ID",
-                UmaAuditType.REQUEST_APPROVED, "REQUESTING_PARTY_ID");
+        assertThat(policy).stringAt("permissions/0/subject").isEqualTo(REQUESTING_PARTY_ID);
+        assertThat(policy).hasArray("permissions/0/scopes").containsOnly(SCOPE);
+        verify(store).delete(PENDING_REQUEST_ID);
+        verify(auditLogger).log(RESOURCE_SET_ID, RESOURCE_SET_NAME, RESOURCE_OWNER_ID,
+                UmaAuditType.REQUEST_APPROVED, REQUESTING_PARTY_ID);
     }
 
     @Test
@@ -185,25 +204,25 @@ public class PendingRequestsServiceTest {
 
         //Given
         ServerContext context = mock(ServerContext.class);
-        createPendingRequest("PENDING_REQUEST_ID", "RESOURCE_SET_ID", "RESOURCE_SET_NAME", "RESOURCE_OWNER_ID",
-                "REALM", "REQUESTING_PARTY_ID", Collections.singleton("SCOPE"));
+        createPendingRequest(PENDING_REQUEST_ID, RESOURCE_SET_ID, RESOURCE_SET_NAME, RESOURCE_OWNER_ID,
+                REALM, REQUESTING_PARTY_ID, Collections.singleton(SCOPE));
         mockSuccessfulPolicyCreationForPendingRequest();
         JsonValue content = json(object(field("scopes", array("SCOPE_A", "SCOPE_B"))));
 
         //When
-        service.approvePendingRequest(context, "PENDING_REQUEST_ID", content, "REALM");
+        service.approvePendingRequest(context, PENDING_REQUEST_ID, content, REALM);
 
         //Then
         ArgumentCaptor<JsonValue> policyCaptor = ArgumentCaptor.forClass(JsonValue.class);
         verify(policyService).createPolicy(eq(context), policyCaptor.capture());
         JsonValue policy = policyCaptor.getValue();
-        assertThat(policy).stringAt("policyId").isEqualTo("RESOURCE_SET_ID");
+        assertThat(policy).stringAt("policyId").isEqualTo(RESOURCE_SET_ID);
         assertThat(policy).hasArray("permissions").hasSize(1);
-        assertThat(policy).stringAt("permissions/0/subject").isEqualTo("REQUESTING_PARTY_ID");
+        assertThat(policy).stringAt("permissions/0/subject").isEqualTo(REQUESTING_PARTY_ID);
         assertThat(policy).hasArray("permissions/0/scopes").containsOnly("SCOPE_A", "SCOPE_B");
-        verify(store).delete("PENDING_REQUEST_ID");
-        verify(auditLogger).log("RESOURCE_SET_ID", "RESOURCE_SET_NAME", "RESOURCE_OWNER_ID",
-                UmaAuditType.REQUEST_APPROVED, "REQUESTING_PARTY_ID");
+        verify(store).delete(PENDING_REQUEST_ID);
+        verify(auditLogger).log(RESOURCE_SET_ID, RESOURCE_SET_NAME, RESOURCE_OWNER_ID,
+                UmaAuditType.REQUEST_APPROVED, REQUESTING_PARTY_ID);
     }
 
     @Test
@@ -211,39 +230,39 @@ public class PendingRequestsServiceTest {
 
         //Given
         ServerContext context = mock(ServerContext.class);
-        createPendingRequest("PENDING_REQUEST_ID", "RESOURCE_SET_ID", "RESOURCE_SET_NAME", "RESOURCE_OWNER_ID",
-                "REALM", "REQUESTING_PARTY_ID", Collections.singleton("SCOPE"));
+        createPendingRequest(PENDING_REQUEST_ID, RESOURCE_SET_ID, RESOURCE_SET_NAME, RESOURCE_OWNER_ID,
+                REALM, REQUESTING_PARTY_ID, Collections.singleton(SCOPE));
         given(settings.isEmailRequestingPartyOnPendingRequestApprovalEnabled()).willReturn(true);
-        mockPendingRequestApprovalEmailTemplate("REQUESTING_PARTY_ID", "REALM");
+        mockPendingRequestApprovalEmailTemplate(REQUESTING_PARTY_ID, REALM);
         mockSuccessfulPolicyCreationForPendingRequest();
         JsonValue content = json(object());
 
         //When
-        service.approvePendingRequest(context, "PENDING_REQUEST_ID", content, "REALM");
+        service.approvePendingRequest(context, PENDING_REQUEST_ID, content, REALM);
 
         //Then
         verify(policyService).createPolicy(eq(context), any(JsonValue.class));
-        verify(emailService).email("REALM", "REQUESTING_PARTY_ID", "APPROVAL_SUBJECT",
-                "APPROVAL_BODY RESOURCE_OWNER_ID RESOURCE_SET_NAME SCOPE");
-        verify(store).delete("PENDING_REQUEST_ID");
-        verify(auditLogger).log("RESOURCE_SET_ID", "RESOURCE_SET_NAME", "RESOURCE_OWNER_ID",
-                UmaAuditType.REQUEST_APPROVED, "REQUESTING_PARTY_ID");
+        verify(emailService).email(REALM, REQUESTING_PARTY_ID, "APPROVAL_SUBJECT",
+                "APPROVAL_BODY " + RESOURCE_OWNER_ID + " " + RESOURCE_SET_NAME + " " + SCOPE);
+        verify(store).delete(PENDING_REQUEST_ID);
+        verify(auditLogger).log(RESOURCE_SET_ID, RESOURCE_SET_NAME, RESOURCE_OWNER_ID,
+                UmaAuditType.REQUEST_APPROVED, REQUESTING_PARTY_ID);
     }
 
     @Test
     public void shouldDenyPendingRequest() throws Exception {
 
         //Given
-        createPendingRequest("PENDING_REQUEST_ID", "RESOURCE_SET_ID", "RESOURCE_SET_NAME", "RESOURCE_OWNER_ID",
-                "REALM", "REQUESTING_PARTY_ID", Collections.singleton("SCOPE"));
+        createPendingRequest(PENDING_REQUEST_ID, RESOURCE_SET_ID, RESOURCE_SET_NAME, RESOURCE_OWNER_ID,
+                REALM, REQUESTING_PARTY_ID, Collections.singleton(SCOPE));
 
         //When
-        service.denyPendingRequest("PENDING_REQUEST_ID", "REALM");
+        service.denyPendingRequest(PENDING_REQUEST_ID, REALM);
 
         //Then
-        verify(store).delete("PENDING_REQUEST_ID");
-        verify(auditLogger).log("RESOURCE_SET_ID", "RESOURCE_SET_NAME", "RESOURCE_OWNER_ID",
-                UmaAuditType.REQUEST_DENIED, "REQUESTING_PARTY_ID");
+        verify(store).delete(PENDING_REQUEST_ID);
+        verify(auditLogger).log(RESOURCE_SET_ID, RESOURCE_SET_NAME, RESOURCE_OWNER_ID,
+                UmaAuditType.REQUEST_DENIED, REQUESTING_PARTY_ID);
     }
 
     private void createPendingRequest(String id, String resourceSetId, String resourceSetName, String resourceOwnerId,
@@ -258,14 +277,14 @@ public class PendingRequestsServiceTest {
         given(pendingRequestEmailTemplate.getCreationTemplate(resourceOwnerId, realm))
                 .willReturn(Pair.of("CREATION_SUBJECT", "CREATION_BODY {0} {1} {2}"));
         given(pendingRequestEmailTemplate.buildScopeString(anySetOf(String.class), eq(resourceOwnerId), eq(realm)))
-                .willReturn("SCOPE");
+                .willReturn(SCOPE);
     }
 
     private void mockPendingRequestApprovalEmailTemplate(String resourceOwnerId, String realm) {
         given(pendingRequestEmailTemplate.getApprovalTemplate(resourceOwnerId, realm))
                 .willReturn(Pair.of("APPROVAL_SUBJECT", "APPROVAL_BODY {0} {1} {2}"));
         given(pendingRequestEmailTemplate.buildScopeString(anySetOf(String.class), eq(resourceOwnerId), eq(realm)))
-                .willReturn("SCOPE");
+                .willReturn(SCOPE);
     }
 
     private void mockSuccessfulPolicyCreationForPendingRequest() {

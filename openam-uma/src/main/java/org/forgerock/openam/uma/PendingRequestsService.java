@@ -18,10 +18,12 @@ package org.forgerock.openam.uma;
 
 import static org.forgerock.json.fluent.JsonValue.*;
 import static org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest.*;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
 import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Set;
@@ -31,6 +33,7 @@ import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ServerContext;
+import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
@@ -59,6 +62,7 @@ public class PendingRequestsService {
     private final UmaEmailService emailService;
     private final PendingRequestEmailTemplate pendingRequestEmailTemplate;
     private final UmaPolicyService policyService;
+    private final BaseURLProviderFactory baseURLProviderFactory;
 
     /**
      * Constructs a new {@code PendingRequestsService} instance.
@@ -69,40 +73,48 @@ public class PendingRequestsService {
      * @param emailService An instance of the {@code UmaEmailService}.
      * @param pendingRequestEmailTemplate An instance of the {@code PendingRequestEmailTemplate}.
      * @param policyService An instance of the {@code UmaPolicyService}.
+     * @param baseURLProviderFactory An instance of the {@code BaseUrlProviderFactory}.
      */
     @Inject
     public PendingRequestsService(@DataLayer(ConnectionType.UMA_PENDING_REQUESTS) TokenDataStore store,
             UmaAuditLogger auditLogger, UmaProviderSettingsFactory settingsFactory,
             UmaEmailService emailService,
-            PendingRequestEmailTemplate pendingRequestEmailTemplate, UmaPolicyService policyService) {
+            PendingRequestEmailTemplate pendingRequestEmailTemplate, UmaPolicyService policyService,
+            BaseURLProviderFactory baseURLProviderFactory) {
         this.store = store;
         this.auditLogger = auditLogger;
         this.settingsFactory = settingsFactory;
         this.emailService = emailService;
         this.pendingRequestEmailTemplate = pendingRequestEmailTemplate;
         this.policyService = policyService;
+        this.baseURLProviderFactory = baseURLProviderFactory;
     }
 
     /**
      * Creates a pending request.
      *
+     * @param httpRequest The {@code HttpServletRequest}.
      * @param resourceSetId The resource set id.
      * @param resourceSetName The resource set name.
      * @param resourceOwnerId The resource owner id.
      * @param requestingPartyId The requesting party id.
      * @param realm The realm.
      * @param scopes The requested scopes.
-     * @throws ServerException If the pending request could not be created.
+     * @throws ServerException If the pending request
+     * could not be created.
      */
-    public void createPendingRequest(String resourceSetId, String resourceSetName, String resourceOwnerId,
+    public void createPendingRequest(HttpServletRequest httpRequest, String resourceSetId, String resourceSetName,
+            String resourceOwnerId,
             String requestingPartyId, String realm, Set<String> scopes) throws ServerException {
 
         if (isEmailResourceOwnerOnPendingRequestCreationEnabled(realm)) {
             Pair<String, String> template = pendingRequestEmailTemplate.getCreationTemplate(resourceOwnerId, realm);
             try {
+                String scopesString = pendingRequestEmailTemplate.buildScopeString(scopes, resourceOwnerId, realm);
+                String baseUrl = baseURLProviderFactory.get(realm).getURL(httpRequest);
                 emailService.email(realm, resourceOwnerId, template.getFirst(),
                         MessageFormat.format(template.getSecond(), requestingPartyId, resourceSetName,
-                                pendingRequestEmailTemplate.buildScopeString(scopes, resourceOwnerId, realm)));
+                                scopesString, baseUrl, resourceSetId, requestingPartyId, scopesString));
             } catch (MessagingException e) {
                 debug.warning("Pending Request Creation email could not be sent", e);
             }
@@ -177,52 +189,60 @@ public class PendingRequestsService {
      * @param context The request context.
      * @param id The pending request id.
      * @param content The content of the approval request.
-     * @param realm The current realm.  @return {@code Promise} which is completed successfully or failed with a {@code ResourceException}.
-     * @throws ResourceException If the pending request is not found or could not be marked as approved.
+     * @param realm The current realm.  @return {@code Promise} which is completed successfully or
+     *              failed with a {@code ResourceException}.
      */
-    public Promise<Void, ResourceException> approvePendingRequest(ServerContext context, final String id,
-            JsonValue content, final String realm) throws ResourceException {
+    public Promise<Void, ResourceException> approvePendingRequest(ServerContext context, String id,
+            JsonValue content, String realm) {
         try {
             final UmaPendingRequest request = store.read(id);
             return createUmaPolicy(context, request, content)
-                    .thenAsync(new AsyncFunction<UmaPolicy, Void, ResourceException>() {
-                        @Override
-                        public Promise<Void, ResourceException> apply(UmaPolicy value) throws ResourceException {
-                            try {
-                                if (isEmailRequestingPartyOnPendingRequestApprovalEnabled(realm)) {
-                                    Pair<String, String> template = pendingRequestEmailTemplate.getApprovalTemplate(
-                                            request.getRequestingPartyId(), realm);
-                                    try {
-                                        emailService.email(realm, request.getRequestingPartyId(), template.getFirst(),
-                                                MessageFormat.format(template.getSecond(),
-                                                        request.getResourceOwnerId(), request.getResourceSetName(),
-                                                        pendingRequestEmailTemplate.buildScopeString(
-                                                                request.getScopes(), request.getRequestingPartyId(),
-                                                                realm)));
-                                    } catch (MessagingException e) {
-                                        debug.warning("Pending Request Approval email could not be sent", e);
-                                    }
-                                }
-                                store.delete(id);
-                                auditLogger.log(request.getResourceSetId(), request.getResourceSetName(),
-                                        request.getResourceOwnerId(), UmaAuditType.REQUEST_APPROVED,
-                                        request.getRequestingPartyId());
-
-                                return newResultPromise(null);
-                            } catch (NotFoundException e) {
-                                throw new org.forgerock.json.resource.NotFoundException("Pending request, " + id
-                                        + ", not found", e);
-                            } catch (ServerException e) {
-                                throw new InternalServerErrorException("Failed to mark pending request, " + id
-                                        + ", as approved", e);
-                            }
-                        }
-                    });
+                    .thenAsync(approvePendingRequest(request, id, realm));
         } catch (NotFoundException e) {
-            throw new org.forgerock.json.resource.NotFoundException("Pending request, " + id + ", not found", e);
+            return newExceptionPromise((ResourceException) new org.forgerock.json.resource.NotFoundException(
+                    "Pending request, " + id + ", not found", e));
         } catch (ServerException e) {
-            throw new InternalServerErrorException("Failed to mark pending request, " + id + ", as approved", e);
+            return newExceptionPromise((ResourceException) new InternalServerErrorException(
+                    "Failed to mark pending request, " + id + ", as approved", e));
         }
+    }
+
+    private AsyncFunction<UmaPolicy, Void, ResourceException> approvePendingRequest(final UmaPendingRequest request,
+            final String id, final String realm) {
+        return new AsyncFunction<UmaPolicy, Void, ResourceException>() {
+            @Override
+            public Promise<Void, ResourceException> apply(UmaPolicy value) {
+                try {
+                    if (isEmailRequestingPartyOnPendingRequestApprovalEnabled(realm)) {
+                        Pair<String, String> template = pendingRequestEmailTemplate.getApprovalTemplate(
+                                request.getRequestingPartyId(), realm);
+                        try {
+                            emailService.email(realm, request.getRequestingPartyId(), template.getFirst(),
+                                    MessageFormat.format(template.getSecond(),
+                                            request.getResourceOwnerId(), request.getResourceSetName(),
+                                            pendingRequestEmailTemplate.buildScopeString(
+                                                    request.getScopes(), request.getRequestingPartyId(),
+                                                    realm)));
+                        } catch (MessagingException e) {
+                            debug.warning("Pending Request Approval email could not be sent", e);
+                        }
+                    }
+                    store.delete(id);
+                    auditLogger.log(request.getResourceSetId(), request.getResourceSetName(),
+                            request.getResourceOwnerId(), UmaAuditType.REQUEST_APPROVED,
+                            request.getRequestingPartyId());
+
+                    return newResultPromise(null);
+                } catch (NotFoundException e) {
+                    return newExceptionPromise(
+                            (ResourceException) new org.forgerock.json.resource.NotFoundException(
+                                    "Pending request, " + id + ", not found", e));
+                } catch (ServerException e) {
+                    return newExceptionPromise((ResourceException) new InternalServerErrorException(
+                            "Failed to mark pending request, " + id + ", as approved", e));
+                }
+            }
+        };
     }
 
     private Promise<UmaPolicy, ResourceException> createUmaPolicy(ServerContext context, UmaPendingRequest request,

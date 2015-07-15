@@ -67,12 +67,44 @@ public class PendingRequestEmailTemplate {
         this.authServiceSettings = authServiceSettings;
     }
 
+    /**
+     * Gets the subject and body for the Pending Request creation email.
+     *
+     * <p>The body contains 7 arguments:
+     * <ul>
+     *     <li>The requesting party username</li>
+     *     <li>The resource set name</li>
+     *     <li>The requested scopes</li>
+     *     <li>The AM base URL</li>
+     *     <li>The resource set ID</li>
+     *     <li>The requesting party username</li>
+     *     <li>The requested scopes</li>
+     * </ul></p>
+     *
+     * @param resourceOwnerId The resource owner username.
+     * @param realm The realm.
+     * @return A {@code Pair} containing the subject and body of the email template.
+     */
     Pair<String, String> getCreationTemplate(String resourceOwnerId, String realm) {
         ResourceBundle resourceBundle = getResourceBundle(resourceOwnerId, realm);
         return Pair.of(resourceBundle.getString("UmaPendingRequestCreationEmailSubject"),
                 resourceBundle.getString("UmaPendingRequestCreationEmailTemplate"));
     }
 
+    /**
+     * Gets the subject and body for the Pending Request approval email.
+     *
+     * <p>The body contains 3 arguments:
+     * <ul>
+     *     <li>The resource owner username</li>
+     *     <li>The resource set name</li>
+     *     <li>The requested scopes</li>
+     * </ul></p>
+     *
+     * @param requestingPartyId The resource owner username.
+     * @param realm The realm.
+     * @return A {@code Pair} containing the subject and body of the email template.
+     */
     Pair<String, String> getApprovalTemplate(String requestingPartyId, String realm) {
         ResourceBundle resourceBundle = getResourceBundle(requestingPartyId, realm);
         return Pair.of(resourceBundle.getString("UmaPendingRequestApprovalEmailSubject"),

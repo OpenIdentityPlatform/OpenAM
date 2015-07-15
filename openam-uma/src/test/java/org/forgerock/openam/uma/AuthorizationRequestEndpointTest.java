@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
 import javax.security.auth.Subject;
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -266,8 +267,8 @@ public class AuthorizationRequestEndpointTest {
         try {
             endpoint.requestAuthorization(entity);
         } catch (UmaException e) {
-            verify(pendingRequestsService).createPendingRequest(eq("RESOURCE_SET_ID"), anyString(), anyString(),
-                    anyString(), eq("REALM"), eq(requestedScopes));
+            verify(pendingRequestsService).createPendingRequest(any(HttpServletRequest.class), eq("RESOURCE_SET_ID"),
+                    anyString(), anyString(), anyString(), eq("REALM"), eq(requestedScopes));
             verify(umaAuditLogger).log(eq("RESOURCE_SET_ID"), anyString(), eq(UmaAuditType.REQUEST_SUBMITTED),
                     any(Request.class), anyString());
             assertThat(e.getStatusCode()).isEqualTo(403);
@@ -298,8 +299,8 @@ public class AuthorizationRequestEndpointTest {
         try {
             endpoint.requestAuthorization(entity);
         } catch (UmaException e) {
-            verify(pendingRequestsService).createPendingRequest(eq("RESOURCE_SET_ID"), anyString(), anyString(),
-                    anyString(), eq("REALM"), eq(requestedScopes));
+            verify(pendingRequestsService).createPendingRequest(any(HttpServletRequest.class), eq("RESOURCE_SET_ID"),
+                    anyString(), anyString(), anyString(), eq("REALM"), eq(requestedScopes));
             verify(umaAuditLogger).log(eq("RESOURCE_SET_ID"), anyString(), eq(UmaAuditType.REQUEST_SUBMITTED),
                     any(Request.class), anyString());
             assertThat(e.getStatusCode()).isEqualTo(403);
@@ -330,8 +331,8 @@ public class AuthorizationRequestEndpointTest {
         try {
             endpoint.requestAuthorization(entity);
         } catch (UmaException e) {
-            verify(pendingRequestsService, never()).createPendingRequest(eq("RESOURCE_SET_ID"), anyString(), anyString(),
-                    anyString(), eq("REALM"), eq(requestedScopes));
+            verify(pendingRequestsService, never()).createPendingRequest(any(HttpServletRequest.class),
+                    eq("RESOURCE_SET_ID"), anyString(), anyString(), anyString(), eq("REALM"), eq(requestedScopes));
             verify(umaAuditLogger, never()).log(eq("RESOURCE_SET_ID"), anyString(), eq(UmaAuditType.REQUEST_SUBMITTED),
                     any(Request.class), anyString());
             assertThat(e.getStatusCode()).isEqualTo(403);
