@@ -19,9 +19,9 @@ define("org/forgerock/openam/ui/admin/delegates/PoliciesDelegate", [
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/common/util/RealmHelper",
-    "org/forgerock/openam/ui/admin/utils/AdministeredRealmsHelper"
-], function (_, AbstractDelegate, Constants, RealmHelper, AdministeredRealmsHelper) {
+    "org/forgerock/openam/ui/admin/utils/AdministeredRealmsHelper",
+    "org/forgerock/openam/ui/common/util/RealmHelper"
+], function (_, AbstractDelegate, Constants, AdministeredRealmsHelper, RealmHelper) {
     var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json"),
         getCurrentAdministeredRealm = function () {
             var realm = AdministeredRealmsHelper.getCurrentRealm();
@@ -65,14 +65,14 @@ define("org/forgerock/openam/ui/admin/delegates/PoliciesDelegate", [
 
     obj.queryIdentities = function (name, query) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm("/" + name + "?_queryId=" + query + "*"),
+            url: RealmHelper.decorateURLWithOverrideRealm(getCurrentAdministeredRealm() + "/" + name + "?_queryId=" + query + "*"),
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
 
     obj.getUniversalId = function (name, type) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURLWithOverrideRealm("/" + type + "/" + name + "?_fields=universalid"),
+            url: RealmHelper.decorateURLWithOverrideRealm(getCurrentAdministeredRealm() + "/" + type + "/" + name + "?_fields=universalid"),
             headers: {"Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=2.0"}
         });
     };
