@@ -40,7 +40,7 @@ define("org/forgerock/openam/ui/uma/delegates/UMADelegate", [
 
         if (!Configuration.globalData.auth.uma || !Configuration.globalData.auth.uma.resharingMode){
             request = obj.serviceCall({
-                url: RealmHelper.decorateURIWithRealm("__subrealm__/server-config/uma"),
+                url: RealmHelper.decorateURIWithRealm("__subrealm__/serverinfo/uma"),
                 headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
             });
             request.done(function (data) {
