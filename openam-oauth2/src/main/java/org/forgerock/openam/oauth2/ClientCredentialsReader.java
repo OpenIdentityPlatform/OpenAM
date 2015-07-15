@@ -12,6 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2015 ForgeRock AS.
+* Portions Copyrighted 2015 Nomura Research Institute, Ltd.
 */
 package org.forgerock.openam.oauth2;
 
@@ -123,9 +124,13 @@ public class ClientCredentialsReader {
         final OAuth2Jwt jwt = OAuth2Jwt.create(request.<String>getParameter(CLIENT_ASSERTION));
 
         final ClientRegistration clientRegistration = clientRegistrationStore.get(jwt.getSubject(), request);
+        
+        if (jwt.isExpired()) {
+            throw new InvalidClientException("JWT has expired");
+        }
 
         if (!clientRegistration.verifyJwtIdentity(jwt)) {
-            throw new InvalidClientException("JWT has expired or is not valid");
+            throw new InvalidClientException("JWT is not valid");
         }
 
         if (basicAuth && jwt.getSubject() != null) {
