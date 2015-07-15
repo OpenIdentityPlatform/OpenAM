@@ -104,10 +104,8 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
             config.addSubConfig(name, lastSchemaNodeName(), 0, attrs);
             ServiceConfig created = checkedInstanceSubConfig(context, name, config);
 
-            String dn = created.getDN();
             JsonValue result = getJsonValue(created);
-            handler.handleResult(new Resource(dn.substring(dn.lastIndexOf("=") + 1), String.valueOf(result.hashCode()),
-                    result));
+            handler.handleResult(new Resource(created.getName(), String.valueOf(result.hashCode()), result));
         } catch (ServiceAlreadyExistsException e) {
             debug.warning("::SmsCollectionProvider:: ServiceAlreadyExistsException on create", e);
             handler.handleError(new ConflictException("Unable to create SMS config: " + e.getMessage()));
