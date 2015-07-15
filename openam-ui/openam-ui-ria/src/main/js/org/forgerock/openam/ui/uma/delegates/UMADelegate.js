@@ -103,11 +103,28 @@ define("org/forgerock/openam/ui/uma/delegates/UMADelegate", [
         });
     };
 
-    obj.revokeAllResources = function(){
+    obj.revokeAllResources = function() {
         return obj.serviceCall({
             url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" + encodeURIComponent(Configuration.loggedUser.username) + "/oauth2/resourcesets?_action=revokeAll"),
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             errorsHandlers: obj.ERROR_HANDLERS,
+            type:'POST'
+        });
+    };
+
+    obj.approveRequest = function(id, permissions) {
+        return obj.serviceCall({
+            url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" + encodeURIComponent(Configuration.loggedUser.username) + "/uma/pendingrequests/" + id + "?_action=approve"),
+            type:'POST',
+            data: JSON.stringify({
+                scopes: permissions
+            })
+        });
+    };
+
+    obj.denyRequest = function(id) {
+        return obj.serviceCall({
+            url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" + encodeURIComponent(Configuration.loggedUser.username) + "/uma/pendingrequests/" + id + "?_action=deny"),
             type:'POST'
         });
     };

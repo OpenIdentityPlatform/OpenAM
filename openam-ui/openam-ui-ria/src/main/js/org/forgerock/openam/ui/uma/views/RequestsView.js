@@ -24,8 +24,9 @@ define("org/forgerock/openam/ui/uma/views/RequestsView", [
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/util/RealmHelper",
-    "org/forgerock/openam/ui/uma/views/backgrid/cells/PermissionsCell"
-], function ($, AbstractView, Backbone, Backgrid, BackgridUtils, Configuration, Constants, RealmHelper, PermissionsCell) {
+    "org/forgerock/openam/ui/uma/views/backgrid/cells/PermissionsCell",
+    "org/forgerock/openam/ui/uma/delegates/UMADelegate"
+], function ($, AbstractView, Backbone, Backgrid, BackgridUtils, Configuration, Constants, RealmHelper, PermissionsCell, UMADelegate) {
     var RequestsView = AbstractView.extend({
         template: "templates/uma/views/RequestsTemplate.html",
 
@@ -37,8 +38,7 @@ define("org/forgerock/openam/ui/uma/views/RequestsView", [
                 RequestsCollection;
 
             RequestsCollection = Backbone.PageableCollection.extend({
-                // FIXME: Update when server implemenation is complete
-                url: RealmHelper.decorateURIWithRealm("/" + Constants.context + "/json/__subrealm__/users/" + Configuration.loggedUser.username + "/oauth2/resourcesets"),
+                url: RealmHelper.decorateURIWithRealm("/" + Constants.context + "/json/__subrealm__/users/" + Configuration.loggedUser.username + "/uma/pendingrequests"),
                 state: {
                     pageSize: 10,
                     sortKey: "user"
@@ -47,11 +47,11 @@ define("org/forgerock/openam/ui/uma/views/RequestsView", [
                     pageSize: "_pageSize",
                     _sortKeys: BackgridUtils.sortKeys,
                     _queryId: "*",
-                    _queryFilter: BackgridUtils.queryFilter,
-                    _pagedResultsOffset: BackgridUtils.pagedResultsOffset,
-                    _fields: ["_id", "icon_uri", "name", "resourceServer", "type"]
+                    _queryFilter: "true",
+                    _pagedResultsOffset: BackgridUtils.pagedResultsOffset
                 },
                 parseState: BackgridUtils.parseState,
+                parseRecords: BackgridUtils.parseRecords,
                 sync: BackgridUtils.sync
             });
 
@@ -77,9 +77,15 @@ define("org/forgerock/openam/ui/uma/views/RequestsView", [
                     className: "col-xs-7 col-md-6"
                 }),
                 cell: PermissionsCell.extend({
-                    onChange: function () {
-                        var anySelected = this.$el.find("li.active").length > 0;
+                    onChange: function (value) {
+                        this.model.set("permissions", value, { silent: true });
+
+                        var anySelected = value !== null;
                         this.$el.parent().find("[data-permission=allow]").prop("disabled", !anySelected);
+
+                        // TODO: Code that works with Backbone MultiSelect
+                        // var anySelected = this.$el.find("li.active").length > 0;
+                        // this.$el.parent().find("[data-permission=allow]").prop("disabled", !anySelected);
                     }
                 }),
                 editable: false
@@ -89,14 +95,18 @@ define("org/forgerock/openam/ui/uma/views/RequestsView", [
                 cell: BackgridUtils.TemplateCell.extend({
                     template: "templates/uma/backgrid/cell/ActionsCell.html",
                     events: {
-                        "click #allow": "allow",
-                        "click #deny": "deny"
+                        "click button[data-permission=allow]": "allow",
+                        "click button[data-permission=deny]": "deny"
                     },
                     allow: function () {
-                        // TODO:
+                        UMADelegate.approveRequest(this.model.get("_id"), this.model.get("permissions")).done(function() {
+                            self.data.requests.fetch({ reset: true, processData: false }); // TODO: DRY
+                        });
                     },
                     deny: function () {
-                        // TODO:
+                        UMADelegate.denyRequest(this.model.get("_id")).done(function() {
+                            self.data.requests.fetch({ reset: true, processData: false }); // TODO: DRY
+                        });
                     }
                 }),
                 editable: false
@@ -104,14 +114,6 @@ define("org/forgerock/openam/ui/uma/views/RequestsView", [
 
             this.data.requests = new RequestsCollection();
             this.data.requests.on("backgrid:sort", BackgridUtils.doubleSortFix);
-
-            // FIXME: Remove when server implemenation is complete
-            this.data.requests.add({
-                user: "Bob",
-                resource: "Photo1",
-                when: "",
-                permissions: ["View", "Delete", "Read", "Update", "Execute"]
-            });
 
             grid = new Backgrid.Grid({
                 columns: columns,
@@ -128,8 +130,8 @@ define("org/forgerock/openam/ui/uma/views/RequestsView", [
             self.parentRender(function() {
                 self.$el.find("#backgridContainer").append( grid.render().el );
                 self.$el.find("#paginationContainer").append( paginator.render().el );
-                // FIXME: Comment back in when server implemenation is complete
-                // self.data.requests.fetch({reset: true, processData: false});
+                self.data.requests.fetch({ reset: true, processData: false }); // TODO: DRY
+
                 if (callback) { callback(); }
             });
         }

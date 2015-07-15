@@ -22,13 +22,13 @@ define("org/forgerock/openam/ui/uma/views/backgrid/cells/PermissionsCell", [
     return BackgridUtils.TemplateCell.extend({
         className: "permissions-cell",
         template: "templates/uma/backgrid/cell/PermissionsCell.html",
-        onChange: function () {},
+        onChange: function() {},
         rendered: function() {
             this.$el.find("select").selectize({
-                dropdownParent: "body"
+                dropdownParent: "body",
+                onChange: this.onChange.bind(this)
             });
         }
-
     });
 });
 
