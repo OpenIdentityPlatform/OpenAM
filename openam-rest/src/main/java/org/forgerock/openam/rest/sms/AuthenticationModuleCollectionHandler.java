@@ -106,14 +106,24 @@ public class AuthenticationModuleCollectionHandler implements RequestHandler {
             for (AMAuthenticationInstance instance : moduleInstances) {
                 String name = instance.getName();
                 if (searchForId == null || searchForId.equalsIgnoreCase(name)) {
-                    ServiceSchemaManager schemaManager = getSchemaManager(instance.getType());
-                    String type = schemaManager.getResourceName();
-                    String typeDescription = getI18NValue(schemaManager, instance.getType(), debug);
-                    JsonValue result = json(object(
-                            field(Resource.FIELD_CONTENT_ID, name),
-                            field("typeDescription", typeDescription),
-                            field("type", type)));
-                    handler.handleResource(new Resource(name, String.valueOf(result.hashCode()), result));
+                    try {
+                        ServiceSchemaManager schemaManager = getSchemaManager(instance.getType());
+                        String type = schemaManager.getResourceName();
+                        String typeDescription = getI18NValue(schemaManager, instance.getType(), debug);
+                        JsonValue result = json(object(
+                                field(Resource.FIELD_CONTENT_ID, name),
+                                field("typeDescription", typeDescription),
+                                field("type", type)));
+                        handler.handleResource(new Resource(name, String.valueOf(result.hashCode()), result));
+                    } catch (AMConfigurationException ex) {
+                        debug.error("AuthenticationModuleCollectionHandler.handleQuery(): Invalid auth module " +
+                                "instance configuration: {}", name);
+                        if (debug.messageEnabled()) {
+                            debug.message(
+                                    "AuthenticationModuleCollectionHandler.handleQuery(): Configuration exception: {}",
+                                    name, ex);
+                        }
+                    }
                 }
             }
 
