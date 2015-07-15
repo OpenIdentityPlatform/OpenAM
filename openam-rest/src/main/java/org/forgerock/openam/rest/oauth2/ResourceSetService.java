@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.security.auth.Subject;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
@@ -142,7 +143,11 @@ public class ResourceSetService {
                             filteredResourceSets.addAll(query.getResourceSetQuery().accept(new QueryFilterVisitor<Set<ResourceSetDescription>, Set<ResourceSetDescription>, String>() {
                                 @Override
                                 public Set<ResourceSetDescription> visitAndFilter(Set<ResourceSetDescription> resourceSetDescriptions, List<org.forgerock.util.query.QueryFilter<String>> list) {
-                                    throw new UnsupportedOperationException("'And' not supported");
+                                    for (org.forgerock.util.query.QueryFilter<String> filter : list) {
+                                        resourceSetDescriptions.retainAll(filter.accept(this, resourceSetDescriptions));
+                                    }
+
+                                    return resourceSetDescriptions;
                                 }
 
                                 @Override
@@ -156,7 +161,17 @@ public class ResourceSetService {
 
                                 @Override
                                 public Set<ResourceSetDescription> visitContainsFilter(Set<ResourceSetDescription> resourceSetDescriptions, String fieldName, Object value) {
-                                    throw new UnsupportedOperationException("'Contains' not supported");
+                                    Set<ResourceSetDescription> results = new HashSet<>();
+
+                                    for (ResourceSetDescription resourceSetDescription : resourceSetDescriptions) {
+                                        if (fieldName.equals("name")) {
+                                            if (resourceSetDescription.getName().contains((String) value)) {
+                                                results.add(resourceSetDescription);
+                                            }
+                                        }
+                                    }
+
+                                    return results;
                                 }
 
                                 @Override
