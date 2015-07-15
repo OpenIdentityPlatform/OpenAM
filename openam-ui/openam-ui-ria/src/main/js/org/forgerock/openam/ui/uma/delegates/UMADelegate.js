@@ -16,11 +16,12 @@
 
 /*global _, define*/
 define("org/forgerock/openam/ui/uma/delegates/UMADelegate", [
+    "jquery",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function (AbstractDelegate, Configuration, Constants, RealmHelper) {
+], function ($, AbstractDelegate, Configuration, Constants, RealmHelper) {
     var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/");
 
     obj.ERROR_HANDLERS = {
@@ -30,6 +31,29 @@ define("org/forgerock/openam/ui/uma/delegates/UMADelegate", [
         "Conflict":                 { status: "409" },
         "Internal Server Error":    { status: "500" },
         "Service Unavailable":      { status: "503" }
+    };
+
+    obj.getUmaConfig = function () {
+
+        var promise = $.Deferred(),
+            request;
+
+        if (!Configuration.globalData.auth.uma || !Configuration.globalData.auth.uma.resharingMode){
+            request = obj.serviceCall({
+                url: RealmHelper.decorateURIWithRealm("__subrealm__/server-config/uma"),
+                headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
+            });
+            request.done(function (data) {
+                Configuration.globalData.auth.uma = data;
+                promise.resolve();
+            }).error(function (e) {
+                promise.resolve();
+            });
+        } else {
+            promise.resolve();
+        }
+
+        return promise;
     };
 
     obj.getPoliciesByQuery = function (query) {
