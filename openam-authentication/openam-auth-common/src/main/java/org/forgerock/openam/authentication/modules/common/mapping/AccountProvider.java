@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2011-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2011-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -34,6 +34,8 @@ import java.util.Set;
 /**
  * Implementations of this interface provide the means to search for and create users given a map of attributes.
  * @see org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider
+ *
+ * @supported.all.api
  */
 public interface AccountProvider {
 
