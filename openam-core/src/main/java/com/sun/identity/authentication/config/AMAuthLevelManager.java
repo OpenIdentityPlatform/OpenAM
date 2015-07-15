@@ -28,14 +28,32 @@
  */
 package com.sun.identity.authentication.config;
 
-import java.util.*;
-import javax.security.auth.login.*;
-import com.sun.identity.authentication.service.*;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.sm.*;
+import static java.util.Collections.singleton;
+import static java.util.Collections.synchronizedMap;
+
 import com.iplanet.sso.SSOException;
+import com.sun.identity.authentication.service.AuthD;
+import com.sun.identity.authentication.service.AuthUtils;
+import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceListener;
+import com.sun.identity.sm.ServiceNotFoundException;
+import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
+
+import javax.security.auth.login.Configuration;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Manager for module authentication level, this class provides methods to 
@@ -50,26 +68,27 @@ public class AMAuthLevelManager implements ServiceListener {
 
     /**
      * listener Map for the auth modules, key is the module name,
-     * value is a List which contain the <code>ServiceSchemaManager</code>,
+     * value is a ListenerMapEntry which contain the <code>ServiceSchemaManager</code>,
      * listener ID, <code>ServiceConfigmanager</code> and listener ID.
      */
-    private Map listenerMap = new HashMap();
+    private final Map<String, ListenerMapEntry> listenerMap = synchronizedMap(new HashMap<String, ListenerMapEntry>());
 
     /**
      * Map to hold authentication level for all organizations. Map of
-     * organization DN to a map of authentication module odule name (String) to
+     * organization DN to a map of authentication module name (String) to
      * module authentication level(Integer).
      */
-    private static Map authLevelMap = new HashMap();
+    private static final ConcurrentMap<String, Map<String, Integer>> authLevelMap = new ConcurrentHashMap<>();
 
     /**
-     * Map to hold all supported modules for organizations. Map of
-     * organization DN to a set of all supported modules for the organization.
+     * Map from service name to module name.
      */
-    private static Map supportedModulesMap = new HashMap();
+    private static final ConcurrentMap<String, String> moduleServiceMap = new ConcurrentHashMap<>();
 
-    private static Map moduleServiceMap = new HashMap();
-    private static Map globalAuthLevelMap = new HashMap();
+    /**
+     * Map from global module name to auth level.
+     */
+    private static final Map<String, Integer> globalAuthLevelMap = new ConcurrentHashMap<>();
 
     /**
      * Map of service name to authentication config name. This is the map to
@@ -77,11 +96,12 @@ public class AMAuthLevelManager implements ServiceListener {
      * changes. Upon notification on the service change, the listened
      * authentication configuration need to be checked.
      */
-    private static Map authConfigListenerMap = new HashMap();
+    private static final Map<String, Set<String>> authConfigListenerMap =
+            synchronizedMap(new HashMap<String, Set<String>>());
 
-    private static String CORE_AUTH = "iPlanetAMAuthService";
+    private static final String CORE_AUTH = "iPlanetAMAuthService";
 
-    private Debug debug = Debug.getInstance("amAuthConfig");
+    private static final Debug debug = Debug.getInstance("amAuthConfig");
 
     /**
      * Constructor
@@ -106,29 +126,24 @@ public class AMAuthLevelManager implements ServiceListener {
         return instance;
     } 
 
-    private void registerListener(String serviceName, Map newMap) {
+    private void registerListener(String serviceName, Map<String, ListenerMapEntry> newMap) {
         // register listener for the specified service 
         // check if the listener for the service is registered already
-        List list =  (List) listenerMap.get(serviceName);
-        if (list != null) {
+        ListenerMapEntry entry = listenerMap.remove(serviceName);
+        if (entry != null) {
             if (debug.messageEnabled()) {
                 debug.message("initialize, existing " + serviceName);
             }
-            newMap.put(serviceName, list);
-            // remove from original map
-            synchronized (listenerMap) {
-                listenerMap.remove(serviceName);
-            }
+            newMap.put(serviceName, entry);
         } else {
             // create new listener
             try {
-                list = addServiceListener(serviceName);
-                if (list != null) {
-                    newMap.put(serviceName, list);
+                entry = addServiceListener(serviceName);
+                if (entry != null) {
+                    newMap.put(serviceName, entry);
                 }
             } catch (Exception e) {
                 debug.error("can't add listener for " + serviceName, e);
-                return;
             }
         }
     }
@@ -139,7 +154,7 @@ public class AMAuthLevelManager implements ServiceListener {
      * <code>iPlanetAMAuthConfiguration</code> and all login modules.
      */
     private synchronized void initialize() {
-        Map newMap = new HashMap();
+        final Map<String, ListenerMapEntry> newMap = new HashMap<>();
         // register listener for iPlanetAMAuthService
         registerListener(CORE_AUTH, newMap);
 
@@ -157,22 +172,18 @@ public class AMAuthLevelManager implements ServiceListener {
                     AuthUtils.getModuleServiceName(moduleName);
                 
                 // check if the listener for the module is registered already
-                List list =  (List) listenerMap.get(moduleName);
-                if (list != null) {
+                ListenerMapEntry entry = listenerMap.remove(moduleName);
+                if (entry != null) {
                     if (debug.messageEnabled()) {
                         debug.message("initialize, existing " + moduleName);
                     }
-                    newMap.put(moduleName, list);
-                    // remove from original map
-                    synchronized (listenerMap) {
-                        listenerMap.remove(moduleName);
-                    }
+                    newMap.put(moduleName, entry);
                 } else {
                     // create new listener
                     try {
-                        list = addServiceListener(moduleServiceName);
-                        if (list != null) {
-                            newMap.put(moduleName, list);
+                        entry = addServiceListener(moduleServiceName);
+                        if (entry != null) {
+                            newMap.put(moduleName, entry);
                         }
                     } catch (Exception e) {
                         // this is OK since some modules might not have
@@ -183,12 +194,8 @@ public class AMAuthLevelManager implements ServiceListener {
                         }
                     }
                 }
-                if ((moduleServiceMap != null) &&
-                    !moduleServiceMap.containsKey(moduleServiceName)
-                ) {
-                    moduleServiceMap.put(moduleServiceName,moduleName);
-                }
-                // get organization schema auth level for module 
+                moduleServiceMap.putIfAbsent(moduleServiceName, moduleName);
+                // get organization schema auth level for module
                 updateGlobalAuthLevelMap(moduleServiceName);
             }
 
@@ -196,48 +203,32 @@ public class AMAuthLevelManager implements ServiceListener {
 
         // remove listeners remains in listenerMap : module removed
         if (!listenerMap.isEmpty()) {
-            it = listenerMap.values().iterator();
-            while (it.hasNext()) {
-                 List list = (List) it.next();
-                 ServiceSchemaManager ssm = (ServiceSchemaManager) list.get(0); 
-                 String ssmListener = (String) list.get(1);
-                 ServiceConfigManager scm = (ServiceConfigManager) list.get(2); 
-                 String scmListener = (String) list.get(3);
-                 try {
-                     ssm.removeListener(ssmListener);
-                     scm.removeListener(scmListener);
-                 } catch (Exception e) {
-                     debug.error("remove listeners ", e);
-                 }
+            for (ListenerMapEntry entry : listenerMap.values()) {
+                entry.removeListeners();
             }
         }
 
         // reassign map
         synchronized (listenerMap) {
-            listenerMap = newMap;
+            listenerMap.clear();
+            listenerMap.putAll(newMap);
         }
     }
 
-    private List addServiceListener(String service)
-            throws SMSException, SSOException {
+    private ListenerMapEntry addServiceListener(String service) throws SMSException, SSOException {
         if (debug.messageEnabled()) {
             debug.message("addServiceListener for " + service);
         }
         // add Service Schema Listener 
         ServiceSchemaManager ssm = null;
         try {
-            ssm = new ServiceSchemaManager(service,
-              AuthD.getAuth().getSSOAuthSession());
+            ssm = new ServiceSchemaManager(service, AuthD.getAuth().getSSOAuthSession());
         } catch (ServiceNotFoundException e) {
             // service not defined, this is OK, since Application/Cert
             // module does not define any xml file
             return null;
         }
-        String id = ssm.addListener(this);
-        // new List to hold return
-        List list = new ArrayList();
-        list.add(ssm);
-        list.add(id);
+        String schemaListenerId = ssm.addListener(this);
         // add Service Config Manager
         ServiceConfigManager scm = null;
         try {
@@ -248,10 +239,9 @@ public class AMAuthLevelManager implements ServiceListener {
             // module does not define any xml file
             return null;
         }
-        id = scm.addListener(this);
-        list.add(scm);
-        list.add(id);
-        return list;
+        String configListenerId = scm.addListener(this);
+
+        return new ListenerMapEntry(ssm, schemaListenerId, scm, configListenerId);
     }
 
     /**
@@ -266,15 +256,15 @@ public class AMAuthLevelManager implements ServiceListener {
      * @return Set which contains module names, e.g. <code>LDAP, Cert,
      *         RADIUS</code>.
      */
-    public Set getModulesForLevel(int level, String orgDN, String clientType) {
-        Map map = (Map) authLevelMap.get(orgDN);
+    public Set<String> getModulesForLevel(int level, String orgDN, String clientType) {
+        Map<String, Integer> map = authLevelMap.get(orgDN);
         if (map == null) {
             map = initOrgAuthLevel(orgDN);
         }
         if (map == null || map.isEmpty()) {
-            return Collections.EMPTY_SET; 
+            return Collections.emptySet();
         }
-        Set set = getModuleForLevel(level, map);
+        Set<String> set = getModuleForLevel(level, map);
         if (debug.messageEnabled()) {
             debug.message("getModuleForLevel " + level + ", org=" + orgDN +
                 ", modules=" + set);
@@ -286,50 +276,41 @@ public class AMAuthLevelManager implements ServiceListener {
         return set;
     }
 
-    private Map initOrgAuthLevel(String orgDN) {
+    private Map<String, Integer> initOrgAuthLevel(String orgDN) {
         // new map contains the module to auth level mapping
-        Map map = new HashMap();
-        Set allowedModules;
+        Map<String, Integer> map = new HashMap<>();
+        Set<String> allowedModules;
         AMAuthenticationManager manager = null;
         try {
             // get all enabled auth modules for this org
-            manager = new AMAuthenticationManager(
-                AuthD.getAuth().getSSOAuthSession(), orgDN);
+            manager = new AMAuthenticationManager(AuthD.getAuth().getSSOAuthSession(), orgDN);
             allowedModules = manager.getAllowedModuleNames();
-            // put the allowed modules into the map
-            synchronized (supportedModulesMap) {
-                supportedModulesMap.put(orgDN, allowedModules);
-            }
         } catch (Exception e) {
             debug.error("initOrgAuthLevel " + orgDN, e);
             return map;
         }
 
         if (!allowedModules.isEmpty()) {
-            Iterator modules = allowedModules.iterator();
-            while (modules.hasNext()) {
-                String module = (String) modules.next();
+            for (final String module : allowedModules) {
                 if (debug.messageEnabled()) {
                     debug.message("initOrgAuthLevel process " + module);
                 }
-                AMAuthenticationInstance instance = 
-                    manager.getAuthenticationInstance(module);
+                final AMAuthenticationInstance instance = manager.getAuthenticationInstance(module);
 
                 if (instance == null) {
                     continue;
                 }
                 // get the auth level attribute
                 Map attrs = instance.getAttributeValues();
-                String attrName = AMAuthConfigUtils.getAuthLevelAttribute(
-                    attrs, instance.getType());
+                String attrName = AMAuthConfigUtils.getAuthLevelAttribute(attrs, instance.getType());
                 String authLevel = CollectionHelper.getMapAttr(attrs, attrName);
                 Integer level = null;
-                if (authLevel != null && authLevel.length() != 0) { 
+                if (authLevel != null && authLevel.length() != 0) {
                     try {
                         level = Integer.valueOf(authLevel);
                     } catch (Exception e) {
                         debug.error("initOrgAuthLevel, invalid level", e);
-                    } 
+                    }
                 }
 
                 if (debug.messageEnabled()) {
@@ -337,7 +318,7 @@ public class AMAuthLevelManager implements ServiceListener {
                     debug.message("initOrgAuthLevel add " + module);
                     debug.message("level is... " + level);
                 }
-          
+
                 // add the mapping to the map
                 if (level != null) {
                     map.put(module, level);
@@ -346,20 +327,21 @@ public class AMAuthLevelManager implements ServiceListener {
         }
 
         // add to the authLevelMap
-        synchronized (authLevelMap) {
-            authLevelMap.put(orgDN, map);
+        Map<String, Integer> previousMap = authLevelMap.putIfAbsent(orgDN, map);
+        if (previousMap != null) {
+            // We lost the race
+            map = previousMap;
         }
 
         return map;
     }
 
-    private Set getModuleForLevel(int level, Map map) {
-        Iterator modules = map.keySet().iterator();
-        Set set = new HashSet();
-        while (modules.hasNext()) {
-            String module = (String) modules.next();
-            if (((Integer) map.get(module)).intValue() >= level) {
-                set.add(module);
+    private Set<String> getModuleForLevel(int level, Map<String, Integer> map) {
+        Set<String> set = new HashSet<>();
+
+        for (final Map.Entry<String, Integer> entry : map.entrySet()) {
+            if (entry.getValue() >= level) {
+                set.add(entry.getKey());
             }
         }
         return set;
@@ -416,17 +398,8 @@ public class AMAuthLevelManager implements ServiceListener {
         }
 
         // update auth level map for the org
-        synchronized (authLevelMap) {
-            authLevelMap.remove(orgName);
-        }
-        // updated supported authentication modules for this org 
-        // this is needed for 6.3 and earlier releases.
-        if (AuthD.revisionNumber < ISAuthConstants.AUTHSERVICE_REVISION7_0 &&
-            serviceName.equals(CORE_AUTH)) {
-            synchronized (supportedModulesMap) {
-                supportedModulesMap.remove(orgName);
-            }
-        }
+        authLevelMap.remove(orgName);
+
         // this listener event should be conditioned only for ADDED and REMOVED. SM will provide special MODIFIED type
         // for removal of all attributes(for the default instance)
         AMAuthenticationManager.updateModuleInstanceTable(orgName, serviceName);
@@ -454,33 +427,19 @@ public class AMAuthLevelManager implements ServiceListener {
         	//HashMap will replace if there is existing one already
         	//this is necessary because ServiceSchemaManagerImpl will 
         	//be cleared and therefore will be stale
-        	String moduleName = (String)moduleServiceMap.get(serviceName);
-    		if ( !listenerMap.isEmpty() && listenerMap.get(moduleName) != null ) {
+        	String moduleName = moduleServiceMap.get(serviceName);
+    		if ( !listenerMap.isEmpty() ) {
 	        	try {
 	                // just in case ssm or scm already has AMAuthLevelManager registered
 	        		// will remove existing one and replace it with new one.
-	        		Iterator it = listenerMap.values().iterator();
-	                while (it.hasNext()) {
-	                     List list = (List) it.next();
-	                     ServiceSchemaManager ssm = (ServiceSchemaManager) list.get(0); 
-	                     String ssmListener = (String) list.get(1);
-	                     ServiceConfigManager scm = (ServiceConfigManager) list.get(2); 
-	                     String scmListener = (String) list.get(3);
-	                     try {
-	                         ssm.removeListener(ssmListener);
-	                         scm.removeListener(scmListener);
-	                     } catch (Exception e) {
-	                         // this is harmless
-	                    	 debug.error("remove listeners ", e);
-	                     }
-	                }
-	                	
-	        		List list = addServiceListener(serviceName);
-	                if (list != null) {
-	                	synchronized (listenerMap) {
-	                	    listenerMap.put(moduleName, list);
-	                	}
-	                }
+                    ListenerMapEntry entry = listenerMap.remove(moduleName);
+                    if (entry != null) {
+                        entry.removeListeners();
+                        entry = addServiceListener(serviceName);
+                        if (entry != null) {
+                            listenerMap.put(moduleName, entry);
+                        }
+                    }
 	            } catch (Exception e) {
 	                debug.error("can't add listener for " + serviceName, e);
 	                return;
@@ -501,7 +460,7 @@ public class AMAuthLevelManager implements ServiceListener {
             debug.message("orgDN : " + orgDN);
             debug.message("defaultAuthLevel: " + defaultAuthLevel);
         }
-        Map map = (Map) authLevelMap.get(orgDN);
+        Map<String, Integer> map = authLevelMap.get(orgDN);
         if (map == null) {
             map = initOrgAuthLevel(orgDN);
         }
@@ -511,39 +470,21 @@ public class AMAuthLevelManager implements ServiceListener {
 
         Integer authLevel = null;
         if (map != null && !map.isEmpty()) {
-            authLevel = (Integer) map.get(moduleName);
+            authLevel = map.get(moduleName);
         }
         //same fix needed for 6.3 too.
         if (authLevel == null) {
-            authLevel = ((authLevel = 
-                (Integer)globalAuthLevelMap.get(moduleName))== null) ? 
-                Integer.valueOf(defaultAuthLevel) : authLevel;
-        }
-
-        int level = authLevel.intValue();
-        if (debug.messageEnabled()) {
-            debug.message("authLevel : " + level);
-        }
-
-        return level;
-    }
-
-    protected Set getSupportedModule(String orgDN) {
-        if (debug.messageEnabled()) {
-            debug.message("getSupportedModules=" + orgDN);
-        }
-        Set modules = (Set) supportedModulesMap.get(orgDN);
-        if (modules == null) {
-            initOrgAuthLevel(orgDN);
-            modules = (Set) supportedModulesMap.get(orgDN);
-            if (modules == null) {
-                return Collections.EMPTY_SET;
+            authLevel = globalAuthLevelMap.get(moduleName);
+            if (authLevel == null) {
+                authLevel = Integer.valueOf(defaultAuthLevel);
             }
         }
+
         if (debug.messageEnabled()) {
-            debug.message("supported modules are : " + modules);
+            debug.message("authLevel : " + authLevel);
         }
-        return modules;
+
+        return authLevel;
     }
 
     /**
@@ -553,9 +494,7 @@ public class AMAuthLevelManager implements ServiceListener {
      * @param configName Name of authentication configuration.
      */
     protected void removeAuthConfigListener(String configName) {
-       Set set = new HashSet();
-       set.add(configName);
-       removeConfigListenerEntry(set);
+       removeConfigListenerEntry(singleton(configName));
     }
 
     /**
@@ -565,17 +504,13 @@ public class AMAuthLevelManager implements ServiceListener {
      * @param name      Auth config name
      */
     protected void addAuthConfigListener(String service, String name) {
-        Set set = (Set) authConfigListenerMap.get(service);
+        Set<String> set = authConfigListenerMap.get(service);
         if (set == null) {
-            set = new HashSet();
+            set = new CopyOnWriteArraySet<>();
             set.add(name);
-            synchronized(authConfigListenerMap) {
-                authConfigListenerMap.put(service, set);
-            }
+            authConfigListenerMap.put(service, set);
         } else {
-            synchronized (set) {
-                set.add(name);
-            }
+            set.add(name);
         }
     }
 
@@ -591,24 +526,22 @@ public class AMAuthLevelManager implements ServiceListener {
         String serviceName, 
         String orgName,
         String componentName) {
-        Set set = (Set) authConfigListenerMap.get(serviceName);
+        Set<String> set = authConfigListenerMap.get(serviceName);
         if (set == null || set.isEmpty()) {
             // no auth config listener for this service
             return;
         }
         // new set to hold entries which will be updated
         // need to remove them from other entries in the authConfigListenerMap
-        Set updatedEntries = null; 
-        Iterator it = set.iterator();
-        while (it.hasNext()) {
-            String configName = (String) it.next();
-            if (processAuthConfigEntry(serviceName, orgName, 
-                componentName, configName)) {
+        Set<String> updatedEntries = null;
+        for (final String configName : set) {
+            if (processAuthConfigEntry(serviceName, orgName,
+                    componentName, configName)) {
                 if (updatedEntries == null) {
-                    updatedEntries = new HashSet();
+                    updatedEntries = new HashSet<>();
                 }
                 updatedEntries.add(configName);
-            } 
+            }
         }
 
         if (updatedEntries == null) {
@@ -624,18 +557,16 @@ public class AMAuthLevelManager implements ServiceListener {
         removeConfigListenerEntry(updatedEntries);
     }
 
-    private void removeConfigListenerEntry(Set updatedEntries) {
-        synchronized(authConfigListenerMap) {
-            Iterator services = authConfigListenerMap.keySet().iterator();
-            while (services.hasNext()) {
-                String service = (String) services.next();
-                Set entries = (Set) authConfigListenerMap.get(service);
+    private void removeConfigListenerEntry(Set<String> updatedEntries) {
+        synchronized (authConfigListenerMap) {
+            for (final Map.Entry<String, Set<String>> entry : authConfigListenerMap.entrySet()) {
+                String service = entry.getKey();
+                Set<String> entries = entry.getValue();
                 if (debug.messageEnabled()) {
-                    debug.message("updateAuthConfiguration, check " + 
-                        service + ", entries=" + entries);
+                    debug.message("updateAuthConfiguration, check " + service + ", entries=" + entries);
                 }
                 if (entries != null && !entries.isEmpty()) {
-                    entries.removeAll(updatedEntries); 
+                    entries.removeAll(updatedEntries);
                 }
             }
         }
@@ -728,7 +659,7 @@ public class AMAuthLevelManager implements ServiceListener {
             if (schema != null) {
                 attrs = schema.getAttributeDefaults();
             }
-            String module = (String) moduleServiceMap.get(serviceName);
+            String module = moduleServiceMap.get(serviceName);
             if ( (module != null) && module.length() > 0 ) {
                 String attrName = 
                     AMAuthConfigUtils.getAuthLevelAttribute(attrs, module);
@@ -737,7 +668,7 @@ public class AMAuthLevelManager implements ServiceListener {
                 if ((authLevel != null) && (authLevel.length() > 0)) {
                         level = Integer.valueOf(authLevel);
                 }
-                globalAuthLevelMap.put(module,level); 
+                globalAuthLevelMap.put(module, level);
                 if (debug.messageEnabled()) {
                     debug.message("authLevel is :" + authLevel);
                     debug.message(
@@ -747,6 +678,37 @@ public class AMAuthLevelManager implements ServiceListener {
         } catch (Exception e) {
             if (debug.messageEnabled()) {
                 debug.message("Error retrieving service schema " , e);
+            }
+        }
+    }
+
+    /**
+     * Holds information on registered service and config listeners so that they can be de-registered when no longer
+     * needed.
+     */
+    private static class ListenerMapEntry {
+        private final ServiceSchemaManager serviceSchemaManager;
+        private final String schemaListenerId;
+        private final ServiceConfigManager serviceConfigManager;
+        private final String configListenerId;
+
+        ListenerMapEntry(final ServiceSchemaManager serviceSchemaManager, final String schemaListenerId,
+                         final ServiceConfigManager serviceConfigManager, final String configListenerId) {
+            this.serviceSchemaManager = serviceSchemaManager;
+            this.schemaListenerId = schemaListenerId;
+            this.serviceConfigManager = serviceConfigManager;
+            this.configListenerId = configListenerId;
+        }
+
+        /**
+         * Removes the registered listeners. Any errors that occur will be logged and swallowed.
+         */
+        void removeListeners() {
+            try {
+                serviceSchemaManager.removeListener(schemaListenerId);
+                serviceConfigManager.removeListener(configListenerId);
+            } catch (Exception e) {
+                debug.error("AMAuthLevelManager: removeListeners", e);
             }
         }
     }
