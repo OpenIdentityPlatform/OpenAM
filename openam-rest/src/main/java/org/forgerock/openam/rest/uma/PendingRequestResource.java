@@ -42,6 +42,7 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
+import org.forgerock.openam.forgerockrest.utils.JsonValueQueryFilterVisitor;
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
@@ -59,6 +60,7 @@ public class PendingRequestResource implements CollectionResourceProvider {
 
     private static final String APPROVE_ACTION_ID = "approve";
     private static final String DENY_ACTION_ID = "deny";
+    private static final JsonValueQueryFilterVisitor QUERY_VISITOR = new JsonValueQueryFilterVisitor();
 
     private final PendingRequestsService service;
     private final ContextHelper contextHelper;
@@ -137,16 +139,18 @@ public class PendingRequestResource implements CollectionResourceProvider {
 
     @Override
     public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
-        if (request.getQueryFilter() == null || !"true".equalsIgnoreCase(request.getQueryFilter().toString())) {
-            handler.handleError(new NotSupportedException("Only query filter 'true' is supported."));
+        if (request.getQueryFilter() == null) {
+            handler.handleError(new NotSupportedException("Only query filter is supported."));
             return;
         }
-        //TODO support filtering
+
         handler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
 
         try {
             for (UmaPendingRequest pendingRequest : queryResourceOwnerPendingRequests(context)) {
-                handler.handleResource(newResource(pendingRequest));
+                if (request.getQueryFilter().accept(QUERY_VISITOR, pendingRequest.asJson())) {
+                    handler.handleResource(newResource(pendingRequest));
+                }
             }
             handler.handleResult(new QueryResult());
         } catch (ResourceException e) {
@@ -198,4 +202,6 @@ public class PendingRequestResource implements CollectionResourceProvider {
             ResultHandler<Resource> handler) {
         handler.handleError(new NotSupportedException());
     }
+
+
 }
