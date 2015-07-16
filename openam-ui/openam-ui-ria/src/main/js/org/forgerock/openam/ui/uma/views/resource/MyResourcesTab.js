@@ -42,26 +42,24 @@ define("org/forgerock/openam/ui/uma/views/resource/MyResourcesTab", [
                 ResourceSetCollection;
 
             ResourceSetCollection = Backbone.PageableCollection.extend({
-                url: RealmHelper.decorateURIWithRealm("/" + Constants.context + "/json/__subrealm__/users/" + Configuration.loggedUser.username + '/oauth2/resourcesets'),
-                state: {
-                    pageSize: 10,
-                    sortKey: "name"
-                },
-                queryParams: {
-                    pageSize: "_pageSize",
+                url: RealmHelper.decorateURIWithRealm("/" + Constants.context + "/json/__subrealm__/users/" + Configuration.loggedUser.username + "/oauth2/resourcesets"),
+                queryParams:  BackgridUtils.getQueryParams({
                     _sortKeys: BackgridUtils.sortKeys,
-                    _queryId: "*",
-                    _queryFilter: BackgridUtils.queryFilter,
-                    _pagedResultsOffset:  BackgridUtils.pagedResultsOffset,
-                    _fields: ['_id', 'icon_uri', 'name', 'resourceServer', 'type']
-                },
-
+                    _queryFilter: ['resourceOwnerId eq "' + Configuration.loggedUser.username + '"'],
+                    _pagedResultsOffset: BackgridUtils.pagedResultsOffset
+                }),
+                state: BackgridUtils.getState(),
                 parseState: BackgridUtils.parseState,
                 parseRecords: function(data, options){
                     self.$el.find("button#revokeAll").prop("disabled", data.result.length === 0);
                     return data.result;
                 },
-                sync: BackgridUtils.sync
+                sync: function (method, model, options) {
+                   options.beforeSend = function (xhr) {
+                       xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=1.0");
+                   };
+                   return BackgridUtils.sync(method, model, options);
+                }
             });
 
             columns = [
@@ -80,11 +78,6 @@ define("org/forgerock/openam/ui/uma/views/resource/MyResourcesTab", [
                 {
                     name: "resourceServer",
                     label: $.t("uma.resources.list.myResources.grid.1"),
-                    /*cell: BackgridUtils.UriExtCell,
-                    cheaderCell: BackgridUtils.FilterHeaderCell,
-                    href: function(rawValue, formattedValue, model){
-                        return "#uma/apps/" + encodeURIComponent(model.get('resourceServer'));
-                    },*/
                     cell: "string",
                     editable: false,
                     headerCell : BackgridUtils.ClassHeaderCell.extend({
@@ -104,7 +97,7 @@ define("org/forgerock/openam/ui/uma/views/resource/MyResourcesTab", [
                     name: "share",
                     label: "",
                     cell: Backgrid.Cell.extend({
-                        className: "fa fa-share-alt",
+                        className: "fa fa-share",
                         events: { "click": "share" },
                         share: function(e) {
                             var shareView = new CommonShare();

@@ -479,6 +479,9 @@
         }
     },
     "uma": {
+        "common": {
+            "shares" : "Shares"
+        },
         "share": {
             "shareResource": "Share the resource",
             "people": "Add or select people to share your resource with",
@@ -500,7 +503,7 @@
                 "subtitle": "All your shared resources",
                 "myResources": {
                     "title": "My Resources",
-                    "grid": ["Resources", "Host", "Type"]
+                    "grid": ["Resources", "Host", "Type", "Shared By"]
                 },
                 "sharedResources": {
                     "title": "Shared with me",

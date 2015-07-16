@@ -46,25 +46,20 @@ define("org/forgerock/openam/ui/uma/views/resource/SharedResourcesTab", [
                     paginator,
                     ResourceSetCollection = Backbone.PageableCollection.extend({
                         url: RealmHelper.decorateURIWithRealm("/" + Constants.context + "/json/__subrealm__/users/" + Configuration.loggedUser.username + "/oauth2/resourcesets"),
-                        state: {
-                            pageSize: 10,
-                            sortKey: "name"
-                        },
-                        queryParams: {
-                            pageSize: "_pageSize",
+                        queryParams:  BackgridUtils.getQueryParams({
                             _sortKeys: BackgridUtils.sortKeys,
-                            _queryId: "*",
-                            _queryFilter: BackgridUtils.queryFilter,
-                            _pagedResultsOffset:  BackgridUtils.pagedResultsOffset,
-                            _fields: ['_id', 'icon_uri', 'name', 'resourceServer', 'permission']
-                        },
-
+                            _queryFilter: ['! resourceOwnerId eq "' + Configuration.loggedUser.username + '"'],
+                            _pagedResultsOffset: BackgridUtils.pagedResultsOffset
+                        }),
+                        state: BackgridUtils.getState(),
                         parseState: BackgridUtils.parseState,
-                        parseRecords: function(data, options){
-                            self.$el.find("button#revokeAll").prop("disabled", data.result.length === 0);
-                            return data.result;
-                        },
-                        sync: BackgridUtils.sync
+                        parseRecords: BackgridUtils.parseRecords,
+                        sync: function (method, model, options) {
+                           options.beforeSend = function (xhr) {
+                               xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=1.0");
+                           };
+                           return BackgridUtils.sync(method, model, options);
+                        }
                     });
 
                 columns = [
@@ -80,25 +75,22 @@ define("org/forgerock/openam/ui/uma/views/resource/SharedResourcesTab", [
                         },
                         editable: false
                     },
+
                     {
-                        name: "resourceServer",
-                        label: $.t("uma.resources.list.sharedResources.grid.1"),
+                        name: "resourceOwnerId",
+                        label: $.t("uma.resources.list.sharedResources.grid.3"),
                         cell: "string",
-                        editable: false,
-                        headerCell : BackgridUtils.ClassHeaderCell.extend({
-                            className: "col-md-1"
-                        })
+                        editable: false
                     },
                     {
-                        name: "permission",
+                        name: "scopes",
                         label: $.t("uma.resources.list.sharedResources.grid.2"),
                         cell: "string",
-                        headerCell : BackgridUtils.ClassHeaderCell.extend({
-                            className: "col-md-4"
+                        headerCell: BackgridUtils.ClassHeaderCell.extend({
+                            className: "col-xs-7 col-md-6"
                         }),
                         editable: false
                     }
-
                 ];
 
                 if (Configuration.globalData.auth.uma && Configuration.globalData.auth.uma.resharingMode &&
@@ -107,7 +99,7 @@ define("org/forgerock/openam/ui/uma/views/resource/SharedResourcesTab", [
                         name: "share",
                         label: "",
                         cell: Backgrid.Cell.extend({
-                            className: "fa fa-share-alt",
+                            className: "fa fa-share",
                             events: { "click": "share" },
                             share: function(e) {
                                 var shareView = new CommonShare();
