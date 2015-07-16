@@ -165,7 +165,7 @@ public class ResourceSetService {
 
                                     for (ResourceSetDescription resourceSetDescription : resourceSetDescriptions) {
                                         if (fieldName.equals("name")) {
-                                            if (resourceSetDescription.getName().contains((String) value)) {
+                                            if (resourceSetDescription.getName().toLowerCase().contains(((String) value).toLowerCase())) {
                                                 results.add(resourceSetDescription);
                                             }
                                         }
