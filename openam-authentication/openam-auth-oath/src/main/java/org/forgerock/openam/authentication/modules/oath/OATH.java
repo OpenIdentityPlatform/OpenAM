@@ -50,7 +50,6 @@ import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.TextOutputCallback;
 import javax.xml.bind.DatatypeConverter;
 import org.apache.commons.codec.DecoderException;
 import org.forgerock.guice.core.InjectorHolder;
@@ -595,9 +594,6 @@ public class OATH extends AMLoginModule {
                  */
 
                 int counter = settings.getCounter();
-
-                // we have to do counter+1 because counter is the last previous accepted counter
-                counter++;
 
                 //test the counter in the lookahead window
                 for (int i = 0; i <= windowSize; i++) {
