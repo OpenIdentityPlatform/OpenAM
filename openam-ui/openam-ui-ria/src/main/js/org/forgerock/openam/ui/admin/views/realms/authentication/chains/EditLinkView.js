@@ -65,7 +65,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLin
                                 linkConfig.type = _.findWhere(moduleSelectize.options, { _id: linkConfig.module }).type;
                                 linkConfig.options = self.data.linkConfig.options;
 
-                                obj.linkInfoView.render(linkConfig);
+                                obj.linkInfoView.render(linkConfig, _.findWhere(formData.allModules, { _id: linkConfig.module }).typeDescription);
                                 obj.criteriaView.setCriteria(criteriaValue);
                                 dialog.close();
                             }

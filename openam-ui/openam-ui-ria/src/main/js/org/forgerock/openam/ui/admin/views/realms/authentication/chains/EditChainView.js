@@ -66,7 +66,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
                 // on to to all the child linkview instances.
                 allModules : this.data.allModules,
                 allCriteria : this.data.allCriteria,
-                linkConfig : this.data.form.chainData.authChainConfiguration[index]
+                linkConfig : this.data.form.chainData.authChainConfiguration[index],
+                typeDescription : ""
             };
 
             return linkView;

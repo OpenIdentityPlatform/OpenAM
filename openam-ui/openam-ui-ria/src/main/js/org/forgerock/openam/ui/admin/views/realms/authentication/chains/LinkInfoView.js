@@ -22,8 +22,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkInf
     var LinkInfoView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/chains/LinkInfoTemplate.html",
 
-        render: function (data, element) {
+        render: function (data, description) {
             this.data.linkConfig = data;
+            this.data.typeDescription = description;
             this.data.optionsLength = _.keys(data.options).length;
 
             this.parentRender();

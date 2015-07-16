@@ -83,7 +83,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
             var self = this;
             this.data.id = this.cid;
 
-            self.parentRender(function(){
+            self.parentRender(function () {
 
                 self.criteriaView = new CriteriaView();
                 self.criteriaView.element = "#criteria-" + self.data.id;
@@ -91,7 +91,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkVie
 
                 self.linkInfoView = new LinkInfoView();
                 self.linkInfoView.element = "#link-info-" + self.data.id;
-                self.linkInfoView.render(self.data.linkConfig);
+                if (self.data.linkConfig.module) {
+                    self.data.typeDescription = _.findWhere(self.data.allModules, {_id : self.data.linkConfig.module}).typeDescription;
+                }
+                self.linkInfoView.render(self.data.linkConfig, self.data.typeDescription);
 
                 if (!self.data.linkConfig.module && !self.data.linkConfig.criteria) {
                     self.editItem();
