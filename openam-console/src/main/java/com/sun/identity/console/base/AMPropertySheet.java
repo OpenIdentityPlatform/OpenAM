@@ -24,10 +24,7 @@
  *
  * $Id: AMPropertySheet.java,v 1.11 2009/10/21 00:46:38 asyhuang Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2014 ForgeRock, AS.
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.console.base;
@@ -491,11 +488,15 @@ public class AMPropertySheet
                 Set values = null;
 
                 if (CCAddRemoveModel.class.isInstance(childModel)) {
-                    values = getValues(
-                        ((CCAddRemoveModel)childModel).getSelectedOptionList());
+                    values = getValues(((CCAddRemoveModel)childModel).getSelectedOptionList());
                 } else if (CCEditableListModel.class.isInstance(childModel)) {
-                    values = getValues(
-                        ((CCEditableListModel)childModel).getOptionList());
+                    values = getValues(((CCEditableListModel)childModel).getOptionList());
+                } else if (CCOrderedListModel.class.isInstance(childModel)) {
+                    values = getListValues(((CCOrderedListModel)childModel).getSelectedOptionList());
+                    if (values == null || values.isEmpty()) {
+                        values = new HashSet(1);
+                        values.add("[0]=");
+                    }
                 } else if (model.isChildSupported(
                     name + PropertyTemplate.PWD_CONFIRM_SUFFIX)
                 ) {
