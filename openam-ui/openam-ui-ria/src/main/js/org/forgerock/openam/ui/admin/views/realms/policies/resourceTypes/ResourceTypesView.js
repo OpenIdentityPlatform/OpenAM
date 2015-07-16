@@ -26,10 +26,8 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/resourceTypes/Resour
     "org/forgerock/openam/ui/common/util/URLHelper",
     "org/forgerock/openam/ui/admin/views/realms/policies/common/AbstractListView",
     "org/forgerock/openam/ui/admin/models/policies/ResourceTypeModel",
-    "org/forgerock/openam/ui/common/util/BackgridUtils",
-    "org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole"
-], function ($, _, Backbone, Backgrid, Router, UIUtils, URLHelper, AbstractListView, ResourceTypeModel, BackgridUtils,
-             RedirectToLegacyConsole) {
+    "org/forgerock/openam/ui/common/util/BackgridUtils"
+], function ($, _, Backbone, Backgrid, Router, UIUtils, URLHelper, AbstractListView, ResourceTypeModel, BackgridUtils) {
     return AbstractListView.extend({
         template: "templates/admin/views/realms/policies/resourceTypes/ResourceTypesTemplate.html",
         toolbarTemplate: "templates/admin/views/realms/policies/resourceTypes/ResourceTypesToolbarTemplate.html",

@@ -19,7 +19,8 @@
 define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/ConditionAttrTimeZoneView", [
     "jquery",
     "underscore",
-    "org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/ConditionAttrBaseView"
+    "org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/ConditionAttrBaseView",
+    "jqueryui"
 ], function ($, _, ConditionAttrBaseView) {
     return ConditionAttrBaseView.extend({
         template: "templates/admin/views/realms/policies/policies/conditions/ConditionAttrTimeZone.html",

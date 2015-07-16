@@ -28,6 +28,8 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
             "change select:not(#selection):not(.selectize)": "changeInput",
             "change input": "changeInput",
             "keyup  input": "changeInput",
+            "dp.change input": "changeInput",
+            // TODO don't forget to remove this once jQuery UI autocomplete is removed
             "autocompletechange input": "changeInput"
         },
 

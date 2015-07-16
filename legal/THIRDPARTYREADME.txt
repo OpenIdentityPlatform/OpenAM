@@ -608,6 +608,9 @@ The MIT License (MIT)
 Version: backbone-1.1.2-min.js
 Copyright: Copyright (c) 2010-2014 Jeremy Ashkenas, DocumentCloud
 
+Version: bootstrap-datetimepicker-4.14.30-min.js
+Copyright: Copyright (c) 2015 Jonathan Peterson
+
 Version: form2js-2.0.js
 Copyright: Copyright (c) 2010 Maxim Vasiliev
 

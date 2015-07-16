@@ -19,8 +19,7 @@
 define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/ConditionAttrDateView", [
     "jquery",
     "underscore",
-    "org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/ConditionAttrBaseView",
-    "jqueryui"
+    "org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/ConditionAttrBaseView"
 ], function ($, _, ConditionAttrBaseView) {
     return ConditionAttrBaseView.extend({
         template: "templates/admin/views/realms/policies/policies/conditions/ConditionAttrDate.html",
@@ -38,19 +37,27 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
         },
 
         initDatePickers: function () {
-            var common = {numberOfMonths: 2, dateFormat: "yy:mm:dd"};
+            var options = {
+                    format: "YYYY:MM:DD",
+                    useCurrent: false,
+                    icons: {
+                        previous: "fa fa-chevron-left",
+                        next: "fa fa-chevron-right"
+                    }
+                },
+                startDate = this.$el.find("#startDate"),
+                endDate = this.$el.find("#endDate");
 
-            this.$el.find("#startDate").datepicker(
-                $.extend({onClose: function (selectedDate) {
-                    $("#endDate").datepicker("option", "minDate", selectedDate);
-                }}, common)
-            );
+            startDate.datetimepicker(options);
+            endDate.datetimepicker(options);
 
-            this.$el.find("#endDate").datepicker(
-                $.extend({onClose: function (selectedDate) {
-                    $("#startDate").datepicker("option", "maxDate", selectedDate);
-                }}, common)
-            );
+            startDate.on("dp.change", function (e) {
+                endDate.data("DateTimePicker").minDate(e.date);
+            });
+
+            endDate.on("dp.change", function (e) {
+                startDate.data("DateTimePicker").maxDate(e.date);
+            });
         }
     });
 });

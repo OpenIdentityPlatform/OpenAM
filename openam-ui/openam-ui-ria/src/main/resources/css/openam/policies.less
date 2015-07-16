@@ -650,97 +650,101 @@ body.editing {
     }
 
     ol.condition-management-group {
+        .rule, .operator, .placeholder {
+            display: block;
+            margin: 5px;
+            padding: 5px;
+            background: 0 0 repeat-y #eee;
+            transition: background 200ms ease-out 0ms, box-shadow 100ms linear 0ms;
+        }
 
-        li {
+        li.operator {
             display: block;
             margin: 5px;
             padding: 5px;
             background: 0 0 repeat-y #eee;
             transition: background 200ms ease-out 0ms, box-shadow 100ms linear 0ms;
 
-            &.operator {
-
-                &.or {
-                    background-color: @or-color;
-                    > span, > select {
-                        color: darken(@or-color, 50%)
-                    }
-                    &.dragged, &:focus {
-                        background-color: darken(@or-color, 10%)
-                    }
-                    > ol > .placeholder {
-                        background-color: darken(@or-color, 20%)
-                    }
+            &.or {
+                background-color: @or-color;
+                > span, > select {
+                    color: darken(@or-color, 50%)
                 }
-
-                &.and {
-                    background-color: @and-color;
-                    > span, > select {
-                        color: darken(@and-color, 50%)
-                    }
-                    &.dragged, &:focus {
-                        background-color: darken(@and-color, 10%)
-                    }
-                    > ol > .placeholder {
-                        background-color: darken(@and-color, 20%)
-                    }
+                &.dragged, &:focus {
+                    background-color: darken(@or-color, 10%)
                 }
-
-                &.not {
-                    background-color: @not-color;
-                    > span, > select {
-                        color: darken(@not-color, 50%)
-                    }
-                    &.dragged, &:focus {
-                        background-color: darken(@not-color, 10%)
-                    }
-                    > ol > .placeholder {
-                        background-color: darken(@not-color, 20%)
-                    }
-                }
-
-                &.or, &.and, &.not {
-                    cursor: default;
-
-                    > .form-control {
-                        width: 80px;
-                    }
-
-                    &:focus {
-                        outline: none;
-                        cursor: move;
-                        box-shadow: 1px 2px 1px 0 rgba(0, 0, 0, 0.4);
-                        background-image: url(@grabber-image);
-                    }
+                > ol > .placeholder {
+                    background-color: darken(@or-color, 20%)
                 }
             }
 
-            &.rule {
+            &.and {
+                background-color: @and-color;
+                > span, > select {
+                    color: darken(@and-color, 50%)
+                }
+                &.dragged, &:focus {
+                    background-color: darken(@and-color, 10%)
+                }
+                > ol > .placeholder {
+                    background-color: darken(@and-color, 20%)
+                }
+            }
+
+            &.not {
+                background-color: @not-color;
+                > span, > select {
+                    color: darken(@not-color, 50%)
+                }
+                &.dragged, &:focus {
+                    background-color: darken(@not-color, 10%)
+                }
+                > ol > .placeholder {
+                    background-color: darken(@not-color, 20%)
+                }
+            }
+
+            &.or, &.and, &.not {
                 cursor: default;
 
+                > .form-control {
+                    width: 80px;
+                }
+
                 &:focus {
-                    .focus-state;
+                    outline: none;
                     cursor: move;
+                    box-shadow: 1px 2px 1px 0 rgba(0, 0, 0, 0.4);
                     background-image: url(@grabber-image);
-                    background-color: #e6e6e6;
-                }
-
-                &.legacy-condition {
-                    color: #777;
-                    .striped-background(#f7f7f7, #ddd, #ddd);
                 }
             }
+        }
 
-            &.placeholder {
-                position: relative;
-                margin: 5px;
-                padding: 0;
-                border: none;
-                height: 10px;
-                .striped-background(inherit, rgba(255, 255, 255, .5), rgba(255, 255, 255, .5));
-                background-size: 100% 100px;
-                box-shadow: 0 1px 5px -1px rgba(0, 0, 0, 0.5) inset;
+        li.rule {
+            cursor: default;
+
+            &:focus {
+                .focus-state;
+                cursor: move;
+                background-image: url(@grabber-image);
+                background-color: #e6e6e6;
             }
+
+            &.legacy-condition {
+                color: #777;
+                .striped-background(#f7f7f7, #ddd, #ddd);
+            }
+        }
+
+        li.placeholder {
+            position: relative;
+            margin: 5px;
+            padding: 0;
+            border: none;
+            height: 10px;
+            .striped-background(inherit, rgba(255, 255, 255, .5), rgba(255, 255, 255, .5));
+            background-size: 100% 100px;
+            box-shadow: 0 1px 5px -1px rgba(0, 0, 0, 0.5) inset;
         }
     }
 
@@ -946,4 +950,12 @@ body.editing {
     /* prevent horizontal scrollbar */
     overflow-x: hidden;
     z-index: 1051;
+}
+
+.bootstrap-datetimepicker-widget table {
+    td.active,
+    td.active:hover,
+    td span.active {
+        background-color: @base-theme-color;
+    }
 }

@@ -117,6 +117,20 @@
             <classifier>min</classifier>
             <type>css</type>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>bootstrap-datetimepicker</artifactId>
+            <version>4.14.30</version>
+            <classifier>min</classifier>
+            <type>js</type>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>bootstrap-datetimepicker</artifactId>
+            <version>4.14.30</version>
+            <classifier>min</classifier>
+            <type>css</type>
+        </dependency>
     </dependencies>
 
     <build>
@@ -221,7 +235,7 @@
                         <configuration>
                             <outputDirectory>${project.build.directory}/classes/libs</outputDirectory>
                             <includeArtifactIds>
-                                bootstrap-clockpicker,jquery-sortable,bootstrap-tabdrop,selectize-non-standalone,microplugin,sifter,jquery-nestingSortable,jsoneditor,qrcode
+                                bootstrap-clockpicker,bootstrap-datetimepicker,jquery-sortable,bootstrap-tabdrop,selectize-non-standalone,microplugin,sifter,jquery-nestingSortable,jsoneditor,qrcode
                             </includeArtifactIds>
                         </configuration>
                     </execution>
