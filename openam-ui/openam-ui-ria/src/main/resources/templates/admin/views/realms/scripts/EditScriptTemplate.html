@@ -4,6 +4,11 @@
     </span>
 
     <h4 class="page-type">{{t "console.scripts.edit.script"}}</h4>
+    <div class="page-header-button-group">
+        <button id="deleteScript" class="btn btn-primary" type="button" {{#unless entity.name}}disabled{{/unless}}>
+            <i class="fa fa-times"></i> {{t "common.form.delete"}}
+        </button>
+    </div>
     <h1>
         {{#if entity.name}}
         {{entity.name}}
@@ -84,8 +89,8 @@
 
         <div class="panel-footer clearfix">
             <div class="pull-right">
-                <button id="cancelEdit" class="btn btn-default" type="button">{{t "common.form.cancel"}}</button>
-                <input type="button" name="save" value="{{t 'common.form.save'}}" class="btn btn-primary">
+                <button id="revertChanges" class="btn btn-default" type="reset">{{t "common.form.revert"}}</button>
+                <button id="saveChanges" class="btn btn-primary" type="submit">{{t 'common.form.save'}}</button>
             </div>
         </div>
     </form>
