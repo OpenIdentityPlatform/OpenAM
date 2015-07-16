@@ -208,41 +208,52 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
      */
     public boolean isConsentSaved(ResourceOwner resourceOwner, String clientId, Set<String> scope) {
 
+        String consentAttribute = null;
         try {
-            final String attribute =
-                    getStringSetting(realm, OAuth2ProviderService.SAVED_CONSENT_ATTRIBUTE);
+            consentAttribute = getStringSetting(realm, OAuth2ProviderService.SAVED_CONSENT_ATTRIBUTE);
+            if (consentAttribute != null) {
+                AMIdentity id = ((OpenAMResourceOwner) resourceOwner).getIdentity();
+                if (id != null) {
+                    Set<String> attributeSet = id.getAttribute(consentAttribute);
+                    if (attributeSet != null) {
+                        if (logger.messageEnabled()) {
+                            logger.message("Existing saved consent value for resourceOwner: " + resourceOwner.getId() +
+                                   " in attribute:" + consentAttribute + " in realm:" + realm + " is:" + attributeSet);
+                        }
+                        //check the values of the attribute set vs the scope and client requested
+                        //attribute set is in the form of client_id|scope1 scope2 scope3
+                        for (String consent : attributeSet) {
+                            int loc = consent.indexOf(" ");
+                            String consentClientId = consent.substring(0, loc);
+                            String[] scopesArray = null;
+                            if (loc + 1 < consent.length()) {
+                                scopesArray = consent.substring(loc + 1, consent.length()).split(" ");
+                            }
+                            Set<String> consentScopes;
+                            if (scopesArray != null && scopesArray.length > 0) {
+                                consentScopes = new HashSet<String>(Arrays.asList(scopesArray));
+                            } else {
+                                consentScopes = new HashSet<String>();
+                            }
 
-            AMIdentity id = ((OpenAMResourceOwner) resourceOwner).getIdentity();
-            Set<String> attributeSet = null;
-
-            if (id != null) {
-                    attributeSet = id.getAttribute(attribute);
-            }
-
-            //check the values of the attribute set vs the scope and client requested
-            //attribute set is in the form of client_id|scope1 scope2 scope3
-            for (String consent : attributeSet) {
-                int loc = consent.indexOf(" ");
-                String consentClientId = consent.substring(0, loc);
-                String[] scopesArray = null;
-                if (loc + 1 < consent.length()) {
-                    scopesArray = consent.substring(loc + 1, consent.length()).split(" ");
+                            //if both the client and the scopes are identical to the saved consent then approve
+                            if (clientId.equals(consentClientId) && scope.equals(consentScopes)) {
+                                return true;
+                            }
+                        }
+                    } else {
+                        if (logger.messageEnabled()) {
+                            logger.message("No existing saved consent value for resourceOwner: " + resourceOwner.getId()
+                                    + " in attribute:" + consentAttribute + " in realm:" + realm);
+                        }
+                    }
                 }
-                Set<String> consentScopes = null;
-                if (scopesArray != null && scopesArray.length > 0) {
-                    consentScopes = new HashSet<String>(Arrays.asList(scopesArray));
-                } else {
-                    consentScopes = new HashSet<String>();
-                }
-
-                //if both the client and the scopes are identical to the saved consent then approve
-                if (clientId.equals(consentClientId) && scope.equals(consentScopes)) {
-                    return true;
-                }
+            } else {
+                logger.error("No saved consent attribute defined in realm:" + realm);
             }
         } catch (Exception e) {
-            logger.error("Unable to get profile attribute", e);
-            return false;
+            logger.error("There was a problem getting the saved consent from the attribute: "
+                    + consentAttribute + " for realm:" + realm, e);
         }
 
         return false;
@@ -445,28 +456,38 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
      * {@inheritDoc}
      */
     public void saveConsent(ResourceOwner resourceOwner, String clientId, Set<String> scope) {
-        final AMIdentity id = ((OpenAMResourceOwner) resourceOwner).getIdentity();
+
+        String consentAttribute = null;
         try {
-            String consentAttribute =
-                    getStringSetting(realm, OAuth2ProviderService.SAVED_CONSENT_ATTRIBUTE);
+            consentAttribute = getStringSetting(realm, OAuth2ProviderService.SAVED_CONSENT_ATTRIBUTE);
+            if (consentAttribute != null) {
+                AMIdentity id = ((OpenAMResourceOwner) resourceOwner).getIdentity();
+                //get the current set of consents and add our new consent to it if they exist.
+                Set<String> existing = id.getAttribute(consentAttribute);
+                Set<String> consents = (existing != null) ? new HashSet<String>(existing) : new HashSet<String>(1);
+                StringBuilder sb = new StringBuilder();
+                if (scope == null || scope.isEmpty()) {
+                    sb.append(clientId.trim()).append(" ");
+                } else {
+                    sb.append(clientId.trim()).append(" ").append(joinScope(scope));
+                }
+                consents.add(sb.toString());
 
-            //get the current set of consents and add our new consent to it.
-            Set<String> consents = new HashSet<String>(id.getAttribute(consentAttribute));
-            StringBuilder sb = new StringBuilder();
-            if (scope == null || scope.isEmpty()) {
-                sb.append(clientId.trim()).append(" ");
+                if (logger.messageEnabled()) {
+                    logger.message("Saving consents:" + consents + " for resourceOwner: " + resourceOwner.getId()
+                            + " in attribute:" + consentAttribute + " in realm:" + realm);
+                }
+                //update the user profile with our new consent settings
+                Map<String, Set<String>> attrs = new HashMap<String, Set<String>>(1);
+                attrs.put(consentAttribute, consents);
+                id.setAttributes(attrs);
+                id.store();
             } else {
-                sb.append(clientId.trim()).append(" ").append(joinScope(scope));
+                logger.error("Cannot save consent as no saved consent attribute defined in realm:" + realm);
             }
-            consents.add(sb.toString());
-
-            //update the user profile with our new consent settings
-            Map<String, Set<String>> attrs = new HashMap<String, Set<String>>();
-            attrs.put(consentAttribute, consents);
-            id.setAttributes(attrs);
-            id.store();
         } catch (Exception e) {
-            logger.error("Unable to save consent ", e);
+            logger.error("There was a problem saving the consent into the attribute: "
+                    + consentAttribute + " for realm:" + realm, e);
         }
     }
 
