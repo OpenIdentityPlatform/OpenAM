@@ -22,8 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global window, define, $, _, console, Handlebars */
-
+/*global window, define, $, _, console*/
 define("org/forgerock/openam/ui/policy/policies/conditions/EditEnvironmentView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/UIUtils",
@@ -37,8 +36,10 @@ define("org/forgerock/openam/ui/policy/policies/conditions/EditEnvironmentView",
     "org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrDayView",
     "org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrDateView",
     "org/forgerock/openam/ui/policy/policies/conditions/ConditionAttrTimeZoneView",
-    "org/forgerock/openam/ui/policy/delegates/PolicyDelegate"
-], function (AbstractView, uiUtils, HelpLink, BooleanAttr, ArrayAttr, StringAttr, ObjectAttr, EnumAttr, TimeAttr, DayAttr, DateAttr, TimeZoneAttr, PolicyDelegate) {
+    "org/forgerock/openam/ui/policy/delegates/PolicyDelegate",
+    "handlebars"
+], function (AbstractView, uiUtils, HelpLink, BooleanAttr, ArrayAttr, StringAttr, ObjectAttr, EnumAttr, TimeAttr,
+             DayAttr, DateAttr, TimeZoneAttr, PolicyDelegate, Handlebars) {
     var EditEnvironmentView = AbstractView.extend({
         events: {
             'change select#selection': 'changeType'

@@ -22,25 +22,24 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define, $, form2js, _, js2form, Handlebars, window */
-
+/*global define, $, form2js, _, js2form, window*/
 define("org/forgerock/openam/ui/user/login/RESTLoginView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/user/delegates/AuthNDelegate",
-    "org/forgerock/commons/ui/common/main/ValidatorsManager",
-    "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/Constants",
+    "bootstrap-dialog",
     "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/main/SessionManager",
-    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/CookieHelper",
-    "org/forgerock/commons/ui/common/util/UIUtils",
+    "org/forgerock/commons/ui/common/main/EventManager",
+    "handlebars",
     "org/forgerock/commons/ui/common/main/i18nManager",
-    "org/forgerock/openam/ui/user/login/RESTLoginHelper",
     "org/forgerock/commons/ui/common/components/Messages",
-    "bootstrap-dialog"
-], function(AbstractView, authNDelegate, validatorsManager, eventManager, constants, conf, sessionManager, router, cookieHelper, uiUtils, i18nManager, restLoginHelper, messageManager, BootstrapDialog) {
-
+    "org/forgerock/openam/ui/user/login/RESTLoginHelper",
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/commons/ui/common/main/SessionManager",
+    "org/forgerock/commons/ui/common/util/UIUtils"
+], function(AbstractView, AuthNDelegate, BootstrapDialog, Configuration, Constants, CookieHelper, EventManager,
+            Handlebars, i18nManager, Messages, RESTLoginHelper, Router, SessionManager, UIUtils) {
     var LoginView = AbstractView.extend({
         template: "templates/openam/RESTLoginTemplate.html",
         genericTemplate: "templates/openam/RESTLoginTemplate.html",
@@ -58,40 +57,40 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             //save the login params in a cookie for use with the cancel button on forgotPassword/register page
             //and also the "proceed to login" link once password has been successfully changed or registration is complete
             var expire = new Date(),
-                cookieVal = "/" + conf.globalData.auth.subRealm,
+                cookieVal = "/" + Configuration.globalData.auth.subRealm,
                 href = e.target.href + "/";
-            if(conf.globalData.auth.urlParams){
-                cookieVal += restLoginHelper.filterUrlParams(conf.globalData.auth.urlParams);
+            if(Configuration.globalData.auth.urlParams){
+                cookieVal += RESTLoginHelper.filterUrlParams(Configuration.globalData.auth.urlParams);
             }
             expire.setDate(expire.getDate() + 1);
-            cookieHelper.setCookie("loginUrlParams",cookieVal,expire);
-            if(conf.globalData.auth.subRealm) {
-                href += conf.globalData.auth.subRealm;
+            CookieHelper.setCookie("loginUrlParams",cookieVal,expire);
+            if(Configuration.globalData.auth.subRealm) {
+                href += Configuration.globalData.auth.subRealm;
             }
             location.href = href;
         },
         autoLogin: function() {
             var index,
                 submitContent = {};
-            _.each(_.keys(conf.globalData.auth.urlParams),function(key){
+            _.each(_.keys(Configuration.globalData.auth.urlParams),function(key){
                 if(key.indexOf('IDToken') > -1){
                     index = parseInt(key.substring(7),10) - 1;
-                    submitContent['callback_' + index] = conf.globalData.auth.urlParams['IDToken' + key.substring(7)];
+                    submitContent['callback_' + index] = Configuration.globalData.auth.urlParams['IDToken' + key.substring(7)];
                 }
             });
-            conf.globalData.auth.autoLoginAttempts = 1;
-            eventManager.sendEvent(constants.EVENT_LOGIN_REQUEST, submitContent);
+            Configuration.globalData.auth.autoLoginAttempts = 1;
+            EventManager.sendEvent(Constants.EVENT_LOGIN_REQUEST, submitContent);
         },
         isZeroPageLoginAllowed: function() {
             var referer = document.referrer,
-                whitelist = conf.globalData.zeroPageLogin.refererWhitelist;
+                whitelist = Configuration.globalData.zeroPageLogin.refererWhitelist;
 
-            if (!conf.globalData.zeroPageLogin.enabled) {
+            if (!Configuration.globalData.zeroPageLogin.enabled) {
                 return false;
             }
 
             if (!referer) {
-                return conf.globalData.zeroPageLogin.allowedWithoutReferer;
+                return Configuration.globalData.zeroPageLogin.allowedWithoutReferer;
             }
 
             return !whitelist || !whitelist.length || whitelist.indexOf(referer) > -1;
@@ -110,14 +109,14 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 expire = new Date();
                 expire.setDate(expire.getDate() + 20);
                 // cheesy assumption that the login name is the first text input box
-                cookieHelper.setCookie("login", this.$el.find("input[type=text]:first").val(), expire);
+                CookieHelper.setCookie("login", this.$el.find("input[type=text]:first").val(), expire);
             } else if (this.$el.find("[name=loginRemember]").length !== 0) {
-                cookieHelper.deleteCookie("login");
+                CookieHelper.deleteCookie("login");
             }
 
             // END CUSTOM STAGE-SPECIFIC LOGIC HERE
 
-            eventManager.sendEvent(constants.EVENT_LOGIN_REQUEST, submitContent);
+            EventManager.sendEvent(Constants.EVENT_LOGIN_REQUEST, submitContent);
         },
         render: function(args, callback) {
             var
@@ -125,53 +124,53 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 promise = $.Deferred();
 
             if (args && args.length) {
-                conf.globalData.auth.additional = args[1]; // may be "undefined"
-                conf.globalData.auth.urlParams = urlParams;
+                Configuration.globalData.auth.additional = args[1]; // may be "undefined"
+                Configuration.globalData.auth.urlParams = urlParams;
 
                 if(args[1]){
                     urlParams = this.handleUrlParams();
                 }
 
                 //if there are IDTokens try to login with the provided credentials
-                if(urlParams.IDToken1 && this.isZeroPageLoginAllowed() && !conf.globalData.auth.autoLoginAttempts){
+                if(urlParams.IDToken1 && this.isZeroPageLoginAllowed() && !Configuration.globalData.auth.autoLoginAttempts){
                     this.autoLogin();
                 }
             }
 
-            authNDelegate.getRequirements()
+            AuthNDelegate.getRequirements()
                 .done(_.bind(function (reqs) {
                     var _this = this;
 
                     //clear out existing session if instructed
                     if (reqs.hasOwnProperty("tokenId") && urlParams.arg === 'newsession') {
-                        restLoginHelper.removeSession();
-                        conf.setProperty('loggedUser', null);
+                        RESTLoginHelper.removeSession();
+                        Configuration.setProperty('loggedUser', null);
                     }
 
                     // if simply by asking for the requirements, we end up with a token, then we must have auto-logged-in somehow
                     if (reqs.hasOwnProperty("tokenId") && urlParams.ForceAuth !== 'true') {
                         //set a variable for the realm passed into the browser so there can be a check to make sure it is the same as the current user's realm
-                        conf.globalData.auth.passedInRealm = conf.globalData.auth.subRealm;
+                        Configuration.globalData.auth.passedInRealm = Configuration.globalData.auth.subRealm;
                         // if we have a token, let's see who we are logged in as....
-                        sessionManager.getLoggedUser(function(user) {
-                            if(String(conf.globalData.auth.passedInRealm).toLowerCase() === conf.globalData.auth.subRealm.toLowerCase()){
-                                conf.setProperty('loggedUser', user);
-                                delete conf.globalData.auth.passedInRealm;
-                                restLoginHelper.setSuccessURL(reqs.tokenId).then(function() {
-                                    if (conf.globalData.auth.urlParams && conf.globalData.auth.urlParams.goto) {
-                                        window.location.href = conf.globalData.auth.urlParams.goto;
+                        SessionManager.getLoggedUser(function(user) {
+                            if(String(Configuration.globalData.auth.passedInRealm).toLowerCase() === Configuration.globalData.auth.subRealm.toLowerCase()){
+                                Configuration.setProperty('loggedUser', user);
+                                delete Configuration.globalData.auth.passedInRealm;
+                                RESTLoginHelper.setSuccessURL(reqs.tokenId).then(function() {
+                                    if (Configuration.globalData.auth.urlParams && Configuration.globalData.auth.urlParams.goto) {
+                                        window.location.href = Configuration.globalData.auth.urlParams.goto;
                                         $('body').empty();
                                         return false;
                                     }
-                                    eventManager.sendEvent(constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: false});
+                                    EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: false});
 
                                     // copied from EVENT_LOGIN_REQUEST handler
-                                    if (conf.gotoURL && _.indexOf(["#", "", "#/", "/#"], conf.gotoURL) === -1) {
-                                        console.log("Auto redirect to " + conf.gotoURL);
-                                        router.navigate(conf.gotoURL, {trigger: true});
-                                        delete conf.gotoURL;
+                                    if (Configuration.gotoURL && _.indexOf(["#", "", "#/", "/#"], Configuration.gotoURL) === -1) {
+                                        console.log("Auto redirect to " + Configuration.gotoURL);
+                                        Router.navigate(Configuration.gotoURL, {trigger: true});
+                                        delete Configuration.gotoURL;
                                     } else {
-                                        router.navigate("", {trigger: true});
+                                        Router.navigate("", {trigger: true});
                                     }
                                 });
                             }
@@ -180,8 +179,8 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                             }
                         },function(){
                             //there is a tokenId but it is invalid so kill it
-                            restLoginHelper.removeSession();
-                            conf.setProperty('loggedUser', null);
+                            RESTLoginHelper.removeSession();
+                            Configuration.setProperty('loggedUser', null);
                         });
 
                     } else { // we aren't logged in yet, so render a form...
@@ -195,7 +194,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     this.template = this.unavailableTemplate;
                     this.parentRender( function () {
                         if (error) {
-                            messageManager.messages.addMessage(error);
+                            Messages.messages.addMessage(error);
                         }
 
                     });
@@ -204,9 +203,9 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
             promise
                 .done(function() {
-                    if (cookieHelper.getCookie('invalidRealm')) {
-                        cookieHelper.deleteCookie('invalidRealm');
-                        eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidRealm");
+                    if (CookieHelper.getCookie('invalidRealm')) {
+                        CookieHelper.deleteCookie('invalidRealm');
+                        EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidRealm");
                     }
                 });
 
@@ -261,67 +260,65 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
             //is there an attempt at autologin happening?
             //if yes then don't render the form until it fails one time
-            if (urlParams.IDToken1 && conf.globalData.auth.autoLoginAttempts === 1) {
-                conf.globalData.auth.autoLoginAttempts++;
+            if (urlParams.IDToken1 && Configuration.globalData.auth.autoLoginAttempts === 1) {
+                Configuration.globalData.auth.autoLoginAttempts++;
             } else {
                 // attempt to load a stage-specific template to render this form.  If not found, use the generic one.
-                uiUtils
-                    .fillTemplateWithData("templates/openam/authn/" + reqs.stage + ".html",
-                    _.extend(conf.globalData, this.data),
-                    _.bind(function (populatedTemplate) {
-                        if (typeof populatedTemplate === "string") { // a rendered template will be a string; an error will be an object
-                            this.template = "templates/openam/authn/" + reqs.stage + ".html";
-                        } else {
-                            this.template = this.genericTemplate;
-                        }
+                UIUtils.fillTemplateWithData("templates/openam/authn/" + reqs.stage + ".html",
+                                             _.extend(Configuration.globalData, this.data),
+                                             _.bind(function (populatedTemplate) {
+                    if (typeof populatedTemplate === "string") { // a rendered template will be a string; an error will be an object
+                        this.template = "templates/openam/authn/" + reqs.stage + ".html";
+                    } else {
+                        this.template = this.genericTemplate;
+                    }
 
-                        this.data.showForgotPassword = false;
-                        this.data.showRegister = false;
-                        this.data.showSpacer = false;
+                    this.data.showForgotPassword = false;
+                    this.data.showRegister = false;
+                    this.data.showSpacer = false;
 
-                        if (conf.globalData.forgotPassword === "true") {
-                            this.data.showForgotPassword = true;
+                    if (Configuration.globalData.forgotPassword === "true") {
+                        this.data.showForgotPassword = true;
+                    }
+                    if (Configuration.globalData.selfRegistration === "true") {
+                        if (this.data.showForgotPassword) {
+                            this.data.showSpacer = true;
                         }
-                        if (conf.globalData.selfRegistration === "true") {
-                            if (this.data.showForgotPassword) {
-                                this.data.showSpacer = true;
-                            }
-                            this.data.showRegister = true;
-                        }
+                        this.data.showRegister = true;
+                    }
 
-                        if (conf.backgroundLogin){
-                            this.reloadData();
-                            var self = this,
-                                args = {
-                                    type: BootstrapDialog.TYPE_DEFAULT,
-                                    title: $.t("common.form.sessionExpired"),
-                                    cssClass: "loginDialog",
-                                    closable: false,
-                                    message: $(populatedTemplate),
-                                    onshow: function(dialog){
-                                        self.element = dialog.$modal;
-                                        dialog.$modalBody.find("form").removeClass("col-sm-6 col-sm-offset-3");
-                                        self.rebind();
-                                    }
-                                };
-                            BootstrapDialog.show(args);
-                            return;
-                        }
+                    if (Configuration.backgroundLogin) {
+                        this.reloadData();
+                        var self = this,
+                            args = {
+                                type: BootstrapDialog.TYPE_DEFAULT,
+                                title: $.t("common.form.sessionExpired"),
+                                cssClass: "loginDialog",
+                                closable: false,
+                                message: $(populatedTemplate),
+                                onshow: function(dialog){
+                                    self.element = dialog.$modal;
+                                    dialog.$modalBody.find("form").removeClass("col-sm-6 col-sm-offset-3");
+                                    self.rebind();
+                                }
+                            };
+                        BootstrapDialog.show(args);
+                        return;
+                    }
 
-                        this.parentRender(_.bind(function () {
-                            this.reloadData();
-                            // resolve a promise when all templates will be loaded
-                            promise.resolve();
-                        }, this));
-                    }, this)
-                );
+                    this.parentRender(_.bind(function () {
+                        this.reloadData();
+                        // resolve a promise when all templates will be loaded
+                        promise.resolve();
+                    }, this));
+                }, this));
             }
             return promise;
         },
         reloadData: function () {
             // This function is useful for adding logic that is used by stage-specific custom templates.
 
-            var login = cookieHelper.getCookie("login");
+            var login = CookieHelper.getCookie("login");
 
             if(this.$el.find("[name=loginRemember]").length !== 0 && login) {
                 this.$el.find("input[type=text]:first").val(login);
@@ -332,7 +329,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             }
         },
         handleUrlParams: function() {
-            var urlParams = uiUtils.convertCurrentUrlToJSON().params;
+            var urlParams = UIUtils.convertCurrentUrlToJSON().params;
 
             //rest does not accept the params listed in the array below as is
             //they must be transformed into the 'authIndexType' and 'authIndexValue' params
@@ -341,17 +338,17 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     urlParams.authIndexType = ((p === 'authlevel') ? 'level' : p);
                     urlParams.authIndexValue = urlParams[p];
                     //***note special case for authLevel
-                    conf.globalData.auth.additional += '&authIndexType=' + ((p === 'authlevel') ? 'level' : p) + '&authIndexValue=' + urlParams[p];
+                    Configuration.globalData.auth.additional += '&authIndexType=' + ((p === 'authlevel') ? 'level' : p) + '&authIndexValue=' + urlParams[p];
                 }
             });
 
             //special case for SSORedirect
             if(urlParams.goto && urlParams.goto.indexOf('/SSORedirect') === 0){
-                urlParams.goto = "/" + constants.context + urlParams.goto;
-                conf.globalData.auth.additional.replace("&goto=","&goto=" + "/" + constants.context);
+                urlParams.goto = "/" + Constants.context + urlParams.goto;
+                Configuration.globalData.auth.additional.replace("&goto=","&goto=" + "/" + Constants.context);
             }
 
-            conf.globalData.auth.urlParams = urlParams;
+            Configuration.globalData.auth.urlParams = urlParams;
             return urlParams;
         }
     });

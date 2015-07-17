@@ -73,4 +73,3 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
 
     return SettingsView;
 });
-

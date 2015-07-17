@@ -1,21 +1,12 @@
 <div class="page-header clearfix">
-    <span class="header-icon pull-left">
-        <span class="fa fa-code"></span>
-    </span>
-
-    <h4 class="page-type">{{t "console.scripts.edit.script"}}</h4>
-    <div class="page-header-button-group">
-        <button id="deleteScript" class="btn btn-primary" type="button" {{#unless entity.name}}disabled{{/unless}}>
-            <i class="fa fa-times"></i> {{t "common.form.delete"}}
-        </button>
-    </div>
-    <h1>
-        {{#if entity.name}}
-        {{entity.name}}
-        {{else}}
-        {{t "common.form.createNew"}}
-        {{/if}}
-    </h1>
+    <button id="deleteScript" class="btn btn-primary page-header page-header-button-group" type="button" {{#unless entity.name}}disabled{{/unless}}>
+        <i class="fa fa-times"></i> {{t "common.form.delete"}}
+    </button>
+    {{#if entity.name}}
+        {{> headers/_TitleWithSubAndIcon title=entity.name type="console.scripts.edit.script" icon="code" }}
+    {{else}}
+        {{> headers/_TitleWithSubAndIcon title="common.form.createNew" type="console.scripts.edit.script" icon="code" }}
+    {{/if}}
 </div>
 
 <div class="panel panel-default panel-content">

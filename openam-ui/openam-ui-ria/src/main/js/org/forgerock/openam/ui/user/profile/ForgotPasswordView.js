@@ -21,8 +21,8 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
-/*global define, $, form2js, _, js2form, Handlebars, window*/
 
+/*global define, $, form2js, _, js2form, window*/
 define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/ValidatorsManager",

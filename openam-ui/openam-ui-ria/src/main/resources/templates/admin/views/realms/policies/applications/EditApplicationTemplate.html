@@ -1,22 +1,12 @@
 <div class="page-header clearfix">
-    <span class="header-icon pull-left">
-        <i class="fa fa-list-alt"></i>
-    </span>
-
-    <h4 class="page-type">{{t "console.policies.common.application"}}</h4>
-
-    <div class="page-header-button-group">
-        <button id="deleteApp" class="btn btn-primary" type="button" {{#unless entity.name}}disabled{{/unless}}>
-            <i class="fa fa-times"></i> {{t "common.form.delete"}}</button>
-    </div>
-
-    <h1>
-        {{#if entity.name}}
-        {{entity.name}}
-        {{else}}
-        {{t "common.form.createNew"}}
-        {{/if}}
-    </h1>
+    <button id="deleteApp" class="btn btn-primary page-header page-header-button-group" type="button" {{#unless entity.name}}disabled{{/unless}}>
+        <i class="fa fa-times"></i> {{t "common.form.delete"}}
+    </button>
+    {{#if entity.name}}
+        {{> headers/_TitleWithSubAndIcon title=entity.name type="console.policies.common.application" icon="list-alt" }}
+    {{else}}
+        {{> headers/_TitleWithSubAndIcon title="common.form.createNew" type="console.policies.common.application" icon="list-alt" }}
+    {{/if}}
 </div>
 
 <div class="tab-menu">

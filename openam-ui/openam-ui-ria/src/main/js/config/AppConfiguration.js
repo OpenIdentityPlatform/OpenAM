@@ -115,6 +115,10 @@ define("config/AppConfiguration", [
                             "templates/uma/backgrid/cell/RevokeCell.html",
                             "templates/uma/backgrid/cell/SelectizeCell.html",
                             "templates/user/ConfirmPasswordDialogTemplate.html"
+                        ],
+                        partialUrls: [
+                            "partials/headers/_Title.html",
+                            "partials/headers/_TitleWithSubAndIcon.html"
                         ]
                     }
                 },

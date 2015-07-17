@@ -1,11 +1,8 @@
 <div class="container">
-    <div class="page-header page-header-no-border">
-        <h4 class="page-type">{{t "uma.common.shares"}}</h4>
-        <div class="page-header-button-group">
-            <button id="revokeAll" type="button" class="btn btn-default"><i class="fa fa-times"></i> {{t "uma.resources.show.revokeAll"}}</button>
-        </div>
-        <h1>{{t "uma.resources.list.title"}}</h1>
-    </div>
+    <button id="revokeAll" type="button" class="btn btn-default page-header-button-group">
+        <i class="fa fa-times"></i> {{t "uma.resources.show.revokeAll"}}
+    </button>
+    {{> headers/_TitleWithSubAndIcon title="uma.resources.list.title" type="uma.common.shares" }}
     <p class="page-description">{{t "uma.resources.list.subtitle"}}</p>
 
     <div class="tab-menu">

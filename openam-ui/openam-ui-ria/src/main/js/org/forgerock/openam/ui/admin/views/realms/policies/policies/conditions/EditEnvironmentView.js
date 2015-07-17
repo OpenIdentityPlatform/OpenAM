@@ -14,8 +14,7 @@
  * Portions copyright 2014-2015 ForgeRock AS.
  */
 
-/*global define, console, Handlebars */
-
+/*global define, console*/
 define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/EditEnvironmentView", [
     "jquery",
     "underscore",
@@ -30,9 +29,10 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
     "org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/ConditionAttrTimeView",
     "org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/ConditionAttrDayView",
     "org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/ConditionAttrDateView",
-    "org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/ConditionAttrTimeZoneView"
+    "org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/ConditionAttrTimeZoneView",
+    "handlebars"
 ], function ($, _, AbstractView, uiUtils, PoliciesDelegate, BooleanAttr, ArrayAttr, StringAttr, ObjectAttr, EnumAttr,
-             TimeAttr, DayAttr, DateAttr, TimeZoneAttr) {
+             TimeAttr, DayAttr, DateAttr, TimeZoneAttr, Handlebars) {
     return AbstractView.extend({
         events: {
             "change select#selection": "changeType"
