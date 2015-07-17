@@ -24,10 +24,7 @@
  *
  * $Id: UpdateAuthInstance.java,v 1.3 2008/12/16 06:47:01 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2014 Forgerock AS.
+ * Portions Copyrighted 2014-2015 Forgerock AS.
  */
 
 package com.sun.identity.cli.authentication;
@@ -55,7 +52,12 @@ import java.util.Map;
 import java.util.Set;
 
 public class UpdateAuthInstance extends AuthenticatedCommand {
+    
     private static final String FILE_REFERENCE_SUFFIX = "-file";
+    // One-off case of an existing WindowsDesktopSSO property that makes use of the -file suffix in an existing property
+    // => don't apply the file reference rule in this case.
+    private static final String FILE_REFERENCE_SUFFIX_EXEMPT = "iplanet-am-auth-windowsdesktopsso-keytab-file";
+
     /**
      * Handles request.
      *
@@ -148,7 +150,7 @@ public class UpdateAuthInstance extends AuthenticatedCommand {
                 String key = attr.getKey();
                 Set<String> values = attr.getValue();
 
-                if (key != null && key.endsWith(FILE_REFERENCE_SUFFIX)) {
+                if (key != null && key.endsWith(FILE_REFERENCE_SUFFIX) && !key.equals(FILE_REFERENCE_SUFFIX_EXEMPT)) {
                     key = key.substring(0, key.length() - FILE_REFERENCE_SUFFIX.length());
 
                     if (attrs.containsKey(key)) {
