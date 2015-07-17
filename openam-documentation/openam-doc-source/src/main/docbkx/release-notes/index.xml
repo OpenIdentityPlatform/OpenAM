@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
 <book xml:id='release-notes'
@@ -40,23 +40,18 @@
    Federation software.</para>
   </abstract>
   <copyright>
-   <year>2011-2014</year>
+   <year>2011-2015</year>
    <holder>ForgeRock AS</holder>
   </copyright>
   <authorgroup>
    <author>
     <personname>
-     <firstname>Mark </firstname><surname>Craig</surname>
+     <firstname>Mark</firstname> <surname>Craig</surname>
     </personname>
    </author>
    <author>
     <personname>
-     <firstname>Mike </firstname><surname>Jang</surname>
-    </personname>
-   </author>
-   <author>
-    <personname>
-     <firstname>Vanessa </firstname><surname>Richie</surname>
+     <firstname>Gene</firstname> <surname>Hirayama</surname>
     </personname>
 
     <xinclude:include href="../shared/affiliation-fr.xml"/>

@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock AS
+  !      Copyright 2011-2015 ForgeRock AS.
   !    
 -->
 <chapter xml:id='chap-compatibility'
@@ -37,9 +37,327 @@
  <section xml:id="changes">
   <title>Important Changes to Existing Functionality</title>
 
+  <!-- Changes for 12.0.1 -->
   <itemizedlist>
+   <para>
+    These changes are new in OpenAM ${serverDocTargetVersion}:
+   </para>
 
-   <!-- Update docs for click-through license acceptance KEEP THIS AT TOP -->
+   <!-- OPENAM-718 -->
+   <listitem>
+    <para>
+     <emphasis role="bold">Agent Group Membership Now Stored in Agent Profile</emphasis>.
+     Agent group membership information is now stored as part of the agent
+     profile using the <literal>agentgroup</literal>
+     attribute. You can assign an agent to a group by simply setting the
+     <literal>agentgroup</literal> property upon creation.
+     You can also use the <command>ssoadm</command> <command>show-agent</command> command
+     to return the group membership detail in the <literal>agentgroup</literal>
+     attribute.
+     Note that the existing <command>ssoadm</command>
+     commands (for example, <literal>add-agent-to-grp</literal>
+     and <literal>remove-agent-from-grp</literal>) are still the preferred methods
+     for managing group membership information.
+    </para>
+    <para>
+     During upgrade, agent profiles will be automatically upgraded to use the new
+     <literal>agentgroup</literal> attribute to store the group's name.
+    </para>
+    <para>
+     For more information, see
+     <link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-718"
+      xlink:show="new"
+      >OPENAM-718</link>.
+    </para>
+   </listitem>
+
+   <!-- OPENAM-3333 -->
+   <listitem>
+    <para>
+     <emphasis role="bold">Updated weblogic.xml for WebLogic</emphasis>.
+     When running OpenAM on WebLogic 11g, you must add a WebLogic-specific descriptor
+     file, <filename>WEB-INF/weblogic.xml</filename> in the <literal>.war</literal>
+     before deployment. The descriptor file maps resources defined for OpenAM in
+     WebLogic deployments.
+    </para>
+    <para>
+     An example <literal>weblogic.xml</literal> file is presented below.
+    </para>
+    <programlisting>&lt;?xml version="1.0" encoding="UTF-8"?>
+&lt;weblogic-web-app xmlns="http://xmlns.oracle.com/weblogic/weblogic-web-app"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://xmlns.oracle.com/weblogic/weblogic-web-app
+     http://xmlns.oracle.com/weblogic/weblogic-web-app/1.3/weblogic-web-app.xsd">
+      &lt;context-root>/openam&lt;/context-root>
+      &lt;container-descriptor>
+       &lt;prefer-application-packages>
+
+        &lt;!-- Use bundled Jersey library -->
+        &lt;package-name>com.sun.jersey.*&lt;/package-name>
+        &lt;package-name>com.sun.research.ws.wadl.*&lt;/package-name>
+        &lt;package-name>com.sun.ws.rs.ext.*&lt;/package-name>
+
+        &lt;!-- Rhino -->
+        &lt;package-name>org.mozilla.javascript.*&lt;/package-name>
+
+        &lt;package-name>org.apache.commons.lang.*&lt;/package-name>
+      &lt;/prefer-application-packages>
+     &lt;/container-descriptor>
+ &lt;/weblogic-web-app>
+    </programlisting>
+    <para>
+     For more information see, <link
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3333"
+     xlink:show="new"
+     >OPENAM-3333</link>.
+    </para>
+   </listitem>
+
+   <!-- OPENAM-3575/6212 -->
+   <listitem>
+    <para>
+     <emphasis role="bold">AD/LDAP/RADIUS Authentication Modules Allow More Than One
+      Primary/Secondary Server</emphasis>. The Active Directory, LDAP, and
+     RADIUS authentication modules now allow one or more servers to be designated
+     as primary or secondary servers.
+    </para>
+    <para>
+     When authenticating users from a directory server that is remote
+     to OpenAM, set the primary server values, and optionally the secondary server
+     values. Primary servers have priority over secondary servers.
+    </para>
+    <para><command>ssoadm</command> attributes are: primary is
+     <literal>iplanet-am-auth-ldap-server</literal>; secondary is
+     <literal>iplanet-am-auth-ldap-server2</literal>.
+    </para>
+    <para>
+     Both properties take more than one value; thus, allowing more than one primary
+     or secondary remote server, respectively. Assuming a multi-data center
+     environment, OpenAM determines priority within
+     the primary and secondary remote servers, respectively, as follows:
+    </para>
+    <itemizedlist>
+     <listitem>
+      <para>
+       Every LDAP server that is mapped to the current OpenAM instance has highest
+       priority.
+      </para>
+      <para>
+       For example, if you are connected to <literal>openam1.example.com</literal>
+       and <literal>ldap1.example.com</literal> is mapped to that OpenAM instance,
+       then OpenAM uses <literal>ldap1.example.com</literal>.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       Every LDAP server that was not specifically mapped to a given OpenAM instance has
+       the next highest priority.
+      </para>
+      <para>
+       For example, if you have another LDAP server, <literal>ldap2.example.com</literal>,
+       that is not connected to a specific OpenAM server and if <literal>ldap1.example.com</literal>
+       is unavailable, OpenAM connects to the next highest priority LDAP server,
+       <literal>ldap2.example.com</literal>.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       LDAP servers that are mapped to different OpenAM instances have the
+       lowest priority.
+      </para>
+      <para>
+       For example, if <literal>ldap3.example.com</literal> is connected to
+       <literal>openam3.example.com</literal> and <literal>ldap1.example.com</literal>
+       and <literal>ldap2.example.com</literal> are unavailable, then
+       <literal>openam1.example.com</literal> connects to <literal>ldap3.example.com</literal>.
+      </para>
+     </listitem>
+    </itemizedlist>
+    <para>
+     For more information, see
+     <link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3575"
+      xlink:show="new"
+      >OPENAM-3575</link>.
+    </para>
+   </listitem>
+
+   <!-- OPENAM-3714 -->
+   <listitem>
+    <para>
+     <emphasis role="bold">StartTLS Support for IdRepo</emphasis>.
+     You can now use StartTLS to initiate secure connections to an OpenAM Identity
+     Repository.
+     A new property, <literal>sun-idrepo-ldapv3-config-connection-mode</literal>,
+     has been created and has possible values of <literal>LDAP</literal>,
+     <literal>LDAPS</literal>, and <literal>StartTLS</literal> to enable this
+     feature.
+    </para>
+    <para>
+     The <literal>sun-idrepo-ldapv3-config-connection-mode</literal> property
+     replaces <literal>sun-idrepo-ldapv3-config-ssl-enabled</literal>,
+     which has been removed from the configuration schema
+     (<literal>sunIdentityRepositoryService</literal>).
+    </para>
+    <para>
+     OpenAM automatically updates the <literal>sun-idrepo-ldapv3-config-ssl-enabled</literal>
+     property to the <literal>sun-idrepo-ldapv3-config-connection-mode</literal> property
+     when you upgrade.
+     To enable StartTLS, set
+     the <literal>sun-idrepo-ldapv3-config-connection-mode</literal> property
+     to "StartTLS".
+     You will also need to update existing <command>ssoadm</command> scripts to
+     use the new property,
+    </para>
+    <para>
+     For more information, see
+     <link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3714"
+      xlink:show="new"
+      >OPENAM-3714</link>.
+    </para>
+   </listitem>
+
+   <!-- OPENAM-4333 -->
+   <listitem>
+    <para>
+     <emphasis role="bold">Move of OAuth 2.0 Well-Known Endpoints</emphasis>.
+     The well-known endpoints have been moved from
+     <literal>/openam/.well-known</literal> to <literal>/openam/oauth2/.well-known</literal>.
+    </para>
+    <para>
+     For more information, see
+     <link
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4333"
+     xlink:show="new"
+     >OPENAM-4333</link>.
+    </para>
+   </listitem>
+
+   <!-- OPENAM-5097 -->
+   <listitem>
+    <para>
+     <emphasis role="bold">StartTLS Support For AD/LDAP Authentication Moduels</emphasis>.
+     You can now use StartTLS with the Active Directory
+     and LDAP authentication modules to secure OpenAM's connection to the data stores.
+     A new property, <literal>openam-auth-ldap-connection-mode</literal>,
+     has been created with the possible values of <literal>LDAP</literal>,
+     <literal>LDAPS</literal>, and <literal>StartTLS</literal> to enable this
+     feature.
+    </para>
+    <para>
+     The <literal>openam-auth-ldap-connection-mode</literal> property replaces
+     the <literal>iplanet-am-auth-ldap-ssl-enabled</literal> property, which has been
+     removed from the configuration schema (<literal>sunAMAuthADService</literal>
+     and <literal>iPlanetAMAuthLDAPService</literal>).
+    </para>
+    <para>
+     OpenAM automatically updates the <literal>iplanet-am-auth-ldap-ssl-enabled</literal>
+     property to the <literal>openam-auth-ldap-connection-mode</literal> property
+     when you upgrade. You must manually set the value of
+     the <literal>openam-auth-ldap-connection-mode</literal> to "StartTLS"
+     to initiate a StartTLS connection to the data store.
+     You will also need to update existing <command>ssoadm</command> scripts to
+     use the new property,
+    </para>
+    <para>
+     For more information, see
+     <link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5097"
+      xlink:show="new"
+      >OPENAM-5097</link>.
+    </para>
+   </listitem>
+
+   <!-- OPENAM-5460 -->
+   <listitem>
+    <para>
+     <emphasis role="bold">AD Authentication Module Now Provides iplanet-am-auth-ldap-ssl-trust-all</emphasis>.
+     The <literal>iplanet-am-auth-ldap-ssl-trust-all</literal> property
+     in the Active Directory authentication module enables
+     the <literal>X509TrustManager</literal> to trust all certificates when
+     the Active Directory authentication module connects to AD servers protected
+     by self-signed or invalid (for example, invalid hostnames) certificates.
+    </para>
+    <para>
+     Caution: Use this property with care as it bypasses the normal certificate
+     verification process.
+    </para>
+    <para>
+     For more information, see
+     <link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5460"
+      xlink:show="new"
+      >OPENAM-5460</link>.
+    </para>
+   </listitem>
+
+   <!-- OPENAM-6109 -->
+   <listitem>
+    <para>
+     <emphasis role="bold">Addional JVM Properties for WebSphere Installs</emphasis>.
+     OpenAM 12.0.1 requires an updated step when running OpenAM on WebSphere. The JVM
+     settings require additional properties to be set.
+    </para>
+    <screen>
+-DamCryptoDescriptor.provider=IBMJCE
+-DamKeyGenDescriptor.provider=IBMJCE
+-Djavax.xml.parsers.DocumentBuilderFactory=org.apache.xerces.jaxp.DocumentBuilderFactoryImpl
+-Djavax.xml.parsers.SAXParserFactory=org.apache.xerces.jaxp.SAXParserFactoryImpl
+    </screen>
+    <para>
+     Run the following procedures to set up the JVM properties on WebSphere. Note
+     that these steps were run on WebSphere 8.5 on a Windows platform.
+    </para>
+    <procedure>
+     <step>
+      <para>Log in to the WebSphere console.</para>
+     </step>
+     <step>
+      <para>In the left pane, expand Servers.</para>
+     </step>
+     <step>
+      <para>Expand Server Types.</para>
+     </step>
+     <step>
+      <para>Click WebSphere application servers.</para>
+     </step>
+     <step>
+      <para>In the right pane, click on the server name.</para>
+     </step>
+     <step>
+      <para>In the Server infrastructure section, expand Java and Process Management.</para>
+     </step>
+     <step>
+      <para>Click Process definition.</para>
+     </step>
+     <step>
+      <para>In the Advanced properties section, click Java Virtual Machine.</para>
+     </step>
+     <step>
+      <para>In the Generic JVM arguments text field, add the JVM properties.</para>
+     </step>
+     <step>
+      <para>Save the configuration.</para>
+     </step>
+    </procedure>
+    <para>
+     For more information, see
+     <link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-6109"
+      xlink:show="new"
+      >OPENAM-6109</link>.
+    </para>
+   </listitem>
+
+  </itemizedlist>
+
+  <!-- Changes for OpenAM 12.0.0 -->
+  <itemizedlist>
+   <para>
+    The following changes were listed for OpenAM 12.0.0:
+   </para>
    <listitem>
        <para>All OpenAM core server, tools, and agent installers now display a
         software license acceptance screen prior to configuration.
@@ -473,11 +791,11 @@ http://realm1.example.com:8080/openam/XUI/#Login/test
   </itemizedlist>
  </section>
 
- <section xml:id="deprecated">
+ <section xml:id="deprecated-functionality">
   <title>Deprecated Functionality</title>
   
   <para>The following functionality is deprecated in OpenAM
-  <?eval ${serverDocTargetVersion}?>, and is likely to be removed in a future
+  ${serverDocTargetVersion}, and is likely to be removed in a future
   release.</para>
 
   <itemizedlist>
@@ -764,13 +1082,138 @@ http://realm1.example.com:8080/openam/XUI/#Login/test
   </itemizedlist>
  </section>
 
- <section xml:id="removed">
+ <section xml:id="removed-functionality">
   <title>Removed Functionality</title>
 
   <itemizedlist>
+
+   <!-- OPENAM-1036/5809 -->
    <listitem>
     <para>
-     No functionality has been removed in this release.
+     <emphasis role="bold">Removal of Unused Install-Time LDAP Users</emphasis>.
+     Default LDAP users that were set up during initial installation have
+     been removed, because they were not referenced anywhere in the configuration.
+     Any associated access control instructions to the removed entries have also
+     been removed.
+    </para>
+    <para>
+     When targeting Oracle DSEE as the user store, OpenAM no longer creates
+     the following entries and ACIs:
+    </para>
+    <itemizedlist>
+     <listitem>
+      <para>
+       dn: ou=DSAME users, CHOSEN_SUFFIX
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       dn: cn=dsameuser, ou=DSAME users, CHOSEN_SUFFIX
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       dn: cn=amldapuser,ou=DSAME Users, CHOSEN_SUFFIX
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       allow (all) userdn = "ldap:///cn=dsameuser,ou=DSAME Users,CHOSEN_SUFFIX";
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       allow (read,search) userdn = "ldap:///cn=amldapuser,ou=DSAME Users,CHOSEN_SUFFIX";
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       deny (write) userdn ="ldap:///self". The aci was updated to remove the
+       <literal>dsameuser</literal> reference from the target filter.
+      </para>
+     </listitem>
+    </itemizedlist>
+    <para>
+     When targeting OpenDJ as the user store (internally or externally), OpenAM
+     no longer creates the following entries and ACIs:
+    </para>
+    <itemizedlist>
+     <listitem>
+      <para>
+       dn: ou=opensso adminusers,CHOSEN_SUFFIX
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       dn: cn=openssouser,ou=opensso adminusers,CHOSEN_SUFFIX
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       dn: cn=ldapuser,ou=opensso adminusers,CHOSEN_SUFFIX
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       allow (read,search) userdn = "ldap:///cn=ldapuser,ou=opensso adminusers,CHOSEN_SUFFIX";
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       allow (all) userdn = "ldap:///cn=openssouser,ou=opensso adminusers,CHOSEN_SUFFIX";
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       deny (write) userdn ="ldap:///self". The aci was updated to remove the
+       <literal>openssouser</literal> reference from the target filter.
+      </para>
+     </listitem>
+    </itemizedlist>
+    <para>
+     For existing deployments, upgrading to OpenAM ${serverDocTargetVersion}
+     safely removes these entries.
+    </para>
+    <para>
+     For details, see the explanation in
+     (<link
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1036"
+     xlink:show="new"
+     >OPENAM-1036</link>).
+    </para>
+   </listitem>
+
+   <!-- OPENAM-3714 -->
+   <listitem>
+    <para>
+     The <literal>sun-idrepo-ldapv3-config-connection-mode</literal> property
+     replaces <literal>sun-idrepo-ldapv3-config-ssl-enabled</literal>,
+     which has been removed from the configuration schema
+     (<literal>sunIdentityRepositoryService</literal>).
+    </para>
+    <para>
+     For more information, see
+     <link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3714"
+      xlink:show="new"
+      >OPENAM-3714</link>.
+    </para>
+   </listitem>
+
+   <!-- OPENAM-5097 -->
+   <listitem>
+    <para>
+     The <literal>openam-auth-ldap-connection-mode</literal> property replaces
+     <literal>iplanet-am-auth-ldap-ssl-enabled</literal>, which has been
+     removed from the configuration schema (<literal>sunAMAuthADService</literal>
+     and <literal>iPlanetAMAuthLDAPService</literal>).
+    </para>
+    <para>
+     For more information, see
+     <link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5097"
+      xlink:show="new"
+      >OPENAM-5097</link>.
     </para>
    </listitem>
   </itemizedlist>

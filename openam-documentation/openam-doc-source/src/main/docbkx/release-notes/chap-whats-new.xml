@@ -29,777 +29,487 @@
  xsi:schemaLocation='http://docbook.org/ns/docbook
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
- <title>What's New in OpenAM <?eval ${serverDocTargetVersion}?></title>
+ <title>What's New in OpenAM ${serverDocTargetVersion}</title>
 
- <para>OpenAM <?eval ${serverDocTargetVersion}?> fixes a number of issues, and
- provides the following additional features.</para>
-
- <section xml:id="major-new-features">
- <title>Major New Features</title>
-  <!-- New Features for Users -->
-  <itemizedlist>
-   <title>New Features for Users</title>
-
-   <!-- Epic: AME-2791 -->
-   <listitem>
-    <para>
-     <emphasis role="bold">User Self-Service</emphasis></para>
-     <para>OpenAM supports self-service user registration, device management and
-      password reset - reducing costs and increasing customer satisfaction.</para>
-     <variablelist>
-      <varlistentry>
-       <term>Self-Service User Registration</term>
-       <listitem>
-        <para>
-        OpenAM now offers a user self-registration service through the XUI
-         interface. Click the Register link on the Login page and enter an
-         email address.
-       </para>
-
-        <para>OpenAM will email you to confirm your address, and include a
-         link to a page where you can register your details, as shown below.</para>
-
-        <mediaobject xml:id="figure-user-self-registration-xui">
-         <alt>User Self-Registration Account</alt>
-         <imageobject>
-          <imagedata fileref="images/user-self-registration-xui.png"
-                     format="PNG" />
-         </imageobject>
-         <textobject>
-          <para>User Self Registration Account Entry
-          </para>
-         </textobject>
-        </mediaobject>
-
-        <para>
-         For more information, see the
-         <citetitle>Administration Guide</citetitle> section <link
-         xlink:show="new"
-         xlink:href="admin-guide#user-self-registration"
-         xlink:role="http://docbook.org/xlink/role/olink"
-         ><citetitle>Configuring User Self-Registration</citetitle></link>.
-        </para>
-       </listitem>
-      </varlistentry>
-
-
-      <varlistentry>
-       <term>Trusted Device Management</term>
-      <listitem>
-       <para>
-       OpenAM allows you to manage a list of trusted devices from your Dashboard
-       page.
-      </para>
-
-       <para>
-        When you log in to the console, OpenAM determines if the device you
-        are using differs from that in a stored profile.
-        If there are differences, you will be asked to enter a one-time
-        password.</para>
-
-       <para>
-        After the one-time password is verified, you can provide a name
-        for the device and add it to the list of trusted devices.
-       </para>
-
-       <para>
-        Trusted devices appear in the Dashboard when you log in, as shown below,
-        and can be removed by clicking Delete Device.
-       </para>
-
-       <mediaobject xml:id="figure-trusted-device-mgmt">
-        <alt>Trusted Device Management</alt>
-        <imageobject>
-         <imagedata fileref="images/trusted-device-mgmt.png"
-                    format="PNG" />
-        </imageobject>
-        <textobject>
-         <para>Trusted Device Management on the User Profile page.
-         </para>
-        </textobject>
-       </mediaobject>
-       <para>
-        For more information, see the
-        <citetitle>Administration Guide</citetitle> sections <link
-        xlink:show="new"
-        xlink:href="admin-guide#device-id-match-hints"
-        xlink:role="http://docbook.org/xlink/role/olink"
-        ><citetitle>Hints for the Device ID (Match) Authentication
-        Module</citetitle></link> and <link
-        xlink:show="new"
-        xlink:href="admin-guide#device-id-save-hints"
-        xlink:role="http://docbook.org/xlink/role/olink"
-        ><citetitle>Hints for the Device ID (Save) Authentication
-        Module</citetitle></link>.
-       </para>
-      </listitem>
-      </varlistentry>
-
-     <varlistentry>
-      <term>Authorized Application Management</term>
-      <listitem>
-       <para>
-        You can now manage your authorized applications (those that use OAuth 2.0
-        tokens) from the Dashboard link on the user page of the OpenAM console.
-        In the Authorized Apps section, view your OAuth 2.0 tokens or
-        remove them by clicking the Revoke Access link.
-       </para>
-
-       <mediaobject xml:id="figure-xui-oauth2-self-service-2">
-        <alt>OAuth2 Self-Service</alt>
-        <imageobject>
-         <imagedata fileref="images/xui-oauth2-self-service-2.png"
-                    format="PNG" />
-        </imageobject>
-        <textobject>
-         <para>OAuth 2.0 Self-Service in the XUI.
-         </para>
-        </textobject>
-       </mediaobject>
-
-      </listitem>
-     </varlistentry>
-     </variablelist>
-   </listitem>
-
-   <!-- Epic: AME-4374 -->
-   <listitem>
-    <para><emphasis role="bold">Social Authentication</emphasis></para>
-    <para>Log in to an OpenAM protected resource by using your existing social
-     website credentials. OpenAM supports Facebook, Google, Microsoft, or
-     any other OpenID Connect 1.0 compliant identity provider.</para>
-    <mediaobject xml:id="figure-login-with-social-authentication">
-     <alt>Social Authentication enabled</alt>
-     <imageobject>
-      <imagedata fileref="images/login-with-social-authentication.png"
-                 format="PNG" />
-     </imageobject>
-     <textobject>
-      <para>
-       Authenticate with your Microsoft, Facebook or Google credentials.
-      </para>
-     </textobject>
-    </mediaobject>
-
-    <para>
-     The OpenAM administration console provides wizards for quickly configuring
-     social authentication. For more information, see the
-     <citetitle>Administration Guide</citetitle> section <link
-     xlink:show="new"
-     xlink:href="admin-guide#configure-social-authn"
-     xlink:role="http://docbook.org/xlink/role/olink"
-     ><citetitle>Configuring Social Authentication</citetitle></link>.
-    </para>
-   </listitem>
-  </itemizedlist>
-
-  <!-- New Features for Administrators -->
-  <itemizedlist>
-   <title>New Features for Administrators</title>
-
-  <!-- Epic: AME-2767 -->
-  <listitem>
-   <para>
-    <emphasis role="bold">New Policy Editor</emphasis>
-   </para>
-   <para>
-    OpenAM policy configuration now supports applications.
-    OpenAM applications act as templates for all the policies
-    that govern access to the protected resources in your applications.
-   </para>
-   <para>
-    When you create or edit a policy in OpenAM console for a particular realm,
-    you first choose the application that the policy belongs to,
-    and then create the policy or choose the policy to edit.
-   </para>
-   <para>The new policy editor user interface allows you to quickly create
-    applications and complex authorization policies, using point-and-click and
-    drag-and-drop operations.</para>
-
-   <mediaobject xml:id="figure-policy-editor">
-    <alt>Policy editor</alt>
-    <imageobject>
-     <imagedata fileref="images/policy-editor.png"
-                format="PNG" />
-    </imageobject>
-    <textobject>
-     <para>Policy editor
-     </para>
-    </textobject>
-   </mediaobject>
-
-   <para>
-    For more information, see the
-    <citetitle>Administration Guide</citetitle> chapter <link
-    xlink:show="new"
-    xlink:href="admin-guide#chap-authz-policy"
-    xlink:role="http://docbook.org/xlink/role/olink"
-    ><citetitle>Defining Authorization Policies</citetitle></link>
-   </para>
-  </listitem>
-
-   <!-- Epic: AME-4486 -->
-   <listitem>
-    <para>
-     <emphasis role="bold">Policy Export and Import</emphasis></para>
-    <para>You can import and export policies to and from XACML 3.0
-     format files. Use the files for version control,
-     or migration between OpenAM test and production instances,
-     for example.</para>
-    <para>
-     For more information, see the
-     <citetitle>Administration Guide</citetitle> section <link
-     xlink:show="new"
-     xlink:href="admin-guide#script-policy"
-     xlink:role="http://docbook.org/xlink/role/olink"
-     ><citetitle>Importing and Exporting Policies</citetitle></link>
-    </para>
-   </listitem>
-
-   <!-- AME-3150 -->
-   <listitem>
-    <para>
-     <emphasis role="bold">Extended Authorization Subjects</emphasis></para>
-    <para>You can now choose between an SSO token and an OpenID Connect
-     ID token as the subject to evaluate authorization policies
-     against. OpenID Connect ID Tokens can be used when there is no
-     current user session, for example when an offline batch processing
-     routine acts on behalf of a user.</para>
-    <para>
-     For more information, see the
-     <citetitle>Administration Guide</citetitle> section <link
-     xlink:show="new"
-     xlink:href="admin-guide#oidc-module-conf-hints"
-     xlink:role="http://docbook.org/xlink/role/olink"
-     ><citetitle>Hints for the OpenID Connect id_token bearer Module</citetitle></link>
-    </para>
-   </listitem>
-
-  <!-- Epic: AME-2765 -->
-   <listitem>
-    <para>
-     <emphasis role="bold">Scripted Authentication Modules</emphasis>
-    </para>
-    <para>You can create custom authentication scripts to gather knowledge
-     about a user to help determine their authentication path. A scripted
-     authentication module runs a script to perform authentication,
-     making it easier than ever before to develop custom authentication
-     modules.</para>
-    <para>
-     For example
-     your script could make a call to a third-party proofing service to
-     determine risk, and require stronger authentication depending on the
-     context of the login request.</para>
-     <para>
-      Scripted authentication modules
-      have access to the same data as other modules in the chain,
-      can access user profile data during authentication,
-      can make HTTP calls to external services,
-      and are sandboxed for more secure operation.
-      The scripts are stored in OpenAM configuration data,
-      and so transparently available across OpenAM Sites.
-      Server-side scripts can be written in either Groovy or JavaScript.
-     </para>
-    <para>
-     For details on writing authentication module scripts, see the
-     <citetitle>Developer Guide</citetitle> chapter
-     <link
-      xlink:href="dev-guide#chap-scripted-auth-module"
-      xlink:role="http://docbook.org/xlink/role/olink"
-      xlink:show="new"
-      ><citetitle>Scripting Authentication</citetitle></link>.
-    </para>
-
-    <para>
-     For details on configuring scripted authentication modules, see the
-     <citetitle>Administration Guide</citetitle> section
-     <link
-      xlink:href="admin-guide#scripted-module-conf-hints"
-      xlink:role="http://docbook.org/xlink/role/olink"
-      xlink:show="new"
-      ><citetitle>Hints For Scripted Authentication Modules</citetitle></link>.
-    </para>
-   </listitem>
-
-  <!-- AME-3612 -->
-   <listitem>
-    <para>
-     <emphasis role="bold">Scripted Device Identification Modules</emphasis>
-    </para>
-    <para>OpenAM 12.0 introduces new Device ID (Match) and Device ID (Save) authentication
-     modules that support the ability to customize your device fingerprinting
-     implementations.</para>
-    <para>The Device ID (Match) Authentication Module uses the new
-     JavaScript/Groovy scripting engine, and demonstrates how scripted modules
-     can be used to add contextual intelligence to the login process.</para>
-    <para>
-    For more information, see the
-     <citetitle>Administration Guide</citetitle> section <link
-    xlink:show="new"
-    xlink:href="admin-guide#device-id-match-hints"
-    xlink:role="http://docbook.org/xlink/role/olink"
-    ><citetitle>Hints for the Device ID (Match) Authentication
-    Module</citetitle></link>
-    </para>
-   </listitem>
-  </itemizedlist>
-
-  <!-- New Features for Developers -->
-  <itemizedlist>
-   <title>New Features for Developers</title>
-
-   <!-- Epic: AME-2707 -->
-   <listitem>
-    <para>
-     <emphasis role="bold">REST STS for Token Transformation</emphasis>
-    </para>
-    <para>
-     Use the RESTful Security Token Service (REST STS) to convert
-     tokens in the various formats that OpenAM supports, such as OpenID
-     Connect, X.509, and SSO, into a SAML2 token. Given the variety of token
-     types in use today, it can be helpful to have a configurable service that
-     transform tokens.
-    </para>
-    <para>
-     For more information, see the
-     <citetitle>Administration Guide</citetitle> chapter <link
-     xlink:show="new"
-     xlink:href="admin-guide#chap-rest-sts"
-     xlink:role="http://docbook.org/xlink/role/olink"
-     ><citetitle>The RESTful Security Token Service</citetitle></link>
-    </para>
-   </listitem>
-
-   <!-- Epic: CAF-18 -->
-   <listitem>
-    <para>
-     <emphasis role="bold">OAuth 2.0 and OpenID Connect 1.0
-      Improvements</emphasis>
-    </para>
-    <para>
-     Make use of improved support of the OAuth 2.0 and OpenID Connect 1.0
-     standards, widely used in mobile and web applications. OpenAM
-     rigorously enforces these standards, improving interoperability, and
-     shortening development lead times.
-    </para>
-    <para>
-     For more information, see the
-     <citetitle>Developer's Guide</citetitle> chapter  <link
-     xlink:show="new"
-     xlink:href="dev-guide#chap-rest-oauth2-oidc"
-     xlink:role="http://docbook.org/xlink/role/olink"
-     ><citetitle>RESTful OAuth 2.0 and OpenID Connect 1.0 Services</citetitle></link>
-    </para>
-    <!-- OPENAM-4394 -->
-     <para>OpenAM also supports the
-      <link
-       xlink:href="http://self-issued.info/docs/draft-ietf-oauth-jwt-bearer.html"
-       xlink:show="new"
-       ><citetitle>JSON Web Token (JWT) Profile for OAuth 2.0 Client
-       Authentication and Authorization Grants</citetitle></link>
-      (<link
-       xlink:show="new"
-       xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4394"
-       >OPENAM-4394</link>).
-      This profile allows OAuth 2.0 clients to use JWTs
-      for authentication and to request access tokens.
-      For more information, see the <citetitle>Administration Guide</citetitle>
-      section <link
-       xlink:href="admin-guide#rest-api-authz"
-       xlink:role="http://docbook.org/xlink/role/olink"
-       xlink:show="new"
-       ><citetitle>Authorization</citetitle></link>.
-     </para>
-    </listitem>
-
-   <!-- Epic: AME-2766 -->
-   <listitem>
-    <para>
-     <emphasis role="bold">Fine-Grained Policy APIs</emphasis>
-    </para>
-    <para>Author sophisticated authorization policies by using OpenAM's
-     RESTful interfaces. Manage realms, applications, and policies,
-     list application, condition, and subject types, and request policy
-     decisions using the API, simplifying your applications and deployment.</para>
-    <para>
-     For more information, see the
-     <citetitle>Developer's Guide</citetitle> chapter <link
-     xlink:show="new"
-     xlink:href="dev-guide#chap-rest-authz-policy"
-     xlink:role="http://docbook.org/xlink/role/olink"
-     ><citetitle>RESTful Authorization and Policy Management Services</citetitle></link>
-    </para>
-   </listitem>
-
-   <!-- Epic: AME-4630 -->
-   <listitem>
-    <para>
-     <emphasis role="bold">GSMA Mobile Connect Support</emphasis></para>
-    <para>
-     OpenAM now includes support for GSMA Mobile Connect,
-     a profile of OpenID Connect 1.0.</para>
-   <para>
-     Mobile Connect lets you authenticate with a mobile phone,
-     regardless of the service or the device on which it is consumed.
-     This allows mobile network operators to serve as identity providers
-     for their customers.
-    </para>
-
-    <para>
-     For more information, see the
-     <citetitle>Administration Guide</citetitle> section <link
-      xlink:href="admin-guide#mobile-connect"
-      xlink:role="http://docbook.org/xlink/role/olink"
-      xlink:show="new"
-      ><citetitle>Using OpenAM with Mobile Connect</citetitle></link>.
-    </para>
-   </listitem>
-
-   <!-- Epic: AME-4094 -->
-   <listitem>
-    <para>
-     <emphasis role="bold">REST API Versioning</emphasis></para>
-    <para>
-     OpenAM now assigns REST API features version numbers, to help with
-     backwards-compatibility. You can specify the required version to use when
-     making a call.
-    </para>
-    <para>Use the versioning to insulate your REST clients against breaking
-     changes when upgrading an OpenAM instance.</para>
-    <para>
-     For more information, see the
-     <citetitle>Developer's Guide</citetitle> section <link
-      xlink:href="dev-guide#rest-api-versioning"
-      xlink:role="http://docbook.org/xlink/role/olink"
-      xlink:show="new"
-      ><citetitle>REST API Versioning</citetitle></link>.
-    </para>
-   </listitem>
-
-   <!-- Story: AME-3190  -->
-   <listitem>
-    <para>
-     <emphasis role="bold">Support for the Latest Platforms</emphasis>
-    </para>
-    <para>
-     OpenAM supports the latest platforms such as Java 8 and Apache Tomcat 8.
-    </para>
-    <para>
-     For more information on OpenAM requirements and supported versions, see
-     <xref linkend="chap-before-you-install" />.
-    </para>
-   </listitem>
-
-  </itemizedlist>
-</section>
-
-<section xml:id="additional-new-features">
- <title>Additional New Features</title>
+ <para>
+  OpenAM ${serverDocTargetVersion} is a maintenance release
+  that resolves a number of issues, including security issues in OpenAM.
+  It is strongly recommended that you update to this release
+  to make your deployment more secure
+  and to take advantage of important functional fixes.
+  ForgeRock customers can contact support for help and further information.
+ </para>
 
  <itemizedlist>
-  <!-- Enhancement: AME-2111 -->
-  <listitem>
-   <para><emphasis role="bold">Audit Logging to Syslog</emphasis></para>
-   <para>
-    OpenAM now supports logging audit messages to syslog.
-   </para>
-   <para>
-    For more information, see the
-    <citetitle>Administration Guide</citetitle> section <link
-     xlink:show="new"
-     xlink:href="admin-guide#log-mgmt-syslog"
-     xlink:role="http://docbook.org/xlink/role/olink"
-     ><citetitle>Audit Logging to syslog</citetitle></link>
-    in the <citetitle>Administration Guide</citetitle>.
-   </para>
-  </listitem>
+  <para>
+   Before you install OpenAM or update your existing OpenAM installation,
+   read these release notes.
+   Then, update or install OpenAM.</para>
 
-  <!-- Enhancement: AME-2210 -->
-  <listitem>
-   <para><emphasis role="bold">Persistent Cookie from Client IP Issued</emphasis></para>
-   <para>
-    The Persistent Cookie module has been enhanced to be able to enforce
-    that the persistent cookie can only be used from the same client IP
-    to which the cookie was issued.
-   </para>
-  </listitem>
-
-  <!-- Enhancement: AME-3299 -->
   <listitem>
    <para>
-    <emphasis role="bold">CORS Support for OpenAM APIs</emphasis></para>
-   <para>
-    OpenAM now supports cross-origin resource sharing (CORS)
-    to allow requests to be made across domains from user agents.
-    Applications in browsers that support CORS
-    can therefore now successfully make calls to an OpenAM server
-    that runs in a different domain from the application.
-   </para>
-
-   <para>
-    Instead, you must configure CORS support in OpenAM's deployment descriptor.
-    For instructions, see the
-    <citetitle>Installation Guide</citetitle> section <link
-    xlink:href="install-guide#enable-cors-support"
-    xlink:role="http://docbook.org/xlink/role/olink"
-    xlink:show="new"><citetitle>Enabling CORS Support</citetitle></link>.
-   </para>
-  </listitem>
-
-  <!-- Story: AME-2565 -->
-  <listitem>
-   <para>
-    <emphasis role="bold">Session Failover Across Sites</emphasis></para>
-   <para>
-    OpenAM now allows session failover across OpenAM Sites.
-    In order to take advantage of this capability,
-    you must make sure that the underlying Core Token Service (CTS)
-    replicates session data across your OpenAM Sites.
-   </para>
-
-   <para>
-    For details on setting up the underlying Core Token Service, see the
-    <citetitle>Installation Guide</citetitle> chapter
-    <link
-     xlink:href="install-guide#chap-cts"
-     xlink:role="http://docbook.org/xlink/role/olink"
-     xlink:show="new"
-     ><citetitle>Configuring the Core Token Service</citetitle></link>.
-   </para>
-  </listitem>
-
-  <!-- Epic: AME-3390 -->
-  <listitem>
-   <para>
-    <emphasis role="bold">Reduced Cross-Talk</emphasis></para>
-   <para>
-    OpenAM now attempts to locate a user's session in the Core Token
-    Service (CTS) store before making a crosstalk request through a back
-    channel to other OpenAM servers in the cluster.</para>
-   <para>
-    The reduction in network traffic can increase performance.
-   </para>
-
-   <para>
-    For more information, see the <citetitle>Install Guide</citetitle>
-    section <link
+    If you have already installed OpenAM, see <link
     xlink:show="new"
-    xlink:href="install-guide#configure-site-load-balancing"
+    xlink:href="release-notes#update-from-earlier-release"
     xlink:role="http://docbook.org/xlink/role/olink"
-    ><citetitle>To Configure Site Load Balancing</citetitle></link>.
+    ><citetitle>To Update OpenAM From 12.0</citetitle></link>.
+   </para>
+
+   <para>
+    Do <emphasis>not</emphasis> perform an upgrade
+    by deploying the new version
+    and then importing an existing configuration
+    by running the <command>ssoadm import-svc-config</command> command.
+    Importing an outdated configuration can result in a corrupted installation.
    </para>
   </listitem>
 
-  <!-- Epic: AME-3573 -->
   <listitem>
    <para>
-    <emphasis role="bold">Asynchronous Core Token Service
-     Requests</emphasis></para>
-   <para>
-    A change to the Core Token Service (CTS) means that requests are no
-    longer performed synchronously. CTS processes all requests asynchronously
-    in the background, allowing callers (that is, those entities that call CTS)
-    to send subsequent requests without waiting for a previous request to
-    finish processing, improving response times and performance.
-   </para>
-
-   <para>
-    For more information, see the <citetitle>Install Guide</citetitle>
-    section <link
+    If you are installing OpenAM for the first time, see <link
     xlink:show="new"
-    xlink:href="install-guide#cts-tuning-considerations"
+    xlink:href="release-notes#install-fresh"
     xlink:role="http://docbook.org/xlink/role/olink"
-    ><citetitle>CTS Tuning Considerations</citetitle></link>.
+    ><citetitle>To Install OpenAM</citetitle></link>.
    </para>
   </listitem>
-
-  <!-- AME-4028 -->
-  <listitem>
-   <para>
-    <emphasis role="bold">Fine-Grained Settings for LDAP Connections</emphasis></para>
-   <para>
-    OpenAM now provides additional options for tuning
-    LDAP connection pool sizes and timeouts related to the Core Token Service
-    and to other components that use LDAP connections.
-    For more information, see the <citetitle>Administration Guide</citetitle>
-    section
-    <link
-     xlink:show="new"
-     xlink:href="admin-guide#tuning-ldap-settings-cts"
-     xlink:role="http://docbook.org/xlink/role/olink"
-     ><citetitle>Tuning LDAP CTS &amp; Configuration Store Settings</citetitle></link>.
-   </para>
-  </listitem>
-
-  <!-- AME-2972 -->
-  <listitem>
-    <para>
-     <emphasis role="bold">REST Policy Filter Rules</emphasis></para>
-   <para>
-     OpenAM now supports REST Policy Filter rules
-     that simplify the configuration to protect ForgeRock common REST APIs.
-    </para>
-   </listitem>
-
-  <!-- AME-2975 -->
-  <listitem>
-   <para>
-     <emphasis role="bold">OAuth 2.0 Scope Conditions</emphasis></para>
-   <para>
-     OpenAM now supports an OAuth2 Scope condition
-     that lets the you set required OAuth 2.0 scopes as a policy condition.
-    </para>
-   </listitem>
-
-  <!-- OPENAM-3822 -->
-  <listitem>
-    <para>
-     <emphasis role="bold">Configurable DN Cache for LDAP Data Stores</emphasis></para>
-   <para>
-     OpenAM now has the capability to enable and disable DN caching.
-     DN caching helps avoid DN lookups
-     that can happen in bursts during authentication.
-     (
-     <link
-      xlink:show="new"
-      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3822"
-     >OPENAM-3822</link>
-     ).
-    </para>
-  </listitem>
-
-  <!-- OPENAM-3989 -->
-  <listitem>
-    <para>
-     <emphasis role="bold">Quicker UI Customization</emphasis></para>
-   <para>
-     While customizing the UI, you can set the advanced server property,
-     <literal>org.forgerock.openam.core.resource.lookup.cache.enabled</literal>,
-     to <literal>false</literal> to allow OpenAM immediately to pick up changes
-     to the files as you customize them
-     (<link
-       xlink:show="new"
-       xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3989"
-      >OPENAM-3989</link>).
-     You can set advanced server properties in OpenAM Console under
-     Configuration > Servers and Sites > <replaceable>Server Name</replaceable> > Advanced.
-     For production servers, leave this set to the default, <literal>true</literal>.
-    </para>
-  </listitem>
-
-  <!-- OPENAM-3918 -->
-  <listitem>
-    <para>
-     <emphasis role="bold">Whitelist for Custom Login URIs</emphasis></para>
-   <para>
-     OpenAM now includes a property that specifies
-     a whitelist for custom login URIs
-     so that the CDCServlet and the Distributed Authentication UI (DAS)
-     can check login URI values against those in the whitelist.
-    </para>
-
-    <para>
-     The property name is <literal>org.forgerock.openam.cdc.validLoginURIs</literal>.
-     For more information about this property,
-     see the <citetitle>Reference</citetitle> section on advanced properties,
-     <link
-      xlink:show="new"
-      xlink:href="reference#servers-advanced-configuration"
-      xlink:role="http://docbook.org/xlink/role/olink"
-     ><citetitle>Servers &gt; Advanced</citetitle></link>.
-    </para>
-  </listitem>
-
-  <!-- OPENAM-3604 -->
-  <listitem>
-    <para>
-     <emphasis role="bold">OpenID Connect Registration Without an Access Token</emphasis></para>
-   <para>
-     OpenAM can now be configured to let OpenID Connect clients
-     register dynamically without having to provide an access token
-     (<link
-       xlink:show="new"
-       xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3604"
-      >OPENAM-3604</link>).
-     For details, see the documentation on the advanced server property,
-     <literal>org.forgerock.openam.openidconnect.allow.open.dynamic.registration</literal>,
-     in the <citetitle>OpenAM Reference</citetitle> section,
-     <link
-      xlink:show="new"
-      xlink:href="reference#servers-advanced-configuration"
-      xlink:role="http://docbook.org/xlink/role/olink"
-     ><citetitle>Servers > Advanced</citetitle></link>.
-    </para>
-  </listitem>
-
-  <!-- OPENAM-336 -->
-  <listitem>
-    <para>
-     <emphasis role="bold">Policy Support for Common HTTP Operations</emphasis></para>
-   <para>
-     OpenAM policies now let you allow and deny not only HTTP GET and HTTP POST,
-     but also HTTP DELETE, HEAD, OPTIONS, PATCH, and PUT
-     (<link xlink:show="new"
-            xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-336"
-     >OPENAM-336</link>).
-    </para>
-  </listitem>
-
-  <!-- AME-4401 -->
-  <listitem>
-   <para><emphasis role="bold">REST Logging</emphasis></para>
-   <para>
-    OpenAM now supports audit logging and debug notifications for any request
-    going to a common REST (CREST) endpoint.
-    OpenAM audits every request going to any CREST endpoint
-    and writes to two files:
-    <literal>amRest.access</literal> and <literal>amRest.authx</literal>.
-   </para>
-   <para>
-    The <literal>amRest.access</literal> file records all accesses to a
-    CREST endpoint (except <literal>/authenticate</literal>),
-    regardless of whether the request successfully reached the endpoint through
-    policy authorization.
-   </para>
-   <para>
-    The <literal>amRest.authz</literal> file records all CREST
-    authorization results regardless of success. If a request has an entry in the
-    <literal>amRest.access</literal> log, but no corresponding entry in
-    <literal>amRest.authz</literal>, then that
-    endpoint was not protected by an authorization filter and therefore the
-    request was granted access to the resource.
-   </para>
-   <para>
-    OpenAM now provides additional information in its debug notifications
-    depending on the message type (error, warning or message) including realm,
-    user, and result of the operation.
-   </para>
-   <para>
-    For more information on CREST logging, see <link
-    xlink:show="new"
-    xlink:href="dev-guide#rest-api-logging"
-    xlink:role="http://docbook.org/xlink/role/olink"
-    ><citetitle>Logging</citetitle></link>.
-   </para>
-  </listitem>
-
-  <!-- OPENAM-5468 -->
-  <listitem>
-   <para>
-    <emphasis role="bold">Validation Service</emphasis></para>
-   <para>
-    OpenAM provides a validation service to ensure that <literal>goto</literal>
-    and <literal>gotoOnFail</literal> URLs are valid, which helps protect
-    against possible phishing attacks.
-    </para>
-   <para>For more information, see <link
-    xlink:show="new"
-    xlink:href="install-guide#configure-valid-goto-url-resources"
-    xlink:role="http://docbook.org/xlink/role/olink"
-    ><citetitle>Configuring Valid goto URL Resources</citetitle></link>.
-   </para>
-  </listitem>
-
  </itemizedlist>
-</section>
+
+
+ <section xml:id="security-advisories">
+  <title>Security Advisories</title>
+
+  <!-- Note: This passage is the recommended text for advisories per S. Ferris -->
+  <para>
+   ForgeRock issues security advisories in collaboration with our customers and
+   the open source community to address any security vulnerabilities transparently
+   and rapidly. ForgeRock's security advisory policy governs the process on
+   how security issues are submitted, received, and evaluated as well as the
+   timeline for the issuance of security advisories and patches.
+  </para>
+
+  <para>
+   For more information on ForgeRock's security advisory policy, click the
+   following link:
+   <link
+    xlink:href="http://www.forgerock.com/services/security-policy/"
+    xlink:show="new"
+    >http://www.forgerock.com/services/security-policy/</link>
+  </para>
+
+  <para>The following security advisories have been included in this release:
+  </para>
+
+  <itemizedlist>
+
+   <!-- #201503-01 Critical -->
+   <listitem>
+    <para><emphasis role="bold">Issue #201503-01: Cross Site Request
+     Forgery</emphasis>.
+     When “Prompt user for old password” feature is disabled (which is the
+     default
+     value) it is possible for a skilled attacker to change the user’s password
+     without their knowledge.
+    </para>
+    <para>
+     Severity: <emphasis role="bold">Critical</emphasis>
+    </para>
+    <para>
+     For more information, see
+     <link
+      xlink:href="https://forgerock.org/2015/03/openam-security-advisory-201503/#201503-01"
+      xlink:show="new"
+      >OpenAM Security Advisory #201503-01</link>.
+    </para>
+   </listitem>
+
+   <!-- #201503-02 High -->
+   <listitem>
+    <para><emphasis role="bold">Issue #201503-02: Cross Site
+     Scripting</emphasis>.
+     OpenAM is vulnerable to cross-site scripting (XSS) attacks, which could lead
+     to session hijacking or phishing.
+     It has been detected that the following endpoint is vulnerable to
+     cross-site scripting attacks:
+    </para>
+    <itemizedlist>
+     <listitem>/openam/oauth/registerconsumer.jsp (Core Server, Server Only)
+     </listitem>
+    </itemizedlist>
+    <para>
+     Severity: <emphasis role="bold">High</emphasis>
+    </para>
+    <para>
+     For more information, see
+     <link
+      xlink:href="https://forgerock.org/2015/03/openam-security-advisory-201503/#201503-02"
+      xlink:show="new"
+      >OpenAM Security Advisory #201503-02</link>.
+    </para>
+   </listitem>
+
+   <!-- #201503-03 Medium -->
+   <listitem>
+    <para><emphasis role="bold">Issue #201503-03: Password recorded as plain
+     text
+     during install</emphasis>.
+     When performing new installations of OpenAM 11.0.2 and 12.0.0, the
+     installation properties are recorded in the install log at the end of the OpenAM
+     installation process to aid diagnostic analysis. In the case of configuring OpenAM to
+     use an external user store, the user data store’s LDAP password will be stored
+     in plain text in the installation log file.
+    </para>
+    <para>
+     Severity: <emphasis role="bold">Medium</emphasis>
+    </para>
+    <para>
+     For more information, see
+     <link
+      xlink:href="https://forgerock.org/2015/03/openam-security-advisory-201503/#201503-03"
+      xlink:show="new"
+      >OpenAM Security Advisory #201503-03</link>.
+    </para>
+   </listitem>
+
+   <!-- #201505-01 Critical -->
+   <listitem>
+    <para>
+     <emphasis role="bold">Issue #201505-01: Deserialization of Untrusted Data</emphasis>.
+     Using a well-crafted request, an attacker may be able to perform remote
+     code execution.
+    </para>
+    <para>
+     Severity: <emphasis role="bold">Critical</emphasis>
+    </para>
+    <para>
+     For more information, see
+     <link
+      xlink:href="https://forgerock.org/2015/07/openam-security-advisory-201505/#201505-01"
+      xlink:show="new"
+      >OpenAM Security Advisory #201505-01</link>.
+    </para>
+   </listitem>
+
+   <!-- #201505-02 High -->
+   <listitem>
+    <para><emphasis role="bold">Issue #201505-02: Authentication Bypass in SAMLv2</emphasis>.
+     When OpenAM acts as a SAMLv2 Identity Provider and more than one realm has
+     been configured, it is possible to obtain access to Service Providers that
+     have been configured in a different realm than the current session's realm.
+    </para>
+    <para>
+     Severity: <emphasis role="bold">High</emphasis>
+    </para>
+    <para>
+     For more information, see
+     <link
+      xlink:href="https://forgerock.org/2015/07/openam-security-advisory-201505/#201505-02"
+      xlink:show="new"
+      >OpenAM Security Advisory #201505-02</link>.
+    </para>
+   </listitem>
+
+   <!-- #201505-03 High -->
+   <listitem>
+    <para><emphasis role="bold">Issue #201505-03: XML Injection Vulnerability</emphasis>.
+     A well-crafted XML document can be used to exploit the default high entity
+     expansion limits and cause a denial of service attack for a short interval.
+    </para>
+    <para>
+     Severity: <emphasis role="bold">High</emphasis>
+    </para>
+    <para>
+     For more information, see
+     <link
+      xlink:href="https://forgerock.org/2015/07/openam-security-advisory-201505/#201505-03"
+      xlink:show="new"
+      >OpenAM Security Advisory #201505-03</link>.
+    </para>
+   </listitem>
+
+   <!-- #201505-04 Medium -->
+   <listitem>
+    <para><emphasis role="bold">Issue #201505-04: A Non-Admin User Can Import/Export XACML Policies</emphasis>.
+     A user with an account in OpenAM that has access to a configured
+     <command>ssoadm</command> tool can import, export, and list XACML policies.
+    </para>
+    <para>
+     Severity: <emphasis role="bold">Medium</emphasis>
+    </para>
+    <para>
+     For more information, see
+     <link
+      xlink:href="https://forgerock.org/2015/07/openam-security-advisory-201505/#201505-04"
+      xlink:show="new"
+      >OpenAM Security Advisory #201505-04</link>.
+    </para>
+   </listitem>
+
+   <!-- #201505-05 Medium -->
+   <listitem>
+    <para><emphasis role="bold">Issue #201505-05: Insecure Default Passwords</emphasis>.
+     When OpenAM is configured with an external OpenDJ or Oracle Directory Server
+     Enterprise Edition (formerly Sun DSEE) server, or when the "Load Schema when saved"
+     feature is used, the users created will have insecure passwords.
+    </para>
+    <para>
+     Severity: <emphasis role="bold">Medium</emphasis>
+    </para>
+    <para>
+     For more information, see
+     <link
+      xlink:href="https://forgerock.org/2015/07/openam-security-advisory-201505/#201505-05"
+      xlink:show="new"
+      >OpenAM Security Advisory #201505-05</link>.
+    </para>
+   </listitem>
+
+  </itemizedlist>
+ </section>
+
+ <section xml:id="product-enhancements">
+  <title>Product Enhancements</title>
+
+  <para>
+   In addition to fixes,
+   this release includes the following limited product enhancements:
+  </para>
+
+  <!-- Product Enhancements -->
+  <itemizedlist>
+
+   <!-- OPENAM-816/6211 -->
+   <listitem>
+    <para>
+     <emphasis role="bold">New JVM Properties For ssoadm</emphasis>.
+     You can now specifically set the authentication module or chain for
+     administrator logins using two JVM settings for the <command>ssoadm</command>
+     command:
+     <literal>org.forgerock.openam.ssoadm.auth.indexType</literal> and
+     <literal>org.forgerock.openam.ssoadm.auth.indexName</literal>.
+     These settings provide more control to select the exact authentication
+     mechanisms to be used when <command>ssoadm</command> authenticates
+     administrators in the top-level realm.
+    </para>
+    <para>
+     To set the JVM properties, manually edit the <command>ssoadm</command> or
+     <command>ssoadm.bat</command> script.
+    </para>
+    <para>
+     The <literal>indexType</literal> property specifies
+     the module or chain-based authentication mechanism used in the top-level realm.
+     If the property is set, OpenAM uses only <emphasis>that</emphasis>
+     authentication mechanism for administrators. Accepted values are:
+    </para>
+    <itemizedlist>
+     <listitem>
+      <para>module_instance</para>
+     </listitem>
+     <listitem>
+      <para>service</para>
+     </listitem>
+     <listitem>
+      <para>user</para>
+     </listitem>
+     <listitem>
+      <para>role</para>
+     </listitem>
+     <listitem>
+      <para>level</para>
+     </listitem>
+     <listitem>
+      <para>composite_advice</para>
+     </listitem>
+     <listitem>
+      <para>resource</para>
+     </listitem>
+    </itemizedlist>
+
+    <para>
+     The <literal>indexName</literal> specifies the actual name of the authentication
+     module/chain as controlled by the <literal>indexType</literal> property.
+     For example, if <literal>indexType</literal> is set to <literal>module_instance</literal>
+     and <literal>indexName</literal> is set to <literal>LDAP</literal>, then
+     <command>ssoadm</command> authenticates using the LDAP authentication module.
+    </para>
+
+    <para>
+     For more information, see
+     <link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-816"
+      xlink:show="new"
+      >OPENAM-816</link>.
+    </para>
+   </listitem>
+
+   <!-- OPENAM-1631 -->
+   <listitem>
+    <para>
+     <emphasis role="bold">Add Option to Enable Debug Logging of Decrypted SAML
+      Assertions</emphasis>.
+     OpenAM now provides a debug logging option to decrypt SAML assertions when
+     OpenAM runs as a service provider and assertion encryption is enabled.
+    </para>
+    <para>
+     To enable the feature, go to the <filename>Debug.jsp</filename> page and
+     select the sub page where you want debugging to occur. Then, at the top of
+     the page, click the button to turn decryption on or off.
+     This feature operates independently of the other debug logging options on the
+     page, so you can click Cancel or Back after pressing the button, and the
+     setting will still be set.
+    </para>
+    <para>
+     For more information, see
+     <link
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1631"
+     xlink:show="new"
+     >OPENAM-1631</link>.
+    </para>
+   </listitem>
+
+   <!-- OPENAM-2238 -->
+   <listitem>
+    <para>
+     <emphasis role="bold">Authentication Context Extensibility Support</emphasis>.
+     OpenAM supports the extensibility of authentication context classes as described
+     in the SAMLv2 specification.
+    </para>
+    <para>
+     Custom contexts are also now shown in the OpenAM Console if included in the
+     extended metadata. Note that this change does not include the ability to add new
+     contexts via the Console. Custom contexts still need to be loaded via
+     <literal>ssoadm/extended</literal> metadata.
+    </para>
+    <para>
+     For more information, see <link
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2238"
+     xlink:show="new"
+     >OPENAM-2238</link>.
+    </para>
+   </listitem>
+
+   <!-- OPENAM-3714 -->
+   <listitem>
+    <para>
+     <emphasis role="bold">StartTLS Support for IdRepo</emphasis>.
+     You can now use StartTLS to initiate secure connections to an Identity Repository
+     data store.
+     A new property, <literal>sun-idrepo-ldapv3-config-connection-mode</literal>,
+     has been created with the possible values of <literal>LDAP</literal>,
+     <literal>LDAPS</literal>, and <literal>StartTLS</literal> to enable this feature.
+    </para>
+    <para>
+     For more information, see
+     <link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3714"
+      xlink:show="new"
+      >OPENAM-3714</link>.
+    </para>
+   </listitem>
+
+   <!-- OPENAM-4923 -->
+   <listitem>
+    <para>
+     <emphasis role="bold">Specifying Trusted Realms using the WindowsDesktopSSO Authentication Module</emphasis>.
+     The WindowsDesktopSSO authentication module now allows you to specify a list
+     of trusted realms. When the setting is specified, Kerberos tokens issued by
+     those realms will only be accepted.
+    </para>
+    <para>
+     For more information, see
+     <link
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4923"
+     xlink:show="new">OPENAM-4923</link>.
+    </para>
+   </listitem>
+
+   <!-- OPENAM-5097 -->
+   <listitem>
+    <para>
+     <emphasis role="bold">StartTLS Support for AD/LDAP Authentication Modules</emphasis>.
+     You can now use StartTLS with the Active Directory
+     and LDAP authentication modules to secure OpenAM's connection to the data stores.
+     A new property, <literal>openam-auth-ldap-connection-mode</literal>,
+     has been created with the possible values of <literal>LDAP</literal>,
+     <literal>LDAPS</literal>, and <literal>StartTLS</literal> to enable this
+     feature.
+    </para>
+    <para>
+     For more information, see
+     <link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5097"
+      xlink:show="new"
+      >OPENAM-5097</link>.
+    </para>
+   </listitem>
+
+   <!-- OPENAM-5311 -->
+   <listitem>
+    <para>
+     <emphasis role="bold">Default Time limit using Netscape SDK is Configurable</emphasis>.
+     The default timelimit for LDAP operations performed using the Netscape SDK
+     is now configurable.
+    </para>
+    <para>
+     To set the property, open the OpenAM Console, and then click Configuration
+     &gt; Servers and Sites &gt; Servers &gt; <replaceable>URL of the server</replaceable>
+     &gt; Advanced to display the Advanced Properties table.
+     Set
+     <literal>org.forgerock.openam.ldap.default.time=&lt;time limit is milliseconds&gt;</literal>.
+    </para>
+    <para>
+     For more information, see <link
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5311"
+     xlink:show="new"
+     >OPENAM-5311</link>.
+    </para>
+   </listitem>
+
+   <!-- OPENAM-5534 -->
+   <listitem>
+    <para>
+     <emphasis role="bold">New Base URL Provider Service</emphasis>. A new
+     provider service has been created that allows the realm to have a configured
+     option for obtaining the base URL (including protocol) for components that
+     need to return a URL to the client. This service is used to provide the
+     URL base that is used in the well-known OIDC endpoints.
+    </para>
+    <para>
+     The provider provides the following:
+    </para>
+    <itemizedlist>
+     <listitem>
+      <para>A radio button option for selecting a URL source from:</para>
+      <simplelist>
+       <member>Configured value</member>
+       <member>RFC7239 Forwarded header</member>
+       <member>X-Forwarded-Host + X-Forwarded-Proto headers</member>
+       <member>Host and protocol from the incoming AM request</member>
+       <member>an extension point that returns a base URL from a given
+        <literal>HttpServletRequest</literal>.
+       </member>
+      </simplelist>
+     </listitem>
+     <listitem>
+      <para>A check box to include or exclude the container's context path.</para>
+     </listitem>
+     <listitem>
+      <para>A text field for specifying the configured fixed value if required.</para>
+     </listitem>
+     <listitem>
+      <para>A text field for specifying the extension class if required.</para>
+     </listitem>
+    </itemizedlist>
+    <para>
+     For more information, see
+     <link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5534"
+      xlink:show="new"
+      >OPENAM-5534</link>.
+    </para>
+   </listitem>
+
+  </itemizedlist>
+ </section>
+
 </chapter>
