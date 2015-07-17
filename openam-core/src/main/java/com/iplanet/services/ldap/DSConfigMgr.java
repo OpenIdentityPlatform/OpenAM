@@ -43,7 +43,6 @@ import java.util.StringTokenizer;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.util.I18n;
-import com.iplanet.services.util.XMLException;
 import com.iplanet.services.util.XMLParser;
 import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.security.ServerInstanceAction;
@@ -398,8 +397,7 @@ public class DSConfigMgr implements IDSConfigMgr {
         return getServerInstance(DEFAULT, authType);
     }
 
-    private void loadServerConfiguration(InputStream is)
-            throws LDAPServiceException {
+    private void loadServerConfiguration(InputStream is) throws LDAPServiceException {
         // Instantiate the XML classes and pass the file names.
         XMLParser parser = new XMLParser(true, groupHash);
 
@@ -410,11 +408,9 @@ public class DSConfigMgr implements IDSConfigMgr {
 
         try {
             parser.parse(is);
-        } catch (XMLException ex) {
-            ex.printStackTrace();
         } catch (Exception e) {
-            throw new LDAPServiceException(LDAPServiceException.FILE_NOT_FOUND,
-                    e.getMessage());
+            debugger.error("DSConfigMgr.loadServerConfiguration: Exception during XML parsing", e);
+            throw new LDAPServiceException(LDAPServiceException.FILE_NOT_FOUND, e);
         }
     }
 

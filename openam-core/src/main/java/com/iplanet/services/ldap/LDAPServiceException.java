@@ -29,11 +29,8 @@
 
 package com.iplanet.services.ldap;
 
-import org.forgerock.opendj.ldap.ErrorResultException;
-
 /**
- * This exception class captures expcetions that occurs in the
- * com.iplanet.services.adal package.
+ * This exception class captures exceptions that occur in the com.iplanet.services.ldap package.
  */
 public class LDAPServiceException extends Exception {
     /**
@@ -162,7 +159,7 @@ public class LDAPServiceException extends Exception {
      * Constructor
      * 
      * @param code
-     *            The error code that represents the error that occured while
+     *            The error code that represents the error that occurred while
      *            performing an operation.
      */
     public LDAPServiceException(int code) {
@@ -170,36 +167,18 @@ public class LDAPServiceException extends Exception {
         exceptionCode = code;
     }
 
-    /**
-     * Get the exception string.
-     * 
-     * @return String The exception string.
-     */
-    public String toString() {
-        StringBuilder buf = new StringBuilder();
-        if (rootCause != null) {
-            buf.append(rootCause.toString());
-        }
-
-        buf.append('\n');
-        buf.append(getMessage());
-
-        return buf.toString();
-    }
-
     public String getMessage() {
-        String str = "Got LDAPServiceException code=" + exceptionCode;
-        return str;
+        return super.getMessage() + "\n LDAPServiceException code=" + exceptionCode;
     }
 
     /**
      * The constructor.
      * 
      * @param code
-     *            The error code that represents the error that occured while
+     *            The error code that represents the error that occurred while
      *            performing an operation.
      * @param errormsg
-     *            A string description of the error that occured.
+     *            A string description of the error that occurred.
      */
     public LDAPServiceException(int code, String errormsg) {
         super(errormsg);
@@ -210,45 +189,35 @@ public class LDAPServiceException extends Exception {
      * The constructor.
      * 
      * @param errormsg
-     *            A string description of the error that occured.
+     *            A string description of the error that occurred.
      */
     public LDAPServiceException(String errormsg) {
         super(errormsg);
     }
 
     /**
+     *
+     * @param code The type of error that occurred
+     * @param t The original exception that triggered the error
+     */
+    public LDAPServiceException(int code, Throwable t) {
+        this(code);
+        initCause(t);
+    }
+
+    /**
      * The constructor.
      * 
      * @param errormsg
-     *            A string description of the error that occured.
+     *            A string description of the error that occurred.
+     * @param t The original exception that triggered the error
      */
     public LDAPServiceException(String errormsg, Throwable t) {
-        super(errormsg);
-        rootCause = t;
+        super(errormsg, t);
     }
 
     /**
-     * Gets LDAPException error code.
-     * 
-     * @return LDAPException error code or -1 if not a LDAPException
-     */
-    public int getLDAPExceptionErrorCode() {
-        if (rootCause == null) {
-            return -1;
-        } else if (rootCause instanceof ErrorResultException) {
-            return ((ErrorResultException) rootCause).getResult().getResultCode().intValue();
-        } else if (rootCause instanceof LDAPServiceException) {
-            return ((LDAPServiceException) rootCause)
-                    .getLDAPExceptionErrorCode();
-        }
-
-        return -1;
-    }
-
-    /**
-     * The variable contains the error that has occured.
+     * The variable contains the error that has occurred.
      */
     int exceptionCode = -1;
-
-    Throwable rootCause;
 }
