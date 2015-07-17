@@ -67,6 +67,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLin
 
                                 obj.linkInfoView.render(linkConfig, _.findWhere(formData.allModules, { _id: linkConfig.module }).typeDescription);
                                 obj.criteriaView.setCriteria(criteriaValue);
+                                obj.parent.setArrows();
                                 dialog.close();
                             }
                         }, {

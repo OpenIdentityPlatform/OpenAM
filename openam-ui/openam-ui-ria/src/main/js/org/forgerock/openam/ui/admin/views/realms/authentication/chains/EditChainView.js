@@ -30,7 +30,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             "click #saveChanges":       "saveChanges",
             "click #addModuleLink":     "addModuleLink"
         },
-
+ 
         addModuleLink: function(e) {
             if (e) {
                 e.preventDefault();

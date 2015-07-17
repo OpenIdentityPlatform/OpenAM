@@ -146,7 +146,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
                 columns: columns,
                 row: ClickableRow,
                 collection: self.data.scripts,
-                className: "backgrid table",
+                className: "backgrid table table-hover",
                 emptyText: $.t("console.common.noResults")
             });
 

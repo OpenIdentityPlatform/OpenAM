@@ -122,7 +122,7 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/resourceTypes/Resour
                 columns: columns,
                 row: ClickableRow,
                 collection: self.data.items,
-                className: "backgrid table",
+                className: "backgrid table table-hover",
                 emptyText: $.t("console.common.noResults")
             });
 
