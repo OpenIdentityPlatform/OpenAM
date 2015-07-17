@@ -27,7 +27,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.forgerock.json.fluent.JsonValue;
@@ -226,6 +228,33 @@ public class PendingRequestsServiceTest {
     }
 
     @Test
+    public void shouldApprovePendingRequestUpdatingExistingPolicy() throws Exception {
+
+        //Given
+        ServerContext context = mock(ServerContext.class);
+        createPendingRequest(PENDING_REQUEST_ID, RESOURCE_SET_ID, RESOURCE_SET_NAME, RESOURCE_OWNER_ID,
+                REALM, REQUESTING_PARTY_ID, Collections.singleton(SCOPE));
+        UmaPolicy existingPolicy = mockUmaPolicy("SCOPE_A");
+        mockSuccessfulPolicyUpdateForPendingRequest(existingPolicy);
+        JsonValue content = json(object());
+
+        //When
+        service.approvePendingRequest(context, PENDING_REQUEST_ID, content, REALM);
+
+        //Then
+        ArgumentCaptor<JsonValue> policyCaptor = ArgumentCaptor.forClass(JsonValue.class);
+        verify(policyService).updatePolicy(eq(context), eq(RESOURCE_SET_ID), policyCaptor.capture());
+        JsonValue policy = policyCaptor.getValue();
+        assertThat(policy).stringAt("policyId").isEqualTo(RESOURCE_SET_ID);
+        assertThat(policy).hasArray("permissions").hasSize(1);
+        assertThat(policy).stringAt("permissions/0/subject").isEqualTo(REQUESTING_PARTY_ID);
+        assertThat(policy).hasArray("permissions/0/scopes").containsOnly(SCOPE, "SCOPE_A");
+        verify(store).delete(PENDING_REQUEST_ID);
+        verify(auditLogger).log(RESOURCE_SET_ID, RESOURCE_SET_NAME, RESOURCE_OWNER_ID,
+                UmaAuditType.REQUEST_APPROVED, REQUESTING_PARTY_ID);
+    }
+
+    @Test
     public void shouldSendEmailOnPendingRequestApproval() throws Exception {
 
         //Given
@@ -288,7 +317,24 @@ public class PendingRequestsServiceTest {
     }
 
     private void mockSuccessfulPolicyCreationForPendingRequest() {
-        Promise<UmaPolicy, ResourceException> promise = Promises.newResultPromise(null);
-        given(policyService.createPolicy(any(ServerContext.class), any(JsonValue.class))).willReturn(promise);
+        Promise<UmaPolicy, ResourceException> readPromise =
+                Promises.newExceptionPromise(ResourceException.getException(ResourceException.NOT_FOUND));
+        given(policyService.readPolicy(any(ServerContext.class), anyString())).willReturn(readPromise);
+        Promise<UmaPolicy, ResourceException> createPromise = Promises.newResultPromise(null);
+        given(policyService.createPolicy(any(ServerContext.class), any(JsonValue.class))).willReturn(createPromise);
+    }
+
+    private UmaPolicy mockUmaPolicy(String... scopes) {
+        UmaPolicy policy = mock(UmaPolicy.class);
+        given(policy.getScopes()).willReturn(new HashSet<>(Arrays.asList(scopes)));
+        return policy;
+    }
+
+    private void mockSuccessfulPolicyUpdateForPendingRequest(UmaPolicy policy) {
+        Promise<UmaPolicy, ResourceException> readPromise = Promises.newResultPromise(policy);
+        given(policyService.readPolicy(any(ServerContext.class), anyString())).willReturn(readPromise);
+        Promise<UmaPolicy, ResourceException> updatePromise = Promises.newResultPromise(null);
+        given(policyService.updatePolicy(any(ServerContext.class), anyString(), any(JsonValue.class)))
+                .willReturn(updatePromise);
     }
 }

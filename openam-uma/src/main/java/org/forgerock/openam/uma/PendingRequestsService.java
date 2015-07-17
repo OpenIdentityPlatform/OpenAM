@@ -26,6 +26,7 @@ import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import com.sun.identity.shared.debug.Debug;
@@ -45,6 +46,7 @@ import org.forgerock.openam.uma.audit.UmaAuditType;
 import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.Pair;
 import org.forgerock.util.promise.Promise;
+import org.forgerock.util.promise.Promises;
 import org.forgerock.util.query.QueryFilter;
 
 /**
@@ -245,23 +247,46 @@ public class PendingRequestsService {
         };
     }
 
-    private Promise<UmaPolicy, ResourceException> createUmaPolicy(ServerContext context, UmaPendingRequest request,
-            JsonValue content) {
-        Collection<String> scopes;
+    private Promise<UmaPolicy, ResourceException> createUmaPolicy(final ServerContext context,
+            final UmaPendingRequest request, JsonValue content) {
+        final Collection<String> scopes;
         if (content != null && !content.isNull() && content.isDefined("scopes")) {
-            scopes = content.get("scopes").asList(String.class);
+            scopes = new HashSet<>(content.get("scopes").asList(String.class));
         } else {
-            scopes = request.getScopes();
+            scopes = new HashSet<>(request.getScopes());
         }
-        JsonValue policy = json(object(
-                field("policyId", request.getResourceSetId()),
+        return policyService.readPolicy(context, request.getResourceSetId())
+                .thenAsync(new AsyncFunction<UmaPolicy, UmaPolicy, ResourceException>() {
+                    @Override
+                    public Promise<UmaPolicy, ResourceException> apply(UmaPolicy umaPolicy) {
+                        if (umaPolicy.getScopes().containsAll(scopes)) {
+                            return Promises.newResultPromise(umaPolicy);
+                        }
+                        scopes.addAll(umaPolicy.getScopes());
+                        return policyService.updatePolicy(context, request.getResourceSetId(),
+                                createPolicyJson(request.getResourceSetId(), request.getRequestingPartyId(), scopes));
+                    }
+                }, new AsyncFunction<ResourceException, UmaPolicy, ResourceException>() {
+                    @Override
+                    public Promise<UmaPolicy, ResourceException> apply(ResourceException e) {
+                        if (e instanceof org.forgerock.json.resource.NotFoundException) {
+                            return policyService.createPolicy(context, createPolicyJson(request.getResourceSetId(),
+                                    request.getRequestingPartyId(), scopes));
+                        }
+                        return Promises.newExceptionPromise(e);
+                    }
+                });
+    }
+
+    private JsonValue createPolicyJson(String resourceSetId, String requestingPartyId, Collection<String> scopes) {
+        return json(object(
+                field("policyId", resourceSetId),
                 field("permissions", array(
                         object(
-                                field("subject", request.getRequestingPartyId()),
+                                field("subject", requestingPartyId),
                                 field("scopes", scopes)
                         )
                 ))));
-        return policyService.createPolicy(context, policy);
     }
 
     /**
