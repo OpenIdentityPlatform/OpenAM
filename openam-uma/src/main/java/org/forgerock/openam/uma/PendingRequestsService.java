@@ -107,6 +107,10 @@ public class PendingRequestsService {
             String resourceOwnerId,
             String requestingPartyId, String realm, Set<String> scopes) throws ServerException {
 
+        UmaPendingRequest pendingRequest = new UmaPendingRequest(resourceSetId, resourceSetName, resourceOwnerId, realm,
+                requestingPartyId, scopes);
+        store.create(pendingRequest);
+
         if (isEmailResourceOwnerOnPendingRequestCreationEnabled(realm)) {
             Pair<String, String> template = pendingRequestEmailTemplate.getCreationTemplate(resourceOwnerId, realm);
             try {
@@ -114,15 +118,11 @@ public class PendingRequestsService {
                 String baseUrl = baseURLProviderFactory.get(realm).getURL(httpRequest);
                 emailService.email(realm, resourceOwnerId, template.getFirst(),
                         MessageFormat.format(template.getSecond(), requestingPartyId, resourceSetName,
-                                scopesString, baseUrl, resourceSetId, requestingPartyId, scopesString));
+                                scopesString, baseUrl, pendingRequest.getId()));
             } catch (MessagingException e) {
                 debug.warning("Pending Request Creation email could not be sent", e);
             }
         }
-
-        UmaPendingRequest pendingRequest = new UmaPendingRequest(resourceSetId, resourceSetName, resourceOwnerId, realm,
-                requestingPartyId, scopes);
-        store.create(pendingRequest);
     }
 
     /**

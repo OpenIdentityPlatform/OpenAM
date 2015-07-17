@@ -70,15 +70,13 @@ public class PendingRequestEmailTemplate {
     /**
      * Gets the subject and body for the Pending Request creation email.
      *
-     * <p>The body contains 7 arguments:
+     * <p>The body contains 5 arguments:
      * <ul>
      *     <li>The requesting party username</li>
      *     <li>The resource set name</li>
      *     <li>The requested scopes</li>
      *     <li>The AM base URL</li>
-     *     <li>The resource set ID</li>
-     *     <li>The requesting party username</li>
-     *     <li>The requested scopes</li>
+     *     <li>The pending request ID</li>
      * </ul></p>
      *
      * @param resourceOwnerId The resource owner username.
