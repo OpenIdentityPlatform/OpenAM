@@ -146,7 +146,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
             String realm, String requestingUserId, Set<String> scopes)
             throws org.forgerock.openam.sm.datalayer.store.ServerException, UmaException {
         Set<UmaPendingRequest> pendingRequests = pendingRequestsService.queryPendingRequests(resourceSetId,
-                resourceOwnerId, requestingUserId, realm);
+                resourceOwnerId, realm, requestingUserId);
         if (!pendingRequests.isEmpty()) {
             for (UmaPendingRequest pendingRequest : pendingRequests) {
                 if (pendingRequest.getScopes().containsAll(scopes)) {
