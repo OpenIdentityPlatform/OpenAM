@@ -475,96 +475,6 @@
   <title>Limitations</title>
 
   <itemizedlist>
-   <!-- OPENAM-5400 -->
-   <listitem>
-    <para><emphasis role="bold">Do Not End Policy Names with a "/"
-     Character</emphasis>.
-     Do not use a "/" character at the end of a policy name as it will cause
-     OpenAM to not read, edit, or delete the policy.
-    </para>
-    <para>
-     After upgrade, users who have policies with a trailing slash "/" character
-     at the end of a policy name should remove the slash
-     (<link xlink:show="new"
-            xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5400"
-     >OPENAM-5400</link>).
-    </para>
-    <para>
-     To remove slashes in the policy names, remove them as recommended in
-     <link xlink:show="new"
-           xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5187"
-      >OPENAM-5187</link>.
-    </para>
-   </listitem>
-
-   <!-- OPENAM-5363 -->
-   <listitem>
-    <para><emphasis role="bold">Do Not Include a "?" Character in Policy
-     Names</emphasis>.
-     Policy names with a "?" character leads to the policy editor not being
-     able to edit it (<link xlink:show="new"
-                            xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5363"
-      >OPENAM-5363</link>).
-    </para>
-   </listitem>
-
-   <!-- OPENAM-6345 -->
-   <listitem>
-    <para><emphasis role="bold">Restart Container When Getting
-     Exception</emphasis>.
-     After you deploy OpenAM 12.0.1, if you get an "Cannot initialize
-     Authentication"
-     exception on some containers
-     (WebLogic 11 and 12, and JBoss), you must restart the container
-     (<link xlink:show="new"
-            xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-6345"
-      >OPENAM-6345</link>).
-    </para>
-   </listitem>
-
-   <!-- OPENAM-6302 -->
-   <listitem>
-    <para><emphasis role="bold">Upgrade Incorrectly Sets the Default Value for
-     the REST API
-     Service</emphasis>.
-     The workaround is to manually set the Default Version setting in the REST
-     API
-     service to the preferred value:
-    </para>
-    <screen>
-     $
-     <userinput>openam/bin/ssoadm set-attr-defs -s RestApisService -t Global \
-      -a openam-rest-apis-default-version=Latest -u amadmin -f .pass
-     </userinput>
-    </screen>
-    <para>
-     For background information, see
-     <link xlink:show="new"
-           xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-6302"
-      >OPENAM-6302</link>.
-    </para>
-   </listitem>
-
-   <!-- OPENAM-6319 -->
-   <listitem>
-    <para><emphasis role="bold">OAuth2 Scopes Behavior Affected by
-     Upgrade</emphasis>.
-     After an upgrade, OAuth 2.0 scope behavior uses a deprecated implementation
-     class,<literal>
-      org.forgerock.openam.oauth2.provider.impl.ScopeImpl</literal>.
-    </para>
-    <para>
-     The workaround is to manually update the OAuth 2.0 providers to use the
-     <literal>org.forgerock.openam.oauth2.OpenAMScopeValidator</literal>.
-    </para>
-    <para>
-     For background information, see
-     <link xlink:show="new"
-           xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-6319"
-      >OPENAM-6319</link>.
-    </para>
-   </listitem>
-
    <listitem>
     <para><emphasis role="bold">Different OpenAM Version within a
      Site</emphasis>.
@@ -717,6 +627,78 @@
     OpenAM issue
     tracker</link>.
   </para>
+
+  <itemizedlist>
+   <!-- OPENAM-5400 -->
+   <listitem>
+    <para><emphasis role="bold">Do Not End Policy Names with a "/"
+     Character</emphasis>.
+     Do not use a "/" character at the end of a policy name as it will cause
+     OpenAM to not read, edit, or delete the policy.
+    </para>
+    <para>
+     After upgrade, users who have policies with a trailing slash "/" character
+     at the end of a policy name should remove the slash
+     (<link xlink:show="new"
+            xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5400"
+     >OPENAM-5400</link>).
+    </para>
+    <para>
+     To remove slashes in the policy names, remove them as recommended in
+     <link xlink:show="new"
+           xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5187"
+      >OPENAM-5187</link>.
+    </para>
+   </listitem>
+
+   <!-- OPENAM-5363 -->
+   <listitem>
+    <para><emphasis role="bold">Do Not Include a "?" Character in Policy
+     Names</emphasis>.
+     Policy names with a "?" character leads to the policy editor not being
+     able to edit it (<link xlink:show="new"
+                            xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5363"
+      >OPENAM-5363</link>).
+    </para>
+   </listitem>
+
+   <!-- OPENAM-6345 -->
+   <listitem>
+    <para><emphasis role="bold">Restart Container When Getting
+     Exception</emphasis>.
+     After you deploy OpenAM 12.0.1, if you get an "Cannot initialize
+     Authentication"
+     exception on some containers
+     (WebLogic 11 and 12, and JBoss), you must restart the container
+     (<link xlink:show="new"
+            xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-6345"
+      >OPENAM-6345</link>).
+    </para>
+   </listitem>
+
+   <!-- OPENAM-6302 -->
+   <listitem>
+    <para><emphasis role="bold">Upgrade Incorrectly Sets the Default Value for
+     the REST API
+     Service</emphasis>.
+     The workaround is to manually set the Default Version setting in the REST
+     API
+     service to the preferred value:
+    </para>
+    <screen>
+$ <userinput>openam/bin/ssoadm set-attr-defs -s RestApisService -t Global \
+  -a openam-rest-apis-default-version=Latest -u amadmin -f .pass
+     </userinput>
+    </screen>
+    <para>
+     For background information, see
+     <link xlink:show="new"
+           xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-6302"
+      >OPENAM-6302</link>.
+    </para>
+   </listitem>
+
+  </itemizedlist>
 
   <!-- List generated at 16:31:58 20150710 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+labels+%3D+release-notes+AND+%28resolution+%3D+unresolved+OR+%28fixVersion+not+in+%28%2210.0.0%22%2C+%2210.1.0-Xpress%22%2C+%2211.0.0%22%2C%2211.0.1%22%2C%2211.0.2%22%2C%2211.0.3%22%2C%2212.0.0%22%2C%2212.0.1%22%29+AND+fixVersion+in+%28%2213.0.0%22%29%29%29+AND+type+%3D+bug+AND+%28component+is+EMPTY+OR+component+not+in+%28QA%2C+Documentation%2C+%22web+agents%22%2C+%22j2ee+agents%22%29%29+ORDER+BY+Issue&startAt=0&maxResults=500&fields=summary-->
   <itemizedlist>

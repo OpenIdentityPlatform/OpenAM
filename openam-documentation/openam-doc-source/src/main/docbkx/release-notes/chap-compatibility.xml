@@ -186,9 +186,9 @@
    <!-- OPENAM-3714 -->
    <listitem>
     <para>
-     <emphasis role="bold">StartTLS Support for IdRepo</emphasis>.
-     You can now use StartTLS to initiate secure connections to an OpenAM Identity
-     Repository.
+     <emphasis role="bold">StartTLS Support for Directory Server Based Data Stores</emphasis>.
+     You can now use StartTLS to initiate secure connections to directory server based
+     data stores.
      A new property, <literal>sun-idrepo-ldapv3-config-connection-mode</literal>,
      has been created and has possible values of <literal>LDAP</literal>,
      <literal>LDAPS</literal>, and <literal>StartTLS</literal> to enable this
@@ -238,7 +238,7 @@
    <!-- OPENAM-5097 -->
    <listitem>
     <para>
-     <emphasis role="bold">StartTLS Support For AD/LDAP Authentication Moduels</emphasis>.
+     <emphasis role="bold">StartTLS Support For AD/LDAP Authentication Modules</emphasis>.
      You can now use StartTLS with the Active Directory
      and LDAP authentication modules to secure OpenAM's connection to the data stores.
      A new property, <literal>openam-auth-ldap-connection-mode</literal>,
@@ -348,6 +348,26 @@
       xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-6109"
       xlink:show="new"
       >OPENAM-6109</link>.
+    </para>
+   </listitem>
+
+   <!-- OPENAM-6319 -->
+   <listitem>
+    <para><emphasis role="bold">OAuth2 Scopes Behavior Affected by
+     Upgrade</emphasis>.
+     After an upgrade, OAuth 2.0 scope behavior uses a deprecated implementation
+     class,<literal>
+      org.forgerock.openam.oauth2.provider.impl.ScopeImpl</literal>.
+    </para>
+    <para>
+     The workaround is to manually update the OAuth 2.0 providers to use the
+     <literal>org.forgerock.openam.oauth2.OpenAMScopeValidator</literal>.
+    </para>
+    <para>
+     For background information, see
+     <link xlink:show="new"
+           xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-6319"
+      >OPENAM-6319</link>.
     </para>
    </listitem>
 

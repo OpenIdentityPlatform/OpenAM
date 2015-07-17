@@ -391,9 +391,9 @@
    <!-- OPENAM-3714 -->
    <listitem>
     <para>
-     <emphasis role="bold">StartTLS Support for IdRepo</emphasis>.
-     You can now use StartTLS to initiate secure connections to an Identity Repository
-     data store.
+     <emphasis role="bold">StartTLS Support for Directory Server Based Data Stores</emphasis>.
+     You can now use StartTLS to initiate secure connections to directory server based
+     data stores.
      A new property, <literal>sun-idrepo-ldapv3-config-connection-mode</literal>,
      has been created with the possible values of <literal>LDAP</literal>,
      <literal>LDAPS</literal>, and <literal>StartTLS</literal> to enable this feature.
