@@ -342,7 +342,7 @@ abstract class SmsResourceProvider {
         Map<String, String> valuesMap = attribute.getChoiceValuesMap(environment);
         for (Map.Entry<String, String> value : valuesMap.entrySet()) {
             values.add(value.getKey());
-            if (i18n.containsKey(value.getValue())) {
+            if (value.getValue() != null && i18n.containsKey(value.getValue())) {
                 descriptions.add(i18n.getString(value.getValue()));
             } else {
                 descriptions.add(value.getKey());
