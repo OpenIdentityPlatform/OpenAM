@@ -107,6 +107,10 @@
         <!-- OpenAM Audit -->
         <dependency>
             <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-audit-context</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-audit-core</artifactId>
         </dependency>
 

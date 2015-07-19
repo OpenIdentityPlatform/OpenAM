@@ -44,7 +44,6 @@ import org.forgerock.json.resource.PersistenceConfig;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResultHandler;
@@ -64,7 +63,6 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import javax.security.auth.Subject;
-import java.net.UnknownHostException;
 
 /**
  * @since 13.0.0
@@ -231,26 +229,10 @@ public class AuditFilterTest {
 
     private AuditEventFactory mockAuditEventFactory() {
         AuditEventFactory auditEventFactory = mock(AuditEventFactory.class);
-        // The following convoluted code disables DNS lookup; an easier approach would be to make the DnsUtils class
-        // publicly visible and a field of the AuditAccessEventBuilder so that AuditEventFactory could inject it.
         when(auditEventFactory.accessEvent()).thenAnswer(new Answer<AMAccessAuditEventBuilder>() {
             @Override
             public AMAccessAuditEventBuilder answer(InvocationOnMock invocation) throws Throwable {
-                return new AMAccessAuditEventBuilder() {
-
-                    DnsUtils mocked = new DnsUtils() {
-                        @Override
-                        public String getHostName(String ipAddress) throws UnknownHostException {
-                            return "example.com";
-                        }
-                    };
-
-                    @Override
-                    protected AMAccessAuditEventBuilder forHttpCrestRequest(Context context, Request request, DnsUtils dnsUtils) {
-                        return super.forHttpCrestRequest(context, request, mocked);
-                    }
-
-                };
+                return new AMAccessAuditEventBuilder();
             }
         });
         return auditEventFactory;

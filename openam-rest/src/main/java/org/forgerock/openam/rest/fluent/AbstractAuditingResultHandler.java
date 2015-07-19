@@ -28,6 +28,7 @@ import org.forgerock.json.resource.ServerContext;
 import org.forgerock.openam.audit.AMAccessAuditEventBuilder;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
+import org.forgerock.openam.audit.context.AuditRequestContext;
 
 /**
  * ResultHandler decorator responsible for publishing audit access events for a single request.
@@ -99,10 +100,11 @@ abstract class AbstractAuditingResultHandler<T, H extends ResultHandler<T>> impl
         if (auditEventPublisher.isAuditing(ACCESS_TOPIC)) {
 
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
+                    .forHttpCrestRequest(context, request)
                     .timestamp(startTime)
+                    .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(AM_REST_ACCESS_ATTEMPT)
-                    .component(CREST_COMPONENT)
-                    .forHttpCrestRequest(context, request);
+                    .component(CREST_COMPONENT);
             addSessionDetailsFromSSOTokenContext(builder, context);
 
             auditEventPublisher.publish(ACCESS_TOPIC, builder.toEvent());
@@ -121,10 +123,11 @@ abstract class AbstractAuditingResultHandler<T, H extends ResultHandler<T>> impl
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
+                    .forHttpCrestRequest(context, request)
                     .timestamp(endTime)
+                    .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(AM_REST_ACCESS_SUCCESS)
                     .component(CREST_COMPONENT)
-                    .forHttpCrestRequest(context, request)
                     .response("SUCCESS", elapsedTime);
             addSessionDetailsFromSSOTokenContext(builder, context);
 
@@ -147,10 +150,11 @@ abstract class AbstractAuditingResultHandler<T, H extends ResultHandler<T>> impl
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
+                    .forHttpCrestRequest(context, request)
                     .timestamp(endTime)
+                    .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(AM_REST_ACCESS_FAILURE)
                     .component(CREST_COMPONENT)
-                    .forHttpCrestRequest(context, request)
                     .responseWithMessage("FAILED - " + resultCode, elapsedTime, message);
             addSessionDetailsFromSSOTokenContext(builder, context);
 

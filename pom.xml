@@ -185,7 +185,7 @@
         <json.version>20090211</json.version>
         <javax.inject.version>1</javax.inject.version>
         <forgerock.guava.version>18.0.1</forgerock.guava.version>
-        <forgerock.audit.version>0.1.0</forgerock.audit.version>
+        <forgerock.audit.version>0.2.0-SNAPSHOT</forgerock.audit.version>
 
         <openam.version>OpenAM ${project.version}</openam.version>
         <!--  Project web site -->
