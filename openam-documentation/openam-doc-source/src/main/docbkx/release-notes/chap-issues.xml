@@ -622,13 +622,53 @@
 
   <para>The following important known issues remained open at the time
    release <?eval ${serverDocTargetVersion}?> became available. For details and
-   information on other issues, see the<link xlink:show="new"
-                                             xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM">
-    OpenAM issue
+   information on other issues, see the
+   <link xlink:show="new"
+         xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM">OpenAM issue
     tracker</link>.
   </para>
 
   <itemizedlist>
+
+   <!-- OPENAM-6424 -->
+   <listitem>
+    <para><emphasis role="bold">Missing Policy Actions after Upgrading 11.0.0 &gt; 11.02 &gt; 12.0.1</emphasis>.
+     OpenAM's 11.0.0 has two Policy Editor actions: <literal>GET</literal> and
+     <literal>POST</literal>. If you upgrade to OpenAM 11.0.2 or later,
+     additional actions are available: <literal>DELETE</literal>, <literal>HEAD</literal>,
+     <literal>OPTIONS</literal>, <literal>PATCH</literal>, and <literal>PUT</literal>.
+     When upgrading from 11.0.2 (or later), the new actions will be missing from the
+     Policy Editor.
+    </para>
+    <para>
+     You can add the actions in OpenAM 12.0.1 by running the following <command>ssoadm</command>
+     command:
+    </para>
+    <screen>
+$ openam/bin/ssoadm set-appl -e -m iPlanetAMWebAgentService \
+  -u amadmin -f .pass -D appl.text
+    </screen>
+    <para>
+     where <filename>appl.txt</filename> is a file containing the actions:
+    </para>
+    <screen>
+actions=GET=true
+actions=POST=true
+actions=PUT=true
+actinos=DELETE=true
+actions=HEAD=true
+actions=OPTIONS=true
+actions=PATCH=true
+    </screen>
+
+    <para>
+     For information, see
+     <link xlink:show="new"
+           xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-6424"
+      >OPENAM-6424</link>.
+    </para>
+   </listitem>
+
    <!-- OPENAM-5400 -->
    <listitem>
     <para><emphasis role="bold">Do Not End Policy Names with a "/"

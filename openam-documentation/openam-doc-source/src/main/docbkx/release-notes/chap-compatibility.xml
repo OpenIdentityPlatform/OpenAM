@@ -1191,15 +1191,20 @@ http://realm1.example.com:8080/openam/XUI/#Login/test
      </listitem>
     </itemizedlist>
     <para>
-     For existing deployments, upgrading to OpenAM ${serverDocTargetVersion}
-     safely removes these entries.
+     New installations will not have these entries and ACIs.
+     For upgraded deployments, you must manually remove the entries
+     if they are not being used.
     </para>
     <para>
      For details, see the explanation in
      (<link
      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1036"
      xlink:show="new"
-     >OPENAM-1036</link>).
+     >OPENAM-1036</link> and in
+     <link
+      xlink:href="https://forgerock.org/2015/07/openam-security-advisory-201505/#201505-05"
+      xlink:show="new"
+      >OpenAM Security Advisory #201505-05</link>).
     </para>
    </listitem>
 
