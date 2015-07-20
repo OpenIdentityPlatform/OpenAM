@@ -29,7 +29,7 @@
  xsi:schemaLocation='http://docbook.org/ns/docbook
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
- <title>OpenAM Changes &amp; Deprecated Functionality</title>
+ <title>OpenAM Changes and Deprecated Functionality</title>
 
  <para>This chapter covers both major changes to existing functionality, and
  also deprecated and removed functionality.</para>
@@ -124,7 +124,7 @@
     </para>
     <para>
      When authenticating users from a directory server that is remote
-     to OpenAM, set the primary server values, and optionally the secondary server
+     to OpenAM, set the primary server values, and optionally, the secondary server
      values. Primary servers have priority over secondary servers.
     </para>
     <para><command>ssoadm</command> attributes are: primary is
@@ -186,8 +186,8 @@
    <!-- OPENAM-3714 -->
    <listitem>
     <para>
-     <emphasis role="bold">StartTLS Support for Directory Server Based Data Stores</emphasis>.
-     You can now use StartTLS to initiate secure connections to directory server based
+     <emphasis role="bold">StartTLS Support for Directory Server-Based Data Stores</emphasis>.
+     You can now use StartTLS to initiate secure connections to directory server-based
      data stores.
      A new property, <literal>sun-idrepo-ldapv3-config-connection-mode</literal>,
      has been created and has possible values of <literal>LDAP</literal>,
@@ -206,9 +206,9 @@
      when you upgrade.
      To enable StartTLS, set
      the <literal>sun-idrepo-ldapv3-config-connection-mode</literal> property
-     to "StartTLS".
+     to <literal>StartTLS</literal>.
      You will also need to update existing <command>ssoadm</command> scripts to
-     use the new property,
+     use the new <literal>sun-idrepo-ldapv3-config-connection-mode</literal> property.
     </para>
     <para>
      For more information, see
@@ -238,7 +238,7 @@
    <!-- OPENAM-5097 -->
    <listitem>
     <para>
-     <emphasis role="bold">StartTLS Support For AD/LDAP Authentication Modules</emphasis>.
+     <emphasis role="bold">StartTLS Support for AD/LDAP Authentication Modules</emphasis>.
      You can now use StartTLS with the Active Directory
      and LDAP authentication modules to secure OpenAM's connection to the data stores.
      A new property, <literal>openam-auth-ldap-connection-mode</literal>,
@@ -256,10 +256,10 @@
      OpenAM automatically updates the <literal>iplanet-am-auth-ldap-ssl-enabled</literal>
      property to the <literal>openam-auth-ldap-connection-mode</literal> property
      when you upgrade. You must manually set the value of
-     the <literal>openam-auth-ldap-connection-mode</literal> to "StartTLS"
+     the <literal>openam-auth-ldap-connection-mode</literal> to <literal>StartTLS</literal>
      to initiate a StartTLS connection to the data store.
      You will also need to update existing <command>ssoadm</command> scripts to
-     use the new property,
+     use the new <literal>openam-auth-ldap-connection-mode</literal> property.
     </para>
     <para>
      For more information, see
@@ -308,7 +308,7 @@
     </screen>
     <para>
      Run the following procedures to set up the JVM properties on WebSphere. Note
-     that these steps were run on WebSphere 8.5 on a Windows platform.
+     that these steps were run on WebSphere 8.5 on a Windows platform:
     </para>
     <procedure>
      <step>
@@ -353,7 +353,7 @@
 
    <!-- OPENAM-6319 -->
    <listitem>
-    <para><emphasis role="bold">OAuth2 Scopes Behavior Affected by
+    <para><emphasis role="bold">OAuth2 Scopes Behavior Affected By
      Upgrade</emphasis>.
      After an upgrade, OAuth 2.0 scope behavior uses a deprecated implementation
      class,<literal>
@@ -411,7 +411,7 @@
       OpenAM has changed its internal representation for policies
       to better fit the underlying implementation,
       which is based on a new engine
-      designed for higher performance and finer grained policies.
+      designed for higher performance and fine-grained policies.
       When you upgrade to this version,
       OpenAM migrates your policies to the new representation.
      </para>
@@ -432,7 +432,7 @@
        OpenAM appends a number to the existing name for each new policy.
        This allows you to recognize the set of policies
        when you must manage them together,
-       for example to change them all in the same way.
+       for example, to change them all in the same way.
       </para>
 
       <para>
@@ -455,7 +455,7 @@
        provided in OpenAM out of the box.
        Custom conditions developed for your deployment
        do not map to any of the newer conditions provided.
-       In that case you must implement your custom conditions
+       In that case, you must set your custom conditions
        by implementing the newer service provider interfaces,
        and then replace your existing policies to use them.
       </para>
@@ -476,10 +476,10 @@
        When OpenAM encounters issues migrating policies during upgrade,
        it writes messages about the problems in the upgrade log.
        When you open a policy in the policy editor
-       that caused problems during the upgrade process
+       that caused problems during the upgrade process,
        the policy editor shows the issues,
        but does not let you fix them directly.
-       Instead you must create equivalent, corrected policies
+       Instead, you must create equivalent, corrected policies
        in order to use them in OpenAM.
       </para>
      </listitem>
@@ -621,7 +621,7 @@
     <para>
      The Device Print authentication module is only available
      for OpenAM 11.x versions and their upgrades.
-     If you have upgraded from OpenAM 11.x to OpenAM 12.0 you
+     If you have upgraded from OpenAM 11.x to OpenAM 12.0, you
      can still use the Device Print module, customize it, and create new instances
      of the module or use the Device ID (Match) and Device ID (Save) modules.
     </para>
@@ -631,7 +631,7 @@
     Print authentication module, these old profiles will always fail to match the
     client's new device profiles using the scripted Device ID (Match) module
     even when using the same device.</para>
-    <para>With the Device ID (Match) and Device ID (Save) modules, the user must re-save each
+    <para>With the Device ID (Match) and Device ID (Save) modules, the user must resave each
      device profile, which deletes the old 11.x profiles stored for the user.</para>
    </important>
    </listitem>
@@ -641,7 +641,7 @@
      Following a change to the SAML 2.0 pages in OpenAM,
      you no longer customize <filename>saml2login.template</filename>
      and <filename>saml2loginwithrelay.template</filename>
-     to add a progress bar for single sign on.
+     to add a progress bar for SSO.
      Instead, customize <filename>saml2/jsp/autosubmitaccessrights.jsp</filename>
      as described in the procedure,
      <link xlink:show="new" xlink:href="admin-guide#show-saml2-sso-login-progress"
@@ -736,7 +736,7 @@
      algorithm. The default OAuth2 client agent configuration has been changed
      to RS256 to match the OAuth2 provider algorithm.
      The client agent continues to support HMAC algorithms; only the default
-     encryption algorithm has been changed to support out-of-the-box functionality.
+     encryption algorithm has been changed to support out of the box functionality.
      (<link
      xlink:show="new"
      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5279"
@@ -759,7 +759,7 @@
      modules mean that any custom implementations of
      <literal>org.forgerock.openam.authentication.modules.oauth2.AccountMapper</literal> or
      <literal>org.forgerock.openam.authentication.modules.oauth2.AttributeMapper</literal>
-     no longer work, and needs to be reimplemented against
+     no longer work, and need to be reimplemented against
      <literal>org.forgerock.openam.authentication.modules.common.mapping.AttributeMapper</literal>
      and/or <literal>org.forgerock.openam.authentication.modules.common.mapping.AccountProvider</literal>
      as appropriate.
@@ -787,7 +787,7 @@ http://realm1.example.com:8080/openam/UI/Login?realm=realm1
     </programlisting>
     <para>
      With XUI, you do not include a realm in the URI if it has already been
-     mapped as now any URI realm is additive and specifies a subrealm of the
+     mapped, as now any URI realm is additive and specifies a subrealm of the
      DNS alias realm.
      For example, using the following URL indicates that you are attempting
      to authenticate to <literal>/realm1/realm1</literal> (that is, the sub-realm,
@@ -830,7 +830,7 @@ http://realm1.example.com:8080/openam/XUI/#Login/test
 
    <listitem>
     <para>Older REST services relying on the following endpoints are
-     deprecated.</para>
+     deprecated:</para>
 
     <simplelist type="vert" columns="2">
      <member>/identity/attributes</member>
@@ -863,9 +863,9 @@ http://realm1.example.com:8080/openam/XUI/#Login/test
       <thead>
        <row>
         <entry><link xlink:show="new" xlink:href="admin-guide#interface-stability"
-                     xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link> URIs</entry>
+                     xlink:role="http://docbook.org/xlink/role/olink">Deprecated URIs</link></entry>
         <entry>Newer <link xlink:show="new" xlink:href="admin-guide#interface-stability"
-                           xlink:role="http://docbook.org/xlink/role/olink">Evolving</link> URIs</entry>
+                           xlink:role="http://docbook.org/xlink/role/olink">Evolving URIs</link></entry>
        </row>
       </thead>
 
@@ -984,11 +984,11 @@ http://realm1.example.com:8080/openam/XUI/#Login/test
    <!-- AME-5059 //-->
    <listitem>
     <para>With the implementation of XACML 3.0 support when importing and
-    exporting policies the following <option>ssoadm</option> commands
+    exporting policies, the following <option>ssoadm</option> commands
      have been replaced:</para>
 
     <table>
-    <title>Policy Import and Export with ssoadm</title>
+    <title>Policy Import and Export With ssoadm</title>
 
     <tgroup cols="2">
     <colspec colnum="1" colwidth="1*"/>
@@ -998,10 +998,10 @@ http://realm1.example.com:8080/openam/XUI/#Login/test
      <row>
       <entry><link xlink:show="new" xlink:href="admin-guide#interface-stability"
                    xlink:role="http://docbook.org/xlink/role/olink">
-       Deprecated</link> Command</entry>
+       Deprecated Command</link></entry>
       <entry>Newer <link xlink:show="new" xlink:href="admin-guide#interface-stability"
                          xlink:role="http://docbook.org/xlink/role/olink">
-       Evolving</link> Command</entry>
+       Evolving Command</link></entry>
      </row>
     </thead>
 
@@ -1060,7 +1060,7 @@ http://realm1.example.com:8080/openam/XUI/#Login/test
 
    <listitem>
     <para>
-     The OAuth 2.0 plugin interface for custom scopes,
+     The OAuth 2.0 plugin interface for custom scopes
      <link
       xlink:href="${javadocBase}?org/forgerock/openam/oauth2/provider/Scope.html"
       xlink:show="new"><literal>Scope</literal></link>
@@ -1087,7 +1087,7 @@ http://realm1.example.com:8080/openam/XUI/#Login/test
      The OAuth 2.0 plugin interface for custom response types,
      <link
       xlink:href="${javadocBase}?org/forgerock/openam/oauth2/provider/ResponseType.html"
-      xlink:show="new"><literal>ResponseType</literal></link>
+      xlink:show="new"><literal>ResponseType</literal></link>,
      is deprecated and likely to be removed in a future release.
     </para>
 

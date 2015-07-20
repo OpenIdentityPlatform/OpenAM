@@ -30,7 +30,7 @@
                      http://docbook.org/xml/5.0/xsd/docbook.xsd
                      http://docbook.org/ns/docbook"
          xmlns:xlink='http://www.w3.org/1999/xlink'>
- <title>OpenAM Fixes, Limitations, &amp; Known Issues</title>
+ <title>OpenAM Fixes, Limitations, and Known Issues</title>
 
  <para>OpenAM issues are tracked at<link
   xlink:href='https://bugster.forgerock.org/jira/browse/OPENAM'
@@ -473,10 +473,13 @@
 
  <section xml:id="limitations">
   <title>Limitations</title>
+  <para>
+   The following items are limitations in <?eval ${serverDocTargetVersion}?>:
+  </para>
 
   <itemizedlist>
    <listitem>
-    <para><emphasis role="bold">Different OpenAM Version within a
+    <para><emphasis role="bold">Different OpenAM Version Within a
      Site</emphasis>.
      Do not run different versions of OpenAM together in the same OpenAM
      site.
@@ -497,7 +500,7 @@
    <!-- OPENAM-5262 -->
    <listitem>
     <para><emphasis role="bold">Avoid Use of Special Characters in Policy or
-     Application creation</emphasis>.
+     Application Creation</emphasis>.
      Do not use special characters within policy, application or referral names
      (for example, "my+referral") using the Policy Editor or REST endpoints as
      OpenAM returns a 400 Bad Request error.
@@ -515,8 +518,9 @@
     <para><emphasis role="bold">Avoid Using REST Endpoint Names for
      Realm Names</emphasis>.
      Do not use the names of OpenAM REST endpoints as the name of a realm.
-     The OpenAM REST endpoint names that should not be used includes: "users",
-     "groups", "realms", "policies" and "applications".
+     The OpenAM REST endpoint names that should not be used includes: <literal>users</literal>,
+     <literal>groups</literal>, <literal>realms</literal>, <literal>policies</literal>,
+     and <literal>applications</literal>.
      (<link xlink:show="new"
             xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-5314"
       >OPENAM-5314</link>)
@@ -546,9 +550,9 @@
 
    <!-- OPENAM-1032 -->
    <listitem>
-    <para><emphasis role="bold">Enforcing Session Quotas with Session
+    <para><emphasis role="bold">Enforcing Session Quotas With Session
      Failover</emphasis>.
-     By default OpenAM does not enforce session quotas when running in Site
+     By default, OpenAM does not enforce session quotas when running in Site
      mode without session failover. To work around this behavior, set the server
      configuration property
      <literal>openam.session.useLocalSessionsInMultiServerMode=true</literal>.
@@ -584,7 +588,7 @@
 
    <!-- OPENAM-4045 -->
    <listitem>
-    <para><emphasis role="bold">Note about HttpServletResponse and
+    <para><emphasis role="bold">Note about HttpServletResponse And
      HttpServletRequest</emphasis>.
      The
      <literal>HttpServletRequest</literal>

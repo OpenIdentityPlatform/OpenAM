@@ -127,10 +127,10 @@
    <listitem>
     <para><emphasis role="bold">Issue #201503-02: Cross Site
      Scripting</emphasis>.
-     OpenAM is vulnerable to cross-site scripting (XSS) attacks, which could lead
+     OpenAM is vulnerable to cross site scripting (XSS) attacks, which could lead
      to session hijacking or phishing.
      It has been detected that the following endpoint is vulnerable to
-     cross-site scripting attacks:
+     cross site scripting attacks:
     </para>
     <itemizedlist>
      <listitem>/openam/oauth/registerconsumer.jsp (Core Server, Server Only)
@@ -150,9 +150,8 @@
 
    <!-- #201503-03 Medium -->
    <listitem>
-    <para><emphasis role="bold">Issue #201503-03: Password recorded as plain
-     text
-     during install</emphasis>.
+    <para><emphasis role="bold">Issue #201503-03: Password Recorded As Plain
+     Text During Install</emphasis>.
      When performing new installations of OpenAM 11.0.2 and 12.0.0, the
      installation properties are recorded in the install log at the end of the OpenAM
      installation process to aid diagnostic analysis. In the case of configuring OpenAM to
@@ -174,7 +173,7 @@
    <!-- #201505-01 Critical -->
    <listitem>
     <para>
-     <emphasis role="bold">Issue #201505-01: Deserialization of Untrusted Data</emphasis>.
+     <emphasis role="bold">Issue #201505-01: Deserialization Of Untrusted Data</emphasis>.
      Using a well-crafted request, an attacker may be able to perform remote
      code execution.
     </para>
@@ -192,7 +191,7 @@
 
    <!-- #201505-02 High -->
    <listitem>
-    <para><emphasis role="bold">Issue #201505-02: Authentication Bypass in SAMLv2</emphasis>.
+    <para><emphasis role="bold">Issue #201505-02: Authentication Bypass In SAMLv2</emphasis>.
      When OpenAM acts as a SAMLv2 Identity Provider and more than one realm has
      been configured, it is possible to obtain access to Service Providers that
      have been configured in a different realm than the current session's realm.
@@ -249,7 +248,7 @@
    <listitem>
     <para><emphasis role="bold">Issue #201505-05: Insecure Default Passwords</emphasis>.
      When OpenAM is configured with an external OpenDJ or Oracle Directory Server
-     Enterprise Edition (formerly Sun DSEE) server, or when the "Load Schema when saved"
+     Enterprise Edition (formerly Sun DSEE) server, or when the <literal>Load Schema when saved</literal>
      feature is used, the users created will have insecure passwords.
     </para>
     <para>
@@ -281,7 +280,7 @@
    <!-- OPENAM-816/6211 -->
    <listitem>
     <para>
-     <emphasis role="bold">New JVM Properties For ssoadm</emphasis>.
+     <emphasis role="bold">New JVM Properties for ssoadm</emphasis>.
      You can now specifically set the authentication module or chain for
      administrator logins using two JVM settings for the <command>ssoadm</command>
      command:
@@ -352,7 +351,7 @@
     </para>
     <para>
      To enable the feature, go to the <filename>Debug.jsp</filename> page and
-     select the sub page where you want debugging to occur. Then, at the top of
+     select the subpage where you want debugging to occur. Then, at the top of
      the page, click the button to turn decryption on or off.
      This feature operates independently of the other debug logging options on the
      page, so you can click Cancel or Back after pressing the button, and the
@@ -375,9 +374,9 @@
      in the SAMLv2 specification.
     </para>
     <para>
-     Custom contexts are also now shown in the OpenAM Console if included in the
+     Custom contexts are also now shown in the OpenAM console if included in the
      extended metadata. Note that this change does not include the ability to add new
-     contexts via the Console. Custom contexts still need to be loaded via
+     contexts via the console. Custom contexts still need to be loaded via
      <literal>ssoadm/extended</literal> metadata.
     </para>
     <para>
@@ -391,8 +390,8 @@
    <!-- OPENAM-3714 -->
    <listitem>
     <para>
-     <emphasis role="bold">StartTLS Support for Directory Server Based Data Stores</emphasis>.
-     You can now use StartTLS to initiate secure connections to directory server based
+     <emphasis role="bold">StartTLS Support for Directory Server-Based Data Stores</emphasis>.
+     You can now use StartTLS to initiate secure connections to directory server-based
      data stores.
      A new property, <literal>sun-idrepo-ldapv3-config-connection-mode</literal>,
      has been created with the possible values of <literal>LDAP</literal>,
@@ -410,7 +409,7 @@
    <!-- OPENAM-4923 -->
    <listitem>
     <para>
-     <emphasis role="bold">Specifying Trusted Realms using the WindowsDesktopSSO Authentication Module</emphasis>.
+     <emphasis role="bold">Specifying Trusted Realms Using the WindowsDesktopSSO Authentication Module</emphasis>.
      The WindowsDesktopSSO authentication module now allows you to specify a list
      of trusted realms. When the setting is specified, Kerberos tokens issued by
      those realms will only be accepted.
@@ -446,7 +445,7 @@
    <!-- OPENAM-5311 -->
    <listitem>
     <para>
-     <emphasis role="bold">Default Time limit using Netscape SDK is Configurable</emphasis>.
+     <emphasis role="bold">Default Time Limit Using Netscape SDK is Configurable</emphasis>.
      The default timelimit for LDAP operations performed using the Netscape SDK
      is now configurable.
     </para>
@@ -475,7 +474,7 @@
      URL base that is used in the well-known OIDC endpoints.
     </para>
     <para>
-     The provider provides the following:
+     The provider service offers the following:
     </para>
     <itemizedlist>
      <listitem>
