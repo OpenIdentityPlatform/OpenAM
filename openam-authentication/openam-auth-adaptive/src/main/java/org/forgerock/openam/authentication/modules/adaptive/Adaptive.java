@@ -225,7 +225,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             try {
                 setAuthLevel(Integer.parseInt(authLevel));
             } catch (Exception e) {
-                debug.error("Adaptive.init : Unable to set auth level " + authLevel, e);
+                debug.error("{}.init : Unable to set auth level {}", ADAPTIVE, authLevel, e);
             }
         }
         Locale locale = getLoginLocale();
@@ -234,18 +234,18 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         try {
             userName = (String) sharedState.get(getUserKey());
         } catch (Exception e) {
-            debug.error("Adaptive.init : " + "Unable to set userName : ", e);
+            debug.error("{}.init : Unable to set userName", ADAPTIVE, e);
         }
 
         try {
             userSearchAttributes = getUserAliasList();
         } catch (final AuthLoginException ale) {
-            debug.warning("Adaptive.init: unable to retrieve search attributes", ale);
+            debug.warning("{}.init: unable to retrieve search attributes", ADAPTIVE, ale);
         }
 
         if (debug.messageEnabled()) {
-            debug.message("Adaptive.init : resbundle locale=" + locale
-                    + ", user search attributes=" + userSearchAttributes);
+            debug.message("{}.init : resbundle locale={}, user search attributes={}", ADAPTIVE, locale,
+                    userSearchAttributes);
          }
     }
 
@@ -254,7 +254,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             throws AuthLoginException {
         int currentScore = 0;
 
-        debug.message("Adaptive: process called with state = " + state);
+        debug.message("{}: process called with state = {}", ADAPTIVE, state);
 
         if (state != ISAuthConstants.LOGIN_START) {
             throw new AuthLoginException("Authentication failed: Internal Error - NOT LOGIN_START");
@@ -274,71 +274,116 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                 userUUID = token.getPrincipal().getName();
                 userName = token.getProperty("UserToken");
                 if (debug.messageEnabled()) {
-                    debug.message("Adaptive.process() : " + "UserName in SSOToken : " + userName);
+                    debug.message("{}.process() : UserName '{}' in SSOToken", ADAPTIVE, userName);
                 }
 
                 if (userName == null || userName.length() == 0) {
                     throw new AuthLoginException("amAuth", "noUserName", null);
                 }
             } catch (SSOException e) {
-                debug.message(ADAPTIVE + ": amAuthIdentity NULL ");
+                debug.message("{}: amAuthIdentity NULL ", ADAPTIVE);
                 throw new AuthLoginException(ADAPTIVE, "noIdentity", null);
             }
         }
-        debug.message(ADAPTIVE + ": Login Attempt User = " + userName);
+        if (debug.messageEnabled()) {
+            debug.message("{}: Login Attempt Username = {}", ADAPTIVE, userName);
+        }
 
-        amAuthIdentity = getIdentity(userName);
+        amAuthIdentity = getIdentity();
         clientIP = ClientUtils.getClientIPAddress(getHttpServletRequest());
 
         if (amAuthIdentity == null) {
-            debug.message(ADAPTIVE + ": amAuthIdentity NULL : " + userName);
             throw new AuthLoginException(ADAPTIVE, "noIdentity", null);
         }
 
         try {
             if (IPRangeCheck) {
-                currentScore += checkIPRange();
+                int retVal = checkIPRange();
+                if (debug.messageEnabled()) {
+                    debug.message("{}.checkIPRange: returns {}", ADAPTIVE,  retVal);
+                }
+                currentScore += retVal;
             }
             if (IPHistoryCheck) {
-                currentScore += checkIPHistory();
+                int retVal = checkIPHistory();
+                if (debug.messageEnabled()) {
+                    debug.message("{}.checkIPHistory: returns {}", ADAPTIVE, retVal);
+                }
+                currentScore += retVal;
             }
             if (knownCookieCheck) {
-                currentScore += checkKnownCookie();
+                int retVal = checkKnownCookie();
+                if (debug.messageEnabled()) {
+                    debug.message("{}.checkKnownCookie: returns {}", ADAPTIVE, retVal);
+                }
+                currentScore += retVal;
             }
             if (timeOfDayCheck) {
-                currentScore += checkTimeDay();
+                int retVal = checkTimeDay();
+                if (debug.messageEnabled()) {
+                    debug.message("{}.checkTimeDay: returns {}", ADAPTIVE, retVal);
+                }
+                currentScore += retVal;
             }
             if (timeSinceLastLoginCheck) {
-                currentScore += checkLastLogin();
+                int retVal = checkLastLogin();
+                if (debug.messageEnabled()) {
+                    debug.message("{}.checkLastLogin: returns {}", ADAPTIVE, retVal);
+                }
+                currentScore += retVal;
             }
             if (riskAttributeCheck) {
-                currentScore += checkRiskAttribute();
+                int retVal = checkRiskAttribute();
+                if (debug.messageEnabled()) {
+                    debug.message("{}.checkRiskAttribute: returns {}", ADAPTIVE, retVal);
+                }
+                currentScore += retVal;
             }
             if (authFailureCheck) {
-                currentScore += checkAuthFailure();
+                int retVal = checkAuthFailure();
+                if (debug.messageEnabled()) {
+                    debug.message("{}.checkAuthFailure: returns {}", ADAPTIVE, retVal);
+                }
+                currentScore += retVal;
             }
             if (deviceCookieCheck) {
-                currentScore += checkRegisteredClient();
+                int retVal = checkRegisteredClient();
+                if (debug.messageEnabled()) {
+                    debug.message( "{}.checkRegisteredClient: returns {}", ADAPTIVE, retVal);
+                }
+                currentScore += retVal;
             }
             if (geoLocationCheck) {
-                currentScore += checkGeoLocation();
+                int retVal = checkGeoLocation();
+                if (debug.messageEnabled()) {
+                    debug.message("{}.checkGeoLocation: returns {}", ADAPTIVE, retVal);
+                }
+                currentScore += retVal;
             }
             if (reqHeaderCheck) {
-                currentScore += checkRequestHeader();
+                int retVal = checkRequestHeader();
+                if (debug.messageEnabled()) {
+                    debug.message("{}.checkRequestHeader: returns {}", ADAPTIVE, retVal);
+                }
+                currentScore += retVal;
             }
         } catch (Exception ex) {
             currentScore = Integer.MAX_VALUE;
-            debug.error(ADAPTIVE + ".process() : Unknown exception occured while"
-                    + " executing checks, module will fail", ex);
+            debug.error("{}.process() : Unknown exception occurred while executing checks, module will fail.",
+                    ADAPTIVE, ex);
         }
 
         setPostAuthNParams();
 
         if (currentScore < adaptiveThreshold) {
-            debug.message(ADAPTIVE + ": Returning Success : " + userName);
+            if (debug.messageEnabled()) {
+                debug.message("{}: Returning Success. Username='{}'", ADAPTIVE, userName);
+            }
             return ISAuthConstants.LOGIN_SUCCEED;
         } else {
-            debug.message(ADAPTIVE + ": Returning FAIL : " + userName);
+            if (debug.messageEnabled()) {
+                debug.message("{}: Returning Fail. Username='{}'", ADAPTIVE, userName);
+            }
             throw new AuthLoginException(ADAPTIVE + " - Risk determined.");
         }
     }
@@ -393,7 +438,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                 throw new IllegalArgumentException(ipStart + " is not a valid format for CIDR");
             }
         } else {
-            debug.message("IPRange found single IP ");
+            debug.message("IPRange found single IP");
             // check single ip range
             if(ValidateIPaddress.isIPv4(range)){
                 details.put(IP_Version, IP_V4);
@@ -441,8 +486,10 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                  retVal = authFailureScore;
             }
         } catch (AuthenticationException e) {
-            debug.error(ADAPTIVE
-                    + ".checkAuthFailure() : Failed to get fail count", e);
+            if (debug.warningEnabled()) {
+                debug.warning("{}.checkAuthFailure() : Failed to get fail count", ADAPTIVE, e);
+            }
+            return authFailureScore;
         }
 
         if (!authFailureInvert) {
@@ -477,47 +524,49 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
 
             try {
                 holdDetails = checkIPVersion(nextIP);
-            } catch (Exception e) {
-                debug.message("IP type could not be validated." + nextIP);
+            } catch (IllegalArgumentException e) {
+                if (debug.warningEnabled()) {
+                    debug.warning("{}.checkIPRange: IP type could not be validated. IP={}", ADAPTIVE, nextIP, e);
+                }
                 continue;
             }
 
             ipVersion = holdDetails.get(IP_Version);
             ipType = holdDetails.get(IP_TYPE);
 
-            if(ipVersion.equalsIgnoreCase(IP_V6) && ValidateIPaddress.isIPv6(clientIP)){
+            if (ipVersion.equalsIgnoreCase(IP_V6) && ValidateIPaddress.isIPv6(clientIP)) {
                 if (debug.messageEnabled()) {
-                    debug.message(ADAPTIVE + ".checkIPRange: " + clientIP + " --> " + nextIP);
-                    debug.message("IP version is: " + IP_V6);
-                    debug.message("Client IP is: " + IPv6Address.fromString(clientIP));
+                    debug.message("{}.checkIPRange: {} --> {}", ADAPTIVE, clientIP, nextIP);
+                    debug.message("IP version is: {}", IP_V6);
+                    debug.message("Client IP is: {}", IPv6Address.fromString(clientIP));
                 }
-                if(ipType.equalsIgnoreCase("Range")){
+                if (ipType.equalsIgnoreCase("Range")) {
                     // Do range IPv6
                     String first = holdDetails.get(IP_START);
                     String last = holdDetails.get(IP_END);
                     IPv6AddressRange iPv6AddressRange = IPv6AddressRange.fromFirstAndLast(
                             IPv6Address.fromString(first), IPv6Address.fromString(last));
-                    if(iPv6AddressRange.contains(IPv6Address.fromString(clientIP))) {
+                    if (iPv6AddressRange.contains(IPv6Address.fromString(clientIP))) {
                         retVal = IPRangeScore;
                     }
-                } else if(ipType.equalsIgnoreCase("CIDR")){
+                } else if (ipType.equalsIgnoreCase("CIDR")) {
                     // Subnet mask ip
                     IPv6Network iPv6Network = IPv6Network.fromString(nextIP);
-                    if(iPv6Network.contains(IPv6Address.fromString(clientIP))){
+                    if (iPv6Network.contains(IPv6Address.fromString(clientIP))) {
                         retVal = IPRangeScore;
                     }
                 } else {
                     // treat as single ip address
                     IPv6Address iPv6AddressNextIP = IPv6Address.fromString(nextIP);
-                    if(iPv6AddressNextIP.compareTo(IPv6Address.fromString(clientIP)) == 0){
+                    if (iPv6AddressNextIP.compareTo(IPv6Address.fromString(clientIP)) == 0) {
                         retVal = IPRangeScore;
                     }
                 }
-            } else if(ipVersion.equalsIgnoreCase(IP_V4) && ValidateIPaddress.isIPv4(clientIP)){ // treat as IPv4
+            } else if (ipVersion.equalsIgnoreCase(IP_V4) && ValidateIPaddress.isIPv4(clientIP)) { // treat as IPv4
                 if (debug.messageEnabled()) {
-                    debug.message(ADAPTIVE + ".checkIPRange: " + clientIP + " --> " + nextIP);
-                    debug.message("IP version is: " + IP_V4);
-                    debug.message("Client IP is: " + clientIP);
+                    debug.message("{}.checkIPRange: {} --> {}", ADAPTIVE, clientIP, nextIP);
+                    debug.message("IP version is: {}", IP_V4);
+                    debug.message("Client IP is: {}", clientIP);
                 }
                 IPRange theRange = new IPRange(nextIP);
                 if (theRange.inRange(clientIP)) {
@@ -529,7 +578,6 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         if (!IPRangeInvert) {
             retVal = IPRangeScore - retVal;
         }
-        debug.message(ADAPTIVE + ".checkIPRange: returns " + retVal);
         return retVal;
     }
 
@@ -552,7 +600,10 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         if (IPHistoryAttribute != null) {
             ipHistoryValues = getIdentityAttributeString(IPHistoryAttribute);
 
-            debug.message(ADAPTIVE + ".checkIPHistory: Client IP = " + clientIP + " History IP = " + ipHistoryValues);
+            if (debug.messageEnabled()) {
+                debug.message("{}.checkIPHistory: Client IP = {}, History IP = {}", ADAPTIVE, clientIP,
+                        ipHistoryValues);
+            }
 
             if (ipHistoryValues != null) {
                 StringTokenizer st = new StringTokenizer(ipHistoryValues, "|");
@@ -581,51 +632,65 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         if (!IPHistoryInvert) {
             retVal = IPHistoryScore - retVal;
         }
-
-        debug.message(ADAPTIVE + ".checkIPHistory: returns " + retVal);
-
         return retVal;
     }
 
     private String getCountryCode(DatabaseReader db, String ipAddress) throws IOException, GeoIp2Exception {
-        try {
-            return db.country(InetAddress.getByName(ipAddress)).getCountry().getIsoCode();
-        } catch (UnknownHostException e) {
-            return UNKNOWN_COUNTRY_CODE;
-        }
+        return db.country(InetAddress.getByName(ipAddress)).getCountry().getIsoCode();
     }
 
-    protected int checkGeoLocation() throws IOException, GeoIp2Exception {
+    protected int checkGeoLocation() {
         int retVal = 0;
         String countryCode;
 
-        debug.message("GeoLocation database location = " + geoLocationDatabase);
+        if (debug.messageEnabled()) {
+            debug.message("{}.checkGeoLocation: GeoLocation database location = {}", ADAPTIVE, geoLocationDatabase);
+        }
 
         DatabaseReader db = getLookupService(geoLocationDatabase);
 
         if (db == null) {
-            debug.message("GeoLocation database lookup returns null");
-        } else {
+            debug.error("{}.checkGeoLocation: GeoLocation database lookup returns null", ADAPTIVE);
+            return geoLocationScore;
+        }
+
+        if (geoLocationValues == null) {
+            debug.error("{}.checkGeoLocation: The property '{}' is null", ADAPTIVE, GEO_LOCATION_VALUES);
+            return geoLocationScore;
+        }
+
+        try {
             countryCode = getCountryCode(db, clientIP);
-            debug.message(ADAPTIVE + ".checkGeoLocation: " + clientIP + " returns " + countryCode);
+        } catch (IOException e) {
+            if (debug.warningEnabled()) {
+                debug.warning("{}.checkGeoLocation: #getCountryCode :: An IO error happened", ADAPTIVE, e);
+            }
+            return geoLocationScore;
+        } catch (GeoIp2Exception e) {
+            if (debug.warningEnabled()) {
+                debug.warning("{}.checkGeoLocation: #getCountryCode :: An error happened when looking up the IP", ADAPTIVE, e);
+            }
+            return geoLocationScore;
+        }
 
-            if (geoLocationValues != null) {
-                StringTokenizer st = new StringTokenizer(geoLocationValues, "|");
-                while (st.hasMoreTokens()) {
+        if (debug.messageEnabled()) {
+            debug.message("{}.checkGeoLocation: {} returns {}", ADAPTIVE, clientIP, countryCode);
+        }
 
-                    if (countryCode.equalsIgnoreCase(st.nextToken())) {
-                        debug.message("Found Country Code : " + countryCode);
-                        retVal = geoLocationScore;
-                        break;
-                    }
+        StringTokenizer st = new StringTokenizer(geoLocationValues, "|");
+        while (st.hasMoreTokens()) {
+            if (countryCode.equalsIgnoreCase(st.nextToken())) {
+                if (debug.messageEnabled()) {
+                    debug.message("{}.checkGeoLocation: Found Country Code : {}", ADAPTIVE, countryCode);
                 }
+                retVal = geoLocationScore;
+                break;
             }
         }
 
         if (!geoLocationInvert) {
             retVal = geoLocationScore - retVal;
         }
-        debug.message(ADAPTIVE + ".checkGeoLocation: returns " + retVal);
         return retVal;
     }
 
@@ -636,7 +701,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
      */
     protected int checkKnownCookie() {
         int retVal = 0;
-        debug.message(ADAPTIVE + ".checkKnownCookie: ");
+        debug.message("{}.checkKnownCookie:", ADAPTIVE);
 
         HttpServletRequest req = getHttpServletRequest();
         if (req != null) {
@@ -659,7 +724,6 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         if (!knownCookieInvert) {
             retVal = knownCookieScore - retVal;
         }
-        debug.message(ADAPTIVE + ".checkKnownCookie: returns " + retVal);
         return retVal;
     }
 
@@ -670,7 +734,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
      */
     protected int checkRequestHeader() {
         int retVal = 0;
-        debug.message(ADAPTIVE + ".checkRequestHeader: ");
+        debug.message("{}.checkRequestHeader:", ADAPTIVE);
 
         HttpServletRequest req = getHttpServletRequest();
         if (req != null) {
@@ -678,13 +742,17 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             while (eHdrs.hasMoreElements()) {
                 String header = eHdrs.nextElement();
                 if (reqHeaderName.equalsIgnoreCase(header)) {
-                    debug.message(ADAPTIVE + ".checkRequestHeader: Found header: " + header);
+                    if (debug.messageEnabled()) {
+                        debug.message("{}.checkRequestHeader: Found header: {}", ADAPTIVE, header);
+                    }
                     if (reqHeaderValue != null) {
                         Enumeration<String> eVals = req.getHeaders(header);
                         while (eVals.hasMoreElements()) {
                             String val = eVals.nextElement();
                             if (reqHeaderValue.equalsIgnoreCase(val)) {
-                                debug.message(ADAPTIVE + ".checkRequestHeader: Found header Value: " + val);
+                                if (debug.messageEnabled()) {
+                                    debug.message("{}.checkRequestHeader: Found header Value: {}", ADAPTIVE,  val);
+                                }
                                 retVal = reqHeaderScore;
                             }
                         }
@@ -699,7 +767,6 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         if (!reqHeaderInvert) {
             retVal = reqHeaderScore - retVal;
         }
-        debug.message(ADAPTIVE + ".checkRequestHeader: returns " + retVal);
         return retVal;
     }
 
@@ -712,7 +779,10 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         int retVal = 0;
         String deviceHash = null;
 
-        debug.message(ADAPTIVE + ".checkRegisteredClient: ");
+        if (debug.messageEnabled()) {
+            debug.message("{}.checkRegisteredClient:", ADAPTIVE);
+        }
+
         HttpServletRequest req = getHttpServletRequest();
 
         if (req != null) {
@@ -729,7 +799,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             Cookie cookie = CookieUtils.getCookieFromReq(req, deviceCookieName);
             if (cookie != null ) {
                 if (debug.messageEnabled()) {
-                    debug.message(ADAPTIVE + ".checkRegisteredClient: Found Cookie :" + deviceCookieName);
+                    debug.message("{}.checkRegisteredClient: Found Cookie : {}", ADAPTIVE, deviceCookieName);
                 }
                 if (deviceHash.equalsIgnoreCase(CookieUtils.getCookieValue(cookie))) {
                     retVal = deviceCookieScore;
@@ -745,7 +815,6 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         if (!deviceCookieInvert) {
             retVal = deviceCookieScore - retVal;
         }
-        debug.message(ADAPTIVE + ".checkRegisteredClient: returns " + retVal);
         return retVal;
     }
 
@@ -781,7 +850,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                 Cookie cookie = CookieUtils.getCookieFromReq(req, timeSinceLastLoginAttribute);
                 if (cookie != null) {
                     if (debug.messageEnabled()) {
-                        debug.message(ADAPTIVE + ".checkLastLogin: Found Cookie :" + timeSinceLastLoginAttribute);
+                        debug.message("{}.checkLastLogin: Found Cookie : {}", ADAPTIVE, timeSinceLastLoginAttribute);
                     }
                     lastLoginEnc = CookieUtils.getCookieValue(cookie);
                     lastLogin = AccessController.doPrivileged(new DecodeAction(lastLoginEnc));
@@ -800,10 +869,14 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                     if (lastLogin != null) {
                         try {
                             loginTime = formatter.parse(lastLogin); // "2002.01.29.08.36.33");
+                            if ((now.getTime() - loginTime.getTime()) < timeSinceLastLoginValue * 1000 * 60 * 60 * 24L) {
+                                retVal = timeSinceLastLoginScore;
+                            }
                         } catch (ParseException pe) {
-                        }
-                        if ((now.getTime() - loginTime.getTime()) < timeSinceLastLoginValue * 1000 * 60 * 60 * 24L) {
-                            retVal = timeSinceLastLoginScore;
+                            if (debug.messageEnabled()) {
+                                debug.message("{}.checkLastLogin: lastLogin '{}' can't be parsed", ADAPTIVE,
+                                        lastLogin, pe);
+                            }
                         }
                     }
                 }
@@ -820,8 +893,6 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         if (!timeSinceLastLoginInvert) {
             retVal = timeSinceLastLoginScore - retVal;
         }
-
-        debug.message(ADAPTIVE + ".checkLastLogin: returns " + retVal);
         return retVal;
     }
 
@@ -832,7 +903,9 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
      */
     protected int checkRiskAttribute() {
         int retVal = 0;
-        debug.message(ADAPTIVE + ".checkRiskAttribute: ");
+        if (debug.messageEnabled()) {
+            debug.message("{}.checkRiskAttribute", ADAPTIVE);
+        }
 
         if (riskAttributeName != null && riskAttributeValue != null) {
             Set<String> riskAttributeValues = null;
@@ -842,7 +915,9 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             if (riskAttributeValues != null) {
                 for (String riskAttr : riskAttributeValues) {
                     if (riskAttributeValue.equalsIgnoreCase(riskAttr)) {
-                        debug.message(ADAPTIVE + ".checkRiskAttribute: Found Match");
+                        if (debug.messageEnabled()) {
+                            debug.message("{}.checkRiskAttribute: Found Match", ADAPTIVE);
+                        }
                         retVal = riskAttributeScore;
                         break;
                     }
@@ -853,8 +928,6 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         if (!riskAttributeInvert) {
             retVal = riskAttributeScore - retVal;
         }
-        debug.message(ADAPTIVE + ".checkRiskAttribute: returns " + retVal);
-
         return retVal;
     }
 
@@ -864,7 +937,9 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         try {
             retVal = amAuthIdentity.getAttribute(attr);
         } catch (Exception e) {
-            debug.message(ADAPTIVE + ".getIdentityAttributeSet Attribute: " + attr, e);
+            if (debug.messageEnabled()) {
+                debug.message("{}.getIdentityAttributeSet Attribute: {}", ADAPTIVE, attr, e);
+            }
         }
         return retVal;
     }
@@ -879,13 +954,15 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                 retVal = theSet.iterator().next();
             }
         } catch (Exception e) {
-            debug.message(ADAPTIVE + ".getIdentityAttributeString Attribute: " + attr, e);
+            if (debug.messageEnabled()) {
+                debug.message("{}.getIdentityAttributeString Attribute: {}", ADAPTIVE, attr, e);
+            }
         }
         return retVal;
 
     }
 
-    private AMIdentity getIdentity(String uName) {
+    private AMIdentity getIdentity() {
         AMIdentity theID = null;
         AMIdentityRepository amIdRepo = getAMIdentityRepository(getRequestOrg());
 
@@ -896,13 +973,12 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         Set<AMIdentity> results = Collections.EMPTY_SET;
         try {
             idsc.setMaxResults(0);
-            IdSearchResults searchResults =
-                    amIdRepo.searchIdentities(IdType.USER, uName, idsc);
+            IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, userName, idsc);
 
             if (searchResults.getSearchResults().isEmpty() && !userSearchAttributes.isEmpty()) {
                 if (debug.messageEnabled()) {
-                    debug.message(ADAPTIVE + ".getIdentity : searching user identity "
-                            + "with alternative attributes " + userSearchAttributes);
+                    debug.message("{}.getIdentity : searching user identity with alternative attributes {}", ADAPTIVE,
+                            userSearchAttributes);
                 }
                 final Map<String, Set<String>> searchAVP = CollectionUtils.toAvPairMap(userSearchAttributes, userName);
                 idsc.setSearchModifiers(IdSearchOpModifier.OR, searchAVP);
@@ -915,19 +991,17 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             }
 
             if (results.isEmpty()) {
-                throw new IdRepoException(ADAPTIVE + ".getIdentity : User "
-                        + uName + " is not found");
+                debug.error("{}.getIdentity : User '{}' is not found", ADAPTIVE, userName);
             } else if (results.size() > 1) {
-                throw new IdRepoException(ADAPTIVE
-                        + ".getIdentity : More than one user found for the userName "
-                        + userName);
+                debug.error("{}.getIdentity : More than one user found for the userName '{}'", ADAPTIVE, userName);
+            } else {
+                theID = results.iterator().next();
             }
 
-            theID = results.iterator().next();
         } catch (IdRepoException e) {
-            debug.error(ADAPTIVE + ".getIdentity : " + "error searching Identities with username : " + userName, e);
+            debug.error("{}.getIdentity : Error searching Identities with username '{}' ", ADAPTIVE, userName, e);
         } catch (SSOException e) {
-            debug.error(ADAPTIVE + ".getIdentity : " + "AuthAdaptive module exception : ", e);
+            debug.error("{}.getIdentity : Module exception", ADAPTIVE, e);
         }
         return theID;
     }
@@ -938,7 +1012,10 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         Map<String, String> m = new HashMap<String, String>();
         Map<String, Set> attrMap = new HashMap<String, Set>();
 
-        debug.message(ADAPTIVE + " executing PostProcessClass");
+        if (debug.messageEnabled()) {
+            debug.message("{} executing PostProcessClass", ADAPTIVE);
+        }
+
         try {
             String s = token.getProperty("ADAPTIVE");
             if (s != null && !s.isEmpty()) {
@@ -963,7 +1040,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                     id.setAttributes(attrMap);
                     id.store();
                 } catch (Exception e) {
-                    debug.error(ADAPTIVE + ".getIdentity : " + "Unable to save Attribute : ", e);
+                    debug.error("{}.getIdentity : Unable to save Attribute : {}", ADAPTIVE, attrMap, e);
                 }
 
             }
@@ -988,7 +1065,9 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                 addCookieToResponse(response, name, value, autoLoginExpire);
             }
         } catch (Exception e) {
-            debug.message(ADAPTIVE + " Unable to Retrieve PostAuthN Params", e);
+            if (debug.messageEnabled()) {
+                debug.message("{}.getIdentity : Unable to Retrieve PostAuthN Params", ADAPTIVE, e);
+            }
         }
     }
 
@@ -1019,7 +1098,9 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             }
 
         } catch (Exception e) {
-            debug.message(ADAPTIVE + " Unable to Set PostAuthN Params" + e);
+            if (debug.messageEnabled()) {
+                debug.message("{} Unable to Set PostAuthN Params", ADAPTIVE, e);
+            }
         }
     }
 
@@ -1087,68 +1168,70 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             reqHeaderInvert = getOptionAsBoolean(options, REQ_HEADER_INVERT);
 
         } catch (Exception e) {
-            debug.error(ADAPTIVE + ".initParams : " + "Unable to initialize parameters : ", e);
+            debug.error("{}.initParams : Unable to initialize parameters", ADAPTIVE, e);
         } finally {
             if (debug.messageEnabled()) {
-                debug.message("Adaptive Threshold-> " + adaptiveThreshold
+                StringBuilder message = new StringBuilder();
+                message.append("Adaptive Threshold-> ").append(adaptiveThreshold)
 
-                        + "\nAuth Failure Check-> " + authFailureCheck
-                        + "\nAuth Failure Score-> " + authFailureScore
-                        + "\nAuth Failure Invert-> " + authFailureInvert
+                        .append("\nAuth Failure Check-> ").append(authFailureCheck)
+                        .append("\nAuth Failure Score-> ").append(authFailureScore)
+                        .append("\nAuth Failure Invert-> ").append(authFailureInvert)
 
-                        + "\nIP Range Check-> " + IPRangeCheck
-                        + "\nIP Range Range-> " + IPRangeRange
-                        + "\nIP Range Score-> " + IPRangeScore
-                        + "\nIP Range Invert-> " + IPRangeInvert
+                        .append("\nIP Range Check-> ").append(IPRangeCheck)
+                        .append("\nIP Range Range-> ").append(IPRangeRange)
+                        .append("\nIP Range Score-> ").append(IPRangeScore)
+                        .append("\nIP Range Invert-> ").append(IPRangeInvert)
 
-                        + "\nIP History Check-> " + IPHistoryCheck
-                        + "\nIP History Count-> " + IPHistoryCount
-                        + "\nIP History Attribute-> " + IPHistoryAttribute
-                        + "\nIP History Save-> " + IPHistorySave
-                        + "\nIP History Score-> " + IPHistoryScore
-                        + "\nIP History Invert-> " + IPHistoryInvert
+                        .append("\nIP History Check-> ").append(IPHistoryCheck)
+                        .append("\nIP History Count-> ").append(IPHistoryCount)
+                        .append("\nIP History Attribute-> ").append(IPHistoryAttribute)
+                        .append("\nIP History Save-> ").append(IPHistorySave)
+                        .append("\nIP History Score-> ").append(IPHistoryScore)
+                        .append("\nIP History Invert-> ").append(IPHistoryInvert)
 
-                        + "\nKnown Cookie Check-> " + knownCookieCheck
-                        + "\nKnown Cookie Name-> " + knownCookieName
-                        + "\nKnown Cookie Value-> " + knownCookieValue
-                        + "\nKnown Cookie Save-> " + knownCookieSave
-                        + "\nKnown Cookie Score-> " + knownCookieScore
-                        + "\nKnown Cookie Invert-> " + knownCookieInvert
+                        .append("\nKnown Cookie Check-> ").append(knownCookieCheck)
+                        .append("\nKnown Cookie Name-> ").append(knownCookieName)
+                        .append("\nKnown Cookie Value-> ").append(knownCookieValue)
+                        .append("\nKnown Cookie Save-> ").append(knownCookieSave)
+                        .append("\nKnown Cookie Score-> ").append(knownCookieScore)
+                        .append("\nKnown Cookie Invert-> ").append(knownCookieInvert)
 
-                        + "\nDevice Cookie Check-> " + deviceCookieCheck
-                        + "\nDevice Cookie Name-> " + deviceCookieName
-                        + "\nDevice Cookie Save-> " + deviceCookieSave
-                        + "\nDevice Cookie Score-> " + deviceCookieScore
-                        + "\nDevice Cookie Invert-> " + deviceCookieInvert
+                        .append("\nDevice Cookie Check-> ").append(deviceCookieCheck)
+                        .append("\nDevice Cookie Name-> ").append(deviceCookieName)
+                        .append("\nDevice Cookie Save-> ").append(deviceCookieSave)
+                        .append("\nDevice Cookie Score-> ").append(deviceCookieScore)
+                        .append("\nDevice Cookie Invert-> ").append(deviceCookieInvert)
 
-                        + "\nTime Of Day Check-> " + timeOfDayCheck
-                        + "\nTime Of Day Range-> " + timeOfDayRange
-                        + "\nTime Of Day Invert-> " + timeOfDayInvert
+                        .append("\nTime Of Day Check-> ").append(timeOfDayCheck)
+                        .append("\nTime Of Day Range-> ").append(timeOfDayRange)
+                        .append("\nTime Of Day Invert-> ").append(timeOfDayInvert)
 
-                        + "\nTime Since Last Login Check-> " + timeSinceLastLoginCheck
-                        + "\nTime Since Last Login Attribute: " + timeSinceLastLoginAttribute
-                        + "\nTime Since Last Login Value-> " + timeSinceLastLoginValue
-                        + "\nTime Since Last Login Save-> " + timeSinceLastLoginSave
-                        + "\nTime Since Last Login Score-> " + timeSinceLastLoginScore
-                        + "\nTime Since Last Login Invert-> " + timeSinceLastLoginInvert
+                        .append("\nTime Since Last Login Check-> ").append(timeSinceLastLoginCheck)
+                        .append("\nTime Since Last Login Attribute: ").append(timeSinceLastLoginAttribute)
+                        .append("\nTime Since Last Login Value-> ").append(timeSinceLastLoginValue)
+                        .append("\nTime Since Last Login Save-> ").append(timeSinceLastLoginSave)
+                        .append("\nTime Since Last Login Score-> ").append(timeSinceLastLoginScore)
+                        .append("\nTime Since Last Login Invert-> ").append(timeSinceLastLoginInvert)
 
-                        + "\nRisk Attribute Check-> " + riskAttributeCheck
-                        + "\nRisk Attribute Name-> " + riskAttributeName
-                        + "\nRisk Attribute Value-> " + riskAttributeValue
-                        + "\nRisk Attribute Score-> " + riskAttributeScore
-                        + "\nRisk Attribute Invert-> " + riskAttributeInvert
+                        .append("\nRisk Attribute Check-> ").append(riskAttributeCheck)
+                        .append("\nRisk Attribute Name-> ").append(riskAttributeName)
+                        .append("\nRisk Attribute Value-> ").append(riskAttributeValue)
+                        .append("\nRisk Attribute Score-> ").append(riskAttributeScore)
+                        .append("\nRisk Attribute Invert-> ").append(riskAttributeInvert)
 
-                        + "\nGeoLocation Check-> " + geoLocationCheck
-                        + "\nGeoLocation Database-> " + geoLocationDatabase
-                        + "\nGeoLocation Values-> " + geoLocationValues
-                        + "\nGeoLocation Score-> " + geoLocationScore
-                        + "\nGeoLocation Invert-> " + geoLocationInvert
+                        .append("\nGeoLocation Check-> ").append(geoLocationCheck)
+                        .append("\nGeoLocation Database-> ").append(geoLocationDatabase)
+                        .append("\nGeoLocation Values-> ").append(geoLocationValues)
+                        .append("\nGeoLocation Score-> ").append(geoLocationScore)
+                        .append("\nGeoLocation Invert-> ").append(geoLocationInvert)
 
-                        + "\nReq Header Check-> " + reqHeaderCheck
-                        + "\nReq Header Name-> " + reqHeaderName
-                        + "\nReq Header Value-> " + reqHeaderValue
-                        + "\nReq Header Score-> " + reqHeaderScore
-                        + "\nReq Header Invert-> " + reqHeaderInvert);
+                        .append("\nReq Header Check-> ").append(reqHeaderCheck)
+                        .append("\nReq Header Name-> ").append(reqHeaderName)
+                        .append("\nReq Header Value-> ").append(reqHeaderValue)
+                        .append("\nReq Header Score-> ").append(reqHeaderScore)
+                        .append("\nReq Header Invert-> ").append(reqHeaderInvert);
+                debug.message(message.toString());
             }
         }
     }
@@ -1289,7 +1372,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             }
         } catch (IOException ioe) {
             //don't log the stacktrace, since it will occur on any module invocation
-            debug.message(ADAPTIVE + "Unable to initialize GeoDB service" + ioe.getMessage());
+            debug.message("{}.getLookupService : Unable to initialize GeoDB service: {}", ADAPTIVE, ioe.getMessage());
         }
         return lookupService;
     }
