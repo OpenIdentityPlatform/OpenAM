@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  *
  * $Id: OpenSSOPolicyDataStore.java,v 1.7 2010/01/08 22:20:47 veiming Exp $
  */
@@ -146,7 +146,7 @@ public class OpenSSOPolicyDataStore extends PolicyDataStore {
             } else {
                 PrivilegeManager.debug.error(
                     "OpenSSOPolicyDataStore.addPolicy: unknown class " +
-                    policy.getClass().getName(), null);
+                    policy.getClass().getName());
             }
         } catch (PolicyException e) {
             String[] logParams = {DNMapper.orgNameToRealmName(realm),

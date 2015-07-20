@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: XACMLPrivilegeUtils.java,v 1.4 2010/01/10 06:39:42 dillidorai Exp $
  *
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.entitlement.xacml3;
@@ -1173,7 +1173,7 @@ public class XACMLPrivilegeUtils {
         //FIXME: remove
         PrivilegeManager.debug.error(
             "XACMLProvilegeUtils.streamToPolicySet(), core_pkg:"
-                    + XACMLConstants.XACML3_CORE_PKG, null);
+                    + XACMLConstants.XACML3_CORE_PKG);
         if (stream == null) {
             return null;
         }
@@ -1221,7 +1221,7 @@ public class XACMLPrivilegeUtils {
             } else {
                 PrivilegeManager.debug.error("XACMLPrivilegeUtils."
                         + "createEntitlementSubject()"
-                        + "not an EntitlementSubject", null);
+                        + "not an EntitlementSubject");
             }
         }
         if (es != null) {
@@ -1250,7 +1250,7 @@ public class XACMLPrivilegeUtils {
             } else {
                 PrivilegeManager.debug.error("XACMLPrivilegeUtils."
                         + "createEntitlementCondition()"
-                        + "not an EntitlementCondition", null);
+                        + "not an EntitlementCondition");
             }
         }
         if (ec != null) {

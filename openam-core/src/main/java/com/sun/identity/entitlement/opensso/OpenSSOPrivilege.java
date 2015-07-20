@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -23,10 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: OpenSSOPrivilege.java,v 1.5 2009/10/07 01:36:55 veiming Exp $
- */
-
-/*
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ *
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 
@@ -157,7 +155,7 @@ public class OpenSSOPrivilege extends Privilege {
             if (PrivilegeManager.debug.messageEnabled()) {
                 PrivilegeManager.debug.message(
                     "[PolicyEval] OpenSSOPrivilege.evaluate: resources=" +
-                    resources.toString(), null);
+                    resources.toString());
             }
             for (String r : resources) {
                 Entitlement e = new Entitlement(origE.getApplicationName(),

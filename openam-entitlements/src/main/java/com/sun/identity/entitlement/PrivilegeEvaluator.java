@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: PrivilegeEvaluator.java,v 1.2 2009/10/07 06:36:40 veiming Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2010-2015 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
@@ -147,16 +147,16 @@ class PrivilegeEvaluator {
 
         if (PrivilegeManager.debug.messageEnabled()) {
             Debug debug = PrivilegeManager.debug;
-            debug.message("[PolicyEval] PrivilegeEvaluator:init()", null);
-            debug.message("[PolicyEval] subject: " + getPrincipalId(subject), null);
-            debug.message("[PolicyEval] realm: " + realm, null);
-            debug.message("[PolicyEval] applicationName: " + applicationName, null);
-            debug.message("[PolicyEval] normalisedResourceName: " + this.normalisedResourceName, null);
-            debug.message("[PolicyEval] requestedResourceName: " + this.requestedResourceName, null);
-            debug.message("[PolicyEval] actions: " + actionNames, null);
+            debug.message("[PolicyEval] PrivilegeEvaluator:init()");
+            debug.message("[PolicyEval] subject: " + getPrincipalId(subject));
+            debug.message("[PolicyEval] realm: " + realm);
+            debug.message("[PolicyEval] applicationName: " + applicationName);
+            debug.message("[PolicyEval] normalisedResourceName: " + this.normalisedResourceName);
+            debug.message("[PolicyEval] requestedResourceName: " + this.requestedResourceName);
+            debug.message("[PolicyEval] actions: " + actionNames);
             if ((envParameters != null) && !envParameters.isEmpty()) {
                 debug.message("[PolicyEval] envParameters: " +
-                    envParameters.toString(), null);
+                    envParameters.toString());
             }
         }
 
@@ -274,9 +274,9 @@ class PrivilegeEvaluator {
             if (i.hasNext()) {
                 IPrivilege p = i.next();
                 if (debug.messageEnabled()) {
-                    debug.message("[PolicyEval] PolicyEvaluator.evaluate", null);
+                    debug.message("[PolicyEval] PolicyEvaluator.evaluate");
                     debug.message("[PolicyEval] search result: privilege=" +
-                        p.getName(), null);
+                        p.getName());
                 }
                 localPrivileges.add(p);
                 totalCount++;
@@ -306,9 +306,9 @@ class PrivilegeEvaluator {
             }
             IPrivilege p = i.next();
             if (debug.messageEnabled()) {
-                debug.message("[PolicyEval] PolicyEvaluator.evaluate", null);
+                debug.message("[PolicyEval] PolicyEvaluator.evaluate");
                 debug.message("[PolicyEval] search result: privilege=" +
-                    p.getName(), null);
+                    p.getName());
             }
             if (p instanceof ReferralPrivilege) {
                 referralPrivileges.add(p);

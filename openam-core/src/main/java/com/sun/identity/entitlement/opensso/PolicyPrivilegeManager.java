@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
@@ -24,7 +24,7 @@
  *
  * $Id: PolicyPrivilegeManager.java,v 1.9 2010/01/26 20:10:15 dillidorai Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 package com.sun.identity.entitlement.opensso;
 
@@ -78,7 +78,7 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
         try {
             if (PrivilegeManager.debug.messageEnabled()) {
                 PrivilegeManager.debug.message(
-                        "PolicyPrivilegeManager.static initializer, getting instance of PolicyCache", null);
+                        "PolicyPrivilegeManager.static initializer, getting instance of PolicyCache");
             }
             policyCache = PolicyCache.getInstance();
         } catch (Exception e) {
@@ -386,7 +386,7 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
 
         if (PrivilegeManager.debug.messageEnabled()) {
             PrivilegeManager.debug.message("PolicyPrivilegeManager.notifyPrivilegeChanged():"
-                    + "applicationName=" + applicationName + ", resources=" + resourceNames, null);
+                    + "applicationName=" + applicationName + ", resources=" + resourceNames);
         }
         PrivilegeChangeNotifier.getInstance().notify(getAdminSubject(), realm,
             applicationName, current.getName(), resourceNames);
