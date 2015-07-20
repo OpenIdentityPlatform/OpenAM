@@ -59,6 +59,7 @@
                 <include>org.forgerock.openam:openam-auth-scripted</include>
                 <include>org.forgerock.openam:openam-scripting</include>
                 <include>org.forgerock.openam:openam-ldap-utils</include>
+                <include>org.forgerock.openam:openam-audit-context</include>
                 <include>org.forgerock.commons:json-resource</include>
                 <include>javax.inject:javax.inject</include>
                 <include>com.google.inject:guice:jar:no_aop</include>
