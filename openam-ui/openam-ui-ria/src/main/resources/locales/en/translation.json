@@ -507,7 +507,7 @@
                 },
                 "sharedResources": {
                     "title": "Shared with me",
-                    "grid": ["Resource", "From", "Permissions"]
+                    "grid": ["Resource", "From", "Permissions", "Shared By"]
                 },
                 "revokeAllResourcesSuccess" : "All resources successfully revoked",
                 "revokeAllResourcesFail" : "We have been unable revoke access to your resources. Please contact your Administrator"

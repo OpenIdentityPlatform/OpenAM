@@ -1,13 +1,15 @@
-<div class="page-header clearfix">
-    <button id="deleteScript" class="btn btn-primary page-header page-header-button-group" type="button" {{#unless entity.name}}disabled{{/unless}}>
+<div class="page-header-button-group button-group">
+    <button id="deleteScript" class="btn btn-primary" type="button" {{#unless entity.name}}disabled{{/unless}}>
         <i class="fa fa-times"></i> {{t "common.form.delete"}}
     </button>
-    {{#if entity.name}}
-        {{> headers/_TitleWithSubAndIcon title=entity.name type="console.scripts.edit.script" icon="code" }}
-    {{else}}
-        {{> headers/_TitleWithSubAndIcon title="common.form.createNew" type="console.scripts.edit.script" icon="code" }}
-    {{/if}}
 </div>
+
+{{#if entity.name}}
+    {{> headers/_TitleWithSubAndIcon title=entity.name type="console.scripts.edit.script" icon="code" }}
+{{else}}
+    {{> headers/_TitleWithSubAndIcon title="common.form.createNew" type="console.scripts.edit.script" icon="code" }}
+{{/if}}
+
 
 <div class="panel panel-default panel-content">
     <form class="form-horizontal" role="form">

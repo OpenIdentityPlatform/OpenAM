@@ -46,7 +46,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ChainsView", [
                     title: $.t("console.authentication.chains.createNewChain"),
                     message: $(html),
                     buttons: [{
-                        label: $.t("common.form.next"),
+                        label: $.t("common.form.create"),
                         cssClass: "btn-primary",
                         action: function(dialog) {
                             chainName = dialog.getModalBody().find("#newName").val().trim();

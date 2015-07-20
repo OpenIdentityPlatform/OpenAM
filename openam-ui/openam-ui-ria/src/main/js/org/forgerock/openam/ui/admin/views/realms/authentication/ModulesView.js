@@ -51,7 +51,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
                         message: $(html),
                         buttons: [{
                             id: "nextButton",
-                            label: $.t("common.form.next"),
+                            label: $.t("common.form.create"),
                             cssClass: "btn-primary",
                             action: function(dialog) {
                                 if (self.addModuleDialogValidation(dialog)) {

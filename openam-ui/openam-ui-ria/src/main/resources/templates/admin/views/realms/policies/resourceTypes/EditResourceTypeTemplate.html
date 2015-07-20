@@ -1,24 +1,14 @@
-<div class="page-header clearfix">
-    <span class="header-icon pull-left">
-        <span class="fa fa-list"></span>
-    </span>
-
-    <h4 class="page-type">{{t "console.policies.resourceTypes.edit.resourceType"}}</h4>
-    <div class="page-header-button-group">
-        <button id="deleteResType" class="btn btn-primary" type="button" {{#unless entity.name}}disabled{{/unless}}>
-            <i class="fa fa-times"></i> {{t "common.form.delete"}}
-        </button>
-    </div>
-    <h1>
-        {{#if entity.name}}
-        {{entity.name}}
-        {{else}}
-        {{t "common.form.createNew"}}
-        {{/if}}
-    </h1>
+<div class="page-header-button-group">
+    <button id="deleteResType" class="btn btn-primary" type="button" {{#unless entity.name}}disabled{{/unless}}>
+        <i class="fa fa-times"></i> {{t "common.form.delete"}}
+    </button>
 </div>
 
-
+{{#if entity.name}}
+    {{> headers/_TitleWithSubAndIcon title=entity.name type="console.policies.resourceTypes.edit.resourceType" icon="list" }}
+{{else}}
+    {{> headers/_TitleWithSubAndIcon title="common.form.createNew" type="console.policies.resourceTypes.edit.resourceType" icon="list" }}
+{{/if}}
 
 
 <div class="panel panel-default panel-content">
