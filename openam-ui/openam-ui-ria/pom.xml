@@ -32,7 +32,6 @@
     </properties>
 
     <dependencies>
-
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-ui-common</artifactId>
@@ -40,7 +39,6 @@
             <type>zip</type>
             <classifier>www</classifier>
         </dependency>
-
         <dependency>
             <groupId>org.forgerock.commons.ui</groupId>
             <artifactId>forgerock-ui-user</artifactId>
@@ -130,6 +128,13 @@
             <version>4.14.30</version>
             <classifier>min</classifier>
             <type>css</type>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>jquery-ui</artifactId>
+            <version>1.11.1</version>
+            <type>js</type>
+            <classifier>min</classifier>
         </dependency>
     </dependencies>
 
@@ -235,7 +240,7 @@
                         <configuration>
                             <outputDirectory>${project.build.directory}/classes/libs</outputDirectory>
                             <includeArtifactIds>
-                                bootstrap-clockpicker,bootstrap-datetimepicker,jquery-sortable,bootstrap-tabdrop,selectize-non-standalone,microplugin,sifter,jquery-nestingSortable,jsoneditor,qrcode
+                                bootstrap-clockpicker,bootstrap-datetimepicker,jquery-sortable,bootstrap-tabdrop,selectize-non-standalone,microplugin,sifter,jquery-nestingSortable,jsoneditor,qrcode,jquery-ui
                             </includeArtifactIds>
                         </configuration>
                     </execution>
