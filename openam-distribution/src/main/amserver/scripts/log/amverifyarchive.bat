@@ -26,7 +26,7 @@
 : $Id: amverifyarchive.bat,v 1.16 2009/07/06 22:01:16 hvijay Exp $
 :
 
-: Portions Copyrighted 2011-2014 ForgeRock AS.
+: Portions Copyrighted 2011-2015 ForgeRock AS.
 
 set TOOLS_HOME="@TOOLS_HOME@"
 
@@ -39,6 +39,7 @@ goto WHILE
 :WEND
 
 set CLASSPATH="@CONFIG_DIR@"
+set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/classes"
 set CLASSPATH="%CLASSPATH%;lib/forgerock-util-${commons.forgerock-util.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/opendj-server-${opendj.server.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/mail-${mail.version}.jar"
