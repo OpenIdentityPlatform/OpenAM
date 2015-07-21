@@ -37,7 +37,7 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
          * @example
          * CreateUpdateRealmDialog.show({
          *    allRealmPaths :  this.data.allRealmPaths,
-         *      realmPath : realm.path,
+         *      realmPath : realm.parentPath,
          *      callback : function(){
          *          self.render();
          *      }
@@ -74,12 +74,14 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
                     if (!options.allRealmPaths) {
                         options.allRealmPaths = [];
                         _.each(allRealmsData[0].result, function(realm){
-                            options.allRealmPaths.push(realm.path);
+                            if (realm.parentPath) {
+                                options.allRealmPaths.push(realm.parentPath);
+                            }
                         });
                     }
 
-                    data.schema.properties.path["enum"] = options.allRealmPaths;
-                    data.schema.properties.path.options = {enum_titles: options.allRealmPaths};
+                    data.schema.properties.parentPath["enum"] = options.allRealmPaths;
+                    data.schema.properties.parentPath.options = {enum_titles: options.allRealmPaths};
 
                 BootstrapDialog.show({
                     title: $.t("console.realms.createUpdateRealmDialog." + i18nTitleKey, { realmPath: realmName }),
@@ -97,7 +99,7 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
                             if (newRealm) {
                                 promise = SMSGlobalDelegate.realms.create(dialog.form.data());
                             } else {
-                                promise = SMSGlobalDelegate.realms.update(dialog.form.data().path, dialog.form.data());
+                                promise = SMSGlobalDelegate.realms.update(dialog.form.data());
                             }
 
                             promise.done(function() {

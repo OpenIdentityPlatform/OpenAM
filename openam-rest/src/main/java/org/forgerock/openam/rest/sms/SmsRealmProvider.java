@@ -69,7 +69,7 @@ public class SmsRealmProvider implements RequestHandler {
     private static final String ACTIVE_ATTRIBUTE_NAME = "active";
     private static final String ALIASES_ATTRIBUTE_NAME = "aliases";
     private static final String REALM_NAME_ATTRIBUTE_NAME = "name";
-    private static final String PATH_ATTRIBUTE_NAME = "path";
+    private static final String PATH_ATTRIBUTE_NAME = "parentPath";
     private static final String PARENT_I18N_KEY = "a109";
     private static final String ACTIVE_I18N_KEY = "a108";
     public static final String ROOT_SERVICE = "";
@@ -174,7 +174,7 @@ public class SmsRealmProvider implements RequestHandler {
     public void handleCreate(ServerContext serverContext, CreateRequest createRequest, ResultHandler<Resource> resultHandler) {
 
         final JsonValue jsonContent = createRequest.getContent();
-        String realmName = jsonContent.get(REALM_NAME_ATTRIBUTE_NAME).asString();
+        final String realmName = jsonContent.get(REALM_NAME_ATTRIBUTE_NAME).asString();
 
         try {
             if (StringUtils.isBlank(realmName)) {
@@ -185,40 +185,44 @@ public class SmsRealmProvider implements RequestHandler {
                 throw new BadRequestException("Realm names cannot contain '/'");
             }
 
-            realmName = "/" + realmName;
-
             RealmContext realmContext = serverContext.asContext(RealmContext.class);
-            String realmPath = realmContext.getResolvedRealm();
-            if (!realmPath.endsWith("/")) {
-                realmPath = realmPath + "/";
-            }
+            StringBuilder realmPath = new StringBuilder(realmContext.getResolvedRealm());
 
             String location = jsonContent.get(new JsonPointer(PATH_ATTRIBUTE_NAME)).asString();
 
-            if (!location.equals("/")) {
-                realmPath = realmPath + location;
+            if (realmPath.length() > 1) {
+                if (realmPath.charAt(realmPath.length() - 1) != '/' && !location.startsWith("/")) {
+                    realmPath.append('/');
+                }
+
+                realmPath.append(location);
+            } else {
+                realmPath = new StringBuilder(location);
             }
 
-            if (!realmPath.equalsIgnoreCase("/")) {
-                realmName = realmPath + realmName;
+            if (realmPath.charAt(realmPath.length() - 1) != '/') {
+                realmPath.append('/');
             }
 
-            String parentRealm = RealmUtils.getParentRealm(realmName);
-            String childRealm = RealmUtils.getChildRealm(realmName);
+            realmPath.append(realmName);
+            String path = realmPath.toString();
+
+            String parentRealm = RealmUtils.getParentRealm(path);
+            String childRealm = RealmUtils.getChildRealm(path);
 
             OrganizationConfigManager realmManager = new OrganizationConfigManager(getUserSsoToken(serverContext), parentRealm);
 
-            Map<String, Map<String, Set>> serviceAttributes = new HashMap();
+            Map<String, Map<String, Set>> serviceAttributes = new HashMap<>();
             serviceAttributes.put(IdConstants.REPO_SERVICE, getAttributeMap(jsonContent));
             realmManager.createSubOrganization(childRealm, serviceAttributes);
 
             if (debug.messageEnabled()) {
-                debug.message("RealmResource.createInstance :: CREATE of realm " +
-                        childRealm + " in realm " + parentRealm + " performed by {}", PrincipalRestUtils.getPrincipalNameFromServerContext(serverContext));
+                debug.message("RealmResource.createInstance :: CREATE of realm {} in realm {} performed by {}",
+                        childRealm, parentRealm, PrincipalRestUtils.getPrincipalNameFromServerContext(serverContext));
             }
 
-            JsonValue jsonValue = getJsonValue(realmPath);
-            resultHandler.handleResult(new Resource(childRealm, String.valueOf(jsonValue.hashCode()), jsonValue));
+            JsonValue jsonValue = getJsonValue(path, parentRealm);
+            resultHandler.handleResult(getResource(jsonValue));
         } catch (SMSException e) {
             handleError(resultHandler, e);
         } catch (SSOException sso) {
@@ -264,19 +268,19 @@ public class SmsRealmProvider implements RequestHandler {
 
         try {
             OrganizationConfigManager realmManager = new OrganizationConfigManager(getSSOToken(), realmPath);
+            final Resource resource = getResource(getJsonValue(realmPath));
             realmManager.deleteSubOrganization(null, false);
             String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(serverContext);
             debug.message("RealmResource.deleteInstance :: DELETE of realm " + realmPath + " performed by " + principalName);
-            resultHandler.handleResult(new Resource(realmPath, "0", json(
-                    object(field("success", "true")))));
+            resultHandler.handleResult(resource);
         } catch (SMSException smse) {
             try {
                 configureErrorMessage(smse);
             } catch (NotFoundException nf) {
-                debug.error("RealmResource.deleteInstance() : Cannot find " + realmPath + ":" + smse);
+                debug.warning("RealmResource.deleteInstance() : Cannot find {}", realmPath, smse);
                 resultHandler.handleError(nf);
             } catch (ForbiddenException | PermanentException | ConflictException | BadRequestException e) {
-                debug.error("RealmResource.deleteInstance() : Cannot DELETE " + realmPath + ":" + smse);
+                debug.warning("RealmResource.deleteInstance() : Cannot DELETE {}", realmPath, smse);
                 resultHandler.handleError(e);
             } catch (Exception e) {
                 resultHandler.handleError(new BadRequestException(e.getMessage(), e));
@@ -311,7 +315,7 @@ public class SmsRealmProvider implements RequestHandler {
             final OrganizationConfigManager ocm = new OrganizationConfigManager(getUserSsoToken(context), realmPath);
 
             //Return realm query is being performed on
-            handler.handleResource(new Resource(realmPath, "0", getJsonValue(realmPath)));
+            handler.handleResource(getResource(getJsonValue(realmPath)));
 
             for (final Object subRealmRelativePath : ocm.getSubOrganizationNames("*", true)) {
                 String realmName;
@@ -320,9 +324,9 @@ public class SmsRealmProvider implements RequestHandler {
                 } else {
                     realmName = realmPath + "/" + subRealmRelativePath;
                 }
-                handler.handleResource(new Resource(realmName, "0", getJsonValue(realmName)));
+                handler.handleResource(getResource(getJsonValue(realmName)));
             }
-            debug.message("RealmResource :: QUERY : performed by " + principalName);
+            debug.message("RealmResource :: QUERY : performed by {}", principalName);
             handler.handleResult(new QueryResult());
         } catch (SSOException ex) {
             debug.error("RealmResource :: QUERY by " + principalName + " failed : " + ex);
@@ -353,16 +357,15 @@ public class SmsRealmProvider implements RequestHandler {
                 debug.message("RealmResource.readInstance :: READ : Successfully read realm, " +
                         realmPath + " performed by " + PrincipalRestUtils.getPrincipalNameFromServerContext(context));
             }
-            resultHandler.handleResult(new Resource(realmPath, String.valueOf(System.currentTimeMillis()), jsonResponse));
+            resultHandler.handleResult(getResource(jsonResponse));
         } catch (SMSException smse) {
-            debug.error("RealmResource.readInstance() : Cannot READ " + realmPath, smse);
             try {
                 configureErrorMessage(smse);
             } catch (NotFoundException nf) {
-                debug.error("RealmResource.deleteInstance() : Cannot find " + realmPath + ":" + smse);
+                debug.warning("RealmResource.readInstance() : Cannot find {}", realmPath, smse);
                 resultHandler.handleError(nf);
             } catch (ForbiddenException | PermanentException | ConflictException | BadRequestException e) {
-                debug.error("RealmResource.deleteInstance() : Cannot DELETE " + realmPath + ":" + smse);
+                debug.warning("RealmResource.readInstance() : Cannot READ {}", realmPath, smse);
                 resultHandler.handleError(e);
             }
         } catch (Exception e) {
@@ -373,11 +376,35 @@ public class SmsRealmProvider implements RequestHandler {
     private JsonValue getJsonValue(String realmPath) throws SMSException {
         OrganizationConfigManager realmManager = new OrganizationConfigManager(getSSOToken(), realmPath);
         String realmName = getRealmName(realmManager);
+        int pathLastSlash = realmPath.lastIndexOf('/');
+        String parentPath = null;
+        if (!realmName.equals("/") && pathLastSlash == 0) {
+            parentPath = "/";
+        } else if (!realmName.equals("/")) {
+            parentPath = realmPath.substring(0, pathLastSlash);
+        }
+        return getJsonValue(realmManager, realmName, parentPath);
+    }
+
+    private JsonValue getJsonValue(String realmPath, String parentPath)
+            throws SMSException {
+        OrganizationConfigManager realmManager = new OrganizationConfigManager(getSSOToken(), realmPath);
+        String realmName = getRealmName(realmManager);
+        return getJsonValue(realmManager, realmName, parentPath);
+    }
+
+    private JsonValue getJsonValue(OrganizationConfigManager realmManager, String realmName, String parentPath)
+            throws SMSException {
         return json(object(
-                field(PATH_ATTRIBUTE_NAME, realmPath),
+                field(PATH_ATTRIBUTE_NAME, parentPath),
                 field(ACTIVE_ATTRIBUTE_NAME, isActive(realmManager)),
                 field(REALM_NAME_ATTRIBUTE_NAME, realmName),
                 field(ALIASES_ATTRIBUTE_NAME, getAliases(realmManager))));
+    }
+
+    private Resource getResource(JsonValue jsonValue) {
+        return new Resource(jsonValue.get(REALM_NAME_ATTRIBUTE_NAME).asString(),
+                String.valueOf(jsonValue.getObject().hashCode()), jsonValue);
     }
 
     private String getRealmName(OrganizationConfigManager realmManager) {
@@ -397,7 +424,7 @@ public class SmsRealmProvider implements RequestHandler {
     }
 
     private Set<String> getAliases(OrganizationConfigManager realmManager) throws SMSException {
-        Set<String> result = (Set) realmManager.getAttributes(ROOT_SERVICE).get("sunidentityrepositoryservice-sunOrganizationAliases");
+        Set<String> result = (Set<String>) realmManager.getAttributes(ROOT_SERVICE).get("sunidentityrepositoryservice-sunOrganizationAliases");
 
         return result == null ? (Set) Collections.emptySet() : result;
     }
@@ -422,12 +449,15 @@ public class SmsRealmProvider implements RequestHandler {
             OrganizationConfigManager realmManager = new OrganizationConfigManager(getSSOToken(), realmPath);
             realmManager.setAttributes(IdConstants.REPO_SERVICE, getAttributeMap(realmDetails));
 
-            assignServices(realmManager, realmDetails.get(SERVICE_NAMES).asList());
+            final List<Object> newServiceNames = realmDetails.get(SERVICE_NAMES).asList();
+            if (newServiceNames != null) {
+                assignServices(realmManager, newServiceNames);
+            }
 
             debug.message("RealmResource.updateInstance :: UPDATE of realm " + realmPath + " performed by " +
                     PrincipalRestUtils.getPrincipalNameFromServerContext(context));
 
-            handler.handleResult(new Resource(realmPath, String.valueOf(System.currentTimeMillis()), json(object(field("realmUpdated", realmManager.getOrganizationName())))));
+            handler.handleResult(getResource(getJsonValue(realmPath)));
         } catch (SMSException e) {
             debug.error("RealmResource.updateInstance() : Cannot UPDATE " + realmPath, e);
             handleError(handler, e);

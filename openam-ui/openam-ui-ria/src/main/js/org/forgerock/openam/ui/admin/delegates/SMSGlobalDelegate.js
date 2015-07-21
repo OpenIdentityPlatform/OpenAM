@@ -17,11 +17,12 @@
  /*global define*/
 define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
     "jquery",
+    "underscore",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function ($, AbstractDelegate, Constants, SMSDelegateUtils, RealmHelper) {
+], function ($, _, AbstractDelegate, Constants, SMSDelegateUtils, RealmHelper) {
     /**
      * @exports org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate
      */
@@ -47,7 +48,18 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
                         values: templateData[0]
                     };
                 });
+        },
+        getRealmPath = function(realm) {
+            if (realm.parentPath === "/") {
+                return realm.parentPath + realm.name;
+            } else if (realm.parentPath) {
+                return realm.parentPath + "/" + realm.name;
+            } else {
+                return realm.name;
+            }
         };
+
+
 
     obj.realms = {
         /**
@@ -58,7 +70,9 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
             return obj.serviceCall({
                 url: "realms?_queryFilter=true"
             }).done(function (data) {
-                data.result = data.result.sort(function (a, b) {
+                data.result = _.each(data.result, function(realm) {
+                    realm.path = getRealmPath(realm);
+                }).sort(function (a, b) {
                     if (a.active === b.active) {
                         // Within the active 'catagories' sort alphabetically
                         return a.path < b.path ? -1 : 1;
@@ -114,9 +128,9 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
          * @param  {Object} data Complete representation of realm
          * @returns {Promise} Service promise
          */
-        update: function (path, data) {
+        update: function (data) {
             return obj.serviceCall({
-                url: "realms" + path,
+                url: "realms" + getRealmPath(data),
                 type: "PUT",
                 data: JSON.stringify(data)
             });
