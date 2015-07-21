@@ -131,10 +131,11 @@ define("org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate", [
              * @returns {Promise} Service promise
              */
             schema: function(type) {
-                return obj.serviceCall({ url: "authentication/modules/" + type + "?_action=schema", type: "POST" })
-                    .done(function(data) {
-                        data = SMSDelegateUtils.sanitizeSchema(data);
-                    });
+                return obj.serviceCall({
+                    url: "authentication/modules/" + type + "?_action=schema", type: "POST"
+                }).done(function(data) {
+                    data = SMSDelegateUtils.sanitizeSchema(data);
+                });
             }
         }
     };

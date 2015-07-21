@@ -30,9 +30,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
     var EditModuleView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/modules/EditModuleViewTemplate.html",
         events: {
-            'click #revertChanges': 'revert',
-            'click #saveChanges': 'save',
-            'show.bs.tab ul.nav.nav-tabs a': 'renderTab'
+            "click #revert": "revert",
+            "click #save": "save",
+            "show.bs.tab ul.nav.nav-tabs a": "renderTab"
         },
         render: function (args, callback) {
             var self = this;
@@ -42,18 +42,19 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
             this.data.type = args[2];
 
             $.when(
-                SMSGlobalDelegate.authentication.modules.schema(args[2]),
-                SMSRealmDelegate.authentication.modules.get(this.data.realmPath, args[1], args[2])
+                SMSGlobalDelegate.authentication.modules.schema(this.data.type),
+                SMSRealmDelegate.authentication.modules.get(this.data.realmPath, this.data.name, this.data.type)
             ).done(function (schemaData, valuesData) {
-                self.data.schemaData = schemaData[0];
-                self.data.valuesData = valuesData[0];
-                self.parentRender(function () {
-                    self.$el.find('ul.nav a:first').tab('show');
-                    self.$el.find('.tab-menu .nav-tabs').tabdrop();
+                self.data.schema = schemaData[0];
+                self.data.values = valuesData[0];
 
-                    //TODO either add this to the server generated schema (preferred) or this get's moved into the JS sanitising functions for JSON Schemas
-                    self.data.schemaData.type = "object";
-                    self.data.form = new Form(self.$el.find("#moduleContent")[0], self.data.schemaData, self.data.valuesData);
+                self.parentRender(function () {
+                    if(!self.data.schema.grouped) {
+                        self.data.form = new Form(self.$el.find("#tabContent")[0], self.data.schema, self.data.values);
+                    }
+
+                    self.$el.find("ul.nav a:first").tab("show");
+                    self.$el.find(".tab-menu .nav-tabs").tabdrop();
 
                     if (callback) {
                         callback();
@@ -74,15 +75,12 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
             this.data.form.reset();
         },
         renderTab: function (event) {
-            var tabId = $(event.target).attr("href"),
-                element = $(tabId).get(0);
+            var id = $(event.target).attr("href").slice(1),
+                schema = this.data.schema.properties[id],
+                element = this.$el.find("#tabContent").empty().get(0);
 
-            this.$el.find(tabId).empty();
-            //TODO either add this to the server generated schema (preferred) or this get's moved into the JS sanitising functions for JSON Schemas
-            this.data.schemaData.type = "object";
-            this.data.form = new Form(element, this.data.schemaData, this.data.valuesData);
+            this.data.form = new Form(element, schema, this.data.values);
         }
-
     });
 
     return EditModuleView;

@@ -1,13 +1,16 @@
 {{> headers/_TitleWithSubAndIcon title=name type=type icon="link" }}
 
-<div class="panel panel-default">
-    <div id="moduleContent" class="panel-body"></div>
-    <div class="panel-footer clearfix">
-        <div class="col-sm-offset-4 col-sm-8">
-            <div class="btn-action-group">
-                <button id="revert" class="btn btn-default" type="button">{{t "common.form.revert"}}</button>
-                <button id="saveChanges" class="btn btn-primary" type="button">{{t "common.form.save"}}</button>
-            </div>
-        </div>
-    </div>    
+{{#if schema.grouped}}
+    <div class="tab-menu">
+        <ul class="nav nav-tabs" role="tablist">
+            {{#each schema.orderedProperties}}
+                <li><a href="#{{this._id}}" role="tab" data-toggle="tab" aria-expanded="false">{{this.title}}</a></li>
+            {{/each}}
+        </ul>
+    </div>
+{{/if}}
+
+<div class="nav-tab-content clearfix">
+    <div id="tabContent"></div>
+    {{> form/_JSONSchemaFooter }}
 </div>

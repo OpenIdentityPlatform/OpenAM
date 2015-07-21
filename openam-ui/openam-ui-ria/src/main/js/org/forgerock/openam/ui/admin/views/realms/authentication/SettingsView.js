@@ -16,7 +16,7 @@
 
 /*global define*/
 define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView", [
-    'jquery',
+    "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
@@ -27,9 +27,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
     var SettingsView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/SettingsTemplate.html",
         events: {
-            'click #revert': 'revert',
-            'click #saveChanges': 'save',
-            'show.bs.tab ul.nav.nav-tabs a': 'renderTab'
+            "click #revert": "revert",
+            "click #save": "save",
+            "show.bs.tab ul.nav.nav-tabs a": "renderTab"
         },
 
         render: function (args, callback) {
@@ -42,9 +42,9 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
 
                 self.parentRender(function () {
                     self.$el.find("div.tab-pane").show(); // FIXME: To remove
-                    self.$el.find('ul.nav a:first').tab('show');
+                    self.$el.find("ul.nav a:first").tab("show");
 
-                    self.$el.find('.tab-menu .nav-tabs').tabdrop();
+                    self.$el.find(".tab-menu .nav-tabs").tabdrop();
 
                     if (callback) {
                         callback();
@@ -55,7 +55,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
         renderTab: function (event) {
             this.$el.find("#tabpanel").empty();
 
-            var id = $(event.target).attr('href').slice(1),
+            var id = $(event.target).attr("href").slice(1),
                 schema = this.data.formData.schema.properties[id],
                 element = this.$el.find("#tabpanel").get(0);
 

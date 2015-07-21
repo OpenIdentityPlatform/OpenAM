@@ -106,7 +106,6 @@ define("org/forgerock/openam/ui/common/util/RealmHelper", [
         } else if (Configuration.globalData.auth.subRealm) {
             subRealm = Configuration.globalData.auth.subRealm;
         } else {
-            console.warn("Unable to determine realm outside of sub realm aware view (login)");
             subRealm = "";
         }
 

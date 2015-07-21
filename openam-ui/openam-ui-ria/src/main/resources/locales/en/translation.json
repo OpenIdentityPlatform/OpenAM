@@ -248,6 +248,7 @@
             "false" : "False",
             "update" : "Update",
             "save" : "Save",
+            "saveChanges": "Save Changes",
             "create" : "Create",
             "cancel" : "Cancel",
             "reset" : "Reset",
@@ -559,10 +560,7 @@
         },
         "authentication": {
             "settings": {
-                "title": "Authentication Settings",
-                "description": "",
-                "revert": "Revert",
-                "saveChanges": "Save Changes"
+                "title": "Authentication Settings"
             },
             "modules": {
                 "title" : "Authentication Modules",

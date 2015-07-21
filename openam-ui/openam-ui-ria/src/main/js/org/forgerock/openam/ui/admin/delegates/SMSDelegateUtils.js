@@ -24,16 +24,33 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils", [
      */
     var obj = {};
 
+    /**
+     * Sanitizes JSON Schemas.
+     * @param  {Object} schema Schema to sanitize
+     * @return {Object}        Sanitized schema
+     */
     obj.sanitizeSchema = function (schema) {
+        /**
+         * Missing and superfluous attribute checks
+         */
+        schema = obj.rootTypePresent(schema);
+        schema = obj.defaultPropertyPresent(schema);
+
+        /**
+         * Transforms
+         */
         // Recursively transforms propertyOrder attribute to int
         _.forEach(schema.properties, obj.propertyOrderTransform);
-
         // Recursively add checkbox format to boolean FIXME: To fix server side? Visual only?
         _.forEach(schema.properties, obj.addCheckboxFormatToBoolean);
-
         // Recursively add string type to enum FIXME: To fix server side
         _.forEach(schema.properties, obj.addStringTypeToEnum);
 
+        /**
+         * Additional attributes
+         */
+        // Adds attribute indicating if all the schema properties are of the type "object" (hence grouped)
+        schema.grouped = _.every(schema.properties, obj.isObjectType);
         // Create ordered array
         schema.orderedProperties = _.sortBy(_.map(schema.properties, function (value, key) {
             value._id = key;
@@ -42,6 +59,8 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils", [
 
         return schema;
     };
+
+    // Not intented for use outside of this module
 
     obj.addCheckboxFormatToBoolean = function (property) {
         if (property.hasOwnProperty("type") && property.type === "boolean") {
@@ -63,6 +82,24 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils", [
         }
     };
 
+    /**
+     * Checks for the existance of a "defaults" property
+     * @param  {[type]} schema [description]
+     * @return {[type]}        [description]
+     */
+    obj.defaultPropertyPresent = function (schema) {
+        if(schema.properties.defaults) {
+            console.warn("JSON schema detected with a \"defaults\" section present in it's properties. Removing.");
+            delete schema.properties.defaults;
+        }
+
+        return schema;
+    };
+
+    obj.isObjectType = function(schema) {
+        return schema.type === "object";
+    };
+
     obj.propertyOrderTransform = function (property) {
         if (property.hasOwnProperty("propertyOrder")) {
             property.propertyOrder = parseInt(property.propertyOrder.slice(1), 10);
@@ -71,6 +108,21 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils", [
         if (property.type === "object") {
             _.forEach(property.properties, obj.propertyOrderTransform);
         }
+    };
+
+    /**
+     * Checks for the existance of an object type at the root of the schema. Defaults to "object" if attribute is not
+     * found.
+     * @param  {Object} schema Schema to check
+     * @return {Object}        Checked schema
+     */
+    obj.rootTypePresent = function(schema) {
+        if(!schema.type) {
+            console.warn("JSON schema detected without root type attribute! Defaulting to \"object\" type.");
+            schema.type = "object";
+        }
+
+        return schema;
     };
 
     obj.sortResultBy = function (attribute) {

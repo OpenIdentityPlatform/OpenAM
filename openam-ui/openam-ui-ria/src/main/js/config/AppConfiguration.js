@@ -117,6 +117,7 @@ define("config/AppConfiguration", [
                             "templates/user/ConfirmPasswordDialogTemplate.html"
                         ],
                         partialUrls: [
+                            "partials/form/_JSONSchemaFooter.html",
                             "partials/headers/_Title.html",
                             "partials/headers/_TitleWithSubAndIcon.html"
                         ]
