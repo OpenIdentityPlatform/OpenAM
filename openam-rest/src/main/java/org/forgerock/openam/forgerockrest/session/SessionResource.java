@@ -445,13 +445,13 @@ public class SessionResource implements CollectionResourceProvider {
          * class will take set cookies and translate them into the AdviceContext associated with the current CREST
          * ServerContext.
          */
-        private final class CookieCollectingHttpServletResponse extends HttpServletResponseWrapper {
+        private final class HeaderCollectingHttpServletResponse extends HttpServletResponseWrapper {
 
             private static final String SET_COOKIE_HEADER = "Set-Cookie";
 
             private final AdviceContext adviceContext;
 
-            private CookieCollectingHttpServletResponse(HttpServletResponse response, AdviceContext adviceContext) {
+            private HeaderCollectingHttpServletResponse(HttpServletResponse response, AdviceContext adviceContext) {
                 super(response);
                 this.adviceContext = adviceContext;
             }
@@ -465,16 +465,12 @@ public class SessionResource implements CollectionResourceProvider {
 
             @Override
             public void setHeader(String name, String value) {
-                if (SET_COOKIE_HEADER.equals(name)) {
-                    adviceContext.putAdvice(name, value);
-                }
+                adviceContext.putAdvice(name, value);
             }
 
             @Override
             public void addHeader(String name, String value) {
-                if (SET_COOKIE_HEADER.equals(name)) {
-                    adviceContext.putAdvice(name, value);
-                }
+                adviceContext.putAdvice(name, value);
             }
         }
 
@@ -524,7 +520,7 @@ public class SessionResource implements CollectionResourceProvider {
                     LOGGER.warning("No AdviceContext in ServerContext, and thus no headers can be set in the HttpServletResponse.");
                 }
             } else {
-                httpServletResponse = new CookieCollectingHttpServletResponse(new UnsupportedResponse(), adviceContext);
+                httpServletResponse = new HeaderCollectingHttpServletResponse(new UnsupportedResponse(), adviceContext);
             }
             if (ssoToken != null) {
                 try {
