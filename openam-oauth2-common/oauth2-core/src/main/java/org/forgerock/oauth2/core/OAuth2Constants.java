@@ -991,8 +991,12 @@ public class OAuth2Constants {
         CLIENT_DESCRIPTION("client_description"),
         REALM("realm"),
         PUBLIC_KEY_SELECTOR("public_key_selector"),
-        X509("x509");
+        X509("x509"),
 
+        AUTHORIZATION_CODE_LIFE_TIME("authorization_code_lifetime"),
+        ACCESS_TOKEN_LIFE_TIME("access_token_lifetime"),
+        REFRESH_TOKEN_LIFE_TIME("refresh_token_lifetime"),
+        JWT_TOKEN_LIFE_TIME("jwt_token_lifetime");
         private String name;
 
         ShortClientAttributeNames(String name) {

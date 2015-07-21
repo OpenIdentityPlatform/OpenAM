@@ -338,6 +338,10 @@ public class Client extends JsonValue {
      * @param x509                           The client's public key x509.
      * @param selector                       Selector for the public key format.
      * @param sectorIdUri                    Client's sector ID Uri.
+     * @param authorizationCodeLifeTime      The client's authorization code lifetime.
+     * @param accessTokenLifeTime            The client's access token lifetime.
+     * @param refreshTokenLifeTime           The client's refresh token lifetime.
+     * @param jwtTokenLifeTime               The client's JWT token lifetime.
      */
     public Client(String clientID, String clientType, List<String> redirectionURIs, List<String> allowedGrantScopes,
                   List<String> defaultGrantScopes, List<String> displayName, List<String> displayDescription,
@@ -345,7 +349,8 @@ public class Client extends JsonValue {
                   List<String> postLogoutRedirectionURIs, String accessToken, String clientSessionURI, String applicationType,
                   String clientSecret, List<String> responseTypes, List<String> contacts, Long defaultMaxAge,
                   Boolean defaultMaxAgeEnabled, String tokenEndpointAuthMethod, String jwks,
-                  String jwksUri, String x509, String selector, String sectorIdUri) {
+                  String jwksUri, String x509, String selector, String sectorIdUri, Long authorizationCodeLifeTime,
+                  Long accessTokenLifeTime, Long refreshTokenLifeTime, Long jwtTokenLifeTime) {
         super(new HashMap<String, Object>());
         setAccessToken(accessToken);
         setAllowedGrantScopes(allowedGrantScopes);
@@ -372,6 +377,10 @@ public class Client extends JsonValue {
         setX509(x509);
         setKeySelector(selector);
         setSectorIdUri(sectorIdUri);
+        setAuthorizationCodeLifeTime(authorizationCodeLifeTime);
+        setAccessTokenLifeTime(accessTokenLifeTime);
+        setRefreshTokenLifeTime(refreshTokenLifeTime);
+        setJwtTokenLifeTime(jwtTokenLifeTime);
     }
 
     /**
@@ -942,6 +951,95 @@ public class Client extends JsonValue {
     public void setContacts(List<String> contacts) {
         if (contacts != null && !contacts.isEmpty()) {
             put(OAuth2Constants.ShortClientAttributeNames.CONTACTS.getType(), contacts);
+        }
+    }
+
+    /**
+     * Gets the authorization code lifetime of the OAuth2Client.
+     * 
+     * @return the authorization code lifetime.
+     */
+    public Long getAuthorizationCodeLifeTime() {
+        return get(OAuth2Constants.ShortClientAttributeNames.AUTHORIZATION_CODE_LIFE_TIME.getType()).asLong();
+    }
+
+    /**
+     * Sets the authorization code lifetime of the OAuth2Client.
+     * 
+     * @param authorizationCodeLifeTime The authorization code lifetime.
+     */
+    public void setAuthorizationCodeLifeTime(Long authorizationCodeLifeTime) {
+        if (authorizationCodeLifeTime != null) {
+            put(OAuth2Constants.ShortClientAttributeNames.AUTHORIZATION_CODE_LIFE_TIME.getType(),
+                    authorizationCodeLifeTime);
+        } else {
+            put(OAuth2Constants.ShortClientAttributeNames.AUTHORIZATION_CODE_LIFE_TIME.getType(), 0);
+        }
+    }
+
+    /**
+     * Gets the access token lifetime of the OAuth2Client.
+     * 
+     * @return the access token lifetime.
+     */
+    public Long getAccessTokenLifeTime() {
+        return get(OAuth2Constants.ShortClientAttributeNames.ACCESS_TOKEN_LIFE_TIME.getType()).asLong();
+    }
+
+    /**
+     * Sets the access token lifetime of the OAuth2Client.
+     * 
+     * @param accessTokenLifeTime The access token lifetime.
+     */
+    public void setAccessTokenLifeTime(Long accessTokenLifeTime) {
+        if (accessTokenLifeTime != null) {
+            put(OAuth2Constants.ShortClientAttributeNames.ACCESS_TOKEN_LIFE_TIME.getType(), accessTokenLifeTime);
+        } else {
+            put(OAuth2Constants.ShortClientAttributeNames.ACCESS_TOKEN_LIFE_TIME.getType(), 0);
+        }
+    }
+
+    /**
+     * Gets the refresh token lifetime of the OAuth2Client.
+     * 
+     * @return the refresh token lifetime.
+     */
+    public Long getRefreshTokenLifeTime() {
+        return get(OAuth2Constants.ShortClientAttributeNames.REFRESH_TOKEN_LIFE_TIME.getType()).asLong();
+    }
+
+    /**
+     * Sets the refresh token lifetime of the OAuth2Client.
+     * 
+     * @param refreshTokenLifeTime The refresh token lifetime.
+     */
+    public void setRefreshTokenLifeTime(Long refreshTokenLifeTime) {
+        if (refreshTokenLifeTime != null) {
+            put(OAuth2Constants.ShortClientAttributeNames.REFRESH_TOKEN_LIFE_TIME.getType(), refreshTokenLifeTime);
+        } else {
+            put(OAuth2Constants.ShortClientAttributeNames.REFRESH_TOKEN_LIFE_TIME.getType(), 0);
+        }
+    }
+
+    /**
+     * Gets the JWT token lifetime of the OAuth2Client.
+     * 
+     * @return the JWT token lifetime.
+     */
+    public Long getJwtTokenLifeTime() {
+        return get(OAuth2Constants.ShortClientAttributeNames.JWT_TOKEN_LIFE_TIME.getType()).asLong();
+    }
+
+    /**
+     * Sets the JWT token lifetime of the OAuth2Client.
+     * 
+     * @param jwtTokenLifeTime The JWT token lifetime.
+     */
+    public void setJwtTokenLifeTime(Long jwtTokenLifeTime) {
+        if (jwtTokenLifeTime != null) {
+            put(OAuth2Constants.ShortClientAttributeNames.JWT_TOKEN_LIFE_TIME.getType(), jwtTokenLifeTime);
+        } else {
+            put(OAuth2Constants.ShortClientAttributeNames.JWT_TOKEN_LIFE_TIME.getType(), 0);
         }
     }
 }

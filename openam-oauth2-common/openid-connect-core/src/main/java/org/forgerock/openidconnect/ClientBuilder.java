@@ -51,6 +51,10 @@ public class ClientBuilder {
     private String x509;
     private String selector;
     private String sectorIdentifierUri;
+    private Long authorizationCodeLifeTime;
+    private Long accessTokenLifeTime;
+    private Long refreshTokenLifeTime;
+    private Long jwtTokenLifeTime;
 
     /**
      * Sets the client id of the OAuth2Client.
@@ -296,10 +300,50 @@ public class ClientBuilder {
     /**
      * Sets the sector identifier uri.
      *
-     * @return selector identifier uri to be used when pairwise.
+     * @param sectorIdentifierUri identifier uri to be used when pairwise.
      */
     public ClientBuilder setSectorIdentifierUri(String sectorIdentifierUri) {
         this.sectorIdentifierUri = sectorIdentifierUri;
+        return this;
+    }
+
+    /**
+     * Sets the authorization code lifetime.
+     *
+     * @param authorizationCodeLifeTime Authorization code lifetime.
+     */
+    public ClientBuilder setAuthorizationCodeLifeTime(Long authorizationCodeLifeTime) {
+        this.authorizationCodeLifeTime = authorizationCodeLifeTime;
+        return this;
+    }
+
+    /**
+     * Sets the Access token lifetime.
+     *
+     * @param accessTokenLifeTime Access token lifetime.
+     */
+    public ClientBuilder setAccessTokenLifeTime(Long accessTokenLifeTime) {
+        this.accessTokenLifeTime = accessTokenLifeTime;
+        return this;
+    }
+
+    /**
+     * Sets the Refresh token lifetime.
+     *
+     * @param refreshTokenLifeTime Refresh token lifetime.
+     */
+    public ClientBuilder setRefreshTokenLifeTime(Long refreshTokenLifeTime) {
+        this.refreshTokenLifeTime = refreshTokenLifeTime;
+        return this;
+    }
+
+    /**
+     * Sets the JWT token lifetime.
+     *
+     * @param jwtTokenLifeTime JWT token lifetime.
+     */
+    public ClientBuilder setJwtTokenLifeTime(Long jwtTokenLifeTime) {
+        this.jwtTokenLifeTime = jwtTokenLifeTime;
         return this;
     }
 
@@ -312,7 +356,8 @@ public class ClientBuilder {
         return new Client(clientID, clientType, redirectionURIs, allowedGrantScopes, defaultGrantScopes, displayName,
                 displayDescription, clientName, subjectType, idTokenSignedResponseAlgorithm, postLogoutRedirectionURIs,
                 accessToken, clientSessionURI, applicationType, clientSecret, responseTypes, contacts, defaultMaxAge,
-                defaultMaxAgeEnabled, tokenEndpointAuthMethod, jwks, jwksUri, x509, selector, sectorIdentifierUri);
+                defaultMaxAgeEnabled, tokenEndpointAuthMethod, jwks, jwksUri, x509, selector, sectorIdentifierUri,
+                authorizationCodeLifeTime, accessTokenLifeTime, refreshTokenLifeTime, jwtTokenLifeTime);
     }
 
 }

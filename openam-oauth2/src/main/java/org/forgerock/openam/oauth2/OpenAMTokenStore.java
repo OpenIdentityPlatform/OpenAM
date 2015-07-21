@@ -129,9 +129,14 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final String code = UUID.randomUUID().toString();
 
-        final long expiryTime = clientRegistration.getAuthorizationCodeLifeTime(providerSettings) + System.currentTimeMillis();
+        long expiryTime = 0;
+        if (clientRegistration == null) {
+            expiryTime = providerSettings.getAuthorizationCodeLifetime() + System.currentTimeMillis();
+        } else {
+            expiryTime = clientRegistration.getAuthorizationCodeLifeTime(providerSettings) + System.currentTimeMillis();
+        }
+        
         final String ssoTokenId = getSsoTokenId(request);
-
 
         final OpenAMAuthorizationCode authorizationCode = new OpenAMAuthorizationCode(code, resourceOwner.getId(), clientId,
                 redirectUri, scope, getClaimsFromRequest(request), expiryTime, nonce, realmNormaliser.normalise(request.<String>getParameter(REALM)),
@@ -165,8 +170,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         try {
             clientRegistration = clientRegistrationStore.get(clientId, request);
         } catch (InvalidClientException e) {
-            logger.error(e.getMessage(), e);
-            throw new ServerException(e.getMessage());
+            // If the client is not registered, then returns null.
         }
         return clientRegistration;
     }
@@ -445,7 +449,13 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final String id = UUID.randomUUID().toString();
-        final long expiryTime = clientRegistration.getAccessTokenLifeTime(providerSettings) + System.currentTimeMillis();
+        long expiryTime = 0;
+        if (clientRegistration == null) {
+            expiryTime = providerSettings.getAccessTokenLifetime() + System.currentTimeMillis();
+        } else {
+            expiryTime = clientRegistration.getAccessTokenLifeTime(providerSettings) + System.currentTimeMillis();
+        }
+        
         final AccessToken accessToken;
         if (refreshToken == null) {
             accessToken = new OpenAMAccessToken(id, authorizationCode, resourceOwnerId, clientId, redirectUri,
@@ -490,7 +500,12 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
 
         final String id = UUID.randomUUID().toString();
-        final long expiryTime = clientRegistration.getRefreshTokenLifeTime(providerSettings) + System.currentTimeMillis();
+        long expiryTime = 0;
+        if (clientRegistration == null) {
+            expiryTime = providerSettings.getRefreshTokenLifetime() + System.currentTimeMillis();
+        } else {
+            expiryTime = clientRegistration.getRefreshTokenLifeTime(providerSettings) + System.currentTimeMillis();
+        }
         AuthorizationCode token = request.getToken(AuthorizationCode.class);
         String authModules = null;
         String acr = null;
