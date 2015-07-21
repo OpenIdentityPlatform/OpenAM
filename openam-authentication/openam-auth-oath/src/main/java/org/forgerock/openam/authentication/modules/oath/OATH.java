@@ -66,7 +66,8 @@ import org.forgerock.openam.utils.qr.GenerationUtils;
  * generation and authentication; HMAC-based One Time Password (HOTP) and
  * Time-based One Time Password (TOTP).
  */
-public class OATH extends AMLoginModule {
+public class
+        OATH extends AMLoginModule {
 
     //debug log name
     protected Debug debug = null;
@@ -600,8 +601,8 @@ public class OATH extends AMLoginModule {
                     otpGen = HOTPAlgorithm.generateOTP(secretKeyBytes, counter + i, passLen, checksum,
                             truncationOffset);
                     if (otpGen.equals(otp)) {
-                        //OTP is correct set the counter value to counter+i
-                        setCounterAttr(id, counter + i, settings);
+                        //OTP is correct set the counter value to counter+i (+1 for having been successful)
+                        setCounterAttr(id, counter + i + 1, settings);
                         return true;
                     }
                 }
