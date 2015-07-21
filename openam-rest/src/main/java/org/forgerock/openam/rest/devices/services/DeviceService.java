@@ -16,6 +16,8 @@
 package org.forgerock.openam.rest.devices.services;
 
 
+import org.forgerock.openam.rest.devices.DeviceSerialisation;
+
 /**
  * Provides all necessary configuration information at a realm-wide level to 2FA authentication modules underneath it.
  */
@@ -28,4 +30,10 @@ public interface DeviceService {
      */
     String getConfigStorageAttributeName();
 
+    /**
+     * Returns the strategy used for storing devices as profile attributes.
+     *
+     * @return the device profile storage strategy.
+     */
+    DeviceSerialisation getDeviceSerialisationStrategy();
 }

@@ -15,6 +15,9 @@
 */
 package org.forgerock.openam.rest.devices.services;
 
+import org.forgerock.openam.rest.devices.DeviceSerialisation;
+import org.forgerock.openam.rest.devices.JsonDeviceSerialisation;
+
 /**
  * Implementation of the Trusted Device (Device Print) Service. Provides all necessary configuration information
  * at a realm-wide level to Trusted Device (Device Print) authentication modules underneath it.
@@ -29,4 +32,8 @@ public class TrustedDeviceService implements DeviceService {
         return "devicePrintProfiles";
     }
 
+    @Override
+    public DeviceSerialisation getDeviceSerialisationStrategy() {
+        return new JsonDeviceSerialisation();
+    }
 }

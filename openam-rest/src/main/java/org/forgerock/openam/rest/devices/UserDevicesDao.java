@@ -16,8 +16,6 @@
 
 package org.forgerock.openam.rest.devices;
 
-import static org.forgerock.openam.utils.JsonValueBuilder.*;
-
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.idm.AMIdentity;
@@ -27,6 +25,11 @@ import com.sun.identity.idm.IdSearchControl;
 import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.sm.SMSException;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.openam.rest.devices.services.DeviceService;
+import org.forgerock.openam.rest.devices.services.DeviceServiceFactory;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,9 +37,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.openam.rest.devices.services.DeviceServiceFactory;
 
 /**
  * DAO for handling the retrieval and saving of a user's devices.
@@ -68,12 +68,14 @@ public class UserDevicesDao {
 
         final AMIdentity identity = getIdentity(username, realm);
         try {
-            final String attrName = serviceFactory.create(realm).getConfigStorageAttributeName();
+            final DeviceService deviceService = serviceFactory.create(realm);
+            final String attrName = deviceService.getConfigStorageAttributeName();
+            final DeviceSerialisation deviceSerialisation = deviceService.getDeviceSerialisationStrategy();
 
             Set<String> set = (Set<String>) identity.getAttribute(attrName);
 
             for (String profile : set) {
-                devices.add(toJsonValue(profile));
+                devices.add(deviceSerialisation.stringToDeviceProfile(profile));
             }
 
             return devices;
@@ -97,13 +99,17 @@ public class UserDevicesDao {
 
         final AMIdentity identity = getIdentity(username, realm);
 
+
         Set<String> vals = new HashSet<>();
 
-        for (JsonValue profile : profiles) {
-            vals.add(profile.toString());
-        }
         try {
-            final String attrName = serviceFactory.create(realm).getConfigStorageAttributeName();
+            final DeviceService deviceService = serviceFactory.create(realm);
+            final DeviceSerialisation deviceSerialisation = deviceService.getDeviceSerialisationStrategy();
+            final String attrName = deviceService.getConfigStorageAttributeName();
+
+            for (JsonValue profile : profiles) {
+                vals.add(deviceSerialisation.deviceProfileToString(profile));
+            }
 
             Map<String, Set> attrMap = new HashMap<>();
             attrMap.put(attrName, vals);

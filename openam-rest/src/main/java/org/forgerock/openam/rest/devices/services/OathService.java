@@ -22,7 +22,25 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import org.forgerock.json.jose.jwe.EncryptionMethod;
+import org.forgerock.json.jose.jwe.JweAlgorithm;
+import org.forgerock.openam.rest.devices.DeviceSerialisation;
+import org.forgerock.openam.rest.devices.EncryptedJwtDeviceSerialisation;
+import org.forgerock.openam.rest.devices.JsonDeviceSerialisation;
+import org.forgerock.openam.shared.security.crypto.KeyStoreBuilder;
+import org.forgerock.openam.shared.security.crypto.KeyStoreType;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.security.AccessController;
+import java.security.KeyPair;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,6 +56,15 @@ public class OathService implements DeviceService {
     final static private Debug debug = Debug.getInstance("amAuthOATH");
 
     public static final String OATH_ATTRIBUTE_NAME = "iplanet-am-auth-oath-attr-name";
+    private static final String OATH_ENCRYPTION_SCHEME = "openam-auth-oath-device-settings-encryption-scheme";
+    private static final String OATH_KEYSTORE_FILE = "openam-auth-oath-device-settings-encryption-keystore";
+    private static final String OATH_KEYSTORE_TYPE = "openam-auth-oath-device-settings-encryption-keystore-type";
+    private static final String OATH_KEYSTORE_PASSWORD =
+            "openam-auth-oath-device-settings-encryption-keystore-password";
+    private static final String OATH_KEYSTORE_KEYPAIR_ALIAS =
+            "openam-auth-oath-device-settings-encryption-keypair-alias";
+    private static final String OATH_KEYSTORE_PRIVATEKEY_PASSWORD =
+            "openam-auth-oath-device-settings-encryption-privatekey-password";
 
     private Map<String, Set<String>> options;
 
@@ -53,7 +80,6 @@ public class OathService implements DeviceService {
             }
             throw e;
         }
-
     }
 
     /**
@@ -62,5 +88,57 @@ public class OathService implements DeviceService {
     @Override
     public String getConfigStorageAttributeName() {
         return CollectionHelper.getMapAttr(options, OATH_ATTRIBUTE_NAME);
+    }
+
+    @Override
+    public DeviceSerialisation getDeviceSerialisationStrategy() {
+        final SupportedOathEncryptionScheme encryptionScheme =
+                SupportedOathEncryptionScheme.valueOf(CollectionHelper.getMapAttr(options, OATH_ENCRYPTION_SCHEME,
+                SupportedOathEncryptionScheme.NONE.toString()));
+
+        if (encryptionScheme == null) {
+            return new JsonDeviceSerialisation();
+        } else {
+            return new EncryptedJwtDeviceSerialisation(encryptionScheme.encryptionMethod,
+                    encryptionScheme.jweAlgorithm, getEncryptionKeyPair());
+        }
+    }
+
+    private KeyPair getEncryptionKeyPair() {
+        try {
+            final KeyStore keyStore = new KeyStoreBuilder()
+                    .withKeyStoreFile(new File(CollectionHelper.getMapAttr(options, OATH_KEYSTORE_FILE)))
+                    .withPassword(CollectionHelper.getMapAttr(options, OATH_KEYSTORE_PASSWORD))
+                    .withKeyStoreType(KeyStoreType.valueOf(CollectionHelper.getMapAttr(options, OATH_KEYSTORE_TYPE)))
+                    .build();
+
+            final Certificate cert = keyStore.getCertificate(
+                    CollectionHelper.getMapAttr(options, OATH_KEYSTORE_KEYPAIR_ALIAS));
+            final PublicKey publicKey = cert.getPublicKey();
+            final PrivateKey privateKey = (PrivateKey) keyStore.getKey(
+                    CollectionHelper.getMapAttr(options, OATH_KEYSTORE_KEYPAIR_ALIAS),
+                    CollectionHelper.getMapAttr(options, OATH_KEYSTORE_PRIVATEKEY_PASSWORD).toCharArray());
+
+            return new KeyPair(publicKey, privateKey);
+        } catch (FileNotFoundException e) {
+            throw new IllegalArgumentException("Invalid keystore location specified", e);
+        } catch (KeyStoreException | UnrecoverableKeyException | NoSuchAlgorithmException e) {
+            debug.error("OathService.getEncryptionKeyPair(): Unable to load encryption key pair", e);
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private enum SupportedOathEncryptionScheme {
+        NONE(null, null),
+        RSAES_AES256CBC_HS512(EncryptionMethod.A256CBC_HS512, JweAlgorithm.RSAES_PKCS1_V1_5),
+        RSAES_AES128CBC_HS256(EncryptionMethod.A128CBC_HS256, JweAlgorithm.RSAES_PKCS1_V1_5);
+
+        private final EncryptionMethod encryptionMethod;
+        private final JweAlgorithm jweAlgorithm;
+
+        SupportedOathEncryptionScheme(final EncryptionMethod encryptionMethod, final JweAlgorithm jweAlgorithm) {
+            this.encryptionMethod = encryptionMethod;
+            this.jweAlgorithm = jweAlgorithm;
+        }
     }
 }
