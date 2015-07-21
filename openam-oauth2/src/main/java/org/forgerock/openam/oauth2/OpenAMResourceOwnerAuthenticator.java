@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.oauth2;
@@ -49,7 +49,7 @@ import java.util.ArrayList;
 @Singleton
 public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthenticator {
 
-    private final Debug logger = Debug.getInstance("OAuth2Provider");
+    private final Debug logger = Debug.getInstance("amOpenAMResourceOwnerAuthenticator");
     private final RealmNormaliser realmNormaliser;
 
     /**
@@ -71,7 +71,7 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
             SSOTokenManager mgr = SSOTokenManager.getInstance();
             token = mgr.createSSOToken(ServletUtils.getRequest(request.<Request>getRequest()));
         } catch (Exception e){
-            logger.warning("ResourceOwnerAuthenticatorImpl:: No SSO Token in request", e);
+            logger.warning("No SSO Token in request", e);
         }
         if (token == null) {
 
@@ -88,7 +88,7 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
                         token.getProperty(Constants.UNIVERSAL_IDENTIFIER));
                 return new OpenAMResourceOwner(token.getProperty("UserToken"), id);
             } catch (Exception e) {
-                logger.error("ResourceOwnerAuthenticatorImpl:: Unable to create ResourceOwner", e);
+                logger.error("Unable to create ResourceOwner", e);
             }
         }
         return null;
@@ -118,8 +118,7 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
                 }
                 // there's missing requirements not filled by this
                 if (missing.size() > 0) {
-                    throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
-                            "Missing requirements");
+                    throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Missing requirements");
                 }
                 lc.submitRequirements(callbacks);
             }
@@ -130,23 +129,22 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
                     // package up the token for transport..
                     ret = createResourceOwner(lc);
                 } catch (Exception e) {
-                    logger.error( "ResourceOwnerAuthenticatorImpl::authContext: "
-                            + "Unable to get SSOToken", e);
+                    logger.error("Unable to get SSOToken", e);
                     // we're going to throw a generic error
                     // because the system is likely down..
                     throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
                 }
             }
         } catch (AuthLoginException le) {
-            logger.error("ResourceOwnerAuthenticatorImpl::authContext AuthException", le);
+            logger.error("AuthException", le);
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, le);
         } finally {
             if (lc != null && AuthContext.Status.SUCCESS.equals(lc.getStatus())) {
                 try {
                     lc.logout();
-                    logger.message("Logged user out in ResourceOwnerAuthenticatorImpl.authenticate.");
+                    logger.message("Logged user out.");
                 } catch (AuthLoginException e) {
-                    logger.error("Exception caught logging out of AuthContext after successful login: " + e, e);
+                    logger.error("Exception caught logging out of AuthContext after successful login", e);
                 }
             }
         }
