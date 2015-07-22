@@ -40,7 +40,6 @@ require.config({
         "handlebars"  : "libs/handlebars-3.0.3-min",
         "i18next"     : "libs/i18next-1.7.3-min",
         "jquery"      : "libs/jquery-2.1.1-min",
-        "jqueryui"    : "libs/jquery-ui-1.11.1-min", // TODO this is used only for date picker, remove it and use something more lightweight
         "js2form"     : "libs/js2form-2.0",
         "jsonEditor"  : "libs/jsoneditor-custom.min",
         "moment"      : "libs/moment-2.8.1-min",
@@ -118,10 +117,6 @@ require.config({
         },
         "jsonEditor": {
             exports: "JSONEditor"
-        },
-        "jqueryui": {
-            deps: ["jquery"],
-            exports: "jqueryui"
         },
         "moment": {
             exports: "moment"

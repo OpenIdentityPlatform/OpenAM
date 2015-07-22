@@ -29,10 +29,9 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
     "org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/ConditionAttrTimeView",
     "org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/ConditionAttrDayView",
     "org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/ConditionAttrDateView",
-    "org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/ConditionAttrTimeZoneView",
     "handlebars"
 ], function ($, _, AbstractView, uiUtils, PoliciesDelegate, BooleanAttr, ArrayAttr, StringAttr, ObjectAttr, EnumAttr,
-             TimeAttr, DayAttr, DateAttr, TimeZoneAttr, Handlebars) {
+             TimeAttr, DayAttr, DateAttr, Handlebars) {
     return AbstractView.extend({
         events: {
             "change select#selection": "changeType"
@@ -67,6 +66,7 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
                 // TODO: Serverside solution required
                 delete itemData.name;
 
+                // Script name is displayed on UI, but script id is saved along with the condition
                 if (itemData.type === self.SCRIPT_RESOURCE) {
                     hiddenData[itemData.type] = itemData.scriptId;
                     this.$el.data("hiddenData", hiddenData);
@@ -201,36 +201,45 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
                 attributesWrapper,
                 attributesSelector = ".condition-attr";
 
+            function buildScriptAttr() {
+                new ArrayAttr().render({
+                    itemData: itemData,
+                    hiddenData: hiddenData,
+                    data: [hiddenData[itemData.type]],
+                    title: "scriptId",
+                    i18nKey: self.i18n.condition.key + schema.title + self.i18n.condition.props + "scriptId",
+                    dataSource: "scripts",
+                    multiple: false
+                }, itemDataEl);
+            }
+
             if (itemData.type === "SimpleTime") {
                 attributesWrapper = '<div class="clearfix clear-left" id="conditionAttrTimeDate"></div>';
                 new TimeAttr().render({itemData: itemData}, itemDataEl);
                 new DayAttr().render({itemData: itemData}, itemDataEl);
                 new DateAttr().render({itemData: itemData}, itemDataEl);
-                new TimeZoneAttr().render({itemData: itemData}, itemDataEl);
+
+                if (!itemData.enforcementTimeZone) {
+                    itemData.enforcementTimeZone = "GMT";
+                }
+                new ArrayAttr().render({
+                    itemData: itemData,
+                    data: [itemData.enforcementTimeZone],
+                    title: "enforcementTimeZone",
+                    i18nKey: self.i18n.condition.key + schema.title + self.i18n.condition.props + "enforcementTimeZone",
+                    dataSource: "enforcementTimeZone",
+                    multiple: false
+                }, itemDataEl);
             } else if (schema.title === self.SCRIPT_RESOURCE) {
                 attributesWrapper = '<div class="no-float"></div>';
                 if (itemData && itemData.scriptId) {
                     PoliciesDelegate.getScriptById(itemData.scriptId).done(function (script) {
                         hiddenData[itemData.type] = script.name;
-                        new ArrayAttr().render({
-                            itemData: itemData,
-                            hiddenData: hiddenData,
-                            data: [hiddenData[itemData.type]],
-                            title: "scriptId",
-                            i18nKey: self.i18n.condition.key + schema.title + self.i18n.condition.props + "scriptId",
-                            dataSource: "scripts"
-                        }, itemDataEl);
+                        buildScriptAttr();
                         self.animateIn();
                     });
                 } else {
-                    new ArrayAttr().render({
-                        itemData: itemData,
-                        hiddenData: hiddenData,
-                        data: [hiddenData[itemData.type]],
-                        title: "scriptId",
-                        i18nKey: self.i18n.condition.key + schema.title + self.i18n.condition.props + "scriptId",
-                        dataSource: "scripts"
-                    }, itemDataEl);
+                    buildScriptAttr();
                 }
             } else {
                 attributesWrapper = '<div class="no-float"></div>';
@@ -281,6 +290,7 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
                     }
                 });
             }
+
             this.$el.find(attributesSelector).wrapAll(attributesWrapper);
         },
 

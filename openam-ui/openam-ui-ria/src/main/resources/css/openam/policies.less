@@ -818,11 +818,18 @@ body.editing {
         }
     }
 
+    .field-float-pattern {
+        min-height: 46px;
+    }
+
+    .field-float-select {
+        min-height: 41px;
+    }
+
     .field-float-pattern, .field-float-select {
         position: relative;
         margin: 5px;
         float: left;
-        min-height: 41px;
         min-width: 145px;
 
         &.button-field {
@@ -897,9 +904,9 @@ body.editing {
         .fa-clock-o {
             position: absolute;
             right: 6px;
-            bottom: 2px;
+            bottom: 8px;
             color: #ccc;
-            font-size: 16px;
+            font-size: 14px;
 
             &:hover {
                 cursor: text;
@@ -907,15 +914,31 @@ body.editing {
         }
 
         .day-field, .time-field, .date-field {
-            min-width: 100px;
-            .form-control {
-                width: 100px;
+            select, input {
+                font-size: 12px
             }
         }
 
-        .timezone-field {
+        .time-field {
+            min-width: 75px;
             .form-control {
-                width: 130px;
+                padding-left: 10px;
+                width: 75px;
+            }
+        }
+
+        .day-field {
+            min-width: 80px;
+            .form-control {
+                width: 80px;
+            }
+        }
+
+        .date-field {
+            min-width: 100px;
+            .form-control {
+                padding-left: 10px;
+                width: 100px;
             }
         }
     }
@@ -931,6 +954,16 @@ body.editing {
                 border-right: none;
             }
         }
+
+        .selectize-input {
+            height: 30px;
+
+            .time-zone-selected {
+                max-width: 120px;
+                text-overflow: ellipsis;
+                overflow-x: hidden;
+            }
+        }
     }
 }
 
@@ -942,14 +975,6 @@ body.editing {
 
 #editResources {
     margin-top: 30px;
-}
-
-.ui-autocomplete {
-    max-height: 200px;
-    overflow-y: auto;
-    /* prevent horizontal scrollbar */
-    overflow-x: hidden;
-    z-index: 1051;
 }
 
 .bootstrap-datetimepicker-widget table {

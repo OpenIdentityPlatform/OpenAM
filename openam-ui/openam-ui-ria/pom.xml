@@ -129,13 +129,6 @@
             <classifier>min</classifier>
             <type>css</type>
         </dependency>
-        <dependency>
-            <groupId>org.forgerock.commons.ui.libs</groupId>
-            <artifactId>jquery-ui</artifactId>
-            <version>1.11.1</version>
-            <type>js</type>
-            <classifier>min</classifier>
-        </dependency>
     </dependencies>
 
     <build>
@@ -240,7 +233,7 @@
                         <configuration>
                             <outputDirectory>${project.build.directory}/classes/libs</outputDirectory>
                             <includeArtifactIds>
-                                bootstrap-clockpicker,bootstrap-datetimepicker,jquery-sortable,bootstrap-tabdrop,selectize-non-standalone,microplugin,sifter,jquery-nestingSortable,jsoneditor,qrcode,jquery-ui
+                                bootstrap-clockpicker,bootstrap-datetimepicker,jquery-sortable,bootstrap-tabdrop,selectize-non-standalone,microplugin,sifter,jquery-nestingSortable,jsoneditor,qrcode
                             </includeArtifactIds>
                         </configuration>
                     </execution>

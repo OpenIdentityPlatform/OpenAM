@@ -25,12 +25,21 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
     return ConditionAttrBaseView.extend({
         template: "templates/admin/views/realms/policies/policies/conditions/ConditionAttrArray.html",
         MIN_QUERY_LENGTH: 1,
-        SCRIPT_TYPE: "scriptId",
         IDENTITY_PLACEHOLDER: "console.policies.policies.edit.subjectTypes.Identity.placeholder",
         SCRIPT_PLACEHOLDER: "console.policies.policies.edit.conditionTypes.Script.placeholder",
+        TIME_ZONE_PLACEHOLDER: "console.policies.policies.edit.conditionTypes.SimpleTime.props.enterTimeZone",
+        SCRIPT_TYPE: "scriptId",
+        TIME_ZONE_TYPE: "enforcementTimeZone",
+        IDENTITY_TYPE: "users",
+        DEFAULT_TIME_ZONE: "GMT",
 
         render: function (data, element, callback) {
-            data.multiple = data.title !== this.SCRIPT_TYPE;
+
+            // default to multiple selection if this option is not specified
+            if (data.multiple === undefined) {
+                data.multiple = true;
+            }
+
             this.initBasic(data, element, "field-float-selectize data-obj");
 
             this.parentRender(function () {
@@ -48,14 +57,11 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
                     type = $item.parent().find("label").data().title;
                     options = {};
 
-                    // special case for items with added data sets.
                     if ($item.data().source) {
                         if (type === view.SCRIPT_TYPE) {
                             _.extend(options, {
                                 placeholder: $.t(view.SCRIPT_PLACEHOLDER),
-                                create: false,
                                 preload: true,
-                                maxItems: 1,
                                 sortField: "value",
                                 load: function (query, callback) {
                                     view.loadFromDataSource.call(this, item, callback);
@@ -67,11 +73,35 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
                                     view.data.hiddenData[view.data.itemData.type] = text ? text : "";
                                 }
                             });
-                        } else {
-                            // Currently this is only "Identity"
+                        } else if (type === view.TIME_ZONE_TYPE) {
+                            _.extend(options, {
+                                placeholder: $.t(view.TIME_ZONE_PLACEHOLDER),
+                                preload: true,
+                                sortField: "value",
+                                render: {
+                                    item: function (item) {
+                                        return "<span class='time-zone-selected'>" + item.text + "</span>"
+                                    }
+                                },
+                                load: function (query, callback) {
+                                    var selectize = this;
+                                    $.ajax({
+                                        url: "timezones.json",
+                                        dataType: "json",
+                                        cache: true
+                                    }).done(function (data) {
+                                        _.each(data.timezones, function (value) {
+                                            selectize.addOption({value: value, text: value});
+                                        });
+                                    });
+                                },
+                                onChange: function (value) {
+                                    view.data.itemData.enforcementTimeZone = value ? value : view.DEFAULT_TIME_ZONE;
+                                }
+                            });
+                        } else if (type === view.IDENTITY_TYPE) {
                             _.extend(options, {
                                 placeholder: $.t(view.IDENTITY_PLACEHOLDER),
-                                create: false,
                                 sortField: "value",
                                 load: function (query, callback) {
                                     if (query.length < view.MIN_QUERY_LENGTH) {
