@@ -398,9 +398,8 @@
      For instructions on using the new policy editor,
      see the <citetitle>Administration Guide</citetitle> chapter,
      <link
-      xlink:href="admin-guide#chap-authz-policy"
+      xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/admin-guide/chap-authz-policy"
       xlink:show="new"
-      xlink:role="http://docbook.org/xlink/role/olink"
      ><citetitle>Defining Authorization Policies</citetitle></link>.
      Notice that policies now belong to applications
      as described in that chapter.
@@ -464,9 +463,8 @@
        To see how to implement a custom policy plugin,
        see the <citetitle>Developer's Guide</citetitle> chapter,
        <link
-        xlink:href="dev-guide#chap-policy-spi"
+        xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/dev-guide/chap-policy-spi"
         xlink:show="new"
-        xlink:role="http://docbook.org/xlink/role/olink"
        ><citetitle>Customizing Policy Evaluation</citetitle></link>.
       </para>
      </listitem>
@@ -569,9 +567,8 @@
        The Policy Configuration Service is simplified.
        For details see the <citetitle>Reference</citetitle> section,
        <link
-        xlink:href="reference#policy-configuration"
+        xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/reference/chap-config-ref"
         xlink:show="new"
-        xlink:role="http://docbook.org/xlink/role/olink"
        ><citetitle>Policy Configuration</citetitle></link>.
       </para>
      </listitem>
@@ -643,10 +640,9 @@
      and <filename>saml2loginwithrelay.template</filename>
      to add a progress bar for SSO.
      Instead, customize <filename>saml2/jsp/autosubmitaccessrights.jsp</filename>
-     as described in the procedure,
-     <link xlink:show="new" xlink:href="admin-guide#show-saml2-sso-login-progress"
-     xlink:role="http://docbook.org/xlink/role/olink"><citetitle
-     >To Indicate Progress During SSO</citetitle></link>.
+     as described in the procedure in the OpenAM Administration Guide,
+     <link xlink:show="new" xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/admin-guide/chap-federation/show-saml2-sso-login-progress"><citetitle
+     >To Indicate Progress During SSO</citetitle></link> .
     </para>
    </listitem>
 
@@ -862,10 +858,10 @@ http://realm1.example.com:8080/openam/XUI/#Login/test
 
       <thead>
        <row>
-        <entry><link xlink:show="new" xlink:href="admin-guide#interface-stability"
-                     xlink:role="http://docbook.org/xlink/role/olink">Deprecated URIs</link></entry>
-        <entry>Newer <link xlink:show="new" xlink:href="admin-guide#interface-stability"
-                           xlink:role="http://docbook.org/xlink/role/olink">Evolving URIs</link></entry>
+        <entry><link xlink:show="new" xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/admin-guide#interface-stability"
+         >Deprecated URIs</link></entry>
+        <entry>Newer <link xlink:show="new" xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/admin-guide#interface-stability"
+         >Evolving URIs</link></entry>
        </row>
       </thead>
 
@@ -973,7 +969,7 @@ http://realm1.example.com:8080/openam/XUI/#Login/test
     </table>
 
     <para>Find examples in the <citetitle>Developer Guide</citetitle> chapter <link
-     xlink:href="dev-guide#chap-rest" xlink:role="http://docbook.org/xlink/role/olink"
+     xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/dev-guide/chap-rest"
      xlink:show="new"><citetitle>Using RESTful Web Services</citetitle></link>.</para>
 
     <para>Support for the older REST services is likely to be removed in a
@@ -996,11 +992,9 @@ http://realm1.example.com:8080/openam/XUI/#Login/test
 
     <thead>
      <row>
-      <entry><link xlink:show="new" xlink:href="admin-guide#interface-stability"
-                   xlink:role="http://docbook.org/xlink/role/olink">
+      <entry><link xlink:show="new" xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/admin-guide">
        Deprecated Command</link></entry>
-      <entry>Newer <link xlink:show="new" xlink:href="admin-guide#interface-stability"
-                         xlink:role="http://docbook.org/xlink/role/olink">
+      <entry>Newer <link xlink:show="new" xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/admin-guide">
        Evolving Command</link></entry>
      </row>
     </thead>
@@ -1028,8 +1022,7 @@ http://realm1.example.com:8080/openam/XUI/#Login/test
 
     <para>For more information, see the <citetitle>OpenAM
      Reference</citetitle> section <link xlink:show="new"
-     xlink:href="reference#ssoadm-1"
-     xlink:role="http://docbook.org/xlink/role/olink">
+     xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/reference/N101EA/ssoadm-1">
      ssoadm — configure OpenAM core services</link>.</para>
    </listitem>
 
@@ -1075,8 +1068,7 @@ http://realm1.example.com:8080/openam/XUI/#Login/test
       ><literal>ScopeValidator</literal></link> interface instead.
      For an example, see the <citetitle>Developer's Guide</citetitle> chapter,
      <link
-      xlink:href="dev-guide#chap-oauth2-scopes"
-      xlink:role="http://docbook.org/xlink/role/olink"
+      xlink:href="https://backstage.forgerock.com/#!/docs/openam/12.0.0/dev-guide/chap-oauth2-scopes"
       xlink:show="new"
       ><citetitle>Customizing OAuth 2.0 Scope Handling</citetitle></link>.
     </para>

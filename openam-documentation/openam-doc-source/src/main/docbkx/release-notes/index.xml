@@ -41,7 +41,7 @@
   </abstract>
   <copyright>
    <year>2011-2015</year>
-   <holder>ForgeRock AS</holder>
+   <holder>ForgeRock AS.</holder>
   </copyright>
   <authorgroup>
    <author>
@@ -69,6 +69,7 @@
 
  <xinclude:include href='chap-whats-new.xml' />
  <xinclude:include href='chap-before-you-install.xml' />
+ <xinclude:include href='chap-update-install.xml' />
  <xinclude:include href='chap-compatibility.xml' />
  <xinclude:include href='chap-issues.xml' />
  <xinclude:include href="chap-feedback.xml" />
