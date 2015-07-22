@@ -16,6 +16,15 @@
 
 package org.forgerock.openam.uma;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+import static org.forgerock.json.fluent.JsonValue.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
+
+import java.io.IOException;
+import java.util.Map;
+
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.restlet.Request;
@@ -26,14 +35,6 @@ import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
-
-import java.io.IOException;
-import java.util.Map;
 
 public class UmaExceptionFilterTest {
 
@@ -113,6 +114,36 @@ public class UmaExceptionFilterTest {
         verify(response).setEntity(exceptionResponseCaptor.capture());
         Map<String, String> responseBody = (Map<String, String>) exceptionResponseCaptor.getValue().getObject();
         assertThat(responseBody).containsOnly(entry("error", "ERROR"), entry("error_description", "DESCRIPTION"));
+
+        ArgumentCaptor<Status> statusCaptor = ArgumentCaptor.forClass(Status.class);
+        verify(response).setStatus(statusCaptor.capture());
+        assertThat(statusCaptor.getValue().getCode()).isEqualTo(444);
+        assertThat(statusCaptor.getValue().getThrowable()).isEqualTo(exception);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void shouldSetUmaExceptionResponseWithDetail() throws IOException {
+
+        //Given
+        Request request = mock(Request.class);
+        Response response = mock(Response.class);
+        Exception exception = new UmaException(444, "ERROR", "DESCRIPTION")
+                .setDetail(json(object(field("DETAIL", "VALUE"))));
+        Status status = new Status(444, exception);
+
+        given(response.getStatus()).willReturn(status);
+
+        //When
+        exceptionFilter.afterHandle(request, response);
+
+        //Then
+        ArgumentCaptor<JacksonRepresentation> exceptionResponseCaptor =
+                ArgumentCaptor.forClass(JacksonRepresentation.class);
+        verify(response).setEntity(exceptionResponseCaptor.capture());
+        Map<String, String> responseBody = (Map<String, String>) exceptionResponseCaptor.getValue().getObject();
+        assertThat(responseBody).containsOnly(entry("error", "ERROR"), entry("error_description", "DESCRIPTION"),
+                entry("DETAIL", "VALUE"));
 
         ArgumentCaptor<Status> statusCaptor = ArgumentCaptor.forClass(Status.class);
         verify(response).setStatus(statusCaptor.capture());

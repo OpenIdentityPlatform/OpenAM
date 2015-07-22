@@ -1,7 +1,26 @@
+/*
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2015 ForgeRock AS.
+ */
+
 package org.forgerock.openam.uma;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
 import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.eq;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -21,6 +40,7 @@ import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Evaluator;
 import com.sun.identity.idm.AMIdentity;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
@@ -40,6 +60,7 @@ import org.forgerock.util.query.QueryFilter;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mockito.Matchers;
+import org.mockito.Mockito;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.ext.json.JsonRepresentation;
@@ -52,6 +73,7 @@ public class AuthorizationRequestEndpointTest {
     private static final String RS_ID = "RESOURCE_SET_ID";
     private static final String RESOURCE_OWNER_ID = "RESOURCE_OWNER_ID";
     private static final String RS_DESCRIPTION_ID = "RESOURCE_SET_DESCRIPTION_ID";
+    private static final String REQUESTING_PARTY_ID = "REQUESTING_PARTY_ID";
     private static final String RESOURCE_NAME = UmaConstants.UMA_POLICY_SCHEME + RS_DESCRIPTION_ID;
 
     private AuthorizationRequestEndpoint endpoint;
@@ -72,15 +94,17 @@ public class AuthorizationRequestEndpointTest {
     private Subject subject = new Subject();
     private UmaAuditLogger umaAuditLogger;
     private PendingRequestsService pendingRequestsService;
+    private IdTokenClaimGatherer idTokenClaimGatherer;
 
     private class AuthorizationRequestEndpoint2 extends AuthorizationRequestEndpoint {
 
         public AuthorizationRequestEndpoint2(UmaProviderSettingsFactory umaProviderSettingsFactory,
                 TokenStore oauth2TokenStore, OAuth2RequestFactory<Request> requestFactory,
                 OAuth2ProviderSettingsFactory oAuth2ProviderSettingsFactory,
-                UmaAuditLogger auditLogger, PendingRequestsService pendingRequestsService) {
+                UmaAuditLogger auditLogger, PendingRequestsService pendingRequestsService,
+                Map<String, ClaimGatherer> claimGatherers) {
             super(umaProviderSettingsFactory, oauth2TokenStore, requestFactory, oAuth2ProviderSettingsFactory,
-                    auditLogger, pendingRequestsService);
+                    auditLogger, pendingRequestsService, claimGatherers);
         }
 
         @Override
@@ -109,6 +133,7 @@ public class AuthorizationRequestEndpointTest {
         oauth2TokenStore = mock(TokenStore.class);
         given(oauth2TokenStore.readAccessToken(Matchers.<OAuth2Request>anyObject(), anyString())).willReturn(accessToken);
         given(accessToken.getClientId()).willReturn(RS_CLIENT_ID);
+        given(accessToken.getResourceOwnerId()).willReturn(REQUESTING_PARTY_ID);
 
         umaAuditLogger = mock(UmaAuditLogger.class);
 
@@ -121,8 +146,7 @@ public class AuthorizationRequestEndpointTest {
         given(permissionTicket.getClientId()).willReturn(RS_CLIENT_ID);
         given(permissionTicket.getRealm()).willReturn("REALM");
         given(umaTokenStore.readPermissionTicket(anyString())).willReturn(permissionTicket);
-        given(umaTokenStore.createRPT(Matchers.<AccessToken>anyObject(), Matchers.<PermissionTicket>anyObject()))
-                .willReturn(rpt);
+        given(umaTokenStore.createRPT(Matchers.<PermissionTicket>anyObject())).willReturn(rpt);
 
         resourceSetStore = mock(ResourceSetStore.class);
         ResourceSetDescription resourceSet = new ResourceSetDescription();
@@ -144,11 +168,16 @@ public class AuthorizationRequestEndpointTest {
         OAuth2ProviderSettings oauth2ProviderSettings = mock(OAuth2ProviderSettings.class);
         given(oauth2ProviderSettingsFactory.get(any(OAuth2Request.class))).willReturn(oauth2ProviderSettings);
         given(oauth2ProviderSettings.getResourceSetStore()).willReturn(resourceSetStore);
+        given(oauth2ProviderSettings.getIssuer()).willReturn("ISSUER");
 
         pendingRequestsService = mock(PendingRequestsService.class);
 
+        Map<String, ClaimGatherer> claimGatherers = new HashMap<>();
+        idTokenClaimGatherer = mock(IdTokenClaimGatherer.class);
+        claimGatherers.put(IdTokenClaimGatherer.FORMAT, idTokenClaimGatherer);
+
         endpoint = spy(new AuthorizationRequestEndpoint2(umaProviderSettingsFactory, oauth2TokenStore,
-                requestFactory, oauth2ProviderSettingsFactory, umaAuditLogger, pendingRequestsService));
+                requestFactory, oauth2ProviderSettingsFactory, umaAuditLogger, pendingRequestsService, claimGatherers));
         request = mock(Request.class);
         given(endpoint.getRequest()).willReturn(request);
 
@@ -239,6 +268,110 @@ public class AuthorizationRequestEndpointTest {
         Set<String> requestedScopes = new HashSet<String>();
         requestedScopes.add("Read");
         given(permissionTicket.getScopes()).willReturn(requestedScopes);
+
+        //Then
+        assertThat(endpoint.requestAuthorization(entity)).isNotNull();
+    }
+
+    @Test(expectedExceptions = UmaException.class)
+    public void shouldThrowNeedInfoExceptionWhenTrustElevationRequiredButClaimNotPresent() throws Exception {
+        //Given
+        ArrayList<Entitlement> entitlements = new ArrayList<>();
+        entitlements.add(createEntitlement("Read"));
+
+        given(policyEvaluator.evaluate(anyString(), Matchers.<Subject>anyObject(), eq(RESOURCE_NAME),
+                Matchers.<Map<String, Set<String>>>anyObject(), anyBoolean())).willReturn(entitlements);
+
+        Set<String> requestedScopes = new HashSet<>();
+        requestedScopes.add("Read");
+        given(permissionTicket.getScopes()).willReturn(requestedScopes);
+
+        enableRequiredTrustElevation();
+        mockIdTokenClaimGatherRequiredClaimsDetails();
+
+        //Then
+        try {
+            endpoint.requestAuthorization(entity);
+        } catch (UmaException e) {
+            assertThat(e.getStatusCode()).isEqualTo(403);
+            assertThat(e.getError()).isEqualTo("need_info");
+            assertThat(e.getDetail()).hasArray("requesting_party_claims");
+            assertThat(e.getDetail()).booleanAt("requesting_party_claims/0/CLAIMS_REQUIRED").isTrue();
+            throw e;
+        }
+    }
+
+    @Test(expectedExceptions = UmaException.class)
+    public void shouldThrowNeedInfoExceptionWhenTrustElevationRequiredAndUnknownClaimPresent() throws Exception {
+        //Given
+        ArrayList<Entitlement> entitlements = new ArrayList<>();
+        entitlements.add(createEntitlement("Read"));
+
+        given(policyEvaluator.evaluate(anyString(), Matchers.<Subject>anyObject(), eq(RESOURCE_NAME),
+                Matchers.<Map<String, Set<String>>>anyObject(), anyBoolean())).willReturn(entitlements);
+
+        Set<String> requestedScopes = new HashSet<>();
+        requestedScopes.add("Read");
+        given(permissionTicket.getScopes()).willReturn(requestedScopes);
+
+        enableRequiredTrustElevation();
+        mockRequestBodyWithUnknownClaim();
+
+        //Then
+        try {
+            endpoint.requestAuthorization(entity);
+        } catch (UmaException e) {
+            assertThat(e.getStatusCode()).isEqualTo(403);
+            assertThat(e.getError()).isEqualTo("need_info");
+            assertThat(e.getDetail()).hasArray("requesting_party_claims");
+            assertThat(e.getDetail()).booleanAt("requesting_party_claims/0/CLAIMS_REQUIRED").isTrue();
+            throw e;
+        }
+    }
+
+    @Test(expectedExceptions = UmaException.class)
+    public void shouldThrowNeedInfoExceptionWhenTrustElevationRequiredAndClaimGatheringFails() throws Exception {
+        //Given
+        ArrayList<Entitlement> entitlements = new ArrayList<>();
+        entitlements.add(createEntitlement("Read"));
+
+        given(policyEvaluator.evaluate(anyString(), Matchers.<Subject>anyObject(), eq(RESOURCE_NAME),
+                Matchers.<Map<String, Set<String>>>anyObject(), anyBoolean())).willReturn(entitlements);
+
+        Set<String> requestedScopes = new HashSet<>();
+        requestedScopes.add("Read");
+        given(permissionTicket.getScopes()).willReturn(requestedScopes);
+
+        enableRequiredTrustElevation();
+        mockRequestBodyWithInvalidIdTokenClaim();
+
+        //Then
+        try {
+            endpoint.requestAuthorization(entity);
+        } catch (UmaException e) {
+            assertThat(e.getStatusCode()).isEqualTo(403);
+            assertThat(e.getError()).isEqualTo("need_info");
+            assertThat(e.getDetail()).hasArray("requesting_party_claims");
+            assertThat(e.getDetail()).booleanAt("requesting_party_claims/0/CLAIMS_REQUIRED").isTrue();
+            throw e;
+        }
+    }
+
+    @Test
+    public void shouldReturnRptWhenTrustElevationRequiredAndIdTokenClaimPresent() throws Exception {
+        //Given
+        ArrayList<Entitlement> entitlements = new ArrayList<>();
+        entitlements.add(createEntitlement("Read"));
+
+        given(policyEvaluator.evaluate(anyString(), Matchers.<Subject>anyObject(), eq(RESOURCE_NAME),
+                Matchers.<Map<String, Set<String>>>anyObject(), anyBoolean())).willReturn(entitlements);
+
+        Set<String> requestedScopes = new HashSet<>();
+        requestedScopes.add("Read");
+        given(permissionTicket.getScopes()).willReturn(requestedScopes);
+
+        enableRequiredTrustElevation();
+        mockRequestBodyWithIdTokenClaim();
 
         //Then
         assertThat(endpoint.requestAuthorization(entity)).isNotNull();
@@ -359,5 +492,43 @@ public class AuthorizationRequestEndpointTest {
             throws org.forgerock.openam.sm.datalayer.store.ServerException {
         given(pendingRequestsService.queryPendingRequests(anyString(), anyString(), anyString(), anyString()))
                 .willReturn(new HashSet<>(Arrays.asList(pendingRequests)));
+    }
+
+    private void enableRequiredTrustElevation() throws ServerException {
+        given(umaProviderSettings.isTrustElevationRequired()).willReturn(true);
+    }
+
+    private void mockRequestBodyWithIdTokenClaim() {
+        Mockito.reset(requestBody, idTokenClaimGatherer);
+        given(requestBody.toString()).willReturn("{\"ticket\": \"016f84e8-f9b9-11e0-bd6f-0021cc6004de\", "
+                + "\"claim_tokens\": [{"
+                + "\"format\": \"" + IdTokenClaimGatherer.FORMAT + "\", "
+                + "\"token\": \"ID_TOKEN\"}]}");
+        given(idTokenClaimGatherer.getRequestingPartyId(any(OAuth2Request.class), any(AccessToken.class),
+                any(JsonValue.class))).willReturn("REQUESTING_PARTY_ID");
+        mockIdTokenClaimGatherRequiredClaimsDetails();
+    }
+
+    private void mockRequestBodyWithInvalidIdTokenClaim() {
+        Mockito.reset(requestBody, idTokenClaimGatherer);
+        given(requestBody.toString()).willReturn("{\"ticket\": \"016f84e8-f9b9-11e0-bd6f-0021cc6004de\", "
+                + "\"claim_tokens\": [{"
+                + "\"format\": \"" + IdTokenClaimGatherer.FORMAT + "\", "
+                + "\"token\": \"ID_TOKEN\"}]}");
+        mockIdTokenClaimGatherRequiredClaimsDetails();
+    }
+
+    private void mockIdTokenClaimGatherRequiredClaimsDetails() {
+        given(idTokenClaimGatherer.getRequiredClaimsDetails(anyString())).willReturn(json(object(
+                field("CLAIMS_REQUIRED", true))));
+    }
+
+    private void mockRequestBodyWithUnknownClaim() {
+        Mockito.reset(requestBody);
+        given(requestBody.toString()).willReturn("{\"ticket\": \"016f84e8-f9b9-11e0-bd6f-0021cc6004de\", "
+                + "\"claim_tokens\": [{"
+                + "\"format\": \"UNKNOWN_FORMAT\", "
+                + "\"token\": \"TOKEN\"}]}");
+        mockIdTokenClaimGatherRequiredClaimsDetails();
     }
 }

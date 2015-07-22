@@ -18,15 +18,11 @@ package org.forgerock.openam.uma;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.forgerock.json.fluent.JsonValue.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-import java.util.Collections;
 import java.util.HashSet;
 
-import org.forgerock.oauth2.core.AccessToken;
-import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.cts.CTSPersistentStore;
@@ -44,15 +40,6 @@ public class UmaTokenStoreTest {
 
     private static final Token RPT_TOKEN = new Token("123", TokenType.REQUESTING_PARTY);
     private static final Token TICKET_TOKEN = new Token("123", TokenType.PERMISSION_TICKET);
-    private static final AccessToken AAT;
-
-    static {
-        try {
-            AAT = new AccessToken(json(object(field("tokenName", "access_token"), field("id", "123"))));
-        } catch (InvalidGrantException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
 
     private UmaTokenStore store;
     private CTSPersistentStore cts;
@@ -86,7 +73,7 @@ public class UmaTokenStoreTest {
         when(providerSettings.getRPTLifetime()).thenReturn(1000L);
 
         //When
-        RequestingPartyToken rpt = store.createRPT(AAT, new PermissionTicket("123", "abc", new HashSet<String>(asList("a")), null));
+        RequestingPartyToken rpt = store.createRPT(new PermissionTicket("123", "abc", new HashSet<String>(asList("a")), null));
 
         //Then
         verify(cts).create(RPT_TOKEN);
@@ -108,7 +95,7 @@ public class UmaTokenStoreTest {
         doThrow(CoreTokenException.class).when(cts).create(RPT_TOKEN);
 
         //When
-        store.createRPT(AAT, new PermissionTicket("123", "abc", new HashSet<String>(asList("a")), null));
+        store.createRPT(new PermissionTicket("123", "abc", new HashSet<String>(asList("a")), null));
     }
 
     @Test

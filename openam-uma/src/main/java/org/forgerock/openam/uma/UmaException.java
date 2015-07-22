@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.uma;
 
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 
 /**
@@ -24,6 +25,8 @@ import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
  * @since 13.0.0
  */
 public class UmaException extends OAuth2Exception {
+
+    private JsonValue detail;
 
     /**
      * Constructs a new UmaException with specified status code, error and description.
@@ -34,5 +37,20 @@ public class UmaException extends OAuth2Exception {
      */
     public UmaException(int statusCode, String error, String description) {
         super(statusCode, error, description);
+    }
+
+    /**
+     * Sets the error detail to be included with the JSON representation of the error.
+     *
+     * @param detail The detail.
+     * @return This exception.
+     */
+    public UmaException setDetail(JsonValue detail) {
+        this.detail = detail;
+        return this;
+    }
+
+    JsonValue getDetail() {
+        return detail;
     }
 }

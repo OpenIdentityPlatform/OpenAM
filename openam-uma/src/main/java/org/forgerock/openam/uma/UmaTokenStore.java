@@ -54,7 +54,7 @@ public class UmaTokenStore {
         this.settingsFactory = settingsFactory;
     }
 
-    RequestingPartyToken createRPT(AccessToken aat, PermissionTicket permissionTicket) throws ServerException {
+    RequestingPartyToken createRPT(PermissionTicket permissionTicket) throws ServerException {
         UmaProviderSettings settings = settingsFactory.get(realm);
         Permission permission = new Permission(permissionTicket.getResourceSetId(), permissionTicket.getScopes());
         RequestingPartyToken rpt = new RequestingPartyToken(null, permissionTicket.getClientId(), asSet(permission),

@@ -52,6 +52,7 @@ public final class UmaConstants {
             = "emailRequestingPartyOnPendingRequestApproval";
     public static final String USER_PROFILE_PREFERRED_LOCAL_ATTRIBUTE = "userProfileLocaleAttribute";
     public static final String RESHARING_MODE = "resharingMode";
+    public static final String TRUST_ELEVATION_REQUIRED = "requireTrustElevation";
     static final String SUPPORTED_PAT_PROFILES_ATTR_NAME = "uma-supported-pat-profiles";
     static final String SUPPORTED_AAT_PROFILES_ATTR_NAME = "uma-supported-aat-profiles";
     static final String SUPPORTED_RPT_PROFILES_ATTR_NAME = "uma-supported-rpt-profiles";
@@ -67,6 +68,7 @@ public final class UmaConstants {
 
     static final String NOT_AUTHORISED_ERROR_CODE = "not_authorised";
     static final String REQUEST_SUBMITTED_ERROR_CODE = "request_submitted";
+    static final String NEED_INFO_ERROR_CODE = "need_info";
     static final String INVALID_TICKET_ERROR_CODE = "invalid_ticket";
     static final String EXPIRED_TICKET_ERROR_CODE = "expired_ticket";
 

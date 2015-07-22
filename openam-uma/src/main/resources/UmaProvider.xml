@@ -127,6 +127,19 @@
                     </DefaultValues>
                 </AttributeSchema>
 
+                <AttributeSchema name="requireTrustElevation"
+                                 type="single"
+                                 syntax="boolean"
+                                 i18nKey="a109">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
                 <!-- TODO bearer MUST always be supported so should we just added it always and not have here? or have here as well? -->
                 <AttributeSchema name="uma-supported-pat-profiles"
                                  type="list"

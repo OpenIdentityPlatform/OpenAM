@@ -19,6 +19,7 @@ package org.forgerock.openam.uma;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -57,22 +58,25 @@ public class UmaExceptionFilter extends Filter {
             Throwable throwable = response.getStatus().getThrowable();
             if (throwable instanceof UmaException) {
                 UmaException exception = (UmaException) throwable;
-                setExceptionResponse(response, exception.getStatusCode(), exception.getError());
+                setExceptionResponse(response, exception.getStatusCode(), exception.getError(), exception.getDetail());
             } else if (throwable instanceof OAuth2Exception) {
                 OAuth2Exception exception = (OAuth2Exception) throwable;
-                setExceptionResponse(response, exception.getStatusCode(), exception.getError());
+                setExceptionResponse(response, exception.getStatusCode(), exception.getError(), null);
             } else {
-                setExceptionResponse(response, response.getStatus().getCode(), "server_error");
+                setExceptionResponse(response, response.getStatus().getCode(), "server_error", null);
             }
         }
     }
 
-    private void setExceptionResponse(Response response, int statusCode, String error) {
+    private void setExceptionResponse(Response response, int statusCode, String error, JsonValue detail) {
         Throwable throwable = response.getStatus().getThrowable();
-        Map<String, String> responseBody = new HashMap<String, String>();
+        Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("error", error);
         responseBody.put("error_description", throwable.getMessage());
-        response.setEntity(new JacksonRepresentation<Map<String, String>>(responseBody));
+        if (detail != null) {
+            responseBody.putAll(detail.asMap());
+        }
+        response.setEntity(new JacksonRepresentation<>(responseBody));
         response.setStatus(new Status(statusCode, response.getStatus().getThrowable()));
     }
 }

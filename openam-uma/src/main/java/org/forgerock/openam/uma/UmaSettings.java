@@ -173,4 +173,13 @@ public interface UmaSettings {
      * @throws ServerException If there is a problem reading the configuration.
      */
     ResharingMode getResharingMode() throws ServerException;
+
+    /**
+     * Gets whether the AAT is sufficient for determining the requesting party
+     * on the authorization request or trust elevation is required.
+     *
+     * @return {@code true} if the trust elevation is required.
+     * @throws ServerException If there is a problem reading the configuration.
+     */
+    boolean isTrustElevationRequired() throws ServerException;
 }

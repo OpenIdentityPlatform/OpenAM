@@ -295,6 +295,16 @@ public class UmaSettingsImpl extends OpenAMSettingsImpl implements UmaSettings {
         }
     }
 
+    @Override
+    public boolean isTrustElevationRequired() throws ServerException {
+        try {
+            return getBooleanSetting(realm, TRUST_ELEVATION_REQUIRED);
+        } catch (SMSException | SSOException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        }
+    }
+
     /**
      * ServiceListener implementation to clear cache when it changes.
      */

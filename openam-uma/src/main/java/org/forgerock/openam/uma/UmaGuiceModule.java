@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.guice.core.InjectorHolder;
@@ -61,6 +62,9 @@ public class UmaGuiceModule extends AbstractModule {
         install(new FactoryModuleBuilder()
                 .implement(UmaSettings.class, UmaSettingsImpl.class)
                 .build(UmaSettingsFactory.class));
+
+        MapBinder.newMapBinder(binder(), String.class, ClaimGatherer.class)
+                .addBinding(IdTokenClaimGatherer.FORMAT).to(IdTokenClaimGatherer.class);
     }
 
     @Provides
