@@ -16,10 +16,12 @@
 
 package org.forgerock.openam.sm.datalayer.impl;
 
-import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+import java.text.MessageFormat;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.LockSupport;
 
@@ -80,32 +82,45 @@ public class PooledTaskExecutorTest {
         TaskThread task2 = new TaskThread(2, executor, longTask2);
         TaskThread task3 = new TaskThread(3, executor, mock(Task.class));
 
+        debug("Starting task 1");
         task1.start();
+        debug("Starting task 2");
         task2.start();
 
         while (semaphore.availablePermits() > 0) {
+            debug("Waiting for no available permits. Currently got: {0}", semaphore.availablePermits());
             Thread.sleep(50);
         }
 
+        debug("Tasks 1 and 2 should now be executing and will shortly be blocked - starting task 3");
         task3.start();
 
         long timeout = System.currentTimeMillis() + 5000;
         while (!semaphore.hasQueuedThreads()) {
+            debug("Waiting for task 3 to be queued on semaphore");
             Thread.sleep(50);
             if (System.currentTimeMillis() > timeout) {
                 fail("Where did my thread go?");
             }
         }
+        debug("Task 3 now queued on semaphore");
 
         // Then
         verifyZeroInteractions(task3.task);
 
+        debug("Unblocking task 2");
         longTask2.unblock();
+        debug("Unblocking task 1");
         longTask1.unblock();
 
-        task1.join();
-        task2.join();
-        task3.join();
+        debug("Waiting for tasks to complete");
+        task1.join(TimeUnit.SECONDS.toMillis(10));
+        task2.join(1);
+        task3.join(1);
+
+        assertThat(task1.isAlive()).as("Task 1 thread running").isFalse();
+        assertThat(task2.isAlive()).as("Task 2 thread running").isFalse();
+        assertThat(task3.isAlive()).as("Task 3 thread running").isFalse();
 
         verify(task3.task).execute(null, null);
         verify(simpleTaskExecutorProvider, times(2)).get();
@@ -119,6 +134,7 @@ public class PooledTaskExecutorTest {
             this.executor = executor;
             this.task = task;
             setName("Task " + taskId);
+            setDaemon(true);
         }
 
         public void run() {
@@ -138,18 +154,29 @@ public class PooledTaskExecutorTest {
         @Override
         public <T> void execute(T connection, TokenStorageAdapter<T> adapter) throws DataLayerException {
             this.executingThread = Thread.currentThread();
+            debug("Locking");
             locked.set(true);
             while (!locked.compareAndSet(false, true)) {
+                debug("Task still locked - parking thread");
                 LockSupport.park(this);
+                debug("Thread unparked");
             }
+            debug("Thread unlocked - continuing");
         }
 
         public void unblock() {
+            debug("Setting task unlocked");
             locked.set(false);
+            debug("Unparking thread {0}", executingThread);
             LockSupport.unpark(executingThread);
+            debug("Unparked thread {0}", executingThread);
         }
 
     }
 
+    private static void debug(String message, Object... params) {
+        System.out.println("PooledTaskExecutorTest " + Thread.currentThread() + " :: " +
+                MessageFormat.format(message, params));
+    }
 
 }
