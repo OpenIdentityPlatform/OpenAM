@@ -80,7 +80,7 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
                                 sortField: "value",
                                 render: {
                                     item: function (item) {
-                                        return "<span class='time-zone-selected'>" + item.text + "</span>"
+                                        return "<span class='time-zone-selected'>" + item.text + "</span>";
                                     }
                                 },
                                 load: function (query, callback) {
