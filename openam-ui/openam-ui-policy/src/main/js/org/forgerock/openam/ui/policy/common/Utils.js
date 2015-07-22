@@ -22,11 +22,10 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global window, define, $, document, _ */
+/*global window, define, $, document, _, Handlebars */
 define("org/forgerock/openam/ui/policy/common/Utils", [
-    "handlebars",
     "i18next"
-], function (Handlebars, i18next) {
+], function (i18next) {
     var obj = {};
 
     Handlebars.registerHelper('policyEditorRealmUrlHelper', function(string) {
