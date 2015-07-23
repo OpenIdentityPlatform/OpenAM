@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.password.ui.model;
 
@@ -35,6 +35,7 @@ import com.iplanet.am.util.AMSendMail;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.ISLocaleContext;
+import com.sun.identity.common.configuration.ConfigurationObserver;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
@@ -208,9 +209,11 @@ public class PWResetModelImpl
      *
      */
     public PWResetModelImpl() {
-        initialize();
-    } 
-
+        ssoToken = getSSOToken();
+        logger = new PWResetAdminLog(ssoToken);
+        resBundle = PWResetResBundleCacher.getBundle(rbName, localeContext.getLocale());
+        ConfigurationObserver.getInstance().addListener(logger);
+    }
 
     /**
      * Returns localized string.
@@ -478,18 +481,18 @@ public class PWResetModelImpl
 
         try {
             ServiceSchemaManager mgr = new ServiceSchemaManager(
-                serviceName, ssoToken);
+                    serviceName, ssoToken);
             String name = mgr.getI18NFileName();
             if (name != null) {
                 ResourceBundle rb = PWResetResBundleCacher.getBundle(
-                    name,  localeContext.getLocale());
+                        name, localeContext.getLocale());
                 i18nName = Locale.getString(rb, key, debug);
             }
         } catch (MissingResourceException mre) {
             if (debug.warningEnabled()) {
                 debug.warning("PWResetModelImpl.getL10NAttributeName: " +
-                    "Could not localized str for " + key + " in service " + 
-                    serviceName, mre);
+                        "Could not localized str for " + key + " in service " +
+                        serviceName, mre);
             }
         } catch (SSOException e) {
             debug.warning("PWResetModelImpl.getL10NAttributeName", e);
@@ -498,17 +501,6 @@ public class PWResetModelImpl
         }
 
         return i18nName;
-    }
-
-    /**
-     * Initializes the data for this model by getting locale, SSO Token
-     * and <code>AMStoreConnection</code>
-     */
-    private void initialize() {
-        ssoToken = getSSOToken();
-        logger = new PWResetAdminLog(ssoToken);
-        resBundle = PWResetResBundleCacher.getBundle(
-            rbName, localeContext.getLocale());
     }
 
     /**

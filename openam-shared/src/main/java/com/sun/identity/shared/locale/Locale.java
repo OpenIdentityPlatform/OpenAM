@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd.
  */
 package com.sun.identity.shared.locale;
@@ -276,7 +276,8 @@ public class Locale {
      * @return the default Locale object
      */
     public static java.util.Locale getDefaultLocale() {
-        return defaultLocale;
+        String loc = SystemPropertiesManager.get(Constants.AM_LOCALE, "en_US");
+        return getLocale(loc);
     }
 
     /**

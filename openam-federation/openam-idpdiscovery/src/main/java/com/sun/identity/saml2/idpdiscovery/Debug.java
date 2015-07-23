@@ -24,14 +24,26 @@
  *
  * $Id: Debug.java,v 1.5 2008/06/25 05:47:47 qcheng Exp $
  *
+ *  Portions Copyrighted 2015 ForgeRock AS.
  */
 
 
 package com.sun.identity.saml2.idpdiscovery;
 
-import java.io.*;
-import java.util.*;
-import java.text.*;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.MissingResourceException;
 
 // NOTE: Since JVM specs guarantee atomic access/updates to int variables
 // (actually all variables except double and long), the design consciously
@@ -112,9 +124,6 @@ public class Debug {
      * the key and Debug is the value of this map.
      */
     private static Map debugMap = new HashMap();
-    
-    /** serviceInitialized indicates if the service is already initialized. */
-    private static boolean serviceInitialized = false;
 
     private static DateFormat dateFormat;
 
@@ -127,13 +136,18 @@ public class Debug {
      * set the following two static variables to some default values here, then
      * it will interfere with the execution of {@link #initService}.
      */
-    private static String defaultDebugLevel;
-    private static String outputDirectory;
+    private static String debugLevelStr;
+    private static String debugDirectory;
 
     private final String debugName;
     private PrintWriter debugFile = null;
-    private int debugLevel; 
-    
+    private int debugLevel;
+
+    private static boolean validInit() {
+        return IDPDiscoveryConstants.DEBUG_DIR.equals(debugDirectory)
+                && IDPDiscoveryConstants.DEBUG_LEVEL.equals(debugLevelStr);
+    }
+
     /** Initializes the Debug service so that Debug objects can be created. At
      * startup (when the first Debug object is ever created in a JVM), this
      * method reads <code>DebugConfig.properties</code> file (using 
@@ -151,8 +165,8 @@ public class Debug {
         /* We will use the double-checked locking pattern. Rarely entered
          * block. Push synchronization inside it. This is the first check.
          */
-        if (!serviceInitialized) {
-            /* Only 1 thread at a time gets past the next point. Rarely
+        if (!validInit()) {
+             /* Only 1 thread at a time gets past the next point. Rarely
              * executed synchronization statement and hence synchronization
              * penalty is not paid every time this method is called.
              */
@@ -162,37 +176,31 @@ public class Debug {
                  * it will not re-initialize the instance variable. This is the
                  * (second) double-check.
                  */
-                if (!serviceInitialized) {
-                    dateFormat = new SimpleDateFormat(
-                        "MM/dd/yyyy hh:mm:ss:SSS a zzz");
+                if (!validInit()) {
+                    dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss:SSS a zzz");
                     try {
-                        defaultDebugLevel = SystemProperties.get(
-                            IDPDiscoveryConstants.DEBUG_LEVEL);
-                        outputDirectory = SystemProperties.get(
-                            IDPDiscoveryConstants.DEBUG_DIR);
-                        if (outputDirectory != null ) {
-                            File createDir = new File(outputDirectory);
+                        debugLevelStr = SystemProperties.get(IDPDiscoveryConstants.DEBUG_LEVEL);
+                        debugDirectory = SystemProperties.get(IDPDiscoveryConstants.DEBUG_DIR);
+                        if (debugDirectory != null ) {
+                            File createDir = new File(debugDirectory);
                             if ((!createDir.exists()) && (!createDir.mkdirs()))
                             {
-                                System.err.println("could not create "
-                                   + "debug dir /var/opt/SUNWam/debug");
+                                System.err.println("could not create debug dir /var/opt/SUNWam/debug");
                             }
                         }
                     } catch (MissingResourceException e) {
                         System.err.println(e.getMessage());
                         e.printStackTrace();
 
-                        // If there is any error in getting the level or 
-                        // outputDirectory, defaultDebugLevel will be set to 
+                        // If there is any error in getting the level or
+                        // outputDirectory, defaultDebugLevel will be set to
                         // ON so that output will go to
                         // System.out
-
-                        defaultDebugLevel = "on";
-                        outputDirectory = null;
+                        debugLevelStr = "on";
+                        debugDirectory = null;
                     } catch (SecurityException se) {
                         System.err.println(se.getMessage());
                     }
-                    serviceInitialized = true;
                 }
             }
         }
@@ -213,13 +221,12 @@ public class Debug {
     public Debug(String debugName) {
         // Initialize the debug service the first time a Debug object is
         // created.
-
         initService();
 
         // Now initialize this instance itself
 
         this.debugName = debugName;
-        setDebug(defaultDebugLevel);
+        setDebug(debugLevelStr);
 
         synchronized (debugMap) {
             // explicitly ignore any duplicate instances.
@@ -239,7 +246,9 @@ public class Debug {
      */
     public static synchronized Debug getInstance(String debugName) {
         Debug debugObj = (Debug) debugMap.get(debugName);
-        if (debugObj == null) {
+        if (debugObj == null ||
+                (debugDirectory != null &&
+                !debugDirectory.equals(SystemPropertiesManager.get(IDPDiscoveryConstants.DEBUG_DIR)))) {
             debugObj = new Debug(debugName);
         }
         return debugObj;
@@ -530,19 +539,20 @@ public class Debug {
      * properties file, <code>DebugConfig.properties</code>.
      */
     private synchronized void write(String msg) {
+
         try {
             // debugging is enabled.
             // First, see if the debugFile is already open. If not, open it now.
-                
-            if (debugFile == null) {
+            if (debugFile == null ||
+                    (debugDirectory != null &&
+                    !debugDirectory.equals(SystemPropertiesManager.get(IDPDiscoveryConstants.DEBUG_DIR)))) {
+
+                initService();
+
                 // open file in append mode
-                FileOutputStream fos = new FileOutputStream(
-                    outputDirectory + File.separator + debugName,
-                    true);
+                FileOutputStream fos = new FileOutputStream(debugDirectory + File.separator + debugName,  true);
                 debugFile = new PrintWriter(
-                    new BufferedWriter(
-                        new OutputStreamWriter(fos, "UTF8")
-                    ),
+                    new BufferedWriter( new OutputStreamWriter(fos, "UTF8") ),
                     true); // autoflush enabled
 
                 debugFile.println(
@@ -589,8 +599,8 @@ public class Debug {
 
     /**
      * Enables or disables debugging based on the value of debug attribute,
-     * <code>com.iplanet.services.debug.level</code>, in the 
-     * <code>DebugConfig.properties</code> file. 
+     * <code>com.iplanet.services.debug.level</code>, in the
+     * <code>DebugConfig.properties</code> file.
      * <code>DebugConfig.properties<code>
      * file should be accessible from CLASSPATH.
      * If the property is not defined, debug level is set to <code>error</code>.
@@ -603,7 +613,7 @@ public class Debug {
         // The following initService is temporary. setDebug() is anyways
         // deprecated and will be removed in future.
         initService();
-        setDebug(defaultDebugLevel);
+        setDebug(debugLevelStr);
     }
 
     /**

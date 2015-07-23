@@ -137,8 +137,6 @@ public class LoginState {
     private static final List<String> SHARED_STATE_ATTRIBUTES = 
             Arrays.asList(ISAuthConstants.SHARED_STATE_PASSWORD, ISAuthConstants.SHARED_STATE_USERNAME);
 
-    private static final String DEFAULT_LOCALE = SystemProperties.get(Constants.AM_LOCALE);
-
     /**
      * Lazy initialisation holder to allow unit testing without loading the world.
      */
@@ -1569,7 +1567,7 @@ public class LoginState {
      */
     public String getLocale() {
         if (!isLocaleSet) {
-            return DEFAULT_LOCALE;
+            return SystemProperties.get(Constants.AM_LOCALE);
         } else {
             return localeContext.getLocale().toString();
         }

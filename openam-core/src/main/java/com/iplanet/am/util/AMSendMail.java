@@ -45,17 +45,14 @@ import javax.mail.internet.MimeMessage;
  */
 public class AMSendMail {
 
-    private static String mailServerHost = SystemProperties.get(
-            Constants.AM_SMTP_HOST, "localhost");
-    private static String mailServerPort = SystemProperties.get(
-            Constants.SM_SMTP_PORT, "25");
-    private static Properties props = new Properties();
+    private Properties props = new Properties();
 
-
-    static {
-        // Set the host smtp address
-        props.put("mail.smtp.host", mailServerHost);
-        props.put("mail.smtp.port", mailServerPort);
+    /**
+     * Constructor that grabs its SMTP values from SystemProperties.
+     */
+    public AMSendMail() {
+        props.put("mail.smtp.host", SystemProperties.get(Constants.AM_SMTP_HOST, "localhost"));
+        props.put("mail.smtp.port", SystemProperties.get(Constants.SM_SMTP_PORT, "25"));
     }
 
     /**
@@ -241,21 +238,5 @@ public class AMSendMail {
 
         // Transport the message now
         Transport.send(msg);
-    }
-
-    public static void main(String[] args) {
-
-        String from = "<" + "ganesh@iplanet.com" + ">";
-        String[] to = {"malla@sun.com", "ganesh@iplanet.com"};
-        String sub = "Hello Bond";
-        String msg = "Have fun dude";
-
-        try {
-            AMSendMail sm = new AMSendMail();
-            sm.postMail(to, sub, msg, from);
-        } catch (MessagingException ex) {
-            System.out.println("Message Exception occured");
-            ex.printStackTrace();
-        }
     }
 }

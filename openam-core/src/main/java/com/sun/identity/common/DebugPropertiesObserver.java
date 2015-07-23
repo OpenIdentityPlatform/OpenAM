@@ -24,6 +24,8 @@
  *
  * $Id: DebugPropertiesObserver.java,v 1.4 2008/08/13 16:00:54 rajeevangal Exp $
  *
+ *  Portions Copyrighted 2015 ForgeRock AS.
+ *
  */
 
 package com.sun.identity.common;
@@ -34,7 +36,6 @@ import com.sun.identity.common.configuration.ConfigurationObserver;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * This class observes changes in debug configuration properties.
@@ -43,15 +44,15 @@ public class DebugPropertiesObserver implements ConfigurationListener {
     private static DebugPropertiesObserver instance;
     private static String currentState;
     private static String currentMergeFlag = "off";
-    
+
     static {
         instance = new DebugPropertiesObserver();
-        ConfigurationObserver.getInstance().addListener(instance);
         currentState = SystemProperties.get(Constants.SERVICES_DEBUG_LEVEL);
         currentMergeFlag = SystemProperties.get(Constants.SERVICES_DEBUG_MERGEALL);
         if (currentMergeFlag == null) {
             currentMergeFlag = "off";
         }
+        ConfigurationObserver.getInstance().addListener(instance);
     }
     
     private DebugPropertiesObserver() {
@@ -69,24 +70,25 @@ public class DebugPropertiesObserver implements ConfigurationListener {
     /**
      * This method will be call if configuration changed.
      */    
-    public void notifyChanges() {
+    public synchronized void notifyChanges() {
         String state = SystemProperties.get(Constants.SERVICES_DEBUG_LEVEL);
         if (!currentState.equals(state)) {
             Collection debugInstances = Debug.getInstances();
-            for (Iterator i = debugInstances.iterator(); i.hasNext(); ) {
-                Debug d = (Debug)i.next();
+            for (Object debugInstance : debugInstances) {
+                Debug d = (Debug) debugInstance;
                 d.setDebug(state);
             }
             currentState = state;
         }
+
         String mergeflag = SystemProperties.get(Constants.SERVICES_DEBUG_MERGEALL);
         if (!currentMergeFlag.equals(mergeflag)) {
-            currentMergeFlag = mergeflag;
             Collection debugInstances = Debug.getInstances();
-            for (Iterator i = debugInstances.iterator(); i.hasNext(); ) {
-                Debug d = (Debug)i.next();
+            for (Object debugInstance : debugInstances) {
+                Debug d = (Debug) debugInstance;
                 d.resetDebug(mergeflag);
             }
+            currentMergeFlag = mergeflag;
         }
     }
     

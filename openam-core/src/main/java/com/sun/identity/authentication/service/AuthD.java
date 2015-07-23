@@ -28,24 +28,7 @@
  */
 package com.sun.identity.authentication.service;
 
-import static org.forgerock.openam.ldap.LDAPUtils.rdnValueFromDn;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import static org.forgerock.openam.ldap.LDAPUtils.*;
 
 import com.iplanet.am.sdk.AMStoreConnection;
 import com.iplanet.am.util.Misc;
@@ -62,6 +45,8 @@ import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.DNUtils;
 import com.sun.identity.common.RequestUtils;
+import com.sun.identity.common.configuration.ConfigurationListener;
+import com.sun.identity.common.configuration.ConfigurationObserver;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoException;
@@ -83,6 +68,22 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import java.io.IOException;
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
@@ -96,7 +97,7 @@ import org.forgerock.opendj.ldap.DN;
  * It also initializes the other dependent services in the OpenAM system and
  * hence used as bootstrap class for the authentication server.
  */
-public class AuthD  {
+public class AuthD implements ConfigurationListener {
     /**
      * Configured bundle name for auth service
      */
@@ -114,7 +115,18 @@ public class AuthD  {
      * Lazy initialisation holder idiom for the singleton instance.
      */
     private static final class SingletonHolder {
-        private static final AuthD INSTANCE = new AuthD();
+        private static AuthD INSTANCE;
+
+        static AuthD getInstance() {
+            if (INSTANCE == null) {
+                INSTANCE = new AuthD();
+                ConfigurationObserver.getInstance().addListener(INSTANCE);
+
+            }
+
+            return INSTANCE;
+
+        }
     }
 
     /**
@@ -183,10 +195,11 @@ public class AuthD  {
     private final String defaultOrg;
     private String platformLocale;
     private final String platformCharset;
+
     /**
      * ResourceBundle for auth service
      */
-    final ResourceBundle bundle;
+    ResourceBundle bundle;
 
     private final SSOToken ssoAuthSession;
     private AMStoreConnection dpStore = null;
@@ -515,7 +528,7 @@ public class AuthD  {
      * @return Authenticator singleton instance.
      */
     public static AuthD getAuth() {
-        return SingletonHolder.INSTANCE;
+        return SingletonHolder.getInstance();
     }
     
     /**
@@ -831,6 +844,16 @@ public class AuthD  {
         return ssoManager.createSSOToken(authSession.getID().toString());
     }
     
+    @Override
+    public synchronized void notifyChanges() {
+        ResourceBundle newBundle = com.sun.identity.shared.locale.Locale.
+                getInstallResourceBundle(BUNDLE_NAME);
+
+        if (newBundle != bundle) {
+            bundle = newBundle;
+        }
+    }
+
     /**
      * get inetDomainStatus attribute for the org
      * @param orgName org name to check inetDomainStatus

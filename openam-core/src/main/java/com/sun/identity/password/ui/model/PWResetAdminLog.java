@@ -24,12 +24,14 @@
  *
  * $Id: PWResetAdminLog.java,v 1.2 2008/06/25 05:43:42 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.password.ui.model;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.configuration.ConfigurationListener;
 import com.sun.identity.log.LogRecord;
 import com.sun.identity.log.Logger;
 import com.sun.identity.security.AdminTokenAction;
@@ -43,23 +45,22 @@ import java.util.logging.Level;
  * <code>PWResetAdminLog</code> defines the methods to log messages
  * to password reset log file.
  */
-public class PWResetAdminLog
+public class PWResetAdminLog implements ConfigurationListener
 {
     private Logger logger = null;
     private static final String logFile = "amPasswordReset.access";
     private static final String ACTIVE = "active";
-    private java.util.Locale locale = null;
     private static boolean logStatus = false;
     private SSOToken token = null;
-
+    private String localString;
 
     /** 
      * Resource bundle object 
      */
-    protected static ResourceBundle rb = null;
+    protected ResourceBundle rb = null;
 
     static {
-	String status = SystemProperties.get(Constants.AM_LOGSTATUS);
+	    String status = SystemProperties.get(Constants.AM_LOGSTATUS);
         logStatus = status.equalsIgnoreCase(ACTIVE);
     }
 
@@ -75,12 +76,17 @@ public class PWResetAdminLog
         }
         String lstr = SystemProperties.get(Constants.AM_LOCALE);
 
-        locale = com.sun.identity.shared.locale.Locale.getLocale(lstr);
+        init(lstr);
+    }
+
+    private void init(String localStr) {
+        localString = localStr;
+        java.util.Locale locale = Locale.getLocale(localStr);
         rb = PWResetResBundleCacher.getBundle(PWResetModel.DEFAULT_RB, locale);
 
         if (rb == null) {
             PWResetModelImpl.debug.error(
-               "could not get ResourceBundle for " + PWResetModel.DEFAULT_RB);
+                    "could not get ResourceBundle for " + PWResetModel.DEFAULT_RB);
         }
     }
     
@@ -93,7 +99,7 @@ public class PWResetAdminLog
      */
     public void doLogKey(String key) {
         if (logStatus) {
-	    doLog(Locale.getString(rb, key, PWResetModelImpl.debug));
+	        doLog(Locale.getString(rb, key, PWResetModelImpl.debug));
         }
     }
 
@@ -144,5 +150,14 @@ public class PWResetAdminLog
      */
     public boolean isEnabled() {
         return logStatus;
+    }
+
+    @Override
+    public synchronized void notifyChanges() {
+        String lstr = SystemProperties.get(Constants.AM_LOCALE);
+
+        if (!lstr.equalsIgnoreCase(localString)) {
+            init(lstr);
+        }
     }
 }
