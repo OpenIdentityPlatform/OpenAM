@@ -96,7 +96,7 @@ public class OathService implements DeviceService {
                 SupportedOathEncryptionScheme.valueOf(CollectionHelper.getMapAttr(options, OATH_ENCRYPTION_SCHEME,
                 SupportedOathEncryptionScheme.NONE.toString()));
 
-        if (encryptionScheme == null) {
+        if (encryptionScheme == null || encryptionScheme == SupportedOathEncryptionScheme.NONE) {
             return new JsonDeviceSerialisation();
         } else {
             return new EncryptedJwtDeviceSerialisation(encryptionScheme.encryptionMethod,
