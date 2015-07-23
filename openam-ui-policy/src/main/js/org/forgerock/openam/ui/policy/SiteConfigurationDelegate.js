@@ -61,6 +61,7 @@ define("org/forgerock/openam/ui/policy/SiteConfigurationDelegate", [
         obj.serviceCall({
             serviceUrl: Constants.host + "/" + Constants.context + "/json",
             url: "/serverinfo/*",
+            suppressEvents: true,
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         }).done(function (info) {
             _.extend(conf.globalData, {serverInfo: info});

@@ -55,6 +55,7 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
         obj.serviceCall({
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.1"},
             url: RealmHelper.decorateURIWithRealm("/json/__subrealm__/serverinfo/*"),
+            suppressEvents: true,
             success: function(response) {
                 var hostname = location.hostname,
                     fqdn = response.FQDN,
