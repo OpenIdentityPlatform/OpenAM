@@ -31,7 +31,8 @@ define([
     "./models/UMAResourceSetWithPolicy",
     "./models/User",
 
-    "./views/RequestsView",
+    "./views/request/ListRequest",
+    "./views/request/EditRequest",
     "./views/backgrid/cells/PermissionsCell",
     "./views/history/ListHistory",
     "./views/resource/EditResource",

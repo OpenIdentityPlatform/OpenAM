@@ -49,9 +49,16 @@ define("config/routes/user/UMARoutes", function () {
             url: /^uma\/history\/?$/,
             pattern: "uma/history/"
         },
-        "umaRequests": {
-            view: "org/forgerock/openam/ui/uma/views/RequestsView",
+        "umaRequestEdit": {
+            view: "org/forgerock/openam/ui/uma/views/request/EditRequest",
             role: "ui-user",
+            url: /^uma\/requests\/(.*?)(?:\/){0,1}$/,
+            pattern: "uma/requests/?"
+        },
+        "umaRequestList": {
+            view: "org/forgerock/openam/ui/uma/views/request/ListRequest",
+            role: "ui-user",
+            defaults: [""],
             url: /^uma\/requests\/?$/,
             pattern: "uma/requests/"
         }

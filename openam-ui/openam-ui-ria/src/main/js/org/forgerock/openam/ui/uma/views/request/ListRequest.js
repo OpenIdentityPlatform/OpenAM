@@ -15,7 +15,7 @@
  */
 
 /*global define*/
-define("org/forgerock/openam/ui/uma/views/RequestsView", [
+define("org/forgerock/openam/ui/uma/views/request/ListRequest", [
     "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "backbone",
@@ -27,8 +27,8 @@ define("org/forgerock/openam/ui/uma/views/RequestsView", [
     "org/forgerock/openam/ui/uma/views/backgrid/cells/PermissionsCell",
     "org/forgerock/openam/ui/uma/delegates/UMADelegate"
 ], function ($, AbstractView, Backbone, Backgrid, BackgridUtils, Configuration, Constants, RealmHelper, PermissionsCell, UMADelegate) {
-    var RequestsView = AbstractView.extend({
-        template: "templates/uma/views/RequestsTemplate.html",
+    var ListRequest = AbstractView.extend({
+        template: "templates/uma/views/request/ListRequestTemplate.html",
 
         render: function (args, callback) {
             var self = this,
@@ -130,12 +130,13 @@ define("org/forgerock/openam/ui/uma/views/RequestsView", [
             self.parentRender(function() {
                 self.$el.find("#backgridContainer").append( grid.render().el );
                 self.$el.find("#paginationContainer").append( paginator.render().el );
-                self.data.requests.fetch({ reset: true, processData: false }); // TODO: DRY
-
-                if (callback) { callback(); }
+                // TODO: DRY
+                self.data.requests.fetch({ reset: true, processData: false }).done(function(){
+                    if (callback) { callback(); }
+                });
             });
         }
     });
 
-    return new RequestsView();
+    return new ListRequest();
 });

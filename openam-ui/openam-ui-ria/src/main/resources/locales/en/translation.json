@@ -543,7 +543,14 @@
             }
         },
         "requests": {
-            "title": "Requests",
+            "list": {
+                "title": "Requests",
+                "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed condimentum at diam vel pulvinar. Aliquam quis imperdiet magna."
+            },
+            "show": {
+                "title": "Request",
+                "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed condimentum at diam vel pulvinar. Aliquam quis imperdiet magna."
+            },
             "grid": {
                 "header": ["User", "Resource", "When", "Permissions", "Actions"]
             }
