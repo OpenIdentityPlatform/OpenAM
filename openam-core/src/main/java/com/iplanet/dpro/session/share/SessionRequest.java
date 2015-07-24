@@ -39,7 +39,7 @@ import com.sun.identity.shared.xml.XMLUtils;
  * <code>SessionRequest</code> XML document. The <code>SessionRequest</code>
  * DTD is defined as the following:
  * </p>
- * 
+ *
  * <pre>
  *     &lt;?xml version=&quot;1.0&quot;&gt;
  *     &lt; !DOCTYPE SessionRequest [
@@ -77,7 +77,7 @@ import com.sun.identity.shared.xml.XMLUtils;
  *     &lt; !ELEMENT Pattern (#PCDATA)&gt;
  *     ]&gt;
  * </pre>
- * 
+ *
  * </p>
  */
 
@@ -147,7 +147,7 @@ public class SessionRequest {
     /**
      * This constructor shall only be used at the client side to construct a
      * <code>SessionRequest</code> object.
-     * 
+     *
      * @param method The method ID of the <code>SessionRequest</code>.
      * @param sid The session ID required by the <code>SessionRequest</code>.
      * @param reset The flag to indicate whether this request needs to update
@@ -172,7 +172,7 @@ public class SessionRequest {
      * This method is used primarily at the server side to reconstruct a
      * <code>SessionRequest</code> object based on the XML document received
      * from client. The DTD of this XML document is described above.
-     * 
+     *
      * @param xml The <code>SessionRequest</code> XML document String.
      * @return <code>SessionRequest</code> object.
      */
@@ -183,7 +183,7 @@ public class SessionRequest {
 
     /**
      * Sets the request version.
-     * 
+     *
      * @param version Request version.
      */
     void setRequestVersion(String version) {
@@ -192,7 +192,7 @@ public class SessionRequest {
 
     /**
      * Returns the request version.
-     * 
+     *
      * @return The request version.
      */
     public String getRequestVersion() {
@@ -201,7 +201,7 @@ public class SessionRequest {
 
     /**
      * Sets the request ID.
-     * 
+     *
      * @param id Request ID.
      */
     void setRequestID(String id) {
@@ -210,7 +210,7 @@ public class SessionRequest {
 
     /**
      * Returns the request ID.
-     * 
+     *
      * @return The request ID.
      */
     public String getRequestID() {
@@ -219,7 +219,7 @@ public class SessionRequest {
 
     /**
      * Sets the method ID.
-     * 
+     *
      * @param id Method ID.
      */
     void setMethodID(int id) {
@@ -228,7 +228,7 @@ public class SessionRequest {
 
     /**
      * Returns the method ID.
-     * 
+     *
      * @return The method ID.
      */
     public int getMethodID() {
@@ -236,8 +236,34 @@ public class SessionRequest {
     }
 
     /**
+     * @return The method name.
+     */
+    public String getMethodName() {
+        switch (methodID) {
+            case GetSession:
+                return "GetSession";
+            case GetValidSessions:
+                return "GetValidSessions";
+            case DestroySession:
+                return "DestroySession";
+            case Logout:
+                return "Logout";
+            case AddSessionListener:
+                return "AddSessionListener";
+            case AddSessionListenerOnAllSessions:
+                return "AddSessionListenerOnAllSessions";
+            case SetProperty:
+                return "SetProperty";
+            case GetSessionCount:
+                return "GetSessionCount";
+            default:
+                return "unknown";
+        }
+    }
+
+    /**
      * Sets the session ID.
-     * 
+     *
      * @param id Session ID.
      */
     void setSessionID(String id) {
@@ -246,7 +272,7 @@ public class SessionRequest {
 
     /**
      * Returns the session ID.
-     * 
+     *
      * @return Session ID.
      */
     public String getSessionID() {
@@ -273,7 +299,7 @@ public class SessionRequest {
 
     /**
      * Sets the reset flag.
-     * 
+     *
      * @param reset <code>true</code> to update the latest session access time.
      */
     void setResetFlag(boolean reset) {
@@ -282,7 +308,7 @@ public class SessionRequest {
 
     /**
      * Returns the reset flag.
-     * 
+     *
      * @return The reset flag.
      */
     public boolean getResetFlag() {
@@ -291,7 +317,7 @@ public class SessionRequest {
 
     /**
      * Sets the ID of the session to be destroyed.
-     * 
+     *
      * @param id The ID of the session to be destroyed.
      */
     public void setDestroySessionID(String id) {
@@ -300,7 +326,7 @@ public class SessionRequest {
 
     /**
      * Returns the ID of the session to be destroyed.
-     * 
+     *
      * @return The ID of the session to be destroyed.
      */
     public String getDestroySessionID() {
@@ -309,7 +335,7 @@ public class SessionRequest {
 
     /**
      * Sets the notification URL.
-     * 
+     *
      * @param url The notification URL.
      */
     public void setNotificationURL(String url) {
@@ -318,7 +344,7 @@ public class SessionRequest {
 
     /**
      * Returns the notification URL.
-     * 
+     *
      * @return The notification URL.
      */
     public String getNotificationURL() {
@@ -327,7 +353,7 @@ public class SessionRequest {
 
     /**
      * Sets the property name.
-     * 
+     *
      * @param name The property name.
      */
     public void setPropertyName(String name) {
@@ -336,7 +362,7 @@ public class SessionRequest {
 
     /**
      * Returns the property name.
-     * 
+     *
      * @return The property name.
      */
     public String getPropertyName() {
@@ -345,7 +371,7 @@ public class SessionRequest {
 
     /**
      * Sets the property value.
-     * 
+     *
      * @param value The property value.
      */
     public void setPropertyValue(String value) {
@@ -354,7 +380,7 @@ public class SessionRequest {
 
     /**
      * Returns the property value.
-     * 
+     *
      * @return The property value.
      */
     public String getPropertyValue() {
@@ -364,7 +390,7 @@ public class SessionRequest {
     /**
      * Sets the pattern value. Process escape chars in pattern with
      * <code>CDATA</code>.
-     * 
+     *
      * @param value The pattern value.
      */
     public void setPattern(String value) {
@@ -386,7 +412,7 @@ public class SessionRequest {
 
     /**
      * Returns the pattern value.
-     * 
+     *
      * @return The pattern value.
      */
     public String getPattern() {
@@ -407,7 +433,7 @@ public class SessionRequest {
 
     /**
      * Sets the universal unique identifier.
-     * 
+     *
      * @param id The universal unique identifier.
      */
     public void setUUID(String id) {
@@ -416,7 +442,7 @@ public class SessionRequest {
 
     /**
      * Returns the universal unique identifier
-     * 
+     *
      * @return The universal unique identifier
      */
     public String getUUID() {
@@ -469,7 +495,7 @@ public class SessionRequest {
      * <code>AddSessionListener</code> and
      * <code>AddSessionListenerOnAllSessions</code>. otherwise, the returns
      * <code>null</code>.
-     * 
+     *
      * @return An XML String representing the request.
      */
     public String toXMLString() {
