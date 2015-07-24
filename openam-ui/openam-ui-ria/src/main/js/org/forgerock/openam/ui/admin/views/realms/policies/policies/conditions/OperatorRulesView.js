@@ -23,6 +23,7 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
     "org/forgerock/commons/ui/common/util/UIUtils"
 ], function ($, _, AbstractView, UIUtils) {
     return AbstractView.extend({
+        template: "templates/admin/views/realms/policies/policies/conditions/OperatorRulesTemplate.html",
         noBaseTemplate: true,
         events: {
             "change    > select": "onSelect",
@@ -48,7 +49,7 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
             });
 
             this.setElement(element);
-            this.$el.append(UIUtils.fillTemplateWithData("templates/admin/views/realms/policies/policies/conditions/OperatorRulesTemplate.html", this.data));
+            this.$el.append(UIUtils.fillTemplateWithData(this.template, this.data));
 
             this.setElement("#operator" + itemID);
             this.select = this.$el.find("select");

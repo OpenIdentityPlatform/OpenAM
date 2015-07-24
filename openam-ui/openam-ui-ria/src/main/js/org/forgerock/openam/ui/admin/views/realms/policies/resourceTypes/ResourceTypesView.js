@@ -30,6 +30,7 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/resourceTypes/Resour
 ], function ($, _, Backbone, Backgrid, Router, UIUtils, URLHelper, AbstractListView, ResourceTypeModel, BackgridUtils) {
     return AbstractListView.extend({
         template: "templates/admin/views/realms/policies/resourceTypes/ResourceTypesTemplate.html",
+        // Used in AbstractListView
         toolbarTemplate: "templates/admin/views/realms/policies/resourceTypes/ResourceTypesToolbarTemplate.html",
 
         render: function (args, callback) {
@@ -134,9 +135,7 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/resourceTypes/Resour
             this.bindDefaultHandlers();
 
             this.parentRender(function () {
-                UIUtils.fillTemplateWithData(this.toolbarTemplate, this.data, function (tpl) {
-                    self.$el.find(self.toolbarTemplateID).html(tpl);
-                });
+                this.renderToolbar();
 
                 this.$el.find("#backgridContainer").append(grid.render().el);
                 this.$el.find("#paginationContainer").append(paginator.render().el);

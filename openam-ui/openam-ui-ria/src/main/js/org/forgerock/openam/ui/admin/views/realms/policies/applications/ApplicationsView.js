@@ -35,6 +35,7 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/applications/Applica
              ApplicationModel, AbstractListView, PoliciesDelegate) {
     return AbstractListView.extend({
         template: "templates/admin/views/realms/policies/applications/ApplicationsTemplate.html",
+        // Used in AbstractListView
         toolbarTemplate: "templates/admin/views/realms/policies/applications/ApplicationsToolbarTemplate.html",
 
         render: function (args, callback) {
@@ -155,9 +156,7 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/applications/Applica
             this.bindDefaultHandlers();
 
             this.parentRender(function () {
-                UIUtils.fillTemplateWithData(this.toolbarTemplate, this.data, function (tpl) {
-                    self.$el.find(self.toolbarTemplateID).html(tpl);
-                });
+                this.renderToolbar();
 
                 this.$el.find("#backgridContainer").append(grid.render().el);
                 this.$el.find("#paginationContainer").append(paginator.render().el);

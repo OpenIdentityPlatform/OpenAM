@@ -51,9 +51,7 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/common/AbstractListV
                     self.data.selectedItems = [];
                     self.data.items.fetch({reset: true});
 
-                    UIUtils.fillTemplateWithData(self.toolbarTemplate, self.data, function (tpl) {
-                        self.$el.find(self.toolbarTemplateID).html(tpl);
-                    });
+                    self.renderToolbar();
                 },
                 onSuccess = function (model, response, options) {
                     onDestroy();
@@ -75,8 +73,6 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/common/AbstractListV
         },
 
         onRowSelect: function (model, selected) {
-            var self = this;
-
             if (selected) {
                 if (!_.contains(this.data.selectedItems, model.id)) {
                     this.data.selectedItems.push(model.id);
@@ -85,9 +81,7 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/common/AbstractListV
                 this.data.selectedItems = _.without(this.data.selectedItems, model.id);
             }
 
-            UIUtils.fillTemplateWithData(this.toolbarTemplate, this.data, function (tpl) {
-                self.$el.find(self.toolbarTemplateID).html(tpl);
-            });
+            this.renderToolbar();
         },
 
         bindDefaultHandlers: function () {
@@ -98,6 +92,14 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/common/AbstractListV
             });
 
             this.data.items.on("backgrid:sort", BackgridUtils.doubleSortFix);
+        },
+
+        renderToolbar: function () {
+            var self = this;
+
+            UIUtils.fillTemplateWithData(this.toolbarTemplate, this.data, function (tpl) {
+                self.$el.find(self.toolbarTemplateID).html(tpl);
+            });
         }
     });
 });

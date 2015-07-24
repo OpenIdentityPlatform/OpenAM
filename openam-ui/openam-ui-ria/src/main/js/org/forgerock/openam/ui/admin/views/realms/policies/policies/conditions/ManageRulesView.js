@@ -22,11 +22,14 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/EditEnvironmentView",
     "org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/EditSubjectView",
     "org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/OperatorRulesView",
     "org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/LegacyListItemView"
-], function ($, _, AbstractView, EventManager, Constants, EditEnvironmentView, EditSubjectView, OperatorRulesView, LegacyListItemView) {
+], function ($, _, AbstractView, EventManager, Constants, UIUtils, EditEnvironmentView, EditSubjectView,
+             OperatorRulesView, LegacyListItemView) {
+
     return AbstractView.extend({
         template: "templates/admin/views/realms/policies/policies/conditions/ManageRulesTemplate.html",
         noBaseTemplate: true,
@@ -53,6 +56,21 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
         idPrefix: "",
         property: "",
         properties: "",
+
+        initialize: function () {
+            AbstractView.prototype.initialize.call(this);
+
+            // Needed for correct work of animation
+            UIUtils.preloadTemplates(
+                _.map([
+                    "ConditionAttrEnum", "ConditionAttrString", "ConditionAttrBoolean", "ConditionAttrArray",
+                    "ConditionAttrObject", "ConditionAttrTime", "ConditionAttrDay", "ConditionAttrDate",
+                    "OperatorRulesTemplate", "EditSubjectTemplate", "EditEnvironmentTemplate"
+                ], function (filename) {
+                    return "templates/admin/views/realms/policies/policies/conditions/" + filename + ".html";
+                })
+            );
+        },
 
         init: function (args, events) {
             _.extend(this.events, events);

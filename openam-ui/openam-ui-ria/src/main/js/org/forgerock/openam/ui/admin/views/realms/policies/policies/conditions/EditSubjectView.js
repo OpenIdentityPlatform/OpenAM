@@ -25,6 +25,7 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
     "org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/ConditionAttrStringView"
 ], function ($, _, AbstractView, UIUtils, ArrayAttr, StringAttr) {
     return AbstractView.extend({
+        template: "templates/admin/views/realms/policies/policies/conditions/EditSubjectTemplate.html",
         events: {
             "change select#selection": "changeType"
         },
@@ -45,7 +46,7 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
 
             this.data.subjects = _.sortBy(this.data.subjects, "i18nKey");
 
-            this.$el.append(UIUtils.fillTemplateWithData("templates/admin/views/realms/policies/policies/conditions/EditSubjectTemplate.html", this.data));
+            this.$el.append(UIUtils.fillTemplateWithData(this.template, this.data));
             this.setElement("#subject_" + itemID);
 
             if (itemData) {
@@ -72,7 +73,6 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
                 itemData = item.data().itemData,
                 hiddenData = item.data().hiddenData,
                 type,
-                html,
                 list,
                 mergedData;
 
@@ -105,11 +105,12 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
                 });
             }
 
-            html = UIUtils.fillTemplateWithData("templates/admin/views/realms/policies/policies/conditions/ListItem.html", {
+            UIUtils.fillTemplateWithData("templates/admin/views/realms/policies/policies/conditions/ListItem.html", {
                 data: itemToDisplay
+            }, function (tpl) {
+                item.find(".item-data").html(tpl);
+                self.setElement("#" + item.attr("id"));
             });
-            item.find(".item-data").html(html);
-            this.setElement("#" + item.attr("id"));
         },
 
         changeType: function (e) {
@@ -156,7 +157,14 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
 
             if (schema.title === self.IDENTITY_RESOURCE) {
                 _.each(["users", "groups"], function (identityType) {
-                    new ArrayAttr().render({itemData: itemData, hiddenData: hiddenData, data: hiddenData[identityType], title: identityType, i18nKey: self.subjectI18n.key + schema.title + self.subjectI18n.props + identityType, dataSource: identityType}, itemDataEl);
+                    new ArrayAttr().render({
+                        itemData: itemData,
+                        hiddenData: hiddenData,
+                        data: hiddenData[identityType],
+                        title: identityType,
+                        i18nKey: self.subjectI18n.key + schema.title + self.subjectI18n.props + identityType,
+                        dataSource: identityType
+                    }, itemDataEl);
                 });
             } else {
                 _.map(schemaProps, function (value, key) {
@@ -164,10 +172,22 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
 
                     switch (value.type) {
                         case "string":
-                            new StringAttr().render({itemData: itemData, hiddenData: hiddenData, data: itemData[key], title: key, i18nKey: i18nKey}, itemDataEl);
+                            new StringAttr().render({
+                                itemData: itemData,
+                                hiddenData: hiddenData,
+                                data: itemData[key],
+                                title: key,
+                                i18nKey: i18nKey
+                            }, itemDataEl);
                             break;
                         case "array":
-                            new ArrayAttr().render({itemData: itemData, hiddenData: hiddenData, data: itemData[key], title: key, i18nKey: i18nKey}, itemDataEl);
+                            new ArrayAttr().render({
+                                itemData: itemData,
+                                hiddenData: hiddenData,
+                                data: itemData[key],
+                                title: key,
+                                i18nKey: i18nKey
+                            }, itemDataEl);
                             break;
                         default:
                             break;

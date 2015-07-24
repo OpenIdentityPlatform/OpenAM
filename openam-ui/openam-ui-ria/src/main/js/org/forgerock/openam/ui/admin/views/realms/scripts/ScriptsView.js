@@ -184,9 +184,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
                     self.data.selectedUUIDs = [];
                     self.data.scripts.fetch({reset: true});
 
-                    UIUtils.fillTemplateWithData(self.toolbarTemplate, self.data, function (tpl) {
-                        self.$el.find("#gridToolbar").html(tpl);
-                    });
+                    self.renderToolbar();
                 },
                 onSuccess = function (model, response, options) {
                     onDestroy();
@@ -220,7 +218,11 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
         },
 
         renderToolbar: function () {
-            this.$el.find("#gridToolbar").html(UIUtils.fillTemplateWithData(this.toolbarTemplate, this.data));
+            var self = this;
+
+            UIUtils.fillTemplateWithData(self.toolbarTemplate, self.data, function (tpl) {
+                self.$el.find("#gridToolbar").html(tpl);
+            });
         },
 
         addNewScript: function (e) {

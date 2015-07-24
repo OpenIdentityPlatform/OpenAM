@@ -30,9 +30,10 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
     "org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/ConditionAttrDayView",
     "org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/ConditionAttrDateView",
     "handlebars"
-], function ($, _, AbstractView, uiUtils, PoliciesDelegate, BooleanAttr, ArrayAttr, StringAttr, ObjectAttr, EnumAttr,
+], function ($, _, AbstractView, UIUtils, PoliciesDelegate, BooleanAttr, ArrayAttr, StringAttr, ObjectAttr, EnumAttr,
              TimeAttr, DayAttr, DateAttr, Handlebars) {
     return AbstractView.extend({
+        template: "templates/admin/views/realms/policies/policies/conditions/EditEnvironmentTemplate.html",
         events: {
             "change select#selection": "changeType"
         },
@@ -57,7 +58,7 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
 
             this.data.conditions = _.sortBy(this.data.conditions, "i18nKey");
 
-            this.$el.append(uiUtils.fillTemplateWithData("templates/admin/views/realms/policies/policies/conditions/EditEnvironmentTemplate.html", this.data));
+            this.$el.append(UIUtils.fillTemplateWithData(this.template, this.data));
 
             this.setElement("#environment_" + itemID);
 
@@ -121,11 +122,14 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
         },
 
         setListItemHtml: function (item, itemToDisplay) {
-            var html = uiUtils.fillTemplateWithData("templates/admin/views/realms/policies/policies/conditions/ListItem.html", {
+            var self = this;
+
+            UIUtils.fillTemplateWithData("templates/admin/views/realms/policies/policies/conditions/ListItem.html", {
                 data: itemToDisplay
+            }, function (tpl) {
+                item.find(".item-data").html(tpl);
+                self.setElement("#" + item.attr("id"));
             });
-            item.find(".item-data").html(html);
-            this.setElement("#" + item.attr("id"));
         },
 
         changeType: function (e) {

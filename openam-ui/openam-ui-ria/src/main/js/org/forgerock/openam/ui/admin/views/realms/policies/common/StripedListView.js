@@ -55,8 +55,11 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/common/StripedListVi
         },
 
         renderItems: function () {
+            var self = this;
             this.data.items = this.filter ? this.getFilteredItems() : this.getAllItems();
-            this.$el.find(".list-group").html(UIUtils.fillTemplateWithData(this.data.itemTpl, this.data));
+            UIUtils.fillTemplateWithData(this.data.itemTpl, this.data, function (tpl) {
+                self.$el.find(".list-group").html(tpl);
+            });
         },
 
         clickItem: function (e) {

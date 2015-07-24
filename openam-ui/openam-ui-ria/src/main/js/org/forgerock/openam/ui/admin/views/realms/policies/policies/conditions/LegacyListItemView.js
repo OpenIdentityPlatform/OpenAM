@@ -29,14 +29,20 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
             this.setElement(element);
             this.data.itemID = itemID;
             this.data.itemData = itemData;
-            this.$el.append(UIUtils.fillTemplateWithData("templates/admin/views/realms/policies/policies/conditions/LegacyListItem.html", this.data));
-            this.setElement("#legacy_" + itemID);
-            this.delegateEvents();
 
-            this.$el.data("itemData", itemData);
-            if (callback) {
-                callback();
-            }
+            var self = this;
+
+            UIUtils.fillTemplateWithData("templates/admin/views/realms/policies/policies/conditions/LegacyListItem.html",
+                this.data,
+                function (tpl) {
+                    self.setElement("#legacy_" + itemID);
+                    self.delegateEvents();
+
+                    self.$el.data("itemData", itemData);
+                    if (callback) {
+                        callback();
+                    }
+                });
         }
     });
 });

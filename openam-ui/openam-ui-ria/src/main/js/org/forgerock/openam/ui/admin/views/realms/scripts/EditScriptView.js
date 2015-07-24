@@ -65,7 +65,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
         render: function (args, callback) {
             var uuid = null;
 
-            this.realmPath  = args[0];
+            this.realmPath = args[0];
 
             // As we interrupt render to update the model, we need to remember the callback
             if (callback) {
@@ -229,8 +229,10 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             };
 
             ScriptsDelegate.validateScript(script).done(function (result) {
-                self.$el.find("#validation").html(UIUtils.fillTemplateWithData(
-                    "templates/admin/views/realms/scripts/ScriptValidationTemplate.html", result));
+                UIUtils.fillTemplateWithData("templates/admin/views/realms/scripts/ScriptValidationTemplate.html",
+                    result, function (tpl) {
+                        self.$el.find("#validation").html(tpl);
+                    });
             });
         },
 
@@ -275,9 +277,13 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                     cssClass: "script-change-context",
                     closable: !self.data.newScript,
                     message: $("<div></div>"),
-                    onshow: function (dialog) {
-                        this.message.append(UIUtils.fillTemplateWithData(
-                            "templates/admin/views/realms/scripts/ChangeContextTemplate.html", self.data));
+                    onshow: function () {
+                        var dialog = this;
+                        UIUtils.fillTemplateWithData("templates/admin/views/realms/scripts/ChangeContextTemplate.html",
+                            self.data, function (tpl) {
+                                dialog.message.append(tpl);
+                                self.data.newScript = false;
+                            });
                     }
                 };
 
@@ -313,8 +319,6 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
 
             options.buttons = footerButtons;
             BootstrapDialog.show(options);
-
-            this.data.newScript = false;
         },
 
         changeContext: function () {
@@ -435,7 +439,10 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "changesSaved");
                 },
                 onError = function (model, response, options) {
-                    Messages.messages.addMessage({response:response, type:Messages.TYPE_DANGER});
+                    Messages.messages.addMessage({
+                        response: response,
+                        type: Messages.TYPE_DANGER
+                    });
                 };
 
             this.model.destroy({

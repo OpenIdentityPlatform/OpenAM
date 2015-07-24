@@ -130,9 +130,10 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/EditPolicyV
                                 self.data.options.availablePatterns = resourceType.patterns;
                             }
 
-                            dialog.message.html(UIUtils.fillTemplateWithData(self.template, self.data));
-
-                            self.setElement(dialog.message);
+                            UIUtils.fillTemplateWithData(self.template, self.data, function (tpl) {
+                                dialog.message.html(tpl);
+                                self.setElement(dialog.message);
+                            });
                         });
                 },
                 onshown: function () {
