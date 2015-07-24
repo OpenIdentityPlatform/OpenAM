@@ -37,7 +37,6 @@ public class AMAccessAuditEventBuilderTest {
                 .transactionId("ad1f26e3-1ced-418d-b6ec-c8488411a625")
                 .authentication("id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org")
                 .contextId("uniqueSessionAlias")
-                .domain("dc=openam,dc=forgerock,dc=org")
                 .client("172.16.101.7", 62375)
                 .server("216.58.208.36", 80)
                 .resourceOperation("/some/path", "CREST", "READ")

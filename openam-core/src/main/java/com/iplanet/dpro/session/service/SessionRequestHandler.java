@@ -45,6 +45,7 @@ import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.dpro.session.share.SessionRequest;
 import com.iplanet.dpro.session.share.SessionResponse;
+import com.iplanet.services.comm.server.PLLAuditor;
 import com.iplanet.services.comm.server.RequestHandler;
 import com.iplanet.services.comm.share.Request;
 import com.iplanet.services.comm.share.Response;
@@ -96,7 +97,8 @@ public class SessionRequestHandler implements RequestHandler {
         serviceConfig = InjectorHolder.getInstance(SessionServiceConfig.class);
     }
 
-    public ResponseSet process(List<Request> requests,
+    public ResponseSet process(PLLAuditor pllAuditor,
+            List<Request> requests,
             HttpServletRequest servletRequest,
             HttpServletResponse servletResponse, ServletContext servletContext) {
         ResponseSet rset = new ResponseSet(SessionService.SESSION_SERVICE);

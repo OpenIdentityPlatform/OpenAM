@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS
  */
 
 package com.sun.identity.log.service;
@@ -47,6 +47,7 @@ import com.iplanet.services.comm.share.ResponseSet;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import com.iplanet.services.comm.server.PLLAuditor;
 import com.sun.identity.log.spi.Debug;
 import com.sun.identity.monitoring.Agent;
 import com.sun.identity.monitoring.MonitoringUtil;
@@ -107,7 +108,7 @@ public class LogService implements RequestHandler {
      * @param servletResponse
      * @return The response set which contains the result of the log operation.
      */
-    public ResponseSet process(List<Request> requests,
+    public ResponseSet process(PLLAuditor auditor, List<Request> requests,
     HttpServletRequest servletRequest,
     HttpServletResponse servletResponse,
     ServletContext servletContext) {

@@ -29,17 +29,16 @@ import org.forgerock.json.fluent.JsonValue;
  *
  * @since 13.0.0
  */
-final class AMAuditEventBuilderUtils {
+public final class AMAuditEventBuilderUtils {
 
     private static Debug debug = Debug.getInstance("amAudit");
 
     private static final String COMPONENT = "component";
     private static final String CONTEXT_ID = "contextId";
-    private static final String DOMAIN = "domain";
     private static final String EXTRA_INFO = "extraInfo";
 
     private AMAuditEventBuilderUtils() {
-        // Prevent instantiation
+        throw new UnsupportedOperationException("Utils class; should not be instantiated.");
     }
 
     /**
@@ -48,7 +47,7 @@ final class AMAuditEventBuilderUtils {
      * @param value String "component" value.
      */
     static void putComponent(JsonValue jsonValue, String value) {
-        jsonValue.put(COMPONENT, value);
+        jsonValue.put(COMPONENT, value == null ? "" : value);
     }
 
     /**
@@ -57,16 +56,7 @@ final class AMAuditEventBuilderUtils {
      * @param value String "contextId" value.
      */
     static void putContextId(JsonValue jsonValue, String value) {
-        jsonValue.put(CONTEXT_ID, value);
-    }
-
-    /**
-     * Set "domain" (aka realm) audit log field.
-     *
-     * @param value String "domain" value.
-     */
-    static void putDomain(JsonValue jsonValue, String value) {
-        jsonValue.put(DOMAIN, value);
+        jsonValue.put(CONTEXT_ID, value == null ? "" : value);
     }
 
     /**
@@ -85,23 +75,27 @@ final class AMAuditEventBuilderUtils {
      * @param ssoToken The SSOToken from which the contextId value will be retrieved.
      */
     static void putContextIdFromSSOToken(JsonValue jsonValue, SSOToken ssoToken) {
-        putContextId(
-                jsonValue,
-                getSSOTokenProperty(ssoToken, Constants.AM_CTX_ID, ""));
+        putContextId(jsonValue, getContextIdFromSSOToken(ssoToken));
     }
 
     /**
-     * Sets "domain" audit log field from property of {@link SSOToken}, iff the provided
-     * <code>SSOToken</code> is not <code>null</code>.
-     *
-     * @param ssoToken The SSOToken from which the domain value will be retrieved.
+     * @param ssoToken The SSOToken from which the contextId value will be retrieved.
+     * @return contextId for SSOToken or empty string if undefined.
      */
-    static void putDomainFromSSOToken(JsonValue jsonValue, SSOToken ssoToken) {
-        String clientDomain = getSSOTokenProperty(ssoToken, "Organization", "");
-        if (clientDomain == null || clientDomain.isEmpty()) {
-            clientDomain = getSSOTokenProperty(ssoToken, "cdomain", "");
-        }
-        putDomain(jsonValue, clientDomain);
+    public static String getContextIdFromSSOToken(SSOToken ssoToken) {
+        return getSSOTokenProperty(ssoToken, Constants.AM_CTX_ID, "");
+    }
+
+    /**
+     * Given the SSO token, retrieves the user's identifier.
+     *
+     * @param ssoToken
+     *         the SSO token
+     *
+     * @return the associated user identifier
+     */
+    public static String getUserId(SSOToken ssoToken) {
+        return getSSOTokenProperty(ssoToken, Constants.UNIVERSAL_IDENTIFIER, "");
     }
 
     private static String getSSOTokenProperty(SSOToken ssoToken, String name, String defaultValue) {

@@ -15,15 +15,25 @@
  */
 package org.forgerock.openam.audit;
 
+import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.*;
+import static org.forgerock.openam.utils.ClientUtils.getClientIPAddress;
+
 import com.iplanet.sso.SSOToken;
 import org.forgerock.audit.events.AccessAuditEventBuilder;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Builder for OpenAM audit access events.
  *
  * @since 13.0.0
  */
-public class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMAccessAuditEventBuilder> {
+public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMAccessAuditEventBuilder> {
 
     /**
      * Provide value for "extraInfo" audit log field.
@@ -32,7 +42,7 @@ public class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMAccessA
      * @return this builder for method chaining.
      */
     public AMAccessAuditEventBuilder extraInfo(String... values) {
-        AMAuditEventBuilderUtils.putExtraInfo(jsonValue, values);
+        putExtraInfo(jsonValue, values);
         return this;
     }
 
@@ -43,18 +53,7 @@ public class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMAccessA
      * @return this builder for method chaining.
      */
     public AMAccessAuditEventBuilder contextId(String value) {
-        AMAuditEventBuilderUtils.putContextId(jsonValue, value);
-        return this;
-    }
-
-    /**
-     * Provide value for "domain" (aka realm) audit log field.
-     *
-     * @param value String "domain" value.
-     * @return this builder for method chaining.
-     */
-    public AMAccessAuditEventBuilder domain(String value) {
-        AMAuditEventBuilderUtils.putDomain(jsonValue, value);
+        putContextId(jsonValue, value);
         return this;
     }
 
@@ -65,7 +64,7 @@ public class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMAccessA
      * @return this builder for method chaining.
      */
     public AMAccessAuditEventBuilder component(String value) {
-        AMAuditEventBuilderUtils.putComponent(jsonValue, value);
+        putComponent(jsonValue, value);
         return this;
     }
 
@@ -77,19 +76,46 @@ public class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMAccessA
      * @return this builder
      */
     public AMAccessAuditEventBuilder contextIdFromSSOToken(SSOToken ssoToken) {
-        AMAuditEventBuilderUtils.putContextIdFromSSOToken(jsonValue, ssoToken);
+        putContextIdFromSSOToken(jsonValue, ssoToken);
         return this;
     }
 
     /**
-     * Sets domain from property of {@link SSOToken}, iff the provided
-     * <code>SSOToken</code> is not <code>null</code>.
+     * Sets client, server and http details from HttpServletRequest.
      *
-     * @param ssoToken The SSOToken from which the domain value will be retrieved.
+     * @param request HttpServletRequest from which client, server and http details will be retrieved.
      * @return this builder
      */
-    public AMAccessAuditEventBuilder domainFromSSOToken(SSOToken ssoToken) {
-        AMAuditEventBuilderUtils.putDomainFromSSOToken(jsonValue, ssoToken);
+    public final AMAccessAuditEventBuilder forHttpServletRequest(HttpServletRequest request) {
+        client(
+                getClientIPAddress(request),
+                request.getRemotePort(),
+                isReverseDnsLookupEnabled() ? request.getRemoteHost() : "");
+        server(
+                request.getLocalAddr(),
+                request.getLocalPort(),
+                request.getLocalName());
+        http(
+                request.getMethod(),
+                request.getRequestURL().toString(),
+                request.getQueryString() == null ? "" : request.getQueryString(),
+                getHeadersAsMap(request));
         return this;
     }
+
+    private Map<String, List<String>> getHeadersAsMap(HttpServletRequest request) {
+        Map<String, List<String>> headers = new HashMap<>();
+        Enumeration headerNamesEnumeration = request.getHeaderNames();
+        while (headerNamesEnumeration.hasMoreElements()) {
+            String headerName = (String) headerNamesEnumeration.nextElement();
+            List<String> headerValues = new ArrayList<>();
+            Enumeration headersEnumeration = request.getHeaders(headerName);
+            while (headersEnumeration.hasMoreElements()) {
+                headerValues.add((String) headersEnumeration.nextElement());
+            }
+            headers.put(headerName, headerValues);
+        }
+        return headers;
+    }
+
 }

@@ -165,6 +165,5 @@ abstract class AbstractAuditingResultHandler<T, H extends ResultHandler<T>> impl
     private void addSessionDetailsFromSSOTokenContext(AMAccessAuditEventBuilder builder, ServerContext context) {
         SSOToken callerToken = getTokenFromContext(context, debug);
         builder.contextIdFromSSOToken(callerToken);
-        builder.domainFromSSOToken(callerToken);
     }
 }

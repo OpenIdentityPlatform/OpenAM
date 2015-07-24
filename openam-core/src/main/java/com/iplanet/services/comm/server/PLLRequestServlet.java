@@ -26,7 +26,7 @@
  *
  */
 /**
- * Portions Copyrighted 2012-2014 ForgeRock AS
+ * Portions Copyrighted 2012-2015 ForgeRock AS
  */
 package com.iplanet.services.comm.server;
 
@@ -37,6 +37,10 @@ import com.iplanet.services.comm.share.ResponseSet;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.services.naming.service.NamingService;
 import com.sun.identity.shared.Constants;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.audit.AuditEventFactory;
+import org.forgerock.openam.audit.AuditEventPublisher;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -97,56 +101,78 @@ public class PLLRequestServlet extends HttpServlet {
      */
     public void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, java.io.IOException {
-        int length = req.getContentLength();
-        if (length == -1) {
-            PLLServer.pllDebug.warning(PLLBundle.getString("unknownLength"));
-            throw new ServletException(PLLBundle.getString("unknownLength"));
-        }
 
-        if (length > maxContentLength) {
-            PLLServer.pllDebug.error("content length exceeded configured max request size - " + length);
-            throw new ServletException(
-                PLLBundle.getString("largeContentLength"));
-        }
+        PLLAuditor auditor = newAuditor(req);
 
-        byte[] reqData = new byte[length];
-        InputStream in = req.getInputStream();
-        int rlength = 0;
-        int offset = 0;
-        while (rlength != length) {
-            int r = in.read(reqData, offset, length - offset);
-            if (r == -1) {
-                throw new ServletException(PLLBundle
-                        .getString("readRequestError"));
-            }
-            rlength += r;
-            offset += r;
-        }
-        String xml = new String(reqData, 0, length, "UTF-8");
-
-        RequestSet set = RequestSet.parseXML(xml);
-        String svcid = set.getServiceID();
-        if(!AUTH_SVC_ID.equalsIgnoreCase(svcid)) {
-            if (PLLServer.pllDebug.messageEnabled()) {
-                 PLLServer.pllDebug.message("\nReceived RequestSet XML :\n" + xml);
-            }
-        }
-         
-	String responseXML = handleRequest(set, req, res);
-        res.setContentLength(responseXML.getBytes("UTF-8").length);
-        OutputStreamWriter out = new OutputStreamWriter(res.getOutputStream(),
-                "UTF-8");
         try {
-            out.write(responseXML);
-            out.flush();
-        } catch (IOException e) {
-            throw e;
-        } finally {
-            try {
-                out.close();
-            } catch (Exception ex) {
+
+            int length = req.getContentLength();
+            if (length == -1) {
+                PLLServer.pllDebug.warning(PLLBundle.getString("unknownLength"));
+                throw servletException("unknownLength");
             }
+
+            if (length > maxContentLength) {
+                PLLServer.pllDebug.error("content length exceeded configured max request size - " + length);
+                throw servletException("largeContentLength");
+            }
+
+            byte[] reqData = new byte[length];
+            InputStream in = req.getInputStream();
+            int rlength = 0;
+            int offset = 0;
+            while (rlength != length) {
+                int r = in.read(reqData, offset, length - offset);
+                if (r == -1) {
+                    throw servletException("readRequestError");
+                }
+                rlength += r;
+                offset += r;
+            }
+            String xml = new String(reqData, 0, length, "UTF-8");
+
+            RequestSet set = RequestSet.parseXML(xml);
+            String svcid = set.getServiceID();
+            auditor.setService(svcid);
+            if(!AUTH_SVC_ID.equalsIgnoreCase(svcid)) {
+                if (PLLServer.pllDebug.messageEnabled()) {
+                    PLLServer.pllDebug.message("\nReceived RequestSet XML :\n" + xml);
+                }
+            }
+
+            String responseXML = handleRequest(auditor, set, req, res);
+            res.setContentLength(responseXML.getBytes("UTF-8").length);
+            OutputStreamWriter out = new OutputStreamWriter(res.getOutputStream(),
+                    "UTF-8");
+            try {
+                out.write(responseXML);
+                out.flush();
+            } catch (IOException e) {
+                throw e;
+            } finally {
+                try {
+                    out.close();
+                } catch (Exception ex) {
+                }
+            }
+
+        } catch (IOException | ServletException | RuntimeException e) {
+            auditor.auditAccessFailure(e.getMessage());
+            throw e;
         }
+
+    }
+
+    private PLLAuditor newAuditor(HttpServletRequest httpServletRequest) {
+        return new PLLAuditor(
+                PLLServer.pllDebug,
+                InjectorHolder.getInstance(AuditEventPublisher.class),
+                InjectorHolder.getInstance(AuditEventFactory.class),
+                httpServletRequest);
+    }
+
+    private ServletException servletException(String errorId) {
+        return new ServletException(PLLBundle.getString(errorId));
     }
 
     public void doGet(HttpServletRequest req, HttpServletResponse res)
@@ -166,21 +192,17 @@ public class PLLRequestServlet extends HttpServlet {
      * 
      * @see sunir.share.profile.service.server.http.RequestProcessor
      */
-    private String handleRequest(RequestSet set,
-                                 HttpServletRequest req,
-                                 HttpServletResponse res)
-        throws ServletException {
+    private String handleRequest(PLLAuditor auditor, RequestSet set, HttpServletRequest req, HttpServletResponse res)
+            throws ServletException {
         if (!isValid(set)) {
-            throw new ServletException(
-                    PLLBundle.getString("invalidRequestSet"));
+            throw servletException("invalidRequestSet");
         }
         String svcid = set.getServiceID();
         RequestHandler handler = getServiceHandler(svcid);
         if (handler == null) {
-            throw new ServletException(PLLBundle.getString("noRequestHandler"));
+            throw servletException("noRequestHandler");
         }
-        ResponseSet rset = handler.process(set.getRequests(), req, res,
-                getServletConfig().getServletContext());
+        ResponseSet rset = handler.process(auditor, set.getRequests(), req, res, getServletConfig().getServletContext());
         rset.setRequestSetID(set.getRequestSetID());
         return rset.toXMLString();
     }

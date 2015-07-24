@@ -27,11 +27,12 @@
  */
 
 /*
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2015 ForgeRock AS
  */
 
 package com.sun.identity.policy.remote;
 
+import com.iplanet.services.comm.server.PLLAuditor;
 import com.iplanet.services.comm.server.RequestHandler;
 import com.iplanet.services.comm.share.Request;
 import com.iplanet.services.comm.share.Response;
@@ -124,6 +125,7 @@ public class PolicyRequestHandler implements RequestHandler {
      *  @return the set of the response
      */ 
     public ResponseSet process(
+        PLLAuditor pllAuditor,
         List<Request> requests,
         HttpServletRequest servletRequest, 
         HttpServletResponse servletResponse,

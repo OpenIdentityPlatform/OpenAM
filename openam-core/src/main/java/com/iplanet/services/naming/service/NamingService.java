@@ -46,6 +46,7 @@ import com.iplanet.services.naming.share.NamingResponse;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.internal.AuthPrincipal;
+import com.iplanet.services.comm.server.PLLAuditor;
 import com.sun.identity.common.FQDNUtils;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.common.configuration.SiteConfiguration;
@@ -377,7 +378,7 @@ public class NamingService implements RequestHandler, ServiceListener {
         return sb.toString();
     }
 
-    public ResponseSet process(List<Request> requests,
+    public ResponseSet process(PLLAuditor auditor, List<Request> requests,
             HttpServletRequest servletRequest,
             HttpServletResponse servletResponse, ServletContext servletContext)
     {

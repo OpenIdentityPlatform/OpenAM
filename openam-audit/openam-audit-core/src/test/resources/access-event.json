@@ -7,7 +7,6 @@
     "id": "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org"
   },
   "contextId": "uniqueSessionAlias",
-  "domain": "dc=openam,dc=forgerock,dc=org",
   "client": {
     "host": null,
     "ip": "172.16.101.7",

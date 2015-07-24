@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS
  */
 
 package com.iplanet.services.comm.server;
@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.iplanet.services.comm.share.ResponseSet;
+
 import java.util.List;
 
 /**
@@ -58,7 +59,9 @@ public interface RequestHandler {
      * This interface must be implemented by high level services and
      * applications in order to receive requests from the Platform Low Level
      * API.
-     * 
+     *
+     * @param auditor
+     *            Delegate for publication of 'access' audit events.
      * @param requests
      *            A Set<Request> of Request objects.
      * @param servletRequest
@@ -68,7 +71,6 @@ public interface RequestHandler {
      * @param servletContext
      *            Reference to ServletContext object.
      */
-    public ResponseSet process(List<Request> requests,
-            HttpServletRequest servletRequest,
-            HttpServletResponse servletResponse, ServletContext servletContext);
+    ResponseSet process(PLLAuditor auditor, List<Request> requests,
+            HttpServletRequest servletRequest, HttpServletResponse servletResponse, ServletContext servletContext);
 }

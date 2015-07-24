@@ -32,6 +32,7 @@ import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.services.comm.client.PLLClient;
+import com.iplanet.services.comm.server.PLLAuditor;
 import com.iplanet.services.comm.server.RequestHandler;
 import com.iplanet.services.comm.share.Request;
 import com.iplanet.services.comm.share.RequestSet;
@@ -75,6 +76,7 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionServiceURLService;
 import org.forgerock.openam.utils.ClientUtils;
@@ -130,22 +132,19 @@ public class AuthXMLHandler implements RequestHandler {
      * @param servletContext <code>servletContext</code> object for this request
      * @return <code>ResponseSet</code> object for the processed request.
      */
-    public ResponseSet process(
-        List<Request> requests,
-        HttpServletRequest servletRequest,
-        HttpServletResponse servletResponse,
-        ServletContext servletContext) {
+    public ResponseSet process(PLLAuditor auditor, List<Request> requests, HttpServletRequest servletRequest,
+                               HttpServletResponse servletResponse, ServletContext servletContext) {
         ResponseSet rset = new ResponseSet(AuthXMLTags.AUTH_SERVICE);
         for (Request req : requests) {
-            Response res = processRequest(req,servletRequest, servletResponse);
+            Response res = processRequest(auditor, req, servletRequest, servletResponse);
             rset.addResponse(res);
         }
         return rset;
     }
     
     /* process the request */
-    private Response processRequest(Request req,
-        HttpServletRequest servletReq, HttpServletResponse servletRes) {
+    private Response processRequest(PLLAuditor auditor, Request req,
+                                    HttpServletRequest servletReq, HttpServletResponse servletRes) {
         
         // this call is to create a http session so that the JSESSIONID cookie
         // is created. The appserver(8.1) load balancer plugin relies on the
@@ -212,9 +211,11 @@ public class AuthXMLHandler implements RequestHandler {
             RequestSet set = new RequestSet(AuthXMLTags.AUTH_SERVICE);
             set.addRequest(req);
             try {
-                Vector responses = PLLClient.send(new URL(cookieURL), set, 
+                Vector responses = PLLClient.send(new URL(cookieURL), set,
                     cookieTable);
                 if (!responses.isEmpty()) {
+                    auditor.auditAccessAttempt();
+                    auditor.auditAccessSuccess(); // Just record result as success here to avoid parsing response
                     debug.message("=====================Returning redirected");
                     return ((Response) responses.elementAt(0));
                 }
@@ -224,6 +225,8 @@ public class AuthXMLHandler implements RequestHandler {
                 authResponse = new AuthXMLResponse(AuthXMLRequest.
                     NewAuthContext);
                 setErrorCode(authResponse, e);
+                auditor.auditAccessAttempt();
+                auditor.auditAccessFailure(authResponse.errorCode, authResponse.authErrorMessage);
                 return new Response(authResponse.toXMLString());
             }
         }
@@ -232,7 +235,7 @@ public class AuthXMLHandler implements RequestHandler {
         try {
             AuthXMLRequest sreq = AuthXMLRequest.parseXML(content, servletReq);
             sreq.setHttpServletRequest(servletReq);
-            authResponse = processAuthXMLRequest(content, sreq, servletReq, servletRes);
+            authResponse = processAuthXMLRequest(content, auditor, sreq, servletReq, servletRes);
         } catch (AuthException e) {
             debug.error("Got Auth Exception", e);
             authResponse = new AuthXMLResponse(AuthXMLRequest.NewAuthContext);
@@ -243,14 +246,20 @@ public class AuthXMLHandler implements RequestHandler {
             setErrorCode(authResponse, ex);
         }
         debug.message("=======================Returning");
+        if (authResponse.isException) {
+            auditor.auditAccessFailure(authResponse.errorCode, authResponse.authErrorMessage);
+        } else {
+            auditor.auditAccessSuccess();
+        }
         return new Response(authResponse.toXMLString());
     }
-    
+
     /*
      * Process the XMLRequest
      */
     private AuthXMLResponse processAuthXMLRequest(
         String xml,
+        PLLAuditor auditor,
         AuthXMLRequest authXMLRequest,
         HttpServletRequest servletRequest,
         HttpServletResponse servletResponse) {
@@ -262,6 +271,12 @@ public class AuthXMLHandler implements RequestHandler {
         String orgName = authXMLRequest.getOrgName();
         AuthContextLocal authContext = authXMLRequest.getAuthContext();
         LoginState loginState = AuthUtils.getLoginState(authContext);
+
+        auditor.setMethod(getMethodName(requestType));
+        auditor.setAuthenticationId(getAuthenticationId(loginState));
+        auditor.setContextId(getContextId(loginState));
+        auditor.auditAccessAttempt();
+
         String params = authXMLRequest.getParams();
         List envList = authXMLRequest.getEnvironment();
         Map envMap = toEnvMap(envList);
@@ -377,6 +392,7 @@ public class AuthXMLHandler implements RequestHandler {
                     authXMLRequest.setIndexName(indexName);
                     authXMLRequest.setRequestType(AuthXMLRequest.LoginIndex);
                     requestType = AuthXMLRequest.LoginIndex;
+                    auditor.setMethod(getMethodName(requestType));
                 }
             }
         }
@@ -716,8 +732,58 @@ public class AuthXMLHandler implements RequestHandler {
                 }
             }
         }
-        
+
+        auditor.setAuthenticationId(getAuthenticationId(loginState));
+        auditor.setContextId(getContextId(loginState));
+
         return authResponse;
+    }
+
+    private String getContextId(LoginState loginState) {
+        String contextId = null;
+        if (loginState != null && loginState.getSession() != null) {
+            contextId = loginState.getSession().getProperty(Constants.AM_CTX_ID);
+        }
+        return contextId == null ? "" : contextId;
+    }
+
+    private String getDomain(LoginState loginState) {
+        String domain = null;
+        if (loginState != null) {
+            domain = loginState.getOrgDN();
+        }
+        return domain == null ? "" : domain;
+    }
+
+    private String getAuthenticationId(LoginState loginState) {
+        String authenticationId = "";
+        if (loginState != null && loginState.getSession() != null) {
+            authenticationId = loginState.getSession().getClientID();
+        }
+        return authenticationId == null ? "" : authenticationId;
+    }
+
+    private String getMethodName(int requestType) {
+        switch (requestType) {
+            case AuthXMLRequest.NewAuthContext:
+                return "NewAuthContext";
+            case AuthXMLRequest.Login:
+                return "Login";
+            case AuthXMLRequest.LoginIndex:
+                return "LoginIndex";
+            case AuthXMLRequest.LoginSubject:
+                return "LoginSubject";
+            case AuthXMLRequest.SubmitRequirements:
+                return "SubmitRequirements";
+            case AuthXMLRequest.QueryInformation:
+                return "QueryInformation";
+            case AuthXMLRequest.Logout:
+                return "Logout";
+            case AuthXMLRequest.Abort:
+                return "Abort";
+            default:
+                return "unknown";
+        }
     }
 
     /*
