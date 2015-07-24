@@ -15,7 +15,6 @@
  */
 
 /*global define*/
-
 define("org/forgerock/openam/ui/admin/views/realms/policies/resourceTypes/EditResourceTypeView", [
     "jquery",
     "underscore",
@@ -31,10 +30,13 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/resourceTypes/EditRe
 
     return AbstractView.extend({
         template: "templates/admin/views/realms/policies/resourceTypes/EditResourceTypeTemplate.html",
+        partials: [
+            "templates/admin/views/realms/partials/_HeaderDeleteButton.html"
+        ],
         events: {
             "click #saveChanges": "submitForm",
             "click #revertChanges": "revertChanges",
-            "click #deleteResType": "deleteResourceType"
+            "click #delete": "deleteResourceType"
         },
 
         initialize: function (options) {

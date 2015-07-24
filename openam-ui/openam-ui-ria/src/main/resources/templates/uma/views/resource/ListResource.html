@@ -1,8 +1,5 @@
 <div class="container">
-    <button id="revokeAll" type="button" class="btn btn-default page-header-button-group">
-        <i class="fa fa-times"></i> {{t "uma.resources.show.revokeAll"}}
-    </button>
-    {{> headers/_TitleWithSubAndIcon title="uma.resources.list.title" type="uma.common.shares" }}
+    {{> headers/_TitleWithSubAndIcon title="uma.resources.list.title" type="uma.common.shares" buttons="templates/uma/views/resource/_HeaderUnshareAllButton" }}
     <p class="page-description">{{t "uma.resources.list.subtitle"}}</p>
 
     <div class="tab-menu">

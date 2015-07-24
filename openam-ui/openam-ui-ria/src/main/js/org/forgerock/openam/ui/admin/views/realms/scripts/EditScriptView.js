@@ -43,6 +43,9 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
         },
 
         template: "templates/admin/views/realms/scripts/EditScriptTemplate.html",
+        partials: [
+            "templates/admin/views/realms/partials/_HeaderDeleteButton.html"
+        ],
         events: {
             "click #upload": "uploadScript",
             "change [name=upload]": "readUploadedFile",
@@ -52,7 +55,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             "click #saveChanges": "submitForm",
             "submit form": "submitForm",
             "click #revertChanges": "revertChanges",
-            "click #deleteScript": "deleteScript"
+            "click #delete": "deleteScript"
         },
 
         onModelSync: function (model, response) {

@@ -1,11 +1,16 @@
-<div class="clearfix">
-    <header class="page-header page-header-no-border clearfix pull-left">
-        {{#if icon}}
+<header class="page-header page-header-no-border clearfix">
+    {{#if icon}}
         <span class="header-icon pull-left"><i class="fa fa-{{icon}}"></i></span>
-        {{/if}}
-        <div class="pull-left">
-            <h4 class="page-type">{{t type}}</h4>
-            <h1>{{t title}}</h1>
+    {{/if}}
+
+    <div class="pull-left">
+        <h4 class="page-type">{{t type}}</h4>
+        <h1>{{t title}}</h1>
+    </div>
+
+    {{#if buttons}}
+        <div class="page-header-button-group button-group pull-right">
+            {{partial this.buttons this}}
         </div>
-    </header>
-</div>
+    {{/if}}
+</header>

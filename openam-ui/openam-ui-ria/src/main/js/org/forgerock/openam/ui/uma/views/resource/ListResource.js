@@ -30,6 +30,9 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
     var ListResource = AbstractView.extend({
         template: "templates/uma/views/resource/ListResource.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
+        partials: [
+            "templates/uma/views/resource/_HeaderUnshareAllButton.html"
+        ],
         events: {
             "click button#revokeAll:not(.disabled)": "onRevokeAll"
         },

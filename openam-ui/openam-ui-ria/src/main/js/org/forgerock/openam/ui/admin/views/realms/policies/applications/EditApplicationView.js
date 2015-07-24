@@ -32,12 +32,15 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/applications/EditApp
              EventManager, Router, Constants) {
     return AbstractView.extend({
         template: "templates/admin/views/realms/policies/applications/EditApplicationTemplate.html",
+        partials: [
+            "templates/admin/views/realms/partials/_HeaderDeleteButton.html"
+        ],
         APPLICATION_TYPE: "iPlanetAMWebAgentService",
         validationFields: ["name", "resourceTypeUuids"],
         events: {
             "click #saveChanges": "submitForm",
             "click #revertChanges": "revertChanges",
-            "click #deleteApp": "deleteApplication"
+            "click #delete": "deleteApplication"
         },
 
         initialize: function (options) {

@@ -1,0 +1,42 @@
+<div class="container">
+    <div class="page-header page-header-no-border clearfix">
+        <span id="umaShareImage" class="header-icon pull-left fa fa-file-image-o">
+            {{#if icon}}
+                <img title="{{name}}" src="{{icon}}" />
+            {{else}}
+                <i class="fa fa-share"></i>
+            {{/if}}
+        </span>
+
+        <div class="pull-left">
+            <h4 class="page-type">{{t "uma.resources.show.resource"}}</h4>
+            <h1>{{name}}</h1>
+        </div>
+
+        <div div class="page-header-button-group pull-right">
+            <button id="starred" type="button" class="btn btn-default"><i class="fa fa-star-o"></i></button>
+
+            <div class="btn-group">
+                <button id="share" type="button" class="btn btn-primary"><i class="fa fa-share"></i> {{t "uma.resources.show.share"}}</button>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                          <li id="unshare" class="disabled"><a href="#"><i class="fa fa-ban"></i>{{t "uma.resources.show.revoke"}}</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <p class="page-description"> {{t "uma.resources.show.subtitle"}}</p>
+
+    <div id="uma">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div id="backgridContainer" class="backgrid-container backgrid-readonly"></div>
+                <div id="paginationContainer"></div>
+            </div>
+        </div>
+    </div>
+</div>

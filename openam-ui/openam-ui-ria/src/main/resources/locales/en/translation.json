@@ -510,6 +510,7 @@
                     "title": "Shared with me",
                     "grid": ["Resource", "From", "Permissions", "Shared By"]
                 },
+                "revokeAll": "Unshare All Resources",
                 "revokeAllResourcesSuccess" : "All resources successfully revoked",
                 "revokeAllResourcesFail" : "We have been unable revoke access to your resources. Please contact your Administrator"
             },
@@ -517,7 +518,7 @@
                 "subtitle": "Users allowed to access this resource and their permissions",
                 "grid": ["User", "Last accessed", "Permissions"],
                 "share": "Share",
-                "revokeAll": "Revoke All",
+                "revoke": "Unshare Resource",
                 "revokeAllMessage": "Are you sure you want to revoke all access?",
                 "resource" : "Resource",
                 "revokeAllPoliciesSuccess" : "All access successfully revoked for your resource",

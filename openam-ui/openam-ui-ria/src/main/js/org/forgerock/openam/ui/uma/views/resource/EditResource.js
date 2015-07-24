@@ -1,64 +1,65 @@
 /**
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
- *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
- *
- * You can obtain a copy of the License at
- * http://forgerock.org/license/CDDLv1.0.html
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at http://forgerock.org/license/CDDLv1.0.html
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global $, _, Backbone, define*/
-define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
-    'org/forgerock/commons/ui/common/components/Messages',
-    'org/forgerock/commons/ui/common/main/AbstractView',
-    'backgrid',
-    'org/forgerock/openam/ui/common/util/BackgridUtils',
-    'bootstrap-dialog',
-    'org/forgerock/openam/ui/uma/views/share/CommonShare',
-    'org/forgerock/commons/ui/common/util/Constants',
-    'org/forgerock/commons/ui/common/main/EventManager',
-    'org/forgerock/commons/ui/common/main/Router',
-    'org/forgerock/commons/ui/common/util/UIUtils',
-    'org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy'
-], function(Messages, AbstractView, Backgrid, BackgridUtils, BootstrapDialog, CommonShare, Constants, EventManager, Router, UIUtils, UMAResourceSetWithPolicy) {
+/*global define*/
+define("org/forgerock/openam/ui/uma/views/resource/EditResource", [
+    "jquery",
+    "org/forgerock/commons/ui/common/main/AbstractView",
+    "backbone",
+    "backgrid",
+    "org/forgerock/openam/ui/common/util/BackgridUtils",
+    "bootstrap-dialog",
+    "org/forgerock/openam/ui/uma/views/share/CommonShare",
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/components/Messages",
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/commons/ui/common/util/UIUtils",
+    "org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy"
+], function($, AbstractView, Backbone, Backgrid, BackgridUtils, BootstrapDialog, CommonShare, Constants, EventManager,
+            Messages, Router, UIUtils, UMAResourceSetWithPolicy) {
     var EditResource = AbstractView.extend({
-        initialize: function(options) {
+        initialize: function() {
             this.model = null;
         },
-        template: "templates/uma/views/resource/EditResource.html",
+        template: "templates/uma/views/resource/EditResourceTemplate.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",
         events: {
-            'click button#revokeAll': 'onRevokeAll',
-            'click button#share': 'onShare'
+            "click button#starred": "onStarred",
+            "click button#share": "onShare",
+            "click li#unshare": "onUnshare"
         },
         onModelError: function(model, response) {
-            console.error('Unrecoverable load failure UMAResourceSetWithPolicy. ' +
-                response.responseJSON.code + ' (' + response.responseJSON.reason + ') ' +
+            console.error("Unrecoverable load failure UMAResourceSetWithPolicy. " +
+                response.responseJSON.code + " (" + response.responseJSON.reason + ") " +
                 response.responseJSON.message);
         },
-        onModelSync: function(model, response) {
+        onModelSync: function() {
             this.render();
         },
-        onRevokeAll: function() {
+        onUnshare: function(event) {
+            event.preventDefault();
+
+            if($(event.currentTarget).hasClass("disabled")) { return; }
+
             var self = this;
+
             BootstrapDialog.show({
                 type: BootstrapDialog.TYPE_DANGER,
-                title: self.model.get('name'),
+                title: self.model.get("name"),
                 message: $.t("uma.resources.show.revokeAllMessage"),
                 closable: false,
                 buttons: [{
@@ -68,7 +69,7 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
                     action: function(dialog) {
                         dialog.enableButtons(false);
                         dialog.getButton("btnOk").text($.t("common.form.working"));
-                        self.model.get('policy').destroy().done(function (response) {
+                        self.model.get("policy").destroy().done(function () {
                             EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "revokeAllPoliciesSuccess");
                             self.render();
                         }).fail(function (error) {
@@ -89,8 +90,15 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
             var shareView = new CommonShare();
             shareView.renderDialog(this.model.id);
         },
+        onStarred: function() {
+            // TODO: Simply flips the icon ATM, model update and save still TODO
+            // this.model.toggleStarred();
+            // self.model.save().done(function() {
+                this.$el.find("#starred i").toggleClass("fa-star-o fa-star");
+            // });
+        },
         render: function(args, callback) {
-            var collection, grid, id = null, options, paginator, RevokeCell, SelectizeCell, self = this;
+            var collection, grid, id = null, options, RevokeCell, SelectizeCell, self = this;
 
             // Get the current id
             if(args && args[0]) { id = args[0]; }
@@ -110,8 +118,8 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
              * copying in just the attributes I need ATM
              */
             this.data = {};
-            this.data.name = this.model.get('name');
-            this.data.icon = this.model.get('icon_uri');
+            this.data.name = this.model.get("name");
+            this.data.icon = this.model.get("icon_uri");
 
             // FIXME: Re-enable filtering and pagination
             //     UserPoliciesCollection = Backbone.PageableCollection.extend({
@@ -127,31 +135,31 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
                 events: {
                     "click #revoke": "revoke"
                 },
-                revoke: function(event) {
-                    self.model.get('policy').get('permissions').remove(this.model);
-                    self.model.get('policy').save();
+                revoke: function() {
+                    self.model.get("policy").get("permissions").remove(this.model);
+                    self.model.get("policy").save();
                 }
             });
 
-            options = this.model.get('scopes').toJSON();
+            options = this.model.get("scopes").toJSON();
 
             SelectizeCell = Backgrid.Cell.extend({
                 className: "selectize-cell",
                 template: "templates/uma/backgrid/cell/SelectizeCell.html",
                 render: function() {
-                    var items = this.model.get('scopes').pluck('name'),
+                    var items = this.model.get("scopes").pluck("name"),
                         select;
 
                     this.$el.html(UIUtils.fillTemplateWithData(this.template));
 
-                    select = this.$el.find('select').selectize({
+                    select = this.$el.find("select").selectize({
                         create: false,
                         delimiter: ",",
-                        dropdownParent: '#uma',
+                        dropdownParent: "#uma",
                         hideSelected: true,
                         persist: false,
-                        labelField: 'name',
-                        valueField: 'id',
+                        labelField: "name",
+                        valueField: "id",
                         items: items,
                         options: options
                     })[0];
@@ -168,16 +176,16 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
                             offset = this.settings.dropdownParent ? $control.offset() : $control.position();
 
                         if (this.settings.dropdownParent) {
-                            offset.top  -= ($control.outerHeight(true)*2) + $(this.settings.dropdownParent).position().top;
+                            offset.top -= ($control.outerHeight(true) * 2) + $(this.settings.dropdownParent).position().top;
                             offset.left -= $(this.settings.dropdownParent).offset().left + $(this.settings.dropdownParent).outerWidth() - $(this.settings.dropdownParent).outerWidth(true);
                         } else {
                             offset.top += $control.outerHeight(true);
                         }
 
                         this.$dropdown.css({
-                            width : $control.outerWidth(),
-                            top   : offset.top,
-                            left  : offset.left
+                            width: $control.outerWidth(),
+                            top: offset.top,
+                            left: offset.left
                         });
                     };
 
@@ -191,17 +199,16 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
              * checking for this and creating an empty collection if there is no policy
              */
             collection = new Backbone.Collection();
-            if(this.model.has('policy')) { collection = this.model.get('policy').get('permissions'); }
+            if(this.model.has("policy")) { collection = this.model.get("policy").get("permissions"); }
 
             grid = new Backgrid.Grid({
                 columns: [
                     {
                         name: "subject",
                         label: $.t("uma.resources.show.grid.0"),
-                        cell: 'string',
-                        // headerCell: BackgridUtils.FilterHeaderCell,
+                        cell: "string",
                         editable: false,
-                        headerCell : BackgridUtils.ClassHeaderCell.extend({
+                        headerCell: BackgridUtils.ClassHeaderCell.extend({
                             className: "col-md-4"
                         })
                     },
@@ -211,7 +218,7 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
                         cell: SelectizeCell,
                         editable: false,
                         sortable: false,
-                        headerCell : BackgridUtils.ClassHeaderCell.extend({
+                        headerCell: BackgridUtils.ClassHeaderCell.extend({
                             className: "col-md-6"
                         })
                     },
@@ -221,13 +228,13 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
                         cell: RevokeCell,
                         editable: false,
                         sortable: false,
-                        headerCell : BackgridUtils.ClassHeaderCell.extend({
+                        headerCell: BackgridUtils.ClassHeaderCell.extend({
                             className: "col-md-2"
                         })
                     }],
                 collection: collection,
                 emptyText: $.t("console.common.noResults"),
-                className:"backgrid table table-striped"
+                className: "backgrid table table-striped"
             });
 
             // FIXME: Re-enable filtering and pagination
@@ -236,19 +243,25 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
             //     windowSize: 3
             // });
 
-
-
             this.parentRender(function() {
-                self.$el.find('[data-toggle="tooltip"]').tooltip();
-                if (self.model.has('policy') && self.model.get('policy').get('permissions').length > 0){
-                    self.$el.find("button#revokeAll").prop("disabled", false);
+                self.$el.find("[data-toggle='tooltip']").tooltip();
+
+                if (self.model.has("policy") && self.model.get("policy").get("permissions").length > 0){
+                    self.$el.find("li#unshare").removeClass("disabled");
                 }
+
                 self.$el.find("#backgridContainer").append(grid.render().el);
                 // FIXME: Re-enable filtering and pagination
                 // self.$el.find("#paginationContainer").append(paginator.render().el);
+
                 self.$el.find("#umaShareImage img").error(function () {
-                    $(this).parent().addClass('no-image');
+                    $(this).parent().addClass("no-image");
                 });
+
+                // TODO: To be decided off the labels passed by the server
+                self.$el.find("#star i").toggleClass("fa-star-o fa-star");
+
+                if(callback) { callback(); }
             });
         },
         syncModel: function(id) {
@@ -257,8 +270,8 @@ define('org/forgerock/openam/ui/uma/views/resource/EditResource', [
             if(syncRequired) {
                 this.stopListening(this.model);
                 this.model = UMAResourceSetWithPolicy.findOrCreate( { _id: id} );
-                this.listenTo(this.model, 'sync', this.onModelSync);
-                this.listenTo(this.model, 'error', this.onModelError);
+                this.listenTo(this.model, "sync", this.onModelSync);
+                this.listenTo(this.model, "error", this.onModelError);
                 this.model.fetch();
             }
 
