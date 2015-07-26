@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -15,6 +15,9 @@
  */
 package org.forgerock.openam.xui;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
@@ -24,6 +27,9 @@ import javax.servlet.ServletContext;
 import static org.fest.assertions.Assertions.*;
 
 import org.mockito.ArgumentCaptor;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.owasp.esapi.ESAPI;
 
 import static org.mockito.BDDMockito.mock;
 import static org.mockito.Mockito.verify;
@@ -31,6 +37,8 @@ import static org.mockito.BDDMockito.when;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import com.sun.identity.shared.Constants;
 
 public class XUIFilterTest {
 
@@ -66,6 +74,41 @@ public class XUIFilterTest {
 
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
         verify(responseLogin).sendRedirect(captor.capture());
+
+        assertThat(captor.getValue()).isEqualTo(CONTEXT + xuiLoginPath + "&" + query);
+    }
+
+    @Test
+    public void loginRedirectsToXUIWithCompositeAdvice() throws Exception {
+        String pathInfo = "/UI/Login";
+        String query = "locale=fr&realm=%2F";
+        String compositeAdvice = "<Advices><AttributeValuePair><Attribute name=\"AuthLevelConditionAdvice\"/>"
+                + "<Value>1</Value></AttributeValuePair></Advices>";
+        String xuiLoginPath = "/XUI/#login/";
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse responseLogin = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        when(request.getRequestURI()).thenReturn(pathInfo);
+        when(request.getQueryString()).thenReturn(query);
+        when((request.getParameterMap())).thenAnswer(new Answer<Map>() {
+            @Override
+            public Map answer(InvocationOnMock invocation) throws Throwable {
+                Map parameterMap = new LinkedHashMap<String,String[]>();
+                parameterMap.put("locale", new String[]{"fr"});
+                parameterMap.put("realm", new String[]{"/"});
+                return parameterMap;
+            }
+        });
+        when(request.getParameter(Constants.COMPOSITE_ADVICE)).thenReturn(compositeAdvice);
+
+        filter.doFilter(request, responseLogin, filterChain);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(responseLogin).sendRedirect(captor.capture());
+        
+        query += "&authIndexType=composite_advice&authIndexValue=" + ESAPI.encoder().encodeForURL(compositeAdvice);
 
         assertThat(captor.getValue()).isEqualTo(CONTEXT + xuiLoginPath + "&" + query);
     }

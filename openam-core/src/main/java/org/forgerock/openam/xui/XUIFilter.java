@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -19,22 +19,26 @@ package org.forgerock.openam.xui;
 import java.io.IOException;
 import java.security.AccessController;
 import java.util.Map;
+
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
-
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchemaManager;
+
 import org.forgerock.guava.common.annotations.VisibleForTesting;
 import org.forgerock.guice.core.InjectorHolder;
+import org.owasp.esapi.ESAPI;
+import org.owasp.esapi.errors.EncodingException;
 
 /**
  * XUIFilter class is a servlet Filter for filtering incoming requests to OpenAM and redirecting them
@@ -51,6 +55,8 @@ public class XUIFilter implements Filter {
     protected volatile boolean initialized;
     private ServiceSchemaManager scm = null;
     private XUIState xuiState;
+    
+    private final Debug DEBUG = Debug.getInstance("Configuration");
 
     public XUIFilter() {}
 
@@ -106,6 +112,19 @@ public class XUIFilter implements Filter {
             } else if (request.getRequestURI().contains("idm/EndUser")) {
                 response.sendRedirect(profilePage + query);
             } else {
+                String compositeAdvice = (String)request.getParameter(Constants.COMPOSITE_ADVICE);
+                
+                if (compositeAdvice != null) {
+                    try {
+                        compositeAdvice = ESAPI.encoder().encodeForURL(compositeAdvice);
+                        
+                        final String authIndexType  = "authIndexType=composite_advice";
+                        final String authIndexValue = "authIndexValue=" + compositeAdvice;
+                        query = removeCompositeAdviceFromRequest(request) + "&" + authIndexType + "&" + authIndexValue;
+                    } catch (EncodingException e) {
+                        DEBUG.error("XUIFilter.doFilter::  failed to encode composite_advice : " + compositeAdvice, e);
+                    }
+                }
                 response.sendRedirect(xuiLoginPath + query);
             }
         } else {
@@ -120,4 +139,29 @@ public class XUIFilter implements Filter {
         xuiState.destroy();
     }
 
+    private String removeCompositeAdviceFromRequest(HttpServletRequest request) 
+            throws ServletException, EncodingException {
+        Map<String, String[]> parameterNames = request.getParameterMap();
+        StringBuilder query = new StringBuilder();
+
+        if (parameterNames != null) {
+            for (Map.Entry<String, String[]> entry : parameterNames.entrySet())
+            {
+                String paramName = entry.getKey();
+                String[] paramValues = entry.getValue();
+                if (paramName != null && !paramName.equalsIgnoreCase(Constants.COMPOSITE_ADVICE)) {
+                    try {
+                        if (paramValues != null) {
+                            for(String paramValue : paramValues) {
+                                query.append("&" + paramName + "=" + ESAPI.encoder().encodeForURL(paramValue));
+                            }
+                        }
+                    } catch (EncodingException e) {
+                        DEBUG.message("XUIFilter.doFilter::  failed to encode " + paramName + " : " + paramValues);
+                    }
+                }
+            }
+        }
+        return query.toString();
+    }
 }
