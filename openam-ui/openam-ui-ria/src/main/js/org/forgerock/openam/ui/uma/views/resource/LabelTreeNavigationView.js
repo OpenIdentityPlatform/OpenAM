@@ -15,76 +15,48 @@
  */
 
 /*global define require*/
-define("org/forgerock/openam/ui/uma/views/resource/NavResources", [
+define("org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView", [
     "underscore",
     "jquery",
-    "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/openam/ui/common/components/TreeNavigation",
     "org/forgerock/openam/ui/uma/delegates/UMADelegate"
-], function(_, $, AbstractView, Router, UMADelegate) {
-    var NavResources = AbstractView.extend({
-        template: "templates/uma/views/resource/NavResources.html",
-        partials : ["templates/uma/views/resource/_NestedList.html"],
-        events: {
-            "click .sidenav a[href]:not([data-toggle])": "navigateToPage"
-        },
+], function(_, $, Router, TreeNavigation, UMADelegate) {
+    var LabelTreeNavigationView = TreeNavigation.extend({
+        template: "templates/uma/views/resource/LabelTreeNavigationTemplate.html",
+        partials: [ "templates/uma/views/resource/_NestedList.html" ],
         findActiveNavItem: function (fragment) {
             var anchor = this.$el.find(".sidenav ol > li > a[href='#" + fragment + "']"),
-                parentOls, parentAnchors, fragmentSections;
-            if (anchor.length) {
+                parentOls, fragmentSections;
 
+            if (anchor.length) {
                 this.$el.find(".sidenav ol").removeClass("in");
 
                 parentOls = anchor.parentsUntil( this.$el.find(".sidenav"), "ol.collapse" );
-                parentOls.addClass("in").parent().children("span[data-toggle]").attr("aria-expanded","true");
+                parentOls.addClass("in").parent().children("span[data-toggle]").attr("aria-expanded", "true");
                 anchor.parent().addClass("active");
 
                 if(anchor.attr("aria-expanded") === "false"){
-                    anchor.attr("aria-expanded","true");
+                    anchor.attr("aria-expanded", "true");
                 }
-
             } else {
                 fragmentSections = fragment.split("/");
                 this.findActiveNavItem(fragmentSections.slice(0, -1).join("/"));
             }
         },
-        navigateToPage: function (e) {
+        navigateToPage: function (event) {
             this.$el.find(".sidenav li").removeClass("active");
-            $(e.currentTarget).addClass("active");
+            $(event.currentTarget).addClass("active");
             this.nextRenderPage = true;
         },
-        setElement: function (element) {
-            AbstractView.prototype.setElement.call(this, element);
-
-            if (this.route && this.nextRenderPage) {
-                var module = require(this.route.page);
-                if (module) {
-                    this.nextRenderPage = false;
-                    this.renderPage(module, this.args);
-                } else {
-                    throw "Unable to render realm page for module " + this.route.page;
-                }
-            }
-        },
-
-        renderPage: function (Module, args, callback) {
-            var page = new Module();
-            page.element = "#sidePageContent";
-            page.render(args, callback);
-            this.delegateEvents();
-        },
-
         render: function(args, callback) {
             var self = this;
-            this.args = args;
 
             UMADelegate.labels.all().done(function (data) {
-
                 self.data.labels = data;
                 self.data.nestedLabels = [];
 
                 function addToParent(collection, label) {
-
                     if (label.name.indexOf("/") === -1) {
                         label.title = label.name;
                         label.children = [];
@@ -108,14 +80,10 @@ define("org/forgerock/openam/ui/uma/views/resource/NavResources", [
                     addToParent(self.data.nestedLabels, label);
                 });
 
-                self.parentRender(function(){
-                    self.$el.find(".sidenav li").removeClass("active");
-                    self.findActiveNavItem(Router.getURIFragment());
-                    self.renderPage(require(self.route.page), args, callback);
-                });
+                TreeNavigation.prototype.render.call(self, args, callback);
             });
         }
     });
 
-    return new NavResources();
+    return new LabelTreeNavigationView();
 });

@@ -71,7 +71,7 @@ define([
     "./views/realms/subjects/SubjectsView",
 
     "./views/realms/RealmsListView",
-    "./views/realms/RealmView",
+    "./views/realms/RealmTreeNavigationView",
     "./views/realms/CreateUpdateRealmDialog",
 
     "./views/sessions/SessionsView"

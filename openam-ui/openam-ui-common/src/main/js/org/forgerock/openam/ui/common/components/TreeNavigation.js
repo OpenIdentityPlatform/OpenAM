@@ -1,4 +1,4 @@
-/*
+/**
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -15,19 +15,17 @@
  */
 
 /*global define, require*/
-define("org/forgerock/openam/ui/admin/views/realms/RealmView", [
+define("org/forgerock/openam/ui/common/components/TreeNavigation", [
     "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate"
-], function ($, AbstractView, Router, SMSGlobalDelegate) {
-    var RealmView = AbstractView.extend({
-        template: "templates/admin/views/realms/RealmTemplate.html",
+    "org/forgerock/commons/ui/common/main/Router"
+], function ($, AbstractView, Router) {
+    var TreeNavigation = AbstractView.extend({
         events: {
             "click .sidenav a[href]:not([data-toggle])": "navigateToPage"
         },
         findActiveNavItem: function (fragment) {
-            var element = this.$el.find(".sidenav ol > li > a[href^='#" + fragment + "']"),
+            var element = this.$el.find(".sidenav ol > li > a[href^=\"#" + fragment + "\"]"),
                 parent, fragmentSections;
             if (element.length) {
                 parent = element.parent();
@@ -59,42 +57,29 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmView", [
                     this.nextRenderPage = false;
                     this.renderPage(module, this.args);
                 } else {
-                    throw "Unable to render realm page for module " + this.route.page;
+                    throw "Unable to render page for module " + this.route.page;
                 }
             }
-        },
-        realmExists: function (path) {
-            return SMSGlobalDelegate.realms.get(path);
         },
         render: function (args, callback) {
             var self = this;
 
             this.args = args;
-            this.data.realmPath = args[0];
-            this.data.realmName = this.data.realmPath === "/" ? $.t("console.common.topLevelRealm") : this.data.realmPath;
 
-            this.realmExists(args[0])
-            .done(function () {
-                self.parentRender(function () {
-                    self.$el.find(".sidenav li").removeClass("active");
-                    self.findActiveNavItem(Router.getURIFragment());
-                    self.renderPage(require(self.route.page), args, callback);
-                });
-            })
-            .fail(function () {
-                Router.routeTo(Router.configuration.routes.realms, {
-                    args: [],
-                    trigger: true
-                });
+            self.parentRender(function () {
+                self.$el.find(".sidenav li").removeClass("active");
+                self.findActiveNavItem(Router.getURIFragment());
+                self.renderPage(require(self.route.page), args, callback);
             });
         },
         renderPage: function (Module, args, callback) {
             var page = new Module();
+
             page.element = "#sidePageContent";
             page.render(args, callback);
             this.delegateEvents();
         }
     });
 
-    return new RealmView();
+    return TreeNavigation;
 });

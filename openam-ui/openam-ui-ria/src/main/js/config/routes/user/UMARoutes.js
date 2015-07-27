@@ -18,7 +18,7 @@
 define("config/routes/user/UMARoutes", function () {
     return {
         "umaResources": {
-            view: "org/forgerock/openam/ui/uma/views/resource/NavResources",
+            view: "org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView",
             page: "org/forgerock/openam/ui/uma/views/resource/ListResourcesPage",
             url: /^uma\/resources\/?(.+)?\/?$/,
             pattern: "uma/resources/?",
@@ -27,7 +27,7 @@ define("config/routes/user/UMARoutes", function () {
             forceUpdate: true
         },
         "umaResourceEdit": {
-            view: "org/forgerock/openam/ui/uma/views/resource/NavResources",
+            view: "org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView",
             page: "org/forgerock/openam/ui/uma/views/resource/EditResourcePage",
             url: /^uma\/resources\/(.+)\/([^\/]+)\/?$/,
             role: "ui-user",
