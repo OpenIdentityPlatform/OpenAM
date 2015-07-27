@@ -38,6 +38,7 @@ define([
     "./views/resource/EditResource",
     "./views/resource/ListResource",
     "./views/resource/MyResourcesTab",
+    "./views/resource/NavResources",
     "./views/resource/SharedResourcesTab",
     "./views/share/BaseShare",
     "./views/share/CommonShare",

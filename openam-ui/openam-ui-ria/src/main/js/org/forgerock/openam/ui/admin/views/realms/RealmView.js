@@ -32,8 +32,8 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmView", [
             if (element.length) {
                 parent = element.parent();
 
-                this.$el.find('li').removeClass('active');
-                element.parentsUntil( this.$el.find('.sidenav'), 'li' ).addClass('active');
+                this.$el.find(".sidenav ol > li").removeClass("active");
+                element.parentsUntil( this.$el.find(".sidenav"), "li" ).addClass("active");
 
                 // Expand any collapsed element direct above. Only works one level up
                 if (parent.parent().hasClass("collapse")) {
@@ -45,8 +45,8 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmView", [
             }
         },
         navigateToPage: function (event) {
-            this.$el.find('li').removeClass('active');
-            $(event.currentTarget).parentsUntil( this.$el.find('.sidenav'), 'li' ).addClass('active');
+            this.$el.find(".sidenav ol > li").removeClass("active");
+            $(event.currentTarget).parentsUntil( this.$el.find(".sidenav"), "li" ).addClass("active");
 
             this.nextRenderPage = true;
         },
@@ -71,7 +71,7 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmView", [
 
             this.args = args;
             this.data.realmPath = args[0];
-            this.data.realmName = this.data.realmPath === "/" ? $.t('console.common.topLevelRealm') : this.data.realmPath;
+            this.data.realmName = this.data.realmPath === "/" ? $.t("console.common.topLevelRealm") : this.data.realmPath;
 
             this.realmExists(args[0])
             .done(function () {
@@ -90,8 +90,7 @@ define("org/forgerock/openam/ui/admin/views/realms/RealmView", [
         },
         renderPage: function (Module, args, callback) {
             var page = new Module();
-
-            page.element = '#sidePageContent';
+            page.element = "#sidePageContent";
             page.render(args, callback);
             this.delegateEvents();
         }

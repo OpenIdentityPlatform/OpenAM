@@ -129,5 +129,70 @@ define("org/forgerock/openam/ui/uma/delegates/UMADelegate", [
         });
     };
 
+    obj.labels = {
+        all: function () {
+            var promise = $.Deferred(),
+                returnObj = {},
+                mockData = [{
+                    type: 'star',
+                    name: 'Starred',
+                    _id: 'ID_1'
+                },{
+                    type: 'system',
+                    name: 'System 2',
+                    _id: 'ID_2'
+                },{
+                    type: 'system',
+                    name: 'System 5',
+                    _id: 'ID_5'
+                },{
+                    type: 'user',
+                    name: 'Mammals',
+                    _id: 'ID_7'
+                },{
+                    type: 'user',
+                    name: 'Mammals/Apes/Humans',
+                    _id: 'ID_8'
+                },{
+                    type: 'user',
+                    name: 'Mammals/Apes/Monkeys',
+                    _id: 'ID_22'
+                },{
+                    type: 'user',
+                    name: 'Insects/Flys/Bees',
+                    _id: 'ID_23'
+                },{
+                    type: 'user',
+                    name: 'Mammals/Dogs',
+                    _id: 'ID_24'
+                },{
+                    type: 'user',
+                    name: 'Mammals/Whales',
+                    _id: 'ID_26'
+                },{
+                    type: 'user',
+                    name: 'Mammals/Apes/Humans/Coders',
+                    _id: 'ID_99'
+                },{
+                    type: 'user',
+                    name: 'Mammals/Dogs/Puppies',
+                    _id: 'ID_28'
+                }];
+
+            mockData = _.sortBy(mockData, "name");
+
+            returnObj = {
+                'user'    : _.filter(mockData, {'type':'user'}),
+                'starred' : _.filter(mockData, {'type':'star'}),
+                'system'  : _.filter(mockData, {'type':'system'})
+            };
+
+            promise.resolve(returnObj);
+
+            return promise;
+        }
+
+    };
+
     return obj;
 });

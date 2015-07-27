@@ -317,8 +317,100 @@ body, .modal-open {
         border: none;
         box-shadow: none;
     }
+} 
+
+.sidenav {
+
+    a {
+        color: #666;
+        transition: color 0.1s linear;
+        text-decoration:none;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    li.active > a, a:hover {
+        color: @base-theme-color;
+        .fa{
+            color: #666;
+        }
+    }
+
+    ol > li > a {
+        padding: 0 0 15px 0;
+        display: block;
+
+        &:hover {
+            color: @base-theme-color;
+            text-decoration:none;
+        }
+
+        > .fa {
+            margin-right: 5px;
+            width: 20px;
+            text-align: center;
+        }
+    }
+
+    .sidenav-submenu {
+
+        li {
+            a {
+                padding: 0 0 10px 0;
+                display: inline-block;
+            }
+
+
+            a.no-arrow {
+                margin-left:15px;
+            }
+
+            span {
+                cursor:pointer;
+                .fa-icon();
+                color: #999;
+                width: 11px;
+                transform-origin: 10% 50%;
+
+                i {
+                    transition: all 0.3s ease-out;
+                }
+
+                &:hover{
+                    color: #444;
+                }
+
+            }
+
+            span[aria-expanded="true"] i{
+                -webkit-transform: rotate(90deg);
+                -moz-transform: rotate(90deg);
+                -o-transform: rotate(90deg);
+                -ms-transform: rotate(90deg);
+                transform: rotate(90deg);
+            }
+
+            &:last-of-type {
+                padding-bottom:10px;
+            }
+        }
+
+        margin: 0 0 0 20px;
+    }
+
+    > ol > li > ol.sidenav-submenu {
+        margin: 0 0 0 28px;
+    }
 }
 
-.page-header-button-group {
-    margin-top: 34px;
+
+#sidePageContent {
+    margin-top:-6px;
+    .page-header{
+        margin: 0 0 11px;
+        border-bottom:none;
+    }
+    .page-header-button-group {
+         margin-top: 34px;
+    }
 }

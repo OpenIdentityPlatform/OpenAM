@@ -75,5 +75,5 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
         }
     });
 
-    return new ListResource();
+    return ListResource;
 });
