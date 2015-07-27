@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.openam.authentication.modules.oath.JsonConversionUtils;
@@ -191,6 +192,14 @@ public class TwoStepVerificationUpgradeStep extends AbstractUpgradeStep {
             }
         }
 
+        if (attributes.containsKey("iplanet-am-auth-oath-size-of-time-step")) {
+            String timeStepSizeStr = CollectionUtils.getFirstItem(
+                    attributes.get("iplanet-am-auth-oath-size-of-time-step"), "30");
+            if (StringUtils.isNotBlank(timeStepSizeStr)) {
+                oathData.setTimeStepSize(Integer.parseInt(timeStepSizeStr));
+            }
+        }
+
         return oathData;
     }
 
@@ -246,7 +255,8 @@ public class TwoStepVerificationUpgradeStep extends AbstractUpgradeStep {
 
                                 if (timeVal != null) {
                                     try {
-                                        settings.setLastLogin(Long.valueOf(timeVal));
+                                        long timeInSeconds = attributes.getTimeStepSize() * Long.parseLong(timeVal);
+                                        settings.setLastLogin(timeInSeconds, TimeUnit.SECONDS);
                                     } catch (NumberFormatException e) {
                                         continue; //can't upgrade this one
                                     }
@@ -323,6 +333,7 @@ public class TwoStepVerificationUpgradeStep extends AbstractUpgradeStep {
         private int truncation = 0; //sensible defaults
         private boolean checksum = false;
         private String skippable = "oath2faEnabled";
+        private int timeStepSize = 30; // Seconds
 
         public void setSecretKeyAttribute(String key) { this.key = key; }
         public void setCounterAttribute(String counter) { this.counter = counter; }
@@ -330,6 +341,7 @@ public class TwoStepVerificationUpgradeStep extends AbstractUpgradeStep {
         public void setTruncationValue(int truncation) { this.truncation = truncation; }
         public void setChecksum(boolean checksum) { this.checksum = checksum; }
         public void setSkippable(String skippable) { this.skippable = skippable; }
+        public void setTimeStepSize(int timeStepSize) { this.timeStepSize = timeStepSize; }
 
         public String getKey() { return key; }
         public String getCounter() { return counter; }
@@ -337,6 +349,7 @@ public class TwoStepVerificationUpgradeStep extends AbstractUpgradeStep {
         public int getTruncationValue() { return truncation; }
         public boolean getChecksum() { return checksum; }
         public String getSkippable() { return skippable; }
+        public int getTimeStepSize() { return timeStepSize; }
 
         public boolean isUsable() { return key != null && (counter != null || time != null); }
     }

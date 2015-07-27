@@ -32,6 +32,7 @@ import org.testng.annotations.Test;
 
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class OathMakerTest {
     private static final int SECRET_HEX_LENGTH = 20;
@@ -82,7 +83,7 @@ public class OathMakerTest {
         deviceSettings.setCounter(42);
         deviceSettings.setSharedSecret("sekret");
         deviceSettings.setChecksumDigit(true);
-        deviceSettings.setLastLogin(99);
+        deviceSettings.setLastLogin(99, TimeUnit.MILLISECONDS);
         deviceSettings.setDeviceName("test device");
         deviceSettings.setTruncationOffset(32);
         JsonValue expectedJson = JsonConversionUtils.toJsonValue(deviceSettings);

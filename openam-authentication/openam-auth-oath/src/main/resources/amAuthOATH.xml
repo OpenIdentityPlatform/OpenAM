@@ -144,6 +144,16 @@
                         <Value>2</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="openam-auth-oath-maximum-clock-drift"
+                                 type="single"
+                                 syntax="number"
+                                 i18nKey="a514"
+                                 resourceName="totpMaximumClockDrift"
+                                 rangeStart="0" rangeEnd="2147483648">
+                    <DefaultValues>
+                        <Value>0</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
                     <AttributeSchema name="iplanet-am-auth-oath-auth-level"
                                      type="single"
@@ -243,6 +253,16 @@
                                      resourceName="totpTimeStepsInWindow">
                         <DefaultValues>
                             <Value>2</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="openam-auth-oath-maximum-clock-drift"
+                        type="single"
+                        syntax="number"
+                        i18nKey="a514"
+                        resourceName="totpMaximumClockDrift"
+                        rangeStart="0" rangeEnd="2147483648">
+                        <DefaultValues>
+                            <Value>0</Value>
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>

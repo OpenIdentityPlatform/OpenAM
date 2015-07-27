@@ -18,6 +18,8 @@ package org.forgerock.openam.rest.devices;
 
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
 import org.forgerock.util.Reject;
 
 /**
@@ -35,6 +37,7 @@ public final class OathDeviceSettings {
     private int truncationOffset = 0;
     private String[] recoveryCodes = new String[0];
     private String uuid;
+    private int clockDriftSeconds = 0;
 
     public OathDeviceSettings() {
         //Empty no-arg constructor for Jackson usage, due to presence of non-default constructor.
@@ -50,7 +53,7 @@ public final class OathDeviceSettings {
     public OathDeviceSettings(String sharedSecret, String deviceName, long lastLogin, int counter) {
         setSharedSecret(sharedSecret);
         setDeviceName(deviceName);
-        setLastLogin(lastLogin);
+        setLastLogin(lastLogin, TimeUnit.SECONDS);
         setCounter(counter);
 
         //when created w/ the constructor, use a random String
@@ -97,14 +100,15 @@ public final class OathDeviceSettings {
     }
 
     /**
-     * Set the last login time, in milliseconds, when this device was used. This is relevant for authentication using
+     * Set the last login time when this device was used. This is relevant for authentication using
      * the TOTP algorithm.
      *
      * @param lastLogin The last login time in ms. Can not be null.
+     * @param timeUnit The time units.
      */
-    public void setLastLogin(long lastLogin) {
+    public void setLastLogin(long lastLogin, TimeUnit timeUnit) {
         Reject.ifNull(lastLogin, "lastLogin can not be null.");
-        this.lastLogin = lastLogin;
+        this.lastLogin = timeUnit.toSeconds(lastLogin);
     }
 
     /**
@@ -164,7 +168,7 @@ public final class OathDeviceSettings {
     }
 
     /**
-     * Get the last login time, in milliseconds, when this device was used. This is relevant for authentication using
+     * Get the last login time, in seconds, when this device was used. This is relevant for authentication using
      * the TOTP algorithm.
      *
      * @return lastLogin The last login time in ms.
@@ -210,6 +214,27 @@ public final class OathDeviceSettings {
         return uuid;
     }
 
+    /**
+     * The calculated drift between the device and this server, in time steps. Used to implement the
+     * resynchronisation protocol described in <a href="https://tools.ietf.org/html/rfc6238#section-6">RFC 6238,
+     * section 6</a>.
+     *
+     * @return the current observed time-step drift for this TOTP client.
+     */
+    public int getClockDriftSeconds() {
+        return clockDriftSeconds;
+    }
+
+    /**
+     * Sets the observed time-step drift between this device and the server when performing TOTP authentication.
+     *
+     * @param clockDriftSeconds the observed time drift in time-steps.
+     * @see #getClockDriftSeconds()
+     */
+    public void setClockDriftSeconds(final int clockDriftSeconds) {
+        this.clockDriftSeconds = clockDriftSeconds;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -242,6 +267,9 @@ public final class OathDeviceSettings {
         if (!uuid.equals(that.getUUID())) {
             return false;
         }
+        if (clockDriftSeconds != that.clockDriftSeconds) {
+            return false;
+        }
 
         return true;
     }
@@ -249,7 +277,7 @@ public final class OathDeviceSettings {
     @Override
     public int hashCode() {
         return Objects.hash(sharedSecret, deviceName, lastLogin, counter,
-                checksumDigit, truncationOffset, recoveryCodes, uuid);
+                checksumDigit, truncationOffset, recoveryCodes, uuid, clockDriftSeconds);
     }
 
     @Override
@@ -262,6 +290,7 @@ public final class OathDeviceSettings {
                 ", checksumDigit='" + checksumDigit + '\'' +
                 ", truncationOffset='" + truncationOffset + '\'' +
                 ", UUID='"+ uuid + '\'' +
+                ", clockDriftSeconds=" + clockDriftSeconds +
                 '}';
     }
 
