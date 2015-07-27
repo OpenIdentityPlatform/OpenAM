@@ -15,7 +15,7 @@
  */
 
 /*global define*/
-define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
+define("org/forgerock/openam/ui/uma/views/resource/ListResourcesPage", [
     "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "bootstrap-dialog",
@@ -29,7 +29,6 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResource", [
             UMADelegate) {
     var ListResource = AbstractView.extend({
         template: "templates/uma/views/resource/ListResource.html",
-        baseTemplate: "templates/common/DefaultBaseTemplate.html",
         partials: [
             "templates/uma/views/resource/_HeaderUnshareAllButton.html"
         ],

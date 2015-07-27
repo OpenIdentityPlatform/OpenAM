@@ -17,37 +17,28 @@
 /*global define*/
 define("config/routes/user/UMARoutes", function () {
     return {
-        "uma": {
-            view: "org/forgerock/openam/ui/uma/views/resource/ListResource",
-            url: /^uma/,
-            pattern: "uma/resources/",
-            role: "ui-user"
-        },
-        "editResource": {
-            view: "org/forgerock/openam/ui/uma/views/resource/EditResource",
-            url: /^uma\/resources\/(.*?)(?:\/){0,1}$/,
+        "umaResources": {
+            view: "org/forgerock/openam/ui/uma/views/resource/NavResources",
+            page: "org/forgerock/openam/ui/uma/views/resource/ListResourcesPage",
+            url: /^uma\/resources\/?(.+)?\/?$/,
+            pattern: "uma/resources/?",
             role: "ui-user",
-            pattern: "uma/resources/?"
+            defaults: ["myresources"],
+            forceUpdate: true
         },
-        "listResource": {
-            view: "org/forgerock/openam/ui/uma/views/resource/ListResource",
-            url: /^uma\/resources\/$/,
-            defaults: [""],
+        "umaResourceEdit": {
+            view: "org/forgerock/openam/ui/uma/views/resource/NavResources",
+            page: "org/forgerock/openam/ui/uma/views/resource/EditResourcePage",
+            url: /^uma\/resources\/(.+)\/([^\/]+)\/?$/,
             role: "ui-user",
-            pattern: "uma/resources/"
+            pattern: "uma/resources/?/?",
+            forceUpdate: true
         },
-        "baseShare": {
-            view: "org/forgerock/openam/ui/uma/views/share/BaseShare",
-            url: /^uma\/share\/(.*?)(?:\/){0,1}$/,
-            pattern: "uma/share/?",
-            defaults: [""],
-            role: "ui-user"
-        },
-        "listHistory": {
+        "umaHistory": {
             view: "org/forgerock/openam/ui/uma/views/history/ListHistory",
             role: "ui-user",
             url: /^uma\/history\/?$/,
-            pattern: "uma/history/"
+            pattern: "uma/history"
         },
         "umaRequestEdit": {
             view: "org/forgerock/openam/ui/uma/views/request/EditRequest",
@@ -61,6 +52,13 @@ define("config/routes/user/UMARoutes", function () {
             defaults: [""],
             url: /^uma\/requests\/?$/,
             pattern: "uma/requests/"
+        },
+        "umaBaseShare": {
+            view: "org/forgerock/openam/ui/uma/views/share/BaseShare",
+            url: /^uma\/share\/(.*?)(?:\/){0,1}$/,
+            pattern: "uma/share/?",
+            defaults: [""],
+            role: "ui-user"
         }
     };
 });

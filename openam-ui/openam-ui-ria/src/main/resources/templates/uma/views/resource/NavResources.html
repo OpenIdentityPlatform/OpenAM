@@ -8,32 +8,29 @@
         <div class="col-sm-3 col-md-2">
             <nav class="sidenav">
                 <ol class="list-unstyled">
-
                     <li>
-                        <a  data-toggle="collapse"
-                            href="{{routeTo 'navResources' 'myresources'}}"
-                            aria-expanded="true"
-                            aria-controls="applications"
-                            data-target="#applications">
-
+                        <a data-toggle="collapse"
+                           href="{{routeTo 'umaResources' 'myresources'}}"
+                           aria-expanded="true"
+                           aria-controls="applications"
+                           data-target="#applications">
                             <i class="fa fa-folder"></i>My Resources
                         </a>
                         <ol class="collapse in list-unstyled sidenav-submenu" id="applications">
                         {{#each labels.system}}
-                            <li><a href="{{routeTo 'navResources' _id}}">{{name}}</a></li>
+                            <li><a href="{{routeTo 'umaResources' _id}}">{{name}}</a></li>
                         {{/each}}
                         </ol>
                     </li>
 
-                    <li><a href="{{routeTo 'navResources' 'sharedwithme'}}"><i class="fa fa-folder"></i>Shared with me</a></li>
-                    <li><a href="{{routeTo 'navResources' 'starred'}}"><i class="fa fa-star"></i>Starred</a></li>
+                    <li><a href="{{routeTo 'umaResources' 'sharedwithme'}}"><i class="fa fa-folder"></i>Shared with me</a></li>
+                    <li><a href="{{routeTo 'umaResources' 'starred'}}"><i class="fa fa-star"></i>Starred</a></li>
 
                     <li>
-                        <a  data-toggle="collapse"
-                            aria-expanded="false"
-                            aria-controls="labels"
-                            data-target="#labels">
-
+                        <a data-toggle="collapse"
+                           aria-expanded="false"
+                           aria-controls="labels"
+                           data-target="#labels">
                             <i class="fa fa-tags"></i>My Labels
                         </a>
                         <ol class="collapse in list-unstyled sidenav-submenu" id="labels">

@@ -15,7 +15,7 @@
  */
 
 /*global define*/
-define("org/forgerock/openam/ui/uma/views/resource/EditResource", [
+define("org/forgerock/openam/ui/uma/views/resource/EditResourcePage", [
     "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "backbone",
@@ -33,10 +33,10 @@ define("org/forgerock/openam/ui/uma/views/resource/EditResource", [
             Messages, Router, UIUtils, UMAResourceSetWithPolicy) {
     var EditResource = AbstractView.extend({
         initialize: function() {
+            // TODO: AbstarctView.prototype.initialize.call(this);
             this.model = null;
         },
         template: "templates/uma/views/resource/EditResourceTemplate.html",
-        baseTemplate: "templates/common/DefaultBaseTemplate.html",
         events: {
             "click button#starred": "onStarred",
             "click button#share": "onShare",
@@ -101,7 +101,7 @@ define("org/forgerock/openam/ui/uma/views/resource/EditResource", [
             var collection, grid, id = null, options, RevokeCell, SelectizeCell, self = this;
 
             // Get the current id
-            if(args && args[0]) { id = args[0]; }
+            if(args && args[1]) { id = args[1]; }
 
             /**
              * Guard clause to check if model requires sync'ing/updating
@@ -199,7 +199,9 @@ define("org/forgerock/openam/ui/uma/views/resource/EditResource", [
              * checking for this and creating an empty collection if there is no policy
              */
             collection = new Backbone.Collection();
-            if(this.model.has("policy")) { collection = this.model.get("policy").get("permissions"); }
+            if (this.model.has("policy")) {
+                collection = this.model.get("policy").get("permissions");
+            }
 
             grid = new Backgrid.Grid({
                 columns: [
@@ -279,5 +281,5 @@ define("org/forgerock/openam/ui/uma/views/resource/EditResource", [
         }
     });
 
-    return new EditResource();
+    return EditResource;
 });
