@@ -545,11 +545,11 @@
         "requests": {
             "list": {
                 "title": "Requests",
-                "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed condimentum at diam vel pulvinar. Aliquam quis imperdiet magna."
+                "description": "Pending requests for access to your resources."
             },
             "show": {
                 "title": "Request",
-                "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed condimentum at diam vel pulvinar. Aliquam quis imperdiet magna."
+                "description": "Pending request for access to your resources."
             },
             "grid": {
                 "header": ["User", "Resource", "When", "Permissions", "Actions"]

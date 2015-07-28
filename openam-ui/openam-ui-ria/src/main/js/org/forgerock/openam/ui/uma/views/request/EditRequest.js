@@ -25,8 +25,9 @@ define("org/forgerock/openam/ui/uma/views/request/EditRequest", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/openam/ui/uma/views/backgrid/cells/PermissionsCell",
-    "org/forgerock/openam/ui/uma/delegates/UMADelegate"
-], function ($, AbstractView, Backbone, Backgrid, BackgridUtils, Configuration, Constants, RealmHelper, PermissionsCell, UMADelegate) {
+    "org/forgerock/openam/ui/uma/delegates/UMADelegate",
+    "org/forgerock/commons/ui/common/main/Router"
+], function ($, AbstractView, Backbone, Backgrid, BackgridUtils, Configuration, Constants, RealmHelper, PermissionsCell, UMADelegate, Router) {
     var EditRequest = AbstractView.extend({
         template: "templates/uma/views/request/EditRequestTemplate.html",
         events: {
@@ -35,18 +36,20 @@ define("org/forgerock/openam/ui/uma/views/request/EditRequest", [
         },
 
         allowRequest: function () {
-            var self = this;
-            // TODO: change success condition to something more suitable
             UMADelegate.approveRequest(this.model.get("_id"), this.model.get("permissions")).done(function() {
-                self.render();
+                Router.routeTo(Router.configuration.routes.umaRequestList, {
+                    args: [],
+                    trigger: true
+                });
             });
         },
 
         denyRequest: function () {
-            var self = this;
-            // TODO: change success condition to something more suitable
             UMADelegate.denyRequest(this.model.get("_id")).done(function() {
-                self.render();
+                Router.routeTo(Router.configuration.routes.umaRequestList, {
+                    args: [],
+                    trigger: true
+                });
             });
         },
 

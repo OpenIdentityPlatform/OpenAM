@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -134,7 +135,7 @@ public class PendingRequestEmailTemplate {
         return Locale.ROOT;
     }
 
-    String buildScopeString(Set<String> scopes, String username, String realm) {
+    String buildScopeString(Collection<String> scopes, String username, String realm) {
         Locale locale = getLocale(username, realm);
         StringBuilder sb = new StringBuilder();
         for (String scope : scopes) {

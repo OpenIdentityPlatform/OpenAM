@@ -198,8 +198,9 @@ public class PendingRequestsService {
             JsonValue content, String realm) {
         try {
             final UmaPendingRequest request = store.read(id);
-            return createUmaPolicy(context, request, content)
-                    .thenAsync(approvePendingRequest(request, id, realm));
+            Collection<String> scopes = getScopes(request, content);
+            return createUmaPolicy(context, request, scopes)
+                    .thenAsync(approvePendingRequest(request, scopes, id, realm));
         } catch (NotFoundException e) {
             return newExceptionPromise((ResourceException) new org.forgerock.json.resource.NotFoundException(
                     "Pending request, " + id + ", not found", e));
@@ -210,7 +211,7 @@ public class PendingRequestsService {
     }
 
     private AsyncFunction<UmaPolicy, Void, ResourceException> approvePendingRequest(final UmaPendingRequest request,
-            final String id, final String realm) {
+            final Collection<String> scopes, final String id, final String realm) {
         return new AsyncFunction<UmaPolicy, Void, ResourceException>() {
             @Override
             public Promise<Void, ResourceException> apply(UmaPolicy value) {
@@ -223,7 +224,7 @@ public class PendingRequestsService {
                                     MessageFormat.format(template.getSecond(),
                                             request.getResourceOwnerId(), request.getResourceSetName(),
                                             pendingRequestEmailTemplate.buildScopeString(
-                                                    request.getScopes(), request.getRequestingPartyId(),
+                                                    scopes, request.getRequestingPartyId(),
                                                     realm)));
                         } catch (MessagingException e) {
                             debug.warning("Pending Request Approval email could not be sent", e);
@@ -247,14 +248,16 @@ public class PendingRequestsService {
         };
     }
 
-    private Promise<UmaPolicy, ResourceException> createUmaPolicy(final ServerContext context,
-            final UmaPendingRequest request, JsonValue content) {
-        final Collection<String> scopes;
+    private Collection<String> getScopes(UmaPendingRequest request, JsonValue content) {
         if (content != null && !content.isNull() && content.isDefined("scopes")) {
-            scopes = new HashSet<>(content.get("scopes").asList(String.class));
+            return new HashSet<>(content.get("scopes").asList(String.class));
         } else {
-            scopes = new HashSet<>(request.getScopes());
+            return new HashSet<>(request.getScopes());
         }
+    }
+
+    private Promise<UmaPolicy, ResourceException> createUmaPolicy(final ServerContext context,
+            final UmaPendingRequest request, final Collection<String> scopes) {
         return policyService.readPolicy(context, request.getResourceSetId())
                 .thenAsync(new AsyncFunction<UmaPolicy, UmaPolicy, ResourceException>() {
                     @Override
