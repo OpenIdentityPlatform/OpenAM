@@ -40,6 +40,16 @@
                     </DefaultValues>
                 </AttributeSchema>
 
+                <AttributeSchema name="iplanet-am-auth-oath-skippable-name"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a107"
+                                 resourceName="oathSkippableName">
+                    <DefaultValues>
+                        <Value>oath2faEnabled</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
                 <AttributeSchema name="openam-auth-oath-device-settings-encryption-scheme"
                     type="single_choice"
                     i18nKey="a101"

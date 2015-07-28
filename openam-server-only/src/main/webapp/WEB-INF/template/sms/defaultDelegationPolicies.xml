@@ -26,6 +26,10 @@
   $Id: defaultDelegationPolicies.xml,v 1.16 2009/11/26 17:06:07 veiming Exp $
 
 -->
+
+<!--
+    Portions Copyrighted 2015 ForgeRock AS.
+-->
                                                                                 
 <!DOCTYPE Policies
     PUBLIC "-//iPlanet//OpenSSO 2005Q4 Admin CLI DTD//EN"    "jar://com/sun/identity/policy/policyAdmin.dtd">
@@ -106,6 +110,7 @@
                 <Value>iplanet-am-user-password-reset-options</Value>
                 <Value>iplanet-am-user-password-reset-question-answer</Value>
                 <Value>description</Value>
+                <Value>oath2faEnabled</Value>
                 <Value>sunIdentityServerDeviceKeyValue</Value>
                 <Value>sunIdentityServerDeviceStatus</Value>
             </AttributeValuePair>

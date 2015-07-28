@@ -36,4 +36,5 @@ public class TrustedDeviceService implements DeviceService {
     public DeviceSerialisation getDeviceSerialisationStrategy() {
         return new JsonDeviceSerialisation();
     }
+
 }

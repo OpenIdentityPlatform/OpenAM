@@ -16,12 +16,16 @@
 package org.forgerock.openam.rest.devices.services;
 
 import com.iplanet.sso.SSOException;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import java.util.Collections;
+import java.util.HashMap;
 import org.forgerock.json.jose.jwe.EncryptionMethod;
 import org.forgerock.json.jose.jwe.JweAlgorithm;
 import org.forgerock.openam.rest.devices.DeviceSerialisation;
@@ -50,8 +54,12 @@ import java.util.Set;
  */
 public class OathService implements DeviceService {
 
-    final static public String SERVICE_NAME = "OATH";
-    final static public String SERVICE_VERSION = "1.0";
+    static public final String SERVICE_NAME = "OATH";
+    static public final String SERVICE_VERSION = "1.0";
+
+    public static final int NOT_SET = 0;
+    public static final int SKIPPABLE = 1;
+    public static final int NOT_SKIPPABLE = 2;
 
     final static private Debug debug = Debug.getInstance("amAuthOATH");
 
@@ -65,6 +73,8 @@ public class OathService implements DeviceService {
             "openam-auth-oath-device-settings-encryption-keypair-alias";
     private static final String OATH_KEYSTORE_PRIVATEKEY_PASSWORD =
             "openam-auth-oath-device-settings-encryption-privatekey-password";
+    private static final String OATH_SKIPPABLE_ATTRIBUTE_NAME =
+            "iplanet-am-auth-oath-skippable-name";
 
     private Map<String, Set<String>> options;
 
@@ -126,6 +136,35 @@ public class OathService implements DeviceService {
             debug.error("OathService.getEncryptionKeyPair(): Unable to load encryption key pair", e);
             throw new IllegalStateException(e);
         }
+    }
+
+    /**
+     * Returns the skippable attribute name for this service.
+     *
+     * @return The skippable attribute name.
+     */
+    public String getSkippableAttributeName() {
+        return CollectionHelper.getMapAttr(options, OATH_SKIPPABLE_ATTRIBUTE_NAME);
+    }
+
+    /**
+     * Sets the user's ability to skip an OATH module (or any module configured to look at the
+     * supplied attrName for its skippable value).
+     *
+     * @param id User's identity.
+     * @param userSkipOath Whether or not to skip.
+     * @throws IdRepoException If there were troubles talking to the IdRepo.
+     * @throws SSOException If there were issues setting values on the provided ID.
+     */
+    public void setUserSkipOath(AMIdentity id, boolean userSkipOath)
+            throws IdRepoException, SSOException {
+        final HashMap<String, Set<String>> attributesToWrite = new HashMap<>();
+        attributesToWrite.put(getSkippableAttributeName(),
+                userSkipOath ?
+                        Collections.singleton(String.valueOf(SKIPPABLE)) :
+                        Collections.singleton(String.valueOf(NOT_SKIPPABLE)));
+        id.setAttributes(attributesToWrite);
+        id.store();
     }
 
     private enum SupportedOathEncryptionScheme {

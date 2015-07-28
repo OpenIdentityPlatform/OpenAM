@@ -18,7 +18,6 @@ package org.forgerock.openam.rest.dashboard;
 
 import static org.fest.assertions.Assertions.*;
 import static org.forgerock.json.fluent.JsonValue.*;
-import static org.forgerock.json.resource.Resources.*;
 import static org.mockito.BDDMockito.anyObject;
 import static org.mockito.BDDMockito.anyString;
 import static org.mockito.BDDMockito.*;
@@ -26,24 +25,34 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.resource.Connection;
-import org.forgerock.json.resource.Context;
+import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.RootContext;
+import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.openam.rest.devices.OathDevicesDao;
 import org.forgerock.openam.rest.devices.OathDevicesResource;
+import org.forgerock.openam.rest.devices.services.OathService;
+import org.forgerock.openam.rest.devices.services.OathServiceFactory;
 import org.forgerock.openam.rest.resource.ContextHelper;
+import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.openam.utils.JsonValueBuilder;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
@@ -55,28 +64,36 @@ public class OathDevicesResourceTest {
 
     private OathDevicesDao dao;
     private ContextHelper contextHelper;
+    private Debug debug;
+    private OathServiceFactory oathServiceFactory;
+    private OathService oathService;
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws SMSException, SSOException {
 
         dao = mock(OathDevicesDao.class);
         contextHelper = mock(ContextHelper.class);
+        debug = mock(Debug.class);
+        oathServiceFactory = mock(OathServiceFactory.class);
+        oathService = mock(OathService.class);
 
-        resource = new OathDevicesResource(dao, contextHelper);
+        resource = new OathDevicesResourceTestClass(dao, contextHelper, debug, oathServiceFactory);
 
         given(contextHelper.getUserId((ServerContext) anyObject())).willReturn("demo");
+        given(oathServiceFactory.create(anyString())).willReturn(oathService);
     }
 
-    private Context ctx() {
-        return new ServerContext(new RootContext());
+    private ServerContext ctx() throws SSOException {
+        SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
+        given(mockSubjectContext.getCallerSSOToken()).willReturn(mock(SSOToken.class));
+        return new ServerContext(new RealmContext(mock(SSOTokenContext.class)));
     }
 
     @Test
-    public void shouldQueryTrustedDevices() throws ResourceException {
+    public void shouldQueryTrustedDevices() throws ResourceException, SSOException {
 
         //Given
         QueryRequest request = Requests.newQueryRequest("");
-        Connection connection = newInternalConnection(newCollection(resource));
         QueryResultHandler handler = mock(QueryResultHandler.class);
         List<JsonValue> devices = new ArrayList<JsonValue>();
         devices.add(json(object(field("name", "NAME_1"), field("lastSelectedDate", new Date().getTime()))));
@@ -85,18 +102,19 @@ public class OathDevicesResourceTest {
         given(dao.getDeviceProfiles(anyString(), anyString())).willReturn(devices);
 
         //When
-        connection.query(ctx(), request, handler);
+        resource.queryCollection(ctx(), request, handler);
 
         //Then
         verify(handler, times(2)).handleResource(Matchers.<Resource>anyObject());
     }
 
     @Test
-    public void shouldDeleteTrustedDevice() throws ResourceException {
+    public void shouldDeleteTrustedDevice() throws ResourceException, SSOException {
 
         //Given
-        DeleteRequest request = Requests.newDeleteRequest("UUID_1");
-        Connection connection = newInternalConnection(newCollection(resource));
+        DeleteRequest request = Requests.newDeleteRequest("UUID_2");
+        ResultHandler handler = mock(ResultHandler.class);
+
         List<JsonValue> devices = new ArrayList<JsonValue>();
         devices.add(json(object(field("uuid", "UUID_1"), field("name", "NAME_1"))));
         devices.add(json(object(field("uuid", "UUID_2"), field("name", "NAME_2"))));
@@ -104,7 +122,7 @@ public class OathDevicesResourceTest {
         given(dao.getDeviceProfiles(anyString(), anyString())).willReturn(devices);
 
         //When
-        connection.delete(ctx(), request);
+        resource.deleteInstance(ctx(), request.getResourceName(), request, handler);
 
         //Then
         ArgumentCaptor<List> devicesCaptor = ArgumentCaptor.forClass(List.class);
@@ -112,12 +130,12 @@ public class OathDevicesResourceTest {
         assertThat(devicesCaptor.getValue()).hasSize(1);
     }
 
-    @Test (expectedExceptions = NotFoundException.class)
-    public void shouldNotDeleteTrustedDeviceWhenNotFound() throws ResourceException {
+    @Test
+    public void shouldNotDeleteTrustedDeviceWhenNotFound() throws ResourceException, SSOException {
 
         //Given
         DeleteRequest request = Requests.newDeleteRequest("UUID_3");
-        Connection connection = newInternalConnection(newCollection(resource));
+        ResultHandler handler = mock(ResultHandler.class);
         List<JsonValue> devices = new ArrayList<JsonValue>();
         devices.add(json(object(field("uuid", "UUID_1"), field("name", "NAME_1"))));
         devices.add(json(object(field("uuid", "UUID_2"), field("name", "NAME_2"))));
@@ -125,9 +143,99 @@ public class OathDevicesResourceTest {
         given(dao.getDeviceProfiles(anyString(), anyString())).willReturn(devices);
 
         //When
-        connection.delete(ctx(), request);
+        resource.deleteInstance(ctx(), request.getResourceName(), request, handler);
 
         //Then
-        //Expected NotFoundException
+        ArgumentCaptor<ResourceException> exceptionCaptor = ArgumentCaptor.forClass(ResourceException.class);
+        verify(handler).handleError(exceptionCaptor.capture());
+        assertThat(exceptionCaptor.getValue().getCode() == ResourceException.NOT_FOUND);
+    }
+
+    @Test
+    public void shouldFailOnUnknownAction() throws ResourceException, SSOException {
+
+        //given
+        ActionRequest request = Requests.newActionRequest("instanceId", "fake");
+        ResultHandler handler = mock(ResultHandler.class);
+
+        //when
+        resource.actionCollection(ctx(), request, handler);
+
+        //then
+        ArgumentCaptor<ResourceException> exceptionCaptor = ArgumentCaptor.forClass(ResourceException.class);
+        verify(handler).handleError(exceptionCaptor.capture());
+        assertThat(exceptionCaptor.getValue().getCode() == ResourceException.NOT_SUPPORTED);
+    }
+
+    @Test
+    public void shouldExecuteSkipAction() throws ResourceException, SSOException {
+
+        //given
+        JsonValue contents = JsonValueBuilder.toJsonValue("{ \"value\" : true }");
+        JsonValue successResult = JsonValueBuilder.jsonValue().build();
+        ActionRequest request = Requests.newActionRequest("instanceId", "skip");
+        request.setContent(contents);
+        ResultHandler handler = mock(ResultHandler.class);
+
+        //when
+        resource.actionCollection(ctx(), request, handler);
+
+        //then
+        ArgumentCaptor<JsonValue> jsonCaptor = ArgumentCaptor.forClass(JsonValue.class);
+        verify(handler, times(1)).handleResult(jsonCaptor.capture());
+        assertThat(successResult.toString()).isEqualTo(jsonCaptor.getValue().toString());
+    }
+
+    @Test
+    public void shouldExecuteTrueCheckAction() throws ResourceException, SSOException {
+
+        //given
+        JsonValue successResult = JsonValueBuilder.toJsonValue("{ \"result\" : true }");
+        ActionRequest request = Requests.newActionRequest("instanceId", "check");
+        ResultHandler handler = mock(ResultHandler.class);
+
+        //when
+        resource.actionCollection(ctx(), request, handler);
+
+        //then
+        ArgumentCaptor<JsonValue> jsonCaptor = ArgumentCaptor.forClass(JsonValue.class);
+        verify(handler, times(1)).handleResult(jsonCaptor.capture());
+        assertThat(successResult.toString()).isEqualTo(jsonCaptor.getValue().toString());
+    }
+
+    @Test
+    public void shouldFailOnUnknownActionInstance() throws ResourceException, SSOException {
+
+        //given
+        ResultHandler handler = mock(ResultHandler.class);
+        ActionRequest actionRequest = mock(ActionRequest.class);
+
+
+        //when
+        resource.actionInstance(ctx(), "", actionRequest, handler);
+
+        //then
+        ArgumentCaptor<ResourceException> exceptionCaptor = ArgumentCaptor.forClass(ResourceException.class);
+        verify(handler).handleError(exceptionCaptor.capture());
+        assertThat(exceptionCaptor.getValue().getCode() == ResourceException.NOT_SUPPORTED);
+    }
+
+    private static class OathDevicesResourceTestClass extends OathDevicesResource {
+
+
+        public OathDevicesResourceTestClass(OathDevicesDao dao, ContextHelper helper, Debug debug,
+                                            OathServiceFactory oathServiceFactory) {
+            super(dao, helper, debug, oathServiceFactory);
+        }
+
+        protected AMIdentity getIdentity(ServerContext context) throws SSOException, IdRepoException {
+
+            HashSet<String> attribute = new HashSet<>();
+            attribute.add(String.valueOf(OathService.SKIPPABLE));
+
+            AMIdentity mockId = mock(AMIdentity.class);
+            given(mockId.getAttribute(anyString())).willReturn(attribute);
+            return mockId;
+        }
     }
 }

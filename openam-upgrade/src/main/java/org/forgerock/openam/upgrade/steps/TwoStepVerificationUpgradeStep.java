@@ -28,10 +28,12 @@ import com.sun.identity.idm.IdSearchControl;
 import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.SMSException;
 import java.io.IOException;
 import java.security.PrivilegedAction;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,6 +45,7 @@ import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.openam.authentication.modules.oath.JsonConversionUtils;
 import org.forgerock.openam.rest.devices.OathDeviceSettings;
 import org.forgerock.openam.rest.devices.OathDevicesDao;
+import org.forgerock.openam.rest.devices.services.OathService;
 import org.forgerock.openam.rest.devices.services.OathServiceFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
@@ -80,14 +83,14 @@ public class TwoStepVerificationUpgradeStep extends AbstractUpgradeStep {
 
     private final OathServiceFactory oathServiceFactory;
 
-    private ArrayList<String> skippedInRealm = new ArrayList<>();
+    private Collection<String> skippedInRealm = new ArrayList<>();
     private Map<String, OathData> upgradeMap = new HashMap<>();
     private Map<String, Integer> numUpgradedMap = new HashMap<>();
 
     @Inject
     public TwoStepVerificationUpgradeStep(final PrivilegedAction<SSOToken> adminTokenAction,
                                           @DataLayer(ConnectionType.DATA_LAYER) final ConnectionFactory factory,
-                                          OathServiceFactory serviceFactory) {
+                                          final OathServiceFactory serviceFactory) {
         super(adminTokenAction, factory);
         this.oathServiceFactory = serviceFactory;
     }
@@ -184,14 +187,6 @@ public class TwoStepVerificationUpgradeStep extends AbstractUpgradeStep {
             }
         }
 
-        if (attributes.containsKey("iplanet-am-auth-oath-skippable-attr-name")) {
-            String skippable = CollectionUtils.getFirstItem(attributes.get("iplanet-am-auth-oath-skippable-attr-name"),
-                    null);
-            if (StringUtils.isNotBlank(skippable)) {
-                oathData.setSkippable(skippable);
-            }
-        }
-
         if (attributes.containsKey("iplanet-am-auth-oath-size-of-time-step")) {
             String timeStepSizeStr = CollectionUtils.getFirstItem(
                     attributes.get("iplanet-am-auth-oath-size-of-time-step"), "30");
@@ -210,6 +205,7 @@ public class TwoStepVerificationUpgradeStep extends AbstractUpgradeStep {
             int numberUsersUpgraded = 0;
             String realm = entry.getKey();
 
+
             OathDevicesDao dao = new OathDevicesDao(oathServiceFactory);
             OathData attributes = entry.getValue();
             AMIdentityRepository amIdRepo = AuthD.getAuth().getAMIdentityRepository(DNMapper.orgNameToDN(realm));
@@ -219,6 +215,8 @@ public class TwoStepVerificationUpgradeStep extends AbstractUpgradeStep {
             idsc.setMaxResults(0);
             IdSearchResults searchResults;
             try {
+                OathService os = new OathService(realm);
+
                 searchResults = amIdRepo.searchIdentities(IdType.USER, "*", idsc); //find all the things
 
                 if (searchResults != null) {
@@ -276,7 +274,7 @@ public class TwoStepVerificationUpgradeStep extends AbstractUpgradeStep {
                                 //if there's a device we're saving, set their skippable as not-skippable
                                 //otherwise leave it as not set
                                 HashMap<String, Set<String>> attrMap = new HashMap<>();
-                                attrMap.put(attributes.getSkippable(), Collections.singleton("2"));
+                                attrMap.put(os.getSkippableAttributeName(), Collections.singleton("2"));
                                 id.setAttributes(attrMap);
                                 id.store();
 
@@ -285,9 +283,9 @@ public class TwoStepVerificationUpgradeStep extends AbstractUpgradeStep {
                         }
                     }
                 }
-            } catch (IdRepoException | SSOException | IOException | InternalServerErrorException e) {
+            } catch (IdRepoException | SSOException | IOException | InternalServerErrorException | SMSException e) {
                 DEBUG.error(e.getMessage());
-                throw new UpgradeException("Unable to parse data for device migration.");
+                throw new UpgradeException("Unable to parse data for device migration.", e);
             }
 
             numUpgradedMap.put(realm, numberUsersUpgraded);
@@ -332,7 +330,6 @@ public class TwoStepVerificationUpgradeStep extends AbstractUpgradeStep {
         private String key, counter, time;
         private int truncation = 0; //sensible defaults
         private boolean checksum = false;
-        private String skippable = "oath2faEnabled";
         private int timeStepSize = 30; // Seconds
 
         public void setSecretKeyAttribute(String key) { this.key = key; }
@@ -340,7 +337,6 @@ public class TwoStepVerificationUpgradeStep extends AbstractUpgradeStep {
         public void setTimeAttribute(String time) { this.time = time; }
         public void setTruncationValue(int truncation) { this.truncation = truncation; }
         public void setChecksum(boolean checksum) { this.checksum = checksum; }
-        public void setSkippable(String skippable) { this.skippable = skippable; }
         public void setTimeStepSize(int timeStepSize) { this.timeStepSize = timeStepSize; }
 
         public String getKey() { return key; }
@@ -348,7 +344,6 @@ public class TwoStepVerificationUpgradeStep extends AbstractUpgradeStep {
         public String getTime() { return time; }
         public int getTruncationValue() { return truncation; }
         public boolean getChecksum() { return checksum; }
-        public String getSkippable() { return skippable; }
         public int getTimeStepSize() { return timeStepSize; }
 
         public boolean isUsable() { return key != null && (counter != null || time != null); }

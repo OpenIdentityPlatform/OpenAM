@@ -226,64 +226,64 @@ public class RestAuthenticationHandler {
             throws AuthLoginException, SignatureException, RestAuthException {
 
         switch (loginProcess.getLoginStage()) {
-        case REQUIREMENTS_WAITING: {
+            case REQUIREMENTS_WAITING: {
 
-            Callback[] callbacks = loginProcess.getCallbacks();
+                Callback[] callbacks = loginProcess.getCallbacks();
 
-            JsonValue jsonCallbacks;
-            try {
-                jsonCallbacks = handleCallbacks(request, response, postBody, callbacks);
-            } catch (RestAuthResponseException e) {
-                // Include the authId in the JSON response.
-                if (authId == null) {
-                    authId = authIdHelper.createAuthId(loginConfiguration, loginProcess.getAuthContext());
+                JsonValue jsonCallbacks;
+                try {
+                    jsonCallbacks = handleCallbacks(request, response, postBody, callbacks);
+                } catch (RestAuthResponseException e) {
+                    // Include the authId in the JSON response.
+                    if (authId == null) {
+                        authId = authIdHelper.createAuthId(loginConfiguration, loginProcess.getAuthContext());
+                    }
+                    e.getJsonResponse().put("authId", authId);
+                    throw e;
                 }
-                e.getJsonResponse().put("authId", authId);
-                throw e;
-            }
 
-            if (jsonCallbacks != null && jsonCallbacks.size() > 0) {
-                JsonValue jsonValue = createJsonCallbackResponse(authId, loginConfiguration, loginProcess,
-                        jsonCallbacks);
-                return jsonValue;
-            } else {
-                loginProcess = loginProcess.next(callbacks);
-                return processAuthentication(request, response, null, authId,
-                        loginProcess, loginConfiguration);
-            }
-        }
-        case COMPLETE: {
-            loginProcess.cleanup();
-
-            if (loginProcess.isSuccessful()) {
-                // send token to client
-                JsonObject jsonResponseObject = JsonValueBuilder.jsonValue();
-
-                SSOToken ssoToken = loginProcess.getSSOToken();
-                if (ssoToken != null) {
-                    String tokenId = ssoToken.getTokenID().toString();
-                    jsonResponseObject.put("tokenId", tokenId);
+                if (jsonCallbacks != null && jsonCallbacks.size() > 0) {
+                    JsonValue jsonValue = createJsonCallbackResponse(authId, loginConfiguration, loginProcess,
+                            jsonCallbacks);
+                    return jsonValue;
                 } else {
-                    jsonResponseObject.put("message", "Authentication Successful");
+                    loginProcess = loginProcess.next(callbacks);
+                    return processAuthentication(request, response, null, authId,
+                            loginProcess, loginConfiguration);
                 }
-
-                String gotoUrl = urlValidator.getRedirectUrl(loginProcess.getOrgDN(),
-                        urlValidator.getValueFromJson(postBody, RedirectUrlValidator.GOTO),
-                        loginProcess.getSuccessURL());
-
-                jsonResponseObject.put("successUrl", gotoUrl);
-
-                return jsonResponseObject.build();
-
-            } else {
-                // send Error to client
-                AuthenticationContext authContext = loginProcess.getAuthContext();
-                String errorCode = authContext.getErrorCode();
-                String errorMessage = authContext.getErrorMessage();
-
-                throw new RestAuthErrorCodeException(errorCode, errorMessage);
             }
-        }
+            case COMPLETE: {
+                loginProcess.cleanup();
+
+                if (loginProcess.isSuccessful()) {
+                    // send token to client
+                    JsonObject jsonResponseObject = JsonValueBuilder.jsonValue();
+
+                    SSOToken ssoToken = loginProcess.getSSOToken();
+                    if (ssoToken != null) {
+                        String tokenId = ssoToken.getTokenID().toString();
+                        jsonResponseObject.put("tokenId", tokenId);
+                    } else {
+                        jsonResponseObject.put("message", "Authentication Successful");
+                    }
+
+                    String gotoUrl = urlValidator.getRedirectUrl(loginProcess.getOrgDN(),
+                            urlValidator.getValueFromJson(postBody, RedirectUrlValidator.GOTO),
+                            loginProcess.getSuccessURL());
+
+                    jsonResponseObject.put("successUrl", gotoUrl);
+
+                    return jsonResponseObject.build();
+
+                } else {
+                    // send Error to client
+                    AuthenticationContext authContext = loginProcess.getAuthContext();
+                    String errorCode = authContext.getErrorCode();
+                    String errorMessage = authContext.getErrorMessage();
+
+                    throw new RestAuthErrorCodeException(errorCode, errorMessage);
+                }
+            }
         }
 
         // This should never happen

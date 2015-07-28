@@ -24,7 +24,7 @@ import com.sun.identity.sm.SMSException;
 public class OathServiceFactory implements DeviceServiceFactory {
 
     @Override
-    public DeviceService create(String realm) throws SSOException, SMSException {
+    public OathService create(String realm) throws SSOException, SMSException {
         return new OathService(realm);
     }
 }

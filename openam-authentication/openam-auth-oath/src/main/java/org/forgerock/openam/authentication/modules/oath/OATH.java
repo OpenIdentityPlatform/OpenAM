@@ -38,11 +38,11 @@ import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,7 +58,9 @@ import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.openam.rest.devices.OathDeviceSettings;
 import org.forgerock.openam.rest.devices.OathDevicesDao;
+import org.forgerock.openam.rest.devices.services.OathService;
 import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openam.utils.qr.GenerationUtils;
 
 /**
@@ -83,8 +85,6 @@ public class OATH extends AMLoginModule {
             "iplanet-am-auth-oath-password-length";
     private static final String WINDOW_SIZE =
             "iplanet-am-auth-oath-hotp-window-size";
-    private static final String USER_OATH_ACTIVATED_ATTRIBUTE_NAME =
-            "iplanet-am-auth-oath-skippable-attr-name";
     private static final String TRUNCATION_OFFSET =
             "iplanet-am-auth-oath-truncation-offset";
     private static final String CHECKSUM = "iplanet-am-auth-oath-add-checksum";
@@ -99,7 +99,6 @@ public class OATH extends AMLoginModule {
 
     //module attribute holders
     private int userConfiguredSkippable = 0;
-    private String skippableAttrName = null;
     private boolean isOptional;
     private int passLen = 0;
     private int minSecretKeyLength = 0;
@@ -131,9 +130,9 @@ public class OATH extends AMLoginModule {
 
     private static final int SCRIPT_OUTPUT_CALLBACK_INDEX = 1;
 
-    private static final int NOT_SET = 0;
-    private static final int SKIPPABLE = 1;
-    private static final int NOT_SKIPPABLE = 2;
+    private OathService realmOathService;
+    private AMIdentity id;
+
 
     private final OathDevicesDao devicesDao = InjectorHolder.getInstance(OathDevicesDao.class);
     private final OathMaker deviceFactory = InjectorHolder.getInstance(OathMaker.class);
@@ -179,8 +178,14 @@ public class OATH extends AMLoginModule {
             debug.message("OATH::init");
         }
 
-        //get module attributes
+        //get username from previous authentication
         try {
+            userName = (String) sharedState.get(getUserKey());
+
+            //gets skippable name from the realm's service and stores it
+            id = getIdentity();
+            realmOathService = new OathService(id.getRealm());
+
             this.authLevel = CollectionHelper.getMapAttr(options, AUTHLEVEL);
 
             try {
@@ -192,12 +197,11 @@ public class OATH extends AMLoginModule {
             try {
                 this.minSecretKeyLength = CollectionHelper.getIntMapAttr(options, MIN_SECRET_KEY_LENGTH, 0, debug);
             } catch (NumberFormatException e) {
-                minSecretKeyLength = 0; //Default value has been delete, set to 0
+                minSecretKeyLength = 0; //Default value has been deleted, set to 0
             }
 
-            this.skippableAttrName = CollectionHelper.getMapAttr(options, USER_OATH_ACTIVATED_ATTRIBUTE_NAME);
             this.windowSize = CollectionHelper.getIntMapAttr(options, WINDOW_SIZE, 0, debug);
-            this.truncationOffset = CollectionHelper.getIntMapAttr(options, TRUNCATION_OFFSET, 0, debug);
+            this.truncationOffset = CollectionHelper.getIntMapAttr(options, TRUNCATION_OFFSET, -1, debug);
             this.isOptional = !getLoginState("OATH").is2faMandatory();
             this.totpTimeStep = CollectionHelper.getIntMapAttr(options, TOTP_TIME_STEP, 1, debug);
             this.totpStepsInWindow = CollectionHelper.getIntMapAttr(options, TOTP_STEPS_IN_WINDOW, 1, debug);
@@ -219,19 +223,14 @@ public class OATH extends AMLoginModule {
                     setAuthLevel(Integer.parseInt(authLevel));
                 } catch (Exception e) {
                     if (debug.errorEnabled()) {
-                        debug.error("OATH" + ".init() : Unable to set auth level " + authLevel, e);
+                        debug.error("OATH :: init() : Unable to set auth level " + authLevel, e);
                     }
                 }
             }
-        } catch (Exception e) {
-            debug.error("OATH.init() : Unable to get module attributes", e);
-        }
-
-        //get username from previous authentication
-        try {
-            userName = (String) sharedState.get(getUserKey());
-        } catch (Exception e) {
-            debug.error("OATH.init() : Unable to get username : ", e);
+        } catch (SMSException | SSOException | AuthLoginException e) {
+            if (debug.errorEnabled()) {
+                debug.error("OATH :: init() : Unable to configure basic module properties " + authLevel, e);
+            }
         }
 
     }
@@ -268,8 +267,6 @@ public class OATH extends AMLoginModule {
                 }
             }
 
-            final AMIdentity id = getIdentity();
-
             final OathDeviceSettings settings = getOathDeviceSettings(id.getName(), id.getRealm());
 
             try {
@@ -284,11 +281,11 @@ public class OATH extends AMLoginModule {
             switch (state) {
                 case LOGIN_START:
 
-                    if (isOptional && userConfiguredSkippable == SKIPPABLE) {
+                    if (isOptional && userConfiguredSkippable == OathService.SKIPPABLE) {
                         return ISAuthConstants.LOGIN_SUCCEED;
-                    } else if (isOptional && userConfiguredSkippable == NOT_SET) {
+                    } else if (isOptional && userConfiguredSkippable == OathService.NOT_SET) {
                         return LOGIN_OPTIONAL;
-                    } else if (isOptional && userConfiguredSkippable != NOT_SKIPPABLE) {
+                    } else if (isOptional && userConfiguredSkippable != OathService.NOT_SKIPPABLE) {
                         throw new AuthLoginException(amAuthOATH, "authFailed", null); //invalid so error
                     } else {
                         if (settings == null) {
@@ -310,7 +307,7 @@ public class OATH extends AMLoginModule {
 
                     selectedIndex = ((ConfirmationCallback) callbacks[1]).getSelectedIndex();
                     if (selectedIndex == SKIP_OATH_INDEX) {
-                        setUserSkipOath(id, true);
+                        realmOathService.setUserSkipOath(id, true);
                         return ISAuthConstants.LOGIN_SUCCEED;
                     }
 
@@ -354,7 +351,7 @@ public class OATH extends AMLoginModule {
                     }
 
                 case REGISTER_DEVICE:
-                    setUserSkipOath(id, false);
+                    realmOathService.setUserSkipOath(id, false);
                     return LOGIN_SAVED_DEVICE;
 
                 case RECOVERY_USED:
@@ -417,19 +414,18 @@ public class OATH extends AMLoginModule {
     private void detectNecessity(AMIdentity identity) throws AuthLoginException, IdRepoException, SSOException {
 
         //not optional if they haven't selected anywhere to save the user's preference
-        if (isOptional && skippableAttrName == null) {
+        if (isOptional && StringUtils.isBlank(realmOathService.getSkippableAttributeName())) {
             isOptional = false;
         }
 
         //value is stored as: 0 (not chosen), 1 (skippable) or 2 (not skippable)
         if (isOptional) {
-            Set response = identity.getAttribute(skippableAttrName);
+            Set response = identity.getAttribute(realmOathService.getSkippableAttributeName());
             if (response != null && !response.isEmpty()) { //sets skippable to true if set in user
                 String tmp = (String) response.iterator().next();
                 userConfiguredSkippable = Integer.valueOf(tmp);
             }
         }
-
     }
 
     private void paintRegisterDeviceCallback(AMIdentity id, OathDeviceSettings settings) throws AuthLoginException {
@@ -793,15 +789,5 @@ public class OATH extends AMLoginModule {
         settings.setClockDriftSeconds((int) drift * totpTimeStep);
         devicesDao.saveDeviceProfiles(id.getName(), id.getRealm(),
                 Collections.singletonList(JsonConversionUtils.toJsonValue(settings)));
-    }
-
-    private void setUserSkipOath(AMIdentity id, boolean userSkipOath) throws IdRepoException, SSOException {
-        final HashMap<String, Set<String>> attributesToWrite = new HashMap<>();
-        attributesToWrite.put(skippableAttrName,
-                userSkipOath ?
-                        Collections.singleton(String.valueOf(SKIPPABLE)) :
-                        Collections.singleton(String.valueOf(NOT_SKIPPABLE)));
-        id.setAttributes(attributesToWrite);
-        id.store();
     }
 }

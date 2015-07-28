@@ -94,16 +94,6 @@
                     </DefaultValues>
                 </AttributeSchema>
 
-                <AttributeSchema name="iplanet-am-auth-oath-skippable-attr-name"
-                                 type="single"
-                                 syntax="string"
-                                 i18nKey="a513"
-                                 resourceName="oathSkippableAttrName">
-                    <DefaultValues>
-                        <Value>oath2faEnabled</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-
                 <AttributeSchema name="iplanet-am-auth-oath-add-checksum"
                                  type="single_choice"
                                  syntax="string"
@@ -202,16 +192,6 @@
                                      resourceName="hotpWindowSize">
                         <DefaultValues>
                             <Value>100</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema name="iplanet-am-auth-oath-skippable-attr-name"
-                                     type="single"
-                                     syntax="string"
-                                     i18nKey="a513"
-                                     resourceName="oathSkippableAttrName">
-                        <DefaultValues>
-                            <Value>oath2faEnabled</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
