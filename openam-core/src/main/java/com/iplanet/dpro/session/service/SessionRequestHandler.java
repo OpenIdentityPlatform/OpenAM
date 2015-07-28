@@ -442,7 +442,7 @@ public class SessionRequestHandler implements RequestHandler {
     }
 
     private SessionResponse forward(URL svcurl, SessionRequest sreq)
-    throws SessionException {
+            throws SessionException {
         try {
             Object context = RestrictedTokenContext.getCurrent();
 

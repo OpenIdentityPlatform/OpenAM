@@ -75,8 +75,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * The <code>PolicyRequestHandler</code> class handles the policy
@@ -113,47 +111,43 @@ public class PolicyRequestHandler implements RequestHandler {
     String policyServiceRevision;
 
     /**
-     * Default Constructor for <code>PolicyRequestHandler</code>.
-     */
-    public PolicyRequestHandler() {
-    }
-
-    /**
-     *  Process the requests and return the responses.
+     *  Process the requests aÎnd return the responses.
      *
      *  @param requests Requests specified in the policy request
      *  @return the set of the response
      */ 
-    public ResponseSet process(
-        PLLAuditor pllAuditor,
+    public ResponseSet process(PLLAuditor auditor,
         List<Request> requests,
         HttpServletRequest servletRequest, 
         HttpServletResponse servletResponse,
         ServletContext servletContext
     ) {
- 
+
         ResponseSet resSet = new ResponseSet(PolicyService.POLICY_SERVICE);
         int size = requests.size();
-        
+
         for (Request req : requests) {
             Response res = null;
+
             try {
-                res = processRequest(req);
+                res = processRequest(req, auditor);
             } catch (PolicyEvaluationException pe) {
                 if (debug.messageEnabled()) {
                     debug.message("PolicyRequesthandler.process"
-                            + " caught PolicyEvaluationException:",
+                                    + " caught PolicyEvaluationException:",
                             pe);
                 }
+
+
                 PolicyService ps = new PolicyService();
                 try {
-                    String rev = getPolicyServiceRevision(); 
+                    String rev = getPolicyServiceRevision();
                     ps.setRevision(rev);
                 } catch (PolicyEvaluationException pee) {
                     debug.error("PolicyRequesthandler.process"
-                            + " can not get service revision number, "
-                            + ",revision defaulting to :" 
-                            + PolicyService.ON_ERROR_REVISION_NUMBER, 
+                                    + " can not get service revision number, "
+                                    + ",revision defaulting to :"
+                                    + PolicyService.ON_ERROR_REVISION_NUMBER,
                             pee);
                     ps.setRevision(PolicyService.ON_ERROR_REVISION_NUMBER);
                 }
@@ -163,8 +157,10 @@ public class PolicyRequestHandler implements RequestHandler {
                 pRes.setExceptionMsg(pe.getMessage());
                 pRes.setIssueInstant(System.currentTimeMillis());
                 ps.setMethodID(PolicyService.POLICY_RESPONSE_ID);
-                ps.setPolicyResponse(pRes); 
+                ps.setPolicyResponse(pRes);
                 res = new Response(ps.toXMLString());
+
+                auditor.auditAccessFailure(pe.getMessage());
             }
             if (res != null) {
                 resSet.addResponse(res);
@@ -178,9 +174,10 @@ public class PolicyRequestHandler implements RequestHandler {
      * Processes a request and return its corresponding response.
      *
      * @param req the request.
+     * @param auditor the auditor helper
      * @return the corresponding response.
      */
-    private Response processRequest(Request req)
+    private Response processRequest(Request req, PLLAuditor auditor)
     throws PolicyEvaluationException {
         String content = req.getContent();
        
@@ -196,7 +193,7 @@ public class PolicyRequestHandler implements RequestHandler {
                 "policy service object:" + psReq.toXMLString());
         }
 
-        PolicyService psRes = processPolicyServiceRequest(psReq);
+        PolicyService psRes = processPolicyServiceRequest(psReq, auditor);
 
         if (debug.messageEnabled()) { 
             debug.message("PolicyRequestHandler.processRequest(): " +
@@ -210,9 +207,10 @@ public class PolicyRequestHandler implements RequestHandler {
      * response.
      *
      * @param psReq a policy service request.
+     * @param auditor the auditor helper
      * @return its corresponding policy service response.
      */
-    private PolicyService processPolicyServiceRequest(PolicyService psReq)
+    private PolicyService processPolicyServiceRequest(PolicyService psReq, PLLAuditor auditor)
         throws PolicyEvaluationException {
 
         PolicyService psRes = null;
@@ -241,7 +239,7 @@ public class PolicyRequestHandler implements RequestHandler {
             psRes = new PolicyService();
             psRes.setRevision(getPolicyServiceRevision());
 
-            PolicyResponse policyRes = processPolicyRequest(policyReq);
+            PolicyResponse policyRes = processPolicyRequest(policyReq, auditor);
             policyRes.setIssueInstant(System.currentTimeMillis());
             psRes.setMethodID(PolicyService.POLICY_RESPONSE_ID);
             psRes.setPolicyResponse(policyRes);
@@ -261,7 +259,7 @@ public class PolicyRequestHandler implements RequestHandler {
      * @param req a policy request
      * @return its corresponding policy response
      */
-    private PolicyResponse processPolicyRequest(PolicyRequest req) 
+    private PolicyResponse processPolicyRequest(PolicyRequest req, PLLAuditor auditor)
         throws PolicyEvaluationException
     {
         if (debug.messageEnabled()) {
@@ -291,19 +289,25 @@ public class PolicyRequestHandler implements RequestHandler {
         // set the app token into the ThreadLocal
         AppTokenHandler.set(appToken);
 
+        auditor.setMethod(req.getMethodName());
+        auditor.setSsoToken(appToken);
+        auditor.auditAccessAttempt();
+
         if (req.getMethodID() == 
                 PolicyRequest.POLICY_REQUEST_ADD_POLICY_LISTENER) {
             PolicyListenerRequest plReq = req.getPolicyListenerRequest();
             boolean addListener = addPolicyListener(appToken, plReq);
             if (addListener) {
                 policyRes.setMethodID(
-                    PolicyResponse.POLICY_ADD_LISTENER_RESPONSE);
+                        PolicyResponse.POLICY_ADD_LISTENER_RESPONSE);
+                auditor.auditAccessSuccess();
             } else {
                 String[] objs = {plReq.getNotificationURL()};
                 String  message = ResBundleUtils.getString(
                     "failed.add.policy.listener", objs);
                 policyRes.setExceptionMsg(message);
                 policyRes.setMethodID(PolicyResponse.POLICY_EXCEPTION);
+                auditor.auditAccessFailure(message);
             }
             return policyRes;
         }
@@ -314,13 +318,15 @@ public class PolicyRequestHandler implements RequestHandler {
             boolean removeListener = removePolicyListener(appToken, rmReq);
             if (removeListener) {
                 policyRes.setMethodID(
-                    PolicyResponse.POLICY_REMOVE_LISTENER_RESPONSE); 
+                    PolicyResponse.POLICY_REMOVE_LISTENER_RESPONSE);
+                auditor.auditAccessSuccess();
             } else {
                 String[] objs = {rmReq.getNotificationURL()};
                 String  message = ResBundleUtils.getString(
                     "failed.remove.policy.listener", objs );
                 policyRes.setExceptionMsg(message);
                 policyRes.setMethodID(PolicyResponse.POLICY_EXCEPTION);
+                auditor.auditAccessFailure(message);
             }
             return policyRes;
         }
@@ -337,7 +343,8 @@ public class PolicyRequestHandler implements RequestHandler {
                 policyRes.setAdvicesHandleableByAMResponse(
                         new AdvicesHandleableByAMResponse(advices));
                 policyRes.setMethodID(
-                    PolicyResponse.POLICY_ADVICES_HANDLEABLE_BY_AM_RESPONSE); 
+                        PolicyResponse.POLICY_ADVICES_HANDLEABLE_BY_AM_RESPONSE);
+                auditor.auditAccessSuccess();
             } catch (PolicyException pe) {
                 if (debug.warningEnabled()) {
                     debug.warning("PolicyRequestHandler: could not get "
@@ -355,7 +362,7 @@ public class PolicyRequestHandler implements RequestHandler {
         }
 
         if (req.getMethodID() ==
-            PolicyRequest.POLICY_REQUEST_GET_RESOURCE_RESULTS) { 
+            PolicyRequest.POLICY_REQUEST_GET_RESOURCE_RESULTS) {
             ResourceResultRequest resourceResultReq =
                 req.getResourceResultRequest();
 
@@ -372,8 +379,8 @@ public class PolicyRequestHandler implements RequestHandler {
                 } catch (PolicyException pe) {
                     if (debug.warningEnabled()) {
                         debug.warning(
-                            "PolicyRequestHandler: Invalid user sso token, " +
-                            userSSOTokenIDStr, pe);
+                                "PolicyRequestHandler: Invalid user sso token, " +
+                                        userSSOTokenIDStr, pe);
                     }
                     throw new PolicyEvaluationException(ResBundleUtils.rbName,
                         "user_sso_token_invalid", null, null, requestId);
@@ -449,12 +456,13 @@ public class PolicyRequestHandler implements RequestHandler {
                 }
             }
 
-            resourceRst.setResponseDecisions(respDecisions); 
+            resourceRst.setResponseDecisions(respDecisions);
             resourceResults.addAll(resourceRst.getResourceResults());
             policyRes.setResourceResults(resourceResults);
             policyRes.setMethodID(
-                PolicyResponse.POLICY_RESPONSE_RESOURCE_RESULT);     
-            return policyRes; 
+                    PolicyResponse.POLICY_RESPONSE_RESOURCE_RESULT);
+            auditor.auditAccessSuccess();
+            return policyRes;
         }
         debug.error("PolicyRequestHandler: Invalid policy request format"); 
         throw new PolicyEvaluationException(ResBundleUtils.rbName,

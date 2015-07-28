@@ -117,6 +117,27 @@ public class PolicyRequest {
     }
 
     /**
+     * Retrieves the string representation of the method Id.
+     *
+     * @return the string representation of the method Id
+     * @throws IllegalStateException should the method Id become unknown
+     */
+    public String getMethodName() {
+        switch (methodID) {
+            case PolicyRequest.POLICY_REQUEST_ADD_POLICY_LISTENER:
+                return "REQUEST_ADD_POLICY_LISTENER";
+            case PolicyRequest.POLICY_REQUEST_REMOVE_POLICY_LISTENER:
+                return "REQUEST_REMOVE_POLICY_LISTENER";
+            case PolicyRequest.POLICY_REQUEST_ADVICES_HANDLEABLE_BY_AM_REQUEST:
+                return "REQUEST_ADVICES_HANDLEABLE_BY_AM_REQUEST";
+            case PolicyRequest.POLICY_REQUEST_GET_RESOURCE_RESULTS:
+                return "REQUEST_GET_RESOURCE_RESULTS";
+            default:
+                throw new IllegalStateException("Unknown method Id");
+        }
+    }
+
+    /**
      * Sets the method ID of the Policy Request.
      *
      * @param id the method ID.
