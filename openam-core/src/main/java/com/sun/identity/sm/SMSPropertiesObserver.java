@@ -24,13 +24,18 @@
  *
  * $Id: SMSPropertiesObserver.java,v 1.1 2008/07/30 00:50:15 arviranga Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS.
+ *
  */
 
 package com.sun.identity.sm;
 
+import com.iplanet.services.ldap.event.EventException;
+import com.iplanet.services.ldap.event.EventService;
 import com.sun.identity.common.configuration.ConfigurationListener;
 import com.sun.identity.common.configuration.ConfigurationObserver;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.opendj.ldap.ErrorResultException;
 
 /**
  * Listenes to changes to <class>SystemProperties</class> and reinitialized
@@ -72,5 +77,12 @@ public class SMSPropertiesObserver implements ConfigurationListener {
         SMSNotificationManager.getInstance().initializeProperties();
         CachedSMSEntry.initializeProperties();
         SMSThreadPool.initialize(true);
+        try {
+            EventService.getEventService().restartPSearches();
+        } catch (EventException | ErrorResultException e) {
+            if (debug.errorEnabled()) {
+                debug.error("SMSPropertiesObserver :: Unable to restart PSearches after SystemProperties change.", e);
+            }
+        }
     }
 }

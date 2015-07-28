@@ -235,17 +235,13 @@ public class EventService {
             }
         }
 
-        // Verify if SMS notification should be enabled
-        if (isDuringConfigurationTime()) {
-            boolean enableDataStoreNotification = Boolean.parseBoolean(
-                    SystemProperties.get(Constants.SMS_ENABLE_DB_NOTIFICATION));
-            logger.message("EventService.getListenerList(): com.sun.identity.sm.enableDataStoreNotification: {}",
-                    enableDataStoreNotification);
-            disableSM = !enableDataStoreNotification;
-            if (logger.messageEnabled()) {
-                logger.message("EventService.getListenerList(): In realm mode or config time, SMS listener is set "
-                        + "to datastore notification flag: {}", enableDataStoreNotification);
-            }
+        //psearch terminated if you disable the DB notifications, or add 'sm' to the list of disabled
+        if (!disableSM) {
+            disableSM = !Boolean.parseBoolean(SystemProperties.get(Constants.SMS_ENABLE_DB_NOTIFICATION));
+        }
+
+        if (logger.messageEnabled()) {
+            logger.message("EventService.getListenerList(): SMS listener is enabled: {}", !disableSM);
         }
 
         List<Class<? extends IDSEventListener>> listeners = new ArrayList<>();
