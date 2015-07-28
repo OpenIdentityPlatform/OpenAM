@@ -15,7 +15,7 @@
  */
 
 /*global define*/
-define("org/forgerock/openam/ui/uma/views/resource/EditResourcePage", [
+define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
     "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "backbone",
@@ -31,12 +31,12 @@ define("org/forgerock/openam/ui/uma/views/resource/EditResourcePage", [
     "org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy"
 ], function($, AbstractView, Backbone, Backgrid, BackgridUtils, BootstrapDialog, CommonShare, Constants, EventManager,
             Messages, Router, UIUtils, UMAResourceSetWithPolicy) {
-    var EditResource = AbstractView.extend({
+    var ResourcePage = AbstractView.extend({
         initialize: function() {
             // TODO: AbstarctView.prototype.initialize.call(this);
             this.model = null;
         },
-        template: "templates/uma/views/resource/EditResourceTemplate.html",
+        template: "templates/uma/views/resource/ResourceTemplate.html",
         events: {
             "click button#starred": "onStarred",
             "click button#share": "onShare",
@@ -281,5 +281,5 @@ define("org/forgerock/openam/ui/uma/views/resource/EditResourcePage", [
         }
     });
 
-    return EditResource;
+    return ResourcePage;
 });

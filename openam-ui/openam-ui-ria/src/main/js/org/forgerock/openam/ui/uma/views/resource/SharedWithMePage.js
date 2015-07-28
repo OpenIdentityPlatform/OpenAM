@@ -15,7 +15,7 @@
  */
 
 /*global define*/
-define("org/forgerock/openam/ui/uma/views/resource/ListResourcesPage", [
+define("org/forgerock/openam/ui/uma/views/resource/SharedWithMePage", [
     "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "bootstrap-dialog",
@@ -27,8 +27,8 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResourcesPage", [
     "org/forgerock/openam/ui/uma/delegates/UMADelegate"
 ], function($, AbstractView, BootstrapDialog, Constants, EventManager, Messages, MyResourcesTab, SharedResourcesTab,
             UMADelegate) {
-    var ListResource = AbstractView.extend({
-        template: "templates/uma/views/resource/ListResource.html",
+    var SharedWithMePage = AbstractView.extend({
+        template: "templates/uma/views/resource/SharedWithMePageTemplate.html",
         partials: [
             "templates/uma/views/resource/_HeaderUnshareAllButton.html"
         ],
@@ -74,5 +74,5 @@ define("org/forgerock/openam/ui/uma/views/resource/ListResourcesPage", [
         }
     });
 
-    return ListResource;
+    return SharedWithMePage;
 });

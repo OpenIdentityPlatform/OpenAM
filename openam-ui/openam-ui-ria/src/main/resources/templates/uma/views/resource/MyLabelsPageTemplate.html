@@ -1,0 +1,14 @@
+{{> headers/_TitleWithSubAndIcon title="uma.resources.list.title" type="My Labels" buttons="templates/uma/views/resource/_HeaderUnshareAllButton" }}
+<p class="page-description">{{t "uma.resources.list.subtitle"}}</p>
+
+<div class="tab-menu">
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="active"><a href="#myResources" role="tab" data-toggle="tab">{{t "uma.resources.list.myResources.title"}}</a></li>
+        <li><a href="#sharedResources" role="tab" data-toggle="tab">{{t "uma.resources.list.sharedResources.title"}}</a></li>
+    </ul>
+</div>
+
+<div class="tab-content clearfix" id="uma">
+    <div role="tabpanel" class="tab-pane active" id="myResources"></div>
+    <div role="tabpanel" class="tab-pane" id="sharedResources"></div>
+</div>

@@ -35,11 +35,16 @@ define([
     "./views/request/EditRequest",
     "./views/backgrid/cells/PermissionsCell",
     "./views/history/ListHistory",
-    "./views/resource/EditResourcePage",
+
     "./views/resource/LabelTreeNavigationView",
-    "./views/resource/ListResourcesPage",
+    "./views/resource/MyLabelsPage",
+    "./views/resource/MyResourcesPage",
     "./views/resource/MyResourcesTab",
+    "./views/resource/ResourcePage",
     "./views/resource/SharedResourcesTab",
+    "./views/resource/SharedWithMePage",
+    "./views/resource/StarredPage",
+
     "./views/share/BaseShare",
     "./views/share/CommonShare",
     "./views/share/ShareCounter"
