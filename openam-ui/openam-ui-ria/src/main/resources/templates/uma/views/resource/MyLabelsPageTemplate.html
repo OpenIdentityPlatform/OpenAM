@@ -1,14 +1,17 @@
-{{> headers/_TitleWithSubAndIcon title="uma.resources.list.title" type="My Labels" buttons="templates/uma/views/resource/_HeaderUnshareAllButton" }}
-<p class="page-description">{{t "uma.resources.list.subtitle"}}</p>
+{{#if label}}
+{{> headers/_TitleWithSubAndIcon title=label.name type="uma.labels.list.myLabels" buttons="templates/uma/views/resource/_LabelListButtons" }}
+<p class="page-description">{{label.path}}</p>
 
-<div class="tab-menu">
-    <ul class="nav nav-tabs" role="tablist">
-        <li class="active"><a href="#myResources" role="tab" data-toggle="tab">{{t "uma.resources.list.myResources.title"}}</a></li>
-        <li><a href="#sharedResources" role="tab" data-toggle="tab">{{t "uma.resources.list.sharedResources.title"}}</a></li>
-    </ul>
+<div class="tab-content cleaarfix" id="uma">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="backgrid-container"></div>
+            <div class="pagination-container"></div>
+        </div>
+    </div>
 </div>
-
-<div class="tab-content clearfix" id="uma">
-    <div role="tabpanel" class="tab-pane active" id="myResources"></div>
-    <div role="tabpanel" class="tab-pane" id="sharedResources"></div>
+{{else}}
+<div class="alert alert-info" role="alert">
+    <div class="media">{{t "uma.labels.list.noResources"}}</div>
 </div>
+{{/if}}

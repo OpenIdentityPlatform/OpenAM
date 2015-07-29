@@ -483,6 +483,19 @@
         "common": {
             "shares" : "Shares"
         },
+        "labels":{
+            "list": {
+                "deleteLabel": "Delete Label",
+                "deleteResourceLabel" : "Delete Resource Label",
+                "deleteLabelMessage": "Are you sure you want to permanently delete this resource label?<br>Deleting a resource label does not delete the resource itself.",
+                "noResources": "There are no resources associated with this label.",
+                "myLabels": "My Labels"
+            },
+            "starred":{
+                "title": "Starred",
+                "description" :"Your favorite resources"
+            }
+        },
         "share": {
             "shareResource": "Share the resource",
             "people": "Add or select people to share your resource with",

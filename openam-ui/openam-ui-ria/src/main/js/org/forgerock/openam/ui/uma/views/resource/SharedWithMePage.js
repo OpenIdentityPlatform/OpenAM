@@ -33,7 +33,7 @@ define("org/forgerock/openam/ui/uma/views/resource/SharedWithMePage", [
             "templates/uma/views/resource/_HeaderUnshareAllButton.html"
         ],
         events: {
-            "click button#revokeAll:not(.disabled)": "onRevokeAll"
+            "click button#revokeAll": "onRevokeAll"
         },
         onRevokeAll: function() {
             BootstrapDialog.show({
