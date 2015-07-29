@@ -69,15 +69,6 @@ import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
-import org.forgerock.openam.session.SessionServiceURLService;
-import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
-import org.forgerock.openam.utils.ClientUtils;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -103,6 +94,14 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import javax.servlet.ServletContext;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
+import org.forgerock.openam.session.SessionServiceURLService;
+import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
+import org.forgerock.openam.utils.ClientUtils;
 
 public class AuthClientUtils {
 
@@ -122,7 +121,7 @@ public class AuthClientUtils {
 
     private static AMClientDetector clientDetector;
     private static Client defaultClient;
-    private static ResourceBundle bundle;
+    private static volatile ResourceBundle bundle;
     private static final boolean urlRewriteInPath =
         Boolean.valueOf(SystemProperties.get(
         Constants.REWRITE_AS_PATH,"")).booleanValue();
@@ -139,7 +138,7 @@ public class AuthClientUtils {
 
     // dsame version
     private static String dsameVersion =
-        SystemProperties.get(Constants.AM_VERSION,DSAME_VERSION);
+        SystemProperties.get(Constants.AM_VERSION, DSAME_VERSION);
 
     // If true, version header will be added to responses, default is false
     private static final boolean isVersionHeaderEnabled =
@@ -178,7 +177,7 @@ public class AuthClientUtils {
         Constants.IS_ENABLE_UNIQUE_COOKIE, "false")).booleanValue();
     private static String hostUrlCookieName =
         SystemProperties.get(Constants.AUTH_UNIQUE_COOKIE_NAME,
-        "sunIdentityServerAuthNServer");
+                "sunIdentityServerAuthNServer");
     private static String hostUrlCookieDomain =
         SystemProperties.get(Constants.AUTH_UNIQUE_COOKIE_DOMAIN);
 
@@ -420,7 +419,7 @@ public class AuthClientUtils {
      */
     public static Cookie getLogoutCookie(SessionID sid, String cookieDomain) {
         String logoutCookieString = getLogoutCookieString(sid);
-        Cookie logoutCookie = createCookie(logoutCookieString,cookieDomain);
+        Cookie logoutCookie = createCookie(logoutCookieString, cookieDomain);
         logoutCookie.setMaxAge(0);
         return (logoutCookie);
     }
@@ -612,7 +611,7 @@ public class AuthClientUtils {
 
     /* return the the error message for the error code */
     public static String getErrorMessage(String errorCode) {
-        String errorMessage = getErrorVal(errorCode,ERROR_MESSAGE);
+        String errorMessage = getErrorVal(errorCode, ERROR_MESSAGE);
         return (errorMessage);
     }
 
@@ -1194,7 +1193,7 @@ public class AuthClientUtils {
      * whether cookie should be set in response or not.
      */
     public static boolean isSetCookie(String clientType) {
-        boolean setCookie =  setCookieVal(clientType,"true");
+        boolean setCookie =  setCookieVal(clientType, "true");
 
         if (utilDebug.messageEnabled()) {
             utilDebug.message("setCookie : " + setCookie);
@@ -1874,6 +1873,11 @@ public class AuthClientUtils {
     }
 
     public static String getErrorVal(String errorCode,String type) {
+
+        if (Locale.getDefaultLocale() != bundle.getLocale()) {
+            bundle = Locale.getInstallResourceBundle(BUNDLE_NAME);
+        }
+
         String errorMsg=null;
         String templateName=null;
         String resProperty = bundle.getString(errorCode);
@@ -3284,5 +3288,6 @@ public class AuthClientUtils {
             strOut = strIn;
         }
         return strOut;
-    } 
+    }
+
 }
