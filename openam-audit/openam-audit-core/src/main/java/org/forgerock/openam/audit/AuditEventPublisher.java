@@ -29,6 +29,7 @@ import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.RootContext;
+import org.forgerock.openam.audit.configuration.AuditServiceConfigurator;
 
 /**
  * Responsible for publishing locally created audit events to the AuditService.
@@ -40,13 +41,15 @@ public class AuditEventPublisher {
     private static Debug debug = Debug.getInstance("amAudit");
 
     private final ConnectionFactory auditServiceConnectionFactory;
+    private final AuditServiceConfigurator configurator;
 
     /**
      * @param auditService AuditService to which events should be published.
      */
     @Inject
-    public AuditEventPublisher(AuditService auditService) {
+    public AuditEventPublisher(AuditService auditService, AuditServiceConfigurator configurator) {
         this.auditServiceConnectionFactory = Resources.newInternalConnectionFactory(auditService);
+        this.configurator = configurator;
     }
 
     /**
@@ -106,13 +109,13 @@ public class AuditEventPublisher {
     }
 
     public boolean isAuditing(String topic) {
-        return true; // TODO: Check AuditService SMS configuration
+        return configurator.getAuditServiceConfiguration().isAuditEnabled();
     }
 
     /**
      * @return True if the operation being audited can proceed if an exception occurs while publishing an audit event.
      */
     public boolean isSuppressExceptions() {
-        return false; // TODO: Check AuditService SMS configuration
+        return configurator.getAuditServiceConfiguration().isAuditFailureSuppressed();
     }
 }

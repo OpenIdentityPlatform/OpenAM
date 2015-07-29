@@ -15,6 +15,10 @@
  */
 package org.forgerock.openam.audit;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.forgerock.openam.audit.configuration.AuditServiceConfigurator;
+
 /**
  * Factory for creation of AuditEvent builders.
  *
@@ -22,7 +26,15 @@ package org.forgerock.openam.audit;
  *
  * @since 13.0.0
  */
+@Singleton
 public class AuditEventFactory {
+
+    private final AuditServiceConfigurator configurator;
+
+    @Inject
+    public AuditEventFactory(AuditServiceConfigurator configurator) {
+        this.configurator = configurator;
+    }
 
     /**
      * Creates a new AMAccessAuditEventBuilder.
@@ -30,7 +42,11 @@ public class AuditEventFactory {
      * @return AMAccessAuditEventBuilder
      */
     public AMAccessAuditEventBuilder accessEvent() {
-        return new AMAccessAuditEventBuilder();
+        if (configurator.getAuditServiceConfiguration().isResolveHostNameEnabled()) {
+            return new AMAccessAuditEventBuilder().withReverseDnsLookup();
+        } else {
+            return new AMAccessAuditEventBuilder();
+        }
     }
 
 }

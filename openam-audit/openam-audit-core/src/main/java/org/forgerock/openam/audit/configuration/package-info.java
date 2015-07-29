@@ -13,32 +13,10 @@
  *
  * Copyright 2015 ForgeRock AS.
  */
-package org.forgerock.openam.audit;
 
 /**
- * Collection of constants related to auditing.
+ * Audit logging configuration based on Commons Audit.
  *
  * @since 13.0.0
  */
-public final class AuditConstants {
-
-    /**
-     * The topic to which events built using {@link AMAccessAuditEventBuilder} should be routed.
-     */
-    public static final String ACCESS_TOPIC = "access";
-
-    /**
-     * SMS service name for the audit service.
-     */
-    public static final String SERVICE_NAME = "AuditService";
-
-    /**
-     * Name of the event handlers registered with the audit service.
-     */
-    public static final String CSV = "csv";
-
-    private AuditConstants() {
-        // Prevent instantiation
-    }
-
-}
+package org.forgerock.openam.audit.configuration;

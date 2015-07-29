@@ -24,31 +24,20 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <name>OpenAM Audit Core</name>
-    <artifactId>openam-audit-core</artifactId>
+    <name>OpenAM Audit Configuration</name>
+    <artifactId>openam-audit-configuration</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-shared</artifactId>
+            <artifactId>openam-audit-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons</groupId>
-            <artifactId>forgerock-audit-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.commons</groupId>
-            <artifactId>forgerock-audit-handler-csv</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.easytesting</groupId>
-            <artifactId>fest-assert</artifactId>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-core</artifactId>
         </dependency>
     </dependencies>
+
 
 </project>

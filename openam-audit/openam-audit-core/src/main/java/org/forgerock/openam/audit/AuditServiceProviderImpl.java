@@ -17,18 +17,17 @@ package org.forgerock.openam.audit;
 
 import static org.forgerock.json.fluent.JsonValue.*;
 
+import com.google.inject.Inject;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.audit.AuditException;
 import org.forgerock.audit.AuditService;
-import org.forgerock.audit.AuditServiceConfiguration;
-import org.forgerock.audit.events.handlers.impl.CSVAuditEventHandler;
-import org.forgerock.audit.events.handlers.impl.CSVAuditEventHandlerConfiguration;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.audit.configuration.AuditServiceConfigurator;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.openam.utils.JsonValueBuilder;
 
-import java.io.File;
+import javax.inject.Singleton;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -37,9 +36,21 @@ import java.io.InputStream;
  *
  * @since 13.0.0
  */
+@Singleton
 public class AuditServiceProviderImpl implements AuditServiceProvider {
 
     private static Debug debug = Debug.getInstance("amAudit");
+
+    private final AuditServiceConfigurator configurator;
+
+    /**
+     * Create an instance of AuditServiceProviderImpl.
+     * @param configurator The configurator responsible for configuring the audit service.
+     */
+    @Inject
+    public AuditServiceProviderImpl(AuditServiceConfigurator configurator) {
+        this.configurator = configurator;
+    }
 
     /**
      * {@inheritDoc}
@@ -50,36 +61,16 @@ public class AuditServiceProviderImpl implements AuditServiceProvider {
         JsonValue extendedEventTypes = readJsonFile("/org/forgerock/openam/audit/events-config.json");
         JsonValue customEventTypes = json(object());
 
-        AuditServiceConfiguration auditServiceConfiguration = new AuditServiceConfiguration();
-        JsonValue serviceConfig = readJsonFile("/org/forgerock/openam/audit/service-config.json");
-        auditServiceConfiguration.setHandlerForQueries(serviceConfig.get("useForQueries").asString());
-
         AuditService auditService = new AuditService(extendedEventTypes, customEventTypes);
         try {
-            registerCsvAuditEventHandler(auditService);
-            auditService.configure(auditServiceConfiguration);
+            configurator.initializeAuditServiceConfiguration();
+            configurator.registerEventHandlers(auditService);
+            auditService.configure(configurator.getAuditServiceConfiguration());
         } catch (ResourceException|AuditException e) {
             debug.error("Unable to configure AuditService", e);
             throw new RuntimeException("Unable to configure AuditService.", e);
         }
         return auditService;
-    }
-
-    private void registerCsvAuditEventHandler(AuditService auditService) throws ResourceException, AuditException {
-        JsonValue csvConfig = readJsonFile("/org/forgerock/openam/audit/csv-handler-config.json");
-
-        CSVAuditEventHandlerConfiguration csvHandlerConfiguration = new CSVAuditEventHandlerConfiguration();
-        csvHandlerConfiguration.setLogDirectory(getTmpAuditDirectory());
-        csvHandlerConfiguration.setRecordDelimiter(csvConfig.get("config").get("recordDelimiter").asString());
-
-        CSVAuditEventHandler csvAuditEventHandler = new CSVAuditEventHandler();
-        csvAuditEventHandler.configure(csvHandlerConfiguration);
-
-        auditService.register(csvAuditEventHandler, "csv", csvConfig.get("events").asSet(String.class));
-    }
-
-    private String getTmpAuditDirectory() {
-        return new File(System.getProperty("java.io.tmpdir"), "audit").getAbsolutePath();
     }
 
     private JsonValue readJsonFile(String path) throws AuditException {

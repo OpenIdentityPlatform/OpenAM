@@ -13,32 +13,20 @@
  *
  * Copyright 2015 ForgeRock AS.
  */
-package org.forgerock.openam.audit;
+package org.forgerock.openam.audit.configuration;
+
+import com.google.inject.AbstractModule;
+import org.forgerock.guice.core.GuiceModule;
 
 /**
- * Collection of constants related to auditing.
- *
- * @since 13.0.0
+ * Guice Module for configuring bindings for the OpenAM Audit Configuration classes.
  */
-public final class AuditConstants {
+@GuiceModule
+public class AuditConfigurationGuiceModule extends AbstractModule {
 
-    /**
-     * The topic to which events built using {@link AMAccessAuditEventBuilder} should be routed.
-     */
-    public static final String ACCESS_TOPIC = "access";
-
-    /**
-     * SMS service name for the audit service.
-     */
-    public static final String SERVICE_NAME = "AuditService";
-
-    /**
-     * Name of the event handlers registered with the audit service.
-     */
-    public static final String CSV = "csv";
-
-    private AuditConstants() {
-        // Prevent instantiation
+    @Override
+    protected void configure() {
+        bind(AuditServiceConfigurator.class).to(AuditServiceConfiguratorImpl.class);
     }
 
 }

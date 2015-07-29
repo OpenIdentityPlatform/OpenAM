@@ -630,6 +630,11 @@
             <artifactId>openam-datastore</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-audit-configuration</artifactId>
+        </dependency>
+
         <!-- Include all Authentication Modules -->
         <dependency>
             <groupId>org.forgerock.openam</groupId>

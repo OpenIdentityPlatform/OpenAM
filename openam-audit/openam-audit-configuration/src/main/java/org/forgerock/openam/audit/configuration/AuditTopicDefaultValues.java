@@ -13,32 +13,26 @@
  *
  * Copyright 2015 ForgeRock AS.
  */
-package org.forgerock.openam.audit;
+package org.forgerock.openam.audit.configuration;
 
-/**
- * Collection of constants related to auditing.
- *
- * @since 13.0.0
- */
-public final class AuditConstants {
+import com.sun.identity.sm.DefaultValues;
 
-    /**
-     * The topic to which events built using {@link AMAccessAuditEventBuilder} should be routed.
-     */
-    public static final String ACCESS_TOPIC = "access";
+import java.util.HashSet;
+import java.util.Set;
 
-    /**
-     * SMS service name for the audit service.
-     */
-    public static final String SERVICE_NAME = "AuditService";
+public class AuditTopicDefaultValues extends DefaultValues {
 
-    /**
-     * Name of the event handlers registered with the audit service.
-     */
-    public static final String CSV = "csv";
+    private static final Set<String> AUDIT_TOPICS = new HashSet<>();
 
-    private AuditConstants() {
-        // Prevent instantiation
+    static {
+        AUDIT_TOPICS.add("access");
+        AUDIT_TOPICS.add("activity");
+        AUDIT_TOPICS.add("authentication");
+        AUDIT_TOPICS.add("config");
+    };
+
+    @Override
+    public Set<String> getDefaultValues() {
+        return AUDIT_TOPICS;
     }
-
 }

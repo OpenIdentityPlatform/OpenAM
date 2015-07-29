@@ -15,18 +15,23 @@
  */
 package org.forgerock.openam.audit;
 
+import static org.assertj.core.api.Assertions.fail;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 import org.forgerock.audit.AuditException;
 import org.forgerock.audit.AuditService;
+import org.forgerock.audit.AuditServiceConfiguration;
 import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.audit.events.handlers.AuditEventHandler;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.Resource;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
+import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
+import org.forgerock.openam.audit.configuration.AuditServiceConfigurator;
 import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -45,13 +50,18 @@ public class AuditEventPublisherTest {
 
     private AuditEventHandler mockHandler;
     private AuditEventPublisher auditEventPublisher;
+    private AuditServiceConfigurator mockConfigurator;
+    private AMAuditServiceConfiguration configuration;
     
     @BeforeMethod
     protected void setUp() throws AuditException {
         AuditService auditService = new AuditService();
         mockHandler = mock(AuditEventHandler.class);
+        mockConfigurator = mock(AuditServiceConfigurator.class);
+        configuration = new AMAuditServiceConfiguration();
+        when(mockConfigurator.getAuditServiceConfiguration()).thenReturn(configuration);
         auditService.register(mockHandler, "handler", asSet("access"));
-        auditEventPublisher = new AuditEventPublisher(auditService);
+        auditEventPublisher = new AuditEventPublisher(auditService, mockConfigurator);
     }
 
     @Test
@@ -78,6 +88,64 @@ public class AuditEventPublisherTest {
         // Then
         assertThat(requestCaptor.getValue().getResourceName()).isEqualTo("access");
         assertThat(requestCaptor.getValue().getContent()).isEqualTo(auditEvent.getValue());
+    }
+
+    @Test
+    public void shouldSuppressExceptionsOnPublish() {
+        // Given
+        AuditEvent auditEvent = new AMAccessAuditEventBuilder()
+                .eventName("AM-REST-1")
+                .transactionId(UUID.randomUUID().toString())
+                .authentication("id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org")
+                .client("172.16.101.7", 62375)
+                .server("216.58.208.36", 80)
+                .resourceOperation("/some/path", "CREST", "READ")
+                .http("GET", "/some/path", "p1=v1&p2=v2", Collections.<String, List<String>>emptyMap())
+                .response("200", 42)
+                .toEvent();
+
+        ArgumentCaptor<CreateRequest> requestCaptor = ArgumentCaptor.forClass(CreateRequest.class);
+        doAnswer(handleResult()).when(mockHandler)
+                .createInstance(any(ServerContext.class), requestCaptor.capture(), any(ResultHandler.class));
+        configuration.setAuditFailureSuppressed(true);
+
+        // When
+        try {
+            auditEventPublisher.publish("unknownTopic", auditEvent);
+        } catch (AuditException e) {
+            fail("Audit exceptions should be suppressed when publish fails.");
+        }
+    }
+
+    @Test
+    public void shouldNotSuppressExceptionsOnPublish() {
+        // Given
+        AuditEvent auditEvent = new AMAccessAuditEventBuilder()
+                .eventName("AM-REST-1")
+                .transactionId(UUID.randomUUID().toString())
+                .authentication("id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org")
+                .client("172.16.101.7", 62375)
+                .server("216.58.208.36", 80)
+                .resourceOperation("/some/path", "CREST", "READ")
+                .http("GET", "/some/path", "p1=v1&p2=v2", Collections.<String, List<String>>emptyMap())
+                .response("200", 42)
+                .toEvent();
+
+        ArgumentCaptor<CreateRequest> requestCaptor = ArgumentCaptor.forClass(CreateRequest.class);
+        doAnswer(handleResult()).when(mockHandler)
+                .createInstance(any(ServerContext.class), requestCaptor.capture(), any(ResultHandler.class));
+        configuration.setAuditFailureSuppressed(false);
+
+        // When
+        AuditException auditException = null;
+        try {
+            auditEventPublisher.publish("unknownTopic", auditEvent);
+        } catch (AuditException e) {
+            auditException = e;
+        }
+
+        // Then
+        assertThat(auditException).isNotNull();
     }
 
     private Answer<Void> handleResult() {

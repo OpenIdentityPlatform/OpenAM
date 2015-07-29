@@ -16,6 +16,7 @@
 package org.forgerock.openam.audit;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
 import com.google.inject.Provides;
 import org.forgerock.audit.AuditException;
 import org.forgerock.audit.AuditService;
@@ -31,12 +32,13 @@ public class AuditCoreGuiceModule extends AbstractModule {
 
     @Override
     protected void configure() {
+        bind(AuditServiceProvider.class).to(AuditServiceProviderImpl.class);
     }
 
-    @Provides @Singleton
-    private AuditService getAuditService() {
+    @Provides @Singleton @Inject
+    private AuditService getAuditService(AuditServiceProvider serviceProvider) {
         try {
-            return new AuditServiceProviderImpl().createAuditService();
+            return serviceProvider.createAuditService();
         } catch (AuditException e) {
             throw new IllegalStateException(e);
         }
