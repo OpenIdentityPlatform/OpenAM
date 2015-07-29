@@ -24,20 +24,10 @@
  *
  * $Id: LogRecWrite.java,v 1.6 2009/06/19 02:33:29 bigfatrat Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS
  * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 package com.sun.identity.log.service;
-
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
-import java.util.logging.Level;
 
 import com.iplanet.dpro.parser.ParseOutput;
 import com.iplanet.services.comm.share.Response;
@@ -48,11 +38,27 @@ import com.sun.identity.log.LogConstants;
 import com.sun.identity.log.LogRecord;
 import com.sun.identity.log.Logger;
 import com.sun.identity.log.s1is.LogSSOTokenDetails;
+import com.sun.identity.log.service.AgentLogParser.LogExtracts;
 import com.sun.identity.log.spi.Debug;
 import com.sun.identity.monitoring.Agent;
 import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.monitoring.SsoServerLoggingHdlrEntryImpl;
 import com.sun.identity.monitoring.SsoServerLoggingSvcImpl;
+import org.forgerock.openam.audit.AMAccessAuditEventBuilder;
+import org.forgerock.openam.audit.AuditConstants;
+import org.forgerock.openam.audit.AuditEventFactory;
+import org.forgerock.openam.audit.AuditEventPublisher;
+import org.forgerock.openam.audit.context.AuditRequestContext;
+import org.forgerock.openam.utils.StringUtils;
+
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
+import java.util.logging.Level;
 
 /**
  * This class implements <code>ParseOutput</code> interface and <code>
@@ -64,12 +70,12 @@ public class LogRecWrite implements LogOperation, ParseOutput {
     String _logname;
     String _loggedBySid;
     Vector _records = new Vector();
-    
+
     /**
      * Return result of the request processing in <code>Response</code>
      * @return result of the request processing in <code>Response</code>
      */
-    public Response execute() {
+    public Response execute(AuditEventPublisher auditEventPublisher, AuditEventFactory auditEventFactory) {
         Response res = new Response("OK");
         SsoServerLoggingSvcImpl slsi = null;
         SsoServerLoggingHdlrEntryImpl slei = null;
@@ -103,11 +109,11 @@ public class LogRecWrite implements LogOperation, ParseOutput {
                 Debug.message("LogRecWrite: message is not base64 encoded");
             }
         }
-        
+
         LogRecord rec = new LogRecord(level, msg);
-        
+
         if (logInfoMap != null) {
-            String loginIDSid = 
+            String loginIDSid =
                 (String)logInfoMap.get(LogConstants.LOGIN_ID_SID);
             if (loginIDSid != null && loginIDSid.length() > 0) {
                 SSOToken loginIDToken = null;
@@ -171,12 +177,56 @@ public class LogRecWrite implements LogOperation, ParseOutput {
         if (MonitoringUtil.isRunning()) {
             slei.incHandlerRequestCount(1);
         }
+        auditAccessMessage(auditEventPublisher, auditEventFactory, rec);
         logger.log(rec, loggedByToken);
         // Log file record write okay and return OK
         if (MonitoringUtil.isRunning()) {
             slei.incHandlerSuccessCount(1);
         }
         return res;
+    }
+
+    private void auditAccessMessage(AuditEventPublisher auditEventPublisher, AuditEventFactory auditEventFactory, LogRecord record) {
+        if (!auditEventPublisher.isAuditing(AuditConstants.ACCESS_TOPIC)) {
+            return;
+        }
+
+        AgentLogParser logParser = new AgentLogParser();
+        LogExtracts logExtracts = logParser.tryParse(record.getMessage());
+
+        if (logExtracts == null) {
+            // A message type of no interest
+            return;
+        }
+
+        @SuppressWarnings("unchecked")
+        Map<String, String> info = record.getLogInfoMap();
+        String clientIp = info.get(LogConstants.IP_ADDR);
+
+        if (StringUtils.isEmpty(clientIp)) {
+            clientIp = info.get(LogConstants.HOST_NAME);
+        }
+
+        String contextId = info.get(LogConstants.CONTEXT_ID);
+        String clientId = info.get(LogConstants.LOGIN_ID);
+
+        String resourceUrl = logExtracts.getResourceUrl();
+        int queryStringIndex = resourceUrl.indexOf('?');
+        String queryString = queryStringIndex > -1 ? resourceUrl.substring(queryStringIndex) : "";
+        String path = resourceUrl.replace(queryString, "");
+
+        AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
+                .transactionId(AuditRequestContext.getTransactionIdValue())
+                .eventName("AM-AGENT-ACCESS_ATTEMPT")
+                .component("AGENT")
+                .authentication(clientId)
+                .http("UNKNOWN", path, queryString, Collections.<String, List<String>>emptyMap())
+                .resourceOperation(logExtracts.getResourceUrl(), "HTTP", "UNKNOWN")
+                .client(clientIp)
+                .contextId(contextId)
+                .response(logExtracts.getStatus(), -1);
+
+        auditEventPublisher.tryPublish(AuditConstants.ACCESS_TOPIC, builder.toEvent());
     }
     
     /**

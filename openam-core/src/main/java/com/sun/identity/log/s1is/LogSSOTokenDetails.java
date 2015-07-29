@@ -24,10 +24,7 @@
  *
  * $Id: LogSSOTokenDetails.java,v 1.4 2008/09/05 00:51:01 ww203982 Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2013-2015 ForgeRock AS
  * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 
@@ -39,6 +36,7 @@ import com.sun.identity.log.LogConstants;
 import com.sun.identity.log.LogRecord;
 import com.sun.identity.log.Logger;
 import com.sun.identity.log.spi.Debug;
+import com.sun.identity.shared.Constants;
 
 /**
  * This is a DSAME specific util class which takes in LogRecord
@@ -110,6 +108,9 @@ public class LogSSOTokenDetails {
 
             clientID = ssoToken.getPrincipal().getName();
             lr.addLogInfo(LogConstants.LOGIN_ID, clientID);
+
+            String contextId = ssoToken.getProperty(Constants.AM_CTX_ID);
+            lr.addLogInfo(LogConstants.CONTEXT_ID, contextId);
         } catch (SSOException ssoe) {
             Debug.error("LogSSOTokenDetails:logSSOTokenInfo:SSOException: ",
                 ssoe);

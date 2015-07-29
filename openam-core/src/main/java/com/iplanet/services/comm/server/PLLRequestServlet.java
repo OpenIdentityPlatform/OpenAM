@@ -231,8 +231,10 @@ public class PLLRequestServlet extends HttpServlet {
                 else {
                     String svcclass = WebtopNaming.getServiceClass(svcid);
                     if (svcclass != null) {
-                        Class cl = Class.forName(svcclass);
-                        handler = (RequestHandler) cl.newInstance();
+                        Class<? extends RequestHandler> cl = Class
+                                .forName(svcclass)
+                                .asSubclass(RequestHandler.class);
+                        handler = InjectorHolder.getInstance(cl);
                     } else if (PLLServer.pllDebug.messageEnabled()) {
                         PLLServer.pllDebug.message("Service handler for :"
                                 + svcid + " not found");

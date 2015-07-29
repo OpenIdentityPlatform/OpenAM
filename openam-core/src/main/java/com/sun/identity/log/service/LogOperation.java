@@ -24,20 +24,23 @@
  *
  * $Id: LogOperation.java,v 1.3 2008/06/25 05:43:39 qcheng Exp $
  *
+ * Portions Copyrighted 2015 ForgeRock AS
  */
-
-
-
 package com.sun.identity.log.service;
 
 import com.iplanet.services.comm.share.Response;
+import org.forgerock.openam.audit.AuditEventFactory;
+import org.forgerock.openam.audit.AuditEventPublisher;
+
 /**
  *  This interface defines result of log operation.
  */
 public interface LogOperation {
+
     /**
      * Return result of the request processing in <code>Response</code>
      * @return result of the request processing in <code>Response</code>
      */
-    public Response execute();
+    Response execute(AuditEventPublisher auditEventPublisher, AuditEventFactory auditEventFactory);
+
 } //end of LogOperation
