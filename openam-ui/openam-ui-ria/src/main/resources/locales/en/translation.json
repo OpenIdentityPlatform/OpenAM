@@ -500,6 +500,7 @@
             "shareResource": "Share the resource",
             "people": "Add or select people to share your resource with",
             "permission": "Select Permission",
+            "labels": "Labels",
             "share": "Share",
             "info": "Shared with __count__ person",
             "info_plural": "Shared with __count__ people",

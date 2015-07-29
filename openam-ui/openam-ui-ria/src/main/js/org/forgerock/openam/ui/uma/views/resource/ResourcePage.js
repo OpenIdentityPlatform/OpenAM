@@ -29,10 +29,10 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy"
-], function($, AbstractView, Backbone, Backgrid, BackgridUtils, BootstrapDialog, CommonShare, Constants, EventManager,
+], function ($, AbstractView, Backbone, Backgrid, BackgridUtils, BootstrapDialog, CommonShare, Constants, EventManager,
             Messages, Router, UIUtils, UMAResourceSetWithPolicy) {
     var ResourcePage = AbstractView.extend({
-        initialize: function() {
+        initialize: function () {
             // TODO: AbstarctView.prototype.initialize.call(this);
             this.model = null;
         },
@@ -42,18 +42,18 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
             "click button#share": "onShare",
             "click li#unshare": "onUnshare"
         },
-        onModelError: function(model, response) {
+        onModelError: function (model, response) {
             console.error("Unrecoverable load failure UMAResourceSetWithPolicy. " +
                 response.responseJSON.code + " (" + response.responseJSON.reason + ") " +
                 response.responseJSON.message);
         },
-        onModelSync: function() {
+        onModelSync: function () {
             this.render();
         },
-        onUnshare: function(event) {
+        onUnshare: function (event) {
             event.preventDefault();
 
-            if($(event.currentTarget).hasClass("disabled")) { return; }
+            if ($(event.currentTarget).hasClass("disabled")) { return; }
 
             var self = this;
 
@@ -66,7 +66,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                     id: "btnOk",
                     label: $.t("common.form.ok"),
                     cssClass: "btn-primary btn-danger",
-                    action: function(dialog) {
+                    action: function (dialog) {
                         dialog.enableButtons(false);
                         dialog.getButton("btnOk").text($.t("common.form.working"));
                         self.model.get("policy").destroy().done(function () {
@@ -74,7 +74,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                             self.render();
                         }).fail(function (error) {
                             Messages.messages.addMessage({ message: JSON.parse(error.responseText).message, type: "error"});
-                        }).always(function() {
+                        }).always(function () {
                             dialog.close();
                         });
                     }
@@ -96,6 +96,25 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
             // self.model.save().done(function() {
                 this.$el.find("#starred i").toggleClass("fa-star-o fa-star");
             // });
+        },
+        renderTagsOptions: function () {
+          var self = this;
+            this.$el.find('#selectTag select').selectize({
+                plugins: ['restore_on_backspace'],
+                delimiter: ',',
+                persist: false,
+               create: true,
+                hideSelected: true,
+                onChange: function (values) {
+                    self.$el.find("button#saveChanges").prop("disabled", false);
+                },
+                items: self.data.resourceSetLabels,
+                render: {
+                    item: function (item) {
+                        return '<div data-value="' + item.value + '" class="item">' + item.value + '</div>"';
+                    }
+                }
+            });
         },
         render: function(args, callback) {
             var collection, grid, id = null, options, RevokeCell, SelectizeCell, self = this;
@@ -120,6 +139,9 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
             this.data = {};
             this.data.name = this.model.get("name");
             this.data.icon = this.model.get("icon_uri");
+            //TODO: This data should come the server
+            this.data.resourceSetLabels = ["Tag1", "Tag2", "Tag3"];
+            this.data.allLabels = ["Tag1", "Tag2", "Tag3", "Tag4", "Tag5", "Tag6"];
 
             // FIXME: Re-enable filtering and pagination
             //     UserPoliciesCollection = Backbone.PageableCollection.extend({
@@ -247,6 +269,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
 
             this.parentRender(function() {
                 self.$el.find("[data-toggle='tooltip']").tooltip();
+                self.renderTagsOptions();
 
                 if (self.model.has("policy") && self.model.get("policy").get("permissions").length > 0){
                     self.$el.find("li#unshare").removeClass("disabled");

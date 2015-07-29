@@ -29,8 +29,27 @@
             </div>
         </div>
     </div>
-    <p class="page-description"> {{t "uma.resources.show.subtitle"}}</p>
+    <div class="page-description-container">
+        <p class="page-description"> {{t "uma.resources.show.subtitle"}}</p>
+        <div class="tags-container">
+            <div class="pull-right tags-toolbar">
+                <div class="form-group">
+                    <label >{{t 'uma.share.labels'}}</label>
+                    <div id="selectTag">
+                        <select multiple class="selectize">
+                            <option disabled selected value>{{t 'common.form.pleaseSelect'}}</option>
+                            {{#each allLabels}}
+                                <option value="{{this}}">{{this}}</option>
+                            {{/each}}
+                        </select>
+                    </div>
+                    <button id="saveChanges" type="submit" title="{{t 'common.form.saveChanges'}}" disabled class="btn btn-primary">{{t 'common.form.save'}}</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    
     <div id="uma">
         <div class="panel panel-default">
             <div class="panel-body">
