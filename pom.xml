@@ -1749,6 +1749,11 @@
                 <version>${forgerock.guava.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.forgerock.commons.guava</groupId>
+                <artifactId>forgerock-guava-io</artifactId>
+                <version>${forgerock.guava.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-audit-core</artifactId>
                 <version>${forgerock.audit.version}</version>

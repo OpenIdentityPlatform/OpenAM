@@ -33,37 +33,7 @@ import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringReader;
-import java.nio.ByteBuffer;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.concurrent.TimeUnit;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
-import javax.servlet.ServletContext;
+import org.forgerock.guava.common.io.ByteStreams;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.Attributes;
@@ -93,6 +63,38 @@ import org.opends.server.types.DirectoryEnvironmentConfig;
 import org.opends.server.util.EmbeddedUtils;
 import org.opends.server.util.ServerConstants;
 import org.opends.server.util.TimeThread;
+
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
+import javax.servlet.ServletContext;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.StringReader;
+import java.nio.ByteBuffer;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.concurrent.TimeUnit;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 // OpenDS, now OpenDJ, does not have APIs to install and setup replication yet
 
@@ -160,9 +162,7 @@ public class EmbeddedOpenDS {
                 new FileOutputStream(odsRoot + "/opendj.zip"), 10000);
 
         try {
-            while (bin.available() > 0) {
-                bout.write(bin.read());
-            }
+            ByteStreams.copy(bin, bout);
         } catch (IOException ioe) {
             Debug.getInstance(SetupConstants.DEBUG_NAME).error(
                     "EmbeddedOpenDS.setup(): Error copying zip file", ioe);
@@ -190,9 +190,7 @@ public class EmbeddedOpenDS {
                     new BufferedOutputStream(new java.io.FileOutputStream(f), 10000);
 
             try {
-                while (is.available() > 0) {
-                    fos.write(is.read());
-                }
+                ByteStreams.copy(is, fos);
             } catch (IOException ioe) {
                 Debug.getInstance(SetupConstants.DEBUG_NAME).error(
                         "EmbeddedOpenDS.setup(): Error loading ldifs", ioe);
