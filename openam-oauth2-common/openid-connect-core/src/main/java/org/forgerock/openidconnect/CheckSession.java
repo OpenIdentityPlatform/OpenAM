@@ -11,12 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openidconnect;
 
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,7 +44,7 @@ public interface CheckSession {
      * @return The url as a string or empty String.
      */
     public String getClientSessionURI(HttpServletRequest request) throws UnauthorizedClientException,
-            InvalidClientException;
+            InvalidClientException, NotFoundException;
 
     /**
      * Check if the JWT contains a valid session id.

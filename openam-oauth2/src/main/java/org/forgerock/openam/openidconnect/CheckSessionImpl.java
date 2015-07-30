@@ -17,6 +17,7 @@
 package org.forgerock.openam.openidconnect;
 
 import javax.servlet.http.HttpServletRequest;
+
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ import com.google.inject.TypeLiteral;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.shared.debug.Debug;
+
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jose.common.JwtReconstruction;
@@ -41,6 +43,7 @@ import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.adapters.TokenAdapter;
@@ -85,7 +88,7 @@ public class CheckSessionImpl implements CheckSession {
      * {@inheritDoc}
      */
     public String getClientSessionURI(HttpServletRequest request) throws UnauthorizedClientException,
-            InvalidClientException {
+            InvalidClientException, NotFoundException {
 
         SignedJwt jwt = getIDToken(request);
 
@@ -109,7 +112,7 @@ public class CheckSessionImpl implements CheckSession {
      * @return The Client's registration.
      * @throws InvalidClientException If the client's registration is not found.
      */
-    private ClientRegistration getClientRegistration(Jwt jwt) throws InvalidClientException {
+    private ClientRegistration getClientRegistration(Jwt jwt) throws InvalidClientException, NotFoundException {
 
         List<String> clients = jwt.getClaimsSet().getAudience();
         final String realm = (String)jwt.getClaimsSet().getClaim("realm");

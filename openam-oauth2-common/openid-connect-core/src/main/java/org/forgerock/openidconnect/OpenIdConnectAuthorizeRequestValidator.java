@@ -25,6 +25,7 @@ import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.util.Reject;
 
 import javax.inject.Inject;
@@ -57,7 +58,7 @@ public class OpenIdConnectAuthorizeRequestValidator implements AuthorizeRequestV
      * {@inheritDoc}
      */
     public void validateRequest(OAuth2Request request) throws BadRequestException, InvalidRequestException,
-            InvalidClientException, InvalidScopeException {
+            InvalidClientException, InvalidScopeException, NotFoundException {
 
         validateOpenIdScope(request);
 
@@ -70,7 +71,7 @@ public class OpenIdConnectAuthorizeRequestValidator implements AuthorizeRequestV
     }
 
     private void validateOpenIdScope(OAuth2Request request) throws InvalidClientException, InvalidRequestException,
-            InvalidScopeException {
+            InvalidScopeException, NotFoundException {
         final ClientRegistration clientRegistration = clientRegistrationStore.get(
                 request.<String>getParameter(CLIENT_ID), request);
         if (Utils.isOpenIdConnectClient(clientRegistration)) {

@@ -26,14 +26,18 @@ import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
+
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.PEMDecoder;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
+import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.Set;
@@ -65,7 +69,8 @@ public class OpenAMClientRegistrationStore implements OpenIdConnectClientRegistr
     /**
      * {@inheritDoc}
      */
-    public OpenIdConnectClientRegistration get(String clientId, OAuth2Request request) throws InvalidClientException {
+    public OpenIdConnectClientRegistration get(String clientId, OAuth2Request request) 
+            throws InvalidClientException, NotFoundException {
 
         final String realm = realmNormaliser.normalise(request.<String>getParameter("realm"));
         return new OpenAMClientRegistration(getIdentity(clientId, realm), pemDecoder);

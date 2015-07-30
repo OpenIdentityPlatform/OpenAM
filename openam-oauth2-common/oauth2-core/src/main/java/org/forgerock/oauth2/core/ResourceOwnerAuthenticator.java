@@ -11,10 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
+
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 
 /**
  * Authenticates a resource owner from the credentials provided on the request.
@@ -28,7 +30,8 @@ public interface ResourceOwnerAuthenticator {
      * against the OAuth2 provider's internal user store.
      *
      * @param request The OAuth2 request.
+     * @throws NotFoundException if the requested realm doesn't exist
      * @return The authenticated ResourceOwner, or {@code null} if authentication failed.
      */
-    ResourceOwner authenticate(OAuth2Request request);
+    ResourceOwner authenticate(OAuth2Request request) throws NotFoundException;
 }

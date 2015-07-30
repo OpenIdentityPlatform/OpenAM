@@ -28,6 +28,7 @@ import com.sun.identity.shared.debug.Debug;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.ResourceOwner;
 import org.forgerock.oauth2.core.ResourceOwnerAuthenticator;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.restlet.Request;
 import org.restlet.data.Status;
 import org.restlet.ext.servlet.ServletUtils;
@@ -65,7 +66,7 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
     /**
      * {@inheritDoc}
      */
-    public ResourceOwner authenticate(OAuth2Request request) {
+    public ResourceOwner authenticate(OAuth2Request request) throws NotFoundException {
         SSOToken token = null;
         try {
             SSOTokenManager mgr = SSOTokenManager.getInstance();

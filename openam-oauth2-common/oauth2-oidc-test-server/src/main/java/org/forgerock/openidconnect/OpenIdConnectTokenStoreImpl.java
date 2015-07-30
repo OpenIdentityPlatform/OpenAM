@@ -58,7 +58,8 @@ public class OpenIdConnectTokenStoreImpl extends TokenStoreImpl implements OpenI
 
     public OpenIdConnectToken createOpenIDToken(String resourceOwnerId, String clientId,
                                                 String authorizationParty, String nonce, String ops,
-                                                OAuth2Request request) throws ServerException, InvalidClientException {
+                                                OAuth2Request request) 
+                                                throws ServerException, InvalidClientException, NotFoundException {
 
         final OAuth2ProviderSettings providerSettings;
         try {

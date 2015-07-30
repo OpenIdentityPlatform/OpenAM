@@ -24,6 +24,7 @@ import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.util.Reject;
 import org.restlet.Request;
 import org.restlet.data.ChallengeResponse;
@@ -49,7 +50,8 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
         this.clientStore = clientStore;
     }
 
-    public ClientRegistration authenticate(OAuth2Request request) throws InvalidClientException, InvalidRequestException, ClientAuthenticationFailedException {
+    public ClientRegistration authenticate(OAuth2Request request) 
+            throws InvalidClientException, InvalidRequestException, ClientAuthenticationFailedException, NotFoundException {
 
         final ClientCredentials clientCredentials = extractCredentials(request);
         Reject.ifTrue(isEmpty(clientCredentials.clientId), "Missing parameter, 'client_id'");

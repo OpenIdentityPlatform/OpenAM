@@ -414,7 +414,8 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     /**
      * {@inheritDoc}
      */
-    public AuthorizationCode readAuthorizationCode(OAuth2Request request, String code) throws InvalidGrantException, ServerException {
+    public AuthorizationCode readAuthorizationCode(OAuth2Request request, String code) 
+            throws InvalidGrantException, ServerException, NotFoundException {
         if (logger.messageEnabled()) {
             logger.message("Reading Authorization code: " + code);
         }
@@ -434,7 +435,8 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         }
 
         OpenAMAuthorizationCode authorizationCode = new OpenAMAuthorizationCode(token);
-        if (!authorizationCode.getRealm().equals(request.<String>getParameter(REALM))) {
+        final String realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
+        if (!authorizationCode.getRealm().equals(realm)) {
             throw new InvalidGrantException("Grant is not valid for the requested realm");
         }
         request.setToken(AuthorizationCode.class, authorizationCode);
@@ -558,7 +560,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
      * {@inheritDoc}
      */
     public AccessToken readAccessToken(OAuth2Request request, String tokenId) throws ServerException, BadRequestException,
-            InvalidGrantException {
+            InvalidGrantException, NotFoundException {
 
         logger.message("Reading access token");
 
@@ -578,7 +580,8 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         }
 
         OpenAMAccessToken accessToken = new OpenAMAccessToken(token);
-        if (!accessToken.getRealm().equals(request.<String>getParameter(REALM))) {
+        final String realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
+        if (!accessToken.getRealm().equals(realm)) {
             throw new InvalidGrantException("Grant is not valid for the requested realm");
         }
         request.setToken(AccessToken.class, accessToken);
@@ -589,7 +592,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
      * {@inheritDoc}
      */
     public RefreshToken readRefreshToken(OAuth2Request request, String tokenId) throws BadRequestException, InvalidRequestException,
-            InvalidGrantException {
+            InvalidGrantException, NotFoundException {
 
         logger.message("Read refresh token");
         JsonValue token;
@@ -607,7 +610,8 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         }
 
         OpenAMRefreshToken refreshToken = new OpenAMRefreshToken(token);
-        if (!refreshToken.getRealm().equals(request.<String>getParameter(REALM))) {
+        final String realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
+        if (!refreshToken.getRealm().equals(realm)) {
             throw new InvalidGrantException("Grant is not valid for the requested realm");
         }
         request.setToken(RefreshToken.class, refreshToken);

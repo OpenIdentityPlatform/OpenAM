@@ -96,8 +96,10 @@ public interface TokenStore {
      * @throws InvalidGrantException If a problem occurs whilst retrieving the Authorization Code or if the read token
      * is not an Authorization Code.
      * @throws ServerException If any internal server error occurs.
+     * @throws NotFoundException If the requested realm does not exist.
      */
-    AuthorizationCode readAuthorizationCode(OAuth2Request request, String code) throws InvalidGrantException, ServerException;
+    AuthorizationCode readAuthorizationCode(OAuth2Request request, String code) 
+            throws InvalidGrantException, ServerException, NotFoundException;
 
     /**
      * Updates an Authorization Code.
@@ -142,9 +144,10 @@ public interface TokenStore {
      * @param tokenId The token identifier.
      * @return The Access Token.
      * @throws InvalidGrantException If the read token is not an Access Token.
+     * @throws NotFoundException If the requested realm does not exist.
      */
     AccessToken readAccessToken(OAuth2Request request, String tokenId) throws ServerException, BadRequestException,
-            InvalidGrantException;
+            InvalidGrantException, NotFoundException;
 
     /**
      * Reads a Refresh Token from the OAuth2 Provider's store with the specified identifier.
@@ -153,7 +156,8 @@ public interface TokenStore {
      * @param tokenId The token identifier.
      * @return The Refresh Token.
      * @throws InvalidGrantException If the read token is not a Refresh Token.
+     * @throws NotFoundException If the requested realm does not exist.
      */
     RefreshToken readRefreshToken(OAuth2Request request, String tokenId) throws BadRequestException, InvalidRequestException,
-            InvalidGrantException;
+            InvalidGrantException, NotFoundException;
 }
