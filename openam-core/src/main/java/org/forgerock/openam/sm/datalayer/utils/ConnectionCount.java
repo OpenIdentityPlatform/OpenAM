@@ -82,6 +82,8 @@ public class ConnectionCount {
                     max = (max - 1) / numberTypesSharingSMSConnections;
                 }
                 return max;
+            case UMA_LABELS:
+                return max;
             case DATA_LAYER:
                 /**
                   * Ensure that the DATA_LAYER connection type fits into the available
@@ -101,7 +103,8 @@ public class ConnectionCount {
     private int findNumberTypesSharingSMSConnections() {
         int count = 0;
         for (ConnectionType type : ConnectionType.values()) {
-            if (type != ConnectionType.CTS_REAPER && dataLayerConfiguration.get(type).getStoreMode() == StoreMode.DEFAULT) {
+            if (type != ConnectionType.CTS_REAPER && type != ConnectionType.UMA_LABELS &&
+                    dataLayerConfiguration.get(type).getStoreMode() == StoreMode.DEFAULT) {
                 count++;
             }
         }

@@ -50,8 +50,16 @@ public class ResourceSetDescriptionValidator {
         validateType(description);
         validateScopes(description);
         validateIconUri(description);
+        validateLabels(description);
 
         return resourceSetDescription;
+    }
+
+    private void validateLabels(JsonValue description) throws BadRequestException {
+        if (!description.get(OAuth2Constants.ResourceSets.LABELS).isCollection()) {
+            throw new BadRequestException("Invalid Resource Set Description. Required attribute, '" + OAuth2Constants.ResourceSets.LABELS + "', must be a "
+                    + "list.");
+        }
     }
 
     private void validateName(JsonValue description) throws BadRequestException {

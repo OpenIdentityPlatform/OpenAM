@@ -16,16 +16,12 @@
 
 package org.forgerock.openam.rest.oauth2;
 
-import static org.forgerock.json.fluent.JsonValue.json;
-import static org.forgerock.json.fluent.JsonValue.object;
-
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import javax.inject.Inject;
 import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -47,11 +43,19 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
 import org.forgerock.openam.rest.resource.ContextHelper;
+import org.forgerock.openam.oauth2.resources.labels.ResourceSetLabel;
+import org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore;
+import org.forgerock.openam.uma.UmaConstants;
+import org.forgerock.openam.uma.UmaException;
 import org.forgerock.util.promise.ExceptionHandler;
+
+import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.fluent.JsonValue.object;
 
 /**
  * <p>Resource Set resource to expose registered Resource Sets for a given user.</p>
@@ -65,6 +69,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
 
     private final ResourceSetService resourceSetService;
     private final ContextHelper contextHelper;
+    private final UmaLabelsStore umaLabelsStore;
 
     /**
      * Constructs a new ResourceSetResource instance.
@@ -73,9 +78,10 @@ public class ResourceSetResource implements CollectionResourceProvider {
      * @param contextHelper An instance of the ContextHelper.
      */
     @Inject
-    public ResourceSetResource(ResourceSetService resourceSetService, ContextHelper contextHelper) {
+    public ResourceSetResource(ResourceSetService resourceSetService, ContextHelper contextHelper, UmaLabelsStore umaLabelsStore) {
         this.resourceSetService = resourceSetService;
         this.contextHelper = contextHelper;
+        this.umaLabelsStore = umaLabelsStore;
     }
 
     /**
@@ -164,7 +170,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
                 query = new ResourceSetWithPolicyQuery();
                 query.setResourceSetQuery(org.forgerock.util.query.QueryFilter.<String>alwaysTrue());
             } else if (request.getQueryFilter() != null) {
-                query = request.getQueryFilter().accept(new ResourceSetQueryFilter(), new ResourceSetWithPolicyQuery());
+                query = request.getQueryFilter().accept(new ResourceSetQueryFilter(context), new ResourceSetWithPolicyQuery());
             } else {
                 handler.handleError(new BadRequestException("Invalid query"));
                 return;
@@ -226,16 +232,18 @@ public class ResourceSetResource implements CollectionResourceProvider {
         return new JsonValue(content);
     }
 
-    private static final class ResourceSetQueryFilter
+    private final class ResourceSetQueryFilter
             implements QueryFilterVisitor<ResourceSetWithPolicyQuery, ResourceSetWithPolicyQuery> {
 
         private final Map<JsonPointer, String> queryableFields = new HashMap<JsonPointer, String>();
+        private final ServerContext context;
         private int queryDepth = 0;
 
-        private ResourceSetQueryFilter() {
+        private ResourceSetQueryFilter(ServerContext context) {
+            this.context = context;
             queryableFields.put(new JsonPointer("/name"), ResourceSetTokenField.NAME);
             queryableFields.put(new JsonPointer("/resourceServer"), ResourceSetTokenField.CLIENT_ID);
-            queryableFields.put(new JsonPointer("/resourceOwnerId"), "resourceOwnerId");
+            queryableFields.put(new JsonPointer("/resourceOwnerId"), ResourceSetTokenField.RESOURCE_OWNER_ID);
         }
 
         private void increaseQueryDepth() {
@@ -291,6 +299,18 @@ public class ResourceSetResource implements CollectionResourceProvider {
                     throw new UnsupportedOperationException("Cannot nest queries on /policy/permissions/subject field");
                 }
                 query.setPolicyQuery(QueryFilter.equalTo("/permissions/subject", valueAssertion));
+            } else if (new JsonPointer("/labels").equals(field)) {
+                ResourceSetLabel label = null;
+                try {
+                    label = umaLabelsStore.read(getRealm(context), getResourceOwnerId(context), (String) valueAssertion);
+                } catch (ResourceException e) {
+                    throw new IllegalArgumentException("Unknown Label ID.");
+                }
+                List<org.forgerock.util.query.QueryFilter<String>> labelFilters = new ArrayList<>();
+                for (String resourceSetId : label.getResourceSetIds()) {
+                    labelFilters.add(org.forgerock.util.query.QueryFilter.equalTo( ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId));
+                }
+                query.setResourceSetQuery(org.forgerock.util.query.QueryFilter.or(labelFilters));
             } else {
                 query.setResourceSetQuery(
                         org.forgerock.util.query.QueryFilter.equalTo(verifyFieldIsQueryable(field), valueAssertion));

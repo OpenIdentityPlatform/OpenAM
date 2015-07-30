@@ -44,11 +44,13 @@ public class ConnectionCountTest {
         LdapDataLayerConfiguration resourceSetConfiguration = mock(LdapDataLayerConfiguration.class);
         LdapDataLayerConfiguration umaAuditConfiguration = mock(UmaAuditDataLayerConfiguration.class);
         LdapDataLayerConfiguration umaPendingRequestsConfiguration = mock(UmaPendingRequestDataLayerConfiguration.class);
+        LdapDataLayerConfiguration umaLabelsConfiguration = mock(UmaPendingRequestDataLayerConfiguration.class);
         when(dataLayerConfiguration.getStoreMode()).thenReturn(StoreMode.DEFAULT);
         when(ctsConfiguration.getStoreMode()).thenReturn(StoreMode.DEFAULT);
         when(resourceSetConfiguration.getStoreMode()).thenReturn(StoreMode.DEFAULT);
         when(umaAuditConfiguration.getStoreMode()).thenReturn(StoreMode.DEFAULT);
         when(umaPendingRequestsConfiguration.getStoreMode()).thenReturn(StoreMode.DEFAULT);
+        when(umaLabelsConfiguration.getStoreMode()).thenReturn(StoreMode.DEFAULT);
         Map<ConnectionType, LdapDataLayerConfiguration> configMap = new HashMap<ConnectionType, LdapDataLayerConfiguration>();
         configMap.put(ConnectionType.DATA_LAYER, dataLayerConfiguration);
         configMap.put(ConnectionType.CTS_ASYNC, ctsConfiguration);
@@ -56,6 +58,7 @@ public class ConnectionCountTest {
         configMap.put(ConnectionType.RESOURCE_SETS, resourceSetConfiguration);
         configMap.put(ConnectionType.UMA_AUDIT_ENTRY, umaAuditConfiguration);
         configMap.put(ConnectionType.UMA_PENDING_REQUESTS, umaPendingRequestsConfiguration);
+        configMap.put(ConnectionType.UMA_LABELS, umaLabelsConfiguration);
         count = new ConnectionCount(configMap);
     }
 

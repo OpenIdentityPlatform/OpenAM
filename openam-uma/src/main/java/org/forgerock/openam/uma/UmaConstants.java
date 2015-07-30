@@ -100,4 +100,5 @@ public final class UmaConstants {
         static final String BACKEND_POLICY_SUBJECT_CLAIM_NAME_KEY = "claimName";
         static final String BACKEND_POLICY_SUBJECT_CLAIM_NAME = "sub";
     }
+
 }

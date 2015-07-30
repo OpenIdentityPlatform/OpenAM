@@ -62,7 +62,11 @@ public enum ConnectionType {
      */
     UMA_AUDIT_ENTRY(UmaAuditConnectionModule.class),
 
-    UMA_PENDING_REQUESTS(UmaPendingRequestConnectionModule.class);
+    UMA_PENDING_REQUESTS(UmaPendingRequestConnectionModule.class),
+    /**
+     * See {@code org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore}. No fallback module type available.
+     */
+    UMA_LABELS(null);
 
     private static final String CONFIGURATION_CLASS_PROPERTY_PREFIX = "org.forgerock.openam.sm.datalayer.module.";
     private final Class<? extends DataLayerConnectionModule> configurationClass;

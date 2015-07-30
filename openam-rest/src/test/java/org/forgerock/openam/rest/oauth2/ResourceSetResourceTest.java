@@ -47,6 +47,7 @@ import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.openam.rest.resource.ContextHelper;
+import org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 import org.mockito.ArgumentCaptor;
@@ -59,14 +60,15 @@ public class ResourceSetResourceTest {
     private ResourceSetResource resource;
 
     private ResourceSetService resourceSetService;
+    private UmaLabelsStore umaLabelsStore;
     private ContextHelper contextHelper;
 
     @BeforeMethod
     public void setup() {
         resourceSetService = mock(ResourceSetService.class);
         contextHelper = mock(ContextHelper.class);
-
-        resource = new ResourceSetResource(resourceSetService, contextHelper);
+        umaLabelsStore = mock(UmaLabelsStore.class);
+        resource = new ResourceSetResource(resourceSetService, contextHelper, umaLabelsStore);
     }
 
     @Test

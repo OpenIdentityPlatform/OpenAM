@@ -52,6 +52,9 @@ public class TimeoutConfig {
             case UMA_PENDING_REQUESTS:
                 return SystemProperties.getAsInt(DataLayerConstants.UMA_PENDING_REQUESTS_TIMEOUT,
                         getTimeout(ConnectionType.DATA_LAYER));
+            case UMA_LABELS:
+                return SystemProperties.getAsInt(DataLayerConstants.UMA_LABELS_TIMEOUT,
+                        getTimeout(ConnectionType.DATA_LAYER));
             default:
                 throw new IllegalStateException();
         }

@@ -44,14 +44,24 @@
                         heartbeat: 'ServerEditUMA.cscorg-forgerock-services-umaaudit-store-heartbeat'
                 },
                 pendingrequests: {
-                        storeLocationRadioButtonName: 'ServerEditUMA.cscorg-forgerock-services-uma-pendingrequests-store-location',
-                        sslEnableCheckBoxName: 'ServerEditUMA.cscorg-forgerock-services-uma-pendingrequests-store-ssl-enabled',
-                        directoryNameFieldName: 'ServerEditUMA.cscorg-forgerock-services-uma-pendingrequests-store-directory-name',
-                        portFieldName: 'ServerEditUMA.cscorg-forgerock-services-uma-pendingrequests-store-port',
-                        loginIdFieldName: 'ServerEditUMA.cscorg-forgerock-services-uma-pendingrequests-store-loginid',
-                        passwordFieldName: 'ServerEditUMA.cscorg-forgerock-services-uma-pendingrequests-store-password',
-                        maxConnectionsFieldName: 'ServerEditUMA.cscorg-forgerock-services-uma-pendingrequests-store-max-connections',
-                        heartbeat: 'ServerEditUMA.cscorg-forgerock-services-uma-pendingrequests-store-heartbeat'
+                    storeLocationRadioButtonName: 'ServerEditUMA.cscorg-forgerock-services-uma-pendingrequests-store-location',
+                    sslEnableCheckBoxName: 'ServerEditUMA.cscorg-forgerock-services-uma-pendingrequests-store-ssl-enabled',
+                    directoryNameFieldName: 'ServerEditUMA.cscorg-forgerock-services-uma-pendingrequests-store-directory-name',
+                    portFieldName: 'ServerEditUMA.cscorg-forgerock-services-uma-pendingrequests-store-port',
+                    loginIdFieldName: 'ServerEditUMA.cscorg-forgerock-services-uma-pendingrequests-store-loginid',
+                    passwordFieldName: 'ServerEditUMA.cscorg-forgerock-services-uma-pendingrequests-store-password',
+                    maxConnectionsFieldName: 'ServerEditUMA.cscorg-forgerock-services-uma-pendingrequests-store-max-connections',
+                    heartbeat: 'ServerEditUMA.cscorg-forgerock-services-uma-pendingrequests-store-heartbeat'
+                },
+                labels: {
+                    storeLocationRadioButtonName: 'ServerEditUMA.cscorg-forgerock-services-uma-labels-store-location',
+                    sslEnableCheckBoxName: 'ServerEditUMA.cscorg-forgerock-services-uma-labels-store-ssl-enabled',
+                    directoryNameFieldName: 'ServerEditUMA.cscorg-forgerock-services-uma-labels-store-directory-name',
+                    portFieldName: 'ServerEditUMA.cscorg-forgerock-services-uma-labels-store-port',
+                    loginIdFieldName: 'ServerEditUMA.cscorg-forgerock-services-uma-labels-store-loginid',
+                    passwordFieldName: 'ServerEditUMA.cscorg-forgerock-services-uma-labels-store-password',
+                    maxConnectionsFieldName: 'ServerEditUMA.cscorg-forgerock-services-uma-labels-store-max-connections',
+                    heartbeat: 'ServerEditUMA.cscorg-forgerock-services-uma-labels-store-heartbeat'
                 }
             };
 
@@ -59,6 +69,7 @@
                 setState(fields.audit);
                 setState(fields.resourcesets);
                 setState(fields.pendingrequests);
+                setState(fields.labels);
             };
 
             function setState(fieldset) {
@@ -87,7 +98,6 @@
                 toggleField(fieldset.portFieldName, readonly);
                 toggleField(fieldset.loginIdFieldName, readonly);
                 toggleField(fieldset.passwordFieldName, readonly);
-                toggleField(fieldset.maxConnectionsFieldName, readonly);
                 toggleField(fieldset.heartbeat, readonly);
             }
 

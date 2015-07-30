@@ -179,8 +179,12 @@ public class ResourceSetService {
                                     Set<ResourceSetDescription> results = new HashSet<>();
 
                                     for (ResourceSetDescription resourceSetDescription : resourceSetDescriptions) {
-                                        if (fieldName.equals("resourceOwnerId")) {
+                                        if (fieldName.equals(ResourceSetTokenField.RESOURCE_OWNER_ID)) {
                                             if (resourceSetDescription.getResourceOwnerId().equals(value)) {
+                                                results.add(resourceSetDescription);
+                                            }
+                                        } else if (fieldName.equals(ResourceSetTokenField.RESOURCE_SET_ID)) {
+                                            if (resourceSetDescription.getId().equals(value)) {
                                                 results.add(resourceSetDescription);
                                             }
                                         }

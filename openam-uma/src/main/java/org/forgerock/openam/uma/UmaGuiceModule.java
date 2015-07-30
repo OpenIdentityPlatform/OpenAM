@@ -17,17 +17,14 @@
 package org.forgerock.openam.uma;
 
 
-import static org.forgerock.openam.rest.service.RestletUtils.wrap;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.Client;
@@ -46,6 +43,8 @@ import org.forgerock.openam.uma.audit.UmaAuditLogger;
 import org.forgerock.openam.utils.Config;
 import org.restlet.Request;
 import org.restlet.Restlet;
+
+import static org.forgerock.openam.rest.service.RestletUtils.wrap;
 
 @GuiceModule
 public class UmaGuiceModule extends AbstractModule {

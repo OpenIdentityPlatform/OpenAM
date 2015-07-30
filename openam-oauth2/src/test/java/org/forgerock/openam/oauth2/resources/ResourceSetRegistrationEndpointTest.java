@@ -14,7 +14,7 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.oauth2.restlet.resources;
+package org.forgerock.openam.oauth2.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
@@ -47,7 +47,10 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
+import org.forgerock.oauth2.restlet.resources.ResourceSetDescriptionValidator;
+import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationListener;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
+import org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore;
 import org.forgerock.util.query.BaseQueryFilterVisitor;
 import org.forgerock.util.query.QueryFilter;
 import org.forgerock.util.query.QueryFilterVisitor;
@@ -73,16 +76,17 @@ public class ResourceSetRegistrationEndpointTest {
 
     private static final JsonValue RESOURCE_SET_DESCRIPTION_CONTENT = json(object(field("name", "NAME"),
             field("uri", "URI"), field("type", "TYPE"), field("scopes", array("SCOPE")),
-            field("icon_uri", "ICON_URI")));
+            field("icon_uri", "ICON_URI"), field("labels", array("LABEL"))));
     private static final JsonValue RESOURCE_SET_DESCRIPTION_UPDATED_CONTENT = json(object(field("name", "NEW_NAME"),
             field("uri", "NEW_URI"), field("type", "NEW_TYPE"), field("scopes", array("NEW_SCOPE")),
-            field("icon_uri", "NEW_ICON_URI")));
+            field("icon_uri", "NEW_ICON_URI"), field("labels", array())));
 
     private ResourceSetRegistrationEndpoint endpoint;
 
     private ResourceSetStore store;
     private ResourceSetDescriptionValidator validator;
     private ResourceSetRegistrationListener listener;
+    private UmaLabelsStore labelsStore;
 
     private Response response;
 
@@ -96,6 +100,7 @@ public class ResourceSetRegistrationEndpointTest {
         Set<ResourceSetRegistrationListener> listeners = new HashSet<ResourceSetRegistrationListener>();
         listener = mock(ResourceSetRegistrationListener.class);
         listeners.add(listener);
+        labelsStore = mock(UmaLabelsStore.class);
 
         OAuth2ProviderSettingsFactory providerSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
         OAuth2ProviderSettings providerSettings = mock(OAuth2ProviderSettings.class);
@@ -103,7 +108,7 @@ public class ResourceSetRegistrationEndpointTest {
         given(providerSettings.getResourceSetStore()).willReturn(store);
 
         endpoint = spy(new ResourceSetRegistrationEndpoint(providerSettingsFactory, validator, requestFactory,
-                listeners));
+                listeners, labelsStore));
 
         Request request = mock(Request.class);
         ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC);

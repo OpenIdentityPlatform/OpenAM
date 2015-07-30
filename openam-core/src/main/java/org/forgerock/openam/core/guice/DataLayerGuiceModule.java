@@ -65,12 +65,14 @@ public class DataLayerGuiceModule extends AbstractModule {
         binder().bind(connectionMapKey).toProvider(ConfigurationMapProvider.class).in(Singleton.class);
 
         for (ConnectionType connectionType : ConnectionType.values()) {
-            try {
-                DataLayerConnectionModule module = connectionType.getConfigurationClass().newInstance();
-                module.setConnectionType(connectionType);
-                binder().install(module);
-            } catch (Exception e) {
-                throw new IllegalStateException("Could not initialise connection module for " + connectionType, e);
+            if (connectionType != ConnectionType.UMA_LABELS) {
+                try {
+                    DataLayerConnectionModule module = connectionType.getConfigurationClass().newInstance();
+                    module.setConnectionType(connectionType);
+                    binder().install(module);
+                } catch (Exception e) {
+                    throw new IllegalStateException("Could not initialise connection module for " + connectionType, e);
+                }
             }
         }
 

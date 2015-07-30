@@ -30,4 +30,5 @@ public final class ResourceSetTokenField {
     public static final String RESOURCE_OWNER_ID = "resourceOwnerId";
     public static final String REALM = "realm";
     public static final String NAME = "name";
+    public static final String LABELS = "labels";
 }

@@ -29,6 +29,7 @@ public class DataLayerConstants {
     public static final String RESOURCE_SETS_TIMEOUT = "org.forgerock.services.datalayer.connection.timeout.resourcesets";
     public static final String UMA_AUDIT_ENTRY_TIMEOUT = "org.forgerock.services.datalayer.connection.timeout.umaauditentry";
     public static final String UMA_PENDING_REQUESTS_TIMEOUT = "org.forgerock.services.datalayer.connection.timeout.uma.pendingrequests";
+    public static final String UMA_LABELS_TIMEOUT = "org.forgerock.services.datalayer.connection.timeout.uma.labels";
 
     /**
      * Guice bindings for ConnectionConfig instances

@@ -157,6 +157,7 @@ public class ResourceSetDescriptionValidatorTest {
 
         resourceSetDescription.put(OAuth2Constants.ResourceSets.NAME, "NAME");
         resourceSetDescription.put(OAuth2Constants.ResourceSets.SCOPES, Collections.singleton("SCOPES"));
+        resourceSetDescription.put(OAuth2Constants.ResourceSets.LABELS, Collections.singleton("LABELS"));
 
         //When
         Map<String, Object> validated = validator.validate(resourceSetDescription);
@@ -176,6 +177,7 @@ public class ResourceSetDescriptionValidatorTest {
         resourceSetDescription.put(OAuth2Constants.ResourceSets.TYPE, "TYPE");
         resourceSetDescription.put(OAuth2Constants.ResourceSets.SCOPES, Collections.singleton("SCOPES"));
         resourceSetDescription.put(OAuth2Constants.ResourceSets.ICON_URI, "/ICON_URI");
+        resourceSetDescription.put(OAuth2Constants.ResourceSets.LABELS, Collections.singleton("LABELS"));
 
         //When
         Map<String, Object> validated = validator.validate(resourceSetDescription);

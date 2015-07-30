@@ -14,15 +14,15 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.oauth2.restlet.resources;
+package org.forgerock.openam.oauth2.resources;
 
-import javax.inject.Inject;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import javax.inject.Inject;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.oauth2.core.AccessToken;
@@ -35,7 +35,11 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
+import org.forgerock.oauth2.restlet.resources.ResourceSetDescriptionValidator;
+import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationListener;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
+import org.forgerock.openam.oauth2.resources.labels.ResourceSetLabel;
+import org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.util.query.QueryFilter;
 import org.json.JSONException;
@@ -69,6 +73,7 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
     private final ResourceSetDescriptionValidator validator;
     private final OAuth2RequestFactory<Request> requestFactory;
     private final Set<ResourceSetRegistrationListener> listeners;
+    private final UmaLabelsStore labelsStore;
 
     /**
      * Construct a new ResourceSetRegistrationEndpoint instance.
@@ -81,11 +86,12 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
     @Inject
     public ResourceSetRegistrationEndpoint(OAuth2ProviderSettingsFactory providerSettingsFactory,
             ResourceSetDescriptionValidator validator, OAuth2RequestFactory<Request> requestFactory,
-            Set<ResourceSetRegistrationListener> listeners) {
+            Set<ResourceSetRegistrationListener> listeners, UmaLabelsStore labelsStore) {
         this.providerSettingsFactory = providerSettingsFactory;
         this.validator = validator;
         this.requestFactory = requestFactory;
         this.listeners = listeners;
+        this.labelsStore = labelsStore;
     }
 
     /**
@@ -135,18 +141,45 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
 
     @Put
     public Representation updateResourceSet(JsonRepresentation entity) throws NotFoundException,
-            ServerException, BadRequestException {
+            ServerException, BadRequestException, org.forgerock.json.resource.ResourceException {
 
         if (!isConditionalRequest()) {
             throw new ResourceException(512, "precondition_failed", "Require If-Match header to update Resource Set",
                     null);
         }
 
+        final Map<String, Object> resourceSetDescriptionAttributes = validator.validate(toMap(entity));
+        final String realm = getRealm();
+        final String userId = getResourceOwnerId();
+        final String resourceSetId = getResourceSetId();
+
+        //remove this resource set id from all labels
+        Set<ResourceSetLabel> labels = labelsStore.forResourceSet(realm, userId, resourceSetId, true);
+        for (ResourceSetLabel label : labels) {
+            label.removeResourceSetId(resourceSetId);
+            labelsStore.update(realm, userId, label);
+        }
+
+        //add resource set id to new labels
+        for (String labelId : (List<String>) resourceSetDescriptionAttributes.get("labels")) {
+            try {
+                ResourceSetLabel label = labelsStore.read(realm, userId, labelId);
+                label.addResourceSetId(resourceSetId);
+                labelsStore.update(realm, userId, label);
+            } catch (ResourceException | org.forgerock.json.resource.ResourceException e) {
+                throw e;
+            }
+        }
+
         ResourceSetStore store = providerSettingsFactory.get(requestFactory.create(getRequest())).getResourceSetStore();
-        ResourceSetDescription resourceSetDescription = store.read(getResourceSetId())
-                .update(validator.validate(toMap(entity)));
+        ResourceSetDescription resourceSetDescription = store.read(resourceSetId)
+                .update(resourceSetDescriptionAttributes);
         store.update(resourceSetDescription);
         return createJsonResponse(resourceSetDescription, false, true);
+    }
+
+    private String getRealm() {
+        return requestFactory.create(getRequest()).getParameter("realm");
     }
 
     /**

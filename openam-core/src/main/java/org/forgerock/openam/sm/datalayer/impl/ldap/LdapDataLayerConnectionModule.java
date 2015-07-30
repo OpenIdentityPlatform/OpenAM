@@ -16,37 +16,26 @@
 
 package org.forgerock.openam.sm.datalayer.impl.ldap;
 
-import java.util.concurrent.Semaphore;
-
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.impl.LdapAdapter;
 import org.forgerock.openam.cts.utils.LdapTokenAttributeConversion;
 import org.forgerock.openam.sm.ConnectionConfig;
-import org.forgerock.openam.sm.ConnectionConfigFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
-import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConnectionModule;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.sm.datalayer.api.TaskExecutor;
-import org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter;
 import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
 import org.forgerock.openam.sm.datalayer.api.query.QueryFactory;
 import org.forgerock.openam.sm.datalayer.impl.PooledTaskExecutor;
-import org.forgerock.openam.sm.datalayer.impl.SimpleTaskExecutor;
-import org.forgerock.openam.sm.datalayer.impl.SimpleTaskExecutorFactory;
 import org.forgerock.openam.sm.datalayer.providers.ConnectionFactoryProvider;
 import org.forgerock.openam.sm.datalayer.providers.DataLayerConnectionFactoryCache;
 import org.forgerock.openam.sm.datalayer.providers.LdapConnectionFactoryProvider;
-import org.forgerock.openam.sm.datalayer.utils.ConnectionCount;
 
 import com.google.inject.Key;
 import com.google.inject.PrivateBinder;
-import com.google.inject.Provider;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
 
@@ -98,22 +87,6 @@ public abstract class LdapDataLayerConnectionModule extends DataLayerConnectionM
      */
     protected Class<? extends javax.inject.Provider<ConnectionFactory>> getConnectionFactoryProviderType() {
         return DataLayerConnectionFactoryCache.class;
-    }
-
-    private static final class ExternalConnectionConfigProvider implements Provider<ConnectionConfig> {
-        private final LdapDataLayerConfiguration configuration;
-        private final ExternalLdapConfig externalConfig;
-
-        @Inject
-        public ExternalConnectionConfigProvider (ExternalLdapConfig externalConfig, LdapDataLayerConfiguration configuration) {
-            this.externalConfig = externalConfig;
-            this.configuration = configuration;
-        }
-
-        public ConnectionConfig get() {
-            externalConfig.update(configuration);
-            return externalConfig;
-        }
     }
 
 }

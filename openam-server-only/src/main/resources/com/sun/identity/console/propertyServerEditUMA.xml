@@ -136,4 +136,44 @@
             <cc name="cscorg-forgerock-services-uma-pendingrequests-store-heartbeat" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
         </property>
     </section>
+    <section name="rs-labels-common-section" defaultValue="amconfig.org.forgerock.services.uma.labels.store.common.section">
+        <property required="true">
+            <cc name="cscorg-forgerock-services-uma-labels-store-location" tagclass="com.sun.web.ui.taglib.html.CCRadioButtonTag">
+                <option label="amconfig.org.forgerock.services.store.location.default" value="default" />
+                <option label="amconfig.org.forgerock.services.store.location.external" value="external" />
+                <attribute name="onChange" value="toggleExternalConfig(fields.labels, this);" />
+            </cc>
+        </property>
+        <property required="true">
+            <label name="rootSuffixLabel" defaultValue="amconfig.org.forgerock.services.store.root.suffix" labelFor="cscorg-forgerock-services-uma-labels-store-root-suffix" />
+            <cc name="cscorg-forgerock-services-uma-labels-store-root-suffix" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
+        </property>
+        <property required="true">
+            <label name="maxConnectionsLabel" defaultValue="amconfig.org.forgerock.services.store.max.connections" labelFor="cscorg-forgerock-services-uma-labels-store-max-connections" />
+            <cc name="cscorg-forgerock-services-uma-labels-store-max-connections" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
+        </property>
+    </section>
+    <section name="labels-external-section" defaultValue="amconfig.org.forgerock.services.uma.labels.store.external.section">
+        <property required="true">
+            <label name="sslLabel" defaultValue="amconfig.org.forgerock.services.store.ssl.enabled" labelFor="cscorg-forgerock-services-uma-labels-store-ssl-enabled" />
+            <cc name="cscorg-forgerock-services-uma-labels-store-ssl-enabled" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag"></cc>
+        </property>
+        <property required="true">
+            <label name="directoryNameLabel" defaultValue="amconfig.org.forgerock.services.store.directory.name" labelFor="cscorg-forgerock-services-uma-labels-store-directory-name" />
+            <cc name="cscorg-forgerock-services-uma-labels-store-directory-name" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
+            <fieldhelp name="helpcscorg-forgerock-services-uma-labels-store-directory-name" defaultValue="amconfig.help.org.forgerock.services.store.directory.name" />
+        </property>
+        <property required="true">
+            <label name="loginIdLabel" defaultValue="amconfig.org.forgerock.services.store.loginid" labelFor="cscorg-forgerock-services-uma-labels-store-loginid" />
+            <cc name="cscorg-forgerock-services-uma-labels-store-loginid" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
+        </property>
+        <property required="true">
+            <label name="passwordLabel" defaultValue="amconfig.org.forgerock.services.store.password" labelFor="cscorg-forgerock-services-uma-labels-store-password" />
+            <cc name="cscorg-forgerock-services-uma-labels-store-password" tagclass="com.sun.web.ui.taglib.html.CCPasswordTag"></cc>
+        </property>
+        <property required="true">
+            <label name="heartbeatLabel" defaultValue="amconfig.org.forgerock.services.store.heartbeat" labelFor="cscorg-forgerock-services-uma-labels-store-heartbeat" />
+            <cc name="cscorg-forgerock-services-uma-labels-store-heartbeat" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
+        </property>
+    </section>
 </propertysheet>

@@ -21,6 +21,7 @@ import com.google.inject.Provides;
 import com.google.inject.name.Names;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.openam.oauth2.resources.labels.LabelsGuiceModule;
 import org.forgerock.openam.rest.devices.OathDevicesDao;
 import org.forgerock.openam.rest.devices.services.OathServiceFactory;
 
@@ -34,7 +35,6 @@ import javax.inject.Singleton;
 public class OathGuiceModule extends AbstractModule {
     @Override
     protected void configure() {
-
         // Auth module debug instances
         bind(Debug.class).annotatedWith(Names.named("amAuthOATH")).toInstance(Debug.getInstance("amAuthOATH"));
 

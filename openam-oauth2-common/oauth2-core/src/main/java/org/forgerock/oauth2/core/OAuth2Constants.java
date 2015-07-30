@@ -1041,6 +1041,7 @@ public class OAuth2Constants {
         public static final String SCOPES = "scopes";
         public static final String ICON_URI = "icon_uri";
         public static final String CLIENT_ID = "client_id";
+        public static final String LABELS = "labels";
     }
 
     /**

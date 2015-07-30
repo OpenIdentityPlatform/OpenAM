@@ -85,6 +85,7 @@ import org.forgerock.openam.rest.uma.UmaPolicyResource;
 import org.forgerock.openam.rest.uma.UmaPolicyResourceAuthzFilter;
 import org.forgerock.openam.uma.UmaConstants;
 import org.forgerock.openam.uma.UmaExceptionFilter;
+import org.forgerock.openam.forgerockrest.UmaLabelResource;
 import org.forgerock.openam.uma.UmaWellKnownConfigurationEndpoint;
 import org.forgerock.openidconnect.restlet.ConnectClientRegistration;
 import org.forgerock.openidconnect.restlet.EndSession;
@@ -224,7 +225,7 @@ public class RestEndpoints {
         dynamicRealmRouter.route("/users/{user}/devices/2fa/oath")
                 .forVersion("1.0").to(OathDevicesResource.class);
 
-        dynamicRealmRouter.route("/users/{user}/oauth2/resourcesets")
+        dynamicRealmRouter.route("/users/{user}/oauth2/resources/sets")
                 .through(ResourceOwnerOrSuperUserAuthzModule.class, ResourceOwnerOrSuperUserAuthzModule.NAME)
                 .forVersion("1.0").to(ResourceSetResource.class);
 
@@ -239,6 +240,10 @@ public class RestEndpoints {
         dynamicRealmRouter.route("/users/{user}/uma/pendingrequests")
                 .through(ResourceOwnerOrSuperUserAuthzModule.class, ResourceOwnerOrSuperUserAuthzModule.NAME)
                 .forVersion("1.0").to(PendingRequestResource.class);
+
+        dynamicRealmRouter.route("/users/{user}/oauth2/resources/labels")
+                .through(ResourceOwnerOrSuperUserAuthzModule.class, ResourceOwnerOrSuperUserAuthzModule.NAME)
+                .forVersion("1.0").to(UmaLabelResource.class);
 
         //protected
         dynamicRealmRouter.route("/policies")
