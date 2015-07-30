@@ -18,4 +18,5 @@ public final class LabelsConstants {
     public static final String TYPE_ATTR = "umaLabelType";
     public static final String RESOURCE_SET_ATTR = "umaLabelResourceSet";
     public static final String OBJECT_CLASS = "frUmaLabel";
+    public static final String ORG_UNIT_OBJECT_CLASS = "organizationalUnit";
 }

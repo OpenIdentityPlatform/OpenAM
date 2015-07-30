@@ -99,14 +99,18 @@ public class UmaLabelsStore {
                 DN realmDn = userDn.parent();
                 try (Connection connection = getConnection()) {
                     try {
-                        connection.add(newAddRequest(realmDn).addAttribute("ou", LDAPUtils.rdnValueFromDn(realmDn)));
+                        connection.add(newAddRequest(realmDn)
+                                .addAttribute("ou", LDAPUtils.rdnValueFromDn(realmDn))
+                                .addAttribute("objectClass", "top", ORG_UNIT_OBJECT_CLASS));
                     } catch (ErrorResultException ex) {
                         if (!ex.getResult().getResultCode().equals(ResultCode.ENTRY_ALREADY_EXISTS)) {
                             throw new InternalServerErrorException("Could not create realm entry " + realmDn, ex);
                         }
                     }
                     try {
-                        connection.add(newAddRequest(userDn).addAttribute("ou", LDAPUtils.rdnValueFromDn(userDn)));
+                        connection.add(newAddRequest(userDn)
+                                .addAttribute("ou", LDAPUtils.rdnValueFromDn(userDn))
+                                .addAttribute("objectClass", "top", ORG_UNIT_OBJECT_CLASS));
                     } catch (ErrorResultException ex) {
                         throw new InternalServerErrorException("Could not create user entry " + userDn, ex);
                     }
