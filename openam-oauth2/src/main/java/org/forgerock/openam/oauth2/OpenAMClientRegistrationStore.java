@@ -37,6 +37,7 @@ import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.PEMDecoder;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
@@ -71,7 +72,8 @@ public class OpenAMClientRegistrationStore implements OpenIdConnectClientRegistr
     /**
      * {@inheritDoc}
      */
-    public OpenIdConnectClientRegistration get(String clientId, OAuth2Request request) throws InvalidClientException {
+    public OpenIdConnectClientRegistration get(String clientId, OAuth2Request request) 
+            throws InvalidClientException, NotFoundException {
 
         final String realm = realmNormaliser.normalise(request.<String>getParameter(OAuth2Constants.Custom.REALM));
         return new OpenAMClientRegistration(getIdentity(clientId, realm), pemDecoder, resolverService);

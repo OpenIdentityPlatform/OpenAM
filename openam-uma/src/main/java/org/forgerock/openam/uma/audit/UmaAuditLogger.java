@@ -130,6 +130,8 @@ public class UmaAuditLogger {
             return accessToken.getClientId();
         } catch (InvalidGrantException e) {
             throw new org.forgerock.oauth2.core.exceptions.ServerException("Unable to verify client identity.");
+        } catch (NotFoundException e) {
+            throw new org.forgerock.oauth2.core.exceptions.ServerException(e.getMessage());
         }
     }
 

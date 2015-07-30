@@ -92,7 +92,7 @@ public class IdTokenClaimGathererTest {
         return oAuth2ProviderSettingsFactory;
     }
 
-    private ClientRegistrationStore mockClientRegistrationStore() throws InvalidClientException {
+    private ClientRegistrationStore mockClientRegistrationStore() throws InvalidClientException, NotFoundException {
         ClientRegistrationStore clientRegistrationStore = mock(ClientRegistrationStore.class);
         given(clientRegistrationStore.get("CLIENT_ID", oAuth2Request)).willReturn(clientRegistration);
         given(clientRegistration.getClientSecret()).willReturn("CLIENT_SECRET");

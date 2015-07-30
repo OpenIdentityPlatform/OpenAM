@@ -26,6 +26,7 @@ import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidTokenException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -75,6 +76,9 @@ public class AccessTokenProtectionFilter extends Filter {
                 }
             } catch (ServerException e) {
                 failure = new Status(500, e);
+            } catch (NotFoundException e) {
+                debug.message("Error loading token with id: " + tokenId, e);
+                failure = new Status(404, e);
             } catch (InvalidGrantException e) {
                 debug.message("Error loading token with id: " + tokenId, e);
                 failure = new Status(401, new InvalidTokenException());

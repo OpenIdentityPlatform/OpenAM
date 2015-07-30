@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openidconnect;
@@ -19,6 +19,7 @@ package org.forgerock.openidconnect;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 
 /**
  * The OpenId Connect provider's store for all client registrations.
@@ -30,5 +31,6 @@ public interface OpenIdConnectClientRegistrationStore extends ClientRegistration
     /**
      * {@inheritDoc}
      */
-    OpenIdConnectClientRegistration get(String clientId, OAuth2Request request) throws InvalidClientException;
+    OpenIdConnectClientRegistration get(String clientId, OAuth2Request request) 
+            throws InvalidClientException, NotFoundException;
 }

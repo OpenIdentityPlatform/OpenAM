@@ -43,6 +43,7 @@ import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.ResourceOwner;
 import org.forgerock.oauth2.core.ResourceOwnerAuthenticator;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.restlet.Request;
 import org.restlet.data.Status;
@@ -73,7 +74,7 @@ public class OpenAMResourceOwnerAuthenticator implements ResourceOwnerAuthentica
     /**
      * {@inheritDoc}
      */
-    public ResourceOwner authenticate(OAuth2Request request) {
+    public ResourceOwner authenticate(OAuth2Request request) throws NotFoundException {
         SSOToken token = null;
         try {
             SSOTokenManager mgr = SSOTokenManager.getInstance();

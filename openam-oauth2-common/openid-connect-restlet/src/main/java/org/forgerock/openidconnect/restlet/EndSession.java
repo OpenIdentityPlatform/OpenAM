@@ -25,6 +25,7 @@ import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.RelativeRedirectUriException;
@@ -41,6 +42,7 @@ import org.restlet.resource.ServerResource;
 import org.restlet.routing.Redirector;
 
 import javax.inject.Inject;
+
 import java.net.URI;
 
 /**
@@ -105,7 +107,8 @@ public class EndSession extends ServerResource {
     }
 
     private Representation handleRedirect(OAuth2Request request, String idToken, String redirectUri)
-            throws RedirectUriMismatchException, InvalidClientException, RelativeRedirectUriException {
+            throws RedirectUriMismatchException, InvalidClientException, 
+            RelativeRedirectUriException, NotFoundException {
 
         validateRedirect(request, idToken, redirectUri);
         Response response = getResponse();
@@ -115,7 +118,8 @@ public class EndSession extends ServerResource {
     }
 
     private void validateRedirect(OAuth2Request request, String idToken, String redirectUri)
-            throws InvalidClientException, RedirectUriMismatchException, RelativeRedirectUriException {
+            throws InvalidClientException, RedirectUriMismatchException, 
+            RelativeRedirectUriException, NotFoundException {
 
         SignedJwt jwt = new JwtReconstruction().reconstructJwt(idToken, SignedJwt.class);
         JwtClaimsSet claims = jwt.getClaimsSet();

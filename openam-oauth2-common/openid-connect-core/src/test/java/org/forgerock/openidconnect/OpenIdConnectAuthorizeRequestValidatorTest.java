@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openidconnect;
@@ -22,6 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.testng.Assert.*;
 
 import java.util.Collections;
+
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.OAuth2Constants;
@@ -29,6 +30,7 @@ import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -42,7 +44,7 @@ public class OpenIdConnectAuthorizeRequestValidatorTest {
     private ClientRegistration clientRegistration;
 
     @BeforeMethod
-    public void setUp() throws InvalidClientException {
+    public void setUp() throws InvalidClientException, NotFoundException {
         ClientRegistrationStore clientRegistrationStore = mock(ClientRegistrationStore.class);
         clientRegistration = mock(ClientRegistration.class);
         given(clientRegistrationStore.get(anyString(), Matchers.<OAuth2Request>anyObject())).willReturn(clientRegistration);

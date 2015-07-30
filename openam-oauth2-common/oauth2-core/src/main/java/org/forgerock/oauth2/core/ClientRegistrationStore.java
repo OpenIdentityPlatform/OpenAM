@@ -11,12 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
 
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 
 /**
  * The OAuth2 providers store for all client registrations.
@@ -32,6 +33,8 @@ public interface ClientRegistrationStore {
      * @param request The OAuth2 request.
      * @return The ClientRegistration.
      * @throws InvalidClientException If client cannot be retrieved from the store.
+     * @throws NotFoundException If requested realm doesn't exist
      */
-    ClientRegistration get(String clientId, OAuth2Request request) throws InvalidClientException;
+    ClientRegistration get(String clientId, OAuth2Request request) 
+            throws InvalidClientException, NotFoundException;
 }

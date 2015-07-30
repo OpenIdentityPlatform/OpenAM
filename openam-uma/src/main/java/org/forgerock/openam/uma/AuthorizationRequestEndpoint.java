@@ -314,6 +314,8 @@ public class AuthorizationRequestEndpoint extends ServerResource {
                     challengeResponse.getRawValue());
         } catch (InvalidGrantException e) {
             throw new ServerException("Unable to verify client identity.");
+        } catch (NotFoundException e) {
+            throw new ServerException(e.getMessage());
         }
     }
 

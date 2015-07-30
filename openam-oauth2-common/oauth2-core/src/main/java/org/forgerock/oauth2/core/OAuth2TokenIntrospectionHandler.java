@@ -81,7 +81,7 @@ public class OAuth2TokenIntrospectionHandler implements TokenIntrospectionHandle
     }
 
     protected IntrospectableToken getIntrospectableToken(OAuth2Request request, String tokenType, String tokenId)
-            throws ServerException {
+            throws ServerException, NotFoundException {
         IntrospectableToken token = null;
 
         if (token == null && (tokenType == null || ACCESS_TOKEN_TYPE.equals(tokenType))) {

@@ -25,6 +25,7 @@ import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.restlet.ExceptionHandler;
 import org.forgerock.oauth2.restlet.OAuth2RestletException;
 import org.forgerock.openidconnect.OpenIDConnectEndSession;
@@ -47,7 +48,7 @@ public class EndSessionTest {
     private ClientRegistration client;
 
     @BeforeMethod
-    public void setup() throws InvalidClientException, SignatureException {
+    public void setup() throws InvalidClientException, SignatureException, NotFoundException {
         idToken = "eyAidHlwIjogIkpXVCIsICJhbGciOiAiSFMyNTYiIH0.eyAidG9rZW5OYW1lIjogImlkX3Rva2VuIiwgImF6cCI6ICJOZXdPcG" +
                 "VuSWRDbGllbnQiLCAic3ViIjogIlRlc3RVc2VyIiwgImF0X2hhc2giOiAibHhSNE1BcGV1aXl0dWxiVFI4OV9wQSIsICJpc3MiOi" +
                 "AiaHR0cDovL29wZW5hbS5leGFtcGxlLmNvbTo4MDgwL29wZW5hbS9vYXV0aDIiLCAib3JnLmZvcmdlcm9jay5vcGVuaWRjb25uZW" +

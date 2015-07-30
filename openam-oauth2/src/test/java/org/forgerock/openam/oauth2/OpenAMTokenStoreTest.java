@@ -80,8 +80,10 @@ public class OpenAMTokenStoreTest {
                 field("realm", Collections.singleton("/testrealm"))));
         given(tokenStore.read("TOKEN_ID")).willReturn(token);
         ConcurrentHashMap<String, Object> attributes = new ConcurrentHashMap<String, Object>();
-        given(request.getAttributes()).willReturn(attributes);
         attributes.put("realm", "/testrealm");
+        given(request.getAttributes()).willReturn(attributes);
+        
+        given(realmNormaliser.normalise("/testrealm")).willReturn("/testrealm");
 
         OAuth2Request request = new RestletOAuth2Request(this.request);
 
