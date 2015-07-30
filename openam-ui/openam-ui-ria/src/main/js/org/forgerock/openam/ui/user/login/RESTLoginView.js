@@ -148,12 +148,12 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     }
 
                     // if simply by asking for the requirements, we end up with a token, then we must have auto-logged-in somehow
-                    if (reqs.hasOwnProperty("tokenId") && urlParams.ForceAuth !== 'true') {
+                    if (reqs.hasOwnProperty("tokenId") ) {
                         //set a variable for the realm passed into the browser so there can be a check to make sure it is the same as the current user's realm
                         Configuration.globalData.auth.passedInRealm = Configuration.globalData.auth.subRealm;
                         // if we have a token, let's see who we are logged in as....
                         SessionManager.getLoggedUser(function(user) {
-                            if(String(Configuration.globalData.auth.passedInRealm).toLowerCase() === Configuration.globalData.auth.subRealm.toLowerCase()){
+                            if(String(Configuration.globalData.auth.passedInRealm).toLowerCase() === Configuration.globalData.auth.subRealm.toLowerCase() && urlParams.ForceAuth !== 'true'){
                                 Configuration.setProperty('loggedUser', user);
                                 delete Configuration.globalData.auth.passedInRealm;
                                 RESTLoginHelper.setSuccessURL(reqs.tokenId).then(function() {
