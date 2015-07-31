@@ -43,8 +43,8 @@ import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
 import org.forgerock.openam.forgerockrest.utils.JsonValueQueryFilterVisitor;
+import org.forgerock.openam.forgerockrest.utils.ServerContextUtils;
 import org.forgerock.openam.rest.resource.ContextHelper;
-import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
 import org.forgerock.openam.uma.PendingRequestsService;
 import org.forgerock.util.promise.ExceptionHandler;
@@ -80,12 +80,12 @@ public class PendingRequestResource implements CollectionResourceProvider {
                 JsonValue content = request.getContent();
                 for (UmaPendingRequest pendingRequest : queryResourceOwnerPendingRequests(context)) {
                     promises.add(service.approvePendingRequest(context, pendingRequest.getId(),
-                            content.get(pendingRequest.getId()), getRealm(context)));
+                            content.get(pendingRequest.getId()), ServerContextUtils.getRealm(context)));
                 }
                 handlePendingRequestApproval(promises, handler);
             } else if (DENY_ACTION_ID.equalsIgnoreCase(request.getAction())) {
                 for (UmaPendingRequest pendingRequest : queryResourceOwnerPendingRequests(context)) {
-                    service.denyPendingRequest(pendingRequest.getId(), getRealm(context));
+                    service.denyPendingRequest(pendingRequest.getId(), ServerContextUtils.getRealm(context));
                 }
                 handler.handleResult(json(object()));
             } else {
@@ -103,9 +103,9 @@ public class PendingRequestResource implements CollectionResourceProvider {
         try {
             if (APPROVE_ACTION_ID.equalsIgnoreCase(request.getAction())) {
                 handlePendingRequestApproval(service.approvePendingRequest(context, resourceId, request.getContent(),
-                                getRealm(context)), handler);
+                                ServerContextUtils.getRealm(context)), handler);
             } else if (DENY_ACTION_ID.equalsIgnoreCase(request.getAction())) {
-                service.denyPendingRequest(resourceId, getRealm(context));
+                service.denyPendingRequest(resourceId, ServerContextUtils.getRealm(context));
                 handler.handleResult(json(object()));
             } else {
                 handler.handleError(new NotSupportedException("Action, " + request.getAction() + ", is not supported."));
@@ -169,15 +169,11 @@ public class PendingRequestResource implements CollectionResourceProvider {
     }
 
     private Set<UmaPendingRequest> queryResourceOwnerPendingRequests(ServerContext context) throws ResourceException {
-        return service.queryPendingRequests(contextHelper.getUserId(context), getRealm(context));
+        return service.queryPendingRequests(contextHelper.getUserId(context), ServerContextUtils.getRealm(context));
     }
 
     private Resource newResource(UmaPendingRequest request) {
         return new Resource(request.getId(), String.valueOf(request.hashCode()), request.asJson());
-    }
-
-    private String getRealm(ServerContext context) {
-        return context.asContext(RealmContext.class).getResolvedRealm();
     }
 
     @Override

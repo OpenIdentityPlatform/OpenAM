@@ -99,7 +99,7 @@ public class UmaProviderSettingsFactory {
 
     public UmaProviderSettings get(OAuth2Request request) throws NotFoundException {
         String realm = request.getParameter("realm");
-        return getInstance(request, realmNormaliser.normalise(realm));
+        return get(ServletUtils.getRequest(request.<Request>getRequest()), realmNormaliser.normalise(realm));
     }
 
     /**
@@ -107,17 +107,16 @@ public class UmaProviderSettingsFactory {
      *
      * <p>Cache each provider settings on the realm it was created for.</p>
      *
-     * @param request The OAuth2Request instance.
+     * @param request The request instance from which the base URL can be deduced.
      * @param realm The realm.
      * @return The OAuth2ProviderSettings instance.
      */
-    private UmaProviderSettings getInstance(OAuth2Request request, String realm) throws NotFoundException {
+    public UmaProviderSettings get(HttpServletRequest request, String realm) throws NotFoundException {
         synchronized (providerSettingsMap) {
             UmaProviderSettingsImpl providerSettings = providerSettingsMap.get(realm);
             if (providerSettings == null) {
-                OAuth2ProviderSettings oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(request);
-                HttpServletRequest httpReq = ServletUtils.getRequest(request.<Request>getRequest());
-                String baseUrlPattern = baseURLProviderFactory.get(realm).getURL(httpReq);
+                OAuth2ProviderSettings oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(realm, request);
+                String baseUrlPattern = baseURLProviderFactory.get(realm).getURL(request);
                 UmaTokenStore tokenStore = tokenStoreFactory.create(realm);
                 providerSettings = new UmaProviderSettingsImpl(realm, baseUrlPattern, tokenStore,
                         oAuth2ProviderSettings);
@@ -144,7 +143,8 @@ public class UmaProviderSettingsFactory {
             this.oAuth2ProviderSettings = oAuth2ProviderSettings;
         }
 
-        private boolean exists() {
+        @Override
+        public boolean isEnabled() {
             try {
                 return hasConfig(realm);
             } catch (Exception e) {
@@ -206,7 +206,7 @@ public class UmaProviderSettingsFactory {
         }
 
         /**
-         * OpenAM currently does not support requesting party claims so no endpoint exists.
+         * OpenAM currently does not support requesting party claims so no endpoint isEnabled.
          *
          * @return {@code null}.
          */

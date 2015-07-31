@@ -69,31 +69,27 @@ public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettin
     public OAuth2ProviderSettings get(OAuth2Request request) throws NotFoundException {
         final String realm = realmNormaliser.normalise(request.<String>getParameter(OAuth2Constants.Custom.REALM));
         final HttpServletRequest req = ServletUtils.getRequest(request.<Request>getRequest());
-        String baseUrlPattern = baseURLProviderFactory.get(realm).getURL(req);
-        return getInstance(realm, baseUrlPattern);
+        return get(realm, req);
     }
 
     /**
-     * Only to be used internally by AM.
-     *
-     * @param realm The realm.
-     * @return The OAuth2ProviderSettings instance.
+     * Cache each provider settings on the realm it was created for.
+     * {@inheritDoc}
      */
     public OAuth2ProviderSettings get(String realm) throws NotFoundException {
-        return getInstance(realmNormaliser.normalise(realm), null);
+        OAuth2ProviderSettings providerSettings = providerSettingsMap.get(realm);
+        if (providerSettings == null) {
+            throw new IllegalStateException("Realm provider settings have not yet been constructed.");
+        }
+        return providerSettings;
     }
 
     /**
-     * Gets the instance of the OAuth2ProviderSettings.
-     * <br/>
      * Cache each provider settings on the realm it was created for.
-     *
-     * @param realm The realm.
-     * @param baseDeploymentUri The base deployment url.
-     * @return The OAuth2ProviderSettings instance.
+     * {@inheritDoc}
      */
-    private OAuth2ProviderSettings getInstance(String realm, String baseDeploymentUri)
-            throws NotFoundException {
+    public OAuth2ProviderSettings get(String realm, HttpServletRequest req) throws NotFoundException {
+        String baseDeploymentUri = baseURLProviderFactory.get(realm).getURL(req);
         synchronized (providerSettingsMap) {
             OAuth2ProviderSettings providerSettings = providerSettingsMap.get(realm);
             if (providerSettings == null) {

@@ -31,6 +31,11 @@ import org.forgerock.oauth2.core.exceptions.ServerException;
 public interface UmaProviderSettings extends UmaSettings {
 
     /**
+     * Checks whether an UMA Provider is currently configured.
+     */
+    boolean isEnabled();
+
+    /**
      * Gets the identifier of this issuer.
      *
      * @return The issuer.

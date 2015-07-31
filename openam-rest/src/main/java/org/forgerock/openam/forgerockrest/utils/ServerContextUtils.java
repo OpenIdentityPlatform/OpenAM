@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-2015 ForgeRock AS.
 */
 package org.forgerock.openam.forgerockrest.utils;
 
@@ -34,6 +34,7 @@ import org.forgerock.json.resource.RouterContext;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.servlet.HttpContext;
+import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.StringUtils;
 
@@ -256,5 +257,14 @@ public class ServerContextUtils {
             locale = null;
         }
         return locale;
+    }
+
+    /**
+     * Gets the resolved realm from the context.
+     * @param context The context.
+     * @return The resolved realm.
+     */
+    public static String getRealm(ServerContext context) {
+        return context.asContext(RealmContext.class).getResolvedRealm();
     }
 }

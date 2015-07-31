@@ -20,6 +20,7 @@ import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.forgerockrest.utils.RequestHolder;
 import org.forgerock.openam.rest.resource.CrestHttpServlet;
 import org.forgerock.openam.rest.router.RestEndpointManager;
 import org.forgerock.openam.rest.service.JSONServiceEndpointApplication;
@@ -129,7 +130,12 @@ public class RestEndpointServlet extends HttpServlet {
 
             switch (endpointType) {
                 case RESOURCE: {
-                    crestServlet.service(request, response);
+                    RequestHolder.set(request);
+                    try {
+                        crestServlet.service(request, response);
+                    } finally {
+                        RequestHolder.remove();
+                    }
                     break;
                 }
                 case SERVICE: {
