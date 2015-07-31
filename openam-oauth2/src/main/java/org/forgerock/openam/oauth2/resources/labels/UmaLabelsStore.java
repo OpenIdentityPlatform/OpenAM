@@ -270,12 +270,17 @@ public class UmaLabelsStore {
     }
 
     private Set<String> getResourceSetIds(SearchResultEntry searchResult) throws SearchResultReferenceIOException, ErrorResultIOException {
-        final Iterator<ByteString> resourceSets = searchResult.getAttribute(RESOURCE_SET_ATTR).iterator();
-        Set<String> resourceSetIds = new HashSet<>();
-        while (resourceSets.hasNext()) {
-            resourceSetIds.add(resourceSets.next().toString());
+        final Attribute attribute = searchResult.getAttribute(RESOURCE_SET_ATTR);
+        if (attribute != null) {
+            final Iterator<ByteString> resourceSets = attribute.iterator();
+            Set<String> resourceSetIds = new HashSet<>();
+            while (resourceSets.hasNext()) {
+                resourceSetIds.add(resourceSets.next().toString());
+            }
+            return resourceSetIds;
+        } else {
+            return new HashSet<>();
         }
-        return resourceSetIds;
     }
 
     private Connection getConnection() throws InternalServerErrorException {
