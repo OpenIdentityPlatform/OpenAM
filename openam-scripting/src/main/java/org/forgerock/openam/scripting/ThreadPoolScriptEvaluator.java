@@ -16,8 +16,10 @@
 
 package org.forgerock.openam.scripting;
 
+import org.forgerock.openam.audit.context.AuditRequestContextPropagatingExecutorService;
 import org.forgerock.openam.audit.context.ConfigurableExecutorService;
 import org.forgerock.openam.audit.context.ExecutorServiceConfigurator;
+import org.forgerock.openam.shared.concurrency.ResizableLinkedBlockingQueue;
 import org.forgerock.util.Reject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,8 +123,7 @@ public final class ThreadPoolScriptEvaluator implements ScriptEvaluator {
      * configuration parameters are not valid, then an error is logged and the pool is left in its original
      * configuration.
      * <p/>
-     * NB: The queue size is not reconfigurable, so changes will take effect only on server restart. All other settings
-     * can be changed without a restart and the pool will adjust over time to the new settings.
+     * NB: All settings can be changed without a restart and the pool will adjust over time to the new settings.
      */
     private static final class ThreadPoolConfigurator implements StandardScriptEngineManager.ConfigurationListener {
         private final ExecutorService executorService;
@@ -142,6 +143,19 @@ public final class ThreadPoolScriptEvaluator implements ScriptEvaluator {
             }
 
             try {
+
+                int newThreadPoolQueueSize = newConfiguration.getThreadPoolQueueSize();
+                ResizableLinkedBlockingQueue currentQueue =
+                        ((ResizableLinkedBlockingQueue)
+                        ((ThreadPoolExecutor)
+                        ((AuditRequestContextPropagatingExecutorService)
+                                executorService)
+                                .getDelegate())
+                                .getQueue());
+                int currentThreadPoolQueueSize = currentQueue.getMaximumQueueSize();
+                if (newThreadPoolQueueSize != currentThreadPoolQueueSize) {
+                    currentQueue.resizeQueue(newThreadPoolQueueSize);
+                }
 
                 if (delegateConfigurator.getCorePoolSize() != newConfiguration.getThreadPoolCoreSize() ||
                     delegateConfigurator.getMaximumPoolSize() != newConfiguration.getThreadPoolMaxSize() ||

@@ -41,6 +41,15 @@ public class AuditRequestContextPropagatingExecutorService implements Configurab
     }
 
     /**
+     * Gets the {@link ExecutorService} delegate assigned to this instance.
+     *
+     * @return The {@link ExecutorService} delegate.
+     */
+    public ExecutorService getDelegate() {
+        return delegate;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

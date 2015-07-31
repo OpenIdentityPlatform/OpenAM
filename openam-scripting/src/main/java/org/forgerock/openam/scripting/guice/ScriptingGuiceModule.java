@@ -25,7 +25,6 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -49,6 +48,7 @@ import org.forgerock.openam.scripting.datastore.ScriptingDataStoreFactory;
 import org.forgerock.openam.scripting.service.ScriptConfigurationService;
 import org.forgerock.openam.scripting.service.ScriptingService;
 import org.forgerock.openam.scripting.service.ScriptingServiceFactory;
+import org.forgerock.openam.shared.concurrency.ResizableLinkedBlockingQueue;
 import org.forgerock.util.thread.ExecutorServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -204,8 +204,8 @@ public class ScriptingGuiceModule extends AbstractModule {
 
     private BlockingQueue<Runnable> getThreadPoolQueue(int size) {
         return size == ScriptEngineConfiguration.UNBOUNDED_QUEUE_SIZE
-                ? new LinkedBlockingQueue<Runnable>()
-                : new LinkedBlockingQueue<Runnable>(size);
+                ? new ResizableLinkedBlockingQueue<Runnable>()
+                : new ResizableLinkedBlockingQueue<Runnable>(size);
     }
 
 }
