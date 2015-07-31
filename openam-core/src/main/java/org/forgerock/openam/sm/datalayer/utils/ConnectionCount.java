@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.sm.datalayer.utils;
 
@@ -68,13 +68,17 @@ public class ConnectionCount {
             case CTS_REAPER:
                 return 1;
             case DATA_LAYER:
-                /**
-                  * Ensure that the DATA_LAYER connection type fits into the available
-                  * connection space alongside CTS_REAPER and CTS_ASYNC
-                  */
-                int async = getConnectionCount(max, ConnectionType.CTS_ASYNC);
-                int reaper = getConnectionCount(max, ConnectionType.CTS_REAPER);
-                return max - (async + reaper);
+                if (storeMode == StoreMode.DEFAULT) {
+                    /**
+                     * Ensure that the DATA_LAYER connection type fits into the available
+                     * connection space alongside CTS_REAPER and CTS_ASYNC
+                     */
+                    int async = getConnectionCount(max, ConnectionType.CTS_ASYNC);
+                    int reaper = getConnectionCount(max, ConnectionType.CTS_REAPER);
+                    return max - (async + reaper);
+                } else {
+                    return max;
+                }
             default:
                 throw new IllegalStateException();
         }
