@@ -17,11 +17,12 @@
 package org.forgerock.openam.forgerockrest;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 
-import com.sun.identity.common.ISLocaleContext;
+import com.sun.identity.common.LocaleContext;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.fluent.JsonValueException;
@@ -42,7 +43,6 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.OAuth2Constants;
@@ -66,13 +66,15 @@ public class UmaLabelResource implements CollectionResourceProvider {
     private final UmaLabelsStore labelStore;
     private final ContextHelper contextHelper;
     private final ClientRegistrationStore clientRegistrationStore;
+    private final Provider<LocaleContext> localeContextProvider;
 
     @Inject
     public UmaLabelResource(UmaLabelsStore labelStore, ContextHelper contextHelper,
-            ClientRegistrationStore clientRegistrationStore) {
+            ClientRegistrationStore clientRegistrationStore, Provider<LocaleContext> localeContextProvider) {
         this.labelStore = labelStore;
         this.contextHelper = contextHelper;
         this.clientRegistrationStore = clientRegistrationStore;
+        this.localeContextProvider = localeContextProvider;
     }
 
     @Override
@@ -161,8 +163,7 @@ public class UmaLabelResource implements CollectionResourceProvider {
             return;
         }
 
-        ISLocaleContext localeContext = new ISLocaleContext();
-        localeContext.setLocale(serverContext.asContext(HttpContext.class));
+        LocaleContext localeContext = localeContextProvider.get();
         for (ResourceSetLabel label : labels) {
             try {
                 label = resolveLabelName(contextHelper.getRealm(serverContext), label, localeContext);
@@ -177,7 +178,7 @@ public class UmaLabelResource implements CollectionResourceProvider {
         queryResultHandler.handleResult(new QueryResult());
     }
 
-    private ResourceSetLabel resolveLabelName(String realm, ResourceSetLabel label, ISLocaleContext localeContext)
+    private ResourceSetLabel resolveLabelName(String realm, ResourceSetLabel label, LocaleContext localeContext)
             throws InternalServerErrorException {
         if (label.getId().endsWith("/" + label.getName())) {
             String resourceServerId = label.getId().substring(0, label.getId().lastIndexOf("/"));
@@ -189,7 +190,7 @@ public class UmaLabelResource implements CollectionResourceProvider {
         return label;
     }
 
-    private String resolveResourceServerName(String resourceServerId, final String realm, ISLocaleContext localeContext)
+    private String resolveResourceServerName(String resourceServerId, final String realm, LocaleContext localeContext)
             throws InternalServerErrorException {
         try {
             ClientRegistration clientRegistration = clientRegistrationStore.get(resourceServerId, new OAuth2Request() {

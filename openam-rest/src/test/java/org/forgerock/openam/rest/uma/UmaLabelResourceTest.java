@@ -17,6 +17,10 @@
 package org.forgerock.openam.rest.uma;
 
 import java.util.Collections;
+
+import com.google.inject.Provider;
+import com.sun.identity.common.ISLocaleContext;
+import com.sun.identity.common.LocaleContext;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
@@ -63,13 +67,20 @@ public class UmaLabelResourceTest {
     private QueryRequest queryRequest;
     private QueryResultHandler queryResultHandler;
     private ClientRegistrationStore clientRegistrationStore;
+    private LocaleContext localContext;
 
     @BeforeMethod
     public void setup() {
         contextHelper = mock(ContextHelper.class);
         umaLabelsStore = mock(UmaLabelsStore.class);
         clientRegistrationStore = mock(ClientRegistrationStore.class);
-        umaLabelResource = new UmaLabelResource(umaLabelsStore, contextHelper, clientRegistrationStore);
+        localContext = mock(LocaleContext.class);
+        umaLabelResource = new UmaLabelResource(umaLabelsStore, contextHelper, clientRegistrationStore, new Provider<LocaleContext>() {
+            @Override
+            public LocaleContext get() {
+                return localContext;
+            }
+        });
         serverContext = mock(ServerContext.class);
         createRequest = mock(CreateRequest.class);
         queryRequest = mock(QueryRequest.class);
