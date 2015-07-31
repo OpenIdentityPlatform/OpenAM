@@ -51,6 +51,7 @@ import org.forgerock.opendj.ldif.ConnectionEntryReader;
 
 import static org.forgerock.opendj.ldap.Filter.and;
 import static org.forgerock.opendj.ldap.Filter.equality;
+import static org.forgerock.opendj.ldap.Filter.present;
 import static org.forgerock.opendj.ldap.ModificationType.REPLACE;
 import static org.forgerock.opendj.ldap.requests.Requests.newAddRequest;
 import static org.forgerock.openam.oauth2.resources.labels.LabelsConstants.*;
@@ -90,7 +91,7 @@ public class UmaLabelsStore {
      * @throws ResourceException Thrown if the label cannot be created.
      */
     public ResourceSetLabel create(String realm, String username, ResourceSetLabel label) throws ResourceException {
-        String id = tokenIdGenerator.generateTokenId(null);
+        String id = tokenIdGenerator.generateTokenId(label.getId());
         try (Connection connection = getConnection()) {
             return createLabel(realm, username, label, id, connection);
         } catch (ErrorResultException e) {
@@ -235,6 +236,21 @@ public class UmaLabelsStore {
     public Set<ResourceSetLabel> forResourceSet(String realm, String username, String resourceSetId, boolean includeResourceSets)
             throws ResourceException {
         return query(realm, username, and(equality("objectClass", OBJECT_CLASS), equality(RESOURCE_SET_ATTR, resourceSetId)), includeResourceSets);
+    }
+
+    /**
+     * Determines if the label is present on any resource set.
+     *
+     * @param realm The current realm.
+     * @param username The user in question.
+     * @param labelId The ID of the label.
+     * @return {@code true} if the label is present on a resource set, {@code false} if it is not.
+     * @throws ResourceException If it cannot be determined if the label is in use.
+     */
+    public boolean isLabelInUse(String realm, String username, String labelId)
+            throws ResourceException {
+        return !query(realm, username, and(equality("objectClass", OBJECT_CLASS), equality(ID_ATTR, labelId),
+                present(RESOURCE_SET_ATTR)), false).isEmpty();
     }
 
     private Set<ResourceSetLabel> query(String realm, String username, Filter filter, boolean includeResourceSets) throws ResourceException {

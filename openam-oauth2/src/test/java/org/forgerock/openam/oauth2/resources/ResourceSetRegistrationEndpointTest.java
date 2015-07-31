@@ -50,7 +50,6 @@ import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.oauth2.restlet.resources.ResourceSetDescriptionValidator;
 import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationListener;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
-import org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore;
 import org.forgerock.util.query.BaseQueryFilterVisitor;
 import org.forgerock.util.query.QueryFilter;
 import org.forgerock.util.query.QueryFilterVisitor;
@@ -86,7 +85,7 @@ public class ResourceSetRegistrationEndpointTest {
     private ResourceSetStore store;
     private ResourceSetDescriptionValidator validator;
     private ResourceSetRegistrationListener listener;
-    private UmaLabelsStore labelsStore;
+    private ResourceSetLabelRegistration labelRegistration;
 
     private Response response;
 
@@ -100,7 +99,7 @@ public class ResourceSetRegistrationEndpointTest {
         Set<ResourceSetRegistrationListener> listeners = new HashSet<ResourceSetRegistrationListener>();
         listener = mock(ResourceSetRegistrationListener.class);
         listeners.add(listener);
-        labelsStore = mock(UmaLabelsStore.class);
+        labelRegistration = mock(ResourceSetLabelRegistration.class);
 
         OAuth2ProviderSettingsFactory providerSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
         OAuth2ProviderSettings providerSettings = mock(OAuth2ProviderSettings.class);
@@ -108,7 +107,7 @@ public class ResourceSetRegistrationEndpointTest {
         given(providerSettings.getResourceSetStore()).willReturn(store);
 
         endpoint = spy(new ResourceSetRegistrationEndpoint(providerSettingsFactory, validator, requestFactory,
-                listeners, labelsStore));
+                listeners, labelRegistration));
 
         Request request = mock(Request.class);
         ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC);
@@ -216,6 +215,7 @@ public class ResourceSetRegistrationEndpointTest {
                 .readValue(response.getText(), Map.class);
         assertThat(responseBody).containsKey("_id");
         verify(listener).resourceSetCreated(anyString(), Matchers.<ResourceSetDescription>anyObject());
+        verify(labelRegistration).updateLabelsForNewResourceSet(any(ResourceSetDescription.class));
     }
 
     @Test
@@ -303,6 +303,7 @@ public class ResourceSetRegistrationEndpointTest {
         Map<String, Object> responseBody = (Map<String, Object>) new ObjectMapper()
                 .readValue(responseRep.getText(), Map.class);
         assertThat(responseBody).containsKey("_id");
+        verify(labelRegistration).updateLabelsForExistingResourceSet(any(ResourceSetDescription.class));
     }
 
     @Test
@@ -321,6 +322,7 @@ public class ResourceSetRegistrationEndpointTest {
         ArgumentCaptor<Status> responseStatusCaptor = ArgumentCaptor.forClass(Status.class);
         verify(response).setStatus(responseStatusCaptor.capture());
         assertThat(responseStatusCaptor.getValue().getCode()).isEqualTo(204);
+        verify(labelRegistration).updateLabelsForDeletedResourceSet(any(ResourceSetDescription.class));
     }
 
     @Test

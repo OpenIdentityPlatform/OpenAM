@@ -29,6 +29,7 @@ import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
+import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.openam.forgerockrest.UmaLabelResource;
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.oauth2.resources.labels.LabelType;
@@ -61,12 +62,14 @@ public class UmaLabelResourceTest {
     private ResultHandler<Resource> resultHandler;
     private QueryRequest queryRequest;
     private QueryResultHandler queryResultHandler;
+    private ClientRegistrationStore clientRegistrationStore;
 
     @BeforeMethod
     public void setup() {
         contextHelper = mock(ContextHelper.class);
         umaLabelsStore = mock(UmaLabelsStore.class);
-        umaLabelResource = new UmaLabelResource(umaLabelsStore, contextHelper);
+        clientRegistrationStore = mock(ClientRegistrationStore.class);
+        umaLabelResource = new UmaLabelResource(umaLabelsStore, contextHelper, clientRegistrationStore);
         serverContext = mock(ServerContext.class);
         createRequest = mock(CreateRequest.class);
         queryRequest = mock(QueryRequest.class);

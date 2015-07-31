@@ -27,7 +27,7 @@ import static org.forgerock.json.fluent.JsonValue.*;
 public class ResourceSetLabel {
 
     private final String id;
-    private final String name;
+    private String name;
     private final LabelType type;
     private final Set<String> resourceSetIds;
 
@@ -44,6 +44,10 @@ public class ResourceSetLabel {
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public LabelType getType() {

@@ -16,10 +16,13 @@
 
 package org.forgerock.openam.forgerockrest;
 
-import com.sun.identity.shared.debug.Debug;
-import java.util.Collections;
-import java.util.Set;
 import javax.inject.Inject;
+import java.util.Collections;
+import java.util.Locale;
+import java.util.Set;
+
+import com.sun.identity.common.ISLocaleContext;
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.fluent.JsonValueException;
 import org.forgerock.json.resource.ActionRequest;
@@ -27,6 +30,7 @@ import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
@@ -38,6 +42,13 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.json.resource.servlet.HttpContext;
+import org.forgerock.oauth2.core.ClientRegistration;
+import org.forgerock.oauth2.core.ClientRegistrationStore;
+import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.openam.oauth2.resources.labels.LabelType;
 import org.forgerock.openam.oauth2.resources.labels.ResourceSetLabel;
 import org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore;
@@ -54,11 +65,14 @@ public class UmaLabelResource implements CollectionResourceProvider {
     private static final String NAME_LABEL = "name";
     private final UmaLabelsStore labelStore;
     private final ContextHelper contextHelper;
+    private final ClientRegistrationStore clientRegistrationStore;
 
     @Inject
-    public UmaLabelResource(UmaLabelsStore labelStore, ContextHelper contextHelper) {
+    public UmaLabelResource(UmaLabelsStore labelStore, ContextHelper contextHelper,
+            ClientRegistrationStore clientRegistrationStore) {
         this.labelStore = labelStore;
         this.contextHelper = contextHelper;
+        this.clientRegistrationStore = clientRegistrationStore;
     }
 
     @Override
@@ -139,7 +153,7 @@ public class UmaLabelResource implements CollectionResourceProvider {
             return;
         }
 
-        Set<ResourceSetLabel> labels = null;
+        Set<ResourceSetLabel> labels;
         try {
             labels = labelStore.list(getRealm(serverContext), getUserName(serverContext));
         } catch (ResourceException e) {
@@ -147,11 +161,65 @@ public class UmaLabelResource implements CollectionResourceProvider {
             return;
         }
 
+        ISLocaleContext localeContext = new ISLocaleContext();
+        localeContext.setLocale(serverContext.asContext(HttpContext.class));
         for (ResourceSetLabel label : labels) {
-            queryResultHandler.handleResource(new Resource(label.getId(), String.valueOf(System.currentTimeMillis()), label.asJson()));
+            try {
+                label = resolveLabelName(contextHelper.getRealm(serverContext), label, localeContext);
+            } catch (InternalServerErrorException e) {
+                debug.error("Could not resolve Resource Server label name. id: {}, name: {}", label.getId(),
+                        label.getName(), e);
+            }
+            queryResultHandler.handleResource(new Resource(label.getId(),
+                    String.valueOf(label.asJson().getObject().hashCode()), label.asJson()));
         }
 
         queryResultHandler.handleResult(new QueryResult());
+    }
+
+    private ResourceSetLabel resolveLabelName(String realm, ResourceSetLabel label, ISLocaleContext localeContext)
+            throws InternalServerErrorException {
+        if (label.getId().endsWith("/" + label.getName())) {
+            String resourceServerId = label.getId().substring(0, label.getId().lastIndexOf("/"));
+            String resourceServerName = resolveResourceServerName(resourceServerId, realm, localeContext);
+            if (resourceServerName != null) {
+                label.setName(resourceServerName + "/" + label.getName());
+            }
+        }
+        return label;
+    }
+
+    private String resolveResourceServerName(String resourceServerId, final String realm, ISLocaleContext localeContext)
+            throws InternalServerErrorException {
+        try {
+            ClientRegistration clientRegistration = clientRegistrationStore.get(resourceServerId, new OAuth2Request() {
+                @Override
+                public <T> T getRequest() {
+                    throw new UnsupportedOperationException("Realm parameter only OAuth2Request");
+                }
+
+                @Override
+                public <T> T getParameter(String name) {
+                    if (OAuth2Constants.Custom.REALM.equals(name)) {
+                        return (T) realm;
+                    }
+                    throw new UnsupportedOperationException("Realm parameter only OAuth2Request");
+                }
+
+                @Override
+                public JsonValue getBody() {
+                    return null;
+                }
+
+                @Override
+                public Locale getLocale() {
+                    return null;
+                }
+            });
+            return clientRegistration.getDisplayName(localeContext.getLocale());
+        } catch (InvalidClientException | NotFoundException e) {
+            throw new InternalServerErrorException("Could not resolve Resource Server label name", e);
+        }
     }
 
     @Override

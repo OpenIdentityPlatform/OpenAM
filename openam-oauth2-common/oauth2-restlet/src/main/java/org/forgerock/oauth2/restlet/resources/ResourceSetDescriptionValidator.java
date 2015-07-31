@@ -55,13 +55,6 @@ public class ResourceSetDescriptionValidator {
         return resourceSetDescription;
     }
 
-    private void validateLabels(JsonValue description) throws BadRequestException {
-        if (!description.get(OAuth2Constants.ResourceSets.LABELS).isCollection()) {
-            throw new BadRequestException("Invalid Resource Set Description. Required attribute, '" + OAuth2Constants.ResourceSets.LABELS + "', must be a "
-                    + "list.");
-        }
-    }
-
     private void validateName(JsonValue description) throws BadRequestException {
         try {
             description.get(OAuth2Constants.ResourceSets.NAME).required();
@@ -115,6 +108,15 @@ public class ResourceSetDescriptionValidator {
                 throw new BadRequestException("Invalid Resource Set Description. Attribute, 'icon_uri', must be a "
                         + "valid URI.");
             }
+        }
+    }
+
+    private void validateLabels(JsonValue description) throws BadRequestException {
+        try {
+            description.get(OAuth2Constants.ResourceSets.LABELS).asSet(String.class);
+        } catch (JsonValueException e) {
+            throw new BadRequestException("Invalid Resource Set Description. Optional attribute, 'labels', must be an "
+                    + "array of Strings.");
         }
     }
 }
