@@ -1,6 +1,4 @@
 /*
- * Copyright 2013-2014 ForgeRock AS.
- *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,8 +10,9 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2015 ForgeRock AS.
  */
-
 package org.forgerock.openam.upgrade;
 
 import com.google.inject.Key;
@@ -27,6 +26,7 @@ import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import org.forgerock.openam.cts.impl.LDAPConfig;
 import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
+import org.forgerock.openam.sm.datalayer.api.StoreMode;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
@@ -72,6 +72,8 @@ public class DirectoryContentUpgrader {
     private final ConnectionFactory connFactory;
     private final String baseDir;
     private final String baseDN;
+    private final boolean isEmbedded;
+    private final StoreMode storeMode;
 
     /**
      * This constructor will initialize the different directory content upgraders and ensures that each of them are
@@ -84,14 +86,17 @@ public class DirectoryContentUpgrader {
     public DirectoryContentUpgrader(String baseDir, String baseDN) throws UpgradeException {
         this.baseDir = baseDir;
         this.baseDN = baseDN;
+        isEmbedded = EmbeddedOpenDS.isStarted();
+        storeMode = InjectorHolder.getInstance(StoreMode.class);
 
-        Key<ConnectionFactory> key = Key.get(ConnectionFactory.class, Names.named(DataLayerConstants.DATA_LAYER_BINDING));
+        Key<ConnectionFactory> key = Key.get(ConnectionFactory.class,
+                Names.named(DataLayerConstants.DATA_LAYER_BINDING));
         connFactory = InjectorHolder.getInstance(key);
 
 
         upgraders.add(new AddCTSSchema());
         upgraders.add(new CreateCTSContainer());
-        if (EmbeddedOpenDS.isStarted()) {
+        if (isEmbedded) {
             upgraders.add(new CreateCTSIndexes());
             upgraders.add(new AddDashboardSchema());
             upgraders.add(new AddDevicePrintSchema());
@@ -217,7 +222,7 @@ public class DirectoryContentUpgrader {
         } finally {
             IOUtils.closeIfNotNull(conn);
         }
-        if (EmbeddedOpenDS.isStarted()) {
+        if (isEmbedded) {
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("Rebuilding indexes in embedded directory");
             }
@@ -277,7 +282,15 @@ public class DirectoryContentUpgrader {
 
         @Override
         public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
-            return !entryExists(conn, new LDAPConfig(baseDN).getTokenStoreRootSuffix());
+            final LDAPConfig ldapConfig = new LDAPConfig(baseDN);
+            if (isEmbedded) {
+                return ldapConfig.getDefaultCTSRootSuffix().equals(ldapConfig.getTokenStoreRootSuffix())
+                        && !entryExists(conn, ldapConfig.getDefaultCTSRootSuffix());
+            } else {
+                return StoreMode.DEFAULT.equals(storeMode)
+                        && ldapConfig.getDefaultCTSRootSuffix().equals(ldapConfig.getTokenStoreRootSuffix())
+                        && !entryExists(conn, ldapConfig.getTokenStoreRootSuffix());
+            }
         }
     }
 
