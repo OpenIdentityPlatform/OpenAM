@@ -29,6 +29,20 @@
 
 package com.iplanet.ums;
 
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.services.ldap.Attr;
+import com.iplanet.services.ldap.AttrSet;
+import com.iplanet.services.ldap.DSConfigMgr;
+import com.iplanet.services.ldap.LDAPServiceException;
+import com.iplanet.services.ldap.LDAPUser;
+import com.iplanet.services.ldap.ServerInstance;
+import com.iplanet.services.ldap.event.EventService;
+import com.iplanet.services.util.I18n;
+import com.sun.identity.common.configuration.ConfigurationListener;
+import com.sun.identity.common.configuration.ConfigurationObserver;
+import com.sun.identity.security.ServerInstanceAction;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 import java.io.IOException;
 import java.security.AccessController;
 import java.security.Principal;
@@ -40,19 +54,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
-
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.services.ldap.Attr;
-import com.iplanet.services.ldap.AttrSet;
-import com.iplanet.services.ldap.DSConfigMgr;
-import com.iplanet.services.ldap.LDAPServiceException;
-import com.iplanet.services.ldap.LDAPUser;
-import com.iplanet.services.ldap.ServerInstance;
-import com.iplanet.services.ldap.event.EventService;
-import com.iplanet.services.util.I18n;
-import com.sun.identity.security.ServerInstanceAction;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.Attributes;
 import org.forgerock.opendj.ldap.ByteString;
@@ -100,12 +101,17 @@ import org.forgerock.util.thread.listener.ShutdownManager;
  */
 public class DataLayer implements java.io.Serializable {
 
+    private static final String RETRIES_KEY = "com.iplanet.am.replica.num.retries";
+    private static final String RETRIES_DELAY_KEY = "com.iplanet.am.replica.delay.between.retries";
+
     /**
      * Static section to retrieve the debug object.
      */
     private static Debug debug;
 
     private static I18n i18n = I18n.getInstance(IUMSConstants.UMS_PKG);
+
+    private static DataLayerConfigListener configListener;
 
     /**
      * Default minimal connections if none is defined in configuration
@@ -216,13 +222,14 @@ public class DataLayer implements java.io.Serializable {
         m_proxyPassword = pwd;
         m_host = host;
         m_port = port;
+        configListener = new DataLayerConfigListener();
 
         initReplicaProperties();
         initLdapPool();
     }
 
     /**
-     * create the singelton DataLayer object if it doesn't exist already.
+     * Create the singleton DataLayer object if it doesn't exist already.
      *
      * @supported.api
      */
@@ -244,6 +251,8 @@ public class DataLayer implements java.io.Serializable {
             }
             m_instance = new DataLayer(pUser, pPwd, host, port);
 
+            ConfigurationObserver.getInstance().addListener(configListener);
+
             // Start the EventService thread if it has not already started.
             initializeEventService();
         }
@@ -251,7 +260,7 @@ public class DataLayer implements java.io.Serializable {
     }
 
     /**
-     * create the singelton DataLayer object if it doesn't exist already.
+     * Create the singleton DataLayer object if it doesn't exist already.
      * Assumes the server instance for "LDAPUser.Type.AUTH_PROXY".
      *
      * @supported.api
@@ -261,8 +270,7 @@ public class DataLayer implements java.io.Serializable {
         if (m_instance == null) {
             try {
                 DSConfigMgr cfgMgr = DSConfigMgr.getDSConfigMgr();
-                ServerInstance serverCfg = cfgMgr
-                        .getServerInstance(LDAPUser.Type.AUTH_PROXY);
+                ServerInstance serverCfg = cfgMgr.getServerInstance(LDAPUser.Type.AUTH_PROXY);
                 m_instance = getInstance(serverCfg);
             } catch (LDAPServiceException ex) {
                 debug.error("Error:  Unable to get server config instance "
@@ -1025,38 +1033,22 @@ public class DataLayer implements java.io.Serializable {
         return null;
     }
 
-    private void initReplicaProperties() {
-        String retries = SystemProperties
-                .get("com.iplanet.am.replica.num.retries");
-        if (retries != null) {
-            try {
-                replicaRetryNum = Integer.parseInt(retries);
-                if (replicaRetryNum < 0) {
-                    replicaRetryNum = 0;
-                    debug.warning("Invalid value for replica retry num, " +
-                            "set to 0");
-                }
-
-            } catch (NumberFormatException e) {
-                debug.warning("Invalid value for replica retry num");
-            }
+    private synchronized void initReplicaProperties() {
+        int retries = SystemProperties.getAsInt(RETRIES_KEY, 0);
+        if (retries < 0) {
+            retries = 0;
+            debug.warning("Invalid value for replica retry num, set to 0");
         }
 
-        String interval = SystemProperties
-                .get("com.iplanet.am.replica.delay.between.retries");
-        if (interval != null) {
-            try {
-                replicaRetryInterval = Long.parseLong(interval);
-                if (replicaRetryInterval < 0) {
-                    replicaRetryInterval = 0;
-                    debug.warning("Invalid value for replica interval, " +
-                            "set to 0");
-                }
+        replicaRetryNum = retries;
 
-            } catch (NumberFormatException e) {
-                debug.warning("Invalid value for replica interval");
-            }
+        long interval = SystemProperties.getAsLong(RETRIES_DELAY_KEY, 0);
+        if (interval < 0) {
+            interval = 0;
+            debug.warning("Invalid value for replica interval, set to 0");
         }
+
+        replicaRetryInterval = interval;
     }
 
     public Entry readLDAPEntry(Connection ld, String dn,
@@ -1288,4 +1280,16 @@ public class DataLayer implements java.io.Serializable {
 
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
+    private class DataLayerConfigListener implements ConfigurationListener {
+
+        @Override
+        public synchronized void notifyChanges() {
+            final int retries = SystemProperties.getAsInt(RETRIES_KEY, 0);
+            final long delay = SystemProperties.getAsLong(RETRIES_DELAY_KEY, 0);
+
+            if (retries != replicaRetryNum || delay != replicaRetryInterval) {
+                initReplicaProperties();
+            }
+        }
+    }
 }

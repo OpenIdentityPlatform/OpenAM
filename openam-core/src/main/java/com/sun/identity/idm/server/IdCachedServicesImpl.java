@@ -27,47 +27,45 @@
  */
 
 /*
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2015 ForgeRock AS
  */
 package com.sun.identity.idm.server;
-
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.Set;
-
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.common.DNUtils;
-
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdCachedServices;
-import com.sun.identity.idm.IdConstants;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdServices;
-import com.sun.identity.idm.IdType;
-import com.sun.identity.idm.IdUtils;
-import com.sun.identity.idm.IdSearchControl;
-import com.sun.identity.idm.IdSearchResults;
-import com.sun.identity.idm.common.IdCacheBlock;
-import com.sun.identity.idm.common.IdCacheStats;
-import com.sun.identity.monitoring.Agent;
-import com.sun.identity.monitoring.SsoServerIdRepoSvcImpl;
-import com.sun.identity.shared.stats.Stats;
-import com.sun.identity.sm.ServiceManager;
 
 import com.iplanet.am.sdk.AMEvent;
 import com.iplanet.am.sdk.AMHashMap;
 import com.iplanet.am.util.Cache;
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.DNUtils;
+import com.sun.identity.common.configuration.ConfigurationListener;
+import com.sun.identity.common.configuration.ConfigurationObserver;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdCachedServices;
+import com.sun.identity.idm.IdConstants;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdSearchControl;
+import com.sun.identity.idm.IdSearchResults;
+import com.sun.identity.idm.IdServices;
+import com.sun.identity.idm.IdType;
+import com.sun.identity.idm.IdUtils;
+import com.sun.identity.idm.common.IdCacheBlock;
+import com.sun.identity.idm.common.IdCacheStats;
+import com.sun.identity.monitoring.Agent;
 import com.sun.identity.monitoring.MonitoringUtil;
+import com.sun.identity.monitoring.SsoServerIdRepoSvcImpl;
+import com.sun.identity.shared.stats.Stats;
+import com.sun.identity.sm.ServiceManager;
+import java.util.Enumeration;
+import java.util.Map;
+import java.util.Set;
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.thread.listener.ShutdownManager;
 
 /*
  * Class which provides caching on top of available IdRepoLDAPServices.
  */
-public class IdCachedServicesImpl extends IdServicesImpl implements
-        IdCachedServices {
+public class IdCachedServicesImpl extends IdServicesImpl implements IdCachedServices, ConfigurationListener {
 
     static final String CACHE_MAX_SIZE_KEY = "com.iplanet.am.sdk.cache.maxSize";
     
@@ -77,7 +75,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements
     
     private static int maxSize;
 
-    private static IdServices instance;
+    private static IdCachedServicesImpl instance;
 
     // Class Private
     private Cache idRepoCache;
@@ -89,33 +87,20 @@ public class IdCachedServicesImpl extends IdServicesImpl implements
     private static SsoServerIdRepoSvcImpl monIdRepo;
 
     static {
-        initializeParams();
+        int cacheSize = SystemProperties.getAsInt(CACHE_MAX_SIZE_KEY, CACHE_MAX_SIZE_INT);
+        setMaxSize(cacheSize);
     }
 
-    /**
-     * Method to check if caching is enabled or disabled and configure the size
-     * of the cache accordingly.
-     */
-    private static void initializeParams() {
-        // Check if the caching property is set in System runtime.
-        String cacheSize = SystemProperties.get(CACHE_MAX_SIZE_KEY,
-            CACHE_MAX_SIZE);
-        try {
-            maxSize = Integer.parseInt(cacheSize);
-            if (maxSize < 1) {
-                maxSize = CACHE_MAX_SIZE_INT;
-            }
-            if (DEBUG.messageEnabled()) {
-                DEBUG.message(
-                        "IdCachedServicesImpl.intializeParams() "
-                                + "Caching size set to: " + maxSize);
-            }
-        } catch (NumberFormatException ne) {
-            maxSize = CACHE_MAX_SIZE_INT;
-            if (DEBUG.warningEnabled()) {
-                DEBUG.warning("IdCachedServicesImpl.initializeParams() - invalid value for cache size specified. "
-                        + "Setting to default value: " + maxSize);
-            }
+    private static void setMaxSize(int newValue) {
+
+        if (newValue < 1) { //if it's invalid, drop back to max
+            newValue = CACHE_MAX_SIZE_INT;
+        }
+
+        maxSize = newValue;
+
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("IdCachedServicesImpl.intializeParams() Caching size set to: " + maxSize);
         }
     }
 
@@ -132,6 +117,11 @@ public class IdCachedServicesImpl extends IdServicesImpl implements
 
     private void initializeCache() {
         idRepoCache = new Cache(maxSize);
+    }
+
+    private void resetCache(int maxCacheSize) {
+        setMaxSize(maxCacheSize);
+        clearCache();
     }
 
     /**
@@ -161,6 +151,8 @@ public class IdCachedServicesImpl extends IdServicesImpl implements
                         instance.clearIdRepoPlugins();
                     }
                 });
+
+            ConfigurationObserver.getInstance().addListener(instance);
 
         }
         return instance;
@@ -695,4 +687,13 @@ public class IdCachedServicesImpl extends IdServicesImpl implements
         return cachedId;
     }
 
+    @Override
+    public synchronized void notifyChanges() {
+        final int value = SystemProperties.getAsInt(CACHE_MAX_SIZE_KEY, CACHE_MAX_SIZE_INT);
+
+        if (value != maxSize) {
+            resetCache(value);
+        }
+
+    }
 }
