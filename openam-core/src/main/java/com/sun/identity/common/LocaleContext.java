@@ -18,25 +18,22 @@ package com.sun.identity.common;
 
 import java.util.Locale;
 
-import org.forgerock.json.resource.Context;
-import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.servlet.HttpContext;
 
 /**
- * CREST context for storing request Locale.
+ * Context for storing request Locale.
  */
-public class LocaleContext extends ServerContext {
+public class LocaleContext {
 
-    private final Locale locale;
-
-    public LocaleContext(Context parent) {
-        super("locale", parent);
-        ISLocaleContext localeContext = new ISLocaleContext();
-        localeContext.setLocale(parent.asContext(HttpContext.class));
-        this.locale = localeContext.getLocale();
-    }
+    private Locale locale;
 
     public Locale getLocale() {
         return locale;
+    }
+
+    public void setLocale(HttpContext httpContext) {
+        ISLocaleContext localeContext = new ISLocaleContext();
+        localeContext.setLocale(httpContext);
+        locale = localeContext.getLocale();
     }
 }
