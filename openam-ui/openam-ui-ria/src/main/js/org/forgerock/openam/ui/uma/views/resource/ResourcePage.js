@@ -99,7 +99,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
         },
         renderTagsOptions: function () {
           var self = this;
-            this.$el.find('#selectTag select').selectize({
+            this.$el.find('#labels').selectize({
                 plugins: ['restore_on_backspace'],
                 delimiter: ',',
                 persist: false,
@@ -120,7 +120,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
             var collection, grid, id = null, options, RevokeCell, SelectizeCell, self = this;
 
             // Get the current id
-            if(args && args[1]) { id = args[1]; }
+            if(args && args[2]) { id = args[2]; }
 
             /**
              * Guard clause to check if model requires sync'ing/updating

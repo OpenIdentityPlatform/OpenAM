@@ -36,12 +36,11 @@ define([
     "./views/backgrid/cells/PermissionsCell",
     "./views/history/ListHistory",
 
+    "./views/resource/BasePage",
     "./views/resource/LabelTreeNavigationView",
     "./views/resource/MyLabelsPage",
     "./views/resource/MyResourcesPage",
-    "./views/resource/MyResourcesTab",
     "./views/resource/ResourcePage",
-    "./views/resource/SharedResourcesTab",
     "./views/resource/SharedWithMePage",
     "./views/resource/StarredPage",
 

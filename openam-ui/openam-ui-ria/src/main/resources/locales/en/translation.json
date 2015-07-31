@@ -248,7 +248,6 @@
             "false" : "False",
             "update" : "Update",
             "save" : "Save",
-            "saveChanges": "Save Changes",
             "create" : "Create",
             "cancel" : "Cancel",
             "reset" : "Reset",
@@ -483,19 +482,6 @@
         "common": {
             "shares" : "Shares"
         },
-        "labels":{
-            "list": {
-                "deleteLabel": "Delete Label",
-                "deleteResourceLabel" : "Delete Resource Label",
-                "deleteLabelMessage": "Are you sure you want to permanently delete this resource label?<br>Deleting a resource label does not delete the resource itself.",
-                "noResources": "There are no resources associated with this label.",
-                "myLabels": "My Labels"
-            },
-            "starred":{
-                "title": "Starred",
-                "description" :"Your favorite resources"
-            }
-        },
         "share": {
             "shareResource": "Share the resource",
             "people": "Add or select people to share your resource with",
@@ -513,20 +499,51 @@
             "advanced" : "Advanced"
         },
         "resources": {
-            "list": {
-                "title": "Resources",
-                "subtitle": "All your shared resources",
-                "myResources": {
-                    "title": "My Resources",
-                    "grid": ["Resources", "Host", "Type", "Shared By"]
+            "title": "Resources",
+            "grid": {
+                "header": ["Name", "Host", "Type", ""]
+            },
+            "myresources": {
+                "title": "My Resources",
+                "description": "Resources you own.",
+                "unshareAllResources": {
+                    "button": "Unshare All Resources",
+                    "dialog": {
+                        "title": "Unshare all resources?",
+                        "message": "Are you sure you want to unshare all resources? Selecting OK will not remove your resources, but will remove all the shares within your resources."
+                    },
+                    "messages": {
+                        "success" : "All resources successfully unshared",
+                        "fail" : "We have been unable to unshare all resources. Please contact your Administrator"
+                    }
+                }
+            },
+            "sharedWithMe": {
+                "title": "Shared with me",
+                "description": "Resources that have been shared with you."
+            },
+            "starred": {
+                "title": "Starred",
+                "description": "Your favorite resources."
+            },
+            "myLabels": {
+                "title": "My Labels",
+                "description": "Resources with this label applied to them.",
+                "deleteLabel": {
+                    "button": "Delete Label",
+                    "dialog": {
+                        "title": "Delete label?",
+                        "message": "Are you sure you want to delete this label? Deleting a resource label does not delete the resources themselves."
+                    },
+                    "messages": {
+                        "success" : "Label successfully deleted",
+                        "fail" : "We have been unable delete the label. Please contact your Administrator"
+                    }
                 },
-                "sharedResources": {
-                    "title": "Shared with me",
-                    "grid": ["Resource", "From", "Permissions", "Shared By"]
-                },
-                "revokeAll": "Unshare All Resources",
-                "revokeAllResourcesSuccess" : "All resources successfully revoked",
-                "revokeAllResourcesFail" : "We have been unable revoke access to your resources. Please contact your Administrator"
+                "noResources": {
+                    "headline": "Nothing here!",
+                    "text": "There are no resources associated with this label."
+                }
             },
             "show": {
                 "subtitle": "Users allowed to access this resource and their permissions",

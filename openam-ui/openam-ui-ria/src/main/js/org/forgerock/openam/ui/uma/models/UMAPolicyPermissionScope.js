@@ -23,12 +23,12 @@
  */
 
  /*global $, _, define*/
-define('org/forgerock/openam/ui/uma/models/UMAPolicyPermissionScope', [
-    'backbone',
-    'backbone-relational'
+define("org/forgerock/openam/ui/uma/models/UMAPolicyPermissionScope", [
+    "backbone",
+    "backbone-relational"
 ], function(Backbone, BackboneRelational) {
     return Backbone.RelationalModel.extend({
-        parse: function(response, options) {
+        parse: function(response) {
             if(_.isUrl(response.id)) {
                 response = this.resolve(response.id);
             } else {
@@ -46,7 +46,7 @@ define('org/forgerock/openam/ui/uma/models/UMAPolicyPermissionScope', [
             // Synchronous!
             $.ajax({
                 async: false,
-                dataType: 'json',
+                dataType: "json",
                 success: function(data) {
                     resolved.name = data.name;
                     resolved.icon_uri = data.icon_uri;

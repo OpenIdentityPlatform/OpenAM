@@ -1,17 +1,17 @@
 {{#if label}}
-{{> headers/_TitleWithSubAndIcon title=label.name type="uma.labels.list.myLabels" buttons="templates/uma/views/resource/_LabelListButtons" }}
-<p class="page-description">{{label.path}}</p>
+    {{> headers/_TitleWithSubAndIcon title=label.name type="uma.resources.myLabels.title" buttons="templates/uma/views/resource/_DeleteLabelButton" }}
+    <p class="page-description">{{label.path}}</p>
 
-<div class="tab-content cleaarfix" id="uma">
-    <div class="panel panel-default">
-        <div class="panel-body">
-            <div class="backgrid-container"></div>
-            <div class="pagination-container"></div>
+    <div class="tab-content cleaarfix" id="uma">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="backgrid-container"></div>
+                <div class="pagination-container"></div>
+            </div>
         </div>
     </div>
-</div>
 {{else}}
-<div class="alert alert-info" role="alert">
-    <div class="media">{{t "uma.labels.list.noResources"}}</div>
-</div>
+    <div class="alert alert-info" role="alert">
+        <strong>{{t "uma.resources.myLabels.noResources.headline"}}</strong> {{t "uma.resources.myLabels.noResources.text"}}
+    </div>
 {{/if}}
