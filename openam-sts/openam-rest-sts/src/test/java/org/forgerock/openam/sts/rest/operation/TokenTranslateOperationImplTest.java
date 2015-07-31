@@ -28,8 +28,12 @@ import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.config.user.CustomTokenOperation;
 import org.forgerock.openam.sts.rest.config.user.TokenTransformConfig;
-import org.forgerock.openam.sts.user.invocation.RestSTSServiceInvocationState;
-import org.forgerock.openam.sts.user.invocation.SAML2TokenState;
+import org.forgerock.openam.sts.rest.operation.translate.TokenTransform;
+import org.forgerock.openam.sts.rest.operation.translate.TokenTransformFactory;
+import org.forgerock.openam.sts.rest.operation.translate.TokenTranslateOperation;
+import org.forgerock.openam.sts.rest.operation.translate.TokenTranslateOperationImpl;
+import org.forgerock.openam.sts.user.invocation.RestSTSTokenTranslationInvocationState;
+import org.forgerock.openam.sts.user.invocation.SAML2TokenCreationState;
 import org.forgerock.openam.sts.user.invocation.UsernameTokenState;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.slf4j.Logger;
@@ -107,7 +111,7 @@ public class TokenTranslateOperationImplTest {
         @Provides
         @Named(AMSTSConstants.TLS_OFFLOAD_ENGINE_HOSTS)
         Set<String> getTlsOffloadEngineHosts() {
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
 
         @Provides
@@ -142,22 +146,22 @@ public class TokenTranslateOperationImplTest {
     public void testUnknownTransform() throws Exception {
         TokenTranslateOperation tokenTranslateOperation = Guice.createInjector(new MyModule()).getInstance(TokenTranslateOperation.class);
         JsonValue bunkTokenState = json(object(field("token_type", "nonsense")));
-        RestSTSServiceInvocationState invocationState =
-                RestSTSServiceInvocationState.builder().inputTokenState(bunkTokenState).outputTokenState(bunkTokenState).build();
+        RestSTSTokenTranslationInvocationState invocationState =
+                RestSTSTokenTranslationInvocationState.builder().inputTokenState(bunkTokenState).outputTokenState(bunkTokenState).build();
         tokenTranslateOperation.translateToken(invocationState, null, null);
     }
 
-    private RestSTSServiceInvocationState buildInvocationState(TokenType desiredTokenType) throws Exception {
+    private RestSTSTokenTranslationInvocationState buildInvocationState(TokenType desiredTokenType) throws Exception {
         UsernameTokenState untState = UsernameTokenState.builder().password("bobo".getBytes()).username("dodo".getBytes()).build();
         JsonValue outputTokenState;
         if (TokenType.SAML2.equals(desiredTokenType)) {
-            outputTokenState = SAML2TokenState.builder()
+            outputTokenState = SAML2TokenCreationState.builder()
                     .saml2SubjectConfirmation(SAML2SubjectConfirmation.BEARER)
                     .build()
                     .toJson();
         } else {
             throw new Exception("Unexpected desiredTokenType: " + desiredTokenType);
         }
-        return RestSTSServiceInvocationState.builder().inputTokenState(untState.toJson()).outputTokenState(outputTokenState).build();
+        return RestSTSTokenTranslationInvocationState.builder().inputTokenState(untState.toJson()).outputTokenState(outputTokenState).build();
     }
 }

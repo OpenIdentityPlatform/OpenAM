@@ -25,17 +25,23 @@ import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenTypeId;
 import org.forgerock.openam.sts.config.user.CustomTokenOperation;
+import org.forgerock.openam.sts.rest.operation.translate.CustomRestTokenProviderParametersImpl;
+import org.forgerock.openam.sts.rest.operation.translate.OpenIdConnectRestTokenProviderParameters;
+import org.forgerock.openam.sts.rest.operation.translate.Saml2RestTokenProviderParameters;
 import org.forgerock.openam.sts.rest.service.RestSTSServiceHttpServletContext;
+import org.forgerock.openam.sts.rest.token.canceller.RestIssuedTokenCancellerParameters;
 import org.forgerock.openam.sts.rest.token.provider.RestTokenProviderParameters;
 import org.forgerock.openam.sts.rest.token.provider.oidc.OpenIdConnectTokenCreationState;
 import org.forgerock.openam.sts.rest.token.provider.saml.Saml2TokenCreationState;
-import org.forgerock.openam.sts.rest.token.validator.RestTokenValidatorParameters;
+import org.forgerock.openam.sts.rest.token.validator.RestIssuedTokenValidatorParameters;
+import org.forgerock.openam.sts.rest.token.validator.RestTokenTransformValidatorParameters;
 import org.forgerock.openam.sts.user.invocation.ProofTokenState;
-import org.forgerock.openam.sts.user.invocation.SAML2TokenState;
+import org.forgerock.openam.sts.user.invocation.SAML2TokenCreationState;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
 import org.forgerock.openam.sts.token.model.RestUsernameToken;
+import org.forgerock.openam.sts.user.invocation.SAML2TokenState;
 import org.forgerock.openam.utils.ClientUtils;
 import org.slf4j.Logger;
 
@@ -79,9 +85,9 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
     }
 
     @Override
-    public RestTokenValidatorParameters<?> buildTokenValidatorParameters(
-                                                        JsonValue receivedToken, HttpContext httpContext,
-                                                        RestSTSServiceHttpServletContext restSTSServiceHttpServletContext)
+    public RestTokenTransformValidatorParameters<?> buildTokenTransformValidatorParameters(
+            JsonValue receivedToken, HttpContext httpContext,
+            RestSTSServiceHttpServletContext restSTSServiceHttpServletContext)
                                                         throws TokenMarshalException {
         if (!receivedToken.get(AMSTSConstants.TOKEN_TYPE_KEY).isString()) {
             String message = "The to-be-translated token does not contain a " + AMSTSConstants.TOKEN_TYPE_KEY +
@@ -90,21 +96,65 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
         }
         String tokenType = receivedToken.get(AMSTSConstants.TOKEN_TYPE_KEY).asString();
         if (TokenType.USERNAME.name().equals(tokenType)) {
-            return buildUsernameTokenValidatorParameters(receivedToken);
+            return buildUsernameTokenTransformValidatorParameters(receivedToken);
         } else if (TokenType.OPENAM.name().equals(tokenType)) {
-            return buildAMSessionTokenValidatorParameters(receivedToken);
+            return buildAMSessionTokenTransformValidatorParameters(receivedToken);
         } else if (TokenType.OPENIDCONNECT.name().equals(tokenType)) {
-            return buildOpenIdConnectIdTokenValidatorParameters(receivedToken);
+            return buildOpenIdConnectIdTokenTransformValidatorParameters(receivedToken);
         } else if (TokenType.X509.name().equals(tokenType)) {
-            return buildX509CertTokenValidatorParameters(httpContext, restSTSServiceHttpServletContext);
+            return buildX509CertTokenTransformValidatorParameters(httpContext, restSTSServiceHttpServletContext);
         } else {
             for (CustomTokenOperation customTokenOperation : customTokenValidators) {
                 if (tokenType.equals(customTokenOperation.getCustomTokenName())) {
-                    return buildCustomTokenValidatorParameters(receivedToken);
+                    return buildCustomTokenTransformValidatorParameters(receivedToken);
                 }
             }
         }
         throw new TokenMarshalException(ResourceException.BAD_REQUEST, "Unsupported input token type: " + tokenType);
+    }
+
+    @Override
+    public RestIssuedTokenValidatorParameters<?> buildIssuedTokenValidatorParameters(JsonValue receivedToken) throws TokenMarshalException {
+        if (!receivedToken.get(AMSTSConstants.TOKEN_TYPE_KEY).isString()) {
+            String message = "The to-be-validated token does not contain a " + AMSTSConstants.TOKEN_TYPE_KEY +
+                    " entry. The token: " + receivedToken;
+            throw new TokenMarshalException(ResourceException.BAD_REQUEST, message);
+        }
+        String tokenType = receivedToken.get(AMSTSConstants.TOKEN_TYPE_KEY).asString();
+        if (TokenType.OPENIDCONNECT.getId().equals(tokenType)) {
+            return buildOpenIdConnectIssuedTokenValidatorParameters(receivedToken);
+        } else if (TokenType.SAML2.getId().equals(tokenType)) {
+            return buildSAML2IssuedTokenValidatorParameters(receivedToken);
+        } else if (tokenType ==  null) {
+            throw new TokenMarshalException(ResourceException.BAD_REQUEST, "Invalid invocation state: invocation must " +
+                    "specify a validated_token_state key containing json which specifies a token_type of either " +
+                    "OPENIDCONNECT or SAML2, and the corresponding token value. See RestSTSTokenValidationInvocationState " +
+                    "for details.") ;
+        } else {
+            throw new TokenMarshalException(ResourceException.BAD_REQUEST, "Unsupported to-be-validated token type: " + tokenType);
+        }
+    }
+
+    @Override
+    public RestIssuedTokenCancellerParameters<?> buildIssuedTokenCancellerParameters(JsonValue receivedToken) throws TokenMarshalException {
+        if (!receivedToken.get(AMSTSConstants.TOKEN_TYPE_KEY).isString()) {
+            String message = "The to-be-cancelled token does not contain a " + AMSTSConstants.TOKEN_TYPE_KEY +
+                    " entry. The token: " + receivedToken;
+            throw new TokenMarshalException(ResourceException.BAD_REQUEST, message);
+        }
+        String tokenType = receivedToken.get(AMSTSConstants.TOKEN_TYPE_KEY).asString();
+        if (TokenType.OPENIDCONNECT.getId().equals(tokenType)) {
+            return buildOpenIdConnectIssuedTokenCancellerParameters(receivedToken);
+        } else if (TokenType.SAML2.getId().equals(tokenType)) {
+            return buildSAML2IssuedTokenCancellerParameters(receivedToken);
+        } else if (tokenType ==  null) {
+            throw new TokenMarshalException(ResourceException.BAD_REQUEST, "Invalid invocation state: invocation must " +
+                    "specify a cancelled_token_state key containing json which specifies a token_type of either " +
+                    "OPENIDCONNECT or SAML2, and the corresponding token value. See RestSTSTokenCancellationInvocationState " +
+                    "for details.") ;
+        } else {
+            throw new TokenMarshalException(ResourceException.BAD_REQUEST, "Unsupported to-be-cancelled token type: " + tokenType);
+        }
     }
 
     @Override
@@ -147,39 +197,111 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
 
     private SAML2SubjectConfirmation getSubjectConfirmation(JsonValue token) throws TokenMarshalException {
         try {
-            SAML2TokenState tokenState = SAML2TokenState.fromJson(token);
+            SAML2TokenCreationState tokenState = SAML2TokenCreationState.fromJson(token);
             return tokenState.getSubjectConfirmation();
         } catch (TokenMarshalException e) {
             /*
             Try to get the value directly
              */
-            String subjectConfirmationString = token.get(SAML2TokenState.SUBJECT_CONFIRMATION).asString();
+            String subjectConfirmationString = token.get(SAML2TokenCreationState.SUBJECT_CONFIRMATION).asString();
             try {
                 return SAML2SubjectConfirmation.valueOf(subjectConfirmationString);
             } catch (IllegalArgumentException iae) {
                 throw new TokenMarshalException(ResourceException.BAD_REQUEST,
-                        "Invalid subjectConfirmation specified in the JsonValue corresponding to SAML2TokenState. " +
+                        "Invalid subjectConfirmation specified in the JsonValue corresponding to SAML2TokenCreationState. " +
                                 "The JsonValue: " + token.toString());
             } catch (NullPointerException npe) {
                 throw new TokenMarshalException(ResourceException.BAD_REQUEST,
-                        "No subjectConfirmation specified in the JsonValue corresponding to SAML2TokenState. " +
+                        "No subjectConfirmation specified in the JsonValue corresponding to SAML2TokenCreationState. " +
                                 "The JsonValue: " + token.toString());
             }
         }
     }
 
     private ProofTokenState getProofTokenState(JsonValue token) throws TokenMarshalException {
-        final SAML2TokenState tokenState = SAML2TokenState.fromJson(token);
+        final SAML2TokenCreationState tokenState = SAML2TokenCreationState.fromJson(token);
         final ProofTokenState proofTokenState = tokenState.getProofTokenState();
         if (proofTokenState ==  null) {
             throw new TokenMarshalException(ResourceException.BAD_REQUEST, "No ProofTokenState specified in the" +
-                    " SAML2TokenState. The JsonValue: " + token);
+                    " SAML2TokenCreationState. The JsonValue: " + token);
         } else {
             return proofTokenState;
         }
     }
 
-    private RestTokenValidatorParameters<RestUsernameToken> buildUsernameTokenValidatorParameters(JsonValue receivedToken) throws TokenMarshalException {
+    private RestIssuedTokenValidatorParameters<OpenIdConnectIdToken> buildOpenIdConnectIssuedTokenValidatorParameters(JsonValue receivedToken) throws TokenMarshalException {
+        if (!receivedToken.get(AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_KEY).isString()) {
+            String message = "Exception: json representation of a to-be-validated OIDC token does not contain a "
+                    + AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_KEY + " field containing the " +
+                    "to-be-validated token. The representation: " + receivedToken;
+            throw new TokenMarshalException(ResourceException.BAD_REQUEST, message);
+        } else {
+            final String tokenValue = receivedToken.get(AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_KEY).asString();
+            final OpenIdConnectIdToken openIdConnectIdToken = new OpenIdConnectIdToken(tokenValue);
+            return new RestIssuedTokenValidatorParameters<OpenIdConnectIdToken>() {
+                @Override
+                public OpenIdConnectIdToken getInputToken() {
+                    return openIdConnectIdToken;
+                }
+            };
+        }
+    }
+
+    private RestIssuedTokenValidatorParameters<SAML2TokenState> buildSAML2IssuedTokenValidatorParameters(JsonValue receivedToken) throws TokenMarshalException {
+        if (!receivedToken.get(AMSTSConstants.SAML2_TOKEN_KEY).isString()) {
+            String message = "Exception: json representation of a to-be-validated SAML2 token does not contain a "
+                    + AMSTSConstants.SAML2_TOKEN_KEY + " field containing the " +
+                    "to-be-validated token. The representation: " + receivedToken;
+            throw new TokenMarshalException(ResourceException.BAD_REQUEST, message);
+        } else {
+            final String tokenValue = receivedToken.get(AMSTSConstants.SAML2_TOKEN_KEY).asString();
+            final SAML2TokenState saml2TokenState = SAML2TokenState.builder().tokenValue(tokenValue).build();
+            return new RestIssuedTokenValidatorParameters<SAML2TokenState>() {
+                @Override
+                public SAML2TokenState getInputToken() {
+                    return saml2TokenState;
+                }
+            };
+        }
+    }
+
+    private RestIssuedTokenCancellerParameters<OpenIdConnectIdToken> buildOpenIdConnectIssuedTokenCancellerParameters(JsonValue receivedToken) throws TokenMarshalException {
+        if (!receivedToken.get(AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_KEY).isString()) {
+            String message = "Exception: json representation of a to-be-cancelled OIDC token does not contain a "
+                    + AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_KEY + " field containing the " +
+                    "to-be-cancelled token. The representation: " + receivedToken;
+            throw new TokenMarshalException(ResourceException.BAD_REQUEST, message);
+        } else {
+            final String tokenValue = receivedToken.get(AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_KEY).asString();
+            final OpenIdConnectIdToken openIdConnectIdToken = new OpenIdConnectIdToken(tokenValue);
+            return new RestIssuedTokenCancellerParameters<OpenIdConnectIdToken>() {
+                @Override
+                public OpenIdConnectIdToken getInputToken() {
+                    return openIdConnectIdToken;
+                }
+            };
+        }
+    }
+
+    private RestIssuedTokenCancellerParameters<SAML2TokenState> buildSAML2IssuedTokenCancellerParameters(JsonValue receivedToken) throws TokenMarshalException {
+        if (!receivedToken.get(AMSTSConstants.SAML2_TOKEN_KEY).isString()) {
+            String message = "Exception: json representation of a to-be-cancelled SAML2 token does not contain a "
+                    + AMSTSConstants.SAML2_TOKEN_KEY + " field containing the " +
+                    "to-be-cancelled token. The representation: " + receivedToken;
+            throw new TokenMarshalException(ResourceException.BAD_REQUEST, message);
+        } else {
+            final String tokenValue = receivedToken.get(AMSTSConstants.SAML2_TOKEN_KEY).asString();
+            final SAML2TokenState saml2TokenState = SAML2TokenState.builder().tokenValue(tokenValue).build();
+            return new RestIssuedTokenCancellerParameters<SAML2TokenState>() {
+                @Override
+                public SAML2TokenState getInputToken() {
+                    return saml2TokenState;
+                }
+            };
+        }
+    }
+
+    private RestTokenTransformValidatorParameters<RestUsernameToken> buildUsernameTokenTransformValidatorParameters(JsonValue receivedToken) throws TokenMarshalException {
         if (!receivedToken.get(AMSTSConstants.USERNAME_TOKEN_USERNAME).isString()) {
             final String message = "Exception: json representation of UNT does not contain a username field. The representation: "
                     + receivedToken;
@@ -196,7 +318,7 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
         try {
             final RestUsernameToken restUsernameToken =
                     new RestUsernameToken(username.getBytes(AMSTSConstants.UTF_8_CHARSET_ID), password.getBytes(AMSTSConstants.UTF_8_CHARSET_ID));
-            return new RestTokenValidatorParameters<RestUsernameToken>() {
+            return new RestTokenTransformValidatorParameters<RestUsernameToken>() {
                 @Override
                 public RestUsernameToken getInputToken() {
                     return restUsernameToken;
@@ -208,7 +330,7 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
         }
     }
 
-    private RestTokenValidatorParameters<OpenAMSessionToken> buildAMSessionTokenValidatorParameters(JsonValue receivedToken) throws TokenMarshalException {
+    private RestTokenTransformValidatorParameters<OpenAMSessionToken> buildAMSessionTokenTransformValidatorParameters(JsonValue receivedToken) throws TokenMarshalException {
         if (!receivedToken.get(AMSTSConstants.AM_SESSION_TOKEN_SESSION_ID).isString()) {
             String message = "Exception: json representation of AM Session Token does not contain a session_id field. " +
                     "The representation: " + receivedToken;
@@ -216,7 +338,7 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
         } else {
             final String sessionId = receivedToken.get(AMSTSConstants.AM_SESSION_TOKEN_SESSION_ID).asString();
             final OpenAMSessionToken openAMSessionToken = new OpenAMSessionToken(sessionId);
-            return new RestTokenValidatorParameters<OpenAMSessionToken>() {
+            return new RestTokenTransformValidatorParameters<OpenAMSessionToken>() {
                 @Override
                 public OpenAMSessionToken getInputToken() {
                     return openAMSessionToken;
@@ -225,7 +347,7 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
         }
     }
 
-    private RestTokenValidatorParameters<OpenIdConnectIdToken> buildOpenIdConnectIdTokenValidatorParameters(JsonValue receivedToken)
+    private RestTokenTransformValidatorParameters<OpenIdConnectIdToken> buildOpenIdConnectIdTokenTransformValidatorParameters(JsonValue receivedToken)
             throws TokenMarshalException {
         if (!receivedToken.get(AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_KEY).isString()) {
             String message = "Exception: json representation of Open ID Connect ID Token does not contain a "
@@ -234,7 +356,7 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
         } else {
             final String tokenValue = receivedToken.get(AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_KEY).asString();
             final OpenIdConnectIdToken openIdConnectIdToken = new OpenIdConnectIdToken(tokenValue);
-            return new RestTokenValidatorParameters<OpenIdConnectIdToken>() {
+            return new RestTokenTransformValidatorParameters<OpenIdConnectIdToken>() {
                 @Override
                 public OpenIdConnectIdToken getInputToken() {
                     return openIdConnectIdToken;
@@ -256,9 +378,9 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
      *                                         and with it, access to the client cert presented via two-way-tls
      * @throws org.forgerock.openam.sts.TokenMarshalException if the client's X509 token cannot be obtained from the
      * javax.servlet.request.X509Certificate attribute, or from the header referenced by the offloadedTlsClientCertKey value.
-     * @return a RestTokenValidatorParameters instance with a X509Certificate[] generic type.
+     * @return a RestTokenTransformValidatorParameters instance with a X509Certificate[] generic type.
      */
-    private RestTokenValidatorParameters<X509Certificate[]> buildX509CertTokenValidatorParameters(HttpContext httpContext, RestSTSServiceHttpServletContext
+    private RestTokenTransformValidatorParameters<X509Certificate[]> buildX509CertTokenTransformValidatorParameters(HttpContext httpContext, RestSTSServiceHttpServletContext
             restSTSServiceHttpServletContext) throws TokenMarshalException {
 
         X509Certificate[] certificates;
@@ -332,9 +454,9 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
         }
     }
 
-    private RestTokenValidatorParameters<X509Certificate[]> marshalX509CertIntoTokenValidatorParameters(
+    private RestTokenTransformValidatorParameters<X509Certificate[]> marshalX509CertIntoTokenValidatorParameters(
                                         final X509Certificate[] x509Certificates) throws TokenMarshalException {
-        return new RestTokenValidatorParameters<X509Certificate[]>() {
+        return new RestTokenTransformValidatorParameters<X509Certificate[]>() {
             @Override
             public X509Certificate[] getInputToken() {
                 return x509Certificates;
@@ -342,8 +464,8 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
         };
     }
 
-    private RestTokenValidatorParameters<JsonValue> buildCustomTokenValidatorParameters(final JsonValue inputToken) {
-        return new RestTokenValidatorParameters<JsonValue>() {
+    private RestTokenTransformValidatorParameters<JsonValue> buildCustomTokenTransformValidatorParameters(final JsonValue inputToken) {
+        return new RestTokenTransformValidatorParameters<JsonValue>() {
             @Override
             public JsonValue getInputToken() {
                 return inputToken;

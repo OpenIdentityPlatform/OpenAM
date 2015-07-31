@@ -20,27 +20,41 @@ import javax.inject.Inject;
 
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.servlet.HttpContext;
+import org.forgerock.openam.sts.TokenCancellationException;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenValidationException;
-import org.forgerock.openam.sts.rest.operation.TokenTranslateOperation;
+import org.forgerock.openam.sts.rest.operation.cancel.IssuedTokenCancelOperation;
+import org.forgerock.openam.sts.rest.operation.validate.IssuedTokenValidateOperation;
+import org.forgerock.openam.sts.rest.operation.translate.TokenTranslateOperation;
 import org.forgerock.openam.sts.rest.service.RestSTSServiceHttpServletContext;
-import org.forgerock.openam.sts.user.invocation.RestSTSServiceInvocationState;
+import org.forgerock.openam.sts.user.invocation.RestSTSTokenCancellationInvocationState;
+import org.forgerock.openam.sts.user.invocation.RestSTSTokenTranslationInvocationState;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
+import org.forgerock.openam.sts.user.invocation.RestSTSTokenValidationInvocationState;
 
 /**
  * See {@link org.forgerock.openam.sts.rest.RestSTS}
  */
 public class RestSTSImpl implements RestSTS {
     private final TokenTranslateOperation translateOperation;
+    private final IssuedTokenValidateOperation issuedTokenValidateOperation;
+    private final IssuedTokenCancelOperation issuedTokenCancelOperation;
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
 
     @Inject
-    public RestSTSImpl(TokenTranslateOperation translateOperation, ThreadLocalAMTokenCache threadLocalAMTokenCache) {
+    public RestSTSImpl(TokenTranslateOperation translateOperation,
+                       IssuedTokenValidateOperation issuedTokenValidateOperation,
+                       IssuedTokenCancelOperation issuedTokenCancelOperation,
+                       ThreadLocalAMTokenCache threadLocalAMTokenCache) {
         this.translateOperation = translateOperation;
+        this.issuedTokenValidateOperation = issuedTokenValidateOperation;
+        this.issuedTokenCancelOperation = issuedTokenCancelOperation;
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
     }
-    public JsonValue translateToken(RestSTSServiceInvocationState invocationState, HttpContext httpContext,
+
+    @Override
+    public JsonValue translateToken(RestSTSTokenTranslationInvocationState invocationState, HttpContext httpContext,
                                     RestSTSServiceHttpServletContext restSTSServiceHttpServletContext)
             throws TokenMarshalException, TokenValidationException, TokenCreationException {
         try {
@@ -50,4 +64,14 @@ public class RestSTSImpl implements RestSTS {
         }
     }
 
+    @Override
+    public JsonValue validateToken(RestSTSTokenValidationInvocationState invocationState)
+            throws TokenMarshalException, TokenValidationException {
+        return issuedTokenValidateOperation.validateToken(invocationState);
+    }
+
+    @Override
+    public JsonValue cancelToken(RestSTSTokenCancellationInvocationState invocationState) throws TokenMarshalException, TokenCancellationException {
+        return issuedTokenCancelOperation.cancelToken(invocationState);
+    }
 }

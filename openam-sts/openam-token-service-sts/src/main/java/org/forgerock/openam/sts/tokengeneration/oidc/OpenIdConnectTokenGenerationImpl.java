@@ -31,11 +31,14 @@ import org.forgerock.json.jose.jws.handlers.SigningHandler;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.CTSTokenPersistenceException;
 import org.forgerock.openam.sts.TokenCreationException;
+import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.config.user.OpenIdConnectTokenConfig;
 import org.forgerock.openam.sts.config.user.OpenIdConnectTokenPublicKeyReferenceType;
 import org.forgerock.openam.sts.service.invocation.OpenIdConnectTokenGenerationState;
 import org.forgerock.openam.sts.service.invocation.TokenGenerationServiceInvocationState;
+import org.forgerock.openam.sts.tokengeneration.CTSTokenPersistence;
 import org.forgerock.openam.sts.tokengeneration.SSOTokenIdentity;
 import org.forgerock.openam.sts.tokengeneration.oidc.crypto.OpenIdConnectTokenPKIProvider;
 import org.forgerock.openam.sts.tokengeneration.state.STSInstanceState;
@@ -59,15 +62,18 @@ public class OpenIdConnectTokenGenerationImpl implements OpenIdConnectTokenGener
     private final SSOTokenIdentity ssoTokenIdentity;
     private final JwtBuilderFactory jwtBuilderFactory;
     private final OpenIdConnectTokenClaimMapperProvider openIdConnectTokenClaimMapperProvider;
+    private final CTSTokenPersistence ctsTokenPersistence;
     private final Logger logger;
 
     @Inject
     OpenIdConnectTokenGenerationImpl(SSOTokenIdentity ssoTokenIdentity, JwtBuilderFactory jwtBuilderFactory,
                                      OpenIdConnectTokenClaimMapperProvider openIdConnectTokenClaimMapperProvider,
+                                     CTSTokenPersistence ctsTokenPersistence,
                                      Logger logger) {
         this.ssoTokenIdentity = ssoTokenIdentity;
         this.jwtBuilderFactory = jwtBuilderFactory;
         this.openIdConnectTokenClaimMapperProvider = openIdConnectTokenClaimMapperProvider;
+        this.ctsTokenPersistence = ctsTokenPersistence;
         this.logger = logger;
     }
 
@@ -76,26 +82,41 @@ public class OpenIdConnectTokenGenerationImpl implements OpenIdConnectTokenGener
                            TokenGenerationServiceInvocationState invocationState) throws TokenCreationException {
 
         final OpenIdConnectTokenConfig tokenConfig = stsInstanceState.getConfig().getOpenIdConnectTokenConfig();
-        STSOpenIdConnectToken openIdConnectToken = buildToken(subjectToken,
-                tokenConfig, invocationState.getOpenIdConnectTokenGenerationState());
+        final long issueInstant = System.currentTimeMillis();
+        final String subject = ssoTokenIdentity.validateAndGetTokenPrincipal(subjectToken);
+
+        STSOpenIdConnectToken openIdConnectToken = buildToken(subjectToken, tokenConfig,
+                invocationState.getOpenIdConnectTokenGenerationState(), issueInstant / 1000, subject);
 
         final JwsAlgorithm jwsAlgorithm = tokenConfig.getSignatureAlgorithm();
         final JwsAlgorithmType jwsAlgorithmType = jwsAlgorithm.getAlgorithmType();
 
+        String tokenString;
         if (JwsAlgorithmType.HMAC.equals(jwsAlgorithmType)) {
             final SignedJwt signedJwt = symmetricSign(openIdConnectToken, jwsAlgorithm, tokenConfig.getClientSecret());
-            return signedJwt.build();
+            tokenString = signedJwt.build();
         } else if (JwsAlgorithmType.RSA.equals(jwsAlgorithmType)) {
             final SignedJwt signedJwt = asymmetricSign(openIdConnectToken, jwsAlgorithm, getKeyPair(stsInstanceState.getOpenIdConnectTokenPKIProvider(),
                     tokenConfig.getSignatureKeyAlias(), tokenConfig.getSignatureKeyPassword()), determinePublicKeyReferenceType(tokenConfig));
-            return signedJwt.build();
+            tokenString = signedJwt.build();
         } else {
             throw new TokenCreationException(ResourceException.BAD_REQUEST, "Unknown JwsAlgorithmType: " + jwsAlgorithmType);
         }
+        if (stsInstanceState.getConfig().persistIssuedTokensInCTS()) {
+            try {
+                ctsTokenPersistence.persistToken(invocationState.getStsInstanceId(), TokenType.OPENIDCONNECT,
+                        tokenString, subject, issueInstant, tokenConfig.getTokenLifetimeInSeconds());
+            } catch (CTSTokenPersistenceException e) {
+                throw new TokenCreationException(e.getCode(), e.getMessage(), e);
+            }
+        }
+        return tokenString;
     }
 
     private STSOpenIdConnectToken buildToken(SSOToken subjectToken, OpenIdConnectTokenConfig tokenConfig,
-                                                  OpenIdConnectTokenGenerationState tokenGenerationState) throws TokenCreationException {
+                                             OpenIdConnectTokenGenerationState tokenGenerationState,
+                                             long issueTimeSeconds,
+                                             String subject) throws TokenCreationException {
         if (tokenConfig == null) {
             throw new TokenCreationException(ResourceException.BAD_REQUEST,
                     "No OpenIdConnectTokenConfig associated with published sts instance state.");
@@ -105,18 +126,15 @@ public class OpenIdConnectTokenGenerationImpl implements OpenIdConnectTokenGener
                     "No OpenIdConnectTokenGenerationState associated with the TokenGenerationServiceInvocationState.");
         }
 
-        final String subject = ssoTokenIdentity.validateAndGetTokenPrincipal(subjectToken);
-
         STSOpenIdConnectToken openIdConnectToken = new STSOpenIdConnectToken();
-        final long currentTimeInSeconds = System.currentTimeMillis() / 1000;
-        final long expirationTime = currentTimeInSeconds + tokenConfig.getTokenLifetimeInSeconds();
+        final long expirationTimeInSeconds = issueTimeSeconds + tokenConfig.getTokenLifetimeInSeconds();
 
         openIdConnectToken
                 .setAud(tokenConfig.getAudience())
                 .setIss(tokenConfig.getIssuer())
                 .setSub(subject)
-                .setIat(currentTimeInSeconds)
-                .setExp(expirationTime)
+                .setIat(issueTimeSeconds)
+                .setExp(expirationTimeInSeconds)
                 .setId(UUID.randomUUID().toString());
         if (!StringUtils.isEmpty(tokenConfig.getAuthorizedParty())) {
             openIdConnectToken.setAzp(tokenConfig.getAuthorizedParty());

@@ -27,6 +27,9 @@
                 propertiesViewBeanURL="../sts/SoapSTSEdit">
 
             <Organization>
+                <AttributeSchema name="persist-issued-tokens-in-cts"
+                                 type="single" syntax="boolean" i18nKey="persist_issued_tokens_in_cts">
+                </AttributeSchema>
                 <AttributeSchema name="issued-token-types"
                                  type="list"
                                  syntax="string"
@@ -315,6 +318,9 @@
                 Necessary to have multiple soap STS instances per realm, like authN modules.
                 -->
                 <SubSchema name="serverconfig" inheritance="multiple">
+                    <AttributeSchema name="persist-issued-tokens-in-cts"
+                                     type="single" syntax="boolean" i18nKey="persist_issued_tokens_in_cts">
+                    </AttributeSchema>
                     <AttributeSchema name="issued-token-types"
                                      type="list"
                                      syntax="string"

@@ -38,16 +38,18 @@ import java.util.Set;
  */
 public class STSInstanceConfig {
     /*
-    The following two constants define the key names for the json maps that encapsulate state for both rest and soap
+    The following four constants define the key names for the json maps that encapsulate state for both rest and soap
     STS instances.
      */
     protected static final String SAML2_CONFIG = "saml2-config";
-    protected static final String DEPLOYMENT_CONFIG = "deployment-config";
     protected static final String OIDC_ID_TOKEN_CONFIG = "oidc-id-token-config";
+    protected static final String DEPLOYMENT_CONFIG = "deployment-config";
+    protected static final String PERSIST_ISSUED_TOKENS_IN_CTS = "persist-issued-tokens-in-cts";
 
     public static abstract class STSInstanceConfigBuilderBase<T extends STSInstanceConfigBuilderBase<T>> {
         private SAML2Config saml2Config;
         private OpenIdConnectTokenConfig openIdConnectTokenConfig;
+        private boolean persistIssuedTokensInCTS = true;
 
         protected abstract T self();
 
@@ -58,6 +60,11 @@ public class STSInstanceConfig {
 
         public T oidcIdTokenConfig(OpenIdConnectTokenConfig openIdConnectTokenConfig) {
             this.openIdConnectTokenConfig = openIdConnectTokenConfig;
+            return self();
+        }
+
+        public T persistIssuedTokensInCTS(boolean persistIssuedTokensInCTS) {
+            this.persistIssuedTokensInCTS = persistIssuedTokensInCTS;
             return self();
         }
 
@@ -75,10 +82,12 @@ public class STSInstanceConfig {
 
     protected final SAML2Config saml2Config;
     protected final OpenIdConnectTokenConfig openIdConnectTokenConfig;
+    protected final boolean persistIssuedTokensInCTS;
 
     protected STSInstanceConfig(STSInstanceConfigBuilderBase<?> builder) {
         saml2Config = builder.saml2Config;
         openIdConnectTokenConfig = builder.openIdConnectTokenConfig;
+        persistIssuedTokensInCTS = builder.persistIssuedTokensInCTS;
     }
 
     /**
@@ -94,15 +103,21 @@ public class STSInstanceConfig {
         return openIdConnectTokenConfig;
     }
 
+    public boolean persistIssuedTokensInCTS() {
+        return persistIssuedTokensInCTS;
+    }
+
     public static STSInstanceConfigBuilderBase<?> builder() {
         return new STSInstanceConfigBuilder();
     }
+
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("STSInstanceConfig instance:\n");
         sb.append('\t').append("saml2Config: ").append(saml2Config).append('\n');
         sb.append('\t').append("OpenIdConnectTokenConfig: ").append(openIdConnectTokenConfig).append('\n');
+        sb.append('\t').append("Issued tokens persisted in CTS: ").append(persistIssuedTokensInCTS).append('\n');
         return sb.toString();
     }
 
@@ -111,6 +126,7 @@ public class STSInstanceConfig {
         if (other instanceof STSInstanceConfig) {
             STSInstanceConfig otherConfig = (STSInstanceConfig)other;
             return  Objects.equal(saml2Config, otherConfig.getSaml2Config()) &&
+                    (persistIssuedTokensInCTS == otherConfig.persistIssuedTokensInCTS()) &&
                     Objects.equal(openIdConnectTokenConfig, otherConfig.getOpenIdConnectTokenConfig());
         }
         return false;
@@ -124,6 +140,7 @@ public class STSInstanceConfig {
         if (openIdConnectTokenConfig != null) {
             jsonValue.add(OIDC_ID_TOKEN_CONFIG, openIdConnectTokenConfig.toJson());
         }
+        jsonValue.add(PERSIST_ISSUED_TOKENS_IN_CTS, String.valueOf(persistIssuedTokensInCTS));
         return jsonValue;
     }
 
@@ -138,6 +155,7 @@ public class STSInstanceConfig {
         if (!oidcConfig.isNull()) {
             builder.oidcIdTokenConfig(OpenIdConnectTokenConfig.fromJson(oidcConfig));
         }
+        builder.persistIssuedTokensInCTS(Boolean.valueOf(json.get(PERSIST_ISSUED_TOKENS_IN_CTS).asString()));
         return builder.build();
     }
 

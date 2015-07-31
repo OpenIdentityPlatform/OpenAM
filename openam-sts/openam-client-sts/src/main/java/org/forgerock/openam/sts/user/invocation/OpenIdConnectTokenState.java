@@ -30,7 +30,7 @@ import static org.forgerock.json.fluent.JsonValue.object;
 
 /**
  * Class encapsulating an OpenIdConnect jws string, and will emit json which includes state necessary to act as the input_token_state
- * in the RestSTSServiceInvocationState - i.e. the jws string, and a AMSTSConstants.TOKEN_TYPE_KEY field corresponding to
+ * in the RestSTSTokenTranslationInvocationState - i.e. the jws string, and a AMSTSConstants.TOKEN_TYPE_KEY field corresponding to
  * TokenType.OPENIDCONNECT.name().
  */
 public class OpenIdConnectTokenState {

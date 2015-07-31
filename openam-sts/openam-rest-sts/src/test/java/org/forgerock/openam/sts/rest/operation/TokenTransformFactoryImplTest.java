@@ -19,6 +19,7 @@ package org.forgerock.openam.sts.rest.operation;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Provides;
+import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import org.forgerock.openam.sts.AMSTSConstants;
@@ -31,6 +32,9 @@ import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.config.user.CustomTokenOperation;
 import org.forgerock.openam.sts.rest.config.user.TokenTransformConfig;
+import org.forgerock.openam.sts.rest.operation.translate.TokenTransform;
+import org.forgerock.openam.sts.rest.operation.translate.TokenTransformFactory;
+import org.forgerock.openam.sts.rest.operation.translate.TokenTransformFactoryImpl;
 import org.forgerock.openam.sts.rest.token.provider.oidc.DefaultOpenIdConnectTokenAuthMethodReferencesMapper;
 import org.forgerock.openam.sts.rest.token.provider.oidc.DefaultOpenIdConnectTokenAuthnContextMapper;
 import org.forgerock.openam.sts.rest.token.provider.oidc.OpenIdConnectTokenAuthMethodReferencesMapper;
@@ -39,6 +43,8 @@ import org.forgerock.openam.sts.rest.token.provider.saml.Saml2JsonTokenAuthnCont
 import org.forgerock.openam.sts.rest.token.validator.disp.RestUsernameTokenAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.AMTokenParser;
 import org.forgerock.openam.sts.token.AMTokenParserImpl;
+import org.forgerock.openam.sts.token.CTSTokenIdGenerator;
+import org.forgerock.openam.sts.token.CTSTokenIdGeneratorImpl;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCacheImpl;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
@@ -46,8 +52,8 @@ import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
 import org.forgerock.openam.sts.rest.token.provider.saml.Saml2JsonTokenAuthnContextMapper;
 import org.forgerock.openam.sts.token.model.RestUsernameToken;
-import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
-import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumerImpl;
+import org.forgerock.openam.sts.token.provider.TokenServiceConsumer;
+import org.forgerock.openam.sts.token.provider.TokenServiceConsumerImpl;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSessionImpl;
 import org.forgerock.openam.sts.token.validator.AuthenticationHandler;
@@ -105,12 +111,13 @@ public class TokenTransformFactoryImplTest {
             bind(AuthenticationUrlProvider.class)
                     .to(AuthenticationUrlProviderImpl.class);
             bind(AMTokenParser.class).to(AMTokenParserImpl.class);
-            bind(TokenGenerationServiceConsumer.class).to(TokenGenerationServiceConsumerImpl.class);
+            bind(TokenServiceConsumer.class).to(TokenServiceConsumerImpl.class);
             bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
             bind(Saml2JsonTokenAuthnContextMapper.class).to(Saml2JsonTokenAuthnContextMapperImpl.class);
             bind(HttpURLConnectionFactory.class).to(DefaultHttpURLConnectionFactory.class);
             bind(OpenIdConnectTokenAuthnContextMapper.class).to(DefaultOpenIdConnectTokenAuthnContextMapper.class);
             bind(OpenIdConnectTokenAuthMethodReferencesMapper.class).to(DefaultOpenIdConnectTokenAuthMethodReferencesMapper.class);
+            bind(CTSTokenIdGenerator.class).to(CTSTokenIdGeneratorImpl.class).in(Scopes.SINGLETON);
         }
 
         @Provides

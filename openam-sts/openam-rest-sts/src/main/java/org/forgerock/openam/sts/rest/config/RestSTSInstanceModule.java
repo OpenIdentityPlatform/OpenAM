@@ -29,22 +29,39 @@ import javax.inject.Singleton;
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
 
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.HttpURLConnectionFactory;
 import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
 import org.forgerock.openam.sts.OpenAMHttpURLConnectionFactory;
+import org.forgerock.openam.sts.STSInitializationException;
+import org.forgerock.openam.sts.TokenCancellationException;
+import org.forgerock.openam.sts.TokenMarshalException;
+import org.forgerock.openam.sts.TokenTypeId;
+import org.forgerock.openam.sts.TokenValidationException;
+import org.forgerock.openam.sts.XMLUtilities;
+import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.config.user.CustomTokenOperation;
 import org.forgerock.openam.sts.rest.RestSTS;
 import org.forgerock.openam.sts.rest.RestSTSImpl;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
 import org.forgerock.openam.sts.rest.config.user.TokenTransformConfig;
+import org.forgerock.openam.sts.rest.operation.cancel.IssuedTokenCancelOperation;
+import org.forgerock.openam.sts.rest.operation.cancel.IssuedTokenCancelOperationImpl;
+import org.forgerock.openam.sts.rest.operation.cancel.IssuedTokenCancellerFactory;
+import org.forgerock.openam.sts.rest.operation.cancel.IssuedTokenCancellerFactoryImpl;
+import org.forgerock.openam.sts.rest.operation.validate.IssuedTokenValidateOperation;
+import org.forgerock.openam.sts.rest.operation.validate.IssuedTokenValidateOperationImpl;
 import org.forgerock.openam.sts.rest.operation.TokenRequestMarshaller;
 import org.forgerock.openam.sts.rest.operation.TokenRequestMarshallerImpl;
-import org.forgerock.openam.sts.rest.operation.TokenTransformFactory;
-import org.forgerock.openam.sts.rest.operation.TokenTransformFactoryImpl;
-import org.forgerock.openam.sts.rest.operation.TokenTranslateOperation;
-import org.forgerock.openam.sts.rest.operation.TokenTranslateOperationImpl;
+import org.forgerock.openam.sts.rest.operation.translate.TokenTransformFactory;
+import org.forgerock.openam.sts.rest.operation.translate.TokenTransformFactoryImpl;
+import org.forgerock.openam.sts.rest.operation.translate.TokenTranslateOperation;
+import org.forgerock.openam.sts.rest.operation.translate.TokenTranslateOperationImpl;
+import org.forgerock.openam.sts.rest.operation.validate.IssuedTokenValidatorFactory;
+import org.forgerock.openam.sts.rest.operation.validate.IssuedTokenValidatorFactoryImpl;
 import org.forgerock.openam.sts.rest.token.provider.oidc.DefaultOpenIdConnectTokenAuthMethodReferencesMapper;
 import org.forgerock.openam.sts.rest.token.provider.oidc.DefaultOpenIdConnectTokenAuthnContextMapper;
 import org.forgerock.openam.sts.rest.token.provider.oidc.OpenIdConnectTokenAuthMethodReferencesMapper;
@@ -54,14 +71,16 @@ import org.forgerock.openam.sts.rest.token.provider.saml.Saml2JsonTokenAuthnCont
 import org.forgerock.openam.sts.rest.token.validator.disp.RestUsernameTokenAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.AMTokenParser;
 import org.forgerock.openam.sts.token.AMTokenParserImpl;
+import org.forgerock.openam.sts.token.CTSTokenIdGenerator;
+import org.forgerock.openam.sts.token.CTSTokenIdGeneratorImpl;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCacheImpl;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
 import org.forgerock.openam.sts.token.model.RestUsernameToken;
-import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
-import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumerImpl;
+import org.forgerock.openam.sts.token.provider.TokenServiceConsumer;
+import org.forgerock.openam.sts.token.provider.TokenServiceConsumerImpl;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSessionImpl;
 import org.forgerock.openam.sts.token.validator.AuthenticationHandler;
@@ -73,8 +92,11 @@ import org.forgerock.openam.sts.token.validator.url.AuthenticationUrlProviderImp
 import org.forgerock.openam.sts.token.validator.url.AuthenticationUrlProvider;
 
 import java.security.cert.X509Certificate;
+import java.util.HashSet;
 import java.util.Set;
 
+import org.forgerock.openam.sts.user.invocation.RestSTSTokenCancellationInvocationState;
+import org.forgerock.openam.sts.user.invocation.RestSTSTokenValidationInvocationState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,6 +105,11 @@ import org.slf4j.LoggerFactory;
  * This class defines all of the bindings for an instance of the REST-STS. The RestSTSInstanceConfig instance
  * passed to its ctor defines all of the state necessary to bind the elements necessary for a full REST-STS object
  * graph.
+ *
+ * Note that the top-level entry point for REST-STS invocations is RestSTS/RestSTSImpl. These invocations are then
+ * delegated to the top-level operations (TokenTranslateOperation, IssuedTokenValidateOperation, and IssuedTokenCancelOperation),
+ * which are effectively singletons - i.e they will be initialized once. This also means that their dependencies are also
+ * singletons. The point is to create an effectively-immutable object graph for threading performance.
  */
 public class RestSTSInstanceModule extends AbstractModule {
     private final RestSTSInstanceConfig stsInstanceConfig;
@@ -116,17 +143,18 @@ public class RestSTSInstanceModule extends AbstractModule {
         bind(new TypeLiteral<AuthenticationHandler<X509Certificate[]>>(){})
                 .to(new TypeLiteral<AuthenticationHandlerImpl<X509Certificate[]>>() {});
 
-
         bind(TokenRequestMarshaller.class).to(TokenRequestMarshallerImpl.class);
         bind(TokenTransformFactory.class).to(TokenTransformFactoryImpl.class);
+        bind(IssuedTokenValidatorFactory.class).to(IssuedTokenValidatorFactoryImpl.class);
+        bind(IssuedTokenCancellerFactory.class).to(IssuedTokenCancellerFactoryImpl.class);
         bind(TokenTranslateOperation.class).to(TokenTranslateOperationImpl.class);
         bind(AMTokenParser.class).to(AMTokenParserImpl.class);
         bind(PrincipalFromSession.class).to(PrincipalFromSessionImpl.class);
 
-        bind(RestSTS.class).to(RestSTSImpl.class);
+        bind(RestSTS.class).to(RestSTSImpl.class).in(Scopes.SINGLETON);
         bind(UrlConstituentCatenator.class).to(UrlConstituentCatenatorImpl.class);
 
-        bind(TokenGenerationServiceConsumer.class).to(TokenGenerationServiceConsumerImpl.class);
+        bind(TokenServiceConsumer.class).to(TokenServiceConsumerImpl.class);
 
         /*
         Bind the class responsible for producing HttpURLConnectionWrapper instances, and the HttpURLConnectionFactory
@@ -134,6 +162,17 @@ public class RestSTSInstanceModule extends AbstractModule {
          */
         bind(HttpURLConnectionFactory.class).to(OpenAMHttpURLConnectionFactory.class).in(Scopes.SINGLETON);
         bind(HttpURLConnectionWrapperFactory.class).in(Scopes.SINGLETON);
+
+        /*
+        Bind the class which will allow for the generation of token ids, given a to-be-validated/canceled token.
+        Necessary to consume the TokenService's validation/cancellation functionality
+         */
+        bind(CTSTokenIdGenerator.class).to(CTSTokenIdGeneratorImpl.class).in(Scopes.SINGLETON);
+
+        /*
+        Necessary for the CTSTokenIdGenerator, to generate a CTS token id when processing a SAML2 assertion
+         */
+        bind(XMLUtilities.class).to(XMLUtilitiesImpl.class).in(Scopes.SINGLETON);
     }
 
     /*
@@ -399,6 +438,23 @@ public class RestSTSInstanceModule extends AbstractModule {
         return stsInstanceConfig.getCustomTokenTransforms();
     }
 
+    /*
+    Needed by the IssuedTokenValidateOperationImpl - RestIssuedTokenValidator instances will be created for all of the rest-sts issued
+    token types.
+     */
+    @Provides
+    @Named(AMSTSConstants.ISSUED_TOKEN_TYPES)
+    @Inject
+    Set<TokenTypeId> getIssuedTokenTypes(@Named(AMSTSConstants.REST_SUPPORTED_TOKEN_TRANSFORMS) Set<TokenTransformConfig> tokenTransforms) {
+        Set<TokenTypeId> issuedTokenTypes = new HashSet<>();
+        for (TokenTransformConfig tokenTransformConfig : tokenTransforms) {
+            if (!issuedTokenTypes.contains(tokenTransformConfig.getOutputTokenType())) {
+                issuedTokenTypes.add(tokenTransformConfig.getOutputTokenType());
+            }
+        }
+        return issuedTokenTypes;
+    }
+
     /**
      * If a rest-sts instance is configured to support a token transformation with a x509 Certificate as an input token
      * type, and the OpenAM instance is deployed in a TLS-offloaded-environment, the TLS-offload-engines will be able
@@ -412,10 +468,74 @@ public class RestSTSInstanceModule extends AbstractModule {
         return stsInstanceConfig.getDeploymentConfig().getTlsOffloadEngineHostIpAddrs();
     }
 
+    /*
+    Required by the getIssuedTokenValidateOperation method below - a functional IssuedTokenValidateOperation instance will
+    be bound only if issued tokens are persisted in the CTS, as this is a pre-requisite for token validation
+     */
+    @Provides
+    @Named(AMSTSConstants.ISSUED_TOKENS_PERSISTED_IN_CTS)
+    boolean issuedTokensPersistedInCTS() {
+        return stsInstanceConfig.persistIssuedTokensInCTS();
+    }
+
+    /*
+    Provides the IssuedTokenValidateOperation which is responsible for validating tokens issued by this sts instance.
+    Will only return a functional IssuedTokenValidateOperation if the sts instance is configured to persist issued
+    tokens in the CTS.
+     */
+    @Provides
+    @Inject
+    IssuedTokenValidateOperation getIssuedTokenValidateOperation(
+                                @Named(AMSTSConstants.ISSUED_TOKENS_PERSISTED_IN_CTS) boolean issuedTokensPersistedInCTS,
+                                IssuedTokenValidatorFactory issuedTokenValidatorFactory,
+                                TokenRequestMarshaller tokenRequestMarshaller,
+                                @Named(AMSTSConstants.ISSUED_TOKEN_TYPES) Set<TokenTypeId> validatedTokenTypes) throws STSInitializationException {
+        if (issuedTokensPersistedInCTS) {
+            return new IssuedTokenValidateOperationImpl(issuedTokenValidatorFactory, tokenRequestMarshaller, validatedTokenTypes);
+        } else {
+            return new IssuedTokenValidateOperation() {
+                @Override
+                public JsonValue validateToken(RestSTSTokenValidationInvocationState invocationState) throws TokenMarshalException, TokenValidationException {
+                    throw new TokenMarshalException(ResourceException.CONFLICT, "This rest-sts instance is not configured " +
+                            "to persist tokens in the CoreTokenStore, which is a pre-requisite for token validation. " +
+                            "Update the rest-sts instance to persist issued tokens in the CTS, and functional token validation " +
+                            "will be configured for token types issued by this sts instance.");
+                }
+            };
+        }
+    }
+
+    /*
+    Provides the IssuedTokenCancelOperation which is responsible for cancelling tokens issued by this sts instance.
+    Will only return a functional IssuedTokenCancelOperation if the sts instance is configured to persist issued
+    tokens in the CTS.
+     */
+    @Provides
+    @Inject
+    IssuedTokenCancelOperation getIssuedTokenCancelOperation(
+            @Named(AMSTSConstants.ISSUED_TOKENS_PERSISTED_IN_CTS) boolean issuedTokensPersistedInCTS,
+            IssuedTokenCancellerFactory issuedTokenCancellerFactory,
+            TokenRequestMarshaller tokenRequestMarshaller,
+            @Named(AMSTSConstants.ISSUED_TOKEN_TYPES) Set<TokenTypeId> cancelledTokenTypes) throws STSInitializationException {
+        if (issuedTokensPersistedInCTS) {
+            return new IssuedTokenCancelOperationImpl(issuedTokenCancellerFactory, tokenRequestMarshaller, cancelledTokenTypes);
+        } else {
+            return new IssuedTokenCancelOperation() {
+                @Override
+                public JsonValue cancelToken(RestSTSTokenCancellationInvocationState invocationState) throws TokenMarshalException, TokenCancellationException {
+                    throw new TokenMarshalException(ResourceException.CONFLICT, "This rest-sts instance is not configured " +
+                            "to persist tokens in the CoreTokenStore, which is a pre-requisite for token cancellation. " +
+                            "Update the rest-sts instance to persist issued tokens in the CTS, and functional token cancellation " +
+                            "will be configured for token types issued by this sts instance.");
+
+                }
+            };
+        }
+    }
     /**
      * The value corresponding to the Accept-API-Version header specifying the version of CREST services to consume. Note
      * that the rest-sts run-time consumes the rest authN (classes in the wss/disp package), the token generation
-     * service (TokenGenerationServiceConsumerImpl), the service to obtain a principal from a session (PrincipalFromSessionImpl),
+     * service (TokenServiceConsumerImpl), the service to obtain a principal from a session (PrincipalFromSessionImpl),
      * and the session invalidation service (AMSessionInvalidatorImpl).
      * All of these will specify the version returned below. If different versions need to be consumed, different strings
      * can be @Named and provided for the various clients.
@@ -454,7 +574,7 @@ public class RestSTSInstanceModule extends AbstractModule {
     }
 
     /*
-    Required by the TokenGenerationServiceConsumerImpl, to specify the sts type which will allow the token generation
+    Required by the TokenServiceConsumerImpl, to specify the sts type which will allow the token generation
     service to look-up the appropriate sts instance state.
      */
     @Provides

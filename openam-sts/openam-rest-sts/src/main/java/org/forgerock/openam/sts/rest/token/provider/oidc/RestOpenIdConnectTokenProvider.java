@@ -23,7 +23,7 @@ import org.forgerock.openam.sts.rest.token.provider.RestTokenProviderBase;
 import org.forgerock.openam.sts.rest.token.provider.RestTokenProviderParameters;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.provider.AMSessionInvalidator;
-import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
+import org.forgerock.openam.sts.token.provider.TokenServiceConsumer;
 import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
 import org.slf4j.Logger;
 
@@ -43,7 +43,7 @@ public class RestOpenIdConnectTokenProvider extends RestTokenProviderBase<OpenId
     /*
     ctor not injected as this class created by TokenTransformFactoryImpl
      */
-    public RestOpenIdConnectTokenProvider(TokenGenerationServiceConsumer tokenGenerationServiceConsumer,
+    public RestOpenIdConnectTokenProvider(TokenServiceConsumer tokenServiceConsumer,
                                  AMSessionInvalidator amSessionInvalidator,
                                  ThreadLocalAMTokenCache threadLocalAMTokenCache,
                                  String stsInstanceId,
@@ -52,7 +52,7 @@ public class RestOpenIdConnectTokenProvider extends RestTokenProviderBase<OpenId
                                  OpenIdConnectTokenAuthMethodReferencesMapper authModeReferencesMapper,
                                  ValidationInvocationContext validationInvocationContext,
                                  Logger logger) {
-        super(tokenGenerationServiceConsumer, amSessionInvalidator, threadLocalAMTokenCache, stsInstanceId, realm,
+        super(tokenServiceConsumer, amSessionInvalidator, threadLocalAMTokenCache, stsInstanceId, realm,
                 validationInvocationContext, logger);
         this.authnContextMapper = authnContextMapper;
         this.authModeReferencesMapper = authModeReferencesMapper;
@@ -86,7 +86,7 @@ public class RestOpenIdConnectTokenProvider extends RestTokenProviderBase<OpenId
 
     private String getAssertion(String authNContextClassRef, Set<String> authenticationMethodReferences,
                                 long authTimeInSeconds, String nonce) throws TokenCreationException {
-        return tokenGenerationServiceConsumer.getOpenIdConnectToken(
+        return tokenServiceConsumer.getOpenIdConnectToken(
                 threadLocalAMTokenCache.getSessionIdForContext(validationInvocationContext),
                 stsInstanceId, realm, authNContextClassRef, authenticationMethodReferences,
                 authTimeInSeconds, nonce, getAdminToken());

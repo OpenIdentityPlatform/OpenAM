@@ -25,13 +25,17 @@ import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.TokenTypeId;
+import org.forgerock.openam.sts.XMLUtilities;
+import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.config.user.CustomTokenOperation;
 import org.forgerock.openam.sts.rest.service.RestSTSServiceHttpServletContext;
 import org.forgerock.openam.sts.rest.token.provider.RestTokenProviderParameters;
 import org.forgerock.openam.sts.rest.token.provider.saml.Saml2TokenCreationState;
-import org.forgerock.openam.sts.rest.token.validator.RestTokenValidatorParameters;
+import org.forgerock.openam.sts.rest.token.validator.RestTokenTransformValidatorParameters;
+import org.forgerock.openam.sts.token.CTSTokenIdGenerator;
+import org.forgerock.openam.sts.token.CTSTokenIdGeneratorImpl;
 import org.forgerock.openam.sts.user.invocation.ProofTokenState;
-import org.forgerock.openam.sts.user.invocation.SAML2TokenState;
+import org.forgerock.openam.sts.user.invocation.SAML2TokenCreationState;
 import org.forgerock.openam.sts.user.invocation.X509TokenState;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
@@ -68,6 +72,8 @@ public class TokenRequestMarshallerImplTest {
         @Override
         protected void configure() {
             bind(TokenRequestMarshaller.class).to(TokenRequestMarshallerImpl.class);
+            bind(CTSTokenIdGenerator.class).to(CTSTokenIdGeneratorImpl.class);
+            bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
         }
 
         @Provides
@@ -85,7 +91,7 @@ public class TokenRequestMarshallerImplTest {
         @Provides
         @Named(AMSTSConstants.TLS_OFFLOAD_ENGINE_HOSTS)
         Set<String> getTlsOffloadEngineHosts() {
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
 
         @Provides
@@ -110,7 +116,7 @@ public class TokenRequestMarshallerImplTest {
     public void marshallUsernameToken() throws TokenMarshalException, UnsupportedEncodingException {
         JsonValue jsonUnt = json(object(field("token_type", "USERNAME"),
                 field("username", "bobo"), field("password", "cornholio")));
-        RestTokenValidatorParameters<?> params = tokenMarshaller.buildTokenValidatorParameters(jsonUnt, null, null);
+        RestTokenTransformValidatorParameters<?> params = tokenMarshaller.buildTokenTransformValidatorParameters(jsonUnt, null, null);
         assertEquals("bobo".getBytes(AMSTSConstants.UTF_8_CHARSET_ID), ((RestUsernameToken)params.getInputToken()).getUsername());
     }
 
@@ -118,7 +124,7 @@ public class TokenRequestMarshallerImplTest {
     public void marshallOpenAMToken() throws TokenMarshalException {
         JsonValue jsonOpenAM = json(object(field("token_type", "OPENAM"),
                 field("session_id", "super_random")));
-        RestTokenValidatorParameters<?> params = tokenMarshaller.buildTokenValidatorParameters(jsonOpenAM, null, null);
+        RestTokenTransformValidatorParameters<?> params = tokenMarshaller.buildTokenTransformValidatorParameters(jsonOpenAM, null, null);
         assertTrue("super_random".equals(((OpenAMSessionToken) params.getInputToken()).getSessionId()));
     }
 
@@ -131,8 +137,9 @@ public class TokenRequestMarshallerImplTest {
         X509Certificate certificate = getCertificate();
         X509Certificate[] certificates = new X509Certificate[] {certificate};
         when(mockServletRequest.getAttribute("javax.servlet.request.X509Certificate")).thenReturn(certificates);
-        RestTokenValidatorParameters<X509Certificate[]> params = (RestTokenValidatorParameters<X509Certificate[]>)
-                tokenMarshaller.buildTokenValidatorParameters(new X509TokenState().toJson(), null, mockServletContext);
+        @SuppressWarnings("unchecked")
+        RestTokenTransformValidatorParameters<X509Certificate[]> params = (RestTokenTransformValidatorParameters<X509Certificate[]>)
+                tokenMarshaller.buildTokenTransformValidatorParameters(new X509TokenState().toJson(), null, mockServletContext);
         assertEquals(certificate.getEncoded(), (params.getInputToken()[0].getEncoded()));
     }
 
@@ -141,7 +148,7 @@ public class TokenRequestMarshallerImplTest {
         JsonValue jsonUnt = json(object(field("token_type", "USERNAME"),
                 field("username", "bobo"), field("password", "cornholio")));
         JsonValue saml2Output =
-                SAML2TokenState.builder().saml2SubjectConfirmation(SAML2SubjectConfirmation.BEARER).build().toJson();
+                SAML2TokenCreationState.builder().saml2SubjectConfirmation(SAML2SubjectConfirmation.BEARER).build().toJson();
         RestTokenProviderParameters<?> params =
                 tokenMarshaller.buildTokenProviderParameters(TokenType.USERNAME, jsonUnt, TokenType.SAML2, saml2Output);
         assertEquals(TokenType.USERNAME.getId(), params.getInputTokenType().getId());
@@ -153,7 +160,7 @@ public class TokenRequestMarshallerImplTest {
                 field("session_id", "super_random")));
         X509Certificate certificate = getCertificate();
         JsonValue saml2Output =
-                SAML2TokenState.builder()
+                SAML2TokenCreationState.builder()
                         .saml2SubjectConfirmation(SAML2SubjectConfirmation.HOLDER_OF_KEY)
                         .proofTokenState(ProofTokenState.builder().x509Certificate(certificate).build())
                         .build()

@@ -40,7 +40,7 @@ public class AMSTSConstants {
     issue operations vs. the token types for validate operations. In each case a list<TokenType> is returned, and thus
     we need @Named with one of the values below for disambiguation.
      */
-    public static final String TOKEN_ISSUE_OPERATION = "token_issue_operation";
+    public static final String ISSUED_TOKEN_TYPES = "issued_token_types";
     public static final String TOKEN_RENEW_OPERATION = "token_renew_operation";
 
     /*
@@ -252,6 +252,12 @@ public class AMSTSConstants {
     public static final String OPEN_ID_CONNECT_ID_TOKEN_KEY = "oidc_id_token";
 
     /*
+    Used by the SAML2TokenState class to identify the json field which will contain the SAML2 assertion when this
+    assertion is specified in a rest-sts validate invocation.
+     */
+    public static final String SAML2_TOKEN_KEY = "saml2_token";
+
+    /*
     The namespace of the DOM Element used to communicate an OpenID Connect ID Token. When the SoapOpenIdConnectTokenProvider
     issues an OIDC token, it can only be set as an xml element in the TokenProviderResponse. This constant defines the
     namespace of the xml element.
@@ -287,10 +293,16 @@ public class AMSTSConstants {
     public static final String STS_INSTANCE_ID = "sts_instance_id";
 
     /*
-    The JsonValue returned by the TokenGenerationService will have a single entry, keyed by the string below. The value
-    will be the generated token (now just a SAML2 assertion).
+    The JsonValue returned by the TokenGenerationService and from rest-sts token translate invocations,
+    will have a single entry, keyed by the string below. The value will be the generated token.
      */
     public static final String ISSUED_TOKEN = "issued_token";
+
+    /*
+    The JsonValue returned from the rest-sts token validation invocation will have a single entry, keyed by the
+    string below. The value will be true or false.
+     */
+    public static final String TOKEN_VALID = "token_valid";
 
     /*
     The name of the rest sts service, as defined in restSTS.xml. Referenced in the RestSTSInstanceConfigStore, to
@@ -432,4 +444,11 @@ public class AMSTSConstants {
      * in the TokenDelegationResponse.
      */
     public static final String CUSTOM_DELEGATION_HANDLER_INVALIDATE_AM_SESSION = "custom_delegation_handler_invalidate_am_session";
+
+    /**
+     * Used in the context of a @Named annotation to indicate whether the sts is configured to persist issued tokens in the
+     * CTS. Used to determine whether the Validation and Cancellation of sts-issued tokens will be supported, as in the 13
+     * release, this support simply reads/mutates CTS token state.
+     */
+    public static final String ISSUED_TOKENS_PERSISTED_IN_CTS = "issued_tokens_persisted_in_cts";
 }

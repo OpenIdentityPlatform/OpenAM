@@ -20,7 +20,9 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
+import com.google.inject.Scopes;
 import com.iplanet.sso.SSOToken;
+import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.TokenCreationException;
@@ -28,6 +30,10 @@ import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.config.user.SAML2Config;
+import org.forgerock.openam.sts.token.CTSTokenIdGenerator;
+import org.forgerock.openam.sts.token.CTSTokenIdGeneratorImpl;
+import org.forgerock.openam.sts.tokengeneration.CTSTokenPersistence;
+import org.forgerock.openam.sts.tokengeneration.CTSTokenPersistenceImpl;
 import org.forgerock.openam.sts.tokengeneration.oidc.crypto.OpenIdConnectTokenPKIProviderFactory;
 import org.forgerock.openam.sts.tokengeneration.oidc.crypto.OpenIdConnectTokenPKIProviderFactoryImpl;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.SAML2CryptoProviderFactoryImpl;
@@ -95,6 +101,9 @@ public class SAML2TokenGenerationImplTest {
             bind(SAML2CryptoProviderFactory.class).to(SAML2CryptoProviderFactoryImpl.class);
             bind(OpenIdConnectTokenPKIProviderFactory.class).to(OpenIdConnectTokenPKIProviderFactoryImpl.class);
             bind(SSOTokenIdentity.class).toInstance(mockTokenIdentity);
+            bind(CTSTokenIdGenerator.class).to(CTSTokenIdGeneratorImpl.class).in(Scopes.SINGLETON);
+            bind(CTSPersistentStore.class).toInstance(mock(CTSPersistentStore.class));
+            bind(CTSTokenPersistence.class).to(CTSTokenPersistenceImpl.class);
         }
 
         @Provides

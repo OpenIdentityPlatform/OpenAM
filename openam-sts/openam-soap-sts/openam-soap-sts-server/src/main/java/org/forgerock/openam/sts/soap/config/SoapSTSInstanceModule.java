@@ -30,7 +30,9 @@ import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
 import org.apache.cxf.sts.token.delegation.TokenDelegationHandler;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider;
+import org.apache.cxf.ws.security.sts.provider.operation.CancelOperation;
 import org.apache.cxf.ws.security.sts.provider.operation.IssueOperation;
+import org.apache.cxf.ws.security.sts.provider.operation.ValidateOperation;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
@@ -45,9 +47,11 @@ import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.soap.STSEndpoint;
 import org.forgerock.openam.sts.soap.SoapSTSCallbackHandler;
 import org.forgerock.openam.sts.soap.config.user.TokenValidationConfig;
+import org.forgerock.openam.sts.soap.token.config.TokenCancelOperationProvider;
 import org.forgerock.openam.sts.soap.token.config.TokenIssueOperationProvider;
 import org.forgerock.openam.sts.soap.token.config.TokenOperationFactory;
 import org.forgerock.openam.sts.soap.token.config.TokenOperationFactoryImpl;
+import org.forgerock.openam.sts.soap.token.config.TokenValidateOperationProvider;
 import org.forgerock.openam.sts.soap.token.delegation.TokenDelegationHandlersProvider;
 import org.forgerock.openam.sts.soap.token.provider.oidc.DefaultSoapOpenIdConnectTokenAuthnContextMapper;
 import org.forgerock.openam.sts.soap.token.provider.oidc.DefaultSoapOpenIdConnectTokenAuthnMethodsReferencesMapper;
@@ -59,12 +63,14 @@ import org.forgerock.openam.sts.soap.token.validator.wss.WSSValidatorFactory;
 import org.forgerock.openam.sts.soap.token.validator.wss.WSSValidatorFactoryImpl;
 import org.forgerock.openam.sts.token.AMTokenParser;
 import org.forgerock.openam.sts.token.AMTokenParserImpl;
+import org.forgerock.openam.sts.token.CTSTokenIdGenerator;
+import org.forgerock.openam.sts.token.CTSTokenIdGeneratorImpl;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
 import org.forgerock.openam.sts.token.provider.AMSessionInvalidator;
 import org.forgerock.openam.sts.token.provider.AMSessionInvalidatorImpl;
-import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
-import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumerImpl;
+import org.forgerock.openam.sts.token.provider.TokenServiceConsumer;
+import org.forgerock.openam.sts.token.provider.TokenServiceConsumerImpl;
 import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
 import org.forgerock.openam.sts.token.validator.AuthenticationHandler;
 import org.forgerock.openam.sts.token.validator.disp.CertificateAuthenticationRequestDispatcher;
@@ -126,8 +132,8 @@ public class SoapSTSInstanceModule extends AbstractModule {
         //binding all of the Providers of the various sorts of operations
         bind(TokenOperationFactory.class).to(TokenOperationFactoryImpl.class).in(Scopes.SINGLETON);
         bind(IssueOperation.class).toProvider(TokenIssueOperationProvider.class);
-        //TODO: don't bind renewal and validate operations - validate and renewal will be designed as part of AME-5878
-//        bind(ValidateOperation.class).toProvider(TokenValidateOperationProvider.class);
+        bind(ValidateOperation.class).toProvider(TokenValidateOperationProvider.class);
+        bind(CancelOperation.class).toProvider(TokenCancelOperationProvider.class);
 //        bind(RenewOperation.class).toProvider(TokenRenewOperationProvider.class);
 
         /*
@@ -145,7 +151,7 @@ public class SoapSTSInstanceModule extends AbstractModule {
         /*
         Bind the client class used to speak to the TokenGenerationService
          */
-        bind(TokenGenerationServiceConsumer.class).to(TokenGenerationServiceConsumerImpl.class);
+        bind(TokenServiceConsumer.class).to(TokenServiceConsumerImpl.class);
 
         /*
         Bind a XMLUtilities class which encapsulates the shared XMLUtils class, so that static methods are not called
@@ -163,6 +169,10 @@ public class SoapSTSInstanceModule extends AbstractModule {
         Bind the Provider responsible for providing the List<TokenDelegationHandler> required by the IssueOperation.
          */
         bind(new TypeLiteral<List<TokenDelegationHandler>>(){}).toProvider(TokenDelegationHandlersProvider.class);
+
+        //Bind the interface/impl which allows for the generation of a token id given a token. Necessary to consume
+        //the token service to validate/cancel a given token
+        bind(CTSTokenIdGenerator.class).to(CTSTokenIdGeneratorImpl.class).in(Scopes.SINGLETON);
     }
 
     /**
@@ -296,7 +306,7 @@ public class SoapSTSInstanceModule extends AbstractModule {
     user-provided configuration.
      */
     @Provides
-    @Named(AMSTSConstants.TOKEN_ISSUE_OPERATION)
+    @Named(AMSTSConstants.ISSUED_TOKEN_TYPES)
     Set<TokenType> issueTokenTypes() {
         return stsInstanceConfig.getIssueTokenTypes();
     }
@@ -390,7 +400,7 @@ public class SoapSTSInstanceModule extends AbstractModule {
     }
 
     /*
-    Required by the TokenGenerationServiceConsumerImpl, to specify the sts type which will allow the token generation
+    Required by the TokenServiceConsumerImpl, to specify the sts type which will allow the token generation
     service to look-up the appropriate sts instance state.
     */
     @Provides
@@ -482,6 +492,12 @@ public class SoapSTSInstanceModule extends AbstractModule {
         at the token service if the invoking sts has no config corresponding to the desired token type.
          */
         return new DefaultSoapOpenIdConnectTokenAuthnMethodsReferencesMapper();
+    }
+
+    @Provides
+    @Named (AMSTSConstants.ISSUED_TOKENS_PERSISTED_IN_CTS)
+    boolean tokensPersistedInCTS() {
+        return stsInstanceConfig.persistIssuedTokensInCTS();
     }
 }
 

@@ -24,6 +24,7 @@ import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.openam.rest.authz.STSTokenGenerationServiceAuthzModule;
 import org.forgerock.openam.rest.fluent.FluentRouter;
+import org.forgerock.openam.sts.tokengeneration.CTSTokenPersistence;
 import org.forgerock.openam.sts.tokengeneration.config.TokenGenerationServiceInjectorHolder;
 import org.forgerock.openam.sts.tokengeneration.oidc.OpenIdConnectTokenGeneration;
 import org.forgerock.openam.sts.tokengeneration.state.RestSTSInstanceState;
@@ -46,8 +47,9 @@ public class TokenGenerationServiceConnectionFactoryProvider {
                         TokenGenerationServiceInjectorHolder.getInstance(Key.get(OpenIdConnectTokenGeneration.class)),
                         TokenGenerationServiceInjectorHolder.getInstance(Key.get(new TypeLiteral<STSInstanceStateProvider<RestSTSInstanceState>>(){})),
                         TokenGenerationServiceInjectorHolder.getInstance(Key.get(new TypeLiteral<STSInstanceStateProvider<SoapSTSInstanceState>>(){})),
+                        TokenGenerationServiceInjectorHolder.getInstance(Key.get(CTSTokenPersistence.class)),
                         TokenGenerationServiceInjectorHolder.getInstance(Key.get(Logger.class)));
-        router.route("/issue/")
+        router.route("")
                 .through(STSTokenGenerationServiceAuthzModule.class, STSTokenGenerationServiceAuthzModule.NAME)
                 .forVersion(VERSION_STRING)
                 .to(tokenGenerationService);

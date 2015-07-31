@@ -32,7 +32,7 @@ import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProvider;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.provider.AMSessionInvalidator;
-import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
+import org.forgerock.openam.sts.token.provider.TokenServiceConsumer;
 import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
 import org.forgerock.openam.utils.StringUtils;
 import org.slf4j.Logger;
@@ -47,7 +47,7 @@ import java.util.UUID;
  */
 public class SoapSamlTokenProvider extends SoapTokenProviderBase {
     public static class SoapSamlTokenProviderBuilder {
-        private TokenGenerationServiceConsumer tokenGenerationServiceConsumer;
+        private TokenServiceConsumer tokenServiceConsumer;
         private AMSessionInvalidator amSessionInvalidator;
         private ThreadLocalAMTokenCache threadLocalAMTokenCache;
         private String stsInstanceId;
@@ -57,8 +57,8 @@ public class SoapSamlTokenProvider extends SoapTokenProviderBase {
         private SoapSTSAccessTokenProvider soapSTSAccessTokenProvider;
         private Logger logger;
 
-        public SoapSamlTokenProviderBuilder tokenGenerationServiceConsumer(TokenGenerationServiceConsumer tokenGenerationServiceConsumer) {
-            this.tokenGenerationServiceConsumer = tokenGenerationServiceConsumer;
+        public SoapSamlTokenProviderBuilder tokenGenerationServiceConsumer(TokenServiceConsumer tokenServiceConsumer) {
+            this.tokenServiceConsumer = tokenServiceConsumer;
             return this;
         }
 
@@ -107,7 +107,7 @@ public class SoapSamlTokenProvider extends SoapTokenProviderBase {
         }
     }
 
-    private final TokenGenerationServiceConsumer tokenGenerationServiceConsumer;
+    private final TokenServiceConsumer tokenServiceConsumer;
     private final AMSessionInvalidator amSessionInvalidator;
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
     private final String stsInstanceId;
@@ -119,7 +119,7 @@ public class SoapSamlTokenProvider extends SoapTokenProviderBase {
      */
     private SoapSamlTokenProvider(SoapSamlTokenProviderBuilder builder) {
         super(builder.soapSTSAccessTokenProvider, builder.xmlUtilities, builder.logger);
-        this.tokenGenerationServiceConsumer = builder.tokenGenerationServiceConsumer;
+        this.tokenServiceConsumer = builder.tokenServiceConsumer;
         this.amSessionInvalidator = builder.amSessionInvalidator;
         this.threadLocalAMTokenCache = builder.threadLocalAMTokenCache;
         this.stsInstanceId = builder.stsInstanceId;
@@ -292,15 +292,15 @@ public class SoapSamlTokenProvider extends SoapTokenProviderBase {
             consumptionToken = getTokenGenerationServiceConsumptionToken();
             switch (subjectConfirmation) {
                 case BEARER:
-                    return tokenGenerationServiceConsumer.getSAML2BearerAssertion(
+                    return tokenServiceConsumer.getSAML2BearerAssertion(
                             threadLocalAMTokenCache.getSessionIdForContext(ValidationInvocationContext.SOAP_SECURITY_POLICY),
                             stsInstanceId, realm, authnContextClassRef, consumptionToken);
                 case SENDER_VOUCHES:
-                    return tokenGenerationServiceConsumer.getSAML2SenderVouchesAssertion(
+                    return tokenServiceConsumer.getSAML2SenderVouchesAssertion(
                             threadLocalAMTokenCache.getSessionIdForContext(ValidationInvocationContext.SOAP_TOKEN_DELEGATION),
                             stsInstanceId, realm, authnContextClassRef, consumptionToken);
                 case HOLDER_OF_KEY:
-                    return tokenGenerationServiceConsumer.getSAML2HolderOfKeyAssertion(
+                    return tokenServiceConsumer.getSAML2HolderOfKeyAssertion(
                             threadLocalAMTokenCache.getSessionIdForContext(ValidationInvocationContext.SOAP_SECURITY_POLICY),
                             stsInstanceId, realm, authnContextClassRef, proofTokenState, consumptionToken);
             }

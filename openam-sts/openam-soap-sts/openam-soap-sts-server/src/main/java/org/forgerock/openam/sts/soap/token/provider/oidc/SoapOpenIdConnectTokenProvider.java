@@ -33,7 +33,7 @@ import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProvider;
 import org.forgerock.openam.sts.soap.token.provider.SoapTokenProviderBase;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.provider.AMSessionInvalidator;
-import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
+import org.forgerock.openam.sts.token.provider.TokenServiceConsumer;
 import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
 import org.slf4j.Logger;
 import org.w3c.dom.Document;
@@ -55,7 +55,7 @@ public class SoapOpenIdConnectTokenProvider extends SoapTokenProviderBase {
      */
     private static final String NULL_NONCE = null;
     public static class SoapOpenIdConnectTokenProviderBuilder {
-        private TokenGenerationServiceConsumer tokenGenerationServiceConsumer;
+        private TokenServiceConsumer tokenServiceConsumer;
         private AMSessionInvalidator amSessionInvalidator;
         private ThreadLocalAMTokenCache threadLocalAMTokenCache;
         private String stsInstanceId;
@@ -68,8 +68,8 @@ public class SoapOpenIdConnectTokenProvider extends SoapTokenProviderBase {
 
         private SoapOpenIdConnectTokenProviderBuilder() {}
 
-        public SoapOpenIdConnectTokenProviderBuilder tokenGenerationServiceConsumer(TokenGenerationServiceConsumer tokenGenerationServiceConsumer) {
-            this.tokenGenerationServiceConsumer = tokenGenerationServiceConsumer;
+        public SoapOpenIdConnectTokenProviderBuilder tokenGenerationServiceConsumer(TokenServiceConsumer tokenServiceConsumer) {
+            this.tokenServiceConsumer = tokenServiceConsumer;
             return this;
         }
 
@@ -143,7 +143,7 @@ public class SoapOpenIdConnectTokenProvider extends SoapTokenProviderBase {
         }
     }
 
-    private final TokenGenerationServiceConsumer tokenGenerationServiceConsumer;
+    private final TokenServiceConsumer tokenServiceConsumer;
     private final AMSessionInvalidator amSessionInvalidator;
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
     private final String stsInstanceId;
@@ -157,7 +157,7 @@ public class SoapOpenIdConnectTokenProvider extends SoapTokenProviderBase {
      */
     private SoapOpenIdConnectTokenProvider(SoapOpenIdConnectTokenProviderBuilder builder) {
         super(builder.soapSTSAccessTokenProvider, builder.xmlUtilities, builder.logger);
-        this.tokenGenerationServiceConsumer = builder.tokenGenerationServiceConsumer;
+        this.tokenServiceConsumer = builder.tokenServiceConsumer;
         this.amSessionInvalidator = builder.amSessionInvalidator;
         this.threadLocalAMTokenCache = builder.threadLocalAMTokenCache;
         this.stsInstanceId = builder.stsInstanceId;
@@ -215,7 +215,7 @@ public class SoapOpenIdConnectTokenProvider extends SoapTokenProviderBase {
     private String getAssertion(ValidationInvocationContext validationInvocationContext, String authNContextClassRef,
                                 Set<String> authenticationMethodReferences, long authTimeInSeconds,
                                 String nonce) throws TokenCreationException {
-        return tokenGenerationServiceConsumer.getOpenIdConnectToken(
+        return tokenServiceConsumer.getOpenIdConnectToken(
                 threadLocalAMTokenCache.getSessionIdForContext(validationInvocationContext),
                 stsInstanceId, realm, authNContextClassRef, authenticationMethodReferences,
                 authTimeInSeconds, nonce, getTokenGenerationServiceConsumptionToken());

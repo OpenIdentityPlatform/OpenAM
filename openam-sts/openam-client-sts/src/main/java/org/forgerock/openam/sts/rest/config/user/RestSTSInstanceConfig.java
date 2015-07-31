@@ -342,6 +342,7 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
         RestSTSInstanceConfigBuilderBase<?> builder = RestSTSInstanceConfig.builder()
                 .saml2Config(baseConfig.getSaml2Config())
                 .oidcIdTokenConfig(baseConfig.getOpenIdConnectTokenConfig())
+                .persistIssuedTokensInCTS(baseConfig.persistIssuedTokensInCTS())
                 .deploymentConfig(DeploymentConfig.fromJson(json.get(DEPLOYMENT_CONFIG)));
         
         JsonValue supportedTranslations = json.get(SUPPORTED_TOKEN_TRANSFORMS);
@@ -549,7 +550,6 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
         for (String provider : stringCustomProviders) {
             jsonCustomProvidersList.add(CustomTokenOperation.fromSMSString(provider).toJson());
         }
-
         return fromJson(new JsonValue(jsonAttributes));
     }
 

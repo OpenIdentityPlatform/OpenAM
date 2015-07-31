@@ -24,6 +24,7 @@ import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.forgerock.guava.common.collect.Sets;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
@@ -35,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
+import javax.inject.Named;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -63,17 +65,22 @@ public class TokenValidateOperationProviderTest {
         }
 
         @Provides
-        Set<TokenValidationConfig> getValidateConfig() {
-            Set<TokenValidationConfig> validationConfigs = new HashSet<TokenValidationConfig>();
-            validationConfigs.add(new TokenValidationConfig(TokenType.OPENAM, false));
-            validationConfigs.add(new TokenValidationConfig(TokenType.USERNAME, true));
-            return validationConfigs;
+        @Named(AMSTSConstants.ISSUED_TOKEN_TYPES)
+        Set<TokenType> getValidateConfig() {
+            return Sets.newHashSet(TokenType.OPENIDCONNECT, TokenType.SAML2);
         }
+
+        @Provides
+        @Named(AMSTSConstants.ISSUED_TOKENS_PERSISTED_IN_CTS)
+        boolean tokensPersistedInCTS() {
+            return true;
+        }
+
 
         @Provides
         @javax.inject.Named(AMSTSConstants.DELEGATED_TOKEN_VALIDATORS)
         Set<TokenValidationConfig> getDelegatedTokenValidators() {
-            Set<TokenValidationConfig> validationConfigs = new HashSet<TokenValidationConfig>();
+            Set<TokenValidationConfig> validationConfigs = new HashSet<>();
             validationConfigs.add(new TokenValidationConfig(TokenType.USERNAME, true));
             return validationConfigs;
         }
@@ -99,9 +106,7 @@ public class TokenValidateOperationProviderTest {
     @Test(expectedExceptions = RuntimeException.class)
     public void testExceptionInitialization() throws STSInitializationException {
         TokenOperationFactory mockOperationFactory = mock(TokenOperationFactory.class);
-        TokenValidator mockValidator = mock(TokenValidator.class);
-        when(mockOperationFactory.getTokenValidator(any(TokenType.class), any(ValidationInvocationContext.class),
-                any(boolean.class))).thenThrow(STSInitializationException.class);
+        when(mockOperationFactory.getSimpleTokenValidator(any(TokenType.class))).thenThrow(RuntimeException.class);
         TokenValidateOperationProvider validateOperationProvider =
                 Guice.createInjector(new MyModule(mockOperationFactory)).getInstance(TokenValidateOperationProvider.class);
         validateOperationProvider.get();

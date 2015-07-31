@@ -30,6 +30,7 @@ import org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistry;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
+import org.apache.cxf.ws.security.trust.TrustException;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
@@ -180,9 +181,9 @@ public class SoapSTSConsumer {
         addAMSessionTokenSupport();
     }
 
-    private SecurityToken checkIssueInternal(EndpointSpecification endpointSpecification,
-                                            TokenSpecification tokenSpecification,
-                                            boolean allowRenewing) throws SoapSTSConsumerException {
+    private SecurityToken issueTokenInternal(EndpointSpecification endpointSpecification,
+                                             TokenSpecification tokenSpecification,
+                                             boolean allowRenewing) throws SoapSTSConsumerException {
         try {
             STSClient client = getSTSClient(
                     stsInstanceWsdlUrl,
@@ -208,15 +209,83 @@ public class SoapSTSConsumer {
         }
     }
 
-    private void checkValidateInternal(EndpointSpecification endpointSpecification,
-                                      SecurityToken token) throws SoapSTSConsumerException {
+    private void validateTokenSuiteInternal(List<EndpointSpecification> endpoints,
+                                            List<TokenSpecification> tokenSpecs,
+                                            SecurityToken token) throws SoapSTSConsumerException {
+        for (EndpointSpecification endpoint : endpoints) {
+            for (TokenSpecification tokenSpec : tokenSpecs) {
+                SecurityToken localToken = token;
+                if (localToken == null) {
+                    localToken = issueTokenInternal(
+                            endpoint,
+                            tokenSpec,
+                            ALLOW_TOKEN_RENEWAL);
+                }
+                validateToken(
+                        endpoint,
+                        localToken);
+            }
+        }
+    }
+
+    /**
+     *
+     * @param endpoints the endpoints targeted by the issue operation
+     * @param tokenSpecifications the desired tokens, including any additional necessary state
+     * @return the list SecurityTokens resulting from the successful invocations
+     * @throws SoapSTSConsumerException if any individual issue invocation did not succeed.
+     */
+    public List<SecurityToken> issueTokenSuite(List<EndpointSpecification> endpoints, List<TokenSpecification> tokenSpecifications) throws SoapSTSConsumerException {
+        final List<SecurityToken> tokens = new ArrayList<>(endpoints.size() * tokenSpecifications.size());
+        for (EndpointSpecification endpoint : endpoints) {
+            for (TokenSpecification tokenSpecification : tokenSpecifications) {
+                tokens.add(issueTokenInternal(
+                        endpoint,
+                        tokenSpecification,
+                        ALLOW_TOKEN_RENEWAL));
+            }
+        }
+        return tokens;
+    }
+
+    private void validateTokenSuite(List<EndpointSpecification> endpoints, List<TokenSpecification> tokenSpecs) throws SoapSTSConsumerException {
+        validateTokenSuiteInternal(endpoints, tokenSpecs, NULL_SECURITY_TOKEN);
+    }
+
+    /**
+     * Invoke the issue operation to obtain a token specified by the tokenSpecification on the endpoint specified by
+     * the endpointSpecification
+     * @param endpointSpecification specifies the targeted endpoint
+     * @param tokenSpecification specifies the desired token, along with any necessary state
+     * @return a SecurityToken encapsulating the issued token
+     * @throws SoapSTSConsumerException if an exception occurred when issuing the token
+     */
+    public SecurityToken issueToken(EndpointSpecification endpointSpecification, TokenSpecification tokenSpecification)
+            throws SoapSTSConsumerException {
+        return issueTokenInternal(
+                endpointSpecification,
+                tokenSpecification,
+                ALLOW_TOKEN_RENEWAL);
+    }
+
+    /**
+     * Invokes the soap-sts Validate operation
+     * @param endpointSpecification port and service qname of soap-sts instance to be invoked
+     * @param toBeValidatedToken the to-be-validated SecurityToken instance returned from the Issue operation
+     * @throws SoapSTSConsumerException
+     */
+    public boolean validateToken(EndpointSpecification endpointSpecification,
+                                 SecurityToken toBeValidatedToken) throws SoapSTSConsumerException {
         STSClient client = getSTSClient(
                 stsInstanceWsdlUrl,
                 endpointSpecification.serviceQName,
                 endpointSpecification.portQName);
         client.setTokenType(STSConstants.STATUS);
         try {
-            client.validateSecurityToken(token);
+            client.validateSecurityToken(toBeValidatedToken);
+            return true;
+        } catch (TrustException e) {
+            return false;
         } catch (Exception e) {
             throw new SoapSTSConsumerException(e.getMessage(), e);
         }
@@ -230,10 +299,10 @@ public class SoapSTSConsumer {
          */
     }
 
-    private SecurityToken checkRenewInternal(EndpointSpecification endpointSpecification,
-                                            SecurityToken token,
-                                            String tokenType,
-                                            String keyType) throws SoapSTSConsumerException {
+    public boolean cancelToken(EndpointSpecification endpointSpecification,
+                            SecurityToken token,
+                            String tokenType,
+                            String keyType) throws SoapSTSConsumerException {
         STSClient client = getSTSClient(
                 stsInstanceWsdlUrl,
                 endpointSpecification.serviceQName,
@@ -242,94 +311,10 @@ public class SoapSTSConsumer {
         client.setTokenType(tokenType);
         client.setKeyType(keyType);
         try {
-            return client.renewSecurityToken(token);
+            return client.cancelSecurityToken(token);
         } catch (Exception e) {
             throw new SoapSTSConsumerException(e.getMessage(), e);
         }
-    }
-
-    private void checkValidateSuiteInternal(List<EndpointSpecification> endpoints,
-                                           List<TokenSpecification> tokenSpecs,
-                                           SecurityToken token) throws SoapSTSConsumerException {
-        for (EndpointSpecification endpoint : endpoints) {
-            for (TokenSpecification tokenSpec : tokenSpecs) {
-                SecurityToken localToken = token;
-                if (localToken == null) {
-                    localToken = checkIssueInternal(
-                            endpoint,
-                            tokenSpec,
-                            ALLOW_TOKEN_RENEWAL);
-                }
-                checkValidateInternal(
-                        endpoint,
-                        localToken);
-            }
-        }
-    }
-
-    private void checkRenewSuiteInternal(List<EndpointSpecification> endpoints,
-                                        List<TokenSpecification> tokenSpecs,
-                                        SecurityToken token) throws SoapSTSConsumerException {
-        for (EndpointSpecification endpoint : endpoints) {
-            for (TokenSpecification tokenSpec : tokenSpecs) {
-                SecurityToken localToken = token;
-                if (localToken == null) {
-                    localToken = checkIssueInternal(
-                            endpoint,
-                            tokenSpec,
-                            ALLOW_TOKEN_RENEWAL);
-                }
-                checkRenewInternal(
-                        endpoint,
-                        localToken,
-                        tokenSpec.tokenType,
-                        tokenSpec.keyType);
-            }
-        }
-    }
-
-    /**
-     *
-     * @param endpoints the endpoints targeted by the issue operation
-     * @param tokenSpecifications the desired tokens, including any additional necessary state
-     * @return the list SecurityTokens resulting from the successful invocations
-     * @throws SoapSTSConsumerException if any individual issue invocation did not succeed.
-     */
-    public List<SecurityToken> checkIssueSuite(List<EndpointSpecification> endpoints, List<TokenSpecification> tokenSpecifications) throws SoapSTSConsumerException {
-        final List<SecurityToken> tokens = new ArrayList<>(endpoints.size() * tokenSpecifications.size());
-        for (EndpointSpecification endpoint : endpoints) {
-            for (TokenSpecification tokenSpecification : tokenSpecifications) {
-                tokens.add(checkIssueInternal(
-                        endpoint,
-                        tokenSpecification,
-                        ALLOW_TOKEN_RENEWAL));
-            }
-        }
-        return tokens;
-    }
-
-    private void checkRenewSuite(List<EndpointSpecification> endpoints, List<TokenSpecification> tokenSpecs) throws SoapSTSConsumerException {
-        checkRenewSuiteInternal(endpoints, tokenSpecs, NULL_SECURITY_TOKEN);
-    }
-
-    private void checkValidateSuite(List<EndpointSpecification> endpoints, List<TokenSpecification> tokenSpecs) throws SoapSTSConsumerException {
-        checkValidateSuiteInternal(endpoints, tokenSpecs, NULL_SECURITY_TOKEN);
-    }
-
-    /**
-     * Invoke the issue operation to obtain a token specified by the tokenSpecification on the endpoint specified by
-     * the endpointSpecification
-     * @param endpointSpecification specifies the targeted endpoint
-     * @param tokenSpecification specifies the desired token, along with any necessary state
-     * @return a SecurityToken encapsulating the issued token
-     * @throws SoapSTSConsumerException if an exception occurred when issuing the token
-     */
-    public SecurityToken checkIssue(EndpointSpecification endpointSpecification, TokenSpecification tokenSpecification)
-            throws SoapSTSConsumerException {
-        return checkIssueInternal(
-                endpointSpecification,
-                tokenSpecification,
-                ALLOW_TOKEN_RENEWAL);
     }
 
     private STSClient getSTSClient(String wsdlAddress, QName serviceQName, QName portQName) throws SoapSTSConsumerException {

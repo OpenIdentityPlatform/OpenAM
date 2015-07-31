@@ -44,16 +44,20 @@ import org.forgerock.openam.sts.soap.token.provider.oidc.SoapOpenIdConnectTokenA
 import org.forgerock.openam.sts.soap.token.provider.saml2.Saml2XmlTokenAuthnContextMapper;
 import org.forgerock.openam.sts.soap.token.provider.saml2.Saml2XmlTokenAuthnContextMapperImpl;
 import org.forgerock.openam.sts.soap.token.provider.saml2.SoapSamlTokenProvider;
+import org.forgerock.openam.sts.soap.token.validator.SimpleOpenIdConnectTokenValidator;
+import org.forgerock.openam.sts.soap.token.validator.SimpleSAML2TokenValidator;
 import org.forgerock.openam.sts.token.AMTokenParser;
 import org.forgerock.openam.sts.token.AMTokenParserImpl;
+import org.forgerock.openam.sts.token.CTSTokenIdGenerator;
+import org.forgerock.openam.sts.token.CTSTokenIdGeneratorImpl;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCacheImpl;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
 import org.forgerock.openam.sts.token.provider.AMSessionInvalidator;
 import org.forgerock.openam.sts.token.provider.AMSessionInvalidatorImpl;
-import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
-import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumerImpl;
+import org.forgerock.openam.sts.token.provider.TokenServiceConsumer;
+import org.forgerock.openam.sts.token.provider.TokenServiceConsumerImpl;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSessionImpl;
 import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
@@ -98,7 +102,7 @@ public class TokenOperationFactoryImplTest {
             bind(TokenOperationFactory.class).to(TokenOperationFactoryImpl.class);
             bind(PrincipalFromSession.class).to(PrincipalFromSessionImpl.class);
             bind(UrlConstituentCatenator.class).to(UrlConstituentCatenatorImpl.class);
-            bind(TokenGenerationServiceConsumer.class).to(TokenGenerationServiceConsumerImpl.class);
+            bind(TokenServiceConsumer.class).to(TokenServiceConsumerImpl.class);
             bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
             bind(Saml2XmlTokenAuthnContextMapper.class).to(Saml2XmlTokenAuthnContextMapperImpl.class);
             bind(SoapSTSAccessTokenProvider.class).toInstance(mock(SoapSTSAccessTokenProvider.class));
@@ -106,6 +110,7 @@ public class TokenOperationFactoryImplTest {
             bind(HttpURLConnectionWrapperFactory.class);
             bind(SoapOpenIdConnectTokenAuthnContextMapper.class).to(DefaultSoapOpenIdConnectTokenAuthnContextMapper.class);
             bind(SoapOpenIdConnectTokenAuthnMethodsReferencesMapper.class).to(DefaultSoapOpenIdConnectTokenAuthnMethodsReferencesMapper.class);
+            bind(CTSTokenIdGenerator.class).to(CTSTokenIdGeneratorImpl.class);
         }
 
         @Provides
@@ -260,6 +265,16 @@ public class TokenOperationFactoryImplTest {
     @Test
     public void testProvider() throws STSInitializationException {
         assertTrue(operationFactory.getTokenProvider(TokenType.SAML2) instanceof SoapSamlTokenProvider);
+    }
+
+    @Test
+    public void testSAML2SimpleValidator() throws STSInitializationException {
+        assertTrue(operationFactory.getSimpleTokenValidator(TokenType.SAML2) instanceof SimpleSAML2TokenValidator);
+    }
+
+    @Test
+    public void testOIDCSimpleValidator() throws STSInitializationException {
+        assertTrue(operationFactory.getSimpleTokenValidator(TokenType.OPENIDCONNECT) instanceof SimpleOpenIdConnectTokenValidator);
     }
 
     @Test(expectedExceptions = STSInitializationException.class)

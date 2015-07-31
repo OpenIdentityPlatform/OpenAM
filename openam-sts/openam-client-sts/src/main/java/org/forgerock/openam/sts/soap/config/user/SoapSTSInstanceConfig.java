@@ -370,6 +370,7 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         SoapSTSInstanceConfigBuilderBase<?> builder = SoapSTSInstanceConfig.builder()
                 .saml2Config(baseConfig.getSaml2Config())
                 .oidcIdTokenConfig(baseConfig.getOpenIdConnectTokenConfig())
+                .persistIssuedTokensInCTS(baseConfig.persistIssuedTokensInCTS())
                 .deploymentConfig(SoapDeploymentConfig.fromJson(json.get(DEPLOYMENT_CONFIG)));
 
         JsonValue validatedTokenConfiguration = json.get(SECURITY_POLICY_VALIDATED_TOKEN_CONFIG);
@@ -598,7 +599,7 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         for (String key : jsonValue.keys()) {
             final JsonValue value = jsonValue.get(key);
             if (value.isNull()) {
-                smsMap.put(key, Collections.EMPTY_SET);
+                smsMap.put(key, Collections.<String>emptySet());
             } else if(!value.isCollection()) {
                 throw new IllegalStateException("In SoapSTSInstanceConfig#marshalFromJsonAttributeMap, value " +
                         "corresponding to key " + key + " is not a collection. The value: " + value);

@@ -13,7 +13,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS.
   -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -44,6 +44,10 @@
         </pluginManagement>
     </build>
 
+    <properties>
+        <cxf.version>2.7.8</cxf.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
@@ -60,37 +64,37 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>2.7.8</version>
+            <version>${cxf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>2.7.8</version>
+            <version>${cxf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-bindings-soap</artifactId>
-            <version>2.7.8</version>
+            <version>${cxf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>2.7.8</version>
+            <version>${cxf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-policy</artifactId>
-            <version>2.7.8</version>
+            <version>${cxf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-security</artifactId>
-            <version>2.7.8</version>
+            <version>${cxf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf.services.sts</groupId>
             <artifactId>cxf-services-sts-core</artifactId>
-            <version>2.7.8</version>
+            <version>${cxf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.santuario</groupId>
@@ -107,16 +111,6 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
-          <!--  <scope>test</scope>  can't have test scope here, as it appears that slf4j is present in our war anyway.
-          If this is not included, I see messages about the slf4j no-op logger being engaged, at least on tomcat. On Jboss,
-          I get an IllegalStateException that prevents a web-service from being successfully published. On WebSphere 8.5,
-          I get a message about multiple bindings, as WebSphere seems to have its own binding: WebSphere error:
-            SLF4J: Class path contains multiple SLF4J bindings.
-            SLF4J: Found binding in [bundleresource://242.fwk1296609135:1/org/slf4j/impl/StaticLoggerBinder.class]
-            SLF4J: Found binding in [wsjar:file:/home/dhogan/IBM/WebSphere/AppServer/profiles/AppSrv02/installedApps/websphere-85-hostNode01Cell/openam_war.ear/openam.war/WEB-INF/lib/slf4j-jdk14-1.7.2.jar!/org/slf4j/impl/StaticLoggerBinder.class]
-
-          It does not seem like I should have a jdk14 dependency anyway - this requires more investigation.
-          -->
         </dependency>
         <dependency>
             <groupId>org.restlet.jse</groupId>

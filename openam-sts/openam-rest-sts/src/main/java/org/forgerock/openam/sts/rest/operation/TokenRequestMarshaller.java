@@ -21,8 +21,10 @@ import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenTypeId;
 import org.forgerock.openam.sts.rest.service.RestSTSServiceHttpServletContext;
+import org.forgerock.openam.sts.rest.token.canceller.RestIssuedTokenCancellerParameters;
 import org.forgerock.openam.sts.rest.token.provider.RestTokenProviderParameters;
-import org.forgerock.openam.sts.rest.token.validator.RestTokenValidatorParameters;
+import org.forgerock.openam.sts.rest.token.validator.RestIssuedTokenValidatorParameters;
+import org.forgerock.openam.sts.rest.token.validator.RestTokenTransformValidatorParameters;
 
 /**
  * Defines an interface encapsulating the concerns of taking the json posted at the rest-sts, and marshalling it into
@@ -30,19 +32,34 @@ import org.forgerock.openam.sts.rest.token.validator.RestTokenValidatorParameter
  */
 public interface TokenRequestMarshaller {
     /**
-     * Marshals state from a token translate invocation into the RestTokenValidatorParameters necessary to validate this token.
+     * Marshals state from a token translate invocation into the RestTokenTransformValidatorParameters necessary to validate this token.
      * @param token the json representation of a token
      * @param httpContext The HttpContext, which is necessary to obtain the client's x509 cert
      *                    presented via two-way-tls for token transformations with x509 certs as input token types.
      * @param restSTSServiceHttpServletContext Provides direct access to the HttpServletRequest so that
      *                                                            client certificate state, presented via two-way-tls, can
      *                                                            be obtained
-     * @return a RestTokenValidatorParameters instance for a particular token type
-     * @throws org.forgerock.openam.sts.TokenMarshalException if the json string cannot be marshalled into a recognized token.
+     * @return a RestTokenTransformValidatorParameters instance for a particular token type
+     * @throws org.forgerock.openam.sts.TokenMarshalException if the json string cannot be marshaled into a recognized token.
      */
-    RestTokenValidatorParameters<?> buildTokenValidatorParameters(JsonValue token, HttpContext httpContext, RestSTSServiceHttpServletContext
+    RestTokenTransformValidatorParameters<?> buildTokenTransformValidatorParameters(JsonValue token, HttpContext httpContext, RestSTSServiceHttpServletContext
             restSTSServiceHttpServletContext) throws TokenMarshalException;
 
+    /**
+     * Marshals state from a token validate invocation into the RestIssuedTokenValidatorParameters necessary to validate this token
+     * @param token the token specified in the validate request
+     * @return the RestIssuedTokenValidatorParameters instance which will be passed to the RestIssuedTokenValidator for token validation
+     * @throws TokenMarshalException if the json does not contain state sufficient to create a RestIssuedtokenValidatorParameters instance
+     */
+    RestIssuedTokenValidatorParameters<?> buildIssuedTokenValidatorParameters(JsonValue token) throws TokenMarshalException;
+
+    /**
+     * Marshals state from a token cancel invocation into the RestIssuedTokenCancellerParameters necessary to cancel this token
+     * @param token the token specified in the cancel request
+     * @return the RestIssuedTokenCancellerParameters instance which will be passed to the RestIssuedTokenCanceller for token canceller
+     * @throws TokenMarshalException if the json does not contain state sufficient to create a RestIssuedtokenCancellerParameters instance
+     */
+    RestIssuedTokenCancellerParameters<?> buildIssuedTokenCancellerParameters(JsonValue token) throws TokenMarshalException;
 
     /**
      * Marshals state from a token translate invocation into the RestTokenProviderParameters necessary to create a token
@@ -52,12 +69,12 @@ public interface TokenRequestMarshaller {
      * @param desiredTokenType the type of the output token
      * @param desiredTokenState the json state corresponding this output token type
      * @return the RestTokenProviderParameters necessary to create a token of the specified type.
-     * @throws TokenMarshalException
+     * @throws TokenMarshalException if the json does not contain state sufficient to create a RestTokenProviderParameters instance
      */
     RestTokenProviderParameters<?> buildTokenProviderParameters(TokenTypeId inputTokenType, JsonValue inputToken,
                                                                 TokenTypeId desiredTokenType, JsonValue desiredTokenState) throws TokenMarshalException;
     /**
-     * Returns the TokenType corresponding to the JsonValue. The JsonValue will be pulled from the RestSTSServiceInvocationState.
+     * Returns the TokenType corresponding to the JsonValue. The JsonValue will be pulled from the RestSTSTokenTranslationInvocationState.
      * @param token The token definition
      * @return The TokenType represented by the json string.
      * @throws org.forgerock.openam.sts.TokenMarshalException if the TOKEN_TYPE_KEY is missing or unrecognized.

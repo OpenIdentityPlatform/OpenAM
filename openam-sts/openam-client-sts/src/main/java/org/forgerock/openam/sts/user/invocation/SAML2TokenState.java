@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.user.invocation;
@@ -21,104 +21,46 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenType;
-import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
+import org.forgerock.util.Reject;
 
 import static org.forgerock.json.fluent.JsonValue.field;
 import static org.forgerock.json.fluent.JsonValue.json;
 import static org.forgerock.json.fluent.JsonValue.object;
 
 /**
- * This class encapsulates state passed to the REST STS about the nature of the to-be-issued SAML2 token. The
- * REST-STS, in turn, passes some of this information to the TokenGenerationService.
+ * Class encapsulating an SAML2 token string, and will emit json which includes state necessary to act as the to-be-validated
+ * token state in the RestSTSTokenValidationInvocation state - i.e. the SAML2 assertion string, and a
+ * AMSTSConstants.TOKEN_TYPE_KEY field corresponding to TokenType.SAML2.name().
  */
 public class SAML2TokenState {
     public static class SAML2TokenStateBuilder {
-        private SAML2SubjectConfirmation subjectConfirmation;
-        private ProofTokenState proofTokenState;
+        private String saml2TokenValue;
 
         private SAML2TokenStateBuilder() {}
 
-        public SAML2TokenStateBuilder saml2SubjectConfirmation(SAML2SubjectConfirmation subjectConfirmation) {
-            this.subjectConfirmation = subjectConfirmation;
+        public SAML2TokenStateBuilder tokenValue(String tokenValue) {
+            this.saml2TokenValue = tokenValue;
             return this;
         }
 
-        public SAML2TokenStateBuilder proofTokenState(ProofTokenState proofTokenState) {
-            this.proofTokenState = proofTokenState;
-            return this;
-        }
-
-        public SAML2TokenState build() throws TokenMarshalException {
+        public SAML2TokenState build() {
             return new SAML2TokenState(this);
         }
     }
+    private final String saml2TokenValue;
 
-    /*
-    These variables are public so that hand-rolled JsonValues corresponding to SAML2TokenState can be created.
-     */
-    public static final String SUBJECT_CONFIRMATION = "subject_confirmation";
-    public static final String PROOF_TOKEN_STATE = "proof_token_state";
+    private SAML2TokenState(SAML2TokenStateBuilder builder) {
+        Reject.ifNull(builder.saml2TokenValue, "Non-null SAML2 token value must be provided.");
+        Reject.ifTrue(builder.saml2TokenValue.isEmpty(), "Non-empty SAML2 token value must be provided");
+        this.saml2TokenValue = builder.saml2TokenValue;
+    }
 
-    private final SAML2SubjectConfirmation subjectConfirmation;
-    private final ProofTokenState proofTokenState;
-
-    private SAML2TokenState(SAML2TokenStateBuilder builder) throws TokenMarshalException {
-        this.subjectConfirmation = builder.subjectConfirmation;
-        this.proofTokenState = builder.proofTokenState;
-        if (subjectConfirmation == null) {
-            throw new TokenMarshalException(ResourceException.BAD_REQUEST, "SubjectConfirmation type must be set.");
-        }
-        if (SAML2SubjectConfirmation.HOLDER_OF_KEY.equals(subjectConfirmation) && (proofTokenState == null)) {
-            throw new TokenMarshalException(ResourceException.BAD_REQUEST, "If " +
-                    SAML2SubjectConfirmation.HOLDER_OF_KEY + " is specified, proofTokenState must also be set.");
-        }
+    public String getSAML2TokenValue() {
+        return saml2TokenValue;
     }
 
     public static SAML2TokenStateBuilder builder() {
         return new SAML2TokenStateBuilder();
-    }
-
-    public SAML2SubjectConfirmation getSubjectConfirmation() {
-        return subjectConfirmation;
-    }
-
-    public ProofTokenState getProofTokenState() {
-        return proofTokenState;
-    }
-
-    public static SAML2TokenState fromJson(JsonValue jsonValue) throws TokenMarshalException {
-        String subjectConfirmationString = jsonValue.get(SUBJECT_CONFIRMATION).asString();
-        if (subjectConfirmationString == null) {
-            throw new TokenMarshalException(ResourceException.BAD_REQUEST,
-                    "Value corresponding to " + SUBJECT_CONFIRMATION + " key is null");
-        }
-        SAML2SubjectConfirmation saml2SubjectConfirmation;
-        try {
-            saml2SubjectConfirmation = SAML2SubjectConfirmation.valueOf(subjectConfirmationString);
-        } catch (IllegalArgumentException e) {
-            throw new TokenMarshalException(ResourceException.BAD_REQUEST, "Invalid subject confirmation type specified.");
-        }
-        SAML2TokenStateBuilder builder = SAML2TokenState.builder()
-                .saml2SubjectConfirmation(saml2SubjectConfirmation);
-        JsonValue jsonProofToken = jsonValue.get(PROOF_TOKEN_STATE);
-        if (!jsonProofToken.isNull()) {
-            builder.proofTokenState(ProofTokenState.fromJson(jsonProofToken));
-        }
-        return builder.build();
-    }
-
-    public JsonValue toJson() {
-        if (proofTokenState != null) {
-            return json(object(
-                    field(AMSTSConstants.TOKEN_TYPE_KEY, TokenType.SAML2.name()),
-                    field(SUBJECT_CONFIRMATION, subjectConfirmation.name()),
-                    field(PROOF_TOKEN_STATE, proofTokenState.toJson())));
-
-        } else {
-            return json(object(
-                    field(AMSTSConstants.TOKEN_TYPE_KEY, TokenType.SAML2.name()),
-                    field(SUBJECT_CONFIRMATION, subjectConfirmation.name())));
-        }
     }
 
     @Override
@@ -127,18 +69,36 @@ public class SAML2TokenState {
     }
 
     @Override
-    public int hashCode() {
-        return toString().hashCode();
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other instanceof SAML2TokenState) {
+            SAML2TokenState otherTokenState = (SAML2TokenState)other;
+            return saml2TokenValue.equals(otherTokenState.getSAML2TokenValue());
+        }
+        return false;
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (other instanceof SAML2TokenState) {
-            SAML2TokenState otherTokenState = (SAML2TokenState)other;
-            return subjectConfirmation.equals(otherTokenState.getSubjectConfirmation()) &&
-                    proofTokenState != null ? proofTokenState.equals(otherTokenState.getProofTokenState()) :
-                    (otherTokenState.getProofTokenState() == null);
+    public int hashCode() {
+        return saml2TokenValue.hashCode();
+    }
+
+    public JsonValue toJson() {
+        return json(object(
+                field(AMSTSConstants.TOKEN_TYPE_KEY, TokenType.SAML2.name()),
+                field(AMSTSConstants.SAML2_TOKEN_KEY, saml2TokenValue)));
+    }
+
+    public static SAML2TokenState fromJson(JsonValue jsonValue) throws TokenMarshalException {
+        try {
+            return SAML2TokenState.builder()
+                    .tokenValue(jsonValue.get(AMSTSConstants.SAML2_TOKEN_KEY).asString())
+                    .build();
+        } catch (NullPointerException e) {
+            throw new TokenMarshalException(ResourceException.BAD_REQUEST, AMSTSConstants.SAML2_TOKEN_KEY +
+                    " not set in json: " + jsonValue.toString(), e);
         }
-        return false;
     }
 }

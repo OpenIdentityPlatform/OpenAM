@@ -11,52 +11,34 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014-2015 ForgeRock AS.
+ * Copyright 2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.user.invocation;
 
 import org.forgerock.openam.sts.TokenMarshalException;
-import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
-import org.forgerock.openam.sts.user.invocation.ProofTokenState;
-import org.forgerock.openam.sts.user.invocation.SAML2TokenState;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotEquals;
 
 public class SAML2TokenStateTest {
-    @Test
-    public void testJsonRoundTripNoProofTokenState() throws Exception {
-        SAML2TokenState tokenState = SAML2TokenState.builder()
-                .saml2SubjectConfirmation(SAML2SubjectConfirmation.BEARER)
-                .build();
-        assertEquals(tokenState, SAML2TokenState.fromJson(tokenState.toJson()));
-    }
+    private static final String ASSERTION = "<saml:Assertion xmlns:saml=\"urn:oasis:names:tc:SAML:2.0:assertion\" " +
+            "ID=\"s2ad0847ea78329efb63a0f36b74efb80c2c3d4700\" IssueInstant=\"2015-07-14T21:37:06Z\" Version=\"2.0\"> ...</saml:Assertion>";
 
     @Test
-    public void testJsonRoundTripWithProofTokenState() throws Exception {
-        ProofTokenState proofTokenState = ProofTokenState.builder().x509Certificate(getCertificate()).build();
-        SAML2TokenState tokenState = SAML2TokenState.builder()
-                .saml2SubjectConfirmation(SAML2SubjectConfirmation.BEARER)
-                .proofTokenState(proofTokenState)
-                .build();
+    public void testEquals() {
+        SAML2TokenState tokenState = SAML2TokenState.builder().tokenValue(ASSERTION).build();
+        SAML2TokenState tokenState2 = SAML2TokenState.builder().tokenValue(ASSERTION).build();
+        assertEquals(tokenState, tokenState2);
+
+        SAML2TokenState tokenState3 = SAML2TokenState.builder().tokenValue(ASSERTION + "foo").build();
+        assertNotEquals(tokenState, tokenState3);
+    }
+
+    @Test
+    public void testJsonRoundTrip() throws TokenMarshalException {
+        SAML2TokenState tokenState = SAML2TokenState.builder().tokenValue(ASSERTION).build();
         assertEquals(tokenState, SAML2TokenState.fromJson(tokenState.toJson()));
     }
-
-    @Test (expectedExceptions = TokenMarshalException.class)
-    public void testHoKWithoutProofTokenState() throws Exception {
-        SAML2TokenState.builder()
-                .saml2SubjectConfirmation(SAML2SubjectConfirmation.HOLDER_OF_KEY)
-                .build();
-    }
-
-    private X509Certificate getCertificate() throws IOException, CertificateException {
-        return (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(getClass().getResourceAsStream("/cert.jks"));
-    }
-
 }

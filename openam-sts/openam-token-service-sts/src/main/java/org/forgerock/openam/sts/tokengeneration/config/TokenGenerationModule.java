@@ -22,7 +22,9 @@ import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import com.sun.identity.sm.ServiceListener;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
+import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.InstanceConfigMarshaller;
 import org.forgerock.openam.sts.SoapSTSInstanceConfigMarshaller;
@@ -36,6 +38,10 @@ import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
 import org.forgerock.openam.sts.RestSTSInstanceConfigMarshaller;
 import org.forgerock.openam.sts.publish.rest.RestSTSInstanceConfigStore;
 import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
+import org.forgerock.openam.sts.token.CTSTokenIdGenerator;
+import org.forgerock.openam.sts.token.CTSTokenIdGeneratorImpl;
+import org.forgerock.openam.sts.tokengeneration.CTSTokenPersistence;
+import org.forgerock.openam.sts.tokengeneration.CTSTokenPersistenceImpl;
 import org.forgerock.openam.sts.tokengeneration.oidc.OpenIdConnectTokenClaimMapperProvider;
 import org.forgerock.openam.sts.tokengeneration.oidc.OpenIdConnectTokenClaimMapperProviderImpl;
 import org.forgerock.openam.sts.tokengeneration.oidc.OpenIdConnectTokenGeneration;
@@ -136,6 +142,21 @@ public class TokenGenerationModule extends AbstractModule {
         the default implementation.
          */
         bind(OpenIdConnectTokenClaimMapperProvider.class).to(OpenIdConnectTokenClaimMapperProviderImpl.class);
+
+        /*
+        Bind the interface/impl which allows for the generation of CTS token identfiers for CTS-persisted tokens
+         */
+        bind(CTSTokenIdGenerator.class).to(CTSTokenIdGeneratorImpl.class).in(Scopes.SINGLETON);
+
+        /*
+        Bind the CTSPersistentStore so that STS instances configured to persist issued tokens to the CTS can do so.
+         */
+        bind(CTSPersistentStore.class).toInstance(InjectorHolder.getInstance(CTSPersistentStore.class));
+
+        /*
+        Bind the interface/impl which encapsulates CTS persistence.
+         */
+        bind(CTSTokenPersistence.class).to(CTSTokenPersistenceImpl.class).in(Scopes.SINGLETON);
     }
 
     @Provides

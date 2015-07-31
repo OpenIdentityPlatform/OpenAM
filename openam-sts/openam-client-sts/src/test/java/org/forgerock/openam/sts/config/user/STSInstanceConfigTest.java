@@ -39,59 +39,70 @@ public class STSInstanceConfigTest {
     private static final JwsAlgorithm JWS_ALGORITHM = JwsAlgorithm.RS256;
     private static final boolean WITH_SAML2_CONFIG = true;
     private static final boolean WITH_OIDC_CONFIG = true;
+    private static final boolean PERSIST_TOKENS_IN_CTS = true;
 
     @Test
     public void testSettings() throws UnsupportedEncodingException {
-        STSInstanceConfig instance = buildConfig(WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG);
-        assertTrue(ISSUER.equals(instance.getSaml2Config().getIdpId()));
+        STSInstanceConfig instance = buildConfig(WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG, !PERSIST_TOKENS_IN_CTS);
+        assertEquals(ISSUER, instance.getSaml2Config().getIdpId());
+        assertEquals(!PERSIST_TOKENS_IN_CTS, instance.persistIssuedTokensInCTS());
     }
 
     @Test
     public void testEquals() throws UnsupportedEncodingException {
-        STSInstanceConfig instance1 = buildConfig(WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
-        STSInstanceConfig instance2 = buildConfig(WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
+        STSInstanceConfig instance1 = buildConfig(WITH_SAML2_CONFIG, WITH_OIDC_CONFIG, PERSIST_TOKENS_IN_CTS);
+        STSInstanceConfig instance2 = buildConfig(WITH_SAML2_CONFIG, WITH_OIDC_CONFIG, PERSIST_TOKENS_IN_CTS);
         assertEquals(instance1, instance2);
 
-        instance1 = buildConfig(!WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
-        instance2 = buildConfig(!WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
+        instance1 = buildConfig(!WITH_SAML2_CONFIG, WITH_OIDC_CONFIG, PERSIST_TOKENS_IN_CTS);
+        instance2 = buildConfig(!WITH_SAML2_CONFIG, WITH_OIDC_CONFIG, PERSIST_TOKENS_IN_CTS);
         assertEquals(instance1, instance2);
 
-        instance1 = buildConfig(WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG);
-        instance2 = buildConfig(WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG);
+        instance1 = buildConfig(WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG, PERSIST_TOKENS_IN_CTS);
+        instance2 = buildConfig(WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG, PERSIST_TOKENS_IN_CTS);
+        assertEquals(instance1, instance2);
+
+        instance1 = buildConfig(WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG, !PERSIST_TOKENS_IN_CTS);
+        instance2 = buildConfig(WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG, !PERSIST_TOKENS_IN_CTS);
         assertEquals(instance1, instance2);
     }
 
     @Test
     public void testNotEquals() throws UnsupportedEncodingException {
-        STSInstanceConfig instance1 = buildConfig(WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG);
-        STSInstanceConfig instance2 = buildConfig(WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
+        STSInstanceConfig instance1 = buildConfig(WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG, PERSIST_TOKENS_IN_CTS);
+        STSInstanceConfig instance2 = buildConfig(WITH_SAML2_CONFIG, WITH_OIDC_CONFIG, PERSIST_TOKENS_IN_CTS);
         assertNotEquals(instance1, instance2);
 
-        instance1 = buildConfig(!WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG);
-        instance2 = buildConfig(!WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
+        instance1 = buildConfig(!WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG, PERSIST_TOKENS_IN_CTS);
+        instance2 = buildConfig(!WITH_SAML2_CONFIG, WITH_OIDC_CONFIG, PERSIST_TOKENS_IN_CTS);
         assertNotEquals(instance1, instance2);
 
-        instance1 = buildConfig(!WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
-        instance2 = buildConfig(WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
+        instance1 = buildConfig(!WITH_SAML2_CONFIG, WITH_OIDC_CONFIG, PERSIST_TOKENS_IN_CTS);
+        instance2 = buildConfig(WITH_SAML2_CONFIG, WITH_OIDC_CONFIG, PERSIST_TOKENS_IN_CTS);
+        assertNotEquals(instance1, instance2);
+
+        instance1 = buildConfig(!WITH_SAML2_CONFIG, WITH_OIDC_CONFIG, PERSIST_TOKENS_IN_CTS);
+        instance2 = buildConfig(!WITH_SAML2_CONFIG, WITH_OIDC_CONFIG, !PERSIST_TOKENS_IN_CTS);
         assertNotEquals(instance1, instance2);
     }
 
     @Test
     public void testJsonRoundTrip() throws UnsupportedEncodingException {
-        STSInstanceConfig instance1 = buildConfig(WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
+        STSInstanceConfig instance1 = buildConfig(WITH_SAML2_CONFIG, WITH_OIDC_CONFIG, PERSIST_TOKENS_IN_CTS);
         assertEquals(instance1, STSInstanceConfig.fromJson(instance1.toJson()));
 
-        instance1 = buildConfig(!WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
+        instance1 = buildConfig(!WITH_SAML2_CONFIG, WITH_OIDC_CONFIG, PERSIST_TOKENS_IN_CTS);
         assertEquals(instance1, STSInstanceConfig.fromJson(instance1.toJson()));
 
-        instance1 = buildConfig(WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG);
+        instance1 = buildConfig(WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG, !PERSIST_TOKENS_IN_CTS);
         assertEquals(instance1, STSInstanceConfig.fromJson(instance1.toJson()));
     }
 
     @Test
     public void testFieldPersistence() throws UnsupportedEncodingException {
         STSInstanceConfig instanceConfig =
-                STSInstanceConfig.fromJson(buildConfig(WITH_SAML2_CONFIG, WITH_OIDC_CONFIG).toJson());
+                STSInstanceConfig.fromJson(buildConfig(WITH_SAML2_CONFIG, WITH_OIDC_CONFIG, PERSIST_TOKENS_IN_CTS).toJson());
+        assertEquals(instanceConfig.persistIssuedTokensInCTS(), PERSIST_TOKENS_IN_CTS);
         SAML2Config saml2Config = instanceConfig.getSaml2Config();
         assertEquals(KEYSTORE_LOCATION, saml2Config.getKeystoreFileName());
         assertEquals(KEYSTORE_PASSWORD, saml2Config.getKeystorePassword());
@@ -108,16 +119,35 @@ public class STSInstanceConfigTest {
         assertTrue(openIdConnectTokenConfig.getAudience().contains(RELYING_PARTY));
     }
 
+    @Test
+    public void testCTSPersistenceFieldPersistence() throws UnsupportedEncodingException {
+        STSInstanceConfig instanceConfig =
+                STSInstanceConfig.fromJson(buildConfig(WITH_SAML2_CONFIG, WITH_OIDC_CONFIG, !PERSIST_TOKENS_IN_CTS).toJson());
+        assertEquals(instanceConfig.persistIssuedTokensInCTS(), !PERSIST_TOKENS_IN_CTS);
+
+        instanceConfig = buildConfig(WITH_SAML2_CONFIG, WITH_OIDC_CONFIG, !PERSIST_TOKENS_IN_CTS);
+        assertEquals(STSInstanceConfig.marshalFromAttributeMap(instanceConfig.marshalToAttributeMap()).persistIssuedTokensInCTS(), !PERSIST_TOKENS_IN_CTS);
+
+        instanceConfig =
+                STSInstanceConfig.fromJson(buildConfig(WITH_SAML2_CONFIG, WITH_OIDC_CONFIG, PERSIST_TOKENS_IN_CTS).toJson());
+        assertEquals(instanceConfig.persistIssuedTokensInCTS(), PERSIST_TOKENS_IN_CTS);
+
+        instanceConfig = buildConfig(WITH_SAML2_CONFIG, WITH_OIDC_CONFIG, PERSIST_TOKENS_IN_CTS);
+        assertEquals(STSInstanceConfig.marshalFromAttributeMap(instanceConfig.marshalToAttributeMap()).persistIssuedTokensInCTS(), PERSIST_TOKENS_IN_CTS);
+    }
 
     @Test
     public void testMapMarshalRoundTrip() throws UnsupportedEncodingException {
-        STSInstanceConfig instance1 = buildConfig(WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
+        STSInstanceConfig instance1 = buildConfig(WITH_SAML2_CONFIG, WITH_OIDC_CONFIG, PERSIST_TOKENS_IN_CTS);
         assertEquals(instance1, STSInstanceConfig.marshalFromAttributeMap(instance1.marshalToAttributeMap()));
 
-        instance1 = buildConfig(!WITH_SAML2_CONFIG, WITH_OIDC_CONFIG);
+        instance1 = buildConfig(!WITH_SAML2_CONFIG, WITH_OIDC_CONFIG, PERSIST_TOKENS_IN_CTS);
         assertEquals(instance1, STSInstanceConfig.marshalFromAttributeMap(instance1.marshalToAttributeMap()));
 
-        instance1 = buildConfig(WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG);
+        instance1 = buildConfig(WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG, !PERSIST_TOKENS_IN_CTS);
+        assertEquals(instance1, STSInstanceConfig.marshalFromAttributeMap(instance1.marshalToAttributeMap()));
+
+        instance1 = buildConfig(WITH_SAML2_CONFIG, !WITH_OIDC_CONFIG, PERSIST_TOKENS_IN_CTS);
         assertEquals(instance1, STSInstanceConfig.marshalFromAttributeMap(instance1.marshalToAttributeMap()));
     }
 
@@ -271,10 +301,14 @@ public class STSInstanceConfigTest {
         assertTrue(restSTSfileContent.contains(RestSTSInstanceConfig.CUSTOM_TOKEN_PROVIDERS));
         assertTrue(restSTSfileContent.contains(RestSTSInstanceConfig.CUSTOM_TOKEN_VALIDATORS));
         assertTrue(restSTSfileContent.contains(RestSTSInstanceConfig.CUSTOM_TOKEN_TRANSFORMS));
+
+        assertTrue(restSTSfileContent.contains(STSInstanceConfig.PERSIST_ISSUED_TOKENS_IN_CTS));
+        assertTrue(soapSTSfileContent.contains(STSInstanceConfig.PERSIST_ISSUED_TOKENS_IN_CTS));
     }
 
 
-    private STSInstanceConfig buildConfig(boolean withSAM2Config, boolean withOIDCIdTokenConfig) throws UnsupportedEncodingException {
+    private STSInstanceConfig buildConfig(boolean withSAM2Config, boolean withOIDCIdTokenConfig,
+                                          boolean persistTokensInCTS) throws UnsupportedEncodingException {
         SAML2Config saml2Config = null;
         if (withSAM2Config) {
             saml2Config = SAML2Config.builder()
@@ -304,6 +338,7 @@ public class STSInstanceConfigTest {
         return STSInstanceConfig.builder()
                 .saml2Config(saml2Config)
                 .oidcIdTokenConfig(openIdConnectTokenConfig)
+                .persistIssuedTokensInCTS(persistTokensInCTS)
                 .build();
     }
 }

@@ -21,36 +21,40 @@ import com.google.inject.Provider;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.operation.TokenValidateOperation;
 import org.apache.cxf.sts.token.validator.TokenValidator;
+import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.operation.ValidateOperation;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.STSInitializationException;
-import org.forgerock.openam.sts.soap.config.user.TokenValidationConfig;
+import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 
+import javax.inject.Named;
 import javax.xml.ws.WebServiceContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
-import org.slf4j.Logger;
-
 /**
  * This class provides instances of the TokenValidateOperation. The configuration information necessary to construct
  * an appropriately-configured TokenValidateOperation instance will be injected.
  *
- * If, for example, we eventually support the set of configuration options for the SAMLTokenValidator, then an additional
- * configuration object will be injected into this Provider to support these configurations. And it may well be that
- * what is injected is itself a Provider, which has the state necessary to provide the various interface instances necessary
- * to configure a SAMLTokenValidator
- *
+ * In the 13 release, token validation will simply consult the CTS (via the TokenService) to see whether the specified
+ * token has been issued. Note that each sts instance will be published with configuration state which indicates
+ * whether tokens issued by this sts will be stored in the CTS. This support is necessary to implement a functional
+ * ValidateOperation. Thus this Provider will implement logic to either deploy a ValidateOperation with a set of
+ * TokenValidator implementations which will consume the TokenService to validate sts-issued tokens, or with a UnsupportedValidateOperation,
+ * which will simply throw an exception when invoked, as CTS persistence is required for the validation if issued tokens.
  */
 public class TokenValidateOperationProvider implements Provider<ValidateOperation> {
     /*
     This class exists to wrap top-level STS operations with a finally block to clear the thread-local containing
-    the OpenAM session cached as part of any token validation operations.
+    the OpenAM session cached as part of any token validation operations. Note that the actual TokenValidator implementations
+    will not set the ThreadLocalAMTokenCache with OpenAM session tokens resulting from token validation, but SecurityPolicy
+    binding traversal will result in ThreadLocalAMTokenCache population with OpenAM Session token state, which must be
+    cleared in all cases.
      */
     static class TokenValidateOperationWrapper implements ValidateOperation {
         private final TokenValidateOperation validateDelegate;
@@ -70,47 +74,69 @@ public class TokenValidateOperationProvider implements Provider<ValidateOperatio
         }
     }
 
+    /*
+    Class returned if the sts is configured to not persist issued tokens in the STS, which is necessary to implement
+    the ValidateOperation. Will simply throw an exception indicating that the operation is unsupported in the current
+    configuration.
+     */
+    static class UnsupportedValidateOperation implements ValidateOperation {
+        @Override
+        public RequestSecurityTokenResponseType validate(RequestSecurityTokenType request, WebServiceContext context) {
+            throw new STSException("Soap STS instance not configured to persist issued tokens in the CoreTokenService, and " +
+                    "thus the ValidateOperation cannot be implemented. If the validation of issued tokens is desired, " +
+                    "republish the soap-sts instance, with configuration which indicates that issued tokens should be " +
+                    "persisted in the CoreTokenService.");
+        }
+    }
+
     private final STSPropertiesMBean stsPropertiesMBean;
     private final TokenStore tokenStore;
-    private final Set<TokenValidationConfig> validatedTokenConfig;
+    private final Set<TokenType> validatedTokens;
     private final TokenOperationFactory operationFactory;
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
-    private final Logger logger;
+    private final boolean issuedTokensPersistedInCTS;
 
     @Inject
     TokenValidateOperationProvider(
             STSPropertiesMBean stsPropertiesMBean,
             TokenStore tokenStore,
-            Set<TokenValidationConfig> validatedTokenConfig,
+            @Named(AMSTSConstants.ISSUED_TOKEN_TYPES) Set<TokenType> validatedTokens,
             TokenOperationFactory operationFactory,
             ThreadLocalAMTokenCache threadLocalAMTokenCache,
-            Logger logger) {
+            @Named (AMSTSConstants.ISSUED_TOKENS_PERSISTED_IN_CTS) boolean issuedTokensPersistedInCTS) {
         this.stsPropertiesMBean = stsPropertiesMBean;
         this.tokenStore = tokenStore;
-        this.validatedTokenConfig = validatedTokenConfig;
+        this.validatedTokens = validatedTokens;
         this.operationFactory = operationFactory;
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
-        this.logger = logger;
+        this.issuedTokensPersistedInCTS = issuedTokensPersistedInCTS;
     }
 
     public ValidateOperation get() {
-// TODO: migrate to ThrowingProviders
+        if (issuedTokensPersistedInCTS) {
+            return getFunctionalValidateOperation();
+        } else {
+            return getUnsupportedValidateOperation();
+        }
+    }
 
+    private ValidateOperation getFunctionalValidateOperation() {
+        TokenValidateOperation tokenValidateOperation = new TokenValidateOperation();
+        tokenValidateOperation.setStsProperties(stsPropertiesMBean);
+        tokenValidateOperation.setTokenStore(tokenStore);
         try {
-            TokenValidateOperation tokenValidateOperation = new TokenValidateOperation();
-            tokenValidateOperation.setStsProperties(stsPropertiesMBean);
-            tokenValidateOperation.setTokenStore(tokenStore);
-
             List<TokenValidator> tokenValidators = new ArrayList<>();
-            for (TokenValidationConfig tokenValidationConfig : validatedTokenConfig) {
-                tokenValidators.add(operationFactory.getTokenValidator(tokenValidationConfig.getValidatedTokenType(),
-                        ValidationInvocationContext.TOKEN_VALIDATION_OPERATION, tokenValidationConfig.invalidateInterimOpenAMSession()));
+            for (TokenType tokentype : validatedTokens) {
+                tokenValidators.add(operationFactory.getSimpleTokenValidator(tokentype));
             }
             tokenValidateOperation.setTokenValidators(tokenValidators);
-            return new TokenValidateOperationWrapper(tokenValidateOperation, threadLocalAMTokenCache);
         } catch (STSInitializationException e) {
-            logger.error("Exception caught initializing a Validate operation: " + e, e);
             throw new RuntimeException(e);
         }
+        return new TokenValidateOperationWrapper(tokenValidateOperation, threadLocalAMTokenCache);
+    }
+
+    private ValidateOperation getUnsupportedValidateOperation() {
+        return new UnsupportedValidateOperation();
     }
 }

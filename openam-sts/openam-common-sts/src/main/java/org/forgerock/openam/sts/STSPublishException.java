@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts;
@@ -22,11 +22,17 @@ import org.forgerock.json.resource.ResourceException;
  * Exception thrown for actions related to publishing, removing, or reading STS instances.
  */
 public class STSPublishException extends ResourceException {
+    /**
+     * {@inheritDoc}
+     */
     public STSPublishException(int code, String message) {
         super(code, message);
     }
+
+    /**
+     * {@inheritDoc}
+     */
     public STSPublishException(int code, String message, Throwable cause) {
         super(code, message, cause);
     }
-
 }

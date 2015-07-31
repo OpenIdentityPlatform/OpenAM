@@ -38,6 +38,9 @@ provided for required attributes upon service registration.
                     </DefaultValues>
                 </AttributeSchema>
 -->
+                <AttributeSchema name="persist-issued-tokens-in-cts"
+                                 type="single" syntax="boolean" i18nKey="persist_issued_tokens_in_cts">
+                </AttributeSchema>
                 <AttributeSchema name="supported-token-transforms"
                                  type="list"
                                  syntax="string"
@@ -265,6 +268,9 @@ provided for required attributes upon service registration.
                 Appears to be necessary to have multiple rest STS instances per realm, like authN mdoules.
                 -->
                 <SubSchema name="serverconfig" inheritance="multiple">
+                    <AttributeSchema name="persist-issued-tokens-in-cts"
+                                     type="single" syntax="boolean" i18nKey="persist_issued_tokens_in_cts">
+                    </AttributeSchema>
                     <AttributeSchema name="supported-token-transforms"
                                      type="list"
                                      syntax="string"

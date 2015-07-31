@@ -29,6 +29,7 @@ import org.forgerock.openam.sts.config.user.OpenIdConnectTokenConfig;
 import org.forgerock.openam.sts.config.user.STSInstanceConfig;
 import org.forgerock.openam.sts.service.invocation.OpenIdConnectTokenGenerationState;
 import org.forgerock.openam.sts.service.invocation.TokenGenerationServiceInvocationState;
+import org.forgerock.openam.sts.tokengeneration.CTSTokenPersistence;
 import org.forgerock.openam.sts.tokengeneration.SSOTokenIdentity;
 import org.forgerock.openam.sts.tokengeneration.oidc.crypto.OpenIdConnectTokenPKIProviderImpl;
 import org.forgerock.openam.sts.tokengeneration.state.STSInstanceState;
@@ -90,7 +91,7 @@ public class OpenIdConnectTokenGenerationImplTest {
         OpenIdConnectTokenGenerationState openIdConnectTokenGenerationState = buildOpenIdConnectTokenGenerationState(authTime);
         when(mockTokenGenerationInvocationState.getOpenIdConnectTokenGenerationState()).thenReturn(openIdConnectTokenGenerationState);
         String oidcToken = new OpenIdConnectTokenGenerationImpl(mockSSOTokenIdentity, new JwtBuilderFactory(),
-                mockClaimMapperProvider, mock(Logger.class))
+                mockClaimMapperProvider, mock(CTSTokenPersistence.class), mock(Logger.class))
                 .generate(mockSSOToken, mockSTSInstanceState, mockTokenGenerationInvocationState);
         SignedJwt signedJwt = reconstructSignedJwt(oidcToken);
         JwtClaimsSet jwtClaimsSet = signedJwt.getClaimsSet();
@@ -123,7 +124,7 @@ public class OpenIdConnectTokenGenerationImplTest {
         OpenIdConnectTokenGenerationState openIdConnectTokenGenerationState = buildOpenIdConnectTokenGenerationState(authTime);
         when(mockTokenGenerationInvocationState.getOpenIdConnectTokenGenerationState()).thenReturn(openIdConnectTokenGenerationState);
         String oidcToken = new OpenIdConnectTokenGenerationImpl(mockSSOTokenIdentity, new JwtBuilderFactory(),
-                mockClaimMapperProvider, mock(Logger.class))
+                mockClaimMapperProvider, mock(CTSTokenPersistence.class), mock(Logger.class))
                 .generate(mockSSOToken, mockSTSInstanceState, mockTokenGenerationInvocationState);
         SignedJwt signedJwt = reconstructSignedJwt(oidcToken);
         JwtClaimsSet jwtClaimsSet = signedJwt.getClaimsSet();

@@ -18,7 +18,6 @@ package org.forgerock.openam.sts.rest.service;
 
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
@@ -30,10 +29,11 @@ import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.SingletonResourceProvider;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.servlet.HttpContext;
-import org.forgerock.openam.sts.AMSTSRuntimeException;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.rest.RestSTS;
-import org.forgerock.openam.sts.user.invocation.RestSTSServiceInvocationState;
+import org.forgerock.openam.sts.user.invocation.RestSTSTokenCancellationInvocationState;
+import org.forgerock.openam.sts.user.invocation.RestSTSTokenTranslationInvocationState;
+import org.forgerock.openam.sts.user.invocation.RestSTSTokenValidationInvocationState;
 import org.slf4j.Logger;
 
 /**
@@ -41,6 +41,8 @@ import org.slf4j.Logger;
  */
 public class RestSTSService implements SingletonResourceProvider {
     private static final String TRANSLATE = "translate";
+    private static final String VALIDATE = "validate";
+    private static final String CANCEL = "cancel";
     private final RestSTS restSts;
     private final Logger logger;
 
@@ -54,38 +56,89 @@ public class RestSTSService implements SingletonResourceProvider {
     }
 
     public void actionInstance(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-        if (TRANSLATE.equals(request.getAction())) {
-            RestSTSServiceHttpServletContext servletContext = context.asContext(RestSTSServiceHttpServletContext.class);
-            HttpContext httpContext = context.asContext(HttpContext.class);
-            RestSTSServiceInvocationState invocationState;
-            try {
-                invocationState = RestSTSServiceInvocationState.fromJson(request.getContent());
-            } catch (TokenMarshalException e) {
-                handler.handleError(e);
-                return;
-            }
-            try {
-                JsonValue result = restSts.translateToken(invocationState, httpContext, servletContext);
-                handler.handleResult(result);
-            } catch (ResourceException e) {
-                /*
-                This block entered for both TokenValidationException and TokenCreationException instances
-                 */
-                logger.error("Exception caught in translateToken call: " + e, e);
-                handler.handleError(e);
-            } catch (AMSTSRuntimeException e) {
-                /*
-                RuntimeException thrown by the AM implementation of CXF-STS-defined interfaces, including the Authentication
-                handlers.
-                 */
-                logger.error("AMSTSException caught in the RestSTSService: " + e, e);
-                handler.handleError(ResourceException.getException(e.getCode(), e.getMessage(), e));
-            } catch (Exception e) {
-                logger.error("Unexpected: Exception caught in the RestSTSService: " + e, e);
-                handler.handleError(new InternalServerErrorException(e.getMessage()));
-            }
-        } else {
-            handler.handleError(new BadRequestException("The specified _action parameter is not supported."));
+        switch (request.getAction()) {
+            case TRANSLATE:
+                handleTranslate(context, request, handler);
+                break;
+            case VALIDATE:
+                handleValidate(context, request, handler);
+                break;
+            case CANCEL:
+                handleCancel(context, request, handler);
+                break;
+            default:
+                handler.handleError(new NotSupportedException("The specified _action parameter is not supported."));
+        }
+    }
+
+    private void handleTranslate(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
+        RestSTSServiceHttpServletContext servletContext = context.asContext(RestSTSServiceHttpServletContext.class);
+        HttpContext httpContext = context.asContext(HttpContext.class);
+        RestSTSTokenTranslationInvocationState invocationState;
+        try {
+            invocationState = RestSTSTokenTranslationInvocationState.fromJson(request.getContent());
+        } catch (TokenMarshalException e) {
+            handler.handleError(e);
+            return;
+        }
+        try {
+            final JsonValue result = restSts.translateToken(invocationState, httpContext, servletContext);
+            handler.handleResult(result);
+        } catch (ResourceException e) {
+            /*
+            This block entered for TokenMarshalException, TokenValidationException and TokenCreationException instances
+             */
+            logger.error("Exception caught in translateToken call: " + e, e);
+            handler.handleError(e);
+        } catch (Exception e) {
+            logger.error("Unexpected: Exception caught in the RestSTSService invoking translateToken: " + e, e);
+            handler.handleError(new InternalServerErrorException(e.getMessage()));
+        }
+    }
+
+    private void handleValidate(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
+        RestSTSTokenValidationInvocationState invocationState;
+        try {
+            invocationState = RestSTSTokenValidationInvocationState.fromJson(request.getContent());
+        } catch (TokenMarshalException e) {
+            handler.handleError(e);
+            return;
+        }
+        try {
+            final JsonValue result = restSts.validateToken(invocationState);
+            handler.handleResult(result);
+        } catch (ResourceException e) {
+            /*
+            This block entered for both TokenValidationException and TokenMarshalException instances
+             */
+            logger.error("Exception caught in ValidateToken call: " + e, e);
+            handler.handleError(e);
+        } catch (Exception e) {
+            logger.error("Unexpected: Exception caught in the RestSTSService invoking validateToken: " + e, e);
+            handler.handleError(new InternalServerErrorException(e.getMessage()));
+        }
+    }
+
+    private void handleCancel(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
+        RestSTSTokenCancellationInvocationState invocationState;
+        try {
+            invocationState = RestSTSTokenCancellationInvocationState.fromJson(request.getContent());
+        } catch (TokenMarshalException e) {
+            handler.handleError(e);
+            return;
+        }
+        try {
+            final JsonValue result = restSts.cancelToken(invocationState);
+            handler.handleResult(result);
+        } catch (ResourceException e) {
+            /*
+            This block entered for both TokenValidationException and TokenMarshalException instances
+             */
+            logger.error("Exception caught in CancelToken call: " + e, e);
+            handler.handleError(e);
+        } catch (Exception e) {
+            logger.error("Unexpected: Exception caught in the RestSTSService invoking cancelToken: " + e, e);
+            handler.handleError(new InternalServerErrorException(e.getMessage()));
         }
     }
 

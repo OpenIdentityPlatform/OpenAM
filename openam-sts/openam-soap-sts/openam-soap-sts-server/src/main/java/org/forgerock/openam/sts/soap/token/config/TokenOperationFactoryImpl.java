@@ -20,6 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.google.inject.Provider;
+import org.apache.cxf.sts.token.canceller.TokenCanceller;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.ws.security.message.token.UsernameToken;
@@ -28,14 +29,19 @@ import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProvider;
+import org.forgerock.openam.sts.soap.token.canceller.OpenIdConnectTokenCanceller;
+import org.forgerock.openam.sts.soap.token.canceller.SAML2TokenCanceller;
 import org.forgerock.openam.sts.soap.token.provider.oidc.SoapOpenIdConnectTokenAuthnContextMapper;
 import org.forgerock.openam.sts.soap.token.provider.oidc.SoapOpenIdConnectTokenAuthnMethodsReferencesMapper;
 import org.forgerock.openam.sts.soap.token.provider.oidc.SoapOpenIdConnectTokenProvider;
 import org.forgerock.openam.sts.soap.token.provider.saml2.Saml2XmlTokenAuthnContextMapper;
 import org.forgerock.openam.sts.soap.token.provider.saml2.SoapSamlTokenProvider;
+import org.forgerock.openam.sts.soap.token.validator.SimpleOpenIdConnectTokenValidator;
+import org.forgerock.openam.sts.soap.token.validator.SimpleSAML2TokenValidator;
+import org.forgerock.openam.sts.token.CTSTokenIdGenerator;
 import org.forgerock.openam.sts.token.provider.AMSessionInvalidator;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
-import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
+import org.forgerock.openam.sts.token.provider.TokenServiceConsumer;
 import org.forgerock.openam.sts.soap.token.validator.SoapAMTokenValidator;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
@@ -51,7 +57,7 @@ import org.slf4j.Logger;
 public class TokenOperationFactoryImpl implements TokenOperationFactory {
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
     private final PrincipalFromSession principalFromSession;
-    private final TokenGenerationServiceConsumer tokenGenerationServiceConsumer;
+    private final TokenServiceConsumer tokenServiceConsumer;
     private final String stsInstanceId;
     private final String realm;
     private final XMLUtilities xmlUtilities;
@@ -61,6 +67,7 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
     private final AuthenticationHandler<UsernameToken> usernameTokenAuthenticationHandler;
     private final SoapOpenIdConnectTokenAuthnContextMapper soapOpenIdConnectTokenAuthnContextMapper;
     private final SoapOpenIdConnectTokenAuthnMethodsReferencesMapper soapOpenIdConnectTokenAuthnMethodsReferencesMapper;
+    private final CTSTokenIdGenerator ctsTokenIdGenerator;
     private final Logger logger;
 
     /**
@@ -71,7 +78,7 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
     public TokenOperationFactoryImpl(
             ThreadLocalAMTokenCache threadLocalAMTokenCache,
             PrincipalFromSession principalFromSession,
-            TokenGenerationServiceConsumer tokenGenerationServiceConsumer,
+            TokenServiceConsumer tokenServiceConsumer,
             @Named(AMSTSConstants.STS_INSTANCE_ID) String stsInstanceId,
             @Named (AMSTSConstants.REALM) String realm,
             XMLUtilities xmlUtilities,
@@ -81,10 +88,11 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
             AuthenticationHandler<UsernameToken> usernameTokenAuthenticationHandler,
             SoapOpenIdConnectTokenAuthnContextMapper soapOpenIdConnectTokenAuthnContextMapper,
             SoapOpenIdConnectTokenAuthnMethodsReferencesMapper soapOpenIdConnectTokenAuthnMethodsReferencesMapper,
+            CTSTokenIdGenerator ctsTokenIdGenerator,
             Logger logger) {
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
         this.principalFromSession = principalFromSession;
-        this.tokenGenerationServiceConsumer = tokenGenerationServiceConsumer;
+        this.tokenServiceConsumer = tokenServiceConsumer;
         this.stsInstanceId = stsInstanceId;
         this.realm = realm;
         this.xmlUtilities = xmlUtilities;
@@ -94,6 +102,7 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
         this.usernameTokenAuthenticationHandler = usernameTokenAuthenticationHandler;
         this.soapOpenIdConnectTokenAuthnContextMapper = soapOpenIdConnectTokenAuthnContextMapper;
         this.soapOpenIdConnectTokenAuthnMethodsReferencesMapper = soapOpenIdConnectTokenAuthnMethodsReferencesMapper;
+        this.ctsTokenIdGenerator = ctsTokenIdGenerator;
         this.logger = logger;
     }
     /**
@@ -126,7 +135,7 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
     public TokenProvider getTokenProvider(TokenType issuedTokenType) throws STSInitializationException{
         if (TokenType.SAML2.equals(issuedTokenType)) {
             return  SoapSamlTokenProvider.builder()
-                    .tokenGenerationServiceConsumer(tokenGenerationServiceConsumer)
+                    .tokenGenerationServiceConsumer(tokenServiceConsumer)
                     .amSessionInvalidator(amSessionInvalidatorProvider.get())
                     .threadLocalAMTokenCache(threadLocalAMTokenCache)
                     .stsInstanceId(stsInstanceId)
@@ -138,7 +147,7 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
                     .build();
         } else if (TokenType.OPENIDCONNECT.equals(issuedTokenType)) {
             return SoapOpenIdConnectTokenProvider.builder()
-                    .tokenGenerationServiceConsumer(tokenGenerationServiceConsumer)
+                    .tokenGenerationServiceConsumer(tokenServiceConsumer)
                     .amSessionInvalidator(amSessionInvalidatorProvider.get())
                     .threadLocalAMTokenCache(threadLocalAMTokenCache)
                     .stsInstanceId(stsInstanceId)
@@ -152,6 +161,29 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
         }
         throw new STSInitializationException(ResourceException.BAD_REQUEST, "Unhandled outputTokenType specified in " +
                 "getTokenProviderForTransformOperation. OutputTokenType: " + issuedTokenType);
+    }
+
+    @Override
+    public TokenValidator getSimpleTokenValidator(TokenType validatedTokenType) throws STSInitializationException {
+        if (TokenType.SAML2.equals(validatedTokenType)) {
+            return new SimpleSAML2TokenValidator(tokenServiceConsumer, soapSTSAccessTokenProvider, ctsTokenIdGenerator, xmlUtilities);
+        }  else if (TokenType.OPENIDCONNECT.equals(validatedTokenType)) {
+            return new SimpleOpenIdConnectTokenValidator(tokenServiceConsumer, soapSTSAccessTokenProvider, ctsTokenIdGenerator);
+        }
+        throw new STSInitializationException(ResourceException.INTERNAL_ERROR,
+                "Unexpected TokenType passed to TokenOperationFactoryImpl#getSimpleTokenValidator: " + validatedTokenType);
+    }
+
+    @Override
+    public TokenCanceller getTokenCanceller(TokenType cancelledTokenType) throws STSInitializationException {
+        if (TokenType.SAML2.equals(cancelledTokenType)) {
+            return new SAML2TokenCanceller(tokenServiceConsumer, soapSTSAccessTokenProvider, ctsTokenIdGenerator, xmlUtilities);
+        }  else if (TokenType.OPENIDCONNECT.equals(cancelledTokenType)) {
+            return new OpenIdConnectTokenCanceller(tokenServiceConsumer, soapSTSAccessTokenProvider, ctsTokenIdGenerator);
+        }
+        throw new STSInitializationException(ResourceException.INTERNAL_ERROR,
+                "Unexpected TokenType passed to TokenOperationFactoryImpl#getTokenCanceller: " + cancelledTokenType);
+
     }
 
     private SoapAMTokenValidator buildAMTokenValidator(ValidationInvocationContext validationInvocationContext, boolean invalidateAMSession) {

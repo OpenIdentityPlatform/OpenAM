@@ -22,12 +22,12 @@ import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.rest.token.provider.RestTokenProviderBase;
 import org.forgerock.openam.sts.rest.token.provider.RestTokenProviderParameters;
+import org.forgerock.openam.sts.token.provider.TokenServiceConsumer;
 import org.forgerock.openam.sts.user.invocation.ProofTokenState;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 
 import org.forgerock.openam.sts.token.provider.AMSessionInvalidator;
-import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
 import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
 import org.slf4j.Logger;
 
@@ -47,7 +47,7 @@ public class RestSamlTokenProvider extends RestTokenProviderBase<Saml2TokenCreat
     /*
     ctor not injected as this class created by TokenTransformFactoryImpl
      */
-    public RestSamlTokenProvider(TokenGenerationServiceConsumer tokenGenerationServiceConsumer,
+    public RestSamlTokenProvider(TokenServiceConsumer tokenServiceConsumer,
                                AMSessionInvalidator amSessionInvalidator,
                                ThreadLocalAMTokenCache threadLocalAMTokenCache,
                                String stsInstanceId,
@@ -55,7 +55,7 @@ public class RestSamlTokenProvider extends RestTokenProviderBase<Saml2TokenCreat
                                Saml2JsonTokenAuthnContextMapper authnContextMapper,
                                ValidationInvocationContext validationInvocationContext,
                                Logger logger) {
-        super(tokenGenerationServiceConsumer, amSessionInvalidator, threadLocalAMTokenCache, stsInstanceId, realm,
+        super(tokenServiceConsumer, amSessionInvalidator, threadLocalAMTokenCache, stsInstanceId, realm,
                 validationInvocationContext, logger);
         this.authnContextMapper = authnContextMapper;
     }
@@ -92,7 +92,7 @@ public class RestSamlTokenProvider extends RestTokenProviderBase<Saml2TokenCreat
                                 ProofTokenState proofTokenState) throws TokenCreationException {
         switch (subjectConfirmation) {
             case BEARER:
-                return tokenGenerationServiceConsumer.getSAML2BearerAssertion(
+                return tokenServiceConsumer.getSAML2BearerAssertion(
                         threadLocalAMTokenCache.getSessionIdForContext(validationInvocationContext),
                         stsInstanceId, realm, authnContextClassRef, getAdminToken());
             case SENDER_VOUCHES:
@@ -100,11 +100,11 @@ public class RestSamlTokenProvider extends RestTokenProviderBase<Saml2TokenCreat
                 Note that for the rest-sts, there is no delegated token relationship, as there is in ws-trust, so I just
                 pull the standard, non-delegated AMSessionId from the ThreadLocalAMTokenCache.
                  */
-                return tokenGenerationServiceConsumer.getSAML2SenderVouchesAssertion(
+                return tokenServiceConsumer.getSAML2SenderVouchesAssertion(
                         threadLocalAMTokenCache.getSessionIdForContext(validationInvocationContext),
                         stsInstanceId, realm, authnContextClassRef, getAdminToken());
             case HOLDER_OF_KEY:
-                return tokenGenerationServiceConsumer.getSAML2HolderOfKeyAssertion(
+                return tokenServiceConsumer.getSAML2HolderOfKeyAssertion(
                         threadLocalAMTokenCache.getSessionIdForContext(validationInvocationContext),
                         stsInstanceId, realm, authnContextClassRef, proofTokenState, getAdminToken());
         }

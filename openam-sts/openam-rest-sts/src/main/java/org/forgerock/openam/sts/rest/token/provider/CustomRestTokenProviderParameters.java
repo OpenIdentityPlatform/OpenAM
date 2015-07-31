@@ -32,8 +32,8 @@ public interface CustomRestTokenProviderParameters extends RestTokenProviderPara
 
     /**
      *
-     * @return the possibly null JsonValue corresponding the to additionalState possibly returned from the RestTokenValidatorResult.
-     * This is to support custom RestTokenValidator and RestTokenProvider implementations.
+     * @return the possibly null JsonValue corresponding the to additionalState possibly returned from the RestTokenTransformValidatorResult.
+     * This is to support custom RestTokenTransformValidator and RestTokenProvider implementations.
      */
     JsonValue getAdditionalState();
 

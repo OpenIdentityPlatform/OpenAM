@@ -20,6 +20,15 @@
 <propertysheet>
     <section name="General" defaultValue="rest.sts.general.section.title">
         <property>
+            <label name="lblPersistIssuedTokensInCTS"
+                   defaultValue="sts.persist.issued.tokens.in.cts"
+                   labelFor="persist-issued-tokens-in-cts"/>
+            <cc name="persist-issued-tokens-in-cts"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+            </cc>
+            <fieldhelp name="helpPersistIssuedTokensInCTS" defaultValue="sts.persist.issued.tokens.in.cts.help" />
+        </property>
+        <property>
             <label name="lblIssuedTokenTypes"
                    defaultValue="soap.sts.issued.token.types"
                    labelFor="issued-token-types"/>

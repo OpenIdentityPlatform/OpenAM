@@ -31,11 +31,13 @@ import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2SDKUtils;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.CTSTokenPersistenceException;
+import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.service.invocation.SAML2TokenGenerationState;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.config.user.SAML2Config;
-import org.forgerock.openam.sts.config.user.STSInstanceConfig;
+import org.forgerock.openam.sts.tokengeneration.CTSTokenPersistence;
 import org.forgerock.openam.sts.user.invocation.ProofTokenState;
 import org.forgerock.openam.sts.service.invocation.TokenGenerationServiceInvocationState;
 import org.forgerock.openam.sts.tokengeneration.SSOTokenIdentity;
@@ -59,11 +61,13 @@ public class SAML2TokenGenerationImpl implements SAML2TokenGeneration {
     private static final boolean ASSERTION_TO_STRING_DECLARE_NAMESPACE_PREFIX = true;
     private final StatementProvider statementProvider;
     private final SSOTokenIdentity ssoTokenIdentity;
+    private final CTSTokenPersistence ctsTokenPersistence;
 
     @Inject
-    SAML2TokenGenerationImpl(StatementProvider statementProvider, SSOTokenIdentity ssoTokenIdentity) {
+    SAML2TokenGenerationImpl(StatementProvider statementProvider, SSOTokenIdentity ssoTokenIdentity, CTSTokenPersistence ctsTokenPersistence) {
         this.statementProvider = statementProvider;
         this.ssoTokenIdentity = ssoTokenIdentity;
+        this.ctsTokenPersistence = ctsTokenPersistence;
         /*
         Initialize the santuario library context. Multiple calls to this method are idempotent.
          */
@@ -97,10 +101,11 @@ public class SAML2TokenGenerationImpl implements SAML2TokenGeneration {
         entering this branch handles both encryption and signing, as the encryption of the entire assertion must be
         proceeded by signing.
          */
+        String assertionString;
         if (saml2Config.encryptAssertion()) {
             EncryptedAssertion encryptedAssertion = handleSingingAndEncryptionOfEntireAssertion(assertion, saml2Config, stsInstanceState);
             try {
-                return encryptedAssertion.toXMLString(ASSERTION_TO_STRING_INCLUDE_NAMESPACE_PREFIX, ASSERTION_TO_STRING_DECLARE_NAMESPACE_PREFIX);
+                assertionString = encryptedAssertion.toXMLString(ASSERTION_TO_STRING_INCLUDE_NAMESPACE_PREFIX, ASSERTION_TO_STRING_DECLARE_NAMESPACE_PREFIX);
             } catch (SAML2Exception e) {
                 throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
                         "Exception caught calling Assertion.toXMLString: " + e, e);
@@ -116,15 +121,23 @@ public class SAML2TokenGenerationImpl implements SAML2TokenGeneration {
                 signAssertion(assertion, stsInstanceState);
             }
             try {
-                return assertion.toXMLString(ASSERTION_TO_STRING_INCLUDE_NAMESPACE_PREFIX, ASSERTION_TO_STRING_DECLARE_NAMESPACE_PREFIX);
+                assertionString =
+                        assertion.toXMLString(ASSERTION_TO_STRING_INCLUDE_NAMESPACE_PREFIX, ASSERTION_TO_STRING_DECLARE_NAMESPACE_PREFIX);
             } catch (SAML2Exception e) {
                 throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
                         "Exception caught calling Assertion.toXMLString: " + e, e);
             }
         }
+        if (stsInstanceState.getConfig().persistIssuedTokensInCTS()) {
+            try {
+                ctsTokenPersistence.persistToken(invocationState.getStsInstanceId(), TokenType.SAML2, assertionString,
+                        subjectId, issueInstant.getTime(), saml2Config.getTokenLifetimeInSeconds());
+            } catch (CTSTokenPersistenceException e) {
+                throw new TokenCreationException(e.getCode(), e.getMessage(), e);
+            }
+        }
+        return assertionString;
     }
-
-
 
     private void setVersionAndId(Assertion assertion) throws TokenCreationException {
         try {
@@ -187,6 +200,7 @@ public class SAML2TokenGenerationImpl implements SAML2TokenGeneration {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void setAttributeStatements(Assertion assertion, SSOToken token, SAML2Config saml2Config) throws TokenCreationException {
         assertion.getAttributeStatements().addAll(
                 statementProvider.getAttributeStatementsProvider(saml2Config).get(
@@ -194,6 +208,7 @@ public class SAML2TokenGenerationImpl implements SAML2TokenGeneration {
         );
     }
 
+    @SuppressWarnings("unchecked")
     private void setAuthzDecisionStatements(Assertion assertion, SSOToken token, SAML2Config saml2Config) throws TokenCreationException {
         assertion.getAuthzDecisionStatements().addAll(
                 statementProvider.getAuthzDecisionStatementsProvider(saml2Config).get(token, saml2Config));
@@ -262,6 +277,7 @@ public class SAML2TokenGenerationImpl implements SAML2TokenGeneration {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void encryptAttributeStatement(Assertion assertion, SAML2Config saml2Config, STSInstanceState stsInstanceState)
             throws TokenCreationException {
         final PublicKey keyEncryptionKey = stsInstanceState.getSAML2CryptoProvider().getSPX509Certificate(saml2Config.getEncryptionKeyAlias()).getPublicKey();

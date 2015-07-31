@@ -32,7 +32,7 @@ import static org.forgerock.json.fluent.JsonValue.object;
 
 /**
  * Contains state corresponding to a UsernameToken and will emit json which includes state necessary to act as the
- * input_token_state in the RestSTSServiceInvocationState - i.e. the username and password state, and a
+ * input_token_state in the RestSTSTokenTranslationInvocationState - i.e. the username and password state, and a
  * AMSTSConstants.TOKEN_TYPE_KEY field corresponding to TokenType.USERNAME.name().
  */
 public class UsernameTokenState {

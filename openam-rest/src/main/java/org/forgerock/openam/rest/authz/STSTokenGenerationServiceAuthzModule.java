@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.rest.authz;
 
+import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
@@ -32,6 +33,7 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.utils.SoapSTSAgentIdentity;
 import org.forgerock.openam.forgerockrest.utils.SpecialUserIdentity;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.openam.utils.Config;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 
@@ -42,17 +44,17 @@ import java.net.HttpURLConnection;
 /**
  * This CrestAuthorizationModule protects the token generation service. It limits consumption to action invocations
  * made only by SSOTokens corresponding to the 'special' user (to authZ rest-sts consumption), and corresponding to
- * Soap STS agents (to authZ soap-sts consumption).
+ * Soap STS agents (to authZ soap-sts consumption), and to Admins. Used to protect the STS' token service.
  */
-public class STSTokenGenerationServiceAuthzModule extends SpecialUserOnlyAuthzModule  {
+public class STSTokenGenerationServiceAuthzModule extends SpecialAndAdminUserOnlyAuthzModule  {
     public static final String NAME = "STSTokenGenerationServiceAuthzModule";
 
     private final SoapSTSAgentIdentity agentIdentity;
 
     @Inject
-    public STSTokenGenerationServiceAuthzModule(SoapSTSAgentIdentity agentIdentity, SpecialUserIdentity specialUserIdentity,
+    public STSTokenGenerationServiceAuthzModule(Config<SessionService> sessionService, SoapSTSAgentIdentity agentIdentity, SpecialUserIdentity specialUserIdentity,
                                                 @Named("frRest") Debug debug) {
-        super(specialUserIdentity, debug);
+        super(sessionService, specialUserIdentity, debug);
         this.agentIdentity = agentIdentity;
     }
 
@@ -63,7 +65,7 @@ public class STSTokenGenerationServiceAuthzModule extends SpecialUserOnlyAuthzMo
 
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeRead(ServerContext context, ReadRequest request) {
-        return rejectConsumption();
+        return authorize(context);
     }
 
     @Override
@@ -73,7 +75,7 @@ public class STSTokenGenerationServiceAuthzModule extends SpecialUserOnlyAuthzMo
 
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeDelete(ServerContext context, DeleteRequest request) {
-        return rejectConsumption();
+        return authorize(context);
     }
 
     @Override
@@ -88,7 +90,7 @@ public class STSTokenGenerationServiceAuthzModule extends SpecialUserOnlyAuthzMo
 
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeQuery(ServerContext context, QueryRequest request) {
-        return rejectConsumption();
+        return authorize(context);
     }
 
     private Promise<AuthorizationResult, ResourceException> rejectConsumption() {
@@ -96,7 +98,8 @@ public class STSTokenGenerationServiceAuthzModule extends SpecialUserOnlyAuthzMo
                 "invoked functionality is not authorized for any user."));
     }
 
-    Promise<AuthorizationResult, ResourceException> authorize(ServerContext context) {
+    @Override
+    protected Promise<AuthorizationResult, ResourceException> authorize(ServerContext context) {
         SSOTokenContext tokenContext = context.asContext(SSOTokenContext.class);
         String userId;
         SSOToken token;

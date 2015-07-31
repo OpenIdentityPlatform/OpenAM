@@ -18,7 +18,10 @@ package org.forgerock.openam.sts.soap;
 
 import com.google.inject.Inject;
 import org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider;
+import org.apache.cxf.ws.security.sts.provider.operation.CancelOperation;
 import org.apache.cxf.ws.security.sts.provider.operation.IssueOperation;
+import org.apache.cxf.ws.security.sts.provider.operation.RenewOperation;
+import org.apache.cxf.ws.security.sts.provider.operation.ValidateOperation;
 
 /**
  * An instance of this class is created for each STS instance. An instance of this class is set as the bean published via
@@ -31,19 +34,19 @@ public class STSEndpoint extends SecurityTokenServiceProvider {
     as part of calling the ctor below, we need to propagate the exception.
      */
     @Inject
-    public STSEndpoint(IssueOperation issueOperation/*,
+    public STSEndpoint(IssueOperation issueOperation,
                        ValidateOperation validateOperation,
+                       CancelOperation cancelOperation/*,
                        RenewOperation renewOperation*/) throws Exception {
         /*
         I'm never setting the issueSingle operation. The IssueOperation above also implements the IssueSingle interface -
         perhaps I should inject both IssueOperation and IssueSingleOperation instances. Probably necessary for full
         spec compliance.
         TODO:
-        And also - I believe the fact that I am not setting the cancel operation means that cancel invocations are rejected -
-        need to confirm...
          */
         setIssueOperation(issueOperation);
-//        setValidateOperation(validateOperation);
+        setValidateOperation(validateOperation);
+        setCancelOperation(cancelOperation);
 //        setRenewOperation(renewOperation);
     }
 }

@@ -17,10 +17,9 @@
 package org.forgerock.openam.sts.rest.token.provider;
 
 import com.sun.identity.security.AdminTokenAction;
-import org.forgerock.openam.sts.TokenTypeId;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.provider.AMSessionInvalidator;
-import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
+import org.forgerock.openam.sts.token.provider.TokenServiceConsumer;
 import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
 import org.slf4j.Logger;
 
@@ -30,7 +29,7 @@ import java.security.AccessController;
  * Base class for rest token provider implementations.
  */
 public abstract class RestTokenProviderBase<T> implements RestTokenProvider<T> {
-    protected final TokenGenerationServiceConsumer tokenGenerationServiceConsumer;
+    protected final TokenServiceConsumer tokenServiceConsumer;
     protected final AMSessionInvalidator amSessionInvalidator;
     protected final ThreadLocalAMTokenCache threadLocalAMTokenCache;
     protected final String stsInstanceId;
@@ -38,14 +37,14 @@ public abstract class RestTokenProviderBase<T> implements RestTokenProvider<T> {
     protected final ValidationInvocationContext validationInvocationContext;
     protected final Logger logger;
 
-    public RestTokenProviderBase(TokenGenerationServiceConsumer tokenGenerationServiceConsumer,
+    public RestTokenProviderBase(TokenServiceConsumer tokenServiceConsumer,
                                  AMSessionInvalidator amSessionInvalidator,
                                  ThreadLocalAMTokenCache threadLocalAMTokenCache,
                                  String stsInstanceId,
                                  String realm,
                                  ValidationInvocationContext validationInvocationContext,
                                  Logger logger) {
-        this.tokenGenerationServiceConsumer = tokenGenerationServiceConsumer;
+        this.tokenServiceConsumer = tokenServiceConsumer;
         this.amSessionInvalidator = amSessionInvalidator;
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
         this.stsInstanceId = stsInstanceId;

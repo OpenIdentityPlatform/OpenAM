@@ -66,7 +66,7 @@ public class TokenIssueOperationProviderTest {
         }
 
         @Provides
-        @Named(AMSTSConstants.TOKEN_ISSUE_OPERATION)
+        @Named(AMSTSConstants.ISSUED_TOKEN_TYPES)
         public Set<TokenType> getTokenTypes() {
             HashSet<TokenType> tokenTypes = new HashSet<TokenType>();
             tokenTypes.add(TokenType.SAML2);

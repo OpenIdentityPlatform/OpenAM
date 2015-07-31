@@ -101,7 +101,7 @@ public class TokenIssueOperationProvider implements Provider<IssueOperation> {
     TokenIssueOperationProvider(
             STSPropertiesMBean stsPropertiesMBean,
             TokenStore tokenStore,
-            @Named(AMSTSConstants.TOKEN_ISSUE_OPERATION) Set<TokenType> issueTokenTypes,
+            @Named(AMSTSConstants.ISSUED_TOKEN_TYPES) Set<TokenType> issueTokenTypes,
             @Named(AMSTSConstants.DELEGATED_TOKEN_VALIDATORS) Set<TokenValidationConfig> delegatedTokenValidationConfig,
             List<TokenDelegationHandler> tokenDelegationHandlers,
             TokenOperationFactory operationFactory,

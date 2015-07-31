@@ -23,7 +23,7 @@
  * tokens encapsulated in the RequestSecurityToken request targeting the WS-Trust defined issue operation. Note that the
  * org.apache.cxf.sts.token.validator.TokenValidator implementations will commonly delegate actual token validation to
  * wss4j org.apache.ws.security.validate.Validator implementations.
- * 3. rest-sts token validation: org.forgerock.openam.sts.rest.RestTokenValidator implementations which validate the
+ * 3. rest-sts token validation: org.forgerock.openam.sts.rest.RestTokenTransformValidator implementations which validate the
  * input token specified in a token transformation (current implementation), and the input token specified in a validate
  * operation (future feature).
  *
