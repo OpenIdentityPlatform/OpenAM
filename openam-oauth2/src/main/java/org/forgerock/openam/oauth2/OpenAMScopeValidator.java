@@ -286,7 +286,7 @@ public class OpenAMScopeValidator implements ScopeValidator {
             for (String scope : scopes) {
                 try {
                     Set<String> attributes = id.getAttribute(scope);
-                    if (attributes != null || !attributes.isEmpty()) {
+                    if (attributes != null && !attributes.isEmpty()) {
                         Iterator<String> iter = attributes.iterator();
                         StringBuilder builder = new StringBuilder();
                         while (iter.hasNext()) {
