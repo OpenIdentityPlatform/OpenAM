@@ -33,6 +33,7 @@ import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
+import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.openam.forgerockrest.UmaLabelResource;
 import org.forgerock.openam.rest.resource.ContextHelper;

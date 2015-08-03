@@ -43,6 +43,7 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.OAuth2Constants;
@@ -164,6 +165,8 @@ public class UmaLabelResource implements CollectionResourceProvider {
         }
 
         LocaleContext localeContext = localeContextProvider.get();
+        localeContext.setLocale(serverContext);
+
         for (ResourceSetLabel label : labels) {
             try {
                 label = resolveLabelName(contextHelper.getRealm(serverContext), label, localeContext);
