@@ -16,16 +16,17 @@
 
 package org.forgerock.openam.authentication.modules.oath;
 
+import static org.forgerock.openam.authentication.modules.oath.CodeLengthValidator.*;
+
 import com.sun.identity.idm.AMIdentity;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.codec.binary.Hex;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
 
 /**
  * Provides functionality to generate URIs for registering OATH devices with an OATH authentication module.
@@ -36,8 +37,8 @@ public class AuthenticatorAppRegistrationURIBuilder {
 
     private final AMIdentity id;
     private final String secretHex;
-
-    private String issuer = "Forgerock";
+    private final int codeLength;
+    private final String issuer;
 
     /**
      * Construct a builder which can be used to generate URIs for registering OATH devices with an OATH
@@ -46,16 +47,22 @@ public class AuthenticatorAppRegistrationURIBuilder {
      * @param id The AMIdentity to be referred to in the URI. Must not be null.
      * @param secretHex The shared secret, in hex, which is to be shared between the OATH authentication
      *                  module and the OATH device. Must not be null or an empty string.
+     * @param codeLength The length of the OTP. Must be set to 6 or 8, as per Authenticator app.
+     * @param issuer Reference to the user's name. Must not be blank or null.
      */
-    public AuthenticatorAppRegistrationURIBuilder(AMIdentity id, String secretHex) {
+    public AuthenticatorAppRegistrationURIBuilder(AMIdentity id, String secretHex, int codeLength, String issuer) {
         Reject.ifNull(id, "id cannot be null");
         Reject.ifNull(secretHex, "secretHex cannot be null");
+        Reject.ifTrue(StringUtils.isBlank(issuer), "issuer cannot be empty");
+        Reject.ifTrue((codeLength < MIN_CODE_LENGTH), "code length must be " + MIN_CODE_LENGTH + " or greater");
         if (secretHex.length() == 0) {
             throw new IllegalArgumentException("secretHex cannot be an empty String.");
         }
 
+        this.issuer = issuer;
         this.id = id;
         this.secretHex = secretHex;
+        this.codeLength = codeLength;
     }
 
     /**
@@ -92,7 +99,7 @@ public class AuthenticatorAppRegistrationURIBuilder {
     }
 
     private String getAppRegistrationUri(OTPType otpType) throws DecoderException {
-        String appRegistrationUri = "";
+        String appRegistrationUri;
 
         byte[] secretPlainTextBytes = Hex.decodeHex(secretHex.toCharArray());
 
@@ -103,7 +110,7 @@ public class AuthenticatorAppRegistrationURIBuilder {
         String realm = extractHumanReadableRealmString(id.getRealm());
 
         appRegistrationUri = "otpauth://" + otpType.getIdentifier() + "/" + issuer + ":" + realm + userName +
-                "?secret=" + secretBase32 + "&issuer=" + issuer;
+                "?secret=" + secretBase32 + "&issuer=" + issuer + "&digits=" + codeLength;
 
         return appRegistrationUri;
     }
@@ -135,17 +142,6 @@ public class AuthenticatorAppRegistrationURIBuilder {
         extractedRealmString += "/";
 
         return extractedRealmString;
-    }
-
-    /**
-     * Sets the value of the provider or service that the account is associated with. This is used in construction
-     * of the Authenticator App's registration URI.
-     *
-     * @param issuer The provider or service that the account is associated with. Must be a value that is not null
-     *               and not an empty string.
-     */
-    public void setIssuer(String issuer) {
-        this.issuer = issuer;
     }
 
     private enum OTPType {

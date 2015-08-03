@@ -96,8 +96,10 @@ public class OATH extends AMLoginModule {
     private static final String MIN_SECRET_KEY_LENGTH =
             "iplanet-am-auth-oath-min-secret-key-length";
     private static final String MAXIMUM_CLOCK_DRIFT = "openam-auth-oath-maximum-clock-drift";
+    private static final String ISSUER_NAME = "openam-auth-oath-issuer-name";
 
     //module attribute holders
+    private String issuerName;
     private int userConfiguredSkippable = 0;
     private boolean isOptional;
     private int passLen = 0;
@@ -207,6 +209,7 @@ public class OATH extends AMLoginModule {
             this.totpStepsInWindow = CollectionHelper.getIntMapAttr(options, TOTP_STEPS_IN_WINDOW, 1, debug);
             this.checksum = CollectionHelper.getBooleanMapAttr(options, CHECKSUM, false);
             this.totpMaxClockDrift = CollectionHelper.getIntMapAttr(options, MAXIMUM_CLOCK_DRIFT, 0, debug);
+            this.issuerName = CollectionHelper.getMapAttr(options, ISSUER_NAME);
 
             final String algorithm = CollectionHelper.getMapAttr(options, ALGORITHM);
             if (algorithm.equalsIgnoreCase("HOTP")) {
@@ -497,10 +500,8 @@ public class OATH extends AMLoginModule {
             throw new AuthLoginException(amAuthOATH, "authFailed", null);
         }
 
-        final String secretHex = settings.getSharedSecret();
-
         final AuthenticatorAppRegistrationURIBuilder builder =
-                new AuthenticatorAppRegistrationURIBuilder(id, secretHex);
+                new AuthenticatorAppRegistrationURIBuilder(id, settings.getSharedSecret(), passLen, issuerName);
 
         int algorithm = this.algorithm;
         try {
