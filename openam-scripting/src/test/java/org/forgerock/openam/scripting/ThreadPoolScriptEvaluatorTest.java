@@ -36,6 +36,7 @@ import javax.script.SimpleBindings;
 
 import org.forgerock.openam.audit.context.ConfigurableExecutorService;
 import org.forgerock.openam.audit.context.AuditRequestContextPropagatingExecutorService;
+import org.forgerock.openam.shared.concurrency.ResizableLinkedBlockingQueue;
 import org.forgerock.util.thread.ExecutorServiceFactory;
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.thread.listener.ShutdownManager;
@@ -117,8 +118,10 @@ public class ThreadPoolScriptEvaluatorTest {
         // Given
         // Configure thread pool with core = max = 1 threads
         final ThreadPoolExecutor threadPool = new ThreadPoolExecutor(1, 1, 1, TimeUnit.MINUTES,
-                new LinkedBlockingQueue<Runnable>());
-        testEvaluator = new ThreadPoolScriptEvaluator(scriptEngineManager, threadPool, mockEvaluator);
+                new ResizableLinkedBlockingQueue<Runnable>());
+        final ConfigurableExecutorService configurableExecutorService =
+                new AuditRequestContextPropagatingExecutorService(threadPool);
+        testEvaluator = new ThreadPoolScriptEvaluator(scriptEngineManager, configurableExecutorService, mockEvaluator);
         final int newCoreSize = 50;
         final int newMaxSize = 100;
         final ScriptEngineConfiguration newConfiguration = ScriptEngineConfiguration.builder()
@@ -139,7 +142,7 @@ public class ThreadPoolScriptEvaluatorTest {
         // Given
         // Configure thread pool with core = max = 1 threads
         final ThreadPoolExecutor threadPool = new ThreadPoolExecutor(1, 1, 1, TimeUnit.MINUTES,
-                new LinkedBlockingQueue<Runnable>());
+                new ResizableLinkedBlockingQueue<Runnable>());
         final ConfigurableExecutorService configurableExecutorService =
                 new AuditRequestContextPropagatingExecutorService(threadPool);
         testEvaluator = new ThreadPoolScriptEvaluator(scriptEngineManager, configurableExecutorService, mockEvaluator);
