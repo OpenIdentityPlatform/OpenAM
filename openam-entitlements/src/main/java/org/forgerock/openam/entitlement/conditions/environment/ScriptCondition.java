@@ -44,7 +44,6 @@ import org.forgerock.openam.scripting.SupportedScriptingLanguage;
 import org.forgerock.openam.scripting.api.ScriptedIdentity;
 import org.forgerock.openam.scripting.api.ScriptedSession;
 import org.forgerock.openam.scripting.service.ScriptConfiguration;
-import org.forgerock.openam.scripting.service.ScriptingService;
 import org.forgerock.openam.scripting.service.ScriptingServiceFactory;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
@@ -118,8 +117,7 @@ public class ScriptCondition extends EntitlementConditionAdaptor {
     public ConditionDecision evaluate(String realm, Subject subject, String resourceName,
                                       Map<String, Set<String>> environment) throws EntitlementException {
         try {
-            ScriptingService scriptingService = scriptingServiceFactory.create(subject, realm);
-            ScriptConfiguration configuration = scriptingService.get(scriptId);
+            ScriptConfiguration configuration = getScriptConfiguration(realm);
 
             if (configuration == null) {
                 throw new EntitlementException(EntitlementException.INVALID_SCRIPT_ID, scriptId);
@@ -171,6 +169,19 @@ public class ScriptCondition extends EntitlementConditionAdaptor {
         } catch (ScriptException | javax.script.ScriptException | IdRepoException | SSOException ex) {
             throw new EntitlementException(EntitlementException.CONDITION_EVALUATION_FAILED, ex);
         }
+    }
+
+    /**
+     * Retrieve the script configuration from the scripting service.
+     *
+     * @param realm
+     *         The realm in which to locate the configuration
+     *
+     * @return The script configuration or null if it was not found
+     * @throws ScriptException if the operation was not successful
+     */
+    protected ScriptConfiguration getScriptConfiguration(String realm) throws ScriptException {
+        return scriptingServiceFactory.create(SubjectUtils.createSuperAdminSubject(), realm).get(scriptId);
     }
 
     /**

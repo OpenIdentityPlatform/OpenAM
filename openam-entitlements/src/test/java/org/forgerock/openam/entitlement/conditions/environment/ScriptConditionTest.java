@@ -163,9 +163,7 @@ public class ScriptConditionTest extends GuiceTestCase {
         Map<String, Set<String>> env = new HashMap<>();
         Map<String, Set<String>> advice = new HashMap<>();
 
-        given(scriptingServiceFactory.create(subject, "/abc")).willReturn(scriptingService);
-
-        ScriptConfiguration configuration = ScriptConfiguration
+        final ScriptConfiguration configuration = ScriptConfiguration
                 .builder()
                 .setId("123-456-789")
                 .setName("test-script")
@@ -173,7 +171,12 @@ public class ScriptConditionTest extends GuiceTestCase {
                 .setLanguage(SupportedScriptingLanguage.JAVASCRIPT)
                 .setScript("some-script-here")
                 .build();
-        given(scriptingService.get("123-456-789")).willReturn(configuration);
+        scriptCondition = new ScriptCondition() {
+            @Override
+            protected ScriptConfiguration getScriptConfiguration(String realm) throws ScriptException {
+                return configuration;
+            }
+        };
         given(coreWrapper.getIdentity(token)).willReturn(mock(AMIdentity.class));
 
         // When
@@ -208,8 +211,12 @@ public class ScriptConditionTest extends GuiceTestCase {
         subject.getPrincipals().add(new AuthSPrincipal("user"));
         Map<String, Set<String>> env = new HashMap<>();
 
-        given(scriptingServiceFactory.create(subject, "/abc")).willReturn(scriptingService);
-        given(scriptingService.get("123-456-789")).willReturn(null);
+        scriptCondition = new ScriptCondition() {
+            @Override
+            protected ScriptConfiguration getScriptConfiguration(String realm) throws ScriptException {
+                return null;
+            }
+        };
 
         // When
         scriptCondition.setScriptId("123-456-789");
