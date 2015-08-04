@@ -1,6 +1,4 @@
 /*
- * Copyright 2013-2015 ForgeRock AS.
- *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,8 +10,9 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2015 ForgeRock AS.
  */
-
 package org.forgerock.openam.upgrade;
 
 import com.google.inject.Key;
@@ -32,10 +31,13 @@ import java.util.Map;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.impl.CTSDataLayerConfiguration;
+import org.forgerock.openam.cts.impl.LDAPConfig;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.sm.datalayer.api.DataLayerException;
+import org.forgerock.openam.sm.datalayer.api.StoreMode;
+import org.forgerock.openam.sm.datalayer.impl.ldap.LdapDataLayerConfiguration;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.openam.utils.StringUtils;
@@ -61,8 +63,6 @@ import org.forgerock.opendj.ldif.LDIFChangeRecordReader;
  *  <li>Adding the schema for the dashboard service to the embedded user store.</li>
  *  <li>Adding the schema for deviceprint module to the embedded user store.</li>
  * </ul>
- *
- * @author Peter Major
  */
 public class DirectoryContentUpgrader {
 
@@ -75,6 +75,8 @@ public class DirectoryContentUpgrader {
     private final ConnectionFactory<Connection> connFactory;
     private final String baseDir;
     private final String baseDN;
+    private final boolean isEmbedded;
+    private final LdapDataLayerConfiguration ctsConfig;
 
     /**
      * This constructor will initialize the different directory content upgraders and ensures that each of them are
@@ -87,13 +89,15 @@ public class DirectoryContentUpgrader {
     public DirectoryContentUpgrader(String baseDir, String baseDN) throws UpgradeException {
         this.baseDir = baseDir;
         this.baseDN = baseDN;
+        isEmbedded = EmbeddedOpenDS.isStarted();
+        ctsConfig = InjectorHolder.getInstance(CTSDataLayerConfiguration.class);
 
         Key<ConnectionFactory> key = Key.get(ConnectionFactory.class, DataLayer.Types.typed(ConnectionType.DATA_LAYER));
         connFactory = InjectorHolder.getInstance(key);
 
         upgraders.add(new AddCTSSchema());
         upgraders.add(new CreateCTSContainer());
-        if (EmbeddedOpenDS.isStarted()) {
+        if (isEmbedded) {
             upgraders.add(new CreateCTSIndexes());
             upgraders.add(new AddDashboardSchema());
             upgraders.add(new AddDevicePrintSchema());
@@ -224,7 +228,7 @@ public class DirectoryContentUpgrader {
         } finally {
             IOUtils.closeIfNotNull(conn);
         }
-        if (EmbeddedOpenDS.isStarted()) {
+        if (isEmbedded) {
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("Rebuilding indexes in embedded directory");
             }
@@ -284,7 +288,14 @@ public class DirectoryContentUpgrader {
 
         @Override
         public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
-            return !entryExists(conn, CTSDataLayerConfiguration.getTokenRootDN(DN.valueOf(baseDN)));
+            if (isEmbedded) {
+                return ctsConfig.getDefaultRootSuffix().equals(ctsConfig.getTokenStoreRootSuffix())
+                        && !entryExists(conn, ctsConfig.getDefaultRootSuffix());
+            } else {
+                return StoreMode.DEFAULT.equals(ctsConfig.getStoreMode())
+                        && ctsConfig.getDefaultRootSuffix().equals(ctsConfig.getTokenStoreRootSuffix())
+                        && !entryExists(conn, ctsConfig.getDefaultRootSuffix());
+            }
         }
     }
 
