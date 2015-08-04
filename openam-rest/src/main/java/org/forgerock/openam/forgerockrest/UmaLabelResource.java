@@ -106,10 +106,10 @@ public class UmaLabelResource implements CollectionResourceProvider {
         final ResourceSetLabel label;
 
         try {
-            label = labelStore.create(realm, userName, new ResourceSetLabel("", labelName, LabelType.valueOf(labelType), Collections.EMPTY_SET));
+            label = labelStore.create(realm, userName, new ResourceSetLabel(null, labelName, LabelType.valueOf(labelType), Collections.EMPTY_SET));
             resultHandler.handleResult(new Resource(label.getId(), String.valueOf(label.hashCode()), label.asJson()));
         } catch (ResourceException e) {
-            resultHandler.handleError(new BadRequestException("Error creating label"));
+            resultHandler.handleError(e);
         }
     }
 

@@ -104,7 +104,7 @@ public class UmaLabelResourceTest {
         given(createRequest.getContent()).willReturn(umaLabel);
         given(contextHelper.getRealm(serverContext)).willReturn(REALM_NAME);
         given(contextHelper.getUserId(serverContext)).willReturn(RESOURCE_OWNER_ID);
-        final ResourceSetLabel resourceSetLabel = new ResourceSetLabel("", LABEL_NAME, LabelType.valueOf(LABEL_TYPE), Collections.EMPTY_SET);
+        final ResourceSetLabel resourceSetLabel = new ResourceSetLabel(null, LABEL_NAME, LabelType.valueOf(LABEL_TYPE), Collections.EMPTY_SET);
         given(umaLabelsStore.create(REALM_NAME, RESOURCE_OWNER_ID, resourceSetLabel)).willReturn(resourceSetLabel);
 
         //When
