@@ -76,16 +76,8 @@ define("org/forgerock/openam/ui/uma/delegates/UMADelegate", [
     // FIXME: Mutiple calls to #all end-point throughout this section. Optimize
     obj.labels = {
         all: function () {
-            var self = this;
-
             return obj.serviceCall({
                 url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" + encodeURIComponent(Configuration.loggedUser.username) + "/oauth2/resources/labels?_queryFilter=true")
-            }).done(function(data) {
-                if(!_.any(data.result, function(label) {
-                    return label.name.toLowerCase() === "starred";
-                })) {
-                    self.create("starred", "STAR");
-                }
             });
         },
         create: function(name, type) {
@@ -98,22 +90,6 @@ define("org/forgerock/openam/ui/uma/delegates/UMADelegate", [
                 })
             });
         },
-        getStarred: function() {
-            var promise = $.Deferred(),
-                umaConfig = Configuration.globalData.auth.uma;
-
-            if (umaConfig && umaConfig.labels && umaConfig.labels.starred) {
-                promise.resolve(umaConfig.labels.starred);
-            } else {
-                promise = obj.labels.all();
-                promise.done(function () {
-                    promise.resolve(Configuration.globalData.auth.uma.labels.starred);
-                }).error(function () {
-                    promise.resolve();
-                });
-            }
-            return promise;
-        },
         get: function(id) {
             return obj.serviceCall({
                 url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" +
@@ -121,6 +97,13 @@ define("org/forgerock/openam/ui/uma/delegates/UMADelegate", [
                                                       "/oauth2/resources/labels?_queryFilter=true")
             }).then(function(data) {
                 return _.findWhere(data.result, { _id: id });
+            });
+        },
+        getByName: function(name) {
+            return obj.serviceCall({
+                url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" + encodeURIComponent(Configuration.loggedUser.username) + "/oauth2/resources/labels?_queryFilter=true")
+            }).then(function(data) {
+                data = !_.any(data.result, function(label) { return label.name.toLowerCase() === name; });
             });
         }
     };

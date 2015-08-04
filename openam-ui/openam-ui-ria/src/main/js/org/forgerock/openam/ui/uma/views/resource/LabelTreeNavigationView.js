@@ -50,6 +50,12 @@ define("org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView", [
             var self = this;
 
             UMADelegate.labels.all().done(function (data) {
+                if(!_.any(data.result, function(label) {
+                    return label.name.toLowerCase() === "starred";
+                })) {
+                    UMADelegate.labels.create("starred", "STAR");
+                }
+
                 self.data.labels = {
                     starred: _.filter(data.result, function(label) { return label.type.toLowerCase() === "starred"; }),
                     system: _.filter(data.result, function(label) { return label.type.toLowerCase() === "system"; }),
