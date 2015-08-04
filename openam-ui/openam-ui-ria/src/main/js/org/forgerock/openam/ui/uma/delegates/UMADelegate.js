@@ -84,7 +84,7 @@ define("org/forgerock/openam/ui/uma/delegates/UMADelegate", [
                 if(!_.any(data.result, function(label) {
                     return label.name.toLowerCase() === "starred";
                 })) {
-                    self.create("starred", "STARRED");
+                    self.create("starred", "STAR");
                 }
             });
         },

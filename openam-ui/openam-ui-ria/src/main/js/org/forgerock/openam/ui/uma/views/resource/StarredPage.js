@@ -16,12 +16,26 @@
 
 /*global define*/
 define("org/forgerock/openam/ui/uma/views/resource/StarredPage", [
-    "org/forgerock/openam/ui/uma/views/resource/BasePage"
-], function(BasePage) {
+    "underscore",
+    "org/forgerock/openam/ui/uma/views/resource/BasePage",
+    "org/forgerock/openam/ui/uma/delegates/UMADelegate"
+], function(_, BasePage, UMADelegate) {
     var StarredPage = BasePage.extend({
         template: "templates/uma/views/resource/StarredPageTemplate.html",
         render: function(args, callback) {
-            this.renderGrid(this.createLabelCollection("starred"), this.createColumns("starred"), callback);
+            var self = this;
+
+            UMADelegate.labels.all().done(function(data) {
+                var starred = _.find(data.result, function(label) {
+                    return label.name.toLowerCase() === "starred";
+                });
+
+                if(starred) {
+                    self.renderGrid(self.createLabelCollection(starred._id), self.createColumns("starred"), callback);
+                } else {
+                    console.error("Unable to find \"starred\" label. Label should have been created by UI on first load.");
+                }
+            });
         }
     });
 
