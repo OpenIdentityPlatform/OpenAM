@@ -43,9 +43,9 @@ import org.forgerock.opendj.ldap.Connections;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.ErrorResultException;
 import org.forgerock.opendj.ldap.ErrorResultIOException;
+import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.LDAPConnectionFactory;
 import org.forgerock.opendj.ldap.LDAPOptions;
-import org.forgerock.opendj.ldap.RDN;
 import org.forgerock.opendj.ldap.SSLContextBuilder;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.requests.Requests;
@@ -196,9 +196,8 @@ public class AMSetupDSConfig {
      * @return <code>true</code> if specified suffix exists. 
      */
     public boolean connectDSwithDN(boolean ssl) {
-        String filter = "cn=" + "\"" + suffix + "\"";
         try (Connection conn = getLDAPConnection(ssl)) {
-            ConnectionEntryReader results = conn.search(suffix, SearchScope.BASE_OBJECT, filter);
+            ConnectionEntryReader results = conn.search(suffix, SearchScope.BASE_OBJECT, Filter.objectClassPresent().toString());
             return results.hasNext();
         } catch (ErrorResultIOException e) {
             disconnectDServer();
