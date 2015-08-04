@@ -68,7 +68,6 @@ import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.utils.CollectionUtils;
-import org.forgerock.opendj.ldap.DN;
 
 /**
  *
@@ -328,7 +327,7 @@ public class EntitlementService extends EntitlementConfiguration {
             final ServiceConfig appConfig = getApplicationConfiguration(getSSOToken(), realm);
             final Set<String> names = appConfig.getSubConfigNames();
             if (appConfig != null && names.contains(name)) {
-                return createApplication(appConfig, name, realm);
+                return createApplication(appConfig, name);
             }
         } catch (EntitlementException ex) {
             PolicyConstants.DEBUG.error("EntitlementService.getApplication", ex);
@@ -369,7 +368,7 @@ public class EntitlementService extends EntitlementConfiguration {
             if (appConfig != null) {
                 final Set<String> names = appConfig.getSubConfigNames();
                 for (String name : names) {
-                    results.add(createApplication(appConfig, name, realm));
+                    results.add(createApplication(appConfig, name));
                 }
             }
         } catch (EntitlementException ex) {
@@ -423,13 +422,13 @@ public class EntitlementService extends EntitlementConfiguration {
         return null;
     }
 
-    private Application createApplication(ServiceConfig conf, String appName, String realm) throws
+    private Application createApplication(ServiceConfig conf, String appName) throws
             IllegalAccessException, EntitlementException, InstantiationException, SMSException, SSOException {
 
         final Map<String, Set<String>> data = conf.getSubConfig(appName).getAttributes();
         final ApplicationType applicationType = ApplicationTypeManager.getAppplicationType(
                 getAdminSubject(), EntitlementUtils.getAttribute(data, EntitlementUtils.APPLICATION_TYPE));
-        return EntitlementUtils.createApplication(applicationType, realm, appName, data);
+        return EntitlementUtils.createApplication(applicationType, appName, data);
     }
 
     /**

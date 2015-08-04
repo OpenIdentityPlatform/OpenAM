@@ -118,7 +118,6 @@ public class Application implements Cloneable {
     private static final int LEN_LAST_MODIFIED_DATE_ATTRIBUTE =
         LAST_MODIFIED_DATE_ATTRIBUTE.length();
 
-    private String realm = "/";
     private String name;
     private String description;
     private ApplicationType applicationType;
@@ -167,13 +166,8 @@ public class Application implements Cloneable {
      * @param name Name of Application.
      * @param applicationType Its application type.
      */
-    public Application(
-            String realm,
-            String name,
-            ApplicationType applicationType
-    ) {
+    public Application(String name, ApplicationType applicationType) {
         this();
-        this.realm = realm;
         this.name = name;
         this.applicationType = applicationType;
     }
@@ -188,15 +182,6 @@ public class Application implements Cloneable {
         this.applicationType = applicationType;
     }
 
-    /**
-     * Returns the realm of this Application
-     *
-     * @return A string representation of the Application's realm, not-null.
-     */
-    public String getRealm() {
-        return realm;
-    }
-
     @Override
     public Application clone() {
         Application clone = new Application();
@@ -206,7 +191,6 @@ public class Application implements Cloneable {
 
     protected void cloneAppl(Application clone) {
         clone.name = name;
-        clone.realm = realm;
         clone.description = description;
         clone.applicationType = applicationType;
 
@@ -697,15 +681,11 @@ public class Application implements Cloneable {
         }
     }
 
-    public void setRealm(String realm) {
-        this.realm = realm;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
 
-    public boolean canBeDeleted() {
+    public boolean canBeDeleted(String realm) {
         PrivilegeIndexStore pis = PrivilegeIndexStore.getInstance(
                 PolicyConstants.SUPER_ADMIN_SUBJECT, realm);
         try {

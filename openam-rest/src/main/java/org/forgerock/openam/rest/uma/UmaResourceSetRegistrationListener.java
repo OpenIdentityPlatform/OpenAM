@@ -87,7 +87,7 @@ public class UmaResourceSetRegistrationListener implements ResourceSetRegistrati
             Application application = applicationManager.getApplication(adminSubject, realm,
                     resourceSet.getClientId().toLowerCase());
             application.addAllResourceTypeUuids(Collections.singleton(resourceType.getUUID()));
-            applicationManager.saveApplication(adminSubject, application);
+            applicationManager.saveApplication(adminSubject, realm, application);
         } catch (EntitlementException | RuntimeException e) {
             if (logger.errorEnabled()) {
                 logger.error("Failed to add Resource Type, " + resourceType.getUUID() + " to application, "

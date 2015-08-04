@@ -96,7 +96,7 @@ public class CanBeDeletedAppTest {
 
     private void createAppl() throws EntitlementException,
         InstantiationException, IllegalAccessException {
-        Application appl = new Application("/", APPL_NAME,
+        Application appl = new Application(APPL_NAME,
             ApplicationTypeManager.getAppplicationType(adminSubject,
             ApplicationTypeManager.URL_APPLICATION_TYPE_NAME));
 

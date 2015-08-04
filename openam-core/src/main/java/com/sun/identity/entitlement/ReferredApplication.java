@@ -41,10 +41,11 @@ import java.util.Set;
 public class ReferredApplication extends Application {
     private Map<String, Integer> mapResourcesToCount;
 
-    ReferredApplication(String realm, String name, Application application, Set<String> res) {
+    ReferredApplication(String name, Application application, Set<String> res) {
         super();
         application.cloneAppl(this);
-        setRealm(realm);
+        // Removed as part of OPENAM-5821
+        //setRealm(realm);
         mapResourcesToCount(res);
     }
 

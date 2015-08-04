@@ -136,7 +136,7 @@ public class ReferredApplicationManager {
                 if (ra == null) {
                     Application appl = ApplicationManager.getApplication(
                             PolicyConstants.SUPER_ADMIN_SUBJECT, r, applName);
-                    ra = new ReferredApplication(realm, applName,
+                    ra = new ReferredApplication(applName,
                         appl, res);
                     tmpMap.put(applName, ra);
                     applications.add(ra);
@@ -162,7 +162,7 @@ public class ReferredApplicationManager {
         Application appl = ApplicationManager.getApplication(
                 PolicyConstants.SUPER_ADMIN_SUBJECT,
             parentRealm, applName);
-        ReferredApplication ra = new ReferredApplication(realm, applName,
+        ReferredApplication ra = new ReferredApplication(applName,
             appl, resources);
         Set<ReferredApplication> set = mapRealmToReferredAppls.get(realm);
         set.add(ra);

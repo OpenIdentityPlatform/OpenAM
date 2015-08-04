@@ -80,7 +80,7 @@ public class ApplicationFilterTest {
             return;
         }
         
-        Application appl = new Application("/", APPL_NAME,
+        Application appl = new Application(APPL_NAME,
             ApplicationTypeManager.getAppplicationType(adminSubject,
             ApplicationTypeManager.URL_APPLICATION_TYPE_NAME));
         // Test disabled, unable to fix model change

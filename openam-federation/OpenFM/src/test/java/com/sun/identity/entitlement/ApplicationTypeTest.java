@@ -33,9 +33,7 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.security.AdminTokenAction;
 import java.security.AccessController;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
 import org.testng.annotations.AfterClass;
@@ -53,7 +51,7 @@ public class ApplicationTypeTest {
         SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
             AdminTokenAction.getInstance());
         adminSubject = SubjectUtils.createSubject(adminToken);
-        Application appl = new Application("/", APPL_NAME,
+        Application appl = new Application(APPL_NAME,
             ApplicationTypeManager.getAppplicationType(adminSubject,
             ApplicationTypeManager.URL_APPLICATION_TYPE_NAME));
         // Test disabled, unable to fix model change

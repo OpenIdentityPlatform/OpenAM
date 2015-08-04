@@ -96,8 +96,7 @@ public class DelegationPrivilegeIdRepoAccessTest {
 
         createReferral();
         
-        Application appl = ApplicationManager.newApplication(
-            SUB_REALM, APPLICATION_NAME,
+        Application appl = ApplicationManager.newApplication(APPLICATION_NAME,
             ApplicationTypeManager.getAppplicationType(
                 PrivilegeManager.superAdminSubject,
                 ApplicationTypeManager.URL_APPLICATION_TYPE_NAME));

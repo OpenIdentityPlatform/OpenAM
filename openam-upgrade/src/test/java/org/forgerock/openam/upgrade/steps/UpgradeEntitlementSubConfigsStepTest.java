@@ -325,7 +325,7 @@ public class UpgradeEntitlementSubConfigsStepTest {
      * @return new application instance
      */
     private static Application newApplication(final String name, final ApplicationType type) {
-        return new Application("/", name, type);
+        return new Application(name, type);
     }
 
     /**

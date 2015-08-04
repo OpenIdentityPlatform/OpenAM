@@ -71,16 +71,6 @@ public class ApplicationWrapper implements Comparable<ApplicationWrapper> {
         return application;
     }
 
-    @JsonProperty("realm")
-    public void setRealm(String realm) {
-        application.setRealm(realm);
-    }
-
-    @JsonProperty("realm")
-    public String getRealm() {
-        return application.getRealm();
-    }
-
     @JsonProperty("name")
     public void setName(String name) {
         application.setName(name);

@@ -33,8 +33,6 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.security.AdminTokenAction;
 import java.security.AccessController;
-import java.util.HashSet;
-import java.util.Set;
 import javax.security.auth.Subject;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -60,7 +58,7 @@ public class ApplicationCreatorNDateTest {
             return;
         }
 
-        Application appl = new Application("/", APPL_NAME,
+        Application appl = new Application(APPL_NAME,
             ApplicationTypeManager.getAppplicationType(adminSubject,
             ApplicationTypeManager.URL_APPLICATION_TYPE_NAME));
 

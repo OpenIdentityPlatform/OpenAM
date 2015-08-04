@@ -98,7 +98,7 @@ public class ApplicationManagerTest {
         final ApplicationType dummyType =
                 new ApplicationType("DummyType", Collections.<String, Boolean>emptyMap(), null, null, null);
 
-        return new Application("/", name, dummyType);
+        return new Application(name, dummyType);
     }
 
     private SearchFilter nameFilter(String name) {

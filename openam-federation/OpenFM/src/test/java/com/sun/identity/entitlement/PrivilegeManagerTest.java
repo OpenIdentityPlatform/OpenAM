@@ -103,7 +103,7 @@ public class PrivilegeManagerTest {
             return;
         }
 
-        Application appl = new Application(realm, APPL_NAME,
+        Application appl = new Application(APPL_NAME,
             ApplicationTypeManager.getAppplicationType(adminSubject,
             ApplicationTypeManager.URL_APPLICATION_TYPE_NAME));
 

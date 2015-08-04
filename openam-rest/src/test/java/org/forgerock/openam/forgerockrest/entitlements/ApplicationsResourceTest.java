@@ -214,65 +214,6 @@ public class ApplicationsResourceTest {
         assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.INTERNAL_ERROR);
     }
 
-
-    @Test
-    public void shouldThrowBadRequestIfRealmOfRequestAndResourceNotEqualCreate() throws EntitlementException {
-        //given
-        SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        realmContext.addSubRealm("/", "/");
-        CreateRequest mockCreateRequest = mock(CreateRequest.class);
-        ResultHandler mockResultHandler = mock(ResultHandler.class);
-        Subject subject = new Subject();
-        Application mockApplication = mock(Application.class);
-
-        given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
-        given(applicationWrapper.getApplication()).willReturn(mockApplication);
-        given(mockApplication.getRealm()).willReturn("NOT SLASH");
-
-        //when
-        applicationsResource.createInstance(realmContext, mockCreateRequest, mockResultHandler);
-
-        //then
-        ArgumentCaptor<ResourceException> captor = ArgumentCaptor.forClass(ResourceException.class);
-        verify(mockResultHandler).handleError(captor.capture());
-        assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.BAD_REQUEST);
-    }
-
-    @Test
-    public void shouldThrowBadRequestIfRealmOfRequestAndResourceNotEqualUpdate() throws EntitlementException {
-
-        //Given
-        SSOTokenContext subjectContext = mock(SSOTokenContext.class);
-        RealmContext realmContext = new RealmContext(subjectContext);
-        realmContext.addSubRealm("REALM", "REALM");
-        ServerContext context = new ServerContext(realmContext);
-        String resourceId = "iPlanetAMWebAgentService";
-        UpdateRequest request = mock(UpdateRequest.class);
-        ResultHandler<Resource> handler = mock(ResultHandler.class);
-        Subject subject = new Subject();
-        JsonValue content = mock(JsonValue.class);
-        Application application = mock(Application.class);
-        Application newApplication = mock(Application.class);
-
-        given(subjectContext.getCallerSubject()).willReturn(subject);
-        given(request.getContent()).willReturn(content);
-        given(applicationManagerWrapper.getApplication(subject, "/REALM", resourceId)).willReturn(application);
-        given(applicationWrapper.getName()).willReturn("APP_NAME");
-        given(applicationWrapper.getApplication()).willReturn(newApplication);
-        given(newApplication.getRealm()).willReturn("NOT REALM");
-
-        //When
-        applicationsResource.updateInstance(context, resourceId, request, handler);
-
-        //Then
-        ArgumentCaptor<ResourceException> resourceExceptionCaptor = ArgumentCaptor.forClass(ResourceException.class);
-        verify(handler).handleError(resourceExceptionCaptor.capture());
-        ResourceException exception = resourceExceptionCaptor.getValue();
-        Assert.assertEquals(exception.getCode(), 400);
-        Assert.assertEquals(exception.getReason(), "Bad Request");
-    }
-
     @Test
     public void shouldThrowInternalErrorIfResourceWillNotSave() throws EntitlementException {
         //given
@@ -286,10 +227,9 @@ public class ApplicationsResourceTest {
 
         given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
         given(applicationWrapper.getApplication()).willReturn(mockApplication);
-        given(mockApplication.getRealm()).willReturn("/");
         given(mockApplication.getName()).willReturn("newApplication");
         doThrow(new EntitlementException(1)).when
-                (applicationManagerWrapper).saveApplication(any(Subject.class), any(Application.class));
+                (applicationManagerWrapper).saveApplication(any(Subject.class), anyString(), any(Application.class));
 
         //when
         applicationsResource.createInstance(realmContext, mockCreateRequest, mockResultHandler);
@@ -352,7 +292,6 @@ public class ApplicationsResourceTest {
         given(mockSSOTokenContext.getCallerSubject()).willReturn(mockSubject);
         given(applicationWrapper.getApplication()).willReturn(mockApplication);
         given(mockApplication.getName()).willReturn("newApplication");
-        given(mockApplication.getRealm()).willReturn("/");
 
         //when
         applicationsResource.createInstance(realmContext, mockCreateRequest, mockResultHandler);
@@ -392,7 +331,6 @@ public class ApplicationsResourceTest {
         given(mockSSOTokenContext.getCallerSubject()).willReturn(mockSubject);
         given(applicationWrapper.getApplication()).willReturn(mockApplication);
         given(mockApplication.getName()).willReturn("new+application");
-        given(mockApplication.getRealm()).willReturn("/");
 
         //when
         applicationsResource.createInstance(realmContext, mockCreateRequest, mockResultHandler);
@@ -627,14 +565,13 @@ public class ApplicationsResourceTest {
         given(applicationWrapper.getApplication()).willReturn(newApplication);
         given(newApplication.getLastModifiedDate()).willReturn(1000L);
         given(applicationWrapper.toJsonValue()).willReturn(response);
-        given(newApplication.getRealm()).willReturn("/REALM");
 
         //When
         applicationsResource.updateInstance(context, resourceId, request, handler);
 
         //Then
         verify(applicationManagerWrapper)
-                .updateApplication(application, applicationWrapper.getApplication(), subject);
+                .updateApplication(application, applicationWrapper.getApplication(), subject, "/REALM");
         ArgumentCaptor<Resource> resourceCaptor = ArgumentCaptor.forClass(Resource.class);
         verify(handler).handleResult(resourceCaptor.capture());
         Resource resource = resourceCaptor.getValue();
@@ -668,7 +605,6 @@ public class ApplicationsResourceTest {
                 .willReturn(application);
         given(applicationWrapper.getName()).willReturn("APP_NAME");
         given(applicationWrapper.getApplication()).willReturn(newApplication);
-        given(newApplication.getRealm()).willReturn("/REALM");
         given(newApplication.getLastModifiedDate()).willReturn(1000L);
         doThrow(EntitlementException.class).when(applicationWrapper).toJsonValue();
 
@@ -704,7 +640,6 @@ public class ApplicationsResourceTest {
         given(applicationManagerWrapper.getApplication(subject, "/REALM", resourceId)).willReturn(application);
         given(applicationWrapper.getName()).willReturn("APP_NAME");
         given(applicationWrapper.getApplication()).willReturn(newApplication);
-        given(newApplication.getRealm()).willReturn("/REALM");
         given(newApplication.getLastModifiedDate()).willReturn(1000L);
         doThrow(new EntitlementException(1)).when(applicationWrapper).toJsonValue();
 
@@ -713,7 +648,7 @@ public class ApplicationsResourceTest {
 
         //Then
         verify(applicationManagerWrapper)
-                .updateApplication(application, applicationWrapper.getApplication(), subject);
+                .updateApplication(application, applicationWrapper.getApplication(), subject, "/REALM");
         ArgumentCaptor<ResourceException> resourceExceptionCaptor = ArgumentCaptor.forClass(ResourceException.class);
         verify(handler).handleError(resourceExceptionCaptor.capture());
         ResourceException exception = resourceExceptionCaptor.getValue();
@@ -739,10 +674,9 @@ public class ApplicationsResourceTest {
         given(subjectContext.getCallerSubject()).willReturn(subject);
         given(request.getContent()).willReturn(content);
         given(applicationWrapper.getApplication()).willReturn(mockApplication);
-        given(mockApplication.getRealm()).willReturn("/REALM");
         given(applicationManagerWrapper.getApplication(subject, "/REALM", resourceId)).willReturn(mockApplication);
         doThrow(new EntitlementException(326)).when(applicationManagerWrapper)
-                .updateApplication(any(Application.class), any(Application.class), any(Subject.class));
+                .updateApplication(any(Application.class), any(Application.class), any(Subject.class), anyString());
 
         //When
         applicationsResource.updateInstance(context, resourceId, request, handler);
@@ -774,10 +708,9 @@ public class ApplicationsResourceTest {
         given(subjectContext.getCallerSubject()).willReturn(subject);
         given(request.getContent()).willReturn(content);
         given(applicationWrapper.getApplication()).willReturn(mockApplication);
-        given(mockApplication.getRealm()).willReturn("/REALM");
         given(applicationManagerWrapper.getApplication(subject, "/REALM", resourceId)).willReturn(mockApplication);
         doThrow(new EntitlementException(404)).when(applicationManagerWrapper)
-                .updateApplication(any(Application.class), any(Application.class), any(Subject.class));
+                .updateApplication(any(Application.class), any(Application.class), any(Subject.class), anyString());
 
         //When
         applicationsResource.updateInstance(context, resourceId, request, handler);
@@ -809,7 +742,6 @@ public class ApplicationsResourceTest {
         given(request.getContent()).willReturn(content);
         given(applicationManagerWrapper.getApplication(subject, "REALM", resourceId)).willReturn(null);
         given(applicationWrapper.getApplication()).willReturn(mockApplication);
-        given(mockApplication.getRealm()).willReturn("REALM");
 
         //When
         applicationsResource.updateInstance(context, resourceId, request, handler);

@@ -36,7 +36,7 @@ public class ReferredApplicationTest {
     @Test(enabled = false)
     public void shouldCreateUnEditableClone() throws IllegalAccessException, InstantiationException {
         //given
-        ReferredApplication refApp = new ReferredApplication("/", "App", application, Collections.EMPTY_SET);
+        ReferredApplication refApp = new ReferredApplication("App", application, Collections.EMPTY_SET);
 
         //when
         Application clone = refApp.clone();

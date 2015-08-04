@@ -33,12 +33,13 @@ public class ApplicationManagerWrapper {
      * {@link ApplicationManager#saveApplication(Subject, String, Application)}.
      *
      * @param adminSubject An admin-level {@link Subject}.
+     * @param realm The realm in which to save the {@link Application}
      * @param application The {@link Application} to save
      * @throws EntitlementException If there was an issue saving the application
      */
-    public void saveApplication(Subject adminSubject, Application application)
+    public void saveApplication(Subject adminSubject, String realm, Application application)
             throws EntitlementException {
-        ApplicationManager.saveApplication(adminSubject, application.getRealm(), application);
+        ApplicationManager.saveApplication(adminSubject, realm, application);
     }
 
     /**
@@ -91,11 +92,12 @@ public class ApplicationManagerWrapper {
      * @param oldApplication The (existing) application, to update
      * @param newApplication The new version of the existing application. The name of the new and old much match.
      * @param subject The subject authorizing the update - will be validated for permission.
+     * @param realm The realm in which to update the {@link Application}
      * @throws EntitlementException if there was a problem deleting the old resource
      */
-    public void updateApplication(Application oldApplication, Application newApplication, Subject subject)
+    public void updateApplication(Application oldApplication, Application newApplication, Subject subject, String realm)
             throws EntitlementException {
-        ApplicationManager.updateApplication(oldApplication, newApplication, subject, newApplication.getRealm());
+        ApplicationManager.updateApplication(oldApplication, newApplication, subject, realm);
     }
 
     /**

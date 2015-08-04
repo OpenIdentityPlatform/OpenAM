@@ -110,7 +110,6 @@ public final class EntitlementUtils {
      * Constructs an {@link Application} object based on the provided information.
      *
      * @param applicationType The application's type.
-     * @param realm The realm where the application is defined.
      * @param name The name of the application.
      * @param data The configuration settings for the application.
      * @return An {@link Application} object corresponding to the provided details.
@@ -118,10 +117,9 @@ public final class EntitlementUtils {
      * @throws IllegalAccessException If the class settings cannot be instantiated.
      * @throws EntitlementException If the application class cannot be instantiated.
      */
-    public static Application createApplication(ApplicationType applicationType, String realm, String name,
-            Map<String, Set<String>> data) throws InstantiationException, IllegalAccessException,
-        EntitlementException {
-        Application app = ApplicationManager.newApplication(realm, name, applicationType);
+    public static Application createApplication(ApplicationType applicationType, String name,
+            Map<String, Set<String>> data) throws InstantiationException, IllegalAccessException, EntitlementException {
+        Application app = ApplicationManager.newApplication(name, applicationType);
 
         final Set<String> resourceTypeUuids = data.get(CONFIG_RESOURCE_TYPE_UUIDS);
         if (resourceTypeUuids != null) {

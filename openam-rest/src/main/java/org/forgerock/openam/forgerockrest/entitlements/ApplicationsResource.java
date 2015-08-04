@@ -162,12 +162,6 @@ public class ApplicationsResource extends RealmAwareResource {
 
         try {
             wrapp = createApplicationWrapper(creationRequest, callingSubject);
-
-            if (!realm.equals(wrapp.getApplication().getRealm())) {
-                throw new EntitlementException(EntitlementException.INVALID_APP_REALM,
-                                new String[] { wrapp.getApplication().getRealm(), realm });
-            }
-
             String wrappName = wrapp.getName();
             String newResourceId = request.getNewResourceId();
 
@@ -198,7 +192,7 @@ public class ApplicationsResource extends RealmAwareResource {
                 throw new EntitlementException(EntitlementException.APPLICATION_ALREADY_EXISTS);
             }
 
-            appManager.saveApplication(callingSubject, wrapp.getApplication());
+            appManager.saveApplication(callingSubject, realm, wrapp.getApplication());
             Application savedApp = appManager.getApplication(callingSubject, realm, appName);
             ApplicationWrapper savedAppWrapper = createApplicationWrapper(savedApp, appTypeManagerWrapper);
 
@@ -494,17 +488,12 @@ public class ApplicationsResource extends RealmAwareResource {
                 throw new EntitlementException(EntitlementException.NOT_FOUND, new String[] { resourceId });
             }
 
-            if (!getRealm(context).equals(wrapp.getApplication().getRealm())) {
-                 throw new EntitlementException(EntitlementException.INVALID_APP_REALM,
-                                new String[] { wrapp.getApplication().getRealm(), getRealm(context) });
-            }
-
             if (!resourceId.equals(wrapp.getName()) && //return conflict
                     appManager.getApplication(mySubject, getRealm(context), wrapp.getName()) != null) {
                 throw new EntitlementException(EntitlementException.APPLICATION_ALREADY_EXISTS);
             }
 
-            appManager.updateApplication(oldApplication, wrapp.getApplication(), mySubject);
+            appManager.updateApplication(oldApplication, wrapp.getApplication(), mySubject, getRealm(context));
 
             final Resource resource = new Resource(wrapp.getName(),
                     Long.toString(wrapp.getApplication().getLastModifiedDate()), wrapp.toJsonValue());

@@ -419,8 +419,7 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractEntitlementUpgrade
 
             try {
                 DEBUG.message("Saving new entitlement application: " + name);
-                entitlementService.storeApplication(createApplication(applicationType, ROOT_REALM,
-                        name, keyValueMap));
+                entitlementService.storeApplication(createApplication(applicationType, name, keyValueMap));
                 UpgradeProgress.reportEnd(AUDIT_UPGRADE_SUCCESS);
             } catch (EntitlementException eE) {
                 UpgradeProgress.reportEnd(AUDIT_UPGRADE_FAIL);

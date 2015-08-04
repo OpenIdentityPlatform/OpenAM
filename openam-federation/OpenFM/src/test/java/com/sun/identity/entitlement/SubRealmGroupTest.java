@@ -78,7 +78,7 @@ public class SubRealmGroupTest {
             AdminTokenAction.getInstance());
         adminSubject = SubjectUtils.createSubject(adminToken);
 
-        Application appl = new Application("/", APPL_NAME,
+        Application appl = new Application(APPL_NAME,
             ApplicationTypeManager.getAppplicationType(adminSubject,
             ApplicationTypeManager.URL_APPLICATION_TYPE_NAME));
 

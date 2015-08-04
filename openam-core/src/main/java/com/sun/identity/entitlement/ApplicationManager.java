@@ -319,7 +319,7 @@ public final class ApplicationManager {
         Application app = getApplication(adminSubject, realm, name);
 
         if (app != null) {
-            if (!app.canBeDeleted()) {
+            if (!app.canBeDeleted(realm)) {
                 throw new EntitlementException(EntitlementException.APP_NOT_CREATED_POLICIES_EXIST);
             }
             EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
@@ -615,23 +615,17 @@ public final class ApplicationManager {
     /**
      * Creates an application.
      *
-     * @param realm Realm name.
      * @param name Name of application.
      * @param applicationType application type.
      * @throws EntitlementException if application class is not found.
      */
-    public static Application newApplication(
-        String realm,
-        String name,
-        ApplicationType applicationType
-    ) throws EntitlementException {
+    public static Application newApplication(String name, ApplicationType applicationType) throws EntitlementException {
         Class clazz = applicationType.getApplicationClass();
-        Class[] parameterTypes = {String.class, String.class,
-            ApplicationType.class};
+        Class[] parameterTypes = {String.class, ApplicationType.class};
         Constructor constructor;
         try {
             constructor = clazz.getConstructor(parameterTypes);
-            Object[] parameters = {realm, name, applicationType};
+            Object[] parameters = {name, applicationType};
             return (Application) constructor.newInstance(parameters);
         } catch (NoSuchMethodException ex) {
             throw new EntitlementException(6, ex);

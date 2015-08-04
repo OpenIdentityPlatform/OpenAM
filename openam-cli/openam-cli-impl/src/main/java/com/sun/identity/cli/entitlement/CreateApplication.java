@@ -74,8 +74,7 @@ public class CreateApplication extends ApplicationImpl {
         writeLog(LogWriter.LOG_ACCESS, Level.INFO,
             "ATTEMPT_CREATE_APPLICATION", params);
         try {
-            Application appl = ApplicationManager.newApplication(realm,
-                appName, applicationType);
+            Application appl = ApplicationManager.newApplication(appName, applicationType);
             setApplicationAttributes(appl, attributeValues,
                 true);
             ApplicationManager.saveApplication(getAdminSubject(), realm, appl);
