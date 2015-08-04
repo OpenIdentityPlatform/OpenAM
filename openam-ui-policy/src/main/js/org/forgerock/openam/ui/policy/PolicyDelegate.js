@@ -113,7 +113,7 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
 
     obj.updatePolicy = function (name, data) {
         return obj.serviceCall({
-            url: "/policies/" + encodeURIComponent(name),
+            url: RealmHelper.decorateURLWithOverrideRealm("/policies/" + encodeURIComponent(name)),
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             type: "PUT",
             data: JSON.stringify(data),
