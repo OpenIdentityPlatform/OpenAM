@@ -176,7 +176,7 @@ public class RestSecurity {
      * Default Constructor
      * @param realm in which Rest Security service shall be created
      */
-    public RestSecurity(String realm) {
+    RestSecurity(String realm) {
         this.realm = realm;
         try {
             mgr = new ServiceConfigManager(AccessController.doPrivileged(AdminTokenAction.getInstance()),
