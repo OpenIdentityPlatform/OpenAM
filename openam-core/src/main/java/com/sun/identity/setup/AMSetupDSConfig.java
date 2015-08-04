@@ -215,7 +215,7 @@ public class AMSetupDSConfig {
      */
     String isDITLoaded(boolean ssl) {
         String baseDN = "ou=services," + suffix;
-        String filter = "(|(ou=DAI) (ou=sunIdentityRepositoryService))";
+        String filter = "(|(ou=DAI)(ou=sunIdentityRepositoryService))";
         try (Connection conn = getLDAPConnection(ssl)){
             ConnectionEntryReader results = conn.search(baseDN, SearchScope.WHOLE_SUBTREE, filter, "dn");
             return Boolean.toString(results.hasNext());
