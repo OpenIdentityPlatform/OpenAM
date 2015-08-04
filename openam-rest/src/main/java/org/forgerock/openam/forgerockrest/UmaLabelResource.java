@@ -141,7 +141,13 @@ public class UmaLabelResource implements CollectionResourceProvider {
     }
 
     private boolean isSameRevision(DeleteRequest deleteRequest, ResourceSetLabel resourceSetLabel) {
-        return deleteRequest.getRevision().equals(String.valueOf(resourceSetLabel.hashCode()));
+        final String revision = deleteRequest.getRevision();
+
+        if (revision == null || revision.equals("*")) {
+            return true;
+        }
+
+        return revision.equals(String.valueOf(resourceSetLabel.hashCode()));
     }
 
     @Override
