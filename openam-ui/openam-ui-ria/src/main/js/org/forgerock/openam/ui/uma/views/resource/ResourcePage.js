@@ -17,6 +17,7 @@
 /*global define*/
 define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
     "jquery",
+    "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "backbone",
     "backgrid",
@@ -29,7 +30,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy"
-], function ($, AbstractView, Backbone, Backgrid, BackgridUtils, BootstrapDialog, CommonShare, Constants, EventManager,
+], function ($, _, AbstractView, Backbone, Backgrid, BackgridUtils, BootstrapDialog, CommonShare, Constants, EventManager,
             Messages, Router, UIUtils, UMAResourceSetWithPolicy) {
     var ResourcePage = AbstractView.extend({
         initialize: function () {
@@ -94,14 +95,14 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
             // TODO: Simply flips the icon ATM, model update and save still TODO
             // this.model.toggleStarred();
             // self.model.save().done(function() {
-                this.$el.find("#starred i").toggleClass("fa-star-o fa-star");
+            this.$el.find("#starred i").toggleClass("fa-star-o fa-star");
             // });
         },
         renderTagsOptions: function () {
-          var self = this;
-            this.$el.find('#labels').selectize({
-                plugins: ['restore_on_backspace'],
-                delimiter: ',',
+            var self = this;
+            this.$el.find("#labels").selectize({
+                plugins: ["restore_on_backspace"],
+                delimiter: ",",
                 persist: false,
                create: true,
                 hideSelected: true,
@@ -111,16 +112,13 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                 items: self.data.resourceSetLabels,
                 render: {
                     item: function (item) {
-                        return '<div data-value="' + item.value + '" class="item">' + item.value + '</div>"';
+                        return "<div data-value=\"" + item.value + "\" class=\"item\">" + item.value + "</div>\"";
                     }
                 }
             });
         },
         render: function(args, callback) {
-            var collection, grid, id = null, options, RevokeCell, SelectizeCell, self = this;
-
-            // Get the current id
-            if(args && args[2]) { id = args[2]; }
+            var collection, grid, id = _.last(args), options, RevokeCell, SelectizeCell, self = this;
 
             /**
              * Guard clause to check if model requires sync'ing/updating
@@ -268,7 +266,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
             // });
 
             this.parentRender(function() {
-                self.$el.find("[data-toggle='tooltip']").tooltip();
+                self.$el.find("[data-toggle=\"tooltip\"]").tooltip();
                 self.renderTagsOptions();
 
                 if (self.model.has("policy") && self.model.get("policy").get("permissions").length > 0){

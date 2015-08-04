@@ -17,7 +17,7 @@
 /*global define*/
 define("config/routes/user/UMARoutes", function () {
     return {
-        // Lists of Resource Sets
+        // My Resources
         "umaResourcesMyResources": {
             view: "org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView",
             page: "org/forgerock/openam/ui/uma/views/resource/MyResourcesPage",
@@ -27,6 +27,17 @@ define("config/routes/user/UMARoutes", function () {
             defaults: ["myresources", ""],
             forceUpdate: true
         },
+        "umaResourcesMyResourcesResource": {
+            view: "org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView",
+            page: "org/forgerock/openam/ui/uma/views/resource/ResourcePage",
+            url: /^uma\/resources\/myresources\/([^\/]+)\/([^\/]+)\/?$/,
+            role: "ui-user",
+            pattern: "uma/resources/myresources/?/?",
+            defaults: [""],
+            forceUpdate: true
+        },
+
+        // Shared with me
         "umaResourcesSharedWithMe": {
             view: "org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView",
             page: "org/forgerock/openam/ui/uma/views/resource/SharedWithMePage",
@@ -35,6 +46,17 @@ define("config/routes/user/UMARoutes", function () {
             role: "ui-user",
             forceUpdate: true
         },
+        "umaResourcesSharedWithMeResource": {
+            view: "org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView",
+            page: "org/forgerock/openam/ui/uma/views/resource/ResourcePage",
+            url: /^uma\/resources\/sharedwithme\/([^\/]+)\/?$/,
+            role: "ui-user",
+            pattern: "uma/resources/sharedwithme/?",
+            defaults: [""],
+            forceUpdate: true
+        },
+
+        // Starred
         "umaResourcesStarred": {
             view: "org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView",
             page: "org/forgerock/openam/ui/uma/views/resource/StarredPage",
@@ -43,6 +65,17 @@ define("config/routes/user/UMARoutes", function () {
             role: "ui-user",
             forceUpdate: true
         },
+        "umaResourcesStarredResource": {
+            view: "org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView",
+            page: "org/forgerock/openam/ui/uma/views/resource/ResourcePage",
+            url: /^uma\/resources\/starred\/([^\/]+)\/?$/,
+            role: "ui-user",
+            pattern: "uma/resources/starred/?",
+            defaults: [""],
+            forceUpdate: true
+        },
+
+        // My Labels
         "umaResourcesMyLabels": {
             view: "org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView",
             page: "org/forgerock/openam/ui/uma/views/resource/MyLabelsPage",
@@ -52,16 +85,16 @@ define("config/routes/user/UMARoutes", function () {
             defaults: [""],
             forceUpdate: true
         },
-        // Individual Resource Sets
-        "umaResource": {
+        "umaResourcesMyLabelsResource": {
             view: "org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView",
             page: "org/forgerock/openam/ui/uma/views/resource/ResourcePage",
-            url: /^uma\/resources\/([^\/]+)\/([^\/]+)\/([^\/]+)\/?$/,
+            url: /^uma\/resources\/mylabels\/([^\/]+)\/([^\/]+)\/?$/,
             role: "ui-user",
-            pattern: "uma/resources/?/?/?",
-            defaults: ["", "", ""],
+            pattern: "uma/resources/mylabels/?/?",
+            defaults: ["", ""],
             forceUpdate: true
         },
+
         // History
         "umaHistory": {
             view: "org/forgerock/openam/ui/uma/views/history/ListHistory",

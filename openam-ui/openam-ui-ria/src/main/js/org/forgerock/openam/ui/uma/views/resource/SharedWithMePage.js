@@ -21,7 +21,7 @@ define("org/forgerock/openam/ui/uma/views/resource/SharedWithMePage", [
     var SharedWithMePage = BasePage.extend({
         template: "templates/uma/views/resource/SharedWithMePageTemplate.html",
         render: function(args, callback) {
-            this.renderGrid(this.createSetCollection(), this.createColumns("sharedwithme", "PLACEHOLDER"), callback);
+            this.renderGrid(this.createSetCollection(true), this.createColumns("sharedwithme"), callback);
         }
     });
 

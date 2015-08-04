@@ -27,10 +27,10 @@ define("org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView", [
         partials: [ "templates/uma/views/resource/_NestedList.html" ],
         findActiveNavItem: function (fragment) {
             var anchor = this.$el.find(".sidenav ol > li > a[href='#" + fragment + "']"),
-                parentOls, fragmentSections;
+                parentOls;
 
             if (anchor.length) {
-               this.$el.find(".sidenav ol").removeClass("in");
+                this.$el.find(".sidenav ol").removeClass("in");
 
                 parentOls = anchor.parentsUntil( this.$el.find(".sidenav"), "ol.collapse" );
                 parentOls.addClass("in").parent().children("span[data-toggle]").attr("aria-expanded", "true");
@@ -50,7 +50,11 @@ define("org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView", [
             var self = this;
 
             UMADelegate.labels.all().done(function (data) {
-                self.data.labels = data;
+                self.data.labels = {
+                    starred: _.filter(data.result, function(label) { return label.type.toLowerCase() === "starred"; }),
+                    system: _.filter(data.result, function(label) { return label.type.toLowerCase() === "system"; }),
+                    user: _.filter(data.result, function(label) { return label.type.toLowerCase() === "user"; })
+                };
                 self.data.nestedLabels = [];
 
                 function addToParent(collection, label) {

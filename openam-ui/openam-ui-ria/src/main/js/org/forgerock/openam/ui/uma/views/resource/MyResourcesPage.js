@@ -44,18 +44,21 @@ define("org/forgerock/openam/ui/uma/views/resource/MyResourcesPage", [
             this.data.topLevel = topLevel;
 
             if(topLevel) {
-                self.data.labelName = "all";
-
                 this.renderGrid(this.createSetCollection(),
-                                this.createColumns(this.data.labelName),
+                                this.createColumns("myresources/all"),
                                 callback);
             } else {
                 // Resolve label ID to name
-                UMADelegate.labels.getById(labelId).done(function(data) {
+                UMADelegate.labels.get(labelId).done(function(data) {
+                    var columns = self.createColumns("myresources/" + encodeURIComponent(data.id));
+
+                    // Splice out the "Hosts" column
+                    columns.splice(1, 1);
+
                     self.data.labelName = data.name;
 
                     self.renderGrid(self.createLabelCollection(labelId),
-                                    _.reject(self.createColumns(self.data.labelName), { "label": "Host" }),
+                                    columns,
                                     callback);
                 }).fail(function() {
                     //

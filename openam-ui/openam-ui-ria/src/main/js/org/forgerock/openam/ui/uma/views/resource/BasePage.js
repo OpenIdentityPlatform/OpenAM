@@ -27,20 +27,15 @@ define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
     "org/forgerock/openam/ui/common/util/RealmHelper"
 ], function($, AbstractView, Backbone, Backgrid, BackgridUtils, CommonShare, Configuration, Constants, RealmHelper) {
     var BasePage = AbstractView.extend({
-        createCollection: function(url, filters) {
-            var self = this,
-                queryFilter = [ "resourceOwnerId eq \"" + Configuration.loggedUser.username + "\"" ];
-
-            if(filters && filters.length) {
-                queryFilter = queryFilter.concat(filters);
-            }
+        createCollection: function(url, queryFilters) {
+            var self = this;
 
             return Backbone.PageableCollection.extend({
                 url: url,
                 queryParams: BackgridUtils.getQueryParams({
-                    // _sortKeys: BackgridUtils.sortKeys, // TODO: Enable when end point supports
-                    _queryFilter: queryFilter//,
-                    // _pagedResultsOffset: BackgridUtils.pagedResultsOffset // TODO: Enable when end point supports
+                    _sortKeys: BackgridUtils.sortKeys,
+                    _queryFilter: queryFilters,
+                    _pagedResultsOffset: BackgridUtils.pagedResultsOffset
                 }),
                 state: BackgridUtils.getState(),
                 parseState: BackgridUtils.parseState,
@@ -55,33 +50,37 @@ define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
             });
         },
         createLabelCollection: function(labelId) {
-            var filters = [];
+            var filters = ["resourceOwnerId eq \"" + Configuration.loggedUser.username + "\""];
 
             if(labelId) {
                 filters.push("labels eq \"" + labelId + "\"");
             }
 
             return this.createCollection(RealmHelper.decorateURIWithRealm("/" + Constants.context +
-                                                                   "/json/__subrealm__/users/" +
-                                                                   Configuration.loggedUser.username +
-                                                                   "/oauth2/resources/labels"), filters);
+                                                                          "/json/__subrealm__/users/" +
+                                                                          Configuration.loggedUser.username +
+                                                                          "/oauth2/resources/sets"), filters);
         },
-        createSetCollection: function() {
+        createSetCollection: function(notResourceOwner) {
+            var filters = ["resourceOwnerId eq \"" + Configuration.loggedUser.username + "\""];
+
+            if(notResourceOwner) {
+                filters[0] = "! " + filters[0];
+            }
+
             return this.createCollection(RealmHelper.decorateURIWithRealm("/" + Constants.context +
-                                                                   "/json/__subrealm__/users/" +
-                                                                   Configuration.loggedUser.username +
-                                                                   "/oauth2/resources/sets"));
+                                                                          "/json/__subrealm__/users/" +
+                                                                          Configuration.loggedUser.username +
+                                                                          "/oauth2/resources/sets"), filters);
         },
-        createColumns: function(section, labelName) {
+        createColumns: function(pathToResource) {
             return [{
                 name: "name",
                 label: $.t("uma.resources.grid.header.0"),
                 cell: BackgridUtils.UriExtCell,
-                headerCell: BackgridUtils.FilterHeaderCell.extend({
-                    addClassName: "col-md-5"
-                }),
+                headerCell: BackgridUtils.FilterHeaderCell,
                 href: function(rawValue, formattedValue, model){
-                    return "#uma/resources/" + section + "/" + labelName + "/" + model.get("_id");
+                    return "#uma/resources/" + pathToResource + "/" + model.get("_id");
                 },
                 editable: false
             }, {
@@ -89,16 +88,12 @@ define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
                 label: $.t("uma.resources.grid.header.1"),
                 cell: "string",
                 editable: false,
-                headerCell: BackgridUtils.ClassHeaderCell.extend({
-                    className: "col-md-1"
-                })
+                headerCell: BackgridUtils.ClassHeaderCell
             }, {
                 name: "type",
                 label: $.t("uma.resources.grid.header.2"),
                 cell: "string",
-                headerCell: BackgridUtils.ClassHeaderCell.extend({
-                    className: "col-md-4"
-                }),
+                headerCell: BackgridUtils.ClassHeaderCell,
                 editable: false
             }, {
                 name: "share",
@@ -117,13 +112,11 @@ define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
                     }
                 }),
                 editable: false,
-                headerCell: BackgridUtils.ClassHeaderCell.extend({
-                    className: "col-md-1"
-                })
+                headerCell: BackgridUtils.ClassHeaderCell
             }];
         },
         recordsPresent: function() {
-            //
+            // Override in child
         },
         renderGrid: function(Collection, columns, callback) {
             var self = this, grid, paginator;

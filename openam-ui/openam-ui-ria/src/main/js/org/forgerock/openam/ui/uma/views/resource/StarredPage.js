@@ -21,7 +21,7 @@ define("org/forgerock/openam/ui/uma/views/resource/StarredPage", [
     var StarredPage = BasePage.extend({
         template: "templates/uma/views/resource/StarredPageTemplate.html",
         render: function(args, callback) {
-            this.renderGrid(this.createLabelCollection("starred", "PLACEHOLDER"), this.createColumns("starred"), callback);
+            this.renderGrid(this.createLabelCollection("starred"), this.createColumns("starred"), callback);
         }
     });
 
