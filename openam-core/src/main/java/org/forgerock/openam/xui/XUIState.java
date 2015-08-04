@@ -61,7 +61,9 @@ public class XUIState {
                 ServiceSchema schema = schemaManager.getGlobalSchema();
                 Map defaults = schema.getAttributeDefaults();
                 enabled = Boolean.parseBoolean(CollectionHelper.getMapAttr(defaults, attribute, ""));
-                listenerId = schemaManager.addListener(this);
+                if (listenerId == null) {
+                    listenerId = schemaManager.addListener(this);
+                }
             } catch (SMSException e) {
                 DEBUG.error("Could not get " + service, e);
                 throw new IllegalStateException("Could not get " + service, e);
@@ -86,14 +88,12 @@ public class XUIState {
         @Override
         public void globalConfigChanged(String serviceName, String version,
                 String groupName, String serviceComponent, int type) {
-            detectMode(XUI_MODE.service, XUI_MODE.attribute);
-            detectMode(XUI_ADMIN_MODE.service, XUI_ADMIN_MODE.attribute);
+            detectMode(service, attribute);
         }
 
         @Override
         public void schemaChanged(String serviceName, String version) {
-            detectMode(XUI_MODE.service, XUI_MODE.attribute);
-            detectMode(XUI_ADMIN_MODE.service, XUI_ADMIN_MODE.attribute);
+            detectMode(service, attribute);
         }
     }
 
