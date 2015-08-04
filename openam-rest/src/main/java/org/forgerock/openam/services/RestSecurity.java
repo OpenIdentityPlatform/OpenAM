@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2013-2015 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -169,7 +169,7 @@ public class RestSecurity {
      * Default Constructor
      * @param realm in which Rest Security service shall be created
      */
-    public RestSecurity(String realm) {
+    RestSecurity(String realm) {
         this.realm = realm;
         try {
             mgr = new ServiceConfigManager(AccessController.doPrivileged(AdminTokenAction.getInstance()),

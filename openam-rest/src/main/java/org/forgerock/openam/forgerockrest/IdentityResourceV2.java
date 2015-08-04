@@ -80,6 +80,7 @@ import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
 import org.forgerock.openam.services.RestSecurity;
+import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.openam.services.email.MailServer;
 import org.forgerock.openam.services.email.MailServerImpl;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
@@ -144,15 +145,15 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
     final static String USER_PASSWORD = "userpassword";
 
     private final MailServerLoader mailServerLoader;
-
-    private static final Map<String, RestSecurity> REALM_REST_SECURITY_MAP = new ConcurrentHashMap<String, RestSecurity>();
+    private final RestSecurityProvider restSecurityProvider;
 
     private final IdentityResourceV1 identityResourceV1;
     /**
      * Creates a backend
      */
-    public IdentityResourceV2(String userType, MailServerLoader mailServerLoader) {
-        this(userType, null, null, mailServerLoader);
+    public IdentityResourceV2(String userType, MailServerLoader mailServerLoader,
+            RestSecurityProvider restSecurityProvider) {
+        this(userType, null, null, mailServerLoader, restSecurityProvider);
     }
 
     /**
@@ -174,12 +175,13 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
 
     // Constructor used for testing...
     IdentityResourceV2(String userType, ServiceConfigManager mailmgr, ServiceConfig mailscm,
-            MailServerLoader mailServerLoader) {
+            MailServerLoader mailServerLoader, RestSecurityProvider restSecurityProvider) {
         this.userType = userType;
         this.mailmgr = mailmgr;
         this.mailscm = mailscm;
         this.mailServerLoader = mailServerLoader;
-        this.identityResourceV1 = new IdentityResourceV1(userType, mailServerLoader);
+        this.restSecurityProvider = restSecurityProvider;
+        this.identityResourceV1 = new IdentityResourceV1(userType, mailServerLoader, restSecurityProvider);
     }
 
     /**
@@ -635,7 +637,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
         final String realm = realmContext.getResolvedRealm();
-        RestSecurity restSecurity = getRestSecurity(realm);
+        RestSecurity restSecurity = restSecurityProvider.get(realm);
 
         final String action = request.getAction();
         if (action.equalsIgnoreCase("idFromSession")) {
@@ -1383,7 +1385,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
 
             // Handle attribute change when password is required
             // Get restSecurity for this realm
-            RestSecurity restSecurity = getRestSecurity(realm);
+            RestSecurity restSecurity = restSecurityProvider.get(realm);
             // Make sure user is not admin and check to see if we are requiring a password to change any attributes
             Set<String> protectedUserAttributes = restSecurity.getProtectedUserAttributes();
             if (protectedUserAttributes != null && !isAdmin(context)) {
@@ -1480,23 +1482,6 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
         } else {
             return toEncode;
         }
-    }
-
-    /**
-     * Retrieve cached realm's RestSecurity instance
-     **/
-    private RestSecurity getRestSecurity(String realm) {
-        RestSecurity restSecurity = REALM_REST_SECURITY_MAP.get(realm);
-        if (restSecurity == null) {
-            synchronized(REALM_REST_SECURITY_MAP) {
-                restSecurity = REALM_REST_SECURITY_MAP.get(realm);
-                if (restSecurity == null) {
-                    restSecurity = new RestSecurity(realm);
-                    REALM_REST_SECURITY_MAP.put(realm, restSecurity);
-                }
-            }
-        }
-        return restSecurity;
     }
 
     private static boolean isNullOrEmpty(final String value) {

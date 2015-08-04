@@ -79,6 +79,7 @@ import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.services.RestSecurity;
+import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.openam.services.email.MailServer;
 import org.forgerock.openam.services.email.MailServerImpl;
 import org.forgerock.openam.utils.TimeUtils;
@@ -94,7 +95,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A simple {@code Map} based collection resource provider.
@@ -134,14 +134,14 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
     public static final String OLD_PASSWORD = "olduserpassword";
 
     private final MailServerLoader mailServerLoader;
-
-    private static final Map<String, RestSecurity> REALM_REST_SECURITY_MAP = new ConcurrentHashMap<String, RestSecurity>();
+    private final RestSecurityProvider restSecurityProvider;
 
     /**
      * Creates a backend
      */
-    public IdentityResourceV1(String userType, MailServerLoader mailServerLoader) {
-        this(userType, null, null, mailServerLoader);
+    public IdentityResourceV1(String userType, MailServerLoader mailServerLoader,
+            RestSecurityProvider restSecurityProvider) {
+        this(userType, null, null, mailServerLoader, restSecurityProvider);
     }
 
     /**
@@ -163,11 +163,12 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
 
     // Constructor used for testing...
     IdentityResourceV1(String userType, ServiceConfigManager mailmgr, ServiceConfig mailscm,
-            MailServerLoader mailServerLoader) {
+            MailServerLoader mailServerLoader, RestSecurityProvider restSecurityProvider) {
         this.userType = userType;
         this.mailmgr = mailmgr;
         this.mailscm = mailscm;
         this.mailServerLoader = mailServerLoader;
+        this.restSecurityProvider = restSecurityProvider;
     }
 
     /**
@@ -563,7 +564,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
         final String realm = realmContext.getResolvedRealm();
-        RestSecurity restSecurity = getRestSecurity(realm);
+        RestSecurity restSecurity = restSecurityProvider.get(realm);
 
         final String action = request.getAction();
         if (action.equalsIgnoreCase("idFromSession")) {
@@ -1438,23 +1439,6 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         private String getTokenID() {
             return tokenID;
         }
-    }
-
-    /**
-     * Retrieve cached realm's RestSecurity instance
-     **/
-    private RestSecurity getRestSecurity(String realm) {
-        RestSecurity restSecurity = REALM_REST_SECURITY_MAP.get(realm);
-        if (restSecurity == null) {
-            synchronized(REALM_REST_SECURITY_MAP) {
-                restSecurity = REALM_REST_SECURITY_MAP.get(realm);
-                if (restSecurity == null) {
-                    restSecurity = new RestSecurity(realm);
-                    REALM_REST_SECURITY_MAP.put(realm, restSecurity);
-                }
-            }
-        }
-        return restSecurity;
     }
 
     private static boolean isNullOrEmpty(final String value) {

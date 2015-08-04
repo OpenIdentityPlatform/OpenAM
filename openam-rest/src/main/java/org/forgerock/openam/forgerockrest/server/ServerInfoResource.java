@@ -51,6 +51,7 @@ import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.ServiceConfigUtils;
 import org.forgerock.openam.forgerockrest.entitlements.RealmAwareResource;
 import org.forgerock.openam.services.RestSecurity;
+import org.forgerock.openam.services.RestSecurityProvider;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -69,13 +70,15 @@ import java.util.Set;
 public class ServerInfoResource extends RealmAwareResource {
 
     private final Debug debug;
+    private final RestSecurityProvider restSecurityProvider;
 
     private final static String COOKIE_DOMAINS = "cookieDomains";
     private final static String ALL_SERVER_INFO = "*";
 
     @Inject
-    public ServerInfoResource(@Named("frRest") Debug debug) {
+    public ServerInfoResource(@Named("frRest") Debug debug, RestSecurityProvider restSecurityProvider) {
         this.debug = debug;
+        this.restSecurityProvider = restSecurityProvider;
     }
 
     private final MapValueParser nameValueParser = new MapValueParser();
@@ -118,7 +121,7 @@ public class ServerInfoResource extends RealmAwareResource {
         Set<String> cookieDomains;
         Set<String> protectedUserAttributes;
         Resource resource;
-        RestSecurity restSecurity = new RestSecurity(realm);
+        RestSecurity restSecurity = restSecurityProvider.get(realm);
 
         //added for the XUI to be able to understand its locale to request the appropriate translations to cache
         ISLocaleContext locale = new ISLocaleContext();

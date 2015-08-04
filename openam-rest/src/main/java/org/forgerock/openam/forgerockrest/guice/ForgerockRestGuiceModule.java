@@ -1,6 +1,4 @@
 /*
- * Copyright 2014-2015 ForgeRock, AS.
- *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,8 +10,9 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2014-2015 ForgeRock AS.
  */
-
 package org.forgerock.openam.forgerockrest.guice;
 
 import com.google.inject.AbstractModule;
@@ -66,6 +65,7 @@ import org.forgerock.openam.rest.authz.PrivilegeDefinition;
 import org.forgerock.openam.rest.router.CTSPersistentStoreProxy;
 import org.forgerock.openam.rest.router.RestEndpointManager;
 import org.forgerock.openam.rest.router.RestEndpointManagerProxy;
+import org.forgerock.openam.services.RestSecurityProvider;
 import org.forgerock.openam.utils.AMKeyProvider;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.SignatureUtil;
@@ -162,16 +162,18 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Named("UsersResource")
     @Inject
     @Singleton
-    public IdentityResourceV1 getUsersResourceV1(MailServerLoader mailServerLoader) {
-        return new IdentityResourceV1(IdentityResourceV1.USER_TYPE, mailServerLoader);
+    public IdentityResourceV1 getUsersResourceV1(MailServerLoader mailServerLoader,
+            RestSecurityProvider restSecurityProvider) {
+        return new IdentityResourceV1(IdentityResourceV1.USER_TYPE, mailServerLoader, restSecurityProvider);
     }
 
     @Provides
     @Named("GroupsResource")
     @Inject
     @Singleton
-    public IdentityResourceV1 getGroupsResourceV1(MailServerLoader mailServerLoader) {
-        return new IdentityResourceV1(IdentityResourceV1.GROUP_TYPE, mailServerLoader);
+    public IdentityResourceV1 getGroupsResourceV1(MailServerLoader mailServerLoader,
+            RestSecurityProvider restSecurityProvider) {
+        return new IdentityResourceV1(IdentityResourceV1.GROUP_TYPE, mailServerLoader, restSecurityProvider);
     }
 
     @Provides
@@ -201,32 +203,36 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Named("AgentsResource")
     @Inject
     @Singleton
-    public IdentityResourceV1 getAgentsResourceV1(MailServerLoader mailServerLoader) {
-        return new IdentityResourceV1(IdentityResourceV1.AGENT_TYPE, mailServerLoader);
+    public IdentityResourceV1 getAgentsResourceV1(MailServerLoader mailServerLoader,
+            RestSecurityProvider restSecurityProvider) {
+        return new IdentityResourceV1(IdentityResourceV1.AGENT_TYPE, mailServerLoader, restSecurityProvider);
     }
 
     @Provides
     @Named("UsersResource")
     @Inject
     @Singleton
-    public IdentityResourceV2 getUsersResource(MailServerLoader mailServerLoader) {
-        return new IdentityResourceV2(IdentityResourceV2.USER_TYPE, mailServerLoader);
+    public IdentityResourceV2 getUsersResource(MailServerLoader mailServerLoader,
+            RestSecurityProvider restSecurityProvider) {
+        return new IdentityResourceV2(IdentityResourceV2.USER_TYPE, mailServerLoader, restSecurityProvider);
     }
 
     @Provides
     @Named("GroupsResource")
     @Inject
     @Singleton
-    public IdentityResourceV2 getGroupsResource(MailServerLoader mailServerLoader) {
-        return new IdentityResourceV2(IdentityResourceV2.GROUP_TYPE, mailServerLoader);
+    public IdentityResourceV2 getGroupsResource(MailServerLoader mailServerLoader,
+            RestSecurityProvider restSecurityProvider) {
+        return new IdentityResourceV2(IdentityResourceV2.GROUP_TYPE, mailServerLoader, restSecurityProvider);
     }
 
     @Provides
     @Named("AgentsResource")
     @Inject
     @Singleton
-    public IdentityResourceV2 getAgentsResource(MailServerLoader mailServerLoader) {
-        return new IdentityResourceV2(IdentityResourceV2.AGENT_TYPE, mailServerLoader);
+    public IdentityResourceV2 getAgentsResource(MailServerLoader mailServerLoader,
+            RestSecurityProvider restSecurityProvider) {
+        return new IdentityResourceV2(IdentityResourceV2.AGENT_TYPE, mailServerLoader, restSecurityProvider);
     }
 
     @Provides
