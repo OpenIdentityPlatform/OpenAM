@@ -274,7 +274,7 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/EditPolicyV
                 invalid = false;
 
             // entities that are stored in LDAP can't start with '#'. http://www.jguru.com/faq/view.jsp?EID=113588
-            if (entity.name && entity.name.startsWith("#")) {
+            if (entity.name && entity.name.indexOf("#") === 0) {
                 invalid = true;
                 this.$el.find("input[name=entityName]").parents(".form-group").addClass("has-error");
             } else {

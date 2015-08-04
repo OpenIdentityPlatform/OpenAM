@@ -39,7 +39,7 @@ define("org/forgerock/openam/ui/admin/models/policies/ResourceTypeModel", [
             }
 
             // entities that are stored in LDAP can't start with '#'. http://www.jguru.com/faq/view.jsp?EID=113588
-            if (attrs.name.startsWith("#")) {
+            if (attrs.name.indexOf("#") === 0) {
                 return "errorCantStartWithHash";
             }
 
