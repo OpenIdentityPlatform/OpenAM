@@ -130,11 +130,15 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
             return new JsonRepresentation(response);
         }
 
+        JsonValue labels = resourceSetDescription.getDescription().get(OAuth2Constants.ResourceSets.LABELS);
+        resourceSetDescription.getDescription().remove(OAuth2Constants.ResourceSets.LABELS);
         store.create(oAuth2Request, resourceSetDescription);
+        resourceSetDescription.getDescription().add(OAuth2Constants.ResourceSets.LABELS, labels);
+        labelRegistration.updateLabelsForNewResourceSet(resourceSetDescription);
+
         for (ResourceSetRegistrationListener listener : listeners) {
             listener.resourceSetCreated(oAuth2Request.<String>getParameter("realm"), resourceSetDescription);
         }
-        labelRegistration.updateLabelsForNewResourceSet(resourceSetDescription);
         getResponse().setStatus(Status.SUCCESS_CREATED);
         return createJsonResponse(resourceSetDescription, false, true);
     }
@@ -154,7 +158,12 @@ public class ResourceSetRegistrationEndpoint extends ServerResource {
         ResourceSetStore store = providerSettingsFactory.get(requestFactory.create(getRequest())).getResourceSetStore();
         ResourceSetDescription resourceSetDescription = store.read(resourceSetId)
                 .update(resourceSetDescriptionAttributes);
+
+        JsonValue labels = resourceSetDescription.getDescription().get(OAuth2Constants.ResourceSets.LABELS);
+        resourceSetDescription.getDescription().remove(OAuth2Constants.ResourceSets.LABELS);
         store.update(resourceSetDescription);
+        resourceSetDescription.getDescription().add(OAuth2Constants.ResourceSets.LABELS, labels);
+
         labelRegistration.updateLabelsForExistingResourceSet(resourceSetDescription);
         return createJsonResponse(resourceSetDescription, false, true);
     }

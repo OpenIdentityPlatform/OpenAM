@@ -19,8 +19,10 @@ package org.forgerock.openam.rest.oauth2;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.inject.Inject;
 import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
@@ -43,15 +45,13 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
+import org.forgerock.oauth2.restlet.resources.ResourceSetDescriptionValidator;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
-import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.oauth2.resources.labels.ResourceSetLabel;
 import org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore;
-import org.forgerock.openam.uma.UmaConstants;
-import org.forgerock.openam.uma.UmaException;
+import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.util.promise.ExceptionHandler;
 
 import static org.forgerock.json.fluent.JsonValue.json;
@@ -70,6 +70,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
     private final ResourceSetService resourceSetService;
     private final ContextHelper contextHelper;
     private final UmaLabelsStore umaLabelsStore;
+    private final ResourceSetDescriptionValidator validator;
 
     /**
      * Constructs a new ResourceSetResource instance.
@@ -78,10 +79,11 @@ public class ResourceSetResource implements CollectionResourceProvider {
      * @param contextHelper An instance of the ContextHelper.
      */
     @Inject
-    public ResourceSetResource(ResourceSetService resourceSetService, ContextHelper contextHelper, UmaLabelsStore umaLabelsStore) {
+    public ResourceSetResource(ResourceSetService resourceSetService, ContextHelper contextHelper, UmaLabelsStore umaLabelsStore, ResourceSetDescriptionValidator validator) {
         this.resourceSetService = resourceSetService;
         this.contextHelper = contextHelper;
         this.umaLabelsStore = umaLabelsStore;
+        this.validator = validator;
     }
 
     /**
@@ -109,8 +111,13 @@ public class ResourceSetResource implements CollectionResourceProvider {
                 .thenOnResult(new org.forgerock.util.promise.ResultHandler<ResourceSetDescription>() {
                     @Override
                     public void handleResult(ResourceSetDescription result) {
-                        JsonValue content = getResourceSetJson(result);
-                        handler.handleResult(newResource(result.getId(), content));
+                        try {
+                            JsonValue content = null;
+                            content = getResourceSetJson(result);
+                            handler.handleResult(newResource(result.getId(), content));
+                        } catch (ResourceException e) {
+                            handler.handleError(e);
+                        }
                     }
                 })
                 .thenOnException(new ExceptionHandler<ResourceException>() {
@@ -187,11 +194,15 @@ public class ResourceSetResource implements CollectionResourceProvider {
                 .thenOnResult(new org.forgerock.util.promise.ResultHandler<Collection<ResourceSetDescription>>() {
                     @Override
                     public void handleResult(Collection<ResourceSetDescription> resourceSets) {
-                        for (ResourceSetDescription resourceSet : resourceSets) {
-                            queryHandler.handleResource(
-                                    newResource(resourceSet.getId(), getResourceSetJson(resourceSet)));
+                        try {
+                            for (ResourceSetDescription resourceSet : resourceSets) {
+                                queryHandler.handleResource(
+                                        newResource(resourceSet.getId(), getResourceSetJson(resourceSet)));
+                            }
+                            queryHandler.handleResult(new QueryResult());
+                        } catch (ResourceException e) {
+                            queryHandler.handleError(e);
                         }
-                        queryHandler.handleResult(new QueryResult());
                     }
                 })
                 .thenOnException(new ExceptionHandler<ResourceException>() {
@@ -218,11 +229,20 @@ public class ResourceSetResource implements CollectionResourceProvider {
         return new Resource(id, Long.toString(content.hashCode()), content);
     }
 
-    private JsonValue getResourceSetJson(ResourceSetDescription resourceSet) {
+    private JsonValue getResourceSetJson(ResourceSetDescription resourceSet) throws ResourceException {
         HashMap<String, Object> content = new HashMap<String, Object>(resourceSet.asMap());
         content.put("_id", resourceSet.getId());
         content.put("resourceServer", resourceSet.getClientId());
         content.put("resourceOwnerId", resourceSet.getResourceOwnerId());
+
+
+        Set<ResourceSetLabel> labels = umaLabelsStore.forResourceSet(resourceSet.getRealm(), resourceSet.getResourceOwnerId(), resourceSet.getId(), false);
+        Set<String> labelIds = new HashSet<>();
+        for (ResourceSetLabel label : labels) {
+            labelIds.add(label.getId());
+        }
+        content.put("labels", labelIds);
+
         if (resourceSet.getPolicy() != null) {
             JsonValue policy = new JsonValue(new HashMap<String, Object>(resourceSet.getPolicy().asMap()));
             policy.remove("policyId");
@@ -476,7 +496,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
     }
 
     /**
-     * Not supported.
+     * Update the none system labels on a resource set only
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
@@ -484,8 +504,59 @@ public class ResourceSetResource implements CollectionResourceProvider {
      */
     @Override
     public void updateInstance(ServerContext context, String resourceId, UpdateRequest request,
-            ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException());
+            final ResultHandler<Resource> handler) {
+
+        final Map<String, Object> resourceSetDescriptionAttributes;
+        try {
+            resourceSetDescriptionAttributes = validator.validate(request.getContent().asMap());
+
+            final String realm = getRealm(context);
+            final String userId = getResourceOwnerId(context);
+
+            //remove this resource set id from all labels
+            Set<ResourceSetLabel> labels = umaLabelsStore.forResourceSet(realm, userId, resourceId, true);
+            for (ResourceSetLabel label : labels) {
+                if (!isSystemLabel(label)) {
+                    label.removeResourceSetId(resourceId);
+                    umaLabelsStore.update(realm, userId, label);
+                }
+            }
+
+            //add resource set id to new labels
+            for (String labelId : (List<String>) resourceSetDescriptionAttributes.get("labels")) {
+                ResourceSetLabel label = umaLabelsStore.read(realm, userId, labelId);
+                label.addResourceSetId(resourceId);
+                umaLabelsStore.update(realm, userId, label);
+            }
+
+            resourceSetService.getResourceSet(context, realm, resourceId, userId, false)
+                    .thenOnResult(new org.forgerock.util.promise.ResultHandler<ResourceSetDescription>() {
+                        @Override
+                        public void handleResult(ResourceSetDescription result) {
+                            try {
+                                JsonValue content = null;
+                                content = getResourceSetJson(result);
+                                handler.handleResult(newResource(result.getId(), content));
+                            } catch (ResourceException e) {
+                                handler.handleError(e);
+                            }
+                        }
+                    })
+                    .thenOnException(new ExceptionHandler<ResourceException>() {
+                        @Override
+                        public void handleException(ResourceException error) {
+                            handler.handleError(error);
+                        }
+                    });
+        } catch (ResourceException e) {
+            handler.handleError(e);
+        } catch (org.forgerock.oauth2.core.exceptions.BadRequestException e) {
+            handler.handleError(new BadRequestException("Error retrieving labels.", e));
+        }
+    }
+
+    private boolean isSystemLabel(ResourceSetLabel label) {
+        return label.getId().contains("/");
     }
 
     /**

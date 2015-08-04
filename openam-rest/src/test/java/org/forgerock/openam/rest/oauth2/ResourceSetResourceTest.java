@@ -46,6 +46,7 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
+import org.forgerock.oauth2.restlet.resources.ResourceSetDescriptionValidator;
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore;
 import org.forgerock.util.promise.Promise;
@@ -62,13 +63,15 @@ public class ResourceSetResourceTest {
     private ResourceSetService resourceSetService;
     private UmaLabelsStore umaLabelsStore;
     private ContextHelper contextHelper;
+    private ResourceSetDescriptionValidator validator;
 
     @BeforeMethod
     public void setup() {
         resourceSetService = mock(ResourceSetService.class);
         contextHelper = mock(ContextHelper.class);
         umaLabelsStore = mock(UmaLabelsStore.class);
-        resource = new ResourceSetResource(resourceSetService, contextHelper, umaLabelsStore);
+        validator = mock(ResourceSetDescriptionValidator.class);
+        resource = new ResourceSetResource(resourceSetService, contextHelper, umaLabelsStore, validator);
     }
 
     @Test
@@ -106,21 +109,6 @@ public class ResourceSetResourceTest {
 
         //When
         resource.createInstance(context, request, handler);
-
-        //Then
-        verify(handler).handleError(Matchers.<NotSupportedException>anyObject());
-    }
-
-    @Test
-    public void updateShouldNotBeSupported() {
-
-        //Given
-        ServerContext context = mock(ServerContext.class);
-        UpdateRequest request = mock(UpdateRequest.class);
-        ResultHandler<Resource> handler = mock(ResultHandler.class);
-
-        //When
-        resource.updateInstance(context, "RESOURCE_SET_UID", request, handler);
 
         //Then
         verify(handler).handleError(Matchers.<NotSupportedException>anyObject());
