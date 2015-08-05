@@ -14,25 +14,26 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global, define*/
-define('org/forgerock/openam/ui/dashboard/DeviceManagementDelegate', [
-    'org/forgerock/commons/ui/common/main/Configuration',
-    'org/forgerock/commons/ui/common/util/Constants',
-    'org/forgerock/commons/ui/common/main/AbstractDelegate',
-    'org/forgerock/openam/ui/common/util/RealmHelper'
+/*global define*/
+
+define("org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate", [
+    "org/forgerock/commons/ui/common/main/Configuration",
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/main/AbstractDelegate",
+    "org/forgerock/openam/ui/common/util/RealmHelper"
 ], function (Configuration, Constants, AbstractDelegate, RealmHelper) {
-    var obj = new AbstractDelegate(Constants.host + '/' + Constants.context + '/json/');
+    var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/");
 
     obj.deleteDevice = function (uuid) {
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithSubRealm('users/' + Configuration.loggedUser.uid + '/devices/2fa/oath/' + uuid),
-            method: 'DELETE'
+            url: RealmHelper.decorateURIWithSubRealm("users/" + Configuration.loggedUser.uid + "/devices/2fa/oath/" + uuid),
+            method: "DELETE"
         });
     };
 
     obj.getDevices = function () {
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithSubRealm('users/' + Configuration.loggedUser.uid + '/devices/2fa/oath/?_queryFilter=true')
+            url: RealmHelper.decorateURIWithSubRealm("users/" + Configuration.loggedUser.uid + "/devices/2fa/oath/?_queryFilter=true")
         });
     };
 

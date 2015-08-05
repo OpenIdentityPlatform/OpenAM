@@ -20,13 +20,15 @@
                                     <li><a class="delete-device-btn" href="#"><i class="fa fa-times"></i>{{ t 'openam.deviceManagement.menu.delete' }}</a></li>
                                 </ul>
                             </div>
-                            <div class="card-body card-body-with-menu">
-                                <div class="card-icon-circle">
-                                    <i class="fa fa-mobile"></i>
+                            <a href="#" class="device-details">
+                                <div class="card-body card-body-with-menu">
+                                    <div class="card-icon-circle">
+                                        <i class="fa fa-mobile"></i>
+                                    </div>
+                                    <h3 class="card-name">{{deviceName}}</h3>
+                                    <!--<div class="card-subtext"></div>-->
                                 </div>
-                                <h3 class="card-name">{{deviceName}}</h3>
-                                <!--<div class="card-subtext"></div>-->
-                            </div>
+                            </a>
                         </div>
                     </div>
                 {{/each}}

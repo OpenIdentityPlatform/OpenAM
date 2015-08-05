@@ -296,6 +296,7 @@
             "help" : "Help",
             "change": "Change",
             "upload": "Upload",
+            "download": "Download",
             "validate": "Validate",
             "filter": "Filter...",
             "pass" : "Pass",
@@ -471,10 +472,11 @@
                 "recoveryCodes": "Recovery Codes",
                 "delete": "Delete"
             },
-            "recoveryCodes": {
-                "title": "Recovery codes",
-                "download": "Download",
-                "close": "Close"
+            "deviceDetailsDialog": {
+                "recoveryCodes": "Recovery codes",
+                "deviceName": "Device name",
+                "skip": "Skip if appropriate",
+                "help": "If checked, you will not be challenged for 2nd factor authentication unless the administrator has enforced its requirement."
             }
         }
     },
