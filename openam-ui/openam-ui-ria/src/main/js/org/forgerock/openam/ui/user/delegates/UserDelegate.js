@@ -22,10 +22,9 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define */
+/*global $, define, _, console */
 
-define("org/forgerock/openam/ui/user/delegates/UserDelegate", [
-    "underscore",
+define("UserDelegate", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
@@ -33,7 +32,7 @@ define("org/forgerock/openam/ui/user/delegates/UserDelegate", [
     "org/forgerock/commons/ui/common/util/CookieHelper",
     "org/forgerock/commons/ui/common/util/Mime",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function(_, constants, AbstractDelegate, configuration, eventManager, cookieHelper, mime, RealmHelper) {
+], function(constants, AbstractDelegate, configuration, eventManager, cookieHelper, mime, RealmHelper) {
 
     var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json/");
 

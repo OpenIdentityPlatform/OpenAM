@@ -14,7 +14,7 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global define*/
+/*global, define*/
 define('org/forgerock/openam/ui/admin/views/realms/dataStores/DataStoresView', [
     'org/forgerock/commons/ui/common/main/AbstractView',
     'org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole'

@@ -14,8 +14,8 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global define */
-define("org/forgerock/openam/ui/admin/delegates/ScriptsDelegate", [
+/*global _, define*/
+define('org/forgerock/openam/ui/admin/delegates/ScriptsDelegate', [
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",

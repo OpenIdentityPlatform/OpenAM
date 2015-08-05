@@ -22,10 +22,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/SettingsView",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
-    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
-
-    // jquery dependencies
-    "bootstrap-tabdrop"
+    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate"
 ], function ($, AbstractView, Configuration, Constants, Form, FormHelper, SMSRealmDelegate) {
     var SettingsView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/SettingsTemplate.html",

@@ -26,10 +26,7 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
     "org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/EditEnvironmentView",
     "org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/EditSubjectView",
     "org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/OperatorRulesView",
-    "org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/LegacyListItemView",
-
-    // jquery dependencies
-    "sortable"
+    "org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/LegacyListItemView"
 ], function ($, _, AbstractView, EventManager, Constants, UIUtils, EditEnvironmentView, EditSubjectView,
              OperatorRulesView, LegacyListItemView) {
 

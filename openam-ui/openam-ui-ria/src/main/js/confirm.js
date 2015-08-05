@@ -26,18 +26,21 @@
 require.config({
     paths: {
         "backbone":         "libs/backbone-1.1.2-min",
-        "bootstrap":        "libs/bootstrap-3.3.5-custom",
-        "bootstrap-dialog": "libs/bootstrap-dialog-1.34.4-min",
+        "bootstrap":        "libs/bootstrap.min",
+        "bootstrap-dialog": "libs/bootstrap-dialog.min",
         "doTimeout":        "libs/jquery.ba-dotimeout-1.0-min",
         "form2js":          "libs/form2js-2.0",
-        "handlebars":       "libs/handlebars-3.0.3-min",
+        "handlebars":       "libs/handlebars-1.3.0-min",
         "i18next":          "libs/i18next-1.7.3-min",
         "jquery":           "libs/jquery-2.1.1-min",
         "js2form":          "libs/js2form-2.0",
         "moment":           "libs/moment-2.8.1-min",
         "spin":             "libs/spin-2.0.1-min",
         "underscore":       "libs/lodash-2.4.1-min",
-        "xdate":            "libs/xdate-0.8-min"
+        "xdate":            "libs/xdate-0.8-min",
+
+        "ThemeManager": "org/forgerock/openam/ui/common/util/ThemeManager",
+        "UserDelegate": "org/forgerock/openam/ui/user/delegates/UserDelegate"
     },
     shim: {
         "backbone": {
@@ -56,6 +59,9 @@ require.config({
         },
         "form2js": {
             exports: "form2js"
+        },
+        "handlebars": {
+            exports: "handlebars"
         },
         "i18next": {
             deps: ["jquery", "handlebars"],
@@ -80,15 +86,20 @@ require.config({
 });
 
 require([
+    "jquery",
+    "underscore",
+    "backbone",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/ServiceInvoker",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/CookieHelper",
     "org/forgerock/openam/ui/common/util/RealmHelper",
+    "config/main",
     "org/forgerock/commons/ui/common/main",
-    "org/forgerock/openam/ui/main",
-    "config/main"
-], function(Constants, ServiceInvoker, UIUtils, CookieHelper, RealmHelper) {
+    "org/forgerock/commons/ui/user/main",
+    "org/forgerock/openam/ui/common/main",
+    "org/forgerock/openam/ui/user/main"
+], function($, _, Backbone, Constants, ServiceInvoker, UIUtils, CookieHelper, RealmHelper) {
     var conf = {
             defaultHeaders: {}
         },
@@ -98,12 +109,17 @@ require([
         host = Constants.host + "/"+ Constants.context + "/json/",
         searchParams = window.location.search.substring(1);
 
+    // Helpers for the code that hasn't been properly migrated to require these as explicit dependencies:
+    window.$ = $;
+    window._ = _;
+    window.Backbone = Backbone;
+
         callParams = {
             url: host + RealmHelper.decorateURIWithRealm("__subrealm__/serverinfo/*"),
             type: "GET",
             headers: {"Cache-Control": "no-cache"},
             success: function() {
-                window.location.href = UIUtils.getCurrentUrlBasePart() + "/"+ Constants.context + '/XUI/#continueRegister/&' + searchParams;
+                location.href = UIUtils.getCurrentUrlBasePart() + "/"+ Constants.context + '/XUI/#continueRegister/&' + searchParams;
             },
             error: function(err) {
                 responseMessage = JSON.parse(err.responseText).message;
@@ -118,23 +134,23 @@ require([
 
                     expire.setDate(expire.getDate() + 1);
                     CookieHelper.setCookie("invalidRealm",cookieVal,expire);
-                    window.location.href = UIUtils.getCurrentUrlBasePart() + "/"+ Constants.context +'/XUI/#login';
+                    location.href = UIUtils.getCurrentUrlBasePart() + "/"+ Constants.context +'/XUI/#login';
                 }
             }
         };
 
     if(urlParams.username) {
-        window.location.href = UIUtils.getCurrentUrlBasePart() + "/"+ Constants.context +'/XUI/#forgotPasswordChange/&' + searchParams;
+        location.href = UIUtils.getCurrentUrlBasePart() + "/"+ Constants.context +'/XUI/#forgotPasswordChange/&' + searchParams;
     }
     else if (urlParams.realm) {
         ServiceInvoker.configuration = conf;
         ServiceInvoker.restCall(callParams);
     }
     else if (urlParams.email) {
-        window.location.href = UIUtils.getCurrentUrlBasePart() + "/"+ Constants.context + '/XUI/#continueRegister/&' + searchParams;
+        location.href = UIUtils.getCurrentUrlBasePart() + "/"+ Constants.context + '/XUI/#continueRegister/&' + searchParams;
     }
     else {
-        window.location.href = UIUtils.getCurrentUrlBasePart() + "/"+ Constants.context + '/XUI/#login';
+        location.href = UIUtils.getCurrentUrlBasePart() + "/"+ Constants.context + '/XUI/#login';
     }
 
 });

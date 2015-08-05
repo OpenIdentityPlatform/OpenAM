@@ -22,10 +22,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/openam/ui/admin/views/realms/authentication/chains/LinkView",
     "org/forgerock/openam/ui/admin/views/realms/authentication/chains/PostProcessView",
-    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
-
-    // jquery dependencies
-    "sortable"
+    "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate"
 ], function($, _, AbstractView, FormHelper, LinkView, PostProcessView, SMSRealmDelegate) {
     var EditChainView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/chains/EditChainTemplate.html",
@@ -33,7 +30,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditCha
             "click #saveChanges":       "saveChanges",
             "click #addModuleLink":     "addModuleLink"
         },
-
+ 
         addModuleLink: function(e) {
             if (e) {
                 e.preventDefault();

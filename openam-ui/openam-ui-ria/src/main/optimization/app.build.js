@@ -1,4 +1,4 @@
-/**
+/** 
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2012 ForgeRock AS. All Rights Reserved
@@ -21,16 +21,14 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
- ({
-     baseUrl         : "../../../target/www",
-     mainConfigFile  : '../js/main.js',
-     out             : "../../../target/www/main.js",
-     include: ["main"],
-     preserveLicenseComments: false,
-     generateSourceMaps: true,
-     optimize: "uglify2",
-     excludeShallow: [
-         // This file is excluded from optimization so that the UI can be customized without having to repackage it.
-         "config/AppConfiguration"
-     ]
- })
+({
+    appDir : "../../../target/classes",
+    baseUrl : ".",
+    dir : "../../../target/xui_minified",
+    mainConfigFile : '../../../target/classes/main.js',
+    waitSeconds: 0, // disable load timeouts
+    preserveLicenseComments: false,
+    modules : [ {
+        name : "main"
+    } ]
+})

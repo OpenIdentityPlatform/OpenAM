@@ -14,16 +14,11 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global define*/
+/*global _ $ define*/
 define('org/forgerock/openam/ui/admin/models/Form', [
-    "jquery",
-    "underscore",
     'jsonEditor',
-    'org/forgerock/openam/ui/admin/utils/JSONEditorTheme',
-
-    // jquery dependencies
-    "selectize"
-], function ($, _, JSONEditor, JSONEditorTheme) {
+    'org/forgerock/openam/ui/admin/utils/JSONEditorTheme'
+], function (JSONEditor, JSONEditorTheme) {
     var obj = function Form(element, schema, values) {
         this.element = element;
         this.schema = schema;

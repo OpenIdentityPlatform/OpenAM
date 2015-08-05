@@ -14,14 +14,12 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global define */
+/*global define, require*/
 define("org/forgerock/openam/ui/common/components/TreeNavigation", [
     "jquery",
-    "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/util/ModuleLoader",
     "org/forgerock/commons/ui/common/main/Router"
-], function ($, _, AbstractView, ModuleLoader, Router) {
+], function ($, AbstractView, Router) {
     var TreeNavigation = AbstractView.extend({
         events: {
             "click .sidenav a[href]:not([data-toggle])": "navigateToPage"
@@ -54,15 +52,13 @@ define("org/forgerock/openam/ui/common/components/TreeNavigation", [
             AbstractView.prototype.setElement.call(this, element);
 
             if (this.route && this.nextRenderPage) {
-                ModuleLoader.load(this.route.page).then(
-                    _.bind(function (module) {
-                        this.nextRenderPage = false;
-                        this.renderPage(module, this.args);
-                    }, this),
-                    _.bind(function () {
-                        throw "Unable to render page for module " + this.route.page;
-                    }, this)
-                );
+                var module = require(this.route.page);
+                if (module) {
+                    this.nextRenderPage = false;
+                    this.renderPage(module, this.args);
+                } else {
+                    throw "Unable to render page for module " + this.route.page;
+                }
             }
         },
         render: function (args, callback) {
@@ -73,9 +69,7 @@ define("org/forgerock/openam/ui/common/components/TreeNavigation", [
             self.parentRender(function () {
                 self.$el.find(".sidenav li").removeClass("active");
                 self.findActiveNavItem(Router.getURIFragment());
-                ModuleLoader.load(self.route.page).then(function (page) {
-                    self.renderPage(page, args, callback);
-                });
+                self.renderPage(require(self.route.page), args, callback);
             });
         },
         renderPage: function (Module, args, callback) {

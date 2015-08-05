@@ -22,17 +22,16 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define */
+/*global define, $, form2js, _, js2form, window */
 
 define("org/forgerock/openam/ui/user/login/RESTConfirmLoginView", [
-    "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/user/delegates/AuthNDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/openam/ui/user/login/RESTLoginHelper",
     "org/forgerock/openam/ui/user/delegates/SessionDelegate",
     "org/forgerock/commons/ui/common/util/CookieHelper"
-], function($, AbstractView, authNDelegate, conf, restLoginHelper, sessionDelegate, cookieHelper) {
+], function(AbstractView, authNDelegate, conf, restLoginHelper, sessionDelegate, cookieHelper) {
 
     var ConfirmLoginView = AbstractView.extend({
         template: "templates/openam/RESTConfirmLoginTemplate.html",

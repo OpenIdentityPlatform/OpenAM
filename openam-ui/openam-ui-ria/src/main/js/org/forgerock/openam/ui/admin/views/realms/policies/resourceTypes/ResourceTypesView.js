@@ -20,20 +20,14 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/resourceTypes/Resour
     "jquery",
     "underscore",
     "backbone",
-    "backbone.paginator",
     "backgrid",
-    "backgrid.filter",
-    "backgrid.paginator",
-    "backgrid.selectall",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/common/util/URLHelper",
     "org/forgerock/openam/ui/admin/views/realms/policies/common/AbstractListView",
     "org/forgerock/openam/ui/admin/models/policies/ResourceTypeModel",
     "org/forgerock/openam/ui/common/util/BackgridUtils"
-], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, BackgridPaginator, BackgridSelectAll,
-             Router, UIUtils, URLHelper, AbstractListView, ResourceTypeModel, BackgridUtils) {
-
+], function ($, _, Backbone, Backgrid, Router, UIUtils, URLHelper, AbstractListView, ResourceTypeModel, BackgridUtils) {
     return AbstractListView.extend({
         template: "templates/admin/views/realms/policies/resourceTypes/ResourceTypesTemplate.html",
         // Used in AbstractListView

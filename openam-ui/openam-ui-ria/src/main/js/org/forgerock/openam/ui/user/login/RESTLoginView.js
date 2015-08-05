@@ -22,27 +22,24 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define, window*/
+/*global define, $, form2js, _, js2form, window*/
 define("org/forgerock/openam/ui/user/login/RESTLoginView", [
-    "jquery",
-    "underscore",
-    "form2js",
-    "handlebars",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/user/delegates/AuthNDelegate",
+    "bootstrap-dialog",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/CookieHelper",
     "org/forgerock/commons/ui/common/main/EventManager",
+    "handlebars",
     "org/forgerock/commons/ui/common/main/i18nManager",
     "org/forgerock/commons/ui/common/components/Messages",
-    "org/forgerock/commons/ui/common/util/ModuleLoader",
     "org/forgerock/openam/ui/user/login/RESTLoginHelper",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/SessionManager",
     "org/forgerock/commons/ui/common/util/UIUtils"
-], function($, _, form2js, Handlebars, AbstractView, AuthNDelegate, Configuration, Constants, CookieHelper, EventManager,
-             i18nManager, Messages, ModuleLoader, RESTLoginHelper, Router, SessionManager, UIUtils) {
+], function(AbstractView, AuthNDelegate, BootstrapDialog, Configuration, Constants, CookieHelper, EventManager,
+            Handlebars, i18nManager, Messages, RESTLoginHelper, Router, SessionManager, UIUtils) {
     var LoginView = AbstractView.extend({
         template: "templates/openam/RESTLoginTemplate.html",
         genericTemplate: "templates/openam/RESTLoginTemplate.html",
@@ -294,6 +291,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                         this.reloadData();
                         var self = this,
                             args = {
+                                type: BootstrapDialog.TYPE_DEFAULT,
                                 title: $.t("common.form.sessionExpired"),
                                 cssClass: "loginDialog",
                                 closable: false,
@@ -304,9 +302,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                                     self.rebind();
                                 }
                             };
-                        ModuleLoader.load("bootstrap-dialog").then(function (BootstrapDialog) {
-                            BootstrapDialog.show(args);
-                        });
+                        BootstrapDialog.show(args);
                         return;
                     }
 

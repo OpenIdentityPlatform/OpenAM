@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define */
+/*global define, $, _ */
 
 define( "org/forgerock/openam/ui/uma/views/share/BaseShare", [
         "org/forgerock/commons/ui/common/main/AbstractView",

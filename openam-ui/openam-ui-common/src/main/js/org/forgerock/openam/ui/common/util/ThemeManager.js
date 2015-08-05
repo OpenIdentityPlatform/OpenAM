@@ -22,38 +22,52 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global require, define, $, _*/
+/*global require, define, $, _, less*/
 
-define("org/forgerock/openam/ui/common/util/ThemeManager", [
+define("ThemeManager", [
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Configuration"
 ], function(constants,conf) {
 
     var obj = {},
+        themeCSSPromise,
         themeConfigPromise;
 
     obj.loadThemeCSS = function(theme){
 
-        $('head').find('link[type="image/x-icon"]').remove();
-        $('head').find('link[type="text/css"]').remove();
+        if (themeCSSPromise === undefined) {
+            $('head').find('link[href*=less]').remove();
+            $('head').find('link[href*=favicon]').remove();
 
-        $("<link/>", {
-            rel: "icon",
-            type: "image/x-icon",
-            href: require.toUrl(theme.path + theme.icon)
-         }).appendTo("head");
+            $("<link/>", {
+                rel: "stylesheet/less",
+                type: "text/css",
+                href: require.toUrl(theme.path + "css/styles.less")
+             }).appendTo("head");
 
-        $("<link/>", {
-            rel: "shortcut icon",
-            type: "image/x-icon",
-            href: require.toUrl(theme.path + theme.icon)
-         }).appendTo("head");
+            $("<link/>", {
+                rel: "icon",
+                type: "image/x-icon",
+                href: require.toUrl(theme.path + theme.icon)
+             }).appendTo("head");
 
-         $("<link/>", {
-             rel: "stylesheet",
-             type: "text/css",
-             href: theme.stylesheet
-         }).appendTo("head");
+            $("<link/>", {
+                rel: "shortcut icon",
+                type: "image/x-icon",
+                href: require.toUrl(theme.path + theme.icon)
+             }).appendTo("head");
+
+            themeCSSPromise = $.ajax({
+                url: require.toUrl(constants.LESS_VERSION),
+                dataType: "script",
+                cache:true,
+                error: function (request, status, error) {
+                    console.log(request.responseText);
+                }
+              });
+        }
+
+        return themeCSSPromise;
     };
 
     obj.loadThemeConfig = function(){
@@ -67,13 +81,16 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
         var theme = {},
             newLessVars = {},
             realmDefined = typeof conf.globalData.auth.subRealm !== 'undefined',
-            themeName, defaultTheme;
+            themeName, prom, defaultTheme;
 
         //find out if the theme has changed
-        if (conf.globalData.theme && obj.mapRealmToTheme() === conf.globalData.theme.name) {
+        if(conf.globalData.theme && obj.mapRealmToTheme() === conf.globalData.theme.name){
             //no change so use the existing theme
-            return $.Deferred().resolve(conf.globalData.theme);
-        } else {
+            prom = $.Deferred();
+            prom.resolve(conf.globalData.theme);
+            return prom;
+        }
+        else{
             return obj.loadThemeConfig().then(function(themeConfig){
                 obj.data = themeConfig;
                 conf.globalData.themeConfig = obj.updateSrcProperties(themeConfig);
@@ -85,9 +102,18 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
                     defaultTheme = _.reject(obj.data.themes,function(t){return t.name !== 'default';})[0];
                     theme = $.extend(true,{}, defaultTheme, theme);
                 }
-                obj.loadThemeCSS(theme);
-                conf.globalData.theme = theme;
-                return theme;
+
+                return obj.loadThemeCSS(theme).then(function(){
+                    _.each(theme.settings.lessVars, function (value, key) {
+                        newLessVars['@' + key] = value;
+                    });
+                    less.modifyVars(newLessVars);
+
+                    conf.globalData.theme = theme;
+
+                    return theme;
+                });
+
             });
         }
     };

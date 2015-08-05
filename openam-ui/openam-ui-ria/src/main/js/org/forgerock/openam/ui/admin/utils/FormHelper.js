@@ -14,13 +14,11 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global define */
+/*global $ _ define*/
 
 define("org/forgerock/openam/ui/admin/utils/FormHelper", [
-    "jquery",
-    "underscore",
     "jsonEditor"
-], function($, _, JSONEditor) {
+], function(JSONEditor) {
     var obj = {};
 
     obj.bindSavePromiseToElement = function(promise, element) {

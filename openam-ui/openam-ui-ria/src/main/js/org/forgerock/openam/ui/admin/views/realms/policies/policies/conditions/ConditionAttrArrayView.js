@@ -20,10 +20,7 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/
     "jquery",
     "underscore",
     "org/forgerock/openam/ui/admin/views/realms/policies/policies/conditions/ConditionAttrBaseView",
-    "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate",
-
-    // jquery dependencies
-    "selectize"
+    "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate"
 ], function ($, _, ConditionAttrBaseView, PoliciesDelegate) {
     return ConditionAttrBaseView.extend({
         template: "templates/admin/views/realms/policies/policies/conditions/ConditionAttrArray.html",

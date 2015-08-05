@@ -22,11 +22,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define */
+/*global define, $, _, form2js*/
 define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
-    "jquery",
-    "underscore",
-    "form2js",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/ValidatorsManager",
     "org/forgerock/commons/ui/common/main/Configuration",
@@ -36,7 +33,7 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
     "org/forgerock/commons/ui/common/util/Constants",
     'org/forgerock/commons/ui/common/components/Messages',
     "bootstrap-dialog"
-], function($, _, form2js, AbstractView, ValidatorsManager, Configuration, UserDelegate, UIUtils, EventManager, Constants, Messages, BootstrapDialog) {
+], function(AbstractView, ValidatorsManager, Configuration, UserDelegate, UIUtils, EventManager, Constants, Messages, BootstrapDialog) {
     var ChangeSecurityDataDialog = AbstractView.extend({
         template: "templates/openam/ChangeSecurityDataDialogTemplate.html",
         data: { },

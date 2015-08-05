@@ -3,6 +3,8 @@
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
  *
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
  * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
  * specific language governing permission and limitations under the License.
  *
@@ -14,16 +16,14 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global define */
+/*global $, define, _ */
 
-define("org/forgerock/openam/ui/dashboard/delegates/MyApplicationsDelegate", [
-    "jquery",
-    "underscore",
-    "org/forgerock/commons/ui/common/main/AbstractDelegate",
+define("org/forgerock/openam/ui/dashboard/MyApplicationsDelegate", [
     "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function($, _, AbstractDelegate, Constants, RealmHelper) {
-    var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/");
+], function(constants, AbstractDelegate, RealmHelper) {
+    var obj = new AbstractDelegate(constants.host + '/' + constants.context + '/json/');
 
     obj.sortApps = function(apps) {
 

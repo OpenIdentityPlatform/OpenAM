@@ -29,12 +29,9 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy",
-
-    // jquery dependencies
-    "selectize"
+    "org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy"
 ], function ($, _, AbstractView, Backbone, Backgrid, BackgridUtils, BootstrapDialog, CommonShare, Constants, EventManager,
-             Messages, Router, UIUtils, UMAResourceSetWithPolicy) {
+            Messages, Router, UIUtils, UMAResourceSetWithPolicy) {
     var ResourcePage = AbstractView.extend({
         initialize: function () {
             // TODO: AbstarctView.prototype.initialize.call(this);

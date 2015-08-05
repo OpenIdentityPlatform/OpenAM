@@ -22,10 +22,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define*/
+/*global $, _, define*/
 define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
-    "jquery",
-    "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "backgrid",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
@@ -37,11 +35,8 @@ define("org/forgerock/openam/ui/uma/views/share/CommonShare", [
     'org/forgerock/openam/ui/uma/models/UMAPolicyPermission',
     'org/forgerock/openam/ui/uma/models/UMAPolicyPermissionScope',
     'org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy',
-    'org/forgerock/openam/ui/common/util/RealmHelper',
-
-    // jquery dependencies
-    "selectize"
-], function($, _, AbstractView, Backgrid, BackgridUtils, BootstrapDialog, Constants, EventManager, ShareCounter, UMAPolicy, UMAPolicyPermission, UMAPolicyPermissionScope, UMAResourceSetWithPolicy, RealmHelper) {
+    'org/forgerock/openam/ui/common/util/RealmHelper'
+], function(AbstractView, Backgrid, BackgridUtils, BootstrapDialog, Constants, EventManager, ShareCounter, UMAPolicy, UMAPolicyPermission, UMAPolicyPermissionScope, UMAResourceSetWithPolicy, RealmHelper) {
 
     var CommonShare,
         realmRegex = /[?&]realm=/,

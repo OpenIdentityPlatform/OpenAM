@@ -25,10 +25,7 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/modules/EditMo
     "org/forgerock/openam/ui/admin/delegates/SMSRealmDelegate",
     "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate",
     "org/forgerock/openam/ui/admin/models/Form",
-    "org/forgerock/openam/ui/admin/utils/FormHelper",
-
-    // jquery dependencies
-    "bootstrap-tabdrop"
+    "org/forgerock/openam/ui/admin/utils/FormHelper"
 ], function ($, AbstractView, Configuration, EventManager, Router, Constants, SMSRealmDelegate, SMSGlobalDelegate, Form, FormHelper) {
     var EditModuleView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/modules/EditModuleViewTemplate.html",

@@ -14,11 +14,9 @@
  * Portions copyright 2011-2015 ForgeRock AS.
  */
 
-/*global define */
+/*global define, _, window, $ */
 
 define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
-    "jquery",
-    "underscore",
     "org/forgerock/openam/ui/user/delegates/AuthNDelegate",
     "UserDelegate",
     "org/forgerock/commons/ui/common/main/ViewManager",
@@ -30,7 +28,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     "org/forgerock/openam/ui/user/delegates/SessionDelegate",
     "org/forgerock/commons/ui/common/util/CookieHelper",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function ($, _, authNDelegate, userDelegate, viewManager, AbstractConfigurationAware, router, conf, uiUtils, constants, sessionDelegate, cookieHelper, RealmHelper) {
+], function (authNDelegate, userDelegate, viewManager, AbstractConfigurationAware, router, conf, uiUtils, constants, sessionDelegate, cookieHelper, RealmHelper) {
     var obj = new AbstractConfigurationAware();
 
     obj.login = function(params, successCallback, errorCallback) {
