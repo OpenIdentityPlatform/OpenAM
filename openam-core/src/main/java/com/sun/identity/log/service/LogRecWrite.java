@@ -29,6 +29,8 @@
  */
 package com.sun.identity.log.service;
 
+import static org.forgerock.openam.audit.AuditConstants.*;
+
 import com.iplanet.dpro.parser.ParseOutput;
 import com.iplanet.services.comm.share.Response;
 import com.iplanet.sso.SSOException;
@@ -217,8 +219,8 @@ public class LogRecWrite implements LogOperation, ParseOutput {
 
         AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
                 .transactionId(AuditRequestContext.getTransactionIdValue())
-                .eventName("AM-AGENT-ACCESS_ATTEMPT")
-                .component("AGENT")
+                .eventName(EventName.AM_ACCESS_ATTEMPT)
+                .component(Component.AGENT)
                 .authentication(clientId)
                 .http("UNKNOWN", path, queryString, Collections.<String, List<String>>emptyMap())
                 .resourceOperation(logExtracts.getResourceUrl(), "HTTP", "UNKNOWN")

@@ -16,18 +16,17 @@
 package org.forgerock.openam.audit;
 
 import static org.assertj.core.api.Assertions.fail;
+import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 import org.forgerock.audit.AuditException;
 import org.forgerock.audit.AuditService;
-import org.forgerock.audit.AuditServiceConfiguration;
 import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.audit.events.handlers.AuditEventHandler;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.Resource;
-import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
@@ -68,7 +67,7 @@ public class AuditEventPublisherTest {
     public void publishesProvidedAuditEventToAuditService() throws Exception {
         // Given
         AuditEvent auditEvent = new AMAccessAuditEventBuilder()
-                .eventName("AM-REST-1")
+                .eventName(EventName.AM_ACCESS_ATTEMPT)
                 .transactionId(UUID.randomUUID().toString())
                 .authentication("id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org")
                 .client("172.16.101.7", 62375)
@@ -94,7 +93,7 @@ public class AuditEventPublisherTest {
     public void shouldSuppressExceptionsOnPublish() {
         // Given
         AuditEvent auditEvent = new AMAccessAuditEventBuilder()
-                .eventName("AM-REST-1")
+                .eventName(EventName.AM_ACCESS_ATTEMPT)
                 .transactionId(UUID.randomUUID().toString())
                 .authentication("id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org")
                 .client("172.16.101.7", 62375)
@@ -121,7 +120,7 @@ public class AuditEventPublisherTest {
     public void shouldNotSuppressExceptionsOnPublish() {
         // Given
         AuditEvent auditEvent = new AMAccessAuditEventBuilder()
-                .eventName("AM-REST-1")
+                .eventName(EventName.AM_ACCESS_ATTEMPT)
                 .transactionId(UUID.randomUUID().toString())
                 .authentication("id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org")
                 .client("172.16.101.7", 62375)

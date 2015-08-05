@@ -17,6 +17,7 @@ package org.forgerock.openam.audit;
 
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.*;
 import static org.forgerock.openam.utils.ClientUtils.getClientIPAddress;
+import static org.forgerock.openam.audit.AuditConstants.*;
 
 import com.iplanet.sso.SSOToken;
 import org.forgerock.audit.events.AccessAuditEventBuilder;
@@ -60,11 +61,11 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
     /**
      * Provide value for "component" audit log field.
      *
-     * @param value String "component" value.
+     * @param value one of the predefined names from {@link AuditConstants.Component}
      * @return this builder for method chaining.
      */
-    public AMAccessAuditEventBuilder component(String value) {
-        putComponent(jsonValue, value);
+    public AMAccessAuditEventBuilder component(Component value) {
+        putComponent(jsonValue, value.toString());
         return this;
     }
 
@@ -101,6 +102,18 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
                 request.getQueryString() == null ? "" : request.getQueryString(),
                 getHeadersAsMap(request));
         return this;
+    }
+
+    /**
+     * Sets the provided name for the event. This method is preferred over
+     * {@link org.forgerock.audit.events.AuditEventBuilder#eventName(String)} as it allows OpenAM to manage event
+     * names better and documentation to be automatically generated for new events.
+     *
+     * @param name one of the predefined names from {@link AuditConstants.EventName}
+     * @return this builder
+     */
+    public AMAccessAuditEventBuilder eventName(EventName name) {
+        return eventName(name.toString());
     }
 
     private Map<String, List<String>> getHeadersAsMap(HttpServletRequest request) {

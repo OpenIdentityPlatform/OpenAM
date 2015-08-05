@@ -23,6 +23,49 @@ package org.forgerock.openam.audit;
 public final class AuditConstants {
 
     /**
+     * Predefined names for audit events.
+     */
+    public enum EventName {
+        AM_ACCESS_ATTEMPT("AM-ACCESS-ATTEMPT"),
+        AM_ACCESS_OUTCOME("AM-ACCESS-OUTCOME");
+
+        private final String name;
+
+        EventName(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    /**
+     * Predefined components for audit events.
+     */
+    public enum Component {
+        PLL("PLL"),
+        OAUTH2("OAuth2"),
+        OPENID_CONNECT("OpenID Connect"),
+        UMA("UMA"),
+        AGENT("Agent"),
+        AUTHENTICATION("Authentication"),
+        CREST("CREST");
+
+        private final String name;
+
+        Component(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    /**
      * The topic to which events built using {@link AMAccessAuditEventBuilder} should be routed.
      */
     public static final String ACCESS_TOPIC = "access";

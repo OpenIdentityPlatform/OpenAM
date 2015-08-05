@@ -28,6 +28,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
+import static org.forgerock.openam.audit.AuditConstants.*;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.audit.AuditException;
@@ -163,8 +164,8 @@ public class AuditFilterTest {
         filteredOp.run();
 
         // Then
-        verifyPublishAccessEvent(AM_REST_ACCESS_ATTEMPT);
-        verifyTryPublishAccessEvent(AM_REST_ACCESS_SUCCESS);
+        verifyPublishAccessEvent(EventName.AM_ACCESS_ATTEMPT);
+        verifyTryPublishAccessEvent(EventName.AM_ACCESS_OUTCOME);
     }
 
     @Test(dataProvider = "filteredCrudpaqOperations")
@@ -177,8 +178,8 @@ public class AuditFilterTest {
         filteredOp.run();
 
         // Then
-        verifyPublishAccessEvent(AM_REST_ACCESS_ATTEMPT);
-        verifyTryPublishAccessEvent(AM_REST_ACCESS_FAILURE);
+        verifyPublishAccessEvent(EventName.AM_ACCESS_ATTEMPT);
+        verifyTryPublishAccessEvent(EventName.AM_ACCESS_OUTCOME);
     }
 
     @Test(dataProvider = "filteredCrudpaqOperations")
@@ -203,7 +204,7 @@ public class AuditFilterTest {
         filteredOp.run();
 
         // Then
-        verifyPublishAccessEvent(AM_REST_ACCESS_ATTEMPT);
+        verifyPublishAccessEvent(EventName.AM_ACCESS_ATTEMPT);
         verifyTryPublishAccessEventNotCalled();
         verifyNoMoreInteractions(filterChain);
     }
@@ -309,16 +310,16 @@ public class AuditFilterTest {
         };
     }
 
-    private void verifyPublishAccessEvent(String eventName) throws AuditException {
+    private void verifyPublishAccessEvent(EventName eventName) throws AuditException {
         ArgumentCaptor<AuditEvent> auditEventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
         verify(auditEventPublisher).publish(eq(ACCESS_TOPIC), auditEventCaptor.capture());
-        assertThat(getEventName(auditEventCaptor)).isEqualTo(eventName);
+        assertThat(getEventName(auditEventCaptor)).isEqualTo(eventName.toString());
     }
 
-    private void verifyTryPublishAccessEvent(String eventName) {
+    private void verifyTryPublishAccessEvent(EventName eventName) {
         ArgumentCaptor<AuditEvent> auditEventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
         verify(auditEventPublisher).tryPublish(eq(ACCESS_TOPIC), auditEventCaptor.capture());
-        assertThat(getEventName(auditEventCaptor)).isEqualTo(eventName);
+        assertThat(getEventName(auditEventCaptor)).isEqualTo(eventName.toString());
     }
 
     private String getEventName(ArgumentCaptor<AuditEvent> auditEventCaptor) {

@@ -16,7 +16,7 @@
 package com.iplanet.services.comm.server;
 
 import static org.forgerock.openam.audit.AMAuditEventBuilderUtils.*;
-import static org.forgerock.openam.audit.AuditConstants.ACCESS_TOPIC;
+import static org.forgerock.openam.audit.AuditConstants.*;
 
 import com.iplanet.services.comm.share.Request;
 import com.iplanet.services.comm.share.RequestSet;
@@ -36,9 +36,6 @@ import javax.servlet.http.HttpServletRequest;
 public class PLLAuditor {
 
     public static final String PLL = "PLL";
-    public static final String AM_PLL_ACCESS_SUCCESS = "AM-PLL-ACCESS_SUCCESS";
-    public static final String AM_PLL_ACCESS_FAILURE = "AM-PLL-ACCESS_FAILURE";
-    public static final String AM_PLL_ACCESS_ATTEMPT = "AM-PLL-ACCESS_ATTEMPT";
 
     private final Debug debug;
     private final AuditEventPublisher auditEventPublisher;
@@ -81,8 +78,8 @@ public class PLLAuditor {
                     .forHttpServletRequest(httpServletRequest)
                     .timestamp(startTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
-                    .eventName(AM_PLL_ACCESS_ATTEMPT)
-                    .component(PLL)
+                    .eventName(EventName.AM_ACCESS_ATTEMPT)
+                    .component(Component.PLL)
                     .authentication(authenticationId)
                     .resourceOperation(service, PLL, method)
                     .contextId(contextId);
@@ -109,8 +106,8 @@ public class PLLAuditor {
                     .forHttpServletRequest(httpServletRequest)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
-                    .eventName(AM_PLL_ACCESS_SUCCESS)
-                    .component(PLL)
+                    .eventName(EventName.AM_ACCESS_OUTCOME)
+                    .component(Component.PLL)
                     .response("SUCCESS", elapsedTime)
                     .authentication(authenticationId)
                     .resourceOperation(service, PLL, method)
@@ -154,8 +151,8 @@ public class PLLAuditor {
                     .forHttpServletRequest(httpServletRequest)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
-                    .eventName(AM_PLL_ACCESS_FAILURE)
-                    .component(PLL)
+                    .eventName(EventName.AM_ACCESS_OUTCOME)
+                    .component(Component.PLL)
                     .responseWithMessage(errorCode == null ? "FAILED" : "FAILED - " + errorCode, elapsedTime, message)
                     .authentication(authenticationId)
                     .resourceOperation(service, PLL, method)

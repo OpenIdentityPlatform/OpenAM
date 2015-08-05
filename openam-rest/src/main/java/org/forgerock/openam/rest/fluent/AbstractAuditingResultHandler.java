@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.rest.fluent;
 
-import static org.forgerock.openam.audit.AuditConstants.ACCESS_TOPIC;
+import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.forgerockrest.utils.ServerContextUtils.getTokenFromContext;
 
 import com.iplanet.sso.SSOToken;
@@ -38,11 +38,6 @@ import org.forgerock.openam.audit.context.AuditRequestContext;
  * @since 13.0.0
  */
 abstract class AbstractAuditingResultHandler<T, H extends ResultHandler<T>> implements ResultHandler<T> {
-
-    public static final String CREST_COMPONENT = "CREST";
-    public static final String AM_REST_ACCESS_SUCCESS = "AM-REST-ACCESS_SUCCESS";
-    public static final String AM_REST_ACCESS_FAILURE = "AM-REST-ACCESS_FAILURE";
-    public static final String AM_REST_ACCESS_ATTEMPT = "AM-REST-ACCESS_ATTEMPT";
 
     final H delegate;
     private final Debug debug;
@@ -103,8 +98,8 @@ abstract class AbstractAuditingResultHandler<T, H extends ResultHandler<T>> impl
                     .forHttpCrestRequest(context, request)
                     .timestamp(startTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
-                    .eventName(AM_REST_ACCESS_ATTEMPT)
-                    .component(CREST_COMPONENT);
+                    .eventName(EventName.AM_ACCESS_ATTEMPT)
+                    .component(Component.CREST);
             addSessionDetailsFromSSOTokenContext(builder, context);
 
             auditEventPublisher.publish(ACCESS_TOPIC, builder.toEvent());
@@ -126,8 +121,8 @@ abstract class AbstractAuditingResultHandler<T, H extends ResultHandler<T>> impl
                     .forHttpCrestRequest(context, request)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
-                    .eventName(AM_REST_ACCESS_SUCCESS)
-                    .component(CREST_COMPONENT)
+                    .eventName(EventName.AM_ACCESS_OUTCOME)
+                    .component(Component.CREST)
                     .response("SUCCESS", elapsedTime);
             addSessionDetailsFromSSOTokenContext(builder, context);
 
@@ -153,8 +148,8 @@ abstract class AbstractAuditingResultHandler<T, H extends ResultHandler<T>> impl
                     .forHttpCrestRequest(context, request)
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
-                    .eventName(AM_REST_ACCESS_FAILURE)
-                    .component(CREST_COMPONENT)
+                    .eventName(EventName.AM_ACCESS_OUTCOME)
+                    .component(Component.CREST)
                     .responseWithMessage("FAILED - " + resultCode, elapsedTime, message);
             addSessionDetailsFromSSOTokenContext(builder, context);
 
