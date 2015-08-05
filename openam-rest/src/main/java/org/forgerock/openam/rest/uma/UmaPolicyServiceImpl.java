@@ -318,6 +318,20 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
      */
     @Override
     public Promise<UmaPolicy, ResourceException> readPolicy(final ServerContext context, final String resourceSetId) {
+        return internalReadPolicy(context, resourceSetId)
+                .then(new Function<UmaPolicy, UmaPolicy, ResourceException>() {
+                    @Override
+                    public UmaPolicy apply(UmaPolicy umaPolicy) throws ResourceException {
+                        resolveUIDToUsername(umaPolicy.asJson());
+                        return umaPolicy;
+                    }
+                });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    private Promise<UmaPolicy, ResourceException> internalReadPolicy(final ServerContext context, final String resourceSetId) {
         String resourceOwnerUid = getResourceOwnerUid(context);
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.and(
@@ -335,7 +349,6 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                             } else {
                                 ResourceSetDescription resourceSet = getResourceSet(getRealm(context), resourceSetId);
                                 UmaPolicy umaPolicy = UmaPolicy.fromUnderlyingPolicies(resourceSet, value.getSecond());
-                                resolveUIDToUsername(umaPolicy.asJson());
                                 return Promises.newResultPromise(umaPolicy);
                             }
                         } catch (ResourceException e) {
@@ -366,30 +379,22 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         } catch (ResourceException e) {
             return newExceptionPromise(e);
         }
-        return readPolicy(context, resourceSetId)
+        return internalReadPolicy(context, resourceSetId)
                 .thenOnResult(new ResultHandler<UmaPolicy>() {
                     @Override
                     public void handleResult(UmaPolicy currentUmaPolicy) {
-                        Set<String> modifiedScopes = new HashSet<String>(updatedUmaPolicy.getScopes());
+                        Set<String> modifiedScopes = new HashSet<>(updatedUmaPolicy.getScopes());
                         modifiedScopes.retainAll(currentUmaPolicy.getScopes());
-                        Set<String> removedScopes = new HashSet<String>(currentUmaPolicy.getScopes());
+                        Set<String> removedScopes = new HashSet<>(currentUmaPolicy.getScopes());
                         removedScopes.removeAll(modifiedScopes);
                         for (JsonValue policy : currentUmaPolicy.asUnderlyingPolicies(contextHelper.getUserId(context))) {
                             for (String scope : removedScopes) {
                                 if (policy.get("actionValues").isDefined(scope)) {
                                     policyResourceDelegate.queryPolicies(context, Requests.newQueryRequest("")
                                             .setQueryFilter(QueryFilter.and(
-                                                    QueryFilter.equalTo("/createdBy", contextHelper.getUserId(context)),
+                                                    QueryFilter.equalTo("/createdBy", contextHelper.getUserUid(context)),
                                                     QueryFilter.equalTo("/name", policy.get("name").asString()))))
-                                            .thenAsync(new AsyncFunction<Pair<QueryResult, List<Resource>>, Void, ResourceException>() {
-                                                @Override
-                                                public Promise<Void, ResourceException> apply(Pair<QueryResult, List<Resource>> result) {
-                                                    for (Resource resource : result.getSecond()) {
-                                                        policyResourceDelegate.deletePolicies(context, Collections.singleton(resource.getId()));
-                                                    }
-                                                    return Promises.newResultPromise(null);
-                                                }
-                                            });
+                                            .thenAsync(new DeleteOldPolicyFunction(context));
                                 }
                             }
                         }
@@ -397,9 +402,9 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                 }).thenOnResult(new ResultHandler<UmaPolicy>() {
                     @Override
                     public void handleResult(UmaPolicy currentUmaPolicy) {
-                        Set<String> modifiedScopes = new HashSet<String>(currentUmaPolicy.getScopes());
+                        Set<String> modifiedScopes = new HashSet<>(currentUmaPolicy.getScopes());
                         modifiedScopes.retainAll(updatedUmaPolicy.getScopes());
-                        Set<String> deletedScopes = new HashSet<String>(updatedUmaPolicy.getScopes());
+                        Set<String> deletedScopes = new HashSet<>(updatedUmaPolicy.getScopes());
                         deletedScopes.removeAll(modifiedScopes);
                         for (JsonValue policy : updatedUmaPolicy.asUnderlyingPolicies(contextHelper.getUserId(context))) {
                             for (String scope : deletedScopes) {
@@ -444,7 +449,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         } catch (ResourceException e) {
             return newExceptionPromise(e);
         }
-        return readPolicy(context, resourceSetId)
+        return internalReadPolicy(context, resourceSetId)
                 .thenAsync(new AsyncFunction<UmaPolicy, List<Resource>, ResourceException>() {
                     @Override
                     public Promise<List<Resource>, ResourceException> apply(UmaPolicy value) {
@@ -751,4 +756,25 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         return contextHelper.getRealm(context);
     }
 
+    private class DeleteOldPolicyFunction implements AsyncFunction<Pair<QueryResult, List<Resource>>, Void, ResourceException> {
+        private final ServerContext context;
+
+        public DeleteOldPolicyFunction(ServerContext context) {
+            this.context = context;
+        }
+
+        @Override
+        public Promise<Void, ResourceException> apply(Pair<QueryResult, List<Resource>> result) {
+            List<Promise<List<Resource>, ResourceException>> results = new ArrayList<>();
+            for (Resource resource : result.getSecond()) {
+                results.add(policyResourceDelegate.deletePolicies(context, Collections.singleton(resource.getId())));
+            }
+            return Promises.when(results).then(new Function<List<List<Resource>>, Void, ResourceException>() {
+                @Override
+                public Void apply(List<List<Resource>> lists) throws ResourceException {
+                    return null;
+                }
+            });
+        }
+    }
 }
