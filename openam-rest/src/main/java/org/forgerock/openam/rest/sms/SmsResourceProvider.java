@@ -28,10 +28,8 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -242,9 +240,10 @@ abstract class SmsResourceProvider {
     }
 
     protected void addAttributeSchema(JsonValue result, String path, ServiceSchema schema, List<String> sections,
-            Map<String, String> attributeSectionMap, ResourceBundle console, String serviceType, ServerContext context) {
+            Map<String, String> attributeSectionMap, ResourceBundle consoleI18n, String serviceType,
+                                      ServerContext context) {
 
-        ResourceBundle i18n = ResourceBundle.getBundle(schema.getI18NFileName());
+        ResourceBundle schemaI18n = ResourceBundle.getBundle(schema.getI18NFileName());
         NumberFormat sectionFormat = new DecimalFormat("00");
 
         for (AttributeSchema attribute : (Set<AttributeSchema>) schema.getAttributeSchemas()) {
@@ -258,17 +257,17 @@ abstract class SmsResourceProvider {
                     result.putPermissive(new JsonPointer(path + section + "/" + TYPE), OBJECT_TYPE);
 
                     result.putPermissive(new JsonPointer(path + section + "/" + TITLE),
-                            getConsoleString(console, sectionLabel));
+                            getConsoleString(consoleI18n, sectionLabel));
                     result.putPermissive(new JsonPointer(path + section + "/" + PROPERTY_ORDER),
                             "z" + sectionFormat.format(sections.indexOf(section)));
                 }
-                result.addPermissive(new JsonPointer(path + attributePath + "/" + TITLE),
-                        i18n.getString(i18NKey));
+                result.addPermissive(new JsonPointer(path + attributePath + "/" + TITLE), schemaI18n.getString(i18NKey));
 
-                result.addPermissive(new JsonPointer(path + attributePath + "/" + DESCRIPTION), getSchemaDescription(i18n, i18NKey));
+                result.addPermissive(new JsonPointer(path + attributePath + "/" + DESCRIPTION),
+                        getSchemaDescription(schemaI18n, i18NKey));
                 result.addPermissive(new JsonPointer(path + attributePath + "/" + PROPERTY_ORDER), i18NKey);
                 result.addPermissive(new JsonPointer(path + attributePath + "/" + REQUIRED), !attribute.isOptional());
-                addType(result, path + attributePath, attribute, i18n, context);
+                addType(result, path + attributePath, attribute, schemaI18n, consoleI18n, context);
             }
         }
     }
@@ -295,7 +294,8 @@ abstract class SmsResourceProvider {
         }
     }
 
-    private void addType(JsonValue result, String pointer, AttributeSchema attribute, ResourceBundle i18n, ServerContext context) {
+    private void addType(JsonValue result, String pointer, AttributeSchema attribute, ResourceBundle schemaI18n,
+                         ResourceBundle consoleI18n, ServerContext context) {
         String type = null;
         AttributeSchema.Type attributeType = attribute.getType();
         AttributeSchema.Syntax syntax = attribute.getSyntax();
@@ -305,7 +305,7 @@ abstract class SmsResourceProvider {
             type = OBJECT_TYPE;
             JsonValue fieldType = json(object());
             if (attribute.hasChoiceValues()) {
-                addEnumChoices(fieldType, attribute, i18n, context);
+                addEnumChoices(fieldType, attribute, schemaI18n, consoleI18n, context);
             } else {
                 fieldType.add(TYPE, STRING_TYPE);
             }
@@ -316,15 +316,17 @@ abstract class SmsResourceProvider {
             result.addPermissive(new JsonPointer(pointer + "/" + ITEMS),
                     object(field(TYPE, getTypeFromSyntax(attribute.getSyntax()))));
             if (attribute.hasChoiceValues()) {
-                addEnumChoices(result.get(new JsonPointer(pointer + "/" + ITEMS)), attribute, i18n, context);
+                addEnumChoices(result.get(new JsonPointer(pointer + "/" + ITEMS)), attribute, schemaI18n, consoleI18n,
+                        context);
             }
         } else if (attributeType.equals(AttributeSchema.Type.MULTIPLE_CHOICE)) {
             type = ARRAY_TYPE;
             result.addPermissive(new JsonPointer(pointer + "/" + ITEMS),
                     object(field(TYPE, getTypeFromSyntax(attribute.getSyntax()))));
-            addEnumChoices(result.get(new JsonPointer(pointer + "/" + ITEMS)), attribute, i18n, context);
+            addEnumChoices(result.get(new JsonPointer(pointer + "/" + ITEMS)), attribute, schemaI18n, consoleI18n,
+                    context);
         } else if (attributeType.equals(AttributeSchema.Type.SINGLE_CHOICE)) {
-            addEnumChoices(result.get(new JsonPointer(pointer)), attribute, i18n, context);
+            addEnumChoices(result.get(new JsonPointer(pointer)), attribute, schemaI18n, consoleI18n, context);
         } else {
             type = getTypeFromSyntax(syntax);
         }
@@ -333,8 +335,8 @@ abstract class SmsResourceProvider {
         }
     }
 
-    private void addEnumChoices(JsonValue jsonValue, AttributeSchema attribute, ResourceBundle i18n,
-            ServerContext context) {
+    private void addEnumChoices(JsonValue jsonValue, AttributeSchema attribute, ResourceBundle schemaI18n,
+                                ResourceBundle consoleI18n, ServerContext context) {
         List<String> values = new ArrayList<String>();
         List<String> descriptions = new ArrayList<String>();
         Map environment = type == SchemaType.GLOBAL ? Collections.emptyMap() :
@@ -342,8 +344,14 @@ abstract class SmsResourceProvider {
         Map<String, String> valuesMap = attribute.getChoiceValuesMap(environment);
         for (Map.Entry<String, String> value : valuesMap.entrySet()) {
             values.add(value.getKey());
-            if (value.getValue() != null && i18n.containsKey(value.getValue())) {
-                descriptions.add(i18n.getString(value.getValue()));
+            if (AttributeSchema.UIType.SCRIPTSELECT.equals(attribute.getUIType())) {
+                if (value.getValue() != null && consoleI18n.containsKey(value.getValue())) {
+                    descriptions.add(consoleI18n.getString(value.getValue()));
+                } else {
+                    descriptions.add(value.getValue());
+                }
+            } else if (value.getValue() != null && schemaI18n.containsKey(value.getValue())) {
+                descriptions.add(schemaI18n.getString(value.getValue()));
             } else {
                 descriptions.add(value.getKey());
             }
