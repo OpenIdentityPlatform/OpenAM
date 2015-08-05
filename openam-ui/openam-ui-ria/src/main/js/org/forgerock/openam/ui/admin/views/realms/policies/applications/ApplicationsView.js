@@ -174,6 +174,11 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/applications/Applica
                             callback();
                         }
                     });
+                }).fail(function () {
+                    Router.routeTo(Router.configuration.routes.realms, {
+                        args: [],
+                        trigger: true
+                    });
                 });
             });
         },

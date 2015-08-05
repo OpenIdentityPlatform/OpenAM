@@ -26,7 +26,7 @@
                 "errorFetchingData" : "Error fetching user data",
                 "loggedOut" : "You have been logged out.",
                 "loginTimeout" : "Login processed timed out. Restarting...",
-                "unauthorized" : "Unauthorized access or session timeout",
+                "unauthorized" : "Unauthorized access",
                 "internalError" : "Internal server error",
                 "forbiddenError" : "Forbidden request error.",
                 "notFoundError" : "Not found error.",

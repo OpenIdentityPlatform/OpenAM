@@ -60,8 +60,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils", [
         return schema;
     };
 
-    // Not intented for use outside of this module
-
+    // Not intended for use outside of this module
     obj.addCheckboxFormatToBoolean = function (property) {
         if (property.hasOwnProperty("type") && property.type === "boolean") {
             property.format = "checkbox";
@@ -83,7 +82,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils", [
     };
 
     /**
-     * Checks for the existance of a "defaults" property
+     * Checks for the existence of a "defaults" property
      * @param  {[type]} schema [description]
      * @return {[type]}        [description]
      */
@@ -111,7 +110,7 @@ define("org/forgerock/openam/ui/admin/delegates/SMSDelegateUtils", [
     };
 
     /**
-     * Checks for the existance of an object type at the root of the schema. Defaults to "object" if attribute is not
+     * Checks for the existence of an object type at the root of the schema. Defaults to "object" if attribute is not
      * found.
      * @param  {Object} schema Schema to check
      * @return {Object}        Checked schema
