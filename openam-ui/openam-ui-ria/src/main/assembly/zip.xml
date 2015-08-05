@@ -30,7 +30,6 @@
     <baseDirectory>/</baseDirectory>
     <formats>
         <format>dir</format>
-        <format>zip</format>
     </formats>
     <fileSets>
         <fileSet>
@@ -61,15 +60,20 @@
     <dependencySets>
         <dependencySet>
             <includes>
-                <include>org.forgerock.commons.ui.libs:*</include>
+                <include>org.forgerock.commons.ui.libs:*:js</include>
             </includes>
+            <excludes>
+                <exclude>org.forgerock.commons.ui.libs:CodeMirror</exclude>
+                <exclude>org.forgerock.commons.ui.libs:less</exclude>
+                <exclude>org.forgerock.commons.ui.libs:r</exclude>
+            </excludes>
             <outputDirectory>/libs</outputDirectory>
         </dependencySet>
         <dependencySet>
             <includes>
                 <include>org.forgerock.commons.ui.libs:*:css</include>
             </includes>
-            <outputDirectory>/css/common</outputDirectory>
+            <outputDirectory>/css</outputDirectory>
         </dependencySet>
     </dependencySets>
 </assembly>

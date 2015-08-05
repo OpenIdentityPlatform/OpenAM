@@ -22,9 +22,12 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define, $, form2js, _, js2form, window */
+/*global define */
 
 define("org/forgerock/openam/ui/user/profile/RegisterView", [
+    "jquery",
+    "underscore",
+    "form2js",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/ValidatorsManager",
     "UserDelegate",
@@ -33,7 +36,7 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/UIUtils"
-], function(AbstractView, ValidatorsManager, UserDelegate, Configuration, CookieHelper, EventManager, Constants, UiUtils) {
+], function($, _, form2js, AbstractView, ValidatorsManager, UserDelegate, Configuration, CookieHelper, EventManager, Constants, UiUtils) {
 
     var RegisterView = AbstractView.extend({
         template: "templates/openam/RegisterTemplate.html",

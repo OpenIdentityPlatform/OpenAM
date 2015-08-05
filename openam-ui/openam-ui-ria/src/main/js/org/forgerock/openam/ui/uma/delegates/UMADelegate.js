@@ -14,14 +14,15 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global _, define*/
+/*global define */
 define("org/forgerock/openam/ui/uma/delegates/UMADelegate", [
     "jquery",
+    "underscore",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function ($, AbstractDelegate, Configuration, Constants, RealmHelper) {
+], function ($, _, AbstractDelegate, Configuration, Constants, RealmHelper) {
     var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/");
 
     obj.getUmaConfig = function () {

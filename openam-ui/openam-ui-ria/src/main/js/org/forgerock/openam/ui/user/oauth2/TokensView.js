@@ -22,9 +22,10 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define, $, form2js, _ , console*/
+/*global define */
 
 define("org/forgerock/openam/ui/user/oauth2/TokensView", [
+    "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/user/delegates/TokenDelegate",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -32,7 +33,7 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
     "dataTable",
     "org/forgerock/commons/ui/common/main/i18nManager",
     'require'
-], function(AbstractView, tokensDelegate, eventManager, constants, dataTable, i18nManager, require) {
+], function($, AbstractView, tokensDelegate, eventManager, constants, dataTable, i18nManager, require) {
 
 
     var TokensView = AbstractView.extend({
@@ -46,7 +47,6 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
         },
 
         select: function(event) {
-            console.log("oauth2 token selected");
             event.stopPropagation();
         },
 
@@ -175,11 +175,10 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
                 id = td.attr('id');
                 tokensDelegate.deleteToken(
                     function(id) {
-                        console.info("Token Deleted id:", id);
                         location.reload(true);
                     },
                     function(id){
-                        console.error("Unable to delete token id:", id);
+
                     },
                     id);
             });

@@ -22,11 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/**
- * @author Halina Shabuldayeva
- */
-
-/*global document, $, define, _, window */
+/*global define */
 
 define("org/forgerock/openam/ui/user/delegates/SessionDelegate", [
     "org/forgerock/commons/ui/common/util/Constants",

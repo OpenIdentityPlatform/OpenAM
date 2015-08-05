@@ -22,52 +22,38 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global require, define, $, _, less*/
+/*global require, define, $, _*/
 
-define("ThemeManager", [
+define("org/forgerock/openam/ui/common/util/ThemeManager", [
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Configuration"
 ], function(constants,conf) {
 
     var obj = {},
-        themeCSSPromise,
         themeConfigPromise;
 
     obj.loadThemeCSS = function(theme){
 
-        if (themeCSSPromise === undefined) {
-            $('head').find('link[href*=less]').remove();
-            $('head').find('link[href*=favicon]').remove();
+        $('head').find('link[type="image/x-icon"]').remove();
+        $('head').find('link[type="text/css"]').remove();
 
-            $("<link/>", {
-                rel: "stylesheet/less",
-                type: "text/css",
-                href: require.toUrl(theme.path + "css/styles.less")
-             }).appendTo("head");
+        $("<link/>", {
+            rel: "icon",
+            type: "image/x-icon",
+            href: require.toUrl(theme.path + theme.icon)
+         }).appendTo("head");
 
-            $("<link/>", {
-                rel: "icon",
-                type: "image/x-icon",
-                href: require.toUrl(theme.path + theme.icon)
-             }).appendTo("head");
+        $("<link/>", {
+            rel: "shortcut icon",
+            type: "image/x-icon",
+            href: require.toUrl(theme.path + theme.icon)
+         }).appendTo("head");
 
-            $("<link/>", {
-                rel: "shortcut icon",
-                type: "image/x-icon",
-                href: require.toUrl(theme.path + theme.icon)
-             }).appendTo("head");
-
-            themeCSSPromise = $.ajax({
-                url: require.toUrl(constants.LESS_VERSION),
-                dataType: "script",
-                cache:true,
-                error: function (request, status, error) {
-                    console.log(request.responseText);
-                }
-              });
-        }
-
-        return themeCSSPromise;
+         $("<link/>", {
+             rel: "stylesheet",
+             type: "text/css",
+             href: theme.stylesheet
+         }).appendTo("head");
     };
 
     obj.loadThemeConfig = function(){
@@ -81,16 +67,13 @@ define("ThemeManager", [
         var theme = {},
             newLessVars = {},
             realmDefined = typeof conf.globalData.auth.subRealm !== 'undefined',
-            themeName, prom, defaultTheme;
+            themeName, defaultTheme;
 
         //find out if the theme has changed
-        if(conf.globalData.theme && obj.mapRealmToTheme() === conf.globalData.theme.name){
+        if (conf.globalData.theme && obj.mapRealmToTheme() === conf.globalData.theme.name) {
             //no change so use the existing theme
-            prom = $.Deferred();
-            prom.resolve(conf.globalData.theme);
-            return prom;
-        }
-        else{
+            return $.Deferred().resolve(conf.globalData.theme);
+        } else {
             return obj.loadThemeConfig().then(function(themeConfig){
                 obj.data = themeConfig;
                 conf.globalData.themeConfig = obj.updateSrcProperties(themeConfig);
@@ -102,18 +85,9 @@ define("ThemeManager", [
                     defaultTheme = _.reject(obj.data.themes,function(t){return t.name !== 'default';})[0];
                     theme = $.extend(true,{}, defaultTheme, theme);
                 }
-
-                return obj.loadThemeCSS(theme).then(function(){
-                    _.each(theme.settings.lessVars, function (value, key) {
-                        newLessVars['@' + key] = value;
-                    });
-                    less.modifyVars(newLessVars);
-
-                    conf.globalData.theme = theme;
-
-                    return theme;
-                });
-
+                obj.loadThemeCSS(theme);
+                conf.globalData.theme = theme;
+                return theme;
             });
         }
     };

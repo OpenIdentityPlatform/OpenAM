@@ -25,11 +25,15 @@
 /*global require, define, window */
 
 require.config({
+    map: {
+        "*" : {
+            "ThemeManager"              : "org/forgerock/openam/ui/common/util/ThemeManager"
+        }
+    },
     paths: {
         underscore: "libs/lodash-2.4.1-min",
         spin: "libs/spin-2.0.1-min",
-        jquery: "libs/jquery-2.1.1-min",
-        ThemeManager: "org/forgerock/openam/ui/common/util/ThemeManager"
+        jquery: "libs/jquery-2.1.1-min"
     },
 
     shim: {
@@ -42,24 +46,15 @@ require.config({
     }
 });
 
-/**
- * Loads all application on start, so each module will be available to
- * required synchronously
- */
 require([
     "jquery",
-    "underscore",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/SpinnerManager",
     "ThemeManager"
-], function($, _, conf, constants, spinner, themeManager) {
+], function($, conf, constants, spinner, themeManager) {
 
     spinner.showSpinner();
-
-    // Helpers for the code that hasn't been properly migrated to require these as explicit dependencies:
-    window.$ = $;
-    window._ = _;
 
     conf.globalData = { auth: { subRealm : window.realm } };
 

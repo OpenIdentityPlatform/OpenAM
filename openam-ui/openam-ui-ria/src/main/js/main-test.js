@@ -26,7 +26,7 @@
 
 require.config({
     paths: {
-        handlebars: "libs/handlebars-1.3.0-min",
+        handlebars: "libs/handlebars-3.0.3-min",
         i18next: "libs/i18next-1.7.3-min",
         jquery: 'libs/jquery-2.1.1-min',
         moment: "libs/moment-2.8.1-min",

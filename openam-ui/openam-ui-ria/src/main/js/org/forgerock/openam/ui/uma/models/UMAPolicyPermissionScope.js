@@ -22,11 +22,13 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
- /*global $, _, define*/
+ /*global define */
 define("org/forgerock/openam/ui/uma/models/UMAPolicyPermissionScope", [
+    "jquery",
+    "underscore",
     "backbone",
     "backbone-relational"
-], function(Backbone, BackboneRelational) {
+], function($, _, Backbone, BackboneRelational) {
     return Backbone.RelationalModel.extend({
         parse: function(response) {
             if(_.isUrl(response.id)) {

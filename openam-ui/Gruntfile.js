@@ -352,6 +352,13 @@ module.exports = function(grunt) {
             }
 
         },
+        less: {
+            xui: {
+                files: {
+                    "<%= destination %>/XUI/css/styles.css": "<%= destination %>/XUI/css/styles.less"
+                }
+            }
+        },
         watch: {
             frCommons: {
                 files: [
@@ -397,7 +404,7 @@ module.exports = function(grunt) {
                     'openam-ui-policy/src/test/js/**',
                     'openam-ui-policy/src/test/resources/**'
                 ],
-                tasks: ['sync', 'replace']
+                tasks: ['sync', 'replace', 'less']
             }
         }
     });
@@ -405,10 +412,12 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-sync');
     grunt.loadNpmTasks('grunt-text-replace');
+    grunt.loadNpmTasks('grunt-contrib-less');
 
     grunt.registerTask('default', [
         'sync',
         'replace',
+        'less',
         'selectiveWatch:frCommons:frUser:common:ria'
     ]);
 };

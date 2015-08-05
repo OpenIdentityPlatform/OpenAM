@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global $, define, _ */
+/*global define */
 
 define("org/forgerock/openam/ui/dashboard/OAuthTokensDelegate", [
     "org/forgerock/commons/ui/common/util/Constants",
@@ -50,6 +50,3 @@ define("org/forgerock/openam/ui/dashboard/OAuthTokensDelegate", [
 
     return obj;
 });
-
-
-

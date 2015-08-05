@@ -22,10 +22,11 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global $, _, define*/
+/*global define */
 define("org/forgerock/openam/ui/uma/views/share/ShareCounter", [
+    "jquery",
     "org/forgerock/commons/ui/common/main/AbstractView"
-], function(AbstractView) {
+], function($, AbstractView) {
     var ShareCounter = AbstractView.extend({
 
         template: "templates/uma/views/share/ShareCounter.html",

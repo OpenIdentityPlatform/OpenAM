@@ -14,8 +14,10 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global _ define*/
-define('org/forgerock/openam/ui/admin/models/FormCollection', [], function() {
+/*global define*/
+define('org/forgerock/openam/ui/admin/models/FormCollection', [
+    "underscore"
+], function(_) {
     var obj = function FormCollection() {
         this.forms = [];
     };

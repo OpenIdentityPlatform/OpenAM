@@ -26,7 +26,7 @@
  * "Portions Copyrighted 2011-2013 ForgeRock Inc"
  */
 
-/*global $, define, _ */
+/*global define */
 
 define("org/forgerock/openam/ui/user/delegates/TokenDelegate", [
     "org/forgerock/commons/ui/common/util/Constants",
@@ -43,7 +43,6 @@ define("org/forgerock/openam/ui/user/delegates/TokenDelegate", [
      * @param errorCallback
      */
     obj.getAllTokens = function(successCallback, errorCallback) {
-        console.info("getting all tokens");
 
          obj.serviceCall({ url: "/?_queryid=*", success: function(data) {
             if(successCallback) {
@@ -60,7 +59,6 @@ define("org/forgerock/openam/ui/user/delegates/TokenDelegate", [
      * @param id TokenID
      */
     obj.deleteToken = function(successCallback, errorCallback, id) {
-        console.info("Deleting Token ", id);
 
         obj.serviceCall({ type: "DELETE", url: "/"+id, success: function(data) {
             if(successCallback) {
@@ -75,7 +73,6 @@ define("org/forgerock/openam/ui/user/delegates/TokenDelegate", [
      * @param id TokenID
      */
     obj.getTokenByID = function(successCallback, errorCallback, id) {
-        console.info("getting token for id: " + id);
 
         obj.serviceCall({ url: "/" + id, success: function(data) {
             if(successCallback) {
@@ -90,7 +87,6 @@ define("org/forgerock/openam/ui/user/delegates/TokenDelegate", [
      * See AbstractDelegate.patchEntityDifferences
      */
     obj.patchTokenDifferences = function(oldTokenData, newTokenData, successCallback, errorCallback, noChangesCallback) {
-        console.info("updating Token");
         obj.patchEntityDifferences({id: oldTokenData._id, rev: oldTokenData._rev}, oldTokenData, newTokenData, successCallback, errorCallback, noChangesCallback);
     };
 
@@ -98,7 +94,6 @@ define("org/forgerock/openam/ui/user/delegates/TokenDelegate", [
      * See AbstractDelegate.patchEntity
      */
     obj.patchSelectedTokenAttributes = function(id, rev, patchDefinitionObject, successCallback, errorCallback, noChangesCallback) {
-        console.info("updating Token");
         obj.patchEntity({id: id, rev: rev}, patchDefinitionObject, successCallback, errorCallback, noChangesCallback);
     };
 

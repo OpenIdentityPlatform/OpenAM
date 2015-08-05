@@ -22,14 +22,15 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global $, define, _ */
+/*global define */
 
 define("org/forgerock/openam/ui/dashboard/MyApplicationsDelegate", [
-    "org/forgerock/commons/ui/common/util/Constants",
+    "underscore",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
+    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function(constants, AbstractDelegate, RealmHelper) {
-    var obj = new AbstractDelegate(constants.host + '/' + constants.context + '/json/');
+], function(_, AbstractDelegate, Constants, RealmHelper) {
+    var obj = new AbstractDelegate(Constants.host + '/' + Constants.context + '/json/');
 
     obj.sortApps = function(apps) {
 

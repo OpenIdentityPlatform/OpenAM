@@ -14,12 +14,14 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global define, require*/
+/*global define */
 define("org/forgerock/openam/ui/common/components/TreeNavigation", [
     "jquery",
+    "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/commons/ui/common/util/ModuleLoader",
     "org/forgerock/commons/ui/common/main/Router"
-], function ($, AbstractView, Router) {
+], function ($, _, AbstractView, ModuleLoader, Router) {
     var TreeNavigation = AbstractView.extend({
         events: {
             "click .sidenav a[href]:not([data-toggle])": "navigateToPage"
@@ -52,13 +54,15 @@ define("org/forgerock/openam/ui/common/components/TreeNavigation", [
             AbstractView.prototype.setElement.call(this, element);
 
             if (this.route && this.nextRenderPage) {
-                var module = require(this.route.page);
-                if (module) {
-                    this.nextRenderPage = false;
-                    this.renderPage(module, this.args);
-                } else {
-                    throw "Unable to render page for module " + this.route.page;
-                }
+                ModuleLoader.load(this.route.page).then(
+                    _.bind(function (module) {
+                        this.nextRenderPage = false;
+                        this.renderPage(module, this.args);
+                    }, this),
+                    _.bind(function () {
+                        throw "Unable to render page for module " + this.route.page;
+                    }, this)
+                );
             }
         },
         render: function (args, callback) {
@@ -69,7 +73,9 @@ define("org/forgerock/openam/ui/common/components/TreeNavigation", [
             self.parentRender(function () {
                 self.$el.find(".sidenav li").removeClass("active");
                 self.findActiveNavItem(Router.getURIFragment());
-                self.renderPage(require(self.route.page), args, callback);
+                ModuleLoader.load(self.route.page).then(function (page) {
+                    self.renderPage(page, args, callback);
+                });
             });
         },
         renderPage: function (Module, args, callback) {

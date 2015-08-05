@@ -17,16 +17,20 @@
 /*global define*/
 define("org/forgerock/openam/ui/uma/views/request/ListRequest", [
     "jquery",
-    "org/forgerock/commons/ui/common/main/AbstractView",
     "backbone",
+    "backbone.paginator",
     "backgrid",
+    "backgrid.filter",
+    "backgrid.paginator",
+    "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/openam/ui/uma/views/backgrid/cells/PermissionsCell",
     "org/forgerock/openam/ui/uma/delegates/UMADelegate"
-], function ($, AbstractView, Backbone, Backgrid, BackgridUtils, Configuration, Constants, RealmHelper, PermissionsCell, UMADelegate) {
+], function ($, Backbone, BackbonePaginator, Backgrid, BackgridFilter, BackgridPaginator,
+             AbstractView, BackgridUtils, Configuration, Constants, RealmHelper, PermissionsCell, UMADelegate) {
     var ListRequest = AbstractView.extend({
         template: "templates/uma/views/request/ListRequestTemplate.html",
 
