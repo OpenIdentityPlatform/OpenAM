@@ -131,7 +131,8 @@ public class ApplicationV1FilterTest {
         JsonValue jsonValue = json(
                 object(
                         TestData.DATA_SET_1.getResources().asJson(),
-                        TestData.DATA_SET_1.getActions().asJson()
+                        TestData.DATA_SET_1.getActions().asJson(),
+                        field("realm", "/abc")
                 )
         );
 
@@ -175,7 +176,8 @@ public class ApplicationV1FilterTest {
                 object(
                         field("name", "testApplication"),
                         TestData.DATA_SET_1.getResources().asJson(),
-                        TestData.DATA_SET_1.getActions().asJson()
+                        TestData.DATA_SET_1.getActions().asJson(),
+                        field("realm", "/abc")
                 )
         );
 
@@ -274,7 +276,8 @@ public class ApplicationV1FilterTest {
         JsonValue jsonValue = json(
                 object(
                         TestData.DATA_SET_1.getResources().asJson(),
-                        TestData.DATA_SET_1.getActions().asJson()
+                        TestData.DATA_SET_1.getActions().asJson(),
+                        field("realm", "/abc")
                 )
         );
 

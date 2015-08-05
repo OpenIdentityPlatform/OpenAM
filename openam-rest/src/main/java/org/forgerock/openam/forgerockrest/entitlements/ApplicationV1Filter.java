@@ -72,6 +72,7 @@ public class ApplicationV1Filter implements Filter {
     private static final String ACTIONS = "actions";
     private static final String RESOURCES = "resources";
     private static final String APPLICATION_NAME = "name";
+    private static final String REALM = "realm";
 
     private final ResourceTypeService resourceTypeService;
     private final ApplicationServiceFactory applicationServiceFactory;
@@ -114,6 +115,8 @@ public class ApplicationV1Filter implements Filter {
         final JsonValue jsonValue = request.getContent();
         final Map<String, Boolean> actions = jsonValue.get(ACTIONS).asMap(Boolean.class);
         final Set<String> resources = jsonValue.get(RESOURCES).asSet(String.class);
+        final String bodyRealm = jsonValue.get(REALM).asString();
+        final String pathRealm = contextHelper.getRealm(context);
 
         if (actions == null) {
             handler.handleError(ResourceException
@@ -124,6 +127,12 @@ public class ApplicationV1Filter implements Filter {
         if (resources == null) {
             handler.handleError(ResourceException
                     .getException(ResourceException.BAD_REQUEST, "Invalid resources defined in request"));
+            return;
+        }
+
+        if (!pathRealm.equals(bodyRealm)) {
+            handler.handleError(resourceErrorHandler.handleError(context, request, new EntitlementException(
+                    EntitlementException.INVALID_APP_REALM, new String[] { bodyRealm, pathRealm })));
             return;
         }
 
@@ -242,6 +251,8 @@ public class ApplicationV1Filter implements Filter {
         final JsonValue jsonValue = request.getContent();
         final Map<String, Boolean> actions = jsonValue.get(ACTIONS).asMap(Boolean.class);
         final Set<String> resources = jsonValue.get(RESOURCES).asSet(String.class);
+        final String bodyRealm = jsonValue.get(REALM).asString();
+        final String pathRealm = contextHelper.getRealm(context);
 
         if (actions == null) {
             handler.handleError(ResourceException
@@ -255,12 +266,17 @@ public class ApplicationV1Filter implements Filter {
             return;
         }
 
+        if (!pathRealm.equals(bodyRealm)) {
+            handler.handleError(resourceErrorHandler.handleError(context, request, new EntitlementException
+                    (EntitlementException.INVALID_APP_REALM, new String[]{bodyRealm, pathRealm})));
+            return;
+        }
+
         final Subject callingSubject = contextHelper.getSubject(context);
-        final String realm = contextHelper.getRealm(context);
         final String applicationName = request.getResourceName();
 
         try {
-            final ApplicationService applicationService = applicationServiceFactory.create(callingSubject, realm);
+            final ApplicationService applicationService = applicationServiceFactory.create(callingSubject, pathRealm);
             final Application application = applicationService.getApplication(applicationName);
 
             if (application == null) {
@@ -279,7 +295,7 @@ public class ApplicationV1Filter implements Filter {
 
             // Retrieve the resource type from the applications single resource type.
             final String resourceTypeUuid = application.getResourceTypeUuids().iterator().next();
-            ResourceType resourceType = resourceTypeService.getResourceType(callingSubject, realm, resourceTypeUuid);
+            ResourceType resourceType = resourceTypeService.getResourceType(callingSubject, pathRealm, resourceTypeUuid);
 
             boolean resourceTypeModified = false;
 
@@ -300,7 +316,7 @@ public class ApplicationV1Filter implements Filter {
             }
 
             if (resourceTypeModified) {
-                resourceTypeService.updateResourceType(callingSubject, realm, resourceType);
+                resourceTypeService.updateResourceType(callingSubject, pathRealm, resourceType);
             }
 
             // Ensure the resource type UUID isn't lost.
@@ -473,6 +489,7 @@ public class ApplicationV1Filter implements Filter {
         jsonValue.remove(RESOURCE_TYPE_UUIDS);
         jsonValue.add(ACTIONS, actions);
         jsonValue.add(RESOURCES, resources);
+        jsonValue.add(REALM, realm);
     }
 
     /**
