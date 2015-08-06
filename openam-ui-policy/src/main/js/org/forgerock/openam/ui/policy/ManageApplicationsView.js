@@ -147,7 +147,7 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
         },
 
         getAppName: function (e) {
-            return this.appGridView.grid.getRowData(this.appGridView.getSelectedRowId(e)).name;
+            return encodeURIComponent(this.appGridView.grid.getRowData(this.appGridView.getSelectedRowId(e)).name);
         },
 
         getDefaultFilter: function () {

@@ -47,7 +47,8 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
 
         render: function (args, callback) {
             this.data.realm = conf.globalData.auth.realm;
-            this.data.appName = decodeURI(args[0]);
+            this.data.appName = args[0];
+            this.data.encodedAppName = encodeURIComponent(args[0]);
             this.data.referralsEnabled = conf.globalData.serverInfo && conf.globalData.serverInfo.referralsEnabled === "true";
 
             this.parentRender(function () {
@@ -221,12 +222,18 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
 
         editPolicy: function (e) {
             this.navigate(router.configuration.routes.editPolicy,
-                [this.data.appName, this.policyGridView.grid.getRowData(this.policyGridView.getSelectedRowId(e)).name]);
+                [
+                    this.data.appName,
+                    encodeURIComponent(this.policyGridView.grid.getRowData(this.policyGridView.getSelectedRowId(e)).name)
+                ]);
         },
 
         editReferral: function (e) {
             this.navigate(router.configuration.routes.editReferral,
-                [this.data.appName, this.refGridView.grid.getRowData(this.refGridView.getSelectedRowId(e)).name]);
+                [
+                    this.data.appName,
+                    encodeURIComponent(this.refGridView.grid.getRowData(this.refGridView.getSelectedRowId(e)).name)
+                ]);
         },
 
         navigate: function (route, args) {

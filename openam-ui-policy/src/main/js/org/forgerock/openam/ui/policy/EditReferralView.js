@@ -71,6 +71,7 @@ define("org/forgerock/openam/ui/policy/EditReferralView", [
 
                 data.options = {};
                 data.options.appName = args[0];
+                data.options.encodedAppName = encodeURIComponent(args[0]);
                 data.options.realm = app[0].realm;
                 data.options.resourcePatterns = _.sortBy(app[0].resources);
                 data.options.filteredRealms =  self.filterRealms(allRealms[0].result);

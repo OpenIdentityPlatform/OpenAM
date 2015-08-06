@@ -94,6 +94,7 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                 allUserAttributes = _.sortBy(allUserAttributes[0].result);
 
                 data.entity.applicationName = appName;
+                data.entity.encodedAppName = encodeURIComponent(appName);
 
                 data.options = {};
                 data.options.realm = app[0].realm;

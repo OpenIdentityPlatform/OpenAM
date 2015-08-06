@@ -92,7 +92,8 @@ define("org/forgerock/openam/ui/policy/ResourcesListView", [
         addResource: function (e) {
             if (e.type === 'keyup' && e.keyCode !== 13) { return;}
 
-            var resourceStr = this.$el.find('.editing').data().resource.replace('-*-', '̂'),
+            var pattern = this.$el.find('.editing').data().resource.toString(),
+                resourceStr = pattern.replace('-*-', '̂'),
                 inputs = this.$el.find('.editing').find('input'),
                 strLength = resourceStr.length,
                 resource = '',
