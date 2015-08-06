@@ -18,7 +18,7 @@
 
 /*global $, define, _ */
 
-define("org/forgerock/openam/ui/dashboard/MyApplicationsDelegate", [
+define("org/forgerock/openam/ui/dashboard/delegates/MyApplicationsDelegate", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/openam/ui/common/util/RealmHelper"
