@@ -442,4 +442,10 @@ public interface OAuth2ProviderSettings {
      * Returns the salt to use for hashing sub values upon pairwise requests.
      */
     String getHashSalt() throws ServerException;
+
+    /**
+     * Whether to always add claims to id_tokens - non-spec compliant.
+     * @see <a href="http://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims">OpenID Connect Specification</a>
+     */
+    boolean isAlwaysAddClaimsToToken() throws ServerException;
 }

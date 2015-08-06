@@ -370,6 +370,20 @@
                         <Value>createTimestamp</Value>
                     </DefaultValues>
                 </AttributeSchema>
+
+                <AttributeSchema name="alwaysAddClaimsToToken"
+                                 type="single"
+                                 syntax="boolean"
+                                 i18nKey="a125">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
             </Organization>
         </Schema>
     </Service>

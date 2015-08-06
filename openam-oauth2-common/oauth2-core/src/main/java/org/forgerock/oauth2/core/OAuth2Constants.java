@@ -856,6 +856,7 @@ public class OAuth2Constants {
         public static final String CLAIMS_PARAMETER_SUPPORTED = "forgerock-oauth2-provider-claims-parameter-supported";
         public static final String HASH_SALT = "forgerock-oauth2-provider-hash-salt";
 
+        public static final String ALWAYS_ADD_CLAIMS_TO_TOKEN = "alwaysAddClaimsToToken";
     }
 
     /**
