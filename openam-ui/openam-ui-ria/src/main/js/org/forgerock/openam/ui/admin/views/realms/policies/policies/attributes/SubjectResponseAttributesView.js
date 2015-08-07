@@ -20,7 +20,10 @@
 define("org/forgerock/openam/ui/admin/views/realms/policies/policies/attributes/SubjectResponseAttributesView", [
     "jquery",
     "underscore",
-    "org/forgerock/commons/ui/common/main/AbstractView"
+    "org/forgerock/commons/ui/common/main/AbstractView",
+
+    // jquery dependencies
+    "selectize"
 ], function ($, _, AbstractView) {
     var SubjectResponseAttributesView = AbstractView.extend({
         element: "#userAttrs",

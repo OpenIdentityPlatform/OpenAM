@@ -22,16 +22,23 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define, $, _, Backgrid, Backbone*/
+/*global define */
 
 define("org/forgerock/openam/ui/uma/views/history/ListHistory", [
+    "jquery",
+    "underscore",
+    "backbone",
+    "backbone.paginator",
+    "backgrid",
+    "backgrid.filter",
+    "backgrid.paginator",
     "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/common/util/BackgridUtils",
-    "backgrid",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function(AbstractView, Configuration, Constants, BackgridUtils, Backgrid, RealmHelper) {
+], function($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, BackgridPaginator,
+            AbstractView, BackgridUtils, Configuration, Constants, RealmHelper) {
     var HistoryView = AbstractView.extend({
         template: "templates/uma/views/history/ListHistory.html",
         baseTemplate: "templates/common/DefaultBaseTemplate.html",

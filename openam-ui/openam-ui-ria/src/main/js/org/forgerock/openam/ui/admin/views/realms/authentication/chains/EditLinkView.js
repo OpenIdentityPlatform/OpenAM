@@ -20,7 +20,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/chains/EditLin
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "bootstrap-dialog",
-    "org/forgerock/commons/ui/common/util/UIUtils"
+    "org/forgerock/commons/ui/common/util/UIUtils",
+
+    // jquery dependencies
+    "selectize"
 ], function ($, _, AbstractView, BootstrapDialog, UIUtils) {
 
     var EditLinkView = AbstractView.extend({

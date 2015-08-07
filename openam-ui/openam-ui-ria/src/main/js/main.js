@@ -16,6 +16,17 @@
 
 /*global require, define, window */
 require.config({
+    map: {
+        "*" : {
+            "ThemeManager"              : "org/forgerock/openam/ui/common/util/ThemeManager",
+            "UserDelegate"              : "org/forgerock/openam/ui/user/delegates/UserDelegate",
+            "LoginView"                 : "org/forgerock/openam/ui/user/login/RESTLoginView",
+            "UserProfileView"           : "org/forgerock/commons/ui/user/profile/UserProfileView",
+            "LoginDialog"               : "org/forgerock/openam/ui/user/login/RESTLoginDialog",
+            "RegisterView"              : "org/forgerock/openam/ui/user/profile/RegisterView",
+            "ChangeSecurityDataDialog"  : "org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog"
+        }
+    },
     paths: {
         "autosizeInput": "libs/jquery.autosize.input.min",
 
@@ -28,7 +39,7 @@ require.config({
         "backgrid.paginator": "libs/backgrid-paginator.min",
         "backgrid.selectall": "libs/backgrid-select-all.min",
 
-        "bootstrap"               : "libs/bootstrap-3.3.4-custom",
+        "bootstrap"               : "libs/bootstrap-3.3.5-custom",
         "bootstrap-datetimepicker": "libs/bootstrap-datetimepicker-4.14.30-min",
         "bootstrap-dialog"        : "libs/bootstrap-dialog-1.34.4-min",
         "bootstrap-multiselect"   : "libs/bootstrap-multiselect.0.9.13",
@@ -50,9 +61,7 @@ require.config({
         "xdate"       : "libs/xdate-0.8-min",
         "selectize"   : "libs/selectize-non-standalone-0.12.1-min",
         "sifter"      : "libs/sifter-0.4.1-min",
-        "microplugin" : "libs/microplugin-0.0.3",
-        "ThemeManager": "org/forgerock/openam/ui/common/util/ThemeManager",
-        "UserDelegate": "org/forgerock/openam/ui/user/delegates/UserDelegate"
+        "microplugin" : "libs/microplugin-0.0.3"
     },
     shim: {
         "autosizeInput": {
@@ -96,7 +105,7 @@ require.config({
         "bootstrap-tabdrop": {
             deps: ["jquery", "bootstrap"]
         },
-        
+
         "clockPicker": {
             deps: ["jquery"],
             exports: "clockPicker"
@@ -143,57 +152,21 @@ require.config({
     }
 });
 
-/**
- * Loads all application on start, so each module will be available to
- * required synchronously
- */
 require([
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
+
+    // other modules that are necessary to include to startup the app
     "jquery",
     "underscore",
     "backbone",
-    "autosizeInput",
-    "backgrid",
-    "clockPicker",
-    "form2js",
-    "js2form",
-    "jsonEditor",
-    "spin",
-    "xdate",
-    "moment",
-    "doTimeout",
     "handlebars",
     "i18next",
-    "org/forgerock/openam/ui/common/util/ThemeManager",
-    "org/forgerock/commons/ui/common/main/i18nManager",
-    "config/main",
-    "org/forgerock/openam/ui/common/main",
-    "org/forgerock/openam/ui/user/main",
-    "org/forgerock/openam/ui/dashboard/main",
-    "UserDelegate",
-    "ThemeManager",
-    "org/forgerock/commons/ui/user/main",
+    "spin",
     "org/forgerock/commons/ui/common/main",
-    "selectize",
-    "backbone.paginator",
-    "backgrid.paginator",
-    "backgrid.filter",
-    "backgrid.selectall",
-    "bootstrap",
-    "bootstrap-datetimepicker",
-    "bootstrap-dialog",
-    "bootstrap-multiselect",
-    "bootstrap-tabdrop",
-    "org/forgerock/openam/ui/uma/main",
-    "org/forgerock/openam/ui/admin/main",
-    "sortable",
-    "qrcode"
-], function (Constants, EventManager, $, _, Backbone) {
-    // Helpers for the code that hasn't been properly migrated to require these as explicit dependencies:
-    window.$ = $;
-    window._ = _;
-    window.Backbone = Backbone;
+    "org/forgerock/openam/ui/main",
+    "config/main"
 
-    EventManager.sendEvent(Constants.EVENT_DEPENDECIES_LOADED);
+], function (Constants, EventManager) {
+    EventManager.sendEvent(Constants.EVENT_DEPENDENCIES_LOADED);
 });

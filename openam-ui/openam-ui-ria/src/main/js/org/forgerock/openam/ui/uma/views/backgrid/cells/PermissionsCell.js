@@ -17,7 +17,10 @@
 /*global define*/
 define("org/forgerock/openam/ui/uma/views/backgrid/cells/PermissionsCell", [
     "jquery",
-    "org/forgerock/openam/ui/common/util/BackgridUtils"
+    "org/forgerock/openam/ui/common/util/BackgridUtils",
+
+    // jquery dependencies
+    "selectize"
 ], function ($, BackgridUtils) {
     return BackgridUtils.TemplateCell.extend({
         className: "permissions-cell",

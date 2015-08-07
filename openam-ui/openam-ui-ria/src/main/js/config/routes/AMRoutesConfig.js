@@ -48,7 +48,7 @@ define('config/routes/AMRoutesConfig', [], function () {
             forceUpdate: true
         },
         "dashboard": {
-            view: "org/forgerock/openam/ui/dashboard/views/DashboardView",
+            view: "org/forgerock/openam/ui/dashboard/DashboardView",
             role: "ui-user",
             url: "dashboard/",
             forceUpdate: true

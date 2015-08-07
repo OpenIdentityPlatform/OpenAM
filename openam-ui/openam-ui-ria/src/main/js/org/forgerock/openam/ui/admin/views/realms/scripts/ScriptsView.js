@@ -20,7 +20,11 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
     "jquery",
     "underscore",
     "backbone",
+    "backbone.paginator",
     "backgrid",
+    "backgrid.filter",
+    "backgrid.paginator",
+    "backgrid.selectall",
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -31,8 +35,8 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/ScriptsView", [
     "org/forgerock/openam/ui/common/util/BackgridUtils",
     "org/forgerock/openam/ui/admin/models/scripts/ScriptModel",
     "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate"
-], function ($, _, Backbone, Backgrid, Messages, AbstractView, EventManager, Router, Constants, UIUtils, URLHelper,
-             BackgridUtils, Script, SMSGlobalDelegate) {
+], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, BackgridPaginator, BackgridSelectAll,
+             Messages, AbstractView, EventManager, Router, Constants, UIUtils, URLHelper, BackgridUtils, Script, SMSGlobalDelegate) {
 
     return AbstractView.extend({
         template: "templates/admin/views/realms/scripts/ScriptsTemplate.html",

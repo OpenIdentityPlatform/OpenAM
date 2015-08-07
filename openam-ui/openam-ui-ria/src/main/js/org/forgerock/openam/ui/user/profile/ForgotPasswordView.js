@@ -22,8 +22,10 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define, $, form2js, _, js2form, window*/
+/*global define */
 define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
+    "jquery",
+    "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/ValidatorsManager",
     "UserDelegate",
@@ -32,7 +34,7 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/UIUtils"
-], function(AbstractView, validatorsManager, userDelegate, conf, cookieHelper, eventManager, constants, uiUtils) {
+], function($, _, AbstractView, validatorsManager, userDelegate, conf, cookieHelper, eventManager, constants, uiUtils) {
     var ForgottenPasswordView = AbstractView.extend({
         template: "templates/openam/ForgotPasswordTemplate.html",
         baseTemplate: "templates/common/LoginBaseTemplate.html",

@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define, require, window, _*/
+/*global define, window */
 define("config/process/AMConfig", [
     "jquery",
     "org/forgerock/openam/ui/common/util/Constants",
@@ -140,10 +140,11 @@ define("config/process/AMConfig", [
             startEvent: Constants.EVENT_AUTHENTICATED,
             description: "",
             dependencies: [
+                "underscore",
                 "org/forgerock/commons/ui/common/main/Configuration",
                 "org/forgerock/commons/ui/common/components/Navigation"
             ],
-            processDescription: function (event, Configuration, Navigation) {
+            processDescription: function (event, _, Configuration, Navigation) {
                 if (_.contains(Configuration.loggedUser.roles, 'ui-admin')) {
                     Navigation.configuration.links.admin.urls.realms.urls.push({
                         'url': '#realms/' + encodeURIComponent('/'),

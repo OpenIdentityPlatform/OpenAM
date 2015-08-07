@@ -20,7 +20,11 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/PoliciesVie
     "jquery",
     "underscore",
     "backbone",
+    "backbone.paginator",
     "backgrid",
+    "backgrid.filter",
+    "backgrid.paginator",
+    "backgrid.selectall",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/common/util/BackgridUtils",
@@ -30,7 +34,8 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/PoliciesVie
     "org/forgerock/openam/ui/admin/models/policies/PolicyModel",
     "org/forgerock/openam/ui/admin/views/realms/policies/common/AbstractListView",
     "org/forgerock/openam/ui/admin/views/realms/policies/policies/EditPolicyView"
-], function ($, _, Backbone, Backgrid, Configuration, Router, BackgridUtils, UIUtils, URLHelper, PoliciesDelegate,
+], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, BackgridPaginator, BackgridSelectAll,
+             Configuration, Router, BackgridUtils, UIUtils, URLHelper, PoliciesDelegate,
              PolicyModel, AbstractListView, EditPolicyView) {
 
     var PoliciesListView = AbstractListView.extend({

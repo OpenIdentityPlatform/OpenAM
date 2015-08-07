@@ -1,4 +1,4 @@
-/*
+/**
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -11,20 +11,17 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2015 ForgeRock AS.
  */
 
 /*global define */
-define('org/forgerock/openam/ui/admin/views/realms/subjects/SubjectsView', [
-    'org/forgerock/commons/ui/common/main/AbstractView',
-    'org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole'
-], function (AbstractView, RedirectToLegacyConsole) {
-    var SubjectsView = AbstractView.extend({
-        template: 'templates/admin/views/realms/subjects/SubjectsTemplate.html',
-        render: function (args, callback) {
-            RedirectToLegacyConsole.realm.subjects(args[0]);
-        }
-    });
 
-    return SubjectsView;
-});
+
+define("org/forgerock/openam/ui/main", [
+    "./common/delegates/SiteConfigurationDelegate",
+    "./user/login/RESTLoginHelper",
+    "./user/delegates/AuthNDelegate",
+    "./user/delegates/UserDelegate",
+    "./user/delegates/SessionDelegate",
+    "./user/login/RESTLoginView"
+]);

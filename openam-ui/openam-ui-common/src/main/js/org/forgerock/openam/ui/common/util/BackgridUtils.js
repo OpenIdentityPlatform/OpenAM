@@ -241,9 +241,7 @@ define("org/forgerock/openam/ui/common/util/BackgridUtils", [
     });
 
     obj.queryFilter = function (data) {
-        if (data === undefined) {
-            data = {};
-        }
+        if(data === undefined) { data = {}; }
 
         var params = [],
             additionalFilters = data._queryFilter || [],

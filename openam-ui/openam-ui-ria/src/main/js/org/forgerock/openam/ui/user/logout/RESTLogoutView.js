@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define, $, form2js, _, js2form, window */
+/*global define */
 
 define("org/forgerock/openam/ui/user/logout/RESTLogoutView", [
     "org/forgerock/commons/ui/common/main/AbstractView",

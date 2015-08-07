@@ -27,7 +27,10 @@ define("org/forgerock/openam/ui/admin/views/realms/authentication/ModulesView", 
     "org/forgerock/openam/ui/admin/models/Form",
     "org/forgerock/openam/ui/admin/utils/FormHelper",
     "org/forgerock/commons/ui/common/components/Messages",
-    "org/forgerock/commons/ui/common/util/UIUtils"
+    "org/forgerock/commons/ui/common/util/UIUtils",
+
+    // jquery dependencies
+    "selectize"
 ], function ($, AbstractView, BootstrapDialog, Configuration, EventManager, Router, Constants, SMSRealmDelegate, Form, FormHelper, MessageManager, UIUtils) {
     var ModulesView = AbstractView.extend({
         template: "templates/admin/views/realms/authentication/ModulesTemplate.html",

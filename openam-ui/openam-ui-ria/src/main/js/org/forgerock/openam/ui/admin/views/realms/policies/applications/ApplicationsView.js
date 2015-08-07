@@ -20,7 +20,11 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/applications/Applica
     "jquery",
     "underscore",
     "backbone",
+    "backbone.paginator",
     "backgrid",
+    "backgrid.filter",
+    "backgrid.paginator",
+    "backgrid.selectall",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
@@ -31,7 +35,8 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/applications/Applica
     "org/forgerock/openam/ui/admin/models/policies/ApplicationModel",
     "org/forgerock/openam/ui/admin/views/realms/policies/common/AbstractListView",
     "org/forgerock/openam/ui/admin/delegates/PoliciesDelegate"
-], function ($, _, Backbone, Backgrid, Configuration, EventManager, Router, Constants, UIUtils, BackgridUtils, URLHelper,
+], function ($, _, Backbone, BackbonePaginator, Backgrid, BackgridFilter, BackgridPaginator, BackgridSelectAll,
+             Configuration, EventManager, Router, Constants, UIUtils, BackgridUtils, URLHelper,
              ApplicationModel, AbstractListView, PoliciesDelegate) {
     return AbstractListView.extend({
         template: "templates/admin/views/realms/policies/applications/ApplicationsTemplate.html",
@@ -168,11 +173,11 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/applications/Applica
                         if (callback) {
                             callback();
                         }
-                    });
-                }).fail(function () {
-                    Router.routeTo(Router.configuration.routes.realms, {
-                        args: [],
-                        trigger: true
+                    }).fail(function () {
+                        Router.routeTo(Router.configuration.routes.realms, {
+                            args: [],
+                            trigger: true
+                        });
                     });
                 });
             });

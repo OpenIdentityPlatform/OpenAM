@@ -74,15 +74,6 @@ module.exports = function(grunt) {
                     to:  '<%= buildNumber %>'
                 }]
             },
-            script_test: {
-                // temporary fix for test
-                src: ['openam-ui-scripts/src/main/resources/css/styles.less'],
-                dest: '<%= destination %>/../www/css/styles.less',
-                replacements: [{
-                    from: '?v=@{openam-version}',
-                    to:  ''
-                }]
-            },
             policy_html: {
                 src: ['openam-ui-policy/src/main/resources/index.html'],
                 dest: '<%= destination %>/policyEditor/index.html',
@@ -97,15 +88,6 @@ module.exports = function(grunt) {
                 replacements: [{
                     from: '${version}',
                     to:  '<%= buildNumber %>'
-                }]
-            },
-            policy_test: {
-                // temporary fix for test
-                src: ['openam-ui-policy/src/main/resources/css/styles.less'],
-                dest: '<%= destination %>/../www/css/styles.less',
-                replacements: [{
-                    from: '?v=@{openam-version}',
-                    to:  ''
                 }]
             }
         },
@@ -352,6 +334,13 @@ module.exports = function(grunt) {
             }
 
         },
+        less: {
+            xui: {
+                files: {
+                    "<%= destination %>/XUI/css/styles.css": "<%= destination %>/XUI/css/styles.less"
+                }
+            }
+        },
         watch: {
             frCommons: {
                 files: [
@@ -397,7 +386,7 @@ module.exports = function(grunt) {
                     'openam-ui-policy/src/test/js/**',
                     'openam-ui-policy/src/test/resources/**'
                 ],
-                tasks: ['sync', 'replace']
+                tasks: ['sync', 'replace', 'less']
             }
         }
     });
@@ -405,10 +394,12 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-sync');
     grunt.loadNpmTasks('grunt-text-replace');
+    grunt.loadNpmTasks('grunt-contrib-less');
 
     grunt.registerTask('default', [
         'sync',
         'replace',
+        'less',
         'selectiveWatch:frCommons:frUser:common:ria'
     ]);
 };

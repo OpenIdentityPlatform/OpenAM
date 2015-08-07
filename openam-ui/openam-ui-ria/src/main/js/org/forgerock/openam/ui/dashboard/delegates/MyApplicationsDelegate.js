@@ -16,13 +16,14 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-/*global $, define, _ */
+/*global define */
 
 define("org/forgerock/openam/ui/dashboard/delegates/MyApplicationsDelegate", [
+    "underscore",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function(constants, AbstractDelegate, RealmHelper) {
+], function(_, constants, AbstractDelegate, RealmHelper) {
     var obj = new AbstractDelegate(constants.host + '/' + constants.context + '/json/');
 
     obj.sortApps = function(apps) {
