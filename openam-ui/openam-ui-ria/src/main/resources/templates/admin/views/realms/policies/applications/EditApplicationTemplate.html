@@ -22,44 +22,42 @@
         <div role="tabpanel" class="tab-pane active" id="policies"></div>
 
         <div role="tabpanel" class="tab-pane" id="appSettings">
-            <form class="form-horizontal" role="form">
-                <div class="block clearfix">
-                    <h3 class="block-header">{{t "general"}}</h3>
+            <div class="block clearfix form-horizontal">
+                <h3 class="block-header">{{t "general"}}</h3>
 
-                    <div class="form-group clearfix">
-                        <label class="col-sm-2 control-label">{{t "console.common.name"}}</label>
+                <div class="form-group clearfix">
+                    <label class="col-sm-2 control-label">{{t "console.common.name"}}</label>
 
-                        <div class="col-sm-9">
-                            <input type="text" id="appName" class="form-control" value="{{entity.name}}"
-                                   data-field="name" autofocus required
-                                   placeholder="{{t 'common.form.validation.required'}}" name="entityName">
-                        </div>
-                    </div>
-
-                    <div class="form-group clearfix">
-                        <label class="col-sm-2 control-label" for="appDescription">{{t "console.common.description"}}</label>
-                        <div class="col-sm-9">
-                            <textarea class="form-control" id="appDescription" data-field="description">{{entity.description}}</textarea>
-                        </div>
+                    <div class="col-sm-9">
+                        <input type="text" id="appName" class="form-control" value="{{entity.name}}"
+                               data-field="name" autofocus required
+                               placeholder="{{t 'common.form.validation.required'}}" name="entityName">
                     </div>
                 </div>
 
-                <div class="block clearfix">
-                    <h3 class="block-header">{{t "console.policies.common.resourceTypes"}}</h3>
-
-                    <div class="row">
-                        <div id="availableResTypes" class="col-sm-12 col-md-6"></div>
-                        <div id="selectedResTypes" class="col-sm-12 col-md-6"></div>
+                <div class="form-group clearfix">
+                    <label class="col-sm-2 control-label" for="appDescription">{{t "console.common.description"}}</label>
+                    <div class="col-sm-9">
+                        <textarea class="form-control" id="appDescription" data-field="description">{{entity.description}}</textarea>
                     </div>
                 </div>
+            </div>
 
-                <div class="tab-pane-footer clearfix">
-                    <div class="pull-right">
-                        <button id="revertChanges" class="btn btn-default" type="reset">{{t "common.form.revert"}}</button>
-                        <button id="saveChanges" class="btn btn-primary" type="submit">{{t "common.form.saveChanges"}}</button>
-                    </div>
+            <div class="block clearfix">
+                <h3 class="block-header">{{t "console.policies.common.resourceTypes"}}</h3>
+
+                <div class="row">
+                    <div id="availableResTypes" class="col-sm-12 col-md-6"></div>
+                    <div id="selectedResTypes" class="col-sm-12 col-md-6"></div>
                 </div>
-            </form>
+            </div>
+
+            <div class="tab-pane-footer clearfix">
+                <div class="pull-right">
+                    <button id="revertChanges" class="btn btn-default" type="reset">{{t "common.form.revert"}}</button>
+                    <button id="saveChanges" class="btn btn-primary" type="button">{{t "common.form.saveChanges"}}</button>
+                </div>
+            </div>
         </div>                                          
     </div>
 </div>

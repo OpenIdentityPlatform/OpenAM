@@ -53,7 +53,6 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             "click #changeContext": "openDialog",
             "change input[name=language]": "onChangeLanguage",
             "click #saveChanges": "submitForm",
-            "submit form": "submitForm",
             "click #revertChanges": "revertChanges",
             "click #delete": "deleteScript"
         },
@@ -180,8 +179,7 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             e.preventDefault();
 
             var savePromise,
-                nonModifiedAttributes = _.clone(this.model.attributes),
-                self = this;
+                nonModifiedAttributes = _.clone(this.model.attributes);
 
             this.updateFields();
 

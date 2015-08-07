@@ -90,9 +90,12 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/common/StripedListEd
                 this.data.items.push(pending);
                 this.data.options.justAdded = pending;
                 if (this.updateEntity) {
+                    // provide child implementation
                     this.updateEntity();
-                } // provide child implementation
-                this.renderParent();
+                }
+                this.renderParent(function () {
+                    self.$el.find(".editing input[type=text]").focus();
+                });
             }
         },
 

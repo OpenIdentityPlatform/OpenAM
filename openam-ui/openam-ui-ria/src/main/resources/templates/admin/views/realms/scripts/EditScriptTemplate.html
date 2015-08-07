@@ -5,79 +5,77 @@
 {{/if}}
 
 <div class="panel panel-default panel-content">
-    <form class="form-horizontal" role="form">
-        <div class="panel-body">
-            <!-- NAME -->
-            <div class="form-group">
-                <label class="col-sm-3 control-label">{{t "console.common.name"}}</label>
+    <div class="panel-body form-horizontal">
+        <!-- NAME -->
+        <div class="form-group">
+            <label class="col-sm-2 control-label">{{t "console.common.name"}}</label>
 
-                <div class="col-sm-7">
-                    <input type="text" id="name" name="scriptName" class="form-control" value="{{entity.name}}"
-                           data-field="name" placeholder="{{t 'common.form.validation.required'}}" autofocus required>
-                </div>
-            </div>
-
-            <!-- DESCRIPTION -->
-            <div class="form-group">
-                <label class="col-sm-3 control-label">{{t "console.common.description"}}</label>
-
-                <div class="col-sm-7">
-                    <textarea id="description" class="form-control pull-left script-text" rows="3"
-                              data-field="description">{{entity.description}}</textarea>
-                </div>
-            </div>
-
-            <!-- CONTEXT -->
-            <div class="form-group">
-                <label class="col-sm-3 control-label">{{t "console.scripts.edit.scriptType"}}</label>
-
-                <div class="col-sm-7 script-context">
-                    <span class="form-control" id="context">{{contextName}}</span>
-                    <button type="button" id="changeContext" class="btn btn-default pull-right">
-                        <i class="fa fa-gear"></i> {{t "common.form.change"}}
-                    </button>
-                </div>
-            </div>
-
-            <!-- LANGUAGE -->
-            <div class="form-group">
-                <label class="col-sm-3 control-label">{{t "console.scripts.edit.language"}}</label>
-
-                <div class="col-sm-7">
-                    {{#each languages}}
-                    <div class="radio">
-                        <label>
-                            <input type="radio" name="language" id="{{id}}" value="{{id}}" data-field="language"
-                                {{#equals ../entity.language id}} checked {{/equals}}> {{name}}
-                        </label>
-                    </div>
-                    {{/each}}
-                </div>
-            </div>
-
-            <!--SCRIPT-->
-            <div class="form-group">
-                <label class="col-sm-3 control-label" for="script">{{t "console.scripts.edit.script"}}</label>
-
-                <div class="col-sm-7">
-                    <input type="button" class="btn btn-default script-upload" id="upload" value="{{t 'common.form.upload'}}">
-                    <input type="file" name="upload" class="hidden">
-
-                    <div class="script-area">
-                        <textarea id="script">{{entity.script}}</textarea>
-                    </div>
-
-                    <div id="validation" class="script-validation-message"></div>
-                    <input type="button" class="btn btn-default" id="validateScript" value="{{t 'common.form.validate'}}">
-                </div>
+            <div class="col-sm-8">
+                <input type="text" id="name" name="scriptName" class="form-control" value="{{entity.name}}"
+                       data-field="name" placeholder="{{t 'common.form.validation.required'}}" autofocus required>
             </div>
         </div>
 
-        <div class="panel-footer clearfix">
-            <div class="pull-right">
-                <button id="revertChanges" class="btn btn-default" type="reset">{{t "common.form.revert"}}</button>
-                <button id="saveChanges" class="btn btn-primary" type="submit">{{t 'common.form.save'}}</button>
+        <!-- DESCRIPTION -->
+        <div class="form-group">
+            <label class="col-sm-2 control-label">{{t "console.common.description"}}</label>
+
+            <div class="col-sm-8">
+                <textarea id="description" class="form-control pull-left script-text" rows="3"
+                          data-field="description">{{entity.description}}</textarea>
             </div>
         </div>
-    </form>
+
+        <!-- CONTEXT -->
+        <div class="form-group">
+            <label class="col-sm-2 control-label">{{t "console.scripts.edit.scriptType"}}</label>
+
+            <div class="col-sm-8 script-context">
+                <span class="form-control" id="context">{{contextName}}</span>
+                <button type="button" id="changeContext" class="btn btn-default pull-right">
+                    <i class="fa fa-gear"></i> {{t "common.form.change"}}
+                </button>
+            </div>
+        </div>
+
+        <!-- LANGUAGE -->
+        <div class="form-group">
+            <label class="col-sm-2 control-label">{{t "console.scripts.edit.language"}}</label>
+
+            <div class="col-sm-8">
+                {{#each languages}}
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="language" id="{{id}}" value="{{id}}" data-field="language"
+                            {{#equals ../entity.language id}} checked {{/equals}}> {{name}}
+                    </label>
+                </div>
+                {{/each}}
+            </div>
+        </div>
+
+        <!--SCRIPT-->
+        <div class="form-group">
+            <label class="col-sm-2 control-label" for="script">{{t "console.scripts.edit.script"}}</label>
+
+            <div class="col-sm-8">
+                <input type="button" class="btn btn-default script-upload" id="upload" value="{{t 'common.form.upload'}}">
+                <input type="file" name="upload" class="hidden">
+
+                <div class="script-area">
+                    <textarea id="script">{{entity.script}}</textarea>
+                </div>
+
+                <div id="validation" class="script-validation-message"></div>
+                <input type="button" class="btn btn-default" id="validateScript" value="{{t 'common.form.validate'}}">
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-footer clearfix">
+        <div class="pull-right">
+            <button id="revertChanges" class="btn btn-default" type="reset">{{t "common.form.revert"}}</button>
+            <button id="saveChanges" class="btn btn-primary" type="button">{{t 'common.form.save'}}</button>
+        </div>
+    </div>
 </div>
