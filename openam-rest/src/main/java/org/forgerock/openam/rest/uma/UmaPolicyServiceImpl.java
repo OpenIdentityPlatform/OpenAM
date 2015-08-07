@@ -16,8 +16,9 @@
 
 package org.forgerock.openam.rest.uma;
 
+import static java.util.Collections.singleton;
 import static org.forgerock.openam.uma.UmaConstants.UMA_POLICY_SCHEME;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.*;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -409,34 +410,76 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                         for (JsonValue policy : updatedUmaPolicy.asUnderlyingPolicies(contextHelper.getUserId(context))) {
                             for (String scope : deletedScopes) {
                                 if (policy.get("actionValues").isDefined(scope)) {
-                                    policyResourceDelegate.createPolicies(context, Collections.singleton(policy));
+                                    policyResourceDelegate.createPolicies(context, singleton(policy));
                                 }
                             }
                         }
                     }
                 })
                 .thenAsync(new UpdatePolicyGraphStatesFunction<UmaPolicy>(resourceSet, context))
-                .thenAsync(new AsyncFunction<UmaPolicy, UmaPolicy, ResourceException>() {
-                    @Override
-                    public Promise<UmaPolicy, ResourceException> apply(UmaPolicy umaPolicy) throws ResourceException {
-                        return policyResourceDelegate.updatePolicies(context, updatedUmaPolicy.asUnderlyingPolicies(contextHelper.getUserId(context)))
-                                .thenAsync(new AsyncFunction<List<Resource>, UmaPolicy, ResourceException>() {
-                                    @Override
-                                    public Promise<UmaPolicy, ResourceException> apply(List<Resource> value) throws ResourceException {
-                                        String userId = getLoggedInUserId(context);
-                                        auditLogger.get().log(resourceSetId, resourceSet.getName(), userId, UmaAuditType.POLICY_UPDATED, userId);
-                                        resolveUIDToUsername(updatedUmaPolicy.asJson());
-                                        return Promises.newResultPromise(updatedUmaPolicy);
-                                    }
-                                }, new AsyncFunction<ResourceException, UmaPolicy, ResourceException>() {
-                                    @Override
-                                    public Promise<UmaPolicy, ResourceException> apply(ResourceException error) {
-                                        return newExceptionPromise(error);
-                                    }
-                                });
-                    }
-                });
+                .thenAsync(new UpdateUmaPolicyFunction(context, updatedUmaPolicy, resourceSetId, resourceSet));
     }
+
+    private class UpdateUmaPolicyFunction implements AsyncFunction<UmaPolicy, UmaPolicy, ResourceException> {
+        private final ServerContext context;
+        private final UmaPolicy updatedUmaPolicy;
+        private final String resourceSetId;
+        private final ResourceSetDescription resourceSet;
+
+        public UpdateUmaPolicyFunction(ServerContext context, UmaPolicy updatedUmaPolicy, String resourceSetId, ResourceSetDescription resourceSet) {
+            this.context = context;
+            this.updatedUmaPolicy = updatedUmaPolicy;
+            this.resourceSetId = resourceSetId;
+            this.resourceSet = resourceSet;
+        }
+
+        @Override
+        public Promise<UmaPolicy, ResourceException> apply(UmaPolicy umaPolicy) throws ResourceException {
+            List<Promise<Resource, ResourceException>> promises = new ArrayList<>();
+            final String userId = contextHelper.getUserId(context);
+            final Set<JsonValue> policies = updatedUmaPolicy.asUnderlyingPolicies(userId);
+            for (final JsonValue policy : policies) {
+                promises.add(policyResourceDelegate.updatePolicies(context, singleton(policy))
+                        .thenAsync(SINGLETON_RESOURCE_FUNCTION,
+                                new AsyncFunction<ResourceException, Resource, ResourceException>() {
+                            @Override
+                            public Promise<Resource, ResourceException> apply(ResourceException e)
+                                    throws ResourceException {
+                                if (e instanceof NotFoundException) {
+                                    return policyResourceDelegate.createPolicies(context, singleton(policy))
+                                            .thenAsync(SINGLETON_RESOURCE_FUNCTION);
+                                }
+                                return newExceptionPromise(e);
+                            }
+                        })
+                );
+            }
+            return when(promises).thenAsync(new AsyncFunction<List<Resource>, UmaPolicy, ResourceException>() {
+                @Override
+                public Promise<UmaPolicy, ResourceException> apply(List<Resource> value) throws ResourceException {
+                    String userId = getLoggedInUserId(context);
+                    auditLogger.get().log(resourceSetId, resourceSet.getName(), userId, UmaAuditType.POLICY_UPDATED, userId);
+                    resolveUIDToUsername(updatedUmaPolicy.asJson());
+                    return Promises.newResultPromise(updatedUmaPolicy);
+                }
+            }, new AsyncFunction<ResourceException, UmaPolicy, ResourceException>() {
+                @Override
+                public Promise<UmaPolicy, ResourceException> apply(ResourceException error) {
+                    return newExceptionPromise(error);
+                }
+            });
+        }
+
+    }
+
+    private static AsyncFunction<List<Resource>, Resource, ResourceException> SINGLETON_RESOURCE_FUNCTION =
+            new AsyncFunction<List<Resource>, Resource, ResourceException>() {
+                @Override
+                public Promise<Resource, ResourceException> apply(List<Resource> resources)
+                        throws ResourceException {
+                    return newResultPromise(resources.get(0));
+                }
+            };
 
     /**
      * {@inheritDoc}
@@ -767,7 +810,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         public Promise<Void, ResourceException> apply(Pair<QueryResult, List<Resource>> result) {
             List<Promise<List<Resource>, ResourceException>> results = new ArrayList<>();
             for (Resource resource : result.getSecond()) {
-                results.add(policyResourceDelegate.deletePolicies(context, Collections.singleton(resource.getId())));
+                results.add(policyResourceDelegate.deletePolicies(context, singleton(resource.getId())));
             }
             return Promises.when(results).then(new Function<List<List<Resource>>, Void, ResourceException>() {
                 @Override
@@ -777,4 +820,5 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
             });
         }
     }
+
 }
