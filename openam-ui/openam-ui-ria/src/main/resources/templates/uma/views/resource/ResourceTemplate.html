@@ -29,20 +29,19 @@
     </div>
 </header>
 
-<div class="page-description">{{t "uma.resources.show.subtitle"}}
-    <div class="pull-right">
-        <label >{{t 'uma.share.labels'}}</label>
-        <select id="labels" multiple class="selectize">
-            <option disabled selected value>{{t 'common.form.pleaseSelect'}}</option>
-            {{#each allLabels}}
-                <option value="{{this}}">{{this}}</option>
-            {{/each}}
-        </select>
-        <div class="btn-group">
-            <button id="saveChanges" disabled class="btn btn-default"><i class="fa fa-check"></i></button>
-            <button id="disgardChanges" disabled class="btn btn-default"><i class="fa fa-times"></i></button>
-        </div>
+<p class="page-description">{{t "uma.resources.show.subtitle"}}</p>
+<div class="btn-toolbar page-toolbar labels-container">
+    <div class="btn-group pull-right">
+        <button id="saveLabels" disabled class="btn btn-default"><i class="fa fa-check"></i></button>
+        <button id="disgardLabels" class="btn btn-default"><i class="fa fa-times"></i></button>
     </div>
+    <select id="labels" multiple class="selectize pull-left">
+        <option disabled selected value>{{t 'common.form.pleaseSelect'}}</option>
+        {{#each allLabels}}
+            <option value="{{this}}">{{this}}</option>
+        {{/each}}
+    </select>
+    <button id="editLabels" class="btn btn-link"><i class="fa fa-pencil"></i></button>
 </div>
 
 <div id="uma">

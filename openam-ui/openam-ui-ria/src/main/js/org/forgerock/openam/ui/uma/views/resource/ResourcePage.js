@@ -41,7 +41,10 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
         events: {
             "click button#starred": "onStarred",
             "click button#share": "onShare",
-            "click li#unshare": "onUnshare"
+            "click li#unshare": "onUnshare",
+            "click button#editLabels": "editLabels",
+            "click button#saveLabels": "submitLabelsChanges",
+            "click button#disgardLabels": "disgardLabelsChanges"
         },
         onModelError: function (model, response) {
             console.error("Unrecoverable load failure UMAResourceSetWithPolicy. " +
@@ -81,7 +84,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                     }
                 }, {
                     label: $.t("common.form.cancel"),
-                    action: function(dialog) {
+                    action: function (dialog) {
                         dialog.close();
                     }
                 }]
@@ -91,35 +94,38 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
             var shareView = new CommonShare();
             shareView.renderDialog(this.model.id);
         },
-        onStarred: function() {
+        onStarred: function () {
             // TODO: Simply flips the icon ATM, model update and save still TODO
             // this.model.toggleStarred();
             // self.model.save().done(function() {
             this.$el.find("#starred i").toggleClass("fa-star-o fa-star");
             // });
         },
-        renderTagsOptions: function () {
-            var self = this;
-            this.$el.find("#labels").selectize({
-                plugins: ["restore_on_backspace"],
-                delimiter: ",",
-                persist: false,
-               create: true,
-                hideSelected: true,
-                onChange: function (values) {
-                    self.$el.find("button#saveChanges").prop("disabled", false);
-                },
-                items: self.data.resourceSetLabels,
-                render: {
-                    item: function (item) {
-                        return "<div data-value=\"" + item.value + "\" class=\"item\">" + item.value + "</div>\"";
+        renderLabelsOptions: function () {
+            var self = this,
+                labelsSelect = this.$el.find("#labels").selectize({
+                    plugins: ["restore_on_backspace"],
+                    delimiter: ",",
+                    persist: false,
+                    create: true,
+                    hideSelected: true,
+                    items: self.data.resourceSetLabels,
+                    onChange: function () {
+                        self.$el.find("button#saveLabels").prop("disabled", false);
+                    },
+                    render: {
+                        item: function (item) {
+                            return "<div data-value=\"" + item.value + "\" class=\"item\">" + item.value + "</div>\"";
+                        }
                     }
-                }
-            });
-        },
-        render: function(args, callback) {
-            var collection, grid, id = _.last(args), options, RevokeCell, SelectizeCell, self = this;
+                })[0];
+            labelsSelect.selectize.lock();
+            self.$el.find(".labels-container .btn-group").hide();
 
+        },
+
+        render: function (args, callback) {
+            var collection, grid, id = _.last(args), options, RevokeCell, SelectizeCell, self = this;
             /**
              * Guard clause to check if model requires sync'ing/updating
              * Reason: We do not know the id of the data we need until the render function is called with args,
@@ -138,8 +144,8 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
             this.data.name = this.model.get("name");
             this.data.icon = this.model.get("icon_uri");
             //TODO: This data should come the server
-            this.data.resourceSetLabels = ["Tag1", "Tag2", "Tag3"];
-            this.data.allLabels = ["Tag1", "Tag2", "Tag3", "Tag4", "Tag5", "Tag6"];
+            this.data.resourceSetLabels = ["label1", "label2", "label3"];
+            this.data.allLabels = ["label1", "label2", "label3", "label4", "label5", "label6"];
 
             // FIXME: Re-enable filtering and pagination
             //     UserPoliciesCollection = Backbone.PageableCollection.extend({
@@ -267,7 +273,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
 
             this.parentRender(function() {
                 self.$el.find("[data-toggle=\"tooltip\"]").tooltip();
-                self.renderTagsOptions();
+                self.renderLabelsOptions();
 
                 if (self.model.has("policy") && self.model.get("policy").get("permissions").length > 0){
                     self.$el.find("li#unshare").removeClass("disabled");
@@ -286,6 +292,38 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
 
                 if(callback) { callback(); }
             });
+        },
+        deactivateLabels: function () {
+            this.$el.find(".labels-container .btn-group").hide();
+            this.$el.find("#editLabels").show();
+            this.$el.find("#labels")[0].selectize.lock();
+            this.$el.find(".labels-container .selectize-control ").addClass("pull-left");
+        },
+        editLabels: function () {
+            var labelsSelect = this.$el.find("#labels")[0];
+            this.data.labelsCopy = _.clone(labelsSelect.selectize.getValue());
+            labelsSelect.selectize.unlock();
+            labelsSelect.selectize.focus();
+            this.$el.find("#editLabels").hide();
+            this.$el.find(".labels-container .selectize-control ").removeClass("pull-left");
+            this.$el.find("button#saveLabels").prop("disabled", true);
+            this.$el.find(".labels-container .btn-group").show();
+
+        },
+
+        submitLabelsChanges: function () {
+            var selectedValues = this.$el.find("#labels")[0].selectize.getValue();
+            this.deactivateLabels();
+            //TODO: update the model
+        },
+        disgardLabelsChanges: function () {
+            var labelsSelect = this.$el.find("#labels")[0];
+            this.deactivateLabels();
+            labelsSelect.selectize.clear();
+            _.each(this.data.labelsCopy, function (val) {
+                labelsSelect.selectize.addItem(val);
+            });
+
         },
         syncModel: function(id) {
             var syncRequired = !this.model || (id && this.model.id !== id);
