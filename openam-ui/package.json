@@ -1,18 +1,18 @@
 {
-  "_comment": "Add any grunt dependencies you need to this file, such as grunt-contrib-requirejs, grunt-contrib-less, etc...",
-  "name": "deploy_to_target",
-  "author": "Jake Feasel <jake.feasel@forgerock.com>",
-  "version": "0.0.1",
-  "devDependencies": {
-    "grunt": "~0.4.2",
-    "grunt-contrib-watch": "~0.5.3",
-    "grunt-sync": "~0.2.0",
-    "jsdoc": "^3.3.0-beta1",
-    "rimraf": "^2.2.8",
-    "grunt-text-replace": "~0.4.0"
-  },
+  "name": "openam-ui",
+  "private": true,
   "scripts": {
     "predocs": "rimraf docs",
     "docs": "jsdoc -P package.json -d docs -r src/main/js"
+  },
+  "devDependencies": {
+    "eslint": "^1.0.0",
+    "grunt": "^0.4.5",
+    "grunt-contrib-less": "^1.0.1",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-sync": "^0.2.4",
+    "grunt-text-replace": "^0.4.0",
+    "jsdoc": "^3.3.2",
+    "rimraf": "^2.4.2"
   }
 }

@@ -1,0 +1,9 @@
+{
+    "env": {
+        /**
+         * Remove when "amd" is re-enabled in the root .eslintrc
+         */
+        "amd": true,
+        "qunit": true
+    }
+}
