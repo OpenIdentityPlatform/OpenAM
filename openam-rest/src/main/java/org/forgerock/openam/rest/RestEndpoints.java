@@ -229,10 +229,12 @@ public class RestEndpoints {
 
         dynamicRealmRouter.route("/users/{user}/devices/trusted")
                 .auditAs(Component.DEVICES)
+                .through(ResourceOwnerOrSuperUserAuthzModule.class, ResourceOwnerOrSuperUserAuthzModule.NAME)
                 .forVersion("1.0").to(TrustedDevicesResource.class);
 
         dynamicRealmRouter.route("/users/{user}/devices/2fa/oath")
                 .auditAs(Component.DEVICES)
+                .through(ResourceOwnerOrSuperUserAuthzModule.class, ResourceOwnerOrSuperUserAuthzModule.NAME)
                 .forVersion("1.0").to(OathDevicesResource.class);
 
         dynamicRealmRouter.route("/users/{user}/oauth2/resources/sets")

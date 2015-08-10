@@ -38,6 +38,7 @@ import java.util.List;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.Requests;
@@ -225,16 +226,20 @@ public class OathDevicesResourceTest {
 
         public OathDevicesResourceTestClass(OathDevicesDao dao, ContextHelper helper, Debug debug,
                                             OathServiceFactory oathServiceFactory) {
-            super(dao, helper, debug, oathServiceFactory);
+            super(dao, helper, debug, oathServiceFactory, helper);
         }
 
-        protected AMIdentity getIdentity(ServerContext context) throws SSOException, IdRepoException {
+        protected AMIdentity getUserIdFromUri(ServerContext context) throws InternalServerErrorException {
 
             HashSet<String> attribute = new HashSet<>();
             attribute.add(String.valueOf(OathService.SKIPPABLE));
 
             AMIdentity mockId = mock(AMIdentity.class);
-            given(mockId.getAttribute(anyString())).willReturn(attribute);
+            try {
+                given(mockId.getAttribute(anyString())).willReturn(attribute); //makes them
+            } catch (IdRepoException | SSOException e) {
+                e.printStackTrace();
+            }
             return mockId;
         }
     }

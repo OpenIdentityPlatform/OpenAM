@@ -310,7 +310,7 @@ public class OATH extends AMLoginModule {
 
                     selectedIndex = ((ConfirmationCallback) callbacks[1]).getSelectedIndex();
                     if (selectedIndex == SKIP_OATH_INDEX) {
-                        realmOathService.setUserSkipOath(id, true);
+                        realmOathService.setUserSkipOath(id, OathService.SKIPPABLE);
                         return ISAuthConstants.LOGIN_SUCCEED;
                     }
 
@@ -354,7 +354,7 @@ public class OATH extends AMLoginModule {
                     }
 
                 case REGISTER_DEVICE:
-                    realmOathService.setUserSkipOath(id, false);
+                    realmOathService.setUserSkipOath(id, OathService.NOT_SKIPPABLE);
                     return LOGIN_SAVED_DEVICE;
 
                 case RECOVERY_USED:

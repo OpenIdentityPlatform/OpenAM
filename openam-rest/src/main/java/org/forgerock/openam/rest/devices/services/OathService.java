@@ -156,13 +156,11 @@ public class OathService implements DeviceService {
      * @throws IdRepoException If there were troubles talking to the IdRepo.
      * @throws SSOException If there were issues setting values on the provided ID.
      */
-    public void setUserSkipOath(AMIdentity id, boolean userSkipOath)
+    public void setUserSkipOath(AMIdentity id, int userSkipOath)
             throws IdRepoException, SSOException {
         final HashMap<String, Set<String>> attributesToWrite = new HashMap<>();
         attributesToWrite.put(getSkippableAttributeName(),
-                userSkipOath ?
-                        Collections.singleton(String.valueOf(SKIPPABLE)) :
-                        Collections.singleton(String.valueOf(NOT_SKIPPABLE)));
+                        Collections.singleton(String.valueOf(userSkipOath)));
         id.setAttributes(attributesToWrite);
         id.store();
     }
