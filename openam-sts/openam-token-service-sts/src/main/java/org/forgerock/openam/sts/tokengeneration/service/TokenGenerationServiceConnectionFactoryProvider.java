@@ -22,6 +22,7 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.Resources;
+import org.forgerock.openam.audit.AuditConstants.Component;
 import org.forgerock.openam.rest.authz.STSTokenGenerationServiceAuthzModule;
 import org.forgerock.openam.rest.fluent.FluentRouter;
 import org.forgerock.openam.sts.tokengeneration.CTSTokenPersistence;
@@ -50,6 +51,7 @@ public class TokenGenerationServiceConnectionFactoryProvider {
                         TokenGenerationServiceInjectorHolder.getInstance(Key.get(CTSTokenPersistence.class)),
                         TokenGenerationServiceInjectorHolder.getInstance(Key.get(Logger.class)));
         router.route("")
+                .auditAs(Component.STS)
                 .through(STSTokenGenerationServiceAuthzModule.class, STSTokenGenerationServiceAuthzModule.NAME)
                 .forVersion(VERSION_STRING)
                 .to(tokenGenerationService);

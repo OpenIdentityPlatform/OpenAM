@@ -220,7 +220,7 @@ public class LogRecWrite implements LogOperation, ParseOutput {
         AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
                 .transactionId(AuditRequestContext.getTransactionIdValue())
                 .eventName(EventName.AM_ACCESS_ATTEMPT)
-                .component(Component.AGENT)
+                .component(Component.POLICY_AGENT)
                 .authentication(clientId)
                 .http("UNKNOWN", path, queryString, Collections.<String, List<String>>emptyMap())
                 .resourceOperation(logExtracts.getResourceUrl(), "HTTP", "UNKNOWN")

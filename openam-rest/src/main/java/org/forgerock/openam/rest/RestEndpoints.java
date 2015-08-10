@@ -35,6 +35,7 @@ import org.forgerock.oauth2.restlet.AuthorizeResource;
 import org.forgerock.oauth2.restlet.TokenEndpointFilter;
 import org.forgerock.oauth2.restlet.TokenIntrospectionResource;
 import org.forgerock.oauth2.restlet.ValidationServerResource;
+import org.forgerock.openam.audit.AuditConstants.Component;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.forgerockrest.AuditHistory;
 import org.forgerock.openam.forgerockrest.IdentityResourceV1;
@@ -66,8 +67,8 @@ import org.forgerock.openam.rest.batch.BatchResource;
 import org.forgerock.openam.rest.dashboard.DashboardResource;
 import org.forgerock.openam.rest.devices.OathDevicesResource;
 import org.forgerock.openam.rest.devices.TrustedDevicesResource;
+import org.forgerock.openam.rest.fluent.FluentAudit;
 import org.forgerock.openam.rest.fluent.FluentRealmRouter;
-import org.forgerock.openam.rest.fluent.FluentRoute;
 import org.forgerock.openam.rest.fluent.FluentRouter;
 import org.forgerock.openam.rest.fluent.LoggingFluentRouter;
 import org.forgerock.openam.rest.oauth2.ResourceSetResource;
@@ -200,54 +201,68 @@ public class RestEndpoints {
         // ------------------
         //not protected
         dynamicRealmRouter.route("/dashboard")
+                .auditAs(Component.DASHBOARD)
                 .forVersion("1.0").to(DashboardResource.class);
 
         dynamicRealmRouter.route("/serverinfo")
+                .auditAs(Component.SERVER_INFO)
                 .forVersion("1.1").to(ServerInfoResource.class);
 
         dynamicRealmRouter.route("/serverinfo/uma")
+                .auditAs(Component.UMA)
                 .forVersion("1.0").to(InjectorHolder.getInstance(UmaConfigurationResource.class));
 
         dynamicRealmRouter.route("/users")
+                .auditAs(Component.USERS)
                 .forVersion("1.2").to(IdentityResourceV1.class, "UsersResource")
                 .forVersion("2.1").to(IdentityResourceV2.class, "UsersResource");
 
         dynamicRealmRouter.route("/groups")
+                .auditAs(Component.GROUPS)
                 .forVersion("1.1").to(IdentityResourceV1.class, "GroupsResource")
                 .forVersion("2.0").to(IdentityResourceV2.class, "GroupsResource");
 
         dynamicRealmRouter.route("/agents")
+                .auditAs(Component.POLICY_AGENT)
                 .forVersion("1.1").to(IdentityResourceV1.class, "AgentsResource")
                 .forVersion("2.0").to(IdentityResourceV2.class, "AgentsResource");
 
         dynamicRealmRouter.route("/users/{user}/devices/trusted")
+                .auditAs(Component.DEVICES)
                 .forVersion("1.0").to(TrustedDevicesResource.class);
 
         dynamicRealmRouter.route("/users/{user}/devices/2fa/oath")
+                .auditAs(Component.DEVICES)
                 .forVersion("1.0").to(OathDevicesResource.class);
 
         dynamicRealmRouter.route("/users/{user}/oauth2/resources/sets")
+                .auditAs(Component.OAUTH2)
                 .through(ResourceOwnerOrSuperUserAuthzModule.class, ResourceOwnerOrSuperUserAuthzModule.NAME)
                 .forVersion("1.0").through(UmaEnabledFilter.class).to(ResourceSetResource.class);
 
         dynamicRealmRouter.route("/users/{user}/uma/policies")
+                .auditAs(Component.UMA)
                 .through(UmaPolicyResourceAuthzFilter.class, UmaPolicyResourceAuthzFilter.NAME)
                 .forVersion("1.0").through(UmaEnabledFilter.class).to(UmaPolicyResource.class);
 
         dynamicRealmRouter.route("/users/{user}/uma/auditHistory")
+                .auditAs(Component.UMA)
                 .through(ResourceOwnerOrSuperUserAuthzModule.class, ResourceOwnerOrSuperUserAuthzModule.NAME)
                 .forVersion("1.0").through(UmaEnabledFilter.class).to(AuditHistory.class);
 
         dynamicRealmRouter.route("/users/{user}/uma/pendingrequests")
+                .auditAs(Component.UMA)
                 .through(ResourceOwnerOrSuperUserAuthzModule.class, ResourceOwnerOrSuperUserAuthzModule.NAME)
                 .forVersion("1.0").through(UmaEnabledFilter.class).to(PendingRequestResource.class);
 
         dynamicRealmRouter.route("/users/{user}/oauth2/resources/labels")
+                .auditAs(Component.OAUTH2)
                 .through(ResourceOwnerOrSuperUserAuthzModule.class, ResourceOwnerOrSuperUserAuthzModule.NAME)
                 .forVersion("1.0").to(UmaLabelResource.class);
 
         //protected
         dynamicRealmRouter.route("/policies")
+                .auditAs(Component.POLICY)
                 .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0")
                     .through(PolicyV1Filter.class)
@@ -256,18 +271,22 @@ public class RestEndpoints {
                     .to(PolicyResource.class);
 
         dynamicRealmRouter.route("/referrals")
+                .auditAs(Component.POLICY)
                 .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(ReferralsResourceV1.class);
 
         dynamicRealmRouter.route("/realms")
+                .auditAs(Component.REALMS)
                 .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(RealmResource.class);
 
         dynamicRealmRouter.route("/sessions")
+                .auditAs(Component.SESSION)
                 .through(SessionResourceAuthzModule.class, SessionResourceAuthzModule.NAME)
                 .forVersion("1.1").to(SessionResource.class);
 
         dynamicRealmRouter.route("/applications")
+                .auditAs(Component.POLICY)
                 .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0")
                     .through(ApplicationV1Filter.class)
@@ -276,26 +295,32 @@ public class RestEndpoints {
                     .to(ApplicationsResource.class);
 
         dynamicRealmRouter.route("/subjectattributes")
+                .auditAs(Component.POLICY)
                 .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(SubjectAttributesResourceV1.class);
 
         rootRealmRouter.route("/applicationtypes")
+                .auditAs(Component.POLICY)
                 .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(ApplicationTypesResource.class);
 
         dynamicRealmRouter.route("/resourcetypes")
+                .auditAs(Component.POLICY)
                 .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(ResourceTypesResource.class);
 
         dynamicRealmRouter.route("/scripts")
+                .auditAs(Component.SCRIPT)
                 .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
                 .forVersion("1.0").to(ScriptResource.class);
 
         dynamicRealmRouter.route("/realm-config")
+                .auditAs(Component.CONFIG)
                 .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(RoutingMode.STARTS_WITH, smsRequestHandlerFactory.create(SchemaType.ORGANIZATION));
 
         dynamicRealmRouter.route("/batch")
+                .auditAs(Component.BATCH)
                 .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
                 .forVersion("1.0").to(BatchResource.class);
 
@@ -303,26 +328,32 @@ public class RestEndpoints {
         // Global routes
         // ------------------
         rootRealmRouter.route("/decisioncombiners")
+                .auditAs(Component.POLICY)
                 .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(DecisionCombinersResource.class);
 
         rootRealmRouter.route("/conditiontypes")
+                .auditAs(Component.POLICY)
                 .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(ConditionTypesResource.class);
 
         rootRealmRouter.route("/subjecttypes")
+                .auditAs(Component.POLICY)
                 .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(SubjectTypesResource.class);
 
         rootRealmRouter.route("/tokens")
+                .auditAs(Component.CTS)
                 .through(CoreTokenResourceAuthzModule.class, CoreTokenResourceAuthzModule.NAME)
                 .forVersion("1.0").to(CoreTokenResource.class);
 
         rootRealmRouter.route("/global-config")
+                .auditAs(Component.CONFIG)
                 .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(RoutingMode.STARTS_WITH, smsRequestHandlerFactory.create(SchemaType.GLOBAL));
 
         rootRealmRouter.route("/global-config/servers/{serverName}/properties/{tab}")
+                .auditAs(Component.CONFIG)
                 .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(InjectorHolder.getInstance(SmsServerPropertiesResource.class));
 
@@ -435,7 +466,7 @@ public class RestEndpoints {
         }
 
         @Override
-        public FluentRoute route(final String uriTemplate) {
+        public FluentAudit route(final String uriTemplate) {
             invalidRealmNames.add(firstPathSegment(uriTemplate));
             return delegate.route(uriTemplate);
         }
@@ -467,7 +498,7 @@ public class RestEndpoints {
         }
 
         @Override
-        public FluentRoute route(String uriTemplate) {
+        public FluentAudit route(String uriTemplate) {
             invalidRealmNames.add(firstPathSegment(uriTemplate));
             return delegate.route(uriTemplate);
         }

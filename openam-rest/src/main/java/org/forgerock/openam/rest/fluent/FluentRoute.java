@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-2015 ForgeRock AS.
 */
 package org.forgerock.openam.rest.fluent;
 
@@ -20,6 +20,7 @@ import java.util.List;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.CollectionResourceProvider;
+import org.forgerock.json.resource.Filter;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.RoutingMode;
 import org.forgerock.json.resource.SingletonResourceProvider;
@@ -39,20 +40,17 @@ public class FluentRoute implements FluentVersion {
 
     private final CrestRouter router;
     private final String uriTemplate;
+    private final Filter auditFilter;
     private final List<CrestAuthorizationModule> modules;
     private VersionHandler versionHandler;
 
-    FluentRoute(CrestRouter router, String uriTemplate) {
+    FluentRoute(CrestRouter router, String uriTemplate, Filter auditFilter) {
         this.router = router;
         this.uriTemplate = uriTemplate;
+        this.auditFilter = auditFilter;
         this.modules = new ArrayList<CrestAuthorizationModule>();
     }
 
-    FluentRoute(FluentRoute route) {
-        this.router = route.router;
-        this.uriTemplate = route.uriTemplate;
-        this.modules = route.modules;
-    }
     /**
      * Add an authorization module through which the request must pass
      * if it is to reach its destination.
@@ -84,6 +82,15 @@ public class FluentRoute implements FluentVersion {
      */
     CrestAuthorizationModule[] getModules() {
         return modules.toArray(new CrestAuthorizationModule[modules.size()]);
+    }
+
+    /**
+     * Retrieves the filter to be used for auditing.
+     *
+     * @return the audit filter
+     */
+    Filter getAuditFilter() {
+        return auditFilter;
     }
 
     /**

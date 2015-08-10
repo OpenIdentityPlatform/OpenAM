@@ -15,6 +15,8 @@
 */
 package org.forgerock.openam.rest.fluent;
 
+import static org.apache.commons.lang.ArrayUtils.isNotEmpty;
+
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.forgerock.authz.filter.crest.AuthorizationFilters;
@@ -31,9 +33,6 @@ import org.forgerock.util.Reject;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.apache.commons.lang.ArrayUtils.isNotEmpty;
-import static org.forgerock.openam.utils.CollectionUtils.isNotEmpty;
-
 /**
  * Used to chain
  */
@@ -47,7 +46,7 @@ public final class FluentTo {
         this.route = route;
         this.version = version;
         filters = new ArrayList<>();
-        filters.add(get(AuditFilter.class));
+        filters.add(route.getAuditFilter());
     }
 
     /**
@@ -151,11 +150,7 @@ public final class FluentTo {
      *         the requests target
      */
     private void handleFiltersAndRoute(final RoutingMode routingMode, final RequestHandler requestHandler) {
-        RequestHandler targetHandler = requestHandler;
-
-        if (isNotEmpty(filters)) {
-            targetHandler = new FilterChain(targetHandler, filters);
-        }
+        RequestHandler targetHandler = new FilterChain(requestHandler, filters);
 
         if (isNotEmpty(route.getModules())) {
             targetHandler = AuthorizationFilters.createFilter(targetHandler, route.getModules());

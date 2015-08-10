@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 ForgeRock AS.
+ * Copyright 2012-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -20,6 +20,7 @@ import javax.servlet.ServletException;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.Resources;
+import org.forgerock.openam.audit.AuditConstants.Component;
 import org.forgerock.openam.rest.fluent.LoggingFluentRouter;
 import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
 import org.forgerock.openam.rest.router.VersionBehaviourConfigListener;
@@ -35,9 +36,12 @@ public class RestTokenDispatcher {
         try {
             final LoggingFluentRouter myRouter = InjectorHolder.getInstance(LoggingFluentRouter.class);
 
-            myRouter.route("/token/").forVersion("1.0").to(TokenResource.class);
+            myRouter.route("/token/")
+                    .auditAs(Component.OAUTH2)
+                    .forVersion("1.0").to(TokenResource.class);
 
             myRouter.route("/client/")
+                    .auditAs(Component.OAUTH2)
                     .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
                     .forVersion("1.0").to(ClientResource.class);
 

@@ -47,11 +47,25 @@ public final class AuditConstants {
     public enum Component {
         PLL("PLL"),
         OAUTH2("OAuth2"),
+        CTS("CTS"),
         OPENID_CONNECT("OpenID Connect"),
         UMA("UMA"),
-        AGENT("Agent"),
+        POLICY_AGENT("Policy Agent"),
         AUTHENTICATION("Authentication"),
-        CREST("CREST");
+        CREST("CREST"),
+        DASHBOARD("Dashboard"),
+        SERVER_INFO("Server Info"),
+        USERS("Users"),
+        GROUPS("Groups"),
+        OATH("Oath"),
+        DEVICES("Devices"),
+        POLICY("Policy"),
+        REALMS("Realms"),
+        SESSION("Session"),
+        SCRIPT("Script"),
+        BATCH("Batch"),
+        CONFIG("Config"),
+        STS("STS");
 
         private final String name;
 

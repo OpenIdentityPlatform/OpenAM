@@ -11,7 +11,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2014 ForgeRock AS.
+* Copyright 2014-2015 ForgeRock AS.
 */
 package org.forgerock.openam.rest.fluent;
 
@@ -46,8 +46,8 @@ public class FluentRouter<T extends CrestRouter> extends CrestRouter<T> {
         return new FluentRealmRouter() {
 
             @Override
-            public FluentRoute route(String uriTemplate) {
-                return new FluentRoute(realmRouter, uriTemplate);
+            public FluentAudit route(String uriTemplate) {
+                return new FluentAudit(realmRouter, uriTemplate);
             }
 
             @Override
@@ -68,8 +68,8 @@ public class FluentRouter<T extends CrestRouter> extends CrestRouter<T> {
     /**
      * {@inheritDoc}
      */
-    public FluentRoute route(String uriTemplate) {
-        return new FluentRoute(this, uriTemplate);
+    public FluentAudit route(String uriTemplate) {
+        return new FluentAudit(this, uriTemplate);
     }
 
 }

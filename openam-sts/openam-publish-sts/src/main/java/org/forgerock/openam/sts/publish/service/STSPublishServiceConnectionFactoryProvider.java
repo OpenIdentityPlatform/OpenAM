@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.sts.publish.service;
@@ -23,6 +23,7 @@ import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.RoutingMode;
+import org.forgerock.openam.audit.AuditConstants.Component;
 import org.forgerock.openam.rest.authz.STSPublishServiceAuthzModule;
 import org.forgerock.openam.rest.fluent.LoggingFluentRouter;
 import org.forgerock.openam.rest.router.RestRealmValidator;
@@ -49,6 +50,7 @@ public class STSPublishServiceConnectionFactoryProvider {
                     STSPublishInjectorHolder.getInstance(Key.get(new TypeLiteral<InstanceConfigMarshaller<RestSTSInstanceConfig>>() {})),
                     STSPublishInjectorHolder.getInstance(Key.get(Logger.class)));
         router.route("/rest")
+                .auditAs(Component.STS)
                 .through(STSPublishServiceAuthzModule.class, STSPublishServiceAuthzModule.NAME)
                 .forVersion(VERSION_STRING)
                 .to(RoutingMode.STARTS_WITH, restPublishRequestHandler);
@@ -59,6 +61,7 @@ public class STSPublishServiceConnectionFactoryProvider {
                         STSPublishInjectorHolder.getInstance(Key.get(new TypeLiteral<InstanceConfigMarshaller<SoapSTSInstanceConfig>>() {})),
                         STSPublishInjectorHolder.getInstance(Key.get(Logger.class)));
         router.route("/soap")
+                .auditAs(Component.STS)
                 .through(STSPublishServiceAuthzModule.class, STSPublishServiceAuthzModule.NAME)
                 .forVersion(VERSION_STRING)
                 .to(RoutingMode.STARTS_WITH, soapPublishRequestHandler);

@@ -29,6 +29,8 @@ import org.forgerock.openam.audit.AMAccessAuditEventBuilder;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;
+import org.forgerock.openam.rest.resource.AuditInfoContext;
+import org.forgerock.util.Reject;
 
 /**
  * ResultHandler decorator responsible for publishing audit access events for a single request.
@@ -44,6 +46,7 @@ abstract class AbstractAuditingResultHandler<T, H extends ResultHandler<T>> impl
     private final AuditEventPublisher auditEventPublisher;
     private final AuditEventFactory auditEventFactory;
     private final ServerContext context;
+    private final Component component;
     private final Request request;
     private final long startTime;
 
@@ -59,6 +62,10 @@ abstract class AbstractAuditingResultHandler<T, H extends ResultHandler<T>> impl
      */
     AbstractAuditingResultHandler(Debug debug, AuditEventPublisher auditEventPublisher, AuditEventFactory auditEventFactory,
                                   ServerContext context, Request request, H delegate) {
+
+        Reject.ifFalse(context.containsContext(AuditInfoContext.class), "CREST auditing expects the audit context");
+        component = context.asContext(AuditInfoContext.class).getComponent();
+
         this.debug = debug;
         this.auditEventPublisher = auditEventPublisher;
         this.auditEventFactory = auditEventFactory;
@@ -99,7 +106,7 @@ abstract class AbstractAuditingResultHandler<T, H extends ResultHandler<T>> impl
                     .timestamp(startTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_ATTEMPT)
-                    .component(Component.CREST);
+                    .component(component);
             addSessionDetailsFromSSOTokenContext(builder, context);
 
             auditEventPublisher.publish(ACCESS_TOPIC, builder.toEvent());
@@ -122,7 +129,7 @@ abstract class AbstractAuditingResultHandler<T, H extends ResultHandler<T>> impl
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
-                    .component(Component.CREST)
+                    .component(component)
                     .response("SUCCESS", elapsedTime);
             addSessionDetailsFromSSOTokenContext(builder, context);
 
@@ -149,7 +156,7 @@ abstract class AbstractAuditingResultHandler<T, H extends ResultHandler<T>> impl
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
-                    .component(Component.CREST)
+                    .component(component)
                     .responseWithMessage("FAILED - " + resultCode, elapsedTime, message);
             addSessionDetailsFromSSOTokenContext(builder, context);
 

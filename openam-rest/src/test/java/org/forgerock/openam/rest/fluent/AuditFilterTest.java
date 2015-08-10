@@ -22,7 +22,6 @@ import static org.forgerock.json.resource.Requests.*;
 import static org.forgerock.json.resource.ResourceException.INTERNAL_ERROR;
 import static org.forgerock.json.resource.ResourceException.getException;
 import static org.forgerock.openam.audit.AuditConstants.ACCESS_TOPIC;
-import static org.forgerock.openam.rest.fluent.AuditingResultHandler.*;
 import static org.forgerock.openam.rest.fluent.JsonUtils.jsonFromFile;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
@@ -55,6 +54,7 @@ import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.audit.AMAccessAuditEventBuilder;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
+import org.forgerock.openam.rest.resource.AuditInfoContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
@@ -225,7 +225,8 @@ public class AuditFilterTest {
         };
         Context apiVersionContext = new AcceptAPIVersionContext(
                 subjectContext, "proto", AcceptAPIVersion.newBuilder("protocol=1.0,resource=1.0").build());
-        return new ServerContext(apiVersionContext);
+        Context auditContext = new AuditInfoContext(apiVersionContext, Component.CREST);
+        return new ServerContext(auditContext);
     }
 
     private AuditEventFactory mockAuditEventFactory() {
