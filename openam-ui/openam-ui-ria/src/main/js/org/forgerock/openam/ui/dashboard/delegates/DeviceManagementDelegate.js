@@ -17,11 +17,12 @@
 /*global define*/
 
 define("org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate", [
+    "jquery",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/openam/ui/common/util/RealmHelper"
-], function (Configuration, Constants, AbstractDelegate, RealmHelper) {
+], function ($, Configuration, Constants, AbstractDelegate, RealmHelper) {
     var obj = new AbstractDelegate(Constants.host + "/" + Constants.context + "/json/");
 
     obj.deleteDevice = function (uuid) {
@@ -31,9 +32,26 @@ define("org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate", [
         });
     };
 
-    obj.getDevices = function () {
+    obj.setDeviceSkippable = function (statusDevice) {
+        var skipOption = {};
+        skipOption.value = statusDevice;
         return obj.serviceCall({
-            url: RealmHelper.decorateURIWithSubRealm("users/" + Configuration.loggedUser.uid + "/devices/2fa/oath/?_queryFilter=true")
+            url: RealmHelper.decorateURIWithRealm("users/" + Configuration.loggedUser.uid + "/devices/2fa/oath/?_action=skip"),
+            data: JSON.stringify(skipOption),
+            method: "POST"
+        });
+    };
+
+    obj.getDevices = function () {
+        return $.when(
+            obj.serviceCall({ url: RealmHelper.decorateURIWithSubRealm("users/" + Configuration.loggedUser.uid + "/devices/2fa/oath/?_queryFilter=true") }),
+            obj.serviceCall({
+                url: RealmHelper.decorateURIWithRealm("users/" + Configuration.loggedUser.uid + "/devices/2fa/oath/?_action=check"),
+                method: "POST"
+            })
+        ).then(function (devicesData, statusData) {
+            devicesData.result[0].skipped = statusData.result;
+            return devicesData;
         });
     };
 

@@ -49,11 +49,12 @@ define("org/forgerock/openam/ui/dashboard/views/DeviceManagementView", [
         showDeviceDetails: function (event) {
             event.preventDefault();
 
-            var uuid = $(event.currentTarget).closest("div[data-device-uuid]").attr("data-device-uuid"),
+            var self = this,
+                statusDevice,
+                uuid = $(event.currentTarget).closest("div[data-device-uuid]").attr("data-device-uuid"),
                 device = _.findWhere(this.data.devices, {uuid: uuid});
 
             UIUtils.fillTemplateWithData("templates/openam/dashboard/EditDeviceDialogTemplate.html", device, function(html) {
-
                 BootstrapDialog.show({
                     type: BootstrapDialog.TYPE_DEFAULT,
                     title: device.deviceName,
@@ -63,8 +64,11 @@ define("org/forgerock/openam/ui/dashboard/views/DeviceManagementView", [
                     buttons: [{
                         label: $.t("common.form.save"),
                         action: function (dialog) {
-                            //TODO: add save functionality
-                            dialog.close();
+                            statusDevice = dialog.$modalBody.find("[name=\"deviceSkip\"]").is(":checked");
+                            DeviceManagementDelegate.setDeviceSkippable(statusDevice).done(function (data) {
+                                self.render();
+                                dialog.close();
+                            });
                         }
                     }, {
                         label: $.t("common.form.close"),
@@ -77,6 +81,7 @@ define("org/forgerock/openam/ui/dashboard/views/DeviceManagementView", [
                         dialog.$modalBody.find(".recovery-codes-download").click(function(){
                             location.href = "data:text/plain," + encodeURIComponent(device.recoveryCodes.join("\r\n"));
                         });
+
                         dialog.$modalBody.find("[data-toggle=\"popover\"]").popover({
                             content: $.t("openam.deviceManagement.deviceDetailsDialog.help"),
                             placement: "bottom",
@@ -89,37 +94,16 @@ define("org/forgerock/openam/ui/dashboard/views/DeviceManagementView", [
             });
         },
 
-        render: function () {
+        render: function (callback) {
             var self = this;
-
-            DeviceManagementDelegate.getDevices().done(function (data) {
-                // MOCK DATA
-                data.result = [{
-                    "sharedSecret": "6A5C27FAACB0890F",
-                    "deviceName": "OATH Device",
-                    "lastLogin": 1433156184430,
-                    "counter": 1,
-                    "checksumDigit": false,
-                    "truncationOffset": 0,
-                    "recoveryCodes": [
-                        "4b344d30-9511-4c4e-b562-9445420422c5",
-                        "afc644cd-1b8c-40c8-a9a5-0ff86b702bc1",
-                        "92021597-d046-4744-9ddb-77878e5732e3",
-                        "e6194a04-1029-49df-8cd8-f93d029ddf64",
-                        "d3da46df-2137-4587-8ca8-b262e905a45f",
-                        "a3bc9cee-41de-4793-a1c6-1f8f33308987",
-                        "beecc0b6-a0ff-44ad-b82f-a376e63b4f79",
-                        "4094d628-8d97-4a69-8ef4-db81a9c24f32",
-                        "cd475e90-459c-4e84-9536-fcdc8ff2fabd",
-                        "03e86514-e941-4c47-a597-398140249d6d"
-                    ],
-                    "uuid": "24553be4-a356-47a8-9dc4-a973caa27b85"
-                }];
-                self.data.devices = data.result;
-                // TODO: get "skip" value from backend and preselect it if necessary
-                self.parentRender();
-            })
-            .fail(function (error) {
+            DeviceManagementDelegate.getDevices().done(function (devicesData) {
+                self.data.devices = devicesData.result;
+                self.parentRender(function() {
+                    if (callback) {
+                        callback();
+                    }
+                });
+            }).fail(function (error) {
                 // TODO: add failure condition
             });
         }
