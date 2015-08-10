@@ -106,6 +106,15 @@ define("org/forgerock/openam/ui/uma/delegates/UMADelegate", [
             }).then(function(data) {
                 data = !_.any(data.result, function(label) { return label.name.toLowerCase() === name; });
             });
+        },
+        remove: function (id) {
+            return obj.serviceCall({
+                url: RealmHelper.decorateURIWithRealm("__subrealm__/users/" +
+                    encodeURIComponent(Configuration.loggedUser.username) +
+                    "/oauth2/resources/labels/" +
+                    encodeURIComponent(id)),
+                type: "DELETE"
+            });
         }
     };
 

@@ -90,6 +90,14 @@ define("config/AppMessages", [
             msg: "uma.resources.show.revokePolicyFail",
             type: "error"
         },
+        "deleteLabelSuccess": {
+            msg: "uma.resources.myLabels.deleteLabel.messages.success",
+            type: "info"
+        },
+        "deleteLabelFail": {
+            msg: "uma.resources.myLabels.deleteLabel.messages.fail",
+            type: "error"
+        },
 
         /**
          * Scripts messages.

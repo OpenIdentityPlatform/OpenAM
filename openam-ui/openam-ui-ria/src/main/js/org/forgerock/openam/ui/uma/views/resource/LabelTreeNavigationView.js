@@ -21,22 +21,24 @@ define("org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView", [
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/common/components/TreeNavigation",
     "org/forgerock/openam/ui/uma/delegates/UMADelegate"
-], function(_, $, Router, TreeNavigation, UMADelegate) {
+], function (_, $, Router, TreeNavigation, UMADelegate) {
     var LabelTreeNavigationView = TreeNavigation.extend({
         template: "templates/uma/views/resource/LabelTreeNavigationTemplate.html",
         partials: [ "templates/uma/views/resource/_NestedList.html" ],
         findActiveNavItem: function (fragment) {
-            var anchor = this.$el.find(".sidenav ol > li > a[href='#" + fragment + "']"),
+            var isCurrentRouteForResource = Router.currentRoute === Router.configuration.routes.umaResourcesMyLabelsResource,
+                subFragment = (isCurrentRouteForResource) ? _.initial(fragment.split("/")).join("/") : fragment,
+                anchor = this.$el.find(".sidenav ol > li > a[href='#" + subFragment + "']"),
                 parentOls;
 
             if (anchor.length) {
                 this.$el.find(".sidenav ol").removeClass("in");
 
-                parentOls = anchor.parentsUntil( this.$el.find(".sidenav"), "ol.collapse" );
+                parentOls = anchor.parentsUntil(this.$el.find(".sidenav"), "ol.collapse");
                 parentOls.addClass("in").parent().children("span[data-toggle]").attr("aria-expanded", "true");
                 anchor.parent().addClass("active");
 
-                if(anchor.attr("aria-expanded") === "false"){
+                if (anchor.attr("aria-expanded") === "false") {
                     anchor.attr("aria-expanded", "true");
                 }
             }
@@ -46,24 +48,24 @@ define("org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView", [
             $(event.currentTarget).addClass("active");
             this.nextRenderPage = true;
         },
-        render: function(args, callback) {
+        render: function (args, callback) {
             var self = this;
 
             UMADelegate.labels.all().done(function (data) {
-                if(!_.any(data.result, function(label) {
+                if (!_.any(data.result, function (label) {
                     return label.name.toLowerCase() === "starred";
                 })) {
                     UMADelegate.labels.create("starred", "STAR");
                 }
 
                 self.data.labels = {
-                    starred: _.filter(data.result, function(label) { return label.type.toLowerCase() === "starred"; }),
-                    system: _.filter(data.result, function(label) { return label.type.toLowerCase() === "system"; }),
-                    user: _.filter(data.result, function(label) { return label.type.toLowerCase() === "user"; })
+                    starred: _.filter(data.result, function (label) { return label.type.toLowerCase() === "starred"; }),
+                    system: _.filter(data.result, function (label) { return label.type.toLowerCase() === "system"; }),
+                    user: _.filter(data.result, function (label) { return label.type.toLowerCase() === "user"; })
                 };
                 self.data.nestedLabels = [];
 
-                function addToParent(collection, label) {
+                function addToParent (collection, label) {
                     if (label.name.indexOf("/") === -1) {
                         label.title = label.name;
                         label.children = [];
@@ -76,14 +78,14 @@ define("org/forgerock/openam/ui/uma/views/resource/LabelTreeNavigationView", [
                         label.name = shift.join("/");
                         parent = _.findWhere(collection, { title: parentName });
                         if (!parent) {
-                            parent = { title: parentName, children: [], viewId: _.uniqueId("viewId_")};
+                            parent = { title: parentName, children: [], viewId: _.uniqueId("viewId_") };
                             collection.push(parent);
                         }
                         addToParent(parent.children, label);
                     }
                 }
 
-                _.each(data.user, function(label){
+                _.each(self.data.labels.user, function (label) {
                     addToParent(self.data.nestedLabels, label);
                 });
 

@@ -25,9 +25,11 @@ define("org/forgerock/openam/ui/uma/views/resource/MyLabelsPage", [
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/common/util/RealmHelper",
     "org/forgerock/openam/ui/uma/delegates/UMADelegate"
-], function($, Backbone, Backgrid, BackgridUtils, BasePage, BootstrapDialog, Configuration, Constants, EventManager, RealmHelper, UMADelegate) {
+], function ($, Backbone, Backgrid, BackgridUtils, BasePage, BootstrapDialog, Configuration, Constants, EventManager,
+             Router, RealmHelper, UMADelegate) {
     var MyLabelsPage = BasePage.extend({
         template: "templates/uma/views/resource/MyLabelsPageTemplate.html",
         partials: [
@@ -36,20 +38,25 @@ define("org/forgerock/openam/ui/uma/views/resource/MyLabelsPage", [
         events: {
             "click button#deleteLabel": "deleteLabel"
         },
-        deleteLabel: function() {
-            var buttons = [{
+        deleteLabel: function () {
+            var self = this,
+                buttons = [{
                 id: "ok",
                 label: $.t("common.form.ok"),
                 cssClass: "btn-primary btn-danger",
-                action: function(dialog) {
+                action: function (dialog) {
                     dialog.enableButtons(false);
                     dialog.getButton("ok").text($.t("common.form.working"));
 
-                    UMADelegate.labels.remove().done(function() {
+                    UMADelegate.labels.remove(self.data.label._id).done(function () {
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "deleteLabelSuccess");
 
                         dialog.close();
-                    }).fail(function() {
+                        Router.routeTo(Router.configuration.routes.umaResourcesMyResources, {
+                            trigger: true,
+                            args: []
+                        });
+                    }).fail(function () {
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "deleteLabelFail");
 
                         dialog.enableButtons(true);
@@ -58,7 +65,7 @@ define("org/forgerock/openam/ui/uma/views/resource/MyLabelsPage", [
                 }
             }, {
                 label: $.t("common.form.cancel"),
-                action: function(dialog) {
+                action: function (dialog) {
                     dialog.close();
                 }
             }];
@@ -71,13 +78,21 @@ define("org/forgerock/openam/ui/uma/views/resource/MyLabelsPage", [
                 buttons: buttons
             });
         },
-        recordsPresent: function() {
+        recordsPresent: function () {
             this.$el.find("button#deleteLabel").prop("disabled", false);
         },
-        render: function(args, callback) {
-            var labelId = args[0];
+        render: function (args, callback) {
+            var labelId = args[0],
+                self = this;
 
-            this.renderGrid(this.createLabelCollection(labelId), this.createColumns(labelId), callback);
+            UMADelegate.labels.get(labelId).then(function (result) {
+                self.data.label = result;
+                if (result) {
+                    self.renderGrid(self.createLabelCollection(labelId), self.createColumns("mylabels/" + labelId), callback);
+                } else {
+                    self.parentRender(callback);
+                }
+            });
         }
     });
 
