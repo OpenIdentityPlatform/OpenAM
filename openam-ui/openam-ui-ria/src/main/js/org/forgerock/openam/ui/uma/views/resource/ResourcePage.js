@@ -200,7 +200,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                     "click #revoke": "revoke"
                 },
                 revoke: function() {
-                    self.model.get("policy").get("permissions").remove(self.model);
+                    self.model.get("policy").get("permissions").remove(this.model);
                     self.model.get("policy").save();
                 }
             });
