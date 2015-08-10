@@ -33,14 +33,9 @@
 <div class="btn-toolbar page-toolbar labels-container">
     <div class="btn-group pull-right">
         <button id="saveLabels" disabled class="btn btn-default"><i class="fa fa-check"></i></button>
-        <button id="disgardLabels" class="btn btn-default"><i class="fa fa-times"></i></button>
+        <button id="discardLabels" class="btn btn-default"><i class="fa fa-times"></i></button>
     </div>
-    <select id="labels" multiple class="selectize pull-left">
-        <option disabled selected value>{{t 'common.form.pleaseSelect'}}</option>
-        {{#each allLabels}}
-            <option value="{{this}}">{{this}}</option>
-        {{/each}}
-    </select>
+    <select id="labels" multiple class="selectize pull-left"></select>
     <button id="editLabels" class="btn btn-link"><i class="fa fa-pencil"></i></button>
 </div>
 

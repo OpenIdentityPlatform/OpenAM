@@ -29,12 +29,23 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
     "org/forgerock/commons/ui/common/components/Messages",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/UIUtils",
+    "org/forgerock/openam/ui/uma/delegates/UMADelegate",
     "org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy",
 
     // jquery dependencies
     "selectize"
 ], function ($, _, AbstractView, Backbone, Backgrid, BackgridUtils, BootstrapDialog, CommonShare, Constants, EventManager,
-             Messages, Router, UIUtils, UMAResourceSetWithPolicy) {
+             Messages, Router, UIUtils, UMADelegate, UMAResourceSetWithPolicy) {
+    function filterUserLabels(labels) {
+        return _.filter(labels, function(label) {
+            return label.type === "USER";
+        });
+    }
+    function getAllUserLabels() {
+        return UMADelegate.labels.all().then(function(labels) {
+            return filterUserLabels(labels.result);
+        });
+    }
     var ResourcePage = AbstractView.extend({
         initialize: function () {
             // TODO: AbstarctView.prototype.initialize.call(this);
@@ -47,15 +58,12 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
             "click li#unshare": "onUnshare",
             "click button#editLabels": "editLabels",
             "click button#saveLabels": "submitLabelsChanges",
-            "click button#disgardLabels": "disgardLabelsChanges"
+            "click button#discardLabels": "discardLabelsChanges"
         },
         onModelError: function (model, response) {
             console.error("Unrecoverable load failure UMAResourceSetWithPolicy. " +
                 response.responseJSON.code + " (" + response.responseJSON.reason + ") " +
                 response.responseJSON.message);
-        },
-        onModelSync: function () {
-            this.render();
         },
         onUnshare: function (event) {
             event.preventDefault();
@@ -112,32 +120,62 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                     persist: false,
                     create: true,
                     hideSelected: true,
-                    items: self.data.resourceSetLabels,
                     onChange: function () {
                         self.$el.find("button#saveLabels").prop("disabled", false);
                     },
                     render: {
                         item: function (item) {
-                            return "<div data-value=\"" + item.value + "\" class=\"item\">" + item.value + "</div>\"";
+                            return "<div data-value=\"" + item.name + "\" class=\"item\">" + item.name + "</div>\"";
                         }
-                    }
+                    },
+                    labelField: "name",
+                    valueField: "name",
+                    searchField: ["name"]
                 })[0];
             labelsSelect.selectize.lock();
-            self.$el.find(".labels-container .btn-group").hide();
-
+            this.updateLabelOptions();
+            this.$el.find(".labels-container .btn-group").hide();
         },
-
+        updateLabelOptions: function () {
+            var labelsSelectize = this.$el.find("#labels")[0].selectize;
+            labelsSelectize.clearOptions();
+            labelsSelectize.addOption(this.allLabels);
+            labelsSelectize.clear();
+            _.each(this.labels, function (item) {
+                labelsSelectize.addItem(item);
+            });
+        },
         render: function (args, callback) {
-            var collection, grid, id = _.last(args), options, RevokeCell, SelectizeCell, self = this;
-            /**
-             * Guard clause to check if model requires sync'ing/updating
-             * Reason: We do not know the id of the data we need until the render function is called with args,
-             * thus we can only check at this point if we have the correct model to render this view (the model
-             * might already contain the correct data).
-             * Behaviour: If the model does require sync'ing then we abort this render via the return and render
-             * will it invoked again when the model is updated
-             */
-            if(this.syncModel(id)) { return; }
+            var id = _.last(args), self = this;
+
+            if (this.model && this.id === id) {
+                if (!this.isCurrentlyFetchingData) {
+                    this.renderWithModel(callback);
+                }
+            } else {
+                this.isCurrentlyFetchingData = true;
+                $.when(
+                    getAllUserLabels(),
+                    UMAResourceSetWithPolicy.findOrCreate({_id: id}).fetch()
+                ).done(function(allLabels, model) {
+                    // Ensure we don't render any previous requests that were cancelled.
+                    if (model.id === self.id) {
+                        self.allLabels = allLabels;
+                        self.model = model;
+                        self.labels = _(self.model.get("labels")).map(function(labelId) {
+                            return _.find(self.allLabels, function(otherLabel) {
+                                return otherLabel._id === labelId;
+                            });
+                        }).compact().sortBy("name").pluck("name").value();
+                        self.isCurrentlyFetchingData = false;
+                        self.renderWithModel(callback);
+                    }
+                }).fail(this.onModelError);
+            }
+            this.id = id;
+        },
+        renderWithModel: function (callback) {
+            var collection, grid, options, RevokeCell, SelectizeCell, self = this;
 
             /**
              * FIXME: Ideally the data needs to the be whole model, but I'm told it's also global so we're
@@ -146,9 +184,6 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
             this.data = {};
             this.data.name = this.model.get("name");
             this.data.icon = this.model.get("icon_uri");
-            //TODO: This data should come the server
-            this.data.resourceSetLabels = ["label1", "label2", "label3"];
-            this.data.allLabels = ["label1", "label2", "label3", "label4", "label5", "label6"];
 
             // FIXME: Re-enable filtering and pagination
             //     UserPoliciesCollection = Backbone.PageableCollection.extend({
@@ -165,7 +200,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                     "click #revoke": "revoke"
                 },
                 revoke: function() {
-                    self.model.get("policy").get("permissions").remove(this.model);
+                    self.model.get("policy").get("permissions").remove(self.model);
                     self.model.get("policy").save();
                 }
             });
@@ -176,7 +211,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                 className: "selectize-cell",
                 template: "templates/uma/backgrid/cell/SelectizeCell.html",
                 render: function() {
-                    var items = this.model.get("scopes").pluck("name"),
+                    var items = self.model.get("scopes").pluck("name"),
                         select;
 
                     this.$el.html(UIUtils.fillTemplateWithData(this.template));
@@ -310,38 +345,60 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
             this.$el.find("#editLabels").hide();
             this.$el.find(".labels-container .selectize-control ").removeClass("pull-left");
             this.$el.find("button#saveLabels").prop("disabled", true);
+            this.$el.find("button#discardLabels").prop("disabled", false);
             this.$el.find(".labels-container .btn-group").show();
 
         },
-
         submitLabelsChanges: function () {
-            var selectedValues = this.$el.find("#labels")[0].selectize.getValue();
-            this.deactivateLabels();
-            //TODO: update the model
+            var self = this,
+                labelsSelectize = this.$el.find("#labels")[0].selectize,
+                selectedLabelNames = labelsSelectize.getValue(),
+                allLabelNames = _.pluck(this.allLabels, "name"),
+                newLabelNames = _.difference(selectedLabelNames, allLabelNames),
+                existingLabelNames = _.intersection(selectedLabelNames, allLabelNames),
+                existingLabelIds = _.map(existingLabelNames, function(labelName) {
+                    return _.find(self.allLabels, function(otherLabel) {
+                        return otherLabel.name === labelName;
+                    })._id;
+                }),
+                creationPromises = _.map(newLabelNames, function(labelName) {
+                    return UMADelegate.labels.create(labelName, "USER");
+                });
+
+            labelsSelectize.disable();
+            self.$el.find("button#saveLabels").prop("disabled", true);
+            self.$el.find("button#discardLabels").prop("disabled", true);
+            $.when.apply($, creationPromises).then(function() {
+                var newIds;
+                if (creationPromises.length === 1) {
+                    newIds = [arguments[0]._id];
+                } else {
+                    newIds = _.map(arguments, function (arg) {
+                        return arg[0]._id;
+                    });
+                }
+                self.model.set("labels", existingLabelIds.concat(newIds));
+                return $.when(self.model.save(), getAllUserLabels());
+            }).then(function(saveResult, allLabels) {
+                self.labels = selectedLabelNames;
+                self.allLabels = allLabels;
+                self.updateLabelOptions();
+                labelsSelectize.enable();
+                self.deactivateLabels();
+            }, function() {
+                labelsSelectize.enable();
+                self.$el.find("button#saveLabels").prop("disabled", false);
+                self.$el.find("button#discardLabels").prop("disabled", false);
+            });
         },
-        disgardLabelsChanges: function () {
+        discardLabelsChanges: function () {
             var labelsSelect = this.$el.find("#labels")[0];
             this.deactivateLabels();
             labelsSelect.selectize.clear();
-            _.each(this.data.labelsCopy, function (val) {
+            _.each(this.labels, function (val) {
                 labelsSelect.selectize.addItem(val);
             });
-
-        },
-        syncModel: function(id) {
-            var syncRequired = !this.model || (id && this.model.id !== id);
-
-            if(syncRequired) {
-                this.stopListening(this.model);
-                this.model = UMAResourceSetWithPolicy.findOrCreate( { _id: id} );
-                this.listenTo(this.model, "sync", this.onModelSync);
-                this.listenTo(this.model, "error", this.onModelError);
-                this.model.fetch();
-            }
-
-            return syncRequired;
         }
     });
-
     return ResourcePage;
 });

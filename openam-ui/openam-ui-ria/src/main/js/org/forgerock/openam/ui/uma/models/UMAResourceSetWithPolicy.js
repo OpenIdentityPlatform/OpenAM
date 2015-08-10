@@ -25,24 +25,38 @@
 /*global define*/
 
 define("org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy", [
+    "jquery",
     "underscore",
     "backbone",
     "backbone-relational",
     "org/forgerock/openam/ui/uma/models/UMAPolicy",
     "org/forgerock/openam/ui/uma/models/UMAPolicyPermissionScope",
     "org/forgerock/openam/ui/uma/util/URLHelper"
-], function(_, Backbone, BackboneRelational, UMAPolicy, UMAPolicyPermissionScope, URLHelper) {
+], function ($, _, Backbone, BackboneRelational, UMAPolicy, UMAPolicyPermissionScope, URLHelper) {
     return Backbone.RelationalModel.extend({
+        // Promise version of fetch
+        fetch: function () {
+            var d = $.Deferred();
+            Backbone.RelationalModel.prototype.fetch.call(this, {
+                success: function (model) {
+                    d.resolve(model);
+                },
+                error: function (model, response) {
+                    d.reject(response);
+                }
+            });
+            return d.promise();
+        },
         idAttribute: "_id",
-        parse: function(response) {
+        parse: function (response) {
             // Hardwiring the id across to the UMAPolicy object as the server doesn't provide it
-            if(!response.policy) {
+            if (!response.policy) {
                 response.policy = {};
             }
             response.policy.policyId = response._id;
 
-            response.scopes = _.map(response.scopes, function(scope) {
-                return { id: scope };
+            response.scopes = _.map(response.scopes, function (scope) {
+                return {id: scope};
             });
 
             return response;
@@ -56,6 +70,7 @@ define("org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy", [
             type: Backbone.HasMany,
             key: "scopes",
             relatedModel: UMAPolicyPermissionScope,
+            includeInJSON: Backbone.Model.prototype.idAttribute,
             parse: true
         }],
         urlRoot: URLHelper.substitute("__api__/__subrealm__/users/__username__/oauth2/resources/sets")
