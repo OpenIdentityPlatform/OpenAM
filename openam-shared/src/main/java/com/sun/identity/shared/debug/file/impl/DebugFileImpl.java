@@ -36,8 +36,6 @@ import com.sun.identity.shared.debug.DebugConstants;
 import com.sun.identity.shared.debug.file.DebugConfiguration;
 import com.sun.identity.shared.debug.file.DebugFile;
 import com.sun.identity.shared.locale.Locale;
-import org.forgerock.util.time.TimeService;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -47,8 +45,13 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.util.time.TimeService;
 
 /**
  * Manage a log file :
@@ -62,7 +65,7 @@ public class DebugFileImpl implements DebugFile {
 
     private final String debugName;
 
-    private PrintWriter debugWriter = null;
+    private volatile PrintWriter debugWriter = null;
 
     private long fileCreationTime = 0;
 
@@ -70,9 +73,11 @@ public class DebugFileImpl implements DebugFile {
 
     private final SimpleDateFormat suffixDateFormat;
 
-    private final ReadWriteLock fileLock = new ReentrantReadWriteLock();
-
     private final DebugConfiguration configuration;
+
+    private final AtomicReference<String> debugDirectory = new AtomicReference<String>();
+
+    private final ReadWriteLock fileLock = new ReentrantReadWriteLock();
 
     /**
      * Constructor
@@ -112,14 +117,27 @@ public class DebugFileImpl implements DebugFile {
         this.suffixDateFormat = tmpSuffixDateFormat;
     }
 
+    private boolean isConfigChanged() throws IOException {
+        String newDebugDir = SystemPropertiesManager.get(DebugConstants.CONFIG_DEBUG_DIRECTORY);
+        if (StringUtils.isEmpty(newDebugDir)) {
+                ResourceBundle bundle = Locale.getInstallResourceBundle("amUtilMsgs");
+                throw new IOException(bundle.getString("com.iplanet.services.debug.nodir") + " Current Debug File : "
+                        + this);
+        }
+        return !newDebugDir.equals(debugDirectory.getAndSet(newDebugDir));
+    }
+
     @Override
     public void writeIt(String prefix, String msg, Throwable th) throws IOException {
 
-        if (debugWriter == null) {
+        if (isConfigChanged()) {
             initialize();
-        } else if (needsRotate()) {
+        }
+
+        if (needsRotate()) {
             rotate();
         }
+
         StringBuilder buf = new StringBuilder();
         buf.append(prefix);
         buf.append('\n');
@@ -147,8 +165,7 @@ public class DebugFileImpl implements DebugFile {
      * Close the log file
      */
     private void close() {
-        this.debugWriter.flush();
-        this.debugWriter.close();
+        IOUtils.closeIfNotNull(debugWriter);
         this.debugWriter = null;
     }
 
@@ -180,25 +197,32 @@ public class DebugFileImpl implements DebugFile {
     }
 
     /**
-     * Initialize a new log file
+     * Initialize a new log file - setting up the directory if necessary.
      *
      * @throws IOException
      */
-    private synchronized void initialize() throws IOException {
-        if (this.debugWriter == null) {
+    private void initialize() throws IOException {
+
+        fileLock.writeLock().lock();
+
+        try {
+            //if we're switching to a new directory & writer or rotating, flush
+            if (debugWriter != null) {
+                close();
+            }
+
             // remember when we rotated last
             fileCreationTime = clock.now();
             // Is rounded to the lower minute
             fileCreationTime -= fileCreationTime % (1000 * 60);
 
             nextRotation = fileCreationTime + configuration.getRotationInterval() * 60 * 1000;
-
-            String debugDirectory = SystemPropertiesManager.get(DebugConstants.CONFIG_DEBUG_DIRECTORY);
+            boolean directoryAvailable = false;
+            String debugDir = debugDirectory.get();
 
             //Create the log directory
-            boolean directoryAvailable = false;
-            if (debugDirectory != null && debugDirectory.trim().length() > 0) {
-                File dir = new File(debugDirectory);
+            if (debugDir != null && debugDir.trim().length() > 0) {
+                File dir = new File(debugDir);
                 if (!dir.exists()) {
                     directoryAvailable = dir.mkdirs();
                 } else if (dir.isDirectory() && dir.canWrite()) {
@@ -207,24 +231,26 @@ public class DebugFileImpl implements DebugFile {
             }
 
             if (!directoryAvailable) {
-                ResourceBundle bundle = Locale.getInstallResourceBundle("amUtilMsgs");
-                throw new IOException(bundle.getString("com.iplanet.services.debug.nodir") + " Current Debug File : "
-                        + this);
+            ResourceBundle bundle = Locale.getInstallResourceBundle("amUtilMsgs");
+            throw new IOException(bundle.getString("com.iplanet.services.debug.nodir") + " Current Debug File : " +
+                    this);
             }
 
             //Create the log file
-            String debugFilePath = debugDirectory + File.separator + wrapFilename(debugName);
+            String debugFilePath = debugDirectory.get() + File.separator + wrapFilename(debugName);
 
             try {
-                this.debugWriter = new PrintWriter(new FileWriter(debugFilePath, true), true);
+                debugWriter = new PrintWriter(new FileWriter(debugFilePath, true), true);
             } catch (IOException ioex) {
-                if (this.debugWriter != null) {
-                    close();
+                if (debugWriter != null) {
+                close();
                 }
                 ResourceBundle bundle = Locale.getInstallResourceBundle("amUtilMsgs");
                 throw new IOException(bundle.getString("com.iplanet.services.debug.nofile") + " Current Debug File : " +
                         this, ioex);
             }
+        } finally {
+            fileLock.writeLock().unlock();
         }
     }
 
@@ -234,32 +260,12 @@ public class DebugFileImpl implements DebugFile {
      * @return true if the log file need to be rotate
      */
     private boolean needsRotate() {
-        if (configuration.getRotationInterval() > 0) {
-
-            return nextRotation <= clock.now();
-        }
-        return false;
+        return configuration.getRotationInterval() > 0 && nextRotation <= clock.now();
     }
 
-    /**
-     * Rotate log file
-     *
-     * @throws IOException
-     */
     private synchronized void rotate() throws IOException {
-
         if (needsRotate()) {
-
-            fileLock.writeLock().lock();
-            try {
-                if (this.debugWriter != null) {
-                    close();
-
-                }
                 initialize();
-            } finally {
-                fileLock.writeLock().unlock();
-            }
         }
     }
 
@@ -267,6 +273,7 @@ public class DebugFileImpl implements DebugFile {
     public String toString() {
         DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss:SSS a zzz");
         return "DebugFileImpl{" +
+                "debugDirectory" + debugDirectory.get() +
                 "debugName='" + debugName + '\'' +
                 ", fileCreationTime=" + dateFormat.format(new Date(fileCreationTime)) +
                 '}';

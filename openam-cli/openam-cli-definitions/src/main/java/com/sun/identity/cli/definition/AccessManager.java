@@ -3010,5 +3010,44 @@ public class AccessManager {
             "delete-policy-in-realm-succeed=Policies were deleted under realm, {0}."})
     private String delete_xacml;
 
-}
+    @SubCommandInfo(
+            implClassName="com.sun.identity.cli.record.StartRecord",
+            description="Start recording logs. It will generate a record bundle that contains logs, environment " +
+                    "information, thread dump.",
+            webSupport="true",
+            mandatoryOptions={
+                    "servername|s|s|Server name, e.g. http://openam.example.com:8080/openam",
+                    "jsonfile|J|s|Record json."},
+            optionAliases={},
+            macro="authentication",
+            optionalOptions={},
+            resourceStrings={})
+    private String recording_start;
 
+    @SubCommandInfo(
+            implClassName="com.sun.identity.cli.record.StatusRecord",
+            description="Get the current recording status if any.",
+            webSupport="true",
+            mandatoryOptions={
+                    "servername|s|s|Server name, e.g. http://openam.example.com:8080/openam"
+            },
+            optionAliases={},
+            macro="authentication",
+            optionalOptions={},
+            resourceStrings={})
+    private String recording_status;
+
+    @SubCommandInfo(
+            implClassName="com.sun.identity.cli.record.StopRecord",
+            description="Stop recording.",
+            webSupport="true",
+            mandatoryOptions={
+                    "servername|s|s|Server name, e.g. http://openam.example.com:8080/openam"
+            },
+            optionAliases={},
+            macro="authentication",
+            optionalOptions={},
+            resourceStrings={})
+    private String recording_stop;
+
+}

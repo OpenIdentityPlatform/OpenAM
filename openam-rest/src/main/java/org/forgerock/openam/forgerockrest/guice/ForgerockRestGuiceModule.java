@@ -14,7 +14,10 @@
  * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.openam.forgerockrest.guice;
+import javax.security.auth.Subject;
 
+import org.forgerock.openam.rest.record.DefaultDebugRecorder;
+import org.forgerock.openam.rest.record.DebugRecorder;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import com.google.inject.Provides;
@@ -140,6 +143,7 @@ public class ForgerockRestGuiceModule extends AbstractModule {
         bind(RestEndpointManager.class).to(RestEndpointManagerProxy.class);
         bind(VersionSelector.class).in(Singleton.class);
         bind(DelegationEvaluator.class).to(DelegationEvaluatorImpl.class).in(Singleton.class);
+        bind(DebugRecorder.class).to(DefaultDebugRecorder.class);
     }
 
     @Provides

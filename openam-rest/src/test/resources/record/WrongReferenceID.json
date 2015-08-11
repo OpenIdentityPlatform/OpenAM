@@ -1,0 +1,15 @@
+{
+  "issueID": 8339,
+  "referenceID": "with spaces",
+  "description": "all ON record",
+  "threadDump" : {
+    "enable": false
+  },
+  "configExport": {
+    "enable": true
+  },
+  "debugLogs": {
+    "debugLevel": "message"
+  },
+  "zipEnable": false
+}

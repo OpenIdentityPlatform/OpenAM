@@ -27,7 +27,7 @@
 -->
 
 <!--
-    Portions Copyrighted 2010-2012 ForgeRock Inc
+    Portions Copyrighted 2010-2015 ForgeRock Inc
 -->
 
 <!DOCTYPE logmessages
@@ -7444,7 +7444,7 @@
         </triggers>
         <actions />
     </logmessage>
-    <logmessage name="SUCCEED_SET_SITE_ID" id="6050"
+    <logmessage name="FAILED_SET_SITE_ID" id="6050"
         loglevel="LL_INFO"
         description="Unable to set site ID.">
         <datainfo>
@@ -7458,5 +7458,127 @@
         <actions>
             <item>Look under debug file for more information.</item>
         </actions>
+    </logmessage>
+    <logmessage name="FAILED_START_RECORD" id="6051"
+                loglevel="LL_INFO"
+                description="Unable to start the record.">
+        <datainfo>
+            <item>Server name</item>
+            <item>Json record</item>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Execute start record Commandline interface.</item>
+        </triggers>
+        <actions>
+            <item>Look under debug file for more information.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="FAILED_STATUS_RECORD" id="6052"
+                loglevel="LL_INFO"
+                description="Unable to get the status of the recording">
+        <datainfo>
+            <item>Server name</item>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Execute status record Commandline interface.</item>
+        </triggers>
+        <actions>
+            <item>Look under debug file for more information.</item>
+        </actions>
+    </logmessage>
+
+    <logmessage name="FAILED_STOP_RECORD" id="6054"
+                loglevel="LL_INFO"
+                description="Recording can't be stopped">
+        <datainfo>
+            <item>Server name</item>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Execute stop record Commandline interface.</item>
+        </triggers>
+        <actions>
+            <item>Look under debug file for more information.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="SUCCESS_START_RECORD" id="6055"
+                loglevel="LL_INFO"
+                description="Start recording">
+        <datainfo>
+            <item>Server name</item>
+            <item>Json record</item>
+            <item>Json result</item>
+        </datainfo>
+        <triggers>
+            <item>Execute start record Commandline interface.</item>
+        </triggers>
+        <actions>
+            <item>Look under debug file for more information.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="SUCCESS_STATUS_RECORD" id="6056"
+                loglevel="LL_INFO"
+                description="Get the status of the record with success">
+        <datainfo>
+            <item>Server name</item>
+            <item>Json result</item>
+        </datainfo>
+        <triggers>
+            <item>Execute status record Commandline interface.</item>
+        </triggers>
+        <actions>
+            <item>Look under debug file for more information.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="SUCCESS_STOP_RECORD" id="6057"
+                loglevel="LL_INFO"
+                description="Stop recording">
+        <datainfo>
+            <item>Server name</item>
+            <item>Json result</item>
+        </datainfo>
+        <triggers>
+            <item>Execute stop record Commandline interface.</item>
+        </triggers>
+        <actions>
+            <item>Look under debug file for more information.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="ATTEMPT_STOP_RECORD" id="6058"
+                loglevel="LL_INFO"
+                description="Attempt to stop recording.">
+        <datainfo>
+            <item>Server name</item>
+        </datainfo>
+        <triggers>
+            <item>Stop recording OpenAM.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="ATTEMPT_STATUS_RECORD" id="6059"
+                loglevel="LL_INFO"
+                description="Attempt to get the status of the recording.">
+        <datainfo>
+            <item>Server name</item>
+        </datainfo>
+        <triggers>
+            <item>Get the status of the current record.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="ATTEMPT_START_RECORD" id="6060"
+                loglevel="LL_INFO"
+                description="Attempt to start recording.">
+        <datainfo>
+            <item>Server name</item>
+            <item>Json record</item>
+            <item>Json result</item>
+        </datainfo>
+        <triggers>
+            <item>Start record.</item>
+        </triggers>
+        <actions />
     </logmessage>
 </logmessages>

@@ -105,9 +105,14 @@ public interface IArgument {
     String REALM_NAME = "realm";
 
     /**
-     * Data file argument.
+     * Json file argument.
      */
     String DATA_FILE = "datafile";
+
+    /**
+     * Json file argument.
+     */
+    String JSON_FILE = "jsonfile";
 
     /**
      * Mandatory argument.

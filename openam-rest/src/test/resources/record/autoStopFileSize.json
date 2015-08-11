@@ -1,0 +1,21 @@
+{
+  "issueID": 4,
+  "referenceID": "test_auto_stop_file_size",
+  "description": "Test the auto stop file size",
+  "threadDump" : {
+    "enable": false
+  },
+  "configExport": {
+    "enable": false
+  },
+  "debugLogs": {
+    "debugLevel": "message",
+    "autoStop": {
+      "fileSize": {
+        "sizeUnit": "KB",
+        "value": 2
+      }
+    }
+  },
+  "zipEnable": false
+}
