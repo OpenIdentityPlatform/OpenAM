@@ -73,6 +73,17 @@ define("org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy", [
             includeInJSON: Backbone.Model.prototype.idAttribute,
             parse: true
         }],
+        toggleStarred: function (starredLabelId) {
+            var isStarred = _.contains(this.get("labels"), starredLabelId);
+
+            if (isStarred) {
+                this.set("labels", _.reject(this.get("labels"), function (label) {
+                    return label === starredLabelId;
+                }));
+            } else {
+                this.get("labels").push(starredLabelId);
+            }
+        },
         urlRoot: URLHelper.substitute("__api__/__subrealm__/users/__username__/oauth2/resources/sets")
     });
 });
