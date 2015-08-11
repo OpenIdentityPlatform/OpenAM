@@ -62,8 +62,7 @@ public class AuthenticationAccessAuditFilter extends AbstractRestletAccessAuditF
      * @param auditEventPublisher The publisher responsible for logging the events.
      * @param auditEventFactory The factory that can be used to create the events.
      */
-    @Inject
-    public AuthenticationAccessAuditFilter(@Assisted Restlet restlet, AuthIdHelper authIdHelper,
+    public AuthenticationAccessAuditFilter(Restlet restlet, AuthIdHelper authIdHelper,
             AuditEventPublisher auditEventPublisher, AuditEventFactory auditEventFactory) {
         super(Component.AUTHENTICATION, restlet, auditEventPublisher, auditEventFactory);
         this.authIdHelper = authIdHelper;

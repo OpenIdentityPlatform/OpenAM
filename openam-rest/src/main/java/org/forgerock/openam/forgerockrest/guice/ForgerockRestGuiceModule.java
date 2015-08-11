@@ -66,8 +66,6 @@ import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.IdentityResourceV1;
 import org.forgerock.openam.forgerockrest.IdentityResourceV2;
-import org.forgerock.openam.forgerockrest.authn.AuthenticationAccessAuditFilter;
-import org.forgerock.openam.forgerockrest.authn.AuthenticationAccessAuditFilterFactory;
 import org.forgerock.openam.forgerockrest.cts.CoreTokenResource;
 import org.forgerock.openam.forgerockrest.entitlements.ApplicationsResource;
 import org.forgerock.openam.forgerockrest.entitlements.EntitlementEvaluatorFactory;
@@ -213,10 +211,6 @@ public class ForgerockRestGuiceModule extends AbstractModule {
         install(new FactoryModuleBuilder()
                 .implement(SmsGlobalSingletonProvider.class, SmsGlobalSingletonProvider.class)
                 .build(SmsGlobalSingletonProviderFactory.class));
-
-        install(new FactoryModuleBuilder()
-                .implement(AuthenticationAccessAuditFilter.class, AuthenticationAccessAuditFilter.class)
-                .build(AuthenticationAccessAuditFilterFactory.class));
     }
 
     @Provides

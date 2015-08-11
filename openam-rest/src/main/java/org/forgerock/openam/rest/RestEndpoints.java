@@ -42,7 +42,7 @@ import org.forgerock.openam.forgerockrest.IdentityResourceV1;
 import org.forgerock.openam.forgerockrest.IdentityResourceV2;
 import org.forgerock.openam.forgerockrest.RealmResource;
 import org.forgerock.openam.forgerockrest.XacmlService;
-import org.forgerock.openam.forgerockrest.authn.AuthenticationAccessAuditFilterFactory;
+import org.forgerock.openam.rest.audit.RestletAccessAuditFilterFactory;
 import org.forgerock.openam.forgerockrest.authn.restlet.AuthenticationServiceV1;
 import org.forgerock.openam.forgerockrest.authn.restlet.AuthenticationServiceV2;
 import org.forgerock.openam.forgerockrest.cts.CoreTokenResource;
@@ -117,7 +117,7 @@ public class RestEndpoints {
     private final Router umaServiceRouter;
     private final Router oauth2ServiceRouter;
     private final SmsRequestHandlerFactory smsRequestHandlerFactory;
-    private final AuthenticationAccessAuditFilterFactory authAuditFactory;
+    private final RestletAccessAuditFilterFactory restletAuditFactory;
 
     /**
      * Constructs a new RestEndpoints instance.
@@ -127,19 +127,19 @@ public class RestEndpoints {
      */
     @Inject
     public RestEndpoints(RestRealmValidator realmValidator, VersionSelector versionSelector, CoreWrapper coreWrapper,
-            SmsRequestHandlerFactory smsRequestHandlerFactory, AuthenticationAccessAuditFilterFactory authAuditFactory) {
+            SmsRequestHandlerFactory smsRequestHandlerFactory, RestletAccessAuditFilterFactory restletAuditFactory) {
         this(realmValidator, versionSelector, coreWrapper, InvalidRealmNameManager.getInvalidRealmNames(),
-                smsRequestHandlerFactory, authAuditFactory);
+                smsRequestHandlerFactory, restletAuditFactory);
     }
 
     RestEndpoints(RestRealmValidator realmValidator, VersionSelector versionSelector, CoreWrapper coreWrapper,
             Set<String> invalidRealmNames, SmsRequestHandlerFactory smsRequestHandlerFactory,
-            AuthenticationAccessAuditFilterFactory authAuditFactory) {
+            RestletAccessAuditFilterFactory restletAuditFactory) {
         this.realmValidator = realmValidator;
         this.versionSelector = versionSelector;
         this.coreWrapper = coreWrapper;
         this.smsRequestHandlerFactory = smsRequestHandlerFactory;
-        this.authAuditFactory = authAuditFactory;
+        this.restletAuditFactory = restletAuditFactory;
 
         this.resourceRouter = createResourceRouter(invalidRealmNames);
         this.jsonServiceRouter = createJSONServiceRouter(invalidRealmNames);
@@ -387,8 +387,10 @@ public class RestEndpoints {
         ServiceRouter router = new ServiceRouter(realmValidator, versionSelector, coreWrapper);
 
         router.addRoute("/authenticate")
-                .addVersion("1.1", authAuditFactory.create(wrap(AuthenticationServiceV1.class)))
-                .addVersion("2.0", authAuditFactory.create(wrap(AuthenticationServiceV2.class)));
+                .addVersion("1.1",
+                        restletAuditFactory.createFilter(Component.AUTHENTICATION, wrap(AuthenticationServiceV1.class)))
+                .addVersion("2.0",
+                        restletAuditFactory.createFilter(Component.AUTHENTICATION, wrap(AuthenticationServiceV2.class)));
         invalidRealmNames.add("authenticate");
 
         VersionBehaviourConfigListener.bindToServiceConfigManager(router);
