@@ -40,6 +40,7 @@ public class AuditEventPublisher {
 
     private static Debug debug = Debug.getInstance("amAudit");
 
+    private final AuditService auditService;
     private final ConnectionFactory auditServiceConnectionFactory;
     private final AuditServiceConfigurator configurator;
 
@@ -48,6 +49,7 @@ public class AuditEventPublisher {
      */
     @Inject
     public AuditEventPublisher(AuditService auditService, AuditServiceConfigurator configurator) {
+        this.auditService = auditService;
         this.auditServiceConnectionFactory = Resources.newInternalConnectionFactory(auditService);
         this.configurator = configurator;
     }
@@ -109,7 +111,7 @@ public class AuditEventPublisher {
     }
 
     public boolean isAuditing(String topic) {
-        return configurator.getAuditServiceConfiguration().isAuditEnabled();
+        return configurator.getAuditServiceConfiguration().isAuditEnabled() && auditService.isAuditing(topic);
     }
 
     /**
