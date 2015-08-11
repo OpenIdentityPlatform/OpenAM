@@ -310,6 +310,7 @@ public class OAuth extends AMLoginModule {
                             }
                             OAuthUtil.debugMessage("OAuth.process(): LOGIN_SUCCEED "
                                     + "with user " + authenticatedUser);
+                            sharedState.put("userName", authenticatedUser);
                             return ISAuthConstants.LOGIN_SUCCEED;
                         } else {
                             throw new AuthLoginException("No user mapped!");
@@ -329,6 +330,7 @@ public class OAuth extends AMLoginModule {
                                     getRandomData(), jwtClaims);
                             if (authenticatedUser != null) {
                                 OAuthUtil.debugMessage("User created: " + authenticatedUser);
+                                sharedState.put("userName", authenticatedUser);
                                 return ISAuthConstants.LOGIN_SUCCEED;
                             } else {
                                 return ISAuthConstants.LOGIN_IGNORE;
@@ -345,6 +347,7 @@ public class OAuth extends AMLoginModule {
                                     profileSvcResponse, jwtClaims);
                             saveAttributes(attributes);
                         }
+                        sharedState.put("userName", authenticatedUser);
                         return ISAuthConstants.LOGIN_SUCCEED;
                     }
 
@@ -433,6 +436,7 @@ public class OAuth extends AMLoginModule {
                         jwtClaims);
                 if (authenticatedUser != null) {
                     OAuthUtil.debugMessage("User created: " + authenticatedUser);
+                    sharedState.put("userName", authenticatedUser);
                     return ISAuthConstants.LOGIN_SUCCEED;
                 } else {
                     return ISAuthConstants.LOGIN_IGNORE;
