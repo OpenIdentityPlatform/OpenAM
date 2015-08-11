@@ -116,6 +116,7 @@ define("org/forgerock/openam/ui/uma/views/resource/BasePage", [
                     }
                 }),
                 editable: false,
+                sortable: false,
                 headerCell: BackgridUtils.ClassHeaderCell
             }];
         },

@@ -30,20 +30,20 @@
 </header>
 
 <p class="page-description">{{t "uma.resources.show.subtitle"}}</p>
-<div class="btn-toolbar page-toolbar labels-container">
+<div class="btn-toolbar page-toolbar">
     <div class="btn-group pull-right">
         <button id="saveLabels" disabled class="btn btn-default"><i class="fa fa-check"></i></button>
         <button id="discardLabels" class="btn btn-default"><i class="fa fa-times"></i></button>
     </div>
-    <select id="labels" multiple class="selectize pull-left"></select>
+    <div id="labels">
+        <select multiple class="selectize pull-left"></select>
+    </div>
     <button id="editLabels" class="btn btn-link"><i class="fa fa-pencil"></i></button>
 </div>
 
-<div id="uma">
-    <div class="panel panel-default">
-        <div class="panel-body">
-            <div id="backgridContainer" class="backgrid-container backgrid-readonly"></div>
-            <div id="paginationContainer"></div>
-        </div>
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div id="backgridContainer" class="backgrid-container"></div>
+        <div id="paginationContainer"></div>
     </div>
 </div>

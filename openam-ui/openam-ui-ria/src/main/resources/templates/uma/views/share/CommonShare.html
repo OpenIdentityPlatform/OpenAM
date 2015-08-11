@@ -10,59 +10,54 @@
     <h1>{{ name }}</h1>
 </div>
 
-<div id="uma">
-
-    <div class="panel panel-default">
-      <div class="panel-body" >
 
 
-    <div id="shareCounterContainer" class="alert alert-info" role="alert">
-        <div class="media" id="shareCounter">&nbsp;</div>
-    </div>
+<div class="panel panel-default">
+    <div class="panel-body" >
 
-
-    <div id="advancedView" class="form-group"></div>
-
-    {{#if notFound}}
-    <div class="col-sm-12">
-        <div class="striped-list " id="resourceList">
-            <ul><li class="highlight-warning">{{t 'uma.share.notSpecifiedResource'}}</li></ul>
+        <div id="shareCounterContainer" class="alert alert-info" role="alert">
+            <div class="media" id="shareCounter">&nbsp;</div>
         </div>
-    </div>
-    {{else}}
 
-    <div class="row ">
-        <div id="selectUser" class="form-group col-sm-6">
-            <label>{{t 'uma.share.people'}}</label>
-            <select multiple class="selectize" placeholder="{{t 'common.form.startTypingToSearch'}}">
-                <option disabled selected value>{{t 'common.form.pleaseSelect'}}</option>
-                {{#each permissions}}
-                <option value="{{subject}}">{{subject}}</option>
-                {{/each}}
-            </select>
-        </div>
-        <div id="selectPermission" class="form-group col-sm-6">
-            <label>{{t 'uma.share.permission'}}</label>
-            <select multiple class="selectize">
-                <option disabled selected value>{{t 'common.form.pleaseSelect'}}</option>
-                {{#each scopes}}
-                <option value="{{id}}">{{name}}</option>
-                {{/each}}
-            </select>
-        </div>
-    </div>
+        <div id="advancedView" class="form-group"></div>
 
-    <!--<div id="selectAuthentication" class="float-left">
-    <label>Authentication method</label>
-    </div>-->
+        {{#if notFound}}
+        <div class="col-sm-12">
+            <div class="striped-list " id="resourceList">
+                <ul><li class="highlight-warning">{{t 'uma.share.notSpecifiedResource'}}</li></ul>
+            </div>
+        </div>
+        {{else}}
+
+        <div class="row ">
+            <div id="selectUser" class="form-group col-sm-6">
+                <label>{{t 'uma.share.people'}}</label>
+                <select multiple class="selectize" placeholder="{{t 'common.form.startTypingToSearch'}}">
+                    <option disabled selected value>{{t 'common.form.pleaseSelect'}}</option>
+                    {{#each permissions}}
+                    <option value="{{subject}}">{{subject}}</option>
+                    {{/each}}
+                </select>
+            </div>
+            <div id="selectPermission" class="form-group col-sm-6">
+                <label>{{t 'uma.share.permission'}}</label>
+                <select multiple class="selectize">
+                    <option disabled selected value>{{t 'common.form.pleaseSelect'}}</option>
+                    {{#each scopes}}
+                    <option value="{{id}}">{{name}}</option>
+                    {{/each}}
+                </select>
+            </div>
+        </div>
+
+        <!--<div id="selectAuthentication" class="float-left">
+            <label>Authentication method</label>
+        </div>-->
 
     <div class="clearfix pull-right">
         <a href="#" id="toggleAdvanced" role="button" class="btn btn-default"><i class="fa fa-cog"></i> {{t 'uma.share.advanced'}}</a>
         <input type="button" value="{{t 'uma.share.share'}}" id="shareButton" class="btn btn-primary" disabled/>
     </div>
     {{/if}}
-
-</div>
-</div>
 
 </div>

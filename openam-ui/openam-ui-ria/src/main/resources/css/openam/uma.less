@@ -149,14 +149,6 @@ span.item-button-panel {
     }
 }
 
-.labels-container {
-    .selectize-control.multi {
-        margin-right: 85px;
-    }
-    #editLabels {
-        margin-left: -90px;
-    }
-}
 
 #uma {
 
@@ -166,7 +158,7 @@ span.item-button-panel {
     }
 
     #resourceList {
-        margin-bottom:30px;
+        margin-bottom: 30px;
     }
 
 
@@ -187,7 +179,7 @@ span.item-button-panel {
                 }
             }
         }
-
+        
         td.permissions-cell {
             overflow: visible;
 
@@ -239,15 +231,13 @@ span.item-button-panel {
 
     .backgrid-revoke-cell {
 
-        width: 64px;
-
         [class^="fa-"], [class*=" fa-"] {
             font-size: 12px;
             padding: 13px 10px 13px 10px;
 
             &:hover, &:focus{
-                // TODO: BOOTSTRAP: Removed due to build issues. Will need re-adding
-                //color: @color-error;
+                color: darken(@base-theme-color, 5%);
+                cursor:pointer;
             }
         }
 
@@ -261,7 +251,6 @@ span.item-button-panel {
         #save, #cancel {
             display: none;
         }
-
     }
 
     #advancedView {
@@ -283,6 +272,31 @@ span.item-button-panel {
             transition:max-height 500ms ease-out, opacity 500ms ease-in-out ;
         }
     }
+
+    .selectize-control.multi .selectize-input.disabled {
+        background-color: transparent;
+        border-color: transparent;
+        box-shadow: none;
+        opacity: 1;
+        > div {
+            .selectize-div;
+        }
+
+    }
+    .selectize-control.single .selectize-input.disabled {
+        background: none;
+        border: none;
+        box-shadow: none;
+    }
+
+    #labels{
+        margin-right: 85px;
+    }
+
+    #editLabels{
+        margin-left: -10px;
+    }
+
 }
 
 #dialog-background.show {

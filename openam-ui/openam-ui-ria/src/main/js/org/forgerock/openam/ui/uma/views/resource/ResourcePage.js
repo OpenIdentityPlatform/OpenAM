@@ -57,6 +57,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
             "click button#share": "onShare",
             "click li#unshare": "onUnshare",
             "click button#editLabels": "editLabels",
+            "click .page-toolbar .selectize-input.disabled": "editLabels",
             "click button#saveLabels": "submitLabelsChanges",
             "click button#discardLabels": "discardLabelsChanges"
         },
@@ -88,7 +89,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                             EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "revokeAllPoliciesSuccess");
                             self.render();
                         }).fail(function (error) {
-                            Messages.messages.addMessage({ message: JSON.parse(error.responseText).message, type: "error"});
+                            Messages.addMessage({ response: error.responseText, type: Messages.TYPE_DANGER });
                         }).always(function () {
                             dialog.close();
                         });
@@ -114,7 +115,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
         },
         renderLabelsOptions: function () {
             var self = this,
-                labelsSelect = this.$el.find("#labels").selectize({
+                labelsSelect = this.$el.find("#labels select").selectize({
                     plugins: ["restore_on_backspace"],
                     delimiter: ",",
                     persist: false,
@@ -132,12 +133,12 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                     valueField: "name",
                     searchField: ["name"]
                 })[0];
-            labelsSelect.selectize.lock();
+            labelsSelect.selectize.disable();
             this.updateLabelOptions();
-            this.$el.find(".labels-container .btn-group").hide();
+            this.$el.find(".page-toolbar .btn-group").hide();
         },
         updateLabelOptions: function () {
-            var labelsSelectize = this.$el.find("#labels")[0].selectize;
+            var labelsSelectize = this.$el.find("#labels select")[0].selectize;
             labelsSelectize.clearOptions();
             labelsSelectize.addOption(this.allLabels);
             labelsSelectize.clear();
@@ -228,7 +229,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                         options: options
                     })[0];
 
-                    select.selectize.lock();
+                    select.selectize.disable();
 
                     /* This an extention of the original positionDropdown method within Selectize. The override is
                      * required because using the dropdownParent 'body' places the dropdown out of scope of the
@@ -273,20 +274,14 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                         name: "subject",
                         label: $.t("uma.resources.show.grid.0"),
                         cell: "string",
-                        editable: false,
-                        headerCell: BackgridUtils.ClassHeaderCell.extend({
-                            className: "col-md-4"
-                        })
+                        editable: false
                     },
                     {
                         name: "permissions",
                         label: $.t("uma.resources.show.grid.2"),
                         cell: SelectizeCell,
                         editable: false,
-                        sortable: false,
-                        headerCell: BackgridUtils.ClassHeaderCell.extend({
-                            className: "col-md-6"
-                        })
+                        sortable: false
                     },
                     {
                         name: "edit",
@@ -295,7 +290,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                         editable: false,
                         sortable: false,
                         headerCell: BackgridUtils.ClassHeaderCell.extend({
-                            className: "col-md-2"
+                            className: "col-btn"
                         })
                     }],
                 collection: collection,
@@ -332,26 +327,26 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
             });
         },
         deactivateLabels: function () {
-            this.$el.find(".labels-container .btn-group").hide();
+            this.$el.find(".page-toolbar .btn-group").hide();
             this.$el.find("#editLabels").show();
-            this.$el.find("#labels")[0].selectize.lock();
-            this.$el.find(".labels-container .selectize-control ").addClass("pull-left");
+            this.$el.find("#labels select")[0].selectize.disable();
+            this.$el.find("#labels .selectize-control").addClass("pull-left");
         },
         editLabels: function () {
-            var labelsSelect = this.$el.find("#labels")[0];
+            var labelsSelect = this.$el.find("#labels select")[0];
             this.data.labelsCopy = _.clone(labelsSelect.selectize.getValue());
-            labelsSelect.selectize.unlock();
+            labelsSelect.selectize.enable();
             labelsSelect.selectize.focus();
             this.$el.find("#editLabels").hide();
-            this.$el.find(".labels-container .selectize-control ").removeClass("pull-left");
+            this.$el.find("#labels .selectize-control").removeClass("pull-left");
             this.$el.find("button#saveLabels").prop("disabled", true);
             this.$el.find("button#discardLabels").prop("disabled", false);
-            this.$el.find(".labels-container .btn-group").show();
+            this.$el.find(".page-toolbar .btn-group").show();
 
         },
         submitLabelsChanges: function () {
             var self = this,
-                labelsSelectize = this.$el.find("#labels")[0].selectize,
+                labelsSelectize = this.$el.find("#labels select")[0].selectize,
                 selectedLabelNames = labelsSelectize.getValue(),
                 allLabelNames = _.pluck(this.allLabels, "name"),
                 newLabelNames = _.difference(selectedLabelNames, allLabelNames),
@@ -392,7 +387,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
             });
         },
         discardLabelsChanges: function () {
-            var labelsSelect = this.$el.find("#labels")[0];
+            var labelsSelect = this.$el.find("#labels select")[0];
             this.deactivateLabels();
             labelsSelect.selectize.clear();
             _.each(this.labels, function (val) {
