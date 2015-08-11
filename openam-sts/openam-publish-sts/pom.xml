@@ -48,6 +48,10 @@
             <artifactId>openam-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-rest</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
             <classifier>no_aop</classifier>

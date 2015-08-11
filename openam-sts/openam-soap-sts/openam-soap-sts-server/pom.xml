@@ -51,6 +51,14 @@
     <dependencies>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-audit-context</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-audit-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-common-sts</artifactId>
         </dependency>
         <dependency>
@@ -120,6 +128,10 @@
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
             <classifier>no_aop</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-assistedinject</artifactId>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>

@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.sts;
 
+import org.forgerock.openam.audit.context.AuditRequestContext;
+import org.forgerock.openam.audit.context.TransactionId;
 import org.forgerock.openam.utils.IOUtils;
 
 import javax.inject.Inject;
@@ -39,9 +41,16 @@ public class HttpURLConnectionWrapperFactory {
         private final HttpURLConnection httpURLConnection;
         private String requestPayload;
         private int expectedResponseCode = HttpURLConnection.HTTP_OK;
+        private boolean propagateTransactionId = true;
 
         private HttpURLConnectionWrapperImpl(URL url) throws IOException {
             httpURLConnection = httpURLConnectionFactory.getHttpURLConnection(url);
+        }
+
+        @Override
+        public HttpURLConnectionWrapper withoutAuditTransactionIdHeader() {
+            propagateTransactionId = false;
+            return this;
         }
 
         @Override
@@ -73,6 +82,12 @@ public class HttpURLConnectionWrapperFactory {
 
         @Override
         public ConnectionResult makeInvocation() throws IOException {
+
+            if (propagateTransactionId) {
+                httpURLConnection.setRequestProperty(
+                        TransactionId.HTTP_HEADER, AuditRequestContext.createSubTransactionIdValue());
+            }
+
             int responseCode;
             try {
                 if (requestPayload == null) {

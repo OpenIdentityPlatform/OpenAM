@@ -24,14 +24,15 @@ import org.testng.annotations.DataProvider;
 /**
  * @since 13.0.0
  */
-public class AuditFilterTest extends AbstractAuditFilterTest {
+public class AuditEndpointAuditFilterTest extends AbstractAuditFilterTest {
 
-    private AuditFilter auditFilter;
+    private AuditEndpointAuditFilter auditEndpointAuditFilter;
 
     @BeforeMethod
     protected void setUp() throws Exception {
         super.setUp();
-        auditFilter = new AuditFilter(mock(Debug.class), auditEventPublisher, auditEventFactory);
+        AuditFilter auditFilter = new AuditFilter(mock(Debug.class), auditEventPublisher, auditEventFactory);
+        auditEndpointAuditFilter = new AuditEndpointAuditFilter(auditFilter);
     }
 
     @SuppressWarnings("unchecked")
@@ -41,43 +42,37 @@ public class AuditFilterTest extends AbstractAuditFilterTest {
                 {new Runnable() {
                     @Override
                     public void run() {
-                        auditFilter.filterCreate(serverContext, createRequest, resultHandler, filterChain);
+                        auditEndpointAuditFilter.filterRead(serverContext, readRequest, resultHandler, filterChain);
                     }
                 }},
                 {new Runnable() {
                     @Override
                     public void run() {
-                        auditFilter.filterRead(serverContext, readRequest, resultHandler, filterChain);
+                        auditEndpointAuditFilter.filterUpdate(serverContext, updateRequest, resultHandler, filterChain);
                     }
                 }},
                 {new Runnable() {
                     @Override
                     public void run() {
-                        auditFilter.filterUpdate(serverContext, updateRequest, resultHandler, filterChain);
+                        auditEndpointAuditFilter.filterDelete(serverContext, deleteRequest, resultHandler, filterChain);
                     }
                 }},
                 {new Runnable() {
                     @Override
                     public void run() {
-                        auditFilter.filterDelete(serverContext, deleteRequest, resultHandler, filterChain);
+                        auditEndpointAuditFilter.filterPatch(serverContext, patchRequest, resultHandler, filterChain);
                     }
                 }},
                 {new Runnable() {
                     @Override
                     public void run() {
-                        auditFilter.filterPatch(serverContext, patchRequest, resultHandler, filterChain);
+                        auditEndpointAuditFilter.filterAction(serverContext, actionRequest, resultHandler, filterChain);
                     }
                 }},
                 {new Runnable() {
                     @Override
                     public void run() {
-                        auditFilter.filterAction(serverContext, actionRequest, resultHandler, filterChain);
-                    }
-                }},
-                {new Runnable() {
-                    @Override
-                    public void run() {
-                        auditFilter.filterQuery(serverContext, queryRequest, queryResultHandler, filterChain);
+                        auditEndpointAuditFilter.filterQuery(serverContext, queryRequest, queryResultHandler, filterChain);
                     }
                 }}
         };
@@ -86,6 +81,14 @@ public class AuditFilterTest extends AbstractAuditFilterTest {
     @SuppressWarnings("unchecked")
     @DataProvider(name = "unauditedCrudpaqOperations")
     public Object[][] unauditedCrudpaqOperations() throws IllegalAccessException, InstantiationException {
-        return new Object[][] { };
+        return new Object[][] {
+                {new Runnable() {
+                    @Override
+                    public void run() {
+                        auditEndpointAuditFilter.filterCreate(serverContext, createRequest, resultHandler, filterChain);
+                    }
+                }}
+        };
     }
+
 }

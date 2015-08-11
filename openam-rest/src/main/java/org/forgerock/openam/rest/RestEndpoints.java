@@ -25,6 +25,7 @@ import com.google.inject.Key;
 import com.google.inject.name.Names;
 import com.sun.identity.sm.InvalidRealmNameManager;
 import com.sun.identity.sm.SchemaType;
+import org.forgerock.audit.AuditService;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.RoutingMode;
 import org.forgerock.json.resource.VersionSelector;
@@ -60,6 +61,7 @@ import org.forgerock.openam.forgerockrest.entitlements.SubjectTypesResource;
 import org.forgerock.openam.forgerockrest.server.ServerInfoResource;
 import org.forgerock.openam.forgerockrest.session.SessionResource;
 import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
+import org.forgerock.openam.rest.authz.AgentOnlyAuthzModule;
 import org.forgerock.openam.rest.authz.CoreTokenResourceAuthzModule;
 import org.forgerock.openam.rest.authz.PrivilegeAuthzModule;
 import org.forgerock.openam.rest.authz.ResourceOwnerOrSuperUserAuthzModule;
@@ -68,6 +70,7 @@ import org.forgerock.openam.rest.batch.BatchResource;
 import org.forgerock.openam.rest.dashboard.DashboardResource;
 import org.forgerock.openam.rest.devices.OathDevicesResource;
 import org.forgerock.openam.rest.devices.TrustedDevicesResource;
+import org.forgerock.openam.rest.fluent.AuditEndpointAuditFilter;
 import org.forgerock.openam.rest.fluent.FluentAudit;
 import org.forgerock.openam.rest.fluent.FluentRealmRouter;
 import org.forgerock.openam.rest.fluent.FluentRouter;
@@ -365,11 +368,15 @@ public class RestEndpoints {
                 .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(InjectorHolder.getInstance(SmsServerPropertiesResource.class));
 
+        rootRealmRouter.route("/audit")
+                .auditAs(Component.AUDIT, AuditEndpointAuditFilter.class)
+                .through(AgentOnlyAuthzModule.class, AgentOnlyAuthzModule.NAME)
+                .forVersion("1.0").to(RoutingMode.STARTS_WITH, InjectorHolder.getInstance(AuditService.class));
+
         rootRealmRouter.route("/" + RecordConstants.RECORD_REST_ENDPOINT)
                 .auditAs(Component.RECORD)
                 .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
                 .forVersion("1.0").to(RecordResource.class);
-
 
         VersionBehaviourConfigListener.bindToServiceConfigManager(rootRealmRouter);
         VersionBehaviourConfigListener.bindToServiceConfigManager(dynamicRealmRouter);

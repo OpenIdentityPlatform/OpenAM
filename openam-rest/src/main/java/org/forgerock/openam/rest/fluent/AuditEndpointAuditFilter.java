@@ -29,62 +29,65 @@ import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.audit.AuditConstants.Component;
-import org.forgerock.openam.rest.resource.AuditInfoContext;
+
+import javax.inject.Inject;
 
 /**
  * This filter wrapper adds the audit context to the passed server context and delegates on the request.
  *
  * @since 13.0.0
  */
-public final class AuditFilterWrapper implements Filter {
+public final class AuditEndpointAuditFilter implements Filter {
 
-    private final Filter delegate;
-    private final Component component;
+    private final AuditFilter delegate;
 
     /**
+     * Guiced constructor.
      *
-     * @param delegate The filter wrapped by this object.
-     * @param component The component of the CREST endpoint this filter sits in front of.
+     * @param auditFilter AuditFilter to which auditing of read and query operations is delegated.
      */
-    public AuditFilterWrapper(Filter delegate, Component component) {
-        this.delegate = delegate;
-        this.component = component;
+    @Inject
+    public AuditEndpointAuditFilter(AuditFilter auditFilter) {
+        this.delegate = auditFilter;
     }
 
     @Override
     public void filterAction(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler, RequestHandler next) {
-        delegate.filterAction(new AuditInfoContext(context, component), request, handler, next);
+        delegate.filterAction(context, request, handler, next);
     }
 
     @Override
     public void filterCreate(ServerContext context, CreateRequest request, ResultHandler<Resource> handler, RequestHandler next) {
-        delegate.filterCreate(new AuditInfoContext(context, component), request, handler, next);
+        // skip delegate to avoid auditing calls to log audit events
+        next.handleCreate(context, request, handler);
     }
 
     @Override
     public void filterDelete(ServerContext context, DeleteRequest request, ResultHandler<Resource> handler, RequestHandler next) {
-        delegate.filterDelete(new AuditInfoContext(context, component), request, handler, next);
+        // audit service does not support delete; therefore, any calls to delete should be audited.
+        delegate.filterDelete(context, request, handler, next);
     }
 
     @Override
     public void filterPatch(ServerContext context, PatchRequest request, ResultHandler<Resource> handler, RequestHandler next) {
-        delegate.filterPatch(new AuditInfoContext(context, component), request, handler, next);
+        // audit service does not support patch; therefore, any calls to patch should be audited.
+        delegate.filterPatch(context, request, handler, next);
     }
 
     @Override
     public void filterQuery(ServerContext context, QueryRequest request, QueryResultHandler handler, RequestHandler next) {
-        delegate.filterQuery(new AuditInfoContext(context, component), request, handler, next);
+        delegate.filterQuery(context, request, handler, next);
     }
 
     @Override
     public void filterRead(ServerContext context, ReadRequest request, ResultHandler<Resource> handler, RequestHandler next) {
-        delegate.filterRead(new AuditInfoContext(context, component), request, handler, next);
+        delegate.filterRead(context, request, handler, next);
     }
 
     @Override
     public void filterUpdate(ServerContext context, UpdateRequest request, ResultHandler<Resource> handler, RequestHandler next) {
-        delegate.filterUpdate(new AuditInfoContext(context, component), request, handler, next);
+        // audit service does not support update; therefore, any calls to update should be audited.
+        delegate.filterUpdate(context, request, handler, next);
     }
 
 }

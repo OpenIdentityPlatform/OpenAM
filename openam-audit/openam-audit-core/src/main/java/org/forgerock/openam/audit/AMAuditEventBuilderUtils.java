@@ -32,7 +32,7 @@ import org.forgerock.json.fluent.JsonValue;
  */
 public final class AMAuditEventBuilderUtils {
 
-    private static Debug debug = Debug.getInstance("amAudit");
+    private static Debug debug = Debug.getInstance(AuditConstants.DEBUG_NAME);
 
     private static final String COMPONENT = "component";
     private static final String EXTRA_INFO = "extraInfo";

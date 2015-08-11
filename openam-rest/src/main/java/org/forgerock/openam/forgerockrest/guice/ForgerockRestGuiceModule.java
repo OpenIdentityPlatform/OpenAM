@@ -77,10 +77,10 @@ import org.forgerock.openam.forgerockrest.entitlements.PolicyResource;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyStoreProvider;
 import org.forgerock.openam.forgerockrest.entitlements.PrivilegePolicyStoreProvider;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
+import org.forgerock.openam.forgerockrest.utils.AgentIdentity;
+import org.forgerock.openam.forgerockrest.utils.AgentIdentityImpl;
 import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.forgerockrest.utils.RestLog;
-import org.forgerock.openam.forgerockrest.utils.SoapSTSAgentIdentity;
-import org.forgerock.openam.forgerockrest.utils.SoapSTSAgentIdentityImpl;
 import org.forgerock.openam.forgerockrest.utils.SpecialUserIdentity;
 import org.forgerock.openam.forgerockrest.utils.SpecialUserIdentityImpl;
 import org.forgerock.openam.rest.RestEndpointServlet;
@@ -183,8 +183,8 @@ public class ForgerockRestGuiceModule extends AbstractModule {
 
         bind(DebugRecorder.class).to(DefaultDebugRecorder.class);
         bind(UmaPolicyService.class).to(UmaPolicyServiceImpl.class);
-        bind(SoapSTSAgentIdentity.class).to(SoapSTSAgentIdentityImpl.class);
         bind(SpecialUserIdentity.class).to(SpecialUserIdentityImpl.class);
+        bind(AgentIdentity.class).to(AgentIdentityImpl.class);
 
         Multibinder.newSetBinder(binder(), IdRepoCreationListener.class)
                 .addBinding().to(UmaIdRepoCreationListener.class);

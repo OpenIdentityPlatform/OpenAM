@@ -9,18 +9,17 @@
  * When distributing Covered Software, include this CDDL Header Notice in each file and include
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
- * information: "Portions Copyrighted [year] [name of copyright owner]".
+ * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
  */
-
 package org.forgerock.openam.rest.authz;
 
-import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.authz.filter.api.AuthorizationResult;
+import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
@@ -31,9 +30,7 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.utils.AgentIdentity;
-import org.forgerock.openam.forgerockrest.utils.SpecialUserIdentity;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
-import org.forgerock.openam.utils.Config;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 
@@ -42,20 +39,21 @@ import javax.inject.Named;
 import java.net.HttpURLConnection;
 
 /**
- * This CrestAuthorizationModule protects the token generation service. It limits consumption to action invocations
- * made only by SSOTokens corresponding to the 'special' user (to authZ rest-sts consumption), and corresponding to
- * Soap STS agents (to authZ soap-sts consumption), and to Admins. Used to protect the STS' token service.
+ * Authorization module that only grants access to agents (e.g. web agent, J2EE agent, SOAP STS).
+ *
+ * @since 13.0.0
  */
-public class STSTokenGenerationServiceAuthzModule extends SpecialAndAdminUserOnlyAuthzModule  {
-    public static final String NAME = "STSTokenGenerationServiceAuthzModule";
+public class AgentOnlyAuthzModule implements CrestAuthorizationModule {
 
-    private final AgentIdentity agentIdentity;
+    public static final String NAME = "AgentOnlyFilter";
+
+    protected final AgentIdentity agentIdentity;
+    protected final Debug debug;
 
     @Inject
-    public STSTokenGenerationServiceAuthzModule(Config<SessionService> sessionService, AgentIdentity agentIdentity,
-                                                SpecialUserIdentity specialUserIdentity, @Named("frRest") Debug debug) {
-        super(sessionService, specialUserIdentity, debug);
+    public AgentOnlyAuthzModule(AgentIdentity agentIdentity, @Named("frRest") Debug debug) {
         this.agentIdentity = agentIdentity;
+        this.debug = debug;
     }
 
     @Override
@@ -70,7 +68,7 @@ public class STSTokenGenerationServiceAuthzModule extends SpecialAndAdminUserOnl
 
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeUpdate(ServerContext context, UpdateRequest request) {
-        return rejectConsumption();
+        return authorize(context);
     }
 
     @Override
@@ -80,12 +78,12 @@ public class STSTokenGenerationServiceAuthzModule extends SpecialAndAdminUserOnl
 
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizePatch(ServerContext context, PatchRequest request) {
-        return rejectConsumption();
+        return authorize(context);
     }
 
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeAction(ServerContext context, ActionRequest request) {
-        return rejectConsumption();
+        return authorize(context);
     }
 
     @Override
@@ -93,34 +91,29 @@ public class STSTokenGenerationServiceAuthzModule extends SpecialAndAdminUserOnl
         return authorize(context);
     }
 
-    private Promise<AuthorizationResult, ResourceException> rejectConsumption() {
-        return Promises.newResultPromise(AuthorizationResult.accessDenied("TokenGenerationServiceAuthzModule: " +
-                "invoked functionality is not authorized for any user."));
-    }
-
-    @Override
-    protected Promise<AuthorizationResult, ResourceException> authorize(ServerContext context) {
+    private Promise<AuthorizationResult, ResourceException> authorize(ServerContext context) {
         SSOTokenContext tokenContext = context.asContext(SSOTokenContext.class);
         String userId;
-        SSOToken token;
         try {
-            token = tokenContext.getCallerSSOToken();
+            SSOToken token = tokenContext.getCallerSSOToken();
             userId = token.getPrincipal().getName();
+            if (agentIdentity.isAgent(token)) {
+                if (debug.messageEnabled()) {
+                    debug.message("AgentOnlyAuthzModule :: User, " + userId + " accepted as Agent user.");
+                }
+                return Promises.newResultPromise(AuthorizationResult.accessPermitted());
+            } else {
+                if (debug.warningEnabled()) {
+                    debug.warning("AgentUserOnlyAuthzModule :: Denied access to " + userId);
+                }
+                return Promises.newResultPromise(AuthorizationResult.accessDenied("User is not an Agent."));
+            }
         } catch (SSOException e) {
             if (debug.messageEnabled()) {
-                debug.message("TokenGenerationServiceAuthzModule :: Unable to obtain SSOToken or principal", e);
+                debug.message("AgentOnlyAuthzModule :: Unable to authorize as Agent user using SSO Token.", e);
             }
             return Promises.newExceptionPromise(ResourceException
                     .getException(HttpURLConnection.HTTP_UNAUTHORIZED, e.getMessage(), e));
-        }
-
-        if (agentIdentity.isSoapSTSAgent(token)) {
-            if (debug.messageEnabled()) {
-                debug.message("TokenGenerationServiceAuthzModule :: User, " + userId + " accepted as Soap STS Agent.");
-            }
-            return Promises.newResultPromise(AuthorizationResult.accessPermitted());
-        } else {
-            return super.authorize(context);
         }
     }
 }

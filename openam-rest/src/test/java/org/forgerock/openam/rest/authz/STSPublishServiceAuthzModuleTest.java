@@ -35,7 +35,7 @@ import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.forgerockrest.utils.SoapSTSAgentIdentity;
+import org.forgerock.openam.forgerockrest.utils.AgentIdentity;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.promise.Promise;
@@ -53,7 +53,7 @@ public class STSPublishServiceAuthzModuleTest {
     @Mock
     private SessionService mockService;
     @Mock
-    private SoapSTSAgentIdentity mockAgentIdentity;
+    private AgentIdentity mockAgentIdentity;
     @Mock
     private CreateRequest mockCreateRequest;
     @Mock

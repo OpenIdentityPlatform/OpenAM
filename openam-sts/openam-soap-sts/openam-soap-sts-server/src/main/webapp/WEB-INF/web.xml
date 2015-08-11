@@ -21,6 +21,25 @@
     <listener>
         <listener-class>org.forgerock.openam.sts.soap.bootstrap.SoapSTSContextListener</listener-class>
     </listener>
+
+    <filter>
+        <filter-name>audit_context_filter</filter-name>
+        <filter-class>org.forgerock.openam.audit.context.AuditContextFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>audit_context_filter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>audit_access_filter</filter-name>
+        <filter-class>org.forgerock.openam.sts.soap.audit.AuditAccessFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>audit_access_filter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
     <!--
     Non-spring-based CXF requires a subclass of the CXFNonSpringServlet to be the servlet serving the non-spring
      web-services.

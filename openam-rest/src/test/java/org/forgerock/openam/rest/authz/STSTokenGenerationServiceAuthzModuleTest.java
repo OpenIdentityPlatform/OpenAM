@@ -34,7 +34,7 @@ import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.forgerockrest.utils.SoapSTSAgentIdentity;
+import org.forgerock.openam.forgerockrest.utils.AgentIdentity;
 import org.forgerock.openam.forgerockrest.utils.SpecialUserIdentity;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.Config;
@@ -49,7 +49,7 @@ import java.util.concurrent.ExecutionException;
 
 public class STSTokenGenerationServiceAuthzModuleTest {
     @Mock
-    private SoapSTSAgentIdentity mockSoapSTSAgentIdentity;
+    private AgentIdentity mockAgentIdentity;
     @Mock
     private SSOToken mockSSOToken;
     @Mock
@@ -85,7 +85,7 @@ public class STSTokenGenerationServiceAuthzModuleTest {
     @BeforeTest
     public void setup() throws SSOException {
         MockitoAnnotations.initMocks(this);
-        authzModule = new STSTokenGenerationServiceAuthzModule(mockConfig, mockSoapSTSAgentIdentity, mockSpecialUserIdentity, mockDebug);
+        authzModule = new STSTokenGenerationServiceAuthzModule(mockConfig, mockAgentIdentity, mockSpecialUserIdentity, mockDebug);
         given(mockSSOTokenContext.getCallerSSOToken()).willReturn(mockSSOToken);
         given(mockSSOToken.getPrincipal()).willReturn(mockPrincipal);
         given(mockPrincipal.getName()).willReturn("irrelevant");
@@ -95,7 +95,7 @@ public class STSTokenGenerationServiceAuthzModuleTest {
     @Test
     public void testCreateSTSAgentSuccess() throws ExecutionException, InterruptedException, SSOException {
         //given
-        given(mockSoapSTSAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(true);
+        given(mockAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(true);
         given(mockSpecialUserIdentity.isSpecialUser(mockSSOToken)).willReturn(false);
         //when
         Promise<AuthorizationResult, ResourceException> result = authzModule.authorizeCreate(mockSSOTokenContext,
@@ -107,7 +107,7 @@ public class STSTokenGenerationServiceAuthzModuleTest {
     @Test
     public void testCreateSpecialUserSuccess() throws ExecutionException, InterruptedException {
         //given
-        given(mockSoapSTSAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(false);
+        given(mockAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(false);
         given(mockSpecialUserIdentity.isSpecialUser(mockSSOToken)).willReturn(true);
         //when
         Promise<AuthorizationResult, ResourceException> result = authzModule.authorizeCreate(mockSSOTokenContext,
@@ -119,7 +119,7 @@ public class STSTokenGenerationServiceAuthzModuleTest {
     @Test
     public void testCreateAdminUserSuccess() throws ExecutionException, InterruptedException, SSOException {
         //given
-        given(mockSoapSTSAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(false);
+        given(mockAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(false);
         given(mockSpecialUserIdentity.isSpecialUser(mockSSOToken)).willReturn(false);
         given(mockSSOToken.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("test");
         given(mockSessionService.isSuperUser("test")).willReturn(true);
@@ -133,7 +133,7 @@ public class STSTokenGenerationServiceAuthzModuleTest {
     @Test
     public void testReadSTSAgentSuccess() throws ExecutionException, InterruptedException, SSOException {
         //given
-        given(mockSoapSTSAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(true);
+        given(mockAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(true);
         given(mockSpecialUserIdentity.isSpecialUser(mockSSOToken)).willReturn(false);
         //when
         Promise<AuthorizationResult, ResourceException> result = authzModule.authorizeRead(mockSSOTokenContext,
@@ -145,7 +145,7 @@ public class STSTokenGenerationServiceAuthzModuleTest {
     @Test
     public void testReadSpecialUserSuccess() throws ExecutionException, InterruptedException {
         //given
-        given(mockSoapSTSAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(false);
+        given(mockAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(false);
         given(mockSpecialUserIdentity.isSpecialUser(mockSSOToken)).willReturn(true);
         //when
         Promise<AuthorizationResult, ResourceException> result = authzModule.authorizeRead(mockSSOTokenContext,
@@ -157,7 +157,7 @@ public class STSTokenGenerationServiceAuthzModuleTest {
     @Test
     public void testReadAdminUserSuccess() throws ExecutionException, InterruptedException, SSOException {
         //given
-        given(mockSoapSTSAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(false);
+        given(mockAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(false);
         given(mockSpecialUserIdentity.isSpecialUser(mockSSOToken)).willReturn(false);
         given(mockSSOToken.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("test");
         given(mockSessionService.isSuperUser("test")).willReturn(true);
@@ -171,7 +171,7 @@ public class STSTokenGenerationServiceAuthzModuleTest {
     @Test
     public void testDeleteSTSAgentSuccess() throws ExecutionException, InterruptedException, SSOException {
         //given
-        given(mockSoapSTSAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(true);
+        given(mockAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(true);
         given(mockSpecialUserIdentity.isSpecialUser(mockSSOToken)).willReturn(false);
         //when
         Promise<AuthorizationResult, ResourceException> result = authzModule.authorizeDelete(mockSSOTokenContext,
@@ -183,7 +183,7 @@ public class STSTokenGenerationServiceAuthzModuleTest {
     @Test
     public void testDeleteSpecialUserSuccess() throws ExecutionException, InterruptedException {
         //given
-        given(mockSoapSTSAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(false);
+        given(mockAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(false);
         given(mockSpecialUserIdentity.isSpecialUser(mockSSOToken)).willReturn(true);
         //when
         Promise<AuthorizationResult, ResourceException> result = authzModule.authorizeDelete(mockSSOTokenContext,
@@ -195,7 +195,7 @@ public class STSTokenGenerationServiceAuthzModuleTest {
     @Test
     public void testDeleteAdminUserSuccess() throws ExecutionException, InterruptedException, SSOException {
         //given
-        given(mockSoapSTSAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(false);
+        given(mockAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(false);
         given(mockSpecialUserIdentity.isSpecialUser(mockSSOToken)).willReturn(false);
         given(mockSSOToken.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("test");
         given(mockSessionService.isSuperUser("test")).willReturn(true);
@@ -209,7 +209,7 @@ public class STSTokenGenerationServiceAuthzModuleTest {
     @Test
     public void testQuerySTSAgentSuccess() throws ExecutionException, InterruptedException, SSOException {
         //given
-        given(mockSoapSTSAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(true);
+        given(mockAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(true);
         given(mockSpecialUserIdentity.isSpecialUser(mockSSOToken)).willReturn(false);
         //when
         Promise<AuthorizationResult, ResourceException> result = authzModule.authorizeQuery(mockSSOTokenContext,
@@ -221,7 +221,7 @@ public class STSTokenGenerationServiceAuthzModuleTest {
     @Test
     public void testQuerySpecialUserSuccess() throws ExecutionException, InterruptedException {
         //given
-        given(mockSoapSTSAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(false);
+        given(mockAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(false);
         given(mockSpecialUserIdentity.isSpecialUser(mockSSOToken)).willReturn(true);
         //when
         Promise<AuthorizationResult, ResourceException> result = authzModule.authorizeQuery(mockSSOTokenContext,
@@ -233,7 +233,7 @@ public class STSTokenGenerationServiceAuthzModuleTest {
     @Test
     public void testQueryAdminUserSuccess() throws ExecutionException, InterruptedException, SSOException {
         //given
-        given(mockSoapSTSAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(false);
+        given(mockAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(false);
         given(mockSpecialUserIdentity.isSpecialUser(mockSSOToken)).willReturn(false);
         given(mockSSOToken.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("test");
         given(mockSessionService.isSuperUser("test")).willReturn(true);
@@ -247,7 +247,7 @@ public class STSTokenGenerationServiceAuthzModuleTest {
     @Test
     public void testNoAuthz() throws ExecutionException, InterruptedException, SSOException {
         //given
-        given(mockSoapSTSAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(false);
+        given(mockAgentIdentity.isSoapSTSAgent(mockSSOToken)).willReturn(false);
         given(mockSpecialUserIdentity.isSpecialUser(mockSSOToken)).willReturn(false);
         given(mockSSOToken.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("test");
         given(mockSessionService.isSuperUser("test")).willReturn(false);

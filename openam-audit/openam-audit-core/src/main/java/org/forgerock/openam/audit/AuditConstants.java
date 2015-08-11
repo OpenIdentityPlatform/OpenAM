@@ -67,8 +67,9 @@ public final class AuditConstants {
         SCRIPT("Script"),
         BATCH("Batch"),
         CONFIG("Config"),
+        STS("STS"),
         RECORD("Record"),
-        STS("STS");
+        AUDIT("Audit");
 
         private final String name;
 
@@ -98,11 +99,15 @@ public final class AuditConstants {
     public static final String CSV = "csv";
 
     /**
+     * Name of the {@link com.sun.identity.shared.debug.Debug} instance.
+     */
+    public static final String DEBUG_NAME = "amAudit";
+
+    /**
      * Names of fields on an audit events.
      */
     public static final String USER_ID = AUTHENTICATION + "." + ID;
     public static final String CONTEXT_ID = "contextId";
-
 
     private AuditConstants() {
         // Prevent instantiation

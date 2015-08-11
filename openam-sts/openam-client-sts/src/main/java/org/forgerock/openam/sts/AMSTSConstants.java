@@ -108,6 +108,16 @@ public class AMSTSConstants {
     public static final String REST_ID_FROM_SESSION_URI_ELEMENT = "am_rest_id_from_session";
 
     /*
+    Used in conjunction with a @Named annotation to inject the AM create access audit event uri element string.
+     */
+    public static final String REST_CREATE_ACCESS_AUDIT_EVENT_URI_ELEMENT = "am_rest_create_access_audit_event";
+
+    /*
+    Used in conjunction with a @Named annotation to inject the AM create access audit event URL.
+     */
+    public static final String REST_CREATE_ACCESS_AUDIT_EVENT_URL = "am_rest_create_access_audit_event_url";
+
+    /*
     Used in conjunction with a @Named annotation to inject the AM rest token generation service uri element string.
      */
     public static final String REST_TOKEN_GENERATION_SERVICE_URI_ELEMENT = "am_rest_token_gen_service";
@@ -413,6 +423,11 @@ public class AMSTSConstants {
      * Used in context of a @Named annotation to identify the String identifying the version of targeted CREST services.
      */
     public static final String CREST_VERSION_AGENTS_PROFILE_SERVICE = "crest_version_agents_profile_service";
+
+    /**
+     * Used in context of a @Named annotation to identify the String identifying the version of targeted CREST services.
+     */
+    public static final String CREST_VERSION_AUDIT_SERVICE = "crest_version_audit_service";
 
     /**
      * Used in context of a @Named annotation to specify the Set of TokenTypes for which token validators are plugged-into

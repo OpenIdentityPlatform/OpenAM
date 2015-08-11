@@ -44,7 +44,7 @@ import javax.inject.Named;
  *
  * @since 13.0.0
  */
-class AuditFilter implements Filter {
+public class AuditFilter implements Filter {
 
     private final Debug debug;
     private final AuditEventPublisher auditEventPublisher;

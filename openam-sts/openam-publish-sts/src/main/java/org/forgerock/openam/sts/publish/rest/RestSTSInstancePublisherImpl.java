@@ -16,13 +16,22 @@
 
 package org.forgerock.openam.sts.publish.rest;
 
+import static org.forgerock.openam.audit.AuditConstants.Component.STS;
+
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.sm.ServiceListener;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.json.resource.FilterChain;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.Route;
 import org.forgerock.json.resource.Router;
+import org.forgerock.json.resource.RoutingMode;
+import org.forgerock.openam.audit.AuditConstants;
+import org.forgerock.openam.rest.fluent.AuditFilter;
+import org.forgerock.openam.rest.fluent.AuditFilterWrapper;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.DeploymentPathNormalization;
 import org.forgerock.openam.sts.STSInitializationException;
@@ -116,7 +125,12 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
             throw new STSPublishException(ResourceException.CONFLICT, "A rest-sts instance at sub-path " +
                     deploymentSubPath + " has already been published.");
         }
-        Route route = router.addRoute(deploymentSubPath, new RestSTSService(restSTSInstance, logger));
+        // Use InjectorHolder to lookup AuditFilter as Guice struggles to inject it
+        AuditFilter auditFilter = InjectorHolder.getInstance(AuditFilter.class);
+        FilterChain auditedRestSTSService = new FilterChain(
+                Resources.newSingleton(new RestSTSService(restSTSInstance, logger)),
+                new AuditFilterWrapper(auditFilter, STS));
+        Route route = router.addRoute(RoutingMode.EQUALS, deploymentSubPath, auditedRestSTSService);
         /*
         Need to persist the published Route instance as it is necessary for router removal.
          */

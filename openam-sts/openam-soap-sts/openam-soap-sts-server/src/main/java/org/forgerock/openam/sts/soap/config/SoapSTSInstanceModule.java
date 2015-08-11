@@ -38,8 +38,6 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.token.UsernameToken;
-import org.forgerock.openam.sts.DefaultHttpURLConnectionFactory;
-import org.forgerock.openam.sts.HttpURLConnectionFactory;
 import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.XMLUtilities;
@@ -66,7 +64,6 @@ import org.forgerock.openam.sts.token.AMTokenParserImpl;
 import org.forgerock.openam.sts.token.CTSTokenIdGenerator;
 import org.forgerock.openam.sts.token.CTSTokenIdGeneratorImpl;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
-import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
 import org.forgerock.openam.sts.token.provider.AMSessionInvalidator;
 import org.forgerock.openam.sts.token.provider.AMSessionInvalidatorImpl;
 import org.forgerock.openam.sts.token.provider.TokenServiceConsumer;
@@ -146,7 +143,6 @@ public class SoapSTSInstanceModule extends AbstractModule {
         bind the class defining the core STS functionality - necessary for its dependencies to be injected
          */
         bind(SecurityTokenServiceProvider.class).to(STSEndpoint.class);
-        bind(UrlConstituentCatenator.class).to(UrlConstituentCatenatorImpl.class);
 
         /*
         Bind the client class used to speak to the TokenGenerationService
@@ -158,12 +154,6 @@ public class SoapSTSInstanceModule extends AbstractModule {
         directly.
          */
         bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
-
-        /*
-        Bind the class responsible for producing HttpURLConnectionWrapper instances, and the HttpURLConnectionFactory it consumes
-         */
-        bind(HttpURLConnectionFactory.class).to(DefaultHttpURLConnectionFactory.class).in(Scopes.SINGLETON);
-        bind(HttpURLConnectionWrapperFactory.class).in(Scopes.SINGLETON);
 
         /*
         Bind the Provider responsible for providing the List<TokenDelegationHandler> required by the IssueOperation.

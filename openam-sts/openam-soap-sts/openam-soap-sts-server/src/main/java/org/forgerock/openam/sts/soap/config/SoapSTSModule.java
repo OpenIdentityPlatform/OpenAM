@@ -21,11 +21,15 @@ import com.google.inject.Key;
 import com.google.inject.PrivateModule;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.DefaultHttpURLConnectionFactory;
 import org.forgerock.openam.sts.HttpURLConnectionFactory;
 import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
+import org.forgerock.openam.sts.soap.audit.AuditableHttpServletResponse;
+import org.forgerock.openam.sts.soap.audit.Auditor;
+import org.forgerock.openam.sts.soap.audit.AuditorFactory;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAgentConfigAccess;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAgentConfigAccessImpl;
 import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAgentCredentialsAccess;
@@ -49,12 +53,15 @@ import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSessionImpl;
+import org.forgerock.util.time.TimeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -85,8 +92,10 @@ public class SoapSTSModule extends PrivateModule {
     protected void configure() {
         bind(SoapSTSInstanceLifecycleManager.class).to(SoapSTSInstanceLifecycleManagerImpl.class).in(Scopes.SINGLETON);
         bind(SoapSTSInstancePublisher.class).to(SoapSTSInstancePublisherImpl.class).in(Scopes.SINGLETON);
-        bind(HttpURLConnectionFactory.class).to(DefaultHttpURLConnectionFactory.class).in(Scopes.SINGLETON);
-        bind(HttpURLConnectionWrapperFactory.class).in(Scopes.SINGLETON);
+        bind(HttpURLConnectionFactory.class).to(DefaultHttpURLConnectionFactory.class);
+        bind(HttpURLConnectionWrapperFactory.class);
+        expose(HttpURLConnectionFactory.class);
+        expose(HttpURLConnectionWrapperFactory.class);
         bind(PublishServiceConsumer.class).to(PublishServiceConsumerImpl.class).in(Scopes.SINGLETON);
         bind(AMTokenParser.class).to(AMTokenParserImpl.class).in(Scopes.SINGLETON);
         bind(SoapSTSAccessTokenProvider.class).to(SoapSTSAccessTokenProviderImpl.class);
@@ -94,6 +103,7 @@ public class SoapSTSModule extends PrivateModule {
         expose(SoapSTSAccessTokenProvider.class);
 
         bind(UrlConstituentCatenator.class).to(UrlConstituentCatenatorImpl.class);
+        expose(UrlConstituentCatenator.class);
         bind(SoapSTSAgentConfigAccess.class).to(SoapSTSAgentConfigAccessImpl.class).in(Scopes.SINGLETON);
         bind(SoapSTSLifecycle.class).to(SoapSTSLifecycleImpl.class).in(Scopes.SINGLETON);
         // Expose as the STSBroker needs to reference this class to kick off the soap-sts bootstrap process.
@@ -133,6 +143,12 @@ public class SoapSTSModule extends PrivateModule {
         expose(ThreadLocalAMTokenCache.class);
         bind(PrincipalFromSession.class).to(PrincipalFromSessionImpl.class).in(Scopes.SINGLETON);
         expose(PrincipalFromSession.class);
+
+        install(new FactoryModuleBuilder().implement(Auditor.class, Auditor.class).build(AuditorFactory.class));
+        expose(AuditorFactory.class);
+
+        bind(TimeService.class).toInstance(TimeService.SYSTEM);
+        expose(TimeService.class);
     }
 
     @Provides
@@ -204,6 +220,26 @@ public class SoapSTSModule extends PrivateModule {
 
     @Provides
     @Singleton
+    @Named (AMSTSConstants.REST_CREATE_ACCESS_AUDIT_EVENT_URI_ELEMENT)
+    @Exposed
+    String restAMAuditUriElement() {
+        return "/audit/access/?_action=create";
+    }
+
+    @Inject
+    @Provides
+    @Singleton
+    @Named (AMSTSConstants.REST_CREATE_ACCESS_AUDIT_EVENT_URL)
+    @Exposed
+    String restAMAuditUriElement(UrlConstituentCatenator urlConstituentCatenator,
+                                 @Named(SoapSTSModule.OPENAM_HOME_SERVER_PROPERTY_KEY) String openamUrl,
+                                 @Named(AMSTSConstants.AM_REST_AUTHN_JSON_ROOT) String jsonRoot,
+                                 @Named(AMSTSConstants.REST_CREATE_ACCESS_AUDIT_EVENT_URI_ELEMENT) String auditServiceUriElement) {
+        return urlConstituentCatenator.catenateUrlConstituents(openamUrl, jsonRoot, auditServiceUriElement);
+    }
+
+    @Provides
+    @Singleton
     @Named(AMSTSConstants.CREST_VERSION_SESSION_SERVICE)
     @Exposed
     String getSessionServiceVersion() {
@@ -248,6 +284,14 @@ public class SoapSTSModule extends PrivateModule {
     @Exposed
     String getAgentsProfileServiceVersion() {
         return "protocol=1.0, resource=2.0";
+    }
+
+    @Provides
+    @Singleton
+    @Named(AMSTSConstants.CREST_VERSION_AUDIT_SERVICE)
+    @Exposed
+    String getAuditServiceVersion() {
+        return "protocol=1.0, resource=1.0";
     }
 
     @Provides

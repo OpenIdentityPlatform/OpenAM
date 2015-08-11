@@ -51,32 +51,38 @@ public interface HttpURLConnectionWrapper {
     }
 
     /**
+     * Provides a means of disabling automatic propagation of the audit transaction ID.
+     * @return The HttpURLConnectionWrapper to support fluent idiom
+     */
+    HttpURLConnectionWrapper withoutAuditTransactionIdHeader();
+
+    /**
      * Set the response code expected from the connection. Defaults to 200.
      * @param responseCode The expected response code.
      * @return The HttpURLConnectionWrapper to support fluent idiom
      */
-    public HttpURLConnectionWrapper setExpectedResponseCode(int responseCode);
+    HttpURLConnectionWrapper setExpectedResponseCode(int responseCode);
 
     /**
      * @param headers The set of headers to be included in the request.
      * @return The HttpURLConnectionWrapper to support fluent idiom
      */
-    public HttpURLConnectionWrapper setRequestHeaders(Map<String, String> headers);
+    HttpURLConnectionWrapper setRequestHeaders(Map<String, String> headers);
 
     /**
      * @param requestMethod set the desired request method (GET, POST, etc).
      * @return The HttpURLConnectionWrapper to support fluent idiom
      */
-    public HttpURLConnectionWrapper setRequestMethod(String requestMethod) throws ProtocolException;
+    HttpURLConnectionWrapper setRequestMethod(String requestMethod) throws ProtocolException;
 
     /**
      * @param requestPayload the payload to be sent
      * @return The HttpURLConnectionWrapper to support fluent idiom
      */
-    public HttpURLConnectionWrapper setRequestPayload(String requestPayload);
+    HttpURLConnectionWrapper setRequestPayload(String requestPayload);
 
     /**
      * @return The ConnectionResult encapsulating the returned statusCode and the input or error stream contents.
      */
-    public ConnectionResult makeInvocation() throws IOException;
+    ConnectionResult makeInvocation() throws IOException;
 }

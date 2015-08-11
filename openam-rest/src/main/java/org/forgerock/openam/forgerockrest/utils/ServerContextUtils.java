@@ -31,6 +31,7 @@ import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.RouterContext;
+import org.forgerock.json.resource.SecurityContext;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.servlet.HttpContext;
@@ -62,7 +63,12 @@ public class ServerContextUtils {
         SSOToken userToken = null;
 
         if (!context.containsContext(SSOTokenContext.class)) {
-            context = new SSOTokenContext(context);
+            if (!context.containsContext(SecurityContext.class)) {
+                debug.message("No security context found from which caller's SSOToken could be retrieved.");
+                return null;
+            } else {
+                context = new SSOTokenContext(context);
+            }
         }
 
         SSOTokenContext ssoTokenContext = context.asContext(SSOTokenContext.class);

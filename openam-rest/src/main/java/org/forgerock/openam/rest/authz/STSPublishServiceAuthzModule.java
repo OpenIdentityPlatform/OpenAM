@@ -30,7 +30,7 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.forgerockrest.utils.SoapSTSAgentIdentity;
+import org.forgerock.openam.forgerockrest.utils.AgentIdentity;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.promise.Promise;
@@ -46,10 +46,10 @@ import java.net.HttpURLConnection;
  */
 public class STSPublishServiceAuthzModule extends AdminOnlyAuthzModule {
     public static final String NAME = "STSPublishServiceAuthzModule";
-    private final SoapSTSAgentIdentity agentIdentity;
+    private final AgentIdentity agentIdentity;
 
     @Inject
-    public STSPublishServiceAuthzModule(Config<SessionService> sessionService, SoapSTSAgentIdentity agentIdentity,
+    public STSPublishServiceAuthzModule(Config<SessionService> sessionService, AgentIdentity agentIdentity,
                                         @Named("frRest") Debug debug) {
         super(sessionService, debug);
         this.agentIdentity = agentIdentity;
