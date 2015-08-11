@@ -212,7 +212,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                 className: "selectize-cell",
                 template: "templates/uma/backgrid/cell/SelectizeCell.html",
                 render: function() {
-                    var items = self.model.get("scopes").pluck("name"),
+                    var items = this.model.get("scopes").pluck("name"),
                         select;
 
                     this.$el.html(UIUtils.fillTemplateWithData(this.template));
