@@ -58,6 +58,7 @@ public class ExcludedServicesFactory {
 
         excludedServices.remove(SmsRequestHandler.IDFF_METADATA_SERVICE);
         excludedServices.remove(ISAuthConstants.AUTHCONFIG_SERVICE_NAME);
+        excludedServices.remove("iPlanetAMAuthScriptedService");
         excludedServices.remove("iPlanetAMAuthDeviceIdMatchService");
 
         if (type == SchemaType.GLOBAL) {

@@ -393,7 +393,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
         ServiceSchema dynamicSchema = ssm.getDynamicSchema();
         if (schemaType == SchemaType.GLOBAL) {
             ServiceSchema globalSchema = ssm.getGlobalSchema();
-            if (globalSchema != null) {
+            if (hasGlobalSchema(globalSchema)) {
                 debug.message("Adding global schema REST SMS endpoints for service: {}", serviceName);
                 addGlobalPaths(resourceName, new ArrayList<ServiceSchema>(), globalSchema, organizationSchema, dynamicSchema, routes, DEFAULT_IGNORED_ROUTES, null);
             } else if (organizationSchema != null) {
@@ -410,6 +410,12 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
             }
         }
         return routes;
+    }
+
+    private boolean hasGlobalSchema(ServiceSchema globalSchema) throws SMSException {
+        return globalSchema != null
+                && !globalSchema.getAttributeSchemaNames().isEmpty()
+                && !globalSchema.getSubSchemaNames().isEmpty();
     }
 
     /**
