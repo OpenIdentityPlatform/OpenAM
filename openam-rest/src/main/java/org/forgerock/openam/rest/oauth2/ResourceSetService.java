@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.security.auth.Subject;
-import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
@@ -132,11 +131,14 @@ public class ResourceSetService {
 
                             //check to see which of these policies apply to the subject
                             for (UmaPolicy sharedPolicy : result.getSecond()) {
-                                String sharedResourceName = sharedPolicy.getResourceSet().getName();
-                                List<Entitlement> entitlements = evaluator.evaluate(realm, subject, sharedResourceName, null, false);
+                                if (!containsResourceSet(resourceSets, sharedPolicy.getResourceSet())) {
+                                    String sharedResourceName = sharedPolicy.getResourceSet().getName();
+                                    List<Entitlement> entitlements = evaluator.evaluate(realm, subject,
+                                            sharedResourceName, null, false);
 
-                                if (!entitlements.isEmpty()) {
-                                    resourceSets.add(sharedPolicy.getResourceSet());
+                                    if (!entitlements.isEmpty()) {
+                                        resourceSets.add(sharedPolicy.getResourceSet());
+                                    }
                                 }
                             }
 
@@ -249,6 +251,23 @@ public class ResourceSetService {
                         }
                     }
                 });
+    }
+
+    /**
+     * This is a temporary work around that won't be needed once the equals method is fixed on JSONValue
+     * todo: fix remove once JSONValue equals has been fixed
+     * @param resourceSets
+     * @param resourceSet
+     * @return True id resourceSets contains resourceSet
+     */
+    private boolean containsResourceSet(Set<ResourceSetDescription> resourceSets, ResourceSetDescription resourceSet) {
+        for (ResourceSetDescription resource : resourceSets) {
+            if (resource.getId().equals(resourceSet.getId())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
