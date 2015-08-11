@@ -72,6 +72,8 @@ import org.forgerock.openam.rest.fluent.FluentAudit;
 import org.forgerock.openam.rest.fluent.FluentRealmRouter;
 import org.forgerock.openam.rest.fluent.FluentRouter;
 import org.forgerock.openam.rest.fluent.LoggingFluentRouter;
+import org.forgerock.openam.rest.record.RecordConstants;
+import org.forgerock.openam.rest.record.RecordResource;
 import org.forgerock.openam.rest.oauth2.ResourceSetResource;
 import org.forgerock.openam.rest.resource.CrestRouter;
 import org.forgerock.openam.rest.router.RestRealmValidator;
@@ -362,6 +364,12 @@ public class RestEndpoints {
                 .auditAs(Component.CONFIG)
                 .through(PrivilegeAuthzModule.class, PrivilegeAuthzModule.NAME)
                 .forVersion("1.0").to(InjectorHolder.getInstance(SmsServerPropertiesResource.class));
+
+        rootRealmRouter.route("/" + RecordConstants.RECORD_REST_ENDPOINT)
+                .auditAs(Component.RECORD)
+                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .forVersion("1.0").to(RecordResource.class);
+
 
         VersionBehaviourConfigListener.bindToServiceConfigManager(rootRealmRouter);
         VersionBehaviourConfigListener.bindToServiceConfigManager(dynamicRealmRouter);

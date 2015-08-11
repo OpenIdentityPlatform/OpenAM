@@ -1,0 +1,15 @@
+{
+  "issueID": 1,
+  "referenceID": "first_record",
+  "description": "all ON record",
+  "threadDump" : {
+    "enable": false
+  },
+  "configExport": {
+    "enable": false
+  },
+  "debugLogs": {
+    "debugLevel": "message"
+  },
+  "zipEnable": false
+}

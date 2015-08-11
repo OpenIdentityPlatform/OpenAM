@@ -110,6 +110,11 @@ public interface IArgument {
     String DATA_FILE = "datafile";
 
     /**
+     * Json file argument.
+     */
+    String JSON_FILE = "jsonfile";
+
+    /**
      * Mandatory argument.
      */
     String MANDATORY = "mandatory";

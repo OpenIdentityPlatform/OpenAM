@@ -67,6 +67,7 @@ public final class AuditConstants {
         SCRIPT("Script"),
         BATCH("Batch"),
         CONFIG("Config"),
+        RECORD("Record"),
         STS("STS");
 
         private final String name;

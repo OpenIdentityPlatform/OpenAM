@@ -50,6 +50,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.security.auth.Subject;
+
+import org.forgerock.openam.rest.record.DefaultDebugRecorder;
+import org.forgerock.openam.rest.record.DebugRecorder;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.RequestType;
@@ -180,6 +183,7 @@ public class ForgerockRestGuiceModule extends AbstractModule {
         bind(DelegationEvaluatorImpl.class).in(Singleton.class);
         bind(DelegationEvaluator.class).to(DelegationEvaluatorProxy.class).in(Singleton.class);
 
+        bind(DebugRecorder.class).to(DefaultDebugRecorder.class);
         bind(UmaPolicyService.class).to(UmaPolicyServiceImpl.class);
         bind(SoapSTSAgentIdentity.class).to(SoapSTSAgentIdentityImpl.class);
         bind(SpecialUserIdentity.class).to(SpecialUserIdentityImpl.class);

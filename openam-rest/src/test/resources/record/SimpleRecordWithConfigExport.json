@@ -1,0 +1,17 @@
+{
+  "issueID": 1,
+  "referenceID": "successing_story",
+  "description": "Simple record",
+  "threadDump" : {
+    "enable": false
+  },
+  "configExport": {
+    "enable": true,
+    "password": "changeit",
+    "sharePassword": true
+  },
+  "debugLogs": {
+    "debugLevel": "message"
+  },
+  "zipEnable": false
+}

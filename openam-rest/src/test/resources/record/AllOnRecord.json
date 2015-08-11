@@ -1,0 +1,31 @@
+{
+  "issueID": 8339,
+  "referenceID": "OpenID_connect",
+  "description": "all ON record",
+  "threadDump" : {
+    "enable": true,
+    "delay" :  {
+      "timeUnit": "MINUTES",
+      "value": 2
+    }
+  },
+  "configExport": {
+    "enable": true,
+    "password": "changeit",
+    "sharePassword": true
+  },
+  "debugLogs": {
+    "debugLevel": "message",
+    "autoStop": {
+      "time":  {
+        "timeUnit": "MINUTES",
+        "value": 10
+      },
+      "fileSize": {
+        "sizeUnit": "GB",
+        "value": 1
+      }
+    }
+  },
+  "zipEnable": false
+}

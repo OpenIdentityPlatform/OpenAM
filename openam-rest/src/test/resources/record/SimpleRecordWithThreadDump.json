@@ -1,0 +1,19 @@
+{
+  "issueID": 1,
+  "referenceID": "successing_story",
+  "description": "Simple record",
+  "threadDump" : {
+    "enable": true,
+    "delay" :  {
+      "timeUnit": "SECONDS",
+      "value": 1
+    }
+  },
+  "configExport": {
+    "enable": false
+  },
+  "debugLogs": {
+    "debugLevel": "message"
+  },
+  "zipEnable": false
+}

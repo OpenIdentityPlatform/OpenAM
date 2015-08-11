@@ -36,6 +36,10 @@ import com.sun.identity.shared.debug.DebugConstants;
 import com.sun.identity.shared.debug.file.DebugConfiguration;
 import com.sun.identity.shared.debug.file.DebugFile;
 import com.sun.identity.shared.locale.Locale;
+import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.util.time.TimeService;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -48,8 +52,6 @@ import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import org.forgerock.openam.utils.StringUtils;
-import org.forgerock.util.time.TimeService;
 
 /**
  * Manage a log file :
@@ -118,9 +120,9 @@ public class DebugFileImpl implements DebugFile {
     private boolean isConfigChanged() throws IOException {
         String newDebugDir = SystemPropertiesManager.get(DebugConstants.CONFIG_DEBUG_DIRECTORY);
         if (StringUtils.isEmpty(newDebugDir)) {
-                ResourceBundle bundle = Locale.getInstallResourceBundle("amUtilMsgs");
-                throw new IOException(bundle.getString("com.iplanet.services.debug.nodir") + " Current Debug File : "
-                        + this);
+            ResourceBundle bundle = Locale.getInstallResourceBundle("amUtilMsgs");
+            throw new IOException(bundle.getString("com.iplanet.services.debug.nodir") + " Current Debug File : " +
+                    this);
         }
         return !newDebugDir.equals(debugDirectory.getAndSet(newDebugDir));
     }
@@ -162,8 +164,7 @@ public class DebugFileImpl implements DebugFile {
      * Close the log file
      */
     private void close() {
-        debugWriter.flush();
-        debugWriter.close();
+        IOUtils.closeIfNotNull(debugWriter);
         debugWriter = null;
     }
 
@@ -205,9 +206,7 @@ public class DebugFileImpl implements DebugFile {
 
         try {
             //if we're switching to a new directory & writer or rotating, flush
-            if (debugWriter != null) {
-                close();
-            }
+            close();
 
             // remember when we rotated last
             fileCreationTime = clock.now();
@@ -240,9 +239,7 @@ public class DebugFileImpl implements DebugFile {
             try {
                 debugWriter = new PrintWriter(new FileWriter(debugFilePath, true), true);
             } catch (IOException ioex) {
-                if (debugWriter != null) {
-                    close();
-                }
+                close();
                 ResourceBundle bundle = Locale.getInstallResourceBundle("amUtilMsgs");
                 throw new IOException(bundle.getString("com.iplanet.services.debug.nofile") + " Current Debug File : " +
                         this, ioex);

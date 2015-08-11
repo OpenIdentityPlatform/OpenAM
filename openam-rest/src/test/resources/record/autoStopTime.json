@@ -1,0 +1,21 @@
+{
+  "issueID": 3,
+  "referenceID": "test_auto_stop_time",
+  "description": "Test the auto stop time",
+  "threadDump" : {
+    "enable": false
+  },
+  "configExport": {
+    "enable": false
+  },
+  "debugLogs": {
+    "debugLevel": "message",
+    "autoStop": {
+      "time":  {
+        "timeUnit": "SECONDS",
+        "value": 1
+      }
+    }
+  },
+  "zipEnable": false
+}

@@ -16,9 +16,7 @@
 package com.sun.identity.shared.debug.file.impl;
 
 import com.sun.identity.shared.debug.DebugConstants;
-import com.sun.identity.shared.debug.IDebug;
 import com.sun.identity.shared.debug.file.DebugFile;
-import com.sun.identity.shared.debug.impl.DebugImpl;
 
 import java.io.IOException;
 import java.io.PrintWriter;

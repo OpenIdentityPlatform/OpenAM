@@ -1,0 +1,15 @@
+{
+  "issueID": 9,
+  "referenceID": "test_zip",
+  "description": "test zip",
+  "threadDump" : {
+    "enable": false
+  },
+  "configExport": {
+    "enable": false
+  },
+  "debugLogs": {
+    "debugLevel": "message"
+  },
+  "zipEnable": true
+}

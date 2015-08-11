@@ -1,0 +1,17 @@
+{
+  "issueID": 6,
+  "referenceID": "export_config",
+  "description": "all ON record",
+  "threadDump" : {
+    "enable": false
+  },
+  "configExport": {
+    "enable": true,
+    "password": "changeit",
+    "sharePassword": true
+  },
+  "debugLogs": {
+    "debugLevel": "message"
+  },
+  "zipEnable": false
+}

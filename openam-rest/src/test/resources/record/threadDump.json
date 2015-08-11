@@ -1,0 +1,19 @@
+{
+  "issueID": 7,
+  "referenceID": "threadDump",
+  "description": "test threadump",
+  "threadDump" : {
+    "enable": true,
+    "delay" :  {
+      "timeUnit": "SECONDS",
+      "value": 1
+    }
+  },
+  "configExport": {
+    "enable": false
+  },
+  "debugLogs": {
+    "debugLevel": "message"
+  },
+  "zipEnable": false
+}
