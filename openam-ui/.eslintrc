@@ -177,7 +177,15 @@
              * If there is no return statement, a @returns annotation is not required.
              */
             "requireReturn": false
-        }]
+        }],
+        /**
+         * Semicolons must be used any place where they are valid.
+         *
+         * var name = "ESLint" # bad
+         *
+         * var name = "ESLint"; # good
+         */
+        "semi": 2
 
         // TODO: Add these additional rules once we have confidence in the current set being stable
         /**
