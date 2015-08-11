@@ -10,8 +10,11 @@ public abstract class AbstractAuditRequestContextPropagatingDecorator {
     private final AuditRequestContext publisherContext;
     private AuditRequestContext consumerContext = null;
 
+    /**
+     * Constructor that will set the value of the publisher context.
+     */
     public AbstractAuditRequestContextPropagatingDecorator() {
-        publisherContext = AuditRequestContext.get();
+        publisherContext = AuditRequestContext.get().copy();
     }
 
     /**
@@ -20,10 +23,8 @@ public abstract class AbstractAuditRequestContextPropagatingDecorator {
      * This method should be called from the consumer thread.
      */
     protected void setContext() {
-        if (publisherContext != null) {
-            consumerContext = AuditRequestContext.get();
-            AuditRequestContext.set(publisherContext);
-        }
+        consumerContext = AuditRequestContext.get();
+        AuditRequestContext.set(publisherContext);
     }
 
     /**

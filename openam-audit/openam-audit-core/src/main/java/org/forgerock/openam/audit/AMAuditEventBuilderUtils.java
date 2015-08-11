@@ -17,6 +17,7 @@ package org.forgerock.openam.audit;
 
 import static org.forgerock.json.fluent.JsonValue.array;
 import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.openam.audit.AuditConstants.*;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -34,7 +35,6 @@ public final class AMAuditEventBuilderUtils {
     private static Debug debug = Debug.getInstance("amAudit");
 
     private static final String COMPONENT = "component";
-    private static final String CONTEXT_ID = "contextId";
     private static final String EXTRA_INFO = "extraInfo";
 
     private AMAuditEventBuilderUtils() {

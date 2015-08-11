@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.forgerockrest.authn;
 
+import static org.forgerock.openam.forgerockrest.authn.RestAuthenticationConstants.*;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.sm.SMSException;
@@ -98,7 +100,7 @@ public class AuthIdHelper {
             jwtValues.put("authIndexValue", escapeJsonString(loginConfiguration.getIndexValue()));
         }
         jwtValues.put("realm", authContext.getOrgDN());
-        jwtValues.put("sessionId", authContext.getSessionID().toString());
+        jwtValues.put(SESSION_ID, authContext.getSessionID().toString());
 
         String authId = generateAuthId(keyAlias, jwtValues);
         return authId;

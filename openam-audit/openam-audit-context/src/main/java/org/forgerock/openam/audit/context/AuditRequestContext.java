@@ -18,6 +18,9 @@ package org.forgerock.openam.audit.context;
 
 import org.forgerock.util.Reject;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Thread-local context for Commons Audit state.
  *
@@ -33,6 +36,7 @@ public class AuditRequestContext {
     };
 
     private final TransactionId transactionId;
+    private final Map<String, String> properties;
 
     /**
      * Construct a new <code>RequestContext</code>.
@@ -40,8 +44,33 @@ public class AuditRequestContext {
      * @param transactionId Non-null, <code>TransactionId</code>.
      */
     public AuditRequestContext(TransactionId transactionId) {
+        this(transactionId, null);
+    }
+
+    /**
+     * Construct a new <code>RequestContext</code> with a copy of the given properties.
+     *
+     * @param transactionId Non-null, <code>TransactionId</code>.
+     * @param properties Initial properties for this context.
+     */
+    public AuditRequestContext(TransactionId transactionId, Map<String, String> properties) {
         Reject.ifNull(transactionId, "TransactionId should not be null.");
         this.transactionId = transactionId;
+        this.properties = properties == null ? new HashMap<String, String>() : new HashMap<>(properties);
+    }
+
+    /**
+     * Create a new instance of <code>RequestContext</code>, which will have a reference to the original
+     * <code>TransactionId</code> and a copy of the original properties.
+     *
+     * A copy can be used to hand over the context from one thread to another and therefore we make a copy
+     * of the properties in order to keep the map thread-safe. The transactionId is thread-safe
+     * and we want to see the sequence of sub-transactionIds shared across threads.
+     *
+     * @return a copy of this instance
+     */
+    public AuditRequestContext copy() {
+        return new AuditRequestContext(transactionId, properties);
     }
 
     /**
@@ -49,6 +78,38 @@ public class AuditRequestContext {
      */
     public TransactionId getTransactionId() {
         return transactionId;
+    }
+
+    /**
+     * Add a property to the request context. Changing a property for the same transaction in separate threads will
+     * only affect the property on the current thread. Properties are copied when the context is passed
+     * on from one thread to another.
+     *
+     * @param key the name of the property
+     * @param value the value of the property
+     */
+    public static void putProperty(String key, String value) {
+        get().properties.put(key, value);
+    }
+
+    /**
+     * Get the value for the specified property.
+     *
+     * @param key the name of the property
+     * @return the value of the property or null if it has not been set
+     */
+    public static String getProperty(String key) {
+        return get().properties.get(key);
+    }
+
+    /**
+     * Remove the value for the specified property.
+     *
+     * @param key the name of the property
+     * @return the value of the property or null if it has not been set
+     */
+    public static String removeProperty(String key) {
+        return get().properties.remove(key);
     }
 
     /**

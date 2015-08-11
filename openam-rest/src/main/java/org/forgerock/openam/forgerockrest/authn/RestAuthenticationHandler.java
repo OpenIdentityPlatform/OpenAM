@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.forgerockrest.authn;
 
+import static org.forgerock.openam.forgerockrest.authn.RestAuthenticationConstants.*;
+
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
@@ -31,6 +33,7 @@ import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jose.exceptions.JwsSigningException;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.openam.forgerockrest.authn.core.AuthIndexType;
 import org.forgerock.openam.forgerockrest.authn.core.AuthenticationContext;
 import org.forgerock.openam.forgerockrest.authn.core.LoginAuthenticator;
@@ -143,6 +146,7 @@ public class RestAuthenticationHandler {
                     indexType = getAuthIndexType(jwt);
                     indexValue = getAuthIndexValue(jwt);
                     String realmDN = getRealmDomainName(jwt);
+                    AuditRequestContext.putProperty(SESSION_ID, sessionId);
                     authIdHelper.verifyAuthId(realmDN, authId);
                 }
             }
@@ -238,7 +242,8 @@ public class RestAuthenticationHandler {
                     if (authId == null) {
                         authId = authIdHelper.createAuthId(loginConfiguration, loginProcess.getAuthContext());
                     }
-                    e.getJsonResponse().put("authId", authId);
+                    e.getJsonResponse().put(AUTH_ID, authId);
+                    AuditRequestContext.putProperty(AUTH_ID, authId);
                     throw e;
                 }
 
@@ -262,7 +267,8 @@ public class RestAuthenticationHandler {
                     SSOToken ssoToken = loginProcess.getSSOToken();
                     if (ssoToken != null) {
                         String tokenId = ssoToken.getTokenID().toString();
-                        jsonResponseObject.put("tokenId", tokenId);
+                        jsonResponseObject.put(TOKEN_ID, tokenId);
+                        AuditRequestContext.putProperty(TOKEN_ID, tokenId);
                     } else {
                         jsonResponseObject.put("message", "Authentication Successful");
                     }
@@ -319,7 +325,8 @@ public class RestAuthenticationHandler {
         if (authId == null) {
             authId = authIdHelper.createAuthId(loginConfiguration, loginProcess.getAuthContext());
         }
-        jsonResponseObject.put("authId", authId);
+        jsonResponseObject.put(AUTH_ID, authId);
+        AuditRequestContext.putProperty(AUTH_ID, authId);
         if (pagePropertiesCallback != null) {
             jsonResponseObject.put("template", pagePropertiesCallback.getTemplateName());
             String moduleName = pagePropertiesCallback.getModuleName();

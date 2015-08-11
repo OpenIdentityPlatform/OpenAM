@@ -15,6 +15,8 @@
  */
 package org.forgerock.openam.audit;
 
+import static org.forgerock.audit.events.AuditEventBuilder.*;
+
 /**
  * Collection of constants related to auditing.
  *
@@ -93,6 +95,13 @@ public final class AuditConstants {
      * Name of the event handlers registered with the audit service.
      */
     public static final String CSV = "csv";
+
+    /**
+     * Names of fields on an audit events.
+     */
+    public static final String USER_ID = AUTHENTICATION + "." + ID;
+    public static final String CONTEXT_ID = "contextId";
+
 
     private AuditConstants() {
         // Prevent instantiation
