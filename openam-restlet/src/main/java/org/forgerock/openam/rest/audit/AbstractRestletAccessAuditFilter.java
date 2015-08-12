@@ -31,6 +31,8 @@ import org.restlet.engine.io.BufferingRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.routing.Filter;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * Responsible for logging access audit events for restlet requests.
  *
@@ -90,13 +92,14 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
         if (auditEventPublisher.isAuditing(ACCESS_TOPIC)) {
 
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
-                    .forHttpServletRequest(getRequest(request))
                     .timestamp(request.getDate().getTime())
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_ATTEMPT)
                     .component(component)
                     .authentication(getUserIdForAccessAttempt(request))
                     .contextId(getContextIdForAccessAttempt(request));
+
+            addHttpData(request, builder);
 
             auditEventPublisher.publish(ACCESS_TOPIC, builder.toEvent());
         }
@@ -107,7 +110,6 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
 
             long endTime = System.currentTimeMillis();
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
-                    .forHttpServletRequest(getRequest(request))
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
@@ -115,6 +117,8 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
                     .authentication(getUserIdForAccessOutcome(response))
                     .contextId(getContextIdForAccessOutcome(response))
                     .response("SUCCESS", endTime - request.getDate().getTime());
+
+            addHttpData(request, builder);
 
             auditEventPublisher.tryPublish(ACCESS_TOPIC, builder.toEvent());
         }
@@ -125,7 +129,6 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
 
             long endTime = System.currentTimeMillis();
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
-                    .forHttpServletRequest(getRequest(request))
                     .timestamp(endTime)
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_OUTCOME)
@@ -135,7 +138,16 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
                     .responseWithMessage("FAILED - " + response.getStatus().getCode(), endTime - request.getDate()
                             .getTime(), response.getStatus().getDescription());
 
+            addHttpData(request, builder);
+
             auditEventPublisher.tryPublish(ACCESS_TOPIC, builder.toEvent());
+        }
+    }
+
+    private void addHttpData(Request request, AMAccessAuditEventBuilder builder) {
+        HttpServletRequest servletRequest = getRequest(request);
+        if (servletRequest != null) {
+            builder.forHttpServletRequest(servletRequest);
         }
     }
 
