@@ -11,25 +11,18 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
-
 package org.forgerock.oauth2.restlet;
 
-import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AccessTokenVerifier;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.TokenStore;
-import org.forgerock.oauth2.core.exceptions.BadRequestException;
-import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
-import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.restlet.Request;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -42,6 +35,11 @@ import javax.inject.Singleton;
  */
 @Singleton
 public class RestletFormBodyAccessTokenVerifier extends AccessTokenVerifier {
+
+    @Inject
+    public RestletFormBodyAccessTokenVerifier(TokenStore tokenStore) {
+        super(tokenStore);
+    }
 
     /**
      * {@inheritDoc}
@@ -64,5 +62,4 @@ public class RestletFormBodyAccessTokenVerifier extends AccessTokenVerifier {
 
         return formBody.getFirstValue(OAuth2Constants.Params.ACCESS_TOKEN);
     }
-
 }

@@ -13,9 +13,9 @@
  *
  * Copyright 2014-2015 ForgeRock AS.
  */
-
 package org.forgerock.openam.oauth2;
 
+import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
@@ -61,7 +61,10 @@ public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettin
      * {@inheritDoc}
      */
     public OAuth2ProviderSettings get(OAuth2Request request) throws NotFoundException {
-        final String realm = realmNormaliser.normalise(request.<String>getParameter("realm"));
+        final OpenAMAccessToken accessToken = (OpenAMAccessToken) request.getToken(AccessToken.class);
+
+        final String realm = accessToken != null ? accessToken.getRealm() :
+                realmNormaliser.normalise(request.<String>getParameter("realm"));
         final HttpServletRequest req = ServletUtils.getRequest(request.<Request>getRequest());
         String baseUrlPattern = baseURLProviderFactory.get(realm).getURL(req);
         return getInstance(realm, baseUrlPattern);

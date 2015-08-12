@@ -16,6 +16,14 @@
 
 package org.forgerock.openam.oauth2;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.json.fluent.JsonValue.field;
+import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.fluent.JsonValue.object;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonValue;
@@ -27,6 +35,7 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.restlet.RestletOAuth2Request;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.oauth2.guice.OAuth2GuiceModule;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
 import org.restlet.Request;
 import org.testng.annotations.BeforeMethod;
@@ -34,12 +43,6 @@ import org.testng.annotations.Test;
 
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.forgerock.json.fluent.JsonValue.*;
-import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 
 public class OpenAMTokenStoreTest {
 
@@ -50,6 +53,7 @@ public class OpenAMTokenStoreTest {
     private OpenIdConnectClientRegistrationStore clientRegistrationStore;
     private RealmNormaliser realmNormaliser;
     private SSOTokenManager ssoTokenManager;
+    private CookieExtractor cookieExtractor;
     private Request request;
     private OAuth2AuditLogger auditLogger;
     private Debug debug;
@@ -63,7 +67,7 @@ public class OpenAMTokenStoreTest {
         realmNormaliser = mock(RealmNormaliser.class);
         ssoTokenManager = mock(SSOTokenManager.class);
         request = mock(Request.class);
-        CookieExtractor cookieExtractor = mock(CookieExtractor.class);
+        cookieExtractor = mock(CookieExtractor.class);
         auditLogger = mock(OAuth2AuditLogger.class);
         debug = mock(Debug.class);
 
@@ -153,5 +157,29 @@ public class OpenAMTokenStoreTest {
 
         //Then
         //Expected NotFoundException
+    }
+
+    @Test
+    public void realmAgnosticTokenStoreShouldIgnoreRealmMismatch() throws Exception {
+        //Given
+        OpenAMTokenStore realmAgnosticTokenStore = new OAuth2GuiceModule.RealmAgnosticTokenStore(tokenStore,
+                providerSettingsFactory, clientRegistrationStore, realmNormaliser, ssoTokenManager, cookieExtractor,
+                auditLogger, debug);
+        JsonValue token = json(object(
+                field("tokenName", Collections.singleton("access_token")),
+                field("realm", Collections.singleton("/otherrealm"))));
+        given(tokenStore.read("TOKEN_ID")).willReturn(token);
+        ConcurrentHashMap<String, Object> attributes = new ConcurrentHashMap<String, Object>();
+        given(request.getAttributes()).willReturn(attributes);
+        attributes.put("realm", "/testrealm");
+
+        OAuth2Request request = new RestletOAuth2Request(this.request);
+
+        //When
+        AccessToken accessToken = realmAgnosticTokenStore.readAccessToken(request, "TOKEN_ID");
+
+        //Then
+        assertThat(accessToken).isNotNull();
+        assertThat(request.getToken(AccessToken.class)).isSameAs(accessToken);
     }
 }

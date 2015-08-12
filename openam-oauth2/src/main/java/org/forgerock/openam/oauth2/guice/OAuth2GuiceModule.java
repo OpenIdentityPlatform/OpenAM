@@ -13,8 +13,11 @@
  *
  * Copyright 2014-2015 ForgeRock AS.
  */
-
 package org.forgerock.openam.oauth2.guice;
+
+import static com.google.inject.name.Names.*;
+import static org.forgerock.oauth2.core.AccessTokenVerifier.*;
+import static org.forgerock.oauth2.core.TokenStore.*;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
@@ -22,6 +25,8 @@ import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.oauth2.core.AccessTokenService;
 import org.forgerock.oauth2.core.AccessTokenServiceImpl;
@@ -42,6 +47,7 @@ import org.forgerock.oauth2.core.GrantTypeHandler;
 import org.forgerock.oauth2.core.JwtBearerGrantTypeHandler;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
+import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.PasswordCredentialsGrantTypeHandler;
 import org.forgerock.oauth2.core.PasswordCredentialsRequestValidator;
@@ -52,6 +58,7 @@ import org.forgerock.oauth2.core.ResourceOwnerSessionValidator;
 import org.forgerock.oauth2.core.TokenInfoService;
 import org.forgerock.oauth2.core.TokenInfoServiceImpl;
 import org.forgerock.oauth2.core.TokenStore;
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.restlet.AuthorizeRequestHook;
 import org.forgerock.oauth2.restlet.RestletFormBodyAccessTokenVerifier;
 import org.forgerock.oauth2.restlet.RestletHeaderAccessTokenVerifier;
@@ -59,11 +66,15 @@ import org.forgerock.oauth2.restlet.RestletOAuth2RequestFactory;
 import org.forgerock.oauth2.restlet.RestletQueryParameterAccessTokenVerifier;
 import org.forgerock.oauth2.restlet.TokenRequestHook;
 import org.forgerock.openam.oauth2.ClientAuthenticatorImpl;
+import org.forgerock.openam.oauth2.CookieExtractor;
+import org.forgerock.openam.oauth2.OAuth2AuditLogger;
+import org.forgerock.openam.oauth2.OAuthTokenStore;
 import org.forgerock.openam.oauth2.OpenAMClientDAO;
 import org.forgerock.openam.oauth2.OpenAMClientRegistrationStore;
 import org.forgerock.openam.oauth2.OpenAMOAuth2ProviderSettingsFactory;
 import org.forgerock.openam.oauth2.OpenAMResourceOwnerAuthenticator;
 import org.forgerock.openam.oauth2.OpenAMResourceOwnerSessionValidator;
+import org.forgerock.openam.oauth2.RealmNormaliser;
 import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.openam.utils.OpenAMSettingsImpl;
 import org.forgerock.openam.oauth2.OpenAMTokenStore;
@@ -85,13 +96,11 @@ import org.forgerock.openidconnect.restlet.LoginHintHook;
 import org.restlet.Request;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import static com.google.inject.name.Names.*;
-import static org.forgerock.oauth2.core.AccessTokenVerifier.*;
 
 /**
  * Guice module for OAuth2/OpenId Connect provider bindings.
@@ -173,6 +182,46 @@ public class OAuth2GuiceModule extends AbstractModule {
 
     @Inject
     @Provides
+    @Named(REALM_AGNOSTIC_HEADER)
+    @Singleton
+    AccessTokenVerifier getRealmAgnosticHeaderAccessTokenVerifier(
+            @Named(REALM_AGNOSTIC_TOKEN_STORE) TokenStore tokenStore) {
+        return new RestletHeaderAccessTokenVerifier(tokenStore);
+    }
+
+    @Inject
+    @Provides
+    @Named(REALM_AGNOSTIC_FORM_BODY)
+    @Singleton
+    AccessTokenVerifier getRealmAgnosticFormBodyAccessTokenVerifier(
+            @Named(REALM_AGNOSTIC_TOKEN_STORE) TokenStore tokenStore) {
+        return new RestletFormBodyAccessTokenVerifier(tokenStore);
+    }
+
+    @Inject
+    @Provides
+    @Named(REALM_AGNOSTIC_QUERY_PARAM)
+    @Singleton
+    AccessTokenVerifier getRealmAgnosticQueryParamAccessTokenVerifier(
+            @Named(REALM_AGNOSTIC_TOKEN_STORE) TokenStore tokenStore) {
+        return new RestletQueryParameterAccessTokenVerifier(tokenStore);
+    }
+
+    @Inject
+    @Provides
+    @Named(REALM_AGNOSTIC_TOKEN_STORE)
+    @Singleton
+    TokenStore getRealmAgnosticTokenStore(OAuthTokenStore oauthTokenStore,
+            OAuth2ProviderSettingsFactory providerSettingsFactory,
+            OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
+            SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor, OAuth2AuditLogger auditLogger,
+            @Named(OAuth2Constants.DEBUG_LOG_NAME) Debug debug) {
+        return new RealmAgnosticTokenStore(oauthTokenStore, providerSettingsFactory, clientRegistrationStore,
+                realmNormaliser, ssoTokenManager, cookieExtractor, auditLogger, debug);
+    }
+
+    @Inject
+    @Provides
     @Singleton
     List<AuthorizeRequestValidator> getAuthorizeRequestValidators(
             final Set<AuthorizeRequestValidator> authorizeRequestValidators) {
@@ -201,5 +250,22 @@ public class OAuth2GuiceModule extends AbstractModule {
     List<PasswordCredentialsRequestValidator> getPasswordCredentialsRequestValidators(
             final Set<PasswordCredentialsRequestValidator> passwordCredentialsRequestValidators) {
         return new ArrayList<PasswordCredentialsRequestValidator>(passwordCredentialsRequestValidators);
+    }
+
+    public static class RealmAgnosticTokenStore extends OpenAMTokenStore {
+
+        public RealmAgnosticTokenStore(OAuthTokenStore tokenStore,
+                OAuth2ProviderSettingsFactory providerSettingsFactory,
+                OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
+                SSOTokenManager ssoTokenManager, CookieExtractor cookieExtractor, OAuth2AuditLogger auditLogger,
+                Debug debug) {
+            super(tokenStore, providerSettingsFactory, clientRegistrationStore, realmNormaliser, ssoTokenManager,
+                    cookieExtractor, auditLogger, debug);
+        }
+
+        @Override
+        protected void validateTokenRealm(String tokenRealm, OAuth2Request request) throws InvalidGrantException {
+            //No need to validate the realm for the provided token.
+        }
     }
 }

@@ -11,15 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
-
 package org.forgerock.oauth2.restlet;
 
-import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AccessTokenVerifier;
-import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.TokenStore;
 import org.restlet.Request;
@@ -34,13 +31,13 @@ import static org.mockito.Mockito.*;
 
 public class RestletHeaderAccessTokenVerifierTest {
 
-    private RestletHeaderAccessTokenVerifier verifier = new RestletHeaderAccessTokenVerifier();
+    private RestletHeaderAccessTokenVerifier verifier;
     private TokenStore tokenStore;
 
     @BeforeMethod
     public void setup() throws Exception {
         tokenStore = mock(TokenStore.class);
-        verifier.setTokenStore(tokenStore);
+        verifier = new RestletHeaderAccessTokenVerifier(tokenStore);
     }
 
     @Test
