@@ -50,7 +50,7 @@ define("org/forgerock/openam/ui/dashboard/delegates/DeviceManagementDelegate", [
                 method: "POST"
             })
         ).then(function (devicesData, statusData) {
-            devicesData.result[0].skipped = statusData.result;
+            devicesData[0].result.skipped = statusData[0].result;
             return devicesData;
         });
     };
