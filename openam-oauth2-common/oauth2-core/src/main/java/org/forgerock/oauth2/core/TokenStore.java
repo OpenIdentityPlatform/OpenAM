@@ -33,6 +33,13 @@ import org.forgerock.oauth2.core.exceptions.ServerException;
 public interface TokenStore {
 
     /**
+     * A constant to identify the realm agnostic version of the {@link TokenStore} implementation when using dependency
+     * injection. The realm agnostic TokenStore does not verify whether the incoming {@link OAuth2Request}'s realm is
+     * the same as the OAuth2 access token's realm.
+     */
+    String REALM_AGNOSTIC_TOKEN_STORE = "realm-agnostic-token-store";
+
+    /**
      * Creates an Authorization Code and stores it in the OAuth2 Provider's store.
      *
      * @param scope The requested scope.

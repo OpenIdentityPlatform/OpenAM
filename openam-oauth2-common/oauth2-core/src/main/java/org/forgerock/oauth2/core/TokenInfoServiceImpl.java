@@ -41,7 +41,6 @@ import org.slf4j.LoggerFactory;
 public class TokenInfoServiceImpl implements TokenInfoService {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
-    private final TokenStore tokenStore;
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final AccessTokenVerifier headerTokenVerifier;
     private final AccessTokenVerifier queryTokenVerifier;
@@ -49,17 +48,14 @@ public class TokenInfoServiceImpl implements TokenInfoService {
     /**
      * Constructs a new TokenInfoServiceImpl.
      *
-     * @param tokenStore An instance of the TokenStore.
      * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
      * @param headerTokenVerifier Basic HTTP access token verification.
      * @param queryTokenVerifier Query string access token verification.
      */
     @Inject
-    public TokenInfoServiceImpl(TokenStore tokenStore, OAuth2ProviderSettingsFactory providerSettingsFactory,
-            @Named(HEADER) AccessTokenVerifier headerTokenVerifier,
-            @Named(QUERY_PARAM) AccessTokenVerifier queryTokenVerifier) {
-
-        this.tokenStore = tokenStore;
+    public TokenInfoServiceImpl(OAuth2ProviderSettingsFactory providerSettingsFactory,
+            @Named(REALM_AGNOSTIC_HEADER) AccessTokenVerifier headerTokenVerifier,
+            @Named(REALM_AGNOSTIC_QUERY_PARAM) AccessTokenVerifier queryTokenVerifier) {
         this.providerSettingsFactory = providerSettingsFactory;
         this.headerTokenVerifier = headerTokenVerifier;
         this.queryTokenVerifier = queryTokenVerifier;
@@ -82,13 +78,7 @@ public class TokenInfoServiceImpl implements TokenInfoService {
             logger.error("Access Token provided in both query and header in request");
             throw new InvalidRequestException("Access Token cannot be provided in both query and header");
         } else {
-            final String token = headerToken.isValid() ? headerToken.getTokenId() : queryToken.getTokenId();
-            final AccessToken accessToken;
-            try {
-                accessToken = tokenStore.readAccessToken(request, token);
-            } catch (Exception e) {
-                throw new NotFoundException(NotFoundException.ACCESS_TOKEN);
-            }
+            final AccessToken accessToken = request.getToken(AccessToken.class);
 
             logger.trace("In Validator resource - got token = " + accessToken);
 

@@ -14,7 +14,6 @@
  * Copyright 2014-2015 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  */
-
 package org.forgerock.openam.oauth2;
 
 import static org.forgerock.json.fluent.JsonValue.*;
@@ -60,7 +59,6 @@ import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openam.cts.api.fields.OAuthTokenField;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.oauth2.OAuth2AuditLogger;
 import org.forgerock.openam.openidconnect.OpenAMOpenIdConnectToken;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
@@ -73,6 +71,7 @@ import org.json.JSONObject;
 import org.restlet.Request;
 import org.restlet.data.Status;
 import org.restlet.ext.servlet.ServletUtils;
+
 /**
  * Implementation of the OpenId Connect Token Store which the OpenId Connect Provider will implement.
  *
@@ -563,10 +562,8 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         }
 
         OpenAMAuthorizationCode authorizationCode = new OpenAMAuthorizationCode(token);
-        final String realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
-        if (!authorizationCode.getRealm().equals(realm)) {
-            throw new InvalidGrantException("Grant is not valid for the requested realm");
-        }
+        validateTokenRealm(authorizationCode.getRealm(), request);
+
         request.setToken(AuthorizationCode.class, authorizationCode);
         return authorizationCode;
     }
@@ -740,10 +737,8 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         }
 
         OpenAMAccessToken accessToken = new OpenAMAccessToken(token);
-        final String realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
-        if (!accessToken.getRealm().equals(realm)) {
-            throw new InvalidGrantException("Grant is not valid for the requested realm");
-        }
+        validateTokenRealm(accessToken.getRealm(), request);
+
         request.setToken(AccessToken.class, accessToken);
         return accessToken;
     }
@@ -770,11 +765,16 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         }
 
         OpenAMRefreshToken refreshToken = new OpenAMRefreshToken(token);
-        final String realm = realmNormaliser.normalise(request.<String>getParameter(REALM));
-        if (!refreshToken.getRealm().equals(realm)) {
-            throw new InvalidGrantException("Grant is not valid for the requested realm");
-        }
+        validateTokenRealm(refreshToken.getRealm(), request);
+
         request.setToken(RefreshToken.class, refreshToken);
         return refreshToken;
+    }
+
+    protected void validateTokenRealm(final String tokenRealm, final OAuth2Request request)
+            throws InvalidGrantException, NotFoundException {
+        if (!tokenRealm.equals(realmNormaliser.normalise(request.<String>getParameter(REALM)))) {
+            throw new InvalidGrantException("Grant is not valid for the requested realm");
+        }
     }
 }

@@ -13,7 +13,6 @@
  *
  * Copyright 2014-2015 ForgeRock AS.
  */
-
 package org.forgerock.oauth2.core;
 
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
@@ -33,12 +32,31 @@ import javax.inject.Inject;
 public abstract class AccessTokenVerifier {
 
     public static final String HEADER = "header";
+    /**
+     * An {@link AccessTokenVerifier} that verifies the OAuth2 access token provided in a header without checking the
+     * realm corresponding to the {@link OAuth2Request}.
+     */
+    public static final String REALM_AGNOSTIC_HEADER = "realm-agnostic-header";
     public static final String FORM_BODY = "form-body";
+    /**
+     * An {@link AccessTokenVerifier} that verifies the OAuth2 access token provided in the request payload without
+     * checking the realm corresponding to the {@link OAuth2Request}.
+     */
+    public static final String REALM_AGNOSTIC_FORM_BODY = "realm-agnostic-form-body";
     public static final String QUERY_PARAM = "query-param";
+    /**
+     * An {@link AccessTokenVerifier} that verifies the OAuth2 access token provided in the query parameter without
+     * checking the realm corresponding to the {@link OAuth2Request}.
+     */
+    public static final String REALM_AGNOSTIC_QUERY_PARAM = "realm-agnostic-query-param";
     protected final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private static final TokenState INVALID_TOKEN = new TokenState(null);
 
-    private TokenStore tokenStore;
+    private final TokenStore tokenStore;
+
+    protected AccessTokenVerifier(TokenStore tokenStore) {
+        this.tokenStore = tokenStore;
+    }
 
     /**
      * Verifies that the specified OAuth2 request contains a valid access token which has not expired.
@@ -77,16 +95,6 @@ public abstract class AccessTokenVerifier {
      * @return The String access token ID.
      */
     protected abstract String obtainTokenId(OAuth2Request request);
-
-    /**
-     * Sets the token store for verifying the access token.
-     *
-     * @param tokenStore An instance of the TokenStore.
-     */
-    @Inject
-    public void setTokenStore(TokenStore tokenStore) {
-        this.tokenStore = tokenStore;
-    }
 
     /**
      * Represents the state of the token on the request.
