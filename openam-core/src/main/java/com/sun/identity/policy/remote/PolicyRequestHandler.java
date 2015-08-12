@@ -32,6 +32,8 @@
 
 package com.sun.identity.policy.remote;
 
+import static org.forgerock.openam.audit.AuditConstants.Component.POLICY;
+
 import com.iplanet.services.comm.server.PLLAuditor;
 import com.iplanet.services.comm.server.RequestHandler;
 import com.iplanet.services.comm.share.Request;
@@ -60,6 +62,7 @@ import com.sun.identity.session.util.RestrictedTokenHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.stats.Stats;
 import com.sun.identity.sm.SMSException;
+import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.session.util.AppTokenHandler;
 import org.forgerock.openam.utils.CollectionUtils;
 
@@ -125,6 +128,7 @@ public class PolicyRequestHandler implements RequestHandler {
 
         ResponseSet resSet = new ResponseSet(PolicyService.POLICY_SERVICE);
         int size = requests.size();
+        auditor.setComponent(POLICY);
 
         for (Request req : requests) {
             Response res = null;

@@ -32,6 +32,7 @@
 
 package com.iplanet.dpro.session.service;
 
+import static org.forgerock.openam.audit.AuditConstants.Component.SESSION;
 import static org.forgerock.openam.session.SessionConstants.SESSION_DEBUG;
 import static org.forgerock.openam.session.SessionConstants.*;
 
@@ -65,6 +66,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.SessionCookies;
 import org.forgerock.openam.session.SessionPLLSender;
@@ -104,6 +106,7 @@ public class SessionRequestHandler implements RequestHandler {
                                ServletContext servletContext) {
         ResponseSet rset = new ResponseSet(SessionService.SESSION_SERVICE);
 
+        auditor.setComponent(SESSION);
         for (Request req : requests) {
             Response res = processRequest(auditor, req, servletRequest, servletResponse);
             rset.addResponse(res);

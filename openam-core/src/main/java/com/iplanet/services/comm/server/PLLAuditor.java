@@ -47,6 +47,7 @@ public class PLLAuditor {
     private String method;
     private String contextId;
     private String authenticationId;
+    private Component component;
     private boolean accessAttemptAudited;
 
     /**
@@ -172,6 +173,7 @@ public class PLLAuditor {
         method = "unknown";
         authenticationId = "";
         contextId = "";
+        component = Component.PLL;
     }
 
     /**
@@ -179,6 +181,13 @@ public class PLLAuditor {
      */
     public void setService(String service) {
         this.service = service;
+    }
+
+    /**
+     * @param component Identifies the functional area of OpenAM with which this PLL service interacts.
+     */
+    public void setComponent(Component component) {
+        this.component = component;
     }
 
     /**

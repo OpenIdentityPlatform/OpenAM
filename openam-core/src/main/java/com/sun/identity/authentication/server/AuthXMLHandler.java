@@ -28,6 +28,8 @@
  */
 package com.sun.identity.authentication.server;
 
+import static org.forgerock.openam.audit.AuditConstants.Component.AUTHENTICATION;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
@@ -78,6 +80,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.session.SessionServiceURLService;
 import org.forgerock.openam.utils.ClientUtils;
 
@@ -135,6 +138,7 @@ public class AuthXMLHandler implements RequestHandler {
     public ResponseSet process(PLLAuditor auditor, List<Request> requests, HttpServletRequest servletRequest,
                                HttpServletResponse servletResponse, ServletContext servletContext) {
         ResponseSet rset = new ResponseSet(AuthXMLTags.AUTH_SERVICE);
+        auditor.setComponent(AUTHENTICATION);
         for (Request req : requests) {
             Response res = processRequest(auditor, req, servletRequest, servletResponse);
             rset.addResponse(res);
