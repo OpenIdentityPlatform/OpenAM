@@ -74,6 +74,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
             this.model = null;
         },
         template: "templates/uma/views/resource/ResourceTemplate.html",
+        selectizeTemplate: "templates/uma/backgrid/cell/SelectizeCell.html",
         events: {
             "click button#starred": "onToggleStarred",
             "click button#share": "onShare",
@@ -189,6 +190,69 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                 labelsSelectize.addItem(item);
             });
         },
+        renderSelectizeCell: function () {
+            var promise = $.Deferred(),
+                self = this,
+                options = this.model.get("scopes").toJSON(),
+                SelectizeCell;
+
+            UIUtils.fillTemplateWithData(this.selectizeTemplate, {}, function (template) {
+                SelectizeCell = Backgrid.Cell.extend({
+                    className: "selectize-cell",
+                    render: function () {
+                        var items = self.model.get("scopes").pluck("name"),
+                            select;
+
+                        this.$el.html(template);
+                        select = this.$el.find("select").selectize({
+                            create: false,
+                            delimiter: ",",
+                            dropdownParent: "#uma",
+                            hideSelected: true,
+                            persist: false,
+                            labelField: "name",
+                            valueField: "id",
+                            items: items,
+                            options: options
+                        })[0];
+
+                        select.selectize.disable();
+
+                        /* This an extention of the original positionDropdown method within Selectize. The override is
+                         * required because using the dropdownParent 'body' places the dropdown out of scope of the
+                         * containing backbone view. However adding the dropdownParent as any other element, has problems
+                         * due the offsets and/positioning being incorrecly calucaluted in orignal positionDropdown method.
+                         */
+                        select.selectize.positionDropdown = function () {
+                            var $control = this.$control,
+                                offset = this.settings.dropdownParent ? $control.offset() : $control.position();
+
+                            if (this.settings.dropdownParent) {
+                                offset.top -= ($control.outerHeight(true) * 2) +
+                                              $(this.settings.dropdownParent).position().top;
+                                offset.left -= $(this.settings.dropdownParent).offset().left +
+                                               $(this.settings.dropdownParent).outerWidth() -
+                                               $(this.settings.dropdownParent).outerWidth(true);
+                            } else {
+                                offset.top += $control.outerHeight(true);
+                            }
+
+                            this.$dropdown.css({
+                                width: $control.outerWidth(),
+                                top: offset.top,
+                                left: offset.left
+                            });
+                        };
+
+                        this.delegateEvents();
+                        return this;
+                    }
+                });
+                promise.resolve(SelectizeCell);
+            });
+            return promise;
+        },
+
         render: function (args, callback) {
             var id = _.last(args), self = this;
 
@@ -244,62 +308,6 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                 }
             });
 
-            options = this.model.get("scopes").toJSON();
-
-            SelectizeCell = Backgrid.Cell.extend({
-                className: "selectize-cell",
-                template: "templates/uma/backgrid/cell/SelectizeCell.html",
-                render: function () {
-                    var items = this.model.get("scopes").pluck("name"),
-                        select;
-
-                    this.$el.html(UIUtils.fillTemplateWithData(this.template));
-
-                    select = this.$el.find("select").selectize({
-                        create: false,
-                        delimiter: ",",
-                        dropdownParent: "#uma",
-                        hideSelected: true,
-                        persist: false,
-                        labelField: "name",
-                        valueField: "id",
-                        items: items,
-                        options: options
-                    })[0];
-
-                    select.selectize.disable();
-
-                    /* This an extention of the original positionDropdown method within Selectize. The override is
-                     * required because using the dropdownParent 'body' places the dropdown out of scope of the
-                     * containing backbone view. However adding the dropdownParent as any other element, has problems
-                     * due the offsets and/positioning being incorrecly calucaluted in orignal positionDropdown method.
-                     */
-                    select.selectize.positionDropdown = function () {
-                        var $control = this.$control,
-                            offset = this.settings.dropdownParent ? $control.offset() : $control.position();
-
-                        if (this.settings.dropdownParent) {
-                            offset.top -= ($control.outerHeight(true) * 2) +
-                                          $(this.settings.dropdownParent).position().top;
-                            offset.left -= $(this.settings.dropdownParent).offset().left +
-                                           $(this.settings.dropdownParent).outerWidth() -
-                                           $(this.settings.dropdownParent).outerWidth(true);
-                        } else {
-                            offset.top += $control.outerHeight(true);
-                        }
-
-                        this.$dropdown.css({
-                            width: $control.outerWidth(),
-                            top: offset.top,
-                            left: offset.left
-                        });
-                    };
-
-                    this.delegateEvents();
-                    return this;
-                }
-            });
-
             /**
              * There *might* be no policy object present (if all the permissions were removed) so we're
              * checking for this and creating an empty collection if there is no policy
@@ -309,63 +317,65 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                 collection = this.model.get("policy").get("permissions");
             }
 
-            grid = new Backgrid.Grid({
-                columns: [{
-                    name: "subject",
-                    label: $.t("uma.resources.show.grid.0"),
-                    cell: "string",
-                    editable: false
-                }, {
-                    name: "permissions",
-                    label: $.t("uma.resources.show.grid.2"),
-                    cell: SelectizeCell,
-                    editable: false,
-                    sortable: false
-                }, {
-                    name: "edit",
-                    label: "",
-                    cell: RevokeCell,
-                    editable: false,
-                    sortable: false,
-                    headerCell: BackgridUtils.ClassHeaderCell.extend({
-                        className: "col-btn"
-                    })
-                }],
-                collection: collection,
-                emptyText: $.t("console.common.noResults"),
-                className: "backgrid table table-striped"
-            });
-
-            // FIXME: Re-enable filtering and pagination
-            // paginator = new Backgrid.Extension.Paginator({
-            //     collection: this.model.get('policy').get('permissions'),
-            //     windowSize: 3
-            // });
-
-            this.parentRender(function () {
-                self.$el.find("[data-toggle=\"tooltip\"]").tooltip();
-                self.renderLabelsOptions();
-
-                if (self.model.has("policy") && self.model.get("policy").get("permissions").length > 0) {
-                    self.$el.find("li#unshare").removeClass("disabled");
-                }
-
-                self.$el.find("#backgridContainer").append(grid.render().el);
-                // FIXME: Re-enable filtering and pagination
-                // self.$el.find("#paginationContainer").append(paginator.render().el);
-
-                self.$el.find("#umaShareImage img").error(function () {
-                    $(this).parent().addClass("no-image");
+            this.renderSelectizeCell().done(function (SelectizeCell) {
+                grid = new Backgrid.Grid({
+                    columns: [{
+                        name: "subject",
+                        label: $.t("uma.resources.show.grid.0"),
+                        cell: "string",
+                        editable: false
+                    }, {
+                        name: "permissions",
+                        label: $.t("uma.resources.show.grid.2"),
+                        cell: SelectizeCell,
+                        editable: false,
+                        sortable: false
+                    }, {
+                        name: "edit",
+                        label: "",
+                        cell: RevokeCell,
+                        editable: false,
+                        sortable: false,
+                        headerCell: BackgridUtils.ClassHeaderCell.extend({
+                            className: "col-btn"
+                        })
+                    }],
+                    collection: collection,
+                    emptyText: $.t("console.common.noResults"),
+                    className: "backgrid table table-striped"
                 });
 
-                var starredLabel = _.find(this.allLabels, { type: "STAR" }),
-                    isStarred = _.contains(this.model.get("labels"), starredLabel._id);
+                // FIXME: Re-enable filtering and pagination
+                // paginator = new Backgrid.Extension.Paginator({
+                //     collection: this.model.get('policy').get('permissions'),
+                //     windowSize: 3
+                // });
 
-                if (isStarred) {
-                    self.$el.find("#starred i").toggleClass("fa-star-o fa-star");
-                }
+                self.parentRender(function () {
+                    self.$el.find("[data-toggle=\"tooltip\"]").tooltip();
+                    self.renderLabelsOptions();
 
-                if (callback) { callback(); }
+                    if (self.model.has("policy") && self.model.get("policy").get("permissions").length > 0) {
+                        self.$el.find("li#unshare").removeClass("disabled");
+                    }
+
+                    self.$el.find("#backgridContainer").append(grid.render().el);
+                    // FIXME: Re-enable filtering and pagination
+                    // self.$el.find("#paginationContainer").append(paginator.render().el);
+
+                    self.$el.find("#umaShareImage img").error(function () {
+                        $(this).parent().addClass("no-image");
+                    });
+
+                    var starredLabel = _.find(this.allLabels, { type: "STAR" }),
+                        isStarred = _.contains(this.model.get("labels"), starredLabel._id);
+
+                    if (isStarred) {
+                        self.$el.find("#starred i").toggleClass("fa-star-o fa-star");
+                    }
+
+                    if (callback) { callback(); }
+                });
             });
         },
         getLabelSelectize: function () {
