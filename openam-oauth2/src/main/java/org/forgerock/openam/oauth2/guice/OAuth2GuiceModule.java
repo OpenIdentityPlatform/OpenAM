@@ -171,6 +171,7 @@ public class OAuth2GuiceModule extends AbstractModule {
         authorizeRequestValidators.addBinding().to(OpenIdConnectAuthorizeRequestValidator.class);
         authorizeRequestValidators.addBinding().to(ClaimsParameterValidator.class);
         authorizeRequestValidators.addBinding().to(SubjectTypeValidator.class);
+        authorizeRequestValidators.addBinding().to(SubjectTypeValidator.class);
 
         final Multibinder<AuthorizationCodeRequestValidator> authorizationCodeRequestValidators =
                 Multibinder.newSetBinder(binder(), AuthorizationCodeRequestValidator.class);

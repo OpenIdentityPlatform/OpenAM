@@ -84,7 +84,7 @@ public class AuthorizationTokenIssuer {
         final String clientId = clientRegistration.getClientId();
         final String redirectUri = request.getParameter(REDIRECT_URI);
         final String nonce = request.getParameter(OAuth2Constants.Custom.NONCE);
-
+//todo extract code challenge and code challenge method (check whether code flow?)
         final Map<String, Token> tokens = new HashMap<String, Token>();
         boolean returnAsFragment = false;
 
