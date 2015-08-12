@@ -24,11 +24,12 @@
 
 /*global define*/
 define("org/forgerock/openam/ui/uma/models/UMAPolicy", [
+    "underscore",
     "backbone",
     "backbone-relational",
     "org/forgerock/openam/ui/uma/models/UMAPolicyPermission",
     "org/forgerock/openam/ui/uma/util/URLHelper"
-], function(Backbone, BackboneRelational, UMAPolicyPermission, URLHelper) {
+], function (_, Backbone, BackboneRelational, UMAPolicyPermission, URLHelper) {
     return Backbone.RelationalModel.extend({
         idAttribute: "policyId",
         createRequired: true,
@@ -37,19 +38,19 @@ define("org/forgerock/openam/ui/uma/models/UMAPolicy", [
             key: "permissions",
             relatedModel: UMAPolicyPermission
         }],
-        parse: function(response) {
-            if(response.permissions) {
+        parse: function (response) {
+            if (!_.isEmpty(response.permissions)) {
                 this.createRequired = false;
             }
 
             return response;
         },
-        sync: function(method, model, options) {
+        sync: function (method, model, options) {
             options.beforeSend = function(xhr) {
                 xhr.setRequestHeader("Accept-API-Version", "protocol=1.0,resource=1.0");
             };
 
-            if(method.toLowerCase() === "update" && model.createRequired === true) {
+            if (method.toLowerCase() === "update" && model.createRequired === true) {
                 model.createRequired = false;
 
                 options = options || {};
@@ -57,7 +58,7 @@ define("org/forgerock/openam/ui/uma/models/UMAPolicy", [
                 options.headers["If-None-Match"] = "*";
             }
 
-            if(!model.get("permissions").length) {
+            if (!model.get("permissions").length) {
                 model.createRequired = true;
             }
 
