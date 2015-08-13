@@ -31,17 +31,11 @@ public final class AuditInfoContext extends ServerContext {
     private final Component component;
 
     public AuditInfoContext(Context parent, Component component) {
-        super(parent);
+        super(parent, CONTEXT_NAME);
         this.component = component;
     }
 
     public Component getComponent() {
         return component;
     }
-
-    @Override
-    public String getContextName() {
-        return CONTEXT_NAME;
-    }
-
 }

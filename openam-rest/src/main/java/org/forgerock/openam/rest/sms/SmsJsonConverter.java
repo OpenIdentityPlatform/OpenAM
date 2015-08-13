@@ -16,23 +16,7 @@
 
 package org.forgerock.openam.rest.sms;
 
-import com.sun.identity.common.configuration.MapValueParser;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.Base64;
-import com.sun.identity.sm.AttributeSchema;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceSchema;
-import org.apache.commons.lang.StringUtils;
-import org.forgerock.guava.common.collect.BiMap;
-import org.forgerock.guava.common.collect.HashBiMap;
-import org.forgerock.json.JsonException;
-import org.forgerock.json.JsonPointer;
-import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.Resource;
-import org.forgerock.util.Pair;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+import static org.forgerock.json.JsonValue.json;
 
 import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -54,7 +38,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.forgerock.json.JsonValue.json;
+import com.sun.identity.common.configuration.MapValueParser;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Base64;
+import com.sun.identity.sm.AttributeSchema;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceSchema;
+import org.apache.commons.lang.StringUtils;
+import org.forgerock.guava.common.collect.BiMap;
+import org.forgerock.guava.common.collect.HashBiMap;
+import org.forgerock.json.JsonException;
+import org.forgerock.json.JsonPointer;
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.util.Pair;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * A class to convert service configurations between XML and JSON
@@ -271,7 +271,7 @@ public class SmsJsonConverter {
         for (String attributeName : translatedAttributeValuePairs.keySet()) {
 
             // Ignore _id field used to name resource when creating
-            if (Resource.FIELD_CONTENT_ID.equals(attributeName)) {
+            if (ResourceResponse.FIELD_CONTENT_ID.equals(attributeName)) {
                 continue;
             }
 

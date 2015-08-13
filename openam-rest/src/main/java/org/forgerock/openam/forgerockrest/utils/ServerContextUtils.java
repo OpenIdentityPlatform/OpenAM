@@ -35,7 +35,7 @@ import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.StringUtils;
 
@@ -133,7 +133,7 @@ public class ServerContextUtils {
      * @return a String in the form <code>resourceName | id</code>, omitting either if they are null.
      */
     public static String getResourceId(Request request, ServerContext context) {
-        String resource = request.getResourceName();
+        String resource = request.getResourcePath();
         String id = getId(context);
 
         if (id != null) {

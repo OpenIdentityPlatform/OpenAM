@@ -17,6 +17,7 @@
 package org.forgerock.openam.rest.uma;
 
 import static java.util.Collections.singleton;
+import static org.forgerock.json.resource.Responses.newQueryResponse;
 import static org.forgerock.openam.uma.UmaConstants.UMA_POLICY_SCHEME;
 import static org.forgerock.util.promise.Promises.*;
 
@@ -26,7 +27,6 @@ import javax.inject.Singleton;
 import javax.security.auth.Subject;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -41,20 +41,19 @@ import com.sun.identity.entitlement.Evaluator;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.ConflictException;
+import org.forgerock.json.resource.CountPolicy;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
-import org.forgerock.util.query.QueryFilter;
-import org.forgerock.util.query.QueryFilterVisitor;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.Requests;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
@@ -63,8 +62,8 @@ import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.rest.oauth2.AggregateQuery;
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.rest.resource.SubjectContext;
-import org.forgerock.openam.uma.ResharingMode;
 import org.forgerock.openam.uma.PolicySearch;
+import org.forgerock.openam.uma.ResharingMode;
 import org.forgerock.openam.uma.UmaConstants;
 import org.forgerock.openam.uma.UmaPolicy;
 import org.forgerock.openam.uma.UmaPolicyQueryFilterVisitor;
@@ -80,6 +79,8 @@ import org.forgerock.util.Pair;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 import org.forgerock.util.promise.ResultHandler;
+import org.forgerock.util.query.QueryFilter;
+import org.forgerock.util.query.QueryFilterVisitor;
 
 /**
  * Implementation of the {@code UmaPolicyService}.
@@ -239,7 +240,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
             return newExceptionPromise(e);
         }
         return policyResourceDelegate.createPolicies(context, umaPolicy.asUnderlyingPolicies(userId))
-                .thenAsync(new UpdatePolicyGraphStatesFunction<List<Resource>>(resourceSet, context))
+                .thenAsync(new UpdatePolicyGraphStatesFunction<List<ResourceResponse>>(resourceSet, context))
                 .thenAsync(new AuditAndProduceUmaPolicyFunction(resourceSet, context));
     }
 
@@ -258,29 +259,29 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                     .setQueryFilter(QueryFilter.equalTo(new JsonPointer("resourceTypeUuid"), resourceSet.getId()));
             final PolicyGraph policyGraph = new PolicyGraph(resourceSet);
             return policyResourceDelegate.queryPolicies(context, queryRequest, policyGraph)
-                    .thenAsync(new AsyncFunction<QueryResult, T, ResourceException>() {
+                    .thenAsync(new AsyncFunction<QueryResponse, T, ResourceException>() {
                         @Override
-                        public Promise<T, ResourceException> apply(QueryResult queryResult) {
+                        public Promise<T, ResourceException> apply(QueryResponse queryResult) {
                             // All policies are now loaded, so compute the graph and update if necessary
                             policyGraph.computeGraph();
                             if (!policyGraph.isValid()) {
                                 // Graph needs updating, so return a promise that completes once the update is done.
                                 return policyGraph.update(context, policyResourceDelegate).then(
-                                        new Function<List<List<Resource>>, T, ResourceException>() {
+                                        new Function<List<List<ResourceResponse>>, T, ResourceException>() {
                                             @Override
-                                            public T apply(List<List<Resource>> lists) throws ResourceException {
+                                            public T apply(List<List<ResourceResponse>> lists) {
                                                 return result;
                                             }
                                         });
                             }
                             // No update required, complete straight away.
-                            return Promises.newResultPromise(result);
+                            return newResultPromise(result);
                         }
                     });
         }
     }
 
-    private class AuditAndProduceUmaPolicyFunction implements AsyncFunction<List<Resource>, UmaPolicy, ResourceException> {
+    private class AuditAndProduceUmaPolicyFunction implements AsyncFunction<List<ResourceResponse>, UmaPolicy, ResourceException> {
         private final ResourceSetDescription resourceSet;
         private final ServerContext context;
 
@@ -290,13 +291,13 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         }
 
         @Override
-        public Promise<UmaPolicy, ResourceException> apply(List<Resource> value) {
+        public Promise<UmaPolicy, ResourceException> apply(List<ResourceResponse> value) {
             try {
                 UmaPolicy umaPolicy = UmaPolicy.fromUnderlyingPolicies(resourceSet, value);
                 String userId = getLoggedInUserId(context);
                 auditLogger.get().log(resourceSet.getId(), resourceSet.getName(), userId,
                         UmaAuditType.POLICY_CREATED, userId);
-                return Promises.newResultPromise(umaPolicy);
+                return newResultPromise(umaPolicy);
             } catch (ResourceException e) {
                 return newExceptionPromise(e);
             }
@@ -339,9 +340,9 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                         QueryFilter.equalTo(new JsonPointer("resourceTypeUuid"), resourceSetId),
                         QueryFilter.equalTo(new JsonPointer("createdBy"), resourceOwnerUid)));
         return policyResourceDelegate.queryPolicies(context, request)
-                .thenAsync(new AsyncFunction<Pair<QueryResult, List<Resource>>, UmaPolicy, ResourceException>() {
+                .thenAsync(new AsyncFunction<Pair<QueryResponse, List<ResourceResponse>>, UmaPolicy, ResourceException>() {
                     @Override
-                    public Promise<UmaPolicy, ResourceException> apply(Pair<QueryResult, List<Resource>> value) {
+                    public Promise<UmaPolicy, ResourceException> apply(Pair<QueryResponse, List<ResourceResponse>> value) {
                         try {
                             if (value.getSecond().isEmpty()) {
                                 return newExceptionPromise(
@@ -350,7 +351,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                             } else {
                                 ResourceSetDescription resourceSet = getResourceSet(getRealm(context), resourceSetId);
                                 UmaPolicy umaPolicy = UmaPolicy.fromUnderlyingPolicies(resourceSet, value.getSecond());
-                                return Promises.newResultPromise(umaPolicy);
+                                return newResultPromise(umaPolicy);
                             }
                         } catch (ResourceException e) {
                             return newExceptionPromise(e);
@@ -435,15 +436,15 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
 
         @Override
         public Promise<UmaPolicy, ResourceException> apply(UmaPolicy umaPolicy) throws ResourceException {
-            List<Promise<Resource, ResourceException>> promises = new ArrayList<>();
+            List<Promise<ResourceResponse, ResourceException>> promises = new ArrayList<>();
             final String userId = contextHelper.getUserId(context);
             final Set<JsonValue> policies = updatedUmaPolicy.asUnderlyingPolicies(userId);
             for (final JsonValue policy : policies) {
                 promises.add(policyResourceDelegate.updatePolicies(context, singleton(policy))
                         .thenAsync(SINGLETON_RESOURCE_FUNCTION,
-                                new AsyncFunction<ResourceException, Resource, ResourceException>() {
+                                new AsyncFunction<ResourceException, ResourceResponse, ResourceException>() {
                             @Override
-                            public Promise<Resource, ResourceException> apply(ResourceException e)
+                            public Promise<ResourceResponse, ResourceException> apply(ResourceException e)
                                     throws ResourceException {
                                 if (e instanceof NotFoundException) {
                                     return policyResourceDelegate.createPolicies(context, singleton(policy))
@@ -454,13 +455,13 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                         })
                 );
             }
-            return when(promises).thenAsync(new AsyncFunction<List<Resource>, UmaPolicy, ResourceException>() {
+            return when(promises).thenAsync(new AsyncFunction<List<ResourceResponse>, UmaPolicy, ResourceException>() {
                 @Override
-                public Promise<UmaPolicy, ResourceException> apply(List<Resource> value) throws ResourceException {
+                public Promise<UmaPolicy, ResourceException> apply(List<ResourceResponse> value) throws ResourceException {
                     String userId = getLoggedInUserId(context);
                     auditLogger.get().log(resourceSetId, resourceSet.getName(), userId, UmaAuditType.POLICY_UPDATED, userId);
                     resolveUIDToUsername(updatedUmaPolicy.asJson());
-                    return Promises.newResultPromise(updatedUmaPolicy);
+                    return newResultPromise(updatedUmaPolicy);
                 }
             }, new AsyncFunction<ResourceException, UmaPolicy, ResourceException>() {
                 @Override
@@ -472,10 +473,10 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
 
     }
 
-    private static AsyncFunction<List<Resource>, Resource, ResourceException> SINGLETON_RESOURCE_FUNCTION =
-            new AsyncFunction<List<Resource>, Resource, ResourceException>() {
+    private static AsyncFunction<List<ResourceResponse>, ResourceResponse, ResourceException> SINGLETON_RESOURCE_FUNCTION =
+            new AsyncFunction<List<ResourceResponse>, ResourceResponse, ResourceException>() {
                 @Override
-                public Promise<Resource, ResourceException> apply(List<Resource> resources)
+                public Promise<ResourceResponse, ResourceException> apply(List<ResourceResponse> resources)
                         throws ResourceException {
                     return newResultPromise(resources.get(0));
                 }
@@ -493,17 +494,17 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
             return newExceptionPromise(e);
         }
         return internalReadPolicy(context, resourceSetId)
-                .thenAsync(new AsyncFunction<UmaPolicy, List<Resource>, ResourceException>() {
+                .thenAsync(new AsyncFunction<UmaPolicy, List<ResourceResponse>, ResourceException>() {
                     @Override
-                    public Promise<List<Resource>, ResourceException> apply(UmaPolicy value) {
+                    public Promise<List<ResourceResponse>, ResourceException> apply(UmaPolicy value) {
                         return policyResourceDelegate.deletePolicies(context, value.getUnderlyingPolicyIds());
                     }
                 })
-                .thenAsync(new UpdatePolicyGraphStatesFunction<List<Resource>>(resourceSet, context))
-                .thenAsync(new AsyncFunction<List<Resource>, Void, ResourceException>() {
+                .thenAsync(new UpdatePolicyGraphStatesFunction<List<ResourceResponse>>(resourceSet, context))
+                .thenAsync(new AsyncFunction<List<ResourceResponse>, Void, ResourceException>() {
                     @Override
-                    public Promise<Void, ResourceException> apply(List<Resource> value) {
-                        return Promises.newResultPromise(null);
+                    public Promise<Void, ResourceException> apply(List<ResourceResponse> value) {
+                        return newResultPromise(null);
                     }
                 });
     }
@@ -512,7 +513,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
      * {@inheritDoc}
      */
     @Override
-    public Promise<Pair<QueryResult, Collection<UmaPolicy>>, ResourceException> queryPolicies(final ServerContext context,
+    public Promise<Pair<QueryResponse, Collection<UmaPolicy>>, ResourceException> queryPolicies(final ServerContext context,
             final QueryRequest umaQueryRequest) {
 
         if (umaQueryRequest.getQueryExpression() != null) {
@@ -521,7 +522,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
 
         QueryRequest request = Requests.newQueryRequest("");
         final AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> filter = umaQueryRequest.getQueryFilter()
-                .accept(new AggregateUmaPolicyQueryFilter(), new AggregateQuery<QueryFilter, QueryFilter>());
+                .accept(new AggregateUmaPolicyQueryFilter(), new AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>>());
 
         String queryId = umaQueryRequest.getQueryId();
         if (queryId != null && queryId.equals("searchAll")) {
@@ -535,11 +536,11 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
             }
         }
         return policyResourceDelegate.queryPolicies(context, request)
-                .thenAsync(new AsyncFunction<Pair<QueryResult, List<Resource>>, Collection<UmaPolicy>, ResourceException>() {
+                .thenAsync(new AsyncFunction<Pair<QueryResponse, List<ResourceResponse>>, Collection<UmaPolicy>, ResourceException>() {
                     @Override
-                    public Promise<Collection<UmaPolicy>, ResourceException> apply(Pair<QueryResult, List<Resource>> value) {
-                        Map<String, Set<Resource>> policyMapping = new HashMap<>();
-                        for (Resource policy : value.getSecond()) {
+                    public Promise<Collection<UmaPolicy>, ResourceException> apply(Pair<QueryResponse, List<ResourceResponse>> value) {
+                        Map<String, Set<ResourceResponse>> policyMapping = new HashMap<>();
+                        for (ResourceResponse policy : value.getSecond()) {
 
                             String resource = policy.getContent().get("resources").asList(String.class).get(0);
 
@@ -551,7 +552,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                                 resource = resource.substring(0, resource.indexOf(":"));
                             }
 
-                            Set<Resource> mapping = policyMapping.get(resource);
+                            Set<ResourceResponse> mapping = policyMapping.get(resource);
                             if (mapping == null) {
                                 mapping = new HashSet<>();
                                 policyMapping.put(resource, mapping);
@@ -563,21 +564,21 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                         try {
                             Collection<UmaPolicy> umaPolicies = new HashSet<>();
                             String resourceOwnerId = getResourceOwnerId(context);
-                            for (Map.Entry<String, Set<Resource>> entry : policyMapping.entrySet()) {
+                            for (Map.Entry<String, Set<ResourceResponse>> entry : policyMapping.entrySet()) {
                                 ResourceSetDescription resourceSet = getResourceSetDescription(entry.getKey(), resourceOwnerId, context);
                                 UmaPolicy umaPolicy = UmaPolicy.fromUnderlyingPolicies(resourceSet, entry.getValue());
                                 resolveUIDToUsername(umaPolicy.asJson());
                                 umaPolicies.add(umaPolicy);
                             }
-                            return Promises.newResultPromise(umaPolicies);
+                            return newResultPromise(umaPolicies);
                         } catch (ResourceException e) {
                             return newExceptionPromise(e);
                         }
                     }
                 })
-                .thenAsync(new AsyncFunction<Collection<UmaPolicy>, Pair<QueryResult, Collection<UmaPolicy>>, ResourceException>() {
+                .thenAsync(new AsyncFunction<Collection<UmaPolicy>, Pair<QueryResponse, Collection<UmaPolicy>>, ResourceException>() {
                     @Override
-                    public Promise<Pair<QueryResult, Collection<UmaPolicy>>, ResourceException> apply(Collection<UmaPolicy> policies) {
+                    public Promise<Pair<QueryResponse, Collection<UmaPolicy>>, ResourceException> apply(Collection<UmaPolicy> policies) {
                         Collection<UmaPolicy> results = policies;
                         if (filter.getSecondQuery() != null) {
                             PolicySearch search = filter.getSecondQuery().accept(new UmaPolicyQueryFilterVisitor(), new PolicySearch(policies));
@@ -603,8 +604,8 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                             remainingPagedResults /= pageSize;
                         }
 
-                        return Promises.newResultPromise(Pair.of(
-                                new QueryResult(pagedResultsCookie, remainingPagedResults), pagedPolicies));
+                        return newResultPromise(Pair.of(
+                                newQueryResponse(pagedResultsCookie, CountPolicy.EXACT, remainingPagedResults), pagedPolicies));
                     }
                 });
     }
@@ -825,7 +826,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         return contextHelper.getRealm(context);
     }
 
-    private class DeleteOldPolicyFunction implements AsyncFunction<Pair<QueryResult, List<Resource>>, Void, ResourceException> {
+    private class DeleteOldPolicyFunction implements AsyncFunction<Pair<QueryResponse, List<ResourceResponse>>, Void, ResourceException> {
         private final ServerContext context;
 
         public DeleteOldPolicyFunction(ServerContext context) {
@@ -833,14 +834,14 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         }
 
         @Override
-        public Promise<Void, ResourceException> apply(Pair<QueryResult, List<Resource>> result) {
-            List<Promise<List<Resource>, ResourceException>> results = new ArrayList<>();
-            for (Resource resource : result.getSecond()) {
+        public Promise<Void, ResourceException> apply(Pair<QueryResponse, List<ResourceResponse>> result) {
+            List<Promise<List<ResourceResponse>, ResourceException>> results = new ArrayList<>();
+            for (ResourceResponse resource : result.getSecond()) {
                 results.add(policyResourceDelegate.deletePolicies(context, singleton(resource.getId())));
             }
-            return Promises.when(results).then(new Function<List<List<Resource>>, Void, ResourceException>() {
+            return Promises.when(results).then(new Function<List<List<ResourceResponse>>, Void, ResourceException>() {
                 @Override
-                public Void apply(List<List<Resource>> lists) throws ResourceException {
+                public Void apply(List<List<ResourceResponse>> lists) {
                     return null;
                 }
             });

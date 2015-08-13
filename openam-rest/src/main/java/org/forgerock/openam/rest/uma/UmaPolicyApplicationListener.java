@@ -16,50 +16,17 @@
 
 package org.forgerock.openam.rest.uma;
 
-import static org.forgerock.openam.uma.UmaConstants.*;
+import static org.forgerock.openam.uma.UmaConstants.UMA_BACKEND_POLICY_RESOURCE_HANDLER;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.security.auth.Subject;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.security.auth.Subject;
-
-import org.forgerock.http.Context;
-import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.util.query.QueryFilter;
-import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.Requests;
-import org.forgerock.json.resource.Resource;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.RootContext;
-import org.forgerock.http.context.ServerContext;
-import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.oauth2.resources.ResourceSetDescription;
-import org.forgerock.oauth2.resources.ResourceSetStore;
-import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
-import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationManagerWrapper;
-import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
-import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
-import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
-import org.forgerock.openam.rest.resource.RealmContext;
-import org.forgerock.openam.rest.resource.SubjectContext;
-import org.forgerock.openam.uma.UmaConstants;
-import org.forgerock.openam.utils.OpenAMSettings;
-import org.forgerock.openam.utils.OpenAMSettingsImpl;
-import org.forgerock.util.Pair;
-import org.forgerock.util.Reject;
-import org.forgerock.util.AsyncFunction;
-import org.forgerock.util.promise.ExceptionHandler;
-import org.forgerock.util.promise.Promise;
-import org.forgerock.util.promise.PromiseImpl;
-import org.forgerock.util.promise.Promises;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -79,6 +46,38 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
+import org.forgerock.http.Context;
+import org.forgerock.http.context.RootContext;
+import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.JsonPointer;
+import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
+import org.forgerock.json.resource.RequestHandler;
+import org.forgerock.json.resource.Requests;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.oauth2.core.exceptions.NotFoundException;
+import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.oauth2.resources.ResourceSetDescription;
+import org.forgerock.oauth2.resources.ResourceSetStore;
+import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
+import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationManagerWrapper;
+import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
+import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
+import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
+import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.rest.resource.SubjectContext;
+import org.forgerock.openam.uma.UmaConstants;
+import org.forgerock.openam.utils.OpenAMSettings;
+import org.forgerock.openam.utils.OpenAMSettingsImpl;
+import org.forgerock.util.AsyncFunction;
+import org.forgerock.util.Reject;
+import org.forgerock.util.promise.ExceptionHandler;
+import org.forgerock.util.promise.Promise;
+import org.forgerock.util.promise.Promises;
+import org.forgerock.util.query.QueryFilter;
 
 /**
  * Listens for changes to UMA Resource Server (OAuth2 Agent) to create or delete its policy
@@ -93,7 +92,7 @@ public class UmaPolicyApplicationListener implements IdEventListener {
     private final AMIdentityRepositoryFactory idRepoFactory;
     private final ApplicationManagerWrapper applicationManager;
     private final ApplicationTypeManagerWrapper applicationTypeManagerWrapper;
-    private final PromisedRequestHandler policyResource;
+    private final RequestHandler policyResource;
     private final ResourceSetStoreFactory resourceSetStoreFactory;
 
     /**
@@ -109,7 +108,7 @@ public class UmaPolicyApplicationListener implements IdEventListener {
     public UmaPolicyApplicationListener(final AMIdentityRepositoryFactory idRepoFactory,
             ApplicationManagerWrapper applicationManager,
             ApplicationTypeManagerWrapper applicationTypeManagerWrapper,
-            @Named(UMA_BACKEND_POLICY_RESOURCE_HANDLER) PromisedRequestHandler policyResource,
+            @Named(UMA_BACKEND_POLICY_RESOURCE_HANDLER) RequestHandler policyResource,
             ResourceSetStoreFactory resourceSetStoreFactory) {
         this.idRepoFactory = idRepoFactory;
         this.applicationManager = applicationManager;
@@ -294,21 +293,24 @@ public class UmaPolicyApplicationListener implements IdEventListener {
         realmContext.addDnsAlias("/", realm);
         final ServerContext context = new AdminSubjectContext(realmContext);
         QueryRequest request = Requests.newQueryRequest("")
-                .setQueryFilter(QueryFilter.equalTo("/applicationName", resourceServerId));
-        policyResource.handleQuery(context, request)
-                .thenAsync(new AsyncFunction<Pair<QueryResult, List<Resource>>, List<Resource>, ResourceException>() {
+                .setQueryFilter(QueryFilter.equalTo(new JsonPointer("applicationName"), resourceServerId));
+        final List<ResourceResponse> resources = new ArrayList<>();
+        policyResource.handleQuery(context, request, new QueryResourceHandler() {
+            @Override
+            public boolean handleResource(ResourceResponse resource) {
+                resources.add(resource);
+                return true;
+            }
+        })
+                .thenAsync(new AsyncFunction<QueryResponse, List<ResourceResponse>, ResourceException>() {
                     @Override
-                    public Promise<List<Resource>, ResourceException> apply(Pair<QueryResult, List<Resource>> result) {
-                        List<Promise<Resource, ResourceException>> promises
-                                = new ArrayList<Promise<Resource, ResourceException>>();
-                        PromiseImpl<Resource, ResourceException> kicker = PromiseImpl.create();
-                        promises.add(kicker);
-                        for (Resource policy : result.getSecond()) {
+                    public Promise<List<ResourceResponse>, ResourceException> apply(QueryResponse response) {
+                        List<Promise<ResourceResponse, ResourceException>> promises = new ArrayList<>();
+                        for (ResourceResponse policy : resources) {
                             DeleteRequest deleteRequest = Requests.newDeleteRequest("", policy.getId());
                             promises.add(policyResource.handleDelete(context, deleteRequest));
                         }
-                        Promise<List<Resource>, ResourceException> when = Promises.when(promises);
-                        kicker.handleResult(null);
+                        Promise<List<ResourceResponse>, ResourceException> when = Promises.when(promises);
                         return when;
                     }
                 })
@@ -338,7 +340,7 @@ public class UmaPolicyApplicationListener implements IdEventListener {
         private final SSOToken adminToken;
 
         private AdminSubjectContext(Context parent) {
-            super("subjectContext", parent);
+            super(parent, "subjectContext");
             this.adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
         }
 

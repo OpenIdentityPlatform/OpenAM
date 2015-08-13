@@ -33,7 +33,7 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
@@ -126,7 +126,7 @@ public class PrivilegeAuthzModule implements CrestAuthorizationModule {
 
         if (definition == null) {
             return Promises.newResultPromise(
-                    AuthorizationResult.failure("No privilege mapping for requested action " + crestAction));
+                    AuthorizationResult.accessDenied("No privilege mapping for requested action " + crestAction));
         }
 
         return evaluate(serverContext, definition);
@@ -163,7 +163,7 @@ public class PrivilegeAuthzModule implements CrestAuthorizationModule {
                     Collections.<String, Set<String>>emptyMap())) {
 
                 // Authorisation has been approved.
-                return Promises.newResultPromise(AuthorizationResult.success());
+                return Promises.newResultPromise(AuthorizationResult.accessPermitted());
             }
         } catch (DelegationException dE) {
             return Promises.newExceptionPromise(
@@ -173,7 +173,7 @@ public class PrivilegeAuthzModule implements CrestAuthorizationModule {
                     ResourceException.getException(500, "Attempt to authorise the user has failed", ssoE));
         }
 
-        return Promises.newResultPromise(AuthorizationResult.failure("The user has insufficient privileges"));
+        return Promises.newResultPromise(AuthorizationResult.accessDenied("The user has insufficient privileges"));
     }
 
 

@@ -16,11 +16,12 @@
 
 package org.forgerock.openam.rest.oauth2;
 
-import com.sun.identity.entitlement.Entitlement;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.Evaluator;
-import com.sun.identity.entitlement.JwtPrincipal;
-import com.sun.identity.idm.AMIdentity;
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.util.query.QueryFilter.and;
+import static org.forgerock.util.query.QueryFilter.equalTo;
+
+import javax.inject.Inject;
+import javax.security.auth.Subject;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,25 +31,26 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.inject.Inject;
-import javax.security.auth.Subject;
 
+import com.sun.identity.entitlement.Entitlement;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.Evaluator;
+import com.sun.identity.entitlement.JwtPrincipal;
+import com.sun.identity.idm.AMIdentity;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonPointer;
-import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.util.query.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.ServerContext;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.uma.UmaPolicy;
 import org.forgerock.openam.uma.UmaPolicyService;
 import org.forgerock.openam.uma.UmaProviderSettingsFactory;
@@ -58,11 +60,8 @@ import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.PromiseImpl;
 import org.forgerock.util.promise.Promises;
 import org.forgerock.util.promise.ResultHandler;
+import org.forgerock.util.query.QueryFilter;
 import org.forgerock.util.query.QueryFilterVisitor;
-
-import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.util.query.QueryFilter.and;
-import static org.forgerock.util.query.QueryFilter.equalTo;
 
 /**
  * Services for getting Resource Sets and optionally augmenting them with an associated UMA policy.
@@ -123,9 +122,9 @@ public class ResourceSetService {
 
     private Promise<Collection<ResourceSetDescription>, ResourceException> getPolicies(final ServerContext context, QueryRequest policyQuery, final String resourceOwnerId, final Set<ResourceSetDescription> resourceSets, final boolean augmentWithPolicies, final ResourceSetWithPolicyQuery query) {
         return policyService.queryPolicies(context, policyQuery)
-                .thenAsync(new AsyncFunction<Pair<QueryResult, Collection<UmaPolicy>>, Collection<ResourceSetDescription>, ResourceException>() {
+                .thenAsync(new AsyncFunction<Pair<QueryResponse, Collection<UmaPolicy>>, Collection<ResourceSetDescription>, ResourceException>() {
                     @Override
-                    public Promise<Collection<ResourceSetDescription>, ResourceException> apply(final Pair<QueryResult, Collection<UmaPolicy>> result) {
+                    public Promise<Collection<ResourceSetDescription>, ResourceException> apply(final Pair<QueryResponse, Collection<UmaPolicy>> result) {
                         final Set<ResourceSetDescription> filteredResourceSets = new HashSet<>();
                         try {
                             String realm = context.asContext(RealmContext.class).getResolvedRealm();
@@ -305,9 +304,9 @@ public class ResourceSetService {
                         if (query.getPolicyQuery() != null) {
                             QueryRequest policyQuery = Requests.newQueryRequest("").setQueryFilter(query.getPolicyQuery());
                             resourceSetsPromise = policyService.queryPolicies(context, policyQuery)
-                                    .thenAsync(new AsyncFunction<Pair<QueryResult, Collection<UmaPolicy>>, Collection<ResourceSetDescription>, ResourceException>() {
+                                    .thenAsync(new AsyncFunction<Pair<QueryResponse, Collection<UmaPolicy>>, Collection<ResourceSetDescription>, ResourceException>() {
                                         @Override
-                                        public Promise<Collection<ResourceSetDescription>, ResourceException> apply(Pair<QueryResult, Collection<UmaPolicy>> result) throws ResourceException {
+                                        public Promise<Collection<ResourceSetDescription>, ResourceException> apply(Pair<QueryResponse, Collection<UmaPolicy>> result) throws ResourceException {
                                             try {
                                                 return Promises.newResultPromise(combine(context, query, filteredResourceSets,
                                                         result.getSecond(), augmentWithPolicies, resourceOwnerId));

@@ -55,7 +55,7 @@ public class SessionResourceAuthzModule extends AdminOnlyAuthzModule {
                 debug.message("SessionResourceAuthzModule :: " + request.getAction() +
                         " action request authorized by module.");
             }
-            return Promises.newResultPromise(AuthorizationResult.success());
+            return Promises.newResultPromise(AuthorizationResult.accessPermitted());
         }
 
         if (debug.messageEnabled()) {
