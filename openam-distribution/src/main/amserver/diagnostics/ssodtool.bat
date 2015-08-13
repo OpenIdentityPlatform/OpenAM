@@ -25,7 +25,7 @@
 :: $Id: ssodtool.bat,v 1.4 2009/08/18 01:03:25 ak138937 Exp $
 ::
 
-:: Portions Copyrighted 2011-2014 ForgeRock AS
+:: Portions Copyrighted 2011-2015 ForgeRock AS.
 
 set _JAVA_CMD=java
 set _TRIMMED_JAVA_HOME=%JAVA_HOME%
@@ -79,7 +79,7 @@ SET DEBUG_FLAGS="-Xdebug -Xrunjdwp:transport=dt_socket,address=8888,server=y,sus
 set ORIG_CLASSPATH=%CLASSPATH%
 
 set CLASSPATH="resources"
-set CLASSPATH="%CLASSPATH%;lib/forgerock-util-${commons.forgerock-util.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/forgerock-util-${forgerock.util.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/openam-diagnostics-base-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/openam-diagnostics-schema-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/openam-core-${project.version}.jar"

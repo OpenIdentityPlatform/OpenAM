@@ -25,7 +25,7 @@
 # $Id: ssodtool.sh,v 1.3 2009/08/18 01:02:53 ak138937 Exp $
 #
 
-# Portions Copyrighted 2011-2014 ForgeRock AS
+# Portions Copyrighted 2011-2015 ForgeRock AS.
 
 if [ -z "$JAVA_HOME" ]; then
   echo "Please define JAVA_HOME environment variable before running this program"
@@ -58,7 +58,7 @@ TOOLS_HOME="`dirname $HOME`"
 EXT_CLASSPATH=$CLASSPATH
 
 CLASSPATH="resources"
-CLASSPATH="$CLASSPATH:lib/forgerock-util-${commons.forgerock-util.version}.jar"
+CLASSPATH="$CLASSPATH:lib/forgerock-util-${forgerock.util.version}.jar"
 CLASSPATH="$CLASSPATH:lib/openam-diagnostics-base-${project.version}.jar"
 CLASSPATH="$CLASSPATH:lib/openam-diagnostics-schema-${project.version}.jar"
 CLASSPATH="$CLASSPATH:lib/openam-core-${project.version}.jar"

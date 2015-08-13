@@ -30,7 +30,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <codemirror.version>4.10</codemirror.version>
-        <forgerock-ui.version>2.0.7</forgerock-ui.version>
+        <forgerock.ui.version>2.0.7</forgerock.ui.version>
     </properties>
 
     <dependencies>
@@ -47,7 +47,7 @@
             <groupId>org.forgerock.commons.ui</groupId>
             <artifactId>forgerock-ui-commons</artifactId>
             <type>zip</type>
-            <version>${forgerock-ui.version}</version>
+            <version>${forgerock.ui.version}</version>
             <classifier>www</classifier>
         </dependency>
 
@@ -147,7 +147,7 @@
                                 <artifactItem>
                                     <groupId>org.forgerock.commons.ui</groupId>
                                     <artifactId>forgerock-ui-commons</artifactId>
-                                    <version>${forgerock-ui.version}</version>
+                                    <version>${forgerock.ui.version}</version>
                                     <type>zip</type>
                                     <classifier>www</classifier>
                                 </artifactItem>

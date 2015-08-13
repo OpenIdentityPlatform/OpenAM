@@ -225,7 +225,7 @@
                                 <artifactItem>
                                     <groupId>org.forgerock.commons.ui</groupId>
                                     <artifactId>forgerock-ui-user</artifactId>
-                                    <version>${forgerock-ui.version}</version>
+                                    <version>${forgerock.ui.version}</version>
                                     <type>zip</type>
                                     <classifier>www</classifier>
                                 </artifactItem>

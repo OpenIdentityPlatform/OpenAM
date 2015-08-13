@@ -40,7 +40,7 @@ goto WHILE
 
 set CLASSPATH="@CONFIG_DIR@"
 set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/classes"
-set CLASSPATH="%CLASSPATH%;lib/forgerock-util-${commons.forgerock-util.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/forgerock-util-${forgerock.util.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/opendj-server-${opendj.server.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/mail-${mail.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/servlet-api-${servlet-api.version}.jar"

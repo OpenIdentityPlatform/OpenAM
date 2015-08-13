@@ -116,15 +116,16 @@
         <opendj.server.version>2.6.2</opendj.server.version>
         <opendj.sdk.version>2.6.10</opendj.sdk.version>
 
-        <commons.forgerock-util.version>2.0.0-SNAPSHOT</commons.forgerock-util.version>
+        <forgerock.util.version>2.0.0-SNAPSHOT</forgerock.util.version>
         <forgerock.bloomfilter.version>1.0.0-SNAPSHOT</forgerock.bloomfilter.version>
         <forgerock.http.version>0.0.1-SNAPSHOT</forgerock.http.version>
-        <commons.authfilter.version>2.0.0-SNAPSHOT</commons.authfilter.version>
+        <forgerock.authfilters.version>2.0.0-SNAPSHOT</forgerock.authfilters.version>
         <forgerock.json.version>3.0.0-SNAPSHOT</forgerock.json.version>
-        <forgerock-ui.version>2.2.0-SNAPSHOT</forgerock-ui.version>
+        <forgerock.ui.version>2.2.0-SNAPSHOT</forgerock.ui.version>
         <forgerock.guava.version>18.0.1</forgerock.guava.version>
         <forgerock.audit.version>0.3.0-SNAPSHOT</forgerock.audit.version>
         <forgerock.guice.version>1.1.0-SNAPSHOT</forgerock.guice.version>
+
         <guice.version>3.0</guice.version>
         <restlet.version>2.1.7</restlet.version>
         <xercesj.version>2.11.0</xercesj.version>
@@ -917,7 +918,7 @@
             <dependency>
                 <groupId>org.forgerock.commons.ui</groupId>
                 <artifactId>forgerock-ui-user</artifactId>
-                <version>${forgerock-ui.version}</version>
+                <version>${forgerock.ui.version}</version>
                 <type>zip</type>
                 <classifier>www</classifier>
             </dependency>
@@ -1702,7 +1703,7 @@
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-util</artifactId>
-                <version>${commons.forgerock-util.version}</version>
+                <version>${forgerock.util.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
@@ -1717,32 +1718,32 @@
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-auth-filter-common</artifactId>
-                <version>${commons.authfilter.version}</version>
+                <version>${forgerock.authfilters.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-jaspi-runtime</artifactId>
-                <version>${commons.authfilter.version}</version>
+                <version>${forgerock.authfilters.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-jaspi-jwt-session-module</artifactId>
-                <version>${commons.authfilter.version}</version>
+                <version>${forgerock.authfilters.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>authz-framework-api</artifactId>
-                <version>${commons.authfilter.version}</version>
+                <version>${forgerock.authfilters.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>authz-framework</artifactId>
-                <version>${commons.authfilter.version}</version>
+                <version>${forgerock.authfilters.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-jaspi-openid-connect-module</artifactId>
-                <version>${commons.authfilter.version}</version>
+                <version>${forgerock.authfilters.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons.guava</groupId>
