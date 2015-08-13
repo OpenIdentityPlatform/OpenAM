@@ -287,6 +287,7 @@
     <!-- OpenAM Child Modules -->
     <!-- Build order will be determined by the Maven Reactor. -->
     <modules>
+        <module>openam-http</module>
 
         <module>openam-ldap-utils</module>
         <module>openam-datastore</module>
@@ -905,6 +906,11 @@
                 <artifactId>json-test</artifactId>
                 <version>${forgerock.json.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-http</artifactId>
+                <version>${project.version}</version>
             </dependency>
 
             <!-- New RIA Client UI -->
@@ -1671,6 +1677,11 @@
             <dependency>
                 <groupId>org.forgerock.http</groupId>
                 <artifactId>chf-client-apache-sync</artifactId>
+                <version>${forgerock.http.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.http</groupId>
+                <artifactId>chf-http-servlet</artifactId>
                 <version>${forgerock.http.version}</version>
             </dependency>
             <dependency>

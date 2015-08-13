@@ -521,6 +521,15 @@
     <dependencies>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-http</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.http</groupId>
+            <artifactId>chf-http-servlet</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-ui-ria</artifactId>
             <type>zip</type>
             <classifier>www</classifier>

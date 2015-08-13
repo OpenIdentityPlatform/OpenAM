@@ -1195,6 +1195,19 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>OpenAM</servlet-name>
+        <servlet-class>org.forgerock.http.servlet.HttpFrameworkServlet</servlet-class>
+        <init-param>
+            <param-name>application-loader</param-name>
+            <param-value>guice</param-value>
+        </init-param>
+        <init-param>
+            <param-name>routing-base</param-name>
+            <param-value>context_path</param-value>
+        </init-param>
+    </servlet>
+
+    <servlet>
         <servlet-name>ForgeRockRest</servlet-name>
         <servlet-class>org.forgerock.openam.rest.RestEndpointServlet</servlet-class>
     </servlet>
