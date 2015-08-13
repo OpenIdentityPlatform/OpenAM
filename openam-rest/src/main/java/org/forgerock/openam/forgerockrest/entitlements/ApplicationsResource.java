@@ -56,7 +56,7 @@ import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryFilterVisitorAdapter;
-import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationWrapper;
@@ -371,7 +371,7 @@ public class ApplicationsResource extends RealmAwareResource {
                 apps.add(createApplicationWrapper(application, appTypeManagerWrapper));
             }
 
-            handler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
+            handler = QueryResourceHandlerBuilder.withPagingAndSorting(handler, request);
 
             if (apps.size() > 0) {
                 remaining = apps.size();

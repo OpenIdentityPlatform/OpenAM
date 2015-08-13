@@ -41,16 +41,16 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-public class SortingQueryResultHandlerTest {
+public class SortingQueryResponseHandlerTest {
     private static final List<SortKey> SORT_BY_NAME = Arrays.asList(SortKey.ascendingOrder("name"));
     private static final List<SortKey> SORT_BY_NAME_DESC = Arrays.asList(SortKey.descendingOrder("name"));
     private static final List<SortKey> SORT_BY_NAME_AND_AGE = Arrays.asList(SortKey.ascendingOrder("name"),
             SortKey.descendingOrder("age"));
 
     @Mock
-    private QueryResultHandler mockHandler;
+    private QueryResponseHandler mockHandler;
 
-    private SortingQueryResultHandler sortingHandler;
+    private SortingQueryResponseHandler sortingHandler;
 
     @BeforeMethod
     public void setupMocks() {
@@ -59,23 +59,23 @@ public class SortingQueryResultHandlerTest {
 
     @Test(expectedExceptions = NullPointerException.class)
     public void shouldRejectNullDelegateHandler() {
-        new SortingQueryResultHandler(null, SORT_BY_NAME);
+        new SortingQueryResponseHandler(null, SORT_BY_NAME);
     }
 
     @Test(expectedExceptions = NullPointerException.class)
     public void shouldRejectNullSortKeys() {
-        new SortingQueryResultHandler(mockHandler, null);
+        new SortingQueryResponseHandler(mockHandler, null);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void shouldRejectEmptySortKeys() {
-        new SortingQueryResultHandler(mockHandler, Collections.<SortKey>emptyList());
+        new SortingQueryResponseHandler(mockHandler, Collections.<SortKey>emptyList());
     }
 
     @Test
     public void shouldSortResults() {
         // Given
-        sortingHandler = new SortingQueryResultHandler(mockHandler, SORT_BY_NAME);
+        sortingHandler = new SortingQueryResponseHandler(mockHandler, SORT_BY_NAME);
         List<Resource> resources = namedResources("b", "a", "c");
         given(mockHandler.handleResource(any(Resource.class))).willReturn(true);
 
@@ -94,7 +94,7 @@ public class SortingQueryResultHandlerTest {
     @Test
     public void shouldSortResultsDescendingIfSpecified() {
         // Given
-        sortingHandler = new SortingQueryResultHandler(mockHandler, SORT_BY_NAME_DESC);
+        sortingHandler = new SortingQueryResponseHandler(mockHandler, SORT_BY_NAME_DESC);
         List<Resource> resources = namedResources("b", "a", "c");
         given(mockHandler.handleResource(any(Resource.class))).willReturn(true);
 
@@ -113,7 +113,7 @@ public class SortingQueryResultHandlerTest {
     @Test
     public void shouldSupportMultiLevelSorting() {
         // Given
-        sortingHandler = new SortingQueryResultHandler(mockHandler, SORT_BY_NAME_AND_AGE);
+        sortingHandler = new SortingQueryResponseHandler(mockHandler, SORT_BY_NAME_AND_AGE);
         List<Resource> resources = nameAgeResources(field("b", 1), field("b", 2), field("a", 1), field("c", 1));
         given(mockHandler.handleResource(any(Resource.class))).willReturn(true);
 
@@ -135,7 +135,7 @@ public class SortingQueryResultHandlerTest {
     @Test
     public void shouldHandleNullContent() {
         // Given
-        sortingHandler = new SortingQueryResultHandler(mockHandler, SORT_BY_NAME);
+        sortingHandler = new SortingQueryResponseHandler(mockHandler, SORT_BY_NAME);
         Resource resource = new Resource("a", null, null);
 
         // When
@@ -149,7 +149,7 @@ public class SortingQueryResultHandlerTest {
     @Test
     public void shouldUpdateQueryResultWithAccurateRemainingResultsCount() {
         // Given
-        sortingHandler = new SortingQueryResultHandler(mockHandler, SORT_BY_NAME);
+        sortingHandler = new SortingQueryResponseHandler(mockHandler, SORT_BY_NAME);
         String cookie = "xxx";
         QueryResult queryResult = new QueryResult(cookie, 12);
         List<Resource> resources = namedResources("a", "b", "c");

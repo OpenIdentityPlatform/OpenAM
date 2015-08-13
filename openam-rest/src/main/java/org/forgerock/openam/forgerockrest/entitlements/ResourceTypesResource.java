@@ -52,7 +52,7 @@ import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.RestUtils;
-import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.JsonResourceType;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.forgerockrest.utils.ServerContextUtils;
@@ -274,7 +274,7 @@ public class ResourceTypesResource extends RealmAwareResource {
         String principalName = "unknown";
         String realm = getRealm(context);
         QueryFilter<JsonPointer> queryFilter = request.getQueryFilter();
-        handler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
+        handler = QueryResourceHandlerBuilder.withPagingAndSorting(handler, request);
 
         try {
             Subject subject = getSubject(context);

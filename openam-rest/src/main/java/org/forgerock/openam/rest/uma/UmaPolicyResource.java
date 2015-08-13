@@ -40,7 +40,7 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
 import org.forgerock.openam.uma.UmaPolicy;
 import org.forgerock.openam.uma.UmaPolicyService;
 import org.forgerock.util.AsyncFunction;
@@ -158,7 +158,7 @@ public class UmaPolicyResource implements CollectionResourceProvider {
     @Override
     public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
             QueryResourceHandler handler) {
-        final QueryResourceHandler resultHandler = new QueryResultHandlerBuilder(handler)
+        final QueryResourceHandler resultHandler = new QueryResourceHandlerBuilder(handler)
                 .withPaging(request.getPageSize(), request.getPagedResultsOffset()).build();
         return umaPolicyService.queryPolicies(context, request)
                 .thenAsync(new AsyncFunction<Pair<QueryResponse, Collection<UmaPolicy>>, QueryResponse, ResourceException>() {

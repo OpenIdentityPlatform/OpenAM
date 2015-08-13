@@ -50,7 +50,7 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.SecurityContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.RestUtils;
-import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeWrapper;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
@@ -176,7 +176,7 @@ public class ApplicationTypesResource extends SubjectAwareResource {
 
         final List<JsonValue> jsonifiedAppTypes = jsonify(appTypes);
 
-        handler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
+        handler = QueryResourceHandlerBuilder.withPagingAndSorting(handler, request);
 
         int remaining = 0;
         if (appTypes.size() > 0) {

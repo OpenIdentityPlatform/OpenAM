@@ -59,7 +59,7 @@ import org.forgerock.openam.entitlement.conditions.environment.IPv4Condition;
 import org.forgerock.openam.entitlement.conditions.environment.IPv6Condition;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.JsonEntitlementConditionModule;
-import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
@@ -193,7 +193,7 @@ public class ConditionTypesResource implements CollectionResourceProvider {
             }
         }
 
-        handler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
+        handler = QueryResourceHandlerBuilder.withPagingAndSorting(handler, request);
 
         int remaining = 0;
         if (conditionTypes.size() > 0) {

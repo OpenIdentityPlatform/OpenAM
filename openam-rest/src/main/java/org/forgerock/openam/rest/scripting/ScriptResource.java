@@ -47,7 +47,7 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.entitlements.RealmAwareResource;
-import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
 import org.forgerock.openam.rest.query.QueryByStringFilterConverter;
 import org.forgerock.openam.scripting.ScriptError;
 import org.forgerock.openam.scripting.ScriptException;
@@ -161,7 +161,7 @@ public class ScriptResource extends RealmAwareResource {
     @Override
     public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
             QueryResourceHandler resultHandler) {
-        resultHandler = QueryResultHandlerBuilder.withPagingAndSorting(resultHandler, request);
+        resultHandler = QueryResourceHandlerBuilder.withPagingAndSorting(resultHandler, request);
         final QueryFilter<JsonPointer> filter = request.getQueryFilter();
         try {
             final Set<ScriptConfiguration> configs;

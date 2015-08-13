@@ -51,7 +51,7 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.PolicyRequest;
-import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
@@ -222,7 +222,7 @@ public final class PolicyResource implements CollectionResourceProvider {
     public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
             QueryResourceHandler handler) {
         try {
-            handler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
+            handler = QueryResourceHandlerBuilder.withPagingAndSorting(handler, request);
             List<Privilege> policies = policyStoreProvider.getPolicyStore(context).query(request);
 
             int remaining = 0;

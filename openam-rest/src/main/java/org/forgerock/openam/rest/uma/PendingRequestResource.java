@@ -44,7 +44,7 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
 import org.forgerock.openam.forgerockrest.utils.JsonValueQueryFilterVisitor;
 import org.forgerock.openam.forgerockrest.utils.ServerContextUtils;
 import org.forgerock.openam.rest.resource.ContextHelper;
@@ -139,7 +139,7 @@ public class PendingRequestResource implements CollectionResourceProvider {
             return newExceptionPromise(newNotSupportedException("Only query filter is supported."));
         }
 
-        handler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
+        handler = QueryResourceHandlerBuilder.withPagingAndSorting(handler, request);
 
         try {
             for (UmaPendingRequest pendingRequest : queryResourceOwnerPendingRequests(context)) {

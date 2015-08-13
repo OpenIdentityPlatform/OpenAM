@@ -44,7 +44,7 @@ import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.sm.datalayer.store.ServerException;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaAuditEntry;
@@ -84,7 +84,7 @@ public class AuditHistory implements CollectionResourceProvider {
                 history = auditLogger.getHistory(identity, request);
             }
 
-            final QueryResourceHandler resultHandler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
+            final QueryResourceHandler resultHandler = QueryResourceHandlerBuilder.withPagingAndSorting(handler, request);
 
             for (UmaAuditEntry entry : history) {
                 resultHandler.handleResource(newResourceResponse(entry.getId(), null, entry.asJson()));

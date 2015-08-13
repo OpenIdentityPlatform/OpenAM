@@ -16,19 +16,20 @@
 
 package org.forgerock.openam.forgerockrest.entitlements.query;
 
-import org.forgerock.json.JsonPointer;
-import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
-import org.forgerock.json.resource.Resource;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.SortKey;
-import org.forgerock.util.Reject;
+import static org.forgerock.json.resource.Responses.newQueryResponse;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
+
+import org.forgerock.json.JsonPointer;
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.CountPolicy;
+import org.forgerock.json.resource.QueryResponse;
+import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.json.resource.SortKey;
+import org.forgerock.util.Reject;
 
 /**
  * Provides buffered in-memory sorting of results for cases where the backend of a CREST service does not natively
@@ -37,37 +38,33 @@ import java.util.PriorityQueue;
  *
  * @since 12.0.0
  */
-final class SortingQueryResultHandler implements QueryResultHandler {
+final class SortingQueryResponseHandler extends QueryResponseHandler {
     private static final int INITIAL_QUEUE_SIZE = 11;
-    private final QueryResultHandler delegate;
-    private final PriorityQueue<Resource> sortedResources;
+    private final org.forgerock.json.resource.QueryResourceHandler delegate;
+    private final PriorityQueue<ResourceResponse> sortedResources;
 
-    SortingQueryResultHandler(final QueryResultHandler delegate, final List<SortKey> sortKeys) {
+    SortingQueryResponseHandler(final org.forgerock.json.resource.QueryResourceHandler delegate, final List<SortKey> sortKeys) {
+        super(delegate);
         Reject.ifNull(delegate, sortKeys);
         Reject.ifTrue(sortKeys.isEmpty(), "No sort keys specified");
         this.delegate = delegate;
-        this.sortedResources = new PriorityQueue<Resource>(INITIAL_QUEUE_SIZE, new SortKeyComparator(sortKeys));
+        this.sortedResources = new PriorityQueue<>(INITIAL_QUEUE_SIZE, new SortKeyComparator(sortKeys));
     }
 
     @Override
-    public void handleError(final ResourceException error) {
-        delegate.handleError(error);
-    }
-
-    @Override
-    public boolean handleResource(Resource resource) {
+    public boolean handleResource(ResourceResponse resource) {
         sortedResources.add(resource);
         return true;
     }
 
     @Override
-    public void handleResult(QueryResult result) {
+    public QueryResponse getResult(QueryResponse result) {
         // Drain all resources from the queue into the delegate result handler (in sorted order)
         boolean keepGoing = true;
         while (keepGoing && !sortedResources.isEmpty()) {
             keepGoing = delegate.handleResource(sortedResources.poll());
         }
-        delegate.handleResult(new QueryResult(result.getPagedResultsCookie(), sortedResources.size()));
+        return newQueryResponse(result.getPagedResultsCookie(), CountPolicy.EXACT, sortedResources.size());
     }
 
     /**
@@ -75,7 +72,7 @@ final class SortingQueryResultHandler implements QueryResultHandler {
      * first sort key in the list. If two elements compare as equal then subsequent sort keys are used for the
      * comparison. All comparisons are currently done using case-sensitive string comparison.
      */
-    private static final class SortKeyComparator implements Comparator<Resource> {
+    private static final class SortKeyComparator implements Comparator<ResourceResponse> {
         private final List<SortKey> sortKeys;
 
         SortKeyComparator(final List<SortKey> sortKeys) {
@@ -84,7 +81,7 @@ final class SortingQueryResultHandler implements QueryResultHandler {
         }
 
         @Override
-        public int compare(final Resource a, final Resource b) {
+        public int compare(final ResourceResponse a, final ResourceResponse b) {
             int cmp = 0;
 
             for (SortKey key : sortKeys) {
@@ -115,7 +112,7 @@ final class SortingQueryResultHandler implements QueryResultHandler {
          * @param field the path of the field to extract from the JSON content.
          * @return the value of the given field as a string, or null if any component of the path is null.
          */
-        private String field(Resource resource, JsonPointer field) {
+        private String field(ResourceResponse resource, JsonPointer field) {
             String result = null;
             JsonValue json = resource.getContent();
             if (json != null && !json.isNull()) {

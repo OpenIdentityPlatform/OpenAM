@@ -11,49 +11,49 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock, AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.entitlements.query;
 
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.SortKey;
 import org.forgerock.util.Reject;
 
 import java.util.List;
 
 /**
- * Wraps a {@link org.forgerock.json.resource.QueryResultHandler} in decorator implementations to add support for
+ * Wraps a {@link QueryResponseHandler} in decorator implementations to add support for
  * sorting, paging etc.
  *
  * @since 12.0.0
  */
-public final class QueryResultHandlerBuilder {
-    private final QueryResultHandler handler;
+public final class QueryResourceHandlerBuilder {
+    private final QueryResponseHandler handler;
 
-    public QueryResultHandlerBuilder(QueryResultHandler handler) {
+    public QueryResourceHandlerBuilder(QueryResponseHandler handler) {
         Reject.ifNull(handler);
         this.handler = handler;
     }
 
-    public QueryResultHandlerBuilder withSorting(List<SortKey> sortKeys) {
+    public QueryResourceHandlerBuilder withSorting(List<SortKey> sortKeys) {
         // If no sort keys specified then just return the existing handler, otherwise add sorting
         return sortKeys == null || sortKeys.isEmpty() ? this
-                : new QueryResultHandlerBuilder(new SortingQueryResultHandler(handler, sortKeys));
+                : new QueryResourceHandlerBuilder(new SortingQueryResponseHandler(handler, sortKeys));
     }
 
-    public QueryResultHandlerBuilder withPaging(int pageSize, int pageOffset) {
+    public QueryResourceHandlerBuilder withPaging(int pageSize, int pageOffset) {
         return pageSize <= 0 ? this
-                : new QueryResultHandlerBuilder(new PagingQueryResultHandler(handler, pageSize, pageOffset));
+                : new QueryResourceHandlerBuilder(new PagingQueryResponseHandler(handler, pageSize, pageOffset));
     }
 
-    public QueryResultHandler build() {
+    public QueryResponseHandler build() {
         return handler;
     }
 
-    public static QueryResultHandler withPagingAndSorting(QueryResultHandler initialHandler, QueryRequest request) {
-        return new QueryResultHandlerBuilder(initialHandler)
+    public static QueryResponseHandler withPagingAndSorting(QueryResourceHandler initialHandler, QueryRequest request) {
+        return new QueryResourceHandlerBuilder(new QueryResponseHandler(initialHandler))
                 .withPaging(request.getPageSize(), request.getPagedResultsOffset())
                 // Always add sorting after paging, otherwise paging will not be based on the sorted list
                 .withSorting(request.getSortKeys())

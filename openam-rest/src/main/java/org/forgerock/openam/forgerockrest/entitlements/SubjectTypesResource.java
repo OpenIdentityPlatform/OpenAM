@@ -56,7 +56,7 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.JsonEntitlementConditionModule;
-import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
@@ -186,7 +186,7 @@ public class SubjectTypesResource implements CollectionResourceProvider {
             }
         }
 
-        handler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
+        handler = QueryResourceHandlerBuilder.withPagingAndSorting(handler, request);
 
         int remaining = 0;
         if (subjectTypes.size() > 0) {

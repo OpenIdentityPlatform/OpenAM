@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock, AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.entitlements.query;
@@ -29,12 +29,12 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-public class PagingQueryResultHandlerTest {
+public class PagingQueryResponseHandlerTest {
 
     @Mock
-    private QueryResultHandler mockHandler;
+    private QueryResponseHandler mockHandler;
 
-    private PagingQueryResultHandler testHandler;
+    private PagingQueryResponseHandler testHandler;
 
     @BeforeMethod
     protected void setupMocks() {
@@ -43,28 +43,28 @@ public class PagingQueryResultHandlerTest {
 
     @Test(expectedExceptions = NullPointerException.class)
     public void shouldRejectNullDelegateHandler() {
-        new PagingQueryResultHandler(null, 1, 0);
+        new PagingQueryResponseHandler(null, 1, 0);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void shouldRejectZeroPageSize() {
-        new PagingQueryResultHandler(mockHandler, 0, 0);
+        new PagingQueryResponseHandler(mockHandler, 0, 0);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void shouldRejectNegativePageSize() {
-        new PagingQueryResultHandler(mockHandler, -1, 0);
+        new PagingQueryResponseHandler(mockHandler, -1, 0);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void shouldRejectNegativePageOffset() {
-        new PagingQueryResultHandler(mockHandler, 1, -1);
+        new PagingQueryResponseHandler(mockHandler, 1, -1);
     }
 
     @Test
     public void shouldOnlyReadUntilPageIsRead() {
         // Given
-        testHandler = new PagingQueryResultHandler(mockHandler, 2, 0);
+        testHandler = new PagingQueryResponseHandler(mockHandler, 2, 0);
         given(mockHandler.handleResource(Matchers.any(Resource.class))).willReturn(true);
 
         // When
@@ -79,7 +79,7 @@ public class PagingQueryResultHandlerTest {
     @Test
     public void shouldRespectOffset() {
         // Given
-        testHandler = new PagingQueryResultHandler(mockHandler, 1, 1);
+        testHandler = new PagingQueryResponseHandler(mockHandler, 1, 1);
         Resource expectedResource = new Resource("b", null, null);
 
         // When
@@ -94,7 +94,7 @@ public class PagingQueryResultHandlerTest {
     @Test
     public void shouldIgnoreExtraResources() {
         // Given
-        testHandler = new PagingQueryResultHandler(mockHandler, 1, 0);
+        testHandler = new PagingQueryResponseHandler(mockHandler, 1, 0);
         given(mockHandler.handleResource(Matchers.any(Resource.class))).willReturn(true);
         Resource expected = new Resource("expected", null, null);
 

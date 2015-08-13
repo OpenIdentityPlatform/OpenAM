@@ -28,7 +28,7 @@ import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.http.context.ServerContext;
-import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import static org.junit.Assert.assertTrue;
@@ -63,7 +63,7 @@ public class SubjectAttributesResourceV1Test {
         given(mockSSOTokenContext.getCallerSubject()).willReturn(mockSubject);
         QueryRequest mockRequest = mock(QueryRequest.class);
         QueryResultHandler mockHandler = mock(QueryResultHandler.class);
-        QueryResultHandler resultHandler = QueryResultHandlerBuilder.withPagingAndSorting(mockHandler, mockRequest);
+        QueryResultHandler resultHandler = QueryResourceHandlerBuilder.withPagingAndSorting(mockHandler, mockRequest);
         Set<String> attributes = new HashSet<String>();
         attributes.add("attr");
         attributes.add("attr2");
@@ -90,7 +90,7 @@ public class SubjectAttributesResourceV1Test {
         given(mockSSOTokenContext.getCallerSubject()).willReturn(mockSubject);
         QueryRequest mockRequest = mock(QueryRequest.class);
         QueryResultHandler mockHandler = mock(QueryResultHandler.class);
-        QueryResultHandler resultHandler = QueryResultHandlerBuilder.withPagingAndSorting(mockHandler, mockRequest);
+        QueryResultHandler resultHandler = QueryResourceHandlerBuilder.withPagingAndSorting(mockHandler, mockRequest);
         Set<String> attributes = new HashSet<String>();
         given(mockSAM.getAvailableSubjectAttributeNames()).willReturn(attributes);
 
@@ -112,7 +112,7 @@ public class SubjectAttributesResourceV1Test {
         given(mockSSOTokenContext.getCallerSubject()).willReturn(mockSubject);
         QueryRequest mockRequest = mock(QueryRequest.class);
         QueryResultHandler mockHandler = mock(QueryResultHandler.class);
-        QueryResultHandler resultHandler = QueryResultHandlerBuilder.withPagingAndSorting(mockHandler, mockRequest);
+        QueryResultHandler resultHandler = QueryResourceHandlerBuilder.withPagingAndSorting(mockHandler, mockRequest);
         given(mockSAM.getAvailableSubjectAttributeNames()).willThrow(new EntitlementException(401));
 
         //when

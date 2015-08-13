@@ -53,7 +53,7 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.restlet.resources.ResourceSetDescriptionValidator;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
-import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
 import org.forgerock.openam.oauth2.resources.labels.ResourceSetLabel;
 import org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore;
 import org.forgerock.openam.rest.resource.ContextHelper;
@@ -161,7 +161,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
     public Promise<QueryResponse, ResourceException> queryCollection(final ServerContext context, QueryRequest request,
             QueryResourceHandler handler) {
 
-        final QueryResourceHandler queryHandler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
+        final QueryResourceHandler queryHandler = QueryResourceHandlerBuilder.withPagingAndSorting(handler, request);
 
         final ResourceSetWithPolicyQuery query;
         try {

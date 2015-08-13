@@ -11,29 +11,29 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock, AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.entitlements.query;
 
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
-import org.forgerock.json.resource.Resource;
-import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.util.Reject;
 
 /**
- * Adds support for paging to a query result handler.
+ * Adds support for paging to a query resource handler.
  *
  * @since 12.0.0
  */
-final class PagingQueryResultHandler implements QueryResultHandler {
-    private final QueryResultHandler delegate;
+final class PagingQueryResponseHandler extends QueryResponseHandler {
+    private final QueryResourceHandler delegate;
     private final int startOffset;
     private final int endOffset;
     private int currentOffset = 0;
 
-    PagingQueryResultHandler(final QueryResultHandler delegate, final int pageSize, final int pageOffset) {
+    PagingQueryResponseHandler(final QueryResourceHandler delegate, final int pageSize,
+            final int pageOffset) {
+        super(delegate);
         Reject.ifNull(delegate);
         Reject.ifTrue(pageSize <= 0, "Page size must be positive");
         Reject.ifTrue(pageOffset < 0, "Page offset must be positive");
@@ -44,12 +44,7 @@ final class PagingQueryResultHandler implements QueryResultHandler {
     }
 
     @Override
-    public void handleError(ResourceException error) {
-        delegate.handleError(error);
-    }
-
-    @Override
-    public boolean handleResource(Resource resource) {
+    public boolean handleResource(ResourceResponse resource) {
         // By default we will keep going until we reach the end offset of this page...
         boolean needMore = currentOffset < endOffset - 1;
         if (currentOffset >= startOffset && currentOffset < endOffset) {
@@ -58,10 +53,5 @@ final class PagingQueryResultHandler implements QueryResultHandler {
         }
         currentOffset++;
         return needMore;
-    }
-
-    @Override
-    public void handleResult(QueryResult result) {
-        delegate.handleResult(result);
     }
 }
