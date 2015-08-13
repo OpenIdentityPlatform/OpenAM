@@ -25,7 +25,7 @@ import com.sun.identity.shared.debug.Debug;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.RouterContext;
+import org.forgerock.http.routing.RouterContext;
 import org.forgerock.http.context.ServerContext;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.utils.Config;
