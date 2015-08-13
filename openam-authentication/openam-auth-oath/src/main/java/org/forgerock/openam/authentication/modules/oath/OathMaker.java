@@ -101,7 +101,7 @@ final class OathMaker {
         try {
             devicesDao.saveDeviceProfiles(user, realm,
                     JsonConversionUtils.toJsonValues(Collections.singletonList(deviceSettings)));
-        } catch (InternalServerErrorException | IOException e) {
+        } catch (IOException e) {
             debug.error("OathMaker.createDeviceProfile(): Unable to save device profile for user {} in realm {}",
                     user, realm, e);
             throw new AuthLoginException(e);

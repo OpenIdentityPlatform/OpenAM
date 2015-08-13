@@ -364,7 +364,7 @@ public class OATH extends AMLoginModule {
                 default:
                     throw new AuthLoginException("amAuth", "invalidLoginState", new Object[]{state});
             }
-        } catch (SSOException | IdRepoException | InternalServerErrorException | IOException e) {
+        } catch (SSOException | IdRepoException | IOException e) {
             debug.error("OATH.process() : SSOException", e);
             throw new AuthLoginException(amAuthOATH, "authFailed", null);
         }
@@ -466,7 +466,7 @@ public class OATH extends AMLoginModule {
                             getQRCodeGenerationJavascriptForAuthenticatorAppRegistration(authenticatorAppRegistrationUri) +
                     hideButtonHack);
 
-        } catch (InternalServerErrorException | IOException e) {
+        } catch (IOException e) {
             throw new AuthLoginException(amAuthOATH, "authFailed", null);
         }
 
