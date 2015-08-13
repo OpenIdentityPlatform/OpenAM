@@ -18,8 +18,8 @@ package org.forgerock.openam.forgerockrest.entitlements.query;
 
 import com.sun.identity.entitlement.util.SearchFilter;
 import org.forgerock.json.JsonPointer;
-import org.forgerock.json.resource.QueryFilter;
-import org.forgerock.json.resource.QueryFilterVisitor;
+import org.forgerock.util.query.QueryFilter;
+import org.forgerock.util.query.QueryFilterVisitor;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
 import org.forgerock.util.Reject;
 
@@ -35,7 +35,8 @@ import java.util.Set;
  *
  * @since 12.0.0
  */
-public abstract class QueryFilterVisitorAdapter implements QueryFilterVisitor<Set<SearchFilter>, Set<SearchFilter>> {
+public abstract class QueryFilterVisitorAdapter implements QueryFilterVisitor<Set<SearchFilter>, Set<SearchFilter>,
+        JsonPointer> {
 
     private final String type;
     private final Map<String, QueryAttribute> queryAttributes;
@@ -55,9 +56,8 @@ public abstract class QueryFilterVisitorAdapter implements QueryFilterVisitor<Se
      * {@inheritDoc}
      */
     @Override
-    public Set<SearchFilter> visitAndFilter(
-            Set<SearchFilter> filters, List<QueryFilter> subFilters) {
-        for (QueryFilter queryFilter : subFilters) {
+    public Set<SearchFilter> visitAndFilter(Set<SearchFilter> filters, List<QueryFilter<JsonPointer>> subFilters) {
+        for (QueryFilter<JsonPointer> queryFilter : subFilters) {
             queryFilter.accept(this, filters);
         }
         return filters;
@@ -144,8 +144,7 @@ public abstract class QueryFilterVisitorAdapter implements QueryFilterVisitor<Se
      * {@inheritDoc}
      */
     @Override
-    public Set<SearchFilter> visitNotFilter(
-            Set<SearchFilter> filters, QueryFilter subFilter) {
+    public Set<SearchFilter> visitNotFilter(Set<SearchFilter> filters, QueryFilter<JsonPointer> subFilter) {
         throw unsupportedFilterOperation("Negation");
     }
 
@@ -153,8 +152,7 @@ public abstract class QueryFilterVisitorAdapter implements QueryFilterVisitor<Se
      * {@inheritDoc}
      */
     @Override
-    public Set<SearchFilter> visitOrFilter(
-            Set<SearchFilter> filters, List<QueryFilter> subFilters) {
+    public Set<SearchFilter> visitOrFilter(Set<SearchFilter> filters, List<QueryFilter<JsonPointer>> subFilters) {
         throw unsupportedFilterOperation("Or");
     }
 

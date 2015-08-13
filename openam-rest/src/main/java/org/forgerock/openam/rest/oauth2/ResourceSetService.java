@@ -32,8 +32,11 @@ import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.security.auth.Subject;
+
+import org.forgerock.json.JsonPointer;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.json.resource.QueryFilter;
+import org.forgerock.util.query.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.Requests;
@@ -144,8 +147,8 @@ public class ResourceSetService {
 
                             filteredResourceSets.addAll(query.getResourceSetQuery().accept(new QueryFilterVisitor<Set<ResourceSetDescription>, Set<ResourceSetDescription>, String>() {
                                 @Override
-                                public Set<ResourceSetDescription> visitAndFilter(Set<ResourceSetDescription> resourceSetDescriptions, List<org.forgerock.util.query.QueryFilter<String>> list) {
-                                    for (org.forgerock.util.query.QueryFilter<String> filter : list) {
+                                public Set<ResourceSetDescription> visitAndFilter(Set<ResourceSetDescription> resourceSetDescriptions, List<QueryFilter<String>> list) {
+                                    for (QueryFilter<String> filter : list) {
                                         resourceSetDescriptions.retainAll(filter.accept(this, resourceSetDescriptions));
                                     }
 
@@ -221,7 +224,7 @@ public class ResourceSetService {
                                 }
 
                                 @Override
-                                public Set<ResourceSetDescription> visitNotFilter(Set<ResourceSetDescription> resourceSetDescriptions, org.forgerock.util.query.QueryFilter<String> queryFilter) {
+                                public Set<ResourceSetDescription> visitNotFilter(Set<ResourceSetDescription> resourceSetDescriptions, QueryFilter<String> queryFilter) {
                                     Set<ResourceSetDescription> excludedResourceSets = queryFilter.accept(this, resourceSetDescriptions);
                                     resourceSetDescriptions.removeAll(excludedResourceSets);
 
@@ -293,7 +296,7 @@ public class ResourceSetService {
         }
 
         QueryRequest policyQuery = Requests.newQueryRequest("").setQueryId("searchAll");
-        policyQuery.setQueryFilter(QueryFilter.alwaysTrue());
+        policyQuery.setQueryFilter(QueryFilter.<JsonPointer>alwaysTrue());
         return getPolicies(context, policyQuery, resourceOwnerId, resourceSets, augmentWithPolicies, query)
                 .thenAsync(new AsyncFunction<Collection<ResourceSetDescription>, Collection<ResourceSetDescription>, ResourceException>() {
                     @Override
@@ -361,7 +364,7 @@ public class ResourceSetService {
     Promise<Void, ResourceException> revokeAllPolicies(final ServerContext context, String realm,
                                                        String resourceOwnerId) {
         ResourceSetWithPolicyQuery query = new ResourceSetWithPolicyQuery();
-        query.setResourceSetQuery(org.forgerock.util.query.QueryFilter.<String>alwaysTrue());
+        query.setResourceSetQuery(QueryFilter.<String>alwaysTrue());
         return getResourceSets(context, realm, query, resourceOwnerId, false)
                 .thenAsync(new AsyncFunction<Collection<ResourceSetDescription>, Void, ResourceException>() {
                     @Override

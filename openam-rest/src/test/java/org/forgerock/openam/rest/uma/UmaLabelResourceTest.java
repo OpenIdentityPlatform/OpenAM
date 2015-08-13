@@ -21,11 +21,12 @@ import java.util.Collections;
 import com.google.inject.Provider;
 import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.common.LocaleContext;
+import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.json.resource.QueryFilter;
+import org.forgerock.util.query.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
@@ -188,7 +189,7 @@ public class UmaLabelResourceTest {
         given(umaLabelsStore.list(REALM_NAME, RESOURCE_OWNER_ID)).willReturn(Collections.<ResourceSetLabel>emptySet());
         given(contextHelper.getRealm(serverContext)).willReturn(REALM_NAME);
         given(contextHelper.getUserId(serverContext)).willReturn(RESOURCE_OWNER_ID);
-        given(queryRequest.getQueryFilter()).willReturn(QueryFilter.alwaysTrue());
+        given(queryRequest.getQueryFilter()).willReturn(QueryFilter.<JsonPointer>alwaysTrue());
 
         //When
         umaLabelResource.queryCollection(serverContext, queryRequest, queryResultHandler);

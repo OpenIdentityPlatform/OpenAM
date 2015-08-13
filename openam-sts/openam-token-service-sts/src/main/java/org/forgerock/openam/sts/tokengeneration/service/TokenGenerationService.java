@@ -30,7 +30,8 @@ import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.json.resource.QueryFilterVisitor;
+import org.forgerock.util.query.QueryFilter;
+import org.forgerock.util.query.QueryFilterVisitor;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
@@ -253,7 +254,7 @@ class TokenGenerationService implements CollectionResourceProvider {
     @Override
     public void queryCollection(final ServerContext serverContext, final QueryRequest queryRequest,
                                 final QueryResultHandler queryResultHandler) {
-        org.forgerock.json.resource.QueryFilter queryFilter = queryRequest.getQueryFilter();
+        QueryFilter queryFilter = queryRequest.getQueryFilter();
         if (queryFilter == null) {
             queryResultHandler.handleError(new BadRequestException(getUsageString()));
             return;
@@ -272,7 +273,7 @@ class TokenGenerationService implements CollectionResourceProvider {
         }
     }
 
-    private org.forgerock.util.query.QueryFilter<CoreTokenField> convertToCoreTokenFieldQueryFilter(org.forgerock.json.resource.QueryFilter queryFilter)
+    private org.forgerock.util.query.QueryFilter<CoreTokenField> convertToCoreTokenFieldQueryFilter(QueryFilter queryFilter)
                                                                 throws CTSTokenPersistenceException {
         try {
             return queryFilter.accept(CORE_TOKEN_FIELD_QUERY_FILTER_VISITOR, null);
@@ -281,24 +282,24 @@ class TokenGenerationService implements CollectionResourceProvider {
         }
     }
 
-    private static final QueryFilterVisitor<org.forgerock.util.query.QueryFilter<CoreTokenField>, Void> CORE_TOKEN_FIELD_QUERY_FILTER_VISITOR =
-        new QueryFilterVisitor<org.forgerock.util.query.QueryFilter<CoreTokenField>, Void>() {
+    private static final QueryFilterVisitor<QueryFilter<CoreTokenField>, Void, JsonPointer> CORE_TOKEN_FIELD_QUERY_FILTER_VISITOR =
+        new QueryFilterVisitor<QueryFilter<CoreTokenField>, Void, JsonPointer>() {
             @Override
-            public org.forgerock.util.query.QueryFilter<CoreTokenField> visitAndFilter(Void aVoid, List<org.forgerock.json.resource.QueryFilter> subFilters) {
-                List<org.forgerock.util.query.QueryFilter<CoreTokenField>> subCoreTokenFieldFilters = new ArrayList<>(subFilters.size());
-                for (org.forgerock.json.resource.QueryFilter filter : subFilters) {
+            public org.forgerock.util.query.QueryFilter<CoreTokenField> visitAndFilter(Void aVoid, List<QueryFilter<JsonPointer>> subFilters) {
+                List<QueryFilter<CoreTokenField>> subCoreTokenFieldFilters = new ArrayList<>(subFilters.size());
+                for (QueryFilter<JsonPointer> filter : subFilters) {
                     subCoreTokenFieldFilters.add(filter.accept(this, aVoid));
                 }
-                return org.forgerock.util.query.QueryFilter.and(subCoreTokenFieldFilters);
+                return QueryFilter.and(subCoreTokenFieldFilters);
             }
 
             @Override
             public org.forgerock.util.query.QueryFilter<CoreTokenField> visitEqualsFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
                 final String fieldString = field.toString().substring(1);
                 if (STSIssuedTokenState.STS_ID_QUERY_ATTRIBUTE.equals(fieldString)) {
-                    return org.forgerock.util.query.QueryFilter.equalTo(CTSTokenPersistence.CTS_TOKEN_FIELD_STS_ID, valueAssertion);
+                    return QueryFilter.equalTo(CTSTokenPersistence.CTS_TOKEN_FIELD_STS_ID, valueAssertion);
                 } else if (STSIssuedTokenState.STS_TOKEN_PRINCIPAL_QUERY_ATTRIBUTE.equals(fieldString)) {
-                    return org.forgerock.util.query.QueryFilter.equalTo(CoreTokenField.USER_ID, valueAssertion);
+                    return QueryFilter.equalTo(CoreTokenField.USER_ID, valueAssertion);
                 } else {
                     throw new IllegalArgumentException("Querying TokenService on field " + fieldString +
                             " not supported. Query format: " + getUsageString());
@@ -350,14 +351,14 @@ class TokenGenerationService implements CollectionResourceProvider {
             }
 
             @Override
-            public org.forgerock.util.query.QueryFilter<CoreTokenField> visitNotFilter(Void aVoid, org.forgerock.json.resource.QueryFilter subFilter) {
+            public org.forgerock.util.query.QueryFilter<CoreTokenField> visitNotFilter(Void aVoid, QueryFilter<JsonPointer> subFilter) {
                 throw new IllegalArgumentException("Querying STS issued token via not filter unsupported. Query format: "
                     + getUsageString());
 
             }
 
             @Override
-            public org.forgerock.util.query.QueryFilter<CoreTokenField> visitOrFilter(Void aVoid, List<org.forgerock.json.resource.QueryFilter> subFilters) {
+            public org.forgerock.util.query.QueryFilter<CoreTokenField> visitOrFilter(Void aVoid, List<QueryFilter<JsonPointer>> subFilters) {
                 throw new IllegalArgumentException("Querying STS issued token via or filter unsupported. Query format: "
                     + getUsageString());
 

@@ -46,8 +46,8 @@ import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.json.resource.QueryFilter;
-import org.forgerock.json.resource.QueryFilterVisitor;
+import org.forgerock.util.query.QueryFilter;
+import org.forgerock.util.query.QueryFilterVisitor;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
@@ -203,10 +203,10 @@ public class AuthenticationModuleCollectionHandler implements RequestHandler {
                 "The resource collection " + request.getResourceName() + " cannot be updated"));
     }
 
-    private static final class AuthenticationModuleQueryFilterVisitor implements QueryFilterVisitor<String, Void> {
+    private static final class AuthenticationModuleQueryFilterVisitor implements QueryFilterVisitor<String, Void, JsonPointer> {
 
         @Override
-        public String visitAndFilter(Void aVoid, List<QueryFilter> subFilters) {
+        public String visitAndFilter(Void aVoid, List<QueryFilter<JsonPointer>> subFilters) {
             throw new UnsupportedOperationException("And is not supported");
         }
 
@@ -262,12 +262,12 @@ public class AuthenticationModuleCollectionHandler implements RequestHandler {
         }
 
         @Override
-        public String visitNotFilter(Void aVoid, QueryFilter subFilter) {
+        public String visitNotFilter(Void aVoid, QueryFilter<JsonPointer> subFilter) {
             throw new UnsupportedOperationException("Not is not supported");
         }
 
         @Override
-        public String visitOrFilter(Void aVoid, List<QueryFilter> subFilters) {
+        public String visitOrFilter(Void aVoid, List<QueryFilter<JsonPointer>> subFilters) {
             throw new UnsupportedOperationException("Or is not supported");
         }
 

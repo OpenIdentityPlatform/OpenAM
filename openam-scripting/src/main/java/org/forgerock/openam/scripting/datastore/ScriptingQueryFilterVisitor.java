@@ -19,9 +19,9 @@ import static com.sun.identity.shared.datastruct.CollectionHelper.getMapAttr;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode.*;
 
 import org.forgerock.json.JsonPointer;
-import org.forgerock.json.resource.QueryFilter;
-import org.forgerock.json.resource.QueryFilterVisitor;
+import org.forgerock.util.query.QueryFilterVisitor;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.util.query.QueryFilter;
 
 import java.util.HashSet;
 import java.util.List;
@@ -40,14 +40,14 @@ import java.util.Set;
  * @since 13.0.0
  */
 public class ScriptingQueryFilterVisitor implements QueryFilterVisitor<Set<String>, Map<String, Map<String,
-        Set<String>>>> {
+        Set<String>>>, JsonPointer> {
 
     @Override
     public Set<String> visitAndFilter(Map<String, Map<String, Set<String>>> resourceData,
-                                      List<QueryFilter> subFilters) {
+            List<QueryFilter<JsonPointer>> subFilters) {
         final Set<String> andResults = new HashSet<String>();
         boolean firstFilter = true;
-        for (QueryFilter filter : subFilters) {
+        for (QueryFilter<JsonPointer> filter : subFilters) {
             final Set<String> result = filter.accept(this, resourceData);
             if (firstFilter) {
                 andResults.addAll(result);
@@ -60,9 +60,10 @@ public class ScriptingQueryFilterVisitor implements QueryFilterVisitor<Set<Strin
     }
 
     @Override
-    public Set<String> visitOrFilter(Map<String, Map<String, Set<String>>> resourceData, List<QueryFilter> subFilters) {
+    public Set<String> visitOrFilter(Map<String, Map<String, Set<String>>> resourceData,
+            List<QueryFilter<JsonPointer>> subFilters) {
         final Set<String> orResults = new HashSet<String>();
-        for (QueryFilter filter : subFilters) {
+        for (QueryFilter<JsonPointer> filter : subFilters) {
             orResults.addAll(filter.accept(this, resourceData));
         }
         return orResults;
@@ -158,7 +159,8 @@ public class ScriptingQueryFilterVisitor implements QueryFilterVisitor<Set<Strin
     }
 
     @Override
-    public Set<String> visitNotFilter(Map<String, Map<String, Set<String>>> resourceData, QueryFilter subFilter) {
+    public Set<String> visitNotFilter(Map<String, Map<String, Set<String>>> resourceData,
+            QueryFilter<JsonPointer> subFilter) {
         throw new UnsupportedOperationException(FILTER_NOT.name());
     }
 

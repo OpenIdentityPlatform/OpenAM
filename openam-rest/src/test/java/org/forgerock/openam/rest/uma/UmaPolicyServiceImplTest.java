@@ -44,7 +44,7 @@ import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
-import org.forgerock.json.resource.QueryFilter;
+import org.forgerock.util.query.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
@@ -119,13 +119,13 @@ public class UmaPolicyServiceImplTest {
 
         given(resourceSetStoreFactory.create(anyString())).willReturn(resourceSetStore);
         given(resourceSetStore.read("RESOURCE_SET_ID")).willReturn(resourceSet);
-        given(resourceSetStore.query(org.forgerock.util.query.QueryFilter.and(
-                org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RESOURCE_SET_ID"))))
+        given(resourceSetStore.query(QueryFilter.and(
+                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "RESOURCE_SET_ID"))))
                 .willReturn(Collections.singleton(resourceSet));
         doThrow(org.forgerock.oauth2.core.exceptions.NotFoundException.class).when(resourceSetStore).read("OTHER_ID");
         doThrow(org.forgerock.oauth2.core.exceptions.ServerException.class).when(resourceSetStore).read("FAILING_ID");
-        doThrow(org.forgerock.oauth2.core.exceptions.ServerException.class).when(resourceSetStore).query(org.forgerock.util.query.QueryFilter.and(
-                org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "FAILING_ID")));
+        doThrow(org.forgerock.oauth2.core.exceptions.ServerException.class).when(resourceSetStore).query(QueryFilter.and(
+                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, "FAILING_ID")));
         given(lazyAuditLogger.get()).willReturn(auditLogger);
 
         AMIdentity identity = mock(AMIdentity.class);
@@ -627,7 +627,7 @@ public class UmaPolicyServiceImplTest {
         //Given
         ServerContext context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
-                .setQueryFilter(QueryFilter.equalTo("/permissions/subject", "SUBJECT_ONE"));
+                .setQueryFilter(QueryFilter.equalTo(new JsonPointer("permissions/subject"), "SUBJECT_ONE"));
 
         mockBackendQuery(context, createBackendSubjectOnePolicyJson(), createBackendSubjectTwoPolicyJson());
 
@@ -646,7 +646,7 @@ public class UmaPolicyServiceImplTest {
         //Given
         ServerContext context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
-                .setQueryFilter(QueryFilter.equalTo("/permissions/subject", "SUBJECT_OTHER"));
+                .setQueryFilter(QueryFilter.equalTo(new JsonPointer("permissions/subject"), "SUBJECT_OTHER"));
 
         mockBackendQuery(context);
 
@@ -665,7 +665,7 @@ public class UmaPolicyServiceImplTest {
         //Given
         ServerContext context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
-                .setQueryFilter(QueryFilter.equalTo("resourceServer", "CLIENT_ID"));
+                .setQueryFilter(QueryFilter.equalTo(new JsonPointer("resourceServer"), "CLIENT_ID"));
 
         mockBackendQuery(context, createBackendSubjectOnePolicyJson(), createBackendSubjectTwoPolicyJson());
 
@@ -684,7 +684,7 @@ public class UmaPolicyServiceImplTest {
         //Given
         ServerContext context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
-                .setQueryFilter(QueryFilter.equalTo("resourceServer", "OTHER_CLIENT_ID"));
+                .setQueryFilter(QueryFilter.equalTo(new JsonPointer("resourceServer"), "OTHER_CLIENT_ID"));
 
         mockBackendQuery(context);
 
@@ -704,8 +704,8 @@ public class UmaPolicyServiceImplTest {
         ServerContext context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.and(
-                        QueryFilter.equalTo("/permissions/subject", "SUBJECT_ONE"),
-                        QueryFilter.equalTo("resourceServer", "CLIENT_ID")
+                        QueryFilter.equalTo(new JsonPointer("permissions/subject"), "SUBJECT_ONE"),
+                        QueryFilter.equalTo(new JsonPointer("resourceServer"), "CLIENT_ID")
                 ));
 
         mockBackendQuery(context, createBackendSubjectOnePolicyJson(), createBackendSubjectTwoPolicyJson());
@@ -726,8 +726,8 @@ public class UmaPolicyServiceImplTest {
         ServerContext context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.and(
-                        QueryFilter.equalTo("/permissions/subject", "OTHER_SUBJECT"),
-                        QueryFilter.equalTo("resourceServer", "CLIENT_ID")
+                        QueryFilter.equalTo(new JsonPointer("permissions/subject"), "OTHER_SUBJECT"),
+                        QueryFilter.equalTo(new JsonPointer("resourceServer"), "CLIENT_ID")
                 ));
 
         mockBackendQuery(context, createBackendSubjectOnePolicyJson(), createBackendSubjectTwoPolicyJson());
@@ -748,8 +748,8 @@ public class UmaPolicyServiceImplTest {
         ServerContext context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.and(
-                        QueryFilter.equalTo("/permissions/subject", "SUBJECT_ONE"),
-                        QueryFilter.equalTo("resourceServer", "OTHER_CLIENT_ID")
+                        QueryFilter.equalTo(new JsonPointer("permissions/subject"), "SUBJECT_ONE"),
+                        QueryFilter.equalTo(new JsonPointer("resourceServer"), "OTHER_CLIENT_ID")
                 ));
 
         mockBackendQuery(context);
@@ -770,8 +770,8 @@ public class UmaPolicyServiceImplTest {
         ServerContext context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.and(
-                        QueryFilter.equalTo("/permissions/subject", "SUBJECT_OTHER"),
-                        QueryFilter.equalTo("resourceServer", "OTHER_CLIENT_ID")
+                        QueryFilter.equalTo(new JsonPointer("permissions/subject"), "SUBJECT_OTHER"),
+                        QueryFilter.equalTo(new JsonPointer("resourceServer"), "OTHER_CLIENT_ID")
                 ));
 
         mockBackendQuery(context, createBackendSubjectOnePolicyJson(), createBackendSubjectTwoPolicyJson());
@@ -792,8 +792,8 @@ public class UmaPolicyServiceImplTest {
         ServerContext context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.or(
-                        QueryFilter.equalTo("/permissions/subject", "SUBJECT_ONE"),
-                        QueryFilter.equalTo("resourceServer", "CLIENT_ID")
+                        QueryFilter.equalTo(new JsonPointer("permissions/subject"), "SUBJECT_ONE"),
+                        QueryFilter.equalTo(new JsonPointer("resourceServer"), "CLIENT_ID")
                 ));
 
         mockBackendQuery(context, createBackendSubjectOnePolicyJson(), createBackendSubjectTwoPolicyJson());
@@ -814,8 +814,8 @@ public class UmaPolicyServiceImplTest {
         ServerContext context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.or(
-                        QueryFilter.equalTo("/permissions/subject", "SUBJECT_OTHER"),
-                        QueryFilter.equalTo("resourceServer", "CLIENT_ID")
+                        QueryFilter.equalTo(new JsonPointer("permissions/subject"), "SUBJECT_OTHER"),
+                        QueryFilter.equalTo(new JsonPointer("resourceServer"), "CLIENT_ID")
                 ));
 
         mockBackendQuery(context, createBackendSubjectOnePolicyJson(), createBackendSubjectTwoPolicyJson());
@@ -836,8 +836,8 @@ public class UmaPolicyServiceImplTest {
         ServerContext context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.or(
-                        QueryFilter.equalTo("/permissions/subject", "SUBJECT_ONE"),
-                        QueryFilter.equalTo("resourceServer", "OTHER_CLIENT_ID")
+                        QueryFilter.equalTo(new JsonPointer("permissions/subject"), "SUBJECT_ONE"),
+                        QueryFilter.equalTo(new JsonPointer("resourceServer"), "OTHER_CLIENT_ID")
                 ));
 
         mockBackendQuery(context, createBackendSubjectOnePolicyJson(), createBackendSubjectTwoPolicyJson());
@@ -858,8 +858,8 @@ public class UmaPolicyServiceImplTest {
         ServerContext context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.or(
-                        QueryFilter.equalTo("/permissions/subject", "SUBJECT_OTHER"),
-                        QueryFilter.equalTo("resourceServer", "OTHER_CLIENT_ID")
+                        QueryFilter.equalTo(new JsonPointer("permissions/subject"), "SUBJECT_OTHER"),
+                        QueryFilter.equalTo(new JsonPointer("resourceServer"), "OTHER_CLIENT_ID")
                 ));
 
         mockBackendQuery(context);

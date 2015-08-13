@@ -35,7 +35,7 @@ import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.json.resource.QueryFilter;
+import org.forgerock.util.query.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
@@ -223,9 +223,9 @@ public class ResourceSetResourceTest {
         assertThat(queryCaptor.getValue().getPolicyQuery())
                 .isEqualTo(QueryFilter.equalTo("/permissions/subject", "SUBJECT"));
         assertThat(queryCaptor.getValue().getResourceSetQuery())
-                .isEqualTo(org.forgerock.util.query.QueryFilter.and(
-                        org.forgerock.util.query.QueryFilter.equalTo("name", "NAME"),
-                        org.forgerock.util.query.QueryFilter.equalTo("clientId", "myclient")));
+                .isEqualTo(QueryFilter.and(
+                        QueryFilter.equalTo("name", "NAME"),
+                        QueryFilter.equalTo("clientId", "myclient")));
         verify(handler).handleResult(any(QueryResult.class));
     }
 

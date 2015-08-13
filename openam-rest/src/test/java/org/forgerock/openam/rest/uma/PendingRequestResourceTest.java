@@ -27,10 +27,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.json.resource.QueryFilter;
+import org.forgerock.util.query.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
@@ -185,7 +186,7 @@ public class PendingRequestResourceTest {
 
         //Given
         ServerContext context = mockContext("REALM");
-        QueryRequest request = Requests.newQueryRequest("").setQueryFilter(QueryFilter.alwaysTrue());
+        QueryRequest request = Requests.newQueryRequest("").setQueryFilter(QueryFilter.<JsonPointer>alwaysTrue());
         QueryResultHandler handler = mock(QueryResultHandler.class);
 
         mockPendingRequestsForUser("alice", "REALM", 2);

@@ -18,7 +18,7 @@ package org.forgerock.openam.rest.query;
 import static org.forgerock.openam.rest.query.QueryException.QueryErrorCode.FILTER_DEPTH_NOT_SUPPORTED;
 
 import org.forgerock.json.JsonPointer;
-import org.forgerock.json.resource.QueryFilterVisitor;
+import org.forgerock.util.query.QueryFilterVisitor;
 import org.forgerock.util.query.QueryFilter;
 
 import java.util.HashSet;
@@ -26,12 +26,12 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Use this {@code org.forgerock.json.resource.QueryFilterVisitor} implementation to convert a
- * {@code org.forgerock.json.resource.QueryFilter} to a {@code org.forgerock.util.query.QueryFilter<String>}.
+ * Use this {@code org.forgerock.util.query.QueryFilterVisitor} implementation to convert a
+ * {@code org.forgerock.util.query.QueryFilter} to a {@code org.forgerock.util.query.QueryFilter<String>}.
  *
  * @since 13.0.0
  */
-public class QueryByStringFilterConverter implements QueryFilterVisitor<QueryFilter<String>, Void> {
+public class QueryByStringFilterConverter implements QueryFilterVisitor<QueryFilter<String>, Void, JsonPointer> {
 
     private void assertFieldDepth(JsonPointer field, int depth) {
         if (field.size() > depth) {
@@ -40,9 +40,9 @@ public class QueryByStringFilterConverter implements QueryFilterVisitor<QueryFil
     }
 
     @Override
-    public QueryFilter<String> visitAndFilter(Void aVoid, List<org.forgerock.json.resource.QueryFilter> subFilters) {
+    public QueryFilter<String> visitAndFilter(Void aVoid, List<QueryFilter<JsonPointer>> subFilters) {
         Set<QueryFilter<String>> andResults = new HashSet<>();
-        for (org.forgerock.json.resource.QueryFilter filter : subFilters) {
+        for (QueryFilter<JsonPointer> filter : subFilters) {
             QueryFilter<String> result = filter.accept(this, aVoid);
             if (result != null) {
                 andResults.add(result);
@@ -52,9 +52,9 @@ public class QueryByStringFilterConverter implements QueryFilterVisitor<QueryFil
     }
 
     @Override
-    public QueryFilter<String> visitOrFilter(Void aVoid, List<org.forgerock.json.resource.QueryFilter> subFilters) {
+    public QueryFilter<String> visitOrFilter(Void aVoid, List<QueryFilter<JsonPointer>> subFilters) {
         Set<QueryFilter<String>> andResults = new HashSet<>();
-        for (org.forgerock.json.resource.QueryFilter filter : subFilters) {
+        for (QueryFilter<JsonPointer> filter : subFilters) {
             QueryFilter<String> result = filter.accept(this, aVoid);
             if (result != null) {
                 andResults.add(result);
@@ -112,7 +112,7 @@ public class QueryByStringFilterConverter implements QueryFilterVisitor<QueryFil
     }
 
     @Override
-    public QueryFilter<String> visitNotFilter(Void aVoid, org.forgerock.json.resource.QueryFilter subFilter) {
+    public QueryFilter<String> visitNotFilter(Void aVoid, QueryFilter<JsonPointer> subFilter) {
         return QueryFilter.not(subFilter.accept(this, aVoid));
     }
 

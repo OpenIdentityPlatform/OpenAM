@@ -22,7 +22,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.json.resource.QueryFilter;
+import org.forgerock.json.JsonPointer;
+import org.forgerock.util.query.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
@@ -87,7 +88,7 @@ public class UmaAuditLogger {
     }
 
     public Set<UmaAuditEntry> getEntireHistory(AMIdentity identity) throws ServerException {
-        return delegate.query(QueryFilter.equalTo("resourceOwnerId", identity.getUniversalId())
+        return delegate.query(QueryFilter.equalTo(new JsonPointer("resourceOwnerId"), identity.getUniversalId())
                 .accept(new UmaAuditQueryFilterVisitor(), null));
     }
 
@@ -96,7 +97,7 @@ public class UmaAuditLogger {
     }
 
     private org.forgerock.util.query.QueryFilter<String> getQueryFilters(AMIdentity identity, QueryRequest request) {
-        return QueryFilter.and(request.getQueryFilter(), QueryFilter.equalTo("resourceOwnerId", identity.getUniversalId()))
+        return QueryFilter.and(request.getQueryFilter(), QueryFilter.equalTo(new JsonPointer("resourceOwnerId"), identity.getUniversalId()))
                 .accept(new UmaAuditQueryFilterVisitor(), null);
     }
 
@@ -112,7 +113,7 @@ public class UmaAuditLogger {
         try {
             ResourceSetStore store = providerSettings.getResourceSetStore();
             Set<ResourceSetDescription> results = store.query(
-                    org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId));
+                    QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId));
             if (results.size() != 1) {
                 throw new UmaException(400, "invalid_resource_set_id", "Could not find Resource Set, " + resourceSetId);
             }

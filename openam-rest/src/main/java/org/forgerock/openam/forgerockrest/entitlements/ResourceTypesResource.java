@@ -20,12 +20,13 @@ import static com.sun.identity.entitlement.EntitlementException.*;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.shared.debug.Debug;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.json.resource.QueryFilter;
+import org.forgerock.util.query.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
@@ -271,7 +272,7 @@ public class ResourceTypesResource extends RealmAwareResource {
     public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
         String principalName = "unknown";
         String realm = getRealm(context);
-        QueryFilter queryFilter = request.getQueryFilter();
+        QueryFilter<JsonPointer> queryFilter = request.getQueryFilter();
         handler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
 
         try {

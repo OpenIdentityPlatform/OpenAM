@@ -32,7 +32,7 @@ import com.sun.identity.entitlement.Evaluator;
 import com.sun.identity.idm.AMIdentity;
 import org.forgerock.http.context.RootContext;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.QueryFilter;
+import org.forgerock.util.query.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.ResourceException;
@@ -153,7 +153,7 @@ public class ResourceSetServiceTest {
         String resourceOwnerId = "RESOURCE_OWNER_ID";
         boolean augmentWithPolicies = false;
         org.forgerock.util.query.QueryFilter<String> resourceSetQuery
-                = mock(org.forgerock.util.query.QueryFilter.class);
+                = mock(QueryFilter.class);
         QueryFilter policyQuery = QueryFilter.alwaysFalse();
         Set<ResourceSetDescription> queriedResourceSets = new HashSet<ResourceSetDescription>();
         Collection<UmaPolicy> queriedPolicies = new HashSet<UmaPolicy>();
@@ -163,7 +163,7 @@ public class ResourceSetServiceTest {
 
         query.setResourceSetQuery(resourceSetQuery);
         query.setPolicyQuery(policyQuery);
-        given(resourceSetStore.query(any(org.forgerock.util.query.QueryFilter.class))).willReturn(queriedResourceSets);
+        given(resourceSetStore.query(any(QueryFilter.class))).willReturn(queriedResourceSets);
         given(policyService.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(queriedPoliciesPromise);
 
@@ -196,7 +196,7 @@ public class ResourceSetServiceTest {
         String resourceOwnerId = "RESOURCE_OWNER_ID";
         boolean augmentWithPolicies = false;
         org.forgerock.util.query.QueryFilter<String> resourceSetQuery
-                = mock(org.forgerock.util.query.QueryFilter.class);
+                = mock(QueryFilter.class);
         Set<ResourceSetDescription> queriedResourceSets = new HashSet<ResourceSetDescription>();
         ResourceSetDescription resourceSetOne = new ResourceSetDescription("RS_ID_ONE", "CLIENT_ID_ONE",
                 "RESOURCE_OWNER_ID", Collections.<String, Object>emptyMap());
@@ -209,9 +209,9 @@ public class ResourceSetServiceTest {
         query.setResourceSetQuery(resourceSetQuery);
         queriedResourceSets.add(resourceSetOne);
         queriedResourceSets.add(resourceSetTwo);
-        given(resourceSetStore.query(org.forgerock.util.query.QueryFilter.and(
+        given(resourceSetStore.query(QueryFilter.and(
                 resourceSetQuery,
-                org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
+                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
                 .willReturn(queriedResourceSets);
 
         Collection<UmaPolicy> queriedPolicies = new HashSet<UmaPolicy>();
@@ -242,7 +242,7 @@ public class ResourceSetServiceTest {
         String resourceOwnerId = "RESOURCE_OWNER_ID";
         boolean augmentWithPolicies = true;
         org.forgerock.util.query.QueryFilter<String> resourceSetQuery
-                = mock(org.forgerock.util.query.QueryFilter.class);
+                = mock(QueryFilter.class);
         Set<ResourceSetDescription> queriedResourceSets = new HashSet<ResourceSetDescription>();
         ResourceSetDescription resourceSetOne = new ResourceSetDescription("RS_ID_ONE", "CLIENT_ID_ONE",
                 "RESOURCE_OWNER_ID", Collections.<String, Object>emptyMap());
@@ -263,9 +263,9 @@ public class ResourceSetServiceTest {
         given(policyTwo.asJson()).willReturn(policyTwoJson);
         given(policyOne.getId()).willReturn("RS_ID_ONE");
         given(policyTwo.getId()).willReturn("RS_ID_TWO");
-        given(resourceSetStore.query(org.forgerock.util.query.QueryFilter.and(
+        given(resourceSetStore.query(QueryFilter.and(
                 resourceSetQuery,
-                org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
+                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
                 .willReturn(queriedResourceSets);
         given(policyService.readPolicy(context, "RS_ID_ONE")).willReturn(policyOnePromise);
         given(policyService.readPolicy(context, "RS_ID_TWO")).willReturn(policyTwoPromise);
@@ -311,7 +311,7 @@ public class ResourceSetServiceTest {
         String resourceOwnerId = "RESOURCE_OWNER_ID";
         boolean augmentWithPolicies = false;
         org.forgerock.util.query.QueryFilter<String> resourceSetQuery
-                = mock(org.forgerock.util.query.QueryFilter.class);
+                = mock(QueryFilter.class);
         QueryFilter policyQuery = QueryFilter.alwaysFalse();
         Set<ResourceSetDescription> queriedResourceSets = new HashSet<ResourceSetDescription>();
         ResourceSetDescription resourceSetOne = new ResourceSetDescription("RS_ID_ONE", "CLIENT_ID_ONE",
@@ -341,9 +341,9 @@ public class ResourceSetServiceTest {
         given(policyOne.getId()).willReturn("RS_ID_ONE");
         given(policyTwo.getId()).willReturn("RS_ID_THREE");
         given(policyTwo.getResourceSet()).willReturn(resourceSetTwo);
-        given(resourceSetStore.query(org.forgerock.util.query.QueryFilter.and(
+        given(resourceSetStore.query(QueryFilter.and(
                 resourceSetQuery,
-                org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
+                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
                 .willReturn(queriedResourceSets);
         given(policyService.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(queriedPoliciesPromise);
@@ -372,7 +372,7 @@ public class ResourceSetServiceTest {
         String resourceOwnerId = "RESOURCE_OWNER_ID";
         boolean augmentWithPolicies = false;
         org.forgerock.util.query.QueryFilter<String> resourceSetQuery
-                = mock(org.forgerock.util.query.QueryFilter.class);
+                = mock(QueryFilter.class);
         QueryFilter policyQuery = QueryFilter.alwaysFalse();
         Set<ResourceSetDescription> queriedResourceSets = new HashSet<ResourceSetDescription>();
         ResourceSetDescription resourceSetOne = new ResourceSetDescription("RS_ID_ONE", "CLIENT_ID_ONE",
@@ -403,9 +403,9 @@ public class ResourceSetServiceTest {
         given(policyOne.getResourceSet()).willReturn(resourceSetOne);
         given(policyTwo.getId()).willReturn("RS_ID_THREE");
         given(policyTwo.getResourceSet()).willReturn(resourceSetTwo);
-        given(resourceSetStore.query(org.forgerock.util.query.QueryFilter.and(
+        given(resourceSetStore.query(QueryFilter.and(
                 resourceSetQuery,
-                org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
+                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
                 .willReturn(queriedResourceSets);
 
         mockPolicyEvaluator("RS_CLIENT_ID");
@@ -437,7 +437,7 @@ public class ResourceSetServiceTest {
         boolean augmentWithPolicies = true;
 
         org.forgerock.util.query.QueryFilter<String> resourceSetQuery
-                = mock(org.forgerock.util.query.QueryFilter.class);
+                = mock(QueryFilter.class);
         QueryFilter policyQuery = QueryFilter.alwaysFalse();
         Set<ResourceSetDescription> queriedResourceSets = new HashSet<ResourceSetDescription>();
         ResourceSetDescription resourceSetOne = new ResourceSetDescription("RS_ID_ONE", "CLIENT_ID_ONE",
@@ -473,9 +473,9 @@ public class ResourceSetServiceTest {
         given(policyOne.asJson()).willReturn(policyOneJson);
         given(policyTwo.asJson()).willReturn(policyTwoJson);
         given(policyThree.asJson()).willReturn(policyThreeJson);
-        given(resourceSetStore.query(org.forgerock.util.query.QueryFilter.and(
+        given(resourceSetStore.query(QueryFilter.and(
                 resourceSetQuery,
-                org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
+                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
                 .willReturn(queriedResourceSets);
         given(policyService.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(queriedPoliciesPromise);
@@ -504,7 +504,7 @@ public class ResourceSetServiceTest {
         String resourceOwnerId = "RESOURCE_OWNER_ID";
         boolean augmentWithPolicies = true;
         org.forgerock.util.query.QueryFilter<String> resourceSetQuery
-                = mock(org.forgerock.util.query.QueryFilter.class);
+                = mock(QueryFilter.class);
         QueryFilter policyQuery = QueryFilter.alwaysFalse();
         Set<ResourceSetDescription> queriedResourceSets = new HashSet<ResourceSetDescription>();
         ResourceSetDescription resourceSetOne = new ResourceSetDescription("RS_ID_ONE", "CLIENT_ID_ONE",
@@ -540,9 +540,9 @@ public class ResourceSetServiceTest {
         given(policyThree.getId()).willReturn("RS_ID_THREE");
         given(policyThree.asJson()).willReturn(policyThreeJson);
         given(policyThree.getResourceSet()).willReturn(resourceSetThree);
-        given(resourceSetStore.query(org.forgerock.util.query.QueryFilter.and(
+        given(resourceSetStore.query(QueryFilter.and(
                 resourceSetQuery,
-                org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
+                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_OWNER_ID, "RESOURCE_OWNER_ID"))))
                 .willReturn(queriedResourceSets);
         given(policyService.queryPolicies(eq(context), Matchers.<QueryRequest>anyObject()))
                 .willReturn(queriedPoliciesPromise);

@@ -21,7 +21,7 @@ import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.util.SearchFilter;
 import org.forgerock.json.JsonPointer;
-import org.forgerock.json.resource.QueryFilter;
+import org.forgerock.util.query.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryFilterVisitorAdapter;
@@ -80,7 +80,7 @@ final class PrivilegePolicyStore implements PolicyStore {
 
     @Override
     public List<Privilege> query(QueryRequest request) throws EntitlementException {
-        QueryFilter queryFilter = request.getQueryFilter();
+        QueryFilter<JsonPointer> queryFilter = request.getQueryFilter();
         if (queryFilter == null) {
             // Return everything
             queryFilter = QueryFilter.alwaysTrue();

@@ -77,6 +77,7 @@ import org.forgerock.openam.uma.audit.UmaAuditType;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.Pair;
 import org.forgerock.util.promise.Promise;
+import org.forgerock.util.query.QueryFilter;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.mockito.Mock;
@@ -328,8 +329,8 @@ public class UmaPolicyServiceImplDelegationTest {
         ResourceSetDescription resourceSet = new ResourceSetDescription(resourceSetId, "CLIENT_ID", resourceOwner,
                 json(object(field("name", "RESOURCE_SET_NAME"), field("scopes", array("SCOPE_A", "SCOPE_B")))).asMap());
         given(resourceSetStore.read(resourceSetId)).willReturn(resourceSet);
-        given(resourceSetStore.query(org.forgerock.util.query.QueryFilter.and(
-                org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId))))
+        given(resourceSetStore.query(QueryFilter.and(
+                QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId))))
                 .willReturn(Collections.singleton(resourceSet));
         return resourceSetId;
     }

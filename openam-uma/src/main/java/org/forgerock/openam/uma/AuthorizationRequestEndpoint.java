@@ -51,6 +51,7 @@ import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
 import org.forgerock.openam.uma.audit.UmaAuditType;
 import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.util.query.QueryFilter;
 import org.json.JSONException;
 import org.restlet.Request;
 import org.restlet.data.ChallengeResponse;
@@ -230,7 +231,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
             ResourceSetStore store = oauth2ProviderSettingsFactory.get(requestFactory.create(getRequest()))
                     .getResourceSetStore();
             Set<ResourceSetDescription> results = store.query(
-                    org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId));
+                    QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId));
             if (results.size() != 1) {
                 throw new NotFoundException("Could not find Resource Set, " + resourceSetId);
             }
@@ -342,7 +343,7 @@ public class AuthorizationRequestEndpoint extends ServerResource {
         try {
             ResourceSetStore store = providerSettings.getResourceSetStore();
             Set<ResourceSetDescription> results = store.query(
-                    org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId));
+                    QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, resourceSetId));
             if (results.size() != 1) {
                 throw new UmaException(400, "invalid_resource_set_id", "Could not fing Resource Set, " + resourceSetId);
             }

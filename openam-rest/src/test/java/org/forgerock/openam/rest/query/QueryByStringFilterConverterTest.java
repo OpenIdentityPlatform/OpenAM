@@ -16,11 +16,11 @@
 package org.forgerock.openam.rest.query;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.forgerock.json.resource.QueryFilter.*;
+import static org.forgerock.util.query.QueryFilter.*;
 import static org.mockito.Mockito.*;
 
 import org.forgerock.json.JsonPointer;
-import org.forgerock.json.resource.QueryFilter;
+import org.forgerock.util.query.QueryFilter;
 import org.mockito.ArgumentCaptor;
 import org.testng.annotations.Test;
 
@@ -31,7 +31,7 @@ public class QueryByStringFilterConverterTest {
     @Test
     public void shouldThrowQueryException() {
         // given
-        QueryFilter filter = QueryFilter.comparisonFilter("param1/param2", "eq", "*");
+        QueryFilter filter = QueryFilter.comparisonFilter("param1/param2", new JsonPointer("eq"), "*");
 
         // when
         QueryException exception = null;

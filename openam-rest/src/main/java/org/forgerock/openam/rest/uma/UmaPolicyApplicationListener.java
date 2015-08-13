@@ -31,7 +31,7 @@ import javax.security.auth.Subject;
 
 import org.forgerock.http.Context;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.QueryFilter;
+import org.forgerock.util.query.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.Requests;
@@ -323,8 +323,8 @@ public class UmaPolicyApplicationListener implements IdEventListener {
 
     private void deleteResourceSets(String realm, String resourceServerId) throws NotFoundException, ServerException {
         ResourceSetStore resourceSetStore = resourceSetStoreFactory.create(DNMapper.orgNameToRealmName(realm));
-        org.forgerock.util.query.QueryFilter<String> queryFilter
-                = org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.CLIENT_ID, resourceServerId);
+        QueryFilter<String> queryFilter
+                = QueryFilter.equalTo(ResourceSetTokenField.CLIENT_ID, resourceServerId);
         Set<ResourceSetDescription> results = resourceSetStore.query(queryFilter);
         for (ResourceSetDescription resourceSet : results) {
             resourceSetStore.delete(resourceSet.getId(), resourceSet.getResourceOwnerId());

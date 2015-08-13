@@ -19,23 +19,23 @@ package org.forgerock.openam.uma;
 import java.util.List;
 
 import org.forgerock.json.JsonPointer;
-import org.forgerock.json.resource.QueryFilter;
-import org.forgerock.json.resource.QueryFilterVisitor;
+import org.forgerock.util.query.QueryFilter;
+import org.forgerock.util.query.QueryFilterVisitor;
 
 /**
  *
  *
  * @since 13.0.0
  */
-public final class UmaPolicyQueryFilterVisitor implements QueryFilterVisitor<PolicySearch, PolicySearch> {
+public final class UmaPolicyQueryFilterVisitor implements QueryFilterVisitor<PolicySearch, PolicySearch, JsonPointer> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public PolicySearch visitAndFilter(PolicySearch policySearch, List<QueryFilter> subFilters) {
+    public PolicySearch visitAndFilter(PolicySearch policySearch, List<QueryFilter<JsonPointer>> subFilters) {
         PolicySearch andSearch = policySearch;
-        for (QueryFilter filter : subFilters) {
+        for (QueryFilter<JsonPointer> filter : subFilters) {
             andSearch = filter.accept(this, andSearch);
         }
         return andSearch;
@@ -109,7 +109,7 @@ public final class UmaPolicyQueryFilterVisitor implements QueryFilterVisitor<Pol
      * {@inheritDoc}
      */
     @Override
-    public PolicySearch visitNotFilter(PolicySearch policySearch, QueryFilter subFilter) {
+    public PolicySearch visitNotFilter(PolicySearch policySearch, QueryFilter<JsonPointer> subFilter) {
         return policySearch.remove(subFilter.accept(this, policySearch));
     }
 
@@ -117,9 +117,9 @@ public final class UmaPolicyQueryFilterVisitor implements QueryFilterVisitor<Pol
      * {@inheritDoc}
      */
     @Override
-    public PolicySearch visitOrFilter(PolicySearch policySearch, List<QueryFilter> subFilters) {
+    public PolicySearch visitOrFilter(PolicySearch policySearch, List<QueryFilter<JsonPointer>> subFilters) {
         PolicySearch orSearch = new PolicySearch();
-        for (QueryFilter filter : subFilters) {
+        for (QueryFilter<JsonPointer> filter : subFilters) {
             orSearch = orSearch.combine(filter.accept(this, policySearch));
         }
         return orSearch;

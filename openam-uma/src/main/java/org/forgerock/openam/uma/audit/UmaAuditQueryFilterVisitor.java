@@ -17,8 +17,8 @@
 package org.forgerock.openam.uma.audit;
 
 import org.forgerock.json.JsonPointer;
-import org.forgerock.json.resource.QueryFilter;
-import org.forgerock.json.resource.QueryFilterVisitor;
+import org.forgerock.util.query.QueryFilter;
+import org.forgerock.util.query.QueryFilterVisitor;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -29,20 +29,20 @@ import java.util.TimeZone;
  * A visitor that returns a Map containing fieldname -> value representing fieldname==value style filters
  * @since 13.0.0
  */
-public class UmaAuditQueryFilterVisitor implements QueryFilterVisitor<org.forgerock.util.query.QueryFilter<String>, Void> {
+public class UmaAuditQueryFilterVisitor implements QueryFilterVisitor<org.forgerock.util.query.QueryFilter<String>, Void, JsonPointer> {
 
     public UmaAuditQueryFilterVisitor() {
 
     }
 
     @Override
-    public org.forgerock.util.query.QueryFilter<String> visitAndFilter(Void aVoid, List<QueryFilter> subFilters) {
-        List<org.forgerock.util.query.QueryFilter<String>> childFilters =
+    public QueryFilter<String> visitAndFilter(Void aVoid, List<QueryFilter<JsonPointer>> subFilters) {
+        List<QueryFilter<String>> childFilters =
                 new ArrayList<org.forgerock.util.query.QueryFilter<String>>();
-        for (QueryFilter filter : subFilters) {
+        for (QueryFilter<JsonPointer> filter : subFilters) {
             childFilters.add(filter.accept(this, null));
         }
-        return org.forgerock.util.query.QueryFilter.and(childFilters);
+        return QueryFilter.and(childFilters);
     }
 
     @Override
@@ -51,20 +51,20 @@ public class UmaAuditQueryFilterVisitor implements QueryFilterVisitor<org.forger
         if (fieldName.equals("eventTime")) {
             Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
             cal.setTimeInMillis((Long) valueAssertion);
-            return org.forgerock.util.query.QueryFilter.equalTo(field.get(0), cal);
+            return QueryFilter.equalTo(field.get(0), cal);
         } else {
-            return org.forgerock.util.query.QueryFilter.equalTo(field.get(0), valueAssertion);
+            return QueryFilter.equalTo(field.get(0), valueAssertion);
         }
     }
 
     @Override
     public org.forgerock.util.query.QueryFilter<String> visitStartsWithFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
-        return org.forgerock.util.query.QueryFilter.startsWith(field.get(0), valueAssertion);
+        return QueryFilter.startsWith(field.get(0), valueAssertion);
     }
 
     @Override
     public org.forgerock.util.query.QueryFilter<String> visitContainsFilter(Void aVoid, JsonPointer field, Object valueAssertion) {
-        return org.forgerock.util.query.QueryFilter.contains(field.get(0), valueAssertion);
+        return QueryFilter.contains(field.get(0), valueAssertion);
     }
 
     @Override
@@ -98,12 +98,12 @@ public class UmaAuditQueryFilterVisitor implements QueryFilterVisitor<org.forger
     }
 
     @Override
-    public org.forgerock.util.query.QueryFilter<String> visitNotFilter(Void aVoid, QueryFilter subFilter) {
+    public org.forgerock.util.query.QueryFilter<String> visitNotFilter(Void aVoid, QueryFilter<JsonPointer> subFilter) {
         throw unsupportedFilterOperation("Not");
     }
 
     @Override
-    public org.forgerock.util.query.QueryFilter<String> visitOrFilter(Void aVoid, List<QueryFilter> subFilters) {
+    public org.forgerock.util.query.QueryFilter<String> visitOrFilter(Void aVoid, List<QueryFilter<JsonPointer>> subFilters) {
         throw unsupportedFilterOperation("Or");
     }
 

@@ -21,13 +21,14 @@ import static org.forgerock.openam.scripting.ScriptConstants.*;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.sun.identity.shared.encode.Base64;
+import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.json.resource.QueryFilter;
+import org.forgerock.util.query.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
@@ -158,13 +159,13 @@ public class ScriptResource extends RealmAwareResource {
     @Override
     public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler resultHandler) {
         resultHandler = QueryResultHandlerBuilder.withPagingAndSorting(resultHandler, request);
-        final QueryFilter filter = request.getQueryFilter();
+        final QueryFilter<JsonPointer> filter = request.getQueryFilter();
         try {
             final Set<ScriptConfiguration> configs;
             if (filter == null) {
                 configs = serviceFactory.create(getContextSubject(context), getRealm(context)).getAll();
             } else {
-                org.forgerock.util.query.QueryFilter<String> stringQueryFilter = filter.accept(
+                QueryFilter<String> stringQueryFilter = filter.accept(
                         new QueryByStringFilterConverter(), null);
                 configs = serviceFactory.create(getContextSubject(context), getRealm(context)).get(stringQueryFilter);
             }

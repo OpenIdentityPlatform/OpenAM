@@ -22,7 +22,8 @@ import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.util.SearchAttribute;
 import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.shared.DateUtils;
-import org.forgerock.json.resource.QueryFilter;
+import org.forgerock.json.JsonPointer;
+import org.forgerock.util.query.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.openam.forgerockrest.entitlements.query.AttributeType;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
@@ -204,7 +205,7 @@ public class PrivilegePolicyStoreTest {
     throws Exception {
         // Given
         long value = 123l;
-        QueryRequest request = mockQueryRequest(QueryFilter.comparisonFilter(NUMERIC_ATTRIBUTE, queryOperator, value));
+        QueryRequest request = mockQueryRequest(QueryFilter.comparisonFilter(NUMERIC_ATTRIBUTE, new JsonPointer(queryOperator), value));
 
         // When
         testStore.query(request);
@@ -224,7 +225,7 @@ public class PrivilegePolicyStoreTest {
         expectedExceptionsMessageRegExp = ".*not supported.*")
     public void shouldRejectUnsupportedQueryOperators(String queryOperator) throws Exception {
         // Given
-        QueryRequest request = mockQueryRequest(QueryFilter.comparisonFilter(NUMERIC_ATTRIBUTE, queryOperator, 123l));
+        QueryRequest request = mockQueryRequest(QueryFilter.comparisonFilter(NUMERIC_ATTRIBUTE, new JsonPointer(queryOperator), 123l));
 
         // When
         testStore.query(request);
@@ -248,7 +249,7 @@ public class PrivilegePolicyStoreTest {
             throws Exception {
         // Given
         Date value = new Date(123456789000l); // Note: only second accuracy supported in timestamp format
-        QueryRequest request = mockQueryRequest(QueryFilter.comparisonFilter(DATE_ATTRIBUTE, queryOperator,
+        QueryRequest request = mockQueryRequest(QueryFilter.comparisonFilter(DATE_ATTRIBUTE, new JsonPointer(queryOperator),
                 DateUtils.toUTCDateFormat(value)));
 
         // When

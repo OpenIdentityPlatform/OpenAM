@@ -21,18 +21,18 @@ import java.util.List;
 import org.forgerock.guava.common.base.Predicate;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.QueryFilter;
-import org.forgerock.json.resource.QueryFilterVisitor;
+import org.forgerock.util.query.QueryFilter;
+import org.forgerock.util.query.QueryFilterVisitor;
 
 /**
  * A query filter visitor that can be used to test whether a JsonValue matches a given
  * {@code QueryFilter}. String operations are compared case-insensitively.
  */
-public class JsonValueQueryFilterVisitor implements QueryFilterVisitor<Boolean, JsonValue> {
+public class JsonValueQueryFilterVisitor implements QueryFilterVisitor<Boolean, JsonValue, JsonPointer> {
 
     @Override
-    public Boolean visitAndFilter(JsonValue jsonValue, List<QueryFilter> list) {
-        for (QueryFilter subfilter : list) {
+    public Boolean visitAndFilter(JsonValue jsonValue, List<QueryFilter<JsonPointer>> list) {
+        for (QueryFilter<JsonPointer> subfilter : list) {
             if (!subfilter.accept(this, jsonValue)) {
                 return false;
             }
@@ -41,8 +41,8 @@ public class JsonValueQueryFilterVisitor implements QueryFilterVisitor<Boolean, 
     }
 
     @Override
-    public Boolean visitOrFilter(JsonValue jsonValue, List<QueryFilter> list) {
-        for (QueryFilter subfilter : list) {
+    public Boolean visitOrFilter(JsonValue jsonValue, List<QueryFilter<JsonPointer>> list) {
+        for (QueryFilter<JsonPointer> subfilter : list) {
             if (subfilter.accept(this, jsonValue)) {
                 return true;
             }
@@ -51,7 +51,7 @@ public class JsonValueQueryFilterVisitor implements QueryFilterVisitor<Boolean, 
     }
 
     @Override
-    public Boolean visitNotFilter(JsonValue jsonValue, QueryFilter queryFilter) {
+    public Boolean visitNotFilter(JsonValue jsonValue, QueryFilter<JsonPointer> queryFilter) {
         return !queryFilter.accept(this, jsonValue);
     }
 

@@ -47,8 +47,8 @@ import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
-import org.forgerock.json.resource.QueryFilter;
-import org.forgerock.json.resource.QueryFilterVisitor;
+import org.forgerock.util.query.QueryFilter;
+import org.forgerock.util.query.QueryFilterVisitor;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.Requests;
@@ -159,7 +159,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
     private ResourceSetDescription getResourceSet(String realm, String policyId) throws ResourceException {
         try {
             Set<ResourceSetDescription> results = resourceSetStoreFactory.create(realm).query(
-                            org.forgerock.util.query.QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, policyId));
+                            QueryFilter.equalTo(ResourceSetTokenField.RESOURCE_SET_ID, policyId));
             if (results.isEmpty()) {
                 throw new BadRequestException("Invalid ResourceSet UID" + policyId);
             } else if (results.size() > 1) {
@@ -255,7 +255,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         @Override
         public Promise<T, ResourceException> apply(final T result) {
             final QueryRequest queryRequest = Requests.newQueryRequest("")
-                    .setQueryFilter(QueryFilter.equalTo("/resourceTypeUuid", resourceSet.getId()));
+                    .setQueryFilter(QueryFilter.equalTo(new JsonPointer("resourceTypeUuid"), resourceSet.getId()));
             final PolicyGraph policyGraph = new PolicyGraph(resourceSet);
             return policyResourceDelegate.queryPolicies(context, queryRequest, policyGraph)
                     .thenAsync(new AsyncFunction<QueryResult, T, ResourceException>() {
@@ -336,8 +336,8 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         String resourceOwnerUid = getResourceOwnerUid(context);
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.and(
-                        QueryFilter.equalTo("/resourceTypeUuid", resourceSetId),
-                        QueryFilter.equalTo("/createdBy", resourceOwnerUid)));
+                        QueryFilter.equalTo(new JsonPointer("resourceTypeUuid"), resourceSetId),
+                        QueryFilter.equalTo(new JsonPointer("createdBy"), resourceOwnerUid)));
         return policyResourceDelegate.queryPolicies(context, request)
                 .thenAsync(new AsyncFunction<Pair<QueryResult, List<Resource>>, UmaPolicy, ResourceException>() {
                     @Override
@@ -393,8 +393,8 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                                 if (policy.get("actionValues").isDefined(scope)) {
                                     policyResourceDelegate.queryPolicies(context, Requests.newQueryRequest("")
                                             .setQueryFilter(QueryFilter.and(
-                                                    QueryFilter.equalTo("/createdBy", contextHelper.getUserUid(context)),
-                                                    QueryFilter.equalTo("/name", policy.get("name").asString()))))
+                                                    QueryFilter.equalTo(new JsonPointer("createdBy"), contextHelper.getUserUid(context)),
+                                                    QueryFilter.equalTo(new JsonPointer("name"), policy.get("name").asString()))))
                                             .thenAsync(new DeleteOldPolicyFunction(context));
                                 }
                             }
@@ -520,18 +520,18 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         }
 
         QueryRequest request = Requests.newQueryRequest("");
-        final AggregateQuery<QueryFilter, QueryFilter> filter = umaQueryRequest.getQueryFilter()
+        final AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> filter = umaQueryRequest.getQueryFilter()
                 .accept(new AggregateUmaPolicyQueryFilter(), new AggregateQuery<QueryFilter, QueryFilter>());
 
         String queryId = umaQueryRequest.getQueryId();
         if (queryId != null && queryId.equals("searchAll")) {
-            request.setQueryFilter(QueryFilter.alwaysTrue());
+            request.setQueryFilter(QueryFilter.<JsonPointer>alwaysTrue());
         } else {
             String resourceOwnerUid = getResourceOwnerUid(context);
             if (filter.getFirstQuery() == null) {
-                request.setQueryFilter(QueryFilter.equalTo("/createdBy", resourceOwnerUid));
+                request.setQueryFilter(QueryFilter.equalTo(new JsonPointer("createdBy"), resourceOwnerUid));
             } else {
-                request.setQueryFilter(QueryFilter.and(QueryFilter.equalTo("/createdBy", resourceOwnerUid), filter.getFirstQuery()));
+                request.setQueryFilter(QueryFilter.and(QueryFilter.equalTo(new JsonPointer("createdBy"), resourceOwnerUid), filter.getFirstQuery()));
             }
         }
         return policyResourceDelegate.queryPolicies(context, request)
@@ -610,7 +610,9 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
     }
 
     private static final class AggregateUmaPolicyQueryFilter
-            implements QueryFilterVisitor<AggregateQuery<QueryFilter, QueryFilter>, AggregateQuery<QueryFilter, QueryFilter>> {
+            implements QueryFilterVisitor<AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>>,
+            AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>>,
+            JsonPointer> {
 
         private int queryDepth = 0;
 
@@ -636,11 +638,14 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         }
 
         @Override
-        public AggregateQuery<QueryFilter, QueryFilter> visitAndFilter(AggregateQuery<QueryFilter, QueryFilter> query, List<QueryFilter> subFilters) {
+        public AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> visitAndFilter(
+                AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> query,
+                List<QueryFilter<JsonPointer>> subFilters) {
             increaseQueryDepth();
-            List<QueryFilter> childFilters = new ArrayList<QueryFilter>();
-            for (QueryFilter filter : subFilters) {
-                AggregateQuery<QueryFilter, QueryFilter> subAggregateQuery = filter.accept(this, query);
+            List<QueryFilter<JsonPointer>> childFilters = new ArrayList<>();
+            for (QueryFilter<JsonPointer> filter : subFilters) {
+                AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> subAggregateQuery =
+                        filter.accept(this, query);
                 if (subAggregateQuery.getSecondQuery() != null) {
                     subAggregateQuery.setOperator(AggregateQuery.Operator.AND);
                 } else {
@@ -653,12 +658,14 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         }
 
         @Override
-        public AggregateQuery<QueryFilter, QueryFilter> visitEqualsFilter(AggregateQuery<QueryFilter, QueryFilter> query, JsonPointer field, Object valueAssertion) {
+        public AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> visitEqualsFilter(
+                AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> query, JsonPointer field,
+                Object valueAssertion) {
             if (new JsonPointer("/permissions/subject").equals(field)) {
                 if (queryDepth > 1) {
                     throw new UnsupportedOperationException("Cannot nest queries on /permissions/subject field");
                 }
-                query.setSecondQuery(QueryFilter.equalTo("/permissions/subject", valueAssertion));
+                query.setSecondQuery(QueryFilter.equalTo(new JsonPointer("permissions/subject"), valueAssertion));
             } else {
                 query.setFirstQuery(QueryFilter.equalTo(verifyFieldIsQueryable(field), valueAssertion));
             }
@@ -666,12 +673,14 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         }
 
         @Override
-        public AggregateQuery<QueryFilter, QueryFilter> visitStartsWithFilter(AggregateQuery<QueryFilter, QueryFilter> query, JsonPointer field, Object valueAssertion) {
+        public AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> visitStartsWithFilter(
+                AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> query, JsonPointer field,
+                Object valueAssertion) {
             if (new JsonPointer("/permissions/subject").equals(field)) {
                 if (queryDepth > 1) {
                     throw new UnsupportedOperationException("Cannot nest queries on /permissions/subject field");
                 }
-                query.setSecondQuery(QueryFilter.startsWith("/permissions/subject", valueAssertion));
+                query.setSecondQuery(QueryFilter.startsWith(new JsonPointer("permissions/subject"), valueAssertion));
             } else {
                 query.setFirstQuery(QueryFilter.startsWith(verifyFieldIsQueryable(field), valueAssertion));
             }
@@ -679,12 +688,14 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         }
 
         @Override
-        public AggregateQuery<QueryFilter, QueryFilter> visitContainsFilter(AggregateQuery<QueryFilter, QueryFilter> query, JsonPointer field, Object valueAssertion) {
+        public AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> visitContainsFilter(
+                AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> query, JsonPointer field,
+                Object valueAssertion) {
             if (new JsonPointer("/permissions/subject").equals(field)) {
                 if (queryDepth > 1) {
                     throw new UnsupportedOperationException("Cannot nest queries on /permissions/subject field");
                 }
-                query.setSecondQuery(QueryFilter.contains("/permissions/subject", valueAssertion));
+                query.setSecondQuery(QueryFilter.contains(new JsonPointer("permissions/subject"), valueAssertion));
             } else {
                 query.setFirstQuery(QueryFilter.contains(verifyFieldIsQueryable(field), valueAssertion));
             }
@@ -692,7 +703,8 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         }
 
         @Override
-        public AggregateQuery<QueryFilter, QueryFilter> visitBooleanLiteralFilter(AggregateQuery<QueryFilter, QueryFilter> query, boolean value) {
+        public AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> visitBooleanLiteralFilter(
+                AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> query, boolean value) {
             if (value) {
                 return query;
             }
@@ -700,41 +712,54 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         }
 
         @Override
-        public AggregateQuery<QueryFilter, QueryFilter> visitExtendedMatchFilter(AggregateQuery<QueryFilter, QueryFilter> query, JsonPointer field, String operator, Object valueAssertion) {
+        public AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> visitExtendedMatchFilter(
+                AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> query, JsonPointer field,
+                String operator, Object valueAssertion) {
             throw unsupportedFilterOperation("Extended match");
         }
 
         @Override
-        public AggregateQuery<QueryFilter, QueryFilter> visitGreaterThanFilter(AggregateQuery<QueryFilter, QueryFilter> query, JsonPointer field, Object valueAssertion) {
+        public AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> visitGreaterThanFilter(
+                AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> query, JsonPointer field,
+                Object valueAssertion) {
             throw unsupportedFilterOperation("Greater than");
         }
 
         @Override
-        public AggregateQuery<QueryFilter, QueryFilter> visitGreaterThanOrEqualToFilter(AggregateQuery<QueryFilter, QueryFilter> query, JsonPointer field, Object valueAssertion) {
+        public AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> visitGreaterThanOrEqualToFilter(
+                AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> query, JsonPointer field,
+                Object valueAssertion) {
             throw unsupportedFilterOperation("Greater than or equal");
         }
 
         @Override
-        public AggregateQuery<QueryFilter, QueryFilter> visitLessThanFilter(AggregateQuery<QueryFilter, QueryFilter> query, JsonPointer field, Object valueAssertion) {
+        public AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> visitLessThanFilter(
+                AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> query, JsonPointer field,
+                Object valueAssertion) {
             throw unsupportedFilterOperation("Less than");
         }
 
         @Override
-        public AggregateQuery<QueryFilter, QueryFilter> visitLessThanOrEqualToFilter(AggregateQuery<QueryFilter, QueryFilter> query, JsonPointer field, Object valueAssertion) {
+        public AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> visitLessThanOrEqualToFilter(
+                AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> query, JsonPointer field, Object valueAssertion) {
             throw unsupportedFilterOperation("Less than or equal");
         }
 
         @Override
-        public AggregateQuery<QueryFilter, QueryFilter> visitNotFilter(AggregateQuery<QueryFilter, QueryFilter> query, QueryFilter subFilter) {
+        public AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> visitNotFilter(
+                AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> query,
+                QueryFilter<JsonPointer> subFilter) {
             throw unsupportedFilterOperation("Not");
         }
 
         @Override
-        public AggregateQuery<QueryFilter, QueryFilter> visitOrFilter(AggregateQuery<QueryFilter, QueryFilter> query, List<QueryFilter> subFilters) {
+        public AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> visitOrFilter(
+                AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> query,
+                List<QueryFilter<JsonPointer>> subFilters) {
             increaseQueryDepth();
-            List<QueryFilter> childFilters = new ArrayList<QueryFilter>();
-            for (QueryFilter filter : subFilters) {
-                AggregateQuery<QueryFilter, QueryFilter> subAggregateQuery = filter.accept(this, query);
+            List<QueryFilter<JsonPointer>> childFilters = new ArrayList<>();
+            for (QueryFilter<JsonPointer> filter : subFilters) {
+                AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> subAggregateQuery = filter.accept(this, query);
                 if (subAggregateQuery.getSecondQuery() != null) {
                     subAggregateQuery.setOperator(AggregateQuery.Operator.OR);
                 } else {
@@ -747,7 +772,8 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         }
 
         @Override
-        public AggregateQuery<QueryFilter, QueryFilter> visitPresentFilter(AggregateQuery<QueryFilter, QueryFilter> query, JsonPointer field) {
+        public AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> visitPresentFilter(
+                AggregateQuery<QueryFilter<JsonPointer>, QueryFilter<JsonPointer>> query, JsonPointer field) {
             throw unsupportedFilterOperation("Present");
         }
 

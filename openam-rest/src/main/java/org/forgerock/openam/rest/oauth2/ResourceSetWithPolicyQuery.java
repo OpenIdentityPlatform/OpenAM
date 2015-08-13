@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.rest.oauth2;
 
-import org.forgerock.json.resource.QueryFilter;
+import org.forgerock.util.query.QueryFilter;
 
 /**
  * Aggregation of queries against Resource Sets and UMA policies.
