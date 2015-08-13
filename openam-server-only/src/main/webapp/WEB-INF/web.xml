@@ -1213,10 +1213,6 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>ForgeRockRest</servlet-name>
-        <url-pattern>/json/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ForgeRockRest</servlet-name>
         <url-pattern>/xacml/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>

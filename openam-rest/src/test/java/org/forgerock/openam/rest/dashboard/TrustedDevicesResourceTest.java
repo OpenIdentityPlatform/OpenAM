@@ -42,7 +42,7 @@ import org.forgerock.http.Context;
 import org.forgerock.openam.rest.devices.TrustedDevicesDao;
 import org.forgerock.openam.rest.devices.TrustedDevicesResource;
 import org.forgerock.openam.rest.resource.ContextHelper;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;

@@ -52,7 +52,7 @@ import org.forgerock.openam.rest.devices.OathDevicesResource;
 import org.forgerock.openam.rest.devices.services.OathService;
 import org.forgerock.openam.rest.devices.services.OathServiceFactory;
 import org.forgerock.openam.rest.resource.ContextHelper;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.mockito.ArgumentCaptor;

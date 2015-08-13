@@ -47,7 +47,7 @@ import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.openam.forgerockrest.utils.RequestHolder;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.uma.UmaProviderSettings;
 import org.forgerock.openam.uma.UmaProviderSettingsFactory;
 import org.mockito.ArgumentCaptor;

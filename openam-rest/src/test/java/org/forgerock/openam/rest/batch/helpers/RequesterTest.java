@@ -37,7 +37,7 @@ import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.testng.annotations.BeforeTest;

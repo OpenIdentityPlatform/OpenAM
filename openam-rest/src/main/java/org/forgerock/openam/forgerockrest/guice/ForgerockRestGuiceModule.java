@@ -16,8 +16,20 @@
 
 package org.forgerock.openam.forgerockrest.guice;
 
-import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.*;
-import static org.forgerock.openam.uma.UmaConstants.*;
+import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.STRING;
+import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.TIMESTAMP;
+import static org.forgerock.openam.uma.UmaConstants.UMA_BACKEND_POLICY_RESOURCE_HANDLER;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.security.auth.Subject;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
@@ -40,26 +52,11 @@ import com.sun.identity.idm.IdRepoCreationListener;
 import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.security.auth.Subject;
-
-import org.forgerock.openam.rest.record.DefaultDebugRecorder;
-import org.forgerock.openam.rest.record.DebugRecorder;
 import org.forgerock.guice.core.GuiceModule;
-import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.RequestType;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.Resources;
-import org.forgerock.json.resource.VersionSelector;
 import org.forgerock.oauth2.restlet.resources.ResourceSetRegistrationListener;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
@@ -84,11 +81,11 @@ import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.forgerockrest.utils.RestLog;
 import org.forgerock.openam.forgerockrest.utils.SpecialUserIdentity;
 import org.forgerock.openam.forgerockrest.utils.SpecialUserIdentityImpl;
-import org.forgerock.openam.rest.RestEndpointServlet;
 import org.forgerock.openam.rest.RestEndpoints;
 import org.forgerock.openam.rest.authz.CoreTokenResourceAuthzModule;
 import org.forgerock.openam.rest.authz.PrivilegeDefinition;
-import org.forgerock.openam.rest.batch.helpers.Requester;
+import org.forgerock.openam.rest.record.DebugRecorder;
+import org.forgerock.openam.rest.record.DefaultDebugRecorder;
 import org.forgerock.openam.rest.router.CTSPersistentStoreProxy;
 import org.forgerock.openam.rest.router.DelegationEvaluatorProxy;
 import org.forgerock.openam.rest.scripting.ScriptExceptionMappingHandler;
@@ -172,8 +169,6 @@ public class ForgerockRestGuiceModule extends AbstractModule {
                 .toProvider(ApplicationQueryAttributesMapProvider.class)
                 .asEagerSingleton();
 
-        bind(RestEndpointManager.class).to(RestEndpointManagerProxy.class);
-        bind(VersionSelector.class).in(Singleton.class);
         bind(DelegationEvaluatorImpl.class).in(Singleton.class);
         bind(DelegationEvaluator.class).to(DelegationEvaluatorProxy.class).in(Singleton.class);
 
@@ -225,14 +220,6 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Named(UMA_BACKEND_POLICY_RESOURCE_HANDLER)
     RequestHandler getPolicyResource(PolicyResource policyResource) {
         return Resources.newCollection(policyResource);
-    }
-
-    @Provides
-    @Inject
-    @Named(RestEndpointServlet.CREST_CONNECTION_FACTORY_NAME)
-    @Singleton
-    public ConnectionFactory getConnectionFactory(RestEndpoints restEndpoints) {
-        return Resources.newInternalConnectionFactory(restEndpoints.getResourceRouter());
     }
 
     @Inject
@@ -328,13 +315,6 @@ public class ForgerockRestGuiceModule extends AbstractModule {
 
     public static Map<Integer, Integer> getEntitlementsErrorHandlers() {
         return new EntitlementsResourceErrorMappingProvider().get();
-    }
-
-    @Provides
-    @Named(Requester.ROUTER)
-    @Inject
-    public CrestRouter getRealmRouterProvider(RestEndpoints restEndpoints) {
-        return restEndpoints.getResourceRouter();
     }
 
     @Provides

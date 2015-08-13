@@ -17,9 +17,8 @@
 package org.forgerock.openam.forgerockrest.entitlements;
 
 import com.sun.identity.entitlement.PrivilegeManager;
-import org.forgerock.http.Context;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

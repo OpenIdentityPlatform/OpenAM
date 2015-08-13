@@ -76,15 +76,15 @@ class AuditingResultHandler {
     void auditAccessAttempt() throws AuditException {
         if (auditEventPublisher.isAuditing(ACCESS_TOPIC)) {
 
-            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
-                    .forHttpCrestRequest(context, request)
-                    .timestamp(startTime)
-                    .transactionId(AuditRequestContext.getTransactionIdValue())
-                    .eventName(EventName.AM_ACCESS_ATTEMPT)
-                    .component(component);
-            addSessionDetailsFromSSOTokenContext(builder, context);
-
-            auditEventPublisher.publish(ACCESS_TOPIC, builder.toEvent());
+//            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
+//                    .forHttpCrestRequest(context, request)
+//                    .timestamp(startTime)
+//                    .transactionId(AuditRequestContext.getTransactionIdValue())
+//                    .eventName(EventName.AM_ACCESS_ATTEMPT)
+//                    .component(component);
+//            addSessionDetailsFromSSOTokenContext(builder, context);
+//
+//            auditEventPublisher.publish(ACCESS_TOPIC, builder.toEvent());
         }
     }
 
@@ -99,16 +99,16 @@ class AuditingResultHandler {
 
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
-            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
-                    .forHttpCrestRequest(context, request)
-                    .timestamp(endTime)
-                    .transactionId(AuditRequestContext.getTransactionIdValue())
-                    .eventName(EventName.AM_ACCESS_OUTCOME)
-                    .component(component)
-                    .response("SUCCESS", elapsedTime);
-            addSessionDetailsFromSSOTokenContext(builder, context);
-
-            auditEventPublisher.tryPublish(ACCESS_TOPIC, builder.toEvent());
+//            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
+//                    .forHttpCrestRequest(context, request)
+//                    .timestamp(endTime)
+//                    .transactionId(AuditRequestContext.getTransactionIdValue())
+//                    .eventName(EventName.AM_ACCESS_OUTCOME)
+//                    .component(component)
+//                    .response("SUCCESS", elapsedTime);
+//            addSessionDetailsFromSSOTokenContext(builder, context);
+//
+//            auditEventPublisher.tryPublish(ACCESS_TOPIC, builder.toEvent());
         }
     }
 
@@ -126,16 +126,16 @@ class AuditingResultHandler {
 
             final long endTime = System.currentTimeMillis();
             final long elapsedTime = endTime - startTime;
-            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
-                    .forHttpCrestRequest(context, request)
-                    .timestamp(endTime)
-                    .transactionId(AuditRequestContext.getTransactionIdValue())
-                    .eventName(EventName.AM_ACCESS_OUTCOME)
-                    .component(component)
-                    .responseWithMessage("FAILED - " + resultCode, elapsedTime, message);
-            addSessionDetailsFromSSOTokenContext(builder, context);
-
-            auditEventPublisher.tryPublish(ACCESS_TOPIC, builder.toEvent());
+//            AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
+//                    .forHttpCrestRequest(context, request)
+//                    .timestamp(endTime)
+//                    .transactionId(AuditRequestContext.getTransactionIdValue())
+//                    .eventName(EventName.AM_ACCESS_OUTCOME)
+//                    .component(component)
+//                    .responseWithMessage("FAILED - " + resultCode, elapsedTime, message);
+//            addSessionDetailsFromSSOTokenContext(builder, context);
+//
+//            auditEventPublisher.tryPublish(ACCESS_TOPIC, builder.toEvent());
         }
     }
 

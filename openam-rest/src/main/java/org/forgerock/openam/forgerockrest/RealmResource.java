@@ -64,7 +64,7 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.utils.RealmUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.promise.Promise;

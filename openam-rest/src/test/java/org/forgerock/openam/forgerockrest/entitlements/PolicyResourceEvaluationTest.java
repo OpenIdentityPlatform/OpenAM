@@ -28,7 +28,7 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.http.Context;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.PolicyRequest;
 import org.forgerock.openam.forgerockrest.guice.ForgerockRestGuiceModule;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;

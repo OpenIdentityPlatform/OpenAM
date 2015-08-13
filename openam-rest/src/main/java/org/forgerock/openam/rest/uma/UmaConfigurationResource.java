@@ -37,7 +37,7 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.SingletonResourceProvider;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.uma.UmaSettings;
 import org.forgerock.openam.uma.UmaSettingsFactory;
 import org.forgerock.util.promise.Promise;

@@ -18,8 +18,8 @@ package org.forgerock.openam.rest.devices;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 
 import java.text.ParseException;
+
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.openam.rest.resource.ContextHelper;
 

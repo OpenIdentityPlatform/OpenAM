@@ -42,7 +42,7 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.http.Context;
 import org.forgerock.openam.rest.resource.ContextHelper;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
 import org.forgerock.openam.uma.PendingRequestsService;
 import org.forgerock.util.promise.Promise;

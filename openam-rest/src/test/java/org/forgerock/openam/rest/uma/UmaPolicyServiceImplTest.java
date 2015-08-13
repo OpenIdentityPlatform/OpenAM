@@ -59,7 +59,7 @@ import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.rest.resource.ContextHelper;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.openam.uma.UmaPolicy;

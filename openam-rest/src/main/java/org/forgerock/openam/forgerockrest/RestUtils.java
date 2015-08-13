@@ -19,6 +19,15 @@ package org.forgerock.openam.forgerockrest;
 import static org.forgerock.json.resource.ResourceException.newNotSupportedException;
 import static org.forgerock.util.promise.Promises.newExceptionPromise;
 
+import javax.mail.internet.MimeUtility;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.AccessController;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Set;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -30,7 +39,6 @@ import com.sun.identity.delegation.DelegationPermission;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
-import com.sun.identity.idsvcs.Token;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.Constants;
@@ -38,26 +46,13 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceManager;
 import org.forgerock.json.resource.ForbiddenException;
-import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.http.Context;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.dashboard.ServerContextHelper;
-import org.forgerock.openam.rest.resource.RealmContext;
-import org.forgerock.openam.session.SessionURL;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.util.promise.Promise;
-
-import javax.mail.internet.MimeUtility;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.AccessController;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Set;
 
 /**
  * A collection of ForgeRock-REST based utility functions.

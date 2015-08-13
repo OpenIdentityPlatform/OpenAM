@@ -44,7 +44,7 @@ import org.forgerock.json.resource.Router;
 import org.forgerock.json.resource.RoutingMode;
 import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;

@@ -31,7 +31,7 @@ import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.http.Context;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import static org.junit.Assert.assertTrue;
 import org.mockito.ArgumentCaptor;

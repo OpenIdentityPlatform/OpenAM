@@ -31,7 +31,7 @@ import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.http.Context;
 import org.forgerock.json.resource.InternalContext;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyEvaluator;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;

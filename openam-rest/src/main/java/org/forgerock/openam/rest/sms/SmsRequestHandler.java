@@ -18,6 +18,7 @@ package org.forgerock.openam.rest.sms;
 
 import static org.forgerock.http.routing.RoutingMode.EQUALS;
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
+import static org.forgerock.json.resource.RouteMatchers.requestUriMatcher;
 import static org.forgerock.openam.rest.sms.SmsRouteTree.*;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
@@ -62,6 +63,7 @@ import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.FilterChain;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
@@ -74,8 +76,7 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.Router;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.core.CoreWrapper;
-import org.forgerock.openam.rest.router.RestRealmValidator;
+import org.forgerock.openam.rest.RealmContextFilter;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.util.promise.Promise;
 
@@ -240,9 +241,12 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
 
     private void addRealmHandler() {
         if (SchemaType.GLOBAL.equals(schemaType)) {
-            CrestRealmRouter router = new CrestRealmRouter(new RestRealmValidator(), new CoreWrapper());
-            router.addRoute(EQUALS, "", new SmsRealmProvider());
-            routeTree.addRoute(STARTS_WITH, "/realms", router);
+            Router realmRouter = new Router();
+            RealmContextFilter realmContextFilter = InjectorHolder.getInstance(RealmContextFilter.class);
+            realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "{realm}"),
+                    new FilterChain(realmRouter, realmContextFilter));
+            realmRouter.addRoute(requestUriMatcher(EQUALS, ""), new SmsRealmProvider());
+            routeTree.addRoute(RoutingMode.STARTS_WITH, "/realms", realmRouter);
         }
     }
 

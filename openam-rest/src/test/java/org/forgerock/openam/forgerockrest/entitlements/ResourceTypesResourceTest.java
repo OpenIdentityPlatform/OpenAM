@@ -43,7 +43,7 @@ import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import org.forgerock.openam.forgerockrest.guice.ForgerockRestGuiceModule;
 import org.forgerock.openam.rest.query.QueryException;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;

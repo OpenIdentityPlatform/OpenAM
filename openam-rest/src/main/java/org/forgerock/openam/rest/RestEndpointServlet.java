@@ -16,23 +16,18 @@
 
 package org.forgerock.openam.rest;
 
-import com.google.inject.Key;
-import com.google.inject.name.Names;
-import org.forgerock.json.resource.ConnectionFactory;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.forgerockrest.utils.RequestHolder;
-import org.forgerock.openam.rest.service.JSONServiceEndpointApplication;
-import org.forgerock.openam.rest.service.OAuth2ServiceEndpointApplication;
-import org.forgerock.openam.rest.service.RestletServiceServlet;
-import org.forgerock.openam.rest.service.UMAServiceEndpointApplication;
-import org.forgerock.openam.rest.service.XACMLServiceEndpointApplication;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
+import org.forgerock.openam.rest.service.JSONServiceEndpointApplication;
+import org.forgerock.openam.rest.service.OAuth2ServiceEndpointApplication;
+import org.forgerock.openam.rest.service.RestletServiceServlet;
+import org.forgerock.openam.rest.service.UMAServiceEndpointApplication;
+import org.forgerock.openam.rest.service.XACMLServiceEndpointApplication;
 
 /**
  * Root Servlet for all REST endpoint requests, which are then passed onto the correct underlying servlet, either
@@ -44,19 +39,15 @@ public class RestEndpointServlet extends HttpServlet {
 
     public static final String CREST_CONNECTION_FACTORY_NAME = "CrestConnectionFactory";
 
-    private final org.forgerock.json.resource.servlet.HttpServlet crestServlet;
     private final RestletServiceServlet restletJSONServiceServlet;
     private final RestletServiceServlet restletXACMLServiceServlet;
     private final RestletServiceServlet restletOAuth2ServiceServlet;
     private final RestletServiceServlet restletUMAServiceServlet;
-    private final RestEndpointManager endpointManager;
 
     /**
      * Constructs a new RestEndpointServlet.
      */
     public RestEndpointServlet() {
-        this.crestServlet = new CrestHttpServlet(this, InjectorHolder.getInstance(Key.get(ConnectionFactory.class,
-                Names.named(CREST_CONNECTION_FACTORY_NAME))));
         this.restletJSONServiceServlet = new RestletServiceServlet(this, JSONServiceEndpointApplication.class,
                 "jsonRestletServiceServlet");
         this.restletXACMLServiceServlet = new RestletServiceServlet(this, XACMLServiceEndpointApplication.class,
@@ -65,30 +56,24 @@ public class RestEndpointServlet extends HttpServlet {
                 "oauth2RestletServiceServlet");
         this.restletUMAServiceServlet = new RestletServiceServlet(this, UMAServiceEndpointApplication.class,
                 "umaRestletServiceServlet");
-        this.endpointManager = InjectorHolder.getInstance(RestEndpointManager.class);
     }
 
     /**
      * Constructor for test use.
      *
-     * @param crestServlet An instance of a CrestHttpServlet.
      * @param restletJSONServiceServlet An instance of a RestletServiceServlet.
      * @param restletXACMLServiceServlet An instance of a RestletServiceServlet.
      * @param restletUMAServiceServlet An instance of a RestletServiceServlet.
-     * @param endpointManager An instance of the RestEndpointManager.
      */
-    RestEndpointServlet(final CrestHttpServlet crestServlet,
+    RestEndpointServlet(
             final RestletServiceServlet restletJSONServiceServlet,
             final RestletServiceServlet restletXACMLServiceServlet,
             final RestletServiceServlet restletOAuth2ServiceServlet,
-            final RestletServiceServlet restletUMAServiceServlet,
-            final RestEndpointManager endpointManager) {
-        this.crestServlet = crestServlet;
+            final RestletServiceServlet restletUMAServiceServlet) {
         this.restletJSONServiceServlet = restletJSONServiceServlet;
         this.restletXACMLServiceServlet = restletXACMLServiceServlet;
         this.restletOAuth2ServiceServlet = restletOAuth2ServiceServlet;
         this.restletUMAServiceServlet = restletUMAServiceServlet;
-        this.endpointManager = endpointManager;
     }
 
     /**
@@ -98,8 +83,7 @@ public class RestEndpointServlet extends HttpServlet {
      */
     @Override
     public void init() throws ServletException {
-        crestServlet.init();
-        // Don't need to call restServiceServlet.init() as starts Restlet which is not needed as is not created by
+        // Don't need to call init() as starts Restlet which is not needed as is not created by
         // Servlet Container.
     }
 
@@ -115,33 +99,7 @@ public class RestEndpointServlet extends HttpServlet {
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
             IOException {
-        if ("/json".equals(request.getServletPath())) {
-            final String restRequest = getResourceName(request);
-
-            final String endpoint = endpointManager.findEndpoint(restRequest);
-
-            final RestEndpointManager.EndpointType endpointType = endpointManager.getEndpointType(endpoint);
-
-            if (endpointType == null) {
-                throw new ServletException("Endpoint Type could not be determined");
-            }
-
-            switch (endpointType) {
-                case RESOURCE: {
-                    RequestHolder.set(request);
-                    try {
-                        crestServlet.service(request, response);
-                    } finally {
-                        RequestHolder.remove();
-                    }
-                    break;
-                }
-                case SERVICE: {
-                    restletJSONServiceServlet.service(new HttpServletRequestWrapper(request), response);
-                    break;
-                }
-            }
-        } else if ("/xacml".equals(request.getServletPath())) {
+        if ("/xacml".equals(request.getServletPath())) {
             restletXACMLServiceServlet.service(new HttpServletRequestWrapper(request), response);
         } else if ("/oauth2".equals(request.getServletPath())) {
             restletOAuth2ServiceServlet.service(new HttpServletRequestWrapper(request), response);
@@ -151,29 +109,10 @@ public class RestEndpointServlet extends HttpServlet {
     }
 
     /**
-     * Gets the resource name (resource path) from the HttpServletRequest.
-     *
-     * @param req The HttpServletRequest.
-     * @return The resource name (resource path).
-     */
-    private String getResourceName(final HttpServletRequest req) {
-        // Treat null path info as root resource.
-        String resourceName = req.getPathInfo();
-        if (resourceName == null) {
-            return "";
-        }
-        if (resourceName.endsWith("/")) {
-            resourceName = resourceName.substring(0, resourceName.length() - 1);
-        }
-        return resourceName;
-    }
-
-    /**
      * Destroys the CREST and Restlet servlets.
      */
     @Override
     public void destroy() {
-        crestServlet.destroy();
         restletXACMLServiceServlet.destroy();
         restletOAuth2ServiceServlet.destroy();
         restletUMAServiceServlet.destroy();

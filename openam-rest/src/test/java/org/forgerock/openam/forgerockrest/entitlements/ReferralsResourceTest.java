@@ -39,7 +39,7 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ReferralWrapper;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.mockito.ArgumentCaptor;
 import static org.mockito.BDDMockito.given;

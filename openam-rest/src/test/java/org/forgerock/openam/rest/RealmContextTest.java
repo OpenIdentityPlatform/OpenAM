@@ -14,9 +14,10 @@
  * Copyright 2014-2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.rest.resource;
+package org.forgerock.openam.rest;
 
 import org.forgerock.http.context.RootContext;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.util.Pair;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;

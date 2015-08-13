@@ -59,7 +59,7 @@ import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.promise.Promise;

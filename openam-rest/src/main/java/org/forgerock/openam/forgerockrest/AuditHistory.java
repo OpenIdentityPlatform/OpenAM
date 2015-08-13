@@ -45,7 +45,7 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.sm.datalayer.store.ServerException;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaAuditEntry;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;

@@ -24,7 +24,7 @@ import org.forgerock.json.resource.InternalContext;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.BatchPolicyRequest;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.PolicyRequest;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.TreePolicyRequest;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;

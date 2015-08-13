@@ -36,7 +36,7 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.http.Context;
 import org.forgerock.openam.entitlement.ConditionTypeRegistry;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.mockito.ArgumentCaptor;
 import static org.mockito.BDDMockito.given;

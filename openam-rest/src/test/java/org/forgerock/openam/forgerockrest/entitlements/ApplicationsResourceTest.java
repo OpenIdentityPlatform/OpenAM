@@ -60,7 +60,7 @@ import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationManag
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationWrapper;
 import org.forgerock.openam.forgerockrest.guice.ForgerockRestGuiceModule;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import static org.forgerock.openam.utils.CollectionUtils.asOrderedSet;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;

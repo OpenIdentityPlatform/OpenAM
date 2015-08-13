@@ -14,9 +14,8 @@
  * Copyright 2014-2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.rest.resource;
+package org.forgerock.openam.rest;
 
-import org.forgerock.http.Context;
 import org.forgerock.http.Context;
 import org.forgerock.http.context.AbstractContext;
 import org.forgerock.util.Pair;
@@ -38,7 +37,7 @@ public class RealmContext extends AbstractContext {
      * @param parent The parent context.
      */
     public RealmContext(Context parent) {
-        super(parent);
+        super(parent, "realm");
     }
 
     /**

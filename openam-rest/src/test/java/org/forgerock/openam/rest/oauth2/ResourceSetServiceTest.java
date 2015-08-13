@@ -42,7 +42,7 @@ import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.uma.UmaPolicy;
 import org.forgerock.openam.uma.UmaPolicyService;
 import org.forgerock.openam.uma.UmaProviderSettings;
