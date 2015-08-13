@@ -29,92 +29,101 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
     "underscore",
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Configuration"
-], function($, _, constants, conf) {
+], function ($, _, Constants, Configuration) {
 
     var obj = {},
         themeConfigPromise;
 
-    obj.loadThemeCSS = function(theme){
+    obj.loadThemeCSS = function (theme) {
 
-        $('head').find('link[type="image/x-icon"]').remove();
-        $('head').find('link[type="text/css"]').remove();
+        $("head").find("link[type='image/x-icon']").remove();
+        $("head").find("link[type='text/css']").remove();
 
         $("<link/>", {
             rel: "icon",
             type: "image/x-icon",
             href: require.toUrl(theme.path + theme.icon)
-         }).appendTo("head");
+        }).appendTo("head");
 
         $("<link/>", {
             rel: "shortcut icon",
             type: "image/x-icon",
             href: require.toUrl(theme.path + theme.icon)
-         }).appendTo("head");
+        }).appendTo("head");
 
-         $("<link/>", {
-             rel: "stylesheet",
-             type: "text/css",
-             href: theme.stylesheet
-         }).appendTo("head");
+        $("<link/>", {
+            rel: "stylesheet",
+            type: "text/css",
+            href: theme.stylesheet
+        }).appendTo("head");
     };
 
-    obj.loadThemeConfig = function(){
+    obj.loadThemeConfig = function () {
         if (themeConfigPromise === undefined) {
-            themeConfigPromise = $.getJSON(require.toUrl(constants.THEME_CONFIG_PATH));
+            themeConfigPromise = $.getJSON(require.toUrl(Constants.THEME_CONFIG_PATH));
         }
         return themeConfigPromise;
     };
 
-    obj.getTheme = function(){
+    obj.getTheme = function (basePath) {
         var theme = {},
             newLessVars = {},
-            realmDefined = typeof conf.globalData.auth.subRealm !== 'undefined',
+            realmDefined = typeof Configuration.globalData.auth.subRealm !== "undefined",
             themeName, defaultTheme;
 
+
         //find out if the theme has changed
-        if (conf.globalData.theme && obj.mapRealmToTheme() === conf.globalData.theme.name) {
+        if (Configuration.globalData.theme && obj.mapRealmToTheme() === Configuration.globalData.theme.name) {
             //no change so use the existing theme
-            return $.Deferred().resolve(conf.globalData.theme);
+            return $.Deferred().resolve(Configuration.globalData.theme);
         } else {
-            return obj.loadThemeConfig().then(function(themeConfig){
+            return obj.loadThemeConfig().then(function (themeConfig) {
                 obj.data = themeConfig;
-                conf.globalData.themeConfig = obj.updateSrcProperties(themeConfig);
+                Configuration.globalData.themeConfig = obj.updateSrcProperties(themeConfig);
                 themeName = obj.mapRealmToTheme();
+                theme = _.reject(obj.data.themes, function (t) {return t.name !== themeName;})[0];
 
-                theme = _.reject(obj.data.themes,function(t){return t.name !== themeName;})[0];
-
-                if(theme.name !== 'default' && theme.path === ''){
-                    defaultTheme = _.reject(obj.data.themes,function(t){return t.name !== 'default';})[0];
+                if (theme.name !== "default" && theme.path === "") {
+                    defaultTheme = _.reject(obj.data.themes,function (t) { return t.name !== "default";})[0];
                     theme = $.extend(true,{}, defaultTheme, theme);
                 }
+                if (basePath) {
+                    if (basePath.indexOf("http://") === 0 ||
+                        basePath.indexOf("https://") === 0 ||
+                        basePath.indexOf("/") === 0)
+                    {
+                        theme.stylesheet = basePath + theme.stylesheet;
+                    }
+                }
+
                 obj.loadThemeCSS(theme);
-                conf.globalData.theme = theme;
+                Configuration.globalData.theme = theme;
                 return theme;
             });
         }
     };
 
-    obj.mapRealmToTheme = function(){
+    obj.mapRealmToTheme = function () {
         var testString,
-            theme = "default";
-        if(conf.globalData.auth.subRealm && conf.globalData.auth.subRealm.substring(1).length !== 0){
-            testString = conf.globalData.auth.subRealm.substring(1);
-        }
-        else{
+            theme = "default",
+            subrealm = Configuration.globalData.auth.subRealm;
+
+        if (subrealm && subrealm.substring(1).length !== 0) {
+            testString = subrealm.substring(1);
+        } else {
             testString = document.domain;
         }
 
-        _.each(obj.data.themes,function(t){
-            _.each(t.realms,function(r){
-                if(t.regex){
+        _.each(obj.data.themes,function (t) {
+            _.each(t.realms,function (r) {
+                if (t.regex) {
                     var patt = new RegExp(r);
-                    if(patt.test(testString)){
+                    if (patt.test(testString)) {
                         theme = t.name;
                         return false;
                     }
-                }
-                else{
-                    if(r === testString){
+                } else {
+                    if (r === testString) {
                         theme = t.name;
                         return false;
                     }
@@ -126,7 +135,7 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
         return theme;
     };
 
-    obj.updateSrcProperties = function(config) {
+    obj.updateSrcProperties = function (config) {
         var i;
         if (config.themes && _.isArray(config.themes)) {
             for (i = 0; i < config.themes.length; i++) {
@@ -137,12 +146,11 @@ define("org/forgerock/openam/ui/common/util/ThemeManager", [
         }
     };
 
-    obj.updateSrc = function(value) {
-        if (_.has(value, 'src')) {
+    obj.updateSrc = function (value) {
+        if (_.has(value, "src")) {
             value.src = require.toUrl(value.src);
         }
     };
-
 
     return obj;
 });

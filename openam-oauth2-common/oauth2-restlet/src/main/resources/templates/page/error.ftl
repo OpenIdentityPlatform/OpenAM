@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <!--
   ~ DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   ~
@@ -21,28 +21,38 @@
   ~ with the fields enclosed by brackets [] replaced by
   ~ your own identifying information:
   ~ "Portions Copyrighted [year] [name of copyright owner]"
-  ~ 
+  ~
   ~ Portions Copyrighted 2014 Nomura Research Institute, Ltd
   -->
-<html lang="en">
+  <html lang="en">
+      <head>
+          <meta charset="utf-8">
+          <meta http-equiv="X-UA-Compatible" content="IE=edge">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <meta name="description" content="OAuth2 Error">
+          <title>OAuth2 Error Page</title>
+      </head>
 <head>
-    <title>OAuth2 Error Page</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" charset="utf-8"/>
-    <meta name="description" content="OAuth2 Error">
-</head>
-<body>
-<p><b>Error: </b>
-<#if error??>
-    <#if error_uri??>
-        <a href="${error_uri?html}">${error?html}</a>
-    <#else>
-    ${error}
-    </#if>
-</#if>
-</p>
 
-<p><b>Description: </b>
-<#if error_description??>${error_description?html}</#if>
-</p>
-</body>
+<body>
+    <div id="wrapper" class="hidden">Loading...</div>
+    <footer id="footer" class="footer hidden"></footer>
+    <script type="text/javascript">
+        <#if error??>
+            pageData = {
+                baseUrl: "${baseUrl?js_string}/XUI",
+                error: {
+                <#if error_uri??>
+                    uri: "${error_uri?js_string}",
+                </#if>
+                <#if error_description??>
+                    description: "${error_description?js_string}",
+                </#if>
+                    message: "${error?js_string}"
+                }
+            }
+        </#if>
+        </script>
+        <script data-main="${baseUrl?html}/XUI/main-authorize" src="${baseUrl?html}/XUI/libs/requirejs-2.1.14-min.js"></script>
+    </body>
 </html>

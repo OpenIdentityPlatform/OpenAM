@@ -1,0 +1,76 @@
+<div class="container">
+
+    {{#if error}}
+    <div class="alert alert-warning col-md-6 col-md-offset-3" role="alert">
+        <strong>
+        {{#if error.uri}}
+            <a href="{{error.uri}}">{{error.message}}</a>
+        {{else}}
+            {{error.message}}
+        {{/if}}
+        </strong>
+        {{#if error.description}}
+            {{error.description}}
+        {{/if}}
+    </div>
+    {{else}}
+
+    <div class="page-header col-md-6 col-md-offset-3">
+        <h1 class="text-center">{{oauth2Data.displayName}}</h1>
+        {{#if oauth2Data.displayDescription}}
+        <p class="text-center"><em>{{oauth2Data.displayDescription}}</em></p>
+        {{/if}}
+    </div>
+
+    <form action="{{oauth2Data.formTarget}}" method="post" class="form col-md-6 col-md-offset-3" autocomplete="off">
+
+        <fieldset>
+            {{#if oauth2Data.displayScopes}}
+            <p>{{t 'form.description'}}</p>
+            <ul class="list-group">
+                {{#each oauth2Data.displayScopes}}
+                <li class="list-group-item">{{this}}</li>
+                {{/each}}
+            </ul>
+            {{/if}}
+
+            <!-- Optional parameters -->
+            {{#if oauth2Data.realm}}
+            <input type="hidden" name="realm" value="{{oauth2Data.realm}}"/>
+            {{/if}}
+            {{#if oauth2Data.redirectUri}}
+            <input type="hidden" name="redirect_uri" value="{{oauth2Data.redirectUri}}"/>
+            {{/if}}
+            {{#if oauth2Data.scope}}
+            <input type="hidden" name="scope" value="{{oauth2Data.scope}}"/>
+            {{/if}}
+            {{#if oauth2Data.state}}
+            <input type="hidden" name="state" value="{{oauth2Data.state}}"/>
+            {{/if}}
+            {{#if oauth2Data.nonce}}
+            <input type="hidden" name="nonce" value="{{oauth2Data.nonce}}"/>
+            {{/if}}
+            {{#if oauth2Data.acr}}
+            <input type="hidden" name="acr" value="{{oauth2Data.acr}}"/>
+            {{/if}}
+
+            <!-- Required parameters -->
+            <input type="hidden" name="response_type" value="{{oauth2Data.responseType}}"/>
+            <input type="hidden" name="client_id" value="{{oauth2Data.clientId}}"/>
+
+            <div class="form-group clearfix">
+                <div class="pull-right">
+                    <input type="submit" name="decision" class="btn btn-primary" value="{{t 'form.allow'}}"/>
+                    <input type="submit" name="decision" class="btn btn-default" value="{{t 'form.deny'}}"/>
+                </div>
+
+                <div class="pull-left checkbox">
+                    <label><input type="checkbox" name="save_consent"/>{{t 'form.save'}}</label>
+                </div>
+            </div>
+
+        </fieldset>
+    </form>
+
+    {{/if}}
+</div>

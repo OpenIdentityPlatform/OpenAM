@@ -1,0 +1,8 @@
+{
+    "form": {
+        "description": "This application is requesting the following private information:",
+        "save": "Save Consent",
+        "allow": "Allow",
+        "deny": "Deny"
+    }
+}
