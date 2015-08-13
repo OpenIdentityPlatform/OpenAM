@@ -118,10 +118,6 @@
             <artifactId>json-web-token</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons</groupId>
-            <artifactId>json-fluent</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-restlet</artifactId>
         </dependency>

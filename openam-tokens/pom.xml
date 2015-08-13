@@ -34,7 +34,7 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.commons</groupId>
-            <artifactId>json-fluent</artifactId>
+            <artifactId>forgerock-util</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

@@ -1686,11 +1686,6 @@
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
-                <artifactId>json-fluent</artifactId>
-                <version>${forgerock.json.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.commons</groupId>
                 <artifactId>json-resource</artifactId>
                 <version>${forgerock.json.version}</version>
             </dependency>
