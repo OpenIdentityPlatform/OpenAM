@@ -56,7 +56,7 @@ import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
@@ -136,7 +136,7 @@ public class UmaPolicyServiceImplDelegationTest {
         policyService = new UmaPolicyServiceImpl(policyResourceDelegate, resourceSetStoreFactory, lazyAuditLogger,
                 contextHelper, policyEvaluatorFactory, coreServicesWrapper, debug, umaSettingsFactory);
 
-        given(contextHelper.getRealm(Matchers.<ServerContext>anyObject())).willReturn("REALM");
+        given(contextHelper.getRealm(Matchers.<Context>anyObject())).willReturn("REALM");
     }
 
     @AfterMethod
@@ -155,7 +155,7 @@ public class UmaPolicyServiceImplDelegationTest {
         accessingUriForUser("alice");
         String resourceSetId = registerResourceSet("alice");
         JsonValue policy = policyToCreate(resourceSetId);
-        ServerContext context = getContext();
+        Context context = getContext();
 
         //When
         Promise<UmaPolicy, ResourceException> promise = policyService.createPolicy(context, policy);
@@ -177,7 +177,7 @@ public class UmaPolicyServiceImplDelegationTest {
         createPolicyFor("bob", resourceSetId, "SCOPE_A", "SCOPE_B");
         JsonValue policy = policyToCreate(resourceSetId);
         setResharingModeToImplicit();
-        ServerContext context = getContext();
+        Context context = getContext();
 
         //When
         Promise<UmaPolicy, ResourceException> promise = policyService.createPolicy(context, policy);
@@ -196,7 +196,7 @@ public class UmaPolicyServiceImplDelegationTest {
         accessingUriForUser("bob");
         String resourceSetId = registerResourceSet("alice");
         JsonValue policy = policyToCreate(resourceSetId);
-        ServerContext context = getContext();
+        Context context = getContext();
 
         //When
         Promise<UmaPolicy, ResourceException> promise = policyService.createPolicy(context, policy);
@@ -216,7 +216,7 @@ public class UmaPolicyServiceImplDelegationTest {
         String resourceSetId = registerResourceSet("alice");
         createPolicyFor("bob", resourceSetId, "SCOPE_A");
         JsonValue policy = policyToCreate(resourceSetId);
-        ServerContext context = getContext();
+        Context context = getContext();
 
         //When
         Promise<UmaPolicy, ResourceException> promise = policyService.createPolicy(context, policy);
@@ -236,7 +236,7 @@ public class UmaPolicyServiceImplDelegationTest {
         String resourceSetId = registerResourceSet("alice");
         createPolicyFor("bob", resourceSetId, "SCOPE_A", "SCOPE_B");
         JsonValue policy = policyToUpdate(resourceSetId);
-        ServerContext context = getContext();
+        Context context = getContext();
 
         //When
         Promise<UmaPolicy, ResourceException> promise = policyService.updatePolicy(context, resourceSetId, policy);
@@ -256,7 +256,7 @@ public class UmaPolicyServiceImplDelegationTest {
         createPolicyFor("charlie", resourceSetId, "SCOPE_A", "SCOPE_B");
         setResharingModeToImplicit();
         JsonValue policy = policyToUpdate(resourceSetId);
-        ServerContext context = getContext();
+        Context context = getContext();
 
         //When
         Promise<UmaPolicy, ResourceException> promise = policyService.updatePolicy(context, resourceSetId, policy);
@@ -274,7 +274,7 @@ public class UmaPolicyServiceImplDelegationTest {
         String resourceSetId = registerResourceSet("alice");
         createPolicyFor("charlie", resourceSetId, "SCOPE_A", "SCOPE_B");
         JsonValue policy = policyToUpdate(resourceSetId);
-        ServerContext context = getContext();
+        Context context = getContext();
 
         //When
         Promise<UmaPolicy, ResourceException> promise = policyService.updatePolicy(context, resourceSetId, policy);
@@ -293,7 +293,7 @@ public class UmaPolicyServiceImplDelegationTest {
         createPolicyFor("bob", resourceSetId, "SCOPE_B");
         createPolicyFor("charlie", resourceSetId, "SCOPE_A", "SCOPE_B");
         JsonValue policy = policyToUpdate(resourceSetId);
-        ServerContext context = getContext();
+        Context context = getContext();
 
         //When
         Promise<UmaPolicy, ResourceException> promise = policyService.updatePolicy(context, resourceSetId, policy);
@@ -318,8 +318,8 @@ public class UmaPolicyServiceImplDelegationTest {
 
     private void accessingUriForUser(String username) {
         userInUri = username;
-        given(contextHelper.getUserId(Matchers.<ServerContext>anyObject())).willReturn(userInUri);
-        given(contextHelper.getUserUid(Matchers.<ServerContext>anyObject())).willReturn("uid=" + userInUri + ",ou="
+        given(contextHelper.getUserId(Matchers.<Context>anyObject())).willReturn(userInUri);
+        given(contextHelper.getUserUid(Matchers.<Context>anyObject())).willReturn("uid=" + userInUri + ",ou="
                 + loggedInRealm + ",dc=forgerock,dc=org");
     }
 
@@ -378,14 +378,14 @@ public class UmaPolicyServiceImplDelegationTest {
         createdPolicies.add(createdPolicy1);
         createdPolicies.add(createdPolicy2);
         Promise<List<Resource>, ResourceException> createPolicyPromise = newResultPromise(createdPolicies);
-        given(policyResourceDelegate.createPolicies(any(ServerContext.class), anySetOf(JsonValue.class)))
+        given(policyResourceDelegate.createPolicies(any(Context.class), anySetOf(JsonValue.class)))
                 .willReturn(createPolicyPromise);
 
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> queryPromise =
                 newExceptionPromise((ResourceException) new NotFoundException());
-        given(policyResourceDelegate.queryPolicies(any(ServerContext.class), any(QueryRequest.class)))
+        given(policyResourceDelegate.queryPolicies(any(Context.class), any(QueryRequest.class)))
                 .willReturn(queryPromise);
-        given(policyResourceDelegate.queryPolicies(any(ServerContext.class), any(QueryRequest.class),
+        given(policyResourceDelegate.queryPolicies(any(Context.class), any(QueryRequest.class),
                 any(QueryResultHandler.class))).willAnswer(new Answer<Promise<QueryResult, ResourceException>>() {
             @Override
             public Promise<QueryResult, ResourceException> answer(InvocationOnMock invocation) throws Throwable {
@@ -407,7 +407,7 @@ public class UmaPolicyServiceImplDelegationTest {
         currentPolicies.add(currentPolicy2);
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> queryPromise
                 = newResultPromise(Pair.of((QueryResult) null, currentPolicies));
-        given(policyResourceDelegate.queryPolicies(any(ServerContext.class), any(QueryRequest.class)))
+        given(policyResourceDelegate.queryPolicies(any(Context.class), any(QueryRequest.class)))
                 .willReturn(queryPromise);
 
         final List<Resource> updatedPolicies = new ArrayList<>();
@@ -416,9 +416,9 @@ public class UmaPolicyServiceImplDelegationTest {
         updatedPolicies.add(updatedPolicy1);
         updatedPolicies.add(updatedPolicy3);
         Promise<List<Resource>, ResourceException> updatePolicyPromise = newResultPromise(updatedPolicies);
-        given(policyResourceDelegate.updatePolicies(any(ServerContext.class), Matchers.<Set<JsonValue>>anyObject()))
+        given(policyResourceDelegate.updatePolicies(any(Context.class), Matchers.<Set<JsonValue>>anyObject()))
                 .willReturn(updatePolicyPromise);
-        given(policyResourceDelegate.queryPolicies(any(ServerContext.class), any(QueryRequest.class),
+        given(policyResourceDelegate.queryPolicies(any(Context.class), any(QueryRequest.class),
                 any(QueryResultHandler.class))).willAnswer(new Answer<Promise<QueryResult, ResourceException>>() {
             @Override
             public Promise<QueryResult, ResourceException> answer(InvocationOnMock invocation) throws Throwable {
@@ -436,21 +436,21 @@ public class UmaPolicyServiceImplDelegationTest {
         given(umaSettings.getResharingMode()).willReturn(ResharingMode.IMPLICIT);
     }
 
-    private ServerContext getContext() throws Exception {
+    private Context getContext() throws Exception {
         SubjectContext subjectContext = mock(SSOTokenContext.class);
         SSOToken ssoToken = mock(SSOToken.class);
         Principal principal = mock(Principal.class);
         given(subjectContext.getCallerSSOToken()).willReturn(ssoToken);
         given(ssoToken.getPrincipal()).willReturn(principal);
         given(principal.getName()).willReturn(loggedInUser);
-        return new ServerContext(new RealmContext(subjectContext));
+        return new InternalContext(new RealmContext(subjectContext));
     }
 
     @SuppressWarnings("unchecked")
     private void captureCreatedPolicies() {
         if (createdPolicies == null) {
             ArgumentCaptor<Set> policyCaptor = ArgumentCaptor.forClass(Set.class);
-            verify(policyResourceDelegate).createPolicies(any(ServerContext.class), policyCaptor.capture());
+            verify(policyResourceDelegate).createPolicies(any(Context.class), policyCaptor.capture());
             createdPolicies = policyCaptor.getValue();
         }
     }
@@ -463,7 +463,7 @@ public class UmaPolicyServiceImplDelegationTest {
     }
 
     private void verifyPolicyIsNotCreatedForLoggedInUser() {
-        verify(policyResourceDelegate, never()).createPolicies(any(ServerContext.class), anySetOf(JsonValue.class));
+        verify(policyResourceDelegate, never()).createPolicies(any(Context.class), anySetOf(JsonValue.class));
     }
 
     private void verifyAuditLogCreatedForLoggedInUser(String resourceSetId) {

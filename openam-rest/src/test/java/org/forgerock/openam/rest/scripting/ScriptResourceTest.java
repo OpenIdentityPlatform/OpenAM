@@ -38,7 +38,7 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.scripting.ScriptException;
@@ -65,7 +65,7 @@ public class ScriptResourceTest {
     private final String encodeScript = Base64.encode(script.getBytes());
 
     private ScriptResource scriptResource;
-    private ServerContext serverContext;
+    private Context serverContext;
     private Map<String, ScriptConfiguration> scriptConfigSet = new LinkedHashMap<>();
 
     private class MockScriptingService implements ScriptingService {
@@ -148,7 +148,7 @@ public class ScriptResourceTest {
         scriptResource = new ScriptResource(logger, serviceFactory, errorHandler,
                 new StandardScriptValidator(new StandardScriptEngineManager()));
 
-        serverContext = mock(ServerContext.class);
+        serverContext = mock(Context.class);
     }
 
     @Test

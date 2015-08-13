@@ -37,7 +37,7 @@ import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
@@ -72,7 +72,7 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> handleUpdate(ServerContext serverContext,
+    public Promise<ResourceResponse, ResourceException> handleUpdate(Context serverContext,
             UpdateRequest updateRequest) {
         if (organizationSchema != null) {
             try {
@@ -109,7 +109,7 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
      * @return {@inheritDoc}
      */
     @Override
-    protected JsonValue withExtraAttributes(ServerContext context, JsonValue value) {
+    protected JsonValue withExtraAttributes(Context context, JsonValue value) {
         if (organizationSchema != null) {
             value.add("defaults", organizationConverter.toJson(organizationSchema.getAttributeDefaults()).getObject());
         }
@@ -117,12 +117,12 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
     }
 
     @Override
-    protected Map<String, Set<String>> getDynamicAttributes(ServerContext context) {
+    protected Map<String, Set<String>> getDynamicAttributes(Context context) {
         return dynamicSchema.getAttributeDefaults();
     }
 
     @Override
-    protected JsonValue createSchema(ServerContext context) {
+    protected JsonValue createSchema(Context context) {
         JsonValue result = super.createSchema(context);
         if (organizationSchema != null) {
             Map<String, String> attributeSectionMap = getAttributeNameToSection(organizationSchema);

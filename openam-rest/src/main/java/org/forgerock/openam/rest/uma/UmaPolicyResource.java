@@ -26,7 +26,7 @@ import static org.forgerock.util.promise.Promises.newResultPromise;
 import javax.inject.Inject;
 import java.util.Collection;
 
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CollectionResourceProvider;
@@ -70,7 +70,7 @@ public class UmaPolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
+    public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
         return umaPolicyService.createPolicy(context, request.getContent())
                 .thenAsync(new AsyncFunction<UmaPolicy, ResourceResponse, ResourceException>() {
                     @Override
@@ -84,7 +84,7 @@ public class UmaPolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, final String resourceId,
+    public Promise<ResourceResponse, ResourceException> readInstance(Context context, final String resourceId,
             ReadRequest request) {
         return umaPolicyService.readPolicy(context, resourceId)
                 .thenAsync(new AsyncFunction<UmaPolicy, ResourceResponse, ResourceException>() {
@@ -99,7 +99,7 @@ public class UmaPolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
             UpdateRequest request) {
         return umaPolicyService.updatePolicy(context, resourceId, request.getContent())
                 .thenAsync(new AsyncFunction<UmaPolicy, ResourceResponse, ResourceException>() {
@@ -114,7 +114,7 @@ public class UmaPolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, final String resourceId,
+    public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, final String resourceId,
             DeleteRequest request) {
         return umaPolicyService.deletePolicy(context, resourceId)
                 .thenAsync(new AsyncFunction<Void, ResourceResponse, ResourceException>() {
@@ -130,7 +130,7 @@ public class UmaPolicyResource implements CollectionResourceProvider {
      */
     //No patch support on PolicyResource so we will patch our policy representation and then do an update
     @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
             PatchRequest request) {
         return newExceptionPromise(newNotSupportedException());
     }
@@ -139,7 +139,7 @@ public class UmaPolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
+    public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
         return newExceptionPromise(newNotSupportedException());
     }
 
@@ -147,7 +147,7 @@ public class UmaPolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+    public Promise<ActionResponse, ResourceException> actionInstance(Context context, String resourceId,
             ActionRequest request) {
         return newExceptionPromise(newNotSupportedException());
     }
@@ -156,7 +156,7 @@ public class UmaPolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+    public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         final QueryResourceHandler resultHandler = new QueryResourceHandlerBuilder(handler)
                 .withPaging(request.getPageSize(), request.getPagedResultsOffset()).build();

@@ -33,7 +33,7 @@ import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.openam.forgerockrest.UmaLabelResource;
@@ -62,7 +62,7 @@ public class UmaLabelResourceTest {
     private UmaLabelResource umaLabelResource;
     private UmaLabelsStore umaLabelsStore;
     private ContextHelper contextHelper;
-    private ServerContext serverContext;
+    private Context serverContext;
     private CreateRequest createRequest;
     private DeleteRequest deleteRequest;
     private ResultHandler<Resource> resultHandler;
@@ -83,7 +83,7 @@ public class UmaLabelResourceTest {
                 return localContext;
             }
         });
-        serverContext = mock(ServerContext.class);
+        serverContext = mock(Context.class);
         createRequest = mock(CreateRequest.class);
         queryRequest = mock(QueryRequest.class);
         resultHandler = mock(ResultHandler.class);

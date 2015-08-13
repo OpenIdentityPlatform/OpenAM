@@ -26,7 +26,7 @@ import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.PermanentException;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 
 public final class IdentityRestUtils {
@@ -36,7 +36,7 @@ public final class IdentityRestUtils {
     private IdentityRestUtils() {
     }
 
-    public static void changePassword(ServerContext serverContext, String realm, String username, String oldPassword,
+    public static void changePassword(Context serverContext, String realm, String username, String oldPassword,
             String newPassword) throws ResourceException {
         try {
             SSOToken token = serverContext.asContext(SSOTokenContext.class).getCallerSSOToken();

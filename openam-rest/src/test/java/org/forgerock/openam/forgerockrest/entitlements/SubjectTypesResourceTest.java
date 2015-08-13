@@ -29,6 +29,8 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.schema.JsonSchema;
 import static org.fest.assertions.Assertions.assertThat;
+
+import org.forgerock.json.resource.InternalContext;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
@@ -36,7 +38,7 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.entitlement.ConditionTypeRegistry;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.openam.rest.resource.RealmContext;
@@ -75,7 +77,7 @@ public class SubjectTypesResourceTest {
         //given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSubjectContext);
-        ServerContext mockServerContext = new ServerContext(realmContext);
+        Context mockServerContext = new InternalContext(realmContext);
 
         Subject mockSubject = new Subject();
         given(mockSubjectContext.getCallerSubject()).willReturn(mockSubject);
@@ -100,7 +102,7 @@ public class SubjectTypesResourceTest {
         //given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSubjectContext);
-        ServerContext mockServerContext = new ServerContext(realmContext);
+        Context mockServerContext = new InternalContext(realmContext);
 
         Subject mockSubject = new Subject();
         given(mockSubjectContext.getCallerSubject()).willReturn(mockSubject);
@@ -126,7 +128,7 @@ public class SubjectTypesResourceTest {
         //given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSubjectContext);
-        ServerContext mockServerContext = new ServerContext(realmContext);
+        Context mockServerContext = new InternalContext(realmContext);
 
         Subject mockSubject = new Subject();
         given(mockSubjectContext.getCallerSubject()).willReturn(mockSubject);
@@ -160,7 +162,7 @@ public class SubjectTypesResourceTest {
         //given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSubjectContext);
-        ServerContext mockServerContext = new ServerContext(realmContext);
+        Context mockServerContext = new InternalContext(realmContext);
 
         Subject mockSubject = new Subject();
         given(mockSubjectContext.getCallerSubject()).willReturn(mockSubject);

@@ -31,6 +31,7 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalContext;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
@@ -42,7 +43,7 @@ import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.http.context.RootContext;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.openam.forgerockrest.utils.RequestHolder;
@@ -61,7 +62,7 @@ public class UmaEnabledFilterTest {
     private static UmaProviderSettingsFactory notYetConfiguredFactory;
     private static UmaProviderSettingsFactory notEnabledFactory;
     private static UmaProviderSettingsFactory enabledFactory;
-    private ServerContext context;
+    private Context context;
     private RequestHandler requestHandler;
 
     @BeforeClass
@@ -82,7 +83,7 @@ public class UmaEnabledFilterTest {
     @BeforeMethod
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
-        context = new ServerContext(new RealmContext(new RootContext()));
+        context = new InternalContext(new RealmContext(new RootContext()));
         requestHandler = mock(RequestHandler.class);
         RequestHolder.set(mock(HttpServletRequest.class));
     }

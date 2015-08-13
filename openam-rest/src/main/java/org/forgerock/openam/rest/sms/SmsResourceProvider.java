@@ -51,7 +51,7 @@ import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -116,10 +116,10 @@ abstract class SmsResourceProvider {
 
     /**
      * Gets the realm from the underlying RealmContext.
-     * @param context The ServerContext for the request.
+     * @param context The Context for the request.
      * @return The resolved realm.
      */
-    protected String realmFor(ServerContext context) {
+    protected String realmFor(Context context) {
         return context.asContext(RealmContext.class).getResolvedRealm();
     }
 
@@ -132,7 +132,7 @@ abstract class SmsResourceProvider {
      * @throws SMSException From downstream service manager layer.
      * @throws SSOException From downstream service manager layer.
      */
-    protected ServiceConfigManager getServiceConfigManager(ServerContext context) throws SSOException, SMSException {
+    protected ServiceConfigManager getServiceConfigManager(Context context) throws SSOException, SMSException {
         SSOToken ssoToken = context.asContext(SSOTokenContext.class).getCallerSSOToken();
         return new ServiceConfigManager(ssoToken, serviceName, serviceVersion);
     }
@@ -140,12 +140,12 @@ abstract class SmsResourceProvider {
     /**
      * Gets the ServiceConfig parent of the parent of the config being addressed by the current request.
      * @param context The request context, from which the path variables can be retrieved.
-     * @param scm The {@link com.sun.identity.sm.ServiceConfigManager}. See {@link #getServiceConfigManager(ServerContext)}.
+     * @param scm The {@link com.sun.identity.sm.ServiceConfigManager}. See {@link #getServiceConfigManager(Context)}.
      * @return The ServiceConfig that was found.
      * @throws SMSException From downstream service manager layer.
      * @throws SSOException From downstream service manager layer.
      */
-    protected ServiceConfig parentSubConfigFor(ServerContext context, ServiceConfigManager scm)
+    protected ServiceConfig parentSubConfigFor(Context context, ServiceConfigManager scm)
             throws SMSException, SSOException {
         String name = null;
         Map<String, String> uriTemplateVariables = context.asContext(UriRouterContext.class).getUriTemplateVariables();
@@ -179,7 +179,7 @@ abstract class SmsResourceProvider {
      * @throws SSOException From downstream service manager layer.
      * @throws NotFoundException If the ServiceConfig does not exist.
      */
-    protected ServiceConfig checkedInstanceSubConfig(ServerContext context, String resourceId, ServiceConfig config)
+    protected ServiceConfig checkedInstanceSubConfig(Context context, String resourceId, ServiceConfig config)
             throws SSOException, SMSException, NotFoundException {
         if (config.getSubConfigNames().contains(resourceId)) {
             ServiceConfig subConfig = config.getSubConfig(resourceId);
@@ -200,7 +200,7 @@ abstract class SmsResourceProvider {
         }
     }
 
-    boolean isDefaultCreatedAuthModule(ServerContext context, String resourceId) throws SSOException,
+    boolean isDefaultCreatedAuthModule(Context context, String resourceId) throws SSOException,
             SMSException {
         String lastedMatchedUri = context.asContext(UriRouterContext.class).getMatchedUri();
         return AMAuthenticationManager.getAuthenticationServiceNames().contains(serviceName)
@@ -215,7 +215,7 @@ abstract class SmsResourceProvider {
         return schema.getName();
     }
 
-    protected Promise<ActionResponse, ResourceException> handleAction(ServerContext context, ActionRequest request) {
+    protected Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest request) {
         if (request.getAction().equals(TEMPLATE)) {
             return newResultPromise(newActionResponse(converter.toJson(schema.getAttributeDefaults())));
         } else if (SCHEMA.equals(request.getAction())) {
@@ -225,7 +225,7 @@ abstract class SmsResourceProvider {
         }
     }
 
-    protected JsonValue createSchema(ServerContext context) {
+    protected JsonValue createSchema(Context context) {
         JsonValue result = json(object());
 
         Map<String, String> attributeSectionMap = getAttributeNameToSection(schema);
@@ -246,7 +246,7 @@ abstract class SmsResourceProvider {
 
     protected void addAttributeSchema(JsonValue result, String path, ServiceSchema schema, List<String> sections,
             Map<String, String> attributeSectionMap, ResourceBundle consoleI18n, String serviceType,
-                                      ServerContext context) {
+                                      Context context) {
 
         ResourceBundle schemaI18n = ResourceBundle.getBundle(schema.getI18NFileName());
         NumberFormat sectionFormat = new DecimalFormat("00");
@@ -300,7 +300,7 @@ abstract class SmsResourceProvider {
     }
 
     private void addType(JsonValue result, String pointer, AttributeSchema attribute, ResourceBundle schemaI18n,
-                         ResourceBundle consoleI18n, ServerContext context) {
+                         ResourceBundle consoleI18n, Context context) {
         String type = null;
         AttributeSchema.Type attributeType = attribute.getType();
         AttributeSchema.Syntax syntax = attribute.getSyntax();
@@ -341,7 +341,7 @@ abstract class SmsResourceProvider {
     }
 
     private void addEnumChoices(JsonValue jsonValue, AttributeSchema attribute, ResourceBundle schemaI18n,
-                                ResourceBundle consoleI18n, ServerContext context) {
+                                ResourceBundle consoleI18n, Context context) {
         List<String> values = new ArrayList<String>();
         List<String> descriptions = new ArrayList<String>();
         Map environment = type == SchemaType.GLOBAL ? Collections.emptyMap() :

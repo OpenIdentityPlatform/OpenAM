@@ -34,7 +34,7 @@ import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
@@ -61,7 +61,7 @@ public class PolicyResourceDelegateTest {
 
         //Given
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         Set<JsonValue> policies = new HashSet<JsonValue>();
         JsonValue policyOne = json(object(field("name", "POLICY_ONE")));
         JsonValue policyTwo = json(object(field("name", "POLICY_TWO")));
@@ -92,7 +92,7 @@ public class PolicyResourceDelegateTest {
 
         //Given
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         Set<JsonValue> policies = new HashSet<JsonValue>();
         JsonValue policyOne = json(object(field("name", "POLICY_ONE")));
         JsonValue policyTwo = json(object(field("name", "POLICY_TWO")));
@@ -127,7 +127,7 @@ public class PolicyResourceDelegateTest {
 
         //Given
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         Set<JsonValue> policies = new HashSet<JsonValue>();
         JsonValue policyOne = json(object(field("name", "POLICY_ONE")));
         JsonValue policyTwo = json(object(field("name", "POLICY_TWO")));
@@ -163,7 +163,7 @@ public class PolicyResourceDelegateTest {
     public void shouldUpdatePolicies() throws ResourceException {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         Set<JsonValue> policies = new HashSet<JsonValue>();
         JsonValue policyOne = json(object(field("name", "POLICY_ONE")));
         JsonValue policyTwo = json(object(field("name", "POLICY_TWO")));
@@ -192,7 +192,7 @@ public class PolicyResourceDelegateTest {
     public void shouldHandleFailureToUpdatePolicies() throws ResourceException {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         Set<JsonValue> policies = new HashSet<JsonValue>();
         JsonValue policyOne = json(object(field("name", "POLICY_ONE")));
         JsonValue policyTwo = json(object(field("name", "POLICY_TWO")));
@@ -218,7 +218,7 @@ public class PolicyResourceDelegateTest {
     public void shouldQueryPolicies() throws ResourceException {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         QueryRequest request = mock(QueryRequest.class);
 
         //When
@@ -232,7 +232,7 @@ public class PolicyResourceDelegateTest {
     public void shouldQueryPoliciesWithHandler() throws ResourceException {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         QueryRequest request = mock(QueryRequest.class);
         QueryResultHandler handler = mock(QueryResultHandler.class);
 
@@ -247,7 +247,7 @@ public class PolicyResourceDelegateTest {
     public void shouldDeletePolicies() throws ResourceException {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         List<Resource> policies = new ArrayList<Resource>();
         Resource policyOne = new Resource("ID_1", "REVISION_1", json(object()));
         Resource policyTwo = new Resource("ID_2", "REVISION_2", json(object()));
@@ -274,7 +274,7 @@ public class PolicyResourceDelegateTest {
     public void shouldHandleFailureToDeletePolicies() throws ResourceException {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         Resource policyOne = new Resource("ID_1", "REVISION_1", json(object()));
         Set<String> policyIds = new HashSet<String>();
         policyIds.add("ID_1");

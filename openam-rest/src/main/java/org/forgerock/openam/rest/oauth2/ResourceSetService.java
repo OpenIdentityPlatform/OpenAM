@@ -37,7 +37,7 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Evaluator;
 import com.sun.identity.entitlement.JwtPrincipal;
 import com.sun.identity.idm.AMIdentity;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.QueryRequest;
@@ -99,7 +99,7 @@ public class ResourceSetService {
      * @param augmentWithPolicy {@code true} to pull in UMA policies into the resource set.
      * @return A Promise containing the Resource Set or a ResourceException.
      */
-    Promise<ResourceSetDescription, ResourceException> getResourceSet(final ServerContext context,
+    Promise<ResourceSetDescription, ResourceException> getResourceSet(final Context context,
                                                                       String realm, final String resourceSetId, String resourceOwnerId, final boolean augmentWithPolicy) {
         return getResourceSet(realm, resourceSetId, resourceOwnerId)
                 .thenOnResult(new ResultHandler<ResourceSetDescription>() {
@@ -120,7 +120,7 @@ public class ResourceSetService {
         return new Subject(false, principals, Collections.emptySet(), Collections.emptySet());
     }
 
-    private Promise<Collection<ResourceSetDescription>, ResourceException> getPolicies(final ServerContext context, QueryRequest policyQuery, final String resourceOwnerId, final Set<ResourceSetDescription> resourceSets, final boolean augmentWithPolicies, final ResourceSetWithPolicyQuery query) {
+    private Promise<Collection<ResourceSetDescription>, ResourceException> getPolicies(final Context context, QueryRequest policyQuery, final String resourceOwnerId, final Set<ResourceSetDescription> resourceSets, final boolean augmentWithPolicies, final ResourceSetWithPolicyQuery query) {
         return policyService.queryPolicies(context, policyQuery)
                 .thenAsync(new AsyncFunction<Pair<QueryResponse, Collection<UmaPolicy>>, Collection<ResourceSetDescription>, ResourceException>() {
                     @Override
@@ -282,7 +282,7 @@ public class ResourceSetService {
      * @param augmentWithPolicies {@code true} to pull in UMA policies into the resource set.
      * @return A Promise containing the Resource Sets or a ResourceException.
      */
-    Promise<Collection<ResourceSetDescription>, ResourceException> getResourceSets(final ServerContext context,
+    Promise<Collection<ResourceSetDescription>, ResourceException> getResourceSets(final Context context,
                                                                                    String realm, final ResourceSetWithPolicyQuery query, final String resourceOwnerId,
                                                                                    final boolean augmentWithPolicies) {
         final Set<ResourceSetDescription> resourceSets;
@@ -360,7 +360,7 @@ public class ResourceSetService {
      * @param resourceOwnerId The resource owner id.
      * @return A Promise containing {@code null} or a ResourceException.
      */
-    Promise<Void, ResourceException> revokeAllPolicies(final ServerContext context, String realm,
+    Promise<Void, ResourceException> revokeAllPolicies(final Context context, String realm,
                                                        String resourceOwnerId) {
         ResourceSetWithPolicyQuery query = new ResourceSetWithPolicyQuery();
         query.setResourceSetQuery(QueryFilter.<String>alwaysTrue());
@@ -402,7 +402,7 @@ public class ResourceSetService {
         }
     }
 
-    private Promise<ResourceSetDescription, ResourceException> augmentResourceSetWithPolicy(ServerContext context,
+    private Promise<ResourceSetDescription, ResourceException> augmentResourceSetWithPolicy(Context context,
                                                                                             final String resourceSetId, final ResourceSetDescription resourceSet) {
         return policyService.readPolicy(context, resourceSetId)
                 .thenAsync(new AsyncFunction<UmaPolicy, ResourceSetDescription, ResourceException>() {
@@ -419,7 +419,7 @@ public class ResourceSetService {
                 });
     }
 
-    private Collection<ResourceSetDescription> combine(ServerContext context,
+    private Collection<ResourceSetDescription> combine(Context context,
                                                        ResourceSetWithPolicyQuery resourceSetWithPolicyQuery, Collection<ResourceSetDescription> resourceSets,
                                                        Collection<UmaPolicy> policies, boolean augmentWithPolicies, String resourceOwnerId)
             throws org.forgerock.oauth2.core.exceptions.NotFoundException, ServerException {

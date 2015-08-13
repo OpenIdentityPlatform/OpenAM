@@ -22,7 +22,7 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.audit.AuditException;
 import org.forgerock.json.resource.Request;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.audit.AMAccessAuditEventBuilder;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
@@ -40,7 +40,7 @@ class AuditingResultHandler {
     private final Debug debug;
     private final AuditEventPublisher auditEventPublisher;
     private final AuditEventFactory auditEventFactory;
-    private final ServerContext context;
+    private final Context context;
     private final Component component;
     private final Request request;
     private final long startTime;
@@ -55,7 +55,7 @@ class AuditingResultHandler {
      * @param request             Request of the CREST operation being audited.
      */
     AuditingResultHandler(Debug debug, AuditEventPublisher auditEventPublisher,
-            AuditEventFactory auditEventFactory, ServerContext context, Request request) {
+            AuditEventFactory auditEventFactory, Context context, Request request) {
 
         Reject.ifFalse(context.containsContext(AuditInfoContext.class), "CREST auditing expects the audit context");
         component = context.asContext(AuditInfoContext.class).getComponent();
@@ -139,7 +139,7 @@ class AuditingResultHandler {
         }
     }
 
-    private void addSessionDetailsFromSSOTokenContext(AMAccessAuditEventBuilder builder, ServerContext context) {
+    private void addSessionDetailsFromSSOTokenContext(AMAccessAuditEventBuilder builder, Context context) {
         SSOToken callerToken = getTokenFromContext(context, debug);
         builder.contextIdFromSSOToken(callerToken);
     }

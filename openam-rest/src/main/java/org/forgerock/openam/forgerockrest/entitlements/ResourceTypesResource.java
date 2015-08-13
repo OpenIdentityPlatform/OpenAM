@@ -31,7 +31,7 @@ import java.util.Set;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.shared.debug.Debug;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -101,7 +101,7 @@ public class ResourceTypesResource extends RealmAwareResource {
      * Unsupported by this endpoint.
      */
     @Override
-    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
+    public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
 
@@ -109,7 +109,7 @@ public class ResourceTypesResource extends RealmAwareResource {
      * Unsupported by this endpoint.
      */
     @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+    public Promise<ActionResponse, ResourceException> actionInstance(Context context, String resourceId,
             ActionRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
@@ -124,7 +124,7 @@ public class ResourceTypesResource extends RealmAwareResource {
      * @param request {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
+    public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
 
         if (METHOD_PUT.equalsIgnoreCase(context.asContext(HttpContext.class).getMethod())) {
             return newExceptionPromise(ResourceException.getException(METHOD_NOT_ALLOWED));
@@ -176,7 +176,7 @@ public class ResourceTypesResource extends RealmAwareResource {
      * @param request {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId,
             DeleteRequest request) {
 
         String principalName = "unknown";
@@ -203,7 +203,7 @@ public class ResourceTypesResource extends RealmAwareResource {
      * Unsupported by this endpoint.
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
             PatchRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
@@ -218,7 +218,7 @@ public class ResourceTypesResource extends RealmAwareResource {
      * @param request {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
             UpdateRequest request) {
 
         String principalName = "unknown";
@@ -269,7 +269,7 @@ public class ResourceTypesResource extends RealmAwareResource {
      * @param handler {@inheritDoc}
      */
     @Override
-    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+    public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         String principalName = "unknown";
         String realm = getRealm(context);
@@ -323,7 +323,7 @@ public class ResourceTypesResource extends RealmAwareResource {
      * @param request {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
 
         String principalName = "unknown";
@@ -390,7 +390,7 @@ public class ResourceTypesResource extends RealmAwareResource {
      * @return The subject
      * @throws EntitlementException if we fail to get the subject
      */
-    private Subject getSubject(ServerContext context) throws EntitlementException {
+    private Subject getSubject(Context context) throws EntitlementException {
         Subject result = getContextSubject(context);
         if (result == null) {
             throw new EntitlementException(INTERNAL_ERROR, "Cannot retrieve subject");

@@ -18,7 +18,7 @@ package org.forgerock.openam.forgerockrest.entitlements;
 
 import com.sun.identity.entitlement.EntitlementException;
 import javax.security.auth.Subject;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 
 /**
  * Abstract factory pattern for looking up {@link PolicyStore} implementations for a given realm and caller subject
@@ -33,7 +33,7 @@ public interface PolicyStoreProvider {
      * @param context the request context to get a policy store for.
      * @return a policy store for the given realm.
      */
-    PolicyStore getPolicyStore(ServerContext context) throws EntitlementException;
+    PolicyStore getPolicyStore(Context context) throws EntitlementException;
 
     /**
      * Gets a policy store for the given realm.

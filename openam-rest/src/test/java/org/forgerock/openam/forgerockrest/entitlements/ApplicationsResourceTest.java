@@ -37,6 +37,7 @@ import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalContext;
 import org.forgerock.util.query.QueryFilter;
 import static org.forgerock.util.query.QueryFilter.alwaysFalse;
 import static org.forgerock.util.query.QueryFilter.alwaysTrue;
@@ -50,7 +51,7 @@ import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.SortKey;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.entitlements.query.AttributeType;
@@ -136,7 +137,7 @@ public class ApplicationsResourceTest {
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         realmContext.addSubRealm("REALM", "REALM");
-        ServerContext mockServerContext = new ServerContext(realmContext);
+        Context mockServerContext = new InternalContext(realmContext);
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
         ResultHandler mockResultHandler = mock(ResultHandler.class);
 
@@ -157,7 +158,7 @@ public class ApplicationsResourceTest {
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         realmContext.addSubRealm("REALM", "REALM");
-        ServerContext mockServerContext = new ServerContext(realmContext);
+        Context mockServerContext = new InternalContext(realmContext);
         CreateRequest mockCreateRequest = mock(CreateRequest.class);
         ResultHandler mockResultHandler = mock(ResultHandler.class);
         Subject subject = new Subject();
@@ -347,7 +348,7 @@ public class ApplicationsResourceTest {
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(subjectContext);
         realmContext.addSubRealm("REALM", "REALM");
-        ServerContext context = new ServerContext(realmContext);
+        Context context = new InternalContext(realmContext);
         given(subjectContext.getCallerSubject()).willReturn(null);
 
         // When
@@ -367,7 +368,7 @@ public class ApplicationsResourceTest {
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         realmContext.addSubRealm("badger", "badger");
-        ServerContext serverContext = new ServerContext(realmContext);
+        Context serverContext = new InternalContext(realmContext);
 
         Subject subject = new Subject();
         given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
@@ -391,7 +392,7 @@ public class ApplicationsResourceTest {
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         realmContext.addSubRealm(realmID, realmID);
-        ServerContext serverContext = new ServerContext(realmContext);
+        Context serverContext = new InternalContext(realmContext);
 
         Subject subject = new Subject();
         given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
@@ -414,7 +415,7 @@ public class ApplicationsResourceTest {
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         realmContext.addSubRealm("badger", "badger");
-        ServerContext serverContext = new ServerContext(realmContext);
+        Context serverContext = new InternalContext(realmContext);
 
         Subject subject = new Subject();
         given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
@@ -436,7 +437,7 @@ public class ApplicationsResourceTest {
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(subjectContext);
         realmContext.addSubRealm("REALM", "REALM");
-        ServerContext context = new ServerContext(realmContext);
+        Context context = new InternalContext(realmContext);
         String resourceId = "RESOURCE_ID";
         DeleteRequest request = mock(DeleteRequest.class);
         ResultHandler<Resource> handler = mock(ResultHandler.class);
@@ -463,7 +464,7 @@ public class ApplicationsResourceTest {
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(subjectContext);
         realmContext.addSubRealm("REALM", "REALM");
-        ServerContext context = new ServerContext(realmContext);
+        Context context = new InternalContext(realmContext);
         String resourceId = "iPlanetAMWebAgentService";
         DeleteRequest request = mock(DeleteRequest.class);
         ResultHandler<Resource> handler = mock(ResultHandler.class);
@@ -492,7 +493,7 @@ public class ApplicationsResourceTest {
 
         //Given
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
-        ServerContext context = new ServerContext(subjectContext);
+        Context context = new InternalContext(subjectContext);
         String resourceId = "RESOURCE_ID";
         DeleteRequest request = mock(DeleteRequest.class);
         ResultHandler<Resource> handler = mock(ResultHandler.class);
@@ -519,7 +520,7 @@ public class ApplicationsResourceTest {
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(subjectContext);
         realmContext.addSubRealm("REALM", "REALM");
-        ServerContext context = new ServerContext(realmContext);
+        Context context = new InternalContext(realmContext);
         String resourceId = "RESOURCE_ID";
         DeleteRequest request = mock(DeleteRequest.class);
         ResultHandler<Resource> handler = mock(ResultHandler.class);
@@ -548,7 +549,7 @@ public class ApplicationsResourceTest {
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(subjectContext);
         realmContext.addSubRealm("REALM", "REALM");
-        ServerContext context = new ServerContext(realmContext);
+        Context context = new InternalContext(realmContext);
         String resourceId = "iPlanetAMWebAgentService";
         UpdateRequest request = mock(UpdateRequest.class);
         ResultHandler<Resource> handler = mock(ResultHandler.class);
@@ -588,7 +589,7 @@ public class ApplicationsResourceTest {
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(subjectContext);
         realmContext.addSubRealm("REALM", "REALM");
-        ServerContext context = new ServerContext(realmContext);
+        Context context = new InternalContext(realmContext);
         String resourceId = "iPlanetAMWebAgentService";
         UpdateRequest request = mock(UpdateRequest.class);
         ResultHandler<Resource> handler = mock(ResultHandler.class);
@@ -626,7 +627,7 @@ public class ApplicationsResourceTest {
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(subjectContext);
         realmContext.addSubRealm("REALM", "REALM");
-        ServerContext context = new ServerContext(realmContext);
+        Context context = new InternalContext(realmContext);
         String resourceId = "iPlanetAMWebAgentService";
         UpdateRequest request = mock(UpdateRequest.class);
         ResultHandler<Resource> handler = mock(ResultHandler.class);
@@ -663,7 +664,7 @@ public class ApplicationsResourceTest {
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(subjectContext);
         realmContext.addSubRealm("REALM", "REALM");
-        ServerContext context = new ServerContext(realmContext);
+        Context context = new InternalContext(realmContext);
         String resourceId = "iPlanetAMWebAgentService";
         UpdateRequest request = mock(UpdateRequest.class);
         ResultHandler<Resource> handler = mock(ResultHandler.class);
@@ -697,7 +698,7 @@ public class ApplicationsResourceTest {
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(subjectContext);
         realmContext.addSubRealm("REALM", "REALM");
-        ServerContext context = new ServerContext(realmContext);
+        Context context = new InternalContext(realmContext);
         String resourceId = "iPlanetAMWebAgentService";
         UpdateRequest request = mock(UpdateRequest.class);
         ResultHandler<Resource> handler = mock(ResultHandler.class);
@@ -730,7 +731,7 @@ public class ApplicationsResourceTest {
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(subjectContext);
         realmContext.addSubRealm("REALM", "REALM");
-        ServerContext context = new ServerContext(realmContext);
+        Context context = new InternalContext(realmContext);
         String resourceId = "RESOURCE_ID";
         UpdateRequest request = mock(UpdateRequest.class);
         ResultHandler<Resource> handler = mock(ResultHandler.class);
@@ -761,7 +762,7 @@ public class ApplicationsResourceTest {
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(subjectContext);
         realmContext.addSubRealm("REALM", "REALM");
-        ServerContext context = new ServerContext(realmContext);
+        Context context = new InternalContext(realmContext);
         String resourceId = "RESOURCE_ID";
         UpdateRequest request = mock(UpdateRequest.class);
         ResultHandler<Resource> handler = mock(ResultHandler.class);
@@ -812,7 +813,7 @@ public class ApplicationsResourceTest {
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSubjectContext);
         realmContext.addSubRealm("abc", "abc");
-        ServerContext serverContext = new ServerContext(realmContext);
+        Context serverContext = new InternalContext(realmContext);
 
         // Set the page size to be three starting from the second item.
         QueryRequest request = mock(QueryRequest.class);
@@ -888,7 +889,7 @@ public class ApplicationsResourceTest {
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSubjectContext);
         realmContext.addSubRealm("abc", "abc");
-        ServerContext serverContext = new ServerContext(realmContext);
+        Context serverContext = new InternalContext(realmContext);
 
         QueryRequest request = mock(QueryRequest.class);
 
@@ -927,7 +928,7 @@ public class ApplicationsResourceTest {
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSubjectContext);
         realmContext.addSubRealm("abc", "abc");
-        ServerContext serverContext = new ServerContext(realmContext);
+        Context serverContext = new InternalContext(realmContext);
 
         // Set the page size to be three starting from the second item.
         QueryRequest request = mock(QueryRequest.class);
@@ -986,7 +987,7 @@ public class ApplicationsResourceTest {
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSubjectContext);
         realmContext.addSubRealm("abc", "abc");
-        ServerContext serverContext = new ServerContext(realmContext);
+        Context serverContext = new InternalContext(realmContext);
 
         // Set the page size to be three starting from the second item.
         QueryRequest request = mock(QueryRequest.class);

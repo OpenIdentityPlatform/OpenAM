@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.forgerock.guava.common.collect.Sets;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
@@ -129,7 +129,7 @@ public class PolicyGraph implements QueryResourceHandler {
      * @param policyResourceDelegate The delegate to use for updating the policy engine.
      * @return A promise for all the updates made.
      */
-    public Promise<List<List<ResourceResponse>>, ResourceException> update(ServerContext context,
+    public Promise<List<List<ResourceResponse>>, ResourceException> update(Context context,
             PolicyResourceDelegate policyResourceDelegate) {
         checkState();
         List<Promise<List<ResourceResponse>, ResourceException>> promises = new ArrayList<>();
@@ -191,7 +191,7 @@ public class PolicyGraph implements QueryResourceHandler {
      * @param user The user for whom we are switching scope state.
      * @throws BadRequestException If the UmaPolicy cannot be created for new policy.
      */
-    private void moveScope(Map<String, JsonValue> moveFrom, Map<String, JsonValue> moveTo, ServerContext context,
+    private void moveScope(Map<String, JsonValue> moveFrom, Map<String, JsonValue> moveTo, Context context,
             PolicyResourceDelegate policyResourceDelegate, Set<String> allMovingRights, Set<JsonValue> createdPolicies,
             Set<JsonValue> updatedPolicies, String scope, boolean newPolicyActive,
             List<Promise<List<ResourceResponse>, ResourceException>> promises, String user)

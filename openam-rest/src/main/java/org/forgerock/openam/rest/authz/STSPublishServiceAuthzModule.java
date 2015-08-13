@@ -28,7 +28,7 @@ import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.utils.AgentIdentity;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
@@ -56,37 +56,37 @@ public class STSPublishServiceAuthzModule extends AdminOnlyAuthzModule {
     }
 
     @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeCreate(ServerContext context, CreateRequest request) {
+    public Promise<AuthorizationResult, ResourceException> authorizeCreate(Context context, CreateRequest request) {
         return authorizeAdmin(context);
     }
 
     @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeRead(ServerContext context, ReadRequest request) {
+    public Promise<AuthorizationResult, ResourceException> authorizeRead(Context context, ReadRequest request) {
         return authorizeSoapSTSAgentOrAdmin(context);
     }
 
     @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeUpdate(ServerContext context, UpdateRequest request) {
+    public Promise<AuthorizationResult, ResourceException> authorizeUpdate(Context context, UpdateRequest request) {
         return authorizeAdmin(context);
     }
 
     @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeDelete(ServerContext context, DeleteRequest request) {
+    public Promise<AuthorizationResult, ResourceException> authorizeDelete(Context context, DeleteRequest request) {
         return authorizeAdmin(context);
     }
 
     @Override
-    public Promise<AuthorizationResult, ResourceException> authorizePatch(ServerContext context, PatchRequest request) {
+    public Promise<AuthorizationResult, ResourceException> authorizePatch(Context context, PatchRequest request) {
         return rejectConsumption();
     }
 
     @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeAction(ServerContext context, ActionRequest request) {
+    public Promise<AuthorizationResult, ResourceException> authorizeAction(Context context, ActionRequest request) {
         return rejectConsumption();
     }
 
     @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeQuery(ServerContext context, QueryRequest request) {
+    public Promise<AuthorizationResult, ResourceException> authorizeQuery(Context context, QueryRequest request) {
         return rejectConsumption();
     }
 
@@ -95,7 +95,7 @@ public class STSPublishServiceAuthzModule extends AdminOnlyAuthzModule {
                 "invoked functionality is not authorized for any user."));
     }
 
-    Promise<AuthorizationResult, ResourceException> authorizeSoapSTSAgentOrAdmin(ServerContext context) {
+    Promise<AuthorizationResult, ResourceException> authorizeSoapSTSAgentOrAdmin(Context context) {
         try {
             if (isSoapSTSAgent(context)) {
                 return Promises.newResultPromise(AuthorizationResult.accessPermitted());
@@ -108,11 +108,11 @@ public class STSPublishServiceAuthzModule extends AdminOnlyAuthzModule {
         }
     }
 
-    Promise<AuthorizationResult, ResourceException> authorizeAdmin(ServerContext context) {
+    Promise<AuthorizationResult, ResourceException> authorizeAdmin(Context context) {
         return super.authorize(context);
     }
 
-    private boolean isSoapSTSAgent(ServerContext context) throws ResourceException{
+    private boolean isSoapSTSAgent(Context context) throws ResourceException{
         SSOTokenContext tokenContext = context.asContext(SSOTokenContext.class);
         String userId;
         SSOToken token;

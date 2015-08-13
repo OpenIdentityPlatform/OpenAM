@@ -24,7 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.forgerock.guava.common.base.Function;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.http.routing.RouteMatcher;
 import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.json.resource.ActionRequest;
@@ -187,38 +187,38 @@ class SmsRouteTree implements RequestHandler {
     }
 
     @Override
-    public Promise<ActionResponse, ResourceException> handleAction(ServerContext context, ActionRequest request) {
+    public Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest request) {
         return router.handleAction(context, request);
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> handleCreate(ServerContext context, CreateRequest request) {
+    public Promise<ResourceResponse, ResourceException> handleCreate(Context context, CreateRequest request) {
         return router.handleCreate(context, request);
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> handleDelete(ServerContext context, DeleteRequest request) {
+    public Promise<ResourceResponse, ResourceException> handleDelete(Context context, DeleteRequest request) {
         return router.handleDelete(context, request);
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> handlePatch(ServerContext context, PatchRequest request) {
+    public Promise<ResourceResponse, ResourceException> handlePatch(Context context, PatchRequest request) {
         return router.handlePatch(context, request);
     }
 
     @Override
-    public Promise<QueryResponse, ResourceException> handleQuery(ServerContext context, QueryRequest request,
+    public Promise<QueryResponse, ResourceException> handleQuery(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         return router.handleQuery(context, request, handler);
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> handleRead(ServerContext context, ReadRequest request) {
+    public Promise<ResourceResponse, ResourceException> handleRead(Context context, ReadRequest request) {
         return router.handleRead(context, request);
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> handleUpdate(ServerContext context, UpdateRequest request) {
+    public Promise<ResourceResponse, ResourceException> handleUpdate(Context context, UpdateRequest request) {
         return router.handleUpdate(context, request);
     }
 

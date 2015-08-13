@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -99,7 +99,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
      * @param request {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
+    public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
         return newExceptionPromise(newNotSupportedException());
     }
 
@@ -107,7 +107,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
         boolean augmentWithPolicies = augmentWithPolicies(request);
         String realm = getRealm(context);
@@ -134,7 +134,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
      * @param request {@inheritDoc}
      */
     @Override
-    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
+    public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
 
         if ("revokeAll".equalsIgnoreCase(request.getAction())) {
             String realm = getRealm(context);
@@ -158,7 +158,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
      * @param request {@inheritDoc}
      */
     @Override
-    public Promise<QueryResponse, ResourceException> queryCollection(final ServerContext context, QueryRequest request,
+    public Promise<QueryResponse, ResourceException> queryCollection(final Context context, QueryRequest request,
             QueryResourceHandler handler) {
 
         final QueryResourceHandler queryHandler = QueryResourceHandlerBuilder.withPagingAndSorting(handler, request);
@@ -197,11 +197,11 @@ public class ResourceSetResource implements CollectionResourceProvider {
                 });
     }
 
-    private String getResourceOwnerId(ServerContext context) {
+    private String getResourceOwnerId(Context context) {
         return contextHelper.getUserId(context);
     }
 
-    private String getRealm(ServerContext context) {
+    private String getRealm(Context context) {
         return contextHelper.getRealm(context);
     }
 
@@ -240,10 +240,10 @@ public class ResourceSetResource implements CollectionResourceProvider {
             implements QueryFilterVisitor<ResourceSetWithPolicyQuery, ResourceSetWithPolicyQuery, JsonPointer> {
 
         private final Map<JsonPointer, String> queryableFields = new HashMap<JsonPointer, String>();
-        private final ServerContext context;
+        private final Context context;
         private int queryDepth = 0;
 
-        private ResourceSetQueryFilter(ServerContext context) {
+        private ResourceSetQueryFilter(Context context) {
             this.context = context;
             queryableFields.put(new JsonPointer("/name"), ResourceSetTokenField.NAME);
             queryableFields.put(new JsonPointer("/resourceServer"), ResourceSetTokenField.CLIENT_ID);
@@ -487,7 +487,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
      * @param request {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
             UpdateRequest request) {
 
         final Map<String, Object> resourceSetDescriptionAttributes;
@@ -544,7 +544,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
      * @param request {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId,
             DeleteRequest request) {
         return newExceptionPromise(newNotSupportedException());
     }
@@ -556,7 +556,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
      * @param request {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
             PatchRequest request) {
         return newExceptionPromise(newNotSupportedException());
     }
@@ -568,7 +568,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
      * @param request {@inheritDoc}
      */
     @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+    public Promise<ActionResponse, ResourceException> actionInstance(Context context, String resourceId,
             ActionRequest request) {
         return newExceptionPromise(newNotSupportedException());
     }

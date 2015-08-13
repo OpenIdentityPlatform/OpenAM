@@ -20,7 +20,7 @@ import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyEvaluator;
 import org.forgerock.util.Reject;
 
@@ -59,7 +59,7 @@ public final class TreePolicyRequest extends PolicyRequest {
 
         private final String resource;
 
-        private TreePolicyRequestBuilder(final ServerContext context,
+        private TreePolicyRequestBuilder(final Context context,
                                          final ActionRequest request) throws EntitlementException {
             super(context, request);
             final JsonValue jsonValue = request.getContent();
@@ -98,7 +98,7 @@ public final class TreePolicyRequest extends PolicyRequest {
      * @throws EntitlementException
      *         should creating a tree policy request fail
      */
-    public static TreePolicyRequest getTreePolicyRequest(final ServerContext context,
+    public static TreePolicyRequest getTreePolicyRequest(final Context context,
                                                          final ActionRequest request) throws EntitlementException {
         return new TreePolicyRequestBuilder(context, request).build();
     }

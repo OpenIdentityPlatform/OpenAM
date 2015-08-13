@@ -57,7 +57,7 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.xml.bind.StringInputStream;
 import org.apache.commons.io.IOUtils;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -283,7 +283,7 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
     }
 
     @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext serverContext,
+    public Promise<ActionResponse, ResourceException> actionInstance(Context serverContext,
             ActionRequest actionRequest) {
         if (actionRequest.getAction().equals("schema")) {
             Map<String, String> uriVariables = getUriTemplateVariables(serverContext);
@@ -442,7 +442,7 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
                 ("com/sun/identity/console/" + propertyFileName);
     }
 
-    protected ServiceConfigManager getServiceConfigManager(ServerContext context) throws SSOException, SMSException {
+    protected ServiceConfigManager getServiceConfigManager(Context context) throws SSOException, SMSException {
         SSOToken ssoToken = context.asContext(SSOTokenContext.class).getCallerSSOToken();
         return new ServiceConfigManager(ssoToken, "iPlanetAMPlatformService", "1.0");
     }
@@ -454,13 +454,13 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext serverContext,
+    public Promise<ResourceResponse, ResourceException> patchInstance(Context serverContext,
             PatchRequest patchRequest) {
         return newExceptionPromise(newNotSupportedException());
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext serverContext,
+    public Promise<ResourceResponse, ResourceException> readInstance(Context serverContext,
             ReadRequest readRequest) {
         Map<String, String> uriVariables = getUriTemplateVariables(serverContext);
 
@@ -586,7 +586,7 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
         return attributeNamesForTab;
     }
 
-    private Map<String, String> getUriTemplateVariables(ServerContext serverContext) {
+    private Map<String, String> getUriTemplateVariables(Context serverContext) {
         return serverContext.asContext(UriRouterContext.class).getUriTemplateVariables();
     }
 
@@ -599,7 +599,7 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext serverContext,
+    public Promise<ResourceResponse, ResourceException> updateInstance(Context serverContext,
             UpdateRequest updateRequest) {
         Map<String, String> uriVariables = getUriTemplateVariables(serverContext);
 

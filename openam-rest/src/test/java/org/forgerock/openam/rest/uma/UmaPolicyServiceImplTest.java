@@ -42,6 +42,7 @@ import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.ConflictException;
+import org.forgerock.json.resource.InternalContext;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.util.query.QueryFilter;
@@ -51,7 +52,7 @@ import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
@@ -108,9 +109,9 @@ public class UmaPolicyServiceImplTest {
         policyService = new UmaPolicyServiceImpl(policyResourceDelegate, resourceSetStoreFactory, lazyAuditLogger,
                 contextHelper, policyEvaluatorFactory, coreServicesWrapper, debug, umaSettingsFactory);
 
-        given(contextHelper.getRealm(Matchers.<ServerContext>anyObject())).willReturn("REALM");
-        given(contextHelper.getUserId(Matchers.<ServerContext>anyObject())).willReturn(RESOURCE_OWNER_ID);
-        given(contextHelper.getUserUid(Matchers.<ServerContext>anyObject())).willReturn("RESOURCE_OWNER_UID");
+        given(contextHelper.getRealm(Matchers.<Context>anyObject())).willReturn("REALM");
+        given(contextHelper.getUserId(Matchers.<Context>anyObject())).willReturn(RESOURCE_OWNER_ID);
+        given(contextHelper.getUserUid(Matchers.<Context>anyObject())).willReturn("RESOURCE_OWNER_UID");
 
         resourceSetStore = mock(ResourceSetStore.class);
         resourceSet = new ResourceSetDescription("RESOURCE_SET_ID",
@@ -133,18 +134,18 @@ public class UmaPolicyServiceImplTest {
         given(coreServicesWrapper.getIdentity(RESOURCE_OWNER_ID, "REALM")).willReturn(identity);
     }
 
-    private ServerContext createContext() throws SSOException {
+    private Context createContext() throws SSOException {
         return createContextForLoggedInUser(RESOURCE_OWNER_ID);
     }
 
-    private ServerContext createContextForLoggedInUser(String userShortName) throws SSOException {
+    private Context createContextForLoggedInUser(String userShortName) throws SSOException {
         SubjectContext subjectContext = mock(SSOTokenContext.class);
         SSOToken ssoToken = mock(SSOToken.class);
         Principal principal = mock(Principal.class);
         given(subjectContext.getCallerSSOToken()).willReturn(ssoToken);
         given(ssoToken.getPrincipal()).willReturn(principal);
         given(principal.getName()).willReturn(userShortName);
-        return new ServerContext(new RealmContext(subjectContext));
+        return new InternalContext(new RealmContext(subjectContext));
     }
 
     private static JsonValue createUmaPolicyJson(String resourceSetId, String... subjectTwoScopes) {
@@ -224,7 +225,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldCreateUmaPolicy() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         JsonValue policy = createUmaPolicyJson("RESOURCE_SET_ID");
         List<Resource> createdPolicies = new ArrayList<Resource>();
         Resource createdPolicy1 = new Resource("ID_1", "REVISION_1", createBackendSubjectOnePolicyJson());
@@ -261,7 +262,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldNotCreateUmaPolicyIfAlreadyExists() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         JsonValue policy = createUmaPolicyJson("RESOURCE_SET_ID");
         Resource policyResource = new Resource("ID_1", "REVISION_1", createBackendSubjectOnePolicyJson());
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> queryPromise =
@@ -285,7 +286,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldHandleFailureToCreateUnderlyingPolicies() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         JsonValue policy = createUmaPolicyJson("RESOURCE_SET_ID");
         ResourceException exception = mock(ResourceException.class);
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> queryPromise =
@@ -308,7 +309,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldNotCreateUmaPolicyIfContainsInvalidRequestedScope() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         JsonValue policy = createUmaPolicyJson("RESOURCE_SET_ID", "SCOPE_D");
 
         //When
@@ -323,7 +324,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldNotCreateUmaPolicyIfResourceSetNotFound() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         JsonValue policy = createUmaPolicyJson("RESOURCE_SET_ID").put("policyId", "OTHER_ID");
 
         //When
@@ -338,7 +339,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldNotCreateUmaPolicyWhenFailToReadResourceSet() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         JsonValue policy = createUmaPolicyJson("RESOURCE_SET_ID").put("policyId", "FAILING_ID");
 
         //When
@@ -354,7 +355,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldReadUmaPolicy() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
 
         QueryResult queryResult = new QueryResult();
         List<Resource> policies = new ArrayList<Resource>();
@@ -382,7 +383,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldHandleReadFailureToQueryUnderlyingPolicies() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
 
         ResourceException exception = mock(ResourceException.class);
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> queryPromise =
@@ -402,7 +403,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldUpdateUmaPolicy() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         JsonValue policy = createUmaPolicyJson("RESOURCE_SET_ID", "SCOPE_A", "SCOPE_C");
         policy.remove(new JsonPointer("/permissions/0/scopes/1"));
         List<Resource> updatedPolicies = new ArrayList<>();
@@ -442,7 +443,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldHandleFailureToUpdateUnderlyingPolicies() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         JsonValue policy = createUmaPolicyJson("RESOURCE_SET_ID", "SCOPE_A", "SCOPE_B");
         ResourceException exception = mock(ResourceException.class);
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> currentPolicyPromise
@@ -465,7 +466,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldNotUpdateUmaPolicyIfContainsInvalidRequestedScope() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         JsonValue policy = createUmaPolicyJson("RESOURCE_SET_ID", "SCOPE_D");
 
         //When
@@ -480,7 +481,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldNotUpdateUmaPolicyIfResourceSetNotFound() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         JsonValue policy = createUmaPolicyJson("RESOURCE_SET_ID");
 
         //When
@@ -495,7 +496,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldNotUpdateUmaPolicyWhenFailToReadResourceSet() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         JsonValue policy = createUmaPolicyJson("RESOURCE_SET_ID");
 
         //When
@@ -511,7 +512,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldDeleteUmaPolicy() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         List<Resource> readPolicies = new ArrayList<Resource>();
         Resource readPolicy1 = new Resource("ID_1", "REVISION_1", createBackendSubjectOnePolicyJson());
         Resource readPolicy2 = new Resource("ID_2", "REVISION_2", createBackendSubjectTwoPolicyJson());
@@ -539,7 +540,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldHandleDeleteFailureToQueryUnderlyingPolicies() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         ResourceException exception = mock(ResourceException.class);
         Promise<Pair<QueryResult, List<Resource>>, ResourceException> readPoliciesPromise =
                 Promises.newExceptionPromise(exception);
@@ -562,7 +563,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldHandleFailureToDeleteUnderlyingPolicies() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         ResourceException exception = mock(ResourceException.class);
         List<Resource> readPolicies = new ArrayList<Resource>();
         Resource readPolicy1 = new Resource("ID_1", "REVISION_1", createBackendSubjectOnePolicyJson());
@@ -590,9 +591,9 @@ public class UmaPolicyServiceImplTest {
 
     private void setupQueries(Promise<Pair<QueryResult, List<Resource>>, ResourceException> initialQuery,
             final Resource... updatedPolicies) {
-        given(policyResourceDelegate.queryPolicies(any(ServerContext.class), any(QueryRequest.class)))
+        given(policyResourceDelegate.queryPolicies(any(Context.class), any(QueryRequest.class)))
                 .willReturn(initialQuery);
-        given(policyResourceDelegate.queryPolicies(any(ServerContext.class), any(QueryRequest.class),
+        given(policyResourceDelegate.queryPolicies(any(Context.class), any(QueryRequest.class),
                 any(QueryResultHandler.class))).willAnswer(new Answer<Promise<QueryResult, ResourceException>>() {
             @Override
             public Promise<QueryResult, ResourceException> answer(InvocationOnMock invocation) throws Throwable {
@@ -606,7 +607,7 @@ public class UmaPolicyServiceImplTest {
         });
     }
 
-    private void mockBackendQuery(ServerContext context, JsonValue... policies) {
+    private void mockBackendQuery(Context context, JsonValue... policies) {
         QueryResult queryResult = new QueryResult();
         List<Resource> policyResources = new ArrayList<Resource>();
         for (JsonValue policy : policies) {
@@ -625,7 +626,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldQueryUmaPoliciesBySubject() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.equalTo(new JsonPointer("permissions/subject"), "SUBJECT_ONE"));
 
@@ -644,7 +645,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldQueryUmaPoliciesByUnknownSubject() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.equalTo(new JsonPointer("permissions/subject"), "SUBJECT_OTHER"));
 
@@ -663,7 +664,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldQueryUmaPoliciesByResourceServer() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.equalTo(new JsonPointer("resourceServer"), "CLIENT_ID"));
 
@@ -682,7 +683,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldQueryUmaPoliciesByUnknownResourceServer() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.equalTo(new JsonPointer("resourceServer"), "OTHER_CLIENT_ID"));
 
@@ -701,7 +702,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldQueryUmaPoliciesBySubjectAndResourceServer() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.and(
                         QueryFilter.equalTo(new JsonPointer("permissions/subject"), "SUBJECT_ONE"),
@@ -723,7 +724,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldQueryUmaPoliciesByUnknownSubjectAndResourceServer() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.and(
                         QueryFilter.equalTo(new JsonPointer("permissions/subject"), "OTHER_SUBJECT"),
@@ -745,7 +746,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldQueryUmaPoliciesBySubjectAndUnknownResourceServer() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.and(
                         QueryFilter.equalTo(new JsonPointer("permissions/subject"), "SUBJECT_ONE"),
@@ -767,7 +768,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldQueryUmaPoliciesByUnknownSubjectAndUnknownResourceServer() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.and(
                         QueryFilter.equalTo(new JsonPointer("permissions/subject"), "SUBJECT_OTHER"),
@@ -789,7 +790,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldQueryUmaPoliciesBySubjectOrResourceServer() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.or(
                         QueryFilter.equalTo(new JsonPointer("permissions/subject"), "SUBJECT_ONE"),
@@ -811,7 +812,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldQueryUmaPoliciesByUnknownSubjectOrResourceServer() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.or(
                         QueryFilter.equalTo(new JsonPointer("permissions/subject"), "SUBJECT_OTHER"),
@@ -833,7 +834,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldQueryUmaPoliciesBySubjectOrUnknownResourceServer() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.or(
                         QueryFilter.equalTo(new JsonPointer("permissions/subject"), "SUBJECT_ONE"),
@@ -855,7 +856,7 @@ public class UmaPolicyServiceImplTest {
     public void shouldQueryUmaPoliciesByUnknownSubjectOrUnknownResourceServer() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.or(
                         QueryFilter.equalTo(new JsonPointer("permissions/subject"), "SUBJECT_OTHER"),

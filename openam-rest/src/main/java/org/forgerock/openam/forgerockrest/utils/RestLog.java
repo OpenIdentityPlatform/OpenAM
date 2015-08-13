@@ -29,7 +29,7 @@ import com.sun.identity.shared.debug.Debug;
 
 import java.io.IOException;
 import java.security.AccessController;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.util.Reject;
 
 /**
@@ -83,7 +83,7 @@ public final class RestLog {
      * @param debug the debug to write messages out to. Not nullable.
      * @return the name of the principal which requested the operation, or null if not available.
      */
-    public String debugOperationAttemptAsPrincipal(String resource, String operation, ServerContext context,
+    public String debugOperationAttemptAsPrincipal(String resource, String operation, Context context,
             String realm, Debug debug) {
         init();
         Reject.ifNull(resource, operation, context, debug);

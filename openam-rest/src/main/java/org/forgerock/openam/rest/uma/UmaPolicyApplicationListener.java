@@ -47,8 +47,9 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import org.forgerock.http.Context;
+import org.forgerock.http.context.AbstractContext;
 import org.forgerock.http.context.RootContext;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.QueryRequest;
@@ -291,7 +292,7 @@ public class UmaPolicyApplicationListener implements IdEventListener {
     private void deletePolicies(String realm, String resourceServerId) {
         RealmContext realmContext = new RealmContext(new RootContext());
         realmContext.addDnsAlias("/", realm);
-        final ServerContext context = new AdminSubjectContext(realmContext);
+        final Context context = new AdminSubjectContext(realmContext);
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.equalTo(new JsonPointer("applicationName"), resourceServerId));
         final List<ResourceResponse> resources = new ArrayList<>();
@@ -335,7 +336,7 @@ public class UmaPolicyApplicationListener implements IdEventListener {
     /**
      * SubjectContext implementation which contains an admin token.
      */
-    private static final class AdminSubjectContext extends ServerContext implements SubjectContext {
+    private static final class AdminSubjectContext extends AbstractContext implements SubjectContext {
 
         private final SSOToken adminToken;
 

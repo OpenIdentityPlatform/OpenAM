@@ -28,7 +28,7 @@ import javax.script.SimpleBindings;
 
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -93,7 +93,7 @@ public class BatchResource extends RealmAwareResource {
     }
 
     @Override
-    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext serverContext,
+    public Promise<ActionResponse, ResourceException> actionCollection(Context serverContext,
             ActionRequest actionRequest) {
 
         if (!actionRequest.getAction().equals(BATCH)) {
@@ -145,43 +145,43 @@ public class BatchResource extends RealmAwareResource {
     }
 
     @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext serverContext, String s,
+    public Promise<ActionResponse, ResourceException> actionInstance(Context serverContext, String s,
             ActionRequest actionRequest) {
         return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext serverContext,
+    public Promise<ResourceResponse, ResourceException> createInstance(Context serverContext,
             CreateRequest createRequest) {
         return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext serverContext, String s,
+    public Promise<ResourceResponse, ResourceException> deleteInstance(Context serverContext, String s,
             DeleteRequest deleteRequest) {
         return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext serverContext, String s,
+    public Promise<ResourceResponse, ResourceException> patchInstance(Context serverContext, String s,
             PatchRequest patchRequest) {
         return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext serverContext,
+    public Promise<QueryResponse, ResourceException> queryCollection(Context serverContext,
             QueryRequest queryRequest, QueryResourceHandler queryResultHandler) {
         return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext serverContext, String s,
+    public Promise<ResourceResponse, ResourceException> readInstance(Context serverContext, String s,
             ReadRequest readRequest) {
         return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext serverContext, String s,
+    public Promise<ResourceResponse, ResourceException> updateInstance(Context serverContext, String s,
             UpdateRequest updateRequest) {
         return RestUtils.generateUnsupportedOperation();
     }

@@ -34,7 +34,7 @@ import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.security.AdminTokenAction;
 import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.forgerockrest.RestUtils;
 
 import java.security.AccessController;
@@ -88,10 +88,10 @@ public class ClientResourceManager {
     /**
      * Returns TokenID from headers
      *
-     * @param context ServerContext which contains the headers.
+     * @param context Context which contains the headers.
      * @return String with TokenID
      */
-    private String getCookieFromServerContext(ServerContext context) {
+    private String getCookieFromServerContext(Context context) {
         return RestUtils.getCookieFromServerContext(context);
     }
 

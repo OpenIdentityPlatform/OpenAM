@@ -41,7 +41,7 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceNotFoundException;
 import com.sun.identity.sm.ServiceSchema;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -77,7 +77,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
     }
 
     @Override
-    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
+    public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
         return super.handleAction(context, request);
     }
 
@@ -87,7 +87,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
+    public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
         JsonValue content = request.getContent();
         Map<String, Set<String>> attrs = converter.fromJson(content);
         try {
@@ -128,7 +128,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId,
             DeleteRequest request) {
         try {
             ServiceConfigManager scm = getServiceConfigManager(context);
@@ -162,7 +162,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
         try {
             ServiceConfigManager scm = getServiceConfigManager(context);
@@ -188,7 +188,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId, UpdateRequest request) {
+    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId, UpdateRequest request) {
         JsonValue content = request.getContent();
         Map<String, Set<String>> attrs = converter.fromJson(content);
         try {
@@ -222,7 +222,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
      * {@inheritDoc}
      */
     @Override
-    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+    public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         if (!"true".equals(request.getQueryFilter().toString())) {
             return newExceptionPromise(newNotSupportedException("Query not supported: " + request.getQueryFilter()));
@@ -277,13 +277,13 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
     }
 
     @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+    public Promise<ActionResponse, ResourceException> actionInstance(Context context, String resourceId,
             ActionRequest request) {
         return newExceptionPromise(newNotSupportedException(request.getAction() + " action not supported"));
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
             PatchRequest request) {
         return newExceptionPromise(newNotSupportedException("patch operation not supported"));
     }

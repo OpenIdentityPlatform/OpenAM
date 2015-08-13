@@ -18,7 +18,7 @@ package org.forgerock.openam.forgerockrest;
 
 import static org.forgerock.util.promise.Promises.newExceptionPromise;
 
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
@@ -49,7 +49,7 @@ public abstract class ReadOnlyResource implements CollectionResourceProvider  {
      *
      * {@inheritDoc}
      */
-    public final Promise<ResourceResponse, ResourceException> createInstance(ServerContext ctx, CreateRequest request) {
+    public final Promise<ResourceResponse, ResourceException> createInstance(Context ctx, CreateRequest request) {
         return newExceptionPromise(generateException("Creates"));
     }
 
@@ -58,7 +58,7 @@ public abstract class ReadOnlyResource implements CollectionResourceProvider  {
      *
      * {@inheritDoc}
      */
-    public final Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext ctx, String resId,
+    public final Promise<ResourceResponse, ResourceException> deleteInstance(Context ctx, String resId,
             DeleteRequest request) {
         return newExceptionPromise(generateException("Deletes"));
     }
@@ -68,7 +68,7 @@ public abstract class ReadOnlyResource implements CollectionResourceProvider  {
      *
      * {@inheritDoc}
      */
-    public final Promise<ResourceResponse, ResourceException> patchInstance(ServerContext ctx, String resId,
+    public final Promise<ResourceResponse, ResourceException> patchInstance(Context ctx, String resId,
             PatchRequest request) {
         return newExceptionPromise(generateException("Patches"));
     }
@@ -78,7 +78,7 @@ public abstract class ReadOnlyResource implements CollectionResourceProvider  {
      *
      * {@inheritDoc}
      */
-    public final Promise<ResourceResponse, ResourceException> updateInstance(ServerContext ctx, String resId,
+    public final Promise<ResourceResponse, ResourceException> updateInstance(Context ctx, String resId,
             UpdateRequest request) {
         return newExceptionPromise(generateException("Updates"));
     }

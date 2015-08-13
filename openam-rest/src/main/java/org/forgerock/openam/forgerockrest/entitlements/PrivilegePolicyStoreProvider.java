@@ -17,7 +17,7 @@
 package org.forgerock.openam.forgerockrest.entitlements;
 
 import com.sun.identity.entitlement.PrivilegeManager;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
@@ -63,7 +63,7 @@ public final class PrivilegePolicyStoreProvider implements PolicyStoreProvider {
     }
 
     @Override
-    public PolicyStore getPolicyStore(ServerContext context) {
+    public PolicyStore getPolicyStore(Context context) {
         Subject adminSubject = context.asContext(SubjectContext.class).getCallerSubject();
         String realm = context.asContext(RealmContext.class).getResolvedRealm();
 

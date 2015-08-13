@@ -42,7 +42,7 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.Router;
 import org.forgerock.json.resource.RoutingMode;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
@@ -143,7 +143,7 @@ public class PrivilegeAuthzModuleTest {
         verify(evaluator).isAllowed(token, permission, ENVIRONMENT);
         // Required by the following verify.
         given(subjectContext.toJsonValue()).willReturn(JsonValue.json(new Object()));
-        verify(provider).readInstance(isA(ServerContext.class), eq("123"), isA(ReadRequest.class), same(handler));
+        verify(provider).readInstance(isA(Context.class), eq("123"), isA(ReadRequest.class), same(handler));
         verifyNoMoreInteractions(factory, subjectContext, evaluator, handler, token, provider);
     }
 
@@ -176,7 +176,7 @@ public class PrivilegeAuthzModuleTest {
         verify(evaluator).isAllowed(token, permission, ENVIRONMENT);
         // Required by the following verify.
         given(subjectContext.toJsonValue()).willReturn(JsonValue.json(new Object()));
-        verify(provider).queryCollection(isA(ServerContext.class), isA(QueryRequest.class), same(handler));
+        verify(provider).queryCollection(isA(Context.class), isA(QueryRequest.class), same(handler));
         verifyNoMoreInteractions(factory, subjectContext, evaluator, handler, token, provider);
     }
 
@@ -208,7 +208,7 @@ public class PrivilegeAuthzModuleTest {
         verify(evaluator).isAllowed(token, permission, ENVIRONMENT);
         // Required by the following verify.
         given(subjectContext.toJsonValue()).willReturn(JsonValue.json(new Object()));
-        verify(provider).createInstance(isA(ServerContext.class), isA(CreateRequest.class), same(handler));
+        verify(provider).createInstance(isA(Context.class), isA(CreateRequest.class), same(handler));
         verifyNoMoreInteractions(factory, subjectContext, evaluator, handler, token, provider);
     }
 
@@ -240,7 +240,7 @@ public class PrivilegeAuthzModuleTest {
         verify(evaluator).isAllowed(token, permission, ENVIRONMENT);
         // Required by the following verify.
         given(subjectContext.toJsonValue()).willReturn(JsonValue.json(new Object()));
-        verify(provider).updateInstance(isA(ServerContext.class), eq("123"), isA(UpdateRequest.class), same(handler));
+        verify(provider).updateInstance(isA(Context.class), eq("123"), isA(UpdateRequest.class), same(handler));
         verifyNoMoreInteractions(factory, subjectContext, evaluator, handler, token, provider);
     }
 
@@ -272,7 +272,7 @@ public class PrivilegeAuthzModuleTest {
         verify(evaluator).isAllowed(token, permission, ENVIRONMENT);
         // Required by the following verify.
         given(subjectContext.toJsonValue()).willReturn(JsonValue.json(new Object()));
-        verify(provider).deleteInstance(isA(ServerContext.class), eq("123"), isA(DeleteRequest.class), same(handler));
+        verify(provider).deleteInstance(isA(Context.class), eq("123"), isA(DeleteRequest.class), same(handler));
         verifyNoMoreInteractions(factory, subjectContext, evaluator, handler, token, provider);
     }
 
@@ -304,7 +304,7 @@ public class PrivilegeAuthzModuleTest {
         verify(evaluator).isAllowed(token, permission, ENVIRONMENT);
         // Required by the following verify.
         given(subjectContext.toJsonValue()).willReturn(JsonValue.json(new Object()));
-        verify(provider).patchInstance(isA(ServerContext.class), eq("123"), isA(PatchRequest.class), same(handler));
+        verify(provider).patchInstance(isA(Context.class), eq("123"), isA(PatchRequest.class), same(handler));
         verifyNoMoreInteractions(factory, subjectContext, evaluator, handler, token, provider);
     }
 
@@ -336,7 +336,7 @@ public class PrivilegeAuthzModuleTest {
         verify(evaluator).isAllowed(token, permission, ENVIRONMENT);
         // Required by the following verify.
         given(subjectContext.toJsonValue()).willReturn(JsonValue.json(new Object()));
-        verify(provider).actionCollection(isA(ServerContext.class), isA(ActionRequest.class), same(jsonHandler));
+        verify(provider).actionCollection(isA(Context.class), isA(ActionRequest.class), same(jsonHandler));
         verifyNoMoreInteractions(factory, subjectContext, evaluator, jsonHandler, token, provider);
     }
 
@@ -368,7 +368,7 @@ public class PrivilegeAuthzModuleTest {
         verify(evaluator).isAllowed(token, permission, ENVIRONMENT);
         // Required by the following verify.
         given(subjectContext.toJsonValue()).willReturn(JsonValue.json(new Object()));
-        verify(provider).actionCollection(isA(ServerContext.class), isA(ActionRequest.class), same(jsonHandler));
+        verify(provider).actionCollection(isA(Context.class), isA(ActionRequest.class), same(jsonHandler));
         verifyNoMoreInteractions(factory, subjectContext, evaluator, jsonHandler, token, provider);
     }
 
@@ -379,7 +379,7 @@ public class PrivilegeAuthzModuleTest {
         final Router router = new Router();
         router.addRoute(RoutingMode.STARTS_WITH, "/policies", chain);
 
-        final ServerContext context = new RealmContext(subjectContext);
+        final Context context = new RealmContext(subjectContext);
         final ActionRequest request = Requests.newActionRequest("/policies", "unknownAction");
         router.handleAction(context, request, jsonHandler);
 

@@ -45,7 +45,7 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -155,7 +155,7 @@ public class SessionResource implements CollectionResourceProvider {
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
      */
-    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
+    public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
         final String cookieName = SystemProperties.get(Constants.AM_COOKIE_NAME, "iPlanetDirectoryPro");
 
         String tokenId = getTokenIdFromUrlParam(request);
@@ -183,7 +183,7 @@ public class SessionResource implements CollectionResourceProvider {
         return request.getAdditionalParameter("tokenId");
     }
 
-    protected String getTokenIdFromCookie(ServerContext context, String cookieName) {
+    protected String getTokenIdFromCookie(Context context, String cookieName) {
         List<String> cookieValue = StringUtils.getParameter(context.asContext(HttpContext.class).getHeaderAsString("cookie"), ";",
                 cookieName);
 
@@ -194,7 +194,7 @@ public class SessionResource implements CollectionResourceProvider {
         }
     }
 
-    protected String getTokenIdFromHeader(ServerContext context, String cookieName) {
+    protected String getTokenIdFromHeader(Context context, String cookieName) {
         final List<String> header = context.asContext(HttpContext.class).getHeader
                 (cookieName.toLowerCase());
 
@@ -218,7 +218,7 @@ public class SessionResource implements CollectionResourceProvider {
      * @param tokenId The SSO Token Id.
      * @param request {@inheritDoc}
      */
-    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String tokenId,
+    public Promise<ActionResponse, ResourceException> actionInstance(Context context, String tokenId,
             ActionRequest request) {
         return internalHandleAction(tokenId, context, request);
     }
@@ -228,7 +228,7 @@ public class SessionResource implements CollectionResourceProvider {
      * @param tokenId The id of the token to concentrate on.
      * @param request The ActionRequest, giving us all our parameters.
      */
-    private Promise<ActionResponse, ResourceException> internalHandleAction(String tokenId, ServerContext context, ActionRequest request) {
+    private Promise<ActionResponse, ResourceException> internalHandleAction(String tokenId, Context context, ActionRequest request) {
 
         final String action = request.getAction();
         final ActionHandler actionHandler = actionHandlers.get(action);
@@ -308,7 +308,7 @@ public class SessionResource implements CollectionResourceProvider {
      * @param request {@inheritDoc}
      * @param handler {@inheritDoc}
      */
-    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+    public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         String id = request.getQueryId();
 
@@ -350,7 +350,7 @@ public class SessionResource implements CollectionResourceProvider {
      *
      * {@inheritDoc}
      */
-    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String id, ReadRequest request) {
+    public Promise<ResourceResponse, ResourceException> readInstance(Context context, String id, ReadRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
 
@@ -391,14 +391,14 @@ public class SessionResource implements CollectionResourceProvider {
     /**
      * {@inheritDoc}
      */
-    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext ctx, CreateRequest request) {
+    public Promise<ResourceResponse, ResourceException> createInstance(Context ctx, CreateRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * {@inheritDoc}
      */
-    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext ctx, String resId,
+    public Promise<ResourceResponse, ResourceException> deleteInstance(Context ctx, String resId,
             DeleteRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
@@ -406,7 +406,7 @@ public class SessionResource implements CollectionResourceProvider {
     /**
      * {@inheritDoc}
      */
-    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext ctx, String resId,
+    public Promise<ResourceResponse, ResourceException> patchInstance(Context ctx, String resId,
             PatchRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
@@ -414,7 +414,7 @@ public class SessionResource implements CollectionResourceProvider {
     /**
      * {@inheritDoc}
      */
-    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext ctx, String resId,
+    public Promise<ResourceResponse, ResourceException> updateInstance(Context ctx, String resId,
             UpdateRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
@@ -423,7 +423,7 @@ public class SessionResource implements CollectionResourceProvider {
      * Defines a delegate capable of handling a particular action for a collection or instance
      */
     private interface ActionHandler {
-        Promise<ActionResponse, ResourceException> handle(String tokenId, ServerContext context, ActionRequest request);
+        Promise<ActionResponse, ResourceException> handle(String tokenId, Context context, ActionRequest request);
     }
 
     /**
@@ -437,7 +437,7 @@ public class SessionResource implements CollectionResourceProvider {
          * which it does by adding an expired session-jwt cookie to the response. Because the HttpServletResponse is
          * not available to CREST services, but rather headers in the response are set via the AdviceContext, this
          * class will take set cookies and translate them into the AdviceContext associated with the current CREST
-         * ServerContext.
+         * Context.
          */
         private final class HeaderCollectingHttpServletResponse extends HttpServletResponseWrapper {
 
@@ -469,7 +469,7 @@ public class SessionResource implements CollectionResourceProvider {
         }
 
         @Override
-        public Promise<ActionResponse, ResourceException> handle(String tokenId, ServerContext context,
+        public Promise<ActionResponse, ResourceException> handle(String tokenId, Context context,
                 ActionRequest request) {
             try {
                 JsonValue jsonValue = logout(tokenId, context);
@@ -489,7 +489,7 @@ public class SessionResource implements CollectionResourceProvider {
          * @param tokenId The id of the Token to invalidate
          * @throws InternalServerErrorException If the tokenId is invalid or could not be used to logout.
          */
-        private JsonValue logout(String tokenId, ServerContext context) throws InternalServerErrorException {
+        private JsonValue logout(String tokenId, Context context) throws InternalServerErrorException {
 
             SSOToken ssoToken;
             try {
@@ -512,7 +512,7 @@ public class SessionResource implements CollectionResourceProvider {
             final AdviceContext adviceContext = context.asContext(AdviceContext.class);
             if (adviceContext == null) {
                 if (LOGGER.warningEnabled()) {
-                    LOGGER.warning("No AdviceContext in ServerContext, and thus no headers can be set in the HttpServletResponse.");
+                    LOGGER.warning("No AdviceContext in Context, and thus no headers can be set in the HttpServletResponse.");
                 }
             } else {
                 httpServletResponse = new HeaderCollectingHttpServletResponse(new UnsupportedResponse(), adviceContext);
@@ -546,7 +546,7 @@ public class SessionResource implements CollectionResourceProvider {
         private static final String VALID = "valid";
 
         @Override
-        public Promise<ActionResponse, ResourceException> handle(String tokenId, ServerContext context,
+        public Promise<ActionResponse, ResourceException> handle(String tokenId, Context context,
                 ActionRequest request) {
             return newResultPromise(newActionResponse(validateSession(tokenId)));
         }
@@ -631,7 +631,7 @@ public class SessionResource implements CollectionResourceProvider {
         private static final String ACTIVE = "active";
 
         @Override
-        public Promise<ActionResponse, ResourceException> handle(String tokenId, ServerContext context,
+        public Promise<ActionResponse, ResourceException> handle(String tokenId, Context context,
                 ActionRequest request) {
             String refresh = request.getAdditionalParameter("refresh");
             return newResultPromise(newActionResponse(isTokenIdValid(tokenId, refresh)));
@@ -668,7 +668,7 @@ public class SessionResource implements CollectionResourceProvider {
         private static final String MAX_TIME = "maxtime";
 
         @Override
-        public Promise<ActionResponse, ResourceException> handle(String tokenId, ServerContext context,
+        public Promise<ActionResponse, ResourceException> handle(String tokenId, Context context,
                 ActionRequest request) {
             return newResultPromise(newActionResponse(getMaxTime(tokenId)));
         }
@@ -699,7 +699,7 @@ public class SessionResource implements CollectionResourceProvider {
         private static final String IDLE_TIME = "idletime";
 
         @Override
-        public Promise<ActionResponse, ResourceException> handle(String tokenId, ServerContext context,
+        public Promise<ActionResponse, ResourceException> handle(String tokenId, Context context,
                 ActionRequest request) {
             return newResultPromise(newActionResponse(getIdleTime(tokenId)));
         }

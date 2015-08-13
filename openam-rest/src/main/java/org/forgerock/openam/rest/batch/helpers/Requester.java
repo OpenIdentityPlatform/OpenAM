@@ -28,7 +28,7 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
@@ -54,10 +54,10 @@ public class Requester {
         this.resultHandlerFactory = resultHandlerFactory;
     }
 
-    private ServerContext getServerContext(Context serverContext) {
-        Reject.ifNull(serverContext, "Supplied context must contain an instance of a ServerContext.");
+    private Context getServerContext(Context serverContext) {
+        Reject.ifNull(serverContext, "Supplied context must contain an instance of a Context.");
 
-        return serverContext.asContext(ServerContext.class);
+        return serverContext.asContext(Context.class);
     }
 
     /**
@@ -67,7 +67,7 @@ public class Requester {
      * @param resourceId Resource ID to be created. May be null.
      * @param payload Payload of the resource to generate. May not be null.
      * @param serverContext Server context of this request.
-     *                      Must contain a {@link org.forgerock.http.context.ServerContext}.
+     *                      Must contain a {@link org.forgerock.http.context.Context}.
      * @return The {@link org.forgerock.json.JsonValue} returned from the endpoint.
      * @throws ResourceException If any exception occurred during processing.
      */
@@ -78,7 +78,7 @@ public class Requester {
         Reject.ifNull(payload, "The payload object to create must not be null.");
 
         final CrestRouter realmRouter = realmRouterProvider.get();
-        final ServerContext selectedContext = getServerContext(serverContext);
+        final Context selectedContext = getServerContext(serverContext);
         final SDKServerResultHandler<Resource> resultHandler = resultHandlerFactory.getResourceResultHandler();
         final CreateRequest createRequest = Requests.newCreateRequest(location, payload);
 
@@ -96,7 +96,7 @@ public class Requester {
      * @param location Endpoint destination of this request. May not be null.
      * @param resourceId Resource ID to read. May not be null.
      * @param serverContext Server context of this request.
-     *                      Must contain a {@link org.forgerock.http.context.ServerContext}.
+     *                      Must contain a {@link org.forgerock.http.context.Context}.
      * @return The {@link org.forgerock.json.JsonValue} returned from the endpoint.
      * @throws ResourceException If any exception occurred during processing.
      */
@@ -107,7 +107,7 @@ public class Requester {
         Reject.ifTrue(StringUtils.isEmpty(resourceId), "The resourceId to read may not be null or empty.");
 
         final CrestRouter realmRouter = realmRouterProvider.get();
-        final ServerContext selectedContext = getServerContext(serverContext);
+        final Context selectedContext = getServerContext(serverContext);
         final SDKServerResultHandler<Resource> resultHandler = resultHandlerFactory.getResourceResultHandler();
         final ReadRequest readRequest = Requests.newReadRequest(location, resourceId);
         realmRouter.handleRead(selectedContext, readRequest, resultHandler);
@@ -121,7 +121,7 @@ public class Requester {
      * @param resourceId Resource ID to update. May not be null.
      * @param payload Payload of the updated resource. May not be null.
      * @param serverContext Server context of this request.
-     *                      Must contain a {@link org.forgerock.http.context.ServerContext}.
+     *                      Must contain a {@link org.forgerock.http.context.Context}.
      * @return The {@link org.forgerock.json.JsonValue} returned from the endpoint.
      * @throws ResourceException If any exception occurred during processing.
      */
@@ -133,7 +133,7 @@ public class Requester {
         Reject.ifNull(payload, "The payload object to create must not be null.");
 
         final CrestRouter realmRouter = realmRouterProvider.get();
-        final ServerContext selectedContext = getServerContext(serverContext);
+        final Context selectedContext = getServerContext(serverContext);
         final SDKServerResultHandler<Resource> resultHandler = resultHandlerFactory.getResourceResultHandler();
         final UpdateRequest updateRequest = Requests.newUpdateRequest(location, resourceId, payload);
         realmRouter.handleUpdate(selectedContext, updateRequest, resultHandler);
@@ -146,7 +146,7 @@ public class Requester {
      * @param location Endpoint destination of this request. May not be null.
      * @param resourceId Resource ID to delete. May not be null.
      * @param serverContext Server context of this request.
-     *                      Must contain a {@link org.forgerock.http.context.ServerContext}.
+     *                      Must contain a {@link org.forgerock.http.context.Context}.
      * @return The {@link org.forgerock.json.JsonValue} returned from the endpoint.
      * @throws ResourceException If any exception occurred during processing.
      */
@@ -157,7 +157,7 @@ public class Requester {
         Reject.ifTrue(StringUtils.isEmpty(resourceId), "The resourceId to delete may not be null or empty.");
 
         final CrestRouter realmRouter = realmRouterProvider.get();
-        final ServerContext selectedContext = getServerContext(serverContext);
+        final Context selectedContext = getServerContext(serverContext);
         final SDKServerResultHandler<Resource> resultHandler = resultHandlerFactory.getResourceResultHandler();
         final DeleteRequest deleteRequest = Requests.newDeleteRequest(location, resourceId);
         realmRouter.handleDelete(selectedContext, deleteRequest, resultHandler);
@@ -171,7 +171,7 @@ public class Requester {
      * @param resourceId Specific resource ID to perform action on. May be null.
      * @param actionId act ID to delete. May not be null.
      * @param serverContext Server context of this request.
-     *                      Must contain a {@link org.forgerock.http.context.ServerContext}.
+     *                      Must contain a {@link org.forgerock.http.context.Context}.
      * @return The {@link org.forgerock.json.JsonValue} returned from the endpoint.
      * @throws ResourceException If any exception occurred during processing.
      */
@@ -182,7 +182,7 @@ public class Requester {
         Reject.ifTrue(StringUtils.isEmpty(actionId), "The specific action to perform may not be null or empty.");
 
         final CrestRouter realmRouter = realmRouterProvider.get();
-        final ServerContext selectedContext = getServerContext(serverContext);
+        final Context selectedContext = getServerContext(serverContext);
         final SDKServerResultHandler<JsonValue> resultHandler = resultHandlerFactory.getJsonValueResultHandler();
         final ActionRequest actionRequest = Requests.newActionRequest(location, actionId);
 
@@ -205,7 +205,7 @@ public class Requester {
      * @param location Endpoint destination of this request. May not be null.
      * @param queryId Specific query ID to perform. May be null.
      * @param serverContext Server context of this request.
-     *                      Must contain a {@link org.forgerock.http.context.ServerContext}.
+     *                      Must contain a {@link org.forgerock.http.context.Context}.
      * @return The {@link org.forgerock.json.JsonValue} returned from the endpoint.
      * @throws ResourceException If any exception occurred during processing.
      */
@@ -215,7 +215,7 @@ public class Requester {
         Reject.ifTrue(StringUtils.isEmpty(location), "The endpoint destination may not be null or empty.");
 
         final CrestRouter realmRouter = realmRouterProvider.get();
-        final ServerContext selectedContext = getServerContext(serverContext);
+        final Context selectedContext = getServerContext(serverContext);
         final SDKServerQueryResultHandler resultHandler = resultHandlerFactory.getQueryResultHandler();
         final QueryRequest queryRequest = Requests.newQueryRequest(location);
 

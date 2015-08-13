@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 import com.sun.identity.authentication.config.AMAuthConfigUtils;
 import com.sun.identity.authentication.config.AMConfigurationException;
 import com.sun.identity.authentication.config.AuthConfigurationEntry;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -61,13 +61,13 @@ import org.forgerock.util.promise.Promise;
 public class AuthenticationChainsFilter implements Filter {
 
     @Override
-    public Promise<ActionResponse, ResourceException> filterAction(ServerContext context, ActionRequest request,
+    public Promise<ActionResponse, ResourceException> filterAction(Context context, ActionRequest request,
             RequestHandler next) {
         return next.handleAction(context, request);
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> filterCreate(ServerContext context, CreateRequest request,
+    public Promise<ResourceResponse, ResourceException> filterCreate(Context context, CreateRequest request,
             RequestHandler next) {
         try {
             return wrap(next.handleCreate(context, transformRequest(request)));
@@ -77,32 +77,32 @@ public class AuthenticationChainsFilter implements Filter {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> filterDelete(ServerContext context, DeleteRequest request,
+    public Promise<ResourceResponse, ResourceException> filterDelete(Context context, DeleteRequest request,
             RequestHandler next) {
         return wrap(next.handleDelete(context, request));
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> filterPatch(ServerContext context, PatchRequest request,
+    public Promise<ResourceResponse, ResourceException> filterPatch(Context context, PatchRequest request,
             RequestHandler next) {
         //Not currently handling converting authChainConfiguration for patch
         return newExceptionPromise(newNotSupportedException());
     }
 
     @Override
-    public Promise<QueryResponse, ResourceException> filterQuery(ServerContext context, QueryRequest request,
+    public Promise<QueryResponse, ResourceException> filterQuery(Context context, QueryRequest request,
             QueryResourceHandler handler, RequestHandler next) {
         return next.handleQuery(context, request, wrap(handler));
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> filterRead(ServerContext context, ReadRequest request,
+    public Promise<ResourceResponse, ResourceException> filterRead(Context context, ReadRequest request,
             RequestHandler next) {
         return wrap(next.handleRead(context, request));
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> filterUpdate(ServerContext context, UpdateRequest request,
+    public Promise<ResourceResponse, ResourceException> filterUpdate(Context context, UpdateRequest request,
             RequestHandler next) {
         try {
             return wrap(next.handleUpdate(context, transformRequest(request)));

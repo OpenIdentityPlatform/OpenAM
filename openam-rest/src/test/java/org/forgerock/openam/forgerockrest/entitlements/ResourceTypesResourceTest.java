@@ -26,6 +26,7 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.http.Context;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalContext;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
@@ -34,7 +35,7 @@ import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.SecurityContext;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.entitlement.ResourceType;
@@ -85,7 +86,7 @@ public class ResourceTypesResourceTest {
 
     private ResultHandler<Resource> mockResultHandler;
 
-    private ServerContext mockServerContext;
+    private Context mockServerContext;
     private ResourceTypesResource resourceTypesResource;
     private ResourceTypeService resourceTypeService;
     private Subject callerSubject;
@@ -147,7 +148,7 @@ public class ResourceTypesResourceTest {
         RealmContext realmContext = new RealmContext(subjectContext);
         realmContext.addSubRealm("/", "/");
 
-        mockServerContext = new ServerContext(realmContext);
+        mockServerContext = new InternalContext(realmContext);
 
         resourceTypeService = mock(MockResourceTypeService.class);
 

@@ -36,7 +36,7 @@ import org.forgerock.util.query.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.core.CoreWrapper;
@@ -84,7 +84,7 @@ public class ResourceSetServiceTest {
     public void shouldGetResourceSetWithoutPolicy() throws Exception {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         String realm = "REALM";
         String resourceSetId = "RESOURCE_SET_ID";
         String resourceOwnerId = "RESOURCE_OWNER_ID";
@@ -107,7 +107,7 @@ public class ResourceSetServiceTest {
     public void shouldGetResourceWithPolicy() throws Exception {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         String realm = "REALM";
         String resourceSetId = "RESOURCE_SET_ID";
         String resourceOwnerId = "RESOURCE_OWNER_ID";
@@ -131,7 +131,7 @@ public class ResourceSetServiceTest {
         verify(resourceSet).setPolicy(policyJson);
     }
 
-    private ServerContext mockContext(String realm) {
+    private Context mockContext(String realm) {
         RealmContext realmContext = mock(RealmContext.class);
         given(realmContext.getResolvedRealm()).willReturn(realm);
         return realmContext;
@@ -148,7 +148,7 @@ public class ResourceSetServiceTest {
 
         //Given
         String realm = "REALM";
-        ServerContext context = mockContext(realm);
+        Context context = mockContext(realm);
         ResourceSetWithPolicyQuery query = new ResourceSetWithPolicyQuery();
         String resourceOwnerId = "RESOURCE_OWNER_ID";
         boolean augmentWithPolicies = false;
@@ -179,7 +179,7 @@ public class ResourceSetServiceTest {
         assertThat(resourceSets).isEmpty();
     }
 
-    private ServerContext createContext() {
+    private Context createContext() {
         RealmContext realmContext = new RealmContext(new RootContext());
         realmContext.addDnsAlias("/", "REALM");
         return realmContext;
@@ -190,7 +190,7 @@ public class ResourceSetServiceTest {
     public void getResourceSetsShouldReturnSetWhenResourceSetsExistWithNoPolicyQuery() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         String realm = "REALM";
         ResourceSetWithPolicyQuery query = new ResourceSetWithPolicyQuery();
         String resourceOwnerId = "RESOURCE_OWNER_ID";
@@ -236,7 +236,7 @@ public class ResourceSetServiceTest {
     public void getResourceSetsShouldReturnSetWhenResourceSetsExistWithNoPolicyQueryWithPolicies() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         String realm = "REALM";
         ResourceSetWithPolicyQuery query = new ResourceSetWithPolicyQuery();
         String resourceOwnerId = "RESOURCE_OWNER_ID";
@@ -304,7 +304,7 @@ public class ResourceSetServiceTest {
     public void getResourceSetsShouldReturnSetWhenResourceSetsExistQueryingByOr() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         String realm = "REALM";
         ResourceSetWithPolicyQuery query = new ResourceSetWithPolicyQuery();
         query.setOperator(AggregateQuery.Operator.OR);
@@ -366,7 +366,7 @@ public class ResourceSetServiceTest {
     public void getResourceSetsShouldReturnEmptySetWhenResourceSetsExistQueryingByAnd() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         String realm = "REALM";
         ResourceSetWithPolicyQuery query = new ResourceSetWithPolicyQuery();
         String resourceOwnerId = "RESOURCE_OWNER_ID";
@@ -430,7 +430,7 @@ public class ResourceSetServiceTest {
     public void shouldGetResourceSetsWhenResourceSetsExistQueryingByOrWithPolicies() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         String realm = "REALM";
         ResourceSetWithPolicyQuery query = new ResourceSetWithPolicyQuery();
         String resourceOwnerId = "RESOURCE_OWNER_ID";
@@ -498,7 +498,7 @@ public class ResourceSetServiceTest {
     public void getResourceSetsShouldReturnEmptySetWhenResourceSetsExistQueryingByAndWithPolicies() throws Exception {
 
         //Given
-        ServerContext context = createContext();
+        Context context = createContext();
         String realm = "REALM";
         ResourceSetWithPolicyQuery query = new ResourceSetWithPolicyQuery();
         String resourceOwnerId = "RESOURCE_OWNER_ID";
@@ -573,7 +573,7 @@ public class ResourceSetServiceTest {
 
         //Given
         String realm = "REALM";
-        ServerContext context = mockContext(realm);
+        Context context = mockContext(realm);
         String resourceOwnerId = "RESOURCE_OWNER_ID";
         Set<ResourceSetDescription> queriedResourceSets = new HashSet<ResourceSetDescription>();
         ResourceSetDescription resourceSetOne = new ResourceSetDescription("RS_ID_ONE", "CLIENT_ID_ONE",

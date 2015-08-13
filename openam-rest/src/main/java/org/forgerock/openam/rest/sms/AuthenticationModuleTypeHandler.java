@@ -37,7 +37,7 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchemaManager;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -78,7 +78,7 @@ public class AuthenticationModuleTypeHandler implements RequestHandler {
      * {@inheritDoc}
      */
     @Override
-    public Promise<QueryResponse, ResourceException> handleQuery(ServerContext context, QueryRequest request,
+    public Promise<QueryResponse, ResourceException> handleQuery(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         if (!"true".equals(request.getQueryFilter().toString())) {
             return newExceptionPromise(newNotSupportedException("Query not supported: " + request.getQueryFilter()));
@@ -121,41 +121,41 @@ public class AuthenticationModuleTypeHandler implements RequestHandler {
     }
 
     @Override
-    public Promise<ActionResponse, ResourceException> handleAction(ServerContext context, ActionRequest request) {
+    public Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest request) {
         // TODO: i18n
         return newExceptionPromise(newBadRequestException(
                 "The resource collection " + request.getResourcePath() + " cannot perform actions"));
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> handleCreate(ServerContext context, CreateRequest request) {
+    public Promise<ResourceResponse, ResourceException> handleCreate(Context context, CreateRequest request) {
         // TODO: i18n
         return newExceptionPromise(newBadRequestException("Authentication modules must be created per type"));
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> handleDelete(ServerContext context, DeleteRequest request) {
+    public Promise<ResourceResponse, ResourceException> handleDelete(Context context, DeleteRequest request) {
         // TODO: i18n
         return newExceptionPromise(newBadRequestException(
                 "The resource collection " + request.getResourcePath() + " cannot be deleted"));
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> handlePatch(ServerContext context, PatchRequest request) {
+    public Promise<ResourceResponse, ResourceException> handlePatch(Context context, PatchRequest request) {
         // TODO: i18n
         return newExceptionPromise(newBadRequestException(
                 "The resource collection " + request.getResourcePath() + " cannot be patched"));
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> handleRead(ServerContext context, ReadRequest request) {
+    public Promise<ResourceResponse, ResourceException> handleRead(Context context, ReadRequest request) {
         // TODO: i18n
         return newExceptionPromise(newBadRequestException("The resource collection " + request.getResourcePath()
                 + " cannot be read"));
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> handleUpdate(ServerContext context, UpdateRequest request) {
+    public Promise<ResourceResponse, ResourceException> handleUpdate(Context context, UpdateRequest request) {
         // TODO: i18n
         return newExceptionPromise(newBadRequestException(
                 "The resource collection " + request.getResourcePath() + " cannot be updated"));

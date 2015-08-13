@@ -38,11 +38,12 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.AdviceContext;
 import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.InternalContext;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.openam.forgerockrest.session.query.SessionQueryManager;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
@@ -89,7 +90,7 @@ public class SessionResourceTest {
             }
 
             @Override
-            protected String getTokenIdFromHeader(ServerContext context, String cookieName) {
+            protected String getTokenIdFromHeader(Context context, String cookieName) {
                 return headerResponse;
             }
 
@@ -99,7 +100,7 @@ public class SessionResourceTest {
             }
 
             @Override
-            protected String getTokenIdFromCookie(ServerContext context, String cookieName) {
+            protected String getTokenIdFromCookie(Context context, String cookieName) {
                 return cookieResponse;
             }
         };
@@ -157,7 +158,7 @@ public class SessionResourceTest {
         final Map<String, Object> authzContext = new HashMap<String, Object>();
         authzContext.put("tokenId", null);
         final SSOTokenContext tokenContext = mock(SSOTokenContext.class);
-        final ServerContext context = new ServerContext(tokenContext);
+        final Context context = new InternalContext(tokenContext);
         final ActionRequest request = mock(ActionRequest.class);
         final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 
@@ -178,7 +179,7 @@ public class SessionResourceTest {
         final Map<String, Object> authzContext = new HashMap<String, Object>();
         authzContext.put("tokenId", "SSO_TOKEN_ID");
         final SSOTokenContext tokenContext = mock(SSOTokenContext.class);
-        final ServerContext context = new ServerContext(tokenContext);
+        final Context context = new InternalContext(tokenContext);
         final ActionRequest request = mock(ActionRequest.class);
         final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
         final SSOToken ssoToken = mock(SSOToken.class);
@@ -210,7 +211,7 @@ public class SessionResourceTest {
         final Map<String, Object> authzContext = new HashMap<String, Object>();
         authzContext.put("tokenId", "SSO_TOKEN_ID");
         final SSOTokenContext tokenContext = mock(SSOTokenContext.class);
-        final ServerContext context = new ServerContext(new AdviceContext(tokenContext, Collections.<String>emptySet()));
+        final Context context = new InternalContext(new AdviceContext(tokenContext, Collections.<String>emptySet()));
         final ActionRequest request = mock(ActionRequest.class);
         final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
         final SSOTokenID ssoTokenId = mock(SSOTokenID.class);
@@ -232,7 +233,7 @@ public class SessionResourceTest {
             throws SSOException {
 
         //Given
-        final ServerContext context = mock(ServerContext.class);
+        final Context context = mock(Context.class);
         final String resourceId = "SSO_TOKEN_ID";
         final ActionRequest request = mock(ActionRequest.class);
         final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
@@ -253,7 +254,7 @@ public class SessionResourceTest {
     public Promise<ActionResponse, ResourceException> actionInstanceShouldValidateSessionAndReturnTrueWhenSSOTokenValid() throws SSOException {
 
         //Given
-        final ServerContext context = mock(ServerContext.class);
+        final Context context = mock(Context.class);
         final String resourceId = "SSO_TOKEN_ID";
         final ActionRequest request = mock(ActionRequest.class);
         final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
@@ -281,7 +282,7 @@ public class SessionResourceTest {
     public Promise<ActionResponse, ResourceException> actionInstanceShouldBeActiveWhenSSOTokenValid() throws SSOException {
 
         //Given
-        final ServerContext context = mock(ServerContext.class);
+        final Context context = mock(Context.class);
         final String resourceId = "SSO_TOKEN_ID";
         final ActionRequest request = mock(ActionRequest.class);
         final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
@@ -306,7 +307,7 @@ public class SessionResourceTest {
     public Promise<ActionResponse, ResourceException> actionInstanceShouldRefreshWhenParameterPresentAndSSOTokenValid() throws SSOException {
 
         //Given
-        final ServerContext context = mock(ServerContext.class);
+        final Context context = mock(Context.class);
         final String resourceId = "SSO_TOKEN_ID";
         final ActionRequest request = mock(ActionRequest.class);
         final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
@@ -329,7 +330,7 @@ public class SessionResourceTest {
     public Promise<ActionResponse, ResourceException> actionInstanceShouldBeInactiveWhenSSOTokenInvalid() throws SSOException {
 
         //Given
-        final ServerContext context = mock(ServerContext.class);
+        final Context context = mock(Context.class);
         final String resourceId = "SSO_TOKEN_ID";
         final ActionRequest request = mock(ActionRequest.class);
         final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
@@ -355,7 +356,7 @@ public class SessionResourceTest {
         final int TIME_LEFT = 5000;
 
         //Given
-        final ServerContext context = mock(ServerContext.class);
+        final Context context = mock(Context.class);
         final String resourceId = "SSO_TOKEN_ID";
         final ActionRequest request = mock(ActionRequest.class);
         final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
@@ -379,7 +380,7 @@ public class SessionResourceTest {
     public Promise<ActionResponse, ResourceException> actionInstanceShouldGiveMinusOneForMaxTimeWhenSSOTokenInvalid() throws SSOException {
 
         //Given
-        final ServerContext context = mock(ServerContext.class);
+        final Context context = mock(Context.class);
         final String resourceId = "SSO_TOKEN_ID";
         final ActionRequest request = mock(ActionRequest.class);
         final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
@@ -404,7 +405,7 @@ public class SessionResourceTest {
         final int IDLE = 50;
 
         //Given
-        final ServerContext context = mock(ServerContext.class);
+        final Context context = mock(Context.class);
         final String resourceId = "SSO_TOKEN_ID";
         final ActionRequest request = mock(ActionRequest.class);
         final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
@@ -428,7 +429,7 @@ public class SessionResourceTest {
     public Promise<ActionResponse, ResourceException> actionInstanceShouldGiveMinusOneForIdleTimeWhenSSOTokenInvalid() throws SSOException {
 
         //Given
-        final ServerContext context = mock(ServerContext.class);
+        final Context context = mock(Context.class);
         final String resourceId = "SSO_TOKEN_ID";
         final ActionRequest request = mock(ActionRequest.class);
         final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
@@ -451,7 +452,7 @@ public class SessionResourceTest {
     public Promise<ActionResponse, ResourceException> actionInstanceShouldReturnNotSupportedForUnknownAction() throws SSOException {
 
         //Given
-        final ServerContext context = mock(ServerContext.class);
+        final Context context = mock(Context.class);
         final String resourceId = "SSO_TOKEN_ID";
         final ActionRequest request = mock(ActionRequest.class);
         final ResultHandler<JsonValue> handler = mock(ResultHandler.class);

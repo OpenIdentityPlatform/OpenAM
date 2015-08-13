@@ -18,7 +18,7 @@ package org.forgerock.openam.forgerockrest.entitlements;
 
 import com.sun.identity.entitlement.EntitlementException;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.BatchPolicyRequest;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.PolicyRequest;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.TreePolicyRequest;
@@ -42,7 +42,7 @@ public class PolicyRequestFactory {
         builders.put(PolicyAction.EVALUATE, new RequestBuilder<BatchPolicyRequest>() {
 
             @Override
-            public BatchPolicyRequest buildRequest(final ServerContext context,
+            public BatchPolicyRequest buildRequest(final Context context,
                                                    final ActionRequest request) throws EntitlementException {
                 return BatchPolicyRequest.getBatchPolicyRequest(context, request);
             }
@@ -52,7 +52,7 @@ public class PolicyRequestFactory {
         builders.put(PolicyAction.TREE_EVALUATE, new RequestBuilder<TreePolicyRequest>() {
 
             @Override
-            public TreePolicyRequest buildRequest(final ServerContext context,
+            public TreePolicyRequest buildRequest(final Context context,
                                                   final ActionRequest request) throws EntitlementException {
                 return TreePolicyRequest.getTreePolicyRequest(context, request);
             }
@@ -75,7 +75,7 @@ public class PolicyRequestFactory {
      * @throws EntitlementException
      *         should building the request fail
      */
-    public PolicyRequest buildRequest(final PolicyAction action, final ServerContext context,
+    public PolicyRequest buildRequest(final PolicyAction action, final Context context,
                                       final ActionRequest request) throws EntitlementException {
         Reject.ifNull(action);
 
@@ -107,7 +107,7 @@ public class PolicyRequestFactory {
          * @throws EntitlementException
          *         should building the request fail
          */
-        public T buildRequest(final ServerContext context,
+        public T buildRequest(final Context context,
                               final ActionRequest request) throws EntitlementException;
 
     }

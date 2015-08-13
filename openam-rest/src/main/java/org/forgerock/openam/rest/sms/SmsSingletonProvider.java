@@ -42,7 +42,7 @@ import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -91,7 +91,7 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> handleRead(ServerContext serverContext,
+    public Promise<ResourceResponse, ResourceException> handleRead(Context serverContext,
             ReadRequest readRequest) {
         String resourceId = resourceId();
         try {
@@ -109,7 +109,7 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
         }
     }
 
-    protected Map<String, Set<String>> getDynamicAttributes(ServerContext context) {
+    protected Map<String, Set<String>> getDynamicAttributes(Context context) {
         return AuthD.getAuth().getOrgServiceAttributes(realmFor(context), serviceName);
     }
 
@@ -119,14 +119,14 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
      * @param value The {@code JsonValue} to augment.
      * @return The same {@code JsonValue} after is has been augmented.
      */
-    protected JsonValue withExtraAttributes(ServerContext context, JsonValue value) {
+    protected JsonValue withExtraAttributes(Context context, JsonValue value) {
         if (dynamicConverter != null) {
             value.add("dynamic", dynamicConverter.toJson(getDynamicAttributes(context)).getObject());
         }
         return value;
     }
 
-    private void updateDynamicAttributes(ServerContext context, JsonValue value) throws SMSException, SSOException,
+    private void updateDynamicAttributes(Context context, JsonValue value) throws SMSException, SSOException,
             IdRepoException {
         Map<String, Set<String>> dynamic = dynamicConverter.fromJson(value.get("dynamic"));
         if (SchemaType.GLOBAL.equals(type)) {
@@ -141,7 +141,7 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> handleUpdate(ServerContext serverContext,
+    public Promise<ResourceResponse, ResourceException> handleUpdate(Context serverContext,
             UpdateRequest updateRequest) {
         String resourceId = resourceId();
         if (dynamicSchema != null) {
@@ -179,7 +179,7 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> handleDelete(ServerContext serverContext,
+    public Promise<ResourceResponse, ResourceException> handleDelete(Context serverContext,
             DeleteRequest deleteRequest) {
         try {
             ServiceConfigManager scm = getServiceConfigManager(serverContext);
@@ -208,7 +208,7 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> handleCreate(ServerContext serverContext,
+    public Promise<ResourceResponse, ResourceException> handleCreate(Context serverContext,
             CreateRequest createRequest) {
         Map<String, Set<String>> attrs = convertFromJson(createRequest.getContent());
         try {
@@ -237,12 +237,12 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
     }
 
     @Override
-    public Promise<ActionResponse, ResourceException> handleAction(ServerContext context, ActionRequest request) {
+    public Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest request) {
         return super.handleAction(context, request);
     }
 
     @Override
-    protected JsonValue createSchema(ServerContext context) {
+    protected JsonValue createSchema(Context context) {
         JsonValue result = super.createSchema(context);
         if (dynamicSchema != null) {
             Map<String, String> attributeSectionMap = getAttributeNameToSection(dynamicSchema);
@@ -269,7 +269,7 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
      * @throws SSOException From downstream service manager layer.
      * @throws NotFoundException If the config being addressed doesn't exist.
      */
-    protected ServiceConfig getServiceConfigNode(ServerContext serverContext, String resourceId) throws SSOException,
+    protected ServiceConfig getServiceConfigNode(Context serverContext, String resourceId) throws SSOException,
             SMSException, NotFoundException {
         ServiceConfigManager scm = getServiceConfigManager(serverContext);
         ServiceConfig result;
@@ -347,13 +347,13 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
     }
 
     @Override
-    public Promise<QueryResponse, ResourceException> handleQuery(ServerContext serverContext, QueryRequest queryRequest,
+    public Promise<QueryResponse, ResourceException> handleQuery(Context serverContext, QueryRequest queryRequest,
             QueryResourceHandler handler) {
         return newExceptionPromise(newNotSupportedException("query operation not supported"));
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> handlePatch(ServerContext serverContext,
+    public Promise<ResourceResponse, ResourceException> handlePatch(Context serverContext,
             PatchRequest patchRequest) {
         return newExceptionPromise(newNotSupportedException("patch operation not supported"));
     }

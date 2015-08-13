@@ -19,7 +19,8 @@ package org.forgerock.openam.forgerockrest.entitlements.model.json;
 import com.sun.identity.entitlement.EntitlementException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
+import org.forgerock.json.resource.InternalContext;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.mockito.Mock;
@@ -64,7 +65,7 @@ public class BatchPolicyRequestTest {
         properties.put("resources", Arrays.asList("/resource/a", "/resource/b"));
         given(actionRequest.getContent()).willReturn(JsonValue.json(properties));
 
-        ServerContext context = buildContextStructure("/abc");
+        Context context = buildContextStructure("/abc");
         BatchPolicyRequest request = BatchPolicyRequest.getBatchPolicyRequest(context, actionRequest);
 
         assertThat(request).isNotNull();
@@ -83,7 +84,7 @@ public class BatchPolicyRequestTest {
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
 
         // Given...
-        ServerContext context = buildContextStructure("/abc");
+        Context context = buildContextStructure("/abc");
         BatchPolicyRequest.getBatchPolicyRequest(context, actionRequest);
     }
 
@@ -95,12 +96,12 @@ public class BatchPolicyRequestTest {
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
 
         // Given...
-        ServerContext context = buildContextStructure("/abc");
+        Context context = buildContextStructure("/abc");
         BatchPolicyRequest.getBatchPolicyRequest(context, actionRequest);
     }
 
-    private ServerContext buildContextStructure(final String realm) {
-        return new ServerContext(new RealmContext(subjectContext));
+    private Context buildContextStructure(final String realm) {
+        return new InternalContext(new RealmContext(subjectContext));
     }
 
 }

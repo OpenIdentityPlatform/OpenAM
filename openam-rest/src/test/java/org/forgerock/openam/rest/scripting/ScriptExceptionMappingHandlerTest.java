@@ -18,8 +18,9 @@ package org.forgerock.openam.rest.scripting;
 import static org.forgerock.json.JsonValue.*;
 import static org.testng.AssertJUnit.*;
 
+import org.forgerock.json.resource.InternalContext;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.forgerockrest.utils.ServerContextUtils;
 import org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode;
@@ -57,7 +58,7 @@ public class ScriptExceptionMappingHandlerTest {
     @Test
     public void shouldTranslateMessageToAcceptLanguage() throws Exception {
         // given
-        final ServerContext serverContext = getHttpServerContext("te");
+        final Context serverContext = getHttpServerContext("te");
 
         for (ScriptErrorCode errorCode : ScriptErrorCode.values()) {
 
@@ -74,12 +75,12 @@ public class ScriptExceptionMappingHandlerTest {
         return code >= 400 && code < 500;
     }
 
-    private ServerContext getHttpServerContext(String ...language) throws Exception {
+    private Context getHttpServerContext(String ...language) throws Exception {
         final HttpContext httpContext = new HttpContext(json(object(
                 field(HttpContext.ATTR_HEADERS,
-                        Collections.singletonMap(ServerContextUtils.ACCEPT_LANGUAGE, Arrays.asList(language))),
+                        Collections.singletonMap(ContextUtils.ACCEPT_LANGUAGE, Arrays.asList(language))),
                 field(HttpContext.ATTR_PARAMETERS, Collections.emptyMap()))), null);
-        return new ServerContext(httpContext);
+        return new InternalContext(httpContext);
     }
 
 }

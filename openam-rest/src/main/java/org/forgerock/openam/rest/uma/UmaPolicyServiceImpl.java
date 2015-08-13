@@ -41,7 +41,7 @@ import com.sun.identity.entitlement.Evaluator;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
@@ -127,7 +127,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         this.umaSettingsFactory = umaSettingsFactory;
     }
 
-    private JsonValue resolveUsernameToUID(final ServerContext context, JsonValue policy) {
+    private JsonValue resolveUsernameToUID(final Context context, JsonValue policy) {
         final String resourceOwnerName = contextHelper.getUserId(context);
         final String resourceOwnerUserUid = contextHelper.getUserUid(context);
 
@@ -219,7 +219,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
      * {@inheritDoc}
      */
     @Override
-    public Promise<UmaPolicy, ResourceException> createPolicy(final ServerContext context, JsonValue policy) {
+    public Promise<UmaPolicy, ResourceException> createPolicy(final Context context, JsonValue policy) {
         UmaPolicy umaPolicy;
         final ResourceSetDescription resourceSet;
         String userId = contextHelper.getUserId(context);
@@ -246,9 +246,9 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
 
     private class UpdatePolicyGraphStatesFunction<T> implements AsyncFunction<T, T, ResourceException> {
         private final ResourceSetDescription resourceSet;
-        private final ServerContext context;
+        private final Context context;
 
-        public UpdatePolicyGraphStatesFunction(ResourceSetDescription resourceSet, ServerContext context) {
+        public UpdatePolicyGraphStatesFunction(ResourceSetDescription resourceSet, Context context) {
             this.resourceSet = resourceSet;
             this.context = context;
         }
@@ -283,9 +283,9 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
 
     private class AuditAndProduceUmaPolicyFunction implements AsyncFunction<List<ResourceResponse>, UmaPolicy, ResourceException> {
         private final ResourceSetDescription resourceSet;
-        private final ServerContext context;
+        private final Context context;
 
-        public AuditAndProduceUmaPolicyFunction(ResourceSetDescription resourceSet, ServerContext context) {
+        public AuditAndProduceUmaPolicyFunction(ResourceSetDescription resourceSet, Context context) {
             this.resourceSet = resourceSet;
             this.context = context;
         }
@@ -304,7 +304,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         }
     }
 
-    private void verifyPolicyDoesNotAlreadyExist(ServerContext context, ResourceSetDescription resourceSet)
+    private void verifyPolicyDoesNotAlreadyExist(Context context, ResourceSetDescription resourceSet)
             throws ResourceException {
         try {
             readPolicy(context, resourceSet.getId()).getOrThrowUninterruptibly();
@@ -319,7 +319,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
      * {@inheritDoc}
      */
     @Override
-    public Promise<UmaPolicy, ResourceException> readPolicy(final ServerContext context, final String resourceSetId) {
+    public Promise<UmaPolicy, ResourceException> readPolicy(final Context context, final String resourceSetId) {
         return internalReadPolicy(context, resourceSetId)
                 .then(new Function<UmaPolicy, UmaPolicy, ResourceException>() {
                     @Override
@@ -333,7 +333,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
     /**
      * {@inheritDoc}
      */
-    private Promise<UmaPolicy, ResourceException> internalReadPolicy(final ServerContext context, final String resourceSetId) {
+    private Promise<UmaPolicy, ResourceException> internalReadPolicy(final Context context, final String resourceSetId) {
         String resourceOwnerUid = getResourceOwnerUid(context);
         QueryRequest request = Requests.newQueryRequest("")
                 .setQueryFilter(QueryFilter.and(
@@ -364,7 +364,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
      * {@inheritDoc}
      */
     @Override
-    public Promise<UmaPolicy, ResourceException> updatePolicy(final ServerContext context, final String resourceSetId, //TODO need to check if need to delete backend policies
+    public Promise<UmaPolicy, ResourceException> updatePolicy(final Context context, final String resourceSetId, //TODO need to check if need to delete backend policies
             JsonValue policy) {
         final UmaPolicy updatedUmaPolicy;
         final ResourceSetDescription resourceSet;
@@ -422,12 +422,12 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
     }
 
     private class UpdateUmaPolicyFunction implements AsyncFunction<UmaPolicy, UmaPolicy, ResourceException> {
-        private final ServerContext context;
+        private final Context context;
         private final UmaPolicy updatedUmaPolicy;
         private final String resourceSetId;
         private final ResourceSetDescription resourceSet;
 
-        public UpdateUmaPolicyFunction(ServerContext context, UmaPolicy updatedUmaPolicy, String resourceSetId, ResourceSetDescription resourceSet) {
+        public UpdateUmaPolicyFunction(Context context, UmaPolicy updatedUmaPolicy, String resourceSetId, ResourceSetDescription resourceSet) {
             this.context = context;
             this.updatedUmaPolicy = updatedUmaPolicy;
             this.resourceSetId = resourceSetId;
@@ -486,7 +486,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
      * {@inheritDoc}
      */
     @Override
-    public Promise<Void, ResourceException> deletePolicy(final ServerContext context, final String resourceSetId) {
+    public Promise<Void, ResourceException> deletePolicy(final Context context, final String resourceSetId) {
         ResourceSetDescription resourceSet;
         try {
             resourceSet = getResourceSet(getRealm(context), resourceSetId);
@@ -513,7 +513,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
      * {@inheritDoc}
      */
     @Override
-    public Promise<Pair<QueryResponse, Collection<UmaPolicy>>, ResourceException> queryPolicies(final ServerContext context,
+    public Promise<Pair<QueryResponse, Collection<UmaPolicy>>, ResourceException> queryPolicies(final Context context,
             final QueryRequest umaQueryRequest) {
 
         if (umaQueryRequest.getQueryExpression() != null) {
@@ -784,7 +784,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
     }
 
     private ResourceSetDescription getResourceSetDescription(String resourceSetId, String resourceOwnerId,
-            ServerContext context) throws ResourceException {
+            Context context) throws ResourceException {
         try {
             String realm = getRealm(context);
             return resourceSetStoreFactory.create(realm).read(resourceSetId);
@@ -804,7 +804,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         }
     }
 
-    private String getLoggedInUserId(ServerContext context) throws InternalServerErrorException {
+    private String getLoggedInUserId(Context context) throws InternalServerErrorException {
         try {
             SubjectContext subjectContext = context.asContext(SubjectContext.class);
             SSOToken token = subjectContext.getCallerSSOToken();
@@ -814,22 +814,22 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
         }
     }
 
-    private String getResourceOwnerUid(ServerContext context) {
+    private String getResourceOwnerUid(Context context) {
         return contextHelper.getUserUid(context);
     }
 
-    private String getResourceOwnerId(ServerContext context) {
+    private String getResourceOwnerId(Context context) {
         return contextHelper.getUserId(context);
     }
 
-    private String getRealm(ServerContext context) {
+    private String getRealm(Context context) {
         return contextHelper.getRealm(context);
     }
 
     private class DeleteOldPolicyFunction implements AsyncFunction<Pair<QueryResponse, List<ResourceResponse>>, Void, ResourceException> {
-        private final ServerContext context;
+        private final Context context;
 
-        public DeleteOldPolicyFunction(ServerContext context) {
+        public DeleteOldPolicyFunction(Context context) {
             this.context = context;
         }
 

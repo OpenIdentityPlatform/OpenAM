@@ -32,7 +32,7 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.SecurityContext;
 import org.forgerock.http.routing.UriRouterContext;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.rest.RealmContext;
@@ -58,7 +58,7 @@ public class ServerContextUtils {
      * Retrieves a link to the user's SSO Token, if it exists in the context.
      * @param context from which to pull the SSO Token
      */
-    public static SSOToken getTokenFromContext(ServerContext context, Debug debug) {
+    public static SSOToken getTokenFromContext(Context context, Debug debug) {
 
         SSOToken userToken = null;
 
@@ -83,12 +83,12 @@ public class ServerContextUtils {
     }
 
     /**
-     * Returns the UriRouterContext's "id" UriTemplateVariable from the provided ServerContext.
+     * Returns the UriRouterContext's "id" UriTemplateVariable from the provided Context.
      *
      * @param context from which to pull the id
      * @return the id, otherwise null.
      */
-    public static String getId(ServerContext context) {
+    public static String getId(Context context) {
         if (context.containsContext(UriRouterContext.class)) {
             UriRouterContext routerContext = context.asContext(UriRouterContext.class);
             Map<String, String> templateVars = routerContext.getUriTemplateVariables();
@@ -103,12 +103,12 @@ public class ServerContextUtils {
 
     /**
      * Returns the UriRouterContext's matchedUri, and appends its id, if there is one.
-     * Id is retrieved via {@link ServerContextUtils#getId(org.forgerock.http.context.ServerContext)}.
+     * Id is retrieved via {@link ServerContextUtils#getId(org.forgerock.http.context.Context)}.
      *
      * @param context from which to gather the matched Uri and id information
      * @return a String in the form <code>matchedUri | id</code>, omitting either if they are null.
      */
-    public static String getMatchedUri(ServerContext context) {
+    public static String getMatchedUri(Context context) {
         String resource = "";
         if (context.containsContext(UriRouterContext.class)) {
             UriRouterContext routerContext = context.asContext(UriRouterContext.class);
@@ -126,13 +126,13 @@ public class ServerContextUtils {
 
     /**
      * Returns the name of the resource requested, and appends its id, if there is one.
-     * Id is retrieved via {@link ServerContextUtils#getId(org.forgerock.http.context.ServerContext)}.
+     * Id is retrieved via {@link ServerContextUtils#getId(org.forgerock.http.context.Context)}.
      *
      * @param request the request for a resource
      * @param context the context of the request, including its UriRouterContext
      * @return a String in the form <code>resourceName | id</code>, omitting either if they are null.
      */
-    public static String getResourceId(Request request, ServerContext context) {
+    public static String getResourceId(Request request, Context context) {
         String resource = request.getResourcePath();
         String id = getId(context);
 
@@ -245,7 +245,7 @@ public class ServerContextUtils {
     }
 
     /**
-     * Get the ServerContext as an HttpContext, read the accept-language from the
+     * Get the Context as an HttpContext, read the accept-language from the
      * header and create a Locale object from that.
      *
      * @param context The server context from which the language header can be read.
@@ -270,7 +270,7 @@ public class ServerContextUtils {
      * @param context The context.
      * @return The resolved realm.
      */
-    public static String getRealm(ServerContext context) {
+    public static String getRealm(Context context) {
         return context.asContext(RealmContext.class).getResolvedRealm();
     }
 }

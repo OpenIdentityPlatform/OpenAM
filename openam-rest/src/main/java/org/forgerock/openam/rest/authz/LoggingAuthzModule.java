@@ -29,7 +29,7 @@ import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.utils.RestLog;
 import org.forgerock.openam.forgerockrest.utils.ServerContextUtils;
@@ -54,7 +54,7 @@ public class LoggingAuthzModule implements CrestAuthorizationModule {
     }
 
     @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeCreate(ServerContext serverContext,
+    public Promise<AuthorizationResult, ResourceException> authorizeCreate(Context serverContext,
                                                                            CreateRequest createRequest) {
         final String resource = ServerContextUtils.getMatchedUri(serverContext);
         final String action = ServerContextUtils.getCreateString(createRequest);
@@ -64,7 +64,7 @@ public class LoggingAuthzModule implements CrestAuthorizationModule {
     }
 
     @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeRead(ServerContext serverContext,
+    public Promise<AuthorizationResult, ResourceException> authorizeRead(Context serverContext,
                                                                          ReadRequest readRequest) {
         final String resource = ServerContextUtils.getMatchedUri(serverContext);
         final String action = ServerContextUtils.getReadString(readRequest);
@@ -74,7 +74,7 @@ public class LoggingAuthzModule implements CrestAuthorizationModule {
     }
 
     @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeUpdate(ServerContext serverContext,
+    public Promise<AuthorizationResult, ResourceException> authorizeUpdate(Context serverContext,
                                                                            UpdateRequest updateRequest) {
         final String resource = ServerContextUtils.getMatchedUri(serverContext);
         final String action = ServerContextUtils.getUpdateString(updateRequest);
@@ -84,7 +84,7 @@ public class LoggingAuthzModule implements CrestAuthorizationModule {
     }
 
     @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeDelete(ServerContext serverContext,
+    public Promise<AuthorizationResult, ResourceException> authorizeDelete(Context serverContext,
                                                                            DeleteRequest deleteRequest) {
         final String resource = ServerContextUtils.getMatchedUri(serverContext);
         final String action = ServerContextUtils.getDeleteString(deleteRequest);
@@ -94,7 +94,7 @@ public class LoggingAuthzModule implements CrestAuthorizationModule {
     }
 
     @Override
-    public Promise<AuthorizationResult, ResourceException> authorizePatch(ServerContext serverContext,
+    public Promise<AuthorizationResult, ResourceException> authorizePatch(Context serverContext,
                                                                           PatchRequest patchRequest) {
         final String resource = ServerContextUtils.getMatchedUri(serverContext);
         final String action = ServerContextUtils.getPatchString(patchRequest);
@@ -104,7 +104,7 @@ public class LoggingAuthzModule implements CrestAuthorizationModule {
     }
 
     @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeAction(ServerContext serverContext,
+    public Promise<AuthorizationResult, ResourceException> authorizeAction(Context serverContext,
                                                                            ActionRequest actionRequest) {
         final String resource = ServerContextUtils.getMatchedUri(serverContext);
         final String action = ServerContextUtils.getActionString(actionRequest);
@@ -114,7 +114,7 @@ public class LoggingAuthzModule implements CrestAuthorizationModule {
     }
 
     @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeQuery(ServerContext serverContext,
+    public Promise<AuthorizationResult, ResourceException> authorizeQuery(Context serverContext,
                                                                           QueryRequest queryRequest) {
         final String resource = ServerContextUtils.getMatchedUri(serverContext);
         final String action = ServerContextUtils.getQueryString(queryRequest);

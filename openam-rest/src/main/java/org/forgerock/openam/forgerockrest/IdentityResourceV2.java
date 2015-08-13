@@ -69,7 +69,7 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceNotFoundException;
 import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.JsonValueException;
 import org.forgerock.json.resource.ActionRequest;
@@ -205,7 +205,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
      *
      * @param context Current Server Context
      */
-    private Promise<ActionResponse, ResourceException> idFromSession(final ServerContext context) {
+    private Promise<ActionResponse, ResourceException> idFromSession(final Context context) {
 
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         SSOToken ssotok;
@@ -236,7 +236,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
         }
     }
 
-    private String getRelativeRealm(ServerContext context, AMIdentity amIdentity) {
+    private String getRelativeRealm(Context context, AMIdentity amIdentity) {
         RealmContext realmContext = context.asContext(RealmContext.class);
 
         String relativeRealm = realmContext.getRelativeRealm();
@@ -301,7 +301,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
      * @param context Current Server Context
      * @param request Request from client to retrieve id
      */
-    private Promise<ActionResponse, ResourceException> createRegistrationEmail(final ServerContext context, final ActionRequest request, final String realm,
+    private Promise<ActionResponse, ResourceException> createRegistrationEmail(final Context context, final ActionRequest request, final String realm,
             final RestSecurity restSecurity) {
 
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
@@ -495,7 +495,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
      * @param context Current Server Context
      * @param request Request from client to confirm registration
      */
-    private Promise<ActionResponse, ResourceException> validateGoto(final ServerContext context,
+    private Promise<ActionResponse, ResourceException> validateGoto(final Context context,
             final ActionRequest request) {
 
         final JsonValue jVal = request.getContent();
@@ -643,7 +643,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
+    public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
         final String realm = realmContext.getResolvedRealm();
@@ -712,7 +712,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
      * @param realm Used as part of user lookup.
      * @param restSecurity Non null.
      */
-    private Promise<ActionResponse, ResourceException> generateNewPasswordEmail(final ServerContext context, final ActionRequest request, final String realm,
+    private Promise<ActionResponse, ResourceException> generateNewPasswordEmail(final Context context, final ActionRequest request, final String realm,
             final RestSecurity restSecurity) {
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         final JsonValue jsonBody = request.getContent();
@@ -868,7 +868,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
      * @param request Non null
      * @param realm Non null
      */
-    private Promise<ActionResponse, ResourceException> anonymousUpdate(final ServerContext context,
+    private Promise<ActionResponse, ResourceException> anonymousUpdate(final Context context,
             final ActionRequest request, final String realm) {
         final String tokenID;
         String confirmationId;
@@ -969,7 +969,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
     }
 
 
-    private Promise<ActionResponse, ResourceException> anonymousCreate(final ServerContext context,
+    private Promise<ActionResponse, ResourceException> anonymousCreate(final Context context,
             final ActionRequest request, final String realm, RestSecurity restSecurity) {
 
         final JsonValue jVal = request.getContent();
@@ -1050,7 +1050,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(final ServerContext context,
+    public Promise<ActionResponse, ResourceException> actionInstance(final Context context,
             final String resourceId, final ActionRequest request) {
 
         String action = request.getAction();
@@ -1121,7 +1121,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> createInstance(final ServerContext context,
+    public Promise<ResourceResponse, ResourceException> createInstance(final Context context,
             final CreateRequest request) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
@@ -1226,7 +1226,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> deleteInstance(final ServerContext context, final String resourceId, final DeleteRequest request) {
+    public Promise<ResourceResponse, ResourceException> deleteInstance(final Context context, final String resourceId, final DeleteRequest request) {
         return identityResourceV1.deleteInstance(context, resourceId, request);
     }
 
@@ -1296,7 +1296,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(final ServerContext context,
+    public Promise<ResourceResponse, ResourceException> patchInstance(final Context context,
             final String resourceId, final PatchRequest request) {
         return identityResourceV1.patchInstance(context, resourceId, request);
     }
@@ -1305,7 +1305,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<QueryResponse, ResourceException> queryCollection(final ServerContext context,
+    public Promise<QueryResponse, ResourceException> queryCollection(final Context context,
             final QueryRequest request, final QueryResourceHandler handler) {
         return identityResourceV1.queryCollection(context, request, handler);
     }
@@ -1314,7 +1314,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> readInstance(final ServerContext context,
+    public Promise<ResourceResponse, ResourceException> readInstance(final Context context,
             final String resourceId, final ReadRequest request) {
         return identityResourceV1.readInstance(context, resourceId, request);
     }
@@ -1345,7 +1345,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(final ServerContext context,
+    public Promise<ResourceResponse, ResourceException> updateInstance(final Context context,
             final String resourceId, final UpdateRequest request) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);

@@ -40,7 +40,7 @@ import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
@@ -72,7 +72,7 @@ public class PendingRequestResourceTest {
     public Promise<ActionResponse, ResourceException> actionCollectionShouldReturnNotSupportedExceptionForUnsupportedAction() {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         ActionRequest request = Requests.newActionRequest("", "other");
         ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 
@@ -90,7 +90,7 @@ public class PendingRequestResourceTest {
     public Promise<ActionResponse, ResourceException> actionCollectionShouldHandleApproveAction() throws Exception {
 
         //Given
-        ServerContext context = mockContext("REALM");
+        Context context = mockContext("REALM");
         ActionRequest request = Requests.newActionRequest("", "approve");
         ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 
@@ -110,7 +110,7 @@ public class PendingRequestResourceTest {
     public Promise<ActionResponse, ResourceException> actionCollectionShouldHandleDenyAction() throws Exception {
 
         //Given
-        ServerContext context = mockContext("REALM");
+        Context context = mockContext("REALM");
         ActionRequest request = Requests.newActionRequest("", "deny");
         ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 
@@ -129,7 +129,7 @@ public class PendingRequestResourceTest {
     public Promise<ActionResponse, ResourceException> actionInstanceShouldReturnNotSupportedExceptionForUnsupportedAction() {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         ActionRequest request = Requests.newActionRequest("", "other");
         ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 
@@ -147,7 +147,7 @@ public class PendingRequestResourceTest {
     public Promise<ActionResponse, ResourceException> actionInstanceShouldHandleApproveAction() throws Exception {
 
         //Given
-        ServerContext context = mockContext("REALM");
+        Context context = mockContext("REALM");
         ActionRequest request = Requests.newActionRequest("", "approve");
         ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 
@@ -167,7 +167,7 @@ public class PendingRequestResourceTest {
     public Promise<ActionResponse, ResourceException> actionInstanceShouldHandleDenyAction() throws Exception {
 
         //Given
-        ServerContext context = mockContext("REALM");
+        Context context = mockContext("REALM");
         ActionRequest request = Requests.newActionRequest("", "deny");
         ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 
@@ -185,7 +185,7 @@ public class PendingRequestResourceTest {
     public void shouldQueryPendingRequests() throws Exception {
 
         //Given
-        ServerContext context = mockContext("REALM");
+        Context context = mockContext("REALM");
         QueryRequest request = Requests.newQueryRequest("").setQueryFilter(QueryFilter.<JsonPointer>alwaysTrue());
         QueryResultHandler handler = mock(QueryResultHandler.class);
 
@@ -204,7 +204,7 @@ public class PendingRequestResourceTest {
     public void shouldReadPendingRequest() throws Exception {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         ReadRequest request = Requests.newReadRequest("");
         ResultHandler<Resource> handler = mock(ResultHandler.class);
 
@@ -217,7 +217,7 @@ public class PendingRequestResourceTest {
         verify(handler).handleResult(any(Resource.class));
     }
 
-    private ServerContext mockContext(String realm) {
+    private Context mockContext(String realm) {
         RealmContext realmContext = mock(RealmContext.class);
         given(realmContext.getResolvedRealm()).willReturn(realm);
         return realmContext;
@@ -225,7 +225,7 @@ public class PendingRequestResourceTest {
 
     private void mockPendingRequestsForUser(String username, String realm, int numberOfPendingRequests)
             throws ResourceException {
-        given(contextHelper.getUserId(any(ServerContext.class))).willReturn(username);
+        given(contextHelper.getUserId(any(Context.class))).willReturn(username);
         Set<UmaPendingRequest> pendingRequests = new HashSet<>();
         for (int i = 0; i < numberOfPendingRequests; i++) {
             UmaPendingRequest pendingRequest = new UmaPendingRequest();
@@ -245,7 +245,7 @@ public class PendingRequestResourceTest {
 
     private void mockPendingRequestApprovalService() throws ResourceException {
         Promise<Void, ResourceException> promise = Promises.newResultPromise(null);
-        given(service.approvePendingRequest(any(ServerContext.class), anyString(), any(JsonValue.class), anyString()))
+        given(service.approvePendingRequest(any(Context.class), anyString(), any(JsonValue.class), anyString()))
                 .willReturn(promise);
     }
 }

@@ -55,7 +55,7 @@ import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.guava.common.base.Function;
 import org.forgerock.guava.common.collect.Maps;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.http.routing.RouteMatcher;
 import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.json.resource.ActionRequest;
@@ -556,7 +556,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ActionResponse, ResourceException> handleAction(ServerContext context, ActionRequest request) {
+    public Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest request) {
         return routeTree.handleAction(context, request);
     }
 
@@ -565,7 +565,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> handleCreate(ServerContext context, CreateRequest request) {
+    public Promise<ResourceResponse, ResourceException> handleCreate(Context context, CreateRequest request) {
         return routeTree.handleCreate(context, request);
     }
 
@@ -574,7 +574,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> handleDelete(ServerContext context, DeleteRequest request) {
+    public Promise<ResourceResponse, ResourceException> handleDelete(Context context, DeleteRequest request) {
         return routeTree.handleDelete(context, request);
     }
 
@@ -583,7 +583,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> handlePatch(ServerContext context, PatchRequest request) {
+    public Promise<ResourceResponse, ResourceException> handlePatch(Context context, PatchRequest request) {
         return routeTree.handlePatch(context, request);
     }
 
@@ -592,7 +592,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
      * {@inheritDoc}
      */
     @Override
-    public Promise<QueryResponse, ResourceException> handleQuery(ServerContext context, QueryRequest request,
+    public Promise<QueryResponse, ResourceException> handleQuery(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         return routeTree.handleQuery(context, request, handler);
     }
@@ -602,7 +602,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> handleRead(ServerContext context, ReadRequest request) {
+    public Promise<ResourceResponse, ResourceException> handleRead(Context context, ReadRequest request) {
         return routeTree.handleRead(context, request);
     }
 
@@ -611,7 +611,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> handleUpdate(ServerContext context, UpdateRequest request) {
+    public Promise<ResourceResponse, ResourceException> handleUpdate(Context context, UpdateRequest request) {
         return routeTree.handleUpdate(context, request);
     }
 

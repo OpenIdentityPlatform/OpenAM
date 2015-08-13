@@ -31,7 +31,7 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.DeleteRequest;
@@ -79,7 +79,7 @@ public class OathDevicesResource extends TwoFADevicesResource<OathDevicesDao> {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
+    public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
 
         try {
             final AMIdentity identity = getUserIdFromUri(context); //could be admin
@@ -146,7 +146,7 @@ public class OathDevicesResource extends TwoFADevicesResource<OathDevicesDao> {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId,
             DeleteRequest request) {
 
         try {
@@ -169,7 +169,7 @@ public class OathDevicesResource extends TwoFADevicesResource<OathDevicesDao> {
      * Retrieving the user id in this fashion ensures that an admin can utilise these functions.
      */
     @VisibleForTesting
-    protected AMIdentity getUserIdFromUri(ServerContext context) throws InternalServerErrorException {
+    protected AMIdentity getUserIdFromUri(Context context) throws InternalServerErrorException {
         return IdUtils.getIdentity(contextHelper.getUserId(context), contextHelper.getRealm(context));
     }
 }

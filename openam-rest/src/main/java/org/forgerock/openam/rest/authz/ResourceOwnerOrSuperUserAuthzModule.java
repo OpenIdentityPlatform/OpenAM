@@ -26,7 +26,7 @@ import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.http.routing.UriRouterContext;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.promise.Promise;
@@ -61,7 +61,7 @@ public class ResourceOwnerOrSuperUserAuthzModule extends AdminOnlyAuthzModule {
      * @return The authorization result.
      */
     @Override
-    protected Promise<AuthorizationResult, ResourceException> authorize(ServerContext context) {
+    protected Promise<AuthorizationResult, ResourceException> authorize(Context context) {
 
         try {
             String loggedInUserId = getUserId(context);
@@ -89,7 +89,7 @@ public class ResourceOwnerOrSuperUserAuthzModule extends AdminOnlyAuthzModule {
         }
     }
 
-    protected String getUserIdFromUri(ServerContext context) throws InternalServerErrorException {
+    protected String getUserIdFromUri(Context context) throws InternalServerErrorException {
         String username = context.asContext(UriRouterContext.class).getUriTemplateVariables().get("user");
         String realm = context.asContext(RealmContext.class).getResolvedRealm();
         return IdUtils.getIdentity(username, realm).getUniversalId();

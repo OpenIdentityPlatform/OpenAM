@@ -30,7 +30,7 @@ import java.util.Set;
 
 import com.sun.identity.common.LocaleContext;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.JsonValueException;
 import org.forgerock.json.resource.ActionRequest;
@@ -84,19 +84,19 @@ public class UmaLabelResource implements CollectionResourceProvider {
     }
 
     @Override
-    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext serverContext,
+    public Promise<ActionResponse, ResourceException> actionCollection(Context serverContext,
             ActionRequest actionRequest) {
         return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 
     @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext serverContext, String s,
+    public Promise<ActionResponse, ResourceException> actionInstance(Context serverContext, String s,
             ActionRequest actionRequest) {
         return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext serverContext,
+    public Promise<ResourceResponse, ResourceException> createInstance(Context serverContext,
             CreateRequest createRequest) {
         final JsonValue umaLabel = createRequest.getContent();
 
@@ -132,7 +132,7 @@ public class UmaLabelResource implements CollectionResourceProvider {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext serverContext, String labelId,
+    public Promise<ResourceResponse, ResourceException> deleteInstance(Context serverContext, String labelId,
             DeleteRequest deleteRequest) {
         try {
             ResourceSetLabel resourceSetLabel = labelStore.read(getRealm(serverContext), getUserName(serverContext), labelId);
@@ -159,13 +159,13 @@ public class UmaLabelResource implements CollectionResourceProvider {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext serverContext, String s,
+    public Promise<ResourceResponse, ResourceException> patchInstance(Context serverContext, String s,
             PatchRequest patchRequest) {
         return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 
     @Override
-    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext serverContext,
+    public Promise<QueryResponse, ResourceException> queryCollection(Context serverContext,
             QueryRequest queryRequest, QueryResourceHandler queryResultHandler) {
         if (!queryRequest.getQueryFilter().toString().equals("true")) {
             return newExceptionPromise(newBadRequestException("Invalid query"));
@@ -241,22 +241,22 @@ public class UmaLabelResource implements CollectionResourceProvider {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext serverContext, String s,
+    public Promise<ResourceResponse, ResourceException> readInstance(Context serverContext, String s,
             ReadRequest readRequest) {
         return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext serverContext, String s,
+    public Promise<ResourceResponse, ResourceException> updateInstance(Context serverContext, String s,
             UpdateRequest updateRequest) {
         return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 
-    private String getRealm(ServerContext context) {
+    private String getRealm(Context context) {
         return contextHelper.getRealm(context);
     }
 
-    private String getUserName(ServerContext context) {
+    private String getUserName(Context context) {
         return contextHelper.getUserId(context);
     }
 }

@@ -26,7 +26,7 @@ import static org.forgerock.util.promise.Promises.newResultPromise;
 import javax.inject.Inject;
 
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -53,17 +53,17 @@ public class UmaConfigurationResource implements SingletonResourceProvider {
     }
 
     @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, ActionRequest request) {
+    public Promise<ActionResponse, ResourceException> actionInstance(Context context, ActionRequest request) {
         return newExceptionPromise(newNotSupportedException());
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, PatchRequest request) {
+    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, PatchRequest request) {
         return newExceptionPromise(newNotSupportedException());
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, ReadRequest request) {
+    public Promise<ResourceResponse, ResourceException> readInstance(Context context, ReadRequest request) {
 
         String realm = context.asContext(RealmContext.class).getResolvedRealm();
         UmaSettings settings = settingsFactory.create(realm);
@@ -81,7 +81,7 @@ public class UmaConfigurationResource implements SingletonResourceProvider {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, UpdateRequest request) {
+    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, UpdateRequest request) {
         return newExceptionPromise(newNotSupportedException());
     }
 }

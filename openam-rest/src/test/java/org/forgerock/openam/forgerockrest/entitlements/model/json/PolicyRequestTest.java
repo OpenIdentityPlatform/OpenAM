@@ -28,7 +28,8 @@ import org.forgerock.json.jose.jws.handlers.SigningHandler;
 import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
+import org.forgerock.json.resource.InternalContext;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyEvaluator;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
@@ -84,7 +85,7 @@ public class PolicyRequestTest {
 
     @Test(expectedExceptions = NullPointerException.class)
     public void shouldRejectNullRequest() throws EntitlementException {
-        ServerContext context = buildContextStructure("/abc");
+        Context context = buildContextStructure("/abc");
         MockRequest.getRequest(context, null);
     }
 
@@ -104,7 +105,7 @@ public class PolicyRequestTest {
         given(subjectContext.getSubject("some-value")).willReturn(policySubject);
 
         // When...
-        ServerContext context = buildContextStructure("/abc");
+        Context context = buildContextStructure("/abc");
         PolicyRequest request = MockRequest.getRequest(context, actionRequest);
 
         // Then...
@@ -127,7 +128,7 @@ public class PolicyRequestTest {
         given(subjectContext.getCallerSubject()).willReturn(null);
 
         // When...
-        ServerContext context = buildContextStructure("/abc");
+        Context context = buildContextStructure("/abc");
         MockRequest.getRequest(context, actionRequest);
     }
 
@@ -143,7 +144,7 @@ public class PolicyRequestTest {
         given(subjectContext.getSubject("some-value")).willReturn(null);
 
         // When...
-        ServerContext context = buildContextStructure("/abc");
+        Context context = buildContextStructure("/abc");
         MockRequest.getRequest(context, actionRequest);
     }
 
@@ -156,7 +157,7 @@ public class PolicyRequestTest {
         given(actionRequest.getContent()).willReturn(json(properties));
 
         // When...
-        ServerContext context = buildContextStructure("/abc");
+        Context context = buildContextStructure("/abc");
         PolicyRequest request = MockRequest.getRequest(context, actionRequest);
 
         // Then...
@@ -178,7 +179,7 @@ public class PolicyRequestTest {
         given(actionRequest.getContent()).willReturn(json(object(field("subject", object(field("claims", jwt.asMap()))))));
 
         // When
-        ServerContext context = buildContextStructure("/abc");
+        Context context = buildContextStructure("/abc");
         PolicyRequest request = MockRequest.getRequest(context, actionRequest);
 
         // Then
@@ -198,7 +199,7 @@ public class PolicyRequestTest {
         given(actionRequest.getContent()).willReturn(json(object(field("subject", object(field("jwt", jwt.build()))))));
 
         // When
-        ServerContext context = buildContextStructure("/abc");
+        Context context = buildContextStructure("/abc");
         PolicyRequest request = MockRequest.getRequest(context, actionRequest);
 
         // Then
@@ -231,7 +232,7 @@ public class PolicyRequestTest {
         given(actionRequest.getContent()).willReturn(json(properties));
 
         // When...
-        ServerContext context = buildContextStructure("/abc");
+        Context context = buildContextStructure("/abc");
         PolicyRequest request = MockRequest.getRequest(context, actionRequest);
 
         // Then...
@@ -252,7 +253,7 @@ public class PolicyRequestTest {
         given(actionRequest.getContent()).willReturn(json(properties));
 
         // When...
-        ServerContext context = buildContextStructure("");
+        Context context = buildContextStructure("");
         PolicyRequest request = MockRequest.getRequest(context, actionRequest);
 
         // Then...
@@ -273,7 +274,7 @@ public class PolicyRequestTest {
         given(actionRequest.getContent()).willReturn(json(properties));
 
         // When...
-        ServerContext context = buildContextStructure("");
+        Context context = buildContextStructure("");
         PolicyRequest request = MockRequest.getRequest(context, actionRequest);
 
         // Then...
@@ -286,10 +287,10 @@ public class PolicyRequestTest {
         verifyNoMoreInteractions(subjectContext, actionRequest);
     }
 
-    private ServerContext buildContextStructure(final String realm) {
+    private Context buildContextStructure(final String realm) {
         RealmContext realmContext = new RealmContext(subjectContext);
         realmContext.addSubRealm(realm, realm);
-        return new ServerContext(realmContext);
+        return new InternalContext(realmContext);
     }
 
     /**
@@ -382,7 +383,7 @@ public class PolicyRequestTest {
 
         private static final class MockBuilder extends PolicyRequestBuilder<PolicyRequest> {
 
-            MockBuilder(ServerContext context, ActionRequest request) throws EntitlementException {
+            MockBuilder(Context context, ActionRequest request) throws EntitlementException {
                 super(context, request);
             }
 
@@ -392,7 +393,7 @@ public class PolicyRequestTest {
             }
         }
 
-        public static PolicyRequest getRequest(ServerContext context, ActionRequest request) throws EntitlementException {
+        public static PolicyRequest getRequest(Context context, ActionRequest request) throws EntitlementException {
             return new MockBuilder(context, request).build();
         }
 

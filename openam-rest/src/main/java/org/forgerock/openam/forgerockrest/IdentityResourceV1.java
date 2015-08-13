@@ -62,7 +62,7 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceNotFoundException;
 import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.JsonValueException;
 import org.forgerock.json.resource.ActionRequest;
@@ -191,7 +191,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
      * @param context Current Server Context
      * @param request Request from client to retrieve id
      */
-    private Promise<ActionResponse, ResourceException> idFromSession(final ServerContext context, final ActionRequest request) {
+    private Promise<ActionResponse, ResourceException> idFromSession(final Context context, final ActionRequest request) {
 
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         SSOToken ssotok;
@@ -262,7 +262,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
      * @param context Current Server Context
      * @param request Request from client to retrieve id
      */
-    private Promise<ActionResponse, ResourceException> createRegistrationEmail(final ServerContext context,
+    private Promise<ActionResponse, ResourceException> createRegistrationEmail(final Context context,
             final ActionRequest request, final String realm, final RestSecurity restSecurity) {
 
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
@@ -443,7 +443,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
      * @param context Current Server Context
      * @param request Request from client to confirm registration
      */
-    private Promise<ActionResponse, ResourceException> confirmationIdCheck(final ServerContext context,
+    private Promise<ActionResponse, ResourceException> confirmationIdCheck(final Context context,
             final ActionRequest request, final String realm) {
         final String METHOD = "IdentityResource.confirmationIdCheck";
         final JsonValue jVal = request.getContent();
@@ -563,7 +563,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ActionResponse, ResourceException> actionCollection(final ServerContext context,
+    public Promise<ActionResponse, ResourceException> actionCollection(final Context context,
             final ActionRequest request) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
@@ -636,7 +636,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
      * @param realm Used as part of user lookup.
      * @param restSecurity Non null.
      */
-    private Promise<ActionResponse, ResourceException> generateNewPasswordEmail(final ServerContext context,
+    private Promise<ActionResponse, ResourceException> generateNewPasswordEmail(final Context context,
             final ActionRequest request, final String realm, final RestSecurity restSecurity) {
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         final JsonValue jsonBody = request.getContent();
@@ -794,7 +794,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
      * @param request Non null
      * @param realm Non null
      */
-    private Promise<ActionResponse, ResourceException> anonymousUpdate(final ServerContext context,
+    private Promise<ActionResponse, ResourceException> anonymousUpdate(final Context context,
             final ActionRequest request, final String realm) {
         final String tokenID;
         String confirmationId;
@@ -898,7 +898,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
     }
 
 
-    private Promise<ActionResponse, ResourceException> anonymousCreate(final ServerContext context,
+    private Promise<ActionResponse, ResourceException> anonymousCreate(final Context context,
             final ActionRequest request, final String realm, RestSecurity restSecurity) {
 
         final JsonValue jVal = request.getContent();
@@ -979,7 +979,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(final ServerContext context,
+    public Promise<ActionResponse, ResourceException> actionInstance(final Context context,
             final String resourceId, final ActionRequest request) {
         return newExceptionPromise(newNotSupportedException("Actions are not supported for resource instances"));
     }
@@ -1018,7 +1018,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> createInstance(final ServerContext context,
+    public Promise<ResourceResponse, ResourceException> createInstance(final Context context,
             final CreateRequest request) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
@@ -1106,7 +1106,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> deleteInstance(final ServerContext context,
+    public Promise<ResourceResponse, ResourceException> deleteInstance(final Context context,
             final String resourceId, final DeleteRequest request) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
@@ -1239,7 +1239,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(final ServerContext context,
+    public Promise<ResourceResponse, ResourceException> patchInstance(final Context context,
             final String resourceId, final PatchRequest request) {
         return newExceptionPromise(newNotSupportedException("Patch operations are not supported"));
     }
@@ -1248,7 +1248,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<QueryResponse, ResourceException> queryCollection(final ServerContext context,
+    public Promise<QueryResponse, ResourceException> queryCollection(final Context context,
             final QueryRequest request, final QueryResourceHandler handler) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
@@ -1285,7 +1285,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> readInstance(final ServerContext context,
+    public Promise<ResourceResponse, ResourceException> readInstance(final Context context,
             final String resourceId, final ReadRequest request) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
@@ -1329,14 +1329,14 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         }
     }
 
-    private JsonValue addRoleInformation(ServerContext context, String resourceId, JsonValue value) {
+    private JsonValue addRoleInformation(Context context, String resourceId, JsonValue value) {
         if (isAdmin(context) && authenticatedUserMatchesUserProfile(context, resourceId)) {
             value.put("roles", array("ui-admin"));
         }
         return value;
     }
 
-    private boolean authenticatedUserMatchesUserProfile(ServerContext context, String resourceId) {
+    private boolean authenticatedUserMatchesUserProfile(Context context, String resourceId) {
         try {
             SSOToken ssoToken = SSOTokenManager.getInstance().createSSOToken(getCookieFromServerContext(context));
             String requestRealm = coreWrapper.convertRealmNameToOrgName(context.asContext(RealmContext.class)
@@ -1350,7 +1350,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(final ServerContext context,
+    public Promise<ResourceResponse, ResourceException> updateInstance(final Context context,
             final String resourceId, final UpdateRequest request) {
 
         RealmContext realmContext = context.asContext(RealmContext.class);

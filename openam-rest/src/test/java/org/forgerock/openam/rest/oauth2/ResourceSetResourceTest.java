@@ -43,7 +43,7 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.restlet.resources.ResourceSetDescriptionValidator;
@@ -78,7 +78,7 @@ public class ResourceSetResourceTest {
     public void shouldReadResourceSet() throws Exception {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         ReadRequest request = mock(ReadRequest.class);
         given(request.getFields()).willReturn(Arrays.asList(new JsonPointer("/fred")));
         ResultHandler<Resource> handler = mock(ResultHandler.class);
@@ -103,7 +103,7 @@ public class ResourceSetResourceTest {
     public void createShouldNotBeSupported() {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         CreateRequest request = mock(CreateRequest.class);
         ResultHandler<Resource> handler = mock(ResultHandler.class);
 
@@ -118,7 +118,7 @@ public class ResourceSetResourceTest {
     public void deleteShouldNotBeSupported() {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         DeleteRequest request = mock(DeleteRequest.class);
         ResultHandler<Resource> handler = mock(ResultHandler.class);
 
@@ -133,7 +133,7 @@ public class ResourceSetResourceTest {
     public void patchShouldNotBeSupported() {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         PatchRequest request = mock(PatchRequest.class);
         ResultHandler<Resource> handler = mock(ResultHandler.class);
 
@@ -148,7 +148,7 @@ public class ResourceSetResourceTest {
     public Promise<ActionResponse, ResourceException> actionInstanceShouldNotBeSupported() {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         ActionRequest request = mock(ActionRequest.class);
         ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 
@@ -163,7 +163,7 @@ public class ResourceSetResourceTest {
     public Promise<ActionResponse, ResourceException> actionCollectionShouldNotBeSupported() {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         ActionRequest request = mock(ActionRequest.class);
         ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 
@@ -178,7 +178,7 @@ public class ResourceSetResourceTest {
     public void queryShouldNotBeSupported() {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         QueryRequest request = mock(QueryRequest.class);
         QueryResultHandler handler = mock(QueryResultHandler.class);
         given(request.getQueryFilter()).willReturn(QueryFilter.equalTo(new JsonPointer("/fred"), 5));
@@ -194,7 +194,7 @@ public class ResourceSetResourceTest {
     public void nameQueryShouldBeSupported() throws Exception {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         QueryRequest request = mock(QueryRequest.class);
         given(request.getFields()).willReturn(Arrays.asList(new JsonPointer("/fred")));
         QueryResultHandler handler = mock(QueryResultHandler.class);
@@ -233,7 +233,7 @@ public class ResourceSetResourceTest {
     public void shouldRevokeAllUserPolicies() {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         ActionRequest request = mock(ActionRequest.class);
         ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 
@@ -257,7 +257,7 @@ public class ResourceSetResourceTest {
     public void revokeAllUserPoliciesActionShouldHandleResourceException() {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         ActionRequest request = mock(ActionRequest.class);
         ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 
@@ -279,7 +279,7 @@ public class ResourceSetResourceTest {
     public Promise<ActionResponse, ResourceException> actionCollectionShouldHandleUnsupportedAction() {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         ActionRequest request = mock(ActionRequest.class);
         ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 

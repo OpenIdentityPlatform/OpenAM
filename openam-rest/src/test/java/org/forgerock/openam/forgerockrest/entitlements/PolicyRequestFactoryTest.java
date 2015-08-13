@@ -19,7 +19,8 @@ package org.forgerock.openam.forgerockrest.entitlements;
 import com.sun.identity.entitlement.EntitlementException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
+import org.forgerock.json.resource.InternalContext;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.BatchPolicyRequest;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.PolicyRequest;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.TreePolicyRequest;
@@ -72,7 +73,7 @@ public class PolicyRequestFactoryTest {
         given(actionRequest.getContent()).willReturn(JsonValue.json(properties));
 
         // Given...
-        ServerContext context = buildContextStructure("/abc");
+        Context context = buildContextStructure("/abc");
         PolicyRequest request = factory.buildRequest(PolicyAction.EVALUATE, context, actionRequest);
 
         // Then...
@@ -97,7 +98,7 @@ public class PolicyRequestFactoryTest {
         given(actionRequest.getContent()).willReturn(JsonValue.json(properties));
 
         // Given...
-        ServerContext context = buildContextStructure("/abc");
+        Context context = buildContextStructure("/abc");
         PolicyRequest request = factory.buildRequest(PolicyAction.TREE_EVALUATE, context, actionRequest);
 
         // Then...
@@ -115,21 +116,21 @@ public class PolicyRequestFactoryTest {
     @Test(expectedExceptions = EntitlementException.class)
     public void shouldRejectUnsupportedAction() throws EntitlementException {
         // Given...
-        ServerContext context = buildContextStructure("/abc");
+        Context context = buildContextStructure("/abc");
         factory.buildRequest(PolicyAction.UNKNOWN, context, actionRequest);
     }
 
     @Test(expectedExceptions = NullPointerException.class)
     public void shouldRejectNullAction() throws EntitlementException {
         // Given...
-        ServerContext context = buildContextStructure("/abc");
+        Context context = buildContextStructure("/abc");
         factory.buildRequest(null, context, actionRequest);
     }
 
-    private ServerContext buildContextStructure(final String realm) {
+    private Context buildContextStructure(final String realm) {
         RealmContext realmContext = new RealmContext(subjectContext);
         realmContext.addSubRealm(realm, realm);
-        return new ServerContext(realmContext);
+        return new InternalContext(realmContext);
     }
 
 

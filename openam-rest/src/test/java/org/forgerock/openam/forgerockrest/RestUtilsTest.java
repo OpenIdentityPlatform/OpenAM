@@ -16,7 +16,8 @@
 
 package org.forgerock.openam.forgerockrest;
 
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
+import org.forgerock.json.resource.InternalContext;
 import org.forgerock.json.resource.http.HttpContext;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -45,7 +46,7 @@ public class RestUtilsTest {
     @Test(dataProvider = "getMimeHeaderValueData")
     public void shouldParseMimeHeaderValuesCorrectly(String[] values, String expectedResult) throws Exception {
         // Given
-        ServerContext context = getHttpServerContext(values);
+        Context context = getHttpServerContext(values);
 
         // When
         String result = RestUtils.getMimeHeaderValue(context, HEADER);
@@ -54,10 +55,10 @@ public class RestUtilsTest {
         assertThat(result).isEqualTo(expectedResult);
     }
 
-    private ServerContext getHttpServerContext(String...values) throws Exception {
+    private Context getHttpServerContext(String...values) throws Exception {
         final HttpContext httpContext = new HttpContext(json(object(
                 field(HttpContext.ATTR_HEADERS, Collections.singletonMap(HEADER, Arrays.asList(values))),
                 field(HttpContext.ATTR_PARAMETERS, Collections.emptyMap()))), null);
-        return new ServerContext(httpContext);
+        return new InternalContext(httpContext);
     }
 }

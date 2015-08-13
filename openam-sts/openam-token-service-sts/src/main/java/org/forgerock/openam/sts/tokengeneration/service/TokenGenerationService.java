@@ -39,7 +39,7 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.RestUtils;
@@ -100,7 +100,7 @@ class TokenGenerationService implements CollectionResourceProvider {
     }
 
     @Override
-    public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
+    public void createInstance(Context context, CreateRequest request, ResultHandler<Resource> handler) {
         TokenGenerationServiceInvocationState invocationState;
         try {
             invocationState = TokenGenerationServiceInvocationState.fromJson(request.getContent());
@@ -220,7 +220,7 @@ class TokenGenerationService implements CollectionResourceProvider {
     }
 
     @Override
-    public void readInstance(final ServerContext serverContext, final String resourceId, final ReadRequest readRequest,
+    public void readInstance(final Context serverContext, final String resourceId, final ReadRequest readRequest,
                              final ResultHandler<Resource> resultHandler) {
         try {
             String token = ctsTokenPersistence.getToken(resourceId);
@@ -238,7 +238,7 @@ class TokenGenerationService implements CollectionResourceProvider {
     }
 
     @Override
-    public void deleteInstance(final ServerContext serverContext, final String resourceId, final DeleteRequest deleteRequest,
+    public void deleteInstance(final Context serverContext, final String resourceId, final DeleteRequest deleteRequest,
                                final ResultHandler<Resource> resultHandler) {
         try {
             ctsTokenPersistence.deleteToken(resourceId);
@@ -252,7 +252,7 @@ class TokenGenerationService implements CollectionResourceProvider {
     }
 
     @Override
-    public void queryCollection(final ServerContext serverContext, final QueryRequest queryRequest,
+    public void queryCollection(final Context serverContext, final QueryRequest queryRequest,
                                 final QueryResultHandler queryResultHandler) {
         QueryFilter queryFilter = queryRequest.getQueryFilter();
         if (queryFilter == null) {
@@ -386,26 +386,26 @@ class TokenGenerationService implements CollectionResourceProvider {
     }
 
     @Override
-    public void actionCollection(final ServerContext serverContext, final ActionRequest actionRequest,
+    public void actionCollection(final Context serverContext, final ActionRequest actionRequest,
                                  final ResultHandler<JsonValue> resultHandler) {
         RestUtils.generateUnsupportedOperation(resultHandler);
     }
 
     @Override
-    public void actionInstance(final ServerContext serverContext, final String s, final ActionRequest actionRequest,
+    public void actionInstance(final Context serverContext, final String s, final ActionRequest actionRequest,
                                final ResultHandler<JsonValue> resultHandler) {
         RestUtils.generateUnsupportedOperation(resultHandler);
     }
 
 
     @Override
-    public void patchInstance(final ServerContext serverContext, final String s, final PatchRequest patchRequest,
+    public void patchInstance(final Context serverContext, final String s, final PatchRequest patchRequest,
                               final ResultHandler<Resource> resultHandler) {
         RestUtils.generateUnsupportedOperation(resultHandler);
     }
 
     @Override
-    public void updateInstance(final ServerContext serverContext, final String s, final UpdateRequest updateRequest,
+    public void updateInstance(final Context serverContext, final String s, final UpdateRequest updateRequest,
                                final ResultHandler<Resource> resultHandler) {
         RestUtils.generateUnsupportedOperation(resultHandler);
     }

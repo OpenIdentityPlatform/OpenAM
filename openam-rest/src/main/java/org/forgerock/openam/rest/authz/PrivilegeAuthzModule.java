@@ -31,7 +31,7 @@ import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.http.routing.UriRouterContext;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
@@ -82,43 +82,43 @@ public class PrivilegeAuthzModule implements CrestAuthorizationModule {
 
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeRead(
-            ServerContext serverContext, ReadRequest readRequest) {
+            Context serverContext, ReadRequest readRequest) {
         return evaluate(serverContext, READ);
     }
 
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeQuery(
-            ServerContext serverContext, QueryRequest queryRequest) {
+            Context serverContext, QueryRequest queryRequest) {
         return evaluate(serverContext, READ);
     }
 
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeCreate(
-            ServerContext serverContext, CreateRequest createRequest) {
+            Context serverContext, CreateRequest createRequest) {
         return evaluate(serverContext, MODIFY);
     }
 
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeUpdate(
-            ServerContext serverContext, UpdateRequest updateRequest) {
+            Context serverContext, UpdateRequest updateRequest) {
         return evaluate(serverContext, MODIFY);
     }
 
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeDelete(
-            ServerContext serverContext, DeleteRequest deleteRequest) {
+            Context serverContext, DeleteRequest deleteRequest) {
         return evaluate(serverContext, MODIFY);
     }
 
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizePatch(
-            ServerContext serverContext, PatchRequest patchRequest) {
+            Context serverContext, PatchRequest patchRequest) {
         return evaluate(serverContext, MODIFY);
     }
 
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeAction(
-            ServerContext serverContext, ActionRequest actionRequest) {
+            Context serverContext, ActionRequest actionRequest) {
 
         // Get the privilege definition for the CREST action.
         final String crestAction = actionRequest.getAction();
@@ -142,7 +142,7 @@ public class PrivilegeAuthzModule implements CrestAuthorizationModule {
      *
      * @return the authorisation result
      */
-    private Promise<AuthorizationResult, ResourceException> evaluate(final ServerContext context,
+    private Promise<AuthorizationResult, ResourceException> evaluate(final Context context,
                                                                      final PrivilegeDefinition definition) {
 
         // If no realm is specified default to the root realm.

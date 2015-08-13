@@ -30,11 +30,12 @@ import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.http.Context;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalContext;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
@@ -50,7 +51,7 @@ public class RequesterTest {
 
     CrestRealmRouter mockRealmRouter;
     SDKResultHandlerFactory resultHandlerFactory;
-    ServerContext mockServerContext;
+    Context mockServerContext;
     Requester requester;
 
     @BeforeTest
@@ -65,7 +66,7 @@ public class RequesterTest {
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
         realmContext.addSubRealm("REALM", "REALM");
-        mockServerContext = new ServerContext(realmContext);
+        mockServerContext = new InternalContext(realmContext);
     }
 
     //create

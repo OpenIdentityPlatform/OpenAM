@@ -36,7 +36,7 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 import org.codehaus.jackson.schema.JsonSchema;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -99,7 +99,7 @@ public class SubjectTypesResource implements CollectionResourceProvider {
      * Unsupported by this endpoint.
      */
     @Override
-    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
+    public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
 
@@ -107,7 +107,7 @@ public class SubjectTypesResource implements CollectionResourceProvider {
      * Unsupported by this endpoint.
      */
     @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+    public Promise<ActionResponse, ResourceException> actionInstance(Context context, String resourceId,
             ActionRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
@@ -116,7 +116,7 @@ public class SubjectTypesResource implements CollectionResourceProvider {
      * Unsupported by this endpoint.
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
+    public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
 
@@ -124,7 +124,7 @@ public class SubjectTypesResource implements CollectionResourceProvider {
      * Unsupported by this endpoint.
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId,
             DeleteRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
@@ -133,7 +133,7 @@ public class SubjectTypesResource implements CollectionResourceProvider {
      * Unsupported by this endpoint.
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
             PatchRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
@@ -142,7 +142,7 @@ public class SubjectTypesResource implements CollectionResourceProvider {
      * Unsupported by this endpoint.
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
             UpdateRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
@@ -156,7 +156,7 @@ public class SubjectTypesResource implements CollectionResourceProvider {
      * result handler having determined its schema and jsonified it.
      */
     @Override
-    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+    public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
 
         final Set<String> subjectTypeNames = new TreeSet<String>();
@@ -219,7 +219,7 @@ public class SubjectTypesResource implements CollectionResourceProvider {
      * Uses the {@link EntitlementRegistry} to locate the {@link EntitlementSubject} to return.
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
 
         final Class<? extends EntitlementSubject> subjectClass = entitlementRegistry.getSubjectType(resourceId);

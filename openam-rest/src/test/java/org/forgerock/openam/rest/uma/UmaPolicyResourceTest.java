@@ -40,7 +40,7 @@ import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.uma.UmaPolicy;
 import org.forgerock.openam.uma.UmaPolicyService;
@@ -71,7 +71,7 @@ public class UmaPolicyResourceTest {
     public void shouldSuccessfullyCreatePolicy() {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         CreateRequest request = Requests.newCreateRequest("/policies", json(object()));
         ResultHandler<Resource> handler = mock(ResultHandler.class);
         UmaPolicy policy = mock(UmaPolicy.class);
@@ -97,7 +97,7 @@ public class UmaPolicyResourceTest {
     public void shouldHandledFailedCreatePolicy() {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         CreateRequest request = Requests.newCreateRequest("/policies", json(object()));
         ResultHandler<Resource> handler = mock(ResultHandler.class);
         ResourceException resourceException = mock(ResourceException.class);
@@ -117,7 +117,7 @@ public class UmaPolicyResourceTest {
     public void shouldSuccessfullyReadPolicy() {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         ReadRequest request = Requests.newReadRequest("/policies");
         ResultHandler<Resource> handler = mock(ResultHandler.class);
         UmaPolicy policy = mock(UmaPolicy.class);
@@ -145,7 +145,7 @@ public class UmaPolicyResourceTest {
     public void shouldHandledFailedReadPolicy() {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         ReadRequest request = Requests.newReadRequest("/policies");
         ResultHandler<Resource> handler = mock(ResultHandler.class);
         ResourceException resourceException = mock(ResourceException.class);
@@ -165,7 +165,7 @@ public class UmaPolicyResourceTest {
     public void shouldSuccessfullyUpdatePolicy() {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         UpdateRequest request = Requests.newUpdateRequest("/policies", json(object()));
         ResultHandler<Resource> handler = mock(ResultHandler.class);
         UmaPolicy policy = mock(UmaPolicy.class);
@@ -193,7 +193,7 @@ public class UmaPolicyResourceTest {
     public void shouldHandledFailedUpdatePolicy() {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         UpdateRequest request = Requests.newUpdateRequest("/policies", json(object()));
         ResultHandler<Resource> handler = mock(ResultHandler.class);
         ResourceException resourceException = mock(ResourceException.class);
@@ -213,7 +213,7 @@ public class UmaPolicyResourceTest {
     public void shouldSuccessfullyDeletePolicy() {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         DeleteRequest request = Requests.newDeleteRequest("/policies");
         ResultHandler<Resource> handler = mock(ResultHandler.class);
         Promise<Void, ResourceException> promise = Promises.newResultPromise(null);
@@ -236,7 +236,7 @@ public class UmaPolicyResourceTest {
     public void shouldHandledFailedDeletePolicy() {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         DeleteRequest request = Requests.newDeleteRequest("/policies");
         ResultHandler<Resource> handler = mock(ResultHandler.class);
         ResourceException resourceException = mock(ResourceException.class);
@@ -256,7 +256,7 @@ public class UmaPolicyResourceTest {
     public void shouldThrowNotSupportedExceptionForPatchInstance() {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         PatchRequest request = Requests.newPatchRequest("/policies");
         ResultHandler<Resource> handler = mock(ResultHandler.class);
 
@@ -274,7 +274,7 @@ public class UmaPolicyResourceTest {
     public void shouldThrowNotSupportedExceptionForActionCollection() {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         ActionRequest request = Requests.newActionRequest("/policies", "ACTION_ID");
         ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 
@@ -292,7 +292,7 @@ public class UmaPolicyResourceTest {
     public void shouldThrowNotSupportedExceptionForActionInstance() {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         ActionRequest request = Requests.newActionRequest("/policies", "ACTION_ID");
         ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 
@@ -309,7 +309,7 @@ public class UmaPolicyResourceTest {
     public void shouldSuccessfullyQueryPolicies() {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         QueryRequest request = Requests.newQueryRequest("/policies");
         QueryResultHandler handler = mock(QueryResultHandler.class);
         QueryResult queryResult = new QueryResult();
@@ -335,7 +335,7 @@ public class UmaPolicyResourceTest {
     public void shouldHandleFailedQueryOfPolicies() {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         QueryRequest request = Requests.newQueryRequest("/policies");
         QueryResultHandler handler = mock(QueryResultHandler.class);
         ResourceException resourceException = mock(ResourceException.class);

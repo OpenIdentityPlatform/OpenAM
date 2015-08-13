@@ -29,7 +29,7 @@ import java.util.Set;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.SubjectAttributesManager;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -67,35 +67,35 @@ public class SubjectAttributesResourceV1 extends RealmAwareResource {
     }
 
     @Override
-    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
+    public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+    public Promise<ActionResponse, ResourceException> actionInstance(Context context, String resourceId,
             ActionRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
+    public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId,
             DeleteRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
             PatchRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+    public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         final Subject mySubject = getContextSubject(context);
         if (mySubject == null) {
@@ -119,13 +119,13 @@ public class SubjectAttributesResourceV1 extends RealmAwareResource {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
             UpdateRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }

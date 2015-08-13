@@ -16,7 +16,8 @@
 package org.forgerock.openam.rest.resource;
 
 import org.forgerock.http.Context;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
+import org.forgerock.http.context.AbstractContext;
 import org.forgerock.openam.audit.AuditConstants.Component;
 
 /**
@@ -24,7 +25,7 @@ import org.forgerock.openam.audit.AuditConstants.Component;
  *
  * @since 13.0.0
  */
-public final class AuditInfoContext extends ServerContext {
+public final class AuditInfoContext extends AbstractContext {
 
     private static final String CONTEXT_NAME = "AuditContext";
 

@@ -42,7 +42,7 @@ import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -96,7 +96,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext serverContext,
+    public Promise<ActionResponse, ResourceException> actionCollection(Context serverContext,
             ActionRequest actionRequest) {
         return RestUtils.generateUnsupportedOperation();
     }
@@ -105,7 +105,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext serverContext, String resourceId,
+    public Promise<ActionResponse, ResourceException> actionInstance(Context serverContext, String resourceId,
             ActionRequest actionRequest) {
         return RestUtils.generateUnsupportedOperation();
     }
@@ -121,7 +121,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
      * or which are not compliant to your applications resource-pattern.
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext serverContext,
+    public Promise<ResourceResponse, ResourceException> createInstance(Context serverContext,
             CreateRequest createRequest) {
 
         final Subject callingSubject = getContextSubject(serverContext);
@@ -223,7 +223,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext serverContext, String resourceId,
+    public Promise<ResourceResponse, ResourceException> deleteInstance(Context serverContext, String resourceId,
             DeleteRequest deleteRequest) {
         final Subject callingSubject = getContextSubject(serverContext);
 
@@ -261,7 +261,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext serverContext, String resourceId,
+    public Promise<ResourceResponse, ResourceException> patchInstance(Context serverContext, String resourceId,
             PatchRequest patchRequest) {
         return RestUtils.generateUnsupportedOperation();
     }
@@ -270,7 +270,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
      * {@inheritDoc}
      */
     @Override
-    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext serverContext,
+    public Promise<QueryResponse, ResourceException> queryCollection(Context serverContext,
             QueryRequest queryRequest, QueryResourceHandler queryResultHandler) {
         final Subject callingSubject = getContextSubject(serverContext);
 
@@ -340,7 +340,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext serverContext, String resourceId,
+    public Promise<ResourceResponse, ResourceException> readInstance(Context serverContext, String resourceId,
             ReadRequest readRequest) {
         final Subject callingSubject = getContextSubject(serverContext);
 
@@ -379,7 +379,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext serverContext, String resourceId,
+    public Promise<ResourceResponse, ResourceException> updateInstance(Context serverContext, String resourceId,
             UpdateRequest updateRequest) {
         final Subject callingSubject = getContextSubject(serverContext);
 
@@ -495,7 +495,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
      * the operation is being carried out.
      */
     @SuppressWarnings("unchecked")
-    boolean isRequestRealmsValidPeerOrSubrealms(ServerContext serverContext, String realm, Set<String> realms) {
+    boolean isRequestRealmsValidPeerOrSubrealms(Context serverContext, String realm, Set<String> realms) {
         try {
             final SSOToken callerToken = serverContext.asContext(SSOTokenContext.class).getCallerSSOToken();
             final OrganizationConfigManager ocm = new OrganizationConfigManager(callerToken, realm);

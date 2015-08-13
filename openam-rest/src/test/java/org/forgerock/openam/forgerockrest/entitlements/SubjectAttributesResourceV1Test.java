@@ -22,12 +22,14 @@ import com.sun.identity.shared.debug.Debug;
 import java.util.HashSet;
 import java.util.Set;
 import javax.security.auth.Subject;
+
+import org.forgerock.json.resource.InternalContext;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
@@ -58,7 +60,7 @@ public class SubjectAttributesResourceV1Test {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        ServerContext mockServerContext = new ServerContext(realmContext);
+        Context mockServerContext = new InternalContext(realmContext);
         Subject mockSubject = new Subject();
         given(mockSSOTokenContext.getCallerSubject()).willReturn(mockSubject);
         QueryRequest mockRequest = mock(QueryRequest.class);
@@ -85,7 +87,7 @@ public class SubjectAttributesResourceV1Test {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        ServerContext mockServerContext = new ServerContext(realmContext);
+        Context mockServerContext = new InternalContext(realmContext);
         Subject mockSubject = new Subject();
         given(mockSSOTokenContext.getCallerSubject()).willReturn(mockSubject);
         QueryRequest mockRequest = mock(QueryRequest.class);
@@ -107,7 +109,7 @@ public class SubjectAttributesResourceV1Test {
         //given
         SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSSOTokenContext);
-        ServerContext mockServerContext = new ServerContext(realmContext);
+        Context mockServerContext = new InternalContext(realmContext);
         Subject mockSubject = new Subject();
         given(mockSSOTokenContext.getCallerSubject()).willReturn(mockSubject);
         QueryRequest mockRequest = mock(QueryRequest.class);

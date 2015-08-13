@@ -16,11 +16,11 @@
 
 package org.forgerock.openam.forgerockrest.entitlements;
 
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.rest.resource.RealmContext;
 
 /**
- * Resource capable of determining a realm from a ServerContext.
+ * Resource capable of determining a realm from a Context.
  *
  * @since 12.0.0
  */
@@ -30,15 +30,15 @@ public abstract class RealmAwareResource extends SubjectAwareResource {
     protected final String ROOT = "/";
 
     /**
-     * Retrieves the Realm from a provided {@link org.forgerock.http.context.ServerContext}.
+     * Retrieves the Realm from a provided {@link org.forgerock.http.Context}.
      *
-     * Returns null if there's no RealmContext in the provided ServerContext.
+     * Returns null if there's no RealmContext in the provided Context.
      *
      * @param context The request context.
      * @return a String containing the name of the realm associated with this request,
-     *  or null if there is no RealmContext in the ServerContext.
+     *  or null if there is no RealmContext in the Context.
      */
-    protected String getRealm(ServerContext context) {
+    protected String getRealm(Context context) {
 
         if (!context.containsContext(RealmContext.class)) {
             return null;

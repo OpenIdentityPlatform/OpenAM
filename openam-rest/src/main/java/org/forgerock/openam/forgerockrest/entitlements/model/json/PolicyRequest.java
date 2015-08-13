@@ -25,7 +25,7 @@ import org.forgerock.json.jose.common.JwtReconstruction;
 import org.forgerock.json.jose.exceptions.JwtReconstructionException;
 import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyEvaluator;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
@@ -133,7 +133,7 @@ public abstract class PolicyRequest {
          * @throws EntitlementException
          *         should the request construction fail
          */
-        PolicyRequestBuilder(final ServerContext context, final ActionRequest request) throws EntitlementException {
+        PolicyRequestBuilder(final Context context, final ActionRequest request) throws EntitlementException {
             Reject.ifNull(context, request);
 
             final SubjectContext subjectContext = context.asContext(SubjectContext.class);

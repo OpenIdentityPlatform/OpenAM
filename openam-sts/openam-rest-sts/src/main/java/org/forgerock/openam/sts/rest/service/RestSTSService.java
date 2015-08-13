@@ -25,7 +25,7 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.SingletonResourceProvider;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
@@ -55,7 +55,7 @@ public class RestSTSService implements SingletonResourceProvider {
         this.logger = logger;
     }
 
-    public void actionInstance(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
+    public void actionInstance(Context context, ActionRequest request, ResultHandler<JsonValue> handler) {
         switch (request.getAction()) {
             case TRANSLATE:
                 handleTranslate(context, request, handler);
@@ -71,7 +71,7 @@ public class RestSTSService implements SingletonResourceProvider {
         }
     }
 
-    private void handleTranslate(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
+    private void handleTranslate(Context context, ActionRequest request, ResultHandler<JsonValue> handler) {
         RestSTSServiceHttpServletContext servletContext = context.asContext(RestSTSServiceHttpServletContext.class);
         HttpContext httpContext = context.asContext(HttpContext.class);
         RestSTSTokenTranslationInvocationState invocationState;
@@ -96,7 +96,7 @@ public class RestSTSService implements SingletonResourceProvider {
         }
     }
 
-    private void handleValidate(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
+    private void handleValidate(Context context, ActionRequest request, ResultHandler<JsonValue> handler) {
         RestSTSTokenValidationInvocationState invocationState;
         try {
             invocationState = RestSTSTokenValidationInvocationState.fromJson(request.getContent());
@@ -119,7 +119,7 @@ public class RestSTSService implements SingletonResourceProvider {
         }
     }
 
-    private void handleCancel(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
+    private void handleCancel(Context context, ActionRequest request, ResultHandler<JsonValue> handler) {
         RestSTSTokenCancellationInvocationState invocationState;
         try {
             invocationState = RestSTSTokenCancellationInvocationState.fromJson(request.getContent());
@@ -142,15 +142,15 @@ public class RestSTSService implements SingletonResourceProvider {
         }
     }
 
-    public void patchInstance(ServerContext context, PatchRequest request, ResultHandler<Resource> handler) {
+    public void patchInstance(Context context, PatchRequest request, ResultHandler<Resource> handler) {
         handler.handleError(new NotSupportedException());
     }
 
-    public void readInstance(ServerContext context, ReadRequest request, ResultHandler<Resource> handler) {
+    public void readInstance(Context context, ReadRequest request, ResultHandler<Resource> handler) {
         handler.handleError(new NotSupportedException());
     }
 
-    public void updateInstance(ServerContext context, UpdateRequest request, ResultHandler<Resource> handler) {
+    public void updateInstance(Context context, UpdateRequest request, ResultHandler<Resource> handler) {
         handler.handleError(new NotSupportedException());
     }
 }

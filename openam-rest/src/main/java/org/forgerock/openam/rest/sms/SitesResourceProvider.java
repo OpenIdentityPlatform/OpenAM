@@ -37,7 +37,7 @@ import com.sun.identity.common.configuration.SiteConfiguration;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import org.forgerock.guava.common.collect.Sets;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -83,7 +83,7 @@ public class SitesResourceProvider implements CollectionResourceProvider {
     }
 
     @Override
-    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
+    public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
         switch (request.getAction()) {
             case SmsResourceProvider.TEMPLATE:
                 return newResultPromise(newActionResponse(json(object())));
@@ -123,7 +123,7 @@ public class SitesResourceProvider implements CollectionResourceProvider {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
+    public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
         JsonValue content = request.getContent();
         String id = request.getNewResourceId();
         try {
@@ -149,7 +149,7 @@ public class SitesResourceProvider implements CollectionResourceProvider {
         }
     }
 
-    private SSOToken getSsoToken(ServerContext context) throws SSOException {
+    private SSOToken getSsoToken(Context context) throws SSOException {
         return context.asContext(SSOTokenContext.class).getCallerSSOToken();
     }
 
@@ -166,7 +166,7 @@ public class SitesResourceProvider implements CollectionResourceProvider {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String id,
+    public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String id,
             DeleteRequest request) {
         ResourceResponse site;
         SSOToken token;
@@ -196,7 +196,7 @@ public class SitesResourceProvider implements CollectionResourceProvider {
     }
 
     @Override
-    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+    public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         if (!"true".equals(request.getQueryFilter().toString())) {
             return newExceptionPromise(newBadRequestException("Query only supports 'true' filter"));
@@ -242,7 +242,7 @@ public class SitesResourceProvider implements CollectionResourceProvider {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String id,
+    public Promise<ResourceResponse, ResourceException> readInstance(Context context, String id,
             ReadRequest request) {
         try {
             SSOToken token = getSsoToken(context);
@@ -257,7 +257,7 @@ public class SitesResourceProvider implements CollectionResourceProvider {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String id,
+    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String id,
             UpdateRequest request) {
         JsonValue content = request.getContent();
         try {
@@ -293,13 +293,13 @@ public class SitesResourceProvider implements CollectionResourceProvider {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String id,
+    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String id,
             PatchRequest request) {
         return newExceptionPromise(newNotSupportedException());
     }
 
     @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String id,
+    public Promise<ActionResponse, ResourceException> actionInstance(Context context, String id,
             ActionRequest request) {
         return newExceptionPromise(newNotSupportedException("Action not supported on instance"));
     }

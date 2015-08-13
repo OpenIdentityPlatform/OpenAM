@@ -61,7 +61,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.sm.DNMapper;
 import org.apache.commons.lang.StringUtils;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -135,13 +135,13 @@ public class TokenResource implements CollectionResourceProvider {
     }
 
     @Override
-    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context,
+    public Promise<ActionResponse, ResourceException> actionCollection(Context context,
             ActionRequest actionRequest) {
         return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+    public Promise<ActionResponse, ResourceException> actionInstance(Context context, String resourceId,
             ActionRequest request) {
 
         String actionId = request.getAction();
@@ -164,7 +164,7 @@ public class TokenResource implements CollectionResourceProvider {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context,
+    public Promise<ResourceResponse, ResourceException> createInstance(Context context,
             CreateRequest createRequest) {
         return RestUtils.generateUnsupportedOperation();
     }
@@ -177,7 +177,7 @@ public class TokenResource implements CollectionResourceProvider {
      * @param deleteRefreshToken Whether to delete associated refresh token, if token id is for an access token.
      * @return {@code Void} if the token has been deleted.
      */
-    private Promise<Void, ResourceException> deleteToken(ServerContext context, String tokenId, boolean deleteRefreshToken) {
+    private Promise<Void, ResourceException> deleteToken(Context context, String tokenId, boolean deleteRefreshToken) {
         try {
             AMIdentity uid = getUid(context);
 
@@ -286,7 +286,7 @@ public class TokenResource implements CollectionResourceProvider {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, final String resourceId,
+    public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, final String resourceId,
             DeleteRequest request) {
         return deleteToken(context, resourceId, false)
                 .thenAsync(new AsyncFunction<Void, ResourceResponse, ResourceException>() {
@@ -298,13 +298,13 @@ public class TokenResource implements CollectionResourceProvider {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
             PatchRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest queryRequest,
+    public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest queryRequest,
             QueryResourceHandler handler) {
         try {
             JsonValue response;
@@ -370,7 +370,7 @@ public class TokenResource implements CollectionResourceProvider {
         throw new IllegalArgumentException("I don't understand the OAuth 2.0 field called " + fieldname);
     }
 
-    private Promise<QueryResponse, ResourceException> handleResponse(QueryResourceHandler handler, JsonValue response, ServerContext context) throws UnauthorizedClientException,
+    private Promise<QueryResponse, ResourceException> handleResponse(QueryResourceHandler handler, JsonValue response, Context context) throws UnauthorizedClientException,
             CoreTokenException, InternalServerErrorException, NotFoundException {
         ResourceResponse resource = newResourceResponse("result", "1", response);
         JsonValue value = resource.getContent();
@@ -510,7 +510,7 @@ public class TokenResource implements CollectionResourceProvider {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
 
         try {
@@ -592,7 +592,7 @@ public class TokenResource implements CollectionResourceProvider {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
             UpdateRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
@@ -600,14 +600,14 @@ public class TokenResource implements CollectionResourceProvider {
     /**
      * Returns TokenID from headers
      *
-     * @param context ServerContext which contains the headers.
+     * @param context Context which contains the headers.
      * @return String with TokenID
      */
-    private String getCookieFromServerContext(ServerContext context) {
+    private String getCookieFromServerContext(Context context) {
         return RestUtils.getCookieFromServerContext(context);
     }
 
-    private AMIdentity getUid(ServerContext context) throws SSOException, IdRepoException, UnauthorizedClientException {
+    private AMIdentity getUid(Context context) throws SSOException, IdRepoException, UnauthorizedClientException {
         String cookie = getCookieFromServerContext(context);
         SSOTokenManager mgr = SSOTokenManager.getInstance();
         SSOToken token = mgr.createSSOToken(cookie);

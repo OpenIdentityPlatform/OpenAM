@@ -39,7 +39,7 @@ import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.Router;
 import org.forgerock.json.resource.RoutingMode;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
@@ -93,7 +93,7 @@ public class SmsRouteTreeTest {
 
         //Given
         RequestHandler requestHandler = mock(RequestHandler.class);
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         ReadRequest request = Requests.newReadRequest(resourcePath + "/handler");
         ResultHandler<Resource> resultHandler = mock(ResultHandler.class);
 
@@ -102,7 +102,7 @@ public class SmsRouteTreeTest {
         routeTree.handleRead(context, request, resultHandler);
 
         //Then
-        verify(requestHandler).handleRead(Matchers.<ServerContext>anyObject(), Matchers.<ReadRequest>anyObject(),
+        verify(requestHandler).handleRead(Matchers.<Context>anyObject(), Matchers.<ReadRequest>anyObject(),
                 Matchers.<ResultHandler>anyObject());
     }
 }

@@ -23,7 +23,7 @@ import javax.inject.Named;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.forgerockrest.session.SessionResource;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.promise.Promise;
@@ -48,7 +48,7 @@ public class SessionResourceAuthzModule extends AdminOnlyAuthzModule {
      * {@link AdminOnlyAuthzModule}.
      */
     @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeAction(ServerContext context, ActionRequest request) {
+    public Promise<AuthorizationResult, ResourceException> authorizeAction(Context context, ActionRequest request) {
 
         if (actionCanBeInvokedByNonAdmin(request.getAction())) {
             if (debug.messageEnabled()) {

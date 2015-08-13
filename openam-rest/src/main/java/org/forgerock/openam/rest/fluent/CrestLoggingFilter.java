@@ -21,7 +21,7 @@ import javax.inject.Named;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
@@ -64,7 +64,7 @@ public class CrestLoggingFilter implements Filter {
      * @return {@inheritDoc}
      */
     @Override
-    public Promise<ActionResponse, ResourceException> filterAction(ServerContext context, ActionRequest request,
+    public Promise<ActionResponse, ResourceException> filterAction(Context context, ActionRequest request,
             RequestHandler next) {
         final String resource = ServerContextUtils.getResourceId(request, context);
         final String action = ServerContextUtils.getActionString(request);
@@ -82,7 +82,7 @@ public class CrestLoggingFilter implements Filter {
      * @return {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> filterCreate(ServerContext context, CreateRequest request,
+    public Promise<ResourceResponse, ResourceException> filterCreate(Context context, CreateRequest request,
             RequestHandler next) {
         final String resource = ServerContextUtils.getResourceId(request, context);
         final String action = ServerContextUtils.getCreateString(request);
@@ -100,7 +100,7 @@ public class CrestLoggingFilter implements Filter {
      * @return {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> filterDelete(ServerContext context, DeleteRequest request,
+    public Promise<ResourceResponse, ResourceException> filterDelete(Context context, DeleteRequest request,
             RequestHandler next) {
         final String resource = ServerContextUtils.getResourceId(request, context);
         final String action = ServerContextUtils.getDeleteString(request);
@@ -118,7 +118,7 @@ public class CrestLoggingFilter implements Filter {
      * @return {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> filterPatch(ServerContext context, PatchRequest request,
+    public Promise<ResourceResponse, ResourceException> filterPatch(Context context, PatchRequest request,
             RequestHandler next) {
         final String resource = ServerContextUtils.getResourceId(request, context);
         final String action = ServerContextUtils.getPatchString(request);
@@ -137,7 +137,7 @@ public class CrestLoggingFilter implements Filter {
      * @return {@inheritDoc}
      */
     @Override
-    public Promise<QueryResponse, ResourceException> filterQuery(ServerContext context, QueryRequest request,
+    public Promise<QueryResponse, ResourceException> filterQuery(Context context, QueryRequest request,
             QueryResourceHandler handler, RequestHandler next) {
         final String resource = ServerContextUtils.getResourceId(request, context);
         final String action = ServerContextUtils.getQueryString(request);
@@ -156,7 +156,7 @@ public class CrestLoggingFilter implements Filter {
      * @return {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> filterRead(ServerContext context, ReadRequest request,
+    public Promise<ResourceResponse, ResourceException> filterRead(Context context, ReadRequest request,
             RequestHandler next) {
         final String resource = ServerContextUtils.getResourceId(request, context);
         final String action = ServerContextUtils.getReadString(request);
@@ -174,7 +174,7 @@ public class CrestLoggingFilter implements Filter {
      * @return {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> filterUpdate(ServerContext context, UpdateRequest request,
+    public Promise<ResourceResponse, ResourceException> filterUpdate(Context context, UpdateRequest request,
             RequestHandler next) {
         final String resource = ServerContextUtils.getResourceId(request, context);
         final String action = ServerContextUtils.getUpdateString(request);
@@ -186,7 +186,7 @@ public class CrestLoggingFilter implements Filter {
     /**
      * Pushes off to our logging subsystem.
      */
-    private void logAccess(String resource, String operation, ServerContext context) {
+    private void logAccess(String resource, String operation, Context context) {
 
         if (!context.containsContext(SSOTokenContext.class)) {
             context = new SSOTokenContext(context);

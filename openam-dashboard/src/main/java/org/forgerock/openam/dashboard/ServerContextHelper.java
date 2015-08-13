@@ -17,7 +17,7 @@
 package org.forgerock.openam.dashboard;
 
 import org.forgerock.json.resource.SecurityContext;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 
 /**
  * This class contains method that help with getting information out of ServerContexts objects.
@@ -25,12 +25,12 @@ import org.forgerock.http.context.ServerContext;
 public final class ServerContextHelper {
 
     /**
-     * Gets the iPlanetDirectoryPro cookie from the ServerContext.
+     * Gets the iPlanetDirectoryPro cookie from the Context.
      *
-     * @param context The ServerContext instance.
+     * @param context The Context instance.
      * @return The cookie value or null.
      */
-    public static String getCookieFromServerContext(ServerContext context) {
+    public static String getCookieFromServerContext(Context context) {
         SecurityContext securityContext = context.asContext(SecurityContext.class);
         if (securityContext.getAuthorizationId() != null) {
             return (String) securityContext.getAuthorizationId().get("tokenId");

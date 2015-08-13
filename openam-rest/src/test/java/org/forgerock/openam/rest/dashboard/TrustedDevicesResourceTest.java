@@ -38,7 +38,7 @@ import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.rest.devices.TrustedDevicesDao;
 import org.forgerock.openam.rest.devices.TrustedDevicesResource;
 import org.forgerock.openam.rest.resource.ContextHelper;
@@ -64,13 +64,13 @@ public class TrustedDevicesResourceTest {
 
         resource = new TrustedDevicesResource(dao, contextHelper);
 
-        given(contextHelper.getUserId((ServerContext) anyObject())).willReturn("demo");
+        given(contextHelper.getUserId((Context) anyObject())).willReturn("demo");
     }
 
     private Context ctx() {
         SSOTokenContext ssoTokenContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(ssoTokenContext);
-        ServerContext serverContext = new ServerContext(realmContext);
+        Context serverContext = new InternalContext(realmContext);
 
         return serverContext;
     }

@@ -42,7 +42,7 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -125,7 +125,7 @@ public class SmsRealmProvider implements RequestHandler {
     }
 
     @Override
-    public Promise<ActionResponse, ResourceException> handleAction(ServerContext context, ActionRequest request) {
+    public Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest request) {
         switch (request.getAction()) {
             case SmsResourceProvider.TEMPLATE:
                 return newResultPromise(newActionResponse(json(object(
@@ -169,7 +169,7 @@ public class SmsRealmProvider implements RequestHandler {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> handleCreate(ServerContext serverContext,
+    public Promise<ResourceResponse, ResourceException> handleCreate(Context serverContext,
             CreateRequest createRequest) {
 
         final JsonValue jsonContent = createRequest.getContent();
@@ -233,7 +233,7 @@ public class SmsRealmProvider implements RequestHandler {
         }
     }
 
-    private SSOToken getUserSsoToken(ServerContext serverContext) throws SSOException {
+    private SSOToken getUserSsoToken(Context serverContext) throws SSOException {
         final SSOTokenManager mgr = SSOTokenManager.getInstance();
         return mgr.createSSOToken(getCookieFromServerContext(serverContext));
     }
@@ -261,7 +261,7 @@ public class SmsRealmProvider implements RequestHandler {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> handleDelete(ServerContext serverContext,
+    public Promise<ResourceResponse, ResourceException> handleDelete(Context serverContext,
             DeleteRequest request) {
         RealmContext realmContext = serverContext.asContext(RealmContext.class);
         String realmPath = realmContext.getResolvedRealm();
@@ -291,12 +291,12 @@ public class SmsRealmProvider implements RequestHandler {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> handlePatch(ServerContext context, PatchRequest request) {
+    public Promise<ResourceResponse, ResourceException> handlePatch(Context context, PatchRequest request) {
         return newExceptionPromise(newNotSupportedException("Method not supported."));
     }
 
     @Override
-    public Promise<QueryResponse, ResourceException> handleQuery(ServerContext context, QueryRequest request,
+    public Promise<QueryResponse, ResourceException> handleQuery(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         if (!"true".equals(request.getQueryFilter().toString())) {
             return newExceptionPromise(newNotSupportedException("Query not supported: " + request.getQueryFilter()));
@@ -343,7 +343,7 @@ public class SmsRealmProvider implements RequestHandler {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> handleRead(ServerContext context, ReadRequest request) {
+    public Promise<ResourceResponse, ResourceException> handleRead(Context context, ReadRequest request) {
         RealmContext realmContext = context.asContext(RealmContext.class);
         String realmPath = realmContext.getResolvedRealm();
 
@@ -428,7 +428,7 @@ public class SmsRealmProvider implements RequestHandler {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> handleUpdate(ServerContext context, UpdateRequest request) {
+    public Promise<ResourceResponse, ResourceException> handleUpdate(Context context, UpdateRequest request) {
         RealmContext realmContext = context.asContext(RealmContext.class);
         String realmPath = realmContext.getResolvedRealm();
 

@@ -22,11 +22,12 @@ import java.util.List;
 import javax.security.auth.Subject;
 import static org.fest.assertions.Assertions.assertThat;
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.InternalContext;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeWrapper;
 import org.forgerock.openam.rest.resource.RealmContext;
@@ -67,7 +68,7 @@ public class ApplicationTypesResourceTest {
         //given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSubjectContext);
-        ServerContext mockServerContext = new ServerContext(realmContext);
+        Context mockServerContext = new Context(realmContext);
 
         Subject subject = null;
         given(mockSubjectContext.getCallerSubject()).willReturn(subject);
@@ -90,7 +91,7 @@ public class ApplicationTypesResourceTest {
         //given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSubjectContext);
-        ServerContext mockServerContext = new ServerContext(realmContext);
+        Context mockServerContext = new InternalContext(realmContext);
 
         Subject subject = new Subject();
         given(mockSubjectContext.getCallerSubject()).willReturn(subject);
@@ -112,7 +113,7 @@ public class ApplicationTypesResourceTest {
         //given
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSubjectContext);
-        ServerContext mockServerContext = new ServerContext(realmContext);
+        Context mockServerContext = new InternalContext(realmContext);
 
         Subject subject = new Subject();
         given(mockSubjectContext.getCallerSubject()).willReturn(subject);

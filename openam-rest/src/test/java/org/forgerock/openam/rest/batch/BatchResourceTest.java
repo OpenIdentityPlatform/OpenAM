@@ -28,7 +28,7 @@ import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.rest.batch.helpers.Requester;
 import org.forgerock.openam.scripting.ScriptEvaluator;
@@ -60,7 +60,7 @@ public class BatchResourceTest {
     @Test
     public void shouldRejectNonBatchActions() {
         //given
-        ServerContext mockContext = Mockito.mock(ServerContext.class);
+        Context mockContext = Mockito.mock(Context.class);
         ActionRequest mockRequest = mock(ActionRequest.class);
         ResultHandler<JsonValue> mockHandler = mock(ResultHandler.class);
 
@@ -76,7 +76,7 @@ public class BatchResourceTest {
     @Test
     public void shouldRejectNullScriptId() {
         //given
-        ServerContext mockContext = Mockito.mock(ServerContext.class);
+        Context mockContext = Mockito.mock(Context.class);
         ResultHandler<JsonValue> mockHandler = mock(ResultHandler.class);
         ActionRequest action = Requests.newActionRequest("batch", "batch");
         action.setContent(JsonValueBuilder.toJsonValue("{ \"notScriptId\" : \"blah\" }"));

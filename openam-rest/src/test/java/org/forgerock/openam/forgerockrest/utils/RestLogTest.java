@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import javax.security.auth.Subject;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -37,7 +37,7 @@ import org.testng.annotations.Test;
 
 public class RestLogTest {
 
-    ServerContext mockContext = mock(ServerContext.class);
+    Context mockContext = mock(Context.class);
     Debug mockDebug;
     RestLog restLog;
 

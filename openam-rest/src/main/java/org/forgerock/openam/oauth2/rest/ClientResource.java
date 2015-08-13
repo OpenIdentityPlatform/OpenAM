@@ -47,7 +47,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -123,17 +123,17 @@ public class ClientResource implements CollectionResourceProvider {
         }
     }
 
-    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest
+    public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest
             actionRequest) {
         return RestUtils.generateUnsupportedOperation();
     }
 
-    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+    public Promise<ActionResponse, ResourceException> actionInstance(Context context, String resourceId,
             ActionRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
 
-    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context,
+    public Promise<ResourceResponse, ResourceException> createInstance(Context context,
             CreateRequest createRequest) {
 
         String principal = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
@@ -296,7 +296,7 @@ public class ClientResource implements CollectionResourceProvider {
         return true;
     }
 
-    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId,
             DeleteRequest request) {
 
         String principal = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
@@ -376,22 +376,22 @@ public class ClientResource implements CollectionResourceProvider {
         }
     }
 
-    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
             PatchRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
 
-    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest queryRequest,
+    public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest queryRequest,
             QueryResourceHandler handler) {
         return RestUtils.generateUnsupportedOperation();
     }
 
-    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
 
-    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
             UpdateRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }

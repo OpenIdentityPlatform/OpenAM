@@ -22,7 +22,7 @@ import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
 
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
@@ -58,7 +58,7 @@ public class UmaEnabledFilter implements Filter {
         this.umaProviderSettingsFactory = umaProviderSettingsFactory;
     }
 
-    private Promise<Void, ResourceException> enabled(ServerContext serverContext) {
+    private Promise<Void, ResourceException> enabled(Context serverContext) {
         try {
             final String realm = ServerContextUtils.getRealm(serverContext);
             UmaProviderSettings settings = umaProviderSettingsFactory.get(RequestHolder.get(), realm);
@@ -70,7 +70,7 @@ public class UmaEnabledFilter implements Filter {
     }
 
     @Override
-    public Promise<ActionResponse, ResourceException> filterAction(final ServerContext serverContext,
+    public Promise<ActionResponse, ResourceException> filterAction(final Context serverContext,
             final ActionRequest request, final RequestHandler requestHandler) {
         return enabled(serverContext)
                 .thenAsync(new AsyncFunction<Void, ActionResponse, ResourceException>() {
@@ -82,7 +82,7 @@ public class UmaEnabledFilter implements Filter {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> filterCreate(final ServerContext serverContext,
+    public Promise<ResourceResponse, ResourceException> filterCreate(final Context serverContext,
             final CreateRequest request, final RequestHandler requestHandler) {
         return enabled(serverContext)
                 .thenAsync(new AsyncFunction<Void, ResourceResponse, ResourceException>() {
@@ -94,7 +94,7 @@ public class UmaEnabledFilter implements Filter {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> filterDelete(final ServerContext serverContext,
+    public Promise<ResourceResponse, ResourceException> filterDelete(final Context serverContext,
             final DeleteRequest request, final RequestHandler requestHandler) {
         return enabled(serverContext)
                 .thenAsync(new AsyncFunction<Void, ResourceResponse, ResourceException>() {
@@ -106,7 +106,7 @@ public class UmaEnabledFilter implements Filter {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> filterPatch(final ServerContext serverContext,
+    public Promise<ResourceResponse, ResourceException> filterPatch(final Context serverContext,
             final PatchRequest request, final RequestHandler requestHandler) {
         return enabled(serverContext)
                 .thenAsync(new AsyncFunction<Void, ResourceResponse, ResourceException>() {
@@ -118,7 +118,7 @@ public class UmaEnabledFilter implements Filter {
     }
 
     @Override
-    public Promise<QueryResponse, ResourceException> filterQuery(final ServerContext serverContext,
+    public Promise<QueryResponse, ResourceException> filterQuery(final Context serverContext,
             final QueryRequest request, final QueryResourceHandler queryResultHandler,
             final RequestHandler requestHandler) {
         return enabled(serverContext)
@@ -131,7 +131,7 @@ public class UmaEnabledFilter implements Filter {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> filterRead(final ServerContext serverContext,
+    public Promise<ResourceResponse, ResourceException> filterRead(final Context serverContext,
             final ReadRequest request, final RequestHandler requestHandler) {
         return enabled(serverContext)
                 .thenAsync(new AsyncFunction<Void, ResourceResponse, ResourceException>() {
@@ -143,7 +143,7 @@ public class UmaEnabledFilter implements Filter {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> filterUpdate(final ServerContext serverContext,
+    public Promise<ResourceResponse, ResourceException> filterUpdate(final Context serverContext,
             final UpdateRequest request, final RequestHandler requestHandler) {
         return enabled(serverContext)
                 .thenAsync(new AsyncFunction<Void, ResourceResponse, ResourceException>() {

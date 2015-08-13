@@ -42,7 +42,7 @@ import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.dashboard.ServerContextHelper;
 import org.forgerock.openam.rest.resource.RealmContext;
@@ -85,14 +85,14 @@ final public class RestUtils {
     /**
      * Returns TokenID from headers
      *
-     * @param context ServerContext which contains the headers.
+     * @param context Context which contains the headers.
      * @return String with TokenID
      */
-    static public String getCookieFromServerContext(ServerContext context) {
+    static public String getCookieFromServerContext(Context context) {
         return ServerContextHelper.getCookieFromServerContext(context);
     }
 
-    static boolean isAdmin(ServerContext context) {
+    static boolean isAdmin(Context context) {
         boolean isAdmin = false;
         try {
             String realm = context.asContext(RealmContext.class).getResolvedRealm();
@@ -129,7 +129,7 @@ final public class RestUtils {
         return sm.getServiceNames();
     }
 
-    static public void hasPermission(final ServerContext context) throws SSOException, IdRepoException, ForbiddenException {
+    static public void hasPermission(final Context context) throws SSOException, IdRepoException, ForbiddenException {
         SSOTokenManager mgr = SSOTokenManager.getInstance();
         SSOToken ssotok = mgr.createSSOToken(getCookieFromServerContext(context));
         mgr.validateToken(ssotok);
@@ -194,7 +194,7 @@ final public class RestUtils {
      * @see <a href="https://tools.ietf.org/html/rfc2047">RFC 2047: MIME Part 3: Message Header Extensions for Non-ASCII
      * Text</a>
      */
-    public static String getMimeHeaderValue(final ServerContext serverContext, final String headerName) {
+    public static String getMimeHeaderValue(final Context serverContext, final String headerName) {
         final HttpContext httpContext = serverContext.asContext(HttpContext.class);
         final String headerValue = httpContext.getHeaderAsString(headerName);
         try {

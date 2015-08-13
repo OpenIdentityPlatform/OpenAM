@@ -33,7 +33,7 @@ import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
@@ -194,7 +194,7 @@ public class PendingRequestsService {
      * @param realm The current realm.  @return {@code Promise} which is completed successfully or
      *              failed with a {@code ResourceException}.
      */
-    public Promise<Void, ResourceException> approvePendingRequest(ServerContext context, String id,
+    public Promise<Void, ResourceException> approvePendingRequest(Context context, String id,
             JsonValue content, String realm) {
         try {
             final UmaPendingRequest request = store.read(id);
@@ -256,7 +256,7 @@ public class PendingRequestsService {
         }
     }
 
-    private Promise<UmaPolicy, ResourceException> createUmaPolicy(final ServerContext context,
+    private Promise<UmaPolicy, ResourceException> createUmaPolicy(final Context context,
             final UmaPendingRequest request, final Collection<String> scopes) {
         return policyService.readPolicy(context, request.getResourceSetId())
                 .thenAsync(new AsyncFunction<UmaPolicy, UmaPolicy, ResourceException>() {

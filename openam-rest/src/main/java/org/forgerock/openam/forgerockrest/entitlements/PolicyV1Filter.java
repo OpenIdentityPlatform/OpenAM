@@ -24,7 +24,7 @@ import javax.security.auth.Subject;
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -85,7 +85,7 @@ public class PolicyV1Filter implements Filter {
      *         a request handler representing the remainder of the filter chain
      */
     @Override
-    public Promise<ActionResponse, ResourceException> filterAction(ServerContext context, ActionRequest request,
+    public Promise<ActionResponse, ResourceException> filterAction(Context context, ActionRequest request,
             RequestHandler next) {
         // Forward onto next handler.
         return next.handleAction(context, request)
@@ -111,7 +111,7 @@ public class PolicyV1Filter implements Filter {
      *         a request handler representing the remainder of the filter chain
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> filterCreate(ServerContext context, CreateRequest request,
+    public Promise<ResourceResponse, ResourceException> filterCreate(Context context, CreateRequest request,
             RequestHandler next) {
         try {
             final JsonValue jsonValue = request.getContent();
@@ -143,7 +143,7 @@ public class PolicyV1Filter implements Filter {
      *         a request handler representing the remainder of the filter chain
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> filterUpdate(ServerContext context, UpdateRequest request,
+    public Promise<ResourceResponse, ResourceException> filterUpdate(Context context, UpdateRequest request,
             RequestHandler next) {
         try {
             final JsonValue jsonValue = request.getContent();
@@ -219,7 +219,7 @@ public class PolicyV1Filter implements Filter {
      *         a request handler representing the remainder of the filter chain
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> filterDelete(ServerContext context, DeleteRequest request,
+    public Promise<ResourceResponse, ResourceException> filterDelete(Context context, DeleteRequest request,
             RequestHandler next) {
         // Forward onto next handler.
         return next.handleDelete(context, request);
@@ -238,7 +238,7 @@ public class PolicyV1Filter implements Filter {
      *         a request handler representing the remainder of the filter chain
      */
     @Override
-    public Promise<QueryResponse, ResourceException> filterQuery(final ServerContext context,
+    public Promise<QueryResponse, ResourceException> filterQuery(final Context context,
             final QueryRequest request, final QueryResourceHandler handler, final RequestHandler next) {
         return next.handleQuery(context, request, new QueryResourceHandler() {
             @Override
@@ -261,7 +261,7 @@ public class PolicyV1Filter implements Filter {
      *         a request handler representing the remainder of the filter chain
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> filterRead(ServerContext context, ReadRequest request,
+    public Promise<ResourceResponse, ResourceException> filterRead(Context context, ReadRequest request,
             RequestHandler next) {
         // Forward onto next handler.
         return transform(next.handleRead(context, request));
@@ -272,7 +272,7 @@ public class PolicyV1Filter implements Filter {
      * an appropriate implementation will need to be considered here also.
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> filterPatch(ServerContext context, PatchRequest request,
+    public Promise<ResourceResponse, ResourceException> filterPatch(Context context, PatchRequest request,
             RequestHandler next) {
         return RestUtils.generateUnsupportedOperation();
     }

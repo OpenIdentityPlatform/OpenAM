@@ -38,6 +38,7 @@ import java.util.List;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalContext;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResultHandler;
@@ -45,7 +46,7 @@ import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.rest.devices.OathDevicesDao;
 import org.forgerock.openam.rest.devices.OathDevicesResource;
 import org.forgerock.openam.rest.devices.services.OathService;
@@ -80,14 +81,14 @@ public class OathDevicesResourceTest {
 
         resource = new OathDevicesResourceTestClass(dao, contextHelper, debug, oathServiceFactory);
 
-        given(contextHelper.getUserId((ServerContext) anyObject())).willReturn("demo");
+        given(contextHelper.getUserId((Context) anyObject())).willReturn("demo");
         given(oathServiceFactory.create(anyString())).willReturn(oathService);
     }
 
-    private ServerContext ctx() throws SSOException {
+    private Context ctx() throws SSOException {
         SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
         given(mockSubjectContext.getCallerSSOToken()).willReturn(mock(SSOToken.class));
-        return new ServerContext(new RealmContext(mock(SSOTokenContext.class)));
+        return new InternalContext(new RealmContext(mock(SSOTokenContext.class)));
     }
 
     @Test
@@ -229,7 +230,7 @@ public class OathDevicesResourceTest {
             super(dao, helper, debug, oathServiceFactory, helper);
         }
 
-        protected AMIdentity getUserIdFromUri(ServerContext context) throws InternalServerErrorException {
+        protected AMIdentity getUserIdFromUri(Context context) throws InternalServerErrorException {
 
             HashSet<String> attribute = new HashSet<>();
             attribute.add(String.valueOf(OathService.SKIPPABLE));

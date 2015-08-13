@@ -34,7 +34,7 @@ import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.sts.AMSTSConstants;
@@ -83,7 +83,7 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
         this.logger = logger;
     }
 
-    public void handleAction(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
+    public void handleAction(Context context, ActionRequest request, ResultHandler<JsonValue> handler) {
         handler.handleError(new NotSupportedException());
     }
 
@@ -95,7 +95,7 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
      error message, so that in the case of RestSecurityTokenServiceViewBean invocation, the user can make appropriate
       corrections to the configuration state.
       */
-    public void handleCreate(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
+    public void handleCreate(Context context, CreateRequest request, ResultHandler<Resource> handler) {
         final RestSTSInstanceConfig instanceConfig;
         try {
             instanceConfig = marshalInstanceConfigFromInvocation(request.getContent());
@@ -123,7 +123,7 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
         }
     }
 
-    public void handleDelete(ServerContext context, DeleteRequest request, ResultHandler<Resource> handler) {
+    public void handleDelete(Context context, DeleteRequest request, ResultHandler<Resource> handler) {
         String stsId = request.getResourceName();
         String realm = getRealmFromResourceName(request.getResourceName());
         /*
@@ -151,15 +151,15 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
         }
     }
 
-    public void handlePatch(ServerContext context, PatchRequest request, ResultHandler<Resource> handler) {
+    public void handlePatch(Context context, PatchRequest request, ResultHandler<Resource> handler) {
         handler.handleError(new NotSupportedException());
     }
 
-    public void handleQuery(ServerContext context, QueryRequest request, QueryResultHandler handler) {
+    public void handleQuery(Context context, QueryRequest request, QueryResultHandler handler) {
         handler.handleError(new NotSupportedException());
     }
 
-    public void handleRead(ServerContext context, ReadRequest request, ResultHandler<Resource> handler) {
+    public void handleRead(Context context, ReadRequest request, ResultHandler<Resource> handler) {
         try {
             if (EMPTY_STRING.equals(request.getResourceName())) {
                 List<RestSTSInstanceConfig> publishedInstances = publisher.getPublishedInstances();
@@ -200,7 +200,7 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
       * RestSTSInstanceId (wrapped in invocation context information) will result in republishing the existing instance
       * (which is a delete followed by a create).
       */
-    public void handleUpdate(ServerContext context, UpdateRequest request, ResultHandler<Resource> handler) {
+    public void handleUpdate(Context context, UpdateRequest request, ResultHandler<Resource> handler) {
         String stsId = request.getResourceName();
         String realm = getRealmFromResourceName(request.getResourceName());
         if (!realmValidator.isRealm(realm)) {

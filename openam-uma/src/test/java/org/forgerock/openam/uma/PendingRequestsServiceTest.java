@@ -34,7 +34,7 @@ import java.util.Set;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.services.baseurl.BaseURLProvider;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
@@ -179,7 +179,7 @@ public class PendingRequestsServiceTest {
     public void shouldApprovePendingRequest() throws Exception {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         createPendingRequest(PENDING_REQUEST_ID, RESOURCE_SET_ID, RESOURCE_SET_NAME, RESOURCE_OWNER_ID,
                 REALM, REQUESTING_PARTY_ID, Collections.singleton(SCOPE));
         mockSuccessfulPolicyCreationForPendingRequest();
@@ -205,7 +205,7 @@ public class PendingRequestsServiceTest {
     public void shouldApprovePendingRequestUsingScopesFromRequestContent() throws Exception {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         createPendingRequest(PENDING_REQUEST_ID, RESOURCE_SET_ID, RESOURCE_SET_NAME, RESOURCE_OWNER_ID,
                 REALM, REQUESTING_PARTY_ID, Collections.singleton(SCOPE));
         mockSuccessfulPolicyCreationForPendingRequest();
@@ -231,7 +231,7 @@ public class PendingRequestsServiceTest {
     public void shouldApprovePendingRequestUpdatingExistingPolicy() throws Exception {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         createPendingRequest(PENDING_REQUEST_ID, RESOURCE_SET_ID, RESOURCE_SET_NAME, RESOURCE_OWNER_ID,
                 REALM, REQUESTING_PARTY_ID, Collections.singleton(SCOPE));
         UmaPolicy existingPolicy = mockUmaPolicy("SCOPE_A");
@@ -258,7 +258,7 @@ public class PendingRequestsServiceTest {
     public void shouldSendEmailOnPendingRequestApproval() throws Exception {
 
         //Given
-        ServerContext context = mock(ServerContext.class);
+        Context context = mock(Context.class);
         createPendingRequest(PENDING_REQUEST_ID, RESOURCE_SET_ID, RESOURCE_SET_NAME, RESOURCE_OWNER_ID,
                 REALM, REQUESTING_PARTY_ID, Collections.singleton(SCOPE));
         given(settings.isEmailRequestingPartyOnPendingRequestApprovalEnabled()).willReturn(true);
@@ -319,9 +319,9 @@ public class PendingRequestsServiceTest {
     private void mockSuccessfulPolicyCreationForPendingRequest() {
         Promise<UmaPolicy, ResourceException> readPromise =
                 Promises.newExceptionPromise(ResourceException.getException(ResourceException.NOT_FOUND));
-        given(policyService.readPolicy(any(ServerContext.class), anyString())).willReturn(readPromise);
+        given(policyService.readPolicy(any(Context.class), anyString())).willReturn(readPromise);
         Promise<UmaPolicy, ResourceException> createPromise = Promises.newResultPromise(null);
-        given(policyService.createPolicy(any(ServerContext.class), any(JsonValue.class))).willReturn(createPromise);
+        given(policyService.createPolicy(any(Context.class), any(JsonValue.class))).willReturn(createPromise);
     }
 
     private UmaPolicy mockUmaPolicy(String... scopes) {
@@ -332,9 +332,9 @@ public class PendingRequestsServiceTest {
 
     private void mockSuccessfulPolicyUpdateForPendingRequest(UmaPolicy policy) {
         Promise<UmaPolicy, ResourceException> readPromise = Promises.newResultPromise(policy);
-        given(policyService.readPolicy(any(ServerContext.class), anyString())).willReturn(readPromise);
+        given(policyService.readPolicy(any(Context.class), anyString())).willReturn(readPromise);
         Promise<UmaPolicy, ResourceException> updatePromise = Promises.newResultPromise(null);
-        given(policyService.updatePolicy(any(ServerContext.class), anyString(), any(JsonValue.class)))
+        given(policyService.updatePolicy(any(Context.class), anyString(), any(JsonValue.class)))
                 .willReturn(updatePromise);
     }
 }

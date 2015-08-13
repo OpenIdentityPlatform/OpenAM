@@ -23,12 +23,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.InternalContext;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.RequestType;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.forgerockrest.utils.ServerContextUtils;
 import org.testng.annotations.Test;
@@ -133,10 +134,10 @@ public class EntitlementsExceptionMappingHandlerTest {
         return error;
     }
 
-    private ServerContext getHttpServerContext(String ...language) throws Exception {
+    private Context getHttpServerContext(String ...language) throws Exception {
         final HttpContext httpContext = new HttpContext(json(object(field(HttpContext.ATTR_HEADERS,
-                Collections.singletonMap(ServerContextUtils.ACCEPT_LANGUAGE, Arrays.asList(language))),
+                Collections.singletonMap(ContextUtils.ACCEPT_LANGUAGE, Arrays.asList(language))),
                 field(HttpContext.ATTR_PARAMETERS, Collections.emptyMap()))), null);
-        return new ServerContext(httpContext);
+        return new InternalContext(httpContext);
     }
 }

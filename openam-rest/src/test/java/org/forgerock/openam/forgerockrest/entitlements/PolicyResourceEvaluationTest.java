@@ -20,11 +20,12 @@ import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.InternalContext;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.RequestType;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.PolicyRequest;
 import org.forgerock.openam.forgerockrest.guice.ForgerockRestGuiceModule;
 import org.forgerock.openam.rest.resource.RealmContext;
@@ -92,7 +93,7 @@ public class PolicyResourceEvaluationTest {
         // Given...
         given(request.getAction()).willReturn("evaluate");
 
-        ServerContext context = buildContextStructure("/abc");
+        Context context = buildContextStructure("/abc");
         given(requestFactory.buildRequest(PolicyAction.EVALUATE, context, request)).willReturn(policyRequest);
         given(policyRequest.getRestSubject()).willReturn(restSubject);
         given(policyRequest.getApplication()).willReturn("some-application");
@@ -128,7 +129,7 @@ public class PolicyResourceEvaluationTest {
         // Given...
         given(request.getAction()).willReturn("evaluateTree");
 
-        ServerContext context = buildContextStructure("/abc");
+        Context context = buildContextStructure("/abc");
         given(requestFactory.buildRequest(PolicyAction.TREE_EVALUATE, context, request)).willReturn(policyRequest);
         given(policyRequest.getRestSubject()).willReturn(restSubject);
         given(policyRequest.getApplication()).willReturn("some-application");
@@ -164,7 +165,7 @@ public class PolicyResourceEvaluationTest {
         // Given...
         given(request.getAction()).willReturn("evaluate");
 
-        ServerContext context = buildContextStructure("/abc");
+        Context context = buildContextStructure("/abc");
         EntitlementException eE = new EntitlementException(EntitlementException.INVALID_VALUE);
         given(requestFactory.buildRequest(PolicyAction.EVALUATE, context, request)).willThrow(eE);
         given(request.getRequestType()).willReturn(RequestType.ACTION);
@@ -187,7 +188,7 @@ public class PolicyResourceEvaluationTest {
         given(request.getAction()).willReturn("unknownAction");
 
         // When...
-        ServerContext context = buildContextStructure("/abc");
+        Context context = buildContextStructure("/abc");
         policyResource.actionCollection(context, request, jsonHandler);
 
         // Then...
@@ -206,8 +207,8 @@ public class PolicyResourceEvaluationTest {
      *
      * @return the server context hierarchy
      */
-    private ServerContext buildContextStructure(final String realm) {
-        return new ServerContext(new RealmContext(subjectContext));
+    private Context buildContextStructure(final String realm) {
+        return new InternalContext(new RealmContext(subjectContext));
     }
 
     /**

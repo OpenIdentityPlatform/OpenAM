@@ -55,7 +55,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -131,7 +131,7 @@ public class ServerInfoResource extends RealmAwareResource {
      * @param context Current Server Context.
      * @param realm realm in whose security context we use.
      */
-    private Promise<ResourceResponse, ResourceException> getAllServerInfo(ServerContext context, String realm) {
+    private Promise<ResourceResponse, ResourceException> getAllServerInfo(Context context, String realm) {
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         Set<String> cookieDomains;
         Set<String> protectedUserAttributes;
@@ -264,14 +264,14 @@ public class ServerInfoResource extends RealmAwareResource {
     /**
      * {@inheritDoc}
      */
-    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
+    public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * {@inheritDoc}
      */
-    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String s,
+    public Promise<ActionResponse, ResourceException> actionInstance(Context context, String s,
             ActionRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
@@ -279,14 +279,14 @@ public class ServerInfoResource extends RealmAwareResource {
     /**
      * {@inheritDoc}
      */
-    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
+    public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * {@inheritDoc}
      */
-    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String s,
+    public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String s,
             DeleteRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
@@ -294,7 +294,7 @@ public class ServerInfoResource extends RealmAwareResource {
     /**
      * {@inheritDoc}
      */
-    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String s,
+    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String s,
             PatchRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
@@ -302,7 +302,7 @@ public class ServerInfoResource extends RealmAwareResource {
     /**
      * {@inheritDoc}
      */
-    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+    public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         return RestUtils.generateUnsupportedOperation();
     }
@@ -310,7 +310,7 @@ public class ServerInfoResource extends RealmAwareResource {
     /**
      * {@inheritDoc}
      */
-    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
 
         final String realm = getRealm(context);
@@ -334,7 +334,7 @@ public class ServerInfoResource extends RealmAwareResource {
     /**
      * {@inheritDoc}
      */
-    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String s,
+    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String s,
             UpdateRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }

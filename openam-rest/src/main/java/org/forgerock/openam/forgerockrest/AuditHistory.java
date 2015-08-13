@@ -42,7 +42,7 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
 import org.forgerock.openam.rest.resource.RealmContext;
@@ -62,7 +62,7 @@ public class AuditHistory implements CollectionResourceProvider {
     }
 
     @Override
-    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
+    public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
         AMIdentity identity = getIdentity(context);
         try {
             return newResultPromise(newActionResponse(new JsonValue(auditLogger.getHistory(identity, null))));
@@ -72,7 +72,7 @@ public class AuditHistory implements CollectionResourceProvider {
     }
 
     @Override
-    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+    public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         AMIdentity identity = getIdentity(context);
         try {
@@ -96,43 +96,43 @@ public class AuditHistory implements CollectionResourceProvider {
         }
     }
 
-    private AMIdentity getIdentity(ServerContext context) {
+    private AMIdentity getIdentity(Context context) {
         String realm = context.asContext(RealmContext.class).getResolvedRealm();
         final String user = context.asContext(UriRouterContext.class).getUriTemplateVariables().get("user");
         return IdUtils.getIdentity(user, realm);
     }
 
     @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+    public Promise<ActionResponse, ResourceException> actionInstance(Context context, String resourceId,
             ActionRequest request) {
         return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
+    public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
         return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId,
             DeleteRequest request) {
         return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
             PatchRequest request) {
         return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
         return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
             UpdateRequest request) {
         return newExceptionPromise(newNotSupportedException("Not supported."));
     }

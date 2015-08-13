@@ -20,7 +20,7 @@ import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
@@ -54,7 +54,7 @@ public class CoreTokenResourceAuthzModule extends AdminOnlyAuthzModule {
      * a user with Administrator-level access.
      */
     @Override
-    protected Promise<AuthorizationResult, ResourceException> authorize(ServerContext context) {
+    protected Promise<AuthorizationResult, ResourceException> authorize(Context context) {
 
         if (!enabled) {
             if (debug.messageEnabled()) {

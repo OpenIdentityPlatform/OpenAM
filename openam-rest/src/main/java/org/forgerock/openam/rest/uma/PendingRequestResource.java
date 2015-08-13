@@ -29,7 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -76,7 +76,7 @@ public class PendingRequestResource implements CollectionResourceProvider {
     }
 
     @Override
-    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
+    public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
         try {
             if (APPROVE_ACTION_ID.equalsIgnoreCase(request.getAction())) {
                 List<Promise<Void, ResourceException>> promises = new ArrayList<>();
@@ -101,7 +101,7 @@ public class PendingRequestResource implements CollectionResourceProvider {
     }
 
     @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+    public Promise<ActionResponse, ResourceException> actionInstance(Context context, String resourceId,
             ActionRequest request) {
         try {
             if (APPROVE_ACTION_ID.equalsIgnoreCase(request.getAction())) {
@@ -133,7 +133,7 @@ public class PendingRequestResource implements CollectionResourceProvider {
     }
 
     @Override
-    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+    public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         if (request.getQueryFilter() == null) {
             return newExceptionPromise(newNotSupportedException("Only query filter is supported."));
@@ -154,7 +154,7 @@ public class PendingRequestResource implements CollectionResourceProvider {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
         try {
             return newResultPromise(newResource(service.readPendingRequest(resourceId)));
@@ -163,7 +163,7 @@ public class PendingRequestResource implements CollectionResourceProvider {
         }
     }
 
-    private Set<UmaPendingRequest> queryResourceOwnerPendingRequests(ServerContext context) throws ResourceException {
+    private Set<UmaPendingRequest> queryResourceOwnerPendingRequests(Context context) throws ResourceException {
         return service.queryPendingRequests(contextHelper.getUserId(context), ServerContextUtils.getRealm(context));
     }
 
@@ -172,24 +172,24 @@ public class PendingRequestResource implements CollectionResourceProvider {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
+    public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
         return newExceptionPromise(newNotSupportedException());
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId,
             DeleteRequest request) {
         return newExceptionPromise(newNotSupportedException());
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
             PatchRequest request) {
         return newExceptionPromise(newNotSupportedException());
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
             UpdateRequest request) {
         return newExceptionPromise(newNotSupportedException());
     }

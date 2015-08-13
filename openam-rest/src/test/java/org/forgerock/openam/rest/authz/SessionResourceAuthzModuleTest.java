@@ -23,7 +23,7 @@ import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.promise.Promise;
 import static org.mockito.BDDMockito.given;
@@ -47,7 +47,7 @@ public class SessionResourceAuthzModuleTest {
     @Test
     public void shouldAllowLogoutAction() throws ExecutionException, InterruptedException {
         //given
-        ServerContext mockContext = mock(ServerContext.class);
+        Context mockContext = mock(Context.class);
         ActionRequest mockRequest = mock(ActionRequest.class);
 
         given(mockRequest.getAction()).willReturn("logout");
@@ -63,7 +63,7 @@ public class SessionResourceAuthzModuleTest {
     @Test
     public void shouldAllowValidateAction() throws ExecutionException, InterruptedException {
         //given
-        ServerContext mockContext = mock(ServerContext.class);
+        Context mockContext = mock(Context.class);
         ActionRequest mockRequest = mock(ActionRequest.class);
 
         given(mockRequest.getAction()).willReturn("validate");
@@ -78,7 +78,7 @@ public class SessionResourceAuthzModuleTest {
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void shouldDeferAllOthers() {
         //given
-        ServerContext mockContext = mock(ServerContext.class);
+        Context mockContext = mock(Context.class);
         ActionRequest mockRequest = mock(ActionRequest.class);
 
         given(mockRequest.getAction()).willReturn("something else");

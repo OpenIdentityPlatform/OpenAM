@@ -17,7 +17,8 @@
 package org.forgerock.openam.rest.resource;
 
 import org.forgerock.http.Context;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
+import org.forgerock.http.context.AbstractContext;
 import org.forgerock.util.Pair;
 
 /**
@@ -25,7 +26,7 @@ import org.forgerock.util.Pair;
  *
  * @since 12.0.0
  */
-public class RealmContext extends ServerContext {
+public class RealmContext extends AbstractContext {
 
     private Pair<String, String> dnsAliasRealm;
     private Pair<String, String> relativeRealmPath = Pair.of("/", "/");

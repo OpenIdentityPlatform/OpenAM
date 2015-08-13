@@ -43,7 +43,7 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
@@ -168,10 +168,10 @@ public class PolicyGraphTest {
         PolicyGraph graph = makePolicyGraph(policies);
         graph.computeGraph();
 
-        given(delegate.updatePolicies(isNull(ServerContext.class), anySet()))
+        given(delegate.updatePolicies(isNull(Context.class), anySet()))
                 .willReturn(Promises.<List<Resource>, ResourceException>newResultPromise(Collections.<Resource>emptyList()));
 
-        given(delegate.deletePolicies(isNull(ServerContext.class), anySet()))
+        given(delegate.deletePolicies(isNull(Context.class), anySet()))
                 .willReturn(Promises.<List<Resource>, ResourceException>newResultPromise(Collections.<Resource>emptyList()));
 
         // When
@@ -198,7 +198,7 @@ public class PolicyGraphTest {
         PolicyGraph graph = makePolicyGraph(policies);
         graph.computeGraph();
 
-        given(delegate.updatePolicies(isNull(ServerContext.class), anySet()))
+        given(delegate.updatePolicies(isNull(Context.class), anySet()))
                 .willReturn(Promises.<List<Resource>, ResourceException>newResultPromise(Collections.<Resource>emptyList()));
 
         // When
@@ -227,10 +227,10 @@ public class PolicyGraphTest {
         given(resourceSetStore.read(anyString()))
                 .willReturn(new ResourceSetDescription(RESOURCE_SET_ID, "RESOURCE_SERVER_ID", ALICE, null));
 
-        given(delegate.updatePolicies(isNull(ServerContext.class), anySet()))
+        given(delegate.updatePolicies(isNull(Context.class), anySet()))
                 .willReturn(Promises.<List<Resource>, ResourceException>newResultPromise(Collections.<Resource>emptyList()));
 
-        given(delegate.createPolicies(isNull(ServerContext.class), anySet()))
+        given(delegate.createPolicies(isNull(Context.class), anySet()))
                 .willReturn(Promises.<List<Resource>, ResourceException>newResultPromise(Collections.<Resource>emptyList()));
 
         // When
@@ -261,10 +261,10 @@ public class PolicyGraphTest {
         given(resourceSetStore.read(anyString()))
                 .willReturn(new ResourceSetDescription(RESOURCE_SET_ID, "RESOURCE_SERVER_ID", ALICE, null));
 
-        given(delegate.updatePolicies(isNull(ServerContext.class), anySet()))
+        given(delegate.updatePolicies(isNull(Context.class), anySet()))
                 .willReturn(Promises.<List<Resource>, ResourceException>newResultPromise(Collections.<Resource>emptyList()));
 
-        given(delegate.createPolicies(isNull(ServerContext.class), anySet()))
+        given(delegate.createPolicies(isNull(Context.class), anySet()))
                 .willReturn(Promises.<List<Resource>, ResourceException>newResultPromise(Collections.<Resource>emptyList()));
 
         // When
@@ -290,21 +290,21 @@ public class PolicyGraphTest {
 
     private String policyDeleted() {
         ArgumentCaptor<Set> policyIdCaptor = ArgumentCaptor.forClass(Set.class);
-        verify(delegate).deletePolicies(isNull(ServerContext.class), policyIdCaptor.capture());
+        verify(delegate).deletePolicies(isNull(Context.class), policyIdCaptor.capture());
         assertThat(policyIdCaptor.getValue()).hasSize(1);
         return (String) policyIdCaptor.getValue().iterator().next();
     }
 
     private JsonValue policyUpdated() {
         ArgumentCaptor<Set> policyCaptor = ArgumentCaptor.forClass(Set.class);
-        verify(delegate).updatePolicies(isNull(ServerContext.class), policyCaptor.capture());
+        verify(delegate).updatePolicies(isNull(Context.class), policyCaptor.capture());
         assertThat(policyCaptor.getValue()).hasSize(1);
         return (JsonValue) policyCaptor.getValue().iterator().next();
     }
 
     private JsonValue policyCreated() {
         ArgumentCaptor<Set> policyCaptor = ArgumentCaptor.forClass(Set.class);
-        verify(delegate).createPolicies(isNull(ServerContext.class), policyCaptor.capture());
+        verify(delegate).createPolicies(isNull(Context.class), policyCaptor.capture());
         assertThat(policyCaptor.getValue()).hasSize(1);
         return (JsonValue) policyCaptor.getValue().iterator().next();
     }

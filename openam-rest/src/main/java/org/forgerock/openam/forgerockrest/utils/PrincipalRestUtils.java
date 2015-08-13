@@ -18,7 +18,7 @@ package org.forgerock.openam.forgerockrest.utils;
 
 import java.security.Principal;
 import javax.security.auth.Subject;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.rest.resource.SubjectContext;
 
 /**
@@ -33,7 +33,7 @@ final public class PrincipalRestUtils {
      *
      * @return the authenticated principal associated with this context, or null if not authenticated.
      */
-    public static String getPrincipalNameFromServerContext(ServerContext context) {
+    public static String getPrincipalNameFromServerContext(Context context) {
 
         if (context == null || !context.containsContext(SubjectContext.class)) {
             return null;

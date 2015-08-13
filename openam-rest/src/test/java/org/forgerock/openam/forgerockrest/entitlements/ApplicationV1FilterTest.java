@@ -41,7 +41,7 @@ import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.entitlement.configuration.SmsAttribute;
@@ -81,7 +81,7 @@ public class ApplicationV1FilterTest {
     @Mock
     private ApplicationService applicationService;
     @Mock
-    private ServerContext context;
+    private Context context;
     @Mock
     private ResultHandler<JsonValue> jsonResultHandler;
     @Mock

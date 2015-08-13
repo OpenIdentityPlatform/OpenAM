@@ -32,7 +32,7 @@ import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CollectionResourceProvider;
@@ -99,7 +99,7 @@ public final class PolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context,
+    public Promise<ActionResponse, ResourceException> actionCollection(Context context,
             ActionRequest actionRequest) {
         final String actionString = actionRequest.getAction();
         final PolicyAction action = PolicyAction.getAction(actionString);
@@ -143,7 +143,7 @@ public final class PolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+    public Promise<ActionResponse, ResourceException> actionInstance(Context context, String resourceId,
             ActionRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
@@ -152,7 +152,7 @@ public final class PolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
+    public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
         String providedName = null;
         try {
             providedName = request.getNewResourceId();
@@ -190,7 +190,7 @@ public final class PolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId,
             DeleteRequest request) {
         try {
             PolicyStore store = policyStoreProvider.getPolicyStore(context);
@@ -210,7 +210,7 @@ public final class PolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
             PatchRequest request) {
         return RestUtils.generateUnsupportedOperation();
     }
@@ -219,7 +219,7 @@ public final class PolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+    public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         try {
             handler = QueryResourceHandlerBuilder.withPagingAndSorting(handler, request);
@@ -251,7 +251,7 @@ public final class PolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
         try {
             Privilege policy = policyStoreProvider.getPolicyStore(context).read(resourceId);
@@ -266,7 +266,7 @@ public final class PolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
             UpdateRequest request) {
         try {
             Privilege policy = policyParser.parsePolicy(resourceId, request.getContent());

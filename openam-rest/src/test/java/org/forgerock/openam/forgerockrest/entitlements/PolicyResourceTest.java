@@ -32,7 +32,7 @@ import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.guice.ForgerockRestGuiceModule;
@@ -64,7 +64,7 @@ public class PolicyResourceTest {
     private ExceptionMappingHandler resourceErrorHandler;
 
     @Mock
-    private ServerContext mockServerContext;
+    private Context mockServerContext;
 
     @Mock
     private ResultHandler<Resource> mockResultHandler;
@@ -91,7 +91,7 @@ public class PolicyResourceTest {
     public void setupMocks() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        given(mockStoreProvider.getPolicyStore(any(ServerContext.class))).willReturn(mockStore);
+        given(mockStoreProvider.getPolicyStore(any(Context.class))).willReturn(mockStore);
 
         // Use a real error handler as this is a core part of the functionality we are testing and doesn't need to be mocked
         resourceErrorHandler = new EntitlementsExceptionMappingHandler(ForgerockRestGuiceModule.getEntitlementsErrorHandlers());

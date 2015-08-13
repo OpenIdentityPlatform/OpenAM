@@ -19,7 +19,8 @@ package org.forgerock.openam.forgerockrest.entitlements.model.json;
 import com.sun.identity.entitlement.EntitlementException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
+import org.forgerock.json.resource.InternalContext;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.mockito.Mock;
@@ -65,7 +66,7 @@ public class TreePolicyRequestTest {
         given(actionRequest.getContent()).willReturn(JsonValue.json(properties));
 
         // When...
-        ServerContext context = buildContextStructure("/abc");
+        Context context = buildContextStructure("/abc");
         TreePolicyRequest request = TreePolicyRequest.getTreePolicyRequest(context, actionRequest);
 
         // Then...
@@ -85,7 +86,7 @@ public class TreePolicyRequestTest {
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
 
         // When...
-        ServerContext context = buildContextStructure("/abc");
+        Context context = buildContextStructure("/abc");
         TreePolicyRequest.getTreePolicyRequest(context, actionRequest);
     }
 
@@ -97,12 +98,12 @@ public class TreePolicyRequestTest {
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
 
         // When...
-        ServerContext context = buildContextStructure("/abc");
+        Context context = buildContextStructure("/abc");
         TreePolicyRequest.getTreePolicyRequest(context, actionRequest);
     }
 
-    private ServerContext buildContextStructure(final String realm) {
-        return new ServerContext(new RealmContext(subjectContext));
+    private Context buildContextStructure(final String realm) {
+        return new InternalContext(new RealmContext(subjectContext));
     }
 
 }

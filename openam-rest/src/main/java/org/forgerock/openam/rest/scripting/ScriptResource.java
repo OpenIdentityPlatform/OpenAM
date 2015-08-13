@@ -30,7 +30,7 @@ import java.util.Set;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.sun.identity.shared.encode.Base64;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -90,7 +90,7 @@ public class ScriptResource extends RealmAwareResource {
     }
 
     @Override
-    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
+    public Promise<ActionResponse, ResourceException> actionCollection(Context context, ActionRequest request) {
         if ("validate".equals(request.getAction())) {
             try {
                 JsonValue json = request.getContent();
@@ -123,19 +123,19 @@ public class ScriptResource extends RealmAwareResource {
     }
 
     @Override
-    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+    public Promise<ActionResponse, ResourceException> actionInstance(Context context, String resourceId,
             ActionRequest request) {
         return newExceptionPromise(newNotSupportedException());
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, String resourceId,
             PatchRequest request) {
         return newExceptionPromise(newNotSupportedException());
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
+    public Promise<ResourceResponse, ResourceException> createInstance(Context context, CreateRequest request) {
         try {
              final ScriptConfiguration sc = serviceFactory
                     .create(getContextSubject(context), getRealm(context))
@@ -147,7 +147,7 @@ public class ScriptResource extends RealmAwareResource {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, String resourceId,
             DeleteRequest request) {
 
         try {
@@ -159,7 +159,7 @@ public class ScriptResource extends RealmAwareResource {
     }
 
     @Override
-    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+    public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler resultHandler) {
         resultHandler = QueryResourceHandlerBuilder.withPagingAndSorting(resultHandler, request);
         final QueryFilter<JsonPointer> filter = request.getQueryFilter();
@@ -182,7 +182,7 @@ public class ScriptResource extends RealmAwareResource {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId,
             ReadRequest request) {
         try {
             return newResultPromise(newResourceResponse(resourceId, null, asJson(
@@ -193,7 +193,7 @@ public class ScriptResource extends RealmAwareResource {
     }
 
     @Override
-    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId,
+    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
             UpdateRequest request) {
         try {
             return newResultPromise(newResourceResponse(resourceId, null, asJson(serviceFactory

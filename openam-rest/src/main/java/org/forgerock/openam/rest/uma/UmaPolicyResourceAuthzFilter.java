@@ -24,7 +24,7 @@ import com.sun.identity.shared.debug.Debug;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.rest.authz.ResourceOwnerOrSuperUserAuthzModule;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.promise.Promise;
@@ -54,7 +54,7 @@ public class UmaPolicyResourceAuthzFilter extends ResourceOwnerOrSuperUserAuthzM
      * {@inheritDoc}
      */
     @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeCreate(ServerContext context, CreateRequest request) {
+    public Promise<AuthorizationResult, ResourceException> authorizeCreate(Context context, CreateRequest request) {
         try {
             if (!getUserId(context).equalsIgnoreCase(getUserIdFromUri(context))) {
                 return Promises.newResultPromise(

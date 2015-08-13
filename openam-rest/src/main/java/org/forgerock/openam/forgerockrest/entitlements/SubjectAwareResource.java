@@ -18,24 +18,24 @@ package org.forgerock.openam.forgerockrest.entitlements;
 
 import javax.security.auth.Subject;
 import org.forgerock.json.resource.CollectionResourceProvider;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 
 /**
- * Resource capable of determining a subject from a ServerContext.
+ * Resource capable of determining a subject from a Context.
  *
  * @since 12.0.0
  */
 public abstract class SubjectAwareResource implements CollectionResourceProvider {
 
     /**
-     * Retrieves the {@link javax.security.auth.Subject} from the {@link org.forgerock.http.context.ServerContext}.
+     * Retrieves the {@link javax.security.auth.Subject} from the {@link org.forgerock.http.context.Context}.
      * If there's no Subject or no SSOTokenContext in the provided context this method will return null.
      *
      * @param context Context of the request made to this resource.
      * @return an instance of the Subject in the context, or null.
      */
-    protected Subject getContextSubject(ServerContext context) {
+    protected Subject getContextSubject(Context context) {
 
         if (!context.containsContext(SSOTokenContext.class)) {
             return null;

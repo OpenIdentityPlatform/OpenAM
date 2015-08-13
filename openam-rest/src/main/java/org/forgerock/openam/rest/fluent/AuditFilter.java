@@ -22,7 +22,7 @@ import javax.inject.Named;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.audit.AuditException;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
@@ -83,7 +83,7 @@ public class AuditFilter implements Filter {
      * @param next {@inheritDoc}
      */
     @Override
-    public Promise<ActionResponse, ResourceException> filterAction(ServerContext context, ActionRequest request,
+    public Promise<ActionResponse, ResourceException> filterAction(Context context, ActionRequest request,
             RequestHandler next) {
 
         final AuditingResultHandler auditingHandler = newAuditingResultHandler(context, request);
@@ -108,7 +108,7 @@ public class AuditFilter implements Filter {
      * @param next {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> filterCreate(ServerContext context, CreateRequest request,
+    public Promise<ResourceResponse, ResourceException> filterCreate(Context context, CreateRequest request,
             RequestHandler next) {
 
         AuditingResultHandler auditingHandler = newAuditingResultHandler(context, request);
@@ -133,7 +133,7 @@ public class AuditFilter implements Filter {
      * @param next {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> filterDelete(ServerContext context, DeleteRequest request,
+    public Promise<ResourceResponse, ResourceException> filterDelete(Context context, DeleteRequest request,
             RequestHandler next) {
 
         AuditingResultHandler auditingHandler = newAuditingResultHandler(context, request);
@@ -158,7 +158,7 @@ public class AuditFilter implements Filter {
      * @param next {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> filterPatch(ServerContext context, PatchRequest request,
+    public Promise<ResourceResponse, ResourceException> filterPatch(Context context, PatchRequest request,
             RequestHandler next) {
 
         AuditingResultHandler auditingHandler = newAuditingResultHandler(context, request);
@@ -184,7 +184,7 @@ public class AuditFilter implements Filter {
      * @param next {@inheritDoc}
      */
     @Override
-    public Promise<QueryResponse, ResourceException> filterQuery(ServerContext context, QueryRequest request,
+    public Promise<QueryResponse, ResourceException> filterQuery(Context context, QueryRequest request,
             QueryResourceHandler handler, RequestHandler next) {
 
         AuditingResultHandler auditingHandler = newAuditingResultHandler(context, request);
@@ -209,7 +209,7 @@ public class AuditFilter implements Filter {
      * @param next {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> filterRead(ServerContext context, ReadRequest request,
+    public Promise<ResourceResponse, ResourceException> filterRead(Context context, ReadRequest request,
             RequestHandler next) {
 
         AuditingResultHandler auditingHandler = newAuditingResultHandler(context, request);
@@ -234,7 +234,7 @@ public class AuditFilter implements Filter {
      * @param next {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> filterUpdate(ServerContext context, UpdateRequest request,
+    public Promise<ResourceResponse, ResourceException> filterUpdate(Context context, UpdateRequest request,
             RequestHandler next) {
 
         AuditingResultHandler auditingHandler = newAuditingResultHandler(context, request);
@@ -264,7 +264,7 @@ public class AuditFilter implements Filter {
                 });
     }
 
-    private AuditingResultHandler newAuditingResultHandler(ServerContext context, Request request) {
+    private AuditingResultHandler newAuditingResultHandler(Context context, Request request) {
         return new AuditingResultHandler(debug, auditEventPublisher, auditEventFactory, context, request);
     }
 }

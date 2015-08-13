@@ -20,7 +20,7 @@ import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.Context;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyEvaluator;
 import org.forgerock.util.Reject;
 
@@ -60,7 +60,7 @@ public final class BatchPolicyRequest extends PolicyRequest {
 
         private final Set<String> resources;
 
-        private BatchPolicyRequestBuilder(final ServerContext context,
+        private BatchPolicyRequestBuilder(final Context context,
                                           final ActionRequest request) throws EntitlementException {
             super(context, request);
             final JsonValue jsonValue = request.getContent();
@@ -99,7 +99,7 @@ public final class BatchPolicyRequest extends PolicyRequest {
      * @throws EntitlementException
      *         should creating a batch policy request fail
      */
-    public static BatchPolicyRequest getBatchPolicyRequest(final ServerContext context,
+    public static BatchPolicyRequest getBatchPolicyRequest(final Context context,
                                                            final ActionRequest request) throws EntitlementException {
         return new BatchPolicyRequestBuilder(context, request).build();
     }
