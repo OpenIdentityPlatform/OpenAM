@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import org.forgerock.openam.rest.service.JSONServiceEndpointApplication;
 import org.forgerock.openam.rest.service.OAuth2ServiceEndpointApplication;
 import org.forgerock.openam.rest.service.RestletServiceServlet;
 import org.forgerock.openam.rest.service.UMAServiceEndpointApplication;
@@ -39,7 +38,6 @@ public class RestEndpointServlet extends HttpServlet {
 
     public static final String CREST_CONNECTION_FACTORY_NAME = "CrestConnectionFactory";
 
-    private final RestletServiceServlet restletJSONServiceServlet;
     private final RestletServiceServlet restletXACMLServiceServlet;
     private final RestletServiceServlet restletOAuth2ServiceServlet;
     private final RestletServiceServlet restletUMAServiceServlet;
@@ -48,8 +46,6 @@ public class RestEndpointServlet extends HttpServlet {
      * Constructs a new RestEndpointServlet.
      */
     public RestEndpointServlet() {
-        this.restletJSONServiceServlet = new RestletServiceServlet(this, JSONServiceEndpointApplication.class,
-                "jsonRestletServiceServlet");
         this.restletXACMLServiceServlet = new RestletServiceServlet(this, XACMLServiceEndpointApplication.class,
                 "xacmlRestletServiceServlet");
         this.restletOAuth2ServiceServlet = new RestletServiceServlet(this, OAuth2ServiceEndpointApplication.class,
@@ -61,16 +57,13 @@ public class RestEndpointServlet extends HttpServlet {
     /**
      * Constructor for test use.
      *
-     * @param restletJSONServiceServlet An instance of a RestletServiceServlet.
      * @param restletXACMLServiceServlet An instance of a RestletServiceServlet.
      * @param restletUMAServiceServlet An instance of a RestletServiceServlet.
      */
     RestEndpointServlet(
-            final RestletServiceServlet restletJSONServiceServlet,
             final RestletServiceServlet restletXACMLServiceServlet,
             final RestletServiceServlet restletOAuth2ServiceServlet,
             final RestletServiceServlet restletUMAServiceServlet) {
-        this.restletJSONServiceServlet = restletJSONServiceServlet;
         this.restletXACMLServiceServlet = restletXACMLServiceServlet;
         this.restletOAuth2ServiceServlet = restletOAuth2ServiceServlet;
         this.restletUMAServiceServlet = restletUMAServiceServlet;
@@ -116,6 +109,5 @@ public class RestEndpointServlet extends HttpServlet {
         restletXACMLServiceServlet.destroy();
         restletOAuth2ServiceServlet.destroy();
         restletUMAServiceServlet.destroy();
-        restletJSONServiceServlet.destroy();
     }
 }

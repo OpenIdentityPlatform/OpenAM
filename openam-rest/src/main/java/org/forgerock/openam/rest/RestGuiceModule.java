@@ -51,16 +51,16 @@ public class RestGuiceModule extends PrivateModule {
     @Provides
     @Named("RestHandler")
     @Singleton
-    RequestHandler getRestHandler(@Named("ApiVersionFilter") Filter apiVersionFilter,
+    RequestHandler getRestHandler(@Named("ResourceApiVersionFilter") Filter resourceApiVersionFilter,
             @Named("ContextFilter") Filter contextFilter, @Named("LoggingFilter") Filter loggingFilter,
             @Named("RootRouter") Router rootRouter) {
-        return new FilterChain(rootRouter, apiVersionFilter, contextFilter, loggingFilter);
+        return new FilterChain(rootRouter, resourceApiVersionFilter, contextFilter, loggingFilter);
     }
 
     @Provides
-    @Named("ApiVersionFilter")
+    @Named("ResourceApiVersionFilter")
     @Singleton
-    Filter getApiVersionFilter(ResourceApiVersionBehaviourManager behaviourManager) {
+    Filter getResourceApiVersionFilter(ResourceApiVersionBehaviourManager behaviourManager) {
         return resourceApiVersionContextFilter(behaviourManager);
     }
 

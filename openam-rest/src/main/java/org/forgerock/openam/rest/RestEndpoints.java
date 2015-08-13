@@ -15,9 +15,11 @@
  */
 package org.forgerock.openam.rest;
 
+import static org.forgerock.http.routing.Version.version;
 import static org.forgerock.openam.rest.service.RestletUtils.wrap;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Set;
 
@@ -25,7 +27,7 @@ import com.google.inject.Key;
 import com.google.inject.name.Names;
 import com.sun.identity.sm.InvalidRealmNameManager;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.json.resource.VersionSelector;
+import org.forgerock.http.routing.ResourceApiVersionBehaviourManager;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.restlet.AccessTokenFlowFinder;
 import org.forgerock.oauth2.restlet.AuthorizeEndpointFilter;
@@ -36,9 +38,8 @@ import org.forgerock.oauth2.restlet.ValidationServerResource;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.forgerockrest.XacmlService;
 import org.forgerock.openam.rest.audit.RestletAccessAuditFilterFactory;
-import org.forgerock.openam.forgerockrest.authn.restlet.AuthenticationServiceV1;
-import org.forgerock.openam.forgerockrest.authn.restlet.AuthenticationServiceV2;
 import org.forgerock.openam.rest.router.RestRealmValidator;
+import org.forgerock.openam.rest.service.ResourceApiVersionRestlet;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openam.uma.UmaConstants;
 import org.forgerock.openam.uma.UmaExceptionFilter;
@@ -60,10 +61,9 @@ import org.restlet.routing.Router;
 public class RestEndpoints {
 
     private final RestRealmValidator realmValidator;
-    private final VersionSelector versionSelector;
+    private final ResourceApiVersionBehaviourManager versionBehaviourManager;
     private final CoreWrapper coreWrapper;
-    private final ServiceRouter jsonServiceRouter;
-    private final ServiceRouter xacmlServiceRouter;
+    private final Restlet xacmlServiceRouter;
     private final Router umaServiceRouter;
     private final Router oauth2ServiceRouter;
     private final RestletAccessAuditFilterFactory restletAuditFactory;
@@ -72,41 +72,35 @@ public class RestEndpoints {
      * Constructs a new RestEndpoints instance.
      *
      * @param realmValidator An instance of the RestRealmValidator.
-     * @param versionSelector An instance of the VersionSelector.
+     * @param coreWrapper An instance of the CoreWrapper.
+     * @param versionBehaviourManager The ResourceApiVersionBehaviourManager.
      */
     @Inject
-    public RestEndpoints(RestRealmValidator realmValidator, VersionSelector versionSelector, CoreWrapper coreWrapper,
-            RestletAccessAuditFilterFactory restletAuditFactory) {
-        this(realmValidator, versionSelector, coreWrapper, restletAuditFactory,
+    public RestEndpoints(RestRealmValidator realmValidator, CoreWrapper coreWrapper,
+            RestletAccessAuditFilterFactory restletAuditFactory,
+            @Named("ResourceApiVersionFilter") ResourceApiVersionBehaviourManager versionBehaviourManager) {
+        this(realmValidator, coreWrapper, restletAuditFactory, versionBehaviourManager,
                 InvalidRealmNameManager.getInvalidRealmNames());
     }
 
-    RestEndpoints(RestRealmValidator realmValidator, VersionSelector versionSelector, CoreWrapper coreWrapper,
-            RestletAccessAuditFilterFactory restletAuditFactory, Set<String> invalidRealmNames) {
+    RestEndpoints(RestRealmValidator realmValidator, CoreWrapper coreWrapper,
+            RestletAccessAuditFilterFactory restletAuditFactory,
+            ResourceApiVersionBehaviourManager versionBehaviourManager, Set<String> invalidRealmNames) {
         this.realmValidator = realmValidator;
-        this.versionSelector = versionSelector;
+        this.versionBehaviourManager = versionBehaviourManager;
         this.coreWrapper = coreWrapper;
         this.restletAuditFactory = restletAuditFactory;
 
-        this.jsonServiceRouter = createJSONServiceRouter(invalidRealmNames);
         this.xacmlServiceRouter = createXACMLServiceRouter(invalidRealmNames);
         this.umaServiceRouter = createUMAServiceRouter();
         this.oauth2ServiceRouter = createOAuth2Router();
     }
 
     /**
-     * Gets the JSON restlet service router.
-     * @return The router.
-     */
-    public ServiceRouter getJSONServiceRouter() {
-        return jsonServiceRouter;
-    }
-
-    /**
      * Gets the XACML restlet service router.
      * @return The router.
      */
-    public ServiceRouter getXACMLServiceRouter() {
+    public Restlet getXACMLServiceRouter() {
         return xacmlServiceRouter;
     }
 
@@ -126,41 +120,36 @@ public class RestEndpoints {
         return oauth2ServiceRouter;
     }
 
+    //TODO CHF JAX-RS replacement for Restlet required
+//    private ServiceRouter createJSONServiceRouter(final Set<String> invalidRealmNames) {
+//
+//        ServiceRouter router = new ServiceRouter(realmValidator, versionSelector, coreWrapper);
+
+//        router.addRoute("/authenticate")
+//        .addVersion("1.1",
+//            restletAuditFactory.createFilter(Component.AUTHENTICATION, wrap(AuthenticationServiceV1.class)))
+//            .addVersion("2.0",
+//            restletAuditFactory.createFilter(Component.AUTHENTICATION, wrap(AuthenticationServiceV2.class)));
+//    invalidRealmNames.add("authenticate");
+//
+//    VersionBehaviourConfigListener.bindToServiceConfigManager(router);
+//
+//    return router;
+//    }
+
     /**
-     * Constructs a new {@link ServiceRouter} with routes to each of the Restlet service endpoints.
+     * Constructs a new {@link Restlet} with routes to each of the Restlet service endpoints.
      *
      * @return A {@code ServiceRouter}.
      */
-    private ServiceRouter createJSONServiceRouter(final Set<String> invalidRealmNames) {
+    private Restlet createXACMLServiceRouter(final Set<String> invalidRealmNames) {
 
-        ServiceRouter router = new ServiceRouter(realmValidator, versionSelector, coreWrapper);
+        RestletRealmRouter router = new RestletRealmRouter(realmValidator, coreWrapper);
 
-        router.addRoute("/authenticate")
-                .addVersion("1.1",
-                        restletAuditFactory.createFilter(Component.AUTHENTICATION, wrap(AuthenticationServiceV1.class)))
-                .addVersion("2.0",
-                        restletAuditFactory.createFilter(Component.AUTHENTICATION, wrap(AuthenticationServiceV2.class)));
-        invalidRealmNames.add("authenticate");
-
-        VersionBehaviourConfigListener.bindToServiceConfigManager(router);
-
-        return router;
-    }
-
-    /**
-     * Constructs a new {@link ServiceRouter} with routes to each of the Restlet service endpoints.
-     *
-     * @return A {@code ServiceRouter}.
-     */
-    private ServiceRouter createXACMLServiceRouter(final Set<String> invalidRealmNames) {
-
-        ServiceRouter router = new ServiceRouter(realmValidator, versionSelector, coreWrapper);
-
-        router.addRoute("/policies")
-                .addVersion("1.0", wrap(XacmlService.class));
+        ResourceApiVersionRestlet policiesVersionRouter = new ResourceApiVersionRestlet(versionBehaviourManager);
+        policiesVersionRouter.attach(version(1), wrap(XacmlService.class));
+        router.attach("/policies", policiesVersionRouter);
         invalidRealmNames.add("policies");
-
-        VersionBehaviourConfigListener.bindToServiceConfigManager(router);
 
         return router;
     }

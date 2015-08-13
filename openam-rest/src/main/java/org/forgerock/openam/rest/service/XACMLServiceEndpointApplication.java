@@ -11,12 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest.service;
 
 import org.forgerock.openam.rest.RestEndpoints;
+import org.restlet.Restlet;
 import org.restlet.data.MediaType;
 
 /**
@@ -41,7 +42,7 @@ public class XACMLServiceEndpointApplication extends ServiceEndpointApplication 
      * @param restEndpoints Registry of routers.
      * @return
      */
-    protected ServiceRouter getRouter(RestEndpoints restEndpoints) {
+    protected Restlet getRouter(RestEndpoints restEndpoints) {
         return restEndpoints.getXACMLServiceRouter();
     }
 }
