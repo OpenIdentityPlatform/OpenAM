@@ -48,7 +48,6 @@ import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationManag
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
 import org.forgerock.openam.identity.idm.AMIdentityRepositoryFactory;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
-import org.forgerock.openam.rest.resource.PromisedRequestHandler;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.openam.uma.UmaConstants;

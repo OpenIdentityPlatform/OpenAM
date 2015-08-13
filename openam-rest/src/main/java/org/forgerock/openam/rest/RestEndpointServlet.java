@@ -21,8 +21,6 @@ import com.google.inject.name.Names;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.forgerockrest.utils.RequestHolder;
-import org.forgerock.openam.rest.resource.CrestHttpServlet;
-import org.forgerock.openam.rest.router.RestEndpointManager;
 import org.forgerock.openam.rest.service.JSONServiceEndpointApplication;
 import org.forgerock.openam.rest.service.OAuth2ServiceEndpointApplication;
 import org.forgerock.openam.rest.service.RestletServiceServlet;

@@ -30,7 +30,6 @@ import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.rest.resource.CrestRouter;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
 

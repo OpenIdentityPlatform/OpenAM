@@ -24,7 +24,6 @@ import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.openam.audit.AuditConstants.Component;
 import org.forgerock.openam.rest.authz.STSTokenGenerationServiceAuthzModule;
-import org.forgerock.openam.rest.fluent.FluentRouter;
 import org.forgerock.openam.sts.tokengeneration.CTSTokenPersistence;
 import org.forgerock.openam.sts.tokengeneration.config.TokenGenerationServiceInjectorHolder;
 import org.forgerock.openam.sts.tokengeneration.oidc.OpenIdConnectTokenGeneration;

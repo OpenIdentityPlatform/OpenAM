@@ -11,13 +11,11 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.rest;
 
-import org.forgerock.openam.rest.resource.CrestHttpServlet;
-import org.forgerock.openam.rest.router.RestEndpointManager;
 import org.forgerock.openam.rest.service.RestletServiceServlet;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeClass;
