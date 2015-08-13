@@ -26,7 +26,7 @@
  *
  */
 /**
- * Portions Copyrighted 2011-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2011-2015 ForgeRock AS.
  */
 package com.sun.identity.authentication.spi;
 
@@ -35,16 +35,19 @@ import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.service.AuthUtils;
+import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
+import com.sun.identity.shared.encode.CookieUtils;
+
 import java.security.NoSuchAlgorithmException;
 import java.security.InvalidKeyException;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -54,6 +57,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Cookie;
 
+import org.forgerock.openam.utils.StringUtils;
 
 /**
  * This class is used to set the encrypted password as a session property.
@@ -73,35 +77,32 @@ import javax.servlet.http.Cookie;
 public class ReplayPasswd implements AMPostAuthProcessInterface {
 
     private static final String CIPHER_INSTANCE_NAME =
-        "DES/ECB/NoPadding";
+            "DES/ECB/NoPadding";
 
-    private static final String PASSWORD_TOKEN =
-        "IDToken2";
-    
     private static final String REPLAY_PASSWORD_KEY =
-        "com.sun.am.replaypasswd.key";
-    
+            "com.sun.am.replaypasswd.key";
+
     private static final String SUN_IDENTITY_USER_PASSWORD =
-        "sunIdentityUserPassword";
-    
+            "sunIdentityUserPassword";
+
     private static final String IIS_OWA_ENABLED =
-        "com.sun.am.iis_owa_enabled";  
+            "com.sun.am.iis_owa_enabled";
 
     private static final String OWA_AUTH_COOKIE =
-        "owaAuthCookie";
+            "owaAuthCookie";
 
     private static final String OWA_AUTH_COOKIE_VALUE =
-        "amOwaValue";
+            "amOwaValue";
 
     private static final String SHAREPOINT_LOGIN_ATTR_NAME =
-        "com.sun.am.sharepoint_login_attr_name";  
+            "com.sun.am.sharepoint_login_attr_name";
 
     private static final String SHAREPOINT_LOGIN_ATTR_VALUE =
-        "sharepoint_login_attr_value";
+            "sharepoint_login_attr_value";
 
     private static Debug debug = Debug.getInstance("ReplayPasswd");
 
-    /** 
+    /**
      * Post processing on successful authentication.
      * @param requestParamsMap contains HttpServletRequest parameters
      * @param request HttpServlet  request
@@ -111,9 +112,9 @@ public class ReplayPasswd implements AMPostAuthProcessInterface {
      * the session password property
      */
     public void onLoginSuccess(Map requestParamsMap,
-        HttpServletRequest request,
-        HttpServletResponse response,
-        SSOToken ssoToken) throws AuthenticationException {
+                               HttpServletRequest request,
+                               HttpServletResponse response,
+                               SSOToken ssoToken) throws AuthenticationException {
 
         if (request == null) {
             debug.message("ReplayPasswd.onLoginSuccess: request is not available, password is not saved.");
@@ -121,101 +122,78 @@ public class ReplayPasswd implements AMPostAuthProcessInterface {
         }
 
         if (debug.messageEnabled()) {
-            debug.message("ReplayPasswd.onLoginSuccess called: Req:" + 
-                request.getRequestURL());
+            debug.message("ReplayPasswd.onLoginSuccess called: Req:" + request.getRequestURL());
         }
-
-        String userpasswd = request.getParameter(PASSWORD_TOKEN);
-        if (requestParamsMap != null && userpasswd == null ) {
-               userpasswd = (String)requestParamsMap.get(PASSWORD_TOKEN);
-        }
-        String deskeystr = SystemProperties.get(REPLAY_PASSWORD_KEY);
-        String iisOwaEnabled = 
-            SystemProperties.get(IIS_OWA_ENABLED);
-        String strAttributeName = 
-            SystemProperties.get(SHAREPOINT_LOGIN_ATTR_NAME);
 
         try {
-            byte[] desKey = Base64.decode(deskeystr);
-            
-            SecretKeySpec keySpec = new SecretKeySpec(desKey, "DES");
-
-            Cipher cipher = Cipher.getInstance(CIPHER_INSTANCE_NAME);
-            cipher.init(Cipher.ENCRYPT_MODE, keySpec);
-
-            if (userpasswd != null) {
-                //The array size must be a multiply of 8 (DES block size)
-                int length = userpasswd.length() + (8 - userpasswd.length() % 8);
-                byte[] data = new byte[length];
-                System.arraycopy(userpasswd.getBytes(), 0, data, 0, userpasswd.length());
-                byte[] ciphertext = cipher.doFinal(data);
-			
-                String encodedpasswd = Base64.encode(ciphertext);
-                if (encodedpasswd != null) {
-                    ssoToken.setProperty(SUN_IDENTITY_USER_PASSWORD, encodedpasswd);
+            if (requestParamsMap == null) {
+                debug.warning("ReplayPasswd: unable to get user password as requestParamsMap is null");
+            } else {
+                String userpasswd = (String) requestParamsMap.get(ISAuthConstants.SHARED_STATE_PASSWORD);
+                if (StringUtils.isNotEmpty(userpasswd)) {
+                    String encryptedPassword = encryptPassword(userpasswd);
+                    if (StringUtils.isNotBlank(encryptedPassword)) {
+                        ssoToken.setProperty(SUN_IDENTITY_USER_PASSWORD, encryptedPassword);
+                    } else if (debug.warningEnabled()) {
+                        debug.warning("ReplayPasswd: unable to set encrypted Password as encrypted value is empty");
+                    }
+                } else if (debug.warningEnabled()) {
+                    debug.warning("ReplayPasswd: unable to get user password to encrypt");
                 }
             }
 
-            if(iisOwaEnabled != null && 
-		iisOwaEnabled.trim().equalsIgnoreCase("true")) {
-	        // Set OWA Auth Cookie
-	        Cookie owaAuthCookie = new Cookie(OWA_AUTH_COOKIE, 
-                                                  OWA_AUTH_COOKIE_VALUE);
-	        Set domains = AuthUtils.getCookieDomains();
-	        if (!domains.isEmpty()) {
-		    for (Iterator it = domains.iterator(); it.hasNext(); ) {
-		         String domain = (String)it.next();
-		         owaAuthCookie.setDomain(domain);
-		         owaAuthCookie.setPath("/");
-                         response.addCookie(owaAuthCookie);
-                    }
-                } 
+            String iisOwaEnabled = SystemProperties.get(IIS_OWA_ENABLED);
+            String strAttributeName = SystemProperties.get(SHAREPOINT_LOGIN_ATTR_NAME);
+
+            if (Boolean.parseBoolean(iisOwaEnabled)) {
+                // Set OWA Auth Cookie
+                Cookie owaAuthCookie = null;
+                Set<String> domains = AuthUtils.getCookieDomains();
+                for (String domain : domains) {
+                    owaAuthCookie = CookieUtils.newCookie(OWA_AUTH_COOKIE, OWA_AUTH_COOKIE_VALUE, "/", domain);
+                    CookieUtils.addCookieToResponse(response, owaAuthCookie);
+                }
             }
 
-            if(strAttributeName != null && !strAttributeName.trim().equals("")){
+            if (strAttributeName != null && !strAttributeName.trim().equals("")) {
                 AMIdentity amIdentityUser = IdUtils.getIdentity(ssoToken);
                 Map attrMap = amIdentityUser.getAttributes();
-                String strAttributeValue = Misc.getMapAttr(
-                    attrMap, strAttributeName, null);
-                if(strAttributeValue != null){
-            	    ssoToken.setProperty(
-                        SHAREPOINT_LOGIN_ATTR_VALUE, strAttributeValue);
+                String strAttributeValue = Misc.getMapAttr(attrMap, strAttributeName, null);
+                if (strAttributeValue != null) {
+                    ssoToken.setProperty(SHAREPOINT_LOGIN_ATTR_VALUE, strAttributeValue);
                 }
                 if (debug.messageEnabled()) {
-                    debug.message("ReplayPasswd.onLoginSuccess: " + 
-                        strAttributeName + "=" + strAttributeValue);
-                }	            
+                    debug.message("ReplayPasswd.onLoginSuccess: " + strAttributeName + "=" + strAttributeValue);
+                }
             }
 
             if (debug.messageEnabled()) {
-                debug.message("ReplayPasswd.onLoginSuccess: Replay password " +
-                    "concluded successfully");
+                debug.message("ReplayPasswd.onLoginSuccess: Replay password concluded successfully");
             }
         } catch (IdRepoException ire) {
-            debug.error("ReplayPasswd.onLoginSuccess: IOException while " +
-                "fetching user attributes: " + ire);
+            debug.error("ReplayPasswd.onLoginSuccess: IOException while fetching user attributes: " + ire);
         } catch (NoSuchAlgorithmException noe) {
-            debug.error("ReplayPasswd.onLoginSuccess: NoSuchAlgorithmException"+
-                " while setting session password property: " + noe);
+            debug.error("ReplayPasswd.onLoginSuccess: NoSuchAlgorithmException"
+                    + " while setting session password property: " + noe);
         } catch (InvalidKeyException ike) {
-            debug.error("ReplayPasswd.onLoginSuccess: InvalidKeyException " +
-                "while setting session password property: " + ike);
+            debug.error("ReplayPasswd.onLoginSuccess: InvalidKeyException "
+                    + "while setting session password property: " + ike);
         } catch (IllegalBlockSizeException ibe) {
-            debug.error("ReplayPasswd.onLoginSuccess:IllegalBlockSizeException"+
-                " while setting session password property: " + ibe);
+            debug.error("ReplayPasswd.onLoginSuccess:IllegalBlockSizeException"
+                    + " while setting session password property: " + ibe);
         } catch (NoSuchPaddingException npe) {
-            debug.error("ReplayPasswd.onLoginSuccess: NoSuchPaddingException " +
-                "while setting session password property: " + npe);
+            debug.error("ReplayPasswd.onLoginSuccess: NoSuchPaddingException "
+                    + "while setting session password property: " + npe);
         } catch (BadPaddingException bpe) {
-            debug.error("ReplayPasswd.onLoginSuccess: BadPaddingException " +
-                "while setting session password property: " + bpe);
+            debug.error("ReplayPasswd.onLoginSuccess: BadPaddingException "
+                    + "while setting session password property: " + bpe);
         } catch (SSOException sse) {
-            debug.error("ReplayPasswd.onLoginSuccess: SSOException while " +
-                "setting session password property: " + sse);
+            debug.error("ReplayPasswd.onLoginSuccess: SSOException while setting session password property: "
+                    + sse);
         }
     }
 
-    /** 
+    /**
      * Post processing on failed authentication.
      * @param requestParamsMap contains HttpServletRequest parameters
      * @param req HttpServlet request
@@ -223,12 +201,12 @@ public class ReplayPasswd implements AMPostAuthProcessInterface {
      * @throws AuthenticationException if there is an error
      */
     public void onLoginFailure(Map requestParamsMap,
-        HttpServletRequest req,
-        HttpServletResponse res) throws AuthenticationException {
-            debug.message("ReplayPasswd.onLoginFailure: called");
+                               HttpServletRequest req,
+                               HttpServletResponse res) throws AuthenticationException {
+        debug.message("ReplayPasswd.onLoginFailure: called");
     }
 
-    /** 
+    /**
      * Post processing on Logout.
      * @param req HttpServlet request
      * @param res HttpServlet response
@@ -236,8 +214,43 @@ public class ReplayPasswd implements AMPostAuthProcessInterface {
      * @throws AuthenticationException if there is an error
      */
     public void onLogout(HttpServletRequest req,
-        HttpServletResponse res,
-        SSOToken ssoToken) throws AuthenticationException {
-            debug.message("ReplayPasswd.onLogout called");
+                         HttpServletResponse res,
+                         SSOToken ssoToken) throws AuthenticationException {
+        debug.message("ReplayPasswd.onLogout called");
+    }
+
+    /**
+     * Encrypts the provided password.
+     * @param userpasswd the password
+     * @return the encrypted password
+     * @throws NoSuchAlgorithmException
+     * @throws NoSuchPaddingException
+     * @throws InvalidKeyException
+     * @throws IllegalBlockSizeException
+     * @throws BadPaddingException
+     * @throws SSOException
+     */
+    private String encryptPassword(String userpasswd) throws NoSuchAlgorithmException, NoSuchPaddingException,
+            InvalidKeyException, IllegalBlockSizeException, BadPaddingException, SSOException {
+
+        String deskeystr = SystemProperties.get(REPLAY_PASSWORD_KEY);
+        if (StringUtils.isBlank(deskeystr)){
+            if (debug.messageEnabled()) {
+                debug.message("ReplayPasswd.encodePassword: cannot encode password, Replay PaswordKey is empty");
+            }
+            return null;
+        }
+
+        byte[] desKey = Base64.decode(deskeystr);
+        SecretKeySpec keySpec = new SecretKeySpec(desKey, "DES");
+        Cipher cipher = Cipher.getInstance(CIPHER_INSTANCE_NAME);
+        cipher.init(Cipher.ENCRYPT_MODE, keySpec);
+
+        // The array size must be a multiply of 8 (DES block size)
+        int length = userpasswd.length() + (8 - userpasswd.length() % 8);
+        byte[] data = new byte[length];
+        System.arraycopy(userpasswd.getBytes(), 0, data, 0, userpasswd.length());
+        byte[] ciphertext = cipher.doFinal(data);
+        return Base64.encode(ciphertext);
     }
 }
