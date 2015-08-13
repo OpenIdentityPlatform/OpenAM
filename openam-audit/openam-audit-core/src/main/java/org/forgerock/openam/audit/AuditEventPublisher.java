@@ -28,7 +28,7 @@ import org.forgerock.json.resource.Connection;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.Resources;
-import org.forgerock.json.resource.RootContext;
+//import org.forgerock.json.resource.RootContext;
 import org.forgerock.openam.audit.configuration.AuditServiceConfigurator;
 
 /**
@@ -73,21 +73,21 @@ public class AuditEventPublisher {
      */
     public void publish(String topic, AuditEvent auditEvent) throws AuditException {
 
-        try {
-
-            Connection connection = auditServiceConnectionFactory.getConnection();
-            connection.create(new RootContext(), newCreateRequest(topic, auditEvent.getValue()));
-
-        } catch (ResourceException e) {
-
-            final String eventName = getValue(auditEvent.getValue(), EVENT_NAME, "-unknown-");
-            debug.error("Unable to publish {} audit event '{}' due to error: {} [{}]",
-                    topic, eventName, e.getMessage(), e.getReason(), e);
-
-            if (!isSuppressExceptions()) {
-                throw new AuditException("Unable to publish " + topic + " audit event '" + eventName + "'", e);
-            }
-        }
+//        try {
+//
+//            Connection connection = auditServiceConnectionFactory.getConnection();
+//            connection.create(new RootContext(), newCreateRequest(topic, auditEvent.getValue()));
+//
+//        } catch (ResourceException e) {
+//
+//            final String eventName = getValue(auditEvent.getValue(), EVENT_NAME, "-unknown-");
+//            debug.error("Unable to publish {} audit event '{}' due to error: {} [{}]",
+//                    topic, eventName, e.getMessage(), e.getReason(), e);
+//
+//            if (!isSuppressExceptions()) {
+//                throw new AuditException("Unable to publish " + topic + " audit event '" + eventName + "'", e);
+//            }
+//        }
     }
 
     /**

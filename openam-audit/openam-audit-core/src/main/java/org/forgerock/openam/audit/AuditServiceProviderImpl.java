@@ -61,15 +61,15 @@ public class AuditServiceProviderImpl implements AuditServiceProvider {
         JsonValue extendedEventTypes = readJsonFile("/org/forgerock/openam/audit/events-config.json");
         JsonValue customEventTypes = json(object());
 
-        AuditService auditService = new AuditService(extendedEventTypes, customEventTypes);
-        try {
-            configurator.initializeAuditServiceConfiguration();
-            configurator.registerEventHandlers(auditService);
-            auditService.configure(configurator.getAuditServiceConfiguration());
-        } catch (ResourceException|AuditException e) {
-            debug.error("Unable to configure AuditService", e);
-            throw new RuntimeException("Unable to configure AuditService.", e);
-        }
+        AuditService auditService = null;//new AuditService(extendedEventTypes, customEventTypes);
+//        try {
+//            configurator.initializeAuditServiceConfiguration();
+//            configurator.registerEventHandlers(auditService);
+//            auditService.configure(configurator.getAuditServiceConfiguration());
+//        } catch (ResourceException|AuditException e) {
+//            debug.error("Unable to configure AuditService", e);
+//            throw new RuntimeException("Unable to configure AuditService.", e);
+//        }
         return auditService;
     }
 
