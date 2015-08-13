@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.rest.devices;
 
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 
 /**
  * Provides serialisation of devices between JsonValue and String representations.

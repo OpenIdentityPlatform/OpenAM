@@ -16,7 +16,7 @@
 
 package org.forgerock.oauth2.core;
 
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.IntrospectionEndpoint.*;
 
 import java.util.Comparator;
@@ -25,7 +25,7 @@ import java.util.TreeSet;
 
 import javax.inject.Inject;
 
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;

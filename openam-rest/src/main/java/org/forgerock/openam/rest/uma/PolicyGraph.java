@@ -17,7 +17,7 @@
 package org.forgerock.openam.rest.uma;
 
 import static java.util.Collections.*;
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.uma.UmaConstants.BackendPolicy.*;
 import static org.forgerock.openam.uma.UmaConstants.UmaPolicy.*;
 
@@ -32,8 +32,8 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import org.forgerock.guava.common.collect.Sets;
-import org.forgerock.json.fluent.JsonPointer;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonPointer;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;

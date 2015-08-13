@@ -32,7 +32,7 @@ import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import org.apache.commons.lang.StringUtils;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.utils.Utils;
 import org.forgerock.openam.utils.MapHelper;
 import org.forgerock.util.Function;

@@ -35,7 +35,7 @@ import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.shared.debug.Debug;
 
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.common.JwtReconstruction;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jws.SigningManager;

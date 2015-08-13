@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.sts.rest.token.provider.oidc;
 
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.sts.TokenTypeId;
 
 import java.util.Set;

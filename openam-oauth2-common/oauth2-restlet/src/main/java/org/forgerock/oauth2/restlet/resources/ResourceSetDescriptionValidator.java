@@ -16,13 +16,13 @@
 
 package org.forgerock.oauth2.restlet.resources;
 
-import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.JsonValue.json;
 
 import javax.inject.Singleton;
 import java.util.Map;
 
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.fluent.JsonValueException;
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.JsonValueException;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 

@@ -53,7 +53,7 @@ import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.guava.common.base.Function;
 import org.forgerock.guava.common.collect.Maps;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;

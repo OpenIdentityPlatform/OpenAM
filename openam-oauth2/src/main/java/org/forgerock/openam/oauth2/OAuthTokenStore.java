@@ -17,7 +17,7 @@
 package org.forgerock.openam.oauth2;
 
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.api.filter.TokenFilter;

@@ -11,15 +11,15 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.token;
 
 import javax.inject.Inject;
 
-import org.forgerock.json.fluent.JsonException;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonException;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.utils.JsonValueBuilder;

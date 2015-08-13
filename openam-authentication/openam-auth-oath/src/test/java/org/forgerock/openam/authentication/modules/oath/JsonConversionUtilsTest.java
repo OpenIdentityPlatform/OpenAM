@@ -19,7 +19,7 @@ package org.forgerock.openam.authentication.modules.oath;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.rest.devices.OathDeviceSettings;
 import org.testng.Assert;
 import org.testng.annotations.Test;

@@ -17,7 +17,7 @@
 package org.forgerock.openam.sts.rest.token.validator;
 
 import org.forgerock.guava.common.base.Objects;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.util.Reject;
 
 import java.security.Principal;

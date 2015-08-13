@@ -18,7 +18,7 @@ package org.forgerock.openam.rest.uma;
 
 import javax.inject.Inject;
 
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;

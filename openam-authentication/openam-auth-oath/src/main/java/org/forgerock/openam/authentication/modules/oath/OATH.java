@@ -54,7 +54,7 @@ import javax.security.auth.callback.NameCallback;
 import javax.xml.bind.DatatypeConverter;
 import org.apache.commons.codec.DecoderException;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.openam.rest.devices.OathDeviceSettings;
 import org.forgerock.openam.rest.devices.OathDevicesDao;

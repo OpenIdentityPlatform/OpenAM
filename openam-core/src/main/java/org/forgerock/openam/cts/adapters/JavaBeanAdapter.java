@@ -32,7 +32,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.json.fluent.JsonPointer;
+import org.forgerock.json.JsonPointer;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.tokens.Token;

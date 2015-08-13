@@ -25,7 +25,7 @@ import javax.security.auth.Subject;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.util.Reject;
 

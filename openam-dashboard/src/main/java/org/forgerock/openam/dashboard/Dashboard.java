@@ -11,8 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012 ForgeRock Inc.
+ * Copyright 2012-2015 ForgeRock AS.
  */
+
 package org.forgerock.openam.dashboard;
 
 import com.iplanet.sso.SSOException;
@@ -23,7 +24,7 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 
 import java.security.AccessController;
 import java.util.*;

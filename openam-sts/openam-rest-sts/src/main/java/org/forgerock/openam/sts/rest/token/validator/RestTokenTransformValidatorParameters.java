@@ -20,7 +20,7 @@ package org.forgerock.openam.sts.rest.token.validator;
  *  Defines the parameter state which needs to be passed to the RestTokenTransformValidator#validateToken instances. The generic
  *  type will correspond to the to-be-validated token.
  *
- *  For custom RestTokenTransformValidator implementations, this generic type will be {@link org.forgerock.json.fluent.JsonValue}
+ *  For custom RestTokenTransformValidator implementations, this generic type will be {@link org.forgerock.json.JsonValue}
  */
 public interface RestTokenTransformValidatorParameters<T> {
     /**

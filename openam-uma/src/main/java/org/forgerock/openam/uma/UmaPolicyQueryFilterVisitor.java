@@ -18,7 +18,7 @@ package org.forgerock.openam.uma;
 
 import java.util.List;
 
-import org.forgerock.json.fluent.JsonPointer;
+import org.forgerock.json.JsonPointer;
 import org.forgerock.json.resource.QueryFilter;
 import org.forgerock.json.resource.QueryFilterVisitor;
 

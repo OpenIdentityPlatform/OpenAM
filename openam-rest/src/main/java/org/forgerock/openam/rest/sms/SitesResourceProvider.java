@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.rest.sms;
 
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.rest.sms.SmsJsonSchema.*;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 
@@ -27,7 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.forgerock.guava.common.collect.Sets;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CollectionResourceProvider;

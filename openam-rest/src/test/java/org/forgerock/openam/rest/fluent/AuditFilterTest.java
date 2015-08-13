@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.rest.fluent;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
 
 import com.sun.identity.shared.debug.Debug;
 import org.testng.annotations.BeforeMethod;

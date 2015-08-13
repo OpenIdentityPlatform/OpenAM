@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.sts.soap.bootstrap;
 
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ResourceException;
 
 /**

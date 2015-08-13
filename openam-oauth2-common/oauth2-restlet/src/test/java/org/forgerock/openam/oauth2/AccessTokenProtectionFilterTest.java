@@ -19,7 +19,7 @@ package org.forgerock.openam.oauth2;
 import static org.fest.assertions.Assertions.*;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.mockito.Mockito.*;
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.JsonValue.*;
 
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2Request;

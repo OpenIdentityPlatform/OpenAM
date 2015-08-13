@@ -20,7 +20,7 @@ import org.forgerock.json.resource.ResultHandler;
 
 /**
  * ResultHandler for SDK-based operations. Utilised by the {@link org.forgerock.openam.rest.batch.helpers.Requester}
- * during execution. Generic for the purposes of {@link org.forgerock.json.fluent.JsonValue} and
+ * during execution. Generic for the purposes of {@link org.forgerock.json.JsonValue} and
  * {@link org.forgerock.json.resource.Resource} types.
  */
 class SDKServerResultHandler<T> implements ResultHandler<T> {

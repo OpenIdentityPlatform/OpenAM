@@ -19,7 +19,7 @@ import static org.fest.assertions.Assertions.assertThat;
 import static org.forgerock.json.resource.QueryFilter.*;
 import static org.mockito.Mockito.*;
 
-import org.forgerock.json.fluent.JsonPointer;
+import org.forgerock.json.JsonPointer;
 import org.forgerock.json.resource.QueryFilter;
 import org.mockito.ArgumentCaptor;
 import org.testng.annotations.Test;

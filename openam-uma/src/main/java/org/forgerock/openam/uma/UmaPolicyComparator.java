@@ -18,7 +18,7 @@ package org.forgerock.openam.uma;
 
 import java.util.Comparator;
 
-import org.forgerock.json.fluent.JsonPointer;
+import org.forgerock.json.JsonPointer;
 import org.forgerock.json.resource.SortKey;
 
 public class UmaPolicyComparator implements Comparator<UmaPolicy> {

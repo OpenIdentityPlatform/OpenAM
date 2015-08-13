@@ -37,7 +37,7 @@ import java.util.Arrays;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.JsonValue.*;
 
 public class EntitlementsExceptionMappingHandlerTest {
     private static final int ERROR_CODE = 123;

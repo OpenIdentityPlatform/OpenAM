@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.rest.scripting;
 
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.JsonValue.*;
 import static org.testng.AssertJUnit.*;
 
 import org.forgerock.json.resource.ResourceException;

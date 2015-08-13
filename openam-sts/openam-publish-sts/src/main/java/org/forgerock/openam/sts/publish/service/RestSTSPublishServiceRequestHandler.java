@@ -18,7 +18,7 @@ package org.forgerock.openam.sts.publish.service;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CreateRequest;
@@ -50,9 +50,9 @@ import org.slf4j.Logger;
 
 import java.util.List;
 
-import static org.forgerock.json.fluent.JsonValue.field;
-import static org.forgerock.json.fluent.JsonValue.json;
-import static org.forgerock.json.fluent.JsonValue.object;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
 
  /**
   * A custom RequestHandler to allow the Rest STS publish service to act like a CollectionResourceProvider, while still

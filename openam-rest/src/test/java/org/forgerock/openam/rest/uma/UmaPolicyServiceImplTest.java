@@ -17,7 +17,7 @@
 package org.forgerock.openam.rest.uma;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.util.promise.Promises.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyString;
@@ -38,8 +38,8 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Evaluator;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.json.fluent.JsonPointer;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonPointer;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.InternalServerErrorException;

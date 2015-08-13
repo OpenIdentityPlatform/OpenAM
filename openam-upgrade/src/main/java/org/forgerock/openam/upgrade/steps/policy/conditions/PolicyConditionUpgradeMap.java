@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.upgrade.steps.policy.conditions;
@@ -23,7 +23,7 @@ import com.sun.identity.entitlement.EntitlementSubject;
 import com.sun.identity.entitlement.opensso.PolicyCondition;
 import com.sun.identity.entitlement.opensso.PolicySubject;
 import com.sun.identity.policy.interfaces.Condition;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.entitlement.conditions.environment.AMIdentityMembershipCondition;
 import org.forgerock.openam.entitlement.conditions.environment.AuthLevelCondition;
 import org.forgerock.openam.entitlement.conditions.environment.AuthSchemeCondition;

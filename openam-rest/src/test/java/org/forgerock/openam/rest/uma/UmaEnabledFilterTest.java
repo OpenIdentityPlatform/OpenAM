@@ -17,7 +17,7 @@
 package org.forgerock.openam.rest.uma;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.JsonValue.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;

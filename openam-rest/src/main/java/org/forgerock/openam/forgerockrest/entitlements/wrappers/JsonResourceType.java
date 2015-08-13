@@ -19,7 +19,7 @@ import com.sun.identity.entitlement.EntitlementException;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.utils.JsonValueBuilder;
 
@@ -171,7 +171,7 @@ public class JsonResourceType {
 
     /**
      * Focus of this class. Calling this function will return a transportable
-     * {@link org.forgerock.json.fluent.JsonValue}
+     * {@link org.forgerock.json.JsonValue}
      * representing the contained instantiation of {@link org.forgerock.openam.entitlement.ResourceType}.
      *
      * @return JsonValue representing the contained ResourceType

@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.sts.rest;
 
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.sts.TokenCancellationException;
 import org.forgerock.openam.sts.TokenCreationException;

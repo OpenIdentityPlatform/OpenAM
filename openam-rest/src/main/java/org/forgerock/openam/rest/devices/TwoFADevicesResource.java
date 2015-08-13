@@ -16,7 +16,7 @@
 package org.forgerock.openam.rest.devices;
 
 import java.text.ParseException;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.openam.rest.resource.ContextHelper;
 

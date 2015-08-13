@@ -17,14 +17,14 @@
 package org.forgerock.openam.uma;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.JsonValue.*;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.forgerock.json.fluent.JsonPointer;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonPointer;
+import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

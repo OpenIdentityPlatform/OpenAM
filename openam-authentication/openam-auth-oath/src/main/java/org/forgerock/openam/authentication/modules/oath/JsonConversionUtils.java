@@ -21,7 +21,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.rest.devices.OathDeviceSettings;
 import org.forgerock.openam.utils.JsonValueBuilder;
 

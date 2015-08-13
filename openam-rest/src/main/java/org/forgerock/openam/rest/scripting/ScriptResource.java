@@ -15,13 +15,13 @@
  */
 package org.forgerock.openam.rest.scripting;
 
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.scripting.ScriptConstants.*;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.sun.identity.shared.encode.Base64;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;

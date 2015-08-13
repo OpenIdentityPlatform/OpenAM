@@ -17,7 +17,7 @@
 package org.forgerock.openam.rest.sms;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.JsonValue.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.mock;
 
@@ -30,8 +30,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.assertj.core.api.Assertions;
-import org.forgerock.json.fluent.JsonException;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonException;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.test.assertj.AssertJJsonValueAssert;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeClass;

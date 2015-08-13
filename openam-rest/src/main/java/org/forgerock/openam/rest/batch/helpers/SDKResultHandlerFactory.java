@@ -15,7 +15,7 @@
 */
 package org.forgerock.openam.rest.batch.helpers;
 
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.Resource;
 
 /**
@@ -32,7 +32,7 @@ public class SDKResultHandlerFactory {
     }
 
     /**
-     * Returns a result handler appropriate for {@link org.forgerock.json.fluent.JsonValue} resulting operations,
+     * Returns a result handler appropriate for {@link org.forgerock.json.JsonValue} resulting operations,
      * e.g. Action
      */
     public SDKServerResultHandler<JsonValue> getJsonValueResultHandler() {

@@ -15,13 +15,13 @@
  */
 package org.forgerock.openam.audit;
 
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.JsonValue.*;
 
 import com.google.inject.Inject;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.audit.AuditException;
 import org.forgerock.audit.AuditService;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.audit.configuration.AuditServiceConfigurator;
 import org.forgerock.openam.utils.IOUtils;

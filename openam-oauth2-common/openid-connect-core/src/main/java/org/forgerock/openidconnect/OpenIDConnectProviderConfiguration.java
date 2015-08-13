@@ -22,7 +22,7 @@ import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 
 import java.io.IOException;
 import java.io.InputStream;

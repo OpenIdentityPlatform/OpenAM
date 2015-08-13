@@ -379,7 +379,7 @@
                             <Value>java.util.LinkedHashMap$Entry</Value>
                             <Value>java.util.LinkedHashMap$LinkedEntrySet</Value>
                             <Value>java.util.HashMap$Node</Value>
-                            <Value>org.forgerock.json.fluent.JsonValue</Value>
+                            <Value>org.forgerock.json.JsonValue</Value>
                             <Value>org.forgerock.openam.rest.batch.helpers.Requester</Value>
                             <Value>org.forgerock.json.resource.RouterContext</Value>
                             <Value>org.forgerock.openam.rest.batch.helpers.ScriptResponse</Value>

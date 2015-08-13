@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.sts.rest.operation.cancel;
 
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.sts.TokenCancellationException;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.user.invocation.RestSTSTokenCancellationInvocationState;

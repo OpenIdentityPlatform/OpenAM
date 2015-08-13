@@ -15,15 +15,15 @@
  */
 package org.forgerock.openam.audit;
 
-import static org.forgerock.json.fluent.JsonValue.array;
-import static org.forgerock.json.fluent.JsonValue.json;
 import static org.forgerock.openam.audit.AuditConstants.*;
+import static org.forgerock.json.JsonValue.array;
+import static org.forgerock.json.JsonValue.json;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 
 /**
  * Collection of static helper methods for use by AM AuditEventBuilders.

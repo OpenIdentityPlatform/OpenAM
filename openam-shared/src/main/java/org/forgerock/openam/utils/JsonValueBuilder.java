@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 ForgeRock, AS.
+ * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -17,8 +17,8 @@
 package org.forgerock.openam.utils;
 
 import org.codehaus.jackson.map.ObjectMapper;
-import org.forgerock.json.fluent.JsonException;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonException;
+import org.forgerock.json.JsonValue;
 
 import java.io.IOException;
 import java.util.List;

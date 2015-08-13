@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.sts.rest.config.user;
 
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.shared.sts.SharedSTSConstants;
 import org.forgerock.openam.sts.DeploymentPathNormalizationImpl;
 import org.forgerock.openam.sts.MapMarshallUtils;

@@ -19,8 +19,8 @@ package org.forgerock.openam.forgerockrest.utils;
 import java.util.List;
 
 import org.forgerock.guava.common.base.Predicate;
-import org.forgerock.json.fluent.JsonPointer;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonPointer;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.QueryFilter;
 import org.forgerock.json.resource.QueryFilterVisitor;
 

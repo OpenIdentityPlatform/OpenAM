@@ -16,7 +16,7 @@
  */
 package org.forgerock.openam.oauth2;
 
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
 import static org.forgerock.util.query.QueryFilter.*;
 
@@ -39,7 +39,7 @@ import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.JwsAlgorithmType;
 import org.forgerock.json.jose.utils.Utils;

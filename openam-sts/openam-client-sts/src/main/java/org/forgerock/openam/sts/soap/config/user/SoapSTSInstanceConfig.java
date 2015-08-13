@@ -17,7 +17,7 @@
 package org.forgerock.openam.sts.soap.config.user;
 
 import org.forgerock.guava.common.base.Objects;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.shared.sts.SharedSTSConstants;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.DeploymentPathNormalizationImpl;

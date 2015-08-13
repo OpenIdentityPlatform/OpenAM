@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.sts.rest.token.provider.oidc;
 
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.rest.token.provider.RestTokenProviderBase;
@@ -29,9 +29,9 @@ import org.slf4j.Logger;
 
 import java.util.Set;
 
-import static org.forgerock.json.fluent.JsonValue.field;
-import static org.forgerock.json.fluent.JsonValue.json;
-import static org.forgerock.json.fluent.JsonValue.object;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
 
 /**
  *

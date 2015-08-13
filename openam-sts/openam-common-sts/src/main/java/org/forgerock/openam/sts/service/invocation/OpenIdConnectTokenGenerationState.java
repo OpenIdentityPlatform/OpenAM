@@ -17,15 +17,15 @@
 package org.forgerock.openam.sts.service.invocation;
 
 import org.forgerock.guava.common.base.Objects;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.forgerock.json.fluent.JsonValue.field;
-import static org.forgerock.json.fluent.JsonValue.json;
-import static org.forgerock.json.fluent.JsonValue.object;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
 
 /**
  * Encapsulates invocation-specific state necessary to generate an OpenIdConnect Id token. An instance of this class

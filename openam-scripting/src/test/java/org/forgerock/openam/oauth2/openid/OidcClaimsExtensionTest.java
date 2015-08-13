@@ -17,7 +17,7 @@
 package org.forgerock.openam.oauth2.openid;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 import static org.mockito.Mockito.*;
 

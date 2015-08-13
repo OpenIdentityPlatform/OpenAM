@@ -17,7 +17,7 @@ package org.forgerock.openam.rest.batch.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.Resource;
@@ -50,11 +50,11 @@ class SDKServerQueryResultHandler implements QueryResultHandler {
     }
 
     /**
-     * Retrieves the resources returned from the query operation in a single {@link org.forgerock.json.fluent.JsonValue}.
+     * Retrieves the resources returned from the query operation in a single {@link org.forgerock.json.JsonValue}.
      * If there were any errors while executing the query, the appropriate
      * {@link org.forgerock.json.resource.ResourceException} is thrown instead.
      *
-     * @return A {@link org.forgerock.json.fluent.JsonValue} containing all results of the query.
+     * @return A {@link org.forgerock.json.JsonValue} containing all results of the query.
      * @throws ResourceException If any exception was thrown when accessing the endpoint, it is returned here.
      */
     public JsonValue getResource() throws ResourceException {

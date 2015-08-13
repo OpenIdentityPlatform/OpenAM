@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 ForgeRock AS. All rights reserved.
+ * Copyright 2012-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -14,10 +14,11 @@
  * information: "Portions Copyrighted [2012] [ForgeRock Inc]".
  *
  */
+
 package com.sun.identity.sm.model;
 
 import com.sun.identity.shared.Constants;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.opends.server.protocols.ldap.LDAPAttribute;
 import org.opends.server.types.RawAttribute;

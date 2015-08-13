@@ -18,7 +18,7 @@ import static org.testng.Assert.assertEquals;
 
 import java.io.IOException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.testng.annotations.Test;
 

@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.sts.rest.operation.validate;
 
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.user.invocation.RestSTSTokenValidationInvocationState;

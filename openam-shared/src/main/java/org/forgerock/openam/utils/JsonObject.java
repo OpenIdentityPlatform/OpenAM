@@ -1,6 +1,6 @@
 package org.forgerock.openam.utils;
 
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

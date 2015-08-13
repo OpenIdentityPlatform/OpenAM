@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.sts.rest.operation.translate;
 
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.sts.TokenTypeId;
 import org.forgerock.openam.sts.rest.token.provider.RestTokenProviderParameters;
 import org.forgerock.openam.sts.rest.token.provider.saml.Saml2TokenCreationState;

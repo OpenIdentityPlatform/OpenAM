@@ -18,7 +18,7 @@ package org.forgerock.openam.rest.batch.helpers;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.Context;
 import org.forgerock.json.resource.CreateRequest;
@@ -69,7 +69,7 @@ public class Requester {
      * @param payload Payload of the resource to generate. May not be null.
      * @param serverContext Server context of this request.
      *                      Must contain a {@link org.forgerock.json.resource.ServerContext}.
-     * @return The {@link org.forgerock.json.fluent.JsonValue} returned from the endpoint.
+     * @return The {@link org.forgerock.json.JsonValue} returned from the endpoint.
      * @throws ResourceException If any exception occurred during processing.
      */
     public JsonValue create(String location, String resourceId, JsonValue payload, Context serverContext)
@@ -98,7 +98,7 @@ public class Requester {
      * @param resourceId Resource ID to read. May not be null.
      * @param serverContext Server context of this request.
      *                      Must contain a {@link org.forgerock.json.resource.ServerContext}.
-     * @return The {@link org.forgerock.json.fluent.JsonValue} returned from the endpoint.
+     * @return The {@link org.forgerock.json.JsonValue} returned from the endpoint.
      * @throws ResourceException If any exception occurred during processing.
      */
     public JsonValue read(String location, String resourceId, Context serverContext)
@@ -123,7 +123,7 @@ public class Requester {
      * @param payload Payload of the updated resource. May not be null.
      * @param serverContext Server context of this request.
      *                      Must contain a {@link org.forgerock.json.resource.ServerContext}.
-     * @return The {@link org.forgerock.json.fluent.JsonValue} returned from the endpoint.
+     * @return The {@link org.forgerock.json.JsonValue} returned from the endpoint.
      * @throws ResourceException If any exception occurred during processing.
      */
     public JsonValue update(String location, String resourceId, JsonValue payload, Context serverContext)
@@ -148,7 +148,7 @@ public class Requester {
      * @param resourceId Resource ID to delete. May not be null.
      * @param serverContext Server context of this request.
      *                      Must contain a {@link org.forgerock.json.resource.ServerContext}.
-     * @return The {@link org.forgerock.json.fluent.JsonValue} returned from the endpoint.
+     * @return The {@link org.forgerock.json.JsonValue} returned from the endpoint.
      * @throws ResourceException If any exception occurred during processing.
      */
     public JsonValue delete(String location, String resourceId, Context serverContext)
@@ -173,7 +173,7 @@ public class Requester {
      * @param actionId act ID to delete. May not be null.
      * @param serverContext Server context of this request.
      *                      Must contain a {@link org.forgerock.json.resource.ServerContext}.
-     * @return The {@link org.forgerock.json.fluent.JsonValue} returned from the endpoint.
+     * @return The {@link org.forgerock.json.JsonValue} returned from the endpoint.
      * @throws ResourceException If any exception occurred during processing.
      */
     public JsonValue action(String location, String resourceId, String actionId, JsonValue payload,
@@ -207,7 +207,7 @@ public class Requester {
      * @param queryId Specific query ID to perform. May be null.
      * @param serverContext Server context of this request.
      *                      Must contain a {@link org.forgerock.json.resource.ServerContext}.
-     * @return The {@link org.forgerock.json.fluent.JsonValue} returned from the endpoint.
+     * @return The {@link org.forgerock.json.JsonValue} returned from the endpoint.
      * @throws ResourceException If any exception occurred during processing.
      */
     public JsonValue query(String location, String queryId, Context serverContext)

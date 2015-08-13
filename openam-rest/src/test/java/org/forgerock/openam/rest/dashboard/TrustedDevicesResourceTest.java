@@ -17,7 +17,7 @@
 package org.forgerock.openam.rest.dashboard;
 
 import static org.fest.assertions.Assertions.*;
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Resources.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.anyString;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.verify;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.Connection;
 import org.forgerock.json.resource.Context;
 import org.forgerock.json.resource.DeleteRequest;

@@ -16,13 +16,13 @@
 
 package com.sun.identity.authentication.client;
 
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.utils.CollectionUtils;
 
 import java.util.Collections;
 import java.util.Set;
 
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.JsonValue.*;
 
 /**
  * Interface to different methods for configuring Zero Page Login (ZPL). For local authentication, this uses the

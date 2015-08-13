@@ -25,7 +25,7 @@ import com.sun.identity.idm.IdSearchControl;
 import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.sm.SMSException;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.openam.rest.devices.services.DeviceService;
 import org.forgerock.openam.rest.devices.services.DeviceServiceFactory;

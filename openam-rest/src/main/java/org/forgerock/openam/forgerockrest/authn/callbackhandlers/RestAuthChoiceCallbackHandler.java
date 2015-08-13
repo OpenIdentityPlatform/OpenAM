@@ -11,14 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.json.fluent.JsonException;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonException;
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
 import org.forgerock.openam.utils.JsonValueBuilder;
@@ -115,7 +115,7 @@ public class RestAuthChoiceCallbackHandler extends AbstractRestAuthCallbackHandl
      * Try to get or parse JsonValue as int.
      *
      * @param value JsonValue that should contain a number or String that can be converted to int
-     * @throws org.forgerock.json.fluent.JsonValueException if value doesn't represent an int
+     * @throws org.forgerock.json.JsonValueException if value doesn't represent an int
      * @return the int value
      */
     private int toInteger(JsonValue value) {

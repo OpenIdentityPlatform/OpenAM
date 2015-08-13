@@ -19,7 +19,7 @@ package org.forgerock.openam.rest.resource;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;

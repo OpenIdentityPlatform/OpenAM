@@ -17,7 +17,7 @@ package org.forgerock.openam.rest.query;
 
 import static org.forgerock.openam.rest.query.QueryException.QueryErrorCode.FILTER_DEPTH_NOT_SUPPORTED;
 
-import org.forgerock.json.fluent.JsonPointer;
+import org.forgerock.json.JsonPointer;
 import org.forgerock.json.resource.QueryFilterVisitor;
 import org.forgerock.util.query.QueryFilter;
 

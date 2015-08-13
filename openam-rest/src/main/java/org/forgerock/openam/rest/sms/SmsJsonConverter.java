@@ -25,9 +25,9 @@ import com.sun.identity.sm.ServiceSchema;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.guava.common.collect.BiMap;
 import org.forgerock.guava.common.collect.HashBiMap;
-import org.forgerock.json.fluent.JsonException;
-import org.forgerock.json.fluent.JsonPointer;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonException;
+import org.forgerock.json.JsonPointer;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.util.Pair;
 import org.w3c.dom.Document;
@@ -54,7 +54,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.JsonValue.json;
 
 /**
  * A class to convert service configurations between XML and JSON

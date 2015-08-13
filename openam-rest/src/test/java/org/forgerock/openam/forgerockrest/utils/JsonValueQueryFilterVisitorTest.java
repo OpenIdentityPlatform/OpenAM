@@ -17,9 +17,9 @@
 package org.forgerock.openam.forgerockrest.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.JsonValue.*;
 
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.QueryFilter;
 import org.testng.annotations.Test;
 

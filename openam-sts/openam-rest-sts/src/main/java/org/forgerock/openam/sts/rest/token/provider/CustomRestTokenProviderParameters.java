@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.sts.rest.token.provider;
 
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 
 import java.security.Principal;
 

@@ -15,8 +15,8 @@
  */
 package org.forgerock.openam.entitlement.conditions.environment;
 
-import static org.forgerock.json.fluent.JsonValue.field;
-import static org.forgerock.json.fluent.JsonValue.object;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.openam.utils.CollectionUtils.transformMap;
 
 import com.google.inject.Key;
@@ -33,7 +33,7 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.client.RestletHttpClient;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.scripting.ScriptConstants.ScriptContext;

@@ -57,7 +57,7 @@ import org.forgerock.util.promise.Promises;
 import org.forgerock.util.promise.ResultHandler;
 import org.forgerock.util.query.QueryFilterVisitor;
 
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.util.query.QueryFilter.and;
 import static org.forgerock.util.query.QueryFilter.equalTo;
 

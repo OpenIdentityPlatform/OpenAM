@@ -29,7 +29,7 @@ import javax.inject.Singleton;
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
 
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.HttpURLConnectionFactory;

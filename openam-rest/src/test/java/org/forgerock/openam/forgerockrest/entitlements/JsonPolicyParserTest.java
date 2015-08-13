@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock, AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.entitlements;
@@ -31,8 +31,8 @@ import com.sun.identity.entitlement.opensso.OpenSSOPrivilege;
 import com.sun.identity.entitlement.opensso.PolicyCondition;
 import com.sun.identity.policy.plugins.AuthenticateToRealmCondition;
 import com.sun.identity.shared.DateUtils;
-import org.forgerock.json.fluent.JsonPointer;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonPointer;
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.entitlement.conditions.environment.OAuth2ScopeCondition;
 import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
 import org.forgerock.openam.utils.CollectionUtils;
@@ -53,7 +53,7 @@ import java.util.Set;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.fest.assertions.MapAssert.entry;
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.JsonValue.*;
 
 public class JsonPolicyParserTest {
     private static final String POLICY_NAME = "aPolicy";

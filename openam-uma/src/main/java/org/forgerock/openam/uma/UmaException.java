@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.uma;
 
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 
 /**

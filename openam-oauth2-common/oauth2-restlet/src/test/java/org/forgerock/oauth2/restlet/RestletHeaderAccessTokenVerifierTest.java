@@ -25,7 +25,7 @@ import org.restlet.data.ChallengeScheme;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.JsonValue.*;
 import static org.fest.assertions.Assertions.*;
 import static org.mockito.Mockito.*;
 

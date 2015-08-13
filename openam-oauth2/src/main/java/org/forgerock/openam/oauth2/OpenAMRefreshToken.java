@@ -21,7 +21,7 @@ import static org.forgerock.oauth2.core.Utils.*;
 import java.util.Collections;
 import java.util.ResourceBundle;
 import java.util.Set;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.RefreshToken;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;

@@ -24,7 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.testng.Assert.*;
 
 import javax.inject.Provider;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.AbstractContext;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.Context;

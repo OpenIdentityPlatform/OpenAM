@@ -17,9 +17,9 @@
 package org.forgerock.openam.oauth2.resources.labels;
 
 import java.util.Set;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.JsonValue.*;
 
 /**
  * A bean representing a resource set label.

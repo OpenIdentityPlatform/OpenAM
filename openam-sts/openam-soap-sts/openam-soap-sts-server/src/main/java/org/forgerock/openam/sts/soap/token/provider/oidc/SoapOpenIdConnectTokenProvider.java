@@ -20,7 +20,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.ws.security.message.token.BinarySecurity;
-import org.forgerock.json.fluent.JsonValueException;
+import org.forgerock.json.JsonValueException;
 import org.forgerock.json.jose.common.JwtReconstruction;
 import org.forgerock.json.jose.exceptions.JwtReconstructionException;
 import org.forgerock.json.jose.jws.SignedJwt;

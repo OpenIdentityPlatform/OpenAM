@@ -17,7 +17,7 @@
 package org.forgerock.openam.forgerockrest.entitlements;
 
 import static org.apache.commons.lang.StringUtils.*;
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.JsonValue.*;
 
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
@@ -25,7 +25,7 @@ import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.shared.debug.Debug;
 import java.util.List;
 import javax.inject.Inject;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;

@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.rest.devices;
 
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.utils.JsonValueBuilder;
 
 /**

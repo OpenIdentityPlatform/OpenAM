@@ -18,7 +18,7 @@ package org.forgerock.oauth2.core;
 
 import org.forgerock.guava.common.collect.ClassToInstanceMap;
 import org.forgerock.guava.common.collect.MutableClassToInstanceMap;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 
 import java.util.Locale;
 

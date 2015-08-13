@@ -21,7 +21,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.rest.devices.OathDeviceSettings;
 import org.forgerock.openam.rest.devices.OathDevicesDao;
 import org.mockito.ArgumentCaptor;

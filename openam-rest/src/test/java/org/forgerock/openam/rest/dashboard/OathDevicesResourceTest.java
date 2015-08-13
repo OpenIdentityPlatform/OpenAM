@@ -17,7 +17,7 @@
 package org.forgerock.openam.rest.dashboard;
 
 import static org.fest.assertions.Assertions.*;
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.JsonValue.*;
 import static org.mockito.BDDMockito.anyObject;
 import static org.mockito.BDDMockito.anyString;
 import static org.mockito.BDDMockito.*;
@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;

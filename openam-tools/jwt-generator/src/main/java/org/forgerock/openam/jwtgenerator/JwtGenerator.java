@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.jwtgenerator;
 
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.JsonValue.*;
 
 import java.math.BigInteger;
 import java.security.KeyPair;

@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.rest.devices;
 
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
 import org.forgerock.json.jose.common.JwtReconstruction;
 import org.forgerock.json.jose.jwe.EncryptedJwt;

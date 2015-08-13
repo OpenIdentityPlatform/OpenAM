@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.forgerock.guava.common.base.Function;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;

@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.oauth2;
 
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.oauth2.core.Utils.*;
 
 import com.iplanet.sso.SSOException;
@@ -46,7 +46,7 @@ import java.util.UUID;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.jose.jwk.KeyUse;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.oauth2.core.AccessToken;

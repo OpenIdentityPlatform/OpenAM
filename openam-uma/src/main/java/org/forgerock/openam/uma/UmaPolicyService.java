@@ -18,7 +18,7 @@ package org.forgerock.openam.uma;
 
 import java.util.Collection;
 
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.ResourceException;

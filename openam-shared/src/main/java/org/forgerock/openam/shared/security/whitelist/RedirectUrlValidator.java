@@ -11,8 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
+
 package org.forgerock.openam.shared.security.whitelist;
 
 import com.sun.identity.shared.debug.Debug;
@@ -23,7 +24,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import javax.servlet.http.HttpServletRequest;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 
 /**
  * Validates the provided redirect URL against the list of valid goto URL domains.

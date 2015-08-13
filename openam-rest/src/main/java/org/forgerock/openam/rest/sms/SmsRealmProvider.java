@@ -16,14 +16,14 @@
 package org.forgerock.openam.rest.sms;
 
 import static com.sun.identity.sm.SMSException.*;
-import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.forgerockrest.RestUtils.*;
 
 import java.security.AccessController;
 import java.util.*;
 
-import org.forgerock.json.fluent.JsonPointer;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonPointer;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.ConflictException;

@@ -18,7 +18,7 @@ package org.forgerock.openam.scripting.datastore;
 import static com.sun.identity.shared.datastruct.CollectionHelper.getMapAttr;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode.*;
 
-import org.forgerock.json.fluent.JsonPointer;
+import org.forgerock.json.JsonPointer;
 import org.forgerock.json.resource.QueryFilter;
 import org.forgerock.json.resource.QueryFilterVisitor;
 import org.forgerock.openam.utils.StringUtils;
