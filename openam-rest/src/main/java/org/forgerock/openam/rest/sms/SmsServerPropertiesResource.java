@@ -58,7 +58,7 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.xml.bind.StringInputStream;
 import org.apache.commons.io.IOUtils;
 import org.forgerock.http.context.ServerContext;
-import org.forgerock.http.routing.RouterContext;
+import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -587,7 +587,7 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
     }
 
     private Map<String, String> getUriTemplateVariables(ServerContext serverContext) {
-        return serverContext.asContext(RouterContext.class).getUriTemplateVariables();
+        return serverContext.asContext(UriRouterContext.class).getUriTemplateVariables();
     }
 
     private String getTabName(Map<String, String> uriVariables) {

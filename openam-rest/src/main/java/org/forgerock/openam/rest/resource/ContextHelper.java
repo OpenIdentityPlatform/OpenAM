@@ -19,13 +19,13 @@ package org.forgerock.openam.rest.resource;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdUtils;
 import org.forgerock.http.context.ServerContext;
-import org.forgerock.http.routing.RouterContext;
+import org.forgerock.http.routing.UriRouterContext;
 
 import javax.security.auth.Subject;
 
 /**
  * Helper class to get around the fact that some CREST Contexts are final and have package private
- * constructors, i.e. RouterContext.
+ * constructors, i.e. UriRouterContext.
  *
  * @since 13.0.0
  */
@@ -65,7 +65,7 @@ public class ContextHelper {
      * @return The resource users username.
      */
     public String getUserId(ServerContext context) {
-        return context.asContext(RouterContext.class).getUriTemplateVariables().get("user");
+        return context.asContext(UriRouterContext.class).getUriTemplateVariables().get("user");
     }
 
     /**

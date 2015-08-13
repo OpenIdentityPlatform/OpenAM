@@ -30,7 +30,7 @@ import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.routing.RouterContext;
+import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.resource.RealmContext;
@@ -149,7 +149,7 @@ public class PrivilegeAuthzModule implements CrestAuthorizationModule {
         final String realm = (context.containsContext(RealmContext.class)) ?
                 context.asContext(RealmContext.class).getResolvedRealm() : "/";
         final SubjectContext subjectContext = context.asContext(SubjectContext.class);
-        final RouterContext routerContext = context.asContext(RouterContext.class);
+        final UriRouterContext routerContext = context.asContext(UriRouterContext.class);
 
         // Map the set of actions to a set of action strings.
         final Set<String> actions = transformSet(definition.getActions(), ACTION_TO_STRING_MAPPER);

@@ -31,7 +31,7 @@ import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.SecurityContext;
-import org.forgerock.http.routing.RouterContext;
+import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
@@ -83,14 +83,14 @@ public class ServerContextUtils {
     }
 
     /**
-     * Returns the RouterContext's "id" UriTemplateVariable from the provided ServerContext.
+     * Returns the UriRouterContext's "id" UriTemplateVariable from the provided ServerContext.
      *
      * @param context from which to pull the id
      * @return the id, otherwise null.
      */
     public static String getId(ServerContext context) {
-        if (context.containsContext(RouterContext.class)) {
-            RouterContext routerContext = context.asContext(RouterContext.class);
+        if (context.containsContext(UriRouterContext.class)) {
+            UriRouterContext routerContext = context.asContext(UriRouterContext.class);
             Map<String, String> templateVars = routerContext.getUriTemplateVariables();
 
             if (templateVars != null && !templateVars.isEmpty()) {
@@ -102,7 +102,7 @@ public class ServerContextUtils {
     }
 
     /**
-     * Returns the RouterContext's matchedUri, and appends its id, if there is one.
+     * Returns the UriRouterContext's matchedUri, and appends its id, if there is one.
      * Id is retrieved via {@link ServerContextUtils#getId(org.forgerock.http.context.ServerContext)}.
      *
      * @param context from which to gather the matched Uri and id information
@@ -110,8 +110,8 @@ public class ServerContextUtils {
      */
     public static String getMatchedUri(ServerContext context) {
         String resource = "";
-        if (context.containsContext(RouterContext.class)) {
-            RouterContext routerContext = context.asContext(RouterContext.class);
+        if (context.containsContext(UriRouterContext.class)) {
+            UriRouterContext routerContext = context.asContext(UriRouterContext.class);
             resource = routerContext.getMatchedUri();
         }
 
@@ -129,7 +129,7 @@ public class ServerContextUtils {
      * Id is retrieved via {@link ServerContextUtils#getId(org.forgerock.http.context.ServerContext)}.
      *
      * @param request the request for a resource
-     * @param context the context of the request, including its RouterContext
+     * @param context the context of the request, including its UriRouterContext
      * @return a String in the form <code>resourceName | id</code>, omitting either if they are null.
      */
     public static String getResourceId(Request request, ServerContext context) {

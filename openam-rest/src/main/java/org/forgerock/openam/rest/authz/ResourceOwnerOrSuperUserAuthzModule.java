@@ -25,7 +25,7 @@ import com.sun.identity.shared.debug.Debug;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.routing.RouterContext;
+import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.http.context.ServerContext;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.utils.Config;
@@ -90,7 +90,7 @@ public class ResourceOwnerOrSuperUserAuthzModule extends AdminOnlyAuthzModule {
     }
 
     protected String getUserIdFromUri(ServerContext context) throws InternalServerErrorException {
-        String username = context.asContext(RouterContext.class).getUriTemplateVariables().get("user");
+        String username = context.asContext(UriRouterContext.class).getUriTemplateVariables().get("user");
         String realm = context.asContext(RealmContext.class).getResolvedRealm();
         return IdUtils.getIdentity(username, realm).getUniversalId();
     }

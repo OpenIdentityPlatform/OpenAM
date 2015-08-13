@@ -26,7 +26,7 @@ import static org.forgerock.util.promise.Promises.newResultPromise;
 import com.google.inject.Inject;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdUtils;
-import org.forgerock.http.routing.RouterContext;
+import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -98,7 +98,7 @@ public class AuditHistory implements CollectionResourceProvider {
 
     private AMIdentity getIdentity(ServerContext context) {
         String realm = context.asContext(RealmContext.class).getResolvedRealm();
-        final String user = context.asContext(RouterContext.class).getUriTemplateVariables().get("user");
+        final String user = context.asContext(UriRouterContext.class).getUriTemplateVariables().get("user");
         return IdUtils.getIdentity(user, realm);
     }
 

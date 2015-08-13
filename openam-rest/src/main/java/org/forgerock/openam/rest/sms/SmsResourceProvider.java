@@ -52,7 +52,7 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
 import org.forgerock.http.context.ServerContext;
-import org.forgerock.http.routing.RouterContext;
+import org.forgerock.http.routing.UriRouterContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -148,7 +148,7 @@ abstract class SmsResourceProvider {
     protected ServiceConfig parentSubConfigFor(ServerContext context, ServiceConfigManager scm)
             throws SMSException, SSOException {
         String name = null;
-        Map<String, String> uriTemplateVariables = context.asContext(RouterContext.class).getUriTemplateVariables();
+        Map<String, String> uriTemplateVariables = context.asContext(UriRouterContext.class).getUriTemplateVariables();
         if (hasInstanceName) {
             name = uriTemplateVariables.get("name");
         }
@@ -202,7 +202,7 @@ abstract class SmsResourceProvider {
 
     boolean isDefaultCreatedAuthModule(ServerContext context, String resourceId) throws SSOException,
             SMSException {
-        String lastedMatchedUri = context.asContext(RouterContext.class).getMatchedUri();
+        String lastedMatchedUri = context.asContext(UriRouterContext.class).getMatchedUri();
         return AMAuthenticationManager.getAuthenticationServiceNames().contains(serviceName)
                 && AUTO_CREATED_AUTHENTICATION_MODULES.containsKey(resourceId.toLowerCase())
                 && AUTO_CREATED_AUTHENTICATION_MODULES.get(resourceId.toLowerCase()).equalsIgnoreCase(lastedMatchedUri);
