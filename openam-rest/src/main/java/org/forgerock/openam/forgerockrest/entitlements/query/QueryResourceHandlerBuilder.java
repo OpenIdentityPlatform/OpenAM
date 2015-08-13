@@ -30,9 +30,9 @@ import java.util.List;
  * @since 12.0.0
  */
 public final class QueryResourceHandlerBuilder {
-    private final QueryResponseHandler handler;
+    private final QueryResourceHandler handler;
 
-    public QueryResourceHandlerBuilder(QueryResponseHandler handler) {
+    public QueryResourceHandlerBuilder(QueryResourceHandler handler) {
         Reject.ifNull(handler);
         this.handler = handler;
     }
@@ -48,11 +48,11 @@ public final class QueryResourceHandlerBuilder {
                 : new QueryResourceHandlerBuilder(new PagingQueryResponseHandler(handler, pageSize, pageOffset));
     }
 
-    public QueryResponseHandler build() {
+    public QueryResourceHandler build() {
         return handler;
     }
 
-    public static QueryResponseHandler withPagingAndSorting(QueryResourceHandler initialHandler, QueryRequest request) {
+    public static QueryResourceHandler withPagingAndSorting(QueryResourceHandler initialHandler, QueryRequest request) {
         return new QueryResourceHandlerBuilder(new QueryResponseHandler(initialHandler))
                 .withPaging(request.getPageSize(), request.getPagedResultsOffset())
                 // Always add sorting after paging, otherwise paging will not be based on the sorted list
