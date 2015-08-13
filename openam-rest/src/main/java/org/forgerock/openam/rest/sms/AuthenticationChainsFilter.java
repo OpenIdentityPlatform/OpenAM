@@ -17,6 +17,10 @@
 package org.forgerock.openam.rest.sms;
 
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.ResourceException.adapt;
+import static org.forgerock.json.resource.ResourceException.newNotSupportedException;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,24 +30,25 @@ import java.util.regex.Pattern;
 import com.sun.identity.authentication.config.AMAuthConfigUtils;
 import com.sun.identity.authentication.config.AMConfigurationException;
 import com.sun.identity.authentication.config.AuthConfigurationEntry;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.Filter;
 import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.RequestHandler;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.util.AsyncFunction;
+import org.forgerock.util.promise.Promise;
 
 /**
  * Authentication Chain endpoint filter which converts the
@@ -56,53 +61,53 @@ import org.forgerock.json.resource.UpdateRequest;
 public class AuthenticationChainsFilter implements Filter {
 
     @Override
-    public void filterAction(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler,
+    public Promise<ActionResponse, ResourceException> filterAction(ServerContext context, ActionRequest request,
             RequestHandler next) {
-        next.handleAction(context, request, handler);
+        return next.handleAction(context, request);
     }
 
     @Override
-    public void filterCreate(ServerContext context, CreateRequest request, ResultHandler<Resource> handler,
+    public Promise<ResourceResponse, ResourceException> filterCreate(ServerContext context, CreateRequest request,
             RequestHandler next) {
         try {
-            next.handleCreate(context, transformRequest(request), wrap(handler));
+            return wrap(next.handleCreate(context, transformRequest(request)));
         } catch (InternalServerErrorException e) {
-            handler.handleError(e);
+            return newExceptionPromise(adapt(e));
         }
     }
 
     @Override
-    public void filterDelete(ServerContext context, DeleteRequest request, ResultHandler<Resource> handler,
+    public Promise<ResourceResponse, ResourceException> filterDelete(ServerContext context, DeleteRequest request,
             RequestHandler next) {
-        next.handleDelete(context, request, wrap(handler));
+        return wrap(next.handleDelete(context, request));
     }
 
     @Override
-    public void filterPatch(ServerContext context, PatchRequest request, ResultHandler<Resource> handler,
+    public Promise<ResourceResponse, ResourceException> filterPatch(ServerContext context, PatchRequest request,
             RequestHandler next) {
         //Not currently handling converting authChainConfiguration for patch
-        handler.handleError(new NotSupportedException());
+        return newExceptionPromise(newNotSupportedException());
     }
 
     @Override
-    public void filterQuery(ServerContext context, QueryRequest request, QueryResourceHandler handler,
+    public Promise<QueryResponse, ResourceException> filterQuery(ServerContext context, QueryRequest request,
+            QueryResourceHandler handler, RequestHandler next) {
+        return next.handleQuery(context, request, wrap(handler));
+    }
+
+    @Override
+    public Promise<ResourceResponse, ResourceException> filterRead(ServerContext context, ReadRequest request,
             RequestHandler next) {
-        next.handleQuery(context, request, wrap(handler));
+        return wrap(next.handleRead(context, request));
     }
 
     @Override
-    public void filterRead(ServerContext context, ReadRequest request, ResultHandler<Resource> handler,
-            RequestHandler next) {
-        next.handleRead(context, request, wrap(handler));
-    }
-
-    @Override
-    public void filterUpdate(ServerContext context, UpdateRequest request, ResultHandler<Resource> handler,
+    public Promise<ResourceResponse, ResourceException> filterUpdate(ServerContext context, UpdateRequest request,
             RequestHandler next) {
         try {
-            next.handleUpdate(context, transformRequest(request), wrap(handler));
+            return wrap(next.handleUpdate(context, transformRequest(request)));
         } catch (InternalServerErrorException e) {
-            handler.handleError(e);
+            return newExceptionPromise(adapt(e));
         }
     }
 
@@ -150,41 +155,26 @@ public class AuthenticationChainsFilter implements Filter {
         return "";
     }
 
-    private QueryResultHandler wrap(final QueryResultHandler handler) {
-        return new QueryResultHandler() {
+    private QueryResourceHandler wrap(final QueryResourceHandler handler) {
+        return new QueryResourceHandler() {
             @Override
-            public void handleError(ResourceException error) {
-                handler.handleError(error);
-            }
-
-            @Override
-            public boolean handleResource(Resource resource) {
-                handler.handleResource(transformAuthChainConfiguration(resource));
-                return true;
-            }
-
-            @Override
-            public void handleResult(QueryResult result) {
-                handler.handleResult(result);
+            public boolean handleResource(ResourceResponse resource) {
+                return handler.handleResource(transformAuthChainConfiguration(resource));
             }
         };
     }
 
-    private ResultHandler<Resource> wrap(final ResultHandler<Resource> handler) {
-        return new ResultHandler<Resource>() {
-            @Override
-            public void handleError(ResourceException error) {
-                handler.handleError(error);
-            }
-
-            @Override
-            public void handleResult(Resource result) {
-                handler.handleResult(transformAuthChainConfiguration(result));
-            }
-        };
+    private Promise<ResourceResponse, ResourceException> wrap(Promise<ResourceResponse, ResourceException> promise) {
+        return promise
+                .thenAsync(new AsyncFunction<ResourceResponse, ResourceResponse, ResourceException>() {
+                    @Override
+                    public Promise<ResourceResponse, ResourceException> apply(ResourceResponse response) {
+                        return newResultPromise(transformAuthChainConfiguration(response));
+                    }
+                });
     }
 
-    private Resource transformAuthChainConfiguration(Resource resource) {
+    private ResourceResponse transformAuthChainConfiguration(ResourceResponse resource) {
         if (resource.getContent().isDefined("authChainConfiguration")) {
             List<AuthConfigurationEntry> entries = AMAuthConfigUtils.xmlToAuthConfigurationEntry(
                     resource.getContent().get("authChainConfiguration").asString());

@@ -16,26 +16,40 @@
 package org.forgerock.openam.forgerockrest.entitlements;
 
 import static org.forgerock.openam.utils.CollectionUtils.transformSet;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.security.auth.Subject;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.shared.debug.Debug;
 import org.apache.commons.lang.RandomStringUtils;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.Filter;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.RequestHandler;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.entitlement.configuration.ResourceTypeSmsAttributes;
@@ -46,20 +60,11 @@ import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.rest.resource.ContextHelper;
+import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
+import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.security.auth.Subject;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * CREST filter used transform between version 1.0 and version 2.0 of the json for the application endpoint.
@@ -103,14 +108,12 @@ public class ApplicationV1Filter implements Filter {
      *         the filter chain context
      * @param request
      *         the create request
-     * @param handler
-     *         the result handler
      * @param next
      *         a request handler representing the remainder of the filter chain
      */
     @Override
-    public void filterCreate(final ServerContext context, final CreateRequest request,
-                             final ResultHandler<Resource> handler, final RequestHandler next) {
+    public Promise<ResourceResponse, ResourceException> filterCreate(final ServerContext context,
+            final CreateRequest request, final RequestHandler next) {
 
         final JsonValue jsonValue = request.getContent();
         final Map<String, Boolean> actions = jsonValue.get(ACTIONS).asMap(Boolean.class);
@@ -119,21 +122,18 @@ public class ApplicationV1Filter implements Filter {
         final String pathRealm = contextHelper.getRealm(context);
 
         if (actions == null) {
-            handler.handleError(ResourceException
+            return newExceptionPromise(ResourceException
                     .getException(ResourceException.BAD_REQUEST, "Invalid actions defined in request"));
-            return;
         }
 
         if (resources == null) {
-            handler.handleError(ResourceException
+            return newExceptionPromise(ResourceException
                     .getException(ResourceException.BAD_REQUEST, "Invalid resources defined in request"));
-            return;
         }
 
         if (!pathRealm.equals(bodyRealm)) {
-            handler.handleError(resourceErrorHandler.handleError(context, request, new EntitlementException(
+            return newExceptionPromise(resourceErrorHandler.handleError(context, request, new EntitlementException(
                     EntitlementException.INVALID_APP_REALM, new String[] { bodyRealm, pathRealm })));
-            return;
         }
 
         try {
@@ -141,11 +141,11 @@ public class ApplicationV1Filter implements Filter {
             jsonValue.put(RESOURCE_TYPE_UUIDS, new HashSet<String>(Arrays.asList(resourceType.getUUID())));
 
             // Forward onto next handler.
-            next.handleCreate(context, request, new TransformationHandler(handler, context));
+            return transform(next.handleCreate(context, request), context);
 
         } catch (EntitlementException eE) {
             debug.error("Error filtering application create CREST request", eE);
-            handler.handleError(resourceErrorHandler.handleError(context, request, eE));
+            return newExceptionPromise(resourceErrorHandler.handleError(context, request, eE));
         }
     }
 
@@ -239,14 +239,12 @@ public class ApplicationV1Filter implements Filter {
      *         the filter chain context
      * @param request
      *         the update request
-     * @param handler
-     *         the result handler
      * @param next
      *         a request handler representing the remainder of the filter chain
      */
     @Override
-    public void filterUpdate(final ServerContext context, final UpdateRequest request,
-                             final ResultHandler<Resource> handler, final RequestHandler next) {
+    public Promise<ResourceResponse, ResourceException> filterUpdate(final ServerContext context,
+            final UpdateRequest request, final RequestHandler next) {
 
         final JsonValue jsonValue = request.getContent();
         final Map<String, Boolean> actions = jsonValue.get(ACTIONS).asMap(Boolean.class);
@@ -255,42 +253,37 @@ public class ApplicationV1Filter implements Filter {
         final String pathRealm = contextHelper.getRealm(context);
 
         if (actions == null) {
-            handler.handleError(ResourceException
+            return newExceptionPromise(ResourceException
                     .getException(ResourceException.BAD_REQUEST, "Invalid actions defined in request"));
-            return;
         }
 
         if (resources == null) {
-            handler.handleError(ResourceException
+            return newExceptionPromise(ResourceException
                     .getException(ResourceException.BAD_REQUEST, "Invalid resources defined in request"));
-            return;
         }
 
         if (!pathRealm.equals(bodyRealm)) {
-            handler.handleError(resourceErrorHandler.handleError(context, request, new EntitlementException
+            return newExceptionPromise(resourceErrorHandler.handleError(context, request, new EntitlementException
                     (EntitlementException.INVALID_APP_REALM, new String[]{bodyRealm, pathRealm})));
-            return;
         }
 
         final Subject callingSubject = contextHelper.getSubject(context);
-        final String applicationName = request.getResourceName();
+        final String applicationName = request.getResourcePath();
 
         try {
             final ApplicationService applicationService = applicationServiceFactory.create(callingSubject, pathRealm);
             final Application application = applicationService.getApplication(applicationName);
 
             if (application == null) {
-                handler.handleError(ResourceException
+                return newExceptionPromise(ResourceException
                         .getException(ResourceException.BAD_REQUEST, "Unable to find application " + applicationName));
-                return;
             }
 
             if (application.getResourceTypeUuids().size() != 1) {
-                handler.handleError(ResourceException
+                return newExceptionPromise(ResourceException
                         .getException(ResourceException.BAD_REQUEST,
                                 "Cannot modify application with more than one " +
                                         "resource type using version 1.0 of this endpoint"));
-                return;
             }
 
             // Retrieve the resource type from the applications single resource type.
@@ -324,12 +317,11 @@ public class ApplicationV1Filter implements Filter {
 
         } catch (EntitlementException eE) {
             debug.error("Error filtering application update CREST request", eE);
-            handler.handleError(resourceErrorHandler.handleError(context, request, eE));
-            return;
+            return newExceptionPromise(resourceErrorHandler.handleError(context, request, eE));
         }
 
         // Forward onto next handler.
-        next.handleUpdate(context, request, new TransformationHandler(handler, context));
+        return transform(next.handleUpdate(context, request), context);
     }
 
     /**
@@ -340,16 +332,14 @@ public class ApplicationV1Filter implements Filter {
      *         the filter chain context
      * @param request
      *         the delete request
-     * @param handler
-     *         the result handler
      * @param next
      *         a request handler representing the remainder of the filter chain
      */
     @Override
-    public void filterDelete(ServerContext context, DeleteRequest request,
-                             ResultHandler<Resource> handler, RequestHandler next) {
+    public Promise<ResourceResponse, ResourceException> filterDelete(ServerContext context, DeleteRequest request,
+            RequestHandler next) {
         // Forward onto next handler.
-        next.handleDelete(context, request, handler);
+        return next.handleDelete(context, request);
     }
 
     /**
@@ -367,45 +357,16 @@ public class ApplicationV1Filter implements Filter {
      *         a request handler representing the remainder of the filter chain
      */
     @Override
-    public void filterQuery(final ServerContext context, final QueryRequest request,
-                            final QueryResultHandler handler, final RequestHandler next) {
-
-        final Subject callingSubject = contextHelper.getSubject(context);
-        final String realm = contextHelper.getRealm(context);
-
-        final List<Resource> resources = new ArrayList<Resource>();
-
+    public Promise<QueryResponse, ResourceException> filterQuery(final ServerContext context,
+            final QueryRequest request, final QueryResourceHandler handler, final RequestHandler next) {
+        final List<ResourceResponse> resources = new ArrayList<>();
         // Forward onto next handler.
-        next.handleQuery(context, request, new QueryResultHandler() {
-
+        return transform(next.handleQuery(context, request, new QueryResourceHandler() {
             @Override
-            public boolean handleResource(Resource resource) {
+            public boolean handleResource(ResourceResponse resource) {
                 return resources.add(resource);
             }
-
-            @Override
-            public void handleResult(QueryResult result) {
-                try {
-                    for (Resource resource : resources) {
-                        final JsonValue jsonValue = resource.getContent();
-                        transformJson(jsonValue, callingSubject, realm);
-                        handler.handleResource(resource);
-                    }
-                } catch (EntitlementException eE) {
-                    debug.error("Error filtering application query CREST request", eE);
-                    handler.handleError(resourceErrorHandler.handleError(context, request, eE));
-                    return;
-                }
-
-                handler.handleResult(result);
-            }
-
-            @Override
-            public void handleError(ResourceException error) {
-                handler.handleError(error);
-            }
-
-        });
+        }), context, request, handler, resources);
     }
 
     /**
@@ -417,16 +378,14 @@ public class ApplicationV1Filter implements Filter {
      *         the filter chain context
      * @param request
      *         the read request
-     * @param handler
-     *         the result handler
      * @param next
      *         a request handler representing the remainder of the filter chain
      */
     @Override
-    public void filterRead(final ServerContext context, final ReadRequest request,
-                           final ResultHandler<Resource> handler, final RequestHandler next) {
+    public Promise<ResourceResponse, ResourceException> filterRead(final ServerContext context,
+            final ReadRequest request, final RequestHandler next) {
         // Forward onto next handler.
-        next.handleRead(context, request, new TransformationHandler(handler, context));
+        return transform(next.handleRead(context, request), context);
     }
 
     /*
@@ -434,9 +393,9 @@ public class ApplicationV1Filter implements Filter {
      * an appropriate implementation will need to be considered here also.
      */
     @Override
-    public void filterPatch(ServerContext context, PatchRequest request,
-                            ResultHandler<Resource> handler, RequestHandler next) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> filterPatch(ServerContext context, PatchRequest request,
+            RequestHandler next) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /*
@@ -444,9 +403,9 @@ public class ApplicationV1Filter implements Filter {
      * an appropriate implementation will need to be considered here also.
      */
     @Override
-    public void filterAction(ServerContext context, ActionRequest request,
-                             ResultHandler<JsonValue> handler, RequestHandler next) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ActionResponse, ResourceException> filterAction(ServerContext context, ActionRequest request,
+            RequestHandler next) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
@@ -492,42 +451,51 @@ public class ApplicationV1Filter implements Filter {
         jsonValue.add(REALM, realm);
     }
 
-    /**
-     * Inner class to handle the appropriate application json transformation.
-     */
-    private final class TransformationHandler implements ResultHandler<Resource> {
+    private Promise<ResourceResponse, ResourceException> transform(Promise<ResourceResponse, ResourceException> promise,
+            final ServerContext context) {
+        return promise
+                .thenAsync(new AsyncFunction<ResourceResponse, ResourceResponse, ResourceException>() {
+                    @Override
+                    public Promise<ResourceResponse, ResourceException> apply(ResourceResponse response) {
+                        JsonValue jsonValue = response.getContent();
+                        Subject callingSubject = contextHelper.getSubject(context);
+                        String realm = contextHelper.getRealm(context);
 
-        private final ResultHandler<Resource> delegate;
-        private final Subject callingSubject;
-        private final String realm;
+                        try {
+                            transformJson(jsonValue, callingSubject, realm);
+                        } catch (EntitlementException eE) {
+                            debug.error("Error filtering application CREST request", eE);
+                            return newExceptionPromise(resourceErrorHandler.handleError(eE));
+                        }
 
-        TransformationHandler(
-                final ResultHandler<Resource> delegate, final ServerContext context) {
-            this.delegate = delegate;
-            this.callingSubject = contextHelper.getSubject(context);
-            this.realm = contextHelper.getRealm(context);
-        }
+                        return newResultPromise(response);
+                    }
+                });
+    }
 
-        @Override
-        public void handleResult(Resource result) {
-            final JsonValue jsonValue = result.getContent();
+    private Promise<QueryResponse, ResourceException> transform(Promise<QueryResponse, ResourceException> promise,
+            final ServerContext context, final QueryRequest request, final QueryResourceHandler handler,
+            final Collection<ResourceResponse> resources) {
+        return promise
+                .thenAsync(new AsyncFunction<QueryResponse, QueryResponse, ResourceException>() {
+                    @Override
+                    public Promise<QueryResponse, ResourceException> apply(QueryResponse response) {
+                        Subject callingSubject = contextHelper.getSubject(context);
+                        String realm = contextHelper.getRealm(context);
+                        try {
+                            for (ResourceResponse resource : resources) {
+                                final JsonValue jsonValue = resource.getContent();
+                                transformJson(jsonValue, callingSubject, realm);
+                                handler.handleResource(resource);
+                            }
+                        } catch (EntitlementException eE) {
+                            debug.error("Error filtering application query CREST request", eE);
+                            return newExceptionPromise(resourceErrorHandler.handleError(context, request, eE));
+                        }
 
-            try {
-                transformJson(jsonValue, callingSubject, realm);
-            } catch (EntitlementException eE) {
-                debug.error("Error filtering application CREST request", eE);
-                delegate.handleError(resourceErrorHandler.handleError(eE));
-                return;
-            }
-
-            delegate.handleResult(result);
-        }
-
-        @Override
-        public void handleError(ResourceException error) {
-            delegate.handleError(error);
-        }
-
+                        return newResultPromise(response);
+                    }
+                });
     }
 
     /**

@@ -15,34 +15,38 @@
  */
 package org.forgerock.openam.forgerockrest.entitlements;
 
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.security.auth.Subject;
+
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.Filter;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.RequestHandler;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.entitlement.service.ApplicationService;
 import org.forgerock.openam.entitlement.service.ApplicationServiceFactory;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.rest.resource.ContextHelper;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.security.auth.Subject;
+import org.forgerock.util.promise.Promise;
+import org.forgerock.util.promise.ResultHandler;
 
 /**
  * CREST filter used transform between version 1.0 and version 2.0 of the json for the policy endpoint.
@@ -77,31 +81,22 @@ public class PolicyV1Filter implements Filter {
      *         the filter chain context
      * @param request
      *         the action request
-     * @param handler
-     *         the result handler
      * @param next
      *         a request handler representing the remainder of the filter chain
      */
     @Override
-    public void filterAction(ServerContext context, ActionRequest request,
-                             final ResultHandler<JsonValue> handler, RequestHandler next) {
+    public Promise<ActionResponse, ResourceException> filterAction(ServerContext context, ActionRequest request,
+            RequestHandler next) {
         // Forward onto next handler.
-        next.handleAction(context, request, new ResultHandler<JsonValue>() {
-
-            @Override
-            public void handleResult(JsonValue jsonValue) {
-                for (JsonValue entry : jsonValue) {
-                    entry.remove("ttl");
-                }
-                handler.handleResult(jsonValue);
-            }
-
-            @Override
-            public void handleError(ResourceException e) {
-                handler.handleError(e);
-            }
-
-        });
+        return next.handleAction(context, request)
+                .thenOnResult(new ResultHandler<ActionResponse>() {
+                    @Override
+                    public void handleResult(ActionResponse response) {
+                        for (JsonValue entry : response.getJsonContent()) {
+                            entry.remove("ttl");
+                        }
+                    }
+                });
     }
 
     /**
@@ -112,14 +107,12 @@ public class PolicyV1Filter implements Filter {
      *         the filter chain context
      * @param request
      *         the create request
-     * @param handler
-     *         the result handler
      * @param next
      *         a request handler representing the remainder of the filter chain
      */
     @Override
-    public void filterCreate(ServerContext context, CreateRequest request,
-                             ResultHandler<Resource> handler, RequestHandler next) {
+    public Promise<ResourceResponse, ResourceException> filterCreate(ServerContext context, CreateRequest request,
+            RequestHandler next) {
         try {
             final JsonValue jsonValue = request.getContent();
             final Subject callingSubject = contextHelper.getSubject(context);
@@ -129,15 +122,13 @@ public class PolicyV1Filter implements Filter {
 
         } catch (EntitlementException eE) {
             debug.error("Error filtering policy create CREST request", eE);
-            handler.handleError(resourceErrorHandler.handleError(context, request, eE));
-            return;
+            return newExceptionPromise(resourceErrorHandler.handleError(context, request, eE));
         } catch (ResourceException rE) {
             debug.error("Error filtering policy create CREST request", rE);
-            handler.handleError(rE);
-            return;
+            return newExceptionPromise(rE);
         }
 
-        next.handleCreate(context, request, new TransformationHandler(handler));
+        return transform(next.handleCreate(context, request));
     }
 
     /**
@@ -148,14 +139,12 @@ public class PolicyV1Filter implements Filter {
      *         the filter chain context
      * @param request
      *         the update request
-     * @param handler
-     *         the result handler
      * @param next
      *         a request handler representing the remainder of the filter chain
      */
     @Override
-    public void filterUpdate(ServerContext context, UpdateRequest request,
-                             ResultHandler<Resource> handler, RequestHandler next) {
+    public Promise<ResourceResponse, ResourceException> filterUpdate(ServerContext context, UpdateRequest request,
+            RequestHandler next) {
         try {
             final JsonValue jsonValue = request.getContent();
             final Subject callingSubject = contextHelper.getSubject(context);
@@ -165,15 +154,13 @@ public class PolicyV1Filter implements Filter {
 
         } catch (EntitlementException eE) {
             debug.error("Error filtering policy create CREST request", eE);
-            handler.handleError(resourceErrorHandler.handleError(context, request, eE));
-            return;
+            return newExceptionPromise(resourceErrorHandler.handleError(context, request, eE));
         } catch (ResourceException rE) {
             debug.error("Error filtering policy create CREST request", rE);
-            handler.handleError(rE);
-            return;
+            return newExceptionPromise(rE);
         }
 
-        next.handleUpdate(context, request, new TransformationHandler(handler));
+        return transform(next.handleUpdate(context, request));
     }
 
     /**
@@ -228,16 +215,14 @@ public class PolicyV1Filter implements Filter {
      *         the filter chain context
      * @param request
      *         the delete request
-     * @param handler
-     *         the result handler
      * @param next
      *         a request handler representing the remainder of the filter chain
      */
     @Override
-    public void filterDelete(ServerContext context, DeleteRequest request,
-                             ResultHandler<Resource> handler, RequestHandler next) {
+    public Promise<ResourceResponse, ResourceException> filterDelete(ServerContext context, DeleteRequest request,
+            RequestHandler next) {
         // Forward onto next handler.
-        next.handleDelete(context, request, handler);
+        return next.handleDelete(context, request);
     }
 
     /**
@@ -253,27 +238,15 @@ public class PolicyV1Filter implements Filter {
      *         a request handler representing the remainder of the filter chain
      */
     @Override
-    public void filterQuery(final ServerContext context, final QueryRequest request,
-                            final QueryResultHandler handler, final RequestHandler next) {
-        next.handleQuery(context, request, new QueryResultHandler() {
-
+    public Promise<QueryResponse, ResourceException> filterQuery(final ServerContext context,
+            final QueryRequest request, final QueryResourceHandler handler, final RequestHandler next) {
+        return next.handleQuery(context, request, new QueryResourceHandler() {
             @Override
-            public boolean handleResource(Resource resource) {
+            public boolean handleResource(ResourceResponse resource) {
                 final JsonValue jsonValue = resource.getContent();
                 jsonValue.remove(RESOURCE_TYPE_UUID);
                 return handler.handleResource(resource);
             }
-
-            @Override
-            public void handleResult(QueryResult result) {
-                handler.handleResult(result);
-            }
-
-            @Override
-            public void handleError(ResourceException error) {
-                handler.handleError(error);
-            }
-
         });
     }
 
@@ -284,16 +257,14 @@ public class PolicyV1Filter implements Filter {
      *         the filter chain context
      * @param request
      *         the read request
-     * @param handler
-     *         the result handler
      * @param next
      *         a request handler representing the remainder of the filter chain
      */
     @Override
-    public void filterRead(ServerContext context, ReadRequest request,
-                           ResultHandler<Resource> handler, RequestHandler next) {
+    public Promise<ResourceResponse, ResourceException> filterRead(ServerContext context, ReadRequest request,
+            RequestHandler next) {
         // Forward onto next handler.
-        next.handleRead(context, request, new TransformationHandler(handler));
+        return transform(next.handleRead(context, request));
     }
 
     /*
@@ -301,35 +272,19 @@ public class PolicyV1Filter implements Filter {
      * an appropriate implementation will need to be considered here also.
      */
     @Override
-    public void filterPatch(ServerContext context, PatchRequest request,
-                            ResultHandler<Resource> handler, RequestHandler next) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> filterPatch(ServerContext context, PatchRequest request,
+            RequestHandler next) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
-    /**
-     * Inner static class to handle the appropriate policy json transformation.
-     */
-    private static final class TransformationHandler implements ResultHandler<Resource> {
-
-        private final ResultHandler<Resource> delegate;
-
-        TransformationHandler(
-                final ResultHandler<Resource> delegate) {
-            this.delegate = delegate;
-        }
-
-        @Override
-        public void handleResult(Resource result) {
-            final JsonValue jsonValue = result.getContent();
-            jsonValue.remove(RESOURCE_TYPE_UUID);
-            delegate.handleResult(result);
-        }
-
-        @Override
-        public void handleError(ResourceException error) {
-            delegate.handleError(error);
-        }
-
+    private Promise<ResourceResponse, ResourceException> transform(Promise<ResourceResponse, ResourceException> promise) {
+        return promise
+                .thenOnResult(new ResultHandler<ResourceResponse>() {
+                    @Override
+                    public void handleResult(ResourceResponse response) {
+                        JsonValue jsonValue = response.getContent();
+                        jsonValue.remove(RESOURCE_TYPE_UUID);
+                    }
+                });
     }
-
 }

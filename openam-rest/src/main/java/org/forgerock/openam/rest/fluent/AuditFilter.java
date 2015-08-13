@@ -15,29 +15,35 @@
  */
 package org.forgerock.openam.rest.fluent;
 
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.audit.AuditException;
-import org.forgerock.json.JsonValue;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.Filter;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.RequestHandler;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.json.resource.Response;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
-
-import javax.inject.Inject;
-import javax.inject.Named;
+import org.forgerock.util.promise.ExceptionHandler;
+import org.forgerock.util.promise.Promise;
+import org.forgerock.util.promise.ResultHandler;
 
 /**
  * Filter which will audit any requests that pass through it.
@@ -74,21 +80,20 @@ public class AuditFilter implements Filter {
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
      * @param next {@inheritDoc}
      */
     @Override
-    public void filterAction(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler, RequestHandler next) {
+    public Promise<ActionResponse, ResourceException> filterAction(ServerContext context, ActionRequest request,
+            RequestHandler next) {
 
-        AuditingResultHandler<JsonValue> auditingHandler = newAuditingResultHandler(context, request, handler);
+        final AuditingResultHandler auditingHandler = newAuditingResultHandler(context, request);
         try {
             auditingHandler.auditAccessAttempt();
         } catch (AuditException e) {
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
 
-        next.handleAction(context, request, auditingHandler);
+        return auditResponse(next.handleAction(context, request), auditingHandler);
     }
 
     /**
@@ -100,21 +105,20 @@ public class AuditFilter implements Filter {
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
      * @param next {@inheritDoc}
      */
     @Override
-    public void filterCreate(ServerContext context, CreateRequest request, ResultHandler<Resource> handler, RequestHandler next) {
+    public Promise<ResourceResponse, ResourceException> filterCreate(ServerContext context, CreateRequest request,
+            RequestHandler next) {
 
-        AuditingResultHandler<Resource> auditingHandler = newAuditingResultHandler(context, request, handler);
+        AuditingResultHandler auditingHandler = newAuditingResultHandler(context, request);
         try {
             auditingHandler.auditAccessAttempt();
         } catch (AuditException e) {
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
 
-        next.handleCreate(context, request, auditingHandler);
+        return auditResponse(next.handleCreate(context, request), auditingHandler);
     }
 
     /**
@@ -126,22 +130,20 @@ public class AuditFilter implements Filter {
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
      * @param next {@inheritDoc}
      */
     @Override
-    public void filterDelete(ServerContext context, DeleteRequest request, ResultHandler<Resource> handler, RequestHandler next) {
+    public Promise<ResourceResponse, ResourceException> filterDelete(ServerContext context, DeleteRequest request,
+            RequestHandler next) {
 
-        AuditingResultHandler<Resource> auditingHandler = newAuditingResultHandler(context, request, handler);
+        AuditingResultHandler auditingHandler = newAuditingResultHandler(context, request);
         try {
             auditingHandler.auditAccessAttempt();
         } catch (AuditException e) {
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
 
-        next.handleDelete(context, request, auditingHandler);
-
+        return auditResponse(next.handleDelete(context, request), auditingHandler);
     }
 
     /**
@@ -153,21 +155,20 @@ public class AuditFilter implements Filter {
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
      * @param next {@inheritDoc}
      */
     @Override
-    public void filterPatch(ServerContext context, PatchRequest request, ResultHandler<Resource> handler, RequestHandler next) {
+    public Promise<ResourceResponse, ResourceException> filterPatch(ServerContext context, PatchRequest request,
+            RequestHandler next) {
 
-        AuditingResultHandler<Resource> auditingHandler = newAuditingResultHandler(context, request, handler);
+        AuditingResultHandler auditingHandler = newAuditingResultHandler(context, request);
         try {
             auditingHandler.auditAccessAttempt();
         } catch (AuditException e) {
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
 
-        next.handlePatch(context, request, auditingHandler);
+        return auditResponse(next.handlePatch(context, request), auditingHandler);
     }
 
     /**
@@ -183,17 +184,17 @@ public class AuditFilter implements Filter {
      * @param next {@inheritDoc}
      */
     @Override
-    public void filterQuery(ServerContext context, QueryRequest request, QueryResourceHandler handler, RequestHandler next) {
+    public Promise<QueryResponse, ResourceException> filterQuery(ServerContext context, QueryRequest request,
+            QueryResourceHandler handler, RequestHandler next) {
 
-        AuditingQueryResultHandler auditingHandler = newQueryAuditingResultHandler(context, request, handler);
+        AuditingResultHandler auditingHandler = newAuditingResultHandler(context, request);
         try {
             auditingHandler.auditAccessAttempt();
         } catch (AuditException e) {
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
 
-        next.handleQuery(context, request, auditingHandler);
+        return auditResponse(next.handleQuery(context, request, handler), auditingHandler);
     }
 
     /**
@@ -205,21 +206,20 @@ public class AuditFilter implements Filter {
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
      * @param next {@inheritDoc}
      */
     @Override
-    public void filterRead(ServerContext context, ReadRequest request, ResultHandler<Resource> handler, RequestHandler next) {
+    public Promise<ResourceResponse, ResourceException> filterRead(ServerContext context, ReadRequest request,
+            RequestHandler next) {
 
-        AuditingResultHandler<Resource> auditingHandler = newAuditingResultHandler(context, request, handler);
+        AuditingResultHandler auditingHandler = newAuditingResultHandler(context, request);
         try {
             auditingHandler.auditAccessAttempt();
         } catch (AuditException e) {
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
 
-        next.handleRead(context, request, auditingHandler);
+        return auditResponse(next.handleRead(context, request), auditingHandler);
     }
 
     /**
@@ -231,30 +231,40 @@ public class AuditFilter implements Filter {
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
      * @param next {@inheritDoc}
      */
     @Override
-    public void filterUpdate(ServerContext context, UpdateRequest request, ResultHandler<Resource> handler, RequestHandler next) {
+    public Promise<ResourceResponse, ResourceException> filterUpdate(ServerContext context, UpdateRequest request,
+            RequestHandler next) {
 
-        AuditingResultHandler<Resource> auditingHandler = newAuditingResultHandler(context, request, handler);
+        AuditingResultHandler auditingHandler = newAuditingResultHandler(context, request);
         try {
             auditingHandler.auditAccessAttempt();
         } catch (AuditException e) {
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
 
-        next.handleUpdate(context, request, auditingHandler);
+        return auditResponse(next.handleUpdate(context, request), auditingHandler);
     }
 
-    private <T> AuditingResultHandler<T> newAuditingResultHandler(ServerContext context, Request request,
-                                                                  ResultHandler<T> delegate) {
-        return new AuditingResultHandler<>(debug, auditEventPublisher, auditEventFactory, context, request, delegate);
+    private <T extends Response> Promise<T, ResourceException> auditResponse(Promise<T, ResourceException> promise,
+            final AuditingResultHandler auditingHandler) {
+        return promise
+                .thenOnResult(new ResultHandler<Response>() {
+                    @Override
+                    public void handleResult(Response response) {
+                        auditingHandler.auditAccessSuccess();
+                    }
+                })
+                .thenOnException(new ExceptionHandler<ResourceException>() {
+                    @Override
+                    public void handleException(ResourceException exception) {
+                        auditingHandler.auditAccessFailure(exception.getCode(), exception.getMessage());
+                    }
+                });
     }
 
-    private AuditingQueryResultHandler newQueryAuditingResultHandler(ServerContext context, QueryRequest request,
-                                                                     QueryResultHandler delegate) {
-        return new AuditingQueryResultHandler(debug, auditEventPublisher, auditEventFactory, context, request, delegate);
+    private AuditingResultHandler newAuditingResultHandler(ServerContext context, Request request) {
+        return new AuditingResultHandler(debug, auditEventPublisher, auditEventFactory, context, request);
     }
 }
