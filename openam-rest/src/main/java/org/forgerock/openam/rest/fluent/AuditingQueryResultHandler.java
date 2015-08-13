@@ -30,7 +30,7 @@ import org.forgerock.openam.audit.AuditEventPublisher;
  * @since 13.0.0
  */
 class AuditingQueryResultHandler
-        extends AbstractAuditingResultHandler<QueryResult, QueryResultHandler>
+        extends AbstractAuditingResultHandler<QueryResult, QueryResourceHandler>
         implements QueryResultHandler {
 
     /**
@@ -44,7 +44,7 @@ class AuditingQueryResultHandler
      * @param delegate QueryResultHandler of the CREST operation being audited.
      */
     AuditingQueryResultHandler(Debug debug, AuditEventPublisher auditEventPublisher, AuditEventFactory auditEventFactory,
-                               ServerContext context, Request request, QueryResultHandler delegate) {
+                               ServerContext context, Request request, QueryResourceHandler delegate) {
         super(debug, auditEventPublisher, auditEventFactory, context, request, delegate);
     }
 

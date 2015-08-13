@@ -16,7 +16,8 @@
 
 package org.forgerock.openam.rest.sms;
 
-import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.ResourceException.newInternalServerErrorException;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -36,13 +37,13 @@ import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
-import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.json.resource.Resource;
-import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.util.promise.Promise;
 
 /**
  * A CREST singleton provider for SMS global schema config.
@@ -71,20 +72,21 @@ public class SmsGlobalSingletonProvider extends SmsSingletonProvider {
     }
 
     @Override
-    public void handleUpdate(ServerContext serverContext, UpdateRequest updateRequest, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> handleUpdate(ServerContext serverContext,
+            UpdateRequest updateRequest) {
         if (organizationSchema != null) {
             try {
                 Map<String, Set<String>> defaults = organizationConverter.fromJson(updateRequest.getContent().get("defaults"));
                 organizationSchema.setAttributeDefaults(defaults);
             } catch (SMSException e) {
                 debug.warning("::SmsCollectionProvider:: SMSException on create", e);
-                handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+                return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
             } catch (SSOException e) {
                 debug.warning("::SmsCollectionProvider:: SSOException on create", e);
-                handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+                return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
             }
         }
-        super.handleUpdate(serverContext, updateRequest, handler);
+        return super.handleUpdate(serverContext, updateRequest);
     }
 
     @Override

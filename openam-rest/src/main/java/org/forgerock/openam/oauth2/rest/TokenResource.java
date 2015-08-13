@@ -24,6 +24,30 @@
 
 package org.forgerock.openam.oauth2.rest;
 
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.ResourceException.adapt;
+import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.GRANT_TYPE;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.REALM;
+import static org.forgerock.oauth2.core.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN;
+import static org.forgerock.oauth2.core.OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.net.HttpURLConnection;
+import java.security.AccessController;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -37,8 +61,10 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.sm.DNMapper;
 import org.apache.commons.lang.StringUtils;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
@@ -47,13 +73,11 @@ import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.PermanentException;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.ServiceUnavailableException;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
@@ -63,7 +87,6 @@ import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openam.cts.api.fields.OAuthTokenField;
-import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.oauth2.IdentityManager;
@@ -72,28 +95,9 @@ import org.forgerock.openam.oauth2.OpenAMOAuth2ProviderSettingsFactory;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openidconnect.Client;
 import org.forgerock.openidconnect.ClientDAO;
+import org.forgerock.util.AsyncFunction;
+import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.net.HttpURLConnection;
-import java.security.AccessController;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.GRANT_TYPE;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.REALM;
-import static org.forgerock.oauth2.core.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN;
-import static org.forgerock.oauth2.core.OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS;
 
 public class TokenResource implements CollectionResourceProvider {
 
@@ -131,32 +135,38 @@ public class TokenResource implements CollectionResourceProvider {
     }
 
     @Override
-    public void actionCollection(ServerContext context, ActionRequest actionRequest, ResultHandler<JsonValue> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context,
+            ActionRequest actionRequest) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public void actionInstance(ServerContext context, String resourceId, ActionRequest request,
-            ResultHandler<JsonValue> handler) {
+    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+            ActionRequest request) {
 
         String actionId = request.getAction();
 
         if ("revoke".equalsIgnoreCase(actionId)) {
-            if (deleteToken(context, resourceId, handler, true)) {
-                handler.handleResult(json(object()));
-            }
+            return deleteToken(context, resourceId, true)
+                    .thenAsync(new AsyncFunction<Void, ActionResponse, ResourceException>() {
+                        @Override
+                        public Promise<ActionResponse, ResourceException> apply(Void value) {
+                            return newResultPromise(newActionResponse((json(object()))));
+                        }
+                    });
         } else {
             if (debug.errorEnabled()) {
                 debug.error("TokenResource :: ACTION : Unsupported action request performed, " + actionId + " on " +
                     resourceId);
             }
-            RestUtils.generateUnsupportedOperation(handler);
+            return RestUtils.generateUnsupportedOperation();
         }
     }
 
     @Override
-    public void createInstance(ServerContext context, CreateRequest createRequest, ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context,
+            CreateRequest createRequest) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
@@ -164,12 +174,10 @@ public class TokenResource implements CollectionResourceProvider {
      *
      * @param context The context.
      * @param tokenId The token id.
-     * @param handler The handler.
      * @param deleteRefreshToken Whether to delete associated refresh token, if token id is for an access token.
-     * @return {@code true} if the token has been deleted.
+     * @return {@code Void} if the token has been deleted.
      */
-    private boolean deleteToken(ServerContext context, String tokenId, ResultHandler<?> handler,
-            boolean deleteRefreshToken) {
+    private Promise<Void, ResourceException> deleteToken(ServerContext context, String tokenId, boolean deleteRefreshToken) {
         try {
             AMIdentity uid = getUid(context);
 
@@ -213,24 +221,22 @@ public class TokenResource implements CollectionResourceProvider {
                 }
             }
 
-            return true;
+            return newResultPromise(null);
 
         } catch (CoreTokenException e) {
-            handler.handleError(new ServiceUnavailableException(e.getMessage(), e));
+            return newExceptionPromise(adapt(new ServiceUnavailableException(e.getMessage(), e)));
         } catch (ResourceException e) {
-            handler.handleError(e);
+            return newExceptionPromise(e);
         } catch (SSOException e) {
             debug.error("TokenResource :: DELETE : Unable to retrieve identity of the requesting user. Unauthorized.");
-            handler.handleError(new PermanentException(401, "Unauthorized", e));
+            return newExceptionPromise(adapt(new PermanentException(401, "Unauthorized", e)));
         } catch (IdRepoException e) {
             debug.error("TokenResource :: DELETE : Unable to retrieve identity of the requesting user. Unauthorized.");
-            handler.handleError(new PermanentException(401, "Unauthorized", e));
+            return newExceptionPromise(adapt(new PermanentException(401, "Unauthorized", e)));
         } catch (UnauthorizedClientException e) {
             debug.error("TokenResource :: DELETE : Requesting user is unauthorized.");
-            handler.handleError(new PermanentException(401, "Unauthorized", e));
+            return newExceptionPromise(adapt(new PermanentException(401, "Unauthorized", e)));
         }
-
-        return false;
     }
 
     /**
@@ -280,22 +286,26 @@ public class TokenResource implements CollectionResourceProvider {
     }
 
     @Override
-    public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request,
-            ResultHandler<Resource> handler) {
-        if (deleteToken(context, resourceId, handler, false)) {
-            Resource resource = new Resource(resourceId, "1", json(object(field("success", "true"))));
-            handler.handleResult(resource);
-        }
+    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, final String resourceId,
+            DeleteRequest request) {
+        return deleteToken(context, resourceId, false)
+                .thenAsync(new AsyncFunction<Void, ResourceResponse, ResourceException>() {
+                    @Override
+                    public Promise<ResourceResponse, ResourceException> apply(Void value) {
+                        return newResultPromise(newResourceResponse(resourceId, "1", json(object(field("success", "true")))));
+                    }
+                });
     }
 
     @Override
-    public void patchInstance(ServerContext context, String resourceId, PatchRequest request,
-            ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+            PatchRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public void queryCollection(ServerContext context, QueryRequest queryRequest, QueryResultHandler handler) {
+    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest queryRequest,
+            QueryResourceHandler handler) {
         try {
             JsonValue response;
             Collection<QueryFilter<CoreTokenField>> query = new ArrayList<QueryFilter<CoreTokenField>>();
@@ -313,7 +323,7 @@ public class TokenResource implements CollectionResourceProvider {
                     debug.error("TokenResource :: QUERY : Unable to query collection as no UID discovered " +
                             "for requesting user.");
                 }
-                handler.handleError(new PermanentException(401, "Unauthorized", e));
+                return newExceptionPromise(adapt(new PermanentException(401, "Unauthorized", e)));
             }
 
             String id = queryRequest.getQueryId();
@@ -334,20 +344,20 @@ public class TokenResource implements CollectionResourceProvider {
             }
 
             response = tokenStore.query(QueryFilter.and(query));
-            handleResponse(handler, response, context);
+            return handleResponse(handler, response, context);
 
         } catch (UnauthorizedClientException e) {
             debug.error("TokenResource :: QUERY : Unable to query collection as the client is not authorized.", e);
-            handler.handleError(new PermanentException(401, e.getMessage(), e));
+            return newExceptionPromise(adapt(new PermanentException(401, e.getMessage(), e)));
         } catch (CoreTokenException e) {
             debug.error("TokenResource :: QUERY : Unable to query collection as the token store is not available.", e);
-            handler.handleError(new ServiceUnavailableException(e.getMessage(), e));
+            return newExceptionPromise(adapt(new ServiceUnavailableException(e.getMessage(), e)));
         } catch (InternalServerErrorException e) {
             debug.error("TokenResource :: QUERY : Unable to query collection as writing the response failed.", e);
-            handler.handleError(e);
+            return newExceptionPromise(adapt(e));
         } catch (NotFoundException e) {
             debug.error("TokenResource :: QUERY : Unable to query collection as realm does not have OAuth 2 provider.", e);
-            handler.handleError(e);
+            return newExceptionPromise(adapt(e));
         }
     }
 
@@ -360,20 +370,20 @@ public class TokenResource implements CollectionResourceProvider {
         throw new IllegalArgumentException("I don't understand the OAuth 2.0 field called " + fieldname);
     }
 
-    private void handleResponse(QueryResultHandler handler, JsonValue response, ServerContext context) throws UnauthorizedClientException,
+    private Promise<QueryResponse, ResourceException> handleResponse(QueryResourceHandler handler, JsonValue response, ServerContext context) throws UnauthorizedClientException,
             CoreTokenException, InternalServerErrorException, NotFoundException {
-        Resource resource = new Resource("result", "1", response);
+        ResourceResponse resource = newResourceResponse("result", "1", response);
         JsonValue value = resource.getContent();
         String acceptLanguage = context.asContext(HttpContext.class).getHeaderAsString("accept-language");
         Set<HashMap<String, Set<String>>> list = (Set<HashMap<String, Set<String>>>) value.getObject();
 
-        Resource res;
+        ResourceResponse res;
         JsonValue val;
 
         if (list != null && !list.isEmpty()) {
             for (HashMap<String, Set<String>> entry : list) {
                 val = new JsonValue(entry);
-                res = new Resource("result", "1", val);
+                res = newResourceResponse("result", "1", val);
                 Client client = getClient(val);
 
                 val.put(EXPIRE_TIME_KEY, getExpiryDate(json(entry)));
@@ -384,7 +394,7 @@ public class TokenResource implements CollectionResourceProvider {
                 handler.handleResource(res);
             }
         }
-        handler.handleResult(new QueryResult());
+        return newResultPromise(newQueryResponse());
     }
 
     private String getClientName(Client client) throws UnauthorizedClientException {
@@ -500,14 +510,14 @@ public class TokenResource implements CollectionResourceProvider {
     }
 
     @Override
-    public void readInstance(ServerContext context, String resourceId, ReadRequest request,
-            ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+            ReadRequest request) {
 
         try {
             AMIdentity uid = getUid(context);
 
             JsonValue response;
-            Resource resource;
+            ResourceResponse resource;
             try {
                 response = tokenStore.read(resourceId);
             } catch (CoreTokenException e) {
@@ -540,8 +550,8 @@ public class TokenResource implements CollectionResourceProvider {
 
             if (grantType != null && grantType.equalsIgnoreCase(OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS)) {
                 resource =
-                        new Resource(OAuth2Constants.Params.ID, String.valueOf(System.currentTimeMillis()), response);
-                handler.handleResult(resource);
+                        newResourceResponse(OAuth2Constants.Params.ID, String.valueOf(System.currentTimeMillis()), response);
+                return newResultPromise(resource);
             } else {
                 String realm = getAttributeValue(response, REALM);
 
@@ -555,8 +565,8 @@ public class TokenResource implements CollectionResourceProvider {
                 AMIdentity uid2 = identityManager.getResourceOwnerIdentity(username, realm);
                 if (uid.equals(adminUserId) || uid.equals(uid2)) {
                     resource =
-                            new Resource(OAuth2Constants.Params.ID, String.valueOf(System.currentTimeMillis()), response);
-                    handler.handleResult(resource);
+                            newResourceResponse(OAuth2Constants.Params.ID, String.valueOf(System.currentTimeMillis()), response);
+                    return newResultPromise(resource);
                 } else {
                     if (debug.errorEnabled()) {
                         debug.error("TokenResource :: READ : Only the resource owner or an administrator may perform "
@@ -566,25 +576,25 @@ public class TokenResource implements CollectionResourceProvider {
                 }
             }
         } catch (ResourceException e) {
-            handler.handleError(e);
+            return newExceptionPromise(e);
         } catch (SSOException e) {
             debug.error("TokenResource :: READ : Unable to query collection as the IdRepo " +
                     "failed to return a valid user.", e);
-            handler.handleError(new PermanentException(401, "Unauthorized", e));
+            return newExceptionPromise(adapt(new PermanentException(401, "Unauthorized", e)));
         } catch (IdRepoException e) {
             debug.error("TokenResource :: READ : Unable to query collection as the IdRepo " +
                     "failed to return a valid user.", e);
-            handler.handleError(new PermanentException(401, "Unauthorized", e));
+            return newExceptionPromise(adapt(new PermanentException(401, "Unauthorized", e)));
         } catch (UnauthorizedClientException e) {
             debug.error("TokenResource :: READ : Unable to query collection as the client is not authorized.", e);
-            handler.handleError(new PermanentException(401, "Unauthorized", e));
+            return newExceptionPromise(adapt(new PermanentException(401, "Unauthorized", e)));
         }
     }
 
     @Override
-    public void updateInstance(ServerContext context, String resourceId, UpdateRequest request,
-            ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId,
+            UpdateRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**

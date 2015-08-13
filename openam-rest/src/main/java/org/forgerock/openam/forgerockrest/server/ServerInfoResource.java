@@ -15,6 +15,20 @@
  */
 package org.forgerock.openam.forgerockrest.server;
 
+import static org.forgerock.json.resource.ResourceException.newNotFoundException;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.net.URI;
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
+
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -41,20 +55,20 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.forgerockrest.RestUtils;
@@ -62,6 +76,7 @@ import org.forgerock.openam.forgerockrest.ServiceConfigUtils;
 import org.forgerock.openam.forgerockrest.entitlements.RealmAwareResource;
 import org.forgerock.openam.services.RestSecurity;
 import org.forgerock.openam.services.RestSecurityProvider;
+import org.forgerock.util.promise.Promise;
 
 /**
  * Represents Server Information that can be queried via a REST interface.
@@ -88,27 +103,25 @@ public class ServerInfoResource extends RealmAwareResource {
 
     /**
      * Retrieves the cookie domains set on the server.
-     *
-     * @param handler Result handler which handles error or success
      */
-    private void getCookieDomains(ResultHandler<Resource> handler) {
+    private Promise<ResourceResponse, ResourceException> getCookieDomains() {
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         Set<String> cookieDomains;
-        Resource resource;
+        ResourceResponse resource;
         int rev;
         try {
             cookieDomains = AuthClientUtils.getCookieDomains();
             rev = cookieDomains.hashCode();
             result.put("domains", cookieDomains);
-            resource = new Resource(COOKIE_DOMAINS, Integer.toString(rev), result);
+            resource = newResourceResponse(COOKIE_DOMAINS, Integer.toString(rev), result);
             if (debug.messageEnabled()) {
                 debug.message("ServerInfoResource.getCookieDomains ::" +
                         " Added resource to response: " + COOKIE_DOMAINS);
             }
-            handler.handleResult(resource);
+            return newResultPromise(resource);
         } catch (Exception e) {
             debug.error("ServerInfoResource.getCookieDomains : Cannot retrieve cookie domains.", e);
-            handler.handleError(new NotFoundException(e.getMessage()));
+            return newExceptionPromise(newNotFoundException(e.getMessage()));
         }
     }
 
@@ -117,13 +130,12 @@ public class ServerInfoResource extends RealmAwareResource {
      *
      * @param context Current Server Context.
      * @param realm realm in whose security context we use.
-     * @param handler Result handler which handles error or success.
      */
-    private void getAllServerInfo(ServerContext context, ResultHandler<Resource> handler, String realm) {
+    private Promise<ResourceResponse, ResourceException> getAllServerInfo(ServerContext context, String realm) {
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         Set<String> cookieDomains;
         Set<String> protectedUserAttributes;
-        Resource resource;
+        ResourceResponse resource;
         RestSecurity restSecurity = restSecurityProvider.get(realm);
 
         //added for the XUI to be able to understand its locale to request the appropriate translations to cache
@@ -160,12 +172,12 @@ public class ServerInfoResource extends RealmAwareResource {
                         " Added resource to response: " + ALL_SERVER_INFO);
             }
 
-            resource = new Resource(ALL_SERVER_INFO, Integer.toString(result.asMap().hashCode()), result);
+            resource = newResourceResponse(ALL_SERVER_INFO, Integer.toString(result.asMap().hashCode()), result);
 
-            handler.handleResult(resource);
+            return newResultPromise(resource);
         } catch (Exception e) {
             debug.error("ServerInfoResource.getAllServerInfo : Cannot retrieve all server info domains.", e);
-            handler.handleError(new NotFoundException(e.getMessage()));
+            return newExceptionPromise(newNotFoundException(e.getMessage()));
         }
     }
 
@@ -252,77 +264,78 @@ public class ServerInfoResource extends RealmAwareResource {
     /**
      * {@inheritDoc}
      */
-    public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * {@inheritDoc}
      */
-    public void actionInstance(ServerContext context, String s, ActionRequest request,
-            ResultHandler<JsonValue> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String s,
+            ActionRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * {@inheritDoc}
      */
-    public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * {@inheritDoc}
      */
-    public void deleteInstance(ServerContext context, String s, DeleteRequest request,
-            ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String s,
+            DeleteRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * {@inheritDoc}
      */
-    public void patchInstance(ServerContext context, String s, PatchRequest request, ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String s,
+            PatchRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * {@inheritDoc}
      */
-    public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+            QueryResourceHandler handler) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * {@inheritDoc}
      */
-    public void readInstance(ServerContext context, String resourceId, ReadRequest request,
-                             ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+            ReadRequest request) {
 
         final String realm = getRealm(context);
 
         debug.message("ServerInfoResource :: READ : in realm: " + realm);
 
         if (COOKIE_DOMAINS.equalsIgnoreCase(resourceId)) {
-            getCookieDomains(handler);
+            return getCookieDomains();
         } else if (ALL_SERVER_INFO.equalsIgnoreCase(resourceId)) {
-            getAllServerInfo(context, handler, realm);
+            return getAllServerInfo(context, realm);
         } else { // for now this is the only case coming in, so fail if otherwise
             final ResourceException e = new NotSupportedException("ResourceId not supported: " + resourceId);
             if (debug.errorEnabled()) {
                 debug.error("ServerInfoResource :: READ : in realm: " + realm +
                         ": Cannot receive information on requested resource: " + resourceId, e);
             }
-            handler.handleError(e);
+            return newExceptionPromise(e);
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public void updateInstance(ServerContext context, String s, UpdateRequest request,
-            ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String s,
+            UpdateRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
-
 }

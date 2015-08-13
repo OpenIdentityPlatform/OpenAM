@@ -16,45 +16,53 @@
 
 package org.forgerock.openam.forgerockrest.entitlements;
 
+import static org.forgerock.json.resource.Responses.newQueryResponse;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import javax.inject.Inject;
 import javax.inject.Named;
-import com.sun.identity.entitlement.EntitlementCondition;
-import com.sun.identity.entitlement.LogicalCondition;
-import com.sun.identity.shared.debug.Debug;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.inject.Inject;
+
+import com.sun.identity.entitlement.EntitlementCondition;
+import com.sun.identity.entitlement.LogicalCondition;
+import com.sun.identity.shared.debug.Debug;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 import org.codehaus.jackson.schema.JsonSchema;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CollectionResourceProvider;
+import org.forgerock.json.resource.CountPolicy;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.openam.entitlement.conditions.environment.IPv4Condition;
 import org.forgerock.openam.entitlement.conditions.environment.IPv6Condition;
-import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.JsonEntitlementConditionModule;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
+import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.util.Reject;
+import org.forgerock.util.promise.Promise;
 
 /**
  * Allows for CREST-handling of stored {@link EntitlementCondition}s.
@@ -98,52 +106,52 @@ public class ConditionTypesResource implements CollectionResourceProvider {
      * Unsupported by this endpoint.
      */
     @Override
-    public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * Unsupported by this endpoint.
      */
     @Override
-    public void actionInstance(ServerContext context, String resourceId, ActionRequest request,
-                               ResultHandler<JsonValue> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+            ActionRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * Unsupported by this endpoint.
      */
     @Override
-    public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * Unsupported by this endpoint.
      */
     @Override
-    public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request,
-                               ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String resourceId,
+            DeleteRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * Unsupported by this endpoint.
      */
     @Override
-    public void patchInstance(ServerContext context, String resourceId, PatchRequest request,
-                              ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+            PatchRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * Unsupported by this endpoint.
      */
     @Override
-    public void updateInstance(ServerContext context, String resourceId, UpdateRequest request,
-                               ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId,
+            UpdateRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
@@ -155,7 +163,8 @@ public class ConditionTypesResource implements CollectionResourceProvider {
      * result handler having determined its schema and jsonified it.
      */
     @Override
-    public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
+    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+            QueryResourceHandler handler) {
 
         final Set<String> conditionTypeNames = new TreeSet<String>();
         List<JsonValue> conditionTypes = new ArrayList<JsonValue>();
@@ -194,7 +203,7 @@ public class ConditionTypesResource implements CollectionResourceProvider {
                 final JsonValue resourceId = conditionTypesToReturn.get(JSON_POINTER_TO_TITLE);
                 final String id = resourceId != null ? resourceId.toString() : null;
 
-                boolean keepGoing = handler.handleResource(new Resource(id,
+                boolean keepGoing = handler.handleResource(newResourceResponse(id,
                         String.valueOf(System.currentTimeMillis()), conditionTypesToReturn));
                 remaining--;
                 if (debug.messageEnabled()) {
@@ -207,8 +216,7 @@ public class ConditionTypesResource implements CollectionResourceProvider {
             }
         }
 
-        handler.handleResult(new QueryResult(null, remaining));
-
+        return newResultPromise(newQueryResponse(null, CountPolicy.EXACT, remaining));
     }
 
     /**
@@ -217,8 +225,8 @@ public class ConditionTypesResource implements CollectionResourceProvider {
      * Uses the {@link EntitlementRegistry} to locate the {@link EntitlementCondition} to return.
      */
     @Override
-    public void readInstance(ServerContext context, String resourceId, ReadRequest request,
-                             ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+            ReadRequest request) {
 
         final Class<? extends EntitlementCondition> conditionClass = entitlementRegistry.getConditionType(resourceId);
 
@@ -229,15 +237,14 @@ public class ConditionTypesResource implements CollectionResourceProvider {
                 debug.error("ConditionTypesResource :: READ by " + principalName +
                         ": Requested condition short name not found: " + resourceId);
             }
-            handler.handleError(ResourceException.getException(ResourceException.NOT_FOUND));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.NOT_FOUND));
         }
 
         final JsonValue json = jsonify(conditionClass, resourceId,
                 LogicalCondition.class.isAssignableFrom(conditionClass));
 
-        final Resource resource = new Resource(resourceId, String.valueOf(System.currentTimeMillis()), json);
-        handler.handleResult(resource);
+        final ResourceResponse resource = newResourceResponse(resourceId, String.valueOf(System.currentTimeMillis()), json);
+        return newResultPromise(resource);
     }
 
     /**

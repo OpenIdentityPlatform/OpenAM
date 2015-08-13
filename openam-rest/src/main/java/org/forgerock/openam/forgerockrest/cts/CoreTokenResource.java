@@ -15,20 +15,25 @@
  */
 package org.forgerock.openam.forgerockrest.cts;
 
+import static org.forgerock.json.resource.ResourceException.newBadRequestException;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.cts.CTSPersistentStore;
@@ -38,6 +43,7 @@ import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.util.promise.Promise;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -83,10 +89,9 @@ public class CoreTokenResource implements CollectionResourceProvider {
      *
      * @param serverContext Required context.
      * @param createRequest Contains the serialised JSON value of the Token.
-     * @param handler To handle errors.
      */
-    public void createInstance(ServerContext serverContext, CreateRequest createRequest,
-                               ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext serverContext,
+            CreateRequest createRequest) {
         String principal = PrincipalRestUtils.getPrincipalNameFromServerContext(serverContext);
 
         String json = createRequest.getContent().toString();
@@ -97,18 +102,18 @@ public class CoreTokenResource implements CollectionResourceProvider {
             Map<String, String> result = new HashMap<String, String>();
             result.put(TOKEN_ID, token.getTokenId());
 
-            Resource resource = new Resource(
+            ResourceResponse resource = newResourceResponse(
                     token.getTokenId(),
                     String.valueOf(System.currentTimeMillis()),
                     new JsonValue(result));
 
             debug("CREATE by {0}: Stored token with ID: {1}", principal, token.getTokenId());
-            handler.handleResult(resource);
+            return newResultPromise(resource);
         } catch (IllegalArgumentException e) {
-            handler.handleError(new BadRequestException(e.getMessage()));
+            return newExceptionPromise(newBadRequestException(e.getMessage()));
         } catch (CoreTokenException e) {
             error(e, "CREATE by {0}: Error creating token resource with ID: {1}", principal, token.getTokenId());
-            handler.handleError(generateException(e));
+            return newExceptionPromise(generateException(e));
         }
     }
 
@@ -118,10 +123,9 @@ public class CoreTokenResource implements CollectionResourceProvider {
      * @param serverContext Required context.
      * @param tokenId The TokenID of the token to delete.
      * @param deleteRequest Not used.
-     * @param handler To handle errors.
      */
-    public void deleteInstance(ServerContext serverContext, String tokenId, DeleteRequest deleteRequest,
-                               ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext serverContext, String tokenId,
+            DeleteRequest deleteRequest) {
 
         String principal = PrincipalRestUtils.getPrincipalNameFromServerContext(serverContext);
 
@@ -131,18 +135,17 @@ public class CoreTokenResource implements CollectionResourceProvider {
             Map<String, String> result = new HashMap<String, String>();
             result.put(TOKEN_ID, tokenId);
 
-            Resource resource = new Resource(
+            ResourceResponse resource = newResourceResponse(
                     tokenId,
                     String.valueOf(System.currentTimeMillis()),
                     new JsonValue(result));
 
             debug("DELETE by {0}: Deleted token resource with ID: {1}", principal, tokenId);
-            handler.handleResult(resource);
+            return newResultPromise(resource);
         } catch (CoreTokenException e) {
             error(e, "DELETE by {0}: Error deleting token resource with ID: {1}", principal, tokenId);
-            handler.handleError(generateException(e));
+            return newExceptionPromise(generateException(e));
         }
-
     }
 
     /**
@@ -153,32 +156,30 @@ public class CoreTokenResource implements CollectionResourceProvider {
      * @param serverContext Required context.
      * @param tokenId The TokenID of the Token to read.
      * @param readRequest Not used.
-     * @param handler To handle the response of the operation, including errors.
      */
-    public void readInstance(ServerContext serverContext, String tokenId, ReadRequest readRequest,
-                             ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext serverContext, String tokenId,
+            ReadRequest readRequest) {
 
         String principal = PrincipalRestUtils.getPrincipalNameFromServerContext(serverContext);
 
         try {
             Token token = store.read(tokenId);
             if (token == null) {
-                handler.handleError(generateNotFoundException(tokenId));
                 error("READ by {0}: No token resource to read with ID: {1}", principal, tokenId);
-                return;
+                return newExceptionPromise(generateNotFoundException(tokenId));
             }
 
             String json = serialisation.serialise(token);
-            Resource response = new Resource(
+            ResourceResponse response = newResourceResponse(
                     tokenId,
                     String.valueOf(System.currentTimeMillis()),
                     JsonValueBuilder.toJsonValue(json));
 
             debug("READ by {0}: Read token resource with ID: {1}", principal, tokenId);
-            handler.handleResult(response);
+            return newResultPromise(response);
         } catch (CoreTokenException e) {
             error(e, "READ by {0}: Error reading token resource with ID: {1}", principal, tokenId);
-            handler.handleError(generateException(e));
+            return newExceptionPromise(generateException(e));
         }
     }
 
@@ -188,10 +189,9 @@ public class CoreTokenResource implements CollectionResourceProvider {
      * @param serverContext Required context.
      * @param tokenId The tokenId to update. This must be the same TokenId as the serialised Token.
      * @param updateRequest Contains the JSON serialised Token to update.
-     * @param handler To handle errors.
      */
-    public void updateInstance(ServerContext serverContext, String tokenId, UpdateRequest updateRequest,
-                               ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext serverContext, String tokenId,
+            UpdateRequest updateRequest) {
         String principal = PrincipalRestUtils.getPrincipalNameFromServerContext(serverContext);
 
         String value = updateRequest.getContent().toString();
@@ -200,16 +200,16 @@ public class CoreTokenResource implements CollectionResourceProvider {
         try {
             store.updateAsync(newToken);
 
-            Resource resource = new Resource(
+            ResourceResponse resource = newResourceResponse(
                     newToken.getTokenId(),
                     String.valueOf(System.currentTimeMillis()),
                     new JsonValue("Token Updated"));
 
             debug("UPDATE by {0}: Updated token resource with ID: {1}", principal, tokenId);
-            handler.handleResult(resource);
+            return newResultPromise(resource);
         } catch (CoreTokenException e) {
             error(e, "UPDATE by {0}: Error updating token resource with ID: {1}", principal, tokenId);
-            handler.handleError(generateException(e));
+            return newExceptionPromise(generateException(e));
         }
     }
 
@@ -218,8 +218,9 @@ public class CoreTokenResource implements CollectionResourceProvider {
      *
      * This function is planned, however how to define the query attributes will be the question to answer.
      */
-    public void queryCollection(ServerContext serverContext, QueryRequest queryRequest, QueryResultHandler queryResultHandler) {
-        RestUtils.generateUnsupportedOperation(queryResultHandler);
+    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext serverContext,
+            QueryRequest queryRequest, QueryResourceHandler queryResultHandler) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
@@ -246,8 +247,9 @@ public class CoreTokenResource implements CollectionResourceProvider {
      *
      * Not supported.
      */
-    public void patchInstance(ServerContext serverContext, String s, PatchRequest patchRequest, ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext serverContext, String s,
+            PatchRequest patchRequest) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
@@ -255,8 +257,9 @@ public class CoreTokenResource implements CollectionResourceProvider {
      *
      * Not supported.
      */
-    public void actionInstance(ServerContext serverContext, String s, ActionRequest actionRequest, ResultHandler<JsonValue> jsonValueResultHandler) {
-        RestUtils.generateUnsupportedOperation(jsonValueResultHandler);
+    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext serverContext, String s,
+            ActionRequest actionRequest) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
@@ -264,8 +267,9 @@ public class CoreTokenResource implements CollectionResourceProvider {
      *
      * Not supported.
      */
-    public void actionCollection(ServerContext serverContext, ActionRequest actionRequest, ResultHandler<JsonValue> jsonValueResultHandler) {
-        RestUtils.generateUnsupportedOperation(jsonValueResultHandler);
+    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext serverContext,
+            ActionRequest actionRequest) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     private void debug(String format, Object... args) {

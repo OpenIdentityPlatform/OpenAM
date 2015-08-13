@@ -17,6 +17,11 @@
 package org.forgerock.openam.rest.sms;
 
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.ResourceException.*;
+import static org.forgerock.json.resource.Responses.newQueryResponse;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,28 +42,27 @@ import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.util.query.QueryFilter;
-import org.forgerock.util.query.QueryFilterVisitor;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.RequestHandler;
-import org.forgerock.json.resource.Resource;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.util.promise.Promise;
+import org.forgerock.util.query.QueryFilter;
+import org.forgerock.util.query.QueryFilterVisitor;
 
 /**
  * Collection handler for handling queries on the {@literal /authentication/modules} resource.
@@ -82,19 +86,18 @@ public class AuthenticationModuleCollectionHandler implements RequestHandler {
      * {@inheritDoc}
      */
     @Override
-    public void handleQuery(ServerContext context, QueryRequest request, QueryResultHandler handler) {
+    public Promise<QueryResponse, ResourceException> handleQuery(ServerContext context, QueryRequest request,
+            QueryResourceHandler handler) {
 
         String searchForId;
         try {
             searchForId = request.getQueryFilter().accept(new AuthenticationModuleQueryFilterVisitor(), null);
         } catch (UnsupportedOperationException e) {
-            handler.handleError(new NotSupportedException("Query not supported: " + request.getQueryFilter()));
-            return;
+            return newExceptionPromise(newNotSupportedException("Query not supported: " + request.getQueryFilter()));
         }
         if (request.getPagedResultsCookie() != null || request.getPagedResultsOffset() > 0 ||
                 request.getPageSize() > 0) {
-            handler.handleError(new NotSupportedException("Query paging not currently supported"));
-            return;
+            return newExceptionPromise(newNotSupportedException("Query paging not currently supported"));
         }
 
         try {
@@ -111,10 +114,10 @@ public class AuthenticationModuleCollectionHandler implements RequestHandler {
                         String type = schemaManager.getResourceName();
                         String typeDescription = getI18NValue(schemaManager, instance.getType(), debug);
                         JsonValue result = json(object(
-                                field(Resource.FIELD_CONTENT_ID, name),
+                                field(ResourceResponse.FIELD_CONTENT_ID, name),
                                 field("typeDescription", typeDescription),
                                 field("type", type)));
-                        handler.handleResource(new Resource(name, String.valueOf(result.hashCode()), result));
+                        handler.handleResource(newResourceResponse(name, String.valueOf(result.hashCode()), result));
                     } catch (AMConfigurationException ex) {
                         debug.error("AuthenticationModuleCollectionHandler.handleQuery(): Invalid auth module " +
                                 "instance configuration: {}", name);
@@ -127,17 +130,17 @@ public class AuthenticationModuleCollectionHandler implements RequestHandler {
                 }
             }
 
-            handler.handleResult(new QueryResult());
+            return newResultPromise(newQueryResponse());
 
         } catch (AMConfigurationException e) {
             debug.warning("::AuthenticationModuleCollectionHandler:: AMConfigurationException on create", e);
-            handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
         } catch (SSOException e) {
             debug.warning("::AuthenticationModuleCollectionHandler:: SSOException on create", e);
-            handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
         } catch (SMSException e) {
             debug.warning("::AuthenticationModuleCollectionHandler:: SMSException on create", e);
-            handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
         }
     }
 
@@ -163,44 +166,44 @@ public class AuthenticationModuleCollectionHandler implements RequestHandler {
     }
 
     @Override
-    public void handleAction(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
+    public Promise<ActionResponse, ResourceException> handleAction(ServerContext context, ActionRequest request) {
         // TODO: i18n
-        handler.handleError(new BadRequestException(
-                "The resource collection " + request.getResourceName() + " cannot perform actions"));
+        return newExceptionPromise(newBadRequestException(
+                "The resource collection " + request.getResourcePath() + " cannot perform actions"));
     }
 
     @Override
-    public void handleCreate(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> handleCreate(ServerContext context, CreateRequest request) {
         // TODO: i18n
-        handler.handleError(new BadRequestException("Authentication modules must be created per type"));
+        return newExceptionPromise(newBadRequestException("Authentication modules must be created per type"));
     }
 
     @Override
-    public void handleDelete(ServerContext context, DeleteRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> handleDelete(ServerContext context, DeleteRequest request) {
         // TODO: i18n
-        handler.handleError(new BadRequestException(
-                "The resource collection " + request.getResourceName() + " cannot be deleted"));
+        return newExceptionPromise(newBadRequestException(
+                "The resource collection " + request.getResourcePath() + " cannot be deleted"));
     }
 
     @Override
-    public void handlePatch(ServerContext context, PatchRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> handlePatch(ServerContext context, PatchRequest request) {
         // TODO: i18n
-        handler.handleError(new BadRequestException(
-                "The resource collection " + request.getResourceName()  + " cannot be patched"));
+        return newExceptionPromise(newBadRequestException(
+                "The resource collection " + request.getResourcePath() + " cannot be patched"));
     }
 
     @Override
-    public void handleRead(ServerContext context, ReadRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> handleRead(ServerContext context, ReadRequest request) {
         // TODO: i18n
-        handler.handleError(new BadRequestException("The resource collection " + request.getResourceName()
+        return newExceptionPromise(newBadRequestException("The resource collection " + request.getResourcePath()
                 + " cannot be read"));
     }
 
     @Override
-    public void handleUpdate(ServerContext context, UpdateRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> handleUpdate(ServerContext context, UpdateRequest request) {
         // TODO: i18n
-        handler.handleError(new BadRequestException(
-                "The resource collection " + request.getResourceName() + " cannot be updated"));
+        return newExceptionPromise(newBadRequestException(
+                "The resource collection " + request.getResourcePath() + " cannot be updated"));
     }
 
     private static final class AuthenticationModuleQueryFilterVisitor implements QueryFilterVisitor<String, Void, JsonPointer> {

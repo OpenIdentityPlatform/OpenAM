@@ -16,29 +16,37 @@
 
 package org.forgerock.openam.forgerockrest.entitlements;
 
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.SubjectAttributesManager;
-import com.sun.identity.shared.debug.Debug;
-import java.util.Set;
+import static org.forgerock.json.resource.Responses.newQueryResponse;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.security.auth.Subject;
+import java.util.Set;
+
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.SubjectAttributesManager;
+import com.sun.identity.shared.debug.Debug;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.CountPolicy;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
+import org.forgerock.util.promise.Promise;
 
 /**
  * REST endpoint implementation to query the list of subject attributes appropriate to
@@ -59,37 +67,40 @@ public class SubjectAttributesResourceV1 extends RealmAwareResource {
     }
 
     @Override
-    public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public void actionInstance(ServerContext context, String resourceId, ActionRequest request, ResultHandler<JsonValue> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+            ActionRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request, ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String resourceId,
+            DeleteRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public void patchInstance(ServerContext context, String resourceId, PatchRequest request, ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+            PatchRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
+    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+            QueryResourceHandler handler) {
         final Subject mySubject = getContextSubject(context);
         if (mySubject == null) {
             debug.error("SubjectAttributesResource :: QUERY : Unknown Subject");
-            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
         }
         final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(mySubject);
         final SubjectAttributesManager manager = getSubjectAttributesManager(mySubject, getRealm(context));
@@ -99,27 +110,27 @@ public class SubjectAttributesResourceV1 extends RealmAwareResource {
         } catch (EntitlementException e) {
             debug.error("SubjectAttributesResource :: QUERY by " + principalName + " : Unable to query available " +
                     "subject attribute names.");
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
         for (String attr : attributes) {
-            handler.handleResource(new Resource(attr, Long.toString(System.currentTimeMillis()), JsonValue.json(attr)));
+            handler.handleResource(newResourceResponse(attr, Long.toString(System.currentTimeMillis()), JsonValue.json(attr)));
         }
-        handler.handleResult(new QueryResult(null, 0));
+        return newResultPromise(newQueryResponse(null, CountPolicy.EXACT, 0));
     }
 
     @Override
-    public void readInstance(ServerContext context, String resourceId, ReadRequest request, ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+            ReadRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public void updateInstance(ServerContext context, String resourceId, UpdateRequest request, ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId,
+            UpdateRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     SubjectAttributesManager getSubjectAttributesManager(Subject mySubject, String realm) {
         return SubjectAttributesManager.getInstance(mySubject, realm);
     }
-
 }

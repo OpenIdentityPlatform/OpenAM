@@ -85,7 +85,7 @@ public class AuthenticationChainsFilter implements Filter {
     }
 
     @Override
-    public void filterQuery(ServerContext context, QueryRequest request, QueryResultHandler handler,
+    public void filterQuery(ServerContext context, QueryRequest request, QueryResourceHandler handler,
             RequestHandler next) {
         next.handleQuery(context, request, wrap(handler));
     }

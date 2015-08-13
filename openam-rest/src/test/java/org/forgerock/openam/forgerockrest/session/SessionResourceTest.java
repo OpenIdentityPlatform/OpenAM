@@ -151,7 +151,7 @@ public class SessionResourceTest {
     }
 
     @Test
-    public void actionCollectionShouldFailToValidateSessionWhenSSOTokenIdNotSet() {
+    public Promise<ActionResponse, ResourceException> actionCollectionShouldFailToValidateSessionWhenSSOTokenIdNotSet() {
 
         //Given
         final Map<String, Object> authzContext = new HashMap<String, Object>();
@@ -171,7 +171,7 @@ public class SessionResourceTest {
     }
 
     @Test
-    public void actionCollectionShouldValidateSessionAndReturnTrueWhenSSOTokenValid() throws SSOException {
+    public Promise<ActionResponse, ResourceException> actionCollectionShouldValidateSessionAndReturnTrueWhenSSOTokenValid() throws SSOException {
 
         //Given
         cookieResponse = "SSO_TOKEN_ID";
@@ -203,7 +203,7 @@ public class SessionResourceTest {
     }
 
     @Test
-    public void actionCollectionShouldLogoutSessionAndReturnEmptyJsonObjectWhenSSOTokenValid() throws SSOException {
+    public Promise<ActionResponse, ResourceException> actionCollectionShouldLogoutSessionAndReturnEmptyJsonObjectWhenSSOTokenValid() throws SSOException {
 
         //Given
         cookieResponse = "SSO_TOKEN_ID";
@@ -228,7 +228,7 @@ public class SessionResourceTest {
     }
 
     @Test
-    public void actionInstanceShouldValidateSessionAndReturnFalseWhenSSOTokenCreationThrowsException()
+    public Promise<ActionResponse, ResourceException> actionInstanceShouldValidateSessionAndReturnFalseWhenSSOTokenCreationThrowsException()
             throws SSOException {
 
         //Given
@@ -250,7 +250,7 @@ public class SessionResourceTest {
     }
 
     @Test
-    public void actionInstanceShouldValidateSessionAndReturnTrueWhenSSOTokenValid() throws SSOException {
+    public Promise<ActionResponse, ResourceException> actionInstanceShouldValidateSessionAndReturnTrueWhenSSOTokenValid() throws SSOException {
 
         //Given
         final ServerContext context = mock(ServerContext.class);
@@ -278,7 +278,7 @@ public class SessionResourceTest {
     }
 
     @Test
-    public void actionInstanceShouldBeActiveWhenSSOTokenValid() throws SSOException {
+    public Promise<ActionResponse, ResourceException> actionInstanceShouldBeActiveWhenSSOTokenValid() throws SSOException {
 
         //Given
         final ServerContext context = mock(ServerContext.class);
@@ -303,7 +303,7 @@ public class SessionResourceTest {
 
 
     @Test
-    public void actionInstanceShouldRefreshWhenParameterPresentAndSSOTokenValid() throws SSOException {
+    public Promise<ActionResponse, ResourceException> actionInstanceShouldRefreshWhenParameterPresentAndSSOTokenValid() throws SSOException {
 
         //Given
         final ServerContext context = mock(ServerContext.class);
@@ -326,7 +326,7 @@ public class SessionResourceTest {
 
 
     @Test
-    public void actionInstanceShouldBeInactiveWhenSSOTokenInvalid() throws SSOException {
+    public Promise<ActionResponse, ResourceException> actionInstanceShouldBeInactiveWhenSSOTokenInvalid() throws SSOException {
 
         //Given
         final ServerContext context = mock(ServerContext.class);
@@ -350,7 +350,7 @@ public class SessionResourceTest {
     }
 
     @Test
-    public void actionInstanceShouldGiveTimeLeftWhenSSOTokenValid() throws SSOException {
+    public Promise<ActionResponse, ResourceException> actionInstanceShouldGiveTimeLeftWhenSSOTokenValid() throws SSOException {
 
         final int TIME_LEFT = 5000;
 
@@ -376,7 +376,7 @@ public class SessionResourceTest {
     }
 
     @Test
-    public void actionInstanceShouldGiveMinusOneForMaxTimeWhenSSOTokenInvalid() throws SSOException {
+    public Promise<ActionResponse, ResourceException> actionInstanceShouldGiveMinusOneForMaxTimeWhenSSOTokenInvalid() throws SSOException {
 
         //Given
         final ServerContext context = mock(ServerContext.class);
@@ -399,7 +399,7 @@ public class SessionResourceTest {
     }
 
     @Test
-    public void actionInstanceShouldGiveIdleTimeWhenSSOTokenValid() throws SSOException {
+    public Promise<ActionResponse, ResourceException> actionInstanceShouldGiveIdleTimeWhenSSOTokenValid() throws SSOException {
 
         final int IDLE = 50;
 
@@ -425,7 +425,7 @@ public class SessionResourceTest {
     }
 
     @Test
-    public void actionInstanceShouldGiveMinusOneForIdleTimeWhenSSOTokenInvalid() throws SSOException {
+    public Promise<ActionResponse, ResourceException> actionInstanceShouldGiveMinusOneForIdleTimeWhenSSOTokenInvalid() throws SSOException {
 
         //Given
         final ServerContext context = mock(ServerContext.class);
@@ -448,7 +448,7 @@ public class SessionResourceTest {
     }
 
     @Test
-    public void actionInstanceShouldReturnNotSupportedForUnknownAction() throws SSOException {
+    public Promise<ActionResponse, ResourceException> actionInstanceShouldReturnNotSupportedForUnknownAction() throws SSOException {
 
         //Given
         final ServerContext context = mock(ServerContext.class);

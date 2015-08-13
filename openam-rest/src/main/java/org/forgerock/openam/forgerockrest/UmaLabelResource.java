@@ -16,6 +16,12 @@
 
 package org.forgerock.openam.forgerockrest;
 
+import static org.forgerock.json.resource.ResourceException.*;
+import static org.forgerock.json.resource.Responses.newQueryResponse;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.Collections;
@@ -24,26 +30,24 @@ import java.util.Set;
 
 import com.sun.identity.common.LocaleContext;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.JsonValueException;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.OAuth2Constants;
@@ -54,6 +58,7 @@ import org.forgerock.openam.oauth2.resources.labels.LabelType;
 import org.forgerock.openam.oauth2.resources.labels.ResourceSetLabel;
 import org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore;
 import org.forgerock.openam.rest.resource.ContextHelper;
+import org.forgerock.util.promise.Promise;
 
 /**
  * A collection provider for UMA Labels.
@@ -79,24 +84,26 @@ public class UmaLabelResource implements CollectionResourceProvider {
     }
 
     @Override
-    public void actionCollection(ServerContext serverContext, ActionRequest actionRequest, ResultHandler<JsonValue> resultHandler) {
-        resultHandler.handleError(new NotSupportedException("Not supported."));
+    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext serverContext,
+            ActionRequest actionRequest) {
+        return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 
     @Override
-    public void actionInstance(ServerContext serverContext, String s, ActionRequest actionRequest, ResultHandler<JsonValue> resultHandler) {
-        resultHandler.handleError(new NotSupportedException("Not supported."));
+    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext serverContext, String s,
+            ActionRequest actionRequest) {
+        return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 
     @Override
-    public void createInstance(ServerContext serverContext, CreateRequest createRequest, ResultHandler<Resource> resultHandler) {
+    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext serverContext,
+            CreateRequest createRequest) {
         final JsonValue umaLabel = createRequest.getContent();
 
         try {
             validate(umaLabel);
         } catch (BadRequestException e) {
-            resultHandler.handleError(e);
-            return;
+            return newExceptionPromise(adapt(e));
         }
 
         final String realm = getRealm(serverContext);
@@ -107,9 +114,9 @@ public class UmaLabelResource implements CollectionResourceProvider {
 
         try {
             label = labelStore.create(realm, userName, new ResourceSetLabel(null, labelName, LabelType.valueOf(labelType), Collections.EMPTY_SET));
-            resultHandler.handleResult(new Resource(label.getId(), String.valueOf(label.hashCode()), label.asJson()));
+            return newResultPromise(newResourceResponse(label.getId(), String.valueOf(label.hashCode()), label.asJson()));
         } catch (ResourceException e) {
-            resultHandler.handleError(e);
+            return newExceptionPromise(e);
         }
     }
 
@@ -125,7 +132,8 @@ public class UmaLabelResource implements CollectionResourceProvider {
     }
 
     @Override
-    public void deleteInstance(ServerContext serverContext, String labelId, DeleteRequest deleteRequest, ResultHandler<Resource> resultHandler) {
+    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext serverContext, String labelId,
+            DeleteRequest deleteRequest) {
         try {
             ResourceSetLabel resourceSetLabel = labelStore.read(getRealm(serverContext), getUserName(serverContext), labelId);
 
@@ -134,9 +142,9 @@ public class UmaLabelResource implements CollectionResourceProvider {
             }
 
             labelStore.delete(getRealm(serverContext), getUserName(serverContext), labelId);
-            resultHandler.handleResult(new Resource(labelId, null, resourceSetLabel.asJson()));
+            return newResultPromise(newResourceResponse(labelId, null, resourceSetLabel.asJson()));
         } catch (ResourceException e) {
-            resultHandler.handleError(new BadRequestException("Error deleting label."));
+            return newExceptionPromise(newBadRequestException("Error deleting label."));
         }
     }
 
@@ -151,23 +159,23 @@ public class UmaLabelResource implements CollectionResourceProvider {
     }
 
     @Override
-    public void patchInstance(ServerContext serverContext, String s, PatchRequest patchRequest, ResultHandler<Resource> resultHandler) {
-        resultHandler.handleError(new NotSupportedException("Not supported."));
+    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext serverContext, String s,
+            PatchRequest patchRequest) {
+        return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 
     @Override
-    public void queryCollection(ServerContext serverContext, QueryRequest queryRequest, QueryResultHandler queryResultHandler) {
+    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext serverContext,
+            QueryRequest queryRequest, QueryResourceHandler queryResultHandler) {
         if (!queryRequest.getQueryFilter().toString().equals("true")) {
-            queryResultHandler.handleError(new BadRequestException("Invalid query"));
-            return;
+            return newExceptionPromise(newBadRequestException("Invalid query"));
         }
 
         Set<ResourceSetLabel> labels;
         try {
             labels = labelStore.list(getRealm(serverContext), getUserName(serverContext));
         } catch (ResourceException e) {
-            queryResultHandler.handleError(new BadRequestException("Error retrieving labels."));
-            return;
+            return newExceptionPromise(newBadRequestException("Error retrieving labels."));
         }
 
         LocaleContext localeContext = localeContextProvider.get();
@@ -180,11 +188,11 @@ public class UmaLabelResource implements CollectionResourceProvider {
                 debug.error("Could not resolve Resource Server label name. id: {}, name: {}", label.getId(),
                         label.getName(), e);
             }
-            queryResultHandler.handleResource(new Resource(label.getId(),
+            queryResultHandler.handleResource(newResourceResponse(label.getId(),
                     String.valueOf(label.asJson().getObject().hashCode()), label.asJson()));
         }
 
-        queryResultHandler.handleResult(new QueryResult());
+        return newResultPromise(newQueryResponse());
     }
 
     private ResourceSetLabel resolveLabelName(String realm, ResourceSetLabel label, LocaleContext localeContext)
@@ -233,13 +241,15 @@ public class UmaLabelResource implements CollectionResourceProvider {
     }
 
     @Override
-    public void readInstance(ServerContext serverContext, String s, ReadRequest readRequest, ResultHandler<Resource> resultHandler) {
-        resultHandler.handleError(new NotSupportedException("Not supported."));
+    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext serverContext, String s,
+            ReadRequest readRequest) {
+        return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 
     @Override
-    public void updateInstance(ServerContext serverContext, String s, UpdateRequest updateRequest, ResultHandler<Resource> resultHandler) {
-        resultHandler.handleError(new NotSupportedException("Not supported."));
+    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext serverContext, String s,
+            UpdateRequest updateRequest) {
+        return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 
     private String getRealm(ServerContext context) {

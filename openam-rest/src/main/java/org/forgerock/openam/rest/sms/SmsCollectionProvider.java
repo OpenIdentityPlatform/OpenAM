@@ -18,6 +18,11 @@
 package org.forgerock.openam.rest.sms;
 
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.ResourceException.*;
+import static org.forgerock.json.resource.Responses.newQueryResponse;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,26 +41,25 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceNotFoundException;
 import com.sun.identity.sm.ServiceSchema;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
-import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.util.Reject;
+import org.forgerock.util.promise.Promise;
 
 /**
  * A CREST collection provider for SMS schema config.
@@ -73,8 +77,8 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
     }
 
     @Override
-    public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-        super.handleAction(context, request, handler);
+    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
+        return super.handleAction(context, request);
     }
 
     /**
@@ -83,7 +87,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
      * {@inheritDoc}
      */
     @Override
-    public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
         JsonValue content = request.getContent();
         Map<String, Set<String>> attrs = converter.fromJson(content);
         try {
@@ -93,30 +97,28 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
             if (name == null) {
                 name = request.getNewResourceId();
             } else if (request.getNewResourceId() != null && !name.equals(request.getNewResourceId())) {
-                handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST,
+                return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST,
                         "name and URI's resource ID do not match"));
-                return;
             }
             if (name == null) {
-                handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST, "Invalid name"));
-                return;
+                return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST, "Invalid name"));
             }
             config.addSubConfig(name, lastSchemaNodeName(), 0, attrs);
             ServiceConfig created = checkedInstanceSubConfig(context, name, config);
 
             JsonValue result = getJsonValue(created);
-            handler.handleResult(new Resource(created.getName(), String.valueOf(result.hashCode()), result));
+            return newResultPromise(newResourceResponse(created.getName(), String.valueOf(result.hashCode()), result));
         } catch (ServiceAlreadyExistsException e) {
             debug.warning("::SmsCollectionProvider:: ServiceAlreadyExistsException on create", e);
-            handler.handleError(new ConflictException("Unable to create SMS config: " + e.getMessage()));
+            return newExceptionPromise(adapt(new ConflictException("Unable to create SMS config: " + e.getMessage())));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on create", e);
-            handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
         } catch (SSOException e) {
             debug.warning("::SmsCollectionProvider:: SSOException on create", e);
-            handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
         } catch (NotFoundException e) {
-            handler.handleError(e);
+            return newExceptionPromise(adapt(e));
         }
     }
 
@@ -126,7 +128,8 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
      * {@inheritDoc}
      */
     @Override
-    public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String resourceId,
+            DeleteRequest request) {
         try {
             ServiceConfigManager scm = getServiceConfigManager(context);
             ServiceConfig config = parentSubConfigFor(context, scm);
@@ -137,19 +140,19 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
                 config.removeSubConfig(resourceId);
             }
 
-            Resource resource = new Resource(resourceId, "0", json(object(field("success", true))));
-            handler.handleResult(resource);
+            ResourceResponse resource = newResourceResponse(resourceId, "0", json(object(field("success", true))));
+            return newResultPromise(resource);
         } catch (ServiceNotFoundException e) {
             debug.warning("::SmsCollectionProvider:: ServiceNotFoundException on delete", e);
-            handler.handleError(new NotFoundException("Unable to delete SMS config: " + e.getMessage()));
+            return newExceptionPromise(newNotFoundException("Unable to delete SMS config: " + e.getMessage()));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on delete", e);
-            handler.handleError(new InternalServerErrorException("Unable to delete SMS config: " + e.getMessage()));
+            return newExceptionPromise(newInternalServerErrorException("Unable to delete SMS config: " + e.getMessage()));
         } catch (SSOException e) {
             debug.warning("::SmsCollectionProvider:: SSOException on delete", e);
-            handler.handleError(new InternalServerErrorException("Unable to delete SMS config: " + e.getMessage()));
+            return newExceptionPromise(newInternalServerErrorException("Unable to delete SMS config: " + e.getMessage()));
         } catch (NotFoundException e) {
-            handler.handleError(e);
+            return newExceptionPromise(adapt(e));
         }
     }
 
@@ -159,22 +162,23 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
      * {@inheritDoc}
      */
     @Override
-    public void readInstance(ServerContext context, String resourceId, ReadRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+            ReadRequest request) {
         try {
             ServiceConfigManager scm = getServiceConfigManager(context);
             ServiceConfig config = parentSubConfigFor(context, scm);
             ServiceConfig item = checkedInstanceSubConfig(context, resourceId, config);
 
             JsonValue result = getJsonValue(item);
-            handler.handleResult(new Resource(resourceId, String.valueOf(result.hashCode()), result));
+            return newResultPromise(newResourceResponse(resourceId, String.valueOf(result.hashCode()), result));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on read", e);
-            handler.handleError(new InternalServerErrorException("Unable to read SMS config: " + e.getMessage()));
+            return newExceptionPromise(newInternalServerErrorException("Unable to read SMS config: " + e.getMessage()));
         } catch (SSOException e) {
             debug.warning("::SmsCollectionProvider:: SSOException on read", e);
-            handler.handleError(new InternalServerErrorException("Unable to read SMS config: " + e.getMessage()));
+            return newExceptionPromise(newInternalServerErrorException("Unable to read SMS config: " + e.getMessage()));
         } catch (NotFoundException e) {
-            handler.handleError(e);
+            return newExceptionPromise(adapt(e));
         }
     }
 
@@ -184,7 +188,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
      * {@inheritDoc}
      */
     @Override
-    public void updateInstance(ServerContext context, String resourceId, UpdateRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId, UpdateRequest request) {
         JsonValue content = request.getContent();
         Map<String, Set<String>> attrs = converter.fromJson(content);
         try {
@@ -194,18 +198,18 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
 
             node.setAttributes(attrs);
             JsonValue result = getJsonValue(node);
-            handler.handleResult(new Resource(resourceId, String.valueOf(result.hashCode()), result));
+            return newResultPromise(newResourceResponse(resourceId, String.valueOf(result.hashCode()), result));
         } catch (ServiceNotFoundException e) {
             debug.warning("::SmsCollectionProvider:: ServiceNotFoundException on update", e);
-            handler.handleError(new NotFoundException("Unable to update SMS config: " + e.getMessage()));
+            return newExceptionPromise(newNotFoundException("Unable to update SMS config: " + e.getMessage()));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on update", e);
-            handler.handleError(new InternalServerErrorException("Unable to update SMS config: " + e.getMessage()));
+            return newExceptionPromise(newInternalServerErrorException("Unable to update SMS config: " + e.getMessage()));
         } catch (SSOException e) {
             debug.warning("::SmsCollectionProvider:: SSOException on update", e);
-            handler.handleError(new InternalServerErrorException("Unable to update SMS config: " + e.getMessage()));
+            return newExceptionPromise(newInternalServerErrorException("Unable to update SMS config: " + e.getMessage()));
         } catch (NotFoundException e) {
-            handler.handleError(e);
+            return newExceptionPromise(adapt(e));
         }
     }
 
@@ -218,15 +222,14 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
      * {@inheritDoc}
      */
     @Override
-    public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
+    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+            QueryResourceHandler handler) {
         if (!"true".equals(request.getQueryFilter().toString())) {
-            handler.handleError(new NotSupportedException("Query not supported: " + request.getQueryFilter()));
-            return;
+            return newExceptionPromise(newNotSupportedException("Query not supported: " + request.getQueryFilter()));
         }
         if (request.getPagedResultsCookie() != null || request.getPagedResultsOffset() > 0 ||
                 request.getPageSize() > 0) {
-            handler.handleError(new NotSupportedException("Query paging not currently supported"));
-            return;
+            return newExceptionPromise(newNotSupportedException("Query paging not currently supported"));
         }
         try {
             ServiceConfigManager scm = getServiceConfigManager(context);
@@ -241,7 +244,7 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
                             scm.getOrganizationConfig(realm, instanceName);
                     if (config != null) {
                         JsonValue value = getJsonValue(config);
-                        handler.handleResource(new Resource(instanceName, String.valueOf(value.hashCode()), value));
+                        handler.handleResource(newResourceResponse(instanceName, String.valueOf(value.hashCode()), value));
                     }
                 }
             } else {
@@ -249,17 +252,17 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
                 Set<String> names = config.getSubConfigNames("*", lastSchemaNodeName());
                 for (String configName : names) {
                     JsonValue value = getJsonValue(config.getSubConfig(configName));
-                    handler.handleResource(new Resource(configName, String.valueOf(value.hashCode()), value));
+                    handler.handleResource(newResourceResponse(configName, String.valueOf(value.hashCode()), value));
                 }
             }
 
-            handler.handleResult(new QueryResult());
+            return newResultPromise(newQueryResponse());
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on query", e);
-            handler.handleError(new InternalServerErrorException("Unable to query SMS config: " + e.getMessage()));
+            return newExceptionPromise(newInternalServerErrorException("Unable to query SMS config: " + e.getMessage()));
         } catch (SSOException e) {
             debug.warning("::SmsCollectionProvider:: SSOException on query", e);
-            handler.handleError(new InternalServerErrorException("Unable to query SMS config: " + e.getMessage()));
+            return newExceptionPromise(newInternalServerErrorException("Unable to query SMS config: " + e.getMessage()));
         }
     }
 
@@ -274,12 +277,14 @@ public class SmsCollectionProvider extends SmsResourceProvider implements Collec
     }
 
     @Override
-    public void actionInstance(ServerContext context, String resourceId, ActionRequest request, ResultHandler<JsonValue> handler) {
-        handler.handleError(new NotSupportedException(request.getAction() + " action not supported"));
+    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+            ActionRequest request) {
+        return newExceptionPromise(newNotSupportedException(request.getAction() + " action not supported"));
     }
 
     @Override
-    public void patchInstance(ServerContext context, String resourceId, PatchRequest request, ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException("patch operation not supported"));
+    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+            PatchRequest request) {
+        return newExceptionPromise(newNotSupportedException("patch operation not supported"));
     }
 }

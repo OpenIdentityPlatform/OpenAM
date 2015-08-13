@@ -17,25 +17,30 @@
 package org.forgerock.openam.rest.uma;
 
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.ResourceException.newInternalServerErrorException;
+import static org.forgerock.json.resource.ResourceException.newNotSupportedException;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
 
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.SingletonResourceProvider;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.uma.UmaSettings;
 import org.forgerock.openam.uma.UmaSettingsFactory;
+import org.forgerock.util.promise.Promise;
 
 public class UmaConfigurationResource implements SingletonResourceProvider {
 
@@ -48,17 +53,17 @@ public class UmaConfigurationResource implements SingletonResourceProvider {
     }
 
     @Override
-    public void actionInstance(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, ActionRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 
     @Override
-    public void patchInstance(ServerContext context, PatchRequest request, ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, PatchRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 
     @Override
-    public void readInstance(ServerContext context, ReadRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, ReadRequest request) {
 
         String realm = context.asContext(RealmContext.class).getResolvedRealm();
         UmaSettings settings = settingsFactory.create(realm);
@@ -68,15 +73,15 @@ public class UmaConfigurationResource implements SingletonResourceProvider {
                     field("version", settings.getVersion()),
                     field("resharingMode", settings.getResharingMode())));
 
-            handler.handleResult(new Resource("UmaConfiguration", Integer.toString(config.hashCode()), config));
+            return newResultPromise(newResourceResponse("UmaConfiguration", Integer.toString(config.hashCode()), config));
         } catch (ServerException e) {
             logger.error("Failed to get UMA Configuration", e);
-            handler.handleError(new InternalServerErrorException("Failed to get UMA Configuration", e));
+            return newExceptionPromise(newInternalServerErrorException("Failed to get UMA Configuration", e));
         }
     }
 
     @Override
-    public void updateInstance(ServerContext context, UpdateRequest request, ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, UpdateRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 }

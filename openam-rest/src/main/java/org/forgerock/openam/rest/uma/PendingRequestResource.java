@@ -18,6 +18,10 @@ package org.forgerock.openam.rest.uma;
 
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.resource.ResourceException.newNotSupportedException;
+import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -25,21 +29,20 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
 import org.forgerock.openam.forgerockrest.utils.JsonValueQueryFilterVisitor;
@@ -47,7 +50,7 @@ import org.forgerock.openam.forgerockrest.utils.ServerContextUtils;
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
 import org.forgerock.openam.uma.PendingRequestsService;
-import org.forgerock.util.promise.ExceptionHandler;
+import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 
@@ -73,7 +76,7 @@ public class PendingRequestResource implements CollectionResourceProvider {
     }
 
     @Override
-    public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
+    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
         try {
             if (APPROVE_ACTION_ID.equalsIgnoreCase(request.getAction())) {
                 List<Promise<Void, ResourceException>> promises = new ArrayList<>();
@@ -82,66 +85,58 @@ public class PendingRequestResource implements CollectionResourceProvider {
                     promises.add(service.approvePendingRequest(context, pendingRequest.getId(),
                             content.get(pendingRequest.getId()), ServerContextUtils.getRealm(context)));
                 }
-                handlePendingRequestApproval(promises, handler);
+                return handlePendingRequestApproval(promises);
             } else if (DENY_ACTION_ID.equalsIgnoreCase(request.getAction())) {
                 for (UmaPendingRequest pendingRequest : queryResourceOwnerPendingRequests(context)) {
                     service.denyPendingRequest(pendingRequest.getId(), ServerContextUtils.getRealm(context));
                 }
-                handler.handleResult(json(object()));
+                return newResultPromise(newActionResponse((json(object()))));
             } else {
-                handler.handleError(new NotSupportedException("Action, " + request.getAction()
+                return newExceptionPromise(newNotSupportedException("Action, " + request.getAction()
                         + ", is not supported."));
             }
         } catch (ResourceException e) {
-            handler.handleError(e);
+            return newExceptionPromise(e);
         }
     }
 
     @Override
-    public void actionInstance(ServerContext context, String resourceId, ActionRequest request,
-            ResultHandler<JsonValue> handler) {
+    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+            ActionRequest request) {
         try {
             if (APPROVE_ACTION_ID.equalsIgnoreCase(request.getAction())) {
-                handlePendingRequestApproval(service.approvePendingRequest(context, resourceId, request.getContent(),
-                                ServerContextUtils.getRealm(context)), handler);
+                return handlePendingRequestApproval(service.approvePendingRequest(context, resourceId, request.getContent(),
+                                ServerContextUtils.getRealm(context)));
             } else if (DENY_ACTION_ID.equalsIgnoreCase(request.getAction())) {
                 service.denyPendingRequest(resourceId, ServerContextUtils.getRealm(context));
-                handler.handleResult(json(object()));
+                return newResultPromise(newActionResponse(json(object())));
             } else {
-                handler.handleError(new NotSupportedException("Action, " + request.getAction() + ", is not supported."));
+                return newExceptionPromise(newNotSupportedException("Action, " + request.getAction() + ", is not supported."));
             }
         } catch (ResourceException e) {
-            handler.handleError(e);
+            return newExceptionPromise(e);
         }
     }
 
-    private void handlePendingRequestApproval(Promise<Void, ResourceException> promise,
-            final ResultHandler<JsonValue> handler) {
-        handlePendingRequestApproval(Collections.singletonList(promise), handler);
+    private Promise<ActionResponse, ResourceException> handlePendingRequestApproval(Promise<Void, ResourceException> promise) {
+        return handlePendingRequestApproval(Collections.singletonList(promise));
     }
 
-    private void handlePendingRequestApproval(List<Promise<Void, ResourceException>> promises,
-            final ResultHandler<JsonValue> handler) {
-        Promises.when(promises)
-                .thenOnResult(new org.forgerock.util.promise.ResultHandler<List<Void>>() {
+    private Promise<ActionResponse, ResourceException> handlePendingRequestApproval(List<Promise<Void, ResourceException>> promises) {
+        return Promises.when(promises)
+                .thenAsync(new AsyncFunction<List<Void>, ActionResponse, ResourceException>() {
                     @Override
-                    public void handleResult(List<Void> result) {
-                        handler.handleResult(json(object()));
-                    }
-                })
-                .thenOnException(new ExceptionHandler<ResourceException>() {
-                    @Override
-                    public void handleException(ResourceException exception) {
-                        handler.handleError(exception);
+                    public Promise<ActionResponse, ResourceException> apply(List<Void> value) throws ResourceException {
+                        return newResultPromise(newActionResponse(json(object())));
                     }
                 });
     }
 
     @Override
-    public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
+    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+            QueryResourceHandler handler) {
         if (request.getQueryFilter() == null) {
-            handler.handleError(new NotSupportedException("Only query filter is supported."));
-            return;
+            return newExceptionPromise(newNotSupportedException("Only query filter is supported."));
         }
 
         handler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
@@ -152,19 +147,19 @@ public class PendingRequestResource implements CollectionResourceProvider {
                     handler.handleResource(newResource(pendingRequest));
                 }
             }
-            handler.handleResult(new QueryResult());
+            return newResultPromise(newQueryResponse());
         } catch (ResourceException e) {
-            handler.handleError(e);
+            return newExceptionPromise(e);
         }
     }
 
     @Override
-    public void readInstance(ServerContext context, String resourceId, ReadRequest request,
-            ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+            ReadRequest request) {
         try {
-            handler.handleResult(newResource(service.readPendingRequest(resourceId)));
+            return newResultPromise(newResource(service.readPendingRequest(resourceId)));
         } catch (ResourceException e) {
-            handler.handleError(e);
+            return newExceptionPromise(e);
         }
     }
 
@@ -172,32 +167,30 @@ public class PendingRequestResource implements CollectionResourceProvider {
         return service.queryPendingRequests(contextHelper.getUserId(context), ServerContextUtils.getRealm(context));
     }
 
-    private Resource newResource(UmaPendingRequest request) {
-        return new Resource(request.getId(), String.valueOf(request.hashCode()), request.asJson());
+    private ResourceResponse newResource(UmaPendingRequest request) {
+        return newResourceResponse(request.getId(), String.valueOf(request.hashCode()), request.asJson());
     }
 
     @Override
-    public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 
     @Override
-    public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request,
-            ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String resourceId,
+            DeleteRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 
     @Override
-    public void patchInstance(ServerContext context, String resourceId, PatchRequest request,
-            ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+            PatchRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 
     @Override
-    public void updateInstance(ServerContext context, String resourceId, UpdateRequest request,
-            ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId,
+            UpdateRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
-
-
 }

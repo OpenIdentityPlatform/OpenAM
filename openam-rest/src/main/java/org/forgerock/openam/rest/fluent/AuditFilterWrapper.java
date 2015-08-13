@@ -73,7 +73,7 @@ public final class AuditFilterWrapper implements Filter {
     }
 
     @Override
-    public void filterQuery(ServerContext context, QueryRequest request, QueryResultHandler handler, RequestHandler next) {
+    public void filterQuery(ServerContext context, QueryRequest request, QueryResourceHandler handler, RequestHandler next) {
         delegate.filterQuery(new AuditInfoContext(context, component), request, handler, next);
     }
 

@@ -95,7 +95,7 @@ public class UmaLabelResourceTest {
      * Should successfully create an UMA Label.
      */
     @Test
-    public void createInstance() throws ResourceException {
+    public Promise<ResourceResponse, ResourceException> createInstance() throws ResourceException {
         //Given
         JsonValue umaLabel = json(object(
                 field(NAME_ATTRIBUTE_NAME, LABEL_NAME),
@@ -120,7 +120,7 @@ public class UmaLabelResourceTest {
      * Should throw an error when "name" attribute is missing.
      */
     @Test
-    public void createInstanceFails() {
+    public Promise<ResourceResponse, ResourceException> createInstanceFails() {
         //Given
         JsonValue umaLabel = json(object(
                 field(NAME_ATTRIBUTE_NAME, LABEL_NAME)
@@ -142,7 +142,7 @@ public class UmaLabelResourceTest {
      * Should throw an error when "type" attribute is missing.
      */
     @Test
-    public void createInstanceFails2() {
+    public Promise<ResourceResponse, ResourceException> createInstanceFails2() {
         //Given
         JsonValue umaLabel = json(object(
                 field(TYPE_ATTRIBUTE_NAME, LABEL_TYPE)

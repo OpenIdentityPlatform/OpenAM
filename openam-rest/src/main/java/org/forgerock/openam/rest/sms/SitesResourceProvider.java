@@ -17,37 +17,17 @@
 package org.forgerock.openam.rest.sms;
 
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.ResourceException.*;
+import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.openam.rest.sms.SmsJsonSchema.*;
-import static org.forgerock.openam.utils.CollectionUtils.*;
-
-import java.util.ResourceBundle;
-import java.util.Set;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-
-import org.forgerock.guava.common.collect.Sets;
-import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.BadRequestException;
-import org.forgerock.json.resource.CollectionResourceProvider;
-import org.forgerock.json.resource.ConflictException;
-import org.forgerock.json.resource.CreateRequest;
-import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.json.resource.NotFoundException;
-import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.json.resource.PreconditionFailedException;
-import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
-import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
-import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.rest.resource.SSOTokenContext;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -56,6 +36,28 @@ import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.common.configuration.SiteConfiguration;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
+import org.forgerock.guava.common.collect.Sets;
+import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.CollectionResourceProvider;
+import org.forgerock.json.resource.ConflictException;
+import org.forgerock.json.resource.CreateRequest;
+import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.PreconditionFailedException;
+import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
+import org.forgerock.json.resource.ReadRequest;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.util.promise.Promise;
 
 /**
  * A CREST collection resource provider that presents the global sites config in a coherent way.
@@ -81,14 +83,13 @@ public class SitesResourceProvider implements CollectionResourceProvider {
     }
 
     @Override
-    public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
+    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
         switch (request.getAction()) {
             case SmsResourceProvider.TEMPLATE:
-                handler.handleResult(json(object()));
-                return;
+                return newResultPromise(newActionResponse(json(object())));
             case SmsResourceProvider.SCHEMA:
                 ResourceBundle i18n = ResourceBundle.getBundle("amConsole");
-                handler.handleResult(json(object(field(TYPE, OBJECT_TYPE), field(PROPERTIES, object(
+                return newResultPromise(newActionResponse(json(object(field(TYPE, OBJECT_TYPE), field(PROPERTIES, object(
                         field(SITE_ID, object(
                                 field(TYPE, STRING_TYPE),
                                 field(READONLY, true)
@@ -115,40 +116,37 @@ public class SitesResourceProvider implements CollectionResourceProvider {
                                 field(TITLE, i18n.getString(SECONDARY_URLS_LABEL)),
                                 field(ITEMS, object(field(TYPE, STRING_TYPE)))
                         ))
-                )))));
-                return;
+                ))))));
             default:
-                handler.handleError(new BadRequestException("Action not supported: " + request.getAction()));
+                return newExceptionPromise(newBadRequestException("Action not supported: " + request.getAction()));
         }
     }
 
     @Override
-    public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
         JsonValue content = request.getContent();
         String id = request.getNewResourceId();
         try {
             id = validWriteOperation(content, id);
         } catch (BadRequestException e) {
-            handler.handleError(e);
-            return;
+            return newExceptionPromise(adapt(e));
         }
 
         String url = content.get(PRIMARY_URL).asString();
         try {
             SSOToken token = getSsoToken(context);
             if (SiteConfiguration.isSiteExist(token, id)) {
-                handler.handleError(new ConflictException("Site with id already exists: " + id));
+                return newExceptionPromise(adapt(new ConflictException("Site with id already exists: " + id)));
             }
             SiteConfiguration.createSite(token, id, url, content.get(SECONDARY_URLS).asSet());
             debug.message("Site created: {}", id);
-            handler.handleResult(getSite(token, id));
+            return newResultPromise(getSite(token, id));
         } catch (SMSException | SSOException | ConfigurationException e) {
             debug.error("Could not create site", e);
-            handler.handleError(new InternalServerErrorException("Could not create site"));
+            return newExceptionPromise(newInternalServerErrorException("Could not create site"));
         } catch (NotFoundException e) {
-            handler.handleError(new InternalServerErrorException("Could not read site just created"));
+            return newExceptionPromise(newInternalServerErrorException("Could not read site just created"));
         }
-
     }
 
     private SSOToken getSsoToken(ServerContext context) throws SSOException {
@@ -168,41 +166,40 @@ public class SitesResourceProvider implements CollectionResourceProvider {
     }
 
     @Override
-    public void deleteInstance(ServerContext context, String id, DeleteRequest request, ResultHandler<Resource> handler) {
-        Resource site;
+    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String id,
+            DeleteRequest request) {
+        ResourceResponse site;
         SSOToken token;
         try {
             token = getSsoToken(context);
             site = getSite(token, id);
         } catch (SMSException | SSOException | ConfigurationException e) {
             debug.error("Could not read site {}", id, e);
-            handler.handleError(new InternalServerErrorException("Could not read site"));
-            return;
+            return newExceptionPromise(newInternalServerErrorException("Could not read site"));
         } catch (NotFoundException e) {
-            handler.handleError(e);
-            return;
+            return newExceptionPromise(adapt(e));
         }
         try {
             if (!site.getRevision().equals(request.getRevision())) {
-                handler.handleError(new PreconditionFailedException("Revision did not match"));
+                return newExceptionPromise(adapt(new PreconditionFailedException("Revision did not match")));
             } else if (!SiteConfiguration.listServers(token, id).isEmpty()) {
-                handler.handleError(new PreconditionFailedException("Site still has servers attached to it"));
+                return newExceptionPromise(adapt(new PreconditionFailedException("Site still has servers attached to it")));
             } else if (!SiteConfiguration.deleteSite(token, id)) {
-                handler.handleError(new InternalServerErrorException("Could not delete site: " + id));
+                return newExceptionPromise(newInternalServerErrorException("Could not delete site: " + id));
             } else {
-                handler.handleResult(site);
+                return newResultPromise(site);
             }
         } catch (SSOException | SMSException | ConfigurationException e) {
             debug.error("Could not delete site {}", id, e);
-            handler.handleError(new InternalServerErrorException("Could not delete site"));
+            return newExceptionPromise(newInternalServerErrorException("Could not delete site"));
         }
     }
 
     @Override
-    public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
+    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+            QueryResourceHandler handler) {
         if (!"true".equals(request.getQueryFilter().toString())) {
-            handler.handleError(new BadRequestException("Query only supports 'true' filter"));
-            return;
+            return newExceptionPromise(newBadRequestException("Query only supports 'true' filter"));
         }
         try {
             SSOToken token = getSsoToken(context);
@@ -212,17 +209,17 @@ public class SitesResourceProvider implements CollectionResourceProvider {
                 handler.handleResource(getSite(token, siteName));
             }
 
-            handler.handleResult(new QueryResult());
+            return newResultPromise(newQueryResponse());
         } catch (SSOException | SMSException | ConfigurationException e) {
             debug.error("Could not read sites", e);
-            handler.handleError(new InternalServerErrorException("Could not read sites"));
+            return newExceptionPromise(newInternalServerErrorException("Could not read sites"));
         } catch (NotFoundException e) {
             debug.error("Could not read site", e);
-            handler.handleError(new InternalServerErrorException("Could not read site we've just got name for"));
+            return newExceptionPromise(newInternalServerErrorException("Could not read site we've just got name for"));
         }
     }
 
-    protected Resource getSite(SSOToken token, String siteName) throws SMSException, SSOException,
+    protected ResourceResponse getSite(SSOToken token, String siteName) throws SMSException, SSOException,
             ConfigurationException, NotFoundException {
         if (!SiteConfiguration.isSiteExist(token, siteName)) {
             throw new NotFoundException();
@@ -241,70 +238,69 @@ public class SitesResourceProvider implements CollectionResourceProvider {
                     field("url", server)
             ));
         }
-        return new Resource(siteName, String.valueOf(site.getObject().hashCode()), site);
+        return newResourceResponse(siteName, String.valueOf(site.getObject().hashCode()), site);
     }
 
     @Override
-    public void readInstance(ServerContext context, String id, ReadRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String id,
+            ReadRequest request) {
         try {
             SSOToken token = getSsoToken(context);
-            Resource site = getSite(token, id);
-            handler.handleResult(site);
+            ResourceResponse site = getSite(token, id);
+            return newResultPromise(site);
         } catch (SMSException | SSOException | ConfigurationException e) {
             debug.error("Could not read site {}", id, e);
-            handler.handleError(new InternalServerErrorException("Could not read site"));
+            return newExceptionPromise(newInternalServerErrorException("Could not read site"));
         } catch (NotFoundException e) {
-            handler.handleError(e);
+            return newExceptionPromise(adapt(e));
         }
     }
 
     @Override
-    public void updateInstance(ServerContext context, String id, UpdateRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String id,
+            UpdateRequest request) {
         JsonValue content = request.getContent();
         try {
             validWriteOperation(content, id);
         } catch (BadRequestException e) {
-            handler.handleError(e);
-            return;
+            return newExceptionPromise(adapt(e));
         }
 
-        Resource site;
+        ResourceResponse site;
         SSOToken token;
         try {
             token = getSsoToken(context);
             site = getSite(token, id);
         } catch (SMSException | SSOException | ConfigurationException e) {
             debug.error("Could not read site {}", id, e);
-            handler.handleError(new InternalServerErrorException("Could not read site"));
-            return;
+            return newExceptionPromise(newInternalServerErrorException("Could not read site"));
         } catch (NotFoundException e) {
-            handler.handleError(e);
-            return;
+            return newExceptionPromise(adapt(e));
         }
         try {
             if (!site.getRevision().equals(request.getRevision())) {
-                handler.handleError(new PreconditionFailedException("Revision did not match"));
-                return;
+                return newExceptionPromise(adapt(new PreconditionFailedException("Revision did not match")));
             }
             SiteConfiguration.setSitePrimaryURL(token, id, content.get("url").asString());
             SiteConfiguration.setSiteSecondaryURLs(token, id, content.get("secondaryURLs").asSet());
-            handler.handleResult(getSite(token, id));
+            return newResultPromise(getSite(token, id));
         } catch (SSOException | SMSException | ConfigurationException e) {
             debug.error("Could not update site {}", id, e);
-            handler.handleError(new InternalServerErrorException("Could not update site"));
+            return newExceptionPromise(newInternalServerErrorException("Could not update site"));
         } catch (NotFoundException e) {
-            handler.handleError(new InternalServerErrorException("Could not read site after just updating it", e));
+            return newExceptionPromise(newInternalServerErrorException("Could not read site after just updating it", e));
         }
     }
 
     @Override
-    public void patchInstance(ServerContext context, String id, PatchRequest request, ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String id,
+            PatchRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 
     @Override
-    public void actionInstance(ServerContext context, String id, ActionRequest request, ResultHandler<JsonValue> handler) {
-        handler.handleError(new NotSupportedException("Action not supported on instance"));
+    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String id,
+            ActionRequest request) {
+        return newExceptionPromise(newNotSupportedException("Action not supported on instance"));
     }
-
 }

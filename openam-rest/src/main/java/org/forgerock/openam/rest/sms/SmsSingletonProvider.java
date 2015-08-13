@@ -17,6 +17,10 @@
 package org.forgerock.openam.rest.sms;
 
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.ResourceException.*;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -38,24 +42,25 @@ import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
-import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.RequestHandler;
-import org.forgerock.json.resource.Resource;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
+import org.forgerock.util.promise.Promise;
 
 /**
  * A CREST singleton provider for SMS schema config.
@@ -86,20 +91,21 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
      * {@inheritDoc}
      */
     @Override
-    public void handleRead(ServerContext serverContext, ReadRequest readRequest, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> handleRead(ServerContext serverContext,
+            ReadRequest readRequest) {
         String resourceId = resourceId();
         try {
             ServiceConfig config = getServiceConfigNode(serverContext, resourceId);
             JsonValue result = withExtraAttributes(serverContext, convertToJson(config));
-            handler.handleResult(new Resource(resourceId, String.valueOf(result.hashCode()), result));
+            return newResultPromise(newResourceResponse(resourceId, String.valueOf(result.hashCode()), result));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on create", e);
-            handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
         } catch (SSOException e) {
             debug.warning("::SmsCollectionProvider:: SSOException on create", e);
-            handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
         } catch (NotFoundException e) {
-            handler.handleError(e);
+            return newExceptionPromise(adapt(e));
         }
     }
 
@@ -135,35 +141,36 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
      * {@inheritDoc}
      */
     @Override
-    public void handleUpdate(ServerContext serverContext, UpdateRequest updateRequest, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> handleUpdate(ServerContext serverContext,
+            UpdateRequest updateRequest) {
         String resourceId = resourceId();
         if (dynamicSchema != null) {
             try {
                 updateDynamicAttributes(serverContext, updateRequest.getContent());
             } catch (SMSException e) {
                 debug.warning("::SmsCollectionProvider:: SMSException on create", e);
-                handler.handleError(new InternalServerErrorException("Unable to update SMS config: " + e.getMessage()));
+                return newExceptionPromise(newInternalServerErrorException("Unable to update SMS config: " + e.getMessage()));
             } catch (SSOException e) {
                 debug.warning("::SmsCollectionProvider:: SSOException on create", e);
-                handler.handleError(new InternalServerErrorException("Unable to update SMS config: " + e.getMessage()));
+                return newExceptionPromise(newInternalServerErrorException("Unable to update SMS config: " + e.getMessage()));
             } catch (IdRepoException e) {
                 debug.warning("::SmsCollectionProvider:: IdRepoException on create", e);
-                handler.handleError(new InternalServerErrorException("Unable to update SMS config: " + e.getMessage()));
+                return newExceptionPromise(newInternalServerErrorException("Unable to update SMS config: " + e.getMessage()));
             }
         }
         try {
             ServiceConfig config = getServiceConfigNode(serverContext, resourceId);
             saveConfigAttributes(config, convertFromJson(updateRequest.getContent()));
             JsonValue result = withExtraAttributes(serverContext, convertToJson(config));
-            handler.handleResult(new Resource(resourceId, String.valueOf(result.hashCode()), result));
+            return newResultPromise(newResourceResponse(resourceId, String.valueOf(result.hashCode()), result));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on create", e);
-            handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
         } catch (SSOException e) {
             debug.warning("::SmsCollectionProvider:: SSOException on create", e);
-            handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
         } catch (NotFoundException e) {
-            handler.handleError(e);
+            return newExceptionPromise(adapt(e));
         }
     }
 
@@ -172,7 +179,8 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
      * {@inheritDoc}
      */
     @Override
-    public void handleDelete(ServerContext serverContext, DeleteRequest deleteRequest, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> handleDelete(ServerContext serverContext,
+            DeleteRequest deleteRequest) {
         try {
             ServiceConfigManager scm = getServiceConfigManager(serverContext);
             if (subSchemaPath.isEmpty()) {
@@ -185,13 +193,13 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
                 ServiceConfig parent = parentSubConfigFor(serverContext, scm);
                 parent.removeSubConfig(resourceId());
             }
-            handler.handleResult(new Resource(resourceId(), "0", json(object(field("success", true)))));
+            return newResultPromise(newResourceResponse(resourceId(), "0", json(object(field("success", true)))));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on create", e);
-            handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
         } catch (SSOException e) {
             debug.warning("::SmsCollectionProvider:: SSOException on create", e);
-            handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
         }
     }
 
@@ -200,7 +208,8 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
      * {@inheritDoc}
      */
     @Override
-    public void handleCreate(ServerContext serverContext, CreateRequest createRequest, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> handleCreate(ServerContext serverContext,
+            CreateRequest createRequest) {
         Map<String, Set<String>> attrs = convertFromJson(createRequest.getContent());
         try {
             ServiceConfigManager scm = getServiceConfigManager(serverContext);
@@ -217,19 +226,19 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
                 config = parent.getSubConfig(lastSchemaNodeName());
             }
             JsonValue result = withExtraAttributes(serverContext, convertToJson(config));
-            handler.handleResult(new Resource(resourceId(), String.valueOf(result.hashCode()), result));
+            return newResultPromise(newResourceResponse(resourceId(), String.valueOf(result.hashCode()), result));
         } catch (SMSException e) {
             debug.warning("::SmsCollectionProvider:: SMSException on create", e);
-            handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
         } catch (SSOException e) {
             debug.warning("::SmsCollectionProvider:: SSOException on create", e);
-            handler.handleError(new InternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
+            return newExceptionPromise(newInternalServerErrorException("Unable to create SMS config: " + e.getMessage()));
         }
     }
 
     @Override
-    public void handleAction(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-        super.handleAction(context, request, handler);
+    public Promise<ActionResponse, ResourceException> handleAction(ServerContext context, ActionRequest request) {
+        return super.handleAction(context, request);
     }
 
     @Override
@@ -338,13 +347,14 @@ public class SmsSingletonProvider extends SmsResourceProvider implements Request
     }
 
     @Override
-    public void handleQuery(ServerContext serverContext, QueryRequest queryRequest, QueryResultHandler handler) {
-        handler.handleError(new NotSupportedException("query operation not supported"));
+    public Promise<QueryResponse, ResourceException> handleQuery(ServerContext serverContext, QueryRequest queryRequest,
+            QueryResourceHandler handler) {
+        return newExceptionPromise(newNotSupportedException("query operation not supported"));
     }
 
     @Override
-    public void handlePatch(ServerContext serverContext, PatchRequest patchRequest, ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException("patch operation not supported"));
+    public Promise<ResourceResponse, ResourceException> handlePatch(ServerContext serverContext,
+            PatchRequest patchRequest) {
+        return newExceptionPromise(newNotSupportedException("patch operation not supported"));
     }
-
 }

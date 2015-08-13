@@ -15,6 +15,21 @@
 */
 package org.forgerock.openam.forgerockrest.entitlements;
 
+import static org.forgerock.json.resource.Responses.newQueryResponse;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.STRING;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.security.auth.Subject;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.EntitlementException;
@@ -25,40 +40,33 @@ import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.security.auth.Subject;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.CountPolicy;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.util.query.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.RestUtils;
-import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.STRING;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryFilterVisitorAdapter;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ReferralWrapper;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.opendj.ldap.DN;
+import org.forgerock.util.promise.Promise;
+import org.forgerock.util.query.QueryFilter;
 
 /**
  * An endpoint for interacting with legacy referrals. This will be deprecated
@@ -88,18 +96,18 @@ public class ReferralsResourceV1 extends RealmAwareResource {
      * {@inheritDoc}
      */
     @Override
-    public void actionCollection(ServerContext serverContext, ActionRequest actionRequest,
-                                 ResultHandler<JsonValue> jsonValueResultHandler) {
-        RestUtils.generateUnsupportedOperation(jsonValueResultHandler);
+    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext serverContext,
+            ActionRequest actionRequest) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void actionInstance(ServerContext serverContext, String resourceId, ActionRequest actionRequest,
-                               ResultHandler<JsonValue> jsonValueResultHandler) {
-        RestUtils.generateUnsupportedOperation(jsonValueResultHandler);
+    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext serverContext, String resourceId,
+            ActionRequest actionRequest) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
@@ -113,15 +121,14 @@ public class ReferralsResourceV1 extends RealmAwareResource {
      * or which are not compliant to your applications resource-pattern.
      */
     @Override
-    public void createInstance(ServerContext serverContext, CreateRequest createRequest,
-                               ResultHandler<Resource> resourceResultHandler) {
+    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext serverContext,
+            CreateRequest createRequest) {
 
         final Subject callingSubject = getContextSubject(serverContext);
 
         if (callingSubject == null) {
             debug.error("ReferralsResource :: CREATE : Unknown Subject");
-            resourceResultHandler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
         }
 
         final String realm = getRealm(serverContext);
@@ -136,8 +143,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                 debug.error("ReferralsResource :: CREATE by " + principalName +
                         ": Referral failed to create resource from provided JSON. ", e);
             }
-            resourceResultHandler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
         }
 
         // This test for null added to avoid test failure in
@@ -156,8 +162,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                             + principalName
                             + ": Referral name \"" + wrapper.getName() + "\" was invalid");
                 }
-                resourceResultHandler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
-                return;
+                return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
             }
         }
 
@@ -167,16 +172,14 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                     debug.error("ReferralsResource :: CREATE by " + principalName +
                             ": Referral already exists " + wrapper.getName());
                 }
-                resourceResultHandler.handleError(ResourceException.getException(ResourceException.CONFLICT));
-                return;
+                return newExceptionPromise(ResourceException.getException(ResourceException.CONFLICT));
             }
         } catch (EntitlementException e) {
             if (debug.errorEnabled()) {
                 debug.error("ReferralsResource :: CREATE by " + principalName +
                         ": Unable to read existing referral for " + wrapper.getName());
             }
-            resourceResultHandler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
 
         if (!isRequestRealmsValidPeerOrSubrealms(serverContext, realm, wrapper.getRealms())) {
@@ -184,8 +187,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                 debug.error("ReferralsResource :: CREATE by " + principalName +
                         ": Referral failed to validate realm list. ");
             } //thrown by referencing invalid application
-            resourceResultHandler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
         }
 
         final ReferralPrivilege referral = wrapper.getReferral();
@@ -197,40 +199,37 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                 debug.error("ReferralsResource :: CREATE by " + principalName +
                         ": Referral failed to return the resource created. ", e);
             }
-            resourceResultHandler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
         }
 
         try {
-            final Resource resource = new Resource(wrapper.getName(),
+            final ResourceResponse resource = newResourceResponse(wrapper.getName(),
                     Long.toString(wrapper.getLastModifiedDate()), wrapper.toJsonValue());
             if (debug.messageEnabled()) {
                 debug.message("ReferralsResource :: CREATE by " + principalName +
                         ": for Referral: " + wrapper.getName());
             }
-            resourceResultHandler.handleResult(resource);
+            return newResultPromise(resource);
         } catch (IOException e) {
             if (debug.errorEnabled()) {
                 debug.error("ReferralsResource :: CREATE by " + principalName +
                         ": Referral failed to return the resource created. ", e);
             }
-            resourceResultHandler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
-
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void deleteInstance(ServerContext serverContext, String resourceId, DeleteRequest deleteRequest,
-                               ResultHandler<Resource> resourceResultHandler) {
+    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext serverContext, String resourceId,
+            DeleteRequest deleteRequest) {
         final Subject callingSubject = getContextSubject(serverContext);
 
         if (callingSubject == null) {
             debug.error("ReferralsResource :: DELETE : Unknown Subject");
-            resourceResultHandler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
         }
 
         final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(callingSubject);
@@ -243,19 +242,18 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                     debug.error("ReferralsResource :: DELETE by " + principalName +
                             ": Referral does not exist " + resourceId);
                 }
-                resourceResultHandler.handleError(ResourceException.getException(ResourceException.NOT_FOUND));
-                return;
+                return newExceptionPromise(ResourceException.getException(ResourceException.NOT_FOUND));
             }
 
             rpm.remove(resourceId);
-            final Resource resource = new Resource(resourceId, "0", JsonValue.json(JsonValue.object()));
-            resourceResultHandler.handleResult(resource);
+            final ResourceResponse resource = newResourceResponse(resourceId, "0", JsonValue.json(JsonValue.object()));
+            return newResultPromise(resource);
         } catch (EntitlementException e) {
             if (debug.errorEnabled()) {
                 debug.error("ReferralsResource :: DELETE by " + principalName +
                         ": Referral could not be removed " + resourceId);
             }
-            resourceResultHandler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
     }
 
@@ -263,23 +261,22 @@ public class ReferralsResourceV1 extends RealmAwareResource {
      * {@inheritDoc}
      */
     @Override
-    public void patchInstance(ServerContext serverContext, String resourceId, PatchRequest patchRequest,
-                              ResultHandler<Resource> resourceResultHandler) {
-        RestUtils.generateUnsupportedOperation(resourceResultHandler);
+    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext serverContext, String resourceId,
+            PatchRequest patchRequest) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void queryCollection(ServerContext serverContext, QueryRequest queryRequest,
-                                QueryResultHandler queryResultHandler) {
+    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext serverContext,
+            QueryRequest queryRequest, QueryResourceHandler queryResultHandler) {
         final Subject callingSubject = getContextSubject(serverContext);
 
         if (callingSubject == null) {
             debug.error("ReferralsResource :: QUERY : Unknown Subject");
-            queryResultHandler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
         }
 
         final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(callingSubject);
@@ -310,16 +307,15 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                 debug.error("ReferralsResource :: QUERY by " + principalName +
                         ": Unable to convert resource to JSON.", e);
             }
-            queryResultHandler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
 
         int remaining;
         try {
             remaining = allReferralPrivileges.size();
             for (ReferralWrapper wrapper : allReferralPrivileges) {
-                boolean keepGoing = queryResultHandler.handleResource(new Resource(wrapper.getName(),
-                    Long.toString(wrapper.getLastModifiedDate()), wrapper.toJsonValue()));
+                boolean keepGoing = queryResultHandler.handleResource(newResourceResponse(wrapper.getName(),
+                        Long.toString(wrapper.getLastModifiedDate()), wrapper.toJsonValue()));
                 if (debug.messageEnabled()) {
                     debug.message("ReferralsResource :: QUERY by " + principalName +
                             ": Added resource to response: " + wrapper.getName());
@@ -334,25 +330,23 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                         ": Unable to convert resource to JSON.", e);
 
             }
-            queryResultHandler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
 
-        queryResultHandler.handleResult(new QueryResult(null, remaining));
+        return newResultPromise(newQueryResponse(null, CountPolicy.EXACT, remaining));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void readInstance(ServerContext serverContext, String resourceId, ReadRequest readRequest,
-                             ResultHandler<Resource> resourceResultHandler) {
+    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext serverContext, String resourceId,
+            ReadRequest readRequest) {
         final Subject callingSubject = getContextSubject(serverContext);
 
         if (callingSubject == null) {
             debug.error("ReferralResource :: READ : Unknown Subject");
-            resourceResultHandler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
         }
 
         final String realm = getRealm(serverContext);
@@ -363,21 +357,21 @@ public class ReferralsResourceV1 extends RealmAwareResource {
             final ReferralPrivilege referralPrivilege = rpm.findByName(resourceId);
             final ReferralWrapper wrapp = new ReferralWrapper(referralPrivilege);
 
-            final Resource resource = new Resource(resourceId, Long.toString(referralPrivilege.getLastModifiedDate()),
+            final ResourceResponse resource = newResourceResponse(resourceId, Long.toString(referralPrivilege.getLastModifiedDate()),
                     wrapp.toJsonValue());
-            resourceResultHandler.handleResult(resource);
+            return newResultPromise(resource);
         } catch (EntitlementException e) {
             if (debug.errorEnabled()) {
                 debug.error("ReferralsResource :: READ by " + principalName +
                         ": Referral failed to retrieve the resource specified.", e);
             }
-            resourceResultHandler.handleError(ResourceException.getException(ResourceException.NOT_FOUND));
+            return newExceptionPromise(ResourceException.getException(ResourceException.NOT_FOUND));
         } catch (IOException e) {
             if (debug.errorEnabled()) {
                 debug.error("ReferralsResource :: READ by " + principalName +
                         ": Error converting resource to JSON format.", e);
             }
-            resourceResultHandler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
     }
 
@@ -385,14 +379,13 @@ public class ReferralsResourceV1 extends RealmAwareResource {
      * {@inheritDoc}
      */
     @Override
-    public void updateInstance(ServerContext serverContext, String resourceId, UpdateRequest updateRequest,
-                               ResultHandler<Resource> resourceResultHandler) {
+    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext serverContext, String resourceId,
+            UpdateRequest updateRequest) {
         final Subject callingSubject = getContextSubject(serverContext);
 
         if (callingSubject == null) {
             debug.error("ReferralResource :: UPDATE : Unknown Subject");
-            resourceResultHandler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
         }
 
         final String realm = getRealm(serverContext);
@@ -408,8 +401,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                 debug.error("ReferralsResource :: UPDATE by " + principalName +
                         ": Referral failed to create resource from provided JSON. ", e);
             }
-            resourceResultHandler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
         }
 
         final ReferralPrivilege previousPriv;
@@ -421,8 +413,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                 debug.error("ReferralsResource :: UPDATE by " + principalName +
                         ": Referral failed to query the resource set. ", e);
             }
-            resourceResultHandler.handleError(ResourceException.getException(ResourceException.NOT_FOUND));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.NOT_FOUND));
         }
 
         if (!isRequestRealmsValidPeerOrSubrealms(serverContext, realm, wrapper.getRealms())) {
@@ -430,8 +421,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                 debug.error("ReferralsResource :: UPDATE by " + principalName +
                         ": Referral failed to validate new realm list. ");
             }
-            resourceResultHandler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
         }
 
         //conflict if the name we're changing TO is currently taken, and isn't this one
@@ -441,42 +431,39 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                     debug.error("ReferralsResource :: UPDATE by " + principalName +
                             ": Referral already exists " + wrapper.getName());
                 }
-                resourceResultHandler.handleError(ResourceException.getException(ResourceException.CONFLICT));
-                return;
+                return newExceptionPromise(ResourceException.getException(ResourceException.CONFLICT));
             }
         } catch (EntitlementException e) {
             if (debug.errorEnabled()) {
                 debug.error("ReferralsResource :: UPDATE by " + principalName +
                         ": Referral failed to query the resource set. ", e);
             }
-            resourceResultHandler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
 
         try { //then add - if this fails we try to re-add old
             rpm.remove(previousPriv.getName());
             rpm.add(wrapper.getReferral());
-            final Resource resource = new Resource(wrapper.getName(),
+            final ResourceResponse resource = newResourceResponse(wrapper.getName(),
                     Long.toString(wrapper.getLastModifiedDate()), wrapper.toJsonValue());
             if (debug.messageEnabled()) {
                 debug.message("ReferralsResource :: UPDATE by " + principalName +
                         ": for Referral: " + wrapper.getName());
             }
-            resourceResultHandler.handleResult(resource);
+            return newResultPromise(resource);
         } catch (EntitlementException e) {
             if (debug.errorEnabled()) {
                 debug.error("ReferralsResource :: UPDATE by " + principalName +
                         ": Referral failed to restore the old resource after updating ", e);
             }
-            resourceResultHandler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         } catch (IOException e) {
             if (debug.errorEnabled()) {
                 debug.error("ReferralsResource :: UPDATE by " + principalName +
                         ": Referral failed to store the updated resource. ", e);
             }
-            resourceResultHandler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
-
     }
 
     /**

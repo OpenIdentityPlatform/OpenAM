@@ -16,15 +16,18 @@
 
 package org.forgerock.openam.forgerockrest;
 
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.json.resource.Resource;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.util.promise.Promise;
 
 /**
  * Represents a read only view of a resource.
@@ -37,7 +40,7 @@ public abstract class ReadOnlyResource implements CollectionResourceProvider  {
      * @param type The type of operation which is not supported.
      * @return A NotSupportedException.
      */
-    private NotSupportedException generateException(String type) {
+    private ResourceException generateException(String type) {
         return new NotSupportedException(type + " are not supported for this Resource");
     }
 
@@ -46,8 +49,8 @@ public abstract class ReadOnlyResource implements CollectionResourceProvider  {
      *
      * {@inheritDoc}
      */
-    public final void createInstance(ServerContext ctx, CreateRequest request, ResultHandler<Resource> handler) {
-        handler.handleError(generateException("Creates"));
+    public final Promise<ResourceResponse, ResourceException> createInstance(ServerContext ctx, CreateRequest request) {
+        return newExceptionPromise(generateException("Creates"));
     }
 
     /**
@@ -55,9 +58,9 @@ public abstract class ReadOnlyResource implements CollectionResourceProvider  {
      *
      * {@inheritDoc}
      */
-    public final void deleteInstance(ServerContext ctx, String resId, DeleteRequest request,
-                               ResultHandler<Resource> handler) {
-        handler.handleError(generateException("Deletes"));
+    public final Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext ctx, String resId,
+            DeleteRequest request) {
+        return newExceptionPromise(generateException("Deletes"));
     }
 
     /**
@@ -65,9 +68,9 @@ public abstract class ReadOnlyResource implements CollectionResourceProvider  {
      *
      * {@inheritDoc}
      */
-    public final void patchInstance(ServerContext ctx, String resId, PatchRequest request,
-                               ResultHandler<Resource> handler) {
-        handler.handleError(generateException("Patches"));
+    public final Promise<ResourceResponse, ResourceException> patchInstance(ServerContext ctx, String resId,
+            PatchRequest request) {
+        return newExceptionPromise(generateException("Patches"));
     }
 
     /**
@@ -75,8 +78,8 @@ public abstract class ReadOnlyResource implements CollectionResourceProvider  {
      *
      * {@inheritDoc}
      */
-    public final void updateInstance(ServerContext ctx, String resId, UpdateRequest request,
-                               ResultHandler<Resource> handler) {
-        handler.handleError(generateException("Updates"));
+    public final Promise<ResourceResponse, ResourceException> updateInstance(ServerContext ctx, String resId,
+            UpdateRequest request) {
+        return newExceptionPromise(generateException("Updates"));
     }
 }

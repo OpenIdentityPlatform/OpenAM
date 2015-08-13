@@ -16,30 +16,37 @@
 
 package org.forgerock.openam.forgerockrest.entitlements;
 
-import static org.apache.commons.lang.StringUtils.*;
-import static org.forgerock.json.JsonValue.*;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.resource.ResourceException.adapt;
+import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import javax.inject.Inject;
+import java.util.List;
 
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.shared.debug.Debug;
-import java.util.List;
-import javax.inject.Inject;
-import org.forgerock.json.JsonValue;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CollectionResourceProvider;
+import org.forgerock.json.resource.CountPolicy;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.RestUtils;
@@ -47,6 +54,7 @@ import org.forgerock.openam.forgerockrest.entitlements.model.json.PolicyRequest;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.util.Reject;
+import org.forgerock.util.promise.Promise;
 
 /**
  * REST endpoint for policy/entitlements management and evaluation.
@@ -91,7 +99,8 @@ public final class PolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void actionCollection(ServerContext context, ActionRequest actionRequest, ResultHandler<JsonValue> handler) {
+    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context,
+            ActionRequest actionRequest) {
         final String actionString = actionRequest.getAction();
         final PolicyAction action = PolicyAction.getAction(actionString);
 
@@ -99,8 +108,7 @@ public final class PolicyResource implements CollectionResourceProvider {
             final String errorMsg = "Action '" + actionString + "' not implemented for this resource";
             final NotSupportedException nsE = new NotSupportedException(errorMsg);
             DEBUG.error(errorMsg, nsE);
-            handler.handleError(nsE);
-            return;
+            return newExceptionPromise(adapt(nsE));
         }
 
         try {
@@ -123,11 +131,11 @@ public final class PolicyResource implements CollectionResourceProvider {
             }
 
             final List<Entitlement> entitlements = evaluator.routePolicyRequest(request);
-            handler.handleResult(policyParser.printEntitlements(entitlements));
+            return newResultPromise(newActionResponse(policyParser.printEntitlements(entitlements)));
 
         } catch (final EntitlementException eE) {
             DEBUG.error("Error evaluating policy request", eE);
-            handler.handleError(resourceErrorHandler.handleError(context, actionRequest, eE));
+            return newExceptionPromise(resourceErrorHandler.handleError(context, actionRequest, eE));
         }
     }
 
@@ -135,16 +143,16 @@ public final class PolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void actionInstance(ServerContext context, String resourceId, ActionRequest request,
-                               ResultHandler<JsonValue> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+            ActionRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
         String providedName = null;
         try {
             providedName = request.getNewResourceId();
@@ -171,10 +179,10 @@ public final class PolicyResource implements CollectionResourceProvider {
             }
 
             policyStoreProvider.getPolicyStore(context).create(policy);
-            handler.handleResult(policyResource(policy));
+            return newResultPromise(policyResource(policy));
         } catch (EntitlementException ex) {
             DEBUG.error("PolicyResource :: CREATE : Error performing create for policy, " + providedName, ex);
-            handler.handleError(resourceErrorHandler.handleError(context, request, ex));
+            return newExceptionPromise(resourceErrorHandler.handleError(context, request, ex));
         }
     }
 
@@ -182,8 +190,8 @@ public final class PolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request,
-                               ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String resourceId,
+            DeleteRequest request) {
         try {
             PolicyStore store = policyStoreProvider.getPolicyStore(context);
             store.delete(resourceId);
@@ -191,10 +199,10 @@ public final class PolicyResource implements CollectionResourceProvider {
                 DEBUG.message("PolicyResource :: DELETE : Deleted policy with ID, " + resourceId);
             }
             // Return an empty resource to indicate success?
-            handler.handleResult(new Resource(resourceId, "0", json(object())));
+            return newResultPromise(newResourceResponse(resourceId, "0", json(object())));
         } catch (EntitlementException ex) {
             String debug = "PolicyResource :: DELETE : Error performing delete for policy, " + resourceId;
-            handler.handleError(resourceErrorHandler.handleError(context, debug, request, ex));
+            return newExceptionPromise(resourceErrorHandler.handleError(context, debug, request, ex));
         }
     }
 
@@ -202,16 +210,17 @@ public final class PolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void patchInstance(ServerContext context, String resourceId, PatchRequest request,
-                              ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+            PatchRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
+    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+            QueryResourceHandler handler) {
         try {
             handler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
             List<Privilege> policies = policyStoreProvider.getPolicyStore(context).query(request);
@@ -228,13 +237,13 @@ public final class PolicyResource implements CollectionResourceProvider {
                 }
             }
 
-            handler.handleResult(new QueryResult(null, remaining));
+            return newResultPromise(newQueryResponse(null, CountPolicy.EXACT, remaining));
         } catch (EntitlementException ex) {
             DEBUG.error("PolicyResource :: QUERY : Error querying policy collection.", ex);
-            handler.handleError(resourceErrorHandler.handleError(context, request, ex));
+            return newExceptionPromise(resourceErrorHandler.handleError(context, request, ex));
         } catch (IllegalArgumentException ex) {
             DEBUG.error("PolicyResource :: QUERY : Error querying policy collection due to bad request.", ex);
-            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST, ex.getMessage()));
+            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST, ex.getMessage()));
         }
     }
 
@@ -242,14 +251,14 @@ public final class PolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void readInstance(ServerContext context, String resourceId, ReadRequest request,
-                             ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+            ReadRequest request) {
         try {
             Privilege policy = policyStoreProvider.getPolicyStore(context).read(resourceId);
-            handler.handleResult(policyResource(policy));
+            return newResultPromise(policyResource(policy));
         } catch (EntitlementException ex) {
             DEBUG.error("PolicyResource :: READ : Error reading policy, " + resourceId + ".", ex);
-            handler.handleError(resourceErrorHandler.handleError(context, request, ex));
+            return newExceptionPromise(resourceErrorHandler.handleError(context, request, ex));
         }
     }
 
@@ -257,15 +266,15 @@ public final class PolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void updateInstance(ServerContext context, String resourceId, UpdateRequest request,
-                               ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId,
+            UpdateRequest request) {
         try {
             Privilege policy = policyParser.parsePolicy(resourceId, request.getContent());
-            Resource result = policyResource(policyStoreProvider.getPolicyStore(context).update(resourceId, policy));
-            handler.handleResult(result);
+            ResourceResponse result = policyResource(policyStoreProvider.getPolicyStore(context).update(resourceId, policy));
+            return newResultPromise(result);
         } catch (EntitlementException ex) {
             DEBUG.error("PolicyResource :: UPDATE : Error updating policy, " + resourceId + ".", ex);
-            handler.handleError(resourceErrorHandler.handleError(context, request, ex));
+            return newExceptionPromise(resourceErrorHandler.handleError(context, request, ex));
         }
     }
 
@@ -276,8 +285,8 @@ public final class PolicyResource implements CollectionResourceProvider {
      * @return the policy as a resource.
      * @throws EntitlementException if the policy cannot be serialised into JSON.
      */
-    private Resource policyResource(Privilege policy) throws EntitlementException {
-        return new Resource(policy.getName(), policyRevision(policy), policyParser.printPolicy(policy));
+    private ResourceResponse policyResource(Privilege policy) throws EntitlementException {
+        return newResourceResponse(policy.getName(), policyRevision(policy), policyParser.printPolicy(policy));
     }
 
     /**

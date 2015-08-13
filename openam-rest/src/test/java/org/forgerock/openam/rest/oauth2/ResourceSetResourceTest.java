@@ -145,7 +145,7 @@ public class ResourceSetResourceTest {
     }
 
     @Test
-    public void actionInstanceShouldNotBeSupported() {
+    public Promise<ActionResponse, ResourceException> actionInstanceShouldNotBeSupported() {
 
         //Given
         ServerContext context = mock(ServerContext.class);
@@ -160,7 +160,7 @@ public class ResourceSetResourceTest {
     }
 
     @Test
-    public void actionCollectionShouldNotBeSupported() {
+    public Promise<ActionResponse, ResourceException> actionCollectionShouldNotBeSupported() {
 
         //Given
         ServerContext context = mock(ServerContext.class);
@@ -276,7 +276,7 @@ public class ResourceSetResourceTest {
     }
 
     @Test
-    public void actionCollectionShouldHandleUnsupportedAction() {
+    public Promise<ActionResponse, ResourceException> actionCollectionShouldHandleUnsupportedAction() {
 
         //Given
         ServerContext context = mock(ServerContext.class);

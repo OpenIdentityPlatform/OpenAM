@@ -26,16 +26,19 @@ import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.utils.RestLog;
 import org.forgerock.openam.forgerockrest.utils.ServerContextUtils;
-import org.forgerock.openam.rest.resource.CrestRouter;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.util.promise.Promise;
 
 /**
  * Fluent Router which will audit any requests that pass through it.
@@ -60,7 +63,7 @@ public class LoggingFluentRouter<T extends CrestRouter> extends FluentRouter<T> 
      * @param handler {@inheritDoc}
      */
     @Override
-    public void handleAction(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
+    public Promise<ActionResponse, ResourceException> handleAction(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
         final String resource = ServerContextUtils.getResourceId(request, context);
         final String action = ServerContextUtils.getActionString(request);
 
@@ -77,7 +80,7 @@ public class LoggingFluentRouter<T extends CrestRouter> extends FluentRouter<T> 
      * @param handler {@inheritDoc}
      */
     @Override
-    public void handleCreate(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> handleCreate(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
         final String resource = ServerContextUtils.getResourceId(request, context);
         final String action = ServerContextUtils.getCreateString(request);
 
@@ -94,7 +97,7 @@ public class LoggingFluentRouter<T extends CrestRouter> extends FluentRouter<T> 
      * @param handler {@inheritDoc}
      */
     @Override
-    public void handleDelete(ServerContext context, DeleteRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> handleDelete(ServerContext context, DeleteRequest request, ResultHandler<Resource> handler) {
         final String resource = ServerContextUtils.getResourceId(request, context);
         final String action = ServerContextUtils.getDeleteString(request);
 
@@ -111,7 +114,7 @@ public class LoggingFluentRouter<T extends CrestRouter> extends FluentRouter<T> 
      * @param handler {@inheritDoc}
      */
     @Override
-    public void handlePatch(ServerContext context, PatchRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> handlePatch(ServerContext context, PatchRequest request, ResultHandler<Resource> handler) {
         final String resource = ServerContextUtils.getResourceId(request, context);
         final String action = ServerContextUtils.getPatchString(request);
 
@@ -128,7 +131,7 @@ public class LoggingFluentRouter<T extends CrestRouter> extends FluentRouter<T> 
      * @param handler {@inheritDoc}
      */
     @Override
-    public void handleQuery(ServerContext context, QueryRequest request, QueryResultHandler handler) {
+    public Promise<QueryResponse, ResourceException> handleQuery(ServerContext context, QueryRequest request, QueryResourceHandler handler) {
         final String resource = ServerContextUtils.getResourceId(request, context);
         final String action = ServerContextUtils.getQueryString(request);
 
@@ -146,7 +149,7 @@ public class LoggingFluentRouter<T extends CrestRouter> extends FluentRouter<T> 
      * @param handler {@inheritDoc}
      */
     @Override
-    public void handleRead(ServerContext context, ReadRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> handleRead(ServerContext context, ReadRequest request, ResultHandler<Resource> handler) {
         final String resource = ServerContextUtils.getResourceId(request, context);
         final String action = ServerContextUtils.getReadString(request);
 
@@ -163,7 +166,7 @@ public class LoggingFluentRouter<T extends CrestRouter> extends FluentRouter<T> 
      * @param handler {@inheritDoc}
      */
     @Override
-    public void handleUpdate(ServerContext context, UpdateRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> handleUpdate(ServerContext context, UpdateRequest request, ResultHandler<Resource> handler) {
         final String resource = ServerContextUtils.getResourceId(request, context);
         final String action = ServerContextUtils.getUpdateString(request);
 

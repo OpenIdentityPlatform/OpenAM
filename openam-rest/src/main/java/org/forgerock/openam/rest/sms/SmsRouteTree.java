@@ -16,31 +16,37 @@
 
 package org.forgerock.openam.rest.sms;
 
+import static org.forgerock.json.resource.Router.uriTemplate;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.forgerock.guava.common.base.Function;
-import org.forgerock.json.JsonValue;
+import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.routing.RouteMatcher;
+import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.Filter;
 import org.forgerock.json.resource.FilterChain;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
+import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.RequestHandler;
-import org.forgerock.json.resource.Resource;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.json.resource.Route;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.Router;
-import org.forgerock.json.resource.RoutingMode;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.Router.UriTemplate;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.util.promise.Promise;
 
 /**
  * Represents a {@code Router} tree. Allows the structuring of Routers in a tree like manner whilst
@@ -159,14 +165,14 @@ class SmsRouteTree implements RequestHandler {
      * @param handler The request handler to which matching requests will be routed.
      * @return An opaque handle for the route which may be used for removing the route later.
      */
-    final Route addRoute(RoutingMode mode, String uriTemplate, RequestHandler handler) {
+    final RouteMatcher<Request> addRoute(RoutingMode mode, String uriTemplate, RequestHandler handler) {
         RequestHandler routeHandler;
         if (filter == null) {
             routeHandler = handler;
         } else {
             routeHandler = new FilterChain(handler, filter);
         }
-        return router.addRoute(mode, uriTemplate, routeHandler);
+        return router.addRoute(mode, uriTemplate(uriTemplate), routeHandler);
     }
 
     /**
@@ -176,43 +182,44 @@ class SmsRouteTree implements RequestHandler {
      * @param routes The routes to be removed.
      * @return {@code true} if at least one of the routes was found and removed.
      */
-    final boolean removeRoute(Route... routes) {
+    final boolean removeRoute(RouteMatcher<Request>... routes) {
         return router.removeRoute(routes);
     }
 
     @Override
-    public void handleAction(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-        router.handleAction(context, request, handler);
+    public Promise<ActionResponse, ResourceException> handleAction(ServerContext context, ActionRequest request) {
+        return router.handleAction(context, request);
     }
 
     @Override
-    public void handleCreate(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
-        router.handleCreate(context, request, handler);
+    public Promise<ResourceResponse, ResourceException> handleCreate(ServerContext context, CreateRequest request) {
+        return router.handleCreate(context, request);
     }
 
     @Override
-    public void handleDelete(ServerContext context, DeleteRequest request, ResultHandler<Resource> handler) {
-        router.handleDelete(context, request, handler);
+    public Promise<ResourceResponse, ResourceException> handleDelete(ServerContext context, DeleteRequest request) {
+        return router.handleDelete(context, request);
     }
 
     @Override
-    public void handlePatch(ServerContext context, PatchRequest request, ResultHandler<Resource> handler) {
-        router.handlePatch(context, request, handler);
+    public Promise<ResourceResponse, ResourceException> handlePatch(ServerContext context, PatchRequest request) {
+        return router.handlePatch(context, request);
     }
 
     @Override
-    public void handleQuery(ServerContext context, QueryRequest request, QueryResultHandler handler) {
-        router.handleQuery(context, request, handler);
+    public Promise<QueryResponse, ResourceException> handleQuery(ServerContext context, QueryRequest request,
+            QueryResourceHandler handler) {
+        return router.handleQuery(context, request, handler);
     }
 
     @Override
-    public void handleRead(ServerContext context, ReadRequest request, ResultHandler<Resource> handler) {
-        router.handleRead(context, request, handler);
+    public Promise<ResourceResponse, ResourceException> handleRead(ServerContext context, ReadRequest request) {
+        return router.handleRead(context, request);
     }
 
     @Override
-    public void handleUpdate(ServerContext context, UpdateRequest request, ResultHandler<Resource> handler) {
-        router.handleUpdate(context, request, handler);
+    public Promise<ResourceResponse, ResourceException> handleUpdate(ServerContext context, UpdateRequest request) {
+        return router.handleUpdate(context, request);
     }
 
     /**
@@ -223,13 +230,13 @@ class SmsRouteTree implements RequestHandler {
     static class SmsRouteTreeBuilder {
 
         private final Router router;
-        private final String uriTemplate;
+        private final UriTemplate uriTemplate;
         private final Set<SmsRouteTreeBuilder> subTreeBuilders;
 
         private SmsRouteTreeBuilder(Router router, String uriTemplate, SmsRouteTreeBuilder... subTreeBuilders) {
             this.router = router;
-            this.uriTemplate = uriTemplate;
-            this.subTreeBuilders = new HashSet<SmsRouteTreeBuilder>(Arrays.asList(subTreeBuilders));
+            this.uriTemplate = uriTemplate(uriTemplate);
+            this.subTreeBuilders = new HashSet<>(Arrays.asList(subTreeBuilders));
         }
 
         public SmsRouteTreeBuilder(Router router, String uriTemplate, Function<String, Boolean> handlesFunction,
@@ -272,7 +279,7 @@ class SmsRouteTree implements RequestHandler {
         @Override
         SmsRouteTree build(Router parent) {
             if (StringUtils.isNotEmpty(uriTemplate)) {
-                parent.addRoute(RoutingMode.STARTS_WITH, uriTemplate, router);
+                parent.addRoute(RoutingMode.STARTS_WITH, uriTemplate(uriTemplate), router);
             }
             return new SmsRouteTreeLeaf(router, handlesFunction, filter);
         }

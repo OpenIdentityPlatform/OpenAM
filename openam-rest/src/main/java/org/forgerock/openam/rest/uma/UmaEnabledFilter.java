@@ -93,7 +93,7 @@ public class UmaEnabledFilter implements Filter {
     }
 
     @Override
-    public void filterQuery(ServerContext serverContext, QueryRequest request, QueryResultHandler queryResultHandler, RequestHandler requestHandler) {
+    public void filterQuery(ServerContext serverContext, QueryRequest request, QueryResourceHandler queryResultHandler, RequestHandler requestHandler) {
         if (enabled(serverContext, queryResultHandler)) {
             requestHandler.handleQuery(serverContext, request, queryResultHandler);
         }

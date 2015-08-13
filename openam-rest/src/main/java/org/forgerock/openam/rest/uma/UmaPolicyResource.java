@@ -18,31 +18,34 @@ package org.forgerock.openam.rest.uma;
 
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.resource.ResourceException.newNotSupportedException;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
 import java.util.Collection;
 
-import org.forgerock.json.JsonValue;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
 import org.forgerock.openam.uma.UmaPolicy;
 import org.forgerock.openam.uma.UmaPolicyService;
+import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.Pair;
-import org.forgerock.util.promise.ExceptionHandler;
+import org.forgerock.util.promise.Promise;
 
 /**
  * REST endpoint for UMA policy management.
@@ -67,18 +70,12 @@ public class UmaPolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void createInstance(ServerContext context, CreateRequest request, final ResultHandler<Resource> handler) {
-        umaPolicyService.createPolicy(context, request.getContent())
-                .thenOnResult(new org.forgerock.util.promise.ResultHandler<UmaPolicy>() {
+    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
+        return umaPolicyService.createPolicy(context, request.getContent())
+                .thenAsync(new AsyncFunction<UmaPolicy, ResourceResponse, ResourceException>() {
                     @Override
-                    public void handleResult(UmaPolicy result) {
-                        handler.handleResult(new Resource(result.getId(), result.getRevision(), json(object())));
-                    }
-                })
-                .thenOnException(new ExceptionHandler<ResourceException>() {
-                    @Override
-                    public void handleException(ResourceException error) {
-                        handler.handleError(error);
+                    public Promise<ResourceResponse, ResourceException> apply(UmaPolicy result) {
+                        return newResultPromise(newResourceResponse(result.getId(), result.getRevision(), json(object())));
                     }
                 });
     }
@@ -87,19 +84,13 @@ public class UmaPolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void readInstance(ServerContext context, final String resourceId, ReadRequest request,
-            final ResultHandler<Resource> handler) {
-        umaPolicyService.readPolicy(context, resourceId)
-                .thenOnResult(new org.forgerock.util.promise.ResultHandler<UmaPolicy>() {
+    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, final String resourceId,
+            ReadRequest request) {
+        return umaPolicyService.readPolicy(context, resourceId)
+                .thenAsync(new AsyncFunction<UmaPolicy, ResourceResponse, ResourceException>() {
                     @Override
-                    public void handleResult(UmaPolicy result) {
-                        handler.handleResult(new Resource(result.getId(), result.getRevision(), result.asJson()));
-                    }
-                })
-                .thenOnException(new ExceptionHandler<ResourceException>() {
-                    @Override
-                    public void handleException(ResourceException error) {
-                        handler.handleError(error);
+                    public Promise<ResourceResponse, ResourceException> apply(UmaPolicy result) {
+                        return newResultPromise(newResourceResponse(result.getId(), result.getRevision(), result.asJson()));
                     }
                 });
     }
@@ -108,19 +99,13 @@ public class UmaPolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void updateInstance(ServerContext context, String resourceId, UpdateRequest request,
-            final ResultHandler<Resource> handler) {
-        umaPolicyService.updatePolicy(context, resourceId, request.getContent())
-                .thenOnResult(new org.forgerock.util.promise.ResultHandler<UmaPolicy>() {
+    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId,
+            UpdateRequest request) {
+        return umaPolicyService.updatePolicy(context, resourceId, request.getContent())
+                .thenAsync(new AsyncFunction<UmaPolicy, ResourceResponse, ResourceException>() {
                     @Override
-                    public void handleResult(UmaPolicy result) {
-                        handler.handleResult(new Resource(result.getId(), result.getRevision(), result.asJson()));
-                    }
-                })
-                .thenOnException(new ExceptionHandler<ResourceException>() {
-                    @Override
-                    public void handleException(ResourceException error) {
-                        handler.handleError(error);
+                    public Promise<ResourceResponse, ResourceException> apply(UmaPolicy result) {
+                        return newResultPromise(newResourceResponse(result.getId(), result.getRevision(), result.asJson()));
                     }
                 });
     }
@@ -129,19 +114,13 @@ public class UmaPolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void deleteInstance(ServerContext context, final String resourceId, DeleteRequest request,
-            final ResultHandler<Resource> handler) {
-        umaPolicyService.deletePolicy(context, resourceId)
-                .thenOnResult(new org.forgerock.util.promise.ResultHandler<Void>() {
+    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, final String resourceId,
+            DeleteRequest request) {
+        return umaPolicyService.deletePolicy(context, resourceId)
+                .thenAsync(new AsyncFunction<Void, ResourceResponse, ResourceException>() {
                     @Override
-                    public void handleResult(Void result) {
-                        handler.handleResult(new Resource(resourceId, "0", json(object())));
-                    }
-                })
-                .thenOnException(new ExceptionHandler<ResourceException>() {
-                    @Override
-                    public void handleException(ResourceException error) {
-                        handler.handleError(error);
+                    public Promise<ResourceResponse, ResourceException> apply(Void value) throws ResourceException {
+                        return newResultPromise(newResourceResponse(resourceId, "0", json(object())));
                     }
                 });
     }
@@ -151,49 +130,44 @@ public class UmaPolicyResource implements CollectionResourceProvider {
      */
     //No patch support on PolicyResource so we will patch our policy representation and then do an update
     @Override
-    public void patchInstance(ServerContext context, String resourceId, PatchRequest request,
-            ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+            PatchRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void actionInstance(ServerContext context, String resourceId, ActionRequest request,
-            ResultHandler<JsonValue> handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+            ActionRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
-        final QueryResultHandler resultHandler = new QueryResultHandlerBuilder(handler)
+    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+            QueryResourceHandler handler) {
+        final QueryResourceHandler resultHandler = new QueryResultHandlerBuilder(handler)
                 .withPaging(request.getPageSize(), request.getPagedResultsOffset()).build();
-        umaPolicyService.queryPolicies(context, request)
-                .thenOnResult(new org.forgerock.util.promise.ResultHandler<Pair<QueryResult, Collection<UmaPolicy>>>() {
+        return umaPolicyService.queryPolicies(context, request)
+                .thenAsync(new AsyncFunction<Pair<QueryResponse, Collection<UmaPolicy>>, QueryResponse, ResourceException>() {
                     @Override
-                    public void handleResult(Pair<QueryResult, Collection<UmaPolicy>> result) {
+                    public Promise<QueryResponse, ResourceException> apply(Pair<QueryResponse, Collection<UmaPolicy>> result) {
                         for (UmaPolicy policy : result.getSecond()) {
-                            resultHandler.handleResource(new Resource(policy.getId(), policy.getRevision(), policy.asJson()));
+                            resultHandler.handleResource(newResourceResponse(policy.getId(), policy.getRevision(), policy.asJson()));
                         }
-                        resultHandler.handleResult(result.getFirst());
-                    }
-                })
-                .thenOnException(new ExceptionHandler<ResourceException>() {
-                    @Override
-                    public void handleException(ResourceException error) {
-                        resultHandler.handleError(error);
+                        return newResultPromise(result.getFirst());
                     }
                 });
     }

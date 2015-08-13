@@ -15,36 +15,42 @@
 */
 package org.forgerock.openam.forgerockrest.entitlements;
 
-import com.sun.identity.entitlement.Application;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.util.SearchFilter;
-import com.sun.identity.shared.debug.Debug;
+import static org.forgerock.json.resource.Responses.newQueryResponse;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.security.auth.Subject;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.security.auth.Subject;
+
+import com.sun.identity.entitlement.Application;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.util.SearchFilter;
+import com.sun.identity.shared.debug.Debug;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.CountPolicy;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.util.query.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.RestUtils;
@@ -57,6 +63,8 @@ import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationWrapp
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.util.Reject;
+import org.forgerock.util.promise.Promise;
+import org.forgerock.util.query.QueryFilter;
 
 /**
  * Endpoint for the ApplicationsResource.
@@ -111,11 +119,10 @@ public class ApplicationsResource extends RealmAwareResource {
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
      */
     @Override
-    public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
@@ -124,12 +131,11 @@ public class ApplicationsResource extends RealmAwareResource {
      * @param context {@inheritDoc}
      * @param resourceId {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
      */
     @Override
-    public void actionInstance(ServerContext context, String resourceId, ActionRequest request,
-                               ResultHandler<JsonValue> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+            ActionRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
@@ -137,18 +143,16 @@ public class ApplicationsResource extends RealmAwareResource {
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
      */
     @Override
-    public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
 
         //auth
         final Subject callingSubject = getContextSubject(context);
 
         if (callingSubject == null) {
             debug.error("ApplicationsResource :: CREATE : Unknown Subject");
-            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
         }
 
         final String realm = getRealm(context);
@@ -196,21 +200,20 @@ public class ApplicationsResource extends RealmAwareResource {
             Application savedApp = appManager.getApplication(callingSubject, realm, appName);
             ApplicationWrapper savedAppWrapper = createApplicationWrapper(savedApp, appTypeManagerWrapper);
 
-            final Resource resource = new Resource(savedAppWrapper.getName(),
+            ResourceResponse resource = newResourceResponse(savedAppWrapper.getName(),
                     Long.toString(savedAppWrapper.getLastModifiedDate()), savedAppWrapper.toJsonValue());
             if (debug.messageEnabled()) {
                 debug.message("ApplicationsResource :: CREATE by " + principalName +
                         ": for Application: " + wrapp.getName());
             }
-            handler.handleResult(resource);
+            return newResultPromise(resource);
         } catch (EntitlementException e) {
             if (debug.errorEnabled()) {
                 debug.error("ApplicationsResource :: CREATE by " + principalName +
                         ": Application creation failed. ", e);
             }
-            handler.handleError(exceptionMappingHandler.handleError(context, request, e));
+            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, e));
         }
-
     }
 
     /**
@@ -278,19 +281,17 @@ public class ApplicationsResource extends RealmAwareResource {
      * @param context {@inheritDoc}
      * @param resourceId {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
      */
     @Override
-    public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request,
-                              ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String resourceId,
+            DeleteRequest request) {
 
         //auth
         final Subject callingSubject = getContextSubject(context);
 
         if (callingSubject == null) {
             debug.error("ApplicationsResource :: DELETE : Unknown Subject");
-            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
         }
 
         final String realm = getRealm(context);
@@ -306,16 +307,15 @@ public class ApplicationsResource extends RealmAwareResource {
 
             appManager.deleteApplication(callingSubject, realm, resourceId);
 
-            final Resource resource = new Resource(resourceId, "0", JsonValue.json(JsonValue.object()));
-            handler.handleResult(resource);
+            ResourceResponse resource = newResourceResponse(resourceId, "0", JsonValue.json(JsonValue.object()));
+            return newResultPromise(resource);
         } catch (EntitlementException e) {
             if (debug.errorEnabled()) {
                 debug.error("ApplicationsResource :: DELETE by " + principalName +
                         ": Application failed to delete the resource specified. ", e);
             }
-            handler.handleError(exceptionMappingHandler.handleError(context, request, e));
+            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, e));
         }
-
     }
 
     /**
@@ -324,12 +324,11 @@ public class ApplicationsResource extends RealmAwareResource {
      * @param context {@inheritDoc}
      * @param resourceId {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
      */
     @Override
-    public void patchInstance(ServerContext context, String resourceId, PatchRequest request,
-                              ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+            PatchRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
@@ -340,15 +339,15 @@ public class ApplicationsResource extends RealmAwareResource {
      * @param handler {@inheritDoc}
      */
     @Override
-    public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
+    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+            QueryResourceHandler handler) {
 
         //auth
         final Subject mySubject = getContextSubject(context);
 
         if (mySubject == null) {
             debug.error("ApplicationsResource :: UPDATE : Unknown Subject");
-            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
         }
 
         //select
@@ -378,7 +377,7 @@ public class ApplicationsResource extends RealmAwareResource {
                 remaining = apps.size();
                 for (ApplicationWrapper app : apps) {
                     boolean keepGoing = handler.handleResource(
-                            new Resource(app.getName(), Long.toString(app.getLastModifiedDate()), app.toJsonValue()));
+                            newResourceResponse(app.getName(), Long.toString(app.getLastModifiedDate()), app.toJsonValue()));
                     remaining--;
                     if (debug.messageEnabled()) {
                         debug.message("ApplicationsResource :: QUERY by " + principalName +
@@ -395,11 +394,10 @@ public class ApplicationsResource extends RealmAwareResource {
                         ": Failed to query resource.", e);
 
             }
-            handler.handleError(exceptionMappingHandler.handleError(context, request, e));
-            return;
+            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, e));
         }
 
-        handler.handleResult(new QueryResult(null, remaining));
+        return newResultPromise(newQueryResponse(null, CountPolicy.EXACT, remaining));
     }
 
     /**
@@ -408,18 +406,16 @@ public class ApplicationsResource extends RealmAwareResource {
      * @param context {@inheritDoc}
      * @param resourceId {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
      */
     @Override
-    public void readInstance(ServerContext context, String resourceId, ReadRequest request,
-                             ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+            ReadRequest request) {
 
         final Subject mySubject = getContextSubject(context);
 
         if (mySubject == null) {
             debug.error("ApplicationsResource :: READ : Unknown Subject");
-            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
         }
 
         final String realm = getRealm(context);
@@ -434,17 +430,16 @@ public class ApplicationsResource extends RealmAwareResource {
 
             final ApplicationWrapper wrapp = createApplicationWrapper(app, appTypeManagerWrapper);
 
-            final Resource resource = new Resource(resourceId, Long.toString(app.getLastModifiedDate()),
+            ResourceResponse resource = newResourceResponse(resourceId, Long.toString(app.getLastModifiedDate()),
                     wrapp.toJsonValue());
-            handler.handleResult(resource);
+            return newResultPromise(resource);
         } catch (EntitlementException e) {
             if (debug.errorEnabled()) {
                 debug.error("ApplicationsResource :: READ by " + principalName +
                         ": Application failed to retrieve the resource specified.", e);
             }
-            handler.handleError(exceptionMappingHandler.handleError(context, request, e));
+            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, e));
         }
-
     }
 
     /**
@@ -456,18 +451,16 @@ public class ApplicationsResource extends RealmAwareResource {
      * @param context {@inheritDoc}
      * @param resourceId {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
      */
     @Override
-    public void updateInstance(ServerContext context, String resourceId, UpdateRequest request,
-                               ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId,
+            UpdateRequest request) {
 
         final Subject mySubject = getContextSubject(context);
 
         if (mySubject == null) {
             debug.error("ApplicationsResource :: UPDATE : Unknown Subject");
-            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
-            return;
+            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
         }
 
         final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(mySubject);
@@ -495,19 +488,18 @@ public class ApplicationsResource extends RealmAwareResource {
 
             appManager.updateApplication(oldApplication, wrapp.getApplication(), mySubject, getRealm(context));
 
-            final Resource resource = new Resource(wrapp.getName(),
+            ResourceResponse resource = newResourceResponse(wrapp.getName(),
                     Long.toString(wrapp.getApplication().getLastModifiedDate()), wrapp.toJsonValue());
 
-            handler.handleResult(resource);
+            return newResultPromise(resource);
 
         } catch (EntitlementException e) {
             if (debug.errorEnabled()) {
                 debug.error("ApplicationsResource :: UPDATE by " + principalName +
                         ": Error performing update operation.", e);
             }
-            handler.handleError(exceptionMappingHandler.handleError(context, request, e));
+            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, e));
         }
-
     }
 
     /**
@@ -522,7 +514,7 @@ public class ApplicationsResource extends RealmAwareResource {
      */
     Set<String> query(QueryRequest request, Subject subject, String realm) throws EntitlementException {
 
-        QueryFilter queryFilter = request.getQueryFilter();
+        QueryFilter<JsonPointer> queryFilter = request.getQueryFilter();
         if (queryFilter == null) {
             // Return everything
             queryFilter = QueryFilter.alwaysTrue();
@@ -586,6 +578,5 @@ public class ApplicationsResource extends RealmAwareResource {
             filters.add(comparison(field.leaf(), SearchFilter.Operator.LESS_THAN_OR_EQUAL_OPERATOR, valueAssertion));
             return filters;
         }
-
     }
 }

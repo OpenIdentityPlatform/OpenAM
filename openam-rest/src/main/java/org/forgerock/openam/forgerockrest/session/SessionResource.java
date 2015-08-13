@@ -16,42 +16,11 @@
 
 package org.forgerock.openam.forgerockrest.session;
 
-import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.share.SessionInfo;
-import com.iplanet.services.naming.WebtopNaming;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.common.CaseInsensitiveHashMap;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.DNMapper;
-import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.AdviceContext;
-import org.forgerock.json.resource.BadRequestException;
-import org.forgerock.json.resource.CollectionResourceProvider;
-import org.forgerock.json.resource.CreateRequest;
-import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
-import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
-import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.json.resource.http.HttpContext;
-import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
-import org.forgerock.openam.forgerockrest.RestUtils;
-import org.forgerock.openam.forgerockrest.session.query.SessionQueryManager;
-import org.forgerock.openam.session.SessionConstants;
-import org.forgerock.openam.utils.StringUtils;
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.ResourceException.adapt;
+import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
 import javax.servlet.http.Cookie;
@@ -64,7 +33,44 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static org.forgerock.json.JsonValue.*;
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.share.SessionInfo;
+import com.iplanet.services.naming.WebtopNaming;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.common.CaseInsensitiveHashMap;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.DNMapper;
+import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.AdviceContext;
+import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.CollectionResourceProvider;
+import org.forgerock.json.resource.CreateRequest;
+import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
+import org.forgerock.json.resource.ReadRequest;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.json.resource.http.HttpContext;
+import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
+import org.forgerock.openam.forgerockrest.RestUtils;
+import org.forgerock.openam.forgerockrest.session.query.SessionQueryManager;
+import org.forgerock.openam.session.SessionConstants;
+import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.util.promise.Promise;
 
 /**
  * Represents Sessions that can queried via a REST interface.
@@ -148,9 +154,8 @@ public class SessionResource implements CollectionResourceProvider {
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
      */
-    public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
+    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
         final String cookieName = SystemProperties.get(Constants.AM_COOKIE_NAME, "iPlanetDirectoryPro");
 
         String tokenId = getTokenIdFromUrlParam(request);
@@ -168,11 +173,10 @@ public class SessionResource implements CollectionResourceProvider {
         if (tokenId == null) {
             final BadRequestException e = new BadRequestException("iPlanetDirectoryCookie not set on request");
             LOGGER.message("SessionResource.handleNullSSOToken :: iPlanetDirectoryCookie not set on request", e);
-            handler.handleError(e);
-            return;
+            return newExceptionPromise(adapt(e));
         }
 
-        internalHandleAction(tokenId, context, request, handler);
+        return internalHandleAction(tokenId, context, request);
     }
 
     protected String getTokenIdFromUrlParam(ActionRequest request) {
@@ -213,33 +217,24 @@ public class SessionResource implements CollectionResourceProvider {
      * @param context {@inheritDoc}
      * @param tokenId The SSO Token Id.
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
      */
-    public void actionInstance(ServerContext context,
-                               String tokenId,
-                               ActionRequest request,
-                               ResultHandler<JsonValue> handler) {
-
-        internalHandleAction(tokenId, context, request, handler);
+    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String tokenId,
+            ActionRequest request) {
+        return internalHandleAction(tokenId, context, request);
     }
 
     /**
      * Handle the action specified by the user (i.e. one of those in the validActions set).
-     *
      * @param tokenId The id of the token to concentrate on.
      * @param request The ActionRequest, giving us all our parameters.
-     * @param handler The result handler
      */
-    private void internalHandleAction(String tokenId,
-                                      ServerContext context,
-                                      ActionRequest request,
-                                      ResultHandler<JsonValue> handler) {
+    private Promise<ActionResponse, ResourceException> internalHandleAction(String tokenId, ServerContext context, ActionRequest request) {
 
         final String action = request.getAction();
         final ActionHandler actionHandler = actionHandlers.get(action);
 
         if (actionHandler != null) {
-            actionHandler.handle(tokenId, context, request, handler);
+            return actionHandler.handle(tokenId, context, request);
 
         } else {
             String message = String.format("Action %s not implemented for this resource", action);
@@ -247,7 +242,7 @@ public class SessionResource implements CollectionResourceProvider {
             if (LOGGER.messageEnabled()) {
                 LOGGER.message("SessionResource.actionInstance :: " + message, e);
             }
-            handler.handleError(e);
+            return newExceptionPromise(adapt(e));
         }
     }
 
@@ -313,13 +308,14 @@ public class SessionResource implements CollectionResourceProvider {
      * @param request {@inheritDoc}
      * @param handler {@inheritDoc}
      */
-    public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
+    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+            QueryResourceHandler handler) {
         String id = request.getQueryId();
 
         if (KEYWORD_LIST.equals(id)) {
             Collection<String> servers = generateListServers();
             LOGGER.message("SessionResource.queryCollection() :: Retrieved list of servers for query.");
-            handler.handleResource(new Resource(KEYWORD_LIST, String.valueOf(System.currentTimeMillis()),
+            handler.handleResource(newResourceResponse(KEYWORD_LIST, String.valueOf(System.currentTimeMillis()),
                     new JsonValue(servers)));
         } else {
             Collection<SessionInfo> sessions;
@@ -341,12 +337,12 @@ public class SessionResource implements CollectionResourceProvider {
                 map.put(HEADER_USER_ID, username);
                 map.put(HEADER_TIME_REMAINING, timeleft);
 
-                handler.handleResource(new Resource("Sessions", String.valueOf(System.currentTimeMillis()),
+                handler.handleResource(newResourceResponse("Sessions", String.valueOf(System.currentTimeMillis()),
                         new JsonValue(map)));
             }
         }
 
-        handler.handleResult(new QueryResult());
+        return newResultPromise(newQueryResponse());
     }
 
     /**
@@ -354,8 +350,8 @@ public class SessionResource implements CollectionResourceProvider {
      *
      * {@inheritDoc}
      */
-    public void readInstance(ServerContext context, String id, ReadRequest request, ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String id, ReadRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
@@ -395,41 +391,39 @@ public class SessionResource implements CollectionResourceProvider {
     /**
      * {@inheritDoc}
      */
-    public void createInstance(ServerContext ctx, CreateRequest request, ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext ctx, CreateRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * {@inheritDoc}
      */
-    public void deleteInstance(ServerContext ctx, String resId, DeleteRequest request,
-            ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext ctx, String resId,
+            DeleteRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * {@inheritDoc}
      */
-    public void patchInstance(ServerContext ctx, String resId, PatchRequest request,
-            ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext ctx, String resId,
+            PatchRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * {@inheritDoc}
      */
-    public void updateInstance(ServerContext ctx, String resId, UpdateRequest request,
-            ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext ctx, String resId,
+            UpdateRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * Defines a delegate capable of handling a particular action for a collection or instance
      */
-    private static interface ActionHandler {
-
-        void handle(String tokenId, ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler);
-
+    private interface ActionHandler {
+        Promise<ActionResponse, ResourceException> handle(String tokenId, ServerContext context, ActionRequest request);
     }
 
     /**
@@ -475,16 +469,17 @@ public class SessionResource implements CollectionResourceProvider {
         }
 
         @Override
-        public void handle(String tokenId, ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
+        public Promise<ActionResponse, ResourceException> handle(String tokenId, ServerContext context,
+                ActionRequest request) {
             try {
                 JsonValue jsonValue = logout(tokenId, context);
-                handler.handleResult(jsonValue);
+                return newResultPromise(newActionResponse(jsonValue));
             } catch (InternalServerErrorException e) {
                 if (LOGGER.errorEnabled()) {
                     LOGGER.error("SessionResource.actionInstance :: Error performing logout for token "
                             + tokenId, e);
                 }
-                handler.handleError(e);
+                return newExceptionPromise(adapt(e));
             }
         }
 
@@ -551,8 +546,9 @@ public class SessionResource implements CollectionResourceProvider {
         private static final String VALID = "valid";
 
         @Override
-        public void handle(String tokenId, ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-            handler.handleResult(validateSession(tokenId));
+        public Promise<ActionResponse, ResourceException> handle(String tokenId, ServerContext context,
+                ActionRequest request) {
+            return newResultPromise(newActionResponse(validateSession(tokenId)));
         }
 
         /**
@@ -635,9 +631,10 @@ public class SessionResource implements CollectionResourceProvider {
         private static final String ACTIVE = "active";
 
         @Override
-        public void handle(String tokenId, ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
+        public Promise<ActionResponse, ResourceException> handle(String tokenId, ServerContext context,
+                ActionRequest request) {
             String refresh = request.getAdditionalParameter("refresh");
-            handler.handleResult(isTokenIdValid(tokenId, refresh));
+            return newResultPromise(newActionResponse(isTokenIdValid(tokenId, refresh)));
         }
 
         /**
@@ -671,8 +668,9 @@ public class SessionResource implements CollectionResourceProvider {
         private static final String MAX_TIME = "maxtime";
 
         @Override
-        public void handle(String tokenId, ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-            handler.handleResult(getMaxTime(tokenId));
+        public Promise<ActionResponse, ResourceException> handle(String tokenId, ServerContext context,
+                ActionRequest request) {
+            return newResultPromise(newActionResponse(getMaxTime(tokenId)));
         }
 
         /**
@@ -701,8 +699,9 @@ public class SessionResource implements CollectionResourceProvider {
         private static final String IDLE_TIME = "idletime";
 
         @Override
-        public void handle(String tokenId, ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-            handler.handleResult(getIdleTime(tokenId));
+        public Promise<ActionResponse, ResourceException> handle(String tokenId, ServerContext context,
+                ActionRequest request) {
+            return newResultPromise(newActionResponse(getIdleTime(tokenId)));
         }
 
         /**

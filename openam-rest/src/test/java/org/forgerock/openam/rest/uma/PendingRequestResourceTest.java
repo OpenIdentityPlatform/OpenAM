@@ -69,7 +69,7 @@ public class PendingRequestResourceTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void actionCollectionShouldReturnNotSupportedExceptionForUnsupportedAction() {
+    public Promise<ActionResponse, ResourceException> actionCollectionShouldReturnNotSupportedExceptionForUnsupportedAction() {
 
         //Given
         ServerContext context = mock(ServerContext.class);
@@ -87,7 +87,7 @@ public class PendingRequestResourceTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void actionCollectionShouldHandleApproveAction() throws Exception {
+    public Promise<ActionResponse, ResourceException> actionCollectionShouldHandleApproveAction() throws Exception {
 
         //Given
         ServerContext context = mockContext("REALM");
@@ -107,7 +107,7 @@ public class PendingRequestResourceTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void actionCollectionShouldHandleDenyAction() throws Exception {
+    public Promise<ActionResponse, ResourceException> actionCollectionShouldHandleDenyAction() throws Exception {
 
         //Given
         ServerContext context = mockContext("REALM");
@@ -126,7 +126,7 @@ public class PendingRequestResourceTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void actionInstanceShouldReturnNotSupportedExceptionForUnsupportedAction() {
+    public Promise<ActionResponse, ResourceException> actionInstanceShouldReturnNotSupportedExceptionForUnsupportedAction() {
 
         //Given
         ServerContext context = mock(ServerContext.class);
@@ -144,7 +144,7 @@ public class PendingRequestResourceTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void actionInstanceShouldHandleApproveAction() throws Exception {
+    public Promise<ActionResponse, ResourceException> actionInstanceShouldHandleApproveAction() throws Exception {
 
         //Given
         ServerContext context = mockContext("REALM");
@@ -164,7 +164,7 @@ public class PendingRequestResourceTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void actionInstanceShouldHandleDenyAction() throws Exception {
+    public Promise<ActionResponse, ResourceException> actionInstanceShouldHandleDenyAction() throws Exception {
 
         //Given
         ServerContext context = mockContext("REALM");

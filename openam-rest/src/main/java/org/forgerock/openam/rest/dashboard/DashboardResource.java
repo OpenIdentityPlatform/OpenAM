@@ -16,30 +16,39 @@
 
 package org.forgerock.openam.rest.dashboard;
 
+import static org.forgerock.json.resource.ResourceException.adapt;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.util.HashMap;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.debug.Debug;
-import java.util.HashMap;
-import javax.inject.Inject;
-import javax.inject.Named;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.PermanentException;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.dashboard.Dashboard;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.util.promise.Promise;
 
 /**
  * JSON REST interface to return specific information from the Dashboard service.
@@ -60,62 +69,60 @@ public final class DashboardResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void actionCollection(final ServerContext context, final ActionRequest request,
-            final ResultHandler<JsonValue> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void actionInstance(final ServerContext context, final String resourceId, final ActionRequest request,
-            final ResultHandler<JsonValue> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+            ActionRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void createInstance(final ServerContext context, final CreateRequest request,
-            final ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void deleteInstance(final ServerContext context, final String resourceId, final DeleteRequest request,
-            final ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String resourceId,
+            DeleteRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void patchInstance(final ServerContext context, final String resourceId, final PatchRequest request,
-            final ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+            PatchRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void queryCollection(final ServerContext context, final QueryRequest request,
-            final QueryResultHandler handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+            QueryResourceHandler handler) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void readInstance(final ServerContext context, final String resourceId, final ReadRequest request,
-            final ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+            ReadRequest request) {
 
         try {
             SSOTokenContext tokenContext = context.asContext(SSOTokenContext.class);
@@ -145,11 +152,11 @@ public final class DashboardResource implements CollectionResourceProvider {
                 val = Dashboard.getAssignedDashboard(token);
             }
 
-            Resource resource = new Resource("0", String.valueOf(System.currentTimeMillis()), val);
-            handler.handleResult(resource);
+            ResourceResponse resource = newResourceResponse("0", String.valueOf(System.currentTimeMillis()), val);
+            return newResultPromise(resource);
         } catch (SSOException ex) {
             debug.error("DashboardResource :: READ : SSOToken was not found.");
-            handler.handleError(new PermanentException(401, "Unauthorized", null));
+            return newExceptionPromise(adapt(new PermanentException(401, "Unauthorized", null)));
         }
 
     }
@@ -158,8 +165,8 @@ public final class DashboardResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void updateInstance(final ServerContext context, final String resourceId, final UpdateRequest request,
-            final ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId,
+            UpdateRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 }

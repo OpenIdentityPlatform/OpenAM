@@ -1,24 +1,47 @@
+/*
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2015 ForgeRock AS.
+ */
+
 package org.forgerock.openam.forgerockrest;
+
+import static org.forgerock.json.resource.ResourceException.newNotSupportedException;
+import static org.forgerock.json.resource.Responses.newActionResponse;
+import static org.forgerock.json.resource.Responses.newQueryResponse;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import com.google.inject.Inject;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdUtils;
+import org.forgerock.http.routing.RouterContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.util.query.QueryFilter;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.util.promise.Promise;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.json.resource.RouterContext;
 import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
@@ -39,17 +62,18 @@ public class AuditHistory implements CollectionResourceProvider {
     }
 
     @Override
-    public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
+    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
         AMIdentity identity = getIdentity(context);
         try {
-            handler.handleResult(new JsonValue(auditLogger.getHistory(identity, null)));
+            return newResultPromise(newActionResponse(new JsonValue(auditLogger.getHistory(identity, null))));
         } catch (ServerException e) {
-            handler.handleError(new InternalServerErrorException(e));
+            return newExceptionPromise((ResourceException) new InternalServerErrorException(e));
         }
     }
 
     @Override
-    public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
+    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+            QueryResourceHandler handler) {
         AMIdentity identity = getIdentity(context);
         try {
             Set<UmaAuditEntry> history;
@@ -60,15 +84,15 @@ public class AuditHistory implements CollectionResourceProvider {
                 history = auditLogger.getHistory(identity, request);
             }
 
-            final QueryResultHandler resultHandler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
+            final QueryResourceHandler resultHandler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
 
             for (UmaAuditEntry entry : history) {
-                resultHandler.handleResource(new Resource(entry.getId(), null, entry.asJson()));
+                resultHandler.handleResource(newResourceResponse(entry.getId(), null, entry.asJson()));
             }
 
-            resultHandler.handleResult(new QueryResult());
+            return newResultPromise(newQueryResponse());
         } catch (ServerException e) {
-            handler.handleError(new InternalServerErrorException(e));
+            return newExceptionPromise((ResourceException) new InternalServerErrorException(e));
         }
     }
 
@@ -79,32 +103,37 @@ public class AuditHistory implements CollectionResourceProvider {
     }
 
     @Override
-    public void actionInstance(ServerContext context, String resourceId, ActionRequest request, ResultHandler<JsonValue> handler) {
-        handler.handleError(new NotSupportedException("Not supported."));
+    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+            ActionRequest request) {
+        return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 
     @Override
-    public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException("Not supported."));
+    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
+        return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 
     @Override
-    public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request, ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException("Not supported."));
+    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String resourceId,
+            DeleteRequest request) {
+        return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 
     @Override
-    public void patchInstance(ServerContext context, String resourceId, PatchRequest request, ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException("Not supported."));
+    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+            PatchRequest request) {
+        return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 
     @Override
-    public void readInstance(ServerContext context, String resourceId, ReadRequest request, ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException("Not supported."));
+    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+            ReadRequest request) {
+        return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 
     @Override
-    public void updateInstance(ServerContext context, String resourceId, UpdateRequest request, ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException("Not supported."));
+    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId,
+            UpdateRequest request) {
+        return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 }

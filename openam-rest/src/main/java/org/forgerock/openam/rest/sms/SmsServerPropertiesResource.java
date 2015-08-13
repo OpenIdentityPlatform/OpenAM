@@ -16,35 +16,13 @@
 
 package org.forgerock.openam.rest.sms;
 
-import com.iplanet.services.ldap.DSConfigMgr;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.setup.SetupConstants;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.xml.bind.StringInputStream;
-import org.apache.commons.io.IOUtils;
-import org.forgerock.json.JsonPointer;
-import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.BadRequestException;
-import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.json.resource.RouterContext;
-import org.forgerock.http.context.ServerContext;
-import org.forgerock.json.resource.SingletonResourceProvider;
-import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.rest.resource.SSOTokenContext;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.ResourceException.newBadRequestException;
+import static org.forgerock.json.resource.ResourceException.newNotSupportedException;
+import static org.forgerock.json.resource.Responses.newActionResponse;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -68,7 +46,36 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.forgerock.json.JsonValue.*;
+import com.iplanet.services.ldap.DSConfigMgr;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.setup.SetupConstants;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.xml.bind.StringInputStream;
+import org.apache.commons.io.IOUtils;
+import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.routing.RouterContext;
+import org.forgerock.json.JsonPointer;
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.ReadRequest;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.json.resource.SingletonResourceProvider;
+import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.util.promise.Promise;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * A service to allow the modification of server properties
@@ -276,20 +283,21 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
     }
 
     @Override
-    public void actionInstance(ServerContext serverContext, ActionRequest actionRequest, ResultHandler<JsonValue> resultHandler) {
+    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext serverContext,
+            ActionRequest actionRequest) {
         if (actionRequest.getAction().equals("schema")) {
             Map<String, String> uriVariables = getUriTemplateVariables(serverContext);
 
             final String serverName = uriVariables.get("serverName").toLowerCase();
             if (serverName == null) {
-                resultHandler.handleError(new BadRequestException("Server name not specified."));
+                return newExceptionPromise(newBadRequestException("Server name not specified."));
             }
 
             try {
                 ServiceConfigManager scm = getServiceConfigManager(serverContext);
                 ServiceConfig serverConfigs = getServerConfigs(scm);
                 if (!serverConfigs.getSubConfigNames().contains(serverName)) {
-                    resultHandler.handleError(new BadRequestException("Unknown server: " + serverName));
+                    return newExceptionPromise(newBadRequestException("Unknown server: " + serverName));
                 }
             } catch (SSOException | SMSException e) {
                 logger.error("Error getting server config", e);
@@ -297,8 +305,7 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
 
             final String tabName = getTabName(uriVariables);
             if (tabName == null) {
-                resultHandler.handleError(new BadRequestException("Tab name not specified."));
-                return;
+                return newExceptionPromise(newBadRequestException("Tab name not specified."));
             }
 
             JsonValue schema;
@@ -312,13 +319,12 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
             }
 
             if (schema == null) {
-                resultHandler.handleError(new BadRequestException("Unknown tab: " + tabName));
-                return;
+                return newExceptionPromise(newBadRequestException("Unknown tab: " + tabName));
             }
 
-            resultHandler.handleResult(schema);
+            return newResultPromise(newActionResponse(schema));
         } else {
-            resultHandler.handleError(new NotSupportedException("Action not supported: " + actionRequest.getAction()));
+            return newExceptionPromise(newNotSupportedException("Action not supported: " + actionRequest.getAction()));
         }
     }
 
@@ -448,25 +454,25 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
     }
 
     @Override
-    public void patchInstance(ServerContext serverContext, PatchRequest patchRequest, ResultHandler<Resource> resultHandler) {
-        resultHandler.handleError(new NotSupportedException());
+    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext serverContext,
+            PatchRequest patchRequest) {
+        return newExceptionPromise(newNotSupportedException());
     }
 
     @Override
-    public void readInstance(ServerContext serverContext, ReadRequest readRequest, ResultHandler<Resource> resultHandler) {
+    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext serverContext,
+            ReadRequest readRequest) {
         Map<String, String> uriVariables = getUriTemplateVariables(serverContext);
 
         final String tabName = getTabName(uriVariables);
 
         if (tabName == null) {
-            resultHandler.handleError(new BadRequestException("Tab name not specified."));
-            return;
+            return newExceptionPromise(newBadRequestException("Tab name not specified."));
         }
 
         final String serverName = getServerName(uriVariables);
         if (serverName == null) {
-            resultHandler.handleError(new BadRequestException("Server name not specified."));
-            return;
+            return newExceptionPromise(newBadRequestException("Server name not specified."));
         }
 
         try {
@@ -477,8 +483,7 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
             final ServiceConfig serverConfig = serverConfigs.getSubConfig(serverName);
 
             if (serverConfig == null) {
-                resultHandler.handleError(new BadRequestException("Unknown Server " + serverName));
-                return;
+                return newExceptionPromise(newBadRequestException("Unknown Server " + serverName));
             }
 
             Properties serverSpecificAttributes = getAttributes(serverConfig);
@@ -545,15 +550,14 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
                 }
             }
 
-            resultHandler.handleResult(new Resource(serverName + "/properties/" + tabName, String.valueOf(result
+            return newResultPromise(newResourceResponse(serverName + "/properties/" + tabName, String.valueOf(result
                     .hashCode()), result));
-            return;
         } catch (SMSException | SSOException | ParserConfigurationException | SAXException | IOException
                 | XPathExpressionException e) {
             logger.error("Error reading property sheet for tab " + tabName, e);
         }
 
-        resultHandler.handleError(new BadRequestException("Error reading properties file for " + tabName));
+        return newExceptionPromise(newBadRequestException("Error reading properties file for " + tabName));
     }
 
     private String getServerConfigXml(ServiceConfig serverConfig) {
@@ -595,17 +599,18 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
     }
 
     @Override
-    public void updateInstance(ServerContext serverContext, UpdateRequest updateRequest, ResultHandler<Resource> resultHandler) {
+    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext serverContext,
+            UpdateRequest updateRequest) {
         Map<String, String> uriVariables = getUriTemplateVariables(serverContext);
 
         final String tabName = getTabName(uriVariables);
         if (tabName == null) {
-            resultHandler.handleError(new BadRequestException("Tab name not specified."));
+            return newExceptionPromise(newBadRequestException("Tab name not specified."));
         }
 
         final String serverName = getServerName(uriVariables);
         if (serverName == null) {
-            resultHandler.handleError(new BadRequestException("Server name not specified."));
+            return newExceptionPromise(newBadRequestException("Server name not specified."));
         }
 
         try {
@@ -634,16 +639,14 @@ public class SmsServerPropertiesResource implements SingletonResourceProvider {
             allAttributes.put(SERVER_CONFIG, newAttributes);
             serverConfig.setAttributes(allAttributes);
 
-            resultHandler.handleResult(new Resource(tabName, String.valueOf(jsonValue.hashCode()),
+            return newResultPromise(newResourceResponse(tabName, String.valueOf(jsonValue.hashCode()),
                     jsonValue.get("content")));
-            return;
         } catch (SSOException e) {
             logger.error("Error getting SSOToken", e);
         } catch (SMSException e) {
             logger.error("Error getting service config manager", e);
         }
 
-        resultHandler.handleError(new BadRequestException("Error updating values for " + tabName));
+        return newExceptionPromise(newBadRequestException("Error updating values for " + tabName));
     }
-
 }

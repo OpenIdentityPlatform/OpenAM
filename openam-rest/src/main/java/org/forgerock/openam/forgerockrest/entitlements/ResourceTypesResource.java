@@ -16,25 +16,36 @@
 package org.forgerock.openam.forgerockrest.entitlements;
 
 import static com.sun.identity.entitlement.EntitlementException.*;
+import static org.forgerock.json.resource.Responses.newQueryResponse;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.security.auth.Subject;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
 
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.shared.debug.Debug;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
+import org.forgerock.json.resource.CountPolicy;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.util.query.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.entitlement.ResourceType;
@@ -48,13 +59,8 @@ import org.forgerock.openam.forgerockrest.utils.ServerContextUtils;
 import org.forgerock.openam.rest.query.DataQueryFilterVisitor;
 import org.forgerock.openam.rest.query.QueryException;
 import org.forgerock.openam.utils.StringUtils;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.security.auth.Subject;
-import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
+import org.forgerock.util.promise.Promise;
+import org.forgerock.util.query.QueryFilter;
 
 /**
  * Allows for CREST-handling of stored {@link org.forgerock.openam.entitlement.ResourceType}s which know about realms.
@@ -95,17 +101,17 @@ public class ResourceTypesResource extends RealmAwareResource {
      * Unsupported by this endpoint.
      */
     @Override
-    public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
      * Unsupported by this endpoint.
      */
     @Override
-    public void actionInstance(ServerContext context, String resourceId, ActionRequest request,
-                               ResultHandler<JsonValue> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+            ActionRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
@@ -116,14 +122,12 @@ public class ResourceTypesResource extends RealmAwareResource {
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
      */
     @Override
-    public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
 
         if (METHOD_PUT.equalsIgnoreCase(context.asContext(HttpContext.class).getMethod())) {
-            handler.handleError(ResourceException.getException(METHOD_NOT_ALLOWED));
-            return;
+            return newExceptionPromise(ResourceException.getException(METHOD_NOT_ALLOWED));
         }
 
         String principalName = "unknown";
@@ -149,7 +153,7 @@ public class ResourceTypesResource extends RealmAwareResource {
                         + ": for Resource Type: "
                         + savedResourceType.getName());
             }
-            handler.handleResult(new Resource(savedResourceType.getUUID(), null,
+            return newResultPromise(newResourceResponse(savedResourceType.getUUID(), null,
                     new JsonResourceType(savedResourceType).toJsonValue()));
         } catch (EntitlementException e) {
             if (logger.errorEnabled()) {
@@ -158,7 +162,7 @@ public class ResourceTypesResource extends RealmAwareResource {
                              + ": Resource Type creation failed. ",
                              e);
             }
-            handler.handleError(exceptionMappingHandler.handleError(context, request, e));
+            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, e));
         }
     }
 
@@ -170,13 +174,10 @@ public class ResourceTypesResource extends RealmAwareResource {
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
      */
     @Override
-    public void deleteInstance(ServerContext context,
-                               String resourceId,
-                               DeleteRequest request,
-                               ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String resourceId,
+            DeleteRequest request) {
 
         String principalName = "unknown";
         try {
@@ -186,15 +187,15 @@ public class ResourceTypesResource extends RealmAwareResource {
 
             resourceTypeService.deleteResourceType(callingSubject, realm, resourceId);
 
-            final Resource resource = new Resource(resourceId, "0", JsonValue.json(JsonValue.object()));
-            handler.handleResult(resource);
+            final ResourceResponse resource = newResourceResponse(resourceId, "0", JsonValue.json(JsonValue.object()));
+            return newResultPromise(resource);
         } catch (EntitlementException e) {
             if (logger.errorEnabled()) {
                 logger.error("ApplicationsResource :: DELETE by "
                         + principalName
                         + ": Application failed to delete the resource specified. ", e);
             }
-            handler.handleError(exceptionMappingHandler.handleError(context, request, e));
+            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, e));
         }
     }
 
@@ -202,9 +203,9 @@ public class ResourceTypesResource extends RealmAwareResource {
      * Unsupported by this endpoint.
      */
     @Override
-    public void patchInstance(ServerContext context, String resourceId, PatchRequest request,
-                              ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+            PatchRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     /**
@@ -215,11 +216,10 @@ public class ResourceTypesResource extends RealmAwareResource {
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
      */
     @Override
-    public void updateInstance(ServerContext context, String resourceId, UpdateRequest request,
-                               ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId,
+            UpdateRequest request) {
 
         String principalName = "unknown";
         try {
@@ -245,7 +245,7 @@ public class ResourceTypesResource extends RealmAwareResource {
                         + jsonWrapper.getName());
             }
 
-            handler.handleResult(new Resource(updatedResourceType.getUUID(), null,
+            return newResultPromise(newResourceResponse(updatedResourceType.getUUID(), null,
                     new JsonResourceType(updatedResourceType).toJsonValue()));
 
         } catch (EntitlementException e) {
@@ -254,7 +254,7 @@ public class ResourceTypesResource extends RealmAwareResource {
                              + principalName
                              + ": Resource Type update failed. ", e);
             }
-            handler.handleError(exceptionMappingHandler.handleError(context, request, e));
+            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, e));
         }
     }
 
@@ -269,7 +269,8 @@ public class ResourceTypesResource extends RealmAwareResource {
      * @param handler {@inheritDoc}
      */
     @Override
-    public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
+    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+            QueryResourceHandler handler) {
         String principalName = "unknown";
         String realm = getRealm(context);
         QueryFilter<JsonPointer> queryFilter = request.getQueryFilter();
@@ -289,13 +290,13 @@ public class ResourceTypesResource extends RealmAwareResource {
 
             for (String uuid : filterResults) {
                 ResourceType resourceType = resourceTypeService.getResourceType(subject, realm, uuid);
-                handler.handleResource(new Resource(uuid,
+                handler.handleResource(newResourceResponse(uuid,
                         String.valueOf(resourceType.hashCode()),
                         new JsonResourceType(resourceType).toJsonValue()));
             }
             int remaining = request.getPageSize() == 0 ? 0 :
                     filterResults.size() - (request.getPagedResultsOffset() + request.getPageSize());
-            handler.handleResult(new QueryResult(request.getPagedResultsCookie(), remaining < 0 ? 0 : remaining));
+            return newResultPromise(newQueryResponse(request.getPagedResultsCookie(), CountPolicy.EXACT, remaining < 0 ? 0 : remaining));
         } catch (EntitlementException ee) {
             if (logger.errorEnabled()) {
                 logger.error("ResourceTypesResource :: QUERY by "
@@ -303,9 +304,9 @@ public class ResourceTypesResource extends RealmAwareResource {
                              + ": Caused EntitlementException: ",
                              ee);
             }
-            handler.handleError(exceptionMappingHandler.handleError(context, request, ee));
+            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, ee));
         } catch (QueryException e) {
-            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST,
+            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST,
                     e.getL10NMessage(ServerContextUtils.getLocaleFromContext(context))));
         }
     }
@@ -320,11 +321,10 @@ public class ResourceTypesResource extends RealmAwareResource {
      * @param context {@inheritDoc}
      * @param resourceId {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
      */
     @Override
-    public void readInstance(ServerContext context, String resourceId, ReadRequest request,
-                             ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+            ReadRequest request) {
 
         String principalName = "unknown";
         try {
@@ -338,10 +338,10 @@ public class ResourceTypesResource extends RealmAwareResource {
             }
             JsonResourceType wrapper = new JsonResourceType(resourceType);
 
-            final Resource resource = new Resource(resourceId,
-                                                   String.valueOf(System.currentTimeMillis()),
-                                                   JsonValue.json(wrapper.toJsonValue()));
-            handler.handleResult(resource);
+            final ResourceResponse resource = newResourceResponse(resourceId,
+                    String.valueOf(System.currentTimeMillis()),
+                    JsonValue.json(wrapper.toJsonValue()));
+            return newResultPromise(resource);
 
         } catch (EntitlementException ee) {
             if (logger.errorEnabled()) {
@@ -349,7 +349,7 @@ public class ResourceTypesResource extends RealmAwareResource {
                         + principalName
                         + ": Could not jsonify class associated with defined Type: " + resourceId, ee);
             }
-            handler.handleError(exceptionMappingHandler.handleError(context, request, ee));
+            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, ee));
         }
     }
 

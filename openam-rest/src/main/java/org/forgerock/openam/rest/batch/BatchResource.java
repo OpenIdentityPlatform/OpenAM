@@ -15,28 +15,34 @@
 */
 package org.forgerock.openam.rest.batch;
 
-import static org.forgerock.openam.scripting.ScriptConstants.*;
+import static org.forgerock.json.resource.ResourceException.adapt;
+import static org.forgerock.json.resource.Responses.newActionResponse;
+import static org.forgerock.openam.scripting.ScriptConstants.SDK_NAME;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 
-import com.sun.identity.entitlement.opensso.SubjectUtils;
-import com.sun.identity.shared.debug.Debug;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.script.Bindings;
 import javax.script.SimpleBindings;
+
+import com.sun.identity.entitlement.opensso.SubjectUtils;
+import com.sun.identity.shared.debug.Debug;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.RestUtils;
@@ -48,6 +54,7 @@ import org.forgerock.openam.scripting.ScriptException;
 import org.forgerock.openam.scripting.ScriptObject;
 import org.forgerock.openam.scripting.service.ScriptConfiguration;
 import org.forgerock.openam.scripting.service.ScriptingServiceFactory;
+import org.forgerock.util.promise.Promise;
 
 /**
  * Executes scripts with all the stuff needed to understand how batching operates.
@@ -86,15 +93,14 @@ public class BatchResource extends RealmAwareResource {
     }
 
     @Override
-    public void actionCollection(ServerContext serverContext, ActionRequest actionRequest,
-                                 ResultHandler<JsonValue> resultHandler) {
+    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext serverContext,
+            ActionRequest actionRequest) {
 
         if (!actionRequest.getAction().equals(BATCH)) {
             final String msg = "Action '" + actionRequest.getAction() + "' not implemented for this resource";
             final NotSupportedException exception = new NotSupportedException(msg);
             debug.error(msg, exception);
-            resultHandler.handleError(exception);
-            return;
+            return newExceptionPromise(adapt(exception));
         }
 
         String scriptId = null;
@@ -106,8 +112,7 @@ public class BatchResource extends RealmAwareResource {
                 if (debug.errorEnabled()) {
                     debug.error("BatchResource :: actionCollection - ScriptId null. Default scripts not implemented.");
                 }
-                resultHandler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
-                return;
+                return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
             } else {
                 scriptId = scriptIdValue.asString();
             }
@@ -128,56 +133,56 @@ public class BatchResource extends RealmAwareResource {
             bindings.put(REQUESTER, requester);
             bindings.put(RESPONSE, response);
 
-            resultHandler.handleResult((JsonValue) scriptEvaluator.evaluateScript(script, bindings));
+            return newResultPromise(newActionResponse((JsonValue) scriptEvaluator.evaluateScript(script, bindings)));
 
         } catch (ScriptException e) {
             debug.error("BatchResource :: actionCollection - Error running script : {}", scriptId);
-            resultHandler.handleError(exceptionMappingHandler.handleError(serverContext, actionRequest, e));
+            return newExceptionPromise(exceptionMappingHandler.handleError(serverContext, actionRequest, e));
         } catch (javax.script.ScriptException e) {
             debug.error("BatchResource :: actionCollection - Error running script : {}", scriptId);
-            resultHandler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
     }
 
     @Override
-    public void actionInstance(ServerContext serverContext, String s, ActionRequest actionRequest,
-                               ResultHandler<JsonValue> resultHandler) {
-        RestUtils.generateUnsupportedOperation(resultHandler);
+    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext serverContext, String s,
+            ActionRequest actionRequest) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public void createInstance(ServerContext serverContext, CreateRequest createRequest,
-                               ResultHandler<Resource> resultHandler) {
-        RestUtils.generateUnsupportedOperation(resultHandler);
+    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext serverContext,
+            CreateRequest createRequest) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public void deleteInstance(ServerContext serverContext, String s, DeleteRequest deleteRequest,
-                               ResultHandler<Resource> resultHandler) {
-        RestUtils.generateUnsupportedOperation(resultHandler);
+    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext serverContext, String s,
+            DeleteRequest deleteRequest) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public void patchInstance(ServerContext serverContext, String s, PatchRequest patchRequest,
-                              ResultHandler<Resource> resultHandler) {
-        RestUtils.generateUnsupportedOperation(resultHandler);
+    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext serverContext, String s,
+            PatchRequest patchRequest) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public void queryCollection(ServerContext serverContext, QueryRequest queryRequest,
-                                QueryResultHandler queryResultHandler) {
-        RestUtils.generateUnsupportedOperation(queryResultHandler);
+    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext serverContext,
+            QueryRequest queryRequest, QueryResourceHandler queryResultHandler) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public void readInstance(ServerContext serverContext, String s, ReadRequest readRequest,
-                             ResultHandler<Resource> resultHandler) {
-        RestUtils.generateUnsupportedOperation(resultHandler);
+    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext serverContext, String s,
+            ReadRequest readRequest) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public void updateInstance(ServerContext serverContext, String s, UpdateRequest updateRequest,
-                               ResultHandler<Resource> resultHandler) {
-        RestUtils.generateUnsupportedOperation(resultHandler);
+    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext serverContext, String s,
+            UpdateRequest updateRequest) {
+        return RestUtils.generateUnsupportedOperation();
     }
 }

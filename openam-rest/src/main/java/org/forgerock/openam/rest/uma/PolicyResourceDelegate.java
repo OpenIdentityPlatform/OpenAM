@@ -34,7 +34,6 @@ import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.http.context.ServerContext;
-import org.forgerock.openam.rest.resource.PromisedRequestHandler;
 import org.forgerock.util.Pair;
 import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.promise.Promise;
@@ -143,7 +142,7 @@ public class PolicyResourceDelegate {
      * if the query failed.
      */
     public Promise<QueryResult, ResourceException> queryPolicies(ServerContext context,
-            QueryRequest request, QueryResultHandler resultHandler) {
+            QueryRequest request, QueryResourceHandler resultHandler) {
         return policyResource.handleQuery(context, request, resultHandler);
     }
 

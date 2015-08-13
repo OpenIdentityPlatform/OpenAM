@@ -17,27 +17,33 @@
 package org.forgerock.openam.rest.sms;
 
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.ResourceException.newBadRequestException;
+import static org.forgerock.json.resource.ResourceException.newNotSupportedException;
+import static org.forgerock.json.resource.Responses.newQueryResponse;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.util.promise.Promise;
 
 /**
  * CREST resource which returns configuration details about each available common task wizard.
@@ -96,68 +102,66 @@ class CommonTasksResource implements CollectionResourceProvider {
     }
 
     @Override
-    public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 
     @Override
-    public void actionInstance(ServerContext context, String resourceId, ActionRequest request,
-            ResultHandler<JsonValue> handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+            ActionRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 
     @Override
-    public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 
     @Override
-    public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request,
-            ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String resourceId,
+            DeleteRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 
     @Override
-    public void patchInstance(ServerContext context, String resourceId, PatchRequest request,
-            ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+            PatchRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 
     @Override
-    public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
+    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request, QueryResourceHandler handler) {
         if (!"true".equals(request.getQueryFilter().toString())) {
-            handler.handleError(new NotSupportedException("Query not supported: " + request.getQueryFilter()));
-            return;
+            return newExceptionPromise(newNotSupportedException("Query not supported: " + request.getQueryFilter()));
         }
         //TODO pass in locale
         Locale locale = Locale.ROOT;
         JsonValue configuration = configurationManager.getCommonTasksConfiguration(getResourceBundle(locale));
         for (String key : configuration.keys()) {
             JsonValue resource = configuration.get(key);
-            resource.add(Resource.FIELD_CONTENT_ID, key);
-            handler.handleResource(new Resource(key, String.valueOf(resource.getObject().hashCode()), resource));
+            resource.add(ResourceResponse.FIELD_CONTENT_ID, key);
+            handler.handleResource(newResourceResponse(key, String.valueOf(resource.getObject().hashCode()), resource));
         }
-        handler.handleResult(new QueryResult());
+        return newResultPromise(newQueryResponse());
     }
 
     @Override
-    public void readInstance(ServerContext context, String resourceId, ReadRequest request,
-            ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+            ReadRequest request) {
         //TODO pass in locale
         Locale locale = Locale.ROOT;
         JsonValue configuration = configurationManager.getCommonTasksConfiguration(getResourceBundle(locale));
         if (!configuration.isDefined(resourceId)) {
-            handler.handleError(new BadRequestException("Invalid common task"));
-            return;
+            return newExceptionPromise(newBadRequestException("Invalid common task"));
         }
         JsonValue resource = configuration.get(resourceId);
-        handler.handleResult(new Resource(resourceId, String.valueOf(resource.getObject().hashCode()), resource));
+        return newResultPromise(newResourceResponse(resourceId, String.valueOf(resource.getObject().hashCode()), resource));
     }
 
     @Override
-    public void updateInstance(ServerContext context, String resourceId, UpdateRequest request,
-            ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId,
+            UpdateRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 
     private ResourceBundle getResourceBundle(Locale locale) {

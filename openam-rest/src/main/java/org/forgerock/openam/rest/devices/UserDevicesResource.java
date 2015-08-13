@@ -16,26 +16,33 @@
 
 package org.forgerock.openam.rest.devices;
 
+import static org.forgerock.json.resource.ResourceException.*;
+import static org.forgerock.json.resource.Responses.newQueryResponse;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
 import java.text.ParseException;
 import java.util.List;
+
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.json.resource.NotFoundException;
-import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.entitlements.RealmAwareResource;
 import org.forgerock.openam.rest.resource.ContextHelper;
+import org.forgerock.util.promise.Promise;
 
 /**
  * REST resource for a user's trusted devices.
@@ -65,33 +72,33 @@ public abstract class UserDevicesResource<T extends UserDevicesDao> extends Real
      * {@inheritDoc}
      */
     @Override
-    public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-        handler.handleError(new NotSupportedException("Not supported."));
+    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
+        return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void actionInstance(ServerContext context, String resourceId, ActionRequest request,
-                               ResultHandler<JsonValue> handler) {
-        handler.handleError(new NotSupportedException("Not supported."));
+    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+            ActionRequest request) {
+        return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException("Not supported."));
+    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
+        return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request,
-                               ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String resourceId,
+            DeleteRequest request) {
 
         final String userName = contextHelper.getUserId(context);
 
@@ -107,17 +114,16 @@ public abstract class UserDevicesResource<T extends UserDevicesDao> extends Real
             }
 
             if (toDelete == null) {
-                handler.handleError(new NotFoundException("User device, " + resourceId + ", not found."));
-                return;
+                return newExceptionPromise(newNotFoundException("User device, " + resourceId + ", not found."));
             }
 
             devices.remove(toDelete);
 
             userDevicesDao.saveDeviceProfiles(userName, getRealm(context), devices);
 
-            handler.handleResult(new Resource(resourceId, toDelete.hashCode() + "", toDelete));
+            return newResultPromise(newResourceResponse(resourceId, toDelete.hashCode() + "", toDelete));
         } catch (InternalServerErrorException e) {
-            handler.handleError(e);
+            return newExceptionPromise(adapt(e));
         }
     }
 
@@ -125,48 +131,49 @@ public abstract class UserDevicesResource<T extends UserDevicesDao> extends Real
      * {@inheritDoc}
      */
     @Override
-    public void patchInstance(ServerContext context, String resourceId, PatchRequest request,
-                              ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException("Not supported."));
+    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+            PatchRequest request) {
+        return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
+    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+            QueryResourceHandler handler) {
         try {
             final String userName = contextHelper.getUserId(context);
 
             for (JsonValue profile : userDevicesDao.getDeviceProfiles(userName, getRealm(context))) {
                 handler.handleResource(convertValue(profile));
             }
-            handler.handleResult(new QueryResult());
+            return newResultPromise(newQueryResponse());
         } catch (ParseException e) {
-            handler.handleError(new InternalServerErrorException(e.getMessage()));
+            return newExceptionPromise(newInternalServerErrorException(e.getMessage()));
         } catch (InternalServerErrorException e) {
-            handler.handleError(e);
+            return newExceptionPromise(adapt(e));
         }
     }
 
-    protected abstract Resource convertValue(JsonValue queryResult) throws ParseException;
+    protected abstract ResourceResponse convertValue(JsonValue queryResult) throws ParseException;
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void readInstance(ServerContext context, String resourceId, ReadRequest request,
-                             ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException("Not supported."));
+    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+            ReadRequest request) {
+        return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void updateInstance(ServerContext context, String resourceId, UpdateRequest request,
-                               ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException("Not supported."));
+    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId,
+            UpdateRequest request) {
+        return newExceptionPromise(newNotSupportedException("Not supported."));
     }
 
 }

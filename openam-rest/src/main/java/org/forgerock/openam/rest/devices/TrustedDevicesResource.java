@@ -16,13 +16,16 @@
 
 package org.forgerock.openam.rest.devices;
 
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+
+import javax.inject.Inject;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import javax.inject.Inject;
+
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.Resource;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.openam.rest.resource.ContextHelper;
 
 /**
@@ -48,7 +51,7 @@ public class TrustedDevicesResource extends UserDevicesResource<TrustedDevicesDa
         super(dao, contextHelper);
     }
 
-    protected Resource convertValue(JsonValue profile) throws ParseException {
+    protected ResourceResponse convertValue(JsonValue profile) throws ParseException {
         final JsonValue lastSelectedDateJson = profile.get(LAST_SELECTED_DATE_KEY);
         final Date lastSelectedDate;
         final String formatted;
@@ -66,6 +69,6 @@ public class TrustedDevicesResource extends UserDevicesResource<TrustedDevicesDa
         }
 
         profile.put(LAST_SELECTED_DATE_KEY, formatted);
-        return new Resource(profile.get("name").asString(), profile.hashCode() + "", profile);
+        return newResourceResponse(profile.get("name").asString(), profile.hashCode() + "", profile);
     }
 }

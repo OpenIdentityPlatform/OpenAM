@@ -18,7 +18,11 @@ package org.forgerock.openam.rest.sms;
 
 import static com.sun.identity.sm.AttributeSchema.Syntax.*;
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.ResourceException.newNotSupportedException;
+import static org.forgerock.json.resource.Responses.newActionResponse;
 import static org.forgerock.openam.rest.sms.SmsJsonSchema.*;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -47,17 +51,18 @@ import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
+import org.forgerock.http.context.ServerContext;
+import org.forgerock.http.routing.RouterContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.NotFoundException;
-import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.json.resource.RouterContext;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.util.promise.Promise;
 
 /**
  * A base class for resource providers for the REST SMS services - provides common utility methods for
@@ -210,13 +215,13 @@ abstract class SmsResourceProvider {
         return schema.getName();
     }
 
-    protected void handleAction(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
+    protected Promise<ActionResponse, ResourceException> handleAction(ServerContext context, ActionRequest request) {
         if (request.getAction().equals(TEMPLATE)) {
-            handler.handleResult(converter.toJson(schema.getAttributeDefaults()));
+            return newResultPromise(newActionResponse(converter.toJson(schema.getAttributeDefaults())));
         } else if (SCHEMA.equals(request.getAction())) {
-            handler.handleResult(createSchema(context));
+            return newResultPromise(newActionResponse(createSchema(context)));
         } else {
-            handler.handleError(new NotSupportedException("Action not supported: " + request.getAction()));
+            return newExceptionPromise(newNotSupportedException("Action not supported: " + request.getAction()));
         }
     }
 

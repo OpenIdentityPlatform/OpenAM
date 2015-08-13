@@ -18,7 +18,6 @@ package org.forgerock.openam.rest.fluent;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.Filter;
 import org.forgerock.openam.audit.AuditConstants.Component;
-import org.forgerock.openam.rest.resource.CrestRouter;
 import org.forgerock.util.Reject;
 
 /**

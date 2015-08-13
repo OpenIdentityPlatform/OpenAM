@@ -183,7 +183,7 @@ public class AuditFilter implements Filter {
      * @param next {@inheritDoc}
      */
     @Override
-    public void filterQuery(ServerContext context, QueryRequest request, QueryResultHandler handler, RequestHandler next) {
+    public void filterQuery(ServerContext context, QueryRequest request, QueryResourceHandler handler, RequestHandler next) {
 
         AuditingQueryResultHandler auditingHandler = newQueryAuditingResultHandler(context, request, handler);
         try {

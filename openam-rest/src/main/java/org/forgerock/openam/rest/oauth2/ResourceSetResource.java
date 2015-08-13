@@ -16,6 +16,15 @@
 
 package org.forgerock.openam.rest.oauth2;
 
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.resource.ResourceException.newBadRequestException;
+import static org.forgerock.json.resource.ResourceException.newNotSupportedException;
+import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -23,27 +32,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.inject.Inject;
+
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.util.query.QueryFilter;
-import org.forgerock.util.query.QueryFilterVisitor;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Request;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.restlet.resources.ResourceSetDescriptionValidator;
@@ -52,10 +57,10 @@ import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerB
 import org.forgerock.openam.oauth2.resources.labels.ResourceSetLabel;
 import org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore;
 import org.forgerock.openam.rest.resource.ContextHelper;
-import org.forgerock.util.promise.ExceptionHandler;
-
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
+import org.forgerock.util.AsyncFunction;
+import org.forgerock.util.promise.Promise;
+import org.forgerock.util.query.QueryFilter;
+import org.forgerock.util.query.QueryFilterVisitor;
 
 /**
  * <p>Resource Set resource to expose registered Resource Sets for a given user.</p>
@@ -79,7 +84,8 @@ public class ResourceSetResource implements CollectionResourceProvider {
      * @param contextHelper An instance of the ContextHelper.
      */
     @Inject
-    public ResourceSetResource(ResourceSetService resourceSetService, ContextHelper contextHelper, UmaLabelsStore umaLabelsStore, ResourceSetDescriptionValidator validator) {
+    public ResourceSetResource(ResourceSetService resourceSetService, ContextHelper contextHelper,
+            UmaLabelsStore umaLabelsStore, ResourceSetDescriptionValidator validator) {
         this.resourceSetService = resourceSetService;
         this.contextHelper = contextHelper;
         this.umaLabelsStore = umaLabelsStore;
@@ -91,39 +97,32 @@ public class ResourceSetResource implements CollectionResourceProvider {
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
      */
     @Override
-    public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void readInstance(ServerContext context, String resourceId, ReadRequest request,
-            final ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+            ReadRequest request) {
         boolean augmentWithPolicies = augmentWithPolicies(request);
         String realm = getRealm(context);
         String resourceOwnerId = getResourceOwnerId(context);
-        resourceSetService.getResourceSet(context, realm, resourceId, resourceOwnerId, augmentWithPolicies)
-                .thenOnResult(new org.forgerock.util.promise.ResultHandler<ResourceSetDescription>() {
+        return resourceSetService.getResourceSet(context, realm, resourceId, resourceOwnerId, augmentWithPolicies)
+                .thenAsync(new AsyncFunction<ResourceSetDescription, ResourceResponse, ResourceException>() {
                     @Override
-                    public void handleResult(ResourceSetDescription result) {
+                    public Promise<ResourceResponse, ResourceException> apply(ResourceSetDescription result) {
                         try {
                             JsonValue content = null;
                             content = getResourceSetJson(result);
-                            handler.handleResult(newResource(result.getId(), content));
+                            return newResultPromise(newResource(result.getId(), content));
                         } catch (ResourceException e) {
-                            handler.handleError(e);
+                            return newExceptionPromise(e);
                         }
-                    }
-                })
-                .thenOnException(new ExceptionHandler<ResourceException>() {
-                    @Override
-                    public void handleException(ResourceException error) {
-                        handler.handleError(error);
                     }
                 });
     }
@@ -133,29 +132,22 @@ public class ResourceSetResource implements CollectionResourceProvider {
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
      */
     @Override
-    public void actionCollection(ServerContext context, ActionRequest request, final ResultHandler<JsonValue> handler) {
+    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
 
         if ("revokeAll".equalsIgnoreCase(request.getAction())) {
             String realm = getRealm(context);
             String resourceOwnerId = getResourceOwnerId(context);
-            resourceSetService.revokeAllPolicies(context, realm, resourceOwnerId)
-                    .thenOnResult(new org.forgerock.util.promise.ResultHandler<Void>() {
+            return resourceSetService.revokeAllPolicies(context, realm, resourceOwnerId)
+                    .thenAsync(new AsyncFunction<Void, ActionResponse, ResourceException>() {
                         @Override
-                        public void handleResult(Void aVoid) {
-                            handler.handleResult(json(object()));
-                        }
-                    })
-                    .thenOnException(new ExceptionHandler<ResourceException>() {
-                        @Override
-                        public void handleException(ResourceException e) {
-                            handler.handleError(e);
+                        public Promise<ActionResponse, ResourceException> apply(Void value) throws ResourceException {
+                            return newResultPromise(newActionResponse(json(object())));
                         }
                     });
         } else {
-            handler.handleError(new NotSupportedException("Action " + request.getAction() + " not supported"));
+            return newExceptionPromise(newNotSupportedException("Action " + request.getAction() + " not supported"));
         }
     }
 
@@ -164,12 +156,12 @@ public class ResourceSetResource implements CollectionResourceProvider {
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
      */
     @Override
-    public void queryCollection(final ServerContext context, QueryRequest request, QueryResultHandler handler) {
+    public Promise<QueryResponse, ResourceException> queryCollection(final ServerContext context, QueryRequest request,
+            QueryResourceHandler handler) {
 
-        final QueryResultHandler queryHandler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
+        final QueryResourceHandler queryHandler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
 
         final ResourceSetWithPolicyQuery query;
         try {
@@ -179,36 +171,28 @@ public class ResourceSetResource implements CollectionResourceProvider {
             } else if (request.getQueryFilter() != null) {
                 query = request.getQueryFilter().accept(new ResourceSetQueryFilter(context), new ResourceSetWithPolicyQuery());
             } else {
-                handler.handleError(new BadRequestException("Invalid query"));
-                return;
+                return newExceptionPromise(newBadRequestException("Invalid query"));
             }
         } catch (UnsupportedOperationException e) {
-            handler.handleError(new NotSupportedException(e.getMessage()));
-            return;
+            return newExceptionPromise(newNotSupportedException(e.getMessage()));
         }
 
         boolean augmentWithPolicies = augmentWithPolicies(request);
         String realm = getRealm(context);
         String resourceOwnerId = getResourceOwnerId(context);
-        resourceSetService.getResourceSets(context, realm, query, resourceOwnerId, augmentWithPolicies)
-                .thenOnResult(new org.forgerock.util.promise.ResultHandler<Collection<ResourceSetDescription>>() {
+        return resourceSetService.getResourceSets(context, realm, query, resourceOwnerId, augmentWithPolicies)
+                .thenAsync(new AsyncFunction<Collection<ResourceSetDescription>, QueryResponse, ResourceException>() {
                     @Override
-                    public void handleResult(Collection<ResourceSetDescription> resourceSets) {
+                    public Promise<QueryResponse, ResourceException> apply(Collection<ResourceSetDescription> resourceSets) {
                         try {
                             for (ResourceSetDescription resourceSet : resourceSets) {
                                 queryHandler.handleResource(
                                         newResource(resourceSet.getId(), getResourceSetJson(resourceSet)));
                             }
-                            queryHandler.handleResult(new QueryResult());
+                            return newResultPromise(newQueryResponse());
                         } catch (ResourceException e) {
-                            queryHandler.handleError(e);
+                            return newExceptionPromise(e);
                         }
-                    }
-                })
-                .thenOnException(new ExceptionHandler<ResourceException>() {
-                    @Override
-                    public void handleException(ResourceException e) {
-                        queryHandler.handleError(e);
                     }
                 });
     }
@@ -225,8 +209,8 @@ public class ResourceSetResource implements CollectionResourceProvider {
         return request.getFields().isEmpty() || request.getFields().contains(new JsonPointer("/policy"));
     }
 
-    private Resource newResource(String id, JsonValue content) {
-        return new Resource(id, Long.toString(content.hashCode()), content);
+    private ResourceResponse newResource(String id, JsonValue content) {
+        return newResourceResponse(id, Long.toString(content.hashCode()), content);
     }
 
     private JsonValue getResourceSetJson(ResourceSetDescription resourceSet) throws ResourceException {
@@ -501,11 +485,10 @@ public class ResourceSetResource implements CollectionResourceProvider {
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
      */
     @Override
-    public void updateInstance(ServerContext context, String resourceId, UpdateRequest request,
-            final ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId,
+            UpdateRequest request) {
 
         final Map<String, Object> resourceSetDescriptionAttributes;
         try {
@@ -530,29 +513,23 @@ public class ResourceSetResource implements CollectionResourceProvider {
                 umaLabelsStore.update(realm, userId, label);
             }
 
-            resourceSetService.getResourceSet(context, realm, resourceId, userId, false)
-                    .thenOnResult(new org.forgerock.util.promise.ResultHandler<ResourceSetDescription>() {
+            return resourceSetService.getResourceSet(context, realm, resourceId, userId, false)
+                    .thenAsync(new AsyncFunction<ResourceSetDescription, ResourceResponse, ResourceException>() {
                         @Override
-                        public void handleResult(ResourceSetDescription result) {
+                        public Promise<ResourceResponse, ResourceException> apply(ResourceSetDescription result) {
                             try {
                                 JsonValue content = null;
                                 content = getResourceSetJson(result);
-                                handler.handleResult(newResource(result.getId(), content));
+                                return newResultPromise(newResource(result.getId(), content));
                             } catch (ResourceException e) {
-                                handler.handleError(e);
+                                return newExceptionPromise(e);
                             }
-                        }
-                    })
-                    .thenOnException(new ExceptionHandler<ResourceException>() {
-                        @Override
-                        public void handleException(ResourceException error) {
-                            handler.handleError(error);
                         }
                     });
         } catch (ResourceException e) {
-            handler.handleError(e);
+            return newExceptionPromise(e);
         } catch (org.forgerock.oauth2.core.exceptions.BadRequestException e) {
-            handler.handleError(new BadRequestException("Error retrieving labels.", e));
+            return newExceptionPromise(newBadRequestException("Error retrieving labels.", e));
         }
     }
 
@@ -565,12 +542,11 @@ public class ResourceSetResource implements CollectionResourceProvider {
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
      */
     @Override
-    public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request,
-            ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String resourceId,
+            DeleteRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 
     /**
@@ -578,12 +554,11 @@ public class ResourceSetResource implements CollectionResourceProvider {
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
      */
     @Override
-    public void patchInstance(ServerContext context, String resourceId, PatchRequest request,
-            ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+            PatchRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 
     /**
@@ -591,11 +566,10 @@ public class ResourceSetResource implements CollectionResourceProvider {
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
      */
     @Override
-    public void actionInstance(ServerContext context, String resourceId, ActionRequest request,
-            ResultHandler<JsonValue> handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+            ActionRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 }

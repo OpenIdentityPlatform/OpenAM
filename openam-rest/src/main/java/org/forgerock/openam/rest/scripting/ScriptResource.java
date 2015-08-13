@@ -16,27 +16,34 @@
 package org.forgerock.openam.rest.scripting;
 
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.ResourceException.newNotSupportedException;
+import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.openam.scripting.ScriptConstants.*;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import java.io.UnsupportedEncodingException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.sun.identity.shared.encode.Base64;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.util.query.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.entitlements.RealmAwareResource;
@@ -49,12 +56,9 @@ import org.forgerock.openam.scripting.ScriptValidator;
 import org.forgerock.openam.scripting.SupportedScriptingLanguage;
 import org.forgerock.openam.scripting.service.ScriptConfiguration;
 import org.forgerock.openam.scripting.service.ScriptingServiceFactory;
+import org.forgerock.util.promise.Promise;
+import org.forgerock.util.query.QueryFilter;
 import org.slf4j.Logger;
-
-import java.io.UnsupportedEncodingException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * A REST endpoint for managing scripts in OpenAM.
@@ -86,7 +90,7 @@ public class ScriptResource extends RealmAwareResource {
     }
 
     @Override
-    public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> resultHandler) {
+    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest request) {
         if ("validate".equals(request.getAction())) {
             try {
                 JsonValue json = request.getContent();
@@ -99,8 +103,7 @@ public class ScriptResource extends RealmAwareResource {
                 List<ScriptError> scriptErrorList = scriptValidator.validateScript(new ScriptObject(EMPTY,
                         Base64.decodeAsUTF8String(script), language, null));
                 if (scriptErrorList.isEmpty()) {
-                    resultHandler.handleResult(json(object(field("success", true))));
-                    return;
+                    return newResultPromise(newActionResponse(json(object(field("success", true)))));
                 }
 
                 Set<Object> errors = new HashSet<>();
@@ -110,54 +113,54 @@ public class ScriptResource extends RealmAwareResource {
                             field("column", error.getColumnNumber()),
                             field("message", error.getMessage())));
                 }
-                resultHandler.handleResult(json(object(field("success", false), field("errors", errors))));
+                return newResultPromise(newActionResponse(json(object(field("success", false), field("errors", errors)))));
             } catch (ScriptException se) {
-                resultHandler.handleError(exceptionMappingHandler.handleError(context, request, se));
+                return newExceptionPromise(exceptionMappingHandler.handleError(context, request, se));
             }
         } else {
-            resultHandler.handleError(new NotSupportedException());
+            return newExceptionPromise(newNotSupportedException());
         }
     }
 
     @Override
-    public void actionInstance(ServerContext context, String resourceId, ActionRequest request,
-                               ResultHandler<JsonValue> resultHandler) {
-        resultHandler.handleError(new NotSupportedException());
+    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+            ActionRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 
     @Override
-    public void patchInstance(ServerContext context, String resourceId, PatchRequest request,
-                              ResultHandler<Resource> resultHandler) {
-        resultHandler.handleError(new NotSupportedException());
+    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+            PatchRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 
     @Override
-    public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> resultHandler) {
+    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context, CreateRequest request) {
         try {
              final ScriptConfiguration sc = serviceFactory
                     .create(getContextSubject(context), getRealm(context))
                     .create(fromJson(request.getContent()));
-            resultHandler.handleResult(new Resource(sc.getId(), String.valueOf(sc.hashCode()), asJson(sc)));
+            return newResultPromise(newResourceResponse(sc.getId(), String.valueOf(sc.hashCode()), asJson(sc)));
         } catch (ScriptException se) {
-            resultHandler.handleError(exceptionMappingHandler.handleError(context, request, se));
+            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, se));
         }
     }
 
     @Override
-    public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request,
-                               ResultHandler<Resource> resultHandler) {
+    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String resourceId,
+            DeleteRequest request) {
 
         try {
             serviceFactory.create(getContextSubject(context), getRealm(context)).delete(resourceId);
-            resultHandler.handleResult(new Resource(resourceId, null, json(object())));
+            return newResultPromise(newResourceResponse(resourceId, null, json(object())));
         } catch (ScriptException se) {
-            resultHandler.handleError(exceptionMappingHandler.handleError(context, request, se));
+            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, se));
         }
-
     }
 
     @Override
-    public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler resultHandler) {
+    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest request,
+            QueryResourceHandler resultHandler) {
         resultHandler = QueryResultHandlerBuilder.withPagingAndSorting(resultHandler, request);
         final QueryFilter<JsonPointer> filter = request.getQueryFilter();
         try {
@@ -170,34 +173,34 @@ public class ScriptResource extends RealmAwareResource {
                 configs = serviceFactory.create(getContextSubject(context), getRealm(context)).get(stringQueryFilter);
             }
             for (ScriptConfiguration sc : configs) {
-                resultHandler.handleResource(new Resource(sc.getId(), String.valueOf(sc.hashCode()), asJson(sc)));
+                resultHandler.handleResource(newResourceResponse(sc.getId(), String.valueOf(sc.hashCode()), asJson(sc)));
             }
-            resultHandler.handleResult(new QueryResult());
+            return newResultPromise(newQueryResponse());
         } catch (ScriptException se) {
-            resultHandler.handleError(exceptionMappingHandler.handleError(context, request, se));
+            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, se));
         }
     }
 
     @Override
-    public void readInstance(ServerContext context, String resourceId, ReadRequest request,
-                             ResultHandler<Resource> resultHandler) {
+    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+            ReadRequest request) {
         try {
-            resultHandler.handleResult(new Resource(resourceId, null, asJson(
+            return newResultPromise(newResourceResponse(resourceId, null, asJson(
                     serviceFactory.create(getContextSubject(context), getRealm(context)).get(resourceId))));
         } catch (ScriptException se) {
-            resultHandler.handleError(exceptionMappingHandler.handleError(context, request, se));
+            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, se));
         }
     }
 
     @Override
-    public void updateInstance(ServerContext context, String resourceId, UpdateRequest request,
-                               ResultHandler<Resource> resultHandler) {
+    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId,
+            UpdateRequest request) {
         try {
-            resultHandler.handleResult(new Resource(resourceId, null, asJson(serviceFactory
+            return newResultPromise(newResourceResponse(resourceId, null, asJson(serviceFactory
                     .create(getContextSubject(context), getRealm(context))
                     .update(fromJson(request.getContent(), resourceId)))));
         } catch (ScriptException se) {
-            resultHandler.handleError(exceptionMappingHandler.handleError(context, request, se));
+            return newExceptionPromise(exceptionMappingHandler.handleError(context, request, se));
         }
     }
 

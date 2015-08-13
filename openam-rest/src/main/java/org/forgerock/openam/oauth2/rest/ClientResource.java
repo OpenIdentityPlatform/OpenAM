@@ -23,6 +23,12 @@
  */
 package org.forgerock.openam.oauth2.rest;
 
+import static org.forgerock.json.resource.ResourceException.adapt;
+import static org.forgerock.json.resource.ResourceException.newInternalServerErrorException;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
 import javax.inject.Named;
 import java.security.AccessController;
 import java.util.ArrayList;
@@ -41,8 +47,10 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
@@ -50,22 +58,22 @@ import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.PermanentException;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.api.fields.OAuthTokenField;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
-import org.forgerock.openam.cts.api.fields.OAuthTokenField;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.oauth2.OAuth2AuditLogger;
+import org.forgerock.util.promise.Promise;
 
 public class ClientResource implements CollectionResourceProvider {
 
@@ -115,16 +123,18 @@ public class ClientResource implements CollectionResourceProvider {
         }
     }
 
-    public void actionCollection(ServerContext context, ActionRequest actionRequest, ResultHandler<JsonValue> handler){
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ActionResponse, ResourceException> actionCollection(ServerContext context, ActionRequest
+            actionRequest) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
-    public void actionInstance(ServerContext context, String resourceId, ActionRequest request,
-                               ResultHandler<JsonValue> handler){
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ActionResponse, ResourceException> actionInstance(ServerContext context, String resourceId,
+            ActionRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
-    public void createInstance(ServerContext context, CreateRequest createRequest, ResultHandler<Resource> handler){
+    public Promise<ResourceResponse, ResourceException> createInstance(ServerContext context,
+            CreateRequest createRequest) {
 
         String principal = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
 
@@ -219,12 +229,12 @@ public class ClientResource implements CollectionResourceProvider {
 
             JsonValue response = new JsonValue(responseVal);
 
-            Resource resource = new Resource("results", String.valueOf(System.currentTimeMillis()), response);
+            ResourceResponse resource = newResourceResponse("results", String.valueOf(System.currentTimeMillis()), response);
             if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"CREATED_CLIENT", responseVal.toString()};
                 auditLogger.logAccessMessage("CREATED_CLIENT", obs, null);
             }
-            handler.handleResult(resource);
+            return newResultPromise(resource);
         } catch(IdRepoException e){
             responseVal.put("success", "false");
             if (auditLogger.isAuditLogEnabled()) {
@@ -236,7 +246,7 @@ public class ClientResource implements CollectionResourceProvider {
                 debug.error("ClientResource :: CREATE by " + principal + ": Unable to create client due to " +
                         "IdRepo exception.", e);
             }
-            handler.handleError(new InternalServerErrorException("Unable to create client", e));
+            return newExceptionPromise(newInternalServerErrorException("Unable to create client", e));
         } catch (SSOException e){
             responseVal.put("success", "false");
             if (auditLogger.isAuditLogEnabled()) {
@@ -247,7 +257,7 @@ public class ClientResource implements CollectionResourceProvider {
                 debug.error("ClientResource :: CREATE by " + principal + ": Unable to create client due to " +
                         "SSO exception.", e);
             }
-            handler.handleError(new InternalServerErrorException("Unable to create client", e));
+            return newExceptionPromise(newInternalServerErrorException("Unable to create client", e));
         } catch (PermanentException e){
             responseVal.put("success", "false");
             if (auditLogger.isAuditLogEnabled()) {
@@ -258,7 +268,7 @@ public class ClientResource implements CollectionResourceProvider {
                 debug.error("ClientResource :: CREATE by " + principal +
                         ": Unable to create client due to exception.", e);
             }
-            handler.handleError(e);
+            return newExceptionPromise(adapt(e));
         } catch (org.forgerock.json.resource.BadRequestException e) {
             responseVal.put("success", "false");
             if (auditLogger.isAuditLogEnabled()) {
@@ -266,7 +276,7 @@ public class ClientResource implements CollectionResourceProvider {
                 auditLogger.logErrorMessage("FAILED_CREATE_CLIENT", obs, null);
             }
             debug.error("ClientResource :: CREATE : Unable to create client due to Bad Request.", e);
-            handler.handleError(e);
+            return newExceptionPromise(adapt(e));
         }
     }
 
@@ -286,8 +296,8 @@ public class ClientResource implements CollectionResourceProvider {
         return true;
     }
 
-    public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request,
-                               ResultHandler<Resource> handler){
+    public Promise<ResourceResponse, ResourceException> deleteInstance(ServerContext context, String resourceId,
+            DeleteRequest request) {
 
         String principal = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
 
@@ -321,7 +331,7 @@ public class ClientResource implements CollectionResourceProvider {
             responseVal.put("success", "true");
 	        response = new JsonValue(responseVal);
 
-            Resource resource = new Resource("results", "1", response);
+            ResourceResponse resource = newResourceResponse("results", "1", response);
             if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"DELETED_CLIENT", response.toString()};
                 auditLogger.logAccessMessage("DELETED_CLIENT", obs, null);
@@ -329,8 +339,8 @@ public class ClientResource implements CollectionResourceProvider {
                     debug.error("ClientResource :: DELETE by " + principal + ": delete client with ID, " + resourceId);
                 }
             }
-            handler.handleResult(resource);
-        } catch(IdRepoException e){
+            return newResultPromise(resource);
+        } catch(IdRepoException e) {
             responseVal.put("success", "false");
             if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
@@ -340,8 +350,8 @@ public class ClientResource implements CollectionResourceProvider {
                 debug.error("ClientResource :: DELETE by " + principal +
                         ": Unable to delete client with ID, " + resourceId, e);
             }
-            handler.handleError(new InternalServerErrorException("Unable to delete client", e));
-        } catch (SSOException e){
+            return newExceptionPromise(newInternalServerErrorException("Unable to delete client", e));
+        } catch (SSOException e) {
             responseVal.put("success", "false");
             if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
@@ -351,8 +361,8 @@ public class ClientResource implements CollectionResourceProvider {
                 debug.error("ClientResource :: DELETE by " + principal +
                         ": Unable to delete client with ID, " + resourceId, e);
             }
-            handler.handleError(new InternalServerErrorException("Unable to delete client", e));
-        } catch (InternalServerErrorException e){
+            return newExceptionPromise(newInternalServerErrorException("Unable to delete client", e));
+        } catch (InternalServerErrorException e) {
             responseVal.put("success", "false");
             if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
@@ -362,26 +372,27 @@ public class ClientResource implements CollectionResourceProvider {
                 debug.error("ClientResource :: DELETE by " + principal +
                         ": Unable to delete client with ID, " + resourceId, e);
             }
-            handler.handleError(new InternalServerErrorException("Unable to delete client", e));
+            return newExceptionPromise(newInternalServerErrorException("Unable to delete client", e));
         }
     }
 
-    public void patchInstance(ServerContext context, String resourceId, PatchRequest request,
-                              ResultHandler<Resource> handler){
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> patchInstance(ServerContext context, String resourceId,
+            PatchRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
-    public void queryCollection(ServerContext context, QueryRequest queryRequest, QueryResultHandler handler){
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<QueryResponse, ResourceException> queryCollection(ServerContext context, QueryRequest queryRequest,
+            QueryResourceHandler handler) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
-    public void readInstance(ServerContext context, String resourceId, ReadRequest request,
-                             ResultHandler<Resource> handler){
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> readInstance(ServerContext context, String resourceId,
+            ReadRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
-    public void updateInstance(ServerContext context, String resourceId, UpdateRequest request,
-                               ResultHandler<Resource> handler){
-        RestUtils.generateUnsupportedOperation(handler);
+    public Promise<ResourceResponse, ResourceException> updateInstance(ServerContext context, String resourceId,
+            UpdateRequest request) {
+        return RestUtils.generateUnsupportedOperation();
     }
 }

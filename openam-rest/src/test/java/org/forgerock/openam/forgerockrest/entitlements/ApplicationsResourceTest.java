@@ -513,7 +513,7 @@ public class ApplicationsResourceTest {
     }
 
     @Test
-    public void deleteInstanceShouldHandleFailedDeleteApplication() throws EntitlementException {
+    public Promise<ResourceResponse, ResourceException> deleteInstanceShouldHandleFailedDeleteApplication() throws EntitlementException {
 
         //Given
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
@@ -581,7 +581,7 @@ public class ApplicationsResourceTest {
     }
 
     @Test
-    public void updateInstanceShouldReturnConflictExceptionWhenApplicationNameAlreadyExists() throws
+    public Promise<ResourceResponse, ResourceException> updateInstanceShouldReturnConflictExceptionWhenApplicationNameAlreadyExists() throws
             EntitlementException {
 
         //Given
@@ -620,7 +620,7 @@ public class ApplicationsResourceTest {
     }
 
     @Test
-    public void updateInstanceShouldReturnServerInternalExceptionWhenApplicationToJson() throws EntitlementException {
+    public Promise<ResourceResponse, ResourceException> updateInstanceShouldReturnServerInternalExceptionWhenApplicationToJson() throws EntitlementException {
 
         //Given
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
@@ -657,7 +657,7 @@ public class ApplicationsResourceTest {
     }
 
     @Test
-    public void updateInstanceShouldReturnForbiddenWhenUpdatingFailsDueToNotAuthorized() throws EntitlementException {
+    public Promise<ResourceResponse, ResourceException> updateInstanceShouldReturnForbiddenWhenUpdatingFailsDueToNotAuthorized() throws EntitlementException {
 
         //Given
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
@@ -690,7 +690,7 @@ public class ApplicationsResourceTest {
     }
 
     @Test
-    public void updateInstanceShouldReturnConflictWhenUpdatingFailsDueToNeedToDeletePolicies()
+    public Promise<ResourceResponse, ResourceException> updateInstanceShouldReturnConflictWhenUpdatingFailsDueToNeedToDeletePolicies()
             throws EntitlementException {
 
         //Given

@@ -15,9 +15,12 @@
 */
 package org.forgerock.openam.rest.devices;
 
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+
 import java.text.ParseException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.Resource;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.openam.rest.resource.ContextHelper;
 
 /**
@@ -40,8 +43,8 @@ public abstract class TwoFADevicesResource<T extends UserDevicesDao> extends Use
     }
 
     @Override
-    protected Resource convertValue(JsonValue queryResult) throws ParseException {
-        return new Resource(queryResult.get(UUID_KEY).asString(), Integer.toString(queryResult.hashCode()),
+    protected ResourceResponse convertValue(JsonValue queryResult) throws ParseException {
+        return newResourceResponse(queryResult.get(UUID_KEY).asString(), Integer.toString(queryResult.hashCode()),
                 queryResult);
     }
 
