@@ -19,6 +19,7 @@ package org.forgerock.openam.uma;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -26,7 +27,7 @@ import java.util.Set;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
-import org.forgerock.json.resource.Resource;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -56,10 +57,10 @@ public class UmaPolicyTest {
         ));
     }
 
-    private Set<Resource> createUnderlyingPolicies(String resourceOwnerId) {
-        Set<Resource> policies = new HashSet<Resource>();
-        policies.add(new Resource("ID_1", "REVISION_1", createUnderlyingSubjectOnePolicyJson(resourceOwnerId)));
-        policies.add(new Resource("ID_2", "REVISION_2", createUnderlyingSubjectTwoPolicyJson(resourceOwnerId)));
+    private Set<ResourceResponse> createUnderlyingPolicies(String resourceOwnerId) {
+        Set<ResourceResponse> policies = new HashSet<ResourceResponse>();
+        policies.add(newResourceResponse("ID_1", "REVISION_1", createUnderlyingSubjectOnePolicyJson(resourceOwnerId)));
+        policies.add(newResourceResponse("ID_2", "REVISION_2", createUnderlyingSubjectTwoPolicyJson(resourceOwnerId)));
         return policies;
     }
 
@@ -338,7 +339,7 @@ public class UmaPolicyTest {
     public void shouldCreateUmaPolicyFromUnderlyingPolicies() throws BadRequestException {
 
         //Given
-        Set<Resource> policies = createUnderlyingPolicies("RESOURCE_OWNER_ID");
+        Set<ResourceResponse> policies = createUnderlyingPolicies("RESOURCE_OWNER_ID");
 
         //When
         UmaPolicy umaPolicy = UmaPolicy.fromUnderlyingPolicies(resourceSet, policies);

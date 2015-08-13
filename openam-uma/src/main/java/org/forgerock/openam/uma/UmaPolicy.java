@@ -20,7 +20,8 @@ import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.uma.UmaConstants.BackendPolicy.*;
 import static org.forgerock.openam.uma.UmaConstants.UMA_POLICY_SCHEME;
 import static org.forgerock.openam.uma.UmaConstants.UmaPolicy.*;
-import static org.forgerock.openam.uma.UmaPolicyUtils.*;
+import static org.forgerock.openam.uma.UmaPolicyUtils.getPolicyScopes;
+import static org.forgerock.openam.uma.UmaPolicyUtils.getPolicySubject;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,7 +33,7 @@ import java.util.Set;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.JsonValueException;
 import org.forgerock.json.resource.BadRequestException;
-import org.forgerock.json.resource.Resource;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 
 /**
@@ -128,12 +129,12 @@ public class UmaPolicy {
      * @return A {@code UmaPolicy} instance.
      * @throws BadRequestException If the underlying policies do not underpin a valid UMA policy.
      */
-    public static UmaPolicy fromUnderlyingPolicies(ResourceSetDescription resourceSet, Collection<Resource> policies)
+    public static UmaPolicy fromUnderlyingPolicies(ResourceSetDescription resourceSet, Collection<ResourceResponse> policies)
             throws BadRequestException {
 
         Set<String> underlyingPolicyIds = new HashSet<>();
         Map<String, Set<String>> subjectPermissions = new HashMap<>();
-        for (Resource policy : policies) {
+        for (ResourceResponse policy : policies) {
             underlyingPolicyIds.add(policy.getId());
             JsonValue policyContent = policy.getContent();
             String subject = getPolicySubject(policyContent);

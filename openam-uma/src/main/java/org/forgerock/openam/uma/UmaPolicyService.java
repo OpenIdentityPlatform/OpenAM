@@ -18,11 +18,11 @@ package org.forgerock.openam.uma;
 
 import java.util.Collection;
 
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.ServerContext;
 import org.forgerock.util.Pair;
 import org.forgerock.util.promise.Promise;
 
@@ -77,6 +77,6 @@ public interface UmaPolicyService {
      * @param request
      * @return
      */
-    Promise<Pair<QueryResult, Collection<UmaPolicy>>, ResourceException> queryPolicies(ServerContext context,
+    Promise<Pair<QueryResponse, Collection<UmaPolicy>>, ResourceException> queryPolicies(ServerContext context,
             QueryRequest request);
 }

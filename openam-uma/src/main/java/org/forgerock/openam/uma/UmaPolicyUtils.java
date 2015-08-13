@@ -16,15 +16,14 @@
 
 package org.forgerock.openam.uma;
 
-import static org.forgerock.openam.uma.UmaConstants.BackendPolicy.*;
+import static org.forgerock.openam.uma.UmaConstants.BackendPolicy.BACKEND_POLICY_ACTION_VALUES_KEY;
+import static org.forgerock.openam.uma.UmaConstants.BackendPolicy.BACKEND_POLICY_SUBJECT_CLAIM_VALUE_KEY;
 import static org.forgerock.openam.uma.UmaConstants.UmaPolicy.SUBJECT_KEY;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.Resource;
 
 /**
  * Utility methods for interacting with Policies for UMA.
