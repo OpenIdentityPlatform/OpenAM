@@ -16,33 +16,33 @@
 
 package org.forgerock.openam.rest.dashboard;
 
-import static org.fest.assertions.Assertions.*;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.Resources.*;
-import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.forgerock.json.resource.Resources.newCollection;
+import static org.forgerock.json.resource.Resources.newInternalConnection;
+import static org.mockito.BDDMockito.anyObject;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.Connection;
-import org.forgerock.http.Context;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalContext;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.Requests;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.Context;
+import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.devices.TrustedDevicesDao;
 import org.forgerock.openam.rest.devices.TrustedDevicesResource;
 import org.forgerock.openam.rest.resource.ContextHelper;
-import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
@@ -81,7 +81,7 @@ public class TrustedDevicesResourceTest {
         //Given
         QueryRequest request = Requests.newQueryRequest("");
         Connection connection = newInternalConnection(newCollection(resource));
-        QueryResultHandler handler = mock(QueryResultHandler.class);
+        QueryResourceHandler handler = mock(QueryResourceHandler.class);
         List<JsonValue> devices = new ArrayList<>();
         devices.add(json(object(field("name", "NAME_1"), field("lastSelectedDate", new Date().getTime()))));
         devices.add(json(object(field("name", "NAME_2"), field("lastSelectedDate", new Date().getTime() + 1000))));
@@ -92,7 +92,7 @@ public class TrustedDevicesResourceTest {
         connection.query(ctx(), request, handler);
 
         //Then
-        verify(handler, times(2)).handleResource(Matchers.<Resource>anyObject());
+        verify(handler, times(2)).handleResource(Matchers.<ResourceResponse>anyObject());
     }
 
     @Test
