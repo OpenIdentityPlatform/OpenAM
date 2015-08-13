@@ -23,8 +23,6 @@ import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.forgerockrest.authn.RestAuthenticationConstants.*;
 import static org.forgerock.openam.utils.JsonValueBuilder.toJsonValue;
 
-import com.google.inject.Inject;
-import com.google.inject.assistedinject.Assisted;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.sso.SSOException;
@@ -33,7 +31,7 @@ import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;

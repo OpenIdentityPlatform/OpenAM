@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.rest.record;
 
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 
 /**
  * Manage the records.

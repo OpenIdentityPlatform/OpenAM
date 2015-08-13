@@ -15,26 +15,31 @@
  */
 package org.forgerock.openam.rest.record;
 
+import static org.forgerock.json.resource.Responses.newActionResponse;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.fluent.JsonValueException;
+import org.forgerock.http.Context;
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.JsonValueException;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.json.resource.ServerContext;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.utils.JsonObject;
 import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.util.promise.Promise;
 
 import javax.inject.Inject;
 
@@ -58,20 +63,17 @@ public class RecordResource implements CollectionResourceProvider {
     }
 
     @Override
-    public void actionCollection(ServerContext serverContext, ActionRequest actionRequest, ResultHandler<JsonValue>
-            resultHandler) {
+    public Promise<ActionResponse, ResourceException> actionCollection(Context serverContext,
+            ActionRequest actionRequest) {
         switch (actionRequest.getAction()) {
             case RecordConstants.START_ACTION:
-                actionStart(actionRequest.getContent(), resultHandler);
-                break;
+                return actionStart(actionRequest.getContent());
             case RecordConstants.STATUS_ACTION:
-                actionStatus(resultHandler);
-                break;
+                return actionStatus();
             case RecordConstants.STOP_ACTION:
-                actionStop(resultHandler);
-                break;
+                return actionStop();
             default:
-                RestUtils.generateUnsupportedOperation(resultHandler);
+                return RestUtils.generateUnsupportedOperation();
         }
     }
 
@@ -79,19 +81,19 @@ public class RecordResource implements CollectionResourceProvider {
      * Start action
      *
      * @param jsonValue
-     * @param resultHandler
+     * @return
      */
-    private void actionStart(JsonValue jsonValue, ResultHandler<JsonValue> resultHandler) {
+    private Promise<ActionResponse, ResourceException> actionStart(JsonValue jsonValue) {
         try {
             debugRecorder.startRecording(jsonValue);
-            actionStatus(resultHandler);
+            return actionStatus();
         } catch (JsonValueException e) {
             debug.message("Record json '{}' can't be parsed", jsonValue, e);
-            resultHandler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST, "Record json '" +
+            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST, "Record json '" +
                     jsonValue + "' can't be parsed", e));
         } catch (RecordException e) {
             debug.message("Record can't be start.", e);
-            resultHandler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST,
+            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST,
                     "Record can't be start.", e));
         }
     }
@@ -99,9 +101,9 @@ public class RecordResource implements CollectionResourceProvider {
     /**
      * Status action
      *
-     * @param resultHandler
+     * @return
      */
-    private void actionStatus(ResultHandler<JsonValue> resultHandler) {
+    private Promise<ActionResponse, ResourceException> actionStatus() {
 
         Record currentRecord = debugRecorder.getCurrentRecord();
         JsonObject jsonValue = JsonValueBuilder.jsonValue();
@@ -111,72 +113,72 @@ public class RecordResource implements CollectionResourceProvider {
         } else {
             jsonValue.put(STATUS_LABEL, false);
         }
-        resultHandler.handleResult(jsonValue.build());
+        return newResultPromise(newActionResponse(jsonValue.build()));
     }
 
     /**
      * Stop action
      *
-     * @param resultHandler
+     * @return
      */
-    private void actionStop(ResultHandler<JsonValue> resultHandler) {
+    private Promise<ActionResponse, ResourceException> actionStop() {
         try {
             Record record = debugRecorder.stopRecording();
             if (record == null) {
-                resultHandler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST, "No record or" +
-                        " it's already stopped."));
+                return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST,
+                        "No record or it's already stopped."));
             } else {
                 JsonObject result = JsonValueBuilder.jsonValue();
                 result.put(STATUS_LABEL, false);
                 result.put(RECORD_LABEL, record.exportJson().asMap());
-                resultHandler.handleResult(result.build());
+                return newResultPromise(newActionResponse(result.build()));
             }
         } catch (RecordException e) {
             debug.message("Record can't be stopped.", e);
-            resultHandler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST,
+            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST,
                     "Record can't be stopped.", e));
         }
     }
 
     @Override
-    public void actionInstance(ServerContext serverContext, String s, ActionRequest actionRequest,
-            ResultHandler<JsonValue> resultHandler) {
-        RestUtils.generateUnsupportedOperation(resultHandler);
+    public Promise<ActionResponse, ResourceException> actionInstance(Context serverContext, String s,
+            ActionRequest actionRequest) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public void createInstance(ServerContext serverContext, CreateRequest createRequest, ResultHandler<Resource>
-            resultHandler) {
-        RestUtils.generateUnsupportedOperation(resultHandler);
+    public Promise<ResourceResponse, ResourceException> createInstance(Context serverContext,
+            CreateRequest createRequest) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public void deleteInstance(ServerContext serverContext, String s, DeleteRequest deleteRequest,
-            ResultHandler<Resource> resultHandler) {
-        RestUtils.generateUnsupportedOperation(resultHandler);
+    public Promise<ResourceResponse, ResourceException> deleteInstance(Context serverContext, String s,
+            DeleteRequest deleteRequest) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public void patchInstance(ServerContext serverContext, String s, PatchRequest patchRequest,
-            ResultHandler<Resource> resultHandler) {
-        RestUtils.generateUnsupportedOperation(resultHandler);
+    public Promise<ResourceResponse, ResourceException> patchInstance(Context serverContext, String s,
+            PatchRequest patchRequest) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public void queryCollection(ServerContext serverContext, QueryRequest queryRequest, QueryResultHandler
-            queryResultHandler) {
-        RestUtils.generateUnsupportedOperation(queryResultHandler);
+    public Promise<QueryResponse, ResourceException> queryCollection(Context serverContext, QueryRequest queryRequest,
+            QueryResourceHandler queryResultHandler) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public void readInstance(ServerContext serverContext, String s, ReadRequest readRequest, ResultHandler<Resource>
-            resultHandler) {
-        RestUtils.generateUnsupportedOperation(resultHandler);
+    public Promise<ResourceResponse, ResourceException> readInstance(Context serverContext, String s,
+            ReadRequest readRequest) {
+        return RestUtils.generateUnsupportedOperation();
     }
 
     @Override
-    public void updateInstance(ServerContext serverContext, String s, UpdateRequest updateRequest,
-            ResultHandler<Resource> resultHandler) {
-        RestUtils.generateUnsupportedOperation(resultHandler);
+    public Promise<ResourceResponse, ResourceException> updateInstance(Context serverContext, String s,
+            UpdateRequest updateRequest) {
+        return RestUtils.generateUnsupportedOperation();
     }
 }

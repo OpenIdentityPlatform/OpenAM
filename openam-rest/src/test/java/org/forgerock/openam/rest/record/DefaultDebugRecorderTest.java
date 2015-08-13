@@ -22,7 +22,7 @@ import com.sun.identity.shared.debug.DebugConstants;
 import com.sun.identity.shared.debug.DebugLevel;
 import com.sun.identity.shared.debug.file.impl.InvalidDebugConfigurationException;
 
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.util.thread.ExecutorServiceFactory;

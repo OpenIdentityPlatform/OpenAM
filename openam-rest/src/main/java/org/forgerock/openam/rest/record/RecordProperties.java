@@ -15,18 +15,17 @@
  */
 package org.forgerock.openam.rest.record;
 
-
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.debug.DebugLevel;
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.fluent.JsonValueException;
-import org.forgerock.openam.utils.JsonObject;
-import org.forgerock.openam.utils.JsonValueBuilder;
-import org.forgerock.openam.utils.file.FileSizeUnit;
-
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.debug.DebugLevel;
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.JsonValueException;
+import org.forgerock.openam.utils.JsonObject;
+import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.openam.utils.file.FileSizeUnit;
 
 /**
  * Properties of a record, imported from a json content
