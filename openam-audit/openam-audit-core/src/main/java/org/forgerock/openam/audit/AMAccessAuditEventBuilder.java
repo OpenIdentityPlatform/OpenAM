@@ -43,7 +43,7 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
      * @return this builder for method chaining.
      */
     public AMAccessAuditEventBuilder extraInfo(String... values) {
-//        putExtraInfo(jsonValue, values);
+        putExtraInfo(jsonValue, values);
         return this;
     }
 
@@ -54,7 +54,7 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
      * @return this builder for method chaining.
      */
     public AMAccessAuditEventBuilder contextId(String value) {
-//        putContextId(jsonValue, value);
+        putContextId(jsonValue, value);
         return this;
     }
 
@@ -65,7 +65,7 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
      * @return this builder for method chaining.
      */
     public AMAccessAuditEventBuilder component(Component value) {
-//        putComponent(jsonValue, value.toString());
+        putComponent(jsonValue, value.toString());
         return this;
     }
 
@@ -77,7 +77,7 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
      * @return this builder
      */
     public AMAccessAuditEventBuilder contextIdFromSSOToken(SSOToken ssoToken) {
-//        putContextIdFromSSOToken(jsonValue, ssoToken);
+        putContextIdFromSSOToken(jsonValue, ssoToken);
         return this;
     }
 

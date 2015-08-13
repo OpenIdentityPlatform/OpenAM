@@ -28,7 +28,7 @@
 //import org.forgerock.json.resource.CreateRequest;
 //import org.forgerock.json.resource.Resource;
 //import org.forgerock.json.resource.ResultHandler;
-//import org.forgerock.http.Context;
+//import org.forgerock.json.resource.ServerContext;
 //import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
 //import org.forgerock.openam.audit.configuration.AuditServiceConfigurator;
 //import org.mockito.ArgumentCaptor;
@@ -79,7 +79,7 @@
 //
 //        ArgumentCaptor<CreateRequest> requestCaptor = ArgumentCaptor.forClass(CreateRequest.class);
 //        doAnswer(handleResult()).when(mockHandler)
-//                .createInstance(any(Context.class), requestCaptor.capture(), any(ResultHandler.class));
+//                .createInstance(any(ServerContext.class), requestCaptor.capture(), any(ResultHandler.class));
 //
 //        // When
 //        auditEventPublisher.publish("access", auditEvent);
@@ -105,7 +105,7 @@
 //
 //        ArgumentCaptor<CreateRequest> requestCaptor = ArgumentCaptor.forClass(CreateRequest.class);
 //        doAnswer(handleResult()).when(mockHandler)
-//                .createInstance(any(Context.class), requestCaptor.capture(), any(ResultHandler.class));
+//                .createInstance(any(ServerContext.class), requestCaptor.capture(), any(ResultHandler.class));
 //        configuration.setAuditFailureSuppressed(true);
 //
 //        // When
@@ -132,7 +132,7 @@
 //
 //        ArgumentCaptor<CreateRequest> requestCaptor = ArgumentCaptor.forClass(CreateRequest.class);
 //        doAnswer(handleResult()).when(mockHandler)
-//                .createInstance(any(Context.class), requestCaptor.capture(), any(ResultHandler.class));
+//                .createInstance(any(ServerContext.class), requestCaptor.capture(), any(ResultHandler.class));
 //        configuration.setAuditFailureSuppressed(false);
 //
 //        // When
@@ -158,4 +158,3 @@
 //        };
 //    }
 //}
-//
