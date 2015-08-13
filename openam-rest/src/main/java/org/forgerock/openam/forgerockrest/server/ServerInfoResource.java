@@ -16,7 +16,6 @@
 package org.forgerock.openam.forgerockrest.server;
 
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.services.util.CookieUtils;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.client.AuthClientUtils;
@@ -28,9 +27,20 @@ import com.sun.identity.policy.PolicyConfig;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import java.net.URI;
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
@@ -53,15 +63,6 @@ import org.forgerock.openam.forgerockrest.entitlements.RealmAwareResource;
 import org.forgerock.openam.services.RestSecurity;
 import org.forgerock.openam.services.RestSecurityProvider;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.net.URI;
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
-
 /**
  * Represents Server Information that can be queried via a REST interface.
  *
@@ -71,6 +72,8 @@ public class ServerInfoResource extends RealmAwareResource {
 
     private final Debug debug;
     private final RestSecurityProvider restSecurityProvider;
+    private final Map<String, ServiceConfig> realmSocialAuthServiceConfigMap =
+            new ConcurrentHashMap<String, ServiceConfig>();
 
     private final static String COOKIE_DOMAINS = "cookieDomains";
     private final static String ALL_SERVER_INFO = "*";
@@ -175,12 +178,10 @@ public class ServerInfoResource extends RealmAwareResource {
      */
     private List<SocialAuthenticationImplementation> getSocialAuthnImplementations(String realm) {
 
-        List<SocialAuthenticationImplementation> implementations =
-                new ArrayList<SocialAuthenticationImplementation>();
+        List<SocialAuthenticationImplementation> implementations = new ArrayList<SocialAuthenticationImplementation>();
 
         try {
-            final ServiceConfig serviceConfig = getServiceConfig(SocialAuthenticationImplementation.SERVICE_NAME,
-                    realm);
+            final ServiceConfig serviceConfig = getSocialAuthenticationServiceConfig(realm);
             Set<String> enabledImplementationSet = ServiceConfigUtils.getSetAttribute(serviceConfig,
                     SocialAuthenticationImplementation.ENABLED_IMPLEMENTATIONS_ATTRIBUTE);
 
@@ -216,11 +217,23 @@ public class ServerInfoResource extends RealmAwareResource {
 
     }
 
-    private ServiceConfig getServiceConfig(final String serviceName, final String realm) throws SSOException,
-            SMSException {
-        SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
-        ServiceConfigManager mgr = new ServiceConfigManager(serviceName, token);
-        return mgr.getOrganizationConfig(realm, null);
+    private ServiceConfig getSocialAuthenticationServiceConfig(final String realm) throws SSOException, SMSException {
+
+        ServiceConfig realmSocialAuthServiceConfig = realmSocialAuthServiceConfigMap.get(realm);
+        if (realmSocialAuthServiceConfig == null || !realmSocialAuthServiceConfig.isValid()) {
+            synchronized (realmSocialAuthServiceConfigMap) {
+                realmSocialAuthServiceConfig = realmSocialAuthServiceConfigMap.get(realm);
+                if (realmSocialAuthServiceConfig == null || !realmSocialAuthServiceConfig.isValid()) {
+                    SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
+                    ServiceConfigManager mgr =
+                            new ServiceConfigManager(SocialAuthenticationImplementation.SERVICE_NAME, token);
+                    realmSocialAuthServiceConfig = mgr.getOrganizationConfig(realm, null);
+                    realmSocialAuthServiceConfigMap.put(realm, realmSocialAuthServiceConfig);
+                }
+            }
+        }
+
+        return realmSocialAuthServiceConfig;
     }
 
     /**
