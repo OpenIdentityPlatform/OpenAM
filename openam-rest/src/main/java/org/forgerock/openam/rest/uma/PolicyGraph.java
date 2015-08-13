@@ -16,11 +16,12 @@
 
 package org.forgerock.openam.rest.uma;
 
-import static java.util.Collections.*;
+import static java.util.Collections.singleton;
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.openam.uma.UmaConstants.BackendPolicy.*;
+import static org.forgerock.openam.uma.UmaConstants.BackendPolicy.BACKEND_POLICY_ACTION_VALUES_KEY;
 import static org.forgerock.openam.uma.UmaConstants.UmaPolicy.*;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,30 +30,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import org.forgerock.guava.common.collect.Sets;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
-import org.forgerock.json.resource.Resource;
+import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.ServerContext;
-import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
-import org.forgerock.oauth2.resources.ResourceSetStore;
-import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.uma.UmaPolicy;
 import org.forgerock.openam.uma.UmaPolicyUtils;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DirectedMultigraph;
-
-import com.google.inject.assistedinject.Assisted;
 
 
 /**
@@ -62,7 +54,7 @@ import com.google.inject.assistedinject.Assisted;
  * Clients should construct the object with the Resource representation of the policies, then
  * call the {@link #computeGraph()} method before using the other public methods.
  */
-public class PolicyGraph implements QueryResultHandler {
+public class PolicyGraph implements QueryResourceHandler {
     /**
      * @see org.forgerock.openam.forgerockrest.entitlements.model.json.JsonPolicy
      */
@@ -89,7 +81,7 @@ public class PolicyGraph implements QueryResultHandler {
     }
 
     @Override
-    public boolean handleResource(Resource policy) {
+    public boolean handleResource(ResourceResponse policy) {
         JsonValue policyContent = policy.getContent();
         String subject = UmaPolicyUtils.getPolicySubject(policyContent);
         String owner = policyContent.get(OWNER_KEY).asString();
@@ -137,10 +129,10 @@ public class PolicyGraph implements QueryResultHandler {
      * @param policyResourceDelegate The delegate to use for updating the policy engine.
      * @return A promise for all the updates made.
      */
-    public Promise<List<List<Resource>>, ResourceException> update(ServerContext context,
+    public Promise<List<List<ResourceResponse>>, ResourceException> update(ServerContext context,
             PolicyResourceDelegate policyResourceDelegate) {
         checkState();
-        List<Promise<List<Resource>, ResourceException>> promises = new ArrayList<>();
+        List<Promise<List<ResourceResponse>, ResourceException>> promises = new ArrayList<>();
         Set<JsonValue> createdPolicies = new HashSet<>();
         Set<JsonValue> updatedPolicies = new HashSet<>();
 
@@ -202,7 +194,7 @@ public class PolicyGraph implements QueryResultHandler {
     private void moveScope(Map<String, JsonValue> moveFrom, Map<String, JsonValue> moveTo, ServerContext context,
             PolicyResourceDelegate policyResourceDelegate, Set<String> allMovingRights, Set<JsonValue> createdPolicies,
             Set<JsonValue> updatedPolicies, String scope, boolean newPolicyActive,
-            List<Promise<List<Resource>, ResourceException>> promises, String user)
+            List<Promise<List<ResourceResponse>, ResourceException>> promises, String user)
             throws BadRequestException {
         JsonPointer scopePointer = new JsonPointer(BACKEND_POLICY_ACTION_VALUES_KEY).child(scope);
         for (Map.Entry<String, JsonValue> ownedPolicy : moveFrom.entrySet()) {
@@ -293,16 +285,6 @@ public class PolicyGraph implements QueryResultHandler {
             }
         }
         visited.remove(edge.subject);
-    }
-
-    @Override
-    public void handleError(ResourceException e) {
-        complete = false;
-    }
-
-    @Override
-    public void handleResult(QueryResult queryResult) {
-        complete = true;
     }
 
     private static class PolicyEdge extends DefaultEdge {

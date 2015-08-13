@@ -55,6 +55,7 @@ import org.forgerock.openam.rest.record.DefaultDebugRecorder;
 import org.forgerock.openam.rest.record.DebugRecorder;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.json.resource.ConnectionFactory;
+import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.RequestType;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.Resources;
@@ -222,10 +223,8 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     @Named(UMA_BACKEND_POLICY_RESOURCE_HANDLER)
-    PromisedRequestHandler getPolicyResource(PolicyResource policyResource) {
-        org.forgerock.json.resource.Router router = new org.forgerock.json.resource.Router();
-        router.setDefaultRoute(Resources.newCollection(policyResource));
-        return new PromisedRequestHandlerImpl(router);
+    RequestHandler getPolicyResource(PolicyResource policyResource) {
+        return Resources.newCollection(policyResource);
     }
 
     @Provides

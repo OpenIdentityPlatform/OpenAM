@@ -17,6 +17,7 @@
 package org.forgerock.openam.rest.uma;
 
 import static org.forgerock.openam.uma.UmaConstants.UMA_BACKEND_POLICY_RESOURCE_HANDLER;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -26,18 +27,18 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
+import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Requests;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.context.ServerContext;
-import org.forgerock.util.Pair;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.util.AsyncFunction;
+import org.forgerock.util.Pair;
 import org.forgerock.util.promise.Promise;
-import org.forgerock.util.promise.PromiseImpl;
 import org.forgerock.util.promise.Promises;
 import org.forgerock.util.promise.ResultHandler;
 
@@ -49,7 +50,7 @@ import org.forgerock.util.promise.ResultHandler;
 @Singleton
 public class PolicyResourceDelegate {
 
-    private final PromisedRequestHandler policyResource;
+    private final RequestHandler policyResource;
 
     /**
      * Constructs an instance of the {@code PolicyResourceDelegate}.
@@ -57,7 +58,7 @@ public class PolicyResourceDelegate {
      * @param policyResource An instance of the backend policy resource.
      */
     @Inject
-    public PolicyResourceDelegate(@Named(UMA_BACKEND_POLICY_RESOURCE_HANDLER) PromisedRequestHandler policyResource) {
+    public PolicyResourceDelegate(@Named(UMA_BACKEND_POLICY_RESOURCE_HANDLER) RequestHandler policyResource) {
         this.policyResource = policyResource;
     }
 
@@ -73,16 +74,16 @@ public class PolicyResourceDelegate {
      * @return A promise containing the list of created underlying policies or a {@code ResourceException} if
      * the creation fails.
      */
-    public Promise<List<Resource>, ResourceException> createPolicies(ServerContext context,
+    public Promise<List<ResourceResponse>, ResourceException> createPolicies(ServerContext context,
             Set<JsonValue> policies) {
 
         final List<String> policyIds = new ArrayList<String>();
-        List<Promise<Resource, ResourceException>> promises = new ArrayList<Promise<Resource, ResourceException>>();
+        List<Promise<ResourceResponse, ResourceException>> promises = new ArrayList<>();
         for (JsonValue policy : policies) {
             promises.add(policyResource.handleCreate(context, Requests.newCreateRequest("", policy))
-                    .thenOnResult(new ResultHandler<Resource>() {
+                    .thenOnResult(new ResultHandler<ResourceResponse>() {
                         @Override
-                        public void handleResult(Resource result) {
+                        public void handleResult(ResourceResponse result) {
                             //Save ids of created policies, in case a latter policy fails to be created,
                             // so we can roll back.
                             policyIds.add(result.getId());
@@ -90,10 +91,10 @@ public class PolicyResourceDelegate {
                     }));
         }
         return Promises.when(promises)
-                .thenAsync(new AsyncFunction<List<Resource>, List<Resource>, ResourceException>() {
+                .thenAsync(new AsyncFunction<List<ResourceResponse>, List<ResourceResponse>, ResourceException>() {
                     @Override
-                    public Promise<List<Resource>, ResourceException> apply(List<Resource> value) {
-                        return Promises.newResultPromise(value);
+                    public Promise<List<ResourceResponse>, ResourceException> apply(List<ResourceResponse> value) {
+                        return newResultPromise(value);
                     }
                 }, new UmaPolicyCreateFailureHandler(context, policyIds));
     }
@@ -109,9 +110,9 @@ public class PolicyResourceDelegate {
      * @return A promise containing the list of updated underlying policies or a {@code ResourceException} if
      * the update failed.
      */
-    public Promise<List<Resource>, ResourceException> updatePolicies(ServerContext context,
+    public Promise<List<ResourceResponse>, ResourceException> updatePolicies(ServerContext context,
             Set<JsonValue> policies) {
-        List<Promise<Resource, ResourceException>> promises = new ArrayList<Promise<Resource, ResourceException>>();
+        List<Promise<ResourceResponse, ResourceException>> promises = new ArrayList<>();
         for (JsonValue policy : policies) {
             String policyName = policy.get("name").asString();
             promises.add(policyResource.handleUpdate(context, Requests.newUpdateRequest(policyName, policy)));
@@ -127,9 +128,22 @@ public class PolicyResourceDelegate {
      * @return A promise contain the {@code QueryResult} and list of underlying policies or a {@code ResourceException}
      * if the query failed.
      */
-    public Promise<Pair<QueryResult, List<Resource>>, ResourceException> queryPolicies(ServerContext context,
+    public Promise<Pair<QueryResponse, List<ResourceResponse>>, ResourceException> queryPolicies(ServerContext context,
             QueryRequest request) {
-        return policyResource.handleQuery(context, request);
+        final List<ResourceResponse> resources = new ArrayList<>();
+        return policyResource.handleQuery(context, request, new QueryResourceHandler() {
+            @Override
+            public boolean handleResource(ResourceResponse resource) {
+                resources.add(resource);
+                return true;
+            }
+        })
+                .thenAsync(new AsyncFunction<QueryResponse, Pair<QueryResponse, List<ResourceResponse>>, ResourceException>() {
+                    @Override
+                    public Promise<Pair<QueryResponse, List<ResourceResponse>>, ResourceException> apply(QueryResponse response) {
+                        return newResultPromise(Pair.of(response, resources));
+                    }
+                });
     }
 
     /**
@@ -141,7 +155,7 @@ public class PolicyResourceDelegate {
      * @return A promise contain the {@code QueryResult} and list of underlying policies or a {@code ResourceException}
      * if the query failed.
      */
-    public Promise<QueryResult, ResourceException> queryPolicies(ServerContext context,
+    public Promise<QueryResponse, ResourceException> queryPolicies(ServerContext context,
             QueryRequest request, QueryResourceHandler resultHandler) {
         return policyResource.handleQuery(context, request, resultHandler);
     }
@@ -157,9 +171,9 @@ public class PolicyResourceDelegate {
      * @return A promise containing the list of underlying policies that were deleted or a {@code ResourceException}
      * if the policies were failed to be deleted.
      */
-    public Promise<List<Resource>, ResourceException> deletePolicies(ServerContext context,
+    public Promise<List<ResourceResponse>, ResourceException> deletePolicies(ServerContext context,
             Collection<String> policyIds) {
-        List<Promise<Resource, ResourceException>> promises = new ArrayList<Promise<Resource, ResourceException>>();
+        List<Promise<ResourceResponse, ResourceException>> promises = new ArrayList<>();
         for (String policyId : policyIds) {
             promises.add(policyResource.handleDelete(context, Requests.newDeleteRequest(policyId)));
         }
@@ -174,7 +188,7 @@ public class PolicyResourceDelegate {
      * @since 13.0.0
      */
     private final class UmaPolicyCreateFailureHandler
-            implements AsyncFunction<ResourceException, List<Resource>, ResourceException> {
+            implements AsyncFunction<ResourceException, List<ResourceResponse>, ResourceException> {
 
         private final ServerContext context;
         private final List<String> policyIds;
@@ -188,22 +202,19 @@ public class PolicyResourceDelegate {
          * {@inheritDoc}
          */
         @Override
-        public Promise<List<Resource>, ResourceException> apply(final ResourceException error) {
-            List<Promise<Resource, ResourceException>> promises = new ArrayList<Promise<Resource, ResourceException>>();
-            PromiseImpl<Resource, ResourceException> kicker = PromiseImpl.create();
-            promises.add(kicker);
+        public Promise<List<ResourceResponse>, ResourceException> apply(final ResourceException error) {
+            List<Promise<ResourceResponse, ResourceException>> promises = new ArrayList<>();
             for (String id : policyIds) {
                 promises.add(policyResource.handleDelete(context, Requests.newDeleteRequest(id)));
             }
-            Promise<List<Resource>, ResourceException> promise = Promises.when(promises)
-                    .thenAsync(new AsyncFunction<List<Resource>, List<Resource>, ResourceException>() {
+            Promise<List<ResourceResponse>, ResourceException> promise = Promises.when(promises)
+                    .thenAsync(new AsyncFunction<List<ResourceResponse>, List<ResourceResponse>, ResourceException>() {
                         @Override
-                        public Promise<List<Resource>, ResourceException> apply(List<Resource> value) {
+                        public Promise<List<ResourceResponse>, ResourceException> apply(List<ResourceResponse> value) {
                             //If we succeed in deleting then return the original error
                             return Promises.newExceptionPromise(error);
                         }
                     });
-            kicker.handleResult(null);
             return promise;
         }
     }
