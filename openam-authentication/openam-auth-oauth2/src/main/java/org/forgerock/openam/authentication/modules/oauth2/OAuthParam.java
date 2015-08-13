@@ -65,14 +65,16 @@ public class OAuthParam {
     static final String KEY_SMTP_PORT = "org-forgerock-auth-oauth-smtp-port";
     static final String KEY_SMTP_USERNAME = "org-forgerock-auth-oauth-smtp-username";
     static final String KEY_SMTP_PASSWORD = "org-forgerock-auth-oauth-smtp-password";
-    static final String KEY_SMTP_SSL_ENABLED = "org-forgerock-auth-oauth-smtp-ssl_enabled"; 
+    static final String KEY_SMTP_SSL_ENABLED = "org-forgerock-auth-oauth-smtp-ssl_enabled";
     static final String KEY_EMAIL_FROM = "org-forgerock-auth-oauth-smtp-email-from";
-            
+
+    public final static String CODE_CHALLENGE_METHOD = "org-forgerock-auth-oauth-code-challenge-method-algorithm";
+
     // openam parameters
     public final static String PARAM_GOTO = "goto";
     public final static String PARAM_REALM = "realm";
-    public final static String PARAM_MODULE = "module";
 
+    public final static String PARAM_MODULE = "module";
     // OAuth 2.0 parameters
     public final static String PARAM_CODE = "code";
     public final static String PARAM_REDIRECT_URI = "redirect_uri";
@@ -80,7 +82,7 @@ public class OAuthParam {
     public final static String PARAM_CLIENT_SECRET = "client_secret";
     public final static String PARAM_CLIENT_ID = "client_id";
     public final static String PARAM_ACCESS_TOKEN =  "access_token";
-    
+
     // oauthproxy parameters
     public final static String PARAM_ACTIVATION = "activation";
     public final static String PARAM_TOKEN1 = "token1";

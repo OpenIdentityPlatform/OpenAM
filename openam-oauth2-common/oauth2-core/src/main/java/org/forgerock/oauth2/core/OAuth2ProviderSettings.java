@@ -439,6 +439,13 @@ public interface OAuth2ProviderSettings {
     Set<String> getEndpointAuthMethodsSupported();
 
     /**
+     * Whether or not to enforce the Code Verifier Parameter
+     * @return Whether the Code Verifier option has been configured
+     * @see <a href="https://tools.ietf.org/html/draft-ietf-oauth-spop-12"</a>
+     */
+    boolean isCodeVerifierRequired() throws ServerException;
+
+    /**
      * Returns the salt to use for hashing sub values upon pairwise requests.
      */
     String getHashSalt() throws ServerException;

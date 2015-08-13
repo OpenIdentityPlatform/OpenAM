@@ -16,13 +16,13 @@
 
 package org.forgerock.oauth2.core;
 
-import static org.forgerock.oauth2.core.Utils.joinScope;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Set;
-
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
@@ -31,8 +31,11 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.util.encode.Base64url;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.forgerock.oauth2.core.Utils.joinScope;
 
 /**
  * Implementation of the GrantTypeHandler for the OAuth2 Authorization Code grant.
@@ -88,6 +91,14 @@ public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
             throw new InvalidRequestException("Authorization code doesn't exist.");
         }
 
+        final String codeVerifier = request.getParameter(OAuth2Constants.Custom.CODE_VERIFIER);
+        if (providerSettings.isCodeVerifierRequired()) {
+            if (codeVerifier == null) {
+                String message = "code_verifier parameter required";
+                throw new InvalidRequestException(message);
+            }
+        }
+
         RefreshToken refreshToken = null;
         AccessToken accessToken;
         Set<String> authorizationScope;
@@ -115,6 +126,10 @@ public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
             if (authorizationCode.isExpired()) {
                 logger.error("Authorization code has expired, " + code);
                 throw new InvalidCodeException("Authorization code expired.");
+            }
+
+            if (providerSettings.isCodeVerifierRequired()) {
+                checkCodeVerifier(authorizationCode, codeVerifier);
             }
 
             final String grantType = request.getParameter(OAuth2Constants.Params.GRANT_TYPE);
@@ -159,5 +174,33 @@ public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
         }
 
         return accessToken;
+    }
+
+    private void checkCodeVerifier(AuthorizationCode authorizationCode, String codeVerifier) throws
+            InvalidGrantException {
+        final String codeChallenge = authorizationCode.getCodeChallenge();
+        final String codeChallengeMethod = authorizationCode.getCodeChallengeMethod();
+
+        if (OAuth2Constants.Custom.CODE_CHALLENGE_METHOD_S_256.equals(codeChallengeMethod)) {
+            String encodedCodeVerifier = null;
+            try {
+                encodedCodeVerifier = Base64url.encode(
+                        MessageDigest.getInstance("SHA-256").digest(codeVerifier.getBytes(StandardCharsets.US_ASCII)));
+                checkCodeChallenge(codeChallenge, encodedCodeVerifier);
+            } catch (NoSuchAlgorithmException e) {
+                logger.error("Error encoding code verifier.");
+                throw new InvalidGrantException();
+            }
+        } else {
+            //if not SHA256 assume no encoding
+            checkCodeChallenge(codeChallenge, codeVerifier);
+        }
+    }
+
+    private void checkCodeChallenge(String codeChallenge, String codeVerifier) throws InvalidGrantException {
+        if (!MessageDigest.isEqual(codeVerifier.getBytes(), codeChallenge.getBytes())) {
+            logger.error("Incorrect Code Verifier,");
+            throw new InvalidGrantException();
+        }
     }
 }

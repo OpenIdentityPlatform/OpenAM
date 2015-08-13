@@ -30,17 +30,17 @@
 
 package org.forgerock.openam.authentication.modules.oauth2;
 
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
-
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.datastruct.CollectionHelper;
-import org.forgerock.openam.utils.MappingUtils;
-
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.openam.utils.MappingUtils;
+
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
 
 /* 
@@ -84,6 +84,7 @@ public class OAuthConf {
     private String smtpUserPassword = null;
     private String smtpSSLEnabled = "false";
     private String emailFrom = null;
+    private String codeChallengeMethod = null;
     private String authLevel = "0";
 
     OAuthConf() {
@@ -124,6 +125,7 @@ public class OAuthConf {
         smtpSSLEnabled = CollectionHelper.getMapAttr(config, KEY_SMTP_SSL_ENABLED);
         emailFrom = CollectionHelper.getMapAttr(config, KEY_EMAIL_FROM);
         authLevel = CollectionHelper.getMapAttr(config, KEY_AUTH_LEVEL);
+        codeChallengeMethod = CollectionHelper.getMapAttr(config, CODE_CHALLENGE_METHOD);
     }
 
     public int getAuthnLevel() {
@@ -236,7 +238,8 @@ public class OAuthConf {
         return scope;
     }
 
-    public String getAuthServiceUrl(String originalUrl, String state) throws AuthLoginException {
+    public String getAuthServiceUrl(String originalUrl, String state, String codeChallenge, String codeChallengeMethod) throws
+            AuthLoginException {
 
         if (!authServiceUrl.contains("?")) {
             authServiceUrl = authServiceUrl + "?"
@@ -250,7 +253,9 @@ public class OAuthConf {
                     + param(PARAM_SCOPE, OAuthUtil.oAuthEncode(scope))
                     + param(PARAM_REDIRECT_URI, OAuthUtil.oAuthEncode(originalUrl))
                     + param("response_type", "code")
-                    + param("state", state);
+                    + param("state", state)
+                    + param(OAuth2Constants.Custom.CODE_CHALLENGE, codeChallenge)
+                    + param(OAuth2Constants.Custom.CODE_CHALLENGE_METHOD, codeChallengeMethod);
         } catch (UnsupportedEncodingException ex) {
             OAuthUtil.debugError("OAuthConf.getAuthServiceUrl: problems while encoding "
                     + "the scope", ex);
@@ -258,7 +263,7 @@ public class OAuthConf {
         }
     }
 
-    String getTokenServiceUrl(String code, String authServiceURL) 
+    String getTokenServiceUrl(String code, String authServiceURL, String codeVerifier)
             throws AuthLoginException {
 
         if (code == null) {
@@ -280,7 +285,8 @@ public class OAuthConf {
                     + param(PARAM_REDIRECT_URI, OAuthUtil.oAuthEncode(authServiceURL))
                     + param(PARAM_CLIENT_SECRET, clientSecret)
                     + param(PARAM_CODE, OAuthUtil.oAuthEncode(code))
-                    + param("grant_type", "authorization_code");
+                    + param("grant_type", "authorization_code")
+                    + param(OAuth2Constants.Custom.CODE_VERIFIER, codeVerifier);
         } catch (UnsupportedEncodingException ex) {
             OAuthUtil.debugError("OAuthConf.getTokenServiceUrl: problems while encoding "
                     + "and building the Token Service URL", ex);
@@ -355,5 +361,9 @@ public class OAuthConf {
 
     public boolean isOpenIDConnect() {
         return openIDConnect;
+    }
+
+    public String getCodeChallengeMethod() {
+        return codeChallengeMethod;
     }
 }

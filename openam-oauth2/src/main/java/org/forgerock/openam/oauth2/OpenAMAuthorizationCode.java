@@ -63,8 +63,8 @@ public class OpenAMAuthorizationCode extends AuthorizationCode {
      */
     OpenAMAuthorizationCode(String code, String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
                             String claims, long expiryTime, String nonce, String realm, String authModules, String acr,
-                            String ssoTokenId) {
-        super(code, resourceOwnerId, clientId, redirectUri, scope, expiryTime, nonce, authModules, acr);
+                            String ssoTokenId, String codeChallenge, String codeChallengeMethod) {
+        super(code, resourceOwnerId, clientId, redirectUri, scope, expiryTime, nonce, authModules, acr, codeChallenge, codeChallengeMethod);
         setRealm(realm);
         setSsoTokenId(ssoTokenId);
         setClaims(claims);

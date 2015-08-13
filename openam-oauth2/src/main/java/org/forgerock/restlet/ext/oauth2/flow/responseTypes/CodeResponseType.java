@@ -65,11 +65,13 @@ public class CodeResponseType implements ResponseType {
         final String clientId = (String) data.get(OAuth2Constants.CoreTokenParams.CLIENT_ID);
         final String redirectUri = (String) data.get(OAuth2Constants.CoreTokenParams.REDIRECT_URI);
         final String nonce = (String) data.get(OAuth2Constants.Custom.NONCE);
+        final String codeChallenge = (String) data.get(OAuth2Constants.Custom.CODE_CHALLENGE);
+        final String codeChallengeMethod = (String) data.get(OAuth2Constants.Custom.CODE_CHALLENGE_METHOD);
 
         try {
 
             final Map.Entry<String,Token> tokenEntry = handler.handle(null, scope, resourceOwner, clientId,
-                    redirectUri, nonce, request);
+                    redirectUri, nonce, request, codeChallenge, codeChallengeMethod);
 
             return new LegacyAuthorizationTokenAdapter((AuthorizationCode) tokenEntry.getValue());
 

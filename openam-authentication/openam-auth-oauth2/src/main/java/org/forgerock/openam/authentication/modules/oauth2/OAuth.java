@@ -29,8 +29,6 @@
  */
 package org.forgerock.openam.authentication.modules.oauth2;
 
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
-
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.service.AuthUtils;
@@ -44,29 +42,6 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang.StringUtils;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.json.jose.jwt.JwtClaimsSet;
-import org.forgerock.openam.authentication.modules.common.mapping.AccountProvider;
-import org.forgerock.openam.authentication.modules.common.mapping.AttributeMapper;
-import org.forgerock.openam.authentication.modules.oidc.JwtHandler;
-import org.forgerock.openam.authentication.modules.oidc.JwtHandlerConfig;
-import org.forgerock.openam.cts.CTSPersistentStore;
-import org.forgerock.openam.tokens.TokenType;
-import org.forgerock.openam.tokens.CoreTokenField;
-import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.utils.CollectionUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.owasp.esapi.ESAPI;
-
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.login.LoginException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -77,6 +52,9 @@ import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -86,11 +64,37 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.login.LoginException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.StringUtils;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.json.jose.jwt.JwtClaimsSet;
+import org.forgerock.openam.authentication.modules.common.mapping.AccountProvider;
+import org.forgerock.openam.authentication.modules.common.mapping.AttributeMapper;
+import org.forgerock.openam.authentication.modules.oidc.JwtHandler;
+import org.forgerock.openam.authentication.modules.oidc.JwtHandlerConfig;
+import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.tokens.CoreTokenField;
+import org.forgerock.openam.tokens.TokenType;
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.util.encode.Base64url;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.owasp.esapi.ESAPI;
+
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
 public class OAuth extends AMLoginModule {
 
     public static final String PROFILE_SERVICE_RESPONSE = "ATTRIBUTES";
     public static final String OPENID_TOKEN = "OPENID_TOKEN";
+    public static final String SHA_256_DISPLAY_NAME = "SHA 256";
     private static Debug debug = Debug.getInstance("amLoginModule");
     private String authenticatedUser = null;
     private Map sharedState;
@@ -172,6 +176,9 @@ public class OAuth extends AMLoginModule {
                 String csrfState = createAuthorizationState();
                 Token csrfStateToken = new Token(csrfStateTokenId, TokenType.GENERIC);
                 csrfStateToken.setAttribute(CoreTokenField.STRING_ONE, csrfState);
+
+                csrfStateToken.setAttribute(CoreTokenField.STRING_TWO, getCodeVerifier(config.getCodeChallengeMethod()));
+
                 try {
                     ctsStore.create(csrfStateToken);
                 } catch (CoreTokenException e) {
@@ -206,7 +213,9 @@ public class OAuth extends AMLoginModule {
                 setUserSessionProperty(SESSION_LOGOUT_BEHAVIOUR,
                         config.getLogoutBhaviour());
 
-                String authServiceUrl = config.getAuthServiceUrl(proxyURL, csrfState);
+                String authServiceUrl = config.getAuthServiceUrl(proxyURL, csrfState,
+                        getCodeVerifier(config.getCodeChallengeMethod()),
+                        config.getCodeChallengeMethod());
                 OAuthUtil.debugMessage("OAuth.process(): New RedirectURL=" + authServiceUrl);
 
                 Callback[] callbacks1 = getCallback(2);
@@ -249,8 +258,10 @@ public class OAuth extends AMLoginModule {
 
                     OAuthUtil.debugMessage("OAuth.process(): code parameter: " + code);
 
+                    final String codeVerifier = csrfStateToken.getValue(CoreTokenField.STRING_TWO);
                     String tokenSvcResponse = getContent(
-                            config.getTokenServiceUrl(code, proxyURL), null);
+                            config.getTokenServiceUrl(code, proxyURL,
+                                    codeVerifier), null);
                     OAuthUtil.debugMessage("OAuth.process(): token=" + tokenSvcResponse);
 
                     JwtClaimsSet jwtClaims = null;
@@ -450,6 +461,20 @@ public class OAuth extends AMLoginModule {
         }
         
         throw new AuthLoginException(BUNDLE_NAME, "unknownState", null);
+    }
+
+    private String getCodeVerifier(String codeChallengeMethod) throws LoginException {
+        String codeVerifier = Base64url.encode(RandomStringUtils.randomAlphanumeric(96).getBytes());
+        if (SHA_256_DISPLAY_NAME.equals(codeChallengeMethod)) {
+            try {
+                return Base64url.encode(
+                        MessageDigest.getInstance("SHA-256").digest(codeVerifier.getBytes(StandardCharsets.US_ASCII)));
+            } catch (NoSuchAlgorithmException e) {
+                throw new LoginException("Error encoding code challenge");
+            }
+        } else {
+            return codeVerifier;
+        }
     }
 
     private String createAuthorizationState() {

@@ -279,6 +279,20 @@
                     </DefaultValues>
                 </AttributeSchema>
 
+                <AttributeSchema name="forgerock-oauth2-provider-code-verifier-enforced"
+                                 type="single"
+                                 syntax="boolean"
+                                 resourceName="codeVerifierEnforced"
+                                 i18nKey="a126">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
                 <AttributeSchema name="forgerock-oauth2-provider-allow-open-dynamic-registration"
                                  type="single"
                                  syntax="boolean"

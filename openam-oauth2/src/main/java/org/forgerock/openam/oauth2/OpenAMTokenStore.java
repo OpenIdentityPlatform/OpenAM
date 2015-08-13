@@ -118,8 +118,9 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     /**
      * {@inheritDoc}
      */
-    public AuthorizationCode createAuthorizationCode(Set<String> scope, ResourceOwner resourceOwner,
-            String clientId, String redirectUri, String nonce, OAuth2Request request) throws ServerException, NotFoundException {
+    public AuthorizationCode createAuthorizationCode(Set<String> scope, ResourceOwner resourceOwner, String clientId,
+            String redirectUri, String nonce, OAuth2Request request, String codeChallenge, String codeChallengeMethod)
+            throws ServerException, NotFoundException {
 
         logger.message("DefaultOAuthTokenStoreImpl::Creating Authorization code");
 
@@ -140,7 +141,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         final OpenAMAuthorizationCode authorizationCode = new OpenAMAuthorizationCode(code, resourceOwner.getId(), clientId,
                 redirectUri, scope, getClaimsFromRequest(request), expiryTime, nonce, realmNormaliser.normalise(request.<String>getParameter(REALM)),
                 getAuthModulesFromSSOToken(request), getAuthenticationContextClassReferenceFromRequest(request),
-                ssoTokenId);
+                ssoTokenId, codeChallenge, codeChallengeMethod);
 
         // Store in CTS
         try {

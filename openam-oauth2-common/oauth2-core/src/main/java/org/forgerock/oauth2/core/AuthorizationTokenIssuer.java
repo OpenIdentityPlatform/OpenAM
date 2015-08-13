@@ -84,6 +84,9 @@ public class AuthorizationTokenIssuer {
         final String clientId = clientRegistration.getClientId();
         final String redirectUri = request.getParameter(REDIRECT_URI);
         final String nonce = request.getParameter(OAuth2Constants.Custom.NONCE);
+        final String codeChallenge = request.getParameter(OAuth2Constants.Custom.CODE_CHALLENGE);
+        final String codeChallengeMethod = request.getParameter(OAuth2Constants.Custom.CODE_CHALLENGE_METHOD);
+
         final Map<String, Token> tokens = new HashMap<String, Token>();
         boolean returnAsFragment = false;
 
@@ -100,7 +103,7 @@ public class AuthorizationTokenIssuer {
             final ResponseTypeHandler responseTypeHandler = allowedResponseTypes.get(responseType);
 
             final Map.Entry<String, Token> token = responseTypeHandler.handle(tokenType, validatedScope,
-                    resourceOwner, clientId, redirectUri, nonce, request);
+                    resourceOwner, clientId, redirectUri, nonce, request, codeChallenge, codeChallengeMethod);
 
             if (token != null) {
 

@@ -56,7 +56,8 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @param nonce The nonce.
      */
     public AuthorizationCode(String code, String resourceOwnerId, String clientId, String redirectUri,
-            Set<String> scope, long expiryTime, String nonce, String authModules, String acr) {
+            Set<String> scope, long expiryTime, String nonce, String authModules, String acr, String codeChallenge,
+                             String codeChallengeMethod) {
         super(new HashMap<String, Object>());
         setCode(code);
         setResourceOwnerId(resourceOwnerId);
@@ -69,6 +70,8 @@ public class AuthorizationCode extends JsonValue implements Token {
         setNonce(nonce);
         setAuthModules(authModules);
         setAuthenticationContextClassReference(acr);
+        setCodeChallenge(codeChallenge);
+        setCodeChallengeMethod(codeChallengeMethod);
     }
 
     /**
@@ -347,4 +350,35 @@ public class AuthorizationCode extends JsonValue implements Token {
         return tokenInfo;
     }
 
+    /**
+     * Sets the code challenge
+     * @param codeChallenge
+     */
+    public void setCodeChallenge(String codeChallenge) {
+        setStringProperty(OAuth2Constants.Custom.CODE_CHALLENGE, codeChallenge);
+    }
+
+    /**
+     * Get the code challenge
+     * @return code challenge
+     */
+    public String getCodeChallenge() {
+        return getStringProperty(OAuth2Constants.Custom.CODE_CHALLENGE);
+    }
+
+    /**
+     * Sets the code challenge method
+     * @param codeChallengeMethod
+     */
+    public void setCodeChallengeMethod(String codeChallengeMethod) {
+        setStringProperty(OAuth2Constants.Custom.CODE_CHALLENGE_METHOD, codeChallengeMethod);
+    }
+
+    /**
+     * Get the code challenge method
+     * @return code challenge method
+     */
+    public String getCodeChallengeMethod() {
+        return getStringProperty(OAuth2Constants.Custom.CODE_CHALLENGE_METHOD);
+    }
 }

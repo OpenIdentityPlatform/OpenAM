@@ -817,6 +817,16 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     }
 
     @Override
+    public boolean isCodeVerifierRequired() throws ServerException {
+        try {
+            return getBooleanSetting(realm, OAuth2ProviderService.CODE_VERIFIER);
+        } catch (SSOException | SMSException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        }
+    }
+
+    @Override
     public boolean isAlwaysAddClaimsToToken() throws ServerException {
         try {
             return getBooleanSetting(realm, OAuth2ProviderService.ALWAYS_ADD_CLAIMS_TO_TOKEN);

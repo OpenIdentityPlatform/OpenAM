@@ -107,6 +107,7 @@ import org.forgerock.openam.utils.OpenAMSettingsImpl;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openidconnect.ClaimsParameterValidator;
 import org.forgerock.openidconnect.ClientDAO;
+import org.forgerock.openidconnect.CodeVerifierValidator;
 import org.forgerock.openidconnect.OpenIDConnectProvider;
 import org.forgerock.openidconnect.OpenIDTokenIssuer;
 import org.forgerock.openidconnect.OpenIdConnectAuthorizeRequestValidator;
@@ -179,6 +180,7 @@ public class OAuth2GuiceModule extends AbstractModule {
         authorizeRequestValidators.addBinding().to(OpenIdConnectAuthorizeRequestValidator.class);
         authorizeRequestValidators.addBinding().to(ClaimsParameterValidator.class);
         authorizeRequestValidators.addBinding().to(SubjectTypeValidator.class);
+        authorizeRequestValidators.addBinding().to(CodeVerifierValidator.class);
 
         final Multibinder<AuthorizationCodeRequestValidator> authorizationCodeRequestValidators =
                 Multibinder.newSetBinder(binder(), AuthorizationCodeRequestValidator.class);

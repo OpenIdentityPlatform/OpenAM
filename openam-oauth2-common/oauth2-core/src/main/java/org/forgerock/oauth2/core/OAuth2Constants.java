@@ -762,6 +762,12 @@ public class OAuth2Constants {
         public static final String NONCE = "nonce";
         public static final String SAVE_CONSENT= "save_consent";
         public static final String SSO_TOKEN_ID = "ssoTokenId";
+        public static final String CODE_CHALLENGE = "code_challenge";
+        public static final String CODE_CHALLENGE_METHOD = "code_challenge_method";
+        public static final String CODE_VERIFIER = "code_verifier";
+        public static final String CODE_CHALLENGE_METHOD_S_256 = "S256";
+        public static final String CODE_CHALLENGE_METHOD_PLAIN = "plain";
+
         /**
          * The display mode in which to render the dialog. The default is
          * {@code page} on the www subdomain and {@code wap} on the m subdomain.
@@ -855,6 +861,7 @@ public class OAuth2Constants {
         public static final String SUPPORTED_SCOPES = "forgerock-oauth2-provider-supported-scopes";
         public static final String CLAIMS_PARAMETER_SUPPORTED = "forgerock-oauth2-provider-claims-parameter-supported";
         public static final String HASH_SALT = "forgerock-oauth2-provider-hash-salt";
+        public static final String CODE_VERIFIER = "forgerock-oauth2-provider-code-verifier-enforced";
 
         public static final String ALWAYS_ADD_CLAIMS_TO_TOKEN = "alwaysAddClaimsToToken";
     }

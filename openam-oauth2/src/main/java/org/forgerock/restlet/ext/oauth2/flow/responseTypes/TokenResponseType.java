@@ -69,10 +69,12 @@ public class TokenResponseType implements ResponseType {
         final ResourceOwner resourceOwner = ownerAuthenticator.authenticate(request);
         final String clientId = (String) data.get(OAuth2Constants.CoreTokenParams.CLIENT_ID);
         final String redirectUri = (String) data.get(OAuth2Constants.CoreTokenParams.REDIRECT_URI);
+        final String codeChallenge = (String) data.get(OAuth2Constants.Custom.CODE_CHALLENGE);
+        final String codeChallengeMethod = (String) data.get(OAuth2Constants.Custom.CODE_CHALLENGE_METHOD);
 
         try {
             final Map.Entry<String,Token> tokenEntry = handler.handle(tokenType, scope, resourceOwner, clientId,
-                    redirectUri, null, requestFactory.create(Request.getCurrent()));
+                    redirectUri, null, requestFactory.create(Request.getCurrent()), codeChallenge, codeChallengeMethod);
 
             return new LegacyAccessTokenAdapter((AccessToken) tokenEntry.getValue());
 

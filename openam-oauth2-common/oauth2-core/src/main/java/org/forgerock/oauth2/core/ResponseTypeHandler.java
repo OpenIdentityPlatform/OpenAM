@@ -42,6 +42,8 @@ public interface ResponseTypeHandler {
      * @param redirectUri The redirect uri.
      * @param nonce The nonce.
      * @param request The OAuth2 request.
+     * @param codeChallenge The code challenge.
+     * @param codeChallengeMethod The code challenge method.
      * @return A {@code Map.Entry} of the token name with the Token instance.
      * @throws ServerException If any internal server error occurs.
      * @throws InvalidClientException If either the request does not contain the client's id or the client fails to be
@@ -49,7 +51,8 @@ public interface ResponseTypeHandler {
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
     Map.Entry<String, Token> handle(String tokenType, Set<String> scope, ResourceOwner resourceOwner,
-                                    String clientId, String redirectUri, String nonce, OAuth2Request request)
+                                    String clientId, String redirectUri, String nonce, OAuth2Request request,
+                                    String codeChallenge, String codeChallengeMethod)
             throws ServerException, InvalidClientException, NotFoundException;
 
     /**

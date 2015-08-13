@@ -57,7 +57,8 @@ public class LegacyResponseTypeHandler implements ResponseTypeHandler {
 
     public Map.Entry<String, org.forgerock.oauth2.core.Token> handle(
             String tokenType, Set<String> scope, ResourceOwner resourceOwner, String clientId,
-            String redirectUri, String nonce, OAuth2Request request) throws NotFoundException {
+            String redirectUri, String nonce, OAuth2Request request, String codeChallenge,
+            String codeChallengeMethod) throws NotFoundException {
 
         final Map<String, Object> data = new HashMap<String, Object>();
         data.put(TOKEN_TYPE, tokenType);
@@ -67,6 +68,8 @@ public class LegacyResponseTypeHandler implements ResponseTypeHandler {
         data.put(REDIRECT_URI, redirectUri);
         data.put(OAuth2Constants.Custom.NONCE, nonce);
         data.put(REALM, realm);
+        data.put(OAuth2Constants.Custom.CODE_CHALLENGE, codeChallenge);
+        data.put(OAuth2Constants.Custom.CODE_CHALLENGE_METHOD, codeChallengeMethod);
 
         final HttpServletRequest req = ServletUtils.getRequest(request.<Request>getRequest());
         data.put(OAuth2Constants.Custom.SSO_TOKEN_ID, cookieExtractor.extract(req, ssoCookieName));

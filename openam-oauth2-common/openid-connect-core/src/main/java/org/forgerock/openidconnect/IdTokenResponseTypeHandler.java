@@ -55,7 +55,8 @@ public abstract class IdTokenResponseTypeHandler implements ResponseTypeHandler 
      */
     @Override
     public Map.Entry<String, Token> handle(String tokenType, Set<String> scope,
-             ResourceOwner resourceOwner, String clientId, String redirectUri, String nonce, OAuth2Request request)
+             ResourceOwner resourceOwner, String clientId, String redirectUri, String nonce, OAuth2Request request,
+                                           String codeChallenge, String codeChallengeMethod)
             throws ServerException, InvalidClientException, NotFoundException {
 
         final OpenIdConnectToken openIDToken = tokenStore.createOpenIDToken(resourceOwner,

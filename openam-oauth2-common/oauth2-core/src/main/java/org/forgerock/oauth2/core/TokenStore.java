@@ -48,12 +48,14 @@ public interface TokenStore {
      * @param redirectUri The redirect uri.
      * @param nonce The nonce.
      * @param request The OAuth2 request.
+     * @param codeChallenge
+     * @param codeChallengeMethod
      * @return An AuthorizationCode.
      * @throws ServerException If any internal server error occurs.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.
      */
-    AuthorizationCode createAuthorizationCode(Set<String> scope, ResourceOwner resourceOwner,
-            String clientId, String redirectUri, String nonce, OAuth2Request request) throws ServerException,
+    AuthorizationCode createAuthorizationCode(Set<String> scope, ResourceOwner resourceOwner, String clientId, String redirectUri, String nonce, OAuth2Request request,
+                                              String codeChallenge, String codeChallengeMethod) throws ServerException,
             NotFoundException;
 
     /**

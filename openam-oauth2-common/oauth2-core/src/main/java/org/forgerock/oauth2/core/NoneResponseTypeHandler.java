@@ -30,7 +30,8 @@ public class NoneResponseTypeHandler implements ResponseTypeHandler {
      * {@inheritDoc}
      */
     public Map.Entry<String, Token> handle(String tokenType, Set<String> scope,
-            ResourceOwner resourceOwner, String clientId, String redirectUri, String nonce, OAuth2Request request) {
+            ResourceOwner resourceOwner, String clientId, String redirectUri, String nonce, OAuth2Request request,
+                                           String codeChallenge, String codeChallengeMethod) {
         return null;
     }
 

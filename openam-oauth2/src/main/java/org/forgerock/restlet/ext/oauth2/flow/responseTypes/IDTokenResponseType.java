@@ -65,10 +65,12 @@ public class IDTokenResponseType implements ResponseType {
         final ResourceOwner resourceOwner = ownerAuthenticator.authenticate(request);
         final String clientId = (String) data.get(OAuth2Constants.CoreTokenParams.CLIENT_ID);
         final String nonce = (String) data.get(OAuth2Constants.Custom.NONCE);
+        final String codeChallenge = (String) data.get(OAuth2Constants.Custom.CODE_CHALLENGE);
+        final String codeChallengeMethod = (String) data.get(OAuth2Constants.Custom.CODE_CHALLENGE_METHOD);
 
         try {
             final Map.Entry<String,Token> tokenEntry = handler.handle(null, null, resourceOwner, clientId,
-                    null, nonce, request);
+                    null, nonce, request, codeChallenge, codeChallengeMethod);
 
             return new LegacyJwtTokenAdapter((OpenIdConnectToken) tokenEntry.getValue());
 

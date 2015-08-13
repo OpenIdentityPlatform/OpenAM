@@ -49,11 +49,12 @@ public class AuthorizationCodeResponseTypeHandler implements ResponseTypeHandler
      */
     public Map.Entry<String, Token> handle(String tokenType, Set<String> scope,
                                            ResourceOwner resourceOwner, String clientId, String redirectUri,
-                                           String nonce, OAuth2Request request)
+                                           String nonce, OAuth2Request request, String codeChallenge,
+                                           String codeChallengeMethod)
             throws ServerException, NotFoundException {
 
         final AuthorizationCode authorizationCode = tokenStore.createAuthorizationCode(scope, resourceOwner,
-                clientId, redirectUri, nonce, request);
+                clientId, redirectUri, nonce, request, codeChallenge, codeChallengeMethod);
         return new AbstractMap.SimpleEntry<String, Token>(OAuth2Constants.Params.CODE, authorizationCode);
     }
 

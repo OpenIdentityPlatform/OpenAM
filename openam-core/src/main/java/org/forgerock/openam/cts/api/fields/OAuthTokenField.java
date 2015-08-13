@@ -45,7 +45,9 @@ public enum OAuthTokenField {
     TOKEN_NAME(OAuth2Constants.CoreTokenParams.TOKEN_NAME, CoreTokenField.STRING_TEN),
     NONCE(OAuth2Constants.Custom.NONCE, CoreTokenField.STRING_ELEVEN),
     GRANT_TYPE(OAuth2Constants.Params.GRANT_TYPE, CoreTokenField.STRING_TWELVE),
-    SESSION_ID(OAuth2Constants.Custom.SSO_TOKEN_ID, CoreTokenField.STRING_THIRTEEN);
+    SESSION_ID(OAuth2Constants.Custom.SSO_TOKEN_ID, CoreTokenField.STRING_THIRTEEN),
+    CODE_CHALLENGE(OAuth2Constants.Custom.CODE_CHALLENGE, CoreTokenField.STRING_FOURTEEN),
+    CODE_CHALLENGE_METHOD(OAuth2Constants.Custom.CODE_CHALLENGE_METHOD, CoreTokenField.STRING_FIFTEEN);
 
     private final String oAuthField;
     private final CoreTokenField coreTokenField;

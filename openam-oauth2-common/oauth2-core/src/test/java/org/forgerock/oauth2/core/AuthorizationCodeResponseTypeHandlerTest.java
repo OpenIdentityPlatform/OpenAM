@@ -56,12 +56,13 @@ public class AuthorizationCodeResponseTypeHandlerTest {
         OAuth2Request request = mock(OAuth2Request.class);
         AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
 
-        given(tokenStore.createAuthorizationCode(scope, resourceOwner, clientId, redirectUri, nonce, request))
+        given(tokenStore.createAuthorizationCode(scope, resourceOwner, clientId, redirectUri, nonce, request,
+                null, null))
                 .willReturn(authorizationCode);
 
         //When
         final Map.Entry<String, Token> tokenEntry = responseTypeHandler.handle(tokenType, scope, resourceOwner,
-                clientId, redirectUri, nonce, request);
+                clientId, redirectUri, nonce, request, null, null);
 
         //Then
         assertEquals(tokenEntry.getKey(), "code");

@@ -65,7 +65,7 @@ public class TokenResponseTypeHandlerTest {
 
         //When
         final Map.Entry<String, Token> tokenEntry = responseTypeHandler.handle(tokenType, scope, resourceOwner,
-                clientId, redirectUri, nonce, request);
+                clientId, redirectUri, nonce, request, null, null);
 
         //Then
         assertEquals(tokenEntry.getKey(), "access_token");
