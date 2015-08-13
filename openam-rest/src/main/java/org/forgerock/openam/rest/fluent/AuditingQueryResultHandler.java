@@ -20,7 +20,7 @@ import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.Resource;
-import org.forgerock.json.resource.ServerContext;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 

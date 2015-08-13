@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 ForgeRock, Inc.
+ * Copyright 2013-2015 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -23,7 +23,7 @@ import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.json.resource.ServerContext;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 
 /**

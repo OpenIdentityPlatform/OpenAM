@@ -42,7 +42,7 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.Router;
 import org.forgerock.json.resource.RoutingMode;
-import org.forgerock.json.resource.ServerContext;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;

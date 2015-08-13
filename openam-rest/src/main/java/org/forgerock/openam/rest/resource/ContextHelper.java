@@ -19,7 +19,7 @@ package org.forgerock.openam.rest.resource;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdUtils;
 import org.forgerock.json.resource.RouterContext;
-import org.forgerock.json.resource.ServerContext;
+import org.forgerock.http.context.ServerContext;
 
 import javax.security.auth.Subject;
 

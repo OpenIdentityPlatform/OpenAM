@@ -19,7 +19,7 @@ package org.forgerock.openam.sts.rest.operation;
 import com.sun.identity.shared.encode.Base64;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.servlet.HttpContext;
+import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.TokenMarshalException;

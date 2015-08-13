@@ -18,7 +18,7 @@ package org.forgerock.openam.rest.fluent;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.json.resource.ServerContext;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 

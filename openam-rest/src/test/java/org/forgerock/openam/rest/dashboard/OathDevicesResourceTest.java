@@ -45,7 +45,7 @@ import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.json.resource.ServerContext;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.openam.rest.devices.OathDevicesDao;
 import org.forgerock.openam.rest.devices.OathDevicesResource;
 import org.forgerock.openam.rest.devices.services.OathService;

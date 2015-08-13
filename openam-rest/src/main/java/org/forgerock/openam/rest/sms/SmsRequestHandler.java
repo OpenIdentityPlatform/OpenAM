@@ -68,7 +68,7 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.Route;
 import org.forgerock.json.resource.Router;
 import org.forgerock.json.resource.RoutingMode;
-import org.forgerock.json.resource.ServerContext;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.rest.resource.CrestRealmRouter;

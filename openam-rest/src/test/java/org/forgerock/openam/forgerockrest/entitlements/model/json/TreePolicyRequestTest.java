@@ -19,7 +19,7 @@ package org.forgerock.openam.forgerockrest.entitlements.model.json;
 import com.sun.identity.entitlement.EntitlementException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.ServerContext;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.mockito.Mock;

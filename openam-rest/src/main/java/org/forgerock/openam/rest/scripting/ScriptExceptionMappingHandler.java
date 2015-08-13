@@ -21,7 +21,7 @@ import static org.forgerock.json.resource.ResourceException.INTERNAL_ERROR;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode;
 import static org.forgerock.openam.scripting.ScriptConstants.ScriptErrorCode.*;
 
-import org.forgerock.json.resource.Context;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.errors.ExceptionMappingHandler;

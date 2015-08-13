@@ -43,7 +43,7 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ServerContext;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;

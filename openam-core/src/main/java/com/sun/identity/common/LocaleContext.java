@@ -18,8 +18,8 @@ package com.sun.identity.common;
 
 import java.util.Locale;
 
-import org.forgerock.json.resource.ServerContext;
-import org.forgerock.json.resource.servlet.HttpContext;
+import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.http.HttpContext;
 
 /**
  * Context for storing request Locale.

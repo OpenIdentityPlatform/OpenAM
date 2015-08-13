@@ -17,7 +17,7 @@
 package org.forgerock.openam.sts.rest.operation;
 
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.servlet.HttpContext;
+import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenTypeId;
 import org.forgerock.openam.sts.rest.service.RestSTSServiceHttpServletContext;

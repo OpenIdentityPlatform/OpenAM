@@ -24,7 +24,7 @@ import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.RequestType;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.json.resource.ServerContext;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.PolicyRequest;
 import org.forgerock.openam.forgerockrest.guice.ForgerockRestGuiceModule;
 import org.forgerock.openam.rest.resource.RealmContext;

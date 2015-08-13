@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.rest.resource;
 
-import org.forgerock.json.resource.RootContext;
+import org.forgerock.http.context.RootContext;
 import org.forgerock.util.Pair;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;

@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.dashboard;
 
 import org.forgerock.json.resource.SecurityContext;
-import org.forgerock.json.resource.ServerContext;
+import org.forgerock.http.context.ServerContext;
 
 /**
  * This class contains method that help with getting information out of ServerContexts objects.

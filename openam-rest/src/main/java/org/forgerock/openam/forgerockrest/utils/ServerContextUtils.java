@@ -23,7 +23,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.Context;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.PatchRequest;
@@ -32,9 +32,9 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.RouterContext;
 import org.forgerock.json.resource.SecurityContext;
-import org.forgerock.json.resource.ServerContext;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.json.resource.servlet.HttpContext;
+import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.StringUtils;
@@ -103,7 +103,7 @@ public class ServerContextUtils {
 
     /**
      * Returns the RouterContext's matchedUri, and appends its id, if there is one.
-     * Id is retrieved via {@link ServerContextUtils#getId(org.forgerock.json.resource.ServerContext)}.
+     * Id is retrieved via {@link ServerContextUtils#getId(org.forgerock.http.context.ServerContext)}.
      *
      * @param context from which to gather the matched Uri and id information
      * @return a String in the form <code>matchedUri | id</code>, omitting either if they are null.
@@ -126,7 +126,7 @@ public class ServerContextUtils {
 
     /**
      * Returns the name of the resource requested, and appends its id, if there is one.
-     * Id is retrieved via {@link ServerContextUtils#getId(org.forgerock.json.resource.ServerContext)}.
+     * Id is retrieved via {@link ServerContextUtils#getId(org.forgerock.http.context.ServerContext)}.
      *
      * @param request the request for a resource
      * @param context the context of the request, including its RouterContext

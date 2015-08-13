@@ -33,7 +33,7 @@ import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.json.resource.ServerContext;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.openam.rest.devices.services.OathService;
 import org.forgerock.openam.rest.devices.services.OathServiceFactory;
 import org.forgerock.openam.rest.resource.ContextHelper;

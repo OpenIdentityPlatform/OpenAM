@@ -31,7 +31,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.forgerock.guava.common.base.Function;
-import org.forgerock.json.resource.Context;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Requests;
@@ -39,7 +39,7 @@ import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.Router;
 import org.forgerock.json.resource.RoutingMode;
-import org.forgerock.json.resource.ServerContext;
+import org.forgerock.http.context.ServerContext;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;

@@ -28,8 +28,8 @@ import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.RequestType;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ServerContext;
-import org.forgerock.json.resource.servlet.HttpContext;
+import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.forgerockrest.utils.ServerContextUtils;
 import org.testng.annotations.Test;
 

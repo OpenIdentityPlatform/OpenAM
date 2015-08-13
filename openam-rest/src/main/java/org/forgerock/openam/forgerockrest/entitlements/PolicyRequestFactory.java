@@ -11,14 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.entitlements;
 
 import com.sun.identity.entitlement.EntitlementException;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.ServerContext;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.BatchPolicyRequest;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.PolicyRequest;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.TreePolicyRequest;

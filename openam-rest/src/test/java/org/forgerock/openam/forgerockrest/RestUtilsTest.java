@@ -16,8 +16,8 @@
 
 package org.forgerock.openam.forgerockrest;
 
-import org.forgerock.json.resource.ServerContext;
-import org.forgerock.json.resource.servlet.HttpContext;
+import org.forgerock.http.context.ServerContext;
+import org.forgerock.json.resource.http.HttpContext;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 

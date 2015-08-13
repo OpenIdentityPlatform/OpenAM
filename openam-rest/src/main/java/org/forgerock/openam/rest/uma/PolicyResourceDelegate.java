@@ -33,7 +33,7 @@ import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ServerContext;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.openam.rest.resource.PromisedRequestHandler;
 import org.forgerock.util.Pair;
 import org.forgerock.util.AsyncFunction;

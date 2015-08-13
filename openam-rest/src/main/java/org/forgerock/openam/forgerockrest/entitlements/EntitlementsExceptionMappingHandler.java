@@ -26,7 +26,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.codehaus.jackson.map.JsonMappingException;
-import org.forgerock.json.resource.Context;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.RequestType;
 import org.forgerock.json.resource.ResourceException;

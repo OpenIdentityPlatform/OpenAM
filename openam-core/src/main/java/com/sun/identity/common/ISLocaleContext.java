@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
@@ -24,6 +24,7 @@
  *
  * $Id: ISLocaleContext.java,v 1.14 2008/08/19 19:09:00 veiming Exp $
  *
+ * Portions Copyright 2015 ForgeRock AS.
  */
 
 package com.sun.identity.common;
@@ -45,10 +46,11 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.json.resource.http.HttpContext;
+
 import java.security.AccessController;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
-import org.forgerock.json.resource.servlet.HttpContext;
 
 /**
  * Sets the locale suitable for the given situation. Each response to end-user

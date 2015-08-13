@@ -20,7 +20,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.Context;
+import org.forgerock.http.Context;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.QueryRequest;
@@ -28,7 +28,7 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ServerContext;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.resource.CrestRouter;
 import org.forgerock.openam.utils.StringUtils;
@@ -68,7 +68,7 @@ public class Requester {
      * @param resourceId Resource ID to be created. May be null.
      * @param payload Payload of the resource to generate. May not be null.
      * @param serverContext Server context of this request.
-     *                      Must contain a {@link org.forgerock.json.resource.ServerContext}.
+     *                      Must contain a {@link org.forgerock.http.context.ServerContext}.
      * @return The {@link org.forgerock.json.JsonValue} returned from the endpoint.
      * @throws ResourceException If any exception occurred during processing.
      */
@@ -97,7 +97,7 @@ public class Requester {
      * @param location Endpoint destination of this request. May not be null.
      * @param resourceId Resource ID to read. May not be null.
      * @param serverContext Server context of this request.
-     *                      Must contain a {@link org.forgerock.json.resource.ServerContext}.
+     *                      Must contain a {@link org.forgerock.http.context.ServerContext}.
      * @return The {@link org.forgerock.json.JsonValue} returned from the endpoint.
      * @throws ResourceException If any exception occurred during processing.
      */
@@ -122,7 +122,7 @@ public class Requester {
      * @param resourceId Resource ID to update. May not be null.
      * @param payload Payload of the updated resource. May not be null.
      * @param serverContext Server context of this request.
-     *                      Must contain a {@link org.forgerock.json.resource.ServerContext}.
+     *                      Must contain a {@link org.forgerock.http.context.ServerContext}.
      * @return The {@link org.forgerock.json.JsonValue} returned from the endpoint.
      * @throws ResourceException If any exception occurred during processing.
      */
@@ -147,7 +147,7 @@ public class Requester {
      * @param location Endpoint destination of this request. May not be null.
      * @param resourceId Resource ID to delete. May not be null.
      * @param serverContext Server context of this request.
-     *                      Must contain a {@link org.forgerock.json.resource.ServerContext}.
+     *                      Must contain a {@link org.forgerock.http.context.ServerContext}.
      * @return The {@link org.forgerock.json.JsonValue} returned from the endpoint.
      * @throws ResourceException If any exception occurred during processing.
      */
@@ -172,7 +172,7 @@ public class Requester {
      * @param resourceId Specific resource ID to perform action on. May be null.
      * @param actionId act ID to delete. May not be null.
      * @param serverContext Server context of this request.
-     *                      Must contain a {@link org.forgerock.json.resource.ServerContext}.
+     *                      Must contain a {@link org.forgerock.http.context.ServerContext}.
      * @return The {@link org.forgerock.json.JsonValue} returned from the endpoint.
      * @throws ResourceException If any exception occurred during processing.
      */
@@ -206,7 +206,7 @@ public class Requester {
      * @param location Endpoint destination of this request. May not be null.
      * @param queryId Specific query ID to perform. May be null.
      * @param serverContext Server context of this request.
-     *                      Must contain a {@link org.forgerock.json.resource.ServerContext}.
+     *                      Must contain a {@link org.forgerock.http.context.ServerContext}.
      * @return The {@link org.forgerock.json.JsonValue} returned from the endpoint.
      * @throws ResourceException If any exception occurred during processing.
      */

@@ -22,7 +22,7 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ServerContext;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.util.Pair;
 import org.forgerock.util.promise.Promise;
 

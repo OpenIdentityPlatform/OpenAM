@@ -34,7 +34,7 @@ import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.Route;
 import org.forgerock.json.resource.RoutingMode;
-import org.forgerock.json.resource.ServerContext;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.resource.SingletonResourceProvider;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.VersionHandler;
@@ -49,7 +49,7 @@ import org.forgerock.openam.rest.router.VersionedRouter;
  *
  * <ul>
  *     <li>{@link VersionRouter#getRoutes()}</li>
- *     <li>{@link VersionRouter#transformContext(org.forgerock.json.resource.ServerContext)} ()}</li>
+ *     <li>{@link VersionRouter#transformContext(org.forgerock.http.context.ServerContext)} ()}</li>
  * </ul>
  *
  * @since 12.0.0

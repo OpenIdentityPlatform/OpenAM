@@ -1,5 +1,5 @@
 {
-  "class": "org.forgerock.json.resource.servlet.HttpContext",
+  "class": "org.forgerock.json.resource.http.HttpContext",
   "method": "GET",
   "path": "http://product.example.com:8080/path",
   "parameters": {
@@ -13,7 +13,7 @@
   },
   "remoteAddress": "168.0.0.10",
   "parent": {
-    "class": "org.forgerock.json.resource.RootContext",
+    "class": "org.forgerock.http.context.RootContext",
     "id": "08a39103-91aa-41e1-aac7-c1d01d502ddf",
     "parent": null
   }

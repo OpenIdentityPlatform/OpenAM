@@ -20,7 +20,7 @@ import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.ServerContext;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyEvaluator;
 import org.forgerock.util.Reject;
 
