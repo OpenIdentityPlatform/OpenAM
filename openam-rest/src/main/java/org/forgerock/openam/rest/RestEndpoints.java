@@ -72,9 +72,9 @@ import org.forgerock.openam.rest.devices.OathDevicesResource;
 import org.forgerock.openam.rest.devices.TrustedDevicesResource;
 import org.forgerock.openam.rest.fluent.AuditEndpointAuditFilter;
 import org.forgerock.openam.rest.fluent.FluentAudit;
-import org.forgerock.openam.rest.fluent.LoggingFluentRouter;
 import org.forgerock.openam.rest.record.RecordConstants;
 import org.forgerock.openam.rest.record.RecordResource;
+import org.forgerock.openam.rest.fluent.CrestLoggingFilter;
 import org.forgerock.openam.rest.oauth2.ResourceSetResource;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.router.VersionBehaviourConfigListener;
@@ -195,7 +195,7 @@ public class RestEndpoints {
      */
     private CrestRouter createResourceRouter(final Set<String> invalidRealmNames) {
 
-        FluentRouter rootRealmRouterDelegate = InjectorHolder.getInstance(LoggingFluentRouter.class);
+        FluentRouter rootRealmRouterDelegate = InjectorHolder.getInstance(CrestLoggingFilter.class);
 
         // Ensure all routes are added to the realm name blacklist
         FluentRouter rootRealmRouter = new RealmBlackListingFluentRouter(rootRealmRouterDelegate, invalidRealmNames);

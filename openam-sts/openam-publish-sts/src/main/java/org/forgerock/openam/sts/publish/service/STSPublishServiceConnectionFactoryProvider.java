@@ -25,7 +25,7 @@ import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.RoutingMode;
 import org.forgerock.openam.audit.AuditConstants.Component;
 import org.forgerock.openam.rest.authz.STSPublishServiceAuthzModule;
-import org.forgerock.openam.rest.fluent.LoggingFluentRouter;
+import org.forgerock.openam.rest.fluent.CrestLoggingFilter;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.sts.InstanceConfigMarshaller;
 import org.forgerock.openam.sts.publish.config.STSPublishInjectorHolder;
@@ -42,7 +42,7 @@ import org.slf4j.Logger;
 public class STSPublishServiceConnectionFactoryProvider {
     private static final String VERSION_STRING = "1.0";
     public static ConnectionFactory getConnectionFactory() {
-        final LoggingFluentRouter router = InjectorHolder.getInstance(LoggingFluentRouter.class);
+        final CrestLoggingFilter router = InjectorHolder.getInstance(CrestLoggingFilter.class);
         final RequestHandler restPublishRequestHandler =
                 new RestSTSPublishServiceRequestHandler(
                     STSPublishInjectorHolder.getInstance(Key.get(RestSTSInstancePublisher.class)),

@@ -16,24 +16,25 @@
 
 package org.forgerock.openam.rest.fluent;
 
-import com.iplanet.sso.SSOException;
-import com.sun.identity.shared.debug.Debug;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.forgerock.json.JsonValue;
+
+import com.iplanet.sso.SSOException;
+import com.sun.identity.shared.debug.Debug;
+import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.Filter;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
+import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.context.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.utils.RestLog;
 import org.forgerock.openam.forgerockrest.utils.ServerContextUtils;
@@ -41,15 +42,15 @@ import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.util.promise.Promise;
 
 /**
- * Fluent Router which will audit any requests that pass through it.
+ * CREST Filter which will audit any requests that pass through it.
  */
-public class LoggingFluentRouter<T extends CrestRouter> extends FluentRouter<T> {
+public class CrestLoggingFilter implements Filter {
 
     private final Debug debug;
     private final RestLog restLog;
 
     @Inject
-    public LoggingFluentRouter(@Named("frRest") Debug debug, RestLog restLog) {
+    public CrestLoggingFilter(@Named("frRest") Debug debug, RestLog restLog) {
         this.debug = debug;
         this.restLog = restLog;
     }
@@ -60,15 +61,16 @@ public class LoggingFluentRouter<T extends CrestRouter> extends FluentRouter<T> 
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
+     * @return {@inheritDoc}
      */
     @Override
-    public Promise<ActionResponse, ResourceException> handleAction(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
+    public Promise<ActionResponse, ResourceException> filterAction(ServerContext context, ActionRequest request,
+            RequestHandler next) {
         final String resource = ServerContextUtils.getResourceId(request, context);
         final String action = ServerContextUtils.getActionString(request);
 
         logAccess(resource, action, context);
-        super.handleAction(context, request, handler);
+        return next.handleAction(context, request);
     }
 
     /**
@@ -77,15 +79,16 @@ public class LoggingFluentRouter<T extends CrestRouter> extends FluentRouter<T> 
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
+     * @return {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> handleCreate(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> filterCreate(ServerContext context, CreateRequest request,
+            RequestHandler next) {
         final String resource = ServerContextUtils.getResourceId(request, context);
         final String action = ServerContextUtils.getCreateString(request);
 
         logAccess(resource, action, context);
-        super.handleCreate(context, request, handler);
+        return next.handleCreate(context, request);
     }
 
     /**
@@ -94,15 +97,16 @@ public class LoggingFluentRouter<T extends CrestRouter> extends FluentRouter<T> 
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
+     * @return {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> handleDelete(ServerContext context, DeleteRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> filterDelete(ServerContext context, DeleteRequest request,
+            RequestHandler next) {
         final String resource = ServerContextUtils.getResourceId(request, context);
         final String action = ServerContextUtils.getDeleteString(request);
 
         logAccess(resource, action, context);
-        super.handleDelete(context, request, handler);
+        return next.handleDelete(context, request);
     }
 
     /**
@@ -111,15 +115,16 @@ public class LoggingFluentRouter<T extends CrestRouter> extends FluentRouter<T> 
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
+     * @return {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> handlePatch(ServerContext context, PatchRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> filterPatch(ServerContext context, PatchRequest request,
+            RequestHandler next) {
         final String resource = ServerContextUtils.getResourceId(request, context);
         final String action = ServerContextUtils.getPatchString(request);
 
         logAccess(resource, action, context);
-        super.handlePatch(context, request, handler);
+        return next.handlePatch(context, request);
     }
 
     /**
@@ -129,14 +134,16 @@ public class LoggingFluentRouter<T extends CrestRouter> extends FluentRouter<T> 
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
      * @param handler {@inheritDoc}
+     * @return {@inheritDoc}
      */
     @Override
-    public Promise<QueryResponse, ResourceException> handleQuery(ServerContext context, QueryRequest request, QueryResourceHandler handler) {
+    public Promise<QueryResponse, ResourceException> filterQuery(ServerContext context, QueryRequest request,
+            QueryResourceHandler handler, RequestHandler next) {
         final String resource = ServerContextUtils.getResourceId(request, context);
         final String action = ServerContextUtils.getQueryString(request);
 
         logAccess(resource, action, context);
-        super.handleQuery(context, request, handler);
+        return next.handleQuery(context, request, handler);
 
     }
 
@@ -146,15 +153,16 @@ public class LoggingFluentRouter<T extends CrestRouter> extends FluentRouter<T> 
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
+     * @return {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> handleRead(ServerContext context, ReadRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> filterRead(ServerContext context, ReadRequest request,
+            RequestHandler next) {
         final String resource = ServerContextUtils.getResourceId(request, context);
         final String action = ServerContextUtils.getReadString(request);
 
         logAccess(resource, action, context);
-        super.handleRead(context, request, handler);
+        return next.handleRead(context, request);
     }
 
     /**
@@ -163,15 +171,16 @@ public class LoggingFluentRouter<T extends CrestRouter> extends FluentRouter<T> 
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
-     * @param handler {@inheritDoc}
+     * @return {@inheritDoc}
      */
     @Override
-    public Promise<ResourceResponse, ResourceException> handleUpdate(ServerContext context, UpdateRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> filterUpdate(ServerContext context, UpdateRequest request,
+            RequestHandler next) {
         final String resource = ServerContextUtils.getResourceId(request, context);
         final String action = ServerContextUtils.getUpdateString(request);
 
         logAccess(resource, action, context);
-        super.handleUpdate(context, request, handler);
+        return next.handleUpdate(context, request);
     }
 
     /**
@@ -189,7 +198,7 @@ public class LoggingFluentRouter<T extends CrestRouter> extends FluentRouter<T> 
             restLog.auditAccessMessage(resource, operation, ssoTokenContext.getCallerSSOToken());
         } catch (SSOException e) {
             if (debug.warningEnabled()) {
-                debug.warning("LoggingFluentRouter :: " +
+                debug.warning("CrestLoggingFilter :: " +
                         "Error retrieving SSO Token from provided context, forced to log user as 'null'.", e);
                 restLog.auditAccessMessage(resource, operation, null);
             }
