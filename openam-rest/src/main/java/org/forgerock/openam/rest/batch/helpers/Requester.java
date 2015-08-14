@@ -54,19 +54,11 @@ import org.forgerock.util.promise.Promise;
  */
 public class Requester {
 
-    public static final String ROUTER = "requesterRouter";
-
     private final Provider<Router> router;
 
     @Inject
     public Requester(@Named("RootRouter") Provider<Router> router) {
         this.router = router;
-    }
-
-    private Context getContext(Context serverContext) {
-        Reject.ifNull(serverContext, "Supplied context must contain an instance of a Context.");
-
-        return serverContext.asContext(Context.class);
     }
 
     /**
@@ -75,26 +67,24 @@ public class Requester {
      * @param location Endpoint destination of this request. May not be null.
      * @param resourceId Resource ID to be created. May be null.
      * @param payload Payload of the resource to generate. May not be null.
-     * @param serverContext Server context of this request.
-     *                      Must contain a {@link org.forgerock.http.Context}.
+     * @param context Context of this request.
      * @return The {@link org.forgerock.json.JsonValue} returned from the endpoint.
      * @throws ResourceException If any exception occurred during processing.
      */
-    public JsonValue create(String location, String resourceId, JsonValue payload, Context serverContext)
+    public JsonValue create(String location, String resourceId, JsonValue payload, Context context)
             throws ResourceException {
 
         Reject.ifTrue(StringUtils.isEmpty(location), "The endpoint destination may not be null or empty.");
         Reject.ifNull(payload, "The payload object to create must not be null.");
 
         final Router realmRouter = router.get();
-        final Context selectedContext = getContext(serverContext);
         final CreateRequest createRequest = Requests.newCreateRequest(location, payload);
 
         if (resourceId != null) {
             createRequest.setNewResourceId(resourceId);
         }
 
-        return realmRouter.handleCreate(selectedContext, createRequest).getOrThrowUninterruptibly().getContent();
+        return realmRouter.handleCreate(context, createRequest).getOrThrowUninterruptibly().getContent();
     }
 
     /**
@@ -102,21 +92,19 @@ public class Requester {
      *
      * @param location Endpoint destination of this request. May not be null.
      * @param resourceId Resource ID to read. May not be null.
-     * @param serverContext Server context of this request.
-     *                      Must contain a {@link org.forgerock.http.Context}.
+     * @param context Context of this request.
      * @return The {@link org.forgerock.json.JsonValue} returned from the endpoint.
      * @throws ResourceException If any exception occurred during processing.
      */
-    public JsonValue read(String location, String resourceId, Context serverContext)
+    public JsonValue read(String location, String resourceId, Context context)
             throws ResourceException {
 
         Reject.ifTrue(StringUtils.isEmpty(location), "The endpoint destination may not be null or empty.");
         Reject.ifTrue(StringUtils.isEmpty(resourceId), "The resourceId to read may not be null or empty.");
 
         final Router realmRouter = router.get();
-        final Context selectedContext = getContext(serverContext);
         final ReadRequest readRequest = Requests.newReadRequest(location, resourceId);
-        return realmRouter.handleRead(selectedContext, readRequest).getOrThrowUninterruptibly().getContent();
+        return realmRouter.handleRead(context, readRequest).getOrThrowUninterruptibly().getContent();
     }
 
     /**
@@ -125,12 +113,11 @@ public class Requester {
      * @param location Endpoint destination of this request. May not be null.
      * @param resourceId Resource ID to update. May not be null.
      * @param payload Payload of the updated resource. May not be null.
-     * @param serverContext Server context of this request.
-     *                      Must contain a {@link org.forgerock.http.Context}.
+     * @param context Context of this request.
      * @return The {@link org.forgerock.json.JsonValue} returned from the endpoint.
      * @throws ResourceException If any exception occurred during processing.
      */
-    public JsonValue update(String location, String resourceId, JsonValue payload, Context serverContext)
+    public JsonValue update(String location, String resourceId, JsonValue payload, Context context)
             throws ResourceException {
 
         Reject.ifTrue(StringUtils.isEmpty(location), "The endpoint destination may not be null or empty.");
@@ -138,9 +125,8 @@ public class Requester {
         Reject.ifNull(payload, "The payload object to create must not be null.");
 
         final Router realmRouter = router.get();
-        final Context selectedContext = getContext(serverContext);
         final UpdateRequest updateRequest = Requests.newUpdateRequest(location, resourceId, payload);
-        return realmRouter.handleUpdate(selectedContext, updateRequest).getOrThrowUninterruptibly().getContent();
+        return realmRouter.handleUpdate(context, updateRequest).getOrThrowUninterruptibly().getContent();
     }
 
     /**
@@ -148,21 +134,19 @@ public class Requester {
      *
      * @param location Endpoint destination of this request. May not be null.
      * @param resourceId Resource ID to delete. May not be null.
-     * @param serverContext Server context of this request.
-     *                      Must contain a {@link org.forgerock.http.Context}.
+     * @param context Context of this request.
      * @return The {@link org.forgerock.json.JsonValue} returned from the endpoint.
      * @throws ResourceException If any exception occurred during processing.
      */
-    public JsonValue delete(String location, String resourceId, Context serverContext)
+    public JsonValue delete(String location, String resourceId, Context context)
             throws ResourceException {
 
         Reject.ifTrue(StringUtils.isEmpty(location), "The endpoint destination may not be null or empty.");
         Reject.ifTrue(StringUtils.isEmpty(resourceId), "The resourceId to delete may not be null or empty.");
 
         final Router realmRouter = router.get();
-        final Context selectedContext = getContext(serverContext);
         final DeleteRequest deleteRequest = Requests.newDeleteRequest(location, resourceId);
-        return realmRouter.handleDelete(selectedContext, deleteRequest).getOrThrowUninterruptibly().getContent();
+        return realmRouter.handleDelete(context, deleteRequest).getOrThrowUninterruptibly().getContent();
     }
 
     /**
@@ -171,19 +155,17 @@ public class Requester {
      * @param location Endpoint destination of this request. May not be null.
      * @param resourceId Specific resource ID to perform action on. May be null.
      * @param actionId act ID to delete. May not be null.
-     * @param serverContext Server context of this request.
-     *                      Must contain a {@link org.forgerock.http.Context}.
+     * @param context Context of this request.
      * @return The {@link org.forgerock.json.JsonValue} returned from the endpoint.
      * @throws ResourceException If any exception occurred during processing.
      */
     public JsonValue action(String location, String resourceId, String actionId, JsonValue payload,
-                                    Context serverContext) throws ResourceException {
+                                    Context context) throws ResourceException {
 
         Reject.ifTrue(StringUtils.isEmpty(location), "The endpoint destination may not be null or empty.");
         Reject.ifTrue(StringUtils.isEmpty(actionId), "The specific action to perform may not be null or empty.");
 
         final Router realmRouter = router.get();
-        final Context selectedContext = getContext(serverContext);
         final ActionRequest actionRequest = Requests.newActionRequest(location, actionId);
 
         if (payload != null) {
@@ -194,7 +176,7 @@ public class Requester {
             actionRequest.setResourcePath(resourceId);
         }
 
-        return realmRouter.handleAction(selectedContext, actionRequest).getOrThrowUninterruptibly().getJsonContent();
+        return realmRouter.handleAction(context, actionRequest).getOrThrowUninterruptibly().getJsonContent();
 
     }
 
@@ -203,18 +185,16 @@ public class Requester {
      *
      * @param location Endpoint destination of this request. May not be null.
      * @param queryId Specific query ID to perform. May be null.
-     * @param serverContext Server context of this request.
-     *                      Must contain a {@link org.forgerock.http.Context}.
+     * @param context Context of this request.
      * @return The {@link org.forgerock.json.JsonValue} returned from the endpoint.
      * @throws ResourceException If any exception occurred during processing.
      */
-    public JsonValue query(String location, String queryId, Context serverContext)
+    public JsonValue query(String location, String queryId, Context context)
             throws ResourceException {
 
         Reject.ifTrue(StringUtils.isEmpty(location), "The endpoint destination may not be null or empty.");
 
         final Router realmRouter = router.get();
-        final Context selectedContext = getContext(serverContext);
         final QueryRequest queryRequest = Requests.newQueryRequest(location);
 
         if (queryId != null) {
@@ -222,7 +202,7 @@ public class Requester {
         }
 
         final InMemoryQueryResourceHandler resourceHandler = new InMemoryQueryResourceHandler();
-        return realmRouter.handleQuery(selectedContext, queryRequest, resourceHandler)
+        return realmRouter.handleQuery(context, queryRequest, resourceHandler)
                 .thenAsync(new AsyncFunction<QueryResponse, JsonValue, ResourceException>() {
                     @Override
                     public Promise<JsonValue, ResourceException> apply(QueryResponse value) {
@@ -242,7 +222,7 @@ public class Requester {
         @Override
         public boolean handleResource(ResourceResponse resource) {
             resources.add(resource);
-            return false;
+            return true;
         }
 
         Collection<ResourceResponse> getResources() {

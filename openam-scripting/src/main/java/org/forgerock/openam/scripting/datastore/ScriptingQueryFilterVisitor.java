@@ -39,8 +39,8 @@ import java.util.Set;
  *
  * @since 13.0.0
  */
-public class ScriptingQueryFilterVisitor implements QueryFilterVisitor<Set<String>, Map<String, Map<String,
-        Set<String>>>, JsonPointer> {
+public class ScriptingQueryFilterVisitor
+        implements QueryFilterVisitor<Set<String>, Map<String, Map<String, Set<String>>>, JsonPointer> {
 
     @Override
     public Set<String> visitAndFilter(Map<String, Map<String, Set<String>>> resourceData,

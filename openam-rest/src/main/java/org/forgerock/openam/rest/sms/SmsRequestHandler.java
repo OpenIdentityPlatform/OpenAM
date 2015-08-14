@@ -166,6 +166,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
     private final Collection<String> excludedServices;
     private final AuthenticationModuleCollectionHandler authenticationModuleCollectionHandler;
     private final AuthenticationModuleTypeHandler authenticationModuleTypeHandler;
+    private final RealmContextFilter realmContextFilter;
     private final Map<SchemaType, Collection<Function<String, Boolean>>> excludedServiceSingletons =
             new HashMap<SchemaType, Collection<Function<String, Boolean>>>();
     private final Map<SchemaType, Collection<Function<String, Boolean>>> excludedServiceCollections =
@@ -181,7 +182,8 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
             ExcludedServicesFactory excludedServicesFactory,
             AuthenticationModuleCollectionHandler authenticationModuleCollectionHandler,
             AuthenticationModuleTypeHandler authenticationModuleTypeHandler,
-            SitesResourceProvider sitesResourceProvider, AuthenticationChainsFilter authenticationChainsFilter)
+            SitesResourceProvider sitesResourceProvider, AuthenticationChainsFilter authenticationChainsFilter,
+            RealmContextFilter realmContextFilter)
             throws SMSException, SSOException {
         this.schemaType = type;
         this.collectionProviderFactory = collectionProviderFactory;
@@ -192,6 +194,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
         this.excludedServices = excludedServicesFactory.get(type);
         this.authenticationModuleCollectionHandler = authenticationModuleCollectionHandler;
         this.authenticationModuleTypeHandler = authenticationModuleTypeHandler;
+        this.realmContextFilter = realmContextFilter;
         this.schemaDnPattern = Pattern.compile("^ou=([.0-9]+),ou=([^,]+)," +
                 Pattern.quote(ServiceManager.getServiceDN()) + "$");
         routeTree = tree(
@@ -242,7 +245,6 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
     private void addRealmHandler() {
         if (SchemaType.GLOBAL.equals(schemaType)) {
             Router realmRouter = new Router();
-            RealmContextFilter realmContextFilter = InjectorHolder.getInstance(RealmContextFilter.class);
             realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "{realm}"),
                     new FilterChain(realmRouter, realmContextFilter));
             realmRouter.addRoute(requestUriMatcher(EQUALS, ""), new SmsRealmProvider());

@@ -17,7 +17,6 @@
 package org.forgerock.openam.rest;
 
 import java.security.AccessController;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
@@ -40,6 +39,9 @@ public class VersionBehaviourConfigListener implements ServiceListener, Resource
     private static final String SERVICE_NAME = "RestApisService";
     private static final String SERVICE_VERSION = "1.0";
     private static Debug debug = Debug.getInstance("frRest");
+
+    private volatile boolean warningEnabled = true;
+    private volatile DefaultVersionBehaviour defaultVersionBehaviour = DefaultVersionBehaviour.LATEST;
 
     private ServiceConfigManager mgr;
 
@@ -66,16 +68,12 @@ public class VersionBehaviourConfigListener implements ServiceListener, Resource
         }
     }
 
-    private final AtomicBoolean warningEnabled = new AtomicBoolean(true);
-    private volatile DefaultVersionBehaviour defaultVersionBehaviour = DefaultVersionBehaviour.LATEST;
-
     private void updateSettings() {
         try {
             ServiceConfig serviceConfig = mgr.getGlobalConfig(null);
             String versionBehaviour = ServiceConfigUtils.getStringAttribute(serviceConfig, VERSION_BEHAVIOUR_ATTRIBUTE);
             defaultVersionBehaviour = DefaultVersionBehaviour.valueOf(versionBehaviour.toUpperCase());
-            warningEnabled.set(ServiceConfigUtils.getBooleanAttribute(serviceConfig,
-                    WARNING_BEHAVIOUR_ATTRIBUTE));
+            warningEnabled = ServiceConfigUtils.getBooleanAttribute(serviceConfig, WARNING_BEHAVIOUR_ATTRIBUTE);
             if (debug.messageEnabled()) {
                 debug.message("Successfully updated rest version behaviour settings to " + versionBehaviour);
             }
@@ -131,7 +129,7 @@ public class VersionBehaviourConfigListener implements ServiceListener, Resource
 
     @Override
     public boolean isWarningEnabled() {
-        return warningEnabled.get();
+        return warningEnabled;
     }
 
     /**
