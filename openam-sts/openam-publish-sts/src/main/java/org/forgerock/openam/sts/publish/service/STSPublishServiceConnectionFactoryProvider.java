@@ -22,6 +22,8 @@ import static org.forgerock.http.routing.Version.version;
 import static org.forgerock.json.resource.RouteMatchers.requestResourceApiVersionMatcher;
 import static org.forgerock.json.resource.RouteMatchers.requestUriMatcher;
 
+import javax.inject.Provider;
+
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import org.forgerock.guice.core.InjectorHolder;
@@ -53,7 +55,7 @@ import org.slf4j.Logger;
  */
 public class STSPublishServiceConnectionFactoryProvider {
     private static final Version VERSION = version(1);
-    public static ConnectionFactory getConnectionFactory(AuthenticationFilter defaultAuthenticationFilter) {
+    public static ConnectionFactory getConnectionFactory(final AuthenticationFilter defaultAuthenticationFilter) {
         Router router = new Router();
         final RequestHandler restPublishRequestHandler =
                 new RestSTSPublishServiceRequestHandler(

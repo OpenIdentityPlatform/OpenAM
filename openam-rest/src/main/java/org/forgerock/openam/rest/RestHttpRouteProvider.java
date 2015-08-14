@@ -35,6 +35,7 @@ import com.google.inject.name.Names;
 import com.sun.identity.sm.SchemaType;
 import org.forgerock.audit.AuditService;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.http.Handler;
 import org.forgerock.json.resource.Filter;
 import org.forgerock.json.resource.FilterChain;
 import org.forgerock.json.resource.RequestHandler;
@@ -84,6 +85,8 @@ import org.forgerock.openam.rest.uma.UmaConfigurationResource;
 import org.forgerock.openam.rest.uma.UmaEnabledFilter;
 import org.forgerock.openam.rest.uma.UmaPolicyResource;
 import org.forgerock.openam.rest.uma.UmaPolicyResourceAuthzFilter;
+import org.forgerock.util.Function;
+import org.forgerock.util.promise.NeverThrowsException;
 
 public class RestHttpRouteProvider implements HttpRouteProvider {
 
@@ -97,30 +100,34 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
     }
 
     @Inject
-    public void setInvalidRealms(Set<String> invalidRealms) {
+    public void setInvalidRealms(@Named("InvalidRealmNames") Set<String> invalidRealms) {
         this.invalidRealms = invalidRealms;
     }
 
     @Inject
     public void setAuthenticationFilterProvider(
-            @Named("RestAuthentication") Provider<AuthenticationFilter> authenticationFilterProvider) {
+            @Named("RestAuthenticationFilter") Provider<AuthenticationFilter> authenticationFilterProvider) {
         this.authenticationFilterProvider = authenticationFilterProvider;
     }
 
     @Override
     public Set<HttpRoute> get() {
         return Collections.singleton(
-                newHttpRoute(STARTS_WITH, "json", newHttpHandler(createResourceRouter(invalidRealms))));
+                newHttpRoute(STARTS_WITH, "json", (new Function<Void, Handler, NeverThrowsException>() {
+                    @Override
+                    public Handler apply(Void value) throws NeverThrowsException {
+                        return newHttpHandler(createResourceRouter(invalidRealms));
+                    }
+                })));
     }
 
     private RequestHandler createResourceRouter(final Set<String> invalidRealmNames) {
         org.forgerock.json.resource.Router realmRouter = new org.forgerock.json.resource.Router();
         RealmContextFilter realmContextFilter = InjectorHolder.getInstance(RealmContextFilter.class);
-        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "{realm}"),
-                new FilterChain(realmRouter, realmContextFilter));
+        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "{realm}"), realmRouter);
 
         org.forgerock.json.resource.Router rootRouter = new org.forgerock.json.resource.Router();
-        rootRouter.setDefaultRoute(realmRouter);
+        rootRouter.setDefaultRoute(new FilterChain(realmRouter, realmContextFilter));
 
         AuthenticationFilter defaultAuthenticationFilter = authenticationFilterProvider.get();
 
@@ -269,8 +276,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         FilterChain realmsAuthzFilter = createFilter(realmsVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(PrivilegeAuthzModule.class), PrivilegeAuthzModule.NAME));
         AuditFilterWrapper realmsAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.REALMS);
-        Filter realmsAuthnFilter = authenticationFilterProvider.get();
-        FilterChain realmsFilterChain = new FilterChain(realmsAuthzFilter, realmsAuthnFilter, realmsAuditFilter);
+        FilterChain realmsFilterChain = new FilterChain(realmsAuthzFilter, defaultAuthenticationFilter, realmsAuditFilter);
         realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "realms"), realmsFilterChain);
         invalidRealmNames.add(firstPathSegment("realms"));
 

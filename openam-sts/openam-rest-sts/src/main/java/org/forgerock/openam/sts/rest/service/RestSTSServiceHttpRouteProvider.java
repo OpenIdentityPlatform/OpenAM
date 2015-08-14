@@ -21,17 +21,24 @@ import java.util.Set;
 
 import static org.forgerock.http.routing.RoutingMode.*;
 
+import org.forgerock.http.Handler;
 import org.forgerock.json.resource.http.CrestHttp;
 import org.forgerock.openam.http.HttpRoute;
 import org.forgerock.openam.http.HttpRouteProvider;
+import org.forgerock.util.Function;
+import org.forgerock.util.promise.NeverThrowsException;
 
 public class RestSTSServiceHttpRouteProvider implements HttpRouteProvider {
 
     @Override
     public Set<HttpRoute> get() {
-        return Collections.singleton(HttpRoute.newHttpRoute(STARTS_WITH, "rest-sts",
-                CrestHttp.newHttpHandler(
+        return Collections.singleton(HttpRoute.newHttpRoute(STARTS_WITH, "rest-sts", new Function<Void, Handler, NeverThrowsException>() {
+            @Override
+            public Handler apply(Void value) throws NeverThrowsException {
+            return CrestHttp.newHttpHandler(
                         RestSTSServiceConnectionFactoryProvider.getConnectionFactory(),
-                        RestSTSServiceHttpServletContextFactoryProvider.getHttpServletContextFactory())));
+                        RestSTSServiceHttpServletContextFactoryProvider.getHttpServletContextFactory());
+            }
+        }));
     }
 }

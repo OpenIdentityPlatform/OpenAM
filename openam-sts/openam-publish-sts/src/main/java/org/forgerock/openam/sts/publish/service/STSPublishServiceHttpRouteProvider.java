@@ -24,10 +24,13 @@ import javax.inject.Provider;
 import java.util.Collections;
 import java.util.Set;
 
+import org.forgerock.http.Handler;
 import org.forgerock.json.resource.http.CrestHttp;
 import org.forgerock.openam.http.HttpRoute;
 import org.forgerock.openam.http.HttpRouteProvider;
 import org.forgerock.openam.rest.AuthenticationFilter;
+import org.forgerock.util.Function;
+import org.forgerock.util.promise.NeverThrowsException;
 
 public class STSPublishServiceHttpRouteProvider implements HttpRouteProvider {
 
@@ -35,13 +38,17 @@ public class STSPublishServiceHttpRouteProvider implements HttpRouteProvider {
 
     @Inject
     public void setAuthenticationFilterProvider(
-            @Named("RestAuthentication") Provider<AuthenticationFilter> authenticationFilterProvider) {
+            @Named("RestAuthenticationFilter") Provider<AuthenticationFilter> authenticationFilterProvider) {
         this.authenticationFilterProvider = authenticationFilterProvider;
     }
 
     @Override
     public Set<HttpRoute> get() {
-        return Collections.singleton(HttpRoute.newHttpRoute(STARTS_WITH, "sts-publish",
-                CrestHttp.newHttpHandler(STSPublishServiceConnectionFactoryProvider.getConnectionFactory(authenticationFilterProvider.get()))));
+        return Collections.singleton(HttpRoute.newHttpRoute(STARTS_WITH, "sts-publish", new Function<Void, Handler, NeverThrowsException>() {
+                    @Override
+                    public Handler apply(Void value) {
+                        return CrestHttp.newHttpHandler(STSPublishServiceConnectionFactoryProvider.getConnectionFactory(authenticationFilterProvider.get()));
+                    }
+                }));
     }
 }

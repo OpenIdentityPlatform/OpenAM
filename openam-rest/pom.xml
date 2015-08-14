@@ -131,6 +131,10 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-http</artifactId>
         </dependency>
+        <dependency><!-- TODO required until Restlet endpoints are moved to CHF -->
+            <groupId>org.forgerock.http</groupId>
+            <artifactId>chf-http-servlet</artifactId>
+        </dependency>
 
         <!-- OpenAM core -->
         <dependency>

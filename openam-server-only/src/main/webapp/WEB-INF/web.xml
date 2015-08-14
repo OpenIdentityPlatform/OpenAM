@@ -142,24 +142,8 @@
     </filter>
 
     <filter>
-        <filter-name>CommonsAuthenticationFilter</filter-name>
-        <filter-class>org.forgerock.jaspi.JaspiRuntimeFilter</filter-class>
-        <init-param>
-            <param-name>logging-configurator-class</param-name>
-            <param-value>org.forgerock.openam.jaspi.config.RestJaspiRuntimeConfigurationFactory</param-value>
-        </init-param>
-        <init-param>
-            <param-name>module-configuration-factory-class</param-name>
-            <param-value>org.forgerock.openam.jaspi.config.RestJaspiRuntimeConfigurationFactory</param-value>
-        </init-param>
-        <init-param>
-            <param-name>resource-exception-handlers</param-name>
-            <param-value>org.forgerock.openam.forgerockrest.utils.XMLResourceExceptionHandler</param-value>
-        </init-param>
-    </filter>
-    <filter>
         <filter-name>AuditContextFilter</filter-name>
-        <filter-class>org.forgerock.openam.audit.context.AuditContextFilter</filter-class>
+        <filter-class>org.forgerock.openam.audit.context.AuditContextFilter</filter-class> <!-- TODO Does this needs updating too? -->
     </filter>
 
     <!-- filter declaration -->
@@ -223,26 +207,6 @@
     <filter-mapping>
         <filter-name>AuthZFilter</filter-name>
         <url-pattern>/ws/*</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>CommonsAuthenticationFilter</filter-name>
-        <url-pattern>/json/*</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>CommonsAuthenticationFilter</filter-name>
-        <url-pattern>/xacml/*</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>CommonsAuthenticationFilter</filter-name>
-        <url-pattern>/frrest/*</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>CommonsAuthenticationFilter</filter-name>
-        <url-pattern>/sts-publish/*</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>CommonsAuthenticationFilter</filter-name>
-        <url-pattern>/sts-tokengen/*</url-pattern>
     </filter-mapping>
 
     <!-- filter mapping -->
@@ -674,37 +638,6 @@
     </servlet>
 
     <servlet>
-        <servlet-name>rest-sts</servlet-name>
-        <servlet-class>org.forgerock.json.resource.servlet.HttpServlet</servlet-class>
-        <init-param>
-            <param-name>connection-factory-class</param-name>
-            <param-value>org.forgerock.openam.sts.rest.service.RestSTSServiceConnectionFactoryProvider</param-value>
-        </init-param>
-        <init-param>
-            <param-name>context-factory-class</param-name>
-            <param-value>org.forgerock.openam.sts.rest.service.RestSTSServiceHttpServletContextFactoryProvider</param-value>
-        </init-param>
-    </servlet>
-
-    <servlet>
-        <servlet-name>sts-publish</servlet-name>
-        <servlet-class>org.forgerock.json.resource.servlet.HttpServlet</servlet-class>
-        <init-param>
-            <param-name>connection-factory-class</param-name>
-            <param-value>org.forgerock.openam.sts.publish.service.STSPublishServiceConnectionFactoryProvider</param-value>
-        </init-param>
-    </servlet>
-
-    <servlet>
-        <servlet-name>sts-tokengeneration-service</servlet-name>
-        <servlet-class>org.forgerock.json.resource.servlet.HttpServlet</servlet-class>
-        <init-param>
-            <param-name>connection-factory-class</param-name>
-            <param-value>org.forgerock.openam.sts.tokengeneration.service.TokenGenerationServiceConnectionFactoryProvider</param-value>
-        </init-param>
-    </servlet>
-
-    <servlet>
         <description>JAX-WS endpoint - sts</description>
         <display-name>sts</display-name>
         <servlet-name>sts</servlet-name>
@@ -1113,18 +1046,6 @@
         <servlet-name>sts</servlet-name>
         <url-pattern>/sts/mexsoap11</url-pattern>
     </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>rest-sts</servlet-name>
-        <url-pattern>/rest-sts/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>sts-publish</servlet-name>
-        <url-pattern>/sts-publish/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>sts-tokengeneration-service</servlet-name>
-        <url-pattern>/sts-tokengen/*</url-pattern>
-    </servlet-mapping>
 
     <!-- end of servlet mapping -->
 
@@ -1162,21 +1083,6 @@
         <jsp-file>/oauth2/checkSession.jsp</jsp-file>
     </servlet>
 
-    <servlet>
-        <servlet-name>OAuth2Rest</servlet-name>
-        <servlet-class>org.forgerock.json.resource.servlet.HttpServlet</servlet-class>
-
-        <init-param>
-            <param-name>connection-factory-class</param-name>
-            <param-value>org.forgerock.openam.oauth2.rest.RestTokenDispatcher</param-value>
-        </init-param>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>OAuth2Rest</servlet-name>
-        <url-pattern>/frrest/oauth2/*</url-pattern>
-    </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>OAuth2RegisterClient</servlet-name>
         <url-pattern>/oauth2/registerClient.jsp</url-pattern>
@@ -1206,6 +1112,27 @@
             <param-value>context_path</param-value>
         </init-param>
     </servlet>
+
+    <servlet-mapping>
+        <servlet-name>OpenAM</servlet-name>
+        <url-pattern>/json/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>OpenAM</servlet-name>
+        <url-pattern>/frrest/oauth2/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>OpenAM</servlet-name>
+        <url-pattern>/rest-sts/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>OpenAM</servlet-name>
+        <url-pattern>/sts-publish/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>OpenAM</servlet-name>
+        <url-pattern>/sts-tokengen/*</url-pattern>
+    </servlet-mapping>
 
     <servlet>
         <servlet-name>ForgeRockRest</servlet-name>

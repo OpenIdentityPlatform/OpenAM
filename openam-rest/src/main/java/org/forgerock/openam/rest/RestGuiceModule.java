@@ -24,6 +24,8 @@ import static org.forgerock.json.resource.RouteMatchers.resourceApiVersionContex
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.util.Set;
+
 import com.google.inject.Key;
 import com.google.inject.PrivateModule;
 import com.google.inject.Provider;
@@ -31,9 +33,11 @@ import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.sm.InvalidRealmNameManager;
 import org.forgerock.caf.authentication.api.AsyncServerAuthModule;
 import org.forgerock.caf.authentication.framework.AuditApi;
 import org.forgerock.caf.authentication.framework.CrestAuthenticationFilter;
+import org.forgerock.caf.authentication.framework.HttpAuthenticationFilter;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.routing.ResourceApiVersionBehaviourManager;
@@ -46,6 +50,7 @@ import org.forgerock.openam.oauth2.OpenAMTokenStore;
 import org.forgerock.openam.rest.fluent.CrestLoggingFilter;
 import org.forgerock.openam.utils.Config;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @GuiceModule
 public class RestGuiceModule extends PrivateModule {
@@ -57,14 +62,26 @@ public class RestGuiceModule extends PrivateModule {
         bind(ResourceApiVersionBehaviourManager.class).to(VersionBehaviourConfigListener.class).in(Singleton.class);
         bind(Key.get(Filter.class, Names.named("ContextFilter"))).to(ContextFilter.class).in(Singleton.class);
         bind(Key.get(Filter.class, Names.named("LoggingFilter"))).to(CrestLoggingFilter.class).in(Singleton.class);
+        bind(Key.get(Logger.class, Names.named("RestAuthentication")))
+                .toInstance(LoggerFactory.getLogger("restAuthenticationFilter"));
+        bind(AuditApi.class).to(NoopAuditApi.class);
+        bind(Key.get(new TypeLiteral<Set<String>>(){}, Names.named("InvalidRealmNames")))
+                .toInstance(InvalidRealmNameManager.getInvalidRealmNames());
 
+        expose(Key.get(Router.class, Names.named("RootRouter")));
+        expose(Key.get(Router.class, Names.named("RealmRouter")));
+        expose(Key.get(Filter.class, Names.named("ResourceApiVersionFilter")));
+        expose(ResourceApiVersionBehaviourManager.class);
+        expose(Key.get(AuthenticationFilter.class, Names.named("RestAuthenticationFilter")));
+        expose(Key.get(new TypeLiteral<Set<String>>(){}, Names.named("InvalidRealmNames")));
+
+
+
+        //From AuthFilterGuiceModule
         bind(Key.get(AsyncServerAuthModule.class, Names.named("SsoTokenSession")))
                 .to(LocalSSOTokenSessionModule.class).in(Singleton.class);
         bind(Key.get(AsyncServerAuthModule.class, Names.named("OptionalSsoTokenSession")))
                 .to(OptionalSSOTokenSessionModule.class).in(Singleton.class);
-
-        expose(Key.get(Router.class, Names.named("RootRouter")));
-        expose(Key.get(Router.class, Names.named("RealmRouter")));
 
         bind(String.class)
                 .annotatedWith(Names.named(AuthnRequestUtils.SSOTOKEN_COOKIE_NAME))
@@ -85,7 +102,8 @@ public class RestGuiceModule extends PrivateModule {
                         return SystemProperties.get(SSO_TOKEN_COOKIE_NAME_PROPERTY);
                     }
                 });
-        bind(new TypeLiteral<Config<TokenStore>>() {}).toInstance(new Config<TokenStore>() {
+        bind(new TypeLiteral<Config<TokenStore>>() {
+        }).toInstance(new Config<TokenStore>() {
             public boolean isReady() {
                 return true;
             }
@@ -94,9 +112,10 @@ public class RestGuiceModule extends PrivateModule {
                 return InjectorHolder.getInstance(OpenAMTokenStore.class);
             }
         });
+
+        expose(Key.get(new TypeLiteral<Config<String>>() {
+        }, Names.named(AuthnRequestUtils.ASYNC_SSOTOKEN_COOKIE_NAME)));
     }
-
-
 
     @Provides
     @Named("RestHandler")
@@ -134,11 +153,11 @@ public class RestGuiceModule extends PrivateModule {
     }
 
     @Provides
-    @Named("RestAuthenticationFilter")
+    @Named("RestletAuthenticationFilter")
     @Singleton
-    Filter getAuthenticationFilter(@Named("RestAuthentication") Logger logger,
+    org.forgerock.http.Filter getRestletAuthenticationFilter(@Named("RestAuthentication") Logger logger,
             AuditApi auditApi, @Named("RestAuthentication") AuthenticationModule sessionModule) {
-        return CrestAuthenticationFilter.builder()
+        return HttpAuthenticationFilter.builder()
                 .logger(logger)
                 .auditApi(auditApi)
                 .sessionModule(configureModule(sessionModule))
@@ -146,11 +165,14 @@ public class RestGuiceModule extends PrivateModule {
     }
 
     @Provides
-    @Named("RestAuthentication")
-    AuthenticationFilter getRestAuthenticationFilter(
-            @Named("RestAuthentication") CrestAuthenticationFilter authenticationFilter,
-            @Named("RestAuthentication") AuthenticationModule authenticationModule) {
-        return new AuthenticationFilter(authenticationFilter, authenticationModule);
+    @Named("RestAuthenticationFilter")
+    AuthenticationFilter getAuthenticationFilter(@Named("RestAuthentication") Logger logger,
+            AuditApi auditApi, @Named("RestAuthentication") AuthenticationModule sessionModule) {
+        return new AuthenticationFilter(CrestAuthenticationFilter.builder()
+                .logger(logger)
+                .auditApi(auditApi)
+                .sessionModule(configureModule(sessionModule))
+                .build(), sessionModule);
     }
 
     @Provides
