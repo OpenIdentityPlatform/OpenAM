@@ -16,7 +16,6 @@
 
 package org.forgerock.openam.rest;
 
-import org.forgerock.caf.authentication.framework.CrestAuthenticationFilter;
 import org.forgerock.http.Context;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -39,10 +38,10 @@ import org.forgerock.util.promise.Promise;
  */
 public class AuthenticationFilter implements Filter {
 
-    private final CrestAuthenticationFilter authenticationFilter;
+    private final Filter authenticationFilter;
     private final AuthenticationModule authenticationModule;
 
-    AuthenticationFilter(CrestAuthenticationFilter authenticationFilter, AuthenticationModule authenticationModule) {
+    AuthenticationFilter(Filter authenticationFilter, AuthenticationModule authenticationModule) {
         this.authenticationFilter = authenticationFilter;
         this.authenticationModule = authenticationModule;
     }

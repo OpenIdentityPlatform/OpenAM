@@ -78,7 +78,7 @@ public class RestEndpoints {
     @Inject
     public RestEndpoints(RestRealmValidator realmValidator, CoreWrapper coreWrapper,
             RestletAccessAuditFilterFactory restletAuditFactory,
-            @Named("ResourceApiVersionFilter") ResourceApiVersionBehaviourManager versionBehaviourManager) {
+            ResourceApiVersionBehaviourManager versionBehaviourManager) {
         this(realmValidator, coreWrapper, restletAuditFactory, versionBehaviourManager,
                 InvalidRealmNameManager.getInvalidRealmNames());
     }

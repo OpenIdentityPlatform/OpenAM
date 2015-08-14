@@ -20,8 +20,14 @@ import javax.inject.Provider;
 import java.lang.annotation.Annotation;
 
 import com.google.inject.Key;
+import org.forgerock.http.Context;
 import org.forgerock.http.Handler;
+import org.forgerock.http.protocol.Request;
+import org.forgerock.http.protocol.Response;
 import org.forgerock.http.routing.RoutingMode;
+import org.forgerock.util.Function;
+import org.forgerock.util.promise.NeverThrowsException;
+import org.forgerock.util.promise.Promise;
 
 /**
  * Encapsulates a HTTP route that will handle incoming HTTP requests which can
@@ -49,6 +55,30 @@ public final class HttpRoute {
             @Override
             public Handler get() {
                 return handler;
+            }
+        });
+    }
+
+    /**
+     * Creates a new {@code HttpRoute} for a route with the given {@code mode} and
+     * {@code template}. The {@code Handler} for this route will be the provided
+     * {@code handler} class.
+     *
+     * @param mode Indicates how the URI template should be matched against resource names.
+     * @param uriTemplate The URI template which request resource names must match.
+     * @param handlerFunction A {@link Function} that returns the handler to which
+     *                        matching requests will be routed.
+     */
+    public static HttpRoute newHttpRoute(RoutingMode mode, String uriTemplate,
+            final Function<Void, Handler, NeverThrowsException> handlerFunction) {
+        return newHttpRoute(mode, uriTemplate, new Handler() {
+            private volatile Handler handler;
+            @Override
+            public Promise<Response, NeverThrowsException> handle(Context context, Request request) {
+                if (handler == null) {
+                    handler = handlerFunction.apply(null);
+                }
+                return handler.handle(context, request);
             }
         });
     }
@@ -112,6 +142,11 @@ public final class HttpRoute {
     }
 
     Handler getHandler() {
-        return handler.get();
+        return new Handler() {
+            @Override
+            public Promise<Response, NeverThrowsException> handle(Context context, Request request) {
+                return handler.get().handle(context, request);
+            }
+        };
     }
 }
