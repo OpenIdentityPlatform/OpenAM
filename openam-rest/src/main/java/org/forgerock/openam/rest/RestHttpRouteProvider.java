@@ -24,6 +24,8 @@ import static org.forgerock.json.resource.http.CrestHttp.newHttpHandler;
 import static org.forgerock.openam.http.HttpRoute.newHttpRoute;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -87,6 +89,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
 
     private SmsRequestHandlerFactory smsRequestHandlerFactory;
     private Set<String> invalidRealms = new HashSet<>();
+    private Provider<AuthenticationFilter> authenticationFilterProvider;
 
     @Inject
     public void setSmsRequestHandlerFactory(SmsRequestHandlerFactory smsRequestHandlerFactory) {
@@ -96,6 +99,12 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
     @Inject
     public void setInvalidRealms(Set<String> invalidRealms) {
         this.invalidRealms = invalidRealms;
+    }
+
+    @Inject
+    public void setAuthenticationFilterProvider(
+            @Named("RestAuthentication") Provider<AuthenticationFilter> authenticationFilterProvider) {
+        this.authenticationFilterProvider = authenticationFilterProvider;
     }
 
     @Override
@@ -113,6 +122,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         org.forgerock.json.resource.Router rootRouter = new org.forgerock.json.resource.Router();
         rootRouter.setDefaultRoute(realmRouter);
 
+        AuthenticationFilter defaultAuthenticationFilter = authenticationFilterProvider.get();
+
         // ------------------
         // Realm based routes
         // ------------------
@@ -121,7 +132,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         dashboardVersionRouter.addRoute(version(1), InjectorHolder.getInstance(DashboardResource.class));
         AuditFilterWrapper dashboardAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.DASHBOARD);
-        FilterChain dashboardFilterChain = new FilterChain(dashboardVersionRouter, dashboardAuditFilter);
+        FilterChain dashboardFilterChain = new FilterChain(dashboardVersionRouter, defaultAuthenticationFilter, dashboardAuditFilter);
         realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "dashboard"), dashboardFilterChain);
         invalidRealmNames.add(firstPathSegment("dashboard"));
 
@@ -129,7 +140,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         serverInfoVersionRouter.addRoute(version(1, 1), InjectorHolder.getInstance(ServerInfoResource.class));
         AuditFilterWrapper serverInfoAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.SERVER_INFO);
-        FilterChain serverInfoFilterChain = new FilterChain(serverInfoVersionRouter, serverInfoAuditFilter);
+        Filter serverInfoAuthnFilter = authenticationFilterProvider.get().exceptRead();
+        FilterChain serverInfoFilterChain = new FilterChain(serverInfoVersionRouter, serverInfoAuthnFilter, serverInfoAuditFilter);
         realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "serverinfo"), serverInfoFilterChain);
         invalidRealmNames.add(firstPathSegment("serverinfo"));
 
@@ -137,7 +149,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         umaServerInfoVersionRouter.addRoute(version(1), InjectorHolder.getInstance(UmaConfigurationResource.class));
         AuditFilterWrapper umaServerInfoAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.UMA);
-        FilterChain umaServerInfoFilterChain = new FilterChain(umaServerInfoVersionRouter, umaServerInfoAuditFilter);
+        FilterChain umaServerInfoFilterChain = new FilterChain(umaServerInfoVersionRouter, defaultAuthenticationFilter, umaServerInfoAuditFilter);
         realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "serverinfo/uma"), umaServerInfoFilterChain);
         invalidRealmNames.add(firstPathSegment("serverinfo/uma"));
 
@@ -146,7 +158,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         usersVersionRouter.addRoute(version(2, 1), InjectorHolder.getInstance(Key.get(IdentityResourceV2.class, Names.named("UsersResource"))));
         AuditFilterWrapper usersAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.USERS);
-        FilterChain usersFilterChain = new FilterChain(usersVersionRouter, usersAuditFilter);
+        Filter usersAuthnFilter = authenticationFilterProvider.get().exceptActions("register", "confirm", "forgotPassword", "forgotPasswordReset", "anonymousCreate");
+        FilterChain usersFilterChain = new FilterChain(usersVersionRouter, usersAuthnFilter, usersAuditFilter);
         realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "users"), usersFilterChain);
         invalidRealmNames.add(firstPathSegment("users"));
 
@@ -155,7 +168,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         groupsVersionRouter.addRoute(version(2, 1), InjectorHolder.getInstance(Key.get(IdentityResourceV2.class, Names.named("GroupsResource"))));
         AuditFilterWrapper groupsAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.GROUPS);
-        FilterChain groupsFilterChain = new FilterChain(groupsVersionRouter, groupsAuditFilter);
+        FilterChain groupsFilterChain = new FilterChain(groupsVersionRouter, defaultAuthenticationFilter, groupsAuditFilter);
         realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "groups"), groupsFilterChain);
         invalidRealmNames.add(firstPathSegment("groups"));
 
@@ -164,7 +177,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         agentsVersionRouter.addRoute(version(2, 1), InjectorHolder.getInstance(Key.get(IdentityResourceV2.class, Names.named("AgentsResource"))));
         AuditFilterWrapper agentsAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.POLICY_AGENT);
-        FilterChain agentsFilterChain = new FilterChain(agentsVersionRouter, agentsAuditFilter);
+        FilterChain agentsFilterChain = new FilterChain(agentsVersionRouter, defaultAuthenticationFilter, agentsAuditFilter);
         realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "agents"), agentsFilterChain);
         invalidRealmNames.add(firstPathSegment("agents"));
 
@@ -172,7 +185,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         trustedDevicesVersionRouter.addRoute(version(1), InjectorHolder.getInstance(TrustedDevicesResource.class));
         AuditFilterWrapper trustedDevicesAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.DEVICES);
-        FilterChain trustedDevicesFilterChain = new FilterChain(trustedDevicesVersionRouter, trustedDevicesAuditFilter);
+        FilterChain trustedDevicesFilterChain = new FilterChain(trustedDevicesVersionRouter, defaultAuthenticationFilter, trustedDevicesAuditFilter);
         realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "users/{user}/devices/trusted"), trustedDevicesFilterChain);
         invalidRealmNames.add(firstPathSegment("users/{user}/devices/trusted"));
 
@@ -180,7 +193,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         oathDevicesVersionRouter.addRoute(version(1), InjectorHolder.getInstance(OathDevicesResource.class));
         AuditFilterWrapper oathDevicesAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.DEVICES);
-        FilterChain oathDevicesFilterChain = new FilterChain(oathDevicesVersionRouter, oathDevicesAuditFilter);
+        FilterChain oathDevicesFilterChain = new FilterChain(oathDevicesVersionRouter, defaultAuthenticationFilter, oathDevicesAuditFilter);
         realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "users/{user}/devices/2fa/oath"), oathDevicesFilterChain);
         invalidRealmNames.add(firstPathSegment("users/{user}/devices/2fa/oath"));
 
@@ -189,7 +202,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         FilterChain oauth2ResourceSetsAuthzFilter = createFilter(oauth2ResourceSetsVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(UmaPolicyResourceAuthzFilter.class), UmaPolicyResourceAuthzFilter.NAME));
         AuditFilterWrapper oauth2ResourceSetsAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.OAUTH2);
-        FilterChain oauth2ResourceSetsFilterChain = new FilterChain(oauth2ResourceSetsAuthzFilter, InjectorHolder.getInstance(UmaEnabledFilter.class), oauth2ResourceSetsAuditFilter);
+        FilterChain oauth2ResourceSetsFilterChain = new FilterChain(oauth2ResourceSetsAuthzFilter, defaultAuthenticationFilter, InjectorHolder.getInstance(UmaEnabledFilter.class), oauth2ResourceSetsAuditFilter);
         realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "users/{user}/oauth2/resources/sets"), oauth2ResourceSetsFilterChain);
         invalidRealmNames.add(firstPathSegment("users/{user}/oauth2/resources/sets"));
 
@@ -198,7 +211,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         FilterChain umaPoliciesAuthzFilter = createFilter(umaPoliciesVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(UmaPolicyResourceAuthzFilter.class), UmaPolicyResourceAuthzFilter.NAME));
         AuditFilterWrapper umaPoliciesAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.UMA);
-        FilterChain umaPoliciesFilterChain = new FilterChain(umaPoliciesAuthzFilter, InjectorHolder.getInstance(UmaEnabledFilter.class), umaPoliciesAuditFilter);
+        FilterChain umaPoliciesFilterChain = new FilterChain(umaPoliciesAuthzFilter, defaultAuthenticationFilter, InjectorHolder.getInstance(UmaEnabledFilter.class), umaPoliciesAuditFilter);
         realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "users/{user}/uma/policies"), umaPoliciesFilterChain);
         invalidRealmNames.add(firstPathSegment("users/{user}/uma/policies"));
 
@@ -207,7 +220,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         FilterChain umaAuditHistoryAuthzFilter = createFilter(umaAuditHistoryVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(ResourceOwnerOrSuperUserAuthzModule.class), ResourceOwnerOrSuperUserAuthzModule.NAME));
         AuditFilterWrapper umaAuditHistoryAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.UMA);
-        FilterChain umaAuditHistoryFilterChain = new FilterChain(umaAuditHistoryAuthzFilter, InjectorHolder.getInstance(UmaEnabledFilter.class), umaAuditHistoryAuditFilter);
+        FilterChain umaAuditHistoryFilterChain = new FilterChain(umaAuditHistoryAuthzFilter, defaultAuthenticationFilter, InjectorHolder.getInstance(UmaEnabledFilter.class), umaAuditHistoryAuditFilter);
         realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "users/{user}/uma/auditHistory"), umaAuditHistoryFilterChain);
         invalidRealmNames.add(firstPathSegment("users/{user}/uma/auditHistory"));
 
@@ -216,7 +229,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         FilterChain umaPendingRequestsAuthzFilter = createFilter(umaPendingRequestsVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(ResourceOwnerOrSuperUserAuthzModule.class), ResourceOwnerOrSuperUserAuthzModule.NAME));
         AuditFilterWrapper umaPendingRequestsAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.UMA);
-        FilterChain umaPendingRequestsFilterChain = new FilterChain(umaPendingRequestsAuthzFilter, InjectorHolder.getInstance(UmaEnabledFilter.class), umaPendingRequestsAuditFilter);
+        FilterChain umaPendingRequestsFilterChain = new FilterChain(umaPendingRequestsAuthzFilter, defaultAuthenticationFilter, InjectorHolder.getInstance(UmaEnabledFilter.class), umaPendingRequestsAuditFilter);
         realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "users/{user}/uma/pendingrequests"), umaPendingRequestsFilterChain);
         invalidRealmNames.add(firstPathSegment("users/{user}/uma/pendingrequests"));
 
@@ -225,7 +238,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         FilterChain umaLabelsAuthzFilter = createFilter(umaLabelsVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(ResourceOwnerOrSuperUserAuthzModule.class), ResourceOwnerOrSuperUserAuthzModule.NAME));
         AuditFilterWrapper umaLabelsAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.OAUTH2);
-        FilterChain umaLabelsFilterChain = new FilterChain(umaLabelsAuthzFilter, umaLabelsAuditFilter);
+        FilterChain umaLabelsFilterChain = new FilterChain(umaLabelsAuthzFilter, defaultAuthenticationFilter, umaLabelsAuditFilter);
         realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "users/{user}/resources/labels"), umaLabelsFilterChain);
         invalidRealmNames.add(firstPathSegment("users/{user}/resources/labels"));
 
@@ -238,7 +251,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         FilterChain policiesAuthzFilter = createFilter(policiesVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(PrivilegeAuthzModule.class), PrivilegeAuthzModule.NAME));
         AuditFilterWrapper policiesAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.POLICY);
-        FilterChain policiesFilterChain = new FilterChain(policiesAuthzFilter, policiesAuditFilter);
+        FilterChain policiesFilterChain = new FilterChain(policiesAuthzFilter, defaultAuthenticationFilter, policiesAuditFilter);
         realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "policies"), policiesFilterChain);
         invalidRealmNames.add(firstPathSegment("policies"));
 
@@ -247,7 +260,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         FilterChain referralsAuthzFilter = createFilter(referralsVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(PrivilegeAuthzModule.class), PrivilegeAuthzModule.NAME));
         AuditFilterWrapper referralsAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.POLICY);
-        FilterChain referralsFilterChain = new FilterChain(referralsAuthzFilter, referralsAuditFilter);
+        FilterChain referralsFilterChain = new FilterChain(referralsAuthzFilter, defaultAuthenticationFilter, referralsAuditFilter);
         realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "referrals"), referralsFilterChain);
         invalidRealmNames.add(firstPathSegment("referrals"));
 
@@ -256,7 +269,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         FilterChain realmsAuthzFilter = createFilter(realmsVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(PrivilegeAuthzModule.class), PrivilegeAuthzModule.NAME));
         AuditFilterWrapper realmsAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.REALMS);
-        FilterChain realmsFilterChain = new FilterChain(realmsAuthzFilter, realmsAuditFilter);
+        Filter realmsAuthnFilter = authenticationFilterProvider.get();
+        FilterChain realmsFilterChain = new FilterChain(realmsAuthzFilter, realmsAuthnFilter, realmsAuditFilter);
         realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "realms"), realmsFilterChain);
         invalidRealmNames.add(firstPathSegment("realms"));
 
@@ -265,7 +279,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         FilterChain sessionsAuthzFilter = createFilter(sessionsVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(SessionResourceAuthzModule.class), SessionResourceAuthzModule.NAME));
         AuditFilterWrapper sessionsAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.SESSION);
-        FilterChain sessionsFilterChain = new FilterChain(sessionsAuthzFilter, sessionsAuditFilter);
+        Filter sessionsAuthnFilter = authenticationFilterProvider.get().exceptActions("validate");
+        FilterChain sessionsFilterChain = new FilterChain(sessionsAuthzFilter, sessionsAuthnFilter, sessionsAuditFilter);
         realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "sessions"), sessionsFilterChain);
         invalidRealmNames.add(firstPathSegment("sessions"));
 
@@ -276,7 +291,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         FilterChain applicationsAuthzFilter = createFilter(applicationsVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(PrivilegeAuthzModule.class), PrivilegeAuthzModule.NAME));
         AuditFilterWrapper applicationsAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.POLICY);
-        FilterChain applicationsFilterChain = new FilterChain(applicationsAuthzFilter, applicationsAuditFilter);
+        FilterChain applicationsFilterChain = new FilterChain(applicationsAuthzFilter, defaultAuthenticationFilter, applicationsAuditFilter);
         realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "applications"), applicationsFilterChain);
         invalidRealmNames.add(firstPathSegment("applications"));
 
@@ -285,7 +300,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         FilterChain subjectAttributesAuthzFilter = createFilter(subjectAttributesVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(SessionResourceAuthzModule.class), SessionResourceAuthzModule.NAME));
         AuditFilterWrapper subjectAttributesAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.POLICY);
-        FilterChain subjectAttributesFilterChain = new FilterChain(subjectAttributesAuthzFilter, subjectAttributesAuditFilter);
+        FilterChain subjectAttributesFilterChain = new FilterChain(subjectAttributesAuthzFilter, defaultAuthenticationFilter, subjectAttributesAuditFilter);
         realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "subjectattributes"), subjectAttributesFilterChain);
         invalidRealmNames.add(firstPathSegment("subjectattributes"));
 
@@ -294,7 +309,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         FilterChain applicationTypesAuthzFilter = createFilter(applicationTypesVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(PrivilegeAuthzModule.class), PrivilegeAuthzModule.NAME));
         AuditFilterWrapper applicationTypesAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.POLICY);
-        FilterChain applicationTypesFilterChain = new FilterChain(applicationTypesAuthzFilter, applicationTypesAuditFilter);
+        FilterChain applicationTypesFilterChain = new FilterChain(applicationTypesAuthzFilter, defaultAuthenticationFilter, applicationTypesAuditFilter);
         rootRouter.addRoute(requestUriMatcher(STARTS_WITH, "applicationtypes"), applicationTypesFilterChain);
         invalidRealmNames.add(firstPathSegment("applicationtypes"));
 
@@ -303,7 +318,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         FilterChain resourceTypesAuthzFilter = createFilter(resourceTypesVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(SessionResourceAuthzModule.class), SessionResourceAuthzModule.NAME));
         AuditFilterWrapper resourceTypesAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.POLICY);
-        FilterChain resourceTypesFilterChain = new FilterChain(resourceTypesAuthzFilter, resourceTypesAuditFilter);
+        FilterChain resourceTypesFilterChain = new FilterChain(resourceTypesAuthzFilter, defaultAuthenticationFilter, resourceTypesAuditFilter);
         realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "resourcetypes"), resourceTypesFilterChain);
         invalidRealmNames.add(firstPathSegment("resourcetypes"));
 
@@ -312,7 +327,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         FilterChain scriptsAuthzFilter = createFilter(scriptsVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(AdminOnlyAuthzModule.class), AdminOnlyAuthzModule.NAME));
         AuditFilterWrapper scriptsAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.SCRIPT);
-        FilterChain scriptsFilterChain = new FilterChain(scriptsAuthzFilter, scriptsAuditFilter);
+        FilterChain scriptsFilterChain = new FilterChain(scriptsAuthzFilter, defaultAuthenticationFilter, scriptsAuditFilter);
         realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "scripts"), scriptsFilterChain);
         invalidRealmNames.add(firstPathSegment("scripts"));
 
@@ -321,7 +336,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         FilterChain realmConfigAuthzFilter = createFilter(realmConfigVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(AdminOnlyAuthzModule.class), AdminOnlyAuthzModule.NAME));
         AuditFilterWrapper realmConfigAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.CONFIG);
-        FilterChain realmConfigFilterChain = new FilterChain(realmConfigAuthzFilter, realmConfigAuditFilter);
+        FilterChain realmConfigFilterChain = new FilterChain(realmConfigAuthzFilter, defaultAuthenticationFilter, realmConfigAuditFilter);
         realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "realm-config"), realmConfigFilterChain);
         invalidRealmNames.add(firstPathSegment("realm-config"));
 
@@ -330,7 +345,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         FilterChain batchAuthzFilter = createFilter(batchVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(AdminOnlyAuthzModule.class), AdminOnlyAuthzModule.NAME));
         AuditFilterWrapper batchAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.BATCH);
-        FilterChain batchFilterChain = new FilterChain(batchAuthzFilter, batchAuditFilter);
+        FilterChain batchFilterChain = new FilterChain(batchAuthzFilter, defaultAuthenticationFilter, batchAuditFilter);
         realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "batch"), batchFilterChain);
         invalidRealmNames.add(firstPathSegment("batch"));
 
@@ -343,7 +358,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         FilterChain decisionCombinersAuthzFilter = createFilter(decisionCombinersVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(PrivilegeAuthzModule.class), PrivilegeAuthzModule.NAME));
         AuditFilterWrapper decisionCombinersAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.POLICY);
-        FilterChain decisionCombinersFilterChain = new FilterChain(decisionCombinersAuthzFilter, decisionCombinersAuditFilter);
+        FilterChain decisionCombinersFilterChain = new FilterChain(decisionCombinersAuthzFilter, defaultAuthenticationFilter, decisionCombinersAuditFilter);
         rootRouter.addRoute(requestUriMatcher(STARTS_WITH, "decisioncombiners"), decisionCombinersFilterChain);
         invalidRealmNames.add(firstPathSegment("decisioncombiners"));
 
@@ -352,7 +367,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         FilterChain conditionTypesAuthzFilter = createFilter(conditionTypesVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(PrivilegeAuthzModule.class), PrivilegeAuthzModule.NAME));
         AuditFilterWrapper conditionTypesAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.POLICY);
-        FilterChain conditionTypesFilterChain = new FilterChain(conditionTypesAuthzFilter, conditionTypesAuditFilter);
+        FilterChain conditionTypesFilterChain = new FilterChain(conditionTypesAuthzFilter, defaultAuthenticationFilter, conditionTypesAuditFilter);
         rootRouter.addRoute(requestUriMatcher(STARTS_WITH, "conditiontypes"), conditionTypesFilterChain);
         invalidRealmNames.add(firstPathSegment("conditiontypes"));
 
@@ -361,7 +376,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         FilterChain subjectTypesAuthzFilter = createFilter(subjectTypesVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(PrivilegeAuthzModule.class), PrivilegeAuthzModule.NAME));
         AuditFilterWrapper subjectTypesAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.POLICY);
-        FilterChain subjectTypesFilterChain = new FilterChain(subjectTypesAuthzFilter, subjectTypesAuditFilter);
+        FilterChain subjectTypesFilterChain = new FilterChain(subjectTypesAuthzFilter, defaultAuthenticationFilter, subjectTypesAuditFilter);
         rootRouter.addRoute(requestUriMatcher(STARTS_WITH, "subjecttypes"), subjectTypesFilterChain);
         invalidRealmNames.add(firstPathSegment("subjecttypes"));
 
@@ -370,7 +385,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         FilterChain tokensAuthzFilter = createFilter(tokensVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(CoreTokenResourceAuthzModule.class), CoreTokenResourceAuthzModule.NAME));
         AuditFilterWrapper tokensAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.CTS);
-        FilterChain tokensFilterChain = new FilterChain(tokensAuthzFilter, tokensAuditFilter);
+        FilterChain tokensFilterChain = new FilterChain(tokensAuthzFilter, defaultAuthenticationFilter, tokensAuditFilter);
         rootRouter.addRoute(requestUriMatcher(STARTS_WITH, "tokens"), tokensFilterChain);
         invalidRealmNames.add(firstPathSegment("tokens"));
 
@@ -379,7 +394,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         FilterChain globalConfigAuthzFilter = createFilter(globalConfigVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(AdminOnlyAuthzModule.class), AdminOnlyAuthzModule.NAME));
         AuditFilterWrapper globalConfigAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.CONFIG);
-        FilterChain globalConfigFilterChain = new FilterChain(globalConfigAuthzFilter, globalConfigAuditFilter);
+        FilterChain globalConfigFilterChain = new FilterChain(globalConfigAuthzFilter, defaultAuthenticationFilter, globalConfigAuditFilter);
         rootRouter.addRoute(requestUriMatcher(STARTS_WITH, "global-config"), globalConfigFilterChain);
         invalidRealmNames.add(firstPathSegment("global-config"));
 
@@ -388,7 +403,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         FilterChain globalConfigServersAuthzFilter = createFilter(globalConfigServersVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(AdminOnlyAuthzModule.class), AdminOnlyAuthzModule.NAME));
         AuditFilterWrapper globalConfigServersAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.CONFIG);
-        FilterChain globalConfigServersFilterChain = new FilterChain(globalConfigServersAuthzFilter, globalConfigServersAuditFilter);
+        FilterChain globalConfigServersFilterChain = new FilterChain(globalConfigServersAuthzFilter, defaultAuthenticationFilter, globalConfigServersAuditFilter);
         rootRouter.addRoute(requestUriMatcher(STARTS_WITH, "global-config/servers/{serverName}/properties/{tab}"), globalConfigServersFilterChain);
         invalidRealmNames.add(firstPathSegment("global-config/servers/{serverName}/properties/{tab}"));
 
@@ -397,17 +412,16 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         FilterChain auditAuthzFilter = createFilter(auditVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(AgentOnlyAuthzModule.class), AgentOnlyAuthzModule.NAME));
         AuditFilterWrapper auditAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditEndpointAuditFilter.class),
                 AuditConstants.Component.AUDIT);
-        FilterChain auditFilterChain = new FilterChain(auditAuthzFilter, auditAuditFilter);
+        FilterChain auditFilterChain = new FilterChain(auditAuthzFilter, defaultAuthenticationFilter,auditAuditFilter);
         rootRouter.addRoute(requestUriMatcher(STARTS_WITH, "audit"), auditFilterChain);
         invalidRealmNames.add(firstPathSegment("audit"));
-
 
         org.forgerock.json.resource.Router recordVersionRouter = new org.forgerock.json.resource.Router();
         recordVersionRouter.addRoute(version(1), InjectorHolder.getInstance(RecordResource.class));
         FilterChain recordAuthzFilter = createFilter(recordVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(AdminOnlyAuthzModule.class), AdminOnlyAuthzModule.NAME));
         AuditFilterWrapper recordAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.RECORD);
-        FilterChain recordFilterChain = new FilterChain(recordAuthzFilter, recordAuditFilter);
+        FilterChain recordFilterChain = new FilterChain(recordAuthzFilter, defaultAuthenticationFilter, recordAuditFilter);
         rootRouter.addRoute(requestUriMatcher(STARTS_WITH, RecordConstants.RECORD_REST_ENDPOINT), recordFilterChain);
         invalidRealmNames.add(firstPathSegment(RecordConstants.RECORD_REST_ENDPOINT));
 

@@ -16,32 +16,41 @@
 
 package org.forgerock.openam.forgerockrest.utils;
 
-import com.sun.identity.shared.xml.XMLUtils;
-import org.forgerock.guava.common.net.MediaType;
-import org.forgerock.jaspi.runtime.ResourceExceptionHandler;
-import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.util.Reject;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import static org.forgerock.json.JsonValue.*;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.IOException;
+import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.sun.identity.shared.xml.XMLUtils;
+import org.forgerock.caf.authentication.api.AuthenticationException;
+import org.forgerock.caf.authentication.api.MessageContext;
+import org.forgerock.caf.authentication.framework.AuditTrail;
+import org.forgerock.caf.authentication.framework.AuthenticationFailedException;
+import org.forgerock.caf.authentication.framework.ResponseWriter;
+import org.forgerock.guava.common.net.MediaType;
+import org.forgerock.http.header.ContentTypeHeader;
+import org.forgerock.http.protocol.Response;
+import org.forgerock.http.protocol.Status;
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.PermanentException;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.util.Reject;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 /**
  * An implementation of {@code ResourceExceptionHandler} that renders to XML.
  */
-public class XMLResourceExceptionHandler implements ResourceExceptionHandler {
+public class XMLResourceExceptionHandler implements ResponseWriter {
 
     private static final List<MediaType> HANDLES = Arrays.asList(
             MediaType.XML_UTF_8.withoutParameters(), MediaType.APPLICATION_XML_UTF_8.withoutParameters());
@@ -54,15 +63,30 @@ public class XMLResourceExceptionHandler implements ResourceExceptionHandler {
         return HANDLES;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void write(ResourceException e, HttpServletResponse response) throws IOException {
-        Reject.ifNull(e);
-        response.setContentType("application/xml");
+    @Override
+    public void write(MessageContext context, AuthenticationException exception) {
+        Reject.ifNull(exception);
         try {
+            ResourceException jre;
+            if (exception instanceof AuthenticationFailedException) {
+                jre = new PermanentException(Status.UNAUTHORIZED.getCode(), exception.getMessage(), null);
+            } else if (exception.getCause() instanceof ResourceException) {
+                jre = (ResourceException) exception.getCause();
+            } else {
+                jre = new InternalServerErrorException(exception.getMessage(), exception);
+            }
+            AuditTrail auditTrail = context.getAuditTrail();
+            List<Map<String, Object>> failureReasonList = auditTrail.getFailureReasons();
+            if (failureReasonList != null && !failureReasonList.isEmpty()) {
+                jre.setDetail(json(object(field("failureReasons", failureReasonList))));
+            }
+            Response response = context.getResponse();
+            response.setStatus(Status.valueOf(jre.getCode()));
+            context.<Response>getResponse().getHeaders().putSingle(ContentTypeHeader.valueOf(MediaType.XML_UTF_8.toString()));
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             Transformer transformer = XMLUtils.getTransformerFactory().newTransformer();
-            transformer.transform(new DOMSource(asXMLDOM(e.toJsonValue().asMap())), new StreamResult(response.getWriter()));
+            transformer.transform(new DOMSource(asXMLDOM(jre.includeCauseInJsonValue().toJsonValue().asMap())), new StreamResult(outputStream));
+            response.getEntity().setBytes(outputStream.toByteArray());
         } catch (TransformerException e1) {
             throw new IllegalStateException("Could not write XML to response", e1);
         }

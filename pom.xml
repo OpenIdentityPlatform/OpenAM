@@ -322,9 +322,6 @@
         <!-- OpenAM Core Module -->
         <module>openam-core</module>
 
-        <!-- OpenAM Commons Authentication Filter -->
-        <module>openam-auth-filter</module>
-
         <!-- OpenAM CLI Module -->
         <module>openam-cli</module>
 

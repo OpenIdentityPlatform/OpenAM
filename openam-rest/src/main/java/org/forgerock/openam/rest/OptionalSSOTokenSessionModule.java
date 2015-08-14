@@ -11,12 +11,20 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.jaspi.modules.session;
+package org.forgerock.openam.rest;
 
+import static javax.security.auth.message.AuthStatus.SUCCESS;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import javax.security.auth.Subject;
 import javax.security.auth.message.AuthStatus;
+
+import org.forgerock.caf.authentication.api.AuthenticationException;
+import org.forgerock.caf.authentication.api.MessageInfoContext;
+import org.forgerock.util.promise.Promise;
 
 /**
  * An AuthModule that will validate a SSOToken if it's present, else will allow the request through anyway.
@@ -26,7 +34,8 @@ import javax.security.auth.message.AuthStatus;
 public class OptionalSSOTokenSessionModule extends LocalSSOTokenSessionModule {
 
     @Override
-    protected AuthStatus getDefaultAuthStatus() {
-        return AuthStatus.SUCCESS;
+    public Promise<AuthStatus, AuthenticationException> validateRequest(final MessageInfoContext messageInfo,
+            final Subject clientSubject, Subject serviceSubject) {
+        return newResultPromise(SUCCESS);
     }
 }

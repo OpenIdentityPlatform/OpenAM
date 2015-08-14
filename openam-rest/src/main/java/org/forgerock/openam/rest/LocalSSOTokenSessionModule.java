@@ -11,20 +11,15 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.jaspi.modules.session;
+package org.forgerock.openam.rest;
 
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.session.util.RestrictedTokenAction;
-import com.sun.identity.session.util.RestrictedTokenContext;
-import org.apache.commons.lang.StringUtils;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
-import org.forgerock.openam.auth.shared.AuthnRequestUtils;
-import org.forgerock.openam.auth.shared.SSOTokenFactory;
+import static javax.security.auth.message.AuthStatus.SEND_SUCCESS;
+import static javax.security.auth.message.AuthStatus.SUCCESS;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -32,14 +27,29 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.message.AuthException;
 import javax.security.auth.message.AuthStatus;
-import javax.security.auth.message.MessageInfo;
 import javax.security.auth.message.MessagePolicy;
 import javax.security.auth.message.callback.CallerPrincipalCallback;
-import javax.security.auth.message.module.ServerAuthModule;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.session.util.RestrictedTokenAction;
+import com.sun.identity.session.util.RestrictedTokenContext;
+import org.apache.commons.lang.StringUtils;
+import org.forgerock.caf.authentication.api.AsyncServerAuthModule;
+import org.forgerock.caf.authentication.api.AuthenticationException;
+import org.forgerock.caf.authentication.api.MessageInfoContext;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.http.context.HttpRequestContext;
+import org.forgerock.json.resource.Request;
+import org.forgerock.json.resource.Response;
+import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
+import org.forgerock.util.promise.Promise;
 
 /**
  * A local implementation of a SSOToken Session module, that is designed to be deployed in an OpenAM deployment
@@ -48,10 +58,8 @@ import java.util.Map;
  * The SSOToken module will validate the presents and validity of a SSOToken ID on a request, if present and valid then
  * the request is allowed to proceed. The responsibilities of this module are only to validate but never to issue
  * a SSOToken, for this the client must authenticate before trying to access the resource again.
- *
- * @author Phill Cunnington
  */
-public class LocalSSOTokenSessionModule implements ServerAuthModule {
+public class LocalSSOTokenSessionModule implements AsyncServerAuthModule {
 
     private static final String REQUESTER_URL_PARAM = "requester";
 
@@ -97,6 +105,11 @@ public class LocalSSOTokenSessionModule implements ServerAuthModule {
         requestUtils = InjectorHolder.getInstance(AuthnRequestUtils.class);
     }
 
+    @Override
+    public String getModuleId() {
+        return "OpenAM SSO Token Session Module";
+    }
+
     /**
      * No initialisation required for this module.
      *
@@ -104,20 +117,21 @@ public class LocalSSOTokenSessionModule implements ServerAuthModule {
      * @param responsePolicy {@inheritDoc}
      * @param handler {@inheritDoc}
      * @param options {@inheritDoc}
-     * @throws AuthException {@inheritDoc}
+     * @return {@inheritDoc}
      */
     @Override
-    public void initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy, CallbackHandler handler,
-            Map options) throws AuthException {
+    public Promise<Void, AuthenticationException> initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy,
+            CallbackHandler handler, Map<String, Object> options) {
         this.handler = handler;
+        return newResultPromise(null);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Class[] getSupportedMessageTypes() {
-        return new Class[]{HttpServletRequest.class, HttpServletResponse.class};
+    public Collection<Class<?>> getSupportedMessageTypes() {
+        return new HashSet<>(Arrays.asList(Request.class, Response.class));
     }
 
     /**
@@ -130,16 +144,15 @@ public class LocalSSOTokenSessionModule implements ServerAuthModule {
      * @param clientSubject {@inheritDoc}
      * @param serviceSubject {@inheritDoc}
      * @return {@inheritDoc}
-     * @throws AuthException If there is a problem validating the request.
      */
     @Override
-    public AuthStatus validateRequest(final MessageInfo messageInfo, final Subject clientSubject,
-            Subject serviceSubject) throws AuthException {
+    public Promise<AuthStatus, AuthenticationException> validateRequest(final MessageInfoContext messageInfo,
+            final Subject clientSubject, Subject serviceSubject) {
         if (!isInitialised()) {
             initDependencies();
         }
 
-        final HttpServletRequest request = (HttpServletRequest) messageInfo.getRequestMessage();
+        final HttpServletRequest request = (HttpServletRequest) messageInfo.asContext(HttpRequestContext.class).getAttributes().get(HttpServletRequest.class.getName());
 
         String requester = request.getParameter(REQUESTER_URL_PARAM);
         if (requester != null) {
@@ -151,10 +164,11 @@ public class LocalSSOTokenSessionModule implements ServerAuthModule {
                             return validate(request, messageInfo, clientSubject);
                         }
                     });
-                    return (AuthStatus) o;
+                    return newResultPromise((AuthStatus) o);
                 }
             } catch (Exception ex) {
-                throw new AuthException("An error occurred whilst trying to use restricted token.");
+                return newExceptionPromise(
+                        new AuthenticationException("An error occurred whilst trying to use restricted token."));
             }
         }
         return validate(request, messageInfo, clientSubject);
@@ -184,8 +198,8 @@ public class LocalSSOTokenSessionModule implements ServerAuthModule {
      * @return AuthStatus.SUCCESS if the SSOToken ID is valid, otherwise AuthStatus.SEND_FAILURE.
      * @throws AuthException If there is a problem validating the request.
      */
-    private AuthStatus validate(HttpServletRequest request, MessageInfo messageInfo, Subject clientSubject)
-            throws AuthException {
+    private Promise<AuthStatus, AuthenticationException> validate(HttpServletRequest request,
+            MessageInfoContext messageInfo, Subject clientSubject) {
 
         String tokenId = getRequestUtils().getTokenId(request);
         if (StringUtils.isEmpty(tokenId)) {
@@ -204,31 +218,23 @@ public class LocalSSOTokenSessionModule implements ServerAuthModule {
 
                     clientSubject.getPrincipals().add(ssoToken.getPrincipal());
                 } catch (SSOException e) {
-                    throw new AuthException(e.getMessage());
+                    return newExceptionPromise(new AuthenticationException(e.getMessage()));
                 } catch (UnsupportedCallbackException e) {
-                    throw new AuthException(e.getMessage());
+                    return newExceptionPromise(new AuthenticationException(e.getMessage()));
                 } catch (IOException e) {
-                    throw new AuthException(e.getMessage());
+                    return newExceptionPromise(new AuthenticationException(e.getMessage()));
                 }
 
                 Map<String, Object> context =
-                        (Map<String, Object>) messageInfo.getMap().get("org.forgerock.authentication.context");
+                        (Map<String, Object>) messageInfo.getRequestContextMap().get("org.forgerock.authentication.context");
                 context.put("authLevel", authLevel);
                 context.put("tokenId", ssoToken.getTokenID().toString());
                 //TODO add more properties to context map
 
-                return AuthStatus.SUCCESS;
+                return newResultPromise(SUCCESS);
             }
         }
-        return getDefaultAuthStatus();
-    }
-
-    /**
-     * The AuthStatus to be returned if no tokenId is specified in the request
-     * @return The default AuthStatus to be returned if no tokenId is specified in the request
-     */
-    protected AuthStatus getDefaultAuthStatus() {
-        return AuthStatus.SEND_FAILURE;
+        return newResultPromise(AuthStatus.SEND_FAILURE);
     }
 
     /**
@@ -240,8 +246,9 @@ public class LocalSSOTokenSessionModule implements ServerAuthModule {
      * @return {@inheritDoc}
      */
     @Override
-    public AuthStatus secureResponse(MessageInfo messageInfo, Subject serviceSubject) {
-        return AuthStatus.SEND_SUCCESS;
+    public Promise<AuthStatus, AuthenticationException> secureResponse(MessageInfoContext messageInfo,
+            Subject serviceSubject) {
+        return newResultPromise(SEND_SUCCESS);
     }
 
     /**
@@ -249,10 +256,11 @@ public class LocalSSOTokenSessionModule implements ServerAuthModule {
      *
      * @param messageInfo {@inheritDoc}
      * @param subject {@inheritDoc}
-     * @throws AuthException {@inheritDoc}
+     * @return {@inheritDoc}
      */
     @Override
-    public void cleanSubject(MessageInfo messageInfo, Subject subject) throws AuthException {
+    public Promise<Void, AuthenticationException> cleanSubject(MessageInfoContext messageInfo, Subject subject) {
+        return newResultPromise(null);
     }
 
     /**

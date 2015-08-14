@@ -124,7 +124,8 @@ public class RestEndpoints {
 //    private ServiceRouter createJSONServiceRouter(final Set<String> invalidRealmNames) {
 //
 //        ServiceRouter router = new ServiceRouter(realmValidator, versionSelector, coreWrapper);
-
+//
+    // TODO also include authentication exception?
 //        router.addRoute("/authenticate")
 //        .addVersion("1.1",
 //            restletAuditFactory.createFilter(Component.AUTHENTICATION, wrap(AuthenticationServiceV1.class)))

@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock, Inc.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,8 +10,12 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2015 ForgeRock AS.
  */
-package org.forgerock.openam.auth.shared;
+package org.forgerock.openam.rest;
+
+import java.security.AccessController;
 
 import com.google.inject.Inject;
 import com.iplanet.sso.SSOException;
@@ -22,8 +24,6 @@ import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import org.apache.commons.lang.StringUtils;
-
-import java.security.AccessController;
 
 /**
  * Responsible for generating SSOTokens.

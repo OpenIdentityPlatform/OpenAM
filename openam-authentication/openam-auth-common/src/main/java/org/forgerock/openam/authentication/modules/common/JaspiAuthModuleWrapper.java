@@ -11,18 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.authentication.modules.common;
-
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
-import com.sun.identity.authentication.spi.AuthLoginException;
-import com.sun.identity.authentication.spi.AuthenticationException;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.jaspi.runtime.HttpServletMessageInfo;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -36,6 +28,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
+import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.authentication.spi.AuthenticationException;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.shared.debug.Debug;
 
 /**
  * A class which wraps the JASPI Authentication Module framework, allowing JASPI Authentication Modules
@@ -282,12 +281,31 @@ public abstract class JaspiAuthModuleWrapper<T extends ServerAuthModule> extends
      * @param response The HttpServletResponse.
      * @return A MessageInfo instance.
      */
-    protected MessageInfo prepareMessageInfo(HttpServletRequest request, HttpServletResponse response) {
+    protected MessageInfo prepareMessageInfo(final HttpServletRequest request, final HttpServletResponse response) {
+        return new MessageInfo() {
 
-        Map<String, Object> messageProperties = new HashMap<String, Object>();
+            @Override
+            public Object getRequestMessage() {
+                return request;
+            }
 
-        MessageInfo messageInfo = new HttpServletMessageInfo(request, response, messageProperties);
+            @Override
+            public Object getResponseMessage() {
+                return response;
+            }
 
-        return messageInfo;
+            @Override
+            public void setRequestMessage(Object o) {
+            }
+
+            @Override
+            public void setResponseMessage(Object o) {
+            }
+
+            @Override
+            public Map getMap() {
+                return new HashMap<>();
+            }
+        };
     }
 }

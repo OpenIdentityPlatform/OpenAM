@@ -40,5 +40,9 @@
             <groupId>com.google.inject.extensions</groupId>
             <artifactId>guice-multibindings</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>forgerock-jaspi-runtime</artifactId>
+        </dependency>
     </dependencies>
 </project>
