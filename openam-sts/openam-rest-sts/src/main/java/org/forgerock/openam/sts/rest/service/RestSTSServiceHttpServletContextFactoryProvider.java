@@ -17,12 +17,10 @@
 package org.forgerock.openam.sts.rest.service;
 
 import org.forgerock.http.Context;
-import org.forgerock.json.resource.ResourceException;
 import org.forgerock.http.context.RootContext;
-import org.forgerock.json.resource.servlet.HttpServletContextFactory;
-
-import javax.servlet.ServletConfig;
-import javax.servlet.http.HttpServletRequest;
+import org.forgerock.http.protocol.Request;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.http.HttpContextFactory;
 
 /**
  * This class name is specified under the context-factory-class param in the web.xml entry for the rest-sts servlet.
@@ -36,13 +34,13 @@ import javax.servlet.http.HttpServletRequest;
  * The returned HttpServletContextFactory will be invoked to provide an AbstractContext with every CREST request.
  */
 public class RestSTSServiceHttpServletContextFactoryProvider {
-    static class RestSTSServiceHttpServletContextFactory implements HttpServletContextFactory {
+    static class RestSTSServiceHttpServletContextFactory implements HttpContextFactory {
         @Override
-        public Context createContext(HttpServletRequest request) throws ResourceException {
+        public Context createContext(Context context, Request request) throws ResourceException {
             return new RestSTSServiceHttpServletContext(new RootContext(), request);
         }
     }
-    public static HttpServletContextFactory getHttpServletContextFactory(ServletConfig servletConfig) {
+    public static HttpContextFactory getHttpServletContextFactory() {
         return new RestSTSServiceHttpServletContextFactory();
     }
 }

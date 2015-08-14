@@ -16,16 +16,28 @@
 
 package org.forgerock.openam.sts.publish.service;
 
+import static org.forgerock.authz.filter.crest.AuthorizationFilters.createFilter;
+import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
+import static org.forgerock.http.routing.Version.version;
+import static org.forgerock.json.resource.RouteMatchers.requestResourceApiVersionMatcher;
+import static org.forgerock.json.resource.RouteMatchers.requestUriMatcher;
+
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.http.routing.Version;
 import org.forgerock.json.resource.ConnectionFactory;
+import org.forgerock.json.resource.FilterChain;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Resources;
-import org.forgerock.json.resource.RoutingMode;
+import org.forgerock.json.resource.Router;
+import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.AuditConstants.Component;
+import org.forgerock.openam.rest.AuthenticationFilter;
+import org.forgerock.openam.rest.authz.LoggingAuthzModule;
 import org.forgerock.openam.rest.authz.STSPublishServiceAuthzModule;
-import org.forgerock.openam.rest.fluent.CrestLoggingFilter;
+import org.forgerock.openam.rest.fluent.AuditFilter;
+import org.forgerock.openam.rest.fluent.AuditFilterWrapper;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.sts.InstanceConfigMarshaller;
 import org.forgerock.openam.sts.publish.config.STSPublishInjectorHolder;
@@ -40,31 +52,37 @@ import org.slf4j.Logger;
  * SingletonResourceProvider.
  */
 public class STSPublishServiceConnectionFactoryProvider {
-    private static final String VERSION_STRING = "1.0";
-    public static ConnectionFactory getConnectionFactory() {
-        final CrestLoggingFilter router = InjectorHolder.getInstance(CrestLoggingFilter.class);
+    private static final Version VERSION = version(1);
+    public static ConnectionFactory getConnectionFactory(AuthenticationFilter defaultAuthenticationFilter) {
+        Router router = new Router();
         final RequestHandler restPublishRequestHandler =
                 new RestSTSPublishServiceRequestHandler(
                     STSPublishInjectorHolder.getInstance(Key.get(RestSTSInstancePublisher.class)),
                     STSPublishInjectorHolder.getInstance(Key.get(RestRealmValidator.class)),
                     STSPublishInjectorHolder.getInstance(Key.get(new TypeLiteral<InstanceConfigMarshaller<RestSTSInstanceConfig>>() {})),
                     STSPublishInjectorHolder.getInstance(Key.get(Logger.class)));
-        router.route("/rest")
-                .auditAs(Component.STS)
-                .through(STSPublishServiceAuthzModule.class, STSPublishServiceAuthzModule.NAME)
-                .forVersion(VERSION_STRING)
-                .to(RoutingMode.STARTS_WITH, restPublishRequestHandler);
+        Router restVersionRouter = new Router();
+        restVersionRouter.addRoute(requestResourceApiVersionMatcher(VERSION), restPublishRequestHandler);
+        FilterChain restAuthzFilterChain = createFilter(restVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(STSPublishServiceAuthzModule.class), STSPublishServiceAuthzModule.NAME));
+        AuditFilterWrapper restAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
+                AuditConstants.Component.STS);
+        FilterChain restFilterChain = new FilterChain(restAuthzFilterChain, defaultAuthenticationFilter, restAuditFilter);
+        router.addRoute(requestUriMatcher(STARTS_WITH, "rest"), restFilterChain);
+
         final RequestHandler soapPublishRequestHandler =
                 new SoapSTSPublishServiceRequestHandler(
                         STSPublishInjectorHolder.getInstance(Key.get(SoapSTSInstancePublisher.class)),
                         STSPublishInjectorHolder.getInstance(Key.get(RestRealmValidator.class)),
                         STSPublishInjectorHolder.getInstance(Key.get(new TypeLiteral<InstanceConfigMarshaller<SoapSTSInstanceConfig>>() {})),
                         STSPublishInjectorHolder.getInstance(Key.get(Logger.class)));
-        router.route("/soap")
-                .auditAs(Component.STS)
-                .through(STSPublishServiceAuthzModule.class, STSPublishServiceAuthzModule.NAME)
-                .forVersion(VERSION_STRING)
-                .to(RoutingMode.STARTS_WITH, soapPublishRequestHandler);
+        Router soapVersionRouter = new Router();
+        soapVersionRouter.addRoute(requestResourceApiVersionMatcher(VERSION), soapPublishRequestHandler);
+        FilterChain soapAuthzFilterChain = createFilter(soapVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(STSPublishServiceAuthzModule.class), STSPublishServiceAuthzModule.NAME));
+        AuditFilterWrapper soapAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
+                AuditConstants.Component.STS);
+        FilterChain soapFilterChain = new FilterChain(soapAuthzFilterChain, defaultAuthenticationFilter, soapAuditFilter);
+        router.addRoute(requestUriMatcher(STARTS_WITH, "soap"), soapFilterChain);
+
         return Resources.newInternalConnectionFactory(router);
     }
 }

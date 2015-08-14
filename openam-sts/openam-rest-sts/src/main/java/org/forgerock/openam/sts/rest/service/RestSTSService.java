@@ -16,16 +16,19 @@
 
 package org.forgerock.openam.sts.rest.service;
 
+import static org.forgerock.json.resource.ResourceException.*;
+import static org.forgerock.json.resource.Responses.newActionResponse;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.Context;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.SingletonResourceProvider;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.http.HttpContext;
@@ -34,6 +37,7 @@ import org.forgerock.openam.sts.rest.RestSTS;
 import org.forgerock.openam.sts.user.invocation.RestSTSTokenCancellationInvocationState;
 import org.forgerock.openam.sts.user.invocation.RestSTSTokenTranslationInvocationState;
 import org.forgerock.openam.sts.user.invocation.RestSTSTokenValidationInvocationState;
+import org.forgerock.util.promise.Promise;
 import org.slf4j.Logger;
 
 /**
@@ -55,102 +59,96 @@ public class RestSTSService implements SingletonResourceProvider {
         this.logger = logger;
     }
 
-    public void actionInstance(Context context, ActionRequest request, ResultHandler<JsonValue> handler) {
+    public Promise<ActionResponse, ResourceException> actionInstance(Context context, ActionRequest request) {
         switch (request.getAction()) {
             case TRANSLATE:
-                handleTranslate(context, request, handler);
-                break;
+                return handleTranslate(context, request);
             case VALIDATE:
-                handleValidate(context, request, handler);
-                break;
+                return handleValidate(context, request);
             case CANCEL:
-                handleCancel(context, request, handler);
-                break;
+                return handleCancel(context, request);
             default:
-                handler.handleError(new NotSupportedException("The specified _action parameter is not supported."));
+                return newExceptionPromise(newNotSupportedException("The specified _action parameter is not supported."));
         }
     }
 
-    private void handleTranslate(Context context, ActionRequest request, ResultHandler<JsonValue> handler) {
+    private Promise<ActionResponse, ResourceException> handleTranslate(Context context, ActionRequest request) {
         RestSTSServiceHttpServletContext servletContext = context.asContext(RestSTSServiceHttpServletContext.class);
         HttpContext httpContext = context.asContext(HttpContext.class);
         RestSTSTokenTranslationInvocationState invocationState;
         try {
             invocationState = RestSTSTokenTranslationInvocationState.fromJson(request.getContent());
         } catch (TokenMarshalException e) {
-            handler.handleError(e);
-            return;
+            return newExceptionPromise(adapt(e));
         }
         try {
             final JsonValue result = restSts.translateToken(invocationState, httpContext, servletContext);
-            handler.handleResult(result);
+            return newResultPromise(newActionResponse(result));
         } catch (ResourceException e) {
             /*
             This block entered for TokenMarshalException, TokenValidationException and TokenCreationException instances
              */
             logger.error("Exception caught in translateToken call: " + e, e);
-            handler.handleError(e);
+            return newExceptionPromise(e);
         } catch (Exception e) {
             logger.error("Unexpected: Exception caught in the RestSTSService invoking translateToken: " + e, e);
-            handler.handleError(new InternalServerErrorException(e.getMessage()));
+            return newExceptionPromise(newInternalServerErrorException(e.getMessage()));
         }
     }
 
-    private void handleValidate(Context context, ActionRequest request, ResultHandler<JsonValue> handler) {
+    private Promise<ActionResponse, ResourceException> handleValidate(Context context, ActionRequest request) {
         RestSTSTokenValidationInvocationState invocationState;
         try {
             invocationState = RestSTSTokenValidationInvocationState.fromJson(request.getContent());
         } catch (TokenMarshalException e) {
-            handler.handleError(e);
-            return;
+            return newExceptionPromise(adapt(e));
         }
         try {
             final JsonValue result = restSts.validateToken(invocationState);
-            handler.handleResult(result);
+            return newResultPromise(newActionResponse(result));
         } catch (ResourceException e) {
             /*
             This block entered for both TokenValidationException and TokenMarshalException instances
              */
             logger.error("Exception caught in ValidateToken call: " + e, e);
-            handler.handleError(e);
+            return newExceptionPromise(e);
         } catch (Exception e) {
             logger.error("Unexpected: Exception caught in the RestSTSService invoking validateToken: " + e, e);
-            handler.handleError(new InternalServerErrorException(e.getMessage()));
+            return newExceptionPromise(newInternalServerErrorException(e.getMessage()));
         }
     }
 
-    private void handleCancel(Context context, ActionRequest request, ResultHandler<JsonValue> handler) {
+    private Promise<ActionResponse, ResourceException> handleCancel(Context context, ActionRequest request) {
         RestSTSTokenCancellationInvocationState invocationState;
         try {
             invocationState = RestSTSTokenCancellationInvocationState.fromJson(request.getContent());
         } catch (TokenMarshalException e) {
-            handler.handleError(e);
-            return;
+            return newExceptionPromise(adapt(e));
         }
         try {
             final JsonValue result = restSts.cancelToken(invocationState);
-            handler.handleResult(result);
+            return newResultPromise(newActionResponse(result));
         } catch (ResourceException e) {
             /*
             This block entered for both TokenValidationException and TokenMarshalException instances
              */
             logger.error("Exception caught in CancelToken call: " + e, e);
-            handler.handleError(e);
+            return newExceptionPromise(e);
         } catch (Exception e) {
             logger.error("Unexpected: Exception caught in the RestSTSService invoking cancelToken: " + e, e);
-            handler.handleError(new InternalServerErrorException(e.getMessage()));
+            return newExceptionPromise(newInternalServerErrorException(e.getMessage()));
         }
     }
 
-    public void patchInstance(Context context, PatchRequest request, ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<ResourceResponse, ResourceException> patchInstance(Context context, PatchRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 
-    public void readInstance(Context context, ReadRequest request, ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<ResourceResponse, ResourceException> readInstance(Context context, ReadRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 
-    public void updateInstance(Context context, UpdateRequest request, ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<ResourceResponse, ResourceException> updateInstance(Context context, UpdateRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 }

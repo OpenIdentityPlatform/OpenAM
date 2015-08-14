@@ -18,26 +18,22 @@ package org.forgerock.openam.sts.soap.audit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
-import org.forgerock.audit.events.AuditEvent;
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.HttpURLConnectionWrapper;
-import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
-import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProvider;
-import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
-import org.mockito.ArgumentCaptor;
-import org.slf4j.Logger;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import static org.mockito.Mockito.*;
 
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.Map;
+
+import org.forgerock.audit.events.AuditEvent;
+import org.forgerock.json.JsonValue;
+import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.HttpURLConnectionWrapper;
+import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
+import org.forgerock.openam.sts.soap.bootstrap.SoapSTSAccessTokenProvider;
+import org.mockito.ArgumentCaptor;
+import org.slf4j.Logger;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * @since 13.0.0

@@ -37,7 +37,7 @@ import org.forgerock.util.promise.Promise;
 /**
  *
  */
-class AuthenticationFilter implements Filter {
+public class AuthenticationFilter implements Filter {
 
     private final CrestAuthenticationFilter authenticationFilter;
     private final AuthenticationModule authenticationModule;

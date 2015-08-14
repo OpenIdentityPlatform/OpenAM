@@ -16,19 +16,31 @@
 
 package org.forgerock.openam.sts.tokengeneration.service;
 
+import static org.forgerock.authz.filter.crest.AuthorizationFilters.createFilter;
+import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
+import static org.forgerock.http.routing.Version.version;
+import static org.forgerock.json.resource.RouteMatchers.requestUriMatcher;
+
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.http.routing.Version;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.ConnectionFactory;
+import org.forgerock.json.resource.FilterChain;
 import org.forgerock.json.resource.Resources;
-import org.forgerock.openam.audit.AuditConstants.Component;
+import org.forgerock.json.resource.Router;
+import org.forgerock.openam.audit.AuditConstants;
+import org.forgerock.openam.rest.AuthenticationFilter;
+import org.forgerock.openam.rest.authz.LoggingAuthzModule;
 import org.forgerock.openam.rest.authz.STSTokenGenerationServiceAuthzModule;
+import org.forgerock.openam.rest.fluent.AuditFilter;
+import org.forgerock.openam.rest.fluent.AuditFilterWrapper;
 import org.forgerock.openam.sts.tokengeneration.CTSTokenPersistence;
 import org.forgerock.openam.sts.tokengeneration.config.TokenGenerationServiceInjectorHolder;
 import org.forgerock.openam.sts.tokengeneration.oidc.OpenIdConnectTokenGeneration;
-import org.forgerock.openam.sts.tokengeneration.state.RestSTSInstanceState;
 import org.forgerock.openam.sts.tokengeneration.saml2.SAML2TokenGeneration;
+import org.forgerock.openam.sts.tokengeneration.state.RestSTSInstanceState;
 import org.forgerock.openam.sts.tokengeneration.state.STSInstanceStateProvider;
 import org.forgerock.openam.sts.tokengeneration.state.SoapSTSInstanceState;
 import org.slf4j.Logger;
@@ -38,9 +50,11 @@ import org.slf4j.Logger;
  * which initializes the guice injector to create the bindings defined in the TokenGenerationModule.
  */
 public class TokenGenerationServiceConnectionFactoryProvider {
-    private static final String VERSION_STRING = "1.0";
-    public static ConnectionFactory getConnectionFactory() {
-        final FluentRouter router = InjectorHolder.getInstance(FluentRouter.class);
+
+    private static final Version VERSION = version(1);
+
+    public static ConnectionFactory getConnectionFactory(AuthenticationFilter defaultAuthenticationFilter) {
+        Router router = new Router();
         final CollectionResourceProvider tokenGenerationService =
                 new TokenGenerationService(
                         TokenGenerationServiceInjectorHolder.getInstance(Key.get(SAML2TokenGeneration.class)),
@@ -49,11 +63,13 @@ public class TokenGenerationServiceConnectionFactoryProvider {
                         TokenGenerationServiceInjectorHolder.getInstance(Key.get(new TypeLiteral<STSInstanceStateProvider<SoapSTSInstanceState>>(){})),
                         TokenGenerationServiceInjectorHolder.getInstance(Key.get(CTSTokenPersistence.class)),
                         TokenGenerationServiceInjectorHolder.getInstance(Key.get(Logger.class)));
-        router.route("")
-                .auditAs(Component.STS)
-                .through(STSTokenGenerationServiceAuthzModule.class, STSTokenGenerationServiceAuthzModule.NAME)
-                .forVersion(VERSION_STRING)
-                .to(tokenGenerationService);
+        Router issueVersionRouter = new Router();
+        issueVersionRouter.addRoute(VERSION, tokenGenerationService);
+        FilterChain issueAuthzFilterChain = createFilter(issueVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(STSTokenGenerationServiceAuthzModule.class), STSTokenGenerationServiceAuthzModule.NAME));
+        AuditFilterWrapper issueAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
+                AuditConstants.Component.STS);
+        FilterChain issueFilterChain = new FilterChain(issueAuthzFilterChain, defaultAuthenticationFilter, issueAuditFilter);
+        router.addRoute(requestUriMatcher(STARTS_WITH, ""), issueFilterChain);
         return Resources.newInternalConnectionFactory(router);
     }
 }

@@ -102,6 +102,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.forgerock.http</groupId>
+            <artifactId>chf-http-core</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>external</groupId>
             <artifactId>jss4</artifactId>
         </dependency>

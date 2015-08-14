@@ -16,10 +16,9 @@
 
 package org.forgerock.openam.sts.rest.service;
 
-import org.forgerock.json.resource.AbstractContext;
 import org.forgerock.http.Context;
-
-import javax.servlet.http.HttpServletRequest;
+import org.forgerock.http.context.AbstractContext;
+import org.forgerock.http.protocol.Request;
 
 /**
  * An instance of this class will be returned by the RestSTSServiceHttpServletContextFactory class encapsulated in the
@@ -35,19 +34,14 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class RestSTSServiceHttpServletContext extends AbstractContext {
     private static final String CONTEXT_NAME = "RestSTSServiceHttpServletContext";
-    private final HttpServletRequest httpServletRequest;
+    private final Request request;
 
-    RestSTSServiceHttpServletContext(Context parent, HttpServletRequest httpServletRequest) {
-        super(parent);
-        this.httpServletRequest = httpServletRequest;
+    RestSTSServiceHttpServletContext(Context parent, Request request) {
+        super(parent, CONTEXT_NAME);
+        this.request = request;
     }
 
-    @Override
-    public String getContextName() {
-        return CONTEXT_NAME;
-    }
-
-    public HttpServletRequest getHttpServletRequest() {
-        return httpServletRequest;
+    public Request getRequest() {
+        return request;
     }
 }

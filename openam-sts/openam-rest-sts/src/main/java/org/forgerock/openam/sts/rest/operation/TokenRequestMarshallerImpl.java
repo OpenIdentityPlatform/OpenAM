@@ -17,6 +17,7 @@
 package org.forgerock.openam.sts.rest.operation;
 
 import com.sun.identity.shared.encode.Base64;
+import org.forgerock.http.context.HttpRequestContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.http.HttpContext;
@@ -391,7 +392,7 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
         so I will check to insure that this value has indeed been specified.
          */
         if (!"".equals(offloadedTlsClientCertKey)) {
-            String clientIpAddress = ClientUtils.getClientIPAddress(restSTSServiceHttpServletContext.getHttpServletRequest());
+            String clientIpAddress = ClientUtils.getClientIPAddress(restSTSServiceHttpServletContext, restSTSServiceHttpServletContext.getRequest());
             if (!tlsOffloadEngineHosts.contains(clientIpAddress) && !tlsOffloadEngineHosts.contains(ANY_HOST)) {
                 logger.error("A x509-based token transformation is being rejected because the client cert was to be referenced in " +
                         "the  " + offloadedTlsClientCertKey + " header, but the caller was not in the list of TLS offload engines." +
@@ -424,7 +425,7 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
     }
 
     private X509Certificate[] pullClientCertFromRequestAttribute(RestSTSServiceHttpServletContext restSTSServiceHttpServletContext) throws TokenMarshalException {
-        return (X509Certificate[])restSTSServiceHttpServletContext.getHttpServletRequest().getAttribute(X509_CERTIFICATE_ATTRIBUTE);
+        return (X509Certificate[])restSTSServiceHttpServletContext.asContext(HttpRequestContext.class).getAttributes().get(X509_CERTIFICATE_ATTRIBUTE);
     }
 
     private X509Certificate[] pullClientCertFromHeader(HttpContext httpContext) throws TokenMarshalException {

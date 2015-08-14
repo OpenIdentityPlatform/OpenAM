@@ -16,23 +16,30 @@
 
 package org.forgerock.openam.sts.publish.service;
 
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.ResourceException.*;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
+import java.util.List;
+
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.json.resource.NotFoundException;
-import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.RequestHandler;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.Context;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.sts.AMSTSConstants;
@@ -42,13 +49,8 @@ import org.forgerock.openam.sts.publish.soap.SoapSTSInstancePublisher;
 import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
 import org.forgerock.openam.utils.JsonObject;
 import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.util.promise.Promise;
 import org.slf4j.Logger;
-
-import java.util.List;
-
-import static org.forgerock.json.JsonValue.field;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
 
 /**
  * A custom RequestHandler to allow the Soap STS publish service to act like a CollectionResourceProvider, while still
@@ -81,8 +83,8 @@ class SoapSTSPublishServiceRequestHandler implements RequestHandler {
         this.logger = logger;
     }
 
-    public void handleAction(Context context, ActionRequest request, ResultHandler<JsonValue> handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<ActionResponse, ResourceException> handleAction(Context context, ActionRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 
     /*
@@ -93,30 +95,28 @@ class SoapSTSPublishServiceRequestHandler implements RequestHandler {
      error message, so that in the case of SoapSecurityTokenServiceViewBean invocation, the user can make appropriate
       corrections to the configuration state.
       */
-    public void handleCreate(Context context, CreateRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> handleCreate(Context context, CreateRequest request) {
         final SoapSTSInstanceConfig instanceConfig;
         try {
             instanceConfig = marshalInstanceConfigFromInvocation(request.getContent());
         } catch (BadRequestException e) {
-            handler.handleError(e);
-            return;
+            return newExceptionPromise(adapt(e));
         }
         if (!realmValidator.isRealm(instanceConfig.getDeploymentConfig().getRealm())) {
             logger.warn("Publish of Soap STS instance " + instanceConfig.getDeploymentSubPath() + " to realm "
                     + instanceConfig.getDeploymentConfig().getRealm() + " rejected because realm does not exist.");
-            handler.handleError(new NotFoundException("The specified realm does not exist."));
-            return;
+            return newExceptionPromise(newNotFoundException("The specified realm does not exist."));
         }
         try {
-            publishInstance(instanceConfig, handler);
+            return newResultPromise(publishInstance(instanceConfig));
         } catch (ResourceException e) {
-            handler.handleError(e);
+            return newExceptionPromise(e);
         }
     }
 
-    public void handleDelete(Context context, DeleteRequest request, ResultHandler<Resource> handler) {
-        String stsId = request.getResourceName();
-        String realm = getRealmFromResourceName(request.getResourceName());
+    public Promise<ResourceResponse, ResourceException> handleDelete(Context context, DeleteRequest request) {
+        String stsId = request.getResourcePath();
+        String realm = getRealmFromResourceName(request.getResourcePath());
         /*
         Don't reject invocation for specious realm here. It is possible that a user deletes a realm, and then
         re-creates it, and wants to re-publish a soap-sts instance with the same id. Not rejecting this invocation
@@ -128,30 +128,31 @@ class SoapSTSPublishServiceRequestHandler implements RequestHandler {
             if (logger.isDebugEnabled()) {
                 logger.debug("soap sts instance " + stsId + " successfully removed from realm " + realm);
             }
-            handler.handleResult(new Resource(stsId, stsId, json(object(field
+            return newResultPromise(newResourceResponse(stsId, stsId, json(object(field
                     (RESULT, "soap sts instance " + stsId + " successfully removed from realm " + realm)))));
         } catch (STSPublishException e) {
             String message = "Exception caught removing instance: " + stsId + " from realm " + realm + ". Exception:" + e;
             logger.error(message, e);
-            handler.handleError(e);
+            return newExceptionPromise(adapt(e));
         } catch (Exception e) {
             String message = "Exception caught removing instance: " + stsId + " from realm " + realm + ". Exception:" + e;
             logger.error(message, e);
-            handler.handleError(new InternalServerErrorException(message, e));
+            return newExceptionPromise(newInternalServerErrorException(message, e));
         }
     }
 
-    public void handlePatch(Context context, PatchRequest request, ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<ResourceResponse, ResourceException> handlePatch(Context context, PatchRequest request) {
+        return newExceptionPromise(newNotSupportedException());
     }
 
-    public void handleQuery(Context context, QueryRequest request, QueryResultHandler handler) {
-        handler.handleError(new NotSupportedException());
+    public Promise<QueryResponse, ResourceException> handleQuery(Context context, QueryRequest request,
+            QueryResourceHandler handler) {
+        return newExceptionPromise(newNotSupportedException());
     }
 
-    public void handleRead(Context context, ReadRequest request, ResultHandler<Resource> handler) {
+    public Promise<ResourceResponse, ResourceException> handleRead(Context context, ReadRequest request) {
         try {
-            if (EMPTY_STRING.equals(request.getResourceName())) {
+            if (EMPTY_STRING.equals(request.getResourcePath())) {
                 List<SoapSTSInstanceConfig> publishedInstances = publisher.getPublishedInstances();
                 JsonObject jsonObject = JsonValueBuilder.jsonValue();
                 for (SoapSTSInstanceConfig instanceConfig : publishedInstances) {
@@ -162,26 +163,25 @@ class SoapSTSPublishServiceRequestHandler implements RequestHandler {
                 If caching becomes necessary, a string composed of the hash codes of each of the SoapSTSInstanceConfig
                 instances could be used (or a hash of that string).
                  */
-                handler.handleResult(new Resource(PUBLISHED_INSTANCES, EMPTY_STRING, jsonObject.build()));
+                return newResultPromise(newResourceResponse(PUBLISHED_INSTANCES, EMPTY_STRING, jsonObject.build()));
             } else {
-                final String realm = getRealmFromResourceName(request.getResourceName());
+                final String realm = getRealmFromResourceName(request.getResourcePath());
                 if (!realmValidator.isRealm(realm)) {
-                    logger.warn("Read of soap STS instance state for instance " + request.getResourceName() +
+                    logger.warn("Read of soap STS instance state for instance " + request.getResourcePath() +
                             " in realm " + realm + " rejected because realm does not exist");
-                    handler.handleError(new NotFoundException("The specified realm does not exist."));
-                    return;
+                    return newExceptionPromise(newNotFoundException("The specified realm does not exist."));
                 }
                 SoapSTSInstanceConfig instanceConfig =
-                        publisher.getPublishedInstance(request.getResourceName(), realm);
-                handler.handleResult(new Resource(instanceConfig.getDeploymentSubPath(),
+                        publisher.getPublishedInstance(request.getResourcePath(), realm);
+                return newResultPromise(newResourceResponse(instanceConfig.getDeploymentSubPath(),
                         Integer.toString(instanceConfig.hashCode()),
                         JsonValueBuilder.jsonValue().put(instanceConfig.getDeploymentSubPath(), instanceConfig.toJson().toString()).build()));
             }
         } catch (STSPublishException e) {
             String message = "Exception caught obtaining soap sts instance corresponding to id: " +
-                    request.getResourceName() + "; Exception: " + e;
+                    request.getResourcePath() + "; Exception: " + e;
             logger.error(message, e);
-            handler.handleError(e);
+            return newExceptionPromise(adapt(e));
         }
     }
 
@@ -190,14 +190,13 @@ class SoapSTSPublishServiceRequestHandler implements RequestHandler {
      * SoapSTSInstanceId (wrapped in invocation context information) will result in republishing the existing instance
      * (which is a delete followed by a create).
      */
-    public void handleUpdate(Context context, UpdateRequest request, ResultHandler<Resource> handler) {
-        String stsId = request.getResourceName();
-        String realm = getRealmFromResourceName(request.getResourceName());
+    public Promise<ResourceResponse, ResourceException> handleUpdate(Context context, UpdateRequest request) {
+        String stsId = request.getResourcePath();
+        String realm = getRealmFromResourceName(request.getResourcePath());
         if (!realmValidator.isRealm(realm)) {
             logger.warn("Update of soap STS instance state for instance " + stsId +
                     " in realm " + realm + " rejected because realm does not exist");
-            handler.handleError(new NotFoundException("The specified realm does not exist."));
-            return;
+            return newExceptionPromise(newNotFoundException("The specified realm does not exist."));
         }
         /*
         Insure that the instance is published before performing an update.
@@ -208,8 +207,7 @@ class SoapSTSPublishServiceRequestHandler implements RequestHandler {
         } catch (STSPublishException e) {
             logger.error("In SoapSTSPublishServiceRequestHandler#handleUpdate, exception caught determining whether " +
                     "instance persisted in SMS. Instance not updated. Exception: " + e, e);
-            handler.handleError(e);
-            return;
+            return newExceptionPromise(adapt(e));
         }
 
         if (publishedToSMS) {
@@ -220,32 +218,32 @@ class SoapSTSPublishServiceRequestHandler implements RequestHandler {
                 logger.error("In SoapSTSPublishServiceRequestHandler#handleUpdate, exception caught marshalling " +
                         "invocation state to SoapSTSInstanceConfig. Instance not updated. The state: "
                         + request.getContent() + "Exception: " + e, e);
-                handler.handleError(e);
-                return;
+                return newExceptionPromise(adapt(e));
             }
             try {
                 publisher.removeInstance(stsId, realm);
             } catch (STSPublishException e) {
                 logger.error("In SoapSTSPublishServiceRequestHandler#handleUpdate, exception caught removing " +
                         "soap sts instance " + instanceConfig.getDeploymentSubPath() + ". This means instance is" +
-                        "in indeterminate state, and has not been updated. The instance config: " +  instanceConfig
+                        "in indeterminate state, and has not been updated. The instance config: " + instanceConfig
                         + "; Exception: " + e, e);
-                handler.handleError(e);
+                return newExceptionPromise(adapt(e));
             }
             try {
-                publishInstance(instanceConfig, handler);
+                ResourceResponse response = publishInstance(instanceConfig);
                 logger.info("Soap STS instance " + instanceConfig.getDeploymentSubPath() + " updated to state " +
                         instanceConfig.toJson());
+                return newResultPromise(response);
             } catch (ResourceException e) {
                 logger.error("In SoapSTSPublishServiceRequestHandler#handleUpdate, exception caught publishing " +
                         "soap sts instance " + instanceConfig.getDeploymentSubPath() + ". This means instance is" +
                         "in indeterminate state, having been removed, but not successfully published with updated " +
-                        "state. The instance config: " +  instanceConfig + "; Exception: " + e, e);
-                handler.handleError(e);
+                        "state. The instance config: " + instanceConfig + "; Exception: " + e, e);
+                return newExceptionPromise(e);
             }
         } else {
             //404 - realm and id not found in SMS
-            handler.handleError(new NotFoundException("No soap sts instance with id " + stsId + " in realm " + realm));
+            return newExceptionPromise(newNotFoundException("No soap sts instance with id " + stsId + " in realm " + realm));
         }
     }
 
@@ -293,16 +291,16 @@ class SoapSTSPublishServiceRequestHandler implements RequestHandler {
         }
     }
 
-    private void publishInstance(SoapSTSInstanceConfig instanceConfig, ResultHandler<Resource> handler) throws ResourceException {
+    private ResourceResponse publishInstance(SoapSTSInstanceConfig instanceConfig) throws ResourceException {
         try {
             final String urlElement =
                     publisher.publishInstance(instanceConfig);
             if (logger.isDebugEnabled()) {
                 logger.debug("soap sts instance successfully published at " + urlElement);
             }
-            handler.handleResult(new Resource(instanceConfig.getDeploymentSubPath(),
+            return newResourceResponse(instanceConfig.getDeploymentSubPath(),
                     Integer.toString(instanceConfig.hashCode()), json(object(field(RESULT, SUCCESS),
-                    field(AMSTSConstants.SUCCESSFUL_REST_STS_PUBLISH_URL_ELEMENT, urlElement)))));
+                            field(AMSTSConstants.SUCCESSFUL_REST_STS_PUBLISH_URL_ELEMENT, urlElement))));
         } catch (STSPublishException e) {
             String message = "Exception caught publishing instance: " + instanceConfig.getDeploymentSubPath() + ". Exception" + e;
             logger.error(message, e);

@@ -16,20 +16,27 @@
 
 package org.forgerock.openam.sts.publish.rest;
 
+import static org.forgerock.http.routing.RoutingMode.EQUALS;
+import static org.forgerock.json.resource.Router.uriTemplate;
 import static org.forgerock.openam.audit.AuditConstants.Component.STS;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.sm.ServiceListener;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.http.routing.RouteMatcher;
 import org.forgerock.json.resource.FilterChain;
+import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.Resources;
-import org.forgerock.json.resource.Route;
 import org.forgerock.json.resource.Router;
-import org.forgerock.json.resource.RoutingMode;
-import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.rest.fluent.AuditFilter;
 import org.forgerock.openam.rest.fluent.AuditFilterWrapper;
 import org.forgerock.openam.sts.AMSTSConstants;
@@ -45,12 +52,6 @@ import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
 import org.forgerock.openam.sts.rest.service.RestSTSService;
 import org.slf4j.Logger;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * @see org.forgerock.openam.sts.publish.rest.RestSTSInstancePublisher
  *
@@ -65,7 +66,7 @@ import java.util.Map;
 public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
     private final Router router;
     private final STSInstanceConfigStore<RestSTSInstanceConfig> persistentStore;
-    private final Map<String, Route> publishedRoutes;
+    private final Map<String, RouteMatcher<Request>> publishedRoutes;
     private final ServiceListenerRegistration serviceListenerRegistration;
     private final ServiceListener serviceListener;
     private final DeploymentPathNormalization deploymentPathNormalization;
@@ -130,7 +131,7 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
         FilterChain auditedRestSTSService = new FilterChain(
                 Resources.newSingleton(new RestSTSService(restSTSInstance, logger)),
                 new AuditFilterWrapper(auditFilter, STS));
-        Route route = router.addRoute(RoutingMode.EQUALS, deploymentSubPath, auditedRestSTSService);
+        RouteMatcher<Request> route = router.addRoute(EQUALS, uriTemplate(deploymentSubPath), auditedRestSTSService);
         /*
         Need to persist the published Route instance as it is necessary for router removal.
          */
@@ -178,7 +179,7 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
      */
     @Override
     public synchronized void removeInstance(String stsId, String realm, boolean removeOnlyFromRouter) throws STSPublishException {
-        Route route = publishedRoutes.remove(normalizeDeploymentSubPathForRouteCache(stsId));
+        RouteMatcher<Request> route = publishedRoutes.remove(normalizeDeploymentSubPathForRouteCache(stsId));
         if (route == null) {
             /*
             The route is null. Check to see if caller is attempting to delete a non-existent instance, or whether this is
