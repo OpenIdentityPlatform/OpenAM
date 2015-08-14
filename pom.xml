@@ -900,12 +900,6 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>json-test</artifactId>
-                <version>${forgerock.json.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-http</artifactId>
                 <version>${project.version}</version>
@@ -1930,6 +1924,11 @@
                 <artifactId>mockito-all</artifactId>
                 <version>1.9.5</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-test-utils</artifactId>
+                <version>${forgerock.util.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.easymock</groupId>
