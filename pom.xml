@@ -512,16 +512,6 @@
                 <artifactId>openam-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.forgerock.openam</groupId>
-                <artifactId>openam-authn-filter-config</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.openam</groupId>
-                <artifactId>openam-authn-filter-modules</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
             <!-- Include all Authentication Modules -->
             <dependency>
