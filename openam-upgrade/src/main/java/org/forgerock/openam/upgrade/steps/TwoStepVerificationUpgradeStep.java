@@ -283,7 +283,7 @@ public class TwoStepVerificationUpgradeStep extends AbstractUpgradeStep {
                         }
                     }
                 }
-            } catch (IdRepoException | SSOException | IOException | InternalServerErrorException | SMSException e) {
+            } catch (IdRepoException | SSOException | IOException | SMSException e) {
                 DEBUG.error(e.getMessage());
                 throw new UpgradeException("Unable to parse data for device migration.", e);
             }
