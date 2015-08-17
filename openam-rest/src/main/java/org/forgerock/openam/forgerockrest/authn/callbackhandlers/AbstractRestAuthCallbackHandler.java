@@ -81,8 +81,8 @@ public abstract class AbstractRestAuthCallbackHandler<T extends Callback> implem
      * @param value The value of the field.
      * @return The JSON field object.
      */
-    final JsonValue createInputField(int index, Object value) {
-        return createJsonField("IDToken" + index, value);
+    final Object createInputField(int index, Object value) {
+        return createJsonField("IDToken" + index, value).getObject();
     }
 
     /**
@@ -92,8 +92,8 @@ public abstract class AbstractRestAuthCallbackHandler<T extends Callback> implem
      * @param values The array value of the field.
      * @return The JSON field object.
      */
-    final JsonValue createInputField(int index, Object[] values) {
-        return createJsonField("IDToken" + index, values);
+    final Object createInputField(int index, Object[] values) {
+        return createJsonField("IDToken" + index, values).getObject();
     }
 
     /**
@@ -104,8 +104,8 @@ public abstract class AbstractRestAuthCallbackHandler<T extends Callback> implem
      * @param value The value of the field.
      * @return The JSON field object.
      */
-    final JsonValue createInputField(int index, String postString, Object value) {
-        return createJsonField("IDToken" + index + postString, value);
+    final Object createInputField(int index, String postString, Object value) {
+        return createJsonField("IDToken" + index + postString, value).getObject();
     }
 
     /**
@@ -115,8 +115,8 @@ public abstract class AbstractRestAuthCallbackHandler<T extends Callback> implem
      * @param value The value of the field.
      * @return The JSON field object.
      */
-    final JsonValue createOutputField(String name, Object value) {
-        return createJsonField(name, value);
+    final Object createOutputField(String name, Object value) {
+        return createJsonField(name, value).getObject();
     }
 
     /**
@@ -126,8 +126,8 @@ public abstract class AbstractRestAuthCallbackHandler<T extends Callback> implem
      * @param values The array value of the field.
      * @return The JSON field object.
      */
-    final JsonValue createOutputField(String name, Object[] values) {
-        return createJsonField(name, values);
+    final Object createOutputField(String name, Object[] values) {
+        return createJsonField(name, values).getObject();
     }
 
     /**

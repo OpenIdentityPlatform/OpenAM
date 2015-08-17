@@ -1,7 +1,6 @@
 /*
  * The contents of this file are subject to the terms of the Common Development and
- * Distribution License (the License). You may not use this file except in compliance with the
- * License.
+ * Distribution License (the License). You may not use this file except in compliance with the License.
  *
  * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
  * specific language governing permission and limitations under the License.
@@ -14,21 +13,21 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.rest;
+package org.forgerock.openam.http.annotations;
 
-import static javax.security.auth.message.AuthStatus.SUCCESS;
-
-import javax.security.auth.message.AuthStatus;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * An AuthModule that will validate a SSOToken if it's present, else will allow the request through anyway.
- *
- * @since 12.0.0
+ * Specify a PUT HTTP method endpoint.
  */
-public class OptionalSSOTokenSessionModule extends LocalSSOTokenSessionModule {
-
-    @Override
-    AuthStatus getInvalidSSOTokenAuthStatus() {
-        return SUCCESS;
-    }
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Put {
+    /**
+     * An optional path fragment.
+     */
+    String value() default "";
 }

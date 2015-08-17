@@ -45,4 +45,59 @@
             <artifactId>forgerock-jaspi-runtime</artifactId>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>child-precommit</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <!-- Enforce Checkstyle during compilation -->
+
+                        <!-- Strictly speaking Checkstyle should be invoked as a
+                             report during site generation. However, we want
+                             to fail the build if source code does not comply with
+                             our coding guidelines, and not at a later stage when
+                             the site is generated (which may never occur for some
+                             projects).
+                        -->
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>check-src-and-tests</id>
+                                <configuration>
+                                    <configLocation>${checkstyleSourceConfigLocation}</configLocation>
+                                    <headerLocation>${checkstyleHeaderLocation}</headerLocation>
+                                    <suppressionsLocation>${checkstyleUnitTestSuppressionsLocation}</suppressionsLocation>
+                                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                                    <!-- Only output errors if we're not expecting any -->
+                                    <consoleOutput>${checkstyleFailOnError}</consoleOutput>
+                                    <failsOnError>${checkstyleFailOnError}</failsOnError>
+                                </configuration>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>checkstyle</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <!-- Check Open Source licenses for all the dependencies -->
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>license-maven-plugin</artifactId>
+                        <version>1.7</version>
+                        <executions>
+                            <execution>
+                                <id>generate-oss-license-report</id>
+                                <goals>
+                                    <goal>add-third-party</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

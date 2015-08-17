@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static org.forgerock.json.JsonValue.json;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.testng.Assert.assertEquals;
@@ -137,7 +138,7 @@ public class AbstractRestAuthCallbackHandlerTest {
         String value = "VALUE";
 
         //When
-        JsonValue jsonObject = abstractRestAuthCallbackHandler.createInputField(0, value);
+        JsonValue jsonObject = json(abstractRestAuthCallbackHandler.createInputField(0, value));
 
         //Then
         assertEquals(jsonObject.get("name").asString(), "IDToken0");
@@ -151,7 +152,7 @@ public class AbstractRestAuthCallbackHandlerTest {
         String[] values = new String[]{"VALUE1", "VALUE2", "VALUE3"};
 
         //When
-        JsonValue jsonObject = abstractRestAuthCallbackHandler.createInputField(0, values);
+        JsonValue jsonObject = json(abstractRestAuthCallbackHandler.createInputField(0, values));
 
         //Then
         assertEquals(jsonObject.get("name").asString(), "IDToken0");
@@ -168,7 +169,7 @@ public class AbstractRestAuthCallbackHandlerTest {
         String value = "VALUE";
 
         //When
-        JsonValue jsonObject = abstractRestAuthCallbackHandler.createOutputField(name, value);
+        JsonValue jsonObject = json(abstractRestAuthCallbackHandler.createOutputField(name, value));
 
         //Then
         assertEquals(jsonObject.get("name").asString(), "NAME");
@@ -183,7 +184,7 @@ public class AbstractRestAuthCallbackHandlerTest {
         String[] values = new String[]{"VALUE1", "VALUE2", "VALUE3"};
 
         //When
-        JsonValue jsonObject = abstractRestAuthCallbackHandler.createOutputField(name, values);
+        JsonValue jsonObject = json(abstractRestAuthCallbackHandler.createOutputField(name, values));
 
         //Then
         assertEquals(jsonObject.get("name").asString(), "NAME");

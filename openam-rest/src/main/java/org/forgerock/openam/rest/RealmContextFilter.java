@@ -28,6 +28,7 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.IdRepoException;
 import org.forgerock.http.Context;
 import org.forgerock.http.Handler;
+import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
 import org.forgerock.http.routing.UriRouterContext;
@@ -74,7 +75,7 @@ public class RealmContextFilter implements org.forgerock.http.Filter, Filter {
     public Promise<Response, NeverThrowsException> filter(Context context, org.forgerock.http.protocol.Request request,
             Handler next) {
         try {
-            return next.handle(addRouterContext(context), request);
+            return next.handle(addRouterContext(context, request), request);
         } catch (BadRequestException e) {
             //TODO log
             return newResultPromise(new Response(Status.BAD_REQUEST)); //TODO message
@@ -88,7 +89,7 @@ public class RealmContextFilter implements org.forgerock.http.Filter, Filter {
     public Promise<ActionResponse, ResourceException> filterAction(Context context, ActionRequest request,
             RequestHandler next) {
         try {
-            return next.handleAction(addRouterContext(context), request);
+            return next.handleAction(addRouterContext(context, null), request);
         } catch (ResourceException e) {
             //TODO log
             return newExceptionPromise(e);
@@ -99,7 +100,7 @@ public class RealmContextFilter implements org.forgerock.http.Filter, Filter {
     public Promise<ResourceResponse, ResourceException> filterCreate(Context context, CreateRequest request,
             RequestHandler next) {
         try {
-            return next.handleCreate(addRouterContext(context), request);
+            return next.handleCreate(addRouterContext(context, null), request);
         } catch (ResourceException e) {
             //TODO log
             return newExceptionPromise(e);
@@ -110,7 +111,7 @@ public class RealmContextFilter implements org.forgerock.http.Filter, Filter {
     public Promise<ResourceResponse, ResourceException> filterDelete(Context context, DeleteRequest request,
             RequestHandler next) {
         try {
-            return next.handleDelete(addRouterContext(context), request);
+            return next.handleDelete(addRouterContext(context, null), request);
         } catch (ResourceException e) {
             //TODO log
             return newExceptionPromise(e);
@@ -121,7 +122,7 @@ public class RealmContextFilter implements org.forgerock.http.Filter, Filter {
     public Promise<ResourceResponse, ResourceException> filterPatch(Context context, PatchRequest request,
             RequestHandler next) {
         try {
-            return next.handlePatch(addRouterContext(context), request);
+            return next.handlePatch(addRouterContext(context, null), request);
         } catch (ResourceException e) {
             //TODO log
             return newExceptionPromise(e);
@@ -132,7 +133,7 @@ public class RealmContextFilter implements org.forgerock.http.Filter, Filter {
     public Promise<QueryResponse, ResourceException> filterQuery(Context context, QueryRequest request,
             QueryResourceHandler handler, RequestHandler next) {
         try {
-            return next.handleQuery(addRouterContext(context), request, handler);
+            return next.handleQuery(addRouterContext(context, null), request, handler);
         } catch (ResourceException e) {
             //TODO log
             return newExceptionPromise(e);
@@ -143,7 +144,7 @@ public class RealmContextFilter implements org.forgerock.http.Filter, Filter {
     public Promise<ResourceResponse, ResourceException> filterRead(Context context, ReadRequest request,
             RequestHandler next) {
         try {
-            return next.handleRead(addRouterContext(context), request);
+            return next.handleRead(addRouterContext(context, null), request);
         } catch (ResourceException e) {
             //TODO log
             return newExceptionPromise(e);
@@ -154,14 +155,14 @@ public class RealmContextFilter implements org.forgerock.http.Filter, Filter {
     public Promise<ResourceResponse, ResourceException> filterUpdate(Context context, UpdateRequest request,
             RequestHandler next) {
         try {
-            return next.handleUpdate(addRouterContext(context), request);
+            return next.handleUpdate(addRouterContext(context, null), request);
         } catch (ResourceException e) {
             //TODO log
             return newExceptionPromise(e);
         }
     }
 
-    private Context addRouterContext(Context context) throws BadRequestException, InternalServerErrorException {
+    private Context addRouterContext(Context context, Object request) throws BadRequestException, InternalServerErrorException {
 
         RealmContext realmContext;
         if (context.containsContext(RealmContext.class)) {
@@ -172,10 +173,10 @@ public class RealmContextFilter implements org.forgerock.http.Filter, Filter {
 
         boolean handled = getRealmFromURI(context, realmContext);
         if (!handled) {
-            getRealmFromServerName(context, realmContext);
+            getRealmFromServerName(context, realmContext, request);
         }
 
-        getRealmFromQueryString(context, realmContext);
+        getRealmFromQueryString(context, realmContext, request);
         return realmContext;
     }
 
@@ -191,13 +192,18 @@ public class RealmContextFilter implements org.forgerock.http.Filter, Filter {
         return false;
     }
 
-    private void getRealmFromQueryString(Context context, RealmContext realmContext)
+    private void getRealmFromQueryString(Context context, RealmContext realmContext, Object request)
             throws BadRequestException {
         if (realmContext.getOverrideRealm() != null) {
             return;
         }
-        List<String> realm = context.asContext(HttpContext.class).getParameter("realm");
-        if (realm.size() != 1) {
+        List<String> realm;
+        if (context.containsContext(HttpContext.class)) {//TODO bit shit
+            realm = context.asContext(HttpContext.class).getParameter("realm");
+        } else {
+            realm = ((Request) request).getForm().get("realm");
+        }
+        if (realm == null || realm.size() != 1) {
             return;
         }
         String validatedRealm = validateRealm("", realm.get(0));
@@ -208,9 +214,14 @@ public class RealmContextFilter implements org.forgerock.http.Filter, Filter {
         }
     }
 
-    private boolean getRealmFromServerName(Context context, RealmContext realmContext)
+    private boolean getRealmFromServerName(Context context, RealmContext realmContext, Object request)
             throws InternalServerErrorException, BadRequestException {
-        String serverName = URI.create(context.asContext(HttpContext.class).getPath()).getHost();
+        String serverName;
+        if (context.containsContext(HttpContext.class)) {//TODO bit shit
+            serverName = URI.create(context.asContext(HttpContext.class).getPath()).getHost();
+        } else {
+            serverName = ((Request) request).getUri().getHost();
+        }
         try {
             SSOToken adminToken = coreWrapper.getAdminToken();
             String orgDN = coreWrapper.getOrganization(adminToken, serverName);

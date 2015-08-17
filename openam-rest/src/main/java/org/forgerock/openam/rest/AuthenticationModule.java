@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.rest;
 
+import static org.forgerock.util.promise.Promises.newResultPromise;
+
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.message.AuthStatus;
@@ -40,7 +42,9 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.RequestVisitor;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.promise.Promise;
+import org.forgerock.util.promise.Promises;
 
 /**
  *
@@ -102,7 +106,16 @@ public class AuthenticationModule implements AsyncServerAuthModule {
     @Override
     public Promise<Void, AuthenticationException> initialize(MessagePolicy requestPolicy,
             MessagePolicy responsePolicy, CallbackHandler callbackHandler, Map<String, Object> settings) {
-        return ssoTokenAuthModule.initialize(requestPolicy, responsePolicy, callbackHandler, settings);
+        List<Promise<Void, AuthenticationException>> promises = new ArrayList<>();
+        promises.add(ssoTokenAuthModule.initialize(requestPolicy, responsePolicy, callbackHandler, settings));
+        promises.add(optionalSsoTokenAuthModule.initialize(requestPolicy, responsePolicy, callbackHandler, settings));
+        return Promises.when(promises)
+                .thenAsync(new AsyncFunction<List<Void>, Void, AuthenticationException>() {
+                    @Override
+                    public Promise<Void, AuthenticationException> apply(List<Void> value) {
+                        return newResultPromise(null);
+                    }
+                });
     }
 
     @Override

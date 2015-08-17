@@ -17,6 +17,7 @@
 package org.forgerock.openam.rest;
 
 import static org.forgerock.authz.filter.crest.AuthorizationFilters.createFilter;
+import static org.forgerock.http.routing.RoutingMode.EQUALS;
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
 import static org.forgerock.http.routing.Version.version;
 import static org.forgerock.json.resource.RouteMatchers.*;
@@ -36,6 +37,9 @@ import com.sun.identity.sm.SchemaType;
 import org.forgerock.audit.AuditService;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.Handler;
+import org.forgerock.http.handler.Handlers;
+import org.forgerock.http.routing.RouteMatchers;
+import org.forgerock.http.routing.Router;
 import org.forgerock.json.resource.Filter;
 import org.forgerock.json.resource.FilterChain;
 import org.forgerock.json.resource.RequestHandler;
@@ -44,6 +48,8 @@ import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.forgerockrest.IdentityResourceV1;
 import org.forgerock.openam.forgerockrest.IdentityResourceV2;
 import org.forgerock.openam.forgerockrest.UmaLabelResource;
+import org.forgerock.openam.forgerockrest.authn.http.AuthenticationServiceV1;
+import org.forgerock.openam.forgerockrest.authn.http.AuthenticationServiceV2;
 import org.forgerock.openam.forgerockrest.cts.CoreTokenResource;
 import org.forgerock.openam.forgerockrest.entitlements.ApplicationTypesResource;
 import org.forgerock.openam.forgerockrest.entitlements.ApplicationV1Filter;
@@ -59,6 +65,7 @@ import org.forgerock.openam.forgerockrest.entitlements.SubjectTypesResource;
 import org.forgerock.openam.forgerockrest.server.ServerInfoResource;
 import org.forgerock.openam.http.HttpRoute;
 import org.forgerock.openam.http.HttpRouteProvider;
+import org.forgerock.openam.http.annotations.Endpoints;
 import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
 import org.forgerock.openam.rest.authz.AgentOnlyAuthzModule;
 import org.forgerock.openam.rest.authz.CoreTokenResourceAuthzModule;
@@ -93,6 +100,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
     private SmsRequestHandlerFactory smsRequestHandlerFactory;
     private Set<String> invalidRealms = new HashSet<>();
     private Provider<AuthenticationFilter> authenticationFilterProvider;
+    private org.forgerock.http.Filter resourceApiVersionFilter;
 
     @Inject
     public void setSmsRequestHandlerFactory(SmsRequestHandlerFactory smsRequestHandlerFactory) {
@@ -110,15 +118,36 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         this.authenticationFilterProvider = authenticationFilterProvider;
     }
 
+    @Inject
+    public void setResourceApiVersionFilter(@Named("ResourceApiVersionFilter") org.forgerock.http.Filter resourceApiVersionFilter) {
+        this.resourceApiVersionFilter = resourceApiVersionFilter;
+    }
+
     @Override
     public Set<HttpRoute> get() {
         return Collections.singleton(
-                newHttpRoute(STARTS_WITH, "json", (new Function<Void, Handler, NeverThrowsException>() {
+                newHttpRoute(STARTS_WITH, "json", new Function<Void, Handler, NeverThrowsException>() {
                     @Override
-                    public Handler apply(Void value) throws NeverThrowsException {
-                        return newHttpHandler(createResourceRouter(invalidRealms));
+                    public Handler apply(Void value) {
+                        Router router = new Router();
+                        router.addRoute(org.forgerock.http.routing.RouteMatchers.requestUriMatcher(EQUALS, "authenticate"), createAuthenticateHandler());
+                        router.setDefaultRoute(newHttpHandler(createResourceRouter(invalidRealms)));
+                        return router;
                     }
-                })));
+                }));
+    }
+
+    private Handler createAuthenticateHandler() {
+        Router authenticateVersionRouter = new Router();
+        Handler authenticateHandlerV1 = Endpoints.from(InjectorHolder.getInstance(AuthenticationServiceV1.class));
+        Handler authenticateHandlerV2 = Endpoints.from(InjectorHolder.getInstance(AuthenticationServiceV2.class));
+        authenticateVersionRouter.addRoute(RouteMatchers.requestResourceApiVersionMatcher(version(1)), authenticateHandlerV1);
+        authenticateVersionRouter.addRoute(RouteMatchers.requestResourceApiVersionMatcher(version(2)), authenticateHandlerV2);
+//        Router realmRouter = new Router(); //TODO i think i need to attach the realm router at the /json level
+        RealmContextFilter realmContextFilter = InjectorHolder.getInstance(RealmContextFilter.class);
+//        realmRouter.addRoute(org.forgerock.http.routing.RouteMatchers.requestUriMatcher(STARTS_WITH, "{realm}"), realmRouter); //TODO should be sharing the realm router
+        //TODO authentication filter?
+        return Handlers.chainOf(authenticateVersionRouter, resourceApiVersionFilter, realmContextFilter);
     }
 
     private RequestHandler createResourceRouter(final Set<String> invalidRealmNames) {

@@ -14,21 +14,13 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.rest;
+package org.forgerock.openam.http.annotations;
 
-import static javax.security.auth.message.AuthStatus.SUCCESS;
-
-import javax.security.auth.message.AuthStatus;
+import org.forgerock.http.protocol.Response;
 
 /**
- * An AuthModule that will validate a SSOToken if it's present, else will allow the request through anyway.
- *
- * @since 12.0.0
+ * Handles exceptions thrown by a service method and turns them into a response.
  */
-public class OptionalSSOTokenSessionModule extends LocalSSOTokenSessionModule {
-
-    @Override
-    AuthStatus getInvalidSSOTokenAuthStatus() {
-        return SUCCESS;
-    }
+public interface ExceptionHandler<E> {
+    Response handle(E e);
 }

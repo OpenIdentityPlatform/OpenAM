@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.rest;
 
+import static javax.security.auth.message.AuthStatus.SEND_FAILURE;
 import static javax.security.auth.message.AuthStatus.SEND_SUCCESS;
 import static javax.security.auth.message.AuthStatus.SUCCESS;
 import static org.forgerock.util.promise.Promises.newExceptionPromise;
@@ -234,7 +235,11 @@ public class LocalSSOTokenSessionModule implements AsyncServerAuthModule {
                 return newResultPromise(SUCCESS);
             }
         }
-        return newResultPromise(AuthStatus.SEND_FAILURE);
+        return newResultPromise(getInvalidSSOTokenAuthStatus());
+    }
+
+    AuthStatus getInvalidSSOTokenAuthStatus() {
+        return SEND_FAILURE;
     }
 
     /**

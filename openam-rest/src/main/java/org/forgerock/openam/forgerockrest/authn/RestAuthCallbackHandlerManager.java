@@ -16,19 +16,19 @@
 
 package org.forgerock.openam.forgerockrest.authn;
 
-import com.google.inject.Singleton;
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthCallbackHandler;
-import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
-
 import javax.inject.Inject;
 import javax.security.auth.callback.Callback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.google.inject.Singleton;
+import com.sun.identity.shared.debug.Debug;
+import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthCallbackHandler;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 
 /**
  * Manages the converting of Callbacks to and from JSON representation.
@@ -63,7 +63,7 @@ public class RestAuthCallbackHandlerManager {
             HttpServletResponse response, Callback[] callbacks)
             throws RestAuthException {
 
-        List<JsonValue> jsonCallbacks = new ArrayList<JsonValue>();
+        List<Object> jsonCallbacks = new ArrayList<>();
         int callbackIndex = 0;
         // check if can be completed by headers and/or request
         // if so then attempt it and response true if successful
@@ -78,7 +78,7 @@ public class RestAuthCallbackHandlerManager {
                         restAuthCallbackHandlerFactory.getRestAuthCallbackHandler(callback.getClass());
 
                 JsonValue jsonCallback = restAuthCallbackHandler.convertToJson(callback, callbackIndex);
-                jsonCallbacks.add(jsonCallback);
+                jsonCallbacks.add(jsonCallback.getObject());
             }
         }
 

@@ -41,6 +41,7 @@ import org.forgerock.caf.authentication.framework.HttpAuthenticationFilter;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.routing.ResourceApiVersionBehaviourManager;
+import org.forgerock.http.routing.RouteMatchers;
 import org.forgerock.json.resource.Filter;
 import org.forgerock.json.resource.FilterChain;
 import org.forgerock.json.resource.RequestHandler;
@@ -71,6 +72,7 @@ public class RestGuiceModule extends PrivateModule {
         expose(Key.get(Router.class, Names.named("RootRouter")));
         expose(Key.get(Router.class, Names.named("RealmRouter")));
         expose(Key.get(Filter.class, Names.named("ResourceApiVersionFilter")));
+        expose(Key.get(org.forgerock.http.Filter.class, Names.named("ResourceApiVersionFilter")));
         expose(ResourceApiVersionBehaviourManager.class);
         expose(Key.get(AuthenticationFilter.class, Names.named("RestAuthenticationFilter")));
         expose(Key.get(new TypeLiteral<Set<String>>(){}, Names.named("InvalidRealmNames")));
@@ -124,6 +126,13 @@ public class RestGuiceModule extends PrivateModule {
             @Named("ContextFilter") Filter contextFilter, @Named("LoggingFilter") Filter loggingFilter,
             @Named("RootRouter") Router rootRouter) {
         return new FilterChain(rootRouter, resourceApiVersionFilter, contextFilter, loggingFilter);
+    }
+
+    @Provides
+    @Named("ResourceApiVersionFilter")
+    @Singleton //TODO this should be in openam-http
+    org.forgerock.http.Filter getChfResourceApiVersionFilter(ResourceApiVersionBehaviourManager behaviourManager) {
+        return RouteMatchers.resourceApiVersionContextFilter(behaviourManager);
     }
 
     @Provides
