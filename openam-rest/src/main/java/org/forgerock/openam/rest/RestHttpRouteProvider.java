@@ -20,7 +20,8 @@ import static org.forgerock.authz.filter.crest.AuthorizationFilters.createFilter
 import static org.forgerock.http.routing.RoutingMode.EQUALS;
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
 import static org.forgerock.http.routing.Version.version;
-import static org.forgerock.json.resource.RouteMatchers.*;
+import static org.forgerock.json.resource.RouteMatchers.requestResourceApiVersionMatcher;
+import static org.forgerock.json.resource.RouteMatchers.requestUriMatcher;
 import static org.forgerock.json.resource.http.CrestHttp.newHttpHandler;
 import static org.forgerock.openam.http.HttpRoute.newHttpRoute;
 
@@ -37,12 +38,10 @@ import com.sun.identity.sm.SchemaType;
 import org.forgerock.audit.AuditService;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.Handler;
-import org.forgerock.http.handler.Handlers;
 import org.forgerock.http.routing.RouteMatchers;
 import org.forgerock.http.routing.Router;
 import org.forgerock.json.resource.Filter;
 import org.forgerock.json.resource.FilterChain;
-import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.forgerockrest.IdentityResourceV1;
@@ -63,6 +62,7 @@ import org.forgerock.openam.forgerockrest.entitlements.ResourceTypesResource;
 import org.forgerock.openam.forgerockrest.entitlements.SubjectAttributesResourceV1;
 import org.forgerock.openam.forgerockrest.entitlements.SubjectTypesResource;
 import org.forgerock.openam.forgerockrest.server.ServerInfoResource;
+import org.forgerock.openam.forgerockrest.session.SessionResource;
 import org.forgerock.openam.http.HttpRoute;
 import org.forgerock.openam.http.HttpRouteProvider;
 import org.forgerock.openam.http.annotations.Endpoints;
@@ -80,7 +80,6 @@ import org.forgerock.openam.rest.devices.TrustedDevicesResource;
 import org.forgerock.openam.rest.fluent.AuditEndpointAuditFilter;
 import org.forgerock.openam.rest.fluent.AuditFilter;
 import org.forgerock.openam.rest.fluent.AuditFilterWrapper;
-import org.forgerock.openam.rest.fluent.CrestLoggingFilter;
 import org.forgerock.openam.rest.oauth2.ResourceSetResource;
 import org.forgerock.openam.rest.record.RecordConstants;
 import org.forgerock.openam.rest.record.RecordResource;
@@ -100,7 +99,13 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
     private SmsRequestHandlerFactory smsRequestHandlerFactory;
     private Set<String> invalidRealms = new HashSet<>();
     private Provider<AuthenticationFilter> authenticationFilterProvider;
-    private org.forgerock.http.Filter resourceApiVersionFilter;
+    private Router rootRouter;
+    private Router realmRouter;
+    private org.forgerock.json.resource.Router crestRootRouter;
+    private org.forgerock.json.resource.Router crestRealmRouter;
+    private Filter crestLoggingFilter;
+    private Handler restHandler;
+    private Filter contextFilter;
 
     @Inject
     public void setSmsRequestHandlerFactory(SmsRequestHandlerFactory smsRequestHandlerFactory) {
@@ -119,20 +124,48 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
     }
 
     @Inject
-    public void setResourceApiVersionFilter(@Named("ResourceApiVersionFilter") org.forgerock.http.Filter resourceApiVersionFilter) {
-        this.resourceApiVersionFilter = resourceApiVersionFilter;
+    public void setRootRouter(@Named("RestRootRouter") Router rootRouter) {
+        this.rootRouter = rootRouter;
+    }
+
+    @Inject
+    public void setRealmRouter(@Named("RestRealmRouter") Router realmRouter) {
+        this.realmRouter = realmRouter;
+    }
+
+    @Inject
+    public void setCrestRootRouter(@Named("CrestRootRouter") org.forgerock.json.resource.Router crestRootRouter) {
+        this.crestRootRouter = crestRootRouter;
+    }
+
+    @Inject
+    public void setCrestRealmRouter(@Named("CrestRealmRouter") org.forgerock.json.resource.Router crestRealmRouter) {
+        this.crestRealmRouter = crestRealmRouter;
+    }
+
+    @Inject
+    public void setCrestLoggingFilter(@Named("LoggingFilter") Filter crestLoggingFilter) {
+        this.crestLoggingFilter = crestLoggingFilter;
+    }
+
+    @Inject
+    public void setRestHandler(@Named("RestHandler") Handler restHandler) {
+        this.restHandler = restHandler;
+    }
+    
+    @Inject
+    public void setCrestContextFilter(@Named("ContextFilter") Filter contextFilter) {
+        this.contextFilter = contextFilter;
     }
 
     @Override
     public Set<HttpRoute> get() {
+        addJsonRoutes(invalidRealms);
         return Collections.singleton(
                 newHttpRoute(STARTS_WITH, "json", new Function<Void, Handler, NeverThrowsException>() {
                     @Override
                     public Handler apply(Void value) {
-                        Router router = new Router();
-                        router.addRoute(org.forgerock.http.routing.RouteMatchers.requestUriMatcher(EQUALS, "authenticate"), createAuthenticateHandler());
-                        router.setDefaultRoute(newHttpHandler(createResourceRouter(invalidRealms)));
-                        return router;
+                        return restHandler;
                     }
                 }));
     }
@@ -143,20 +176,11 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         Handler authenticateHandlerV2 = Endpoints.from(InjectorHolder.getInstance(AuthenticationServiceV2.class));
         authenticateVersionRouter.addRoute(RouteMatchers.requestResourceApiVersionMatcher(version(1)), authenticateHandlerV1);
         authenticateVersionRouter.addRoute(RouteMatchers.requestResourceApiVersionMatcher(version(2)), authenticateHandlerV2);
-//        Router realmRouter = new Router(); //TODO i think i need to attach the realm router at the /json level
-        RealmContextFilter realmContextFilter = InjectorHolder.getInstance(RealmContextFilter.class);
-//        realmRouter.addRoute(org.forgerock.http.routing.RouteMatchers.requestUriMatcher(STARTS_WITH, "{realm}"), realmRouter); //TODO should be sharing the realm router
         //TODO authentication filter?
-        return Handlers.chainOf(authenticateVersionRouter, resourceApiVersionFilter, realmContextFilter);
+        return authenticateVersionRouter;
     }
 
-    private RequestHandler createResourceRouter(final Set<String> invalidRealmNames) {
-        org.forgerock.json.resource.Router realmRouter = new org.forgerock.json.resource.Router();
-        RealmContextFilter realmContextFilter = InjectorHolder.getInstance(RealmContextFilter.class);
-        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "{realm}"), realmRouter);
-
-        org.forgerock.json.resource.Router rootRouter = new org.forgerock.json.resource.Router();
-        rootRouter.setDefaultRoute(new FilterChain(realmRouter, realmContextFilter));
+    private void addJsonRoutes(final Set<String> invalidRealmNames) {
 
         AuthenticationFilter defaultAuthenticationFilter = authenticationFilterProvider.get();
 
@@ -164,12 +188,16 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         // Realm based routes
         // ------------------
         //not protected
+        realmRouter.addRoute(RouteMatchers.requestUriMatcher(EQUALS, "authenticate"), createAuthenticateHandler());
+        invalidRealmNames.add(firstPathSegment("authenticate"));
+
         org.forgerock.json.resource.Router dashboardVersionRouter = new org.forgerock.json.resource.Router();
         dashboardVersionRouter.addRoute(version(1), InjectorHolder.getInstance(DashboardResource.class));
         AuditFilterWrapper dashboardAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.DASHBOARD);
         FilterChain dashboardFilterChain = new FilterChain(dashboardVersionRouter, defaultAuthenticationFilter, dashboardAuditFilter);
-        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "dashboard"), dashboardFilterChain);
+        realmRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "dashboard"), newHttpHandler(new FilterChain(dashboardFilterChain, contextFilter, crestLoggingFilter)));
+        crestRealmRouter.addRoute(requestUriMatcher(STARTS_WITH, "dashboard"), new FilterChain(dashboardFilterChain, contextFilter, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("dashboard"));
 
         org.forgerock.json.resource.Router serverInfoVersionRouter = new org.forgerock.json.resource.Router();
@@ -178,7 +206,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
                 AuditConstants.Component.SERVER_INFO);
         Filter serverInfoAuthnFilter = authenticationFilterProvider.get().exceptRead();
         FilterChain serverInfoFilterChain = new FilterChain(serverInfoVersionRouter, serverInfoAuthnFilter, serverInfoAuditFilter);
-        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "serverinfo"), serverInfoFilterChain);
+        realmRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "serverinfo"), newHttpHandler(new FilterChain(serverInfoFilterChain, contextFilter, crestLoggingFilter)));
+        crestRealmRouter.addRoute(requestUriMatcher(STARTS_WITH, "serverinfo"), new FilterChain(serverInfoFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("serverinfo"));
 
         org.forgerock.json.resource.Router umaServerInfoVersionRouter = new org.forgerock.json.resource.Router();
@@ -186,7 +215,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper umaServerInfoAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.UMA);
         FilterChain umaServerInfoFilterChain = new FilterChain(umaServerInfoVersionRouter, defaultAuthenticationFilter, umaServerInfoAuditFilter);
-        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "serverinfo/uma"), umaServerInfoFilterChain);
+        realmRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "serverinfo/uma"), newHttpHandler(new FilterChain(umaServerInfoFilterChain, contextFilter, crestLoggingFilter)));
+        crestRealmRouter.addRoute(requestUriMatcher(STARTS_WITH, "serverinfo/uma"), new FilterChain(umaServerInfoFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("serverinfo/uma"));
 
         org.forgerock.json.resource.Router usersVersionRouter = new org.forgerock.json.resource.Router();
@@ -196,7 +226,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
                 AuditConstants.Component.USERS);
         Filter usersAuthnFilter = authenticationFilterProvider.get().exceptActions("register", "confirm", "forgotPassword", "forgotPasswordReset", "anonymousCreate");
         FilterChain usersFilterChain = new FilterChain(usersVersionRouter, usersAuthnFilter, usersAuditFilter);
-        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "users"), usersFilterChain);
+        realmRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "users"), newHttpHandler(new FilterChain(usersFilterChain, contextFilter, crestLoggingFilter)));
+        crestRealmRouter.addRoute(requestUriMatcher(STARTS_WITH, "users"), new FilterChain(usersFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("users"));
 
         org.forgerock.json.resource.Router groupsVersionRouter = new org.forgerock.json.resource.Router();
@@ -205,7 +236,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper groupsAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.GROUPS);
         FilterChain groupsFilterChain = new FilterChain(groupsVersionRouter, defaultAuthenticationFilter, groupsAuditFilter);
-        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "groups"), groupsFilterChain);
+        realmRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "groups"), newHttpHandler(new FilterChain(groupsFilterChain, contextFilter, crestLoggingFilter)));
+        crestRealmRouter.addRoute(requestUriMatcher(STARTS_WITH, "groups"), new FilterChain(groupsFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("groups"));
 
         org.forgerock.json.resource.Router agentsVersionRouter = new org.forgerock.json.resource.Router();
@@ -214,7 +246,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper agentsAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.POLICY_AGENT);
         FilterChain agentsFilterChain = new FilterChain(agentsVersionRouter, defaultAuthenticationFilter, agentsAuditFilter);
-        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "agents"), agentsFilterChain);
+        realmRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "agents"), newHttpHandler(new FilterChain(agentsFilterChain, contextFilter, crestLoggingFilter)));
+        crestRealmRouter.addRoute(requestUriMatcher(STARTS_WITH, "agents"), new FilterChain(agentsFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("agents"));
 
         org.forgerock.json.resource.Router trustedDevicesVersionRouter = new org.forgerock.json.resource.Router();
@@ -222,7 +255,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper trustedDevicesAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.DEVICES);
         FilterChain trustedDevicesFilterChain = new FilterChain(trustedDevicesVersionRouter, defaultAuthenticationFilter, trustedDevicesAuditFilter);
-        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "users/{user}/devices/trusted"), trustedDevicesFilterChain);
+        realmRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "users/{user}/devices/trusted"), newHttpHandler(new FilterChain(trustedDevicesFilterChain, contextFilter, crestLoggingFilter)));
+        crestRealmRouter.addRoute(requestUriMatcher(STARTS_WITH, "users/{user}/devices/trusted"), new FilterChain(trustedDevicesFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("users/{user}/devices/trusted"));
 
         org.forgerock.json.resource.Router oathDevicesVersionRouter = new org.forgerock.json.resource.Router();
@@ -230,7 +264,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper oathDevicesAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.DEVICES);
         FilterChain oathDevicesFilterChain = new FilterChain(oathDevicesVersionRouter, defaultAuthenticationFilter, oathDevicesAuditFilter);
-        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "users/{user}/devices/2fa/oath"), oathDevicesFilterChain);
+        realmRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "users/{user}/devices/2fa/oath"), newHttpHandler(new FilterChain(oathDevicesFilterChain, contextFilter, crestLoggingFilter)));
+        crestRealmRouter.addRoute(requestUriMatcher(STARTS_WITH, "users/{user}/devices/2fa/oath"), new FilterChain(oathDevicesFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("users/{user}/devices/2fa/oath"));
 
         org.forgerock.json.resource.Router oauth2ResourceSetsVersionRouter = new org.forgerock.json.resource.Router();
@@ -239,7 +274,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper oauth2ResourceSetsAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.OAUTH2);
         FilterChain oauth2ResourceSetsFilterChain = new FilterChain(oauth2ResourceSetsAuthzFilter, defaultAuthenticationFilter, InjectorHolder.getInstance(UmaEnabledFilter.class), oauth2ResourceSetsAuditFilter);
-        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "users/{user}/oauth2/resources/sets"), oauth2ResourceSetsFilterChain);
+        realmRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "users/{user}/oauth2/resources/sets"), newHttpHandler(new FilterChain(oauth2ResourceSetsFilterChain, contextFilter, crestLoggingFilter)));
+        crestRealmRouter.addRoute(requestUriMatcher(STARTS_WITH, "users/{user}/oauth2/resources/sets"), new FilterChain(oauth2ResourceSetsFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("users/{user}/oauth2/resources/sets"));
 
         org.forgerock.json.resource.Router umaPoliciesVersionRouter = new org.forgerock.json.resource.Router();
@@ -248,7 +284,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper umaPoliciesAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.UMA);
         FilterChain umaPoliciesFilterChain = new FilterChain(umaPoliciesAuthzFilter, defaultAuthenticationFilter, InjectorHolder.getInstance(UmaEnabledFilter.class), umaPoliciesAuditFilter);
-        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "users/{user}/uma/policies"), umaPoliciesFilterChain);
+        realmRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "users/{user}/uma/policies"), newHttpHandler(new FilterChain(umaPoliciesFilterChain, contextFilter, crestLoggingFilter)));
+        crestRealmRouter.addRoute(requestUriMatcher(STARTS_WITH, "users/{user}/uma/policies"), new FilterChain(umaPoliciesFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("users/{user}/uma/policies"));
 
         org.forgerock.json.resource.Router umaAuditHistoryVersionRouter = new org.forgerock.json.resource.Router();
@@ -257,7 +294,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper umaAuditHistoryAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.UMA);
         FilterChain umaAuditHistoryFilterChain = new FilterChain(umaAuditHistoryAuthzFilter, defaultAuthenticationFilter, InjectorHolder.getInstance(UmaEnabledFilter.class), umaAuditHistoryAuditFilter);
-        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "users/{user}/uma/auditHistory"), umaAuditHistoryFilterChain);
+        realmRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "users/{user}/uma/auditHistory"), newHttpHandler(new FilterChain(umaAuditHistoryFilterChain, contextFilter, crestLoggingFilter)));
+        crestRealmRouter.addRoute(requestUriMatcher(STARTS_WITH, "users/{user}/uma/auditHistory"), new FilterChain(umaAuditHistoryFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("users/{user}/uma/auditHistory"));
 
         org.forgerock.json.resource.Router umaPendingRequestsVersionRouter = new org.forgerock.json.resource.Router();
@@ -266,7 +304,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper umaPendingRequestsAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.UMA);
         FilterChain umaPendingRequestsFilterChain = new FilterChain(umaPendingRequestsAuthzFilter, defaultAuthenticationFilter, InjectorHolder.getInstance(UmaEnabledFilter.class), umaPendingRequestsAuditFilter);
-        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "users/{user}/uma/pendingrequests"), umaPendingRequestsFilterChain);
+        realmRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "users/{user}/uma/pendingrequests"), newHttpHandler(new FilterChain(umaPendingRequestsFilterChain, contextFilter, crestLoggingFilter)));
+        crestRealmRouter.addRoute(requestUriMatcher(STARTS_WITH, "users/{user}/uma/pendingrequests"), new FilterChain(umaPendingRequestsFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("users/{user}/uma/pendingrequests"));
 
         org.forgerock.json.resource.Router umaLabelsVersionRouter = new org.forgerock.json.resource.Router();
@@ -275,7 +314,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper umaLabelsAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.OAUTH2);
         FilterChain umaLabelsFilterChain = new FilterChain(umaLabelsAuthzFilter, defaultAuthenticationFilter, umaLabelsAuditFilter);
-        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "users/{user}/resources/labels"), umaLabelsFilterChain);
+        realmRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "users/{user}/resources/labels"), newHttpHandler(new FilterChain(umaLabelsFilterChain, contextFilter, crestLoggingFilter)));
+        crestRealmRouter.addRoute(requestUriMatcher(STARTS_WITH, "users/{user}/resources/labels"), new FilterChain(umaLabelsFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("users/{user}/resources/labels"));
 
 
@@ -288,7 +328,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper policiesAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.POLICY);
         FilterChain policiesFilterChain = new FilterChain(policiesAuthzFilter, defaultAuthenticationFilter, policiesAuditFilter);
-        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "policies"), policiesFilterChain);
+        realmRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "policies"), newHttpHandler(new FilterChain(policiesFilterChain, contextFilter, crestLoggingFilter)));
+        crestRealmRouter.addRoute(requestUriMatcher(STARTS_WITH, "policies"), new FilterChain(policiesFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("policies"));
 
         org.forgerock.json.resource.Router referralsVersionRouter = new org.forgerock.json.resource.Router();
@@ -297,7 +338,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper referralsAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.POLICY);
         FilterChain referralsFilterChain = new FilterChain(referralsAuthzFilter, defaultAuthenticationFilter, referralsAuditFilter);
-        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "referrals"), referralsFilterChain);
+        realmRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "referrals"), newHttpHandler(new FilterChain(referralsFilterChain, contextFilter, crestLoggingFilter)));
+        crestRealmRouter.addRoute(requestUriMatcher(STARTS_WITH, "referrals"), new FilterChain(referralsFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("referrals"));
 
         org.forgerock.json.resource.Router realmsVersionRouter = new org.forgerock.json.resource.Router();
@@ -306,17 +348,19 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper realmsAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.REALMS);
         FilterChain realmsFilterChain = new FilterChain(realmsAuthzFilter, defaultAuthenticationFilter, realmsAuditFilter);
-        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "realms"), realmsFilterChain);
+        realmRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "realms"), newHttpHandler(new FilterChain(realmsFilterChain, contextFilter, crestLoggingFilter)));
+        crestRealmRouter.addRoute(requestUriMatcher(STARTS_WITH, "realms"), new FilterChain(realmsFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("realms"));
 
         org.forgerock.json.resource.Router sessionsVersionRouter = new org.forgerock.json.resource.Router();
-        sessionsVersionRouter.addRoute(version(1, 1), InjectorHolder.getInstance(ReferralsResourceV1.class));
+        sessionsVersionRouter.addRoute(version(1, 1), InjectorHolder.getInstance(SessionResource.class));
         FilterChain sessionsAuthzFilter = createFilter(sessionsVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(SessionResourceAuthzModule.class), SessionResourceAuthzModule.NAME));
         AuditFilterWrapper sessionsAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.SESSION);
         Filter sessionsAuthnFilter = authenticationFilterProvider.get().exceptActions("validate");
         FilterChain sessionsFilterChain = new FilterChain(sessionsAuthzFilter, sessionsAuthnFilter, sessionsAuditFilter);
-        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "sessions"), sessionsFilterChain);
+        realmRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "sessions"), newHttpHandler(new FilterChain(sessionsFilterChain, contextFilter, crestLoggingFilter)));
+        crestRealmRouter.addRoute(requestUriMatcher(STARTS_WITH, "sessions"), new FilterChain(sessionsFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("sessions"));
 
         org.forgerock.json.resource.Router applicationsVersionRouter = new org.forgerock.json.resource.Router();
@@ -327,7 +371,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper applicationsAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.POLICY);
         FilterChain applicationsFilterChain = new FilterChain(applicationsAuthzFilter, defaultAuthenticationFilter, applicationsAuditFilter);
-        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "applications"), applicationsFilterChain);
+        realmRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "applications"), newHttpHandler(new FilterChain(applicationsFilterChain, contextFilter, crestLoggingFilter)));
+        crestRealmRouter.addRoute(requestUriMatcher(STARTS_WITH, "applications"), new FilterChain(applicationsFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("applications"));
 
         org.forgerock.json.resource.Router subjectAttributesVersionRouter = new org.forgerock.json.resource.Router();
@@ -336,7 +381,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper subjectAttributesAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.POLICY);
         FilterChain subjectAttributesFilterChain = new FilterChain(subjectAttributesAuthzFilter, defaultAuthenticationFilter, subjectAttributesAuditFilter);
-        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "subjectattributes"), subjectAttributesFilterChain);
+        realmRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "subjectattributes"), newHttpHandler(new FilterChain(subjectAttributesFilterChain, contextFilter, crestLoggingFilter)));
+        crestRealmRouter.addRoute(requestUriMatcher(STARTS_WITH, "subjectattributes"), new FilterChain(subjectAttributesFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("subjectattributes"));
 
         org.forgerock.json.resource.Router applicationTypesVersionRouter = new org.forgerock.json.resource.Router();
@@ -345,7 +391,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper applicationTypesAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.POLICY);
         FilterChain applicationTypesFilterChain = new FilterChain(applicationTypesAuthzFilter, defaultAuthenticationFilter, applicationTypesAuditFilter);
-        rootRouter.addRoute(requestUriMatcher(STARTS_WITH, "applicationtypes"), applicationTypesFilterChain);
+        rootRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "applicationtypes"), newHttpHandler(new FilterChain(applicationTypesFilterChain, contextFilter, crestLoggingFilter)));
+        crestRootRouter.addRoute(requestUriMatcher(STARTS_WITH, "applicationtypes"), new FilterChain(applicationTypesFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("applicationtypes"));
 
         org.forgerock.json.resource.Router resourceTypesVersionRouter = new org.forgerock.json.resource.Router();
@@ -354,7 +401,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper resourceTypesAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.POLICY);
         FilterChain resourceTypesFilterChain = new FilterChain(resourceTypesAuthzFilter, defaultAuthenticationFilter, resourceTypesAuditFilter);
-        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "resourcetypes"), resourceTypesFilterChain);
+        realmRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "resourcetypes"), newHttpHandler(new FilterChain(resourceTypesFilterChain, contextFilter, crestLoggingFilter)));
+        crestRealmRouter.addRoute(requestUriMatcher(STARTS_WITH, "resourcetypes"), new FilterChain(resourceTypesFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("resourcetypes"));
 
         org.forgerock.json.resource.Router scriptsVersionRouter = new org.forgerock.json.resource.Router();
@@ -363,7 +411,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper scriptsAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.SCRIPT);
         FilterChain scriptsFilterChain = new FilterChain(scriptsAuthzFilter, defaultAuthenticationFilter, scriptsAuditFilter);
-        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "scripts"), scriptsFilterChain);
+        realmRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "scripts"), newHttpHandler(new FilterChain(scriptsFilterChain, contextFilter, crestLoggingFilter)));
+        crestRealmRouter.addRoute(requestUriMatcher(STARTS_WITH, "scripts"), new FilterChain(scriptsFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("scripts"));
 
         org.forgerock.json.resource.Router realmConfigVersionRouter = new org.forgerock.json.resource.Router();
@@ -372,7 +421,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper realmConfigAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.CONFIG);
         FilterChain realmConfigFilterChain = new FilterChain(realmConfigAuthzFilter, defaultAuthenticationFilter, realmConfigAuditFilter);
-        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "realm-config"), realmConfigFilterChain);
+        realmRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "realm-config"), newHttpHandler(new FilterChain(realmConfigFilterChain, contextFilter, crestLoggingFilter)));
+        crestRealmRouter.addRoute(requestUriMatcher(STARTS_WITH, "realm-config"), new FilterChain(realmConfigFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("realm-config"));
 
         org.forgerock.json.resource.Router batchVersionRouter = new org.forgerock.json.resource.Router();
@@ -381,7 +431,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper batchAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.BATCH);
         FilterChain batchFilterChain = new FilterChain(batchAuthzFilter, defaultAuthenticationFilter, batchAuditFilter);
-        realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "batch"), batchFilterChain);
+        realmRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "batch"), newHttpHandler(new FilterChain(batchFilterChain, contextFilter, crestLoggingFilter)));
+        crestRealmRouter.addRoute(requestUriMatcher(STARTS_WITH, "batch"), new FilterChain(batchFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("batch"));
 
 
@@ -394,7 +445,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper decisionCombinersAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.POLICY);
         FilterChain decisionCombinersFilterChain = new FilterChain(decisionCombinersAuthzFilter, defaultAuthenticationFilter, decisionCombinersAuditFilter);
-        rootRouter.addRoute(requestUriMatcher(STARTS_WITH, "decisioncombiners"), decisionCombinersFilterChain);
+        rootRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "decisioncombiners"), newHttpHandler(new FilterChain(decisionCombinersFilterChain, contextFilter, crestLoggingFilter)));
+        crestRootRouter.addRoute(requestUriMatcher(STARTS_WITH, "decisioncombiners"), new FilterChain(decisionCombinersFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("decisioncombiners"));
 
         org.forgerock.json.resource.Router conditionTypesVersionRouter = new org.forgerock.json.resource.Router();
@@ -403,7 +455,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper conditionTypesAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.POLICY);
         FilterChain conditionTypesFilterChain = new FilterChain(conditionTypesAuthzFilter, defaultAuthenticationFilter, conditionTypesAuditFilter);
-        rootRouter.addRoute(requestUriMatcher(STARTS_WITH, "conditiontypes"), conditionTypesFilterChain);
+        rootRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "conditiontypes"), newHttpHandler(new FilterChain(conditionTypesFilterChain, contextFilter, crestLoggingFilter)));
+        crestRootRouter.addRoute(requestUriMatcher(STARTS_WITH, "conditiontypes"), new FilterChain(conditionTypesFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("conditiontypes"));
 
         org.forgerock.json.resource.Router subjectTypesVersionRouter = new org.forgerock.json.resource.Router();
@@ -412,7 +465,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper subjectTypesAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.POLICY);
         FilterChain subjectTypesFilterChain = new FilterChain(subjectTypesAuthzFilter, defaultAuthenticationFilter, subjectTypesAuditFilter);
-        rootRouter.addRoute(requestUriMatcher(STARTS_WITH, "subjecttypes"), subjectTypesFilterChain);
+        rootRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "subjecttypes"), newHttpHandler(new FilterChain(subjectTypesFilterChain, contextFilter, crestLoggingFilter)));
+        crestRootRouter.addRoute(requestUriMatcher(STARTS_WITH, "subjecttypes"), new FilterChain(subjectTypesFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("subjecttypes"));
 
         org.forgerock.json.resource.Router tokensVersionRouter = new org.forgerock.json.resource.Router();
@@ -421,7 +475,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper tokensAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.CTS);
         FilterChain tokensFilterChain = new FilterChain(tokensAuthzFilter, defaultAuthenticationFilter, tokensAuditFilter);
-        rootRouter.addRoute(requestUriMatcher(STARTS_WITH, "tokens"), tokensFilterChain);
+        rootRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "tokens"), newHttpHandler(new FilterChain(tokensFilterChain, contextFilter, crestLoggingFilter)));
+        crestRootRouter.addRoute(requestUriMatcher(STARTS_WITH, "tokens"), new FilterChain(tokensFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("tokens"));
 
         org.forgerock.json.resource.Router globalConfigVersionRouter = new org.forgerock.json.resource.Router();
@@ -430,7 +485,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper globalConfigAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.CONFIG);
         FilterChain globalConfigFilterChain = new FilterChain(globalConfigAuthzFilter, defaultAuthenticationFilter, globalConfigAuditFilter);
-        rootRouter.addRoute(requestUriMatcher(STARTS_WITH, "global-config"), globalConfigFilterChain);
+        rootRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "global-config"), newHttpHandler(new FilterChain(globalConfigFilterChain, contextFilter, crestLoggingFilter)));
+        crestRootRouter.addRoute(requestUriMatcher(STARTS_WITH, "global-config"), new FilterChain(globalConfigFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("global-config"));
 
         org.forgerock.json.resource.Router globalConfigServersVersionRouter = new org.forgerock.json.resource.Router();
@@ -439,7 +495,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper globalConfigServersAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.CONFIG);
         FilterChain globalConfigServersFilterChain = new FilterChain(globalConfigServersAuthzFilter, defaultAuthenticationFilter, globalConfigServersAuditFilter);
-        rootRouter.addRoute(requestUriMatcher(STARTS_WITH, "global-config/servers/{serverName}/properties/{tab}"), globalConfigServersFilterChain);
+        rootRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "global-config/servers/{serverName}/properties/{tab}"), newHttpHandler(new FilterChain(globalConfigServersFilterChain, contextFilter, crestLoggingFilter)));
+        crestRootRouter.addRoute(requestUriMatcher(STARTS_WITH, "global-config/servers/{serverName}/properties/{tab}"), new FilterChain(globalConfigServersFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("global-config/servers/{serverName}/properties/{tab}"));
 
         org.forgerock.json.resource.Router auditVersionRouter = new org.forgerock.json.resource.Router();
@@ -448,7 +505,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper auditAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditEndpointAuditFilter.class),
                 AuditConstants.Component.AUDIT);
         FilterChain auditFilterChain = new FilterChain(auditAuthzFilter, defaultAuthenticationFilter,auditAuditFilter);
-        rootRouter.addRoute(requestUriMatcher(STARTS_WITH, "audit"), auditFilterChain);
+        rootRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "audit"), newHttpHandler(new FilterChain(auditFilterChain, contextFilter, crestLoggingFilter)));
+        crestRootRouter.addRoute(requestUriMatcher(STARTS_WITH, "audit"), new FilterChain(auditFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment("audit"));
 
         org.forgerock.json.resource.Router recordVersionRouter = new org.forgerock.json.resource.Router();
@@ -457,14 +515,9 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         AuditFilterWrapper recordAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.RECORD);
         FilterChain recordFilterChain = new FilterChain(recordAuthzFilter, defaultAuthenticationFilter, recordAuditFilter);
-        rootRouter.addRoute(requestUriMatcher(STARTS_WITH, RecordConstants.RECORD_REST_ENDPOINT), recordFilterChain);
+        rootRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, RecordConstants.RECORD_REST_ENDPOINT), newHttpHandler(new FilterChain(recordFilterChain, contextFilter, crestLoggingFilter)));
+        crestRootRouter.addRoute(requestUriMatcher(STARTS_WITH, RecordConstants.RECORD_REST_ENDPOINT), new FilterChain(recordFilterChain, contextFilter, crestLoggingFilter));
         invalidRealmNames.add(firstPathSegment(RecordConstants.RECORD_REST_ENDPOINT));
-
-        VersionBehaviourConfigListener behaviourManager = new VersionBehaviourConfigListener();
-        Filter apiVersionFilter = resourceApiVersionContextFilter(behaviourManager);
-        Filter contextFilter = new ContextFilter();
-        Filter loggingFilter = InjectorHolder.getInstance(CrestLoggingFilter.class);
-        return new FilterChain(rootRouter, apiVersionFilter, contextFilter, loggingFilter);
     }
 
     /**

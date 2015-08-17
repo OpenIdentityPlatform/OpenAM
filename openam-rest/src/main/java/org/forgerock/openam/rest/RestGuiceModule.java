@@ -19,11 +19,9 @@ package org.forgerock.openam.rest;
 import static org.forgerock.caf.authentication.framework.AuthenticationFilter.AuthenticationModuleBuilder.configureModule;
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
 import static org.forgerock.json.resource.RouteMatchers.requestUriMatcher;
-import static org.forgerock.json.resource.RouteMatchers.resourceApiVersionContextFilter;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-
 import java.util.Set;
 
 import com.google.inject.Key;
@@ -40,11 +38,12 @@ import org.forgerock.caf.authentication.framework.CrestAuthenticationFilter;
 import org.forgerock.caf.authentication.framework.HttpAuthenticationFilter;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.http.Handler;
+import org.forgerock.http.handler.Handlers;
 import org.forgerock.http.routing.ResourceApiVersionBehaviourManager;
 import org.forgerock.http.routing.RouteMatchers;
 import org.forgerock.json.resource.Filter;
 import org.forgerock.json.resource.FilterChain;
-import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Router;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.openam.oauth2.OpenAMTokenStore;
@@ -69,10 +68,14 @@ public class RestGuiceModule extends PrivateModule {
         bind(Key.get(new TypeLiteral<Set<String>>(){}, Names.named("InvalidRealmNames")))
                 .toInstance(InvalidRealmNameManager.getInvalidRealmNames());
 
-        expose(Key.get(Router.class, Names.named("RootRouter")));
-        expose(Key.get(Router.class, Names.named("RealmRouter")));
-        expose(Key.get(Filter.class, Names.named("ResourceApiVersionFilter")));
+        expose(Key.get(Handler.class, Names.named("RestHandler")));
+        expose(Key.get(org.forgerock.http.routing.Router.class, Names.named("RestRootRouter")));
+        expose(Key.get(org.forgerock.http.routing.Router.class, Names.named("RestRealmRouter")));
+        expose(Key.get(Router.class, Names.named("CrestRootRouter")));
+        expose(Key.get(Router.class, Names.named("CrestRealmRouter")));
         expose(Key.get(org.forgerock.http.Filter.class, Names.named("ResourceApiVersionFilter")));
+        expose(Key.get(Filter.class, Names.named("LoggingFilter")));
+        expose(Key.get(Filter.class, Names.named("ContextFilter")));
         expose(ResourceApiVersionBehaviourManager.class);
         expose(Key.get(AuthenticationFilter.class, Names.named("RestAuthenticationFilter")));
         expose(Key.get(new TypeLiteral<Set<String>>(){}, Names.named("InvalidRealmNames")));
@@ -122,10 +125,9 @@ public class RestGuiceModule extends PrivateModule {
     @Provides
     @Named("RestHandler")
     @Singleton
-    RequestHandler getRestHandler(@Named("ResourceApiVersionFilter") Filter resourceApiVersionFilter,
-            @Named("ContextFilter") Filter contextFilter, @Named("LoggingFilter") Filter loggingFilter,
-            @Named("RootRouter") Router rootRouter) {
-        return new FilterChain(rootRouter, resourceApiVersionFilter, contextFilter, loggingFilter);
+    Handler getRestHandler(@Named("ResourceApiVersionFilter") org.forgerock.http.Filter resourceApiVersionFilter,
+            @Named("RestRootRouter") org.forgerock.http.routing.Router rootRouter) {
+        return Handlers.chainOf(rootRouter, resourceApiVersionFilter);
     }
 
     @Provides
@@ -136,25 +138,37 @@ public class RestGuiceModule extends PrivateModule {
     }
 
     @Provides
-    @Named("ResourceApiVersionFilter")
+    @Named("RestRootRouter")
     @Singleton
-    Filter getResourceApiVersionFilter(ResourceApiVersionBehaviourManager behaviourManager) {
-        return resourceApiVersionContextFilter(behaviourManager);
-    }
-
-    @Provides
-    @Named("RootRouter")
-    @Singleton
-    Router getRootRouter(@Named("RealmRouter") Router realmRouter) {
-        Router rootRouter = new Router();
-        rootRouter.setDefaultRoute(realmRouter);
+    org.forgerock.http.routing.Router getRestRootRouter(@Named("RestRealmRouter") org.forgerock.http.routing.Router realmRouter, RealmContextFilter realmContextFilter) {
+        org.forgerock.http.routing.Router rootRouter = new org.forgerock.http.routing.Router();
+        rootRouter.setDefaultRoute(Handlers.chainOf(realmRouter, realmContextFilter));
         return rootRouter;
     }
 
     @Provides
-    @Named("RealmRouter")
+    @Named("RestRealmRouter")
     @Singleton
-    Router getRealmRouter(RealmContextFilter realmContextFilter) {
+    org.forgerock.http.routing.Router getRestRealmRouter(RealmContextFilter realmContextFilter) {
+        org.forgerock.http.routing.Router realmRouter = new org.forgerock.http.routing.Router();
+        realmRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "{realm}"),
+                Handlers.chainOf(realmRouter, realmContextFilter));
+        return realmRouter;
+    }
+
+    @Provides
+    @Named("CrestRootRouter")
+    @Singleton
+    Router getCrestRootRouter(@Named("CrestRealmRouter") Router realmRouter, RealmContextFilter realmContextFilter) {
+        Router rootRouter = new Router();
+        rootRouter.setDefaultRoute(new FilterChain(realmRouter, realmContextFilter));
+        return rootRouter;
+    }
+
+    @Provides
+    @Named("CrestRealmRouter")
+    @Singleton
+    Router getCrestRealmRouter(RealmContextFilter realmContextFilter) {
         Router realmRouter = new Router();
         realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "{realm}"),
                 new FilterChain(realmRouter, realmContextFilter));

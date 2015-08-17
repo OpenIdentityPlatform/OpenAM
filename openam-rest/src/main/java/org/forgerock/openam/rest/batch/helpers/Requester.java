@@ -57,7 +57,7 @@ public class Requester {
     private final Provider<Router> router;
 
     @Inject
-    public Requester(@Named("RootRouter") Provider<Router> router) {
+    public Requester(@Named("CrestRootRouter") Provider<Router> router) {
         this.router = router;
     }
 
@@ -77,14 +77,14 @@ public class Requester {
         Reject.ifTrue(StringUtils.isEmpty(location), "The endpoint destination may not be null or empty.");
         Reject.ifNull(payload, "The payload object to create must not be null.");
 
-        final Router realmRouter = router.get();
+        final Router rootRouter = router.get();
         final CreateRequest createRequest = Requests.newCreateRequest(location, payload);
 
         if (resourceId != null) {
             createRequest.setNewResourceId(resourceId);
         }
 
-        return realmRouter.handleCreate(context, createRequest).getOrThrowUninterruptibly().getContent();
+        return rootRouter.handleCreate(context, createRequest).getOrThrowUninterruptibly().getContent();
     }
 
     /**
@@ -102,9 +102,9 @@ public class Requester {
         Reject.ifTrue(StringUtils.isEmpty(location), "The endpoint destination may not be null or empty.");
         Reject.ifTrue(StringUtils.isEmpty(resourceId), "The resourceId to read may not be null or empty.");
 
-        final Router realmRouter = router.get();
+        final Router rootRouter = router.get();
         final ReadRequest readRequest = Requests.newReadRequest(location, resourceId);
-        return realmRouter.handleRead(context, readRequest).getOrThrowUninterruptibly().getContent();
+        return rootRouter.handleRead(context, readRequest).getOrThrowUninterruptibly().getContent();
     }
 
     /**
@@ -124,9 +124,9 @@ public class Requester {
         Reject.ifTrue(StringUtils.isEmpty(resourceId), "The resourceId to update may not be null or empty.");
         Reject.ifNull(payload, "The payload object to create must not be null.");
 
-        final Router realmRouter = router.get();
+        final Router rootRouter = router.get();
         final UpdateRequest updateRequest = Requests.newUpdateRequest(location, resourceId, payload);
-        return realmRouter.handleUpdate(context, updateRequest).getOrThrowUninterruptibly().getContent();
+        return rootRouter.handleUpdate(context, updateRequest).getOrThrowUninterruptibly().getContent();
     }
 
     /**
@@ -144,9 +144,9 @@ public class Requester {
         Reject.ifTrue(StringUtils.isEmpty(location), "The endpoint destination may not be null or empty.");
         Reject.ifTrue(StringUtils.isEmpty(resourceId), "The resourceId to delete may not be null or empty.");
 
-        final Router realmRouter = router.get();
+        final Router rootRouter = router.get();
         final DeleteRequest deleteRequest = Requests.newDeleteRequest(location, resourceId);
-        return realmRouter.handleDelete(context, deleteRequest).getOrThrowUninterruptibly().getContent();
+        return rootRouter.handleDelete(context, deleteRequest).getOrThrowUninterruptibly().getContent();
     }
 
     /**
@@ -165,7 +165,7 @@ public class Requester {
         Reject.ifTrue(StringUtils.isEmpty(location), "The endpoint destination may not be null or empty.");
         Reject.ifTrue(StringUtils.isEmpty(actionId), "The specific action to perform may not be null or empty.");
 
-        final Router realmRouter = router.get();
+        final Router rootRouter = router.get();
         final ActionRequest actionRequest = Requests.newActionRequest(location, actionId);
 
         if (payload != null) {
@@ -176,7 +176,7 @@ public class Requester {
             actionRequest.setResourcePath(resourceId);
         }
 
-        return realmRouter.handleAction(context, actionRequest).getOrThrowUninterruptibly().getJsonContent();
+        return rootRouter.handleAction(context, actionRequest).getOrThrowUninterruptibly().getJsonContent();
 
     }
 
@@ -194,7 +194,7 @@ public class Requester {
 
         Reject.ifTrue(StringUtils.isEmpty(location), "The endpoint destination may not be null or empty.");
 
-        final Router realmRouter = router.get();
+        final Router rootRouter = router.get();
         final QueryRequest queryRequest = Requests.newQueryRequest(location);
 
         if (queryId != null) {
@@ -202,7 +202,7 @@ public class Requester {
         }
 
         final InMemoryQueryResourceHandler resourceHandler = new InMemoryQueryResourceHandler();
-        return realmRouter.handleQuery(context, queryRequest, resourceHandler)
+        return rootRouter.handleQuery(context, queryRequest, resourceHandler)
                 .thenAsync(new AsyncFunction<QueryResponse, JsonValue, ResourceException>() {
                     @Override
                     public Promise<JsonValue, ResourceException> apply(QueryResponse value) {
