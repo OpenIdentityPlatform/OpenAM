@@ -93,26 +93,28 @@ public final class IOUtils {
     /**
      * Reads a files content from the classpath using UTF-8 encoding.
      *
+     * @param classInSameModule A class that is in the same module than the resource.
      * @param path the path to the file on the classpath
      * @return the content of the file
      * @throws IOException if an error occured while reading
      * @throws IllegalArgumentException if the file does not exists
      */
-    public static String getFileContentFromClassPath(String path) throws IOException {
-        return getFileContentFromClassPath(path, DEFAULT_ENCODING);
+    public static String getFileContentFromClassPath(Class classInSameModule, String path) throws IOException {
+        return getFileContentFromClassPath(classInSameModule, path, DEFAULT_ENCODING);
     }
 
     /**
      * Reads a files content from the classpath using the given encoding.
      *
+     * @param classInSameModule A class that is in the same module than the resource.
      * @param path the path to the file on the classpath
      * @param encoding encoding of the file
      * @return the content of the file
      * @throws IOException if an error occured while reading
      * @throws IllegalArgumentException if the file does not exists
      */
-    public static String getFileContentFromClassPath(String path, String encoding) throws IOException {
-        InputStream is = IOUtils.class.getResourceAsStream(path);
+    public static String getFileContentFromClassPath(Class classInSameModule, String path, String encoding) throws IOException {
+        InputStream is = classInSameModule.getResourceAsStream(path);
         if (is == null) {
             throw new IllegalArgumentException("The supplied file: " + path
                     + " is missing from the classpath");

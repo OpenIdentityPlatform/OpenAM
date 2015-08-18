@@ -62,8 +62,9 @@ public class RecordResourceTest extends DebugTestTemplate {
     @Test
     public void startRecording() throws IOException {
         // Given...
-        JsonValue jsonRecordProperties = JsonValueBuilder.toJsonValue(IOUtils.getFileContentFromClassPath
-                (RECORD_DIRECTORY + "startSimpleRecord.json"));
+        JsonValue jsonRecordProperties = JsonValueBuilder.toJsonValue(
+                IOUtils.getFileContentFromClassPath(RecordResourceTest.class,
+                        RECORD_DIRECTORY + "startSimpleRecord.json"));
         given(request.getAction()).willReturn("start");
         given(request.getContent()).willReturn(jsonRecordProperties);
 
@@ -87,8 +88,9 @@ public class RecordResourceTest extends DebugTestTemplate {
     @Test
     public void stopRecording() throws IOException, RecordException {
 
-        JsonValue jsonRecordProperties = JsonValueBuilder.toJsonValue(IOUtils.getFileContentFromClassPath
-                (RECORD_DIRECTORY + "startSimpleRecord.json"));
+        JsonValue jsonRecordProperties = JsonValueBuilder.toJsonValue(
+                IOUtils.getFileContentFromClassPath(RecordResourceTest.class,
+                        RECORD_DIRECTORY + "startSimpleRecord.json"));
         debugRecorder.startRecording(jsonRecordProperties);
 
         // Given...

@@ -66,8 +66,8 @@ public class DefaultDebugRecorderTest extends DebugTestTemplate {
 
         Set<String> shouldBeNotPrint = new HashSet<String>();
 
-        JsonValue jsonRecordProperties = JsonValueBuilder.toJsonValue(IOUtils.getFileContentFromClassPath
-                (RecordPropertiesTest.RECORD_DIRECTORY + "oneRecordFirstRecord.json"));
+        JsonValue jsonRecordProperties = JsonValueBuilder.toJsonValue(IOUtils.getFileContentFromClassPath(
+                DefaultDebugRecorderTest.class, RecordPropertiesTest.RECORD_DIRECTORY + "oneRecordFirstRecord.json"));
 
         //Initialize the debugger
         Debug debugTest = Debug.getInstance(logName);
@@ -131,10 +131,12 @@ public class DefaultDebugRecorderTest extends DebugTestTemplate {
 
         Set<String> shouldBeNotPrint = new HashSet<String>();
 
-        JsonValue jsonRecordProperties1 = JsonValueBuilder.toJsonValue(IOUtils.getFileContentFromClassPath
-                (RecordPropertiesTest.RECORD_DIRECTORY + "twoRecordsFirstRecord.json"));
-        JsonValue jsonRecordProperties2 = JsonValueBuilder.toJsonValue(IOUtils.getFileContentFromClassPath
-                (RecordPropertiesTest.RECORD_DIRECTORY + "twoRecordsSecondRecord.json"));
+        JsonValue jsonRecordProperties1 = JsonValueBuilder.toJsonValue(
+                IOUtils.getFileContentFromClassPath(DefaultDebugRecorderTest.class, RecordPropertiesTest
+                        .RECORD_DIRECTORY + "twoRecordsFirstRecord.json"));
+        JsonValue jsonRecordProperties2 = JsonValueBuilder.toJsonValue(
+                IOUtils.getFileContentFromClassPath(DefaultDebugRecorderTest.class, RecordPropertiesTest
+                        .RECORD_DIRECTORY + "twoRecordsSecondRecord.json"));
 
         //Initialize the debugger
         Debug debugTest = Debug.getInstance(logName);
@@ -194,8 +196,9 @@ public class DefaultDebugRecorderTest extends DebugTestTemplate {
 
         SystemPropertiesManager.initializeProperties(DebugConstants.CONFIG_DEBUG_LEVEL, DebugLevel.MESSAGE.getName());
 
-        JsonValue jsonRecordProperties = JsonValueBuilder.toJsonValue(IOUtils.getFileContentFromClassPath
-                (RecordPropertiesTest.RECORD_DIRECTORY + "autoStopFileSize.json"));
+        JsonValue jsonRecordProperties = JsonValueBuilder.toJsonValue(
+                IOUtils.getFileContentFromClassPath(DefaultDebugRecorderTest.class, RecordPropertiesTest
+                        .RECORD_DIRECTORY + "autoStopFileSize.json"));
 
         Debug debugTest = Debug.getInstance(logName);
         debugTest.setDebug(DebugLevel.ERROR.toString());
@@ -222,12 +225,13 @@ public class DefaultDebugRecorderTest extends DebugTestTemplate {
     public void tryThreadDump() throws RecordException, InvalidDebugConfigurationException, IOException,
             InterruptedException {
 
-        int issueID = 7;
+            int issueID = 7;
         String referenceID = "threadDump";
         SystemPropertiesManager.initializeProperties(DebugConstants.CONFIG_DEBUG_LEVEL, DebugLevel.MESSAGE.getName());
 
-        JsonValue jsonRecordProperties = JsonValueBuilder.toJsonValue(IOUtils.getFileContentFromClassPath
-                (RecordPropertiesTest.RECORD_DIRECTORY + "threadDump.json"));
+        JsonValue jsonRecordProperties = JsonValueBuilder.toJsonValue(
+                IOUtils.getFileContentFromClassPath(DefaultDebugRecorderTest.class,
+                        RecordPropertiesTest.RECORD_DIRECTORY + "threadDump.json"));
 
         recordDebugController.startRecording(jsonRecordProperties);
         Record currentRecord =recordDebugController.getCurrentRecord();
@@ -251,7 +255,8 @@ public class DefaultDebugRecorderTest extends DebugTestTemplate {
                     .separator + referenceID + File
                     .separator + RecordConstants.THREAD_DUMP_FOLDER_NAME + File.separator +
                     threadDumpFile.getName();
-            checkLogMessagesAreInTheRightLogFiles(shouldBeInThreadDump, new String[]{relativeThreadDumpFileName}, new String[]{});
+            checkLogMessagesAreInTheRightLogFiles(shouldBeInThreadDump, new String[]{relativeThreadDumpFileName},
+                    new String[]{});
         }
     }
 
@@ -263,8 +268,10 @@ public class DefaultDebugRecorderTest extends DebugTestTemplate {
         String referenceID = "test_zip";
         SystemPropertiesManager.initializeProperties(DebugConstants.CONFIG_DEBUG_LEVEL, DebugLevel.MESSAGE.getName());
 
-        JsonValue jsonRecordProperties = JsonValueBuilder.toJsonValue(IOUtils.getFileContentFromClassPath
-                (RecordPropertiesTest.RECORD_DIRECTORY + "ZipRecord.json"));
+        JsonValue jsonRecordProperties = JsonValueBuilder.toJsonValue(
+                IOUtils.getFileContentFromClassPath(DefaultDebugRecorderTest.class,
+                        RecordPropertiesTest.RECORD_DIRECTORY + "ZipRecord.json"));
+
 
         recordDebugController.startRecording(jsonRecordProperties);
         recordDebugController.stopRecording();
