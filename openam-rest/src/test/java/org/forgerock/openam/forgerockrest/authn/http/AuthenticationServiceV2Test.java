@@ -24,6 +24,8 @@ import static org.mockito.Mockito.*;
 import java.io.IOException;
 import java.util.Collections;
 
+import org.forgerock.http.Context;
+import org.forgerock.http.Session;
 import org.forgerock.http.context.HttpRequestContext;
 import org.forgerock.http.header.ContentTypeHeader;
 import org.forgerock.http.protocol.Request;
@@ -48,7 +50,7 @@ public class AuthenticationServiceV2Test {
     @Test
     public void shouldFailAuthenticationWithUnsupportedMediaTypeMessage() throws IOException {
         // given
-        HttpRequestContext context = mock(HttpRequestContext.class);
+        HttpRequestContext context = new HttpRequestContext(mock(Context.class), mock(Session.class));
         Request httpRequest = new Request();
         httpRequest.getHeaders().putSingle(ContentTypeHeader.NAME, "application/xml");
 
