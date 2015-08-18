@@ -53,6 +53,11 @@ public class ResourceOwnerOrSuperUserAuthzModule extends AdminOnlyAuthzModule {
         super(sessionService, debug);
     }
 
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
     /**
      * Authorizes caller if they are either a super user or they are making a request to a resource they "own",
      * i.e. demo making a call to /json/users/demo/uma/resourceset.

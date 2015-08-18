@@ -43,6 +43,11 @@ public class SessionResourceAuthzModule extends AdminOnlyAuthzModule {
         super(sessionService, debug);
     }
 
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
     /**
      * Lets through requests known to {@link SessionResource}.... otherwise it defers to
      * {@link AdminOnlyAuthzModule}.

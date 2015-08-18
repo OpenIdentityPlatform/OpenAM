@@ -56,6 +56,11 @@ public class STSPublishServiceAuthzModule extends AdminOnlyAuthzModule {
     }
 
     @Override
+    public String getName() {
+        return NAME;
+    }
+
+    @Override
     public Promise<AuthorizationResult, ResourceException> authorizeCreate(Context context, CreateRequest request) {
         return authorizeAdmin(context);
     }

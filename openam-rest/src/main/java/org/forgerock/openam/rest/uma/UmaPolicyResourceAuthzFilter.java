@@ -50,6 +50,11 @@ public class UmaPolicyResourceAuthzFilter extends ResourceOwnerOrSuperUserAuthzM
         super(sessionService, debug);
     }
 
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
     /**
      * {@inheritDoc}
      */

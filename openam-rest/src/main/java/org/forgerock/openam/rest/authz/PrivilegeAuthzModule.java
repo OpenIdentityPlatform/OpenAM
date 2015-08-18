@@ -81,6 +81,11 @@ public class PrivilegeAuthzModule implements CrestAuthorizationModule {
     }
 
     @Override
+    public String getName() {
+        return NAME;
+    }
+
+    @Override
     public Promise<AuthorizationResult, ResourceException> authorizeRead(
             Context serverContext, ReadRequest readRequest) {
         return evaluate(serverContext, READ);

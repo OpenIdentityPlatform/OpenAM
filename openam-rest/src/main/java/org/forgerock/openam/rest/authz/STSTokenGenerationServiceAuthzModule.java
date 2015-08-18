@@ -59,6 +59,11 @@ public class STSTokenGenerationServiceAuthzModule extends SpecialAndAdminUserOnl
     }
 
     @Override
+    public String getName() {
+        return NAME;
+    }
+
+    @Override
     public Promise<AuthorizationResult, ResourceException> authorizeCreate(Context context, CreateRequest request) {
         return authorize(context);
     }

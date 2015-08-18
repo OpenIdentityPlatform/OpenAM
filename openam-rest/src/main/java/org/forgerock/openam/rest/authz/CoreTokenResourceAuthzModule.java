@@ -47,6 +47,11 @@ public class CoreTokenResourceAuthzModule extends AdminOnlyAuthzModule {
         this.enabled = enabled;
     }
 
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
     /**
      * Prevents access to {@link org.forgerock.openam.forgerockrest.cts.CoreTokenResource} unless this
      * REST endpoint has been explicitly enabled. If the endpoint has been explicitly enabled, it defers to

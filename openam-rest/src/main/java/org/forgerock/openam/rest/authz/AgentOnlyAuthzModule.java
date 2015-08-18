@@ -57,6 +57,11 @@ public class AgentOnlyAuthzModule implements CrestAuthorizationModule {
     }
 
     @Override
+    public String getName() {
+        return NAME;
+    }
+
+    @Override
     public Promise<AuthorizationResult, ResourceException> authorizeCreate(Context context, CreateRequest request) {
         return authorize(context);
     }

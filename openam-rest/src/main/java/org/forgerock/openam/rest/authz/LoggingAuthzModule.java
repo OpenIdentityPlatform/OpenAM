@@ -54,6 +54,11 @@ public class LoggingAuthzModule implements CrestAuthorizationModule {
     }
 
     @Override
+    public String getName() {
+        return moduleName;
+    }
+
+    @Override
     public Promise<AuthorizationResult, ResourceException> authorizeCreate(Context serverContext,
                                                                            CreateRequest createRequest) {
         final String resource = ServerContextUtils.getMatchedUri(serverContext);
