@@ -16,11 +16,8 @@
 
 package org.forgerock.openam.http.annotations;
 
-import org.forgerock.http.protocol.Response;
-
 /**
- * Handles exceptions thrown by a service method and turns them into a response.
+ * Mark a method that handles exceptions thrown by a service method and turns them into a response.
  */
-public interface ExceptionHandler<E> {
-    Response handle(E e);
+public @interface ExceptionHandler {
 }

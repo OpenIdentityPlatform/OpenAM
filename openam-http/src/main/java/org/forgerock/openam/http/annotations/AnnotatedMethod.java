@@ -21,6 +21,9 @@ import static org.forgerock.util.promise.Promises.newResultPromise;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.forgerock.http.Context;
 import org.forgerock.http.protocol.Request;
@@ -30,23 +33,32 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
+import org.forgerock.util.promise.Promises;
 
+/**
+ * A method annotated with one of {@link Get}, {@link Post}, {@link Put} or {@link Delete}. This class
+ * works out what parameters are going to need to be passed to the annotated method, and creates
+ * necessary functions for translating at reflection time so that reflection is not done at request
+ * time.
+ * <p>
+ * This class is expected to only be used from the {@link Endpoints} class.
+ */
 public class AnnotatedMethod {
     private final Object requestHandler;
     private final Method method;
-    private final int contextParameter;
     private final int requestParameter;
     private final int numberOfParameters;
     private final String operation;
     private final Function<Object, Promise<Response, NeverThrowsException>, NeverThrowsException> responseAdapter;
+    private final List<ContextParameter> contextParameters;
 
-    AnnotatedMethod(String operation, Object requestHandler, Method method, int contextParameter,
+    AnnotatedMethod(String operation, Object requestHandler, Method method, List<ContextParameter> contextParameters,
             int requestParameter, int numberOfParameters,
             Function<Object, Promise<Response, NeverThrowsException>, NeverThrowsException> responseAdapter) {
         this.operation = operation;
         this.requestHandler = requestHandler;
         this.method = method;
-        this.contextParameter = contextParameter;
+        this.contextParameters = contextParameters;
         this.requestParameter = requestParameter;
         this.numberOfParameters = numberOfParameters;
         this.responseAdapter = responseAdapter;
@@ -60,16 +72,18 @@ public class AnnotatedMethod {
         if (requestParameter > -1) {
             args[requestParameter] = request;
         }
-        if (contextParameter > -1) {
-            args[contextParameter] = context;
+        for (ContextParameter parameter : contextParameters) {
+            args[parameter.index] = parameter.getContext(context);
         }
         try {
             Object result = method.invoke(requestHandler, args);
             return responseAdapter.apply(result);
         } catch (IllegalAccessException e) {
-            throw new IllegalStateException("Cannot access the annotated method: " + method.getName(), e);
+            return newResultPromise(new Response().setStatus(Status.INTERNAL_SERVER_ERROR)
+                    .setCause(new IllegalStateException("Cannot access the annotated method: " + method.getName(), e)));
         } catch (InvocationTargetException e) {
-            throw new IllegalStateException("Exception from invocation expected to be handled by promise", e);
+            return newResultPromise(new Response().setStatus(Status.INTERNAL_SERVER_ERROR)
+                    .setCause(new IllegalStateException("Exception from invocation should be handled by promise", e)));
         }
     }
 
@@ -96,18 +110,22 @@ public class AnnotatedMethod {
                 }
             }
         }
-        return new AnnotatedMethod(annotation.getSimpleName(), null, null, -1, -1, -1, null);
+        return new AnnotatedMethod(annotation.getSimpleName(), null, null, null, -1, -1, null);
     }
 
     static AnnotatedMethod checkMethod(Class<?> annotation, Object requestHandler, Method method) {
-        int contextParam = -1;
+        List<ContextParameter> contextParams = new ArrayList<>();
         int requestParam = -1;
         for (int i = 0; i < method.getParameterTypes().length; i++) {
             Class<?> type = method.getParameterTypes()[i];
-            if (Context.class.equals(type)) {
-                contextParam = i;
-            } else if (Request.class.isAssignableFrom(type)) {
-                requestParam = i;
+            for (Annotation paramAnnotation : method.getParameterAnnotations()[i]) {
+                if (paramAnnotation.getClass().equals(Contextual.class)) {
+                    if (Context.class.isAssignableFrom(type)) {
+                        contextParams.add(new ContextParameter(i, (Class<? extends Context>) type));
+                    } else if (Request.class.isAssignableFrom(type)) {
+                        requestParam = i;
+                    }
+                }
             }
         }
         Function<Object, Promise<Response, NeverThrowsException>, NeverThrowsException> resourceCreator;
@@ -123,7 +141,7 @@ public class AnnotatedMethod {
         } else {
             resourceCreator = ResponseCreator.forType(method.getReturnType());
         }
-        return new AnnotatedMethod(annotation.getSimpleName(), requestHandler, method, contextParam,
+        return new AnnotatedMethod(annotation.getSimpleName(), requestHandler, method, contextParams,
                 requestParam, method.getParameterTypes().length, resourceCreator);
     }
 
@@ -182,8 +200,21 @@ public class AnnotatedMethod {
 
         @Override
         public Object apply(Object o) throws NeverThrowsException {
-            return null;
+            return o;
         }
     };
 
+    private static class ContextParameter {
+        private final int index;
+        private final Class<? extends Context> type;
+
+        private ContextParameter(int index, Class<? extends Context> type) {
+            this.index = index;
+            this.type = type.equals(Context.class) ? null : type;
+        }
+
+        private Context getContext(Context context) {
+            return type == null ? context : context.asContext(type);
+        }
+    }
 }

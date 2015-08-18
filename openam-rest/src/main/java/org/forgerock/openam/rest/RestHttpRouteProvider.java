@@ -121,9 +121,8 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
 
     private Handler createAuthenticateHandler() {
         Router authenticateVersionRouter = new Router();
-        Handler authenticateHandlerV1 = Endpoints.from(InjectorHolder.getInstance(AuthenticationServiceV1.class));
-        Handler authenticateHandlerV2 = Endpoints.from(InjectorHolder.getInstance(AuthenticationServiceV2.class));
-        //TODO need to do auditing
+        Handler authenticateHandlerV1 = Endpoints.from(AuthenticationServiceV1.class);
+        Handler authenticateHandlerV2 = Endpoints.from(AuthenticationServiceV2.class);
         authenticateVersionRouter.addRoute(RouteMatchers.requestResourceApiVersionMatcher(version(1, 1)), authenticateHandlerV1);
         authenticateVersionRouter.addRoute(RouteMatchers.requestResourceApiVersionMatcher(version(2)), authenticateHandlerV2);
         //TODO authentication filter?

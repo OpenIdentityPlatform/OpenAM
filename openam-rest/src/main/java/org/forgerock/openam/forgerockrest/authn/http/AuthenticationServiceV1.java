@@ -46,6 +46,7 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.openam.forgerockrest.authn.RestAuthenticationHandler;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
+import org.forgerock.openam.http.annotations.Contextual;
 import org.forgerock.openam.http.annotations.Post;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.util.Reject;
@@ -101,7 +102,7 @@ public class AuthenticationServiceV1 {
      * @throws ResourceException If there is an error processing the authentication request.
      */
     @Post
-    public Response authenticate(Context context, Request httpRequest) {
+    public Response authenticate(@Contextual HttpRequestContext context, @Contextual Request httpRequest) {
 
         if (!isSupportedMediaType(httpRequest)) {
             if (DEBUG.errorEnabled()) {
@@ -156,8 +157,8 @@ public class AuthenticationServiceV1 {
         return new Form().fromRequestQuery(request);
     }
 
-    private HttpServletResponse getHttpServletResponse(Context context) {
-        Map<String, Object> requestAttributes = context.asContext(HttpRequestContext.class).getAttributes();
+    private HttpServletResponse getHttpServletResponse(HttpRequestContext context) {
+        Map<String, Object> requestAttributes = context.getAttributes();
         return (HttpServletResponse) requestAttributes.get(HttpServletResponse.class.getName());
     }
 
@@ -171,8 +172,8 @@ public class AuthenticationServiceV1 {
      *
      * @return The HttpServletRequest
      */
-    private HttpServletRequest getHttpServletRequest(Context context) {
-        Map<String, Object> requestAttributes = context.asContext(HttpRequestContext.class).getAttributes();
+    private HttpServletRequest getHttpServletRequest(HttpRequestContext context) {
+        Map<String, Object> requestAttributes = context.getAttributes();
         final HttpServletRequest request = (HttpServletRequest) requestAttributes.get(HttpServletRequest.class.getName());
 
         // The request contains the realm query param then use that over any realm parsed from the URI
@@ -233,7 +234,7 @@ public class AuthenticationServiceV1 {
     /**
      * Creates a JsonValue from the request post body.
      *
-     * @param request The request.
+     * @param request The request containing JSON body.
      * @return A JsonValue of the request posy body.
      * @throws IOException If there is a problem parsing the Json entity.
      */
