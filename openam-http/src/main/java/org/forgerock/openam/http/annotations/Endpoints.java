@@ -38,6 +38,8 @@ import com.google.inject.Key;
  */
 public class Endpoints {
 
+    private static final String HEADER_X_HTTP_METHOD_OVERRIDE = "X-HTTP-Method-Override";
+
     /**
      * Produce a {@code Handler} from the annotated methods on the provided object.
      * <p>
@@ -56,7 +58,7 @@ public class Endpoints {
         return new Handler() {
             @Override
             public Promise<Response, NeverThrowsException> handle(Context context, Request request) {
-                AnnotatedMethod method = methods.get(request.getMethod());
+                AnnotatedMethod method = methods.get(getMethod(request));
                 if (method == null) {
                     return newResultPromise(new Response(Status.NOT_IMPLEMENTED));
                 }
@@ -85,4 +87,20 @@ public class Endpoints {
         return from(InjectorHolder.getInstance(key));
     }
 
+    /**
+     * Returns the effective method name for an HTTP request taking into account
+     * the "X-HTTP-Method-Override" header.
+     *
+     * @param req
+     *            The HTTP request.
+     * @return The effective method name.
+     */
+    private static String getMethod(org.forgerock.http.protocol.Request req) {
+        String method = req.getMethod();
+        if ("POST".equals(method)
+                && req.getHeaders().getFirst(HEADER_X_HTTP_METHOD_OVERRIDE) != null) {
+            method = req.getHeaders().getFirst(HEADER_X_HTTP_METHOD_OVERRIDE);
+        }
+        return method;
+    }
 }

@@ -102,7 +102,7 @@ public class AuthenticationServiceV1 {
      * @throws ResourceException If there is an error processing the authentication request.
      */
     @Post
-    public Response authenticate(@Contextual HttpRequestContext context, @Contextual Request httpRequest) {
+    public Response authenticate(@Contextual Context context, @Contextual Request httpRequest) {
 
         if (!isSupportedMediaType(httpRequest)) {
             if (DEBUG.errorEnabled()) {
@@ -157,8 +157,9 @@ public class AuthenticationServiceV1 {
         return new Form().fromRequestQuery(request);
     }
 
-    private HttpServletResponse getHttpServletResponse(HttpRequestContext context) {
-        Map<String, Object> requestAttributes = context.getAttributes();
+    private HttpServletResponse getHttpServletResponse(Context context) {
+        HttpRequestContext requestContext = context.asContext(HttpRequestContext.class);
+        Map<String, Object> requestAttributes = requestContext.getAttributes();
         return (HttpServletResponse) requestAttributes.get(HttpServletResponse.class.getName());
     }
 
@@ -172,8 +173,9 @@ public class AuthenticationServiceV1 {
      *
      * @return The HttpServletRequest
      */
-    private HttpServletRequest getHttpServletRequest(HttpRequestContext context) {
-        Map<String, Object> requestAttributes = context.getAttributes();
+    private HttpServletRequest getHttpServletRequest(Context context) {
+        HttpRequestContext requestContext = context.asContext(HttpRequestContext.class);
+        Map<String, Object> requestAttributes = requestContext.getAttributes();
         final HttpServletRequest request = (HttpServletRequest) requestAttributes.get(HttpServletRequest.class.getName());
 
         // The request contains the realm query param then use that over any realm parsed from the URI

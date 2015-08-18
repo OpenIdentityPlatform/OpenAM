@@ -120,7 +120,7 @@ public class AnnotatedMethod {
         for (int i = 0; i < method.getParameterTypes().length; i++) {
             Class<?> type = method.getParameterTypes()[i];
             for (Annotation paramAnnotation : method.getParameterAnnotations()[i]) {
-                if (paramAnnotation.getClass().equals(Contextual.class)) {
+                if (paramAnnotation instanceof Contextual) {
                     if (Context.class.isAssignableFrom(type)) {
                         contextParams.add(new ContextParameter(i, (Class<? extends Context>) type));
                     } else if (Request.class.isAssignableFrom(type)) {
