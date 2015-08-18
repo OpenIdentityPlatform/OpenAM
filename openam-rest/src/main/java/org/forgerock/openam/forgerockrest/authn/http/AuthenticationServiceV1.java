@@ -27,10 +27,14 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.locale.L10NMessage;
+import com.sun.identity.shared.locale.Locale;
 import org.forgerock.http.Context;
 import org.forgerock.http.context.HttpRequestContext;
 import org.forgerock.http.header.ContentTypeHeader;
@@ -89,7 +93,8 @@ public class AuthenticationServiceV1 {
      * completed before authentication can proceed or an exception if any problems occurred whilst trying to
      * authenticate.
      *
-     * @param entity The Json Representation of the post body of the request.
+     * @param context The request context.
+     * @param httpRequest The HTTP request.
      * @return A Json Representation of the response body. The response will contain either a JSON object containing the
      * SSOToken id from a successful authentication, a JSON object containing a number of Callbacks for the client to
      * complete and return or a JSON object containing an exception message.
@@ -102,7 +107,7 @@ public class AuthenticationServiceV1 {
             if (DEBUG.errorEnabled()) {
                 DEBUG.error("AuthenticationService :: Unable to handle media type request : " + ContentTypeHeader.valueOf(httpRequest).getType());
             }
-            return handleErrorResponse(Status.UNSUPPORTED_MEDIA_TYPE, null);
+            return handleErrorResponse(httpRequest, Status.UNSUPPORTED_MEDIA_TYPE, null);
         }
 
         final HttpServletRequest request = getHttpServletRequest(context);
@@ -117,7 +122,7 @@ public class AuthenticationServiceV1 {
                 jsonContent = getJsonContent(httpRequest);
             } catch (IOException e) {
                 DEBUG.message("AuthenticationService.authenticate() :: JSON parsing error", e);
-                return handleErrorResponse(Status.BAD_REQUEST, e);
+                return handleErrorResponse(httpRequest, Status.BAD_REQUEST, e);
             }
             JsonValue jsonResponse;
 
@@ -137,13 +142,13 @@ public class AuthenticationServiceV1 {
 
         } catch (RestAuthResponseException e) {
             DEBUG.message("AuthenticationService.authenticate() :: Exception from CallbackHandler", e);
-            return handleErrorResponse(Status.valueOf(e.getStatusCode()), e);
+            return handleErrorResponse(httpRequest, Status.valueOf(e.getStatusCode()), e);
         } catch (RestAuthException e) {
             DEBUG.message("AuthenticationService.authenticate() :: Rest Authentication Exception", e);
-            return handleErrorResponse(Status.UNAUTHORIZED, e);
+            return handleErrorResponse(httpRequest, Status.UNAUTHORIZED, e);
         } catch (IOException e) {
             DEBUG.error("AuthenticationService.authenticate() :: Internal Error", e);
-            return handleErrorResponse(Status.INTERNAL_SERVER_ERROR, e);
+            return handleErrorResponse(httpRequest, Status.INTERNAL_SERVER_ERROR, e);
         }
     }
 
@@ -226,9 +231,9 @@ public class AuthenticationServiceV1 {
     }
 
     /**
-     * Creates a JsonValue from the Restlet Json Representation of the request post body.
+     * Creates a JsonValue from the request post body.
      *
-     * @param representation The Json Representation.
+     * @param request The request.
      * @return A JsonValue of the request posy body.
      * @throws IOException If there is a problem parsing the Json entity.
      */
@@ -242,11 +247,11 @@ public class AuthenticationServiceV1 {
     }
 
     /**
-     * Creates a Restlet response representation from the given JsonValue.
+     * Creates a response from the given JsonValue.
      *
      * @param jsonResponse The Json response body.
-     * @return a Restlet response representation.
-     * @throws IOException If there is a problem creating the Json Representation.
+     * @return a response.
+     * @throws IOException If there is a problem creating the response.
      */
     private Response createResponse(final JsonValue jsonResponse) throws IOException {
 
@@ -270,7 +275,7 @@ public class AuthenticationServiceV1 {
      * @return The Restlet Response Representation.
      * @throws ResourceException If the given exception is wrapped in a ResourceException.
      */
-    protected Response handleErrorResponse(Status status, Exception exception) {
+    protected Response handleErrorResponse(Request request, Status status, Exception exception) {
         Reject.ifNull(status);
         Response response = new Response(status);
         final Map<String, Object> rep = new HashMap<>();
@@ -286,12 +291,12 @@ public class AuthenticationServiceV1 {
             if (authException.getFailureUrl() != null) {
                 rep.put("failureUrl", authException.getFailureUrl());
             }
-            rep.put("errorMessage", getLocalizedMessage(exception));
+            rep.put("errorMessage", getLocalizedMessage(request, exception));
 
         } else if (exception == null) {
             rep.put("errorMessage", status.getReasonPhrase());
         } else {
-            rep.put("errorMessage", getLocalizedMessage(exception));
+            rep.put("errorMessage", getLocalizedMessage(request, exception));
         }
 
         response.setEntity(rep);
@@ -307,32 +312,39 @@ public class AuthenticationServiceV1 {
      *
      * @return The localized message.
      */
-    protected String getLocalizedMessage(Exception exception) {
-        //TODO
-//        final List<Preference<Language>> languages = getClientInfo().getAcceptedLanguages();
+    protected String getLocalizedMessage(Request request, Exception exception) {
+        List<String> languages = request.getHeaders().get("Accept-Language");
         String message = null;
-//        L10NMessage localizedException = null;
-//        if (exception instanceof L10NMessage) {
-//            localizedException = (L10NMessage) exception;
-//        } else if (exception.getCause() instanceof L10NMessage) {
-//            localizedException = (L10NMessage) exception.getCause();
-//        }
-//        if (localizedException != null) {
-//            for (Preference<Language> language : languages) {
-//                message = localizedException.getL10NMessage(Locale.getLocale(language.toString()));
-//                if (message == null) {
-//                    continue;
-//                }
-//                // Old UI used a jsp template to display the error message, which we need to strip off here
-//                int delimiterIndex = message.indexOf(AuthClientUtils.MSG_DELIMITER);
-//                if (delimiterIndex > -1) {
-//                    message = message.substring(0, delimiterIndex);
-//                }
-//                break;
-//            }
-//        }
+        L10NMessage localizedException = null;
+        if (exception instanceof L10NMessage) {
+            localizedException = (L10NMessage) exception;
+        } else if (exception.getCause() instanceof L10NMessage) {
+            localizedException = (L10NMessage) exception.getCause();
+        }
+        if (localizedException != null) {
+            if (languages == null) {
+                message = localizeMessage(localizedException, Locale.getDefaultLocale());
+            } else {
+                for (String language : languages) {
+                    message = localizeMessage(localizedException, Locale.getLocale(language));
+                    if (message != null) {
+                        break;
+                    }
+                }
+            }
+        }
         if (message == null) {
             message = exception.getMessage();
+        }
+        return message;
+    }
+
+    private String localizeMessage(L10NMessage localizedException, java.util.Locale locale) {
+        String message = localizedException.getL10NMessage(locale);
+        // Old UI used a jsp template to display the error message, which we need to strip off here
+        int delimiterIndex = message.indexOf(AuthClientUtils.MSG_DELIMITER);
+        if (delimiterIndex > -1) {
+            message = message.substring(0, delimiterIndex);
         }
         return message;
     }

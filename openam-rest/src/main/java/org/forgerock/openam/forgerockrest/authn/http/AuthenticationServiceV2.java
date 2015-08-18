@@ -21,6 +21,7 @@ import static org.forgerock.json.JsonValue.*;
 import javax.inject.Inject;
 import java.util.Map;
 
+import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
 import org.forgerock.json.JsonValue;
@@ -46,7 +47,7 @@ public class AuthenticationServiceV2 extends AuthenticationServiceV1 {
     }
 
     @Override
-    protected Response handleErrorResponse(Status status, Exception exception) {
+    protected Response handleErrorResponse(Request request, Status status, Exception exception) {
         Reject.ifNull(status);
         Response response = new Response(status);
         if (exception instanceof RestAuthResponseException) {
@@ -59,7 +60,7 @@ public class AuthenticationServiceV2 extends AuthenticationServiceV1 {
 
         } else if (exception instanceof RestAuthException) {
             final RestAuthException rae = (RestAuthException)exception;
-            ResourceException cause = ResourceException.getException(rae.getStatusCode(), getLocalizedMessage(rae));
+            ResourceException cause = ResourceException.getException(rae.getStatusCode(), getLocalizedMessage(request, rae));
 
             if (rae.getFailureUrl() != null) {
                 cause.setDetail(json(object(field("failureUrl", rae.getFailureUrl()))));
