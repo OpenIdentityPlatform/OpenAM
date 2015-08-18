@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.sts.publish.service;
 
-import static org.forgerock.authz.filter.crest.AuthorizationFilters.createFilter;
+import static org.forgerock.authz.filter.crest.AuthorizationFilters.createAuthorizationFilter;
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
 import static org.forgerock.http.routing.Version.version;
 import static org.forgerock.json.resource.RouteMatchers.requestResourceApiVersionMatcher;
@@ -65,10 +65,10 @@ public class STSPublishServiceConnectionFactoryProvider {
                     STSPublishInjectorHolder.getInstance(Key.get(Logger.class)));
         Router restVersionRouter = new Router();
         restVersionRouter.addRoute(requestResourceApiVersionMatcher(VERSION), restPublishRequestHandler);
-        FilterChain restAuthzFilterChain = createFilter(restVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(STSPublishServiceAuthzModule.class), STSPublishServiceAuthzModule.NAME));
+        FilterChain restAuthzFilterChain = createAuthorizationFilter(restVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(STSPublishServiceAuthzModule.class), STSPublishServiceAuthzModule.NAME));
         AuditFilterWrapper restAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.STS);
-        FilterChain restFilterChain = new FilterChain(restAuthzFilterChain, defaultAuthenticationFilter, restAuditFilter);
+        FilterChain restFilterChain = new FilterChain(restAuthzFilterChain, restAuditFilter);
         router.addRoute(requestUriMatcher(STARTS_WITH, "rest"), restFilterChain);
 
         final RequestHandler soapPublishRequestHandler =

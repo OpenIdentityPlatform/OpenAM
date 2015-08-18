@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.oauth2.rest;
 
-import static org.forgerock.authz.filter.crest.AuthorizationFilters.createFilter;
+import static org.forgerock.authz.filter.crest.AuthorizationFilters.createAuthorizationFilter;
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
 import static org.forgerock.http.routing.Version.version;
 import static org.forgerock.json.resource.RouteMatchers.requestUriMatcher;
@@ -60,9 +60,8 @@ public class OAuth2RestHttpRouteProvider implements HttpRouteProvider {
 
         Router clientVersionRouter = new Router();
         clientVersionRouter.addRoute(version(1), InjectorHolder.getInstance(ClientResource.class));
-        //TODO rename createFilter to createAuthzFilter or createAuthorizationFilter
-        FilterChain clientAuthzFilterChain = createFilter(clientVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(AdminOnlyAuthzModule.class), AdminOnlyAuthzModule.NAME));
         FilterChain clientFilterChain = new FilterChain(clientAuthzFilterChain, defaultAuthenticationFilter);
+        FilterChain clientAuthzFilterChain = createAuthorizationFilter(clientVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(AdminOnlyAuthzModule.class), AdminOnlyAuthzModule.NAME));
         router.addRoute(requestUriMatcher(STARTS_WITH, "client"), clientFilterChain);
 
         return Collections.singleton(HttpRoute.newHttpRoute(STARTS_WITH, "frrest/oauth2", CrestHttp.newHttpHandler(router)));

@@ -128,7 +128,7 @@
 //        given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
 //
 //        // When...
-//        final FilterChain chain = AuthorizationFilters.createFilter(provider, module);
+//        final FilterChain chain = AuthorizationFilters.createAuthorizationFilter(provider, module);
 //        final Router router = new Router();
 //        router.addRoute(RoutingMode.STARTS_WITH, "/policies", chain);
 //
@@ -160,7 +160,7 @@
 //        given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
 //
 //        // When...
-//        final FilterChain chain = AuthorizationFilters.createFilter(provider, module);
+//        final FilterChain chain = AuthorizationFilters.createAuthorizationFilter(provider, module);
 //        final Router router = new Router();
 //        router.addRoute(RoutingMode.STARTS_WITH, "/policies", chain);
 //
@@ -193,7 +193,7 @@
 //        given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
 //
 //        // When...
-//        final FilterChain chain = AuthorizationFilters.createFilter(provider, module);
+//        final FilterChain chain = AuthorizationFilters.createAuthorizationFilter(provider, module);
 //        final Router router = new Router();
 //        router.addRoute(RoutingMode.STARTS_WITH, "/policies", chain);
 //
@@ -225,7 +225,7 @@
 //        given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
 //
 //        // When...
-//        final FilterChain chain = AuthorizationFilters.createFilter(provider, module);
+//        final FilterChain chain = AuthorizationFilters.createAuthorizationFilter(provider, module);
 //        final Router router = new Router();
 //        router.addRoute(RoutingMode.STARTS_WITH, "/policies", chain);
 //
@@ -257,7 +257,7 @@
 //        given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
 //
 //        // When...
-//        final FilterChain chain = AuthorizationFilters.createFilter(provider, module);
+//        final FilterChain chain = AuthorizationFilters.createAuthorizationFilter(provider, module);
 //        final Router router = new Router();
 //        router.addRoute(RoutingMode.STARTS_WITH, "/policies", chain);
 //
@@ -289,7 +289,7 @@
 //        given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
 //
 //        // When...
-//        final FilterChain chain = AuthorizationFilters.createFilter(provider, module);
+//        final FilterChain chain = AuthorizationFilters.createAuthorizationFilter(provider, module);
 //        final Router router = new Router();
 //        router.addRoute(RoutingMode.STARTS_WITH, "/policies", chain);
 //
@@ -321,7 +321,7 @@
 //        given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
 //
 //        // When...
-//        final FilterChain chain = AuthorizationFilters.createFilter(provider, module);
+//        final FilterChain chain = AuthorizationFilters.createAuthorizationFilter(provider, module);
 //        final Router router = new Router();
 //        router.addRoute(RoutingMode.STARTS_WITH, "/policies", chain);
 //
@@ -353,7 +353,7 @@
 //        given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
 //
 //        // When...
-//        final FilterChain chain = AuthorizationFilters.createFilter(provider, module);
+//        final FilterChain chain = AuthorizationFilters.createAuthorizationFilter(provider, module);
 //        final Router router = new Router();
 //        router.addRoute(RoutingMode.STARTS_WITH, "/policies", chain);
 //
@@ -375,7 +375,7 @@
 //    @Test
 //    public void crestActionNoMappingFails() throws SSOException, DelegationException {
 //        // When...
-//        final FilterChain chain = AuthorizationFilters.createFilter(provider, module);
+//        final FilterChain chain = AuthorizationFilters.createAuthorizationFilter(provider, module);
 //        final Router router = new Router();
 //        router.addRoute(RoutingMode.STARTS_WITH, "/policies", chain);
 //
@@ -405,7 +405,7 @@
 //        given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(false);
 //
 //        // When...
-//        final FilterChain chain = AuthorizationFilters.createFilter(provider, module);
+//        final FilterChain chain = AuthorizationFilters.createAuthorizationFilter(provider, module);
 //        final Router router = new Router();
 //        router.addRoute(RoutingMode.STARTS_WITH, "/policies", chain);
 //

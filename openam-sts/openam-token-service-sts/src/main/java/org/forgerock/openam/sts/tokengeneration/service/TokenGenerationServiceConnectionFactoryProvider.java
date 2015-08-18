@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.sts.tokengeneration.service;
 
-import static org.forgerock.authz.filter.crest.AuthorizationFilters.createFilter;
+import static org.forgerock.authz.filter.crest.AuthorizationFilters.createAuthorizationFilter;
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
 import static org.forgerock.http.routing.Version.version;
 import static org.forgerock.json.resource.RouteMatchers.requestUriMatcher;
@@ -65,7 +65,7 @@ public class TokenGenerationServiceConnectionFactoryProvider {
                         TokenGenerationServiceInjectorHolder.getInstance(Key.get(Logger.class)));
         Router issueVersionRouter = new Router();
         issueVersionRouter.addRoute(VERSION, tokenGenerationService);
-        FilterChain issueAuthzFilterChain = createFilter(issueVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(STSTokenGenerationServiceAuthzModule.class), STSTokenGenerationServiceAuthzModule.NAME));
+        FilterChain issueAuthzFilterChain = createAuthorizationFilter(issueVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(STSTokenGenerationServiceAuthzModule.class), STSTokenGenerationServiceAuthzModule.NAME));
         AuditFilterWrapper issueAuditFilter = new AuditFilterWrapper(InjectorHolder.getInstance(AuditFilter.class),
                 AuditConstants.Component.STS);
         FilterChain issueFilterChain = new FilterChain(issueAuthzFilterChain, defaultAuthenticationFilter, issueAuditFilter);
