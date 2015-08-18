@@ -42,6 +42,7 @@ import org.forgerock.util.promise.Promises;
  * time.
  * <p>
  * This class is expected to only be used from the {@link Endpoints} class.
+ * @since 13.0.0
  */
 public class AnnotatedMethod {
     private final Object requestHandler;

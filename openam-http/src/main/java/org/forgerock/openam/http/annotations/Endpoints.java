@@ -34,6 +34,7 @@ import com.google.inject.Key;
 /**
  * Convenience class for creating {@code Handler}s from classes that contain annotated methods
  * that handle requests.
+ * @since 13.0.0
  */
 public class Endpoints {
 
