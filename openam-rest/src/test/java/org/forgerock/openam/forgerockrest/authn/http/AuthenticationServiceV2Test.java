@@ -19,12 +19,12 @@ package org.forgerock.openam.forgerockrest.authn.http;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.util.Collections;
 
-import org.forgerock.http.Context;
+import org.forgerock.http.context.HttpRequestContext;
 import org.forgerock.http.header.ContentTypeHeader;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
@@ -48,7 +48,7 @@ public class AuthenticationServiceV2Test {
     @Test
     public void shouldFailAuthenticationWithUnsupportedMediaTypeMessage() throws IOException {
         // given
-        Context context = mock(Context.class);
+        HttpRequestContext context = mock(HttpRequestContext.class);
         Request httpRequest = new Request();
         httpRequest.getHeaders().putSingle(ContentTypeHeader.NAME, "application/xml");
 
