@@ -47,8 +47,8 @@ import org.forgerock.caf.authentication.api.AuthenticationException;
 import org.forgerock.caf.authentication.api.MessageInfoContext;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.context.HttpRequestContext;
-import org.forgerock.json.resource.Request;
-import org.forgerock.json.resource.Response;
+import org.forgerock.http.protocol.Request;
+import org.forgerock.http.protocol.Response;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.util.promise.Promise;
 
@@ -132,7 +132,7 @@ public class LocalSSOTokenSessionModule implements AsyncServerAuthModule {
      */
     @Override
     public Collection<Class<?>> getSupportedMessageTypes() {
-        return new HashSet<>(Arrays.asList(Request.class, Response.class));
+        return new HashSet<Class<?>>(Arrays.asList(Request.class, Response.class));
     }
 
     /**

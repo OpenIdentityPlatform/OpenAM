@@ -120,24 +120,6 @@ public class RestEndpoints {
         return oauth2ServiceRouter;
     }
 
-    //TODO CHF JAX-RS replacement for Restlet required
-//    private ServiceRouter createJSONServiceRouter(final Set<String> invalidRealmNames) {
-//
-//        ServiceRouter router = new ServiceRouter(realmValidator, versionSelector, coreWrapper);
-//
-    // TODO also include authentication exception?
-//        router.addRoute("/authenticate")
-//        .addVersion("1.1",
-//            restletAuditFactory.createFilter(Component.AUTHENTICATION, wrap(AuthenticationServiceV1.class)))
-//            .addVersion("2.0",
-//            restletAuditFactory.createFilter(Component.AUTHENTICATION, wrap(AuthenticationServiceV2.class)));
-//    invalidRealmNames.add("authenticate");
-//
-//    VersionBehaviourConfigListener.bindToServiceConfigManager(router);
-//
-//    return router;
-//    }
-
     /**
      * Constructs a new {@link Restlet} with routes to each of the Restlet service endpoints.
      *

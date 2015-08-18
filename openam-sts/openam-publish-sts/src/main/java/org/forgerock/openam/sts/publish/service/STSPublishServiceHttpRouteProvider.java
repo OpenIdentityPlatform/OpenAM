@@ -17,29 +17,39 @@
 package org.forgerock.openam.sts.publish.service;
 
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
+import static org.forgerock.openam.audit.AuditConstants.Component.STS;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import java.util.Collections;
 import java.util.Set;
 
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
 import org.forgerock.http.Handler;
-import org.forgerock.json.resource.http.CrestHttp;
+import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.openam.http.HttpRoute;
 import org.forgerock.openam.http.HttpRouteProvider;
-import org.forgerock.openam.rest.AuthenticationFilter;
+import org.forgerock.openam.rest.RestRouter;
+import org.forgerock.openam.rest.authz.STSPublishServiceAuthzModule;
+import org.forgerock.openam.rest.router.RestRealmValidator;
+import org.forgerock.openam.sts.InstanceConfigMarshaller;
+import org.forgerock.openam.sts.publish.config.STSPublishInjectorHolder;
+import org.forgerock.openam.sts.publish.rest.RestSTSInstancePublisher;
+import org.forgerock.openam.sts.publish.soap.SoapSTSInstancePublisher;
+import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
+import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
 import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
+import org.slf4j.Logger;
 
 public class STSPublishServiceHttpRouteProvider implements HttpRouteProvider {
 
-    private Provider<AuthenticationFilter> authenticationFilterProvider;
+    private RestRouter rootRouter;
 
     @Inject
-    public void setAuthenticationFilterProvider(
-            @Named("RestAuthenticationFilter") Provider<AuthenticationFilter> authenticationFilterProvider) {
-        this.authenticationFilterProvider = authenticationFilterProvider;
+    public void setRouters(RestRouter router) {
+        this.rootRouter = router;
     }
 
     @Override
@@ -47,8 +57,34 @@ public class STSPublishServiceHttpRouteProvider implements HttpRouteProvider {
         return Collections.singleton(HttpRoute.newHttpRoute(STARTS_WITH, "sts-publish", new Function<Void, Handler, NeverThrowsException>() {
                     @Override
                     public Handler apply(Void value) {
-                        return CrestHttp.newHttpHandler(STSPublishServiceConnectionFactoryProvider.getConnectionFactory(authenticationFilterProvider.get()));
+                        return getHandler();
                     }
                 }));
+    }
+
+    private Handler getHandler() {
+        final RequestHandler restPublishRequestHandler =
+                new RestSTSPublishServiceRequestHandler(
+                        STSPublishInjectorHolder.getInstance(Key.get(RestSTSInstancePublisher.class)),
+                        STSPublishInjectorHolder.getInstance(Key.get(RestRealmValidator.class)),
+                        STSPublishInjectorHolder.getInstance(Key.get(new TypeLiteral<InstanceConfigMarshaller<RestSTSInstanceConfig>>() {})),
+                        STSPublishInjectorHolder.getInstance(Key.get(Logger.class)));
+        rootRouter.route("rest")
+                .auditAs(STS)
+                .authorizeWith(STSPublishServiceAuthzModule.class)
+                .toRequestHandler(STARTS_WITH, restPublishRequestHandler);
+
+        final RequestHandler soapPublishRequestHandler =
+                new SoapSTSPublishServiceRequestHandler(
+                        STSPublishInjectorHolder.getInstance(Key.get(SoapSTSInstancePublisher.class)),
+                        STSPublishInjectorHolder.getInstance(Key.get(RestRealmValidator.class)),
+                        STSPublishInjectorHolder.getInstance(Key.get(new TypeLiteral<InstanceConfigMarshaller<SoapSTSInstanceConfig>>() {})),
+                        STSPublishInjectorHolder.getInstance(Key.get(Logger.class)));
+        rootRouter.route("soap")
+                .auditAs(STS)
+                .authorizeWith(STSPublishServiceAuthzModule.class)
+                .toRequestHandler(STARTS_WITH, soapPublishRequestHandler);
+
+        return rootRouter.getRouter();
     }
 }

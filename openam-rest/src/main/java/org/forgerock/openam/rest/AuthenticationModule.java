@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.rest;
 
+import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import javax.security.auth.Subject;
@@ -33,21 +34,19 @@ import com.sun.identity.shared.debug.Debug;
 import org.forgerock.caf.authentication.api.AsyncServerAuthModule;
 import org.forgerock.caf.authentication.api.AuthenticationException;
 import org.forgerock.caf.authentication.api.MessageInfoContext;
-import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.CreateRequest;
-import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Request;
-import org.forgerock.json.resource.RequestVisitor;
-import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.http.protocol.Request;
+import org.forgerock.http.routing.UriRouterContext;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.http.HttpUtils;
 import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 
 /**
+ * CAF authentication module implementation for protecting CREST endpoints that
+ * allows for exceptions to be added for certain CREST operations.
  *
+ * @since 13.0.0
  */
 public class AuthenticationModule implements AsyncServerAuthModule {
 
@@ -64,36 +63,60 @@ public class AuthenticationModule implements AsyncServerAuthModule {
     private List<String> exceptActions = new ArrayList<>();
     private boolean exceptQuery = false;
 
-    public AuthenticationModule(AsyncServerAuthModule ssoTokenAuthModule,
+    AuthenticationModule(AsyncServerAuthModule ssoTokenAuthModule,
             AsyncServerAuthModule optionalSsoTokenAuthModule) {
         this.ssoTokenAuthModule = ssoTokenAuthModule;
         this.optionalSsoTokenAuthModule = optionalSsoTokenAuthModule;
     }
 
+    /**
+     * Marks authentication on create requests to the route as optional.
+     */
     public void exceptCreate() {
         exceptCreate = true;
     }
 
+    /**
+     * Marks authentication on read requests to the route as optional.
+     */
     public void exceptRead() {
         exceptRead = true;
     }
 
+    /**
+     * Marks authentication on update requests to the route as optional.
+     */
     public void exceptUpdate() {
         exceptUpdate = true;
     }
 
+    /**
+     * Marks authentication on delete requests to the route as optional.
+     */
     public void exceptDelete() {
         exceptDelete = true;
     }
 
+    /**
+     * Marks authentication on patch requests to the route as optional.
+     */
     public void exceptPatch() {
         exceptPatch = true;
     }
 
+    /**
+     * Marks authentication on action requests, with the specified action ids,
+     * to the route as optional.
+     *
+     * @param actions The excluded actions.
+     */
     public void exceptActions(String... actions) {
         exceptActions.addAll(Arrays.asList(actions));
     }
 
+    /**
+     * Marks authentication on query requests to the route as optional.
+     */
     public void exceptQuery() {
         exceptQuery = true;
     }
@@ -130,15 +153,54 @@ public class AuthenticationModule implements AsyncServerAuthModule {
     public Promise<AuthStatus, AuthenticationException> validateRequest(MessageInfoContext messageInfo,
             Subject clientSubject, Subject serviceSubject) {
 
+        boolean optional = false;
+
         Request request = messageInfo.getRequest();
-        if (request.accept(new AuthenticateRequestVisitor(), null)) {
-            DEBUG.message(request.getClass().getName() + " for resource, " + request.getResourcePath()
-                    + " is a protected resource.");
-            return ssoTokenAuthModule.validateRequest(messageInfo, clientSubject, serviceSubject);
-        } else {
-            DEBUG.message(request.getClass().getName() + " for resource, " + request.getResourcePath()
-                    + " is not a protected resource.");
-            return optionalSsoTokenAuthModule.validateRequest(messageInfo, clientSubject, serviceSubject);
+        try {
+            switch (HttpUtils.determineRequestOperation(request)) {
+                case CREATE: {
+                    optional = exceptCreate;
+                    break;
+                }
+                case READ: {
+                    optional = exceptRead;
+                    break;
+                }
+                case UPDATE: {
+                    optional = exceptUpdate;
+                    break;
+                }
+                case DELETE: {
+                    optional = exceptDelete;
+                    break;
+                }
+                case PATCH: {
+                    optional = exceptPatch;
+                    break;
+                }
+                case ACTION: {
+                    optional = exceptActions.contains(request.getForm().getFirst(HttpUtils.PARAM_ACTION));
+                    break;
+                }
+                case QUERY: {
+                    optional = exceptQuery;
+                    break;
+                }
+            }
+
+            if (!optional) {
+                DEBUG.message(request.getClass().getName() + " for resource, "
+                        + messageInfo.asContext(UriRouterContext.class).getRemainingUri()
+                        + " is a protected resource.");
+                return ssoTokenAuthModule.validateRequest(messageInfo, clientSubject, serviceSubject);
+            } else {
+                DEBUG.message(request.getClass().getName() + " for resource, "
+                        + messageInfo.asContext(UriRouterContext.class).getRemainingUri()
+                        + " is not a protected resource.");
+                return optionalSsoTokenAuthModule.validateRequest(messageInfo, clientSubject, serviceSubject);
+            }
+        } catch (ResourceException e) {
+            return newExceptionPromise(new AuthenticationException("Failed to authenticate request", e));
         }
     }
 
@@ -152,43 +214,5 @@ public class AuthenticationModule implements AsyncServerAuthModule {
     public Promise<Void, AuthenticationException> cleanSubject(MessageInfoContext messageInfo,
             Subject clientSubject) {
         return ssoTokenAuthModule.cleanSubject(messageInfo, clientSubject);
-    }
-
-    private final class AuthenticateRequestVisitor implements RequestVisitor<Boolean, Void> {
-
-        @Override
-        public Boolean visitActionRequest(Void aVoid, ActionRequest request) {
-            return !exceptActions.contains(request.getAction());
-        }
-
-        @Override
-        public Boolean visitCreateRequest(Void aVoid, CreateRequest request) {
-            return !exceptCreate;
-        }
-
-        @Override
-        public Boolean visitDeleteRequest(Void aVoid, DeleteRequest request) {
-            return !exceptDelete;
-        }
-
-        @Override
-        public Boolean visitPatchRequest(Void aVoid, PatchRequest request) {
-            return !exceptPatch;
-        }
-
-        @Override
-        public Boolean visitQueryRequest(Void aVoid, QueryRequest request) {
-            return !exceptQuery;
-        }
-
-        @Override
-        public Boolean visitReadRequest(Void aVoid, ReadRequest request) {
-            return !exceptRead;
-        }
-
-        @Override
-        public Boolean visitUpdateRequest(Void aVoid, UpdateRequest request) {
-            return !exceptUpdate;
-        }
     }
 }

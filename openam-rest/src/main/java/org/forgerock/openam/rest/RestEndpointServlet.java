@@ -74,7 +74,7 @@ public class RestEndpointServlet extends HttpServlet {
         this.restletUMAServiceServlet = new RestletServiceServlet(this, UMAServiceEndpointApplication.class,
                 "umaRestletServiceServlet");
         this.authenticationFilter =
-                InjectorHolder.getInstance(Key.get(Filter.class, Names.named("RestletAuthenticationFilter")));
+                InjectorHolder.getInstance(Key.get(Filter.class, Names.named("AuthenticationFilter")));
         this.restletXACMLHttpServlet = new HttpFrameworkServlet(new RestletAuthnHttpApplication());
     }
 

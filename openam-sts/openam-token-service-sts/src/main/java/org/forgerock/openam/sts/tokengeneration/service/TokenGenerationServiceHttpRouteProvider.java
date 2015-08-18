@@ -17,29 +17,39 @@
 package org.forgerock.openam.sts.tokengeneration.service;
 
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
+import static org.forgerock.openam.audit.AuditConstants.Component.STS;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import java.util.Collections;
 import java.util.Set;
 
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
 import org.forgerock.http.Handler;
-import org.forgerock.json.resource.http.CrestHttp;
+import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.openam.http.HttpRoute;
 import org.forgerock.openam.http.HttpRouteProvider;
-import org.forgerock.openam.rest.AuthenticationFilter;
+import org.forgerock.openam.rest.RestRouter;
+import org.forgerock.openam.rest.authz.STSTokenGenerationServiceAuthzModule;
+import org.forgerock.openam.sts.tokengeneration.CTSTokenPersistence;
+import org.forgerock.openam.sts.tokengeneration.config.TokenGenerationServiceInjectorHolder;
+import org.forgerock.openam.sts.tokengeneration.oidc.OpenIdConnectTokenGeneration;
+import org.forgerock.openam.sts.tokengeneration.saml2.SAML2TokenGeneration;
+import org.forgerock.openam.sts.tokengeneration.state.RestSTSInstanceState;
+import org.forgerock.openam.sts.tokengeneration.state.STSInstanceStateProvider;
+import org.forgerock.openam.sts.tokengeneration.state.SoapSTSInstanceState;
 import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
+import org.slf4j.Logger;
 
 public class TokenGenerationServiceHttpRouteProvider implements HttpRouteProvider {
 
-    private Provider<AuthenticationFilter> authenticationFilterProvider;
+    private RestRouter rootRouter;
 
     @Inject
-    public void setAuthenticationFilterProvider(
-            @Named("RestAuthenticationFilter") Provider<AuthenticationFilter> authenticationFilterProvider) {
-        this.authenticationFilterProvider = authenticationFilterProvider;
+    public void setRouters(RestRouter router) {
+        this.rootRouter = router;
     }
 
     @Override
@@ -47,7 +57,20 @@ public class TokenGenerationServiceHttpRouteProvider implements HttpRouteProvide
         return Collections.singleton(HttpRoute.newHttpRoute(STARTS_WITH, "sts-tokengen", new Function<Void, Handler, NeverThrowsException>() {
                     @Override
                     public Handler apply(Void value) throws NeverThrowsException {
-                        return CrestHttp.newHttpHandler(TokenGenerationServiceConnectionFactoryProvider.getConnectionFactory(authenticationFilterProvider.get()));
+                        CollectionResourceProvider tokenGenerationService =
+                                new TokenGenerationService(
+                                        TokenGenerationServiceInjectorHolder.getInstance(Key.get(SAML2TokenGeneration.class)),
+                                        TokenGenerationServiceInjectorHolder.getInstance(Key.get(OpenIdConnectTokenGeneration.class)),
+                                        TokenGenerationServiceInjectorHolder.getInstance(Key.get(new TypeLiteral<STSInstanceStateProvider<RestSTSInstanceState>>(){})),
+                                        TokenGenerationServiceInjectorHolder.getInstance(Key.get(new TypeLiteral<STSInstanceStateProvider<SoapSTSInstanceState>>(){})),
+                                        TokenGenerationServiceInjectorHolder.getInstance(Key.get(CTSTokenPersistence.class)),
+                                        TokenGenerationServiceInjectorHolder.getInstance(Key.get(Logger.class)));
+
+                        rootRouter.route("")
+                                .auditAs(STS)
+                                .authorizeWith(STSTokenGenerationServiceAuthzModule.class)
+                                .toCollection(tokenGenerationService);
+                        return rootRouter.getRouter();
                     }
                 }));
     }

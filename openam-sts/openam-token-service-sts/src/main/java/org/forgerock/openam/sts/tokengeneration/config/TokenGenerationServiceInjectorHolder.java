@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.sts.tokengeneration.config;
@@ -22,7 +22,7 @@ import com.google.inject.Key;
 
 /**
  * Class used to create the injector corresponding to the bindings defining the TokenGenerationService. This class will
- * only be referenced by the TokenGenerationServiceConnectionFactoryProvider, when it is initialized by the CREST
+ * only be referenced by the TokenGenerationServiceHttpRouteProvider, when it is initialized by the CREST
  * servlet the first time the token-generation-service is invoked. This class serves as the bridge between the
  * non-guice CREST servlet context and the guice bindings which define the functionality of the token generation service.
  */
@@ -45,7 +45,7 @@ public enum TokenGenerationServiceInjectorHolder {
     /**
      * Returns the appropriate instance for the given injection key.
      * Avoid using this method, in favor of having Guice inject your dependencies ahead of time.
-     * Is only called by the TokenGenerationServiceConnectionFactoryProvider.
+     * Is only called by the TokenGenerationServiceHttpRouteProvider.
      *
      * @param key The key that defines the class to get.
      * @param <T> The type of class defined by the key.

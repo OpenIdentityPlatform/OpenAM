@@ -19,6 +19,7 @@ import static org.forgerock.util.promise.Promises.newExceptionPromise;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.audit.AuditException;
@@ -50,6 +51,7 @@ import org.forgerock.util.promise.ResultHandler;
  *
  * @since 13.0.0
  */
+@Singleton
 public class AuditFilter implements Filter {
 
     private final Debug debug;

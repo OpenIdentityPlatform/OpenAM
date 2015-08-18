@@ -16,54 +16,40 @@
 
 package org.forgerock.openam.oauth2.rest;
 
-import static org.forgerock.authz.filter.crest.AuthorizationFilters.createAuthorizationFilter;
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
-import static org.forgerock.http.routing.Version.version;
-import static org.forgerock.json.resource.RouteMatchers.requestUriMatcher;
+import static org.forgerock.openam.audit.AuditConstants.Component.OAUTH2;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import java.util.Collections;
 import java.util.Set;
 
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.json.resource.FilterChain;
-import org.forgerock.json.resource.Router;
-import org.forgerock.json.resource.http.CrestHttp;
 import org.forgerock.openam.http.HttpRoute;
 import org.forgerock.openam.http.HttpRouteProvider;
-import org.forgerock.openam.rest.AuthenticationFilter;
+import org.forgerock.openam.rest.RestRouter;
 import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
-import org.forgerock.openam.rest.authz.LoggingAuthzModule;
 
 public class OAuth2RestHttpRouteProvider implements HttpRouteProvider {
 
-    private Provider<AuthenticationFilter> authenticationFilterProvider;
+    private RestRouter rootRouter;
 
     @Inject
-    public void setAuthenticationFilterProvider(
-            @Named("RestAuthenticationFilter") Provider<AuthenticationFilter> authenticationFilterProvider) {
-        this.authenticationFilterProvider = authenticationFilterProvider;
+    public void setRouters(RestRouter router) {
+        this.rootRouter = router;
     }
 
     @Override
     public Set<HttpRoute> get() {
-        Router router = new Router();
 
-        AuthenticationFilter defaultAuthenticationFilter = authenticationFilterProvider.get();
+        rootRouter.route("token")
+                .auditAs(OAUTH2)
+                .toCollection(TokenResource.class);
 
-        Router tokenVersionRouter = new Router();
-        tokenVersionRouter.addRoute(version(1), InjectorHolder.getInstance(TokenResource.class));
-        FilterChain tokenFilterChain = new FilterChain(tokenVersionRouter, defaultAuthenticationFilter);
-        router.addRoute(requestUriMatcher(STARTS_WITH, "token"), tokenFilterChain);
+        rootRouter.route("client")
+                .auditAs(OAUTH2)
+                .authorizeWith(AdminOnlyAuthzModule.class)
+                .toCollection(ClientResource.class);
 
-        Router clientVersionRouter = new Router();
-        clientVersionRouter.addRoute(version(1), InjectorHolder.getInstance(ClientResource.class));
-        FilterChain clientFilterChain = new FilterChain(clientAuthzFilterChain, defaultAuthenticationFilter);
-        FilterChain clientAuthzFilterChain = createAuthorizationFilter(clientVersionRouter, new LoggingAuthzModule(InjectorHolder.getInstance(AdminOnlyAuthzModule.class), AdminOnlyAuthzModule.NAME));
-        router.addRoute(requestUriMatcher(STARTS_WITH, "client"), clientFilterChain);
-
-        return Collections.singleton(HttpRoute.newHttpRoute(STARTS_WITH, "frrest/oauth2", CrestHttp.newHttpHandler(router)));
+        return Collections.singleton(HttpRoute.newHttpRoute(STARTS_WITH, "frrest/oauth2", rootRouter.getRouter()));
     }
 }
