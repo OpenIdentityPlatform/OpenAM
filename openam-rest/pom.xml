@@ -262,7 +262,6 @@
             <groupId>org.forgerock.commons</groupId>
             <artifactId>json-resource</artifactId>
             <type>test-jar</type>
-            <version>${forgerock.json.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

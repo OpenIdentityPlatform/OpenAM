@@ -82,20 +82,6 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <plugin>
-                        <!-- Check Open Source licenses for all the dependencies -->
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>license-maven-plugin</artifactId>
-                        <version>1.7</version>
-                        <executions>
-                            <execution>
-                                <id>generate-oss-license-report</id>
-                                <goals>
-                                    <goal>add-third-party</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
                 </plugins>
             </build>
         </profile>

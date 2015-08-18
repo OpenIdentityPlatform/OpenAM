@@ -120,7 +120,7 @@
         <forgerock.bloomfilter.version>1.0.0-SNAPSHOT</forgerock.bloomfilter.version>
         <forgerock.http.version>0.0.1-SNAPSHOT</forgerock.http.version>
         <forgerock.authfilters.version>2.0.0-SNAPSHOT</forgerock.authfilters.version>
-        <forgerock.json.version>3.0.0-SNAPSHOT</forgerock.json.version>
+        <forgerock.rest.version>3.0.0-SNAPSHOT</forgerock.rest.version>
         <forgerock.ui.version>2.2.0-SNAPSHOT</forgerock.ui.version>
         <forgerock.guava.version>18.0.1</forgerock.guava.version>
         <forgerock.audit.version>0.3.0-SNAPSHOT</forgerock.audit.version>
@@ -1669,17 +1669,17 @@
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>json-resource</artifactId>
-                <version>${forgerock.json.version}</version>
+                <version>${forgerock.rest.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>json-resource-http</artifactId>
-                <version>${forgerock.json.version}</version>
+                <version>${forgerock.rest.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>json-web-token</artifactId>
-                <version>${forgerock.json.version}</version>
+                <version>${forgerock.rest.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
@@ -1997,6 +1997,13 @@
                 <groupId>javassist</groupId>
                 <artifactId>javassist</artifactId>
                 <version>3.12.1.GA</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>json-resource</artifactId>
+                <type>test-jar</type>
+                <version>${forgerock.rest.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
