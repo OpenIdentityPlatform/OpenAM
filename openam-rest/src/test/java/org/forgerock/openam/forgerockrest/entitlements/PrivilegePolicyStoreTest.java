@@ -180,7 +180,7 @@ public class PrivilegePolicyStoreTest {
     public void shouldHandleStringEquality() throws Exception {
         // Given
         String value = "testValue";
-        QueryRequest request = mockQueryRequest(QueryFilter.equalTo(STRING_ATTRIBUTE, value));
+        QueryRequest request = mockQueryRequest(QueryFilter.equalTo(new JsonPointer(STRING_ATTRIBUTE), value));
 
         // When
         testStore.query(request);
@@ -238,7 +238,7 @@ public class PrivilegePolicyStoreTest {
     @Test(expectedExceptions = EntitlementException.class, expectedExceptionsMessageRegExp = ".*Unknown query field.*")
     public void shouldRejectUnknownAttributes() throws Exception {
         // Given
-        QueryRequest request = mockQueryRequest(QueryFilter.equalTo("unknown", "a value"));
+        QueryRequest request = mockQueryRequest(QueryFilter.equalTo(new JsonPointer("unknown"), "a value"));
 
         // When
         testStore.query(request);
@@ -266,7 +266,7 @@ public class PrivilegePolicyStoreTest {
     @Test(expectedExceptions = EntitlementException.class, expectedExceptionsMessageRegExp = ".*not supported.*")
     public void shouldRejectPresenceQueries() throws Exception {
         // Given
-        QueryRequest request = mockQueryRequest(QueryFilter.present(STRING_ATTRIBUTE));
+        QueryRequest request = mockQueryRequest(QueryFilter.present(new JsonPointer((STRING_ATTRIBUTE))));
 
         // When
         testStore.query(request);
@@ -280,8 +280,8 @@ public class PrivilegePolicyStoreTest {
         String value1 = "value1";
         String value2 = "value2";
         QueryRequest request = mockQueryRequest(
-                QueryFilter.and(QueryFilter.equalTo(STRING_ATTRIBUTE, value1),
-                        QueryFilter.equalTo(STRING_ATTRIBUTE, value2)));
+                QueryFilter.and(QueryFilter.equalTo(new JsonPointer(STRING_ATTRIBUTE), value1),
+                        QueryFilter.equalTo(new JsonPointer(STRING_ATTRIBUTE), value2)));
 
         // When
         testStore.query(request);
