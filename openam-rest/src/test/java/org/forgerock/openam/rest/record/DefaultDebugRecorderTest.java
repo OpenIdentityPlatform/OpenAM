@@ -222,7 +222,7 @@ public class DefaultDebugRecorderTest extends DebugTestTemplate {
     }
 
     @Test
-    public void tryThreadDump() throws RecordException, InvalidDebugConfigurationException, IOException,
+    public void shouldCreateThreadDumpFiles() throws RecordException, InvalidDebugConfigurationException, IOException,
             InterruptedException {
 
             int issueID = 7;
@@ -234,30 +234,16 @@ public class DefaultDebugRecorderTest extends DebugTestTemplate {
                         RecordPropertiesTest.RECORD_DIRECTORY + "threadDump.json"));
 
         recordDebugController.startRecording(jsonRecordProperties);
-        Record currentRecord =recordDebugController.getCurrentRecord();
+        Record currentRecord = recordDebugController.getCurrentRecord();
+        recordDebugController.getThreadsDumpRunnable().run();
+        recordDebugController.stopRecording();
 
-        Set<String> shouldBeInThreadDump = new HashSet<String>();
         String threadDumpFolder = currentRecord.getFolderPath() + File.separator +
                 RecordConstants.THREAD_DUMP_FOLDER_NAME + File.separator;
-        shouldBeInThreadDump.add("tryThreadDump");
-
-        recordDebugController.stopRecording();
-        Thread.sleep(200);
 
         File[] threadDumpFiles = new File(threadDumpFolder).listFiles();
 
-        if(threadDumpFiles == null) {
-            Assert.fail("No thread dump file created.");
-        }
-
-        for(File threadDumpFile: threadDumpFiles) {
-            String relativeThreadDumpFileName  = RecordConstants.RECORD_FOLDER_NAME + File.separator + issueID + File
-                    .separator + referenceID + File
-                    .separator + RecordConstants.THREAD_DUMP_FOLDER_NAME + File.separator +
-                    threadDumpFile.getName();
-            checkLogMessagesAreInTheRightLogFiles(shouldBeInThreadDump, new String[]{relativeThreadDumpFileName},
-                    new String[]{});
-        }
+        Assert.assertTrue(threadDumpFiles != null && threadDumpFiles.length > 0, "No thread dump file created.");
     }
 
     @Test
@@ -364,6 +350,10 @@ public class DefaultDebugRecorderTest extends DebugTestTemplate {
          */
         public DefaultDebugRecorderForTest(ExecutorServiceFactory executorServiceFactory) {
             super(executorServiceFactory);
+        }
+
+        public ThreadsDumpRunnable getThreadsDumpRunnable() {
+            return new ThreadsDumpRunnable(getCurrentRecord());
         }
 
         public AutoStopFileSizeRecord getAutoStopFileSizeRecord() {
