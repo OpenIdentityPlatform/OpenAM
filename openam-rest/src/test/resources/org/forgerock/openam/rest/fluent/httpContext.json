@@ -1,5 +1,6 @@
 {
   "class": "org.forgerock.json.resource.http.HttpContext",
+  "name": "http",
   "method": "GET",
   "path": "http://product.example.com:8080/path",
   "parameters": {

@@ -31,11 +31,11 @@ import org.forgerock.openam.rest.resource.AuditInfoContext;
 import org.forgerock.util.Reject;
 
 /**
- * ResultHandler decorator responsible for publishing audit access events for a single request.
+ * Responsible for publishing audit access events for individual CREST request.
  *
  * @since 13.0.0
  */
-class AuditingResultHandler {
+class CrestAuditor {
 
     private final Debug debug;
     private final AuditEventPublisher auditEventPublisher;
@@ -46,7 +46,7 @@ class AuditingResultHandler {
     private final long startTime;
 
     /**
-     * Create a new AuditingResultHandler.
+     * Create a new CrestAuditor.
      *
      * @param debug               Debug instance.
      * @param auditEventPublisher AuditEventPublisher to which publishing of events can be delegated.
@@ -54,8 +54,8 @@ class AuditingResultHandler {
      * @param context             Context of the CREST operation being audited.
      * @param request             Request of the CREST operation being audited.
      */
-    AuditingResultHandler(Debug debug, AuditEventPublisher auditEventPublisher,
-            AuditEventFactory auditEventFactory, Context context, Request request) {
+    CrestAuditor(Debug debug, AuditEventPublisher auditEventPublisher,
+                 AuditEventFactory auditEventFactory, Context context, Request request) {
 
         Reject.ifFalse(context.containsContext(AuditInfoContext.class), "CREST auditing expects the audit context");
         component = context.asContext(AuditInfoContext.class).getComponent();

@@ -88,14 +88,14 @@ public class AuditFilter implements Filter {
     public Promise<ActionResponse, ResourceException> filterAction(Context context, ActionRequest request,
             RequestHandler next) {
 
-        final AuditingResultHandler auditingHandler = newAuditingResultHandler(context, request);
+        final CrestAuditor auditor = newAuditor(context, request);
         try {
-            auditingHandler.auditAccessAttempt();
+            auditor.auditAccessAttempt();
         } catch (AuditException e) {
             return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
 
-        return auditResponse(next.handleAction(context, request), auditingHandler);
+        return auditResponse(next.handleAction(context, request), auditor);
     }
 
     /**
@@ -113,14 +113,14 @@ public class AuditFilter implements Filter {
     public Promise<ResourceResponse, ResourceException> filterCreate(Context context, CreateRequest request,
             RequestHandler next) {
 
-        AuditingResultHandler auditingHandler = newAuditingResultHandler(context, request);
+        CrestAuditor auditor = newAuditor(context, request);
         try {
-            auditingHandler.auditAccessAttempt();
+            auditor.auditAccessAttempt();
         } catch (AuditException e) {
             return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
 
-        return auditResponse(next.handleCreate(context, request), auditingHandler);
+        return auditResponse(next.handleCreate(context, request), auditor);
     }
 
     /**
@@ -138,14 +138,14 @@ public class AuditFilter implements Filter {
     public Promise<ResourceResponse, ResourceException> filterDelete(Context context, DeleteRequest request,
             RequestHandler next) {
 
-        AuditingResultHandler auditingHandler = newAuditingResultHandler(context, request);
+        CrestAuditor auditor = newAuditor(context, request);
         try {
-            auditingHandler.auditAccessAttempt();
+            auditor.auditAccessAttempt();
         } catch (AuditException e) {
             return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
 
-        return auditResponse(next.handleDelete(context, request), auditingHandler);
+        return auditResponse(next.handleDelete(context, request), auditor);
     }
 
     /**
@@ -163,14 +163,14 @@ public class AuditFilter implements Filter {
     public Promise<ResourceResponse, ResourceException> filterPatch(Context context, PatchRequest request,
             RequestHandler next) {
 
-        AuditingResultHandler auditingHandler = newAuditingResultHandler(context, request);
+        CrestAuditor auditor = newAuditor(context, request);
         try {
-            auditingHandler.auditAccessAttempt();
+            auditor.auditAccessAttempt();
         } catch (AuditException e) {
             return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
 
-        return auditResponse(next.handlePatch(context, request), auditingHandler);
+        return auditResponse(next.handlePatch(context, request), auditor);
     }
 
     /**
@@ -189,14 +189,14 @@ public class AuditFilter implements Filter {
     public Promise<QueryResponse, ResourceException> filterQuery(Context context, QueryRequest request,
             QueryResourceHandler handler, RequestHandler next) {
 
-        AuditingResultHandler auditingHandler = newAuditingResultHandler(context, request);
+        CrestAuditor auditor = newAuditor(context, request);
         try {
-            auditingHandler.auditAccessAttempt();
+            auditor.auditAccessAttempt();
         } catch (AuditException e) {
             return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
 
-        return auditResponse(next.handleQuery(context, request, handler), auditingHandler);
+        return auditResponse(next.handleQuery(context, request, handler), auditor);
     }
 
     /**
@@ -214,14 +214,14 @@ public class AuditFilter implements Filter {
     public Promise<ResourceResponse, ResourceException> filterRead(Context context, ReadRequest request,
             RequestHandler next) {
 
-        AuditingResultHandler auditingHandler = newAuditingResultHandler(context, request);
+        CrestAuditor auditor = newAuditor(context, request);
         try {
-            auditingHandler.auditAccessAttempt();
+            auditor.auditAccessAttempt();
         } catch (AuditException e) {
             return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
 
-        return auditResponse(next.handleRead(context, request), auditingHandler);
+        return auditResponse(next.handleRead(context, request), auditor);
     }
 
     /**
@@ -239,18 +239,18 @@ public class AuditFilter implements Filter {
     public Promise<ResourceResponse, ResourceException> filterUpdate(Context context, UpdateRequest request,
             RequestHandler next) {
 
-        AuditingResultHandler auditingHandler = newAuditingResultHandler(context, request);
+        CrestAuditor auditor = newAuditor(context, request);
         try {
-            auditingHandler.auditAccessAttempt();
+            auditor.auditAccessAttempt();
         } catch (AuditException e) {
             return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
 
-        return auditResponse(next.handleUpdate(context, request), auditingHandler);
+        return auditResponse(next.handleUpdate(context, request), auditor);
     }
 
     private <T extends Response> Promise<T, ResourceException> auditResponse(Promise<T, ResourceException> promise,
-            final AuditingResultHandler auditingHandler) {
+            final CrestAuditor auditingHandler) {
         return promise
                 .thenOnResult(new ResultHandler<Response>() {
                     @Override
@@ -266,7 +266,7 @@ public class AuditFilter implements Filter {
                 });
     }
 
-    private AuditingResultHandler newAuditingResultHandler(Context context, Request request) {
-        return new AuditingResultHandler(debug, auditEventPublisher, auditEventFactory, context, request);
+    private CrestAuditor newAuditor(Context context, Request request) {
+        return new CrestAuditor(debug, auditEventPublisher, auditEventFactory, context, request);
     }
 }
