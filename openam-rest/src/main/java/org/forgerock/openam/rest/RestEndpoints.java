@@ -19,7 +19,6 @@ import static org.forgerock.http.routing.Version.version;
 import static org.forgerock.openam.rest.service.RestletUtils.wrap;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Set;
 
@@ -37,7 +36,7 @@ import org.forgerock.oauth2.restlet.TokenIntrospectionResource;
 import org.forgerock.oauth2.restlet.ValidationServerResource;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.forgerockrest.XacmlService;
-import org.forgerock.openam.rest.audit.RestletAccessAuditFilterFactory;
+import org.forgerock.openam.rest.audit.HttpAccessAuditFilterFactory;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.service.ResourceApiVersionRestlet;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
@@ -66,7 +65,6 @@ public class RestEndpoints {
     private final Restlet xacmlServiceRouter;
     private final Router umaServiceRouter;
     private final Router oauth2ServiceRouter;
-    private final RestletAccessAuditFilterFactory restletAuditFactory;
 
     /**
      * Constructs a new RestEndpoints instance.
@@ -77,19 +75,16 @@ public class RestEndpoints {
      */
     @Inject
     public RestEndpoints(RestRealmValidator realmValidator, CoreWrapper coreWrapper,
-            RestletAccessAuditFilterFactory restletAuditFactory,
             ResourceApiVersionBehaviourManager versionBehaviourManager) {
-        this(realmValidator, coreWrapper, restletAuditFactory, versionBehaviourManager,
+        this(realmValidator, coreWrapper, versionBehaviourManager,
                 InvalidRealmNameManager.getInvalidRealmNames());
     }
 
     RestEndpoints(RestRealmValidator realmValidator, CoreWrapper coreWrapper,
-            RestletAccessAuditFilterFactory restletAuditFactory,
             ResourceApiVersionBehaviourManager versionBehaviourManager, Set<String> invalidRealmNames) {
         this.realmValidator = realmValidator;
         this.versionBehaviourManager = versionBehaviourManager;
         this.coreWrapper = coreWrapper;
-        this.restletAuditFactory = restletAuditFactory;
 
         this.xacmlServiceRouter = createXACMLServiceRouter(invalidRealmNames);
         this.umaServiceRouter = createUMAServiceRouter();

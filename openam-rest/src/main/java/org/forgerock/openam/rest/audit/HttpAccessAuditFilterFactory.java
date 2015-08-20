@@ -17,12 +17,11 @@ package org.forgerock.openam.rest.audit;
 
 import static org.forgerock.openam.audit.AuditConstants.Component;
 
+import org.forgerock.http.Filter;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.forgerockrest.authn.AuthIdHelper;
 import org.forgerock.openam.forgerockrest.authn.AuthenticationAccessAuditFilter;
-import org.restlet.Restlet;
-import org.restlet.routing.Filter;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -33,7 +32,7 @@ import javax.inject.Singleton;
  * @since 13.0.0
  */
 @Singleton
-public final class RestletAccessAuditFilterFactory {
+public final class HttpAccessAuditFilterFactory {
 
     private final AuthIdHelper authIdHelper;
     private final AuditEventPublisher eventPublisher;
@@ -47,7 +46,7 @@ public final class RestletAccessAuditFilterFactory {
      * @param eventFactory The factory that can be used to create the events.
      */
     @Inject
-    public RestletAccessAuditFilterFactory(AuthIdHelper authIdHelper, AuditEventPublisher eventPublisher,
+    public HttpAccessAuditFilterFactory(AuthIdHelper authIdHelper, AuditEventPublisher eventPublisher,
             AuditEventFactory eventFactory) {
         this.authIdHelper = authIdHelper;
         this.eventPublisher = eventPublisher;
@@ -58,13 +57,12 @@ public final class RestletAccessAuditFilterFactory {
      * Create a new {@link Filter} for the given restlet and component for auditing access to the restlet.
      *
      * @param component The component represented by the restlet.
-     * @param restlet The restlet for which auditing will be done.
      * @return an instance of {@link Filter}
      */
-    public Filter createFilter(Component component, Restlet restlet) {
+    public Filter createFilter(Component component) {
         switch (component) {
             case AUTHENTICATION:
-                return new AuthenticationAccessAuditFilter(restlet, authIdHelper, eventPublisher, eventFactory);
+                return new AuthenticationAccessAuditFilter(authIdHelper, eventPublisher, eventFactory);
         }
 
         throw new IllegalArgumentException("Filter for " + component + " does not exist.");

@@ -21,6 +21,11 @@ import static org.forgerock.openam.audit.AuditConstants.*;
 
 import com.iplanet.sso.SSOToken;
 import org.forgerock.audit.events.AccessAuditEventBuilder;
+import org.forgerock.http.Context;
+import org.forgerock.http.MutableUri;
+import org.forgerock.http.context.ClientInfoContext;
+import org.forgerock.http.protocol.Headers;
+import org.forgerock.http.protocol.Request;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -105,6 +110,28 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
     }
 
     /**
+     * Sets client, server and http details from CHF Request and Context.
+     *
+     * @param request Request from which client, server and http details will be retrieved.
+     * @param context Context from which client, server and http details will be retrieved.
+     * @return this builder
+     */
+    public final AMAccessAuditEventBuilder forRequest(Request request, Context context) {
+        ClientInfoContext clientInfo = context.asContext(ClientInfoContext.class);
+        client(
+                getClientIPAddress(context, request),
+                clientInfo.getRemotePort(),
+                isReverseDnsLookupEnabled() ? clientInfo.getRemoteHost() : "");
+        MutableUri uri = request.getUri();
+        http(
+                request.getMethod(),
+                uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort() + uri.getPath(),
+                uri.getQuery() == null ? "" : uri.getQuery(),
+                getHeadersAsMap(request.getHeaders()));
+        return this;
+    }
+
+    /**
      * Sets the provided name for the event. This method is preferred over
      * {@link org.forgerock.audit.events.AuditEventBuilder#eventName(String)} as it allows OpenAM to manage event
      * names better and documentation to be automatically generated for new events.
@@ -127,6 +154,14 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
                 headerValues.add((String) headersEnumeration.nextElement());
             }
             headers.put(headerName, headerValues);
+        }
+        return headers;
+    }
+
+    private Map<String, List<String>> getHeadersAsMap(Headers requestHeaders) {
+        Map<String, List<String>> headers = new HashMap<>();
+        for (String headerName : requestHeaders.keySet()) {
+            headers.put(headerName, new ArrayList<>(requestHeaders.get(headerName)));
         }
         return headers;
     }

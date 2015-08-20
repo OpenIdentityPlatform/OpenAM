@@ -13,32 +13,33 @@
  *
  * Copyright 2015 ForgeRock AS.
  */
-package org.forgerock.openam.rest.audit;
+package org.forgerock.openam.http.audit;
 
 import static org.forgerock.openam.audit.AuditConstants.*;
-import static org.restlet.ext.servlet.ServletUtils.getRequest;
+import static org.forgerock.util.promise.Promises.*;
 
 import org.forgerock.audit.AuditException;
+import org.forgerock.http.Context;
+import org.forgerock.http.Filter;
+import org.forgerock.http.Handler;
+import org.forgerock.http.protocol.Request;
+import org.forgerock.http.protocol.Response;
+import org.forgerock.http.protocol.Status;
 import org.forgerock.openam.audit.AMAccessAuditEventBuilder;
+import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.context.AuditRequestContext;
-import org.restlet.Request;
-import org.restlet.Response;
-import org.restlet.Restlet;
-import org.restlet.data.Status;
-import org.restlet.engine.io.BufferingRepresentation;
-import org.restlet.representation.Representation;
-import org.restlet.routing.Filter;
-
-import javax.servlet.http.HttpServletRequest;
+import org.forgerock.util.Function;
+import org.forgerock.util.promise.NeverThrowsException;
+import org.forgerock.util.promise.Promise;
 
 /**
  * Responsible for logging access audit events for restlet requests.
  *
  * @since 13.0.0
  */
-public abstract class AbstractRestletAccessAuditFilter extends Filter {
+public abstract class AbstractHttpAccessAuditFilter implements Filter {
 
     private final AuditEventPublisher auditEventPublisher;
     private final AuditEventFactory auditEventFactory;
@@ -48,65 +49,56 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
      * Create a new filter for the given component and restlet.
      *
      * @param component The component for which events will be logged.
-     * @param restlet The restlet for which events will be logged.
      * @param auditEventPublisher The publisher responsible for logging the events.
      * @param auditEventFactory The factory that can be used to create the events.
      */
-    public AbstractRestletAccessAuditFilter(Component component, Restlet restlet,
+    public AbstractHttpAccessAuditFilter(Component component,
             AuditEventPublisher auditEventPublisher, AuditEventFactory auditEventFactory) {
-        setNext(restlet);
         this.auditEventPublisher = auditEventPublisher;
         this.auditEventFactory = auditEventFactory;
         this.component = component;
     }
 
+
     @Override
-    protected int beforeHandle(Request request, Response response) {
+    public Promise<Response, NeverThrowsException> filter(final Context context, final Request request, Handler next) {
         try {
-            Representation representation = request.getEntity();
-            // If the representation is transient we can only read it's entity once, so we have to wrap it in a
-            // buffer in order to read from it during the event logging and later during authentication
-            if (representation.isTransient()) {
-                request.setEntity(new BufferingRepresentation(request.getEntity()));
-            }
-            auditAccessAttempt(request);
+            auditAccessAttempt(request, context);
         } catch (AuditException e) {
-            response.setStatus(Status.SERVER_ERROR_INTERNAL, e);
-            return STOP;
+            return newResultPromise(new Response().setStatus(Status.INTERNAL_SERVER_ERROR).setCause(e));
         }
-        return CONTINUE;
+        ;
+        return next.handle(context, request).then(new Function<Response, Response, NeverThrowsException>() {
+            @Override
+            public Response apply(Response response) throws NeverThrowsException {
+                if (response.getStatus().isSuccessful()) {
+                    auditAccessSuccess(request, context, response);
+                } else {
+                    auditAccessFailure(request, context, response);
+                }
+                return response;
+            }
+        });
     }
 
-    @Override
-    protected void afterHandle(Request request, Response response) {
-        super.afterHandle(request, response);
-
-        if (response.getStatus().isError()) {
-            auditAccessFailure(request, response);
-        } else {
-            auditAccessSuccess(request, response);
-        }
-    }
-
-    private void auditAccessAttempt(Request request) throws AuditException {
-        if (auditEventPublisher.isAuditing(ACCESS_TOPIC)) {
+    private void auditAccessAttempt(Request request, Context context) throws AuditException {
+        if (auditEventPublisher.isAuditing(AuditConstants.ACCESS_TOPIC)) {
 
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
-                    .timestamp(request.getDate().getTime())
+                    .timestamp(request.getTime())
                     .transactionId(AuditRequestContext.getTransactionIdValue())
                     .eventName(EventName.AM_ACCESS_ATTEMPT)
                     .component(component)
                     .authentication(getUserIdForAccessAttempt(request))
-                    .contextId(getContextIdForAccessAttempt(request));
+                    .contextId(getContextIdForAccessAttempt(request))
+                    .forRequest(request, context);
 
-            addHttpData(request, builder);
-
-            auditEventPublisher.publish(ACCESS_TOPIC, builder.toEvent());
+            auditEventPublisher.publish(AuditConstants.ACCESS_TOPIC, builder.toEvent());
         }
     }
 
-    private void auditAccessSuccess(Request request, Response response) {
-        if (auditEventPublisher.isAuditing(ACCESS_TOPIC)) {
+    private void auditAccessSuccess(Request request, Context context, Response response) {
+        if (auditEventPublisher.isAuditing(AuditConstants.ACCESS_TOPIC)) {
 
             long endTime = System.currentTimeMillis();
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
@@ -116,16 +108,15 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
                     .component(component)
                     .authentication(getUserIdForAccessOutcome(response))
                     .contextId(getContextIdForAccessOutcome(response))
-                    .response("SUCCESS", endTime - request.getDate().getTime());
+                    .response("SUCCESS", endTime - request.getTime())
+                    .forRequest(request, context);
 
-            addHttpData(request, builder);
-
-            auditEventPublisher.tryPublish(ACCESS_TOPIC, builder.toEvent());
+            auditEventPublisher.tryPublish(AuditConstants.ACCESS_TOPIC, builder.toEvent());
         }
     }
 
-    private void auditAccessFailure(Request request, Response response) {
-        if (auditEventPublisher.isAuditing(ACCESS_TOPIC)) {
+    private void auditAccessFailure(Request request, Context context, Response response) {
+        if (auditEventPublisher.isAuditing(AuditConstants.ACCESS_TOPIC)) {
 
             long endTime = System.currentTimeMillis();
             AMAccessAuditEventBuilder builder = auditEventFactory.accessEvent()
@@ -135,19 +126,13 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
                     .component(component)
                     .authentication(getUserIdForAccessOutcome(response))
                     .contextId(getContextIdForAccessOutcome(response))
-                    .responseWithMessage("FAILED - " + response.getStatus().getCode(), endTime - request.getDate()
-                            .getTime(), response.getStatus().getDescription());
+                    .responseWithMessage("FAILED - " + response.getStatus().getCode(), endTime - request.getTime(),
+                            response.getStatus().getReasonPhrase())
+                    .forRequest(request, context);
 
-            addHttpData(request, builder);
+            builder.forRequest(request, context);
 
-            auditEventPublisher.tryPublish(ACCESS_TOPIC, builder.toEvent());
-        }
-    }
-
-    private void addHttpData(Request request, AMAccessAuditEventBuilder builder) {
-        HttpServletRequest servletRequest = getRequest(request);
-        if (servletRequest != null) {
-            builder.forHttpServletRequest(servletRequest);
+            auditEventPublisher.tryPublish(AuditConstants.ACCESS_TOPIC, builder.toEvent());
         }
     }
 
@@ -158,7 +143,7 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
      * @return the user ID
      */
     protected String getUserIdForAccessAttempt(Request request) {
-        String userId = AuditRequestContext.getProperty(USER_ID);
+        String userId = AuditRequestContext.getProperty(AuditConstants.USER_ID);
         return userId == null ? "" : userId;
     }
 
@@ -168,8 +153,8 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
      * @param request the restlet request
      * @return the context ID
      */
-    protected String getContextIdForAccessAttempt(Request request) {
-        return AuditRequestContext.getProperty(CONTEXT_ID);
+    protected String getContextIdForAccessAttempt(Request request) throws AuditException {
+        return AuditRequestContext.getProperty(AuditConstants.CONTEXT_ID);
     }
 
     /**
@@ -179,7 +164,7 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
      * @return the user ID
      */
     protected String getUserIdForAccessOutcome(Response response) {
-        String userId = AuditRequestContext.getProperty(USER_ID);
+        String userId = AuditRequestContext.getProperty(AuditConstants.USER_ID);
         return userId == null ? "" : userId;
     }
 
@@ -190,6 +175,6 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
      * @return the context ID
      */
     protected String getContextIdForAccessOutcome(Response response) {
-        return AuditRequestContext.getProperty(CONTEXT_ID);
+        return AuditRequestContext.getProperty(AuditConstants.CONTEXT_ID);
     }
 }

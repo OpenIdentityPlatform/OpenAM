@@ -16,21 +16,20 @@
 
 package org.forgerock.openam.rest;
 
-import static org.forgerock.http.routing.RoutingMode.EQUALS;
-import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
-import static org.forgerock.http.routing.Version.version;
-import static org.forgerock.openam.http.HttpRoute.newHttpRoute;
+import static org.forgerock.http.handler.Handlers.*;
+import static org.forgerock.http.routing.RoutingMode.*;
+import static org.forgerock.http.routing.Version.*;
+import static org.forgerock.openam.audit.AuditConstants.Component.*;
+import static org.forgerock.openam.http.HttpRoute.*;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.name.Names;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.forgerock.http.Handler;
 import org.forgerock.http.routing.RouteMatchers;
 import org.forgerock.http.routing.Router;
@@ -39,6 +38,11 @@ import org.forgerock.openam.forgerockrest.authn.http.AuthenticationServiceV2;
 import org.forgerock.openam.http.HttpRoute;
 import org.forgerock.openam.http.HttpRouteProvider;
 import org.forgerock.openam.http.annotations.Endpoints;
+import org.forgerock.openam.rest.audit.HttpAccessAuditFilterFactory;
+
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 
 public class RestHttpRouteProvider implements HttpRouteProvider {
 
@@ -47,6 +51,7 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
     private RestRouter realmRouter;
     private Router chfRealmRouter;
     private Injector injector;
+    private HttpAccessAuditFilterFactory httpAuditFactory;
 
     @Inject
     public void setInvalidRealms(@Named("InvalidRealmNames") Set<String> invalidRealms) {
@@ -65,6 +70,11 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
     }
 
     @Inject
+    public void setHttpAuditFactory(HttpAccessAuditFilterFactory httpAuditFactory) {
+        this.httpAuditFactory = httpAuditFactory;
+    }
+
+    @Inject
     public void setInjector(Injector injector) {
         this.injector = injector;
     }
@@ -80,11 +90,10 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         Router authenticateVersionRouter = new Router();
         Handler authenticateHandlerV1 = Endpoints.from(AuthenticationServiceV1.class);
         Handler authenticateHandlerV2 = Endpoints.from(AuthenticationServiceV2.class);
-        // TODO need to do auditing
         authenticateVersionRouter.addRoute(RouteMatchers.requestResourceApiVersionMatcher(version(1, 1)), authenticateHandlerV1);
         authenticateVersionRouter.addRoute(RouteMatchers.requestResourceApiVersionMatcher(version(2)), authenticateHandlerV2);
         //TODO authentication filter?
-        return authenticateVersionRouter;
+        return chainOf(authenticateVersionRouter, httpAuditFactory.createFilter(AUTHENTICATION));
     }
 
     private void addJsonRoutes(final Set<String> invalidRealmNames) {
