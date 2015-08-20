@@ -10,6 +10,8 @@
     "grunt": "^0.4.5",
     "grunt-contrib-less": "^1.0.1",
     "grunt-contrib-watch": "^0.6.1",
+    "grunt-contrib-qunit": "^0.5.2",
+    "grunt-notify": "^0.4.1",
     "grunt-sync": "^0.2.4",
     "grunt-text-replace": "^0.4.0",
     "jsdoc": "^3.3.2",

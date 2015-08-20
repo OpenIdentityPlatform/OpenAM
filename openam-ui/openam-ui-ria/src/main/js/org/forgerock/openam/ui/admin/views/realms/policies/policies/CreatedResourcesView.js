@@ -21,7 +21,10 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/policies/CreatedReso
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/Constants"
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/openam/ui/admin/views/realms/policies/common/Helpers",
+    "autosizeInput",
+    "doTimeout"
 ], function ($, _, AbstractView, EventManager, Constants) {
     var CreatedResourcesView = AbstractView.extend({
         element: "#resourcesList",

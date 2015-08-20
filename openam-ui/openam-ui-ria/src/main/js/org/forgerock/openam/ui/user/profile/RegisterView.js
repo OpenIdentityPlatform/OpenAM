@@ -23,21 +23,21 @@
  */
 
 /*global define */
-
 define("org/forgerock/openam/ui/user/profile/RegisterView", [
     "jquery",
     "underscore",
     "form2js",
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/main/ValidatorsManager",
-    "UserDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
+    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/util/CookieHelper",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/util/UIUtils"
-], function($, _, form2js, AbstractView, ValidatorsManager, UserDelegate, Configuration, CookieHelper, EventManager, Constants, UiUtils) {
-
+    "org/forgerock/openam/ui/common/util/RealmHelper",
+    "org/forgerock/commons/ui/common/main/Router",
+    "UserDelegate",
+    "org/forgerock/commons/ui/common/main/ValidatorsManager"
+], function ($, _, form2js, AbstractView, Configuration, Constants, CookieHelper,
+             EventManager, RealmHelper, Router, UserDelegate, ValidatorsManager) {
     var RegisterView = AbstractView.extend({
         template: "templates/openam/RegisterTemplate.html",
         baseTemplate: "templates/common/LoginBaseTemplate.html",
@@ -47,121 +47,128 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
             "click #submit" : "register",
             "onValidate": "onValidate",
             "customValidate": "customValidate",
-            "click #gotoLogin": "gotoLogin",
-            "click #cancel": "gotoLogin"
+            "click #gotoLogin": "redirectToLogin",
+            "click #cancel": "redirectToLogin"
         },
         errorsHandlers: {
             "Bad Request":  { status: "400" },
             "Not found":    { status: "404" },
             "Conflict":     { status: "409" }
         },
-        render: function(args, callback) {
-            this.data.urlParams = UiUtils.convertCurrentUrlToJSON().params;
-            this.data.isStageOne = _.keys(_.pick(this.data.urlParams, 'confirmationId', 'tokenId')).length !== 2;
+        render: function (args, callback) {
+            this.data.urlParams = Router.convertCurrentUrlToJSON().params;
+            this.data.isStageOne = _.keys(_.pick(this.data.urlParams, "confirmationId", "tokenId")).length !== 2;
 
-            this.parentRender(function() {
+            this.parentRender(function () {
                 ValidatorsManager.bindValidators(this.$el);
             });
         },
-        continueProcess: function(e) {
+        continueProcess: function (e) {
             e.preventDefault();
 
             var self = this,
-                emailInput = this.$el.find('#stageOne #mail'),
+                emailInput = this.$el.find("#stageOne #mail"),
                 submitButton = this.$el.find("#continue"),
                 postData = {
-                        email: emailInput.val(),
-                        subject: $.t("templates.user.UserRegistrationTemplate.emailSubject"),
-                        message: $.t("templates.user.UserRegistrationTemplate.emailMessage")
+                    email: emailInput.val(),
+                    subject: $.t("templates.user.UserRegistrationTemplate.emailSubject"),
+                    message: $.t("templates.user.UserRegistrationTemplate.emailMessage")
                 },
-                success = function() {
+                success = function () {
                     self.$el.find("#step2").slideDown();
                     self.$el.find("#step1").slideUp();
                 },
-                error = function(e) {
+                error = function (e) {
                     var response = JSON.parse(e.responseText);
-                    submitButton.prop('disabled', true);
-                    emailInput.prop('readonly', false);
+                    submitButton.prop("disabled", true);
+                    emailInput.prop("readonly", false);
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unableToRegister");
                 };
 
             UserDelegate.doAction("register",postData,success,error);
-            emailInput.prop('readonly', true);
-            submitButton.prop('disabled', true);
+            emailInput.prop("readonly", true);
+            submitButton.prop("disabled", true);
 
         },
-        register: function(e) {
+        register: function (e) {
             e.preventDefault();
 
             var confirmParams,
                 self = this,
-            postData = _.extend(
-                        form2js(this.$el.find("#stageTwo")[0]),
-                    {userpassword:this.$el.find("#password").val()}
-            ),
+                postData = _.extend(
+                    form2js(this.$el.find("#stageTwo")[0]),
+                    { userpassword:this.$el.find("#password").val() }
+                ),
                 submitButton = self.$el.find("#submit"),
-            success = function() {
-
-                    switch(Configuration.globalData.successfulUserRegistrationDestination){
-
-                    case 'login':
-                            EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, 'afterRegistration');
-                            self.gotoLogin();
-
-                    break;
-                    case 'autologin':
-                            EventManager.sendEvent(Constants.EVENT_USER_SUCCESSFULLY_REGISTERED, { user: {userName:postData.username, password:postData.password}, autoLogin: true });
-                    break;
-                    default:
+                success = function () {
+                    switch (Configuration.globalData.successfulUserRegistrationDestination) {
+                        case "login":
+                            EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "afterRegistration");
+                            self.redirectToLogin();
+                            break;
+                        case "autologin":
+                            EventManager.sendEvent(Constants.EVENT_USER_SUCCESSFULLY_REGISTERED, {
+                                user: {
+                                    userName: postData.username,
+                                    password: postData.password
+                                },
+                                autoLogin: true
+                            });
+                            break;
+                        default:
                             self.$el.find("#step3").slideUp();
                             self.$el.find("#step4").fadeIn();
-                    break;
-                }
+                            break;
+                    }
+                },
+                error = function (e) {
+                    var responseMessage = JSON.parse(e.responseText).message,
+                        responseCode = JSON.parse(e.responseText).code;
 
-            },
-            error = function(e) {
-                var responseMessage = JSON.parse(e.responseText).message,
-                    responseCode = JSON.parse(e.responseText).code;
-
-                    submitButton.prop('disabled', false);
-                if (responseMessage.indexOf("ldap exception") > -1) {
+                    submitButton.prop("disabled", false);
+                    if (responseMessage.indexOf("ldap exception") > -1) {
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unableToRegister");
-                } else if (responseMessage.indexOf("Identity names may not have a space character" )> -1) {
+                    } else if (responseMessage.indexOf("Identity names may not have a space character") > -1) {
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "identityNoSpace");
-                } else if (responseCode === 400) {
+                    } else if (responseCode === 400) {
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "selfRegistrationDisabled");
-                        submitButton.prop('disabled', true);
-                } else if (responseCode === 409) {
+                        submitButton.prop("disabled", true);
+                    } else if (responseCode === 409) {
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "userAlreadyExists");
-                }
-            };
+                    }
+                };
 
             UserDelegate.doAction("confirm", this.data.urlParams,
-                function(data){
+                function (data) {
                     _.extend(postData,data);
                     UserDelegate.doAction("anonymousCreate",postData,success,error,self.errorsHandlers);
                 },
-                function(e){
+                function (e) {
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unableToRegister");
                 },
                 self.errorsHandlers
             );
 
-            submitButton.prop('disabled', true);
+            submitButton.prop("disabled", true);
 
         },
-        gotoLogin: function(e) {
-            if(e){ e.preventDefault();}
-            var loginUrlParams = CookieHelper.getCookie("loginUrlParams");
+        redirectToLogin: function (event) {
+            if (event) { event.preventDefault(); }
+
+            var loginUrlParams = CookieHelper.getCookie("loginUrlParams"),
+                // In "Stage One" realm is specified via #getSubRealm, in "Stage Two" it's via #getOverrideRealm
+                realm = RealmHelper.getSubRealm() || RealmHelper.getOverrideRealm().substr(1);
             CookieHelper.deleteCookie("loginUrlParams");
-            location.href = "#login" + ((loginUrlParams) ? loginUrlParams : "/" + Configuration.globalData.auth.subRealm);
+
+            location.href = "#login" + ((loginUrlParams) ? loginUrlParams : "/" + realm);
         },
         customValidate: function () {
-            if(ValidatorsManager.formValidated(this.$el.find("#stageTwo")) || ValidatorsManager.formValidated(this.$el.find("#stageOne"))) {
-                this.$el.find("input[type=submit]").prop('disabled', false);
+            if (ValidatorsManager.formValidated(this.$el.find("#stageTwo")) ||
+                ValidatorsManager.formValidated(this.$el.find("#stageOne"))) {
+                this.$el.find("input[type=submit]").prop("disabled", false);
             }
             else {
-                this.$el.find("input[type=submit]").prop('disabled', true);
+                this.$el.find("input[type=submit]").prop("disabled", true);
             }
         }
     });

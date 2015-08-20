@@ -27,8 +27,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>openam-ui-common</module>
-        <module>openam-ui-policy</module>
         <module>openam-ui-ria</module>
-        <module>openam-ui-scripts</module>
     </modules>
 </project>

@@ -54,7 +54,6 @@ define([
     "./views/realms/policies/applications/EditApplicationView",
 
     "./views/realms/policies/common/AbstractListView",
-    "./views/realms/policies/common/Helpers",
 
     "./views/realms/policies/resourceTypes/ResourceTypesView",
     "./views/realms/policies/resourceTypes/EditResourceTypeView",

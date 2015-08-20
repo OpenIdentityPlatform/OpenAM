@@ -1,4 +1,4 @@
-/*
+/**
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2015 ForgeRock AS.
+ * Portions copyright 2011-2015 ForgeRock AS.
  */
 
 /*
@@ -432,7 +432,7 @@ public class OATH extends AMLoginModule {
     }
 
     private void paintRegisterDeviceCallback(AMIdentity id, OathDeviceSettings settings) throws AuthLoginException {
-        replaceCallback(REGISTER_DEVICE, SCRIPT_OUTPUT_CALLBACK_INDEX, createQRCodeCallback(settings, id));
+        replaceCallback(REGISTER_DEVICE, SCRIPT_OUTPUT_CALLBACK_INDEX, createQRCodeCallback(settings, id, SCRIPT_OUTPUT_CALLBACK_INDEX));
     }
 
     /**
@@ -443,51 +443,22 @@ public class OATH extends AMLoginModule {
     * In the below code returning the ScriptTextOutputCallback, the String used in its construction is
     * defined as follows:
      *
-    * createQRDomElementJS
-    *           Adds the DOM element, in this case a div, in which the QR code will appear.
     * QRCodeGenerationUtilityFunctions.
     *   getQRCodeGenerationJavascriptForAuthenticatorAppRegistration(authenticatorAppRegistrationUri)
     *           Adds a specific call to the Javascript library code, sending the app registration url as the
-    *           text to encode as a QR code. This QR code will then appear in the previously defined DOM
-    *           element (which must have an id of 'qr').
-    * hideButtonHack
-    *           A hack to reverse a hack in RESTLoginView.js. See more detailed comment above.
+    *           text to encode as a QR code.
     */
-    private Callback createQRCodeCallback(OathDeviceSettings settings, AMIdentity id) throws AuthLoginException {
-
-        final String hideButtonHack = "if(document.getElementsByClassName('button')[0] != undefined){document" +
-                ".getElementsByClassName('button')[0].style.visibility = 'visible';}\n";
-        final String createQRDomElementJS = getCreateQRDomElementJS();
+    private Callback createQRCodeCallback(OathDeviceSettings settings, AMIdentity id, int callbackIndex) throws AuthLoginException {
 
         try {
             final String authenticatorAppRegistrationUri = getAuthenticatorAppRegistrationUri(settings, id);
-            return new ScriptTextOutputCallback(createQRDomElementJS +
-                    GenerationUtils.
-                            getQRCodeGenerationJavascriptForAuthenticatorAppRegistration(authenticatorAppRegistrationUri) +
-                    hideButtonHack);
+            final String callback = "callback_" + callbackIndex;
+            return new ScriptTextOutputCallback(
+                GenerationUtils.getQRCodeGenerationJavascriptForAuthenticatorAppRegistration(callback, authenticatorAppRegistrationUri));
 
         } catch (IOException e) {
             throw new AuthLoginException(amAuthOATH, "authFailed", null);
         }
-
-    }
-
-    /**
-    * Because of the lack of support for HTML DOM element output in the XUI, we have to do this faff to get a div in
-    * there, which we can then populate with the constructed QR image.
-    *
-    * In the returned String, the Javascript if statement is used to handle presentation in the classic UI.
-    */
-    private String getCreateQRDomElementJS() {
-        final String qrImagePositioningCss = "node.style.marginTop='20px';";
-        final String qrImageCentralizationCss = "node.style.textAlign='center';";
-
-        return "var node = document.createElement('div'); node.id='qr'; "
-                + qrImagePositioningCss + qrImageCentralizationCss +
-                "if(document.getElementById('callback_0') != undefined)" +
-                "{document.getElementById('callback_0').appendChild(node);}" +
-                "else" +
-                "{document.getElementsByClassName('TextOutputCallback_0')[0].appendChild(node);}\n";
 
     }
 
@@ -578,7 +549,7 @@ public class OATH extends AMLoginModule {
             throw new AuthLoginException(amAuthOATH, "authFailed", null);
         }
 
-        //convert secretkey hex string to hex.     
+        //convert secretkey hex string to hex.
         byte[] secretKeyBytes = DatatypeConverter.parseHexBinary(secretKey);
 
         //check password length MUST be 6 or higher according to RFC

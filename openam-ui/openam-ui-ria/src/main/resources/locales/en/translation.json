@@ -137,8 +137,9 @@
                 "registerAccount" : "Register your account",
                 "problemLoggingQuestion" : "Having trouble logging in?",
                 "resetPassword" : "Reset your password",
-                "siteIdentification": "Site Identification",
-                "siteIdentificationExplanation": "Please enter your login name.<br />Your site image and pass phrase will be displayed here."
+                "siteIdentification" : "Site Identification",
+                "siteIdentificationExplanation" : "Please enter your login name.<br />Your site image and pass phrase will be displayed here.",
+                "socialAuthentication" : "Or login with:"
             },
             "404" : {
                 "pageNotFound" : "Page not found",

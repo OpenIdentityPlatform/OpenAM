@@ -3,20 +3,9 @@
     <div class="btn-group btn-group-justified" role="group" aria-label="Criteria">
         {{#each allCriteria}}
         <div class="btn-group" role="group">
-            {{#each this}}<button type="button" data-criteria="{{@key}}" data-map-id="{{../../id}}" class="btn btn-default btn-xs {{#equals ../../linkConfig.criteria @key}}active{{/equals}}">{{this}}</button>{{/each}}
+            {{#each this}}<button type="button" data-criteria="{{@key}}" data-map-id="{{../../id}}" class="btn fr-btn-secondary btn-xs {{#equals ../../linkConfig.criteria @key}}active{{/equals}}">{{this}}</button>{{/each}}
         </div>
         {{/each}}
-    </div>
-</div>
-
-<div id="criteriaFooter" >
-    <div id="successArrow" class="arrow-box-container"  >
-        <div data-criteria="{{linkConfig.criteria}}" data-pass-through-fail="{{#if passThroughFail}}true{{else}}false{{/if}}" class="arrow-title">{{t 'common.form.pass'}}</div>
-        <div data-criteria="{{linkConfig.criteria}}" data-pass-through-fail="{{#if passThroughFail}}true{{else}}false{{/if}}" class="arrow-out"></div>
-    </div>
-    <div id="failArrow" class="arrow-box-container"  >
-        <div data-criteria="{{linkConfig.criteria}}" class="arrow-title">{{t 'common.form.fail'}}</div>
-        <div data-criteria="{{linkConfig.criteria}}" class="arrow-out"></div>
     </div>
 </div>
 {{/if}}

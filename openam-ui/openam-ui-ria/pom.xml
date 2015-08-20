@@ -139,7 +139,6 @@
             <classifier>min</classifier>
         </dependency>
 
-
         <dependency>
             <groupId>org.forgerock.commons.ui.libs</groupId>
             <artifactId>less</artifactId>
@@ -154,6 +153,34 @@
             <type>js</type>
         </dependency>
 
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>sinon</artifactId>
+            <version>1.15.4</version>
+            <type>js</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>qunit</artifactId>
+            <version>1.15.0</version>
+            <type>js</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>qunit</artifactId>
+            <type>css</type>
+            <version>1.15.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>squire</artifactId>
+            <version>0.2.0</version>
+            <type>js</type>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -166,6 +193,7 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
+
         <testResources>
             <testResource>
                 <directory>${basedir}/src/test/js</directory>
@@ -184,7 +212,6 @@
                    <assumeConsoleAlertEtc>true</assumeConsoleAlertEtc>
                    <excludes>
                        <exclude>**/libs/*.js</exclude>
-                       <exclude>**/*Test.js</exclude>
                    </excludes>
                </configuration>
                <executions>
@@ -289,6 +316,20 @@
                         </configuration>
                     </execution>
 
+                    <execution>
+                        <id>copy-dependencies-test</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/test-classes/libs</outputDirectory>
+                            <includeArtifactIds>sinon,qunit,squire</includeArtifactIds>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>

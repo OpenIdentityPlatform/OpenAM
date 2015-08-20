@@ -52,6 +52,7 @@ define("org/forgerock/openam/ui/uma/models/UMAResourceSetWithPolicy", [
             // Hardwiring the id across to the UMAPolicy object as the server doesn't provide it
             if (!response.policy) {
                 response.policy = {};
+                response.policy.permissions = [];
             }
             response.policy.policyId = response._id;
 

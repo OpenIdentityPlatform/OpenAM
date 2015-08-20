@@ -266,6 +266,10 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
         },
 
         renderDialog: function () {
+            BootstrapDialog.show(this.constructDialogOptions());
+        },
+
+        constructDialogOptions: function() {
             var self = this,
                 footerButtons = [],
                 options = {
@@ -316,7 +320,8 @@ define("org/forgerock/openam/ui/admin/views/realms/scripts/EditScriptView", [
             });
 
             options.buttons = footerButtons;
-            BootstrapDialog.show(options);
+
+            return options;
         },
 
         changeContext: function () {

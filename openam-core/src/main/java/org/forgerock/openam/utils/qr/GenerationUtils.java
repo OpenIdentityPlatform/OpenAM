@@ -57,16 +57,23 @@ public final class GenerationUtils {
      *
      * @return The Javascript required for the UI to generate a QR code and place it on the screen.
      */
-    public static String getQRCodeGenerationJavascript(String textToEncode, int versionNumber,
-                                                       ErrorCorrectionLevel errorCorrectionLevel) {
+    public static String getQRCodeGenerationJavascript(String elementId, String textToEncode,
+        int versionNumber, ErrorCorrectionLevel errorCorrectionLevel)
+    {
         Reject.ifNull("textToEncode cannot be null.");
 
         if (versionNumber < 1 || versionNumber > 40) {
             throw new IllegalArgumentException("versionNumber must be in the range 1 - 40.");
         }
 
-        return "document.getElementById('qr').innerHTML = create_qrcode('" + textToEncode + "', " + versionNumber
-                + ", '" + errorCorrectionLevel.getLetterCode() + "')\n";
+        return "require(['org/forgerock/openam/server/util/QRCodeReader'], function (QRCodeReader) {\n" +
+               "    QRCodeReader.createCode({\n" +
+               "        id: '" + elementId + "',\n" +
+               "        text: '" + textToEncode + "',\n" +
+               "        version: '" + versionNumber + "',\n" +
+               "        code: '" + errorCorrectionLevel.getLetterCode() + "'\n" +
+               "    });\n" +
+               "});";
     }
 
     /**
@@ -77,8 +84,8 @@ public final class GenerationUtils {
      *
      * @return The Javascript required for the UI to generate the relevant QR code and place it on the screen.
      */
-    public static String getQRCodeGenerationJavascriptForAuthenticatorAppRegistration(String textToEncode) {
-        return getQRCodeGenerationJavascript(textToEncode, MINIMUM_VERSION_NUMBER_FOR_AUTH_APP,
+    public static String getQRCodeGenerationJavascriptForAuthenticatorAppRegistration(String elementId, String textToEncode) {
+        return getQRCodeGenerationJavascript(elementId, textToEncode, MINIMUM_VERSION_NUMBER_FOR_AUTH_APP,
                 ErrorCorrectionLevel.LOW);
     }
 

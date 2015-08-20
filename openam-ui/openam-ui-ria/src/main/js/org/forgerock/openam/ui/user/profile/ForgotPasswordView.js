@@ -33,8 +33,10 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
     "org/forgerock/commons/ui/common/util/CookieHelper",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/util/UIUtils"
-], function($, _, AbstractView, validatorsManager, userDelegate, conf, cookieHelper, eventManager, constants, uiUtils) {
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/openam/ui/common/util/RealmHelper"
+], function ($, _, AbstractView, validatorsManager, userDelegate, conf,
+             cookieHelper, eventManager, constants, Router, RealmHelper) {
     var ForgottenPasswordView = AbstractView.extend({
         template: "templates/openam/ForgotPasswordTemplate.html",
         baseTemplate: "templates/common/LoginBaseTemplate.html",
@@ -44,7 +46,8 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
             "click #changePasswordButton" : "changePassword",
             "onValidate": "onValidate",
             "customValidate": "customValidate",
-            "click #cancel": "cancel"
+            "click #cancel": "redirectToLogin",
+            "click #gotoLogin": "redirectToLogin"
         },
         errorsHandlers: {
             "Bad Request":              { status: "400" },
@@ -53,75 +56,80 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
             "Internal Server Error":    { status: "500" },
             "Service Unavailable":      { status: "503" }
         },
-        render: function(args, callback) {
-            this.data.urlParams = uiUtils.convertCurrentUrlToJSON().params;
-            this.data.isStageOne = _.keys(_.pick(this.data.urlParams, 'confirmationId', 'tokenId')).length !== 2;
+        render: function (args, callback) {
+            this.data.urlParams = Router.convertCurrentUrlToJSON().params;
+            this.data.isStageOne = _.keys(_.pick(this.data.urlParams, "confirmationId", "tokenId")).length !== 2;
 
-            this.parentRender(function() {
-               validatorsManager.bindValidators(this.$el);
+            this.parentRender (function () {
+                validatorsManager.bindValidators(this.$el);
             });
         },
-        continueProcess: function(e) {
+        continueProcess: function (e) {
             e.preventDefault();
-            $('#username').prop('readonly', true);
+            $("#username").prop("readonly", true);
             var self = this,
-            postData = {
-                    username: $('#username').val(),
+                postData = {
+                    username: $("#username").val(),
                     subject: $.t("templates.user.ForgottenPasswordTemplate.emailSubject"),
                     message: $.t("templates.user.ForgottenPasswordTemplate.emailMessage")
-            },
-            success = function() {
-                self.$el.find("#step1").slideUp();
-                self.$el.find("#emailSent").slideDown();
-            },
-            error = function(e) {
-                self.$el.find("input[type=submit]").prop('disabled', true);
-                self.$el.find('#username').prop('readonly', false).parent().addClass('has-error');
+                },
+                success = function () {
+                    self.$el.find("#step1").slideUp();
+                    self.$el.find("#emailSent").slideDown();
+                },
+                error = function (e) {
+                    self.$el.find("input[type=submit]").prop("disabled", true);
+                    self.$el.find("#username").prop("readonly", false).parent().addClass("has-error");
 
-                self.displayError(e);
-            };
+                    self.displayError(e);
+                };
 
-            this.$el.find("input[type=submit]").prop('disabled', true);
+            this.$el.find("input[type=submit]").prop("disabled", true);
 
             userDelegate.doAction("forgotPassword",postData,success,error,self.errorsHandlers);
         },
-        changePassword: function(e) {
+        changePassword: function (e) {
             e.preventDefault();
-            this.$el.find('#password').prop('readonly', true);
-            this.$el.find('#passwordConfirm').prop('readonly', true);
-            this.$el.find("input[type=submit]").prop('disabled', true);
+            this.$el.find("#password").prop("readonly", true);
+            this.$el.find("#passwordConfirm").prop("readonly", true);
+            this.$el.find("input[type=submit]").prop("disabled", true);
 
             var self = this,
-            postData = {
-                userpassword: $('#password').val()
-            },
-            success = function() {
-                self.$el.find("#step2").slideUp();
-                self.$el.find("#passwordChangeSuccess").fadeIn();
-            },
-            error = function(e) {
-                self.$el.find('#password').prop('readonly', false);
-                self.$el.find('#passwordConfirm').prop('readonly', false);
-                self.displayError(e);
-            };
+                postData = {
+                    userpassword: this.$el.find("#password").val()
+                },
+                success = function () {
+                    self.$el.find("#step2").slideUp();
+                    self.$el.find("#passwordChangeSuccess").fadeIn();
+                },
+                error = function (e) {
+                    self.$el.find("#password").prop("readonly", false);
+                    self.$el.find("#passwordConfirm").prop("readonly", false);
+                    self.displayError(e);
+                };
             _.extend(postData,this.data.urlParams);
             userDelegate.doAction("forgotPasswordReset",postData,success,error,self.errorsHandlers);
         },
-        cancel: function(e) {
-            e.preventDefault();
-            var loginUrlParams = cookieHelper.getCookie("loginUrlParams");
+        redirectToLogin: function (event) {
+            event.preventDefault();
+
+            var loginUrlParams = cookieHelper.getCookie("loginUrlParams"),
+                // In "Stage One" realm is specified via #getSubRealm, in "Stage Two" it's via #getOverrideRealm
+                realm = RealmHelper.getSubRealm() || RealmHelper.getOverrideRealm().substr(1);
             cookieHelper.deleteCookie("loginUrlParams");
-            location.href = "#login" + ((loginUrlParams) ? loginUrlParams : "/" + conf.globalData.auth.subRealm);
+
+            location.href = "#login" + ((loginUrlParams) ? loginUrlParams : "/" + realm);
         },
         customValidate: function () {
-            this.$el.find('#username').parent().removeClass('has-error');
-            if(validatorsManager.formValidated(this.$el.find("#passwordChange")) || validatorsManager.formValidated(this.$el.find("#forgotPassword"))) {
-                this.$el.find("input[type=submit]").prop('disabled', false);
+            this.$el.find("#username").parent().removeClass("has-error");
+            if (validatorsManager.formValidated(this.$el.find("#passwordChange")) ||
+                validatorsManager.formValidated(this.$el.find("#forgotPassword"))) {
+                this.$el.find("input[type=submit]").prop("disabled", false);
             } else {
-                this.$el.find("input[type=submit]").prop('disabled', true);
+                this.$el.find("input[type=submit]").prop("disabled", true);
             }
         },
-        displayError: function(e) {
+        displayError: function (e) {
             var message = "notFoundError", responseMessage = JSON.parse(e.responseText).message;
             switch (e.status) {
                 case 400:
@@ -129,27 +137,27 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
                     else if (responseMessage === "Username not provided") {
                         message = "noUserNameProvided";
                     }*/
-                break;
+                    break;
 
                 case 404:
                     message = "usernameNotFound";
-                break;
+                    break;
 
                 case 410: //Forgotten Password Link Expired
                     message = "tokenNotFound";
-                break;
+                    break;
 
                 case 500: //Invalid Server Configuration
-                    if (responseMessage === 'No email provided in profile.') {
+                    if (responseMessage === "No email provided in profile.") {
                         message = "noEmailProvided";
                     } else {
                         message = "internalError";
                     }
-                break;
+                    break;
 
                 case 503: //503 - Forgot password is not accessible.
                     message = "serviceUnavailable";
-                break;
+                    break;
             }
 
             eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, message);

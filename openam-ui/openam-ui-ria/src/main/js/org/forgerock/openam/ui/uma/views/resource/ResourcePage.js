@@ -89,10 +89,12 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                 response.responseJSON.code + " (" + response.responseJSON.reason + ") " +
                 response.responseJSON.message);
         },
+        onModelChange: function (model) {
+            this.render([undefined, model.get("_id")]);
+        },
         onUnshare: function (event) {
+            if ($(event.currentTarget).hasClass("disabled")) { return false; }
             event.preventDefault();
-
-            if ($(event.currentTarget).hasClass("disabled")) { return; }
 
             var self = this;
 
@@ -110,7 +112,7 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                         dialog.getButton("btnOk").text($.t("common.form.working"));
                         self.model.get("policy").destroy().done(function () {
                             EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "revokeAllPoliciesSuccess");
-                            self.render();
+                            self.onModelChange(self.model);
                         }).fail(function (error) {
                             Messages.addMessage({
                                 response: error.responseText,
@@ -220,8 +222,9 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
 
                         /* This an extention of the original positionDropdown method within Selectize. The override is
                          * required because using the dropdownParent 'body' places the dropdown out of scope of the
-                         * containing backbone view. However adding the dropdownParent as any other element, has problems
-                         * due the offsets and/positioning being incorrecly calucaluted in orignal positionDropdown method.
+                         * containing backbone view. However adding the dropdownParent as any other element,
+                         * has problems due the offsets and/positioning being incorrecly calucaluted in orignal
+                         * positionDropdown method.
                          */
                         select.selectize.positionDropdown = function () {
                             var $control = this.$control,
@@ -304,7 +307,9 @@ define("org/forgerock/openam/ui/uma/views/resource/ResourcePage", [
                 },
                 revoke: function () {
                     self.model.get("policy").get("permissions").remove(this.model);
-                    self.model.get("policy").save();
+                    self.model.get("policy").save().done(function (){
+                        self.onModelChange(self.model);
+                    });
                 }
             });
 

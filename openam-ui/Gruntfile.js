@@ -14,326 +14,178 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-module.exports = function(grunt) {
-    grunt.registerTask('selectiveWatch', function () {
-        var targets = Array.prototype.slice.call(arguments, 0);
-        Object.keys(grunt.config('watch')).filter(function (target) {
-            return !(grunt.util._.indexOf(targets, target) !== -1);
-        }).forEach(function (target) {
-            grunt.log.writeln('Ignoring ' + target + '...');
-            grunt.config(['watch', target], {files: []});
-        });
-        grunt.task.run('watch');
-    });
-
+module.exports = function (grunt) {
     grunt.initConfig({
-        // please update environment variable OPENAM_VERSION after realise, for fix cache issue
-        // you can use version value from main pom file, ex. 13.0.0-SNAPSHOT
+        // To fix cache issue, do not forget to update OPENAM_VERSION environment variable after release
+        // (refer to the pom.xml for the correct version, e.g. 13.0.0-SNAPSHOT)
         buildNumber: process.env.OPENAM_VERSION,
+
+        // Path to deployed OpenAM (e.g. /Users/username/tomcat/webapps/openam)
         destination: process.env.OPENAM_HOME,
+
+        // Path to FR-UI codebase (e.g. /Users/username/forgerock-ui)
         forgerockui: process.env.FORGEROCK_UI_SRC,
+
         replace: {
             ria_html: {
-                src: ['openam-ui-ria/src/main/resources/index.html'],
-                dest: '<%= destination %>/XUI/index.html',
-                replacements: [{
-                    from: '${version}',
-                    to:  '<%= buildNumber %>'
-                }]
+                src: ["openam-ui-ria/src/main/resources/index.html"],
+                dest: "<%= destination %>/XUI/index.html",
+                replacements: [
+                    {
+                        from: "${version}",
+                        to: "<%= buildNumber %>"
+                    }
+                ]
             },
             ria_style: {
-                src: ['openam-ui-ria/src/main/resources/css/styles.less'],
-                dest: '<%= destination %>/XUI/css/styles.less',
-                replacements: [{
-                    from: '${version}',
-                    to:  '<%= buildNumber %>'
-                }]
-            },
-            ria_test: {
-                // temporary fix for test
-                src: ['openam-ui-ria/src/main/resources/css/styles.less'],
-                dest: '<%= destination %>/../www/css/styles.less',
-                replacements: [{
-                    from: '?v=@{openam-version}',
-                    to:  ''
-                }]
-            },
-            script_html: {
-                src: ['openam-ui-scripts/src/main/resources/index.html'],
-                dest: '<%= destination %>/scripts/index.html',
-                replacements: [{
-                    from: '${version}',
-                    to:  '<%= buildNumber %>'
-                }]
-            },
-            script_style: {
-                src: ['openam-ui-scripts/src/main/resources/css/styles.less'],
-                dest: '<%= destination %>/scripts/css/styles.less',
-                replacements: [{
-                    from: '${version}',
-                    to:  '<%= buildNumber %>'
-                }]
-            },
-            policy_html: {
-                src: ['openam-ui-policy/src/main/resources/index.html'],
-                dest: '<%= destination %>/policyEditor/index.html',
-                replacements: [{
-                    from: '${version}',
-                    to:  '<%= buildNumber %>'
-                }]
-            },
-            policy_style: {
-                src: ['openam-ui-policy/src/main/resources/css/styles.less'],
-                dest: '<%= destination %>/policyEditor/css/styles.less',
-                replacements: [{
-                    from: '${version}',
-                    to:  '<%= buildNumber %>'
-                }]
+                src: ["openam-ui-ria/src/main/resources/css/styles.less"],
+                dest: "<%= destination %>/XUI/css/styles.less",
+                replacements: [
+                    {
+                        from: "${version}",
+                        to: "<%= buildNumber %>"
+                    }
+                ]
             }
         },
+
         sync: {
-            ria: {
-                files: [
-                    {
-                        cwd: '<%= forgerockui %>/forgerock-ui-commons/src/main/js',
-                        src: ['**/*'],
-                        dest: '<%= destination %>/XUI'
-                    },
-                    {
-                        cwd: '<%= forgerockui %>/forgerock-ui-commons/src/main/resources',
-                        src: ['**/*'],
-                        dest: '<%= destination %>/XUI'
-                    },
-                    {
-                        cwd: '<%= forgerockui %>/forgerock-ui-user/src/main/js',
-                        src: ['**/*'],
-                        dest: '<%= destination %>/XUI'
-                    },
-                    {
-                        cwd: '<%= forgerockui %>/forgerock-ui-user/src/main/resources',
-                        src: ['**/*'],
-                        dest: '<%= destination %>/XUI'
-                    },
-                    {
-                        cwd: 'openam-ui-common/src/main/resources',
-                        src: ['**/*'],
-                        dest: '<%= destination %>/XUI'
-                    },
-                    {
-                        cwd: 'openam-ui-common/src/main/js',
-                        src: ['**/*'],
-                        dest: '<%= destination %>/XUI'
-                    },
-                    {
-                        cwd: 'openam-ui-ria/src/main/resources',
-                        src: ['**/*'],
-                        dest: '<%= destination %>/XUI'
-                    },
-                    {
-                        cwd: 'openam-ui-ria/src/main/js',
-                        src: ['**/*'],
-                        dest: '<%= destination %>/XUI'
-                    }
-                ],
-                verbose: true
-            },
-
-            scripts_to_test: {
-                files: [
-                    {
-                        cwd: 'openam-ui-scripts/target/dependency',
-                        src: ['**'],
-                        dest: 'openam-ui-scripts/target/www'
-                    },
-                    {
-                        cwd: 'openam-ui-scripts/target/codemirror-4.10',
-                        src: ['lib/codemirror.js', 'mode/javascript/javascript.js', 'mode/groovy/groovy.js'],
-                        dest: 'openam-ui-scripts/target/www/libs/codemirror'
-                    },
-                    {
-                        cwd: 'openam-ui-scripts/test/libs',
-                        src: ['**'],
-                        dest: 'openam-ui-scripts/target/www/libs'
-                    },
-                    {
-                        cwd: 'openam-ui-scripts/src/main/js',
-                        src: ['**'],
-                        dest: 'openam-ui-scripts/target/www'
-                    },
-                    {
-                        cwd: 'openam-ui-scripts/src/main/resources',
-                        src: ['**'],
-                        dest: 'openam-ui-scripts/target/www'
-                    },
-                    {
-                        cwd: 'openam-ui-scripts/src/test/resources',
-                        src: ['**'],
-                        dest: 'openam-ui-scripts/target/test'
-                    },
-                    {
-                        cwd: 'openam-ui-scripts/src/test/js',
-                        src: ['**'],
-                        dest: 'openam-ui-scripts/target/test'
-                    }
-                ],
-                verbose: true
-            },
-
-            scripts_css_to_test: {
-                files: [
-                    {
-                        cwd: 'openam-ui-scripts/target/www',
-                        src: ['css/**/*.css'],
-                        dest: 'openam-ui-scripts/target/test'
-                    }
-                ],
-                verbose: true
-            },
-
-            scripts_to_tomcat: {
-                files: [
-                    {
-                        cwd: '<%= forgerockui %>/forgerock-ui-commons/src/main/js',
-                        src: ['**/*'],
-                        dest: '<%= destination %>/scripts'
-                    },
-                    {
-                        cwd: '<%= forgerockui %>/forgerock-ui-commons/src/main/resources',
-                        src: ['**/*'],
-                        dest: '<%= destination %>/scripts'
-                    },
-                    {
-                        cwd: 'openam-ui-common/src/main/resources',
-                        src: ['**/*'],
-                        dest: '<%= destination %>/scripts'
-                    },
-                    {
-                        cwd: 'openam-ui-common/src/main/js',
-                        src: ['**/*'],
-                        dest: '<%= destination %>/scripts'
-                    },
-                    {
-                        cwd: 'openam-ui-scripts/src/main/resources',
-                        src: ['**/*'],
-                        dest: '<%= destination %>/scripts'
-                    },
-                    {
-                        cwd: 'openam-ui-scripts/src/main/js',
-                        src: ['**/*'],
-                        dest: '<%= destination %>/scripts'
-                    }
-                    /*
-                    ,
-                    {
-                        cwd: 'target/test',
-                        src: ['**'],
-                        dest: '<%= destination %>/../test'
-                    },
-                    {
-                        cwd: 'target/www',
-                        src: ['**'],
-                        dest: '<%= destination %>/../www'
-                    }*/
-                ],
-                verbose: true
-            },
-
-            policy_to_test: {
-                files: [
-                    {
-                        cwd: 'openam-ui-policy/target/dependency',
-                        src: ['**'],
-                        dest: 'openam-ui-policy/target/www'
-                    },
-                    {
-                        cwd: 'openam-ui-policy/test/libs',
-                        src: ['**'],
-                        dest: 'openam-ui-policy/target/www/libs'
-                    },
-                    {
-                        cwd: 'openam-ui-policy/src/main/js',
-                        src: ['**'],
-                        dest: 'openam-ui-policy/target/www'
-                    },
-                    {
-                        cwd: 'openam-ui-policy/src/main/resources',
-                        src: ['**'],
-                        dest: 'openam-ui-policy/target/www'
-                    },
-                    {
-                        cwd: 'openam-ui-policy/src/test/resources',
-                        src: ['**'],
-                        dest: 'openam-ui-policy/target/test'
-                    },
-                    {
-                        cwd: 'openam-ui-policy/src/test/js',
-                        src: ['**'],
-                        dest: 'openam-ui-policy/target/test'
-                    }
-                ],
-                verbose: true
-            },
-
-            source_css_to_test: {
-                files: [
-                    {
-                        cwd: 'openam-ui-policy/target/www',
-                        src: ['css/**/*.css'],
-                        dest: 'openam-ui-policy/target/test'
-                    }
-                ],
-                verbose: true
-            },
-
             source_to_tomcat: {
                 files: [
                     {
-                        cwd: '<%= forgerockui %>/forgerock-ui-commons/src/main/js',
-                        src: ['**/*'],
-                        dest: '<%= destination %>/policyEditor'
+                        cwd: "<%= forgerockui %>/forgerock-ui-commons/src/main/js",
+                        src: ["**/*"],
+                        dest: "<%= destination %>/XUI"
                     },
                     {
-                        cwd: '<%= forgerockui %>/forgerock-ui-commons/src/main/resources',
-                        src: ['**/*'],
-                        dest: '<%= destination %>/policyEditor'
+                        cwd: "<%= forgerockui %>/forgerock-ui-commons/src/main/resources",
+                        src: ["**/*"],
+                        dest: "<%= destination %>/XUI"
                     },
                     {
-                        cwd: 'openam-ui-common/src/main/resources',
-                        src: ['**/*'],
-                        dest: '<%= destination %>/policyEditor'
+                        cwd: "<%= forgerockui %>/forgerock-ui-user/src/main/js",
+                        src: ["**/*"],
+                        dest: "<%= destination %>/XUI"
                     },
                     {
-                        cwd: 'openam-ui-common/src/main/js',
-                        src: ['**/*'],
-                        dest: '<%= destination %>/policyEditor'
+                        cwd: "<%= forgerockui %>/forgerock-ui-user/src/main/resources",
+                        src: ["**/*"],
+                        dest: "<%= destination %>/XUI"
                     },
                     {
-                        cwd: 'openam-ui-policy/src/main/resources',
-                        src: ['**/*'],
-                        dest: '<%= destination %>/policyEditor'
+                        cwd: "openam-ui-common/src/main/resources",
+                        src: ["**/*"],
+                        dest: "<%= destination %>/XUI"
                     },
                     {
-                        cwd: 'openam-ui-policy/src/main/js',
-                        src: ['**/*'],
-                        dest: '<%= destination %>/policyEditor'
+                        cwd: "openam-ui-common/src/main/js",
+                        src: ["**/*"],
+                        dest: "<%= destination %>/XUI"
+                    },
+
+                    {
+                        cwd: "openam-ui-ria/src/main/resources",
+                        src: ["**/*"],
+                        dest: "<%= destination %>/XUI"
+                    },
+                    {
+                        cwd: "openam-ui-ria/src/main/js",
+                        src: ["**/*"],
+                        dest: "<%= destination %>/XUI"
+                    }
+                ],
+                verbose: true
+            },
+
+            source_to_test: {
+                files: [
+                    {
+                        cwd: "<%= forgerockui %>/forgerock-ui-commons/src/main/js",
+                        src: ["**/*"],
+                        dest: "<%= destination %>/../openam-test"
+                    },
+                    {
+                        cwd: "<%= forgerockui %>/forgerock-ui-commons/src/main/resources",
+                        src: ["**/*"],
+                        dest: "<%= destination %>/../openam-test"
+                    },
+                    {
+                        cwd: "<%= forgerockui %>/forgerock-ui-user/src/main/js",
+                        src: ["**/*"],
+                        dest: "<%= destination %>/../openam-test"
+                    },
+                    {
+                        cwd: "<%= forgerockui %>/forgerock-ui-user/src/main/resources",
+                        src: ["**/*"],
+                        dest: "<%= destination %>/../openam-test"
+                    },
+                    {
+                        cwd: "openam-ui-common/src/main/resources",
+                        src: ["**/*"],
+                        dest: "<%= destination %>/../openam-test"
+                    },
+                    {
+                        cwd: "openam-ui-common/src/main/js",
+                        src: ["**/*"],
+                        dest: "<%= destination %>/../openam-test"
+                    },
+                    {
+                        cwd: "openam-ui-common/src/test/resources",
+                        src: ["**/*"],
+                        dest: "<%= destination %>/../openam-test"
+                    },
+                    {
+                        cwd: "openam-ui-common/src/test/js",
+                        src: ["**/*"],
+                        dest: "<%= destination %>/../openam-test"
+                    },
+                    {
+                        cwd: "openam-ui-ria/src/main/resources",
+                        src: ["**/*"],
+                        dest: "<%= destination %>/../openam-test"
+                    },
+                    {
+                        cwd: "openam-ui-ria/src/main/js",
+                        src: ["**/*"],
+                        dest: "<%= destination %>/../openam-test"
+                    },
+                    {
+                        cwd: "openam-ui-ria/src/test/resources",
+                        src: ["**/*"],
+                        dest: "<%= destination %>/../openam-test"
+                    },
+                    {
+                        cwd: "openam-ui-ria/src/test/js",
+                        src: ["**/*"],
+                        dest: "<%= destination %>/../openam-test"
+                    },
+                    {
+                        cwd: "<%= destination %>/XUI/libs",
+                        src: ["**"],
+                        dest: "<%= destination %>/../openam-test/libs"
+                    },
+                    {
+                        cwd: "openam-ui-ria/target/test-classes/libs",
+                        src: ["**/*"],
+                        dest: "<%= destination %>/../openam-test/libs"
                     }
 
-                    /*,
+                ],
+                verbose: true
+            },
+
+            css_to_test: {
+                files: [
                     {
-                        cwd: 'target/test',
-                        src: ['**'],
-                        dest: '<%= destination %>/../test'
-                    },
-                    {
-                        cwd: 'target/www',
-                        src: ['**'],
-                        dest: '<%= destination %>/../www'
-                    }*/
+                        cwd: "<%= destination %>/XUI/css",
+                        src: ["**"],
+                        dest: "<%= destination %>/../openam-test/css"
+                    }
                 ],
                 verbose: true
             }
-
         },
+
         less: {
             xui: {
                 files: {
@@ -341,65 +193,91 @@ module.exports = function(grunt) {
                 }
             }
         },
+
         watch: {
-            frCommons: {
+            fr_ui_commons: {
                 files: [
-                    '<%= forgerockui %>/forgerock-ui-commons/src/main/js/**',
-                    '<%= forgerockui %>/forgerock-ui-commons/src/main/resources/**'
+                    "<%= forgerockui %>/forgerock-ui-commons/src/main/js/**",
+                    "<%= forgerockui %>/forgerock-ui-commons/src/main/resources/**",
+                    "!<%= forgerockui %>/forgerock-ui-commons/src/main/resources/css/**/*.less"
                 ],
-                tasks: ['sync']
+                tasks: ["sync", "qunit"]
             },
-            frUser : {
+            fr_ui_user: {
                 files: [
-                    '<%= forgerockui %>/forgerock-ui-user/src/main/js/**',
-                    '<%= forgerockui %>/forgerock-ui-user/src/main/resources/**'
+                    "<%= forgerockui %>/forgerock-ui-user/src/main/js/**",
+                    "<%= forgerockui %>/forgerock-ui-user/src/main/resources/**",
+                    "!<%= forgerockui %>/forgerock-ui-user/src/main/resources/css/**/*.less"
                 ],
-                tasks: ['sync']
+                tasks: ["sync", "qunit"]
             },
-            common : {
+            openam_ui_common: {
                 files: [
-                    'openam-ui-common/src/main/js/**',
-                    'openam-ui-common/src/main/resources/**'
+                    "openam-ui-common/src/main/js/**",
+                    "openam-ui-common/src/test/js/**",
+
+                    "openam-ui-common/src/main/resources/**",
+                    "openam-ui-common/src/test/resources/**",
+
+                    "!openam-ui-common/src/main/resources/css/**/*.less",
+                    "!openam-ui-common/src/test/resources/css/**/*.less"
                 ],
-                tasks: ['sync']
+                tasks: ["sync", "qunit"]
             },
-            ria: {
+            openam_ui_ria: {
                 files: [
-                    'openam-ui-ria/src/main/js/**',
-                    'openam-ui-ria/src/main/resources/**'
+                    "openam-ui-ria/src/main/js/**",
+                    "openam-ui-ria/src/test/js/**",
+
+                    "openam-ui-ria/src/main/resources/**",
+                    "openam-ui-ria/src/test/resources/**",
+
+                    "!openam-ui-ria/src/main/resources/css/**/*.less",
+                    "!openam-ui-ria/src/test/resources/css/**/*.less"
                 ],
-                tasks: ['sync', 'replace']
+                tasks: ["sync", "replace", "qunit"]
             },
-            scripts: {
+            less_files: {
                 files: [
-                    'openam-ui-scripts/src/main/js/**',
-                    'openam-ui-scripts/src/main/resources/**',
-                    'openam-ui-scripts/src/test/js/**',
-                    'openam-ui-scripts/src/test/resources/**'
+                    "<%= forgerockui %>/forgerock-ui-commons/src/main/resources/css/**/*.less",
+                    "<%= forgerockui %>/forgerock-ui-user/src/main/resources/css/**/*.less",
+
+                    "openam-ui-common/src/main/resources/css/**/*.less",
+                    "openam-ui-common/src/test/resources/css/**/*.less",
+
+                    "openam-ui-ria/src/main/resources/css/**/*.less",
+                    "openam-ui-ria/src/test/resources/css/**/*.less"
                 ],
-                tasks: ['sync', 'replace']
-            },
-            policy: {
-                files: [
-                    'openam-ui-policy/src/main/js/**',
-                    'openam-ui-policy/src/main/resources/**',
-                    'openam-ui-policy/src/test/js/**',
-                    'openam-ui-policy/src/test/resources/**'
-                ],
-                tasks: ['sync', 'replace', 'less']
+                tasks: ["sync", "less", "sync:css_to_test"]
+            }
+        },
+
+        qunit: {
+            all: ["<%= destination %>/../openam-test/qunit.html"]
+        },
+
+        notify_hooks: {
+            options: {
+                enabled: true,
+                title: "OpenAM XUI Tests"
             }
         }
     });
 
-    grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-sync');
-    grunt.loadNpmTasks('grunt-text-replace');
-    grunt.loadNpmTasks('grunt-contrib-less');
+    grunt.loadNpmTasks("grunt-contrib-qunit");
+    grunt.loadNpmTasks("grunt-contrib-watch");
+    grunt.loadNpmTasks("grunt-notify");
+    grunt.loadNpmTasks("grunt-sync");
+    grunt.loadNpmTasks("grunt-text-replace");
+    grunt.loadNpmTasks("grunt-contrib-less");
 
-    grunt.registerTask('default', [
-        'sync',
-        'replace',
-        'less',
-        'selectiveWatch:frCommons:frUser:common:ria'
+    grunt.registerTask("default", [
+        "sync:source_to_tomcat",
+        "sync:source_to_test",
+        "replace",
+        "less",
+        "sync:css_to_test",
+        "qunit",
+        "watch"
     ]);
 };

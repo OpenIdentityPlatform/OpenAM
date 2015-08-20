@@ -15,13 +15,13 @@
  */
 
 /*global define, window*/
-define('org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole', [
-    'jquery',
-    'org/forgerock/commons/ui/common/main/AbstractDelegate',
-    'org/forgerock/commons/ui/common/main/Configuration',
-    'org/forgerock/commons/ui/common/util/Constants'
+define("org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole", [
+    "jquery",
+    "org/forgerock/commons/ui/common/main/AbstractDelegate",
+    "org/forgerock/commons/ui/common/main/Configuration",
+    "org/forgerock/commons/ui/common/util/Constants"
 ], function ($, AbstractDelegate, Configuration, Constants) {
-    var obj = new AbstractDelegate(Constants.host + '/' + Constants.context),
+    var obj = new AbstractDelegate(Constants.host + "/" + Constants.context),
         redirector = function (tab) {
             return function (realm) {
                 obj.realm.redirectToTab(tab, realm);
@@ -34,17 +34,21 @@ define('org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole', [
         configuration: function () { obj.global.redirectToTab(4); },
         sessions     : function () { obj.global.redirectToTab(5); },
         redirectToTab: function (tabIndex) {
-            obj.getJATOPageSession('/').done(function (session) {
-                window.location.href = '/' + Constants.context + '/task/Home?' +
-                'Home.tabCommon.TabHref=' + tabIndex +
-                '&jato.pageSession=' + session + '&requester=XUI';
+            obj.getJATOPageSession("/").done(function (session) {
+                if (session) {
+                    window.location.href = "/" + Constants.context + "/task/Home?" +
+                        "Home.tabCommon.TabHref=" + tabIndex +
+                        "&jato.pageSession=" + session + "&requester=XUI";
+                } else {
+                    window.location.href = "/" + Constants.context + "/UI/Login?service=adminconsoleservice";
+                }
             });
         }
     };
 
     obj.commonTasks = function (realm, link) {
-        var query = link.indexOf('?') === -1 ? '?' : '&';
-        window.location.href = '/' + Constants.context + '/' + link + query + 'realm=' + encodeURIComponent(realm);
+        var query = link.indexOf("?") === -1 ? "?" : "&";
+        window.location.href = "/" + Constants.context + "/" + link + query + "realm=" + encodeURIComponent(realm);
     };
 
     obj.realm = {
@@ -60,24 +64,33 @@ define('org/forgerock/openam/ui/admin/utils/RedirectToLegacyConsole', [
         scripts       : redirector(20),
         redirectToTab : function (tabIndex, realm) {
             obj.getJATOPageSession(realm).done(function (session) {
-                window.location.href = '/' + Constants.context + '/realm/RealmProperties?' +
-                'RMRealm.tblDataActionHref=' + realm +
-                '&RealmProperties.tabCommon.TabHref=' + tabIndex +
-                '&jato.pageSession=' + session + '&requester=XUI';
+                if (session) {
+                    window.location.href = "/" + Constants.context + "/realm/RealmProperties?" +
+                        "RMRealm.tblDataActionHref=" + realm +
+                        "&RealmProperties.tabCommon.TabHref=" + tabIndex +
+                        "&jato.pageSession=" + session + "&requester=XUI";
+                } else {
+                    window.location.href = "/" + Constants.context + "/UI/Login?service=adminconsoleservice";
+                }
             });
         }
     };
 
     obj.getJATOPageSession = function (realm) {
         var promise = obj.serviceCall({
-            url: '/realm/RMRealm?RMRealm.tblDataActionHref=' + realm + '&requester=XUI',
-            dataType: 'html'
+            url: "/realm/RMRealm?RMRealm.tblDataActionHref=" + realm + "&requester=XUI",
+            dataType: "html"
         });
 
         return $.when(promise)
-        .then(function (data) {
-            return data.match(/jato.pageSession=(.*?)"/)[1];
-        });
+            .then(function (data) {
+                var sessionRegEx = /jato.pageSession=(.*?)"/;
+                if (sessionRegEx.test(data)) {
+                    return data.match(sessionRegEx)[1];
+                } else {
+                    return null;
+                }
+            });
     };
 
     return obj;

@@ -21,7 +21,8 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/common/StripedListEd
     "underscore",
     "org/forgerock/commons/ui/common/main/AbstractView" ,
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/Constants"
+    "org/forgerock/commons/ui/common/util/Constants",
+    "doTimeout"
 ], function ($, _, AbstractView, EventManager, Constants) {
     return AbstractView.extend({
         noBaseTemplate: true,

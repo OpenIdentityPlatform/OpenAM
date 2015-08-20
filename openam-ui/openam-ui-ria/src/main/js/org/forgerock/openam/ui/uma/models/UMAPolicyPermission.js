@@ -27,7 +27,7 @@ define("org/forgerock/openam/ui/uma/models/UMAPolicyPermission", [
     "backbone",
     "backbone-relational",
     "org/forgerock/openam/ui/uma/models/UMAPolicyPermissionScope"
-], function(Backbone, BackboneRelational, UMAPolicyPermissionScope) {
+], function (Backbone, BackboneRelational, UMAPolicyPermissionScope) {
     return Backbone.RelationalModel.extend({
         idAttribute: "subject",
         relations: [{
@@ -37,9 +37,9 @@ define("org/forgerock/openam/ui/uma/models/UMAPolicyPermission", [
             includeInJSON: Backbone.Model.prototype.idAttribute,
             parse: true
         }],
-        validate: function(attributes) {
-            if (!attributes.subject) { return "no subject"; }
-            if (!attributes.scopes || !attributes.scopes.length) { return "no scopes"; }
+        validate: function (attributes) {
+            if (!attributes.subject) { return "no subject"; } // FIXME i18n
+            if (!attributes.scopes || !attributes.scopes.length) { return "no scopes"; } // FIXME i18n
         }
     });
 });

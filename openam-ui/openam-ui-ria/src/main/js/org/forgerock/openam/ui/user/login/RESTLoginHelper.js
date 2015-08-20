@@ -19,29 +19,30 @@
 define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     "jquery",
     "underscore",
-    "org/forgerock/openam/ui/user/delegates/AuthNDelegate",
-    "UserDelegate",
-    "org/forgerock/commons/ui/common/main/ViewManager",
     "org/forgerock/commons/ui/common/main/AbstractConfigurationAware",
-    "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/openam/ui/user/delegates/SessionDelegate",
+    "org/forgerock/openam/ui/user/delegates/AuthNDelegate",
     "org/forgerock/commons/ui/common/util/CookieHelper",
-    "org/forgerock/openam/ui/common/util/RealmHelper"
-], function ($, _, authNDelegate, userDelegate, viewManager, AbstractConfigurationAware, router, conf, uiUtils, constants, sessionDelegate, cookieHelper, RealmHelper) {
+    "org/forgerock/commons/ui/common/main/Configuration",
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/openam/ui/user/delegates/SessionDelegate",
+    "org/forgerock/commons/ui/common/util/UIUtils",
+    "UserDelegate",
+    "org/forgerock/commons/ui/common/main/ViewManager"
+], function ($, _, AbstractConfigurationAware, AuthNDelegate, CookieHelper, Configuration, Constants, Router,
+            SessionDelegate, UIUtils, UserDelegate, ViewManager) {
+
     var obj = new AbstractConfigurationAware();
 
-    obj.login = function(params, successCallback, errorCallback) {
-        var _this = this;
-        authNDelegate.getRequirements().done(function (requirements) {
+    obj.login = function (params, successCallback, errorCallback) {
+        var self = this;
+        AuthNDelegate.getRequirements().done(function (requirements) {
 
             // populate the current set of requirements with the values we have from params
             var populatedRequirements = _.clone(requirements);
 
             // used in auto login from self registration
-            if (params.userName &&  params.password && requirements.stage === "DataStore1"){
+            if (params.userName && params.password && requirements.stage === "DataStore1") {
                 populatedRequirements.callbacks[0].input[0].value = params.userName;
                 populatedRequirements.callbacks[1].input[0].value = params.password;
             } else {
@@ -52,102 +53,102 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                 });
             }
 
-            authNDelegate
+            AuthNDelegate
                 .submitRequirements(populatedRequirements)
                 .then(function (result) {
-                        if (result.hasOwnProperty("tokenId")) {
-                            obj.getLoggedUser(function(user){
-                                conf.setProperty('loggedUser', user);
-                                _this.setSuccessURL(result.tokenId).then(function(){
-                                    successCallback(user);
-                                    authNDelegate.resetProcess();
-                                });
-                            }, errorCallback);
-                        } else if (result.hasOwnProperty("authId")) {
-                            // re-render login form for next set of required inputs
-                            if (viewManager.currentView === 'LoginView') {
-                                viewManager.refresh();
-                            } else {
-                                // TODO: If using a module chain with autologin the user is currently routed to the first login screen.
-                                var href = "#login",
-                                    realm = conf.globalData.auth.subRealm;
-                                if(realm) {
-                                    href += "/" + realm;
-                                }
-                                location.href = href;
+                    if (result.hasOwnProperty("tokenId")) {
+                        obj.getLoggedUser(function (user) {
+                            Configuration.setProperty("loggedUser", user);
+                            self.setSuccessURL(result.tokenId).then(function () {
+                                successCallback(user);
+                                AuthNDelegate.resetProcess();
+                            });
+                        }, errorCallback);
+                    } else if (result.hasOwnProperty("authId")) {
+                        // re-render login form for next set of required inputs
+                        if (ViewManager.currentView === "LoginView") {
+                            ViewManager.refresh();
+                        } else {
+                            // TODO: If using a module chain with autologin the user is
+                            // currently routed to the first login screen.
+                            var href = "#login",
+                                realm = Configuration.globalData.auth.subRealm;
+                            if (realm) {
+                                href += "/" + realm;
                             }
+                            location.href = href;
                         }
-                    },
-                    function (failedStage, errorMsg) {
-                        if (failedStage > 1) {
-                            // re-render login form, sending back to the start of the process.
-                            viewManager.refresh();
-                        }
-                        errorCallback(errorMsg);
-                    });
+                    }
+                },
+                function (failedStage, errorMsg) {
+                    if (failedStage > 1) {
+                        // re-render login form, sending back to the start of the process.
+                        ViewManager.refresh();
+                    }
+                    errorCallback(errorMsg);
+                });
 
         });
     };
 
-    obj.getLoggedUser = function(successCallback, errorCallback) {
-        try{
-            userDelegate.getProfile(function(user) {
-                conf.globalData.auth.subRealm = user.userid.realm.slice(1);
+    obj.getLoggedUser = function (successCallback, errorCallback) {
+        try {
+            UserDelegate.getProfile(function (user) {
+                Configuration.globalData.auth.subRealm = user.userid.realm.slice(1);
 
                 // keep track of the current realm as a future default value, following logout:
-                router.configuration.routes.login.defaults[0] = user.userid.realm;
+                Router.configuration.routes.login.defaults[0] = user.userid.realm;
 
-                userDelegate.getUserById(user.userid.id, user.userid.realm, successCallback, function(e) {
-
+                UserDelegate.getUserById(user.userid.id, user.userid.realm, successCallback, function (e) {
                     if (e.responseJSON.code === 404) {
                         errorCallback("loggedIn");
                     } else {
                         errorCallback();
                     }
-                }, {"Not Found": {status: "404"}});
-            }, function() {
+                } , { "Not Found": { status: "404" } });
+            }, function () {
                 // Try to remove any cookie that is lingering, as it is apparently no longer valid
                 obj.removeSessionCookie();
 
                 errorCallback();
-            }, {"serverError": {status: "503"}, "unauthorized": {status: "401"}});
-        } catch(e) {
+            } , { "serverError": { status: "503" }, "unauthorized": { status: "401" } });
+        } catch (e) {
             console.log(e);
             errorCallback();
         }
     };
 
-    obj.getLoginUrlParams = function() {
-        var url = conf.globalData.auth.fullLoginURL;
-        return uiUtils.convertQueryParametersToJSON(url.substring(url.indexOf('?') + 1));
+    obj.getLoginUrlParams = function () {
+        var url = Configuration.globalData.auth.fullLoginURL;
+        return UIUtils.convertQueryParametersToJSON(url.substring(url.indexOf("?") + 1));
 
     };
 
-    obj.setSuccessURL = function(tokenId) {
+    obj.setSuccessURL = function (tokenId) {
         var promise = $.Deferred(),
-            urlParams = uiUtils.convertCurrentUrlToJSON().params,
-            url = conf.globalData.auth.successURL,
+            urlParams = UIUtils.convertCurrentUrlToJSON().params,
+            url = Configuration.globalData.auth.successURL,
             context = "";
         if (urlParams && urlParams.goto) {
-            authNDelegate
+            AuthNDelegate
                 .setGoToUrl(tokenId, urlParams.goto)
                 .then(function (data) {
                     if (data.successURL.indexOf("/") === 0 &&
-                        data.successURL.indexOf("/" + constants.context) !== 0) {
-                        context = "/" + constants.context;
+                        data.successURL.indexOf("/" + Constants.context) !== 0) {
+                        context = "/" + Constants.context;
                     }
-                    conf.globalData.auth.urlParams.goto = context + data.successURL;
+                    Configuration.globalData.auth.urlParams.goto = context + data.successURL;
                     promise.resolve();
                 }, function () {
                     promise.reject();
                 });
         } else {
-            if(url !== constants.CONSOLE_PATH || _.contains(conf.loggedUser.roles, 'ui-admin')){
-                if (!conf.globalData.auth.urlParams) {
-                    conf.globalData.auth.urlParams = {};
+            if (url !== Constants.CONSOLE_PATH || _.contains(Configuration.loggedUser.roles, "ui-admin")) {
+                if (!Configuration.globalData.auth.urlParams) {
+                    Configuration.globalData.auth.urlParams = {};
                 }
-                if (!conf.globalData.auth.urlParams.goto) {
-                    conf.globalData.auth.urlParams.goto = url;
+                if (!Configuration.globalData.auth.urlParams.goto) {
+                    Configuration.globalData.auth.urlParams.goto = url;
                 }
             }
             promise.resolve();
@@ -155,25 +156,24 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
         return promise;
     };
 
-    obj.filterUrlParams = function(params){
-        var paramsToSave = ['arg','authIndexType','authIndexValue','goto','gotoOnFail','ForceAuth','locale'],
+    obj.filterUrlParams = function (params) {
+        var paramsToSave = ["arg","authIndexType","authIndexValue","goto","gotoOnFail","ForceAuth","locale"],
             filteredParams = {};
 
-        _.each(paramsToSave, function(p){
-            if(params[p]){
+        _.each(paramsToSave, function (p) {
+            if (params[p]) {
                 filteredParams[p] = params[p];
             }
         });
 
-        return (!$.isEmptyObject(filteredParams)) ? '&' + $.param(filteredParams) : '';
+        return (!$.isEmptyObject(filteredParams)) ? "&" + $.param(filteredParams) : "";
     };
 
-    obj.logout = function(successCallback, errorCallback) {
-        var _this = this,
-            tokenCookie = cookieHelper.getCookie(conf.globalData.auth.cookieName);
-        sessionDelegate.isSessionValid(tokenCookie).then(function(result) {
+    obj.logout = function (successCallback, errorCallback) {
+        var tokenCookie = CookieHelper.getCookie(Configuration.globalData.auth.cookieName);
+        SessionDelegate.isSessionValid(tokenCookie).then(function (result) {
             if (result.valid) {
-                sessionDelegate.logout(tokenCookie).then(function () {
+                SessionDelegate.logout(tokenCookie).then(function () {
                     obj.removeSessionCookie();
 
                     successCallback();
@@ -193,24 +193,25 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
         });
     };
 
-    obj.removeSession = function() {
-        var tokenCookie = cookieHelper.getCookie(conf.globalData.auth.cookieName);
-        sessionDelegate.isSessionValid(tokenCookie).then(function(result) {
+    obj.removeSession = function () {
+        var tokenCookie = CookieHelper.getCookie(Configuration.globalData.auth.cookieName);
+        SessionDelegate.isSessionValid(tokenCookie).then(function (result) {
             if (result.valid) {
-                sessionDelegate.logout(tokenCookie).then(function () {
+                SessionDelegate.logout(tokenCookie).then(function () {
                     obj.removeSessionCookie();
                 });
             }
         });
     };
 
-    obj.removeSessionCookie = function(){
-        if (conf.globalData.auth.cookieDomains && conf.globalData.auth.cookieDomains.length !== 0){
-            _.each(conf.globalData.auth.cookieDomains,function(cookieDomain){
-                cookieHelper.deleteCookie(conf.globalData.auth.cookieName, "/", cookieDomain);
+    obj.removeSessionCookie = function () {
+        var auth = Configuration.globalData.auth;
+        if (auth.cookieDomains && auth.cookieDomains.length !== 0) {
+            _.each(auth.cookieDomains,function (cookieDomain) {
+                CookieHelper.deleteCookie(auth.cookieName, "/", cookieDomain);
             });
         } else {
-            cookieHelper.deleteCookie(conf.globalData.auth.cookieName, "/", location.hostname);
+            CookieHelper.deleteCookie(auth.cookieName, "/", location.hostname);
         }
     };
 

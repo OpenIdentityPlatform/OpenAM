@@ -66,22 +66,22 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
                 promise = SMSGlobalDelegate.realms.get(options.realmPath);
             }
 
-            $.when(promise, allRealmsPromise).done(function(data, allRealmsData) {
+            $.when(promise, allRealmsPromise).done(function (data, allRealmsData) {
                 var i18nTitleKey = newRealm ? "createTitle" : "updateTitle",
                     i18nButtonKey = newRealm ? "create" : "save",
                     realmName = data.values.name === "/" ? $.t("console.common.topLevelRealm") : data.values.name;
 
-                    if (!options.allRealmPaths) {
-                        options.allRealmPaths = [];
-                        _.each(allRealmsData[0].result, function(realm){
-                            if (realm.parentPath) {
-                                options.allRealmPaths.push(realm.parentPath);
-                            }
-                        });
-                    }
+                if (!options.allRealmPaths) {
+                    options.allRealmPaths = [];
+                    _.each(allRealmsData[0].result, function (realm) {
+                        if (realm.parentPath) {
+                            options.allRealmPaths.push(realm.parentPath);
+                        }
+                    });
+                }
 
-                    data.schema.properties.parentPath["enum"] = options.allRealmPaths;
-                    data.schema.properties.parentPath.options = {enum_titles: options.allRealmPaths};
+                data.schema.properties.parentPath["enum"] = options.allRealmPaths;
+                data.schema.properties.parentPath.options = {enum_titles: options.allRealmPaths};
 
                 BootstrapDialog.show({
                     title: $.t("console.realms.createUpdateRealmDialog." + i18nTitleKey, { realmPath: realmName }),
@@ -102,12 +102,12 @@ define("org/forgerock/openam/ui/admin/views/realms/CreateUpdateRealmDialog", [
                                 promise = SMSGlobalDelegate.realms.update(dialog.form.data());
                             }
 
-                            promise.done(function() {
+                            promise.done(function () {
                                 if (options.callback) {
                                     options.callback();
                                 }
                                 dialog.close();
-                            }).fail(function(e) {
+                            }).fail(function (e) {
                                 console.error(e);
                                 if (options.callback) {
                                     options.callback();

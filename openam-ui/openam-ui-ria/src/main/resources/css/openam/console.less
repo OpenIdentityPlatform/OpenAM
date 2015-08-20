@@ -131,35 +131,6 @@ div.default-config {
     margin-top: 0;
 }
 
-/* TODO: Need to come up with a common solution */
-ul.btn-realms-tab {
-    list-style: none;
-    padding: 0;
-    margin-bottom: 0;
-
-    li {
-        float: left;
-        display: block;
-    }
-
-    li:not(:last-child) a {
-        border-bottom-right-radius: 0;
-        border-top-right-radius: 0;
-    }
-
-    li:last-child a {
-        margin-left: -1px;
-        border-bottom-left-radius: 0;
-        border-top-left-radius: 0;
-    }
-
-    li.active .btn-default {
-        color: #333;
-        background-color: #e6e6e6;
-        border-color: #adadad;
-    }
-}
-
 @chaining-success-color:#517A93;
 @chaining-failure-color:#FF8784;
 @chaining-next-module-color: #AAA;
@@ -262,141 +233,6 @@ ul.btn-realms-tab {
         background-color: #D3D3D3;
     }
 
-    .arrow-title {
-        color:#fff;
-    }
-
-
-    &:not(:last-of-type){
-
-        #failArrow {
-            .arrow-title{
-                background-color: @chaining-next-module-color;
-                &[data-criteria="REQUISITE"]{
-                    background-color: @chaining-failure-color;
-                }
-            }
-            .arrow-out {
-                &[data-criteria="REQUIRED"], &[data-criteria="SUFFICIENT"], &[data-criteria="OPTIONAL"]{
-                    margin: 0 auto;
-                    .arrow-down(@chaining-next-module-color, 40px, 16px, 5px );
-                }
-                &[data-criteria="REQUISITE"]{
-                    margin: 0 auto;
-                    position: absolute;
-                    right: -20px;
-                    top: -10px;
-                    .arrow-right(@chaining-failure-color, 40px, 20px );
-                }
-            }
-        }
-
-        #successArrow {
-
-            .arrow-title {
-                &[data-pass-through-fail="true"] {
-                    background-color:@chaining-next-module-color;
-                    &[data-criteria="REQUIRED"],&[data-criteria="SUFFICIENT"]{
-                        background-color:@chaining-failure-color;
-                    }
-                }
-                &[data-pass-through-fail="false"] {
-                    background-color:@chaining-next-module-color;
-                    &[data-criteria="REQUIRED"],&[data-criteria="SUFFICIENT"]{
-                        background-color:@chaining-success-color;
-                    }
-                }
-            }
-            .arrow-out {
-
-                &[data-criteria="OPTIONAL"], &[data-criteria="REQUISITE"]{
-                    margin: 0 auto;
-                    &[data-pass-through-fail="true"] {
-                        .arrow-down(@chaining-next-module-color,  40px, 16px, 5px );
-                    }
-                    &[data-pass-through-fail="false"] {
-                        .arrow-down(@chaining-next-module-color,  40px, 16px, 5px );
-                    }
-
-                }
-                &[data-criteria="REQUIRED"],&[data-criteria="SUFFICIENT"]{
-                    margin: 0 auto;
-                    position: absolute;
-                    left: -20px;
-                    top: -10px;
-                    &[data-pass-through-fail="true"] {
-                        .arrow-left(@chaining-failure-color, 40px, 20px );
-                    }
-                    &[data-pass-through-fail="false"] {
-                        .arrow-left(@chaining-success-color, 40px, 20px );
-                    }
-
-                }
-            }
-        }
-    }
-
-    &:last-of-type {
-
-        #failArrow {
-            .arrow-title{
-                background-color:@chaining-failure-color;
-                &[data-criteria="REQUISITE"]{
-                    background-color: @chaining-failure-color;
-                }
-            }
-            .arrow-out {
-                margin: 0 auto;
-                position: absolute;
-                right: -20px;
-                top: -10px;
-                .arrow-right(@chaining-failure-color, 40px, 20px );
-
-            }
-        }
-
-    }
-
-    &:last-of-type {
-
-        #successArrow {
-            .arrow-title {
-                &[data-pass-through-fail="true"] {
-                    background-color:@chaining-failure-color;
-                }
-                &[data-pass-through-fail="false"] {
-                    background-color:@chaining-success-color;
-                    &[data-criteria="REQUIRED"],&[data-criteria="SUFFICIENT"]{
-                        background-color: @chaining-success-color;
-                    }
-                }
-            }
-            .arrow-out {
-                margin: 0 auto;
-                position: absolute;
-                left: -20px;
-                top: -10px;
-                &[data-pass-through-fail="true"] {
-                    .arrow-left(@chaining-failure-color, 40px, 20px );
-                }
-                &[data-pass-through-fail="false"] {
-                    .arrow-left(@chaining-success-color, 40px, 20px );
-                }
-            }
-        }
-
-        &:first-of-type {
-            #successArrow {
-                .arrow-title[data-pass-through-fail="true"] {
-                    background-color:@chaining-success-color;
-                }
-                .arrow-out[data-pass-through-fail="true"] {
-                    .arrow-left(@chaining-success-color, 40px, 20px );
-                }
-            }
-        }
-    }
-
     .fa-link {
         font-size: 32px;
         color: #FFFFFF;
@@ -411,20 +247,6 @@ ul.btn-realms-tab {
 
     .link-info{
         padding-top: 3px;
-    }
-
-    #criteriaFooter {
-        background:transparent;
-        padding: 0;
-        height: 20px;
-        transition: opacity 0.2s ease-out;
-        border-top: none;
-    }
-
-    &.dragged  #criteriaFooter {
-        opacity:0;
-        height:0;
-        transition: all 0.3s ease-in-out;
     }
 
     .criteria-btn-container {

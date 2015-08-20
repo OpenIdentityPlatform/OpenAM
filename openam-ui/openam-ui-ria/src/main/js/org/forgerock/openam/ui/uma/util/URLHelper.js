@@ -31,14 +31,12 @@ define("org/forgerock/openam/ui/uma/util/URLHelper", [
     return {
         substitute: function(url) {
             return function() {
-                url = url.replace("__api__", Constants.host + "/" + Constants.context + "/json")
-                         .replace("__host__", Constants.host)
-                         .replace("__context__", Constants.context)
-                         .replace("__username__", Configuration.loggedUser.username);
+                var replacedUrl = url.replace("__api__", Constants.host + "/" + Constants.context + "/json")
+                    .replace("__host__", Constants.host)
+                    .replace("__context__", Constants.context)
+                    .replace("__username__", Configuration.loggedUser.username);
 
-                url = RealmHelper.decorateURIWithSubRealm(url);
-
-                return url;
+                return RealmHelper.decorateURIWithSubRealm(replacedUrl);
             };
         }
     };

@@ -28,7 +28,5 @@ define("org/forgerock/openam/ui/admin/views/realms/policies/common/Helpers", [
         return new Handlebars.SafeString(result);
     });
 
-    Handlebars.registerHelper("encodeURIComponent", encodeURIComponent);
-
     return obj;
 });

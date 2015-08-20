@@ -25,6 +25,10 @@
             "properties": "always"
         }],
         /**
+         * Use === and not ==. Required for JSLint compliance.
+         */
+        "eqeqeq": [2, "smart"],
+        /**
          * 4 space indent.
          *
          * function() { # bad

@@ -238,25 +238,6 @@ body, .modal-open {
     }
 }
 
-/* FIXME  - to be discussed */
-.btn-secondary {
-    background-color:  #fff;
-    border-color: @base-theme-color;
-    color: @base-theme-color;
-    .fa{
-        color: @base-theme-color;
-    }
-
-    &:hover{
-        border-color: darken(@base-theme-color, 5%);
-        background-color: #eee;
-        color: darken(@base-theme-color, 5%);
-        .fa{
-            color: darken(@base-theme-color, 5%);
-        }
-    }
-}
-
 // removes extra space below control
 .selectize-control.multi {
     font-size:0;
@@ -298,7 +279,7 @@ body, .modal-open {
     border-top: 1px solid #eee;
 
     &:first-of-type{
-        border-top:none;
+        border-top: none;
     }
 }
 
@@ -337,13 +318,11 @@ body, .modal-open {
     }
 
     .sidenav-submenu {
-
         li {
             a {
                 padding: 0 0 10px 0;
                 display: inline-block;
             }
-
 
             a.no-arrow {
                 margin-left:15px;
@@ -387,7 +366,6 @@ body, .modal-open {
     }
 }
 
-
 #sidePageContent {
     margin-top:-6px;
 
@@ -403,4 +381,10 @@ body, .modal-open {
     .deep-page-header-button-group {
          margin-top: 44px;
     }
+}
+
+.open > .dropdown-toggle.btn-default {
+    color: #333;
+    background-color: #e6e6e6;
+    border-color: #adadad;
 }
