@@ -17,18 +17,19 @@
 package org.forgerock.openam.rest.uma;
 
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.openam.rest.uma.UmaPolicyServiceImplTest.*;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
-import static org.forgerock.util.promise.Promises.newResultPromise;
-import static org.forgerock.util.test.assertj.AssertJPromiseAssert.assertThat;
-import static org.mockito.BDDMockito.given;
+import static org.forgerock.util.promise.Promises.*;
+import static org.forgerock.util.test.assertj.AssertJPromiseAssert.*;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
-import javax.security.auth.Subject;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,32 +40,28 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.entitlement.Entitlement;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.Evaluator;
-import com.sun.identity.entitlement.JwtPrincipal;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.shared.debug.Debug;
+import javax.security.auth.Subject;
+
 import org.assertj.core.api.Assertions;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ForbiddenException;
+import org.forgerock.json.resource.InternalContext;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
-import org.forgerock.json.resource.Resource;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.Context;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
-import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.openam.uma.ResharingMode;
@@ -87,6 +84,14 @@ import org.mockito.stubbing.Answer;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.entitlement.Entitlement;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.Evaluator;
+import com.sun.identity.entitlement.JwtPrincipal;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.shared.debug.Debug;
 
 public class UmaPolicyServiceImplDelegationTest {
 
@@ -372,62 +377,62 @@ public class UmaPolicyServiceImplDelegationTest {
     }
 
     private void mockPolicyResourceDelegateForNewPolicy() {
-        final List<Resource> createdPolicies = new ArrayList<>();
-        Resource createdPolicy1 = new Resource("ID_1", "REVISION_1", createBackendSubjectOnePolicyJson());
-        Resource createdPolicy2 = new Resource("ID_1", "REVISION_1", createBackendSubjectTwoPolicyJson());
+        final List<ResourceResponse> createdPolicies = new ArrayList<>();
+        ResourceResponse createdPolicy1 = newResourceResponse("ID_1", "REVISION_1", createBackendSubjectOnePolicyJson());
+        ResourceResponse createdPolicy2 = newResourceResponse("ID_1", "REVISION_1", createBackendSubjectTwoPolicyJson());
         createdPolicies.add(createdPolicy1);
         createdPolicies.add(createdPolicy2);
-        Promise<List<Resource>, ResourceException> createPolicyPromise = newResultPromise(createdPolicies);
+        Promise<List<ResourceResponse>, ResourceException> createPolicyPromise = newResultPromise(createdPolicies);
         given(policyResourceDelegate.createPolicies(any(Context.class), anySetOf(JsonValue.class)))
                 .willReturn(createPolicyPromise);
 
-        Promise<Pair<QueryResult, List<Resource>>, ResourceException> queryPromise =
+        Promise<Pair<QueryResponse, List<ResourceResponse>>, ResourceException> queryPromise =
                 newExceptionPromise((ResourceException) new NotFoundException());
         given(policyResourceDelegate.queryPolicies(any(Context.class), any(QueryRequest.class)))
                 .willReturn(queryPromise);
         given(policyResourceDelegate.queryPolicies(any(Context.class), any(QueryRequest.class),
-                any(QueryResultHandler.class))).willAnswer(new Answer<Promise<QueryResult, ResourceException>>() {
+                any(QueryResourceHandler.class))).willAnswer(new Answer<Promise<QueryResponse, ResourceException>>() {
             @Override
-            public Promise<QueryResult, ResourceException> answer(InvocationOnMock invocation) throws Throwable {
+            public Promise<QueryResponse, ResourceException> answer(InvocationOnMock invocation) throws Throwable {
                 final PolicyGraph policyGraph = (PolicyGraph) invocation.getArguments()[2];
-                for (Resource r : createdPolicies) {
+                for (ResourceResponse r : createdPolicies) {
                     policyGraph.handleResource(r);
                 }
-                policyGraph.handleResult(new QueryResult());
-                return newResultPromise(new QueryResult());
+                policyGraph.handleResult(newQueryResponse());
+                return newResultPromise(newQueryResponse());
             }
         });
     }
 
     private void mockPolicyResourceDelegateForUpdatedPolicy() {
-        List<Resource> currentPolicies = new ArrayList<>();
-        Resource currentPolicy1 = new Resource("ID_1", "REVISION_1", createBackendSubjectOnePolicyJson());
-        Resource currentPolicy2 = new Resource("ID_2", "REVISION_1", createBackendSubjectTwoPolicyJson());
+        List<ResourceResponse> currentPolicies = new ArrayList<>();
+        ResourceResponse currentPolicy1 = newResourceResponse("ID_1", "REVISION_1", createBackendSubjectOnePolicyJson());
+        ResourceResponse currentPolicy2 = newResourceResponse("ID_2", "REVISION_1", createBackendSubjectTwoPolicyJson());
         currentPolicies.add(currentPolicy1);
         currentPolicies.add(currentPolicy2);
-        Promise<Pair<QueryResult, List<Resource>>, ResourceException> queryPromise
-                = newResultPromise(Pair.of((QueryResult) null, currentPolicies));
+        Promise<Pair<QueryResponse, List<ResourceResponse>>, ResourceException> queryPromise
+                = newResultPromise(Pair.of((QueryResponse) null, currentPolicies));
         given(policyResourceDelegate.queryPolicies(any(Context.class), any(QueryRequest.class)))
                 .willReturn(queryPromise);
 
-        final List<Resource> updatedPolicies = new ArrayList<>();
-        Resource updatedPolicy1 = new Resource("ID_1", "REVISION_1", createBackendSubjectOnePolicyJson());
-        Resource updatedPolicy3 = new Resource("ID_3", "REVISION_1", createBackendSubjectTwoPolicyJson());
+        final List<ResourceResponse> updatedPolicies = new ArrayList<>();
+        ResourceResponse updatedPolicy1 = newResourceResponse("ID_1", "REVISION_1", createBackendSubjectOnePolicyJson());
+        ResourceResponse updatedPolicy3 = newResourceResponse("ID_3", "REVISION_1", createBackendSubjectTwoPolicyJson());
         updatedPolicies.add(updatedPolicy1);
         updatedPolicies.add(updatedPolicy3);
-        Promise<List<Resource>, ResourceException> updatePolicyPromise = newResultPromise(updatedPolicies);
+        Promise<List<ResourceResponse>, ResourceException> updatePolicyPromise = newResultPromise(updatedPolicies);
         given(policyResourceDelegate.updatePolicies(any(Context.class), Matchers.<Set<JsonValue>>anyObject()))
                 .willReturn(updatePolicyPromise);
         given(policyResourceDelegate.queryPolicies(any(Context.class), any(QueryRequest.class),
-                any(QueryResultHandler.class))).willAnswer(new Answer<Promise<QueryResult, ResourceException>>() {
+                any(QueryResourceHandler.class))).willAnswer(new Answer<Promise<QueryResponse, ResourceException>>() {
             @Override
-            public Promise<QueryResult, ResourceException> answer(InvocationOnMock invocation) throws Throwable {
+            public Promise<QueryResponse, ResourceException> answer(InvocationOnMock invocation) throws Throwable {
                 final PolicyGraph policyGraph = (PolicyGraph) invocation.getArguments()[2];
-                for (Resource r : updatedPolicies) {
+                for (ResourceResponse r : updatedPolicies) {
                     policyGraph.handleResource(r);
                 }
-                policyGraph.handleResult(new QueryResult());
-                return newResultPromise(new QueryResult());
+                policyGraph.handleResult(newQueryResponse());
+                return newResultPromise(newQueryResponse());
             }
         });
     }

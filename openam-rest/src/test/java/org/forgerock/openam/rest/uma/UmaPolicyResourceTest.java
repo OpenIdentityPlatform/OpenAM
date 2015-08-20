@@ -16,38 +16,39 @@
 
 package org.forgerock.openam.rest.uma;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.util.test.assertj.AssertJPromiseAssert.*;
+import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.*;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Requests;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.Context;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.uma.UmaPolicy;
 import org.forgerock.openam.uma.UmaPolicyService;
 import org.forgerock.util.Pair;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -73,7 +74,6 @@ public class UmaPolicyResourceTest {
         //Given
         Context context = mock(Context.class);
         CreateRequest request = Requests.newCreateRequest("/policies", json(object()));
-        ResultHandler<Resource> handler = mock(ResultHandler.class);
         UmaPolicy policy = mock(UmaPolicy.class);
         Promise<UmaPolicy, ResourceException> promise = Promises.newResultPromise(policy);
 
@@ -82,14 +82,12 @@ public class UmaPolicyResourceTest {
         given(policyService.createPolicy(context, request.getContent())).willReturn(promise);
 
         //When
-        policyResource.createInstance(context, request, handler);
+        Promise<ResourceResponse, ResourceException> result = policyResource.createInstance(context, request);
 
         //Then
-        ArgumentCaptor<Resource> resourceCaptor = ArgumentCaptor.forClass(Resource.class);
-        verify(handler).handleResult(resourceCaptor.capture());
-        assertThat(resourceCaptor.getValue().getId()).isEqualTo("ID");
-        assertThat(resourceCaptor.getValue().getRevision()).isEqualTo("REVISION");
-        assertThat(resourceCaptor.getValue().getContent().asMap()).isEqualTo(Collections.emptyMap());
+        assertThat(result).succeeded().withId().isEqualTo("ID");
+        assertThat(result).succeeded().withRevision().isEqualTo("REVISION");
+        assertThat(result).succeeded().withContent().isObject().containsOnly();
     }
 
     @Test
@@ -99,17 +97,16 @@ public class UmaPolicyResourceTest {
         //Given
         Context context = mock(Context.class);
         CreateRequest request = Requests.newCreateRequest("/policies", json(object()));
-        ResultHandler<Resource> handler = mock(ResultHandler.class);
         ResourceException resourceException = mock(ResourceException.class);
         Promise<UmaPolicy, ResourceException> promise = Promises.newExceptionPromise(resourceException);
 
         given(policyService.createPolicy(context, request.getContent())).willReturn(promise);
 
         //When
-        policyResource.createInstance(context, request, handler);
+        Promise<ResourceResponse, ResourceException> result = policyResource.createInstance(context, request);
 
         //Then
-        verify(handler).handleError(resourceException);
+        assertThat(result).failedWithResourceException().isEqualTo(resourceException);
     }
 
     @Test
@@ -119,7 +116,6 @@ public class UmaPolicyResourceTest {
         //Given
         Context context = mock(Context.class);
         ReadRequest request = Requests.newReadRequest("/policies");
-        ResultHandler<Resource> handler = mock(ResultHandler.class);
         UmaPolicy policy = mock(UmaPolicy.class);
         JsonValue policyJson = json(object());
         Promise<UmaPolicy, ResourceException> promise = Promises.newResultPromise(policy);
@@ -130,14 +126,13 @@ public class UmaPolicyResourceTest {
         given(policyService.readPolicy(context, "RESOURCE_SET_UID")).willReturn(promise);
 
         //When
-        policyResource.readInstance(context, "RESOURCE_SET_UID", request, handler);
+        Promise<ResourceResponse, ResourceException> result =
+                policyResource.readInstance(context, "RESOURCE_SET_UID", request);
 
         //Then
-        ArgumentCaptor<Resource> resourceCaptor = ArgumentCaptor.forClass(Resource.class);
-        verify(handler).handleResult(resourceCaptor.capture());
-        assertThat(resourceCaptor.getValue().getId()).isEqualTo("ID");
-        assertThat(resourceCaptor.getValue().getRevision()).isEqualTo("REVISION");
-        assertThat(resourceCaptor.getValue().getContent()).isEqualTo(policyJson);
+        assertThat(result).succeeded().withId().isEqualTo("ID");
+        assertThat(result).succeeded().withRevision().isEqualTo("REVISION");
+        assertThat(result).succeeded().withContent().isObject().isEqualTo(policyJson);
     }
 
     @Test
@@ -147,17 +142,17 @@ public class UmaPolicyResourceTest {
         //Given
         Context context = mock(Context.class);
         ReadRequest request = Requests.newReadRequest("/policies");
-        ResultHandler<Resource> handler = mock(ResultHandler.class);
         ResourceException resourceException = mock(ResourceException.class);
         Promise<UmaPolicy, ResourceException> promise = Promises.newExceptionPromise(resourceException);
 
         given(policyService.readPolicy(context, "RESOURCE_SET_UID")).willReturn(promise);
 
         //When
-        policyResource.readInstance(context, "RESOURCE_SET_UID", request, handler);
+        Promise<ResourceResponse, ResourceException> result =
+                policyResource.readInstance(context, "RESOURCE_SET_UID", request);
 
         //Then
-        verify(handler).handleError(resourceException);
+        assertThat(result).failedWithResourceException().isEqualTo(resourceException);
     }
 
     @Test
@@ -167,7 +162,6 @@ public class UmaPolicyResourceTest {
         //Given
         Context context = mock(Context.class);
         UpdateRequest request = Requests.newUpdateRequest("/policies", json(object()));
-        ResultHandler<Resource> handler = mock(ResultHandler.class);
         UmaPolicy policy = mock(UmaPolicy.class);
         JsonValue policyJson = json(object());
         Promise<UmaPolicy, ResourceException> promise = Promises.newResultPromise(policy);
@@ -178,14 +172,13 @@ public class UmaPolicyResourceTest {
         given(policyService.updatePolicy(context, "RESOURCE_SET_UID", request.getContent())).willReturn(promise);
 
         //When
-        policyResource.updateInstance(context, "RESOURCE_SET_UID", request, handler);
+        Promise<ResourceResponse, ResourceException> result =
+                policyResource.updateInstance(context, "RESOURCE_SET_UID", request);
 
         //Then
-        ArgumentCaptor<Resource> resourceCaptor = ArgumentCaptor.forClass(Resource.class);
-        verify(handler).handleResult(resourceCaptor.capture());
-        assertThat(resourceCaptor.getValue().getId()).isEqualTo("ID");
-        assertThat(resourceCaptor.getValue().getRevision()).isEqualTo("REVISION");
-        assertThat(resourceCaptor.getValue().getContent()).isEqualTo(policyJson);
+        assertThat(result).succeeded().withId().isEqualTo("ID");
+        assertThat(result).succeeded().withRevision().isEqualTo("REVISION");
+        assertThat(result).succeeded().withContent().isObject().isEqualTo(policyJson);
     }
 
     @Test
@@ -195,17 +188,16 @@ public class UmaPolicyResourceTest {
         //Given
         Context context = mock(Context.class);
         UpdateRequest request = Requests.newUpdateRequest("/policies", json(object()));
-        ResultHandler<Resource> handler = mock(ResultHandler.class);
         ResourceException resourceException = mock(ResourceException.class);
         Promise<UmaPolicy, ResourceException> promise = Promises.newExceptionPromise(resourceException);
 
         given(policyService.updatePolicy(context, "RESOURCE_SET_UID", request.getContent())).willReturn(promise);
 
         //When
-        policyResource.updateInstance(context, "RESOURCE_SET_UID", request, handler);
+        Promise<ResourceResponse, ResourceException> result = policyResource.updateInstance(context, "RESOURCE_SET_UID", request);
 
         //Then
-        verify(handler).handleError(resourceException);
+        assertThat(result).failedWithResourceException().isEqualTo(resourceException);
     }
 
     @Test
@@ -215,20 +207,17 @@ public class UmaPolicyResourceTest {
         //Given
         Context context = mock(Context.class);
         DeleteRequest request = Requests.newDeleteRequest("/policies");
-        ResultHandler<Resource> handler = mock(ResultHandler.class);
         Promise<Void, ResourceException> promise = Promises.newResultPromise(null);
 
         given(policyService.deletePolicy(context, "RESOURCE_SET_UID")).willReturn(promise);
 
         //When
-        policyResource.deleteInstance(context, "RESOURCE_SET_UID", request, handler);
+        Promise<ResourceResponse, ResourceException> result = policyResource.deleteInstance(context, "RESOURCE_SET_UID", request);
 
         //Then
-        ArgumentCaptor<Resource> resourceCaptor = ArgumentCaptor.forClass(Resource.class);
-        verify(handler).handleResult(resourceCaptor.capture());
-        assertThat(resourceCaptor.getValue().getId()).isEqualTo("RESOURCE_SET_UID");
-        assertThat(resourceCaptor.getValue().getRevision()).isEqualTo("0");
-        assertThat(resourceCaptor.getValue().getContent().asMap()).isEqualTo(Collections.emptyMap());
+        assertThat(result).succeeded().withId().isEqualTo("RESOURCE_SET_UID");
+        assertThat(result).succeeded().withRevision().isEqualTo("0");
+        assertThat(result).succeeded().withContent().isObject().containsOnly();
     }
 
     @Test
@@ -238,17 +227,16 @@ public class UmaPolicyResourceTest {
         //Given
         Context context = mock(Context.class);
         DeleteRequest request = Requests.newDeleteRequest("/policies");
-        ResultHandler<Resource> handler = mock(ResultHandler.class);
         ResourceException resourceException = mock(ResourceException.class);
         Promise<Void, ResourceException> promise = Promises.newExceptionPromise(resourceException);
 
         given(policyService.deletePolicy(context, "RESOURCE_SET_UID")).willReturn(promise);
 
         //When
-        policyResource.deleteInstance(context, "RESOURCE_SET_UID", request, handler);
+        Promise<ResourceResponse, ResourceException> result = policyResource.deleteInstance(context, "RESOURCE_SET_UID", request);
 
         //Then
-        verify(handler).handleError(resourceException);
+        assertThat(result).failedWithResourceException().isEqualTo(resourceException);
     }
 
     @Test
@@ -258,15 +246,12 @@ public class UmaPolicyResourceTest {
         //Given
         Context context = mock(Context.class);
         PatchRequest request = Requests.newPatchRequest("/policies");
-        ResultHandler<Resource> handler = mock(ResultHandler.class);
 
         //When
-        policyResource.patchInstance(context, "RESOURCE_SET_UID", request, handler);
+        Promise<ResourceResponse, ResourceException> result = policyResource.patchInstance(context, "RESOURCE_SET_UID", request);
 
         //Then
-        ArgumentCaptor<ResourceException> exceptionCaptor = ArgumentCaptor.forClass(ResourceException.class);
-        verify(handler).handleError(exceptionCaptor.capture());
-        assertThat(exceptionCaptor.getValue()).isInstanceOf(NotSupportedException.class);
+        assertThat(result).failedWithResourceException().isInstanceOf(NotSupportedException.class);
     }
 
     @Test
@@ -276,15 +261,12 @@ public class UmaPolicyResourceTest {
         //Given
         Context context = mock(Context.class);
         ActionRequest request = Requests.newActionRequest("/policies", "ACTION_ID");
-        ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 
         //When
-        policyResource.actionCollection(context, request, handler);
+        Promise<ActionResponse, ResourceException> result = policyResource.actionCollection(context, request);
 
         //Then
-        ArgumentCaptor<ResourceException> exceptionCaptor = ArgumentCaptor.forClass(ResourceException.class);
-        verify(handler).handleError(exceptionCaptor.capture());
-        assertThat(exceptionCaptor.getValue()).isInstanceOf(NotSupportedException.class);
+        assertThat(result).failedWithException().isInstanceOf(NotSupportedException.class);
     }
 
     @Test
@@ -294,15 +276,12 @@ public class UmaPolicyResourceTest {
         //Given
         Context context = mock(Context.class);
         ActionRequest request = Requests.newActionRequest("/policies", "ACTION_ID");
-        ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 
         //When
-        policyResource.actionInstance(context, "RESOURCE_SET_ID", request, handler);
+        Promise<ActionResponse, ResourceException> result = policyResource.actionInstance(context, "RESOURCE_SET_ID", request);
 
         //Then
-        ArgumentCaptor<ResourceException> exceptionCaptor = ArgumentCaptor.forClass(ResourceException.class);
-        verify(handler).handleError(exceptionCaptor.capture());
-        assertThat(exceptionCaptor.getValue()).isInstanceOf(NotSupportedException.class);
+        assertThat(result).failedWithException().isInstanceOf(NotSupportedException.class);
     }
 
     @Test
@@ -311,24 +290,24 @@ public class UmaPolicyResourceTest {
         //Given
         Context context = mock(Context.class);
         QueryRequest request = Requests.newQueryRequest("/policies");
-        QueryResultHandler handler = mock(QueryResultHandler.class);
-        QueryResult queryResult = new QueryResult();
+        QueryResourceHandler handler = mock(QueryResourceHandler.class);
+        QueryResponse queryResult = newQueryResponse();
         Collection<UmaPolicy> umaPolicies = new HashSet<UmaPolicy>();
         UmaPolicy policy1 = mock(UmaPolicy.class);
         UmaPolicy policy2 = mock(UmaPolicy.class);
         umaPolicies.add(policy1);
         umaPolicies.add(policy2);
-        Promise<Pair<QueryResult, Collection<UmaPolicy>>, ResourceException> promise =
+        Promise<Pair<QueryResponse, Collection<UmaPolicy>>, ResourceException> promise =
                 Promises.newResultPromise(Pair.of(queryResult, umaPolicies));
 
         given(policyService.queryPolicies(context, request)).willReturn(promise);
 
         //When
-        policyResource.queryCollection(context, request, handler);
+        Promise<QueryResponse, ResourceException> result = policyResource.queryCollection(context, request, handler);
 
         //Then
-        verify(handler, times(2)).handleResource(Matchers.<Resource>anyObject());
-        verify(handler).handleResult(queryResult);
+        verify(handler, times(2)).handleResource(Matchers.<ResourceResponse>anyObject());
+        assertThat(result).succeeded().withObject().isEqualTo(queryResult);
     }
 
     @Test
@@ -337,17 +316,17 @@ public class UmaPolicyResourceTest {
         //Given
         Context context = mock(Context.class);
         QueryRequest request = Requests.newQueryRequest("/policies");
-        QueryResultHandler handler = mock(QueryResultHandler.class);
+        QueryResourceHandler handler = mock(QueryResourceHandler.class);
         ResourceException resourceException = mock(ResourceException.class);
-        Promise<Pair<QueryResult, Collection<UmaPolicy>>, ResourceException> promise =
+        Promise<Pair<QueryResponse, Collection<UmaPolicy>>, ResourceException> promise =
                 Promises.newExceptionPromise(resourceException);
 
         given(policyService.queryPolicies(context, request)).willReturn(promise);
 
         //When
-        policyResource.queryCollection(context, request, handler);
+        Promise<QueryResponse, ResourceException> result = policyResource.queryCollection(context, request, handler);
 
         //Then
-        verify(handler).handleError(resourceException);
+        assertThat(result).failedWithException().isEqualTo(resourceException);
     }
 }
