@@ -16,6 +16,9 @@
 
 package org.forgerock.openam.rest.uma;
 
+import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.util.promise.Promises.newResultPromise;
+import static org.forgerock.util.test.assertj.AssertJPromiseAssert.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.forgerock.json.JsonValue.*;
 import static org.mockito.BDDMockito.*;
@@ -29,19 +32,20 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalContext;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Requests;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.http.context.RootContext;
 import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
@@ -50,6 +54,7 @@ import org.forgerock.openam.forgerockrest.utils.RequestHolder;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.uma.UmaProviderSettings;
 import org.forgerock.openam.uma.UmaProviderSettingsFactory;
+import org.forgerock.util.promise.Promise;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeClass;
@@ -85,7 +90,25 @@ public class UmaEnabledFilterTest {
         MockitoAnnotations.initMocks(this);
         context = new InternalContext(new RealmContext(new RootContext()));
         requestHandler = mock(RequestHandler.class);
+        when(requestHandler.handleAction(any(Context.class), any(ActionRequest.class)))
+                .thenReturn(promise(newActionResponse(null)));
+        when(requestHandler.handleCreate(any(Context.class), any(CreateRequest.class)))
+                .thenReturn(promise(newResourceResponse(null, null, null)));
+        when(requestHandler.handleDelete(any(Context.class), any(DeleteRequest.class)))
+                .thenReturn(promise(newResourceResponse(null, null, null)));
+        when(requestHandler.handlePatch(any(Context.class), any(PatchRequest.class)))
+                .thenReturn(promise(newResourceResponse(null, null, null)));
+        when(requestHandler.handleQuery(any(Context.class), any(QueryRequest.class), any(QueryResourceHandler.class)))
+                .thenReturn(promise(newQueryResponse()));
+        when(requestHandler.handleRead(any(Context.class), any(ReadRequest.class)))
+                .thenReturn(promise(newResourceResponse(null, null, null)));
+        when(requestHandler.handleUpdate(any(Context.class), any(UpdateRequest.class)))
+                .thenReturn(promise(newResourceResponse(null, null, null)));
         RequestHolder.set(mock(HttpServletRequest.class));
+    }
+
+    private <V> Promise<V, ResourceException> promise(V response) {
+        return newResultPromise(response);
     }
 
     @DataProvider
@@ -101,28 +124,25 @@ public class UmaEnabledFilterTest {
     public void testFilterAction(UmaProviderSettingsFactory factory, boolean expectFailure) throws Exception {
         // Given
         UmaEnabledFilter filter = new UmaEnabledFilter(factory);
-        ResultHandler<JsonValue> resultHandler = mock(ResultHandler.class);
         ActionRequest request = Requests.newActionRequest("test", "test", "test");
 
         // When
-        filter.filterAction(context, request, resultHandler, requestHandler);
+        Promise<ActionResponse, ResourceException> promise = filter.filterAction(context, request, requestHandler);
 
         // Then
-        checkResult(expectFailure, resultHandler);
+        checkResult(expectFailure, promise);
         if (expectFailure) {
             verifyNoMoreInteractions(requestHandler);
         } else {
-            verify(requestHandler).handleAction(context, request, resultHandler);
+            verify(requestHandler).handleAction(context, request);
         }
     }
 
-    private void checkResult(boolean expectFailure, ResultHandler<?> resultHandler) {
+    private void checkResult(boolean expectFailure, Promise<?, ResourceException> promise) {
         if (expectFailure) {
-            ArgumentCaptor<ResourceException> captor = ArgumentCaptor.forClass(ResourceException.class);
-            verify(resultHandler).handleError(captor.capture());
-            assertThat(captor.getValue()).isInstanceOf(NotSupportedException.class);
+            assertThat(promise).failedWithException().isInstanceOf(NotSupportedException.class);
         } else {
-            verifyNoMoreInteractions(resultHandler);
+            assertThat(promise).succeeded();
         }
     }
 
@@ -130,18 +150,17 @@ public class UmaEnabledFilterTest {
     public void testFilterCreate(UmaProviderSettingsFactory factory, boolean expectFailure) throws Exception {
         // Given
         UmaEnabledFilter filter = new UmaEnabledFilter(factory);
-        ResultHandler<Resource> resultHandler = mock(ResultHandler.class);
         CreateRequest request = Requests.newCreateRequest("test", json(object()));
 
         // When
-        filter.filterCreate(context, request, resultHandler, requestHandler);
+        Promise<ResourceResponse, ResourceException> promise = filter.filterCreate(context, request, requestHandler);
 
         // Then
-        checkResult(expectFailure, resultHandler);
+        checkResult(expectFailure, promise);
         if (expectFailure) {
             verifyNoMoreInteractions(requestHandler);
         } else {
-            verify(requestHandler).handleCreate(context, request, resultHandler);
+            verify(requestHandler).handleCreate(context, request);
         }
     }
 
@@ -149,18 +168,17 @@ public class UmaEnabledFilterTest {
     public void testFilterDelete(UmaProviderSettingsFactory factory, boolean expectFailure) throws Exception {
         // Given
         UmaEnabledFilter filter = new UmaEnabledFilter(factory);
-        ResultHandler<Resource> resultHandler = mock(ResultHandler.class);
         DeleteRequest request = Requests.newDeleteRequest("test");
 
         // When
-        filter.filterDelete(context, request, resultHandler, requestHandler);
+        Promise<ResourceResponse, ResourceException> promise = filter.filterDelete(context, request, requestHandler);
 
         // Then
-        checkResult(expectFailure, resultHandler);
+        checkResult(expectFailure, promise);
         if (expectFailure) {
             verifyNoMoreInteractions(requestHandler);
         } else {
-            verify(requestHandler).handleDelete(context, request, resultHandler);
+            verify(requestHandler).handleDelete(context, request);
         }
     }
 
@@ -168,18 +186,17 @@ public class UmaEnabledFilterTest {
     public void testFilterPatch(UmaProviderSettingsFactory factory, boolean expectFailure) throws Exception {
         // Given
         UmaEnabledFilter filter = new UmaEnabledFilter(factory);
-        ResultHandler<Resource> resultHandler = mock(ResultHandler.class);
         PatchRequest request = Requests.newPatchRequest("test", "test");
 
         // When
-        filter.filterPatch(context, request, resultHandler, requestHandler);
+        Promise<ResourceResponse, ResourceException> promise = filter.filterPatch(context, request, requestHandler);
 
         // Then
-        checkResult(expectFailure, resultHandler);
+        checkResult(expectFailure, promise);
         if (expectFailure) {
             verifyNoMoreInteractions(requestHandler);
         } else {
-            verify(requestHandler).handlePatch(context, request, resultHandler);
+            verify(requestHandler).handlePatch(context, request);
         }
     }
 
@@ -187,14 +204,14 @@ public class UmaEnabledFilterTest {
     public void testFilterQuery(UmaProviderSettingsFactory factory, boolean expectFailure) throws Exception {
         // Given
         UmaEnabledFilter filter = new UmaEnabledFilter(factory);
-        QueryResultHandler resultHandler = mock(QueryResultHandler.class);
+        QueryResourceHandler resultHandler = mock(QueryResourceHandler.class);
         QueryRequest request = Requests.newQueryRequest("test");
 
         // When
-        filter.filterQuery(context, request, resultHandler, requestHandler);
+        Promise<QueryResponse, ResourceException> promise = filter.filterQuery(context, request, resultHandler, requestHandler);
 
         // Then
-        checkResult(expectFailure, resultHandler);
+        checkResult(expectFailure, promise);
         if (expectFailure) {
             verifyNoMoreInteractions(requestHandler);
         } else {
@@ -206,18 +223,17 @@ public class UmaEnabledFilterTest {
     public void testFilterRead(UmaProviderSettingsFactory factory, boolean expectFailure) throws Exception {
         // Given
         UmaEnabledFilter filter = new UmaEnabledFilter(factory);
-        ResultHandler<Resource> resultHandler = mock(ResultHandler.class);
         ReadRequest request = Requests.newReadRequest("test");
 
         // When
-        filter.filterRead(context, request, resultHandler, requestHandler);
+        Promise<ResourceResponse, ResourceException> promise = filter.filterRead(context, request, requestHandler);
 
         // Then
-        checkResult(expectFailure, resultHandler);
+        checkResult(expectFailure, promise);
         if (expectFailure) {
             verifyNoMoreInteractions(requestHandler);
         } else {
-            verify(requestHandler).handleRead(context, request, resultHandler);
+            verify(requestHandler).handleRead(context, request);
         }
     }
 
@@ -225,18 +241,17 @@ public class UmaEnabledFilterTest {
     public void testFilterUpdate(UmaProviderSettingsFactory factory, boolean expectFailure) throws Exception {
         // Given
         UmaEnabledFilter filter = new UmaEnabledFilter(factory);
-        ResultHandler<Resource> resultHandler = mock(ResultHandler.class);
         UpdateRequest request = Requests.newUpdateRequest("test", json(object()));
 
         // When
-        filter.filterUpdate(context, request, resultHandler, requestHandler);
+        Promise<ResourceResponse, ResourceException> promise = filter.filterUpdate(context, request, requestHandler);
 
         // Then
-        checkResult(expectFailure, resultHandler);
+        checkResult(expectFailure, promise);
         if (expectFailure) {
             verifyNoMoreInteractions(requestHandler);
         } else {
-            verify(requestHandler).handleUpdate(context, request, resultHandler);
+            verify(requestHandler).handleUpdate(context, request);
         }
     }
 }
