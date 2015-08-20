@@ -15,25 +15,21 @@
  */
 package org.forgerock.openam.forgerockrest.entitlements;
 
-import static org.forgerock.openam.utils.CollectionUtils.transformSet;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
-import static org.forgerock.util.promise.Promises.newResultPromise;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.security.auth.Subject;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import static org.forgerock.openam.utils.CollectionUtils.*;
+import static org.forgerock.util.promise.Promises.*;
 
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.shared.debug.Debug;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.security.auth.Subject;
 import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
@@ -60,7 +56,6 @@ import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.rest.resource.ContextHelper;
-import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
@@ -73,16 +68,17 @@ import org.forgerock.util.query.QueryFilter;
  */
 public class ApplicationV1Filter implements Filter {
 
-    private static final String RESOURCE_TYPE_UUIDS = "resourceTypeUuids";
-    private static final String ACTIONS = "actions";
-    private static final String RESOURCES = "resources";
-    private static final String APPLICATION_NAME = "name";
-    private static final String REALM = "realm";
+    public static final String RESOURCE_TYPE_UUIDS = "resourceTypeUuids";
+    public static final String ACTIONS = "actions";
+    public static final String RESOURCES = "resources";
+    public static final String APPLICATION_NAME = "name";
+    public static final String REALM = "realm";
 
     private final ResourceTypeService resourceTypeService;
     private final ApplicationServiceFactory applicationServiceFactory;
     private final ExceptionMappingHandler<EntitlementException, ResourceException> resourceErrorHandler;
     private final ContextHelper contextHelper;
+    private final ApplicationV1FilterTransformer applicationTransformer;
     private final Debug debug;
 
     @Inject
@@ -90,11 +86,13 @@ public class ApplicationV1Filter implements Filter {
                                final ApplicationServiceFactory applicationServiceFactory,
                                final ExceptionMappingHandler<EntitlementException, ResourceException> resourceErrorHandler,
                                final ContextHelper contextHelper,
+                               final ApplicationV1FilterTransformer applicationTransformer,
                                @Named("frRest") final Debug debug) {
         this.resourceTypeService = resourceTypeService;
         this.applicationServiceFactory = applicationServiceFactory;
         this.resourceErrorHandler = resourceErrorHandler;
         this.contextHelper = contextHelper;
+        this.applicationTransformer = applicationTransformer;
         this.debug = debug;
     }
 
@@ -138,10 +136,10 @@ public class ApplicationV1Filter implements Filter {
 
         try {
             final ResourceType resourceType = findOrCreateResourceType(actions, resources, context, request);
-            jsonValue.put(RESOURCE_TYPE_UUIDS, new HashSet<String>(Arrays.asList(resourceType.getUUID())));
+            jsonValue.put(RESOURCE_TYPE_UUIDS, new HashSet<>(Arrays.asList(resourceType.getUUID())));
 
             // Forward onto next handler.
-            return transform(next.handleCreate(context, request), context);
+            return applicationTransformer.transform(next.handleCreate(context, request), context);
 
         } catch (EntitlementException eE) {
             debug.error("Error filtering application create CREST request", eE);
@@ -321,7 +319,7 @@ public class ApplicationV1Filter implements Filter {
         }
 
         // Forward onto next handler.
-        return transform(next.handleUpdate(context, request), context);
+        return applicationTransformer.transform(next.handleUpdate(context, request), context);
     }
 
     /**
@@ -361,7 +359,7 @@ public class ApplicationV1Filter implements Filter {
             final QueryRequest request, final QueryResourceHandler handler, final RequestHandler next) {
         final List<ResourceResponse> resources = new ArrayList<>();
         // Forward onto next handler.
-        return transform(next.handleQuery(context, request, new QueryResourceHandler() {
+        return applicationTransformer.transform(next.handleQuery(context, request, new QueryResourceHandler() {
             @Override
             public boolean handleResource(ResourceResponse resource) {
                 return resources.add(resource);
@@ -385,7 +383,7 @@ public class ApplicationV1Filter implements Filter {
     public Promise<ResourceResponse, ResourceException> filterRead(final Context context,
             final ReadRequest request, final RequestHandler next) {
         // Forward onto next handler.
-        return transform(next.handleRead(context, request), context);
+        return applicationTransformer.transform(next.handleRead(context, request), context);
     }
 
     /*
@@ -406,96 +404,6 @@ public class ApplicationV1Filter implements Filter {
     public Promise<ActionResponse, ResourceException> filterAction(Context context, ActionRequest request,
             RequestHandler next) {
         return RestUtils.generateUnsupportedOperation();
-    }
-
-    /**
-     * Given the json representation of an application swaps out the resource type UUIDs for a set of actions and
-     * resources that is the union of actions and resources represented by the associated resource types.
-     *
-     * @param jsonValue
-     *         application json
-     * @param callingSubject
-     *         the calling subject
-     * @param realm
-     *         the realm
-     *
-     * @throws EntitlementException
-     *         should an error occur during transformation
-     */
-    private void transformJson(
-            final JsonValue jsonValue, final Subject callingSubject, final String realm) throws EntitlementException {
-
-        final Map<String, Boolean> actions = new HashMap<String, Boolean>();
-        final Set<String> resources = new HashSet<String>();
-
-        final Set<String> resourceTypeUuids = jsonValue
-                .get(RESOURCE_TYPE_UUIDS)
-                .required()
-                .asSet(String.class);
-
-        for (String resourceTypeUuid : resourceTypeUuids) {
-            final ResourceType resourceType = resourceTypeService
-                    .getResourceType(callingSubject, realm, resourceTypeUuid);
-
-            if (resourceType == null) {
-                throw new EntitlementException(EntitlementException.NO_SUCH_RESOURCE_TYPE, resourceTypeUuid);
-            }
-
-            actions.putAll(resourceType.getActions());
-            resources.addAll(resourceType.getPatterns());
-        }
-
-        jsonValue.remove(RESOURCE_TYPE_UUIDS);
-        jsonValue.add(ACTIONS, actions);
-        jsonValue.add(RESOURCES, resources);
-        jsonValue.add(REALM, realm);
-    }
-
-    private Promise<ResourceResponse, ResourceException> transform(Promise<ResourceResponse, ResourceException> promise,
-            final Context context) {
-        return promise
-                .thenAsync(new AsyncFunction<ResourceResponse, ResourceResponse, ResourceException>() {
-                    @Override
-                    public Promise<ResourceResponse, ResourceException> apply(ResourceResponse response) {
-                        JsonValue jsonValue = response.getContent();
-                        Subject callingSubject = contextHelper.getSubject(context);
-                        String realm = contextHelper.getRealm(context);
-
-                        try {
-                            transformJson(jsonValue, callingSubject, realm);
-                        } catch (EntitlementException eE) {
-                            debug.error("Error filtering application CREST request", eE);
-                            return newExceptionPromise(resourceErrorHandler.handleError(eE));
-                        }
-
-                        return newResultPromise(response);
-                    }
-                });
-    }
-
-    private Promise<QueryResponse, ResourceException> transform(Promise<QueryResponse, ResourceException> promise,
-            final Context context, final QueryRequest request, final QueryResourceHandler handler,
-            final Collection<ResourceResponse> resources) {
-        return promise
-                .thenAsync(new AsyncFunction<QueryResponse, QueryResponse, ResourceException>() {
-                    @Override
-                    public Promise<QueryResponse, ResourceException> apply(QueryResponse response) {
-                        Subject callingSubject = contextHelper.getSubject(context);
-                        String realm = contextHelper.getRealm(context);
-                        try {
-                            for (ResourceResponse resource : resources) {
-                                final JsonValue jsonValue = resource.getContent();
-                                transformJson(jsonValue, callingSubject, realm);
-                                handler.handleResource(resource);
-                            }
-                        } catch (EntitlementException eE) {
-                            debug.error("Error filtering application query CREST request", eE);
-                            return newExceptionPromise(resourceErrorHandler.handleError(context, request, eE));
-                        }
-
-                        return newResultPromise(response);
-                    }
-                });
     }
 
     /**

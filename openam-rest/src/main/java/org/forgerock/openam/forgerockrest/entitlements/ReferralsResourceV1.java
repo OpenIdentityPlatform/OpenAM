@@ -199,7 +199,7 @@ public class ReferralsResourceV1 extends RealmAwareResource {
                 debug.error("ReferralsResource :: CREATE by " + principalName +
                         ": Referral failed to return the resource created. ", e);
             }
-            return newExceptionPromise(ResourceException.getException(ResourceException.BAD_REQUEST));
+            return newExceptionPromise(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
 
         try {
