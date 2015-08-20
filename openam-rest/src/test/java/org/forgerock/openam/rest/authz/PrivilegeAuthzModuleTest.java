@@ -17,6 +17,9 @@
 package org.forgerock.openam.rest.authz;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
 import static org.forgerock.json.resource.test.assertj.AssertJActionResponseAssert.assertThat;
 import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.assertThat;
 import static org.mockito.BDDMockito.eq;
@@ -54,7 +57,6 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.Responses;
 import org.forgerock.json.resource.Router;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.util.Function;
@@ -127,7 +129,7 @@ public class PrivilegeAuthzModuleTest {
         given(subjectContext.getCallerSSOToken()).willReturn(token);
         given(evaluator.isAllowed(token, permission, ENVIRONMENT)).willReturn(true);
 
-        JsonValue jsonValue = JsonValue.json(JsonValue.object());
+        JsonValue jsonValue = json(object(field("someKey", "someValue")));
         Promise<ResourceResponse, ResourceException> promise = Promises
                 .newResultPromise(Responses.newResourceResponse("1", "1.0", jsonValue));
         given(provider.readInstance(isA(Context.class), eq("123"), isA(ReadRequest.class))).willReturn(promise);
@@ -142,12 +144,11 @@ public class PrivilegeAuthzModuleTest {
         Promise<ResourceResponse, ResourceException> result = router.handleRead(context, request);
 
         // Then...
-        assertThat(promise).isSameAs(result);
-        assertThat(result).succeeded().withContent().isSameAs(jsonValue);
+        assertThat(result).succeeded().withContent().stringAt("someKey").isEqualTo("someValue");
     }
 
     @Test
-    public void crestQueryIsAllowed() throws SSOException, DelegationException {
+    public void crestQueryIsAllowed() throws SSOException, DelegationException, ResourceException {
         // Given...
         final Set<String> actions = new HashSet<>(Arrays.asList("READ"));
         final DelegationPermission permission = new DelegationPermission(
@@ -159,7 +160,7 @@ public class PrivilegeAuthzModuleTest {
         given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
 
         QueryResourceHandler handler = mock(QueryResourceHandler.class);
-        Promise<QueryResponse, ResourceException> promise = Promises.newResultPromise(Responses.newQueryResponse());
+        Promise<QueryResponse, ResourceException> promise = Promises.newResultPromise(Responses.newQueryResponse("abc-def"));
         given(provider.queryCollection(isA(Context.class), isA(QueryRequest.class), isA(QueryResourceHandler.class)))
                 .willReturn(promise);
 
@@ -174,7 +175,8 @@ public class PrivilegeAuthzModuleTest {
         Promise<QueryResponse, ResourceException> result = router.handleQuery(context, request, handler);
 
         // Then...
-        assertThat(promise).isSameAs(result);
+        QueryResponse response = result.getOrThrowUninterruptibly();
+        assertThat(response.getPagedResultsCookie()).isEqualTo("abc-def");
     }
 
     @Test
@@ -189,7 +191,7 @@ public class PrivilegeAuthzModuleTest {
         given(subjectContext.getCallerSSOToken()).willReturn(token);
         given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
 
-        JsonValue jsonValue = JsonValue.json(JsonValue.object());
+        JsonValue jsonValue = json(object(field("someKey", "someValue")));
         Promise<ResourceResponse, ResourceException> promise = Promises
                 .newResultPromise(Responses.newResourceResponse("1", "1.0", jsonValue));
         given(provider.createInstance(isA(Context.class), isA(CreateRequest.class))).willReturn(promise);
@@ -205,8 +207,7 @@ public class PrivilegeAuthzModuleTest {
         Promise<ResourceResponse, ResourceException> result = router.handleCreate(context, request);
 
         // Then...
-        assertThat(promise).isSameAs(result);
-        assertThat(result).succeeded().withContent().isSameAs(jsonValue);
+        assertThat(result).succeeded().withContent().stringAt("someKey").isEqualTo("someValue");
     }
 
     @Test
@@ -221,7 +222,7 @@ public class PrivilegeAuthzModuleTest {
         given(subjectContext.getCallerSSOToken()).willReturn(token);
         given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
 
-        JsonValue jsonValue = JsonValue.json(JsonValue.object());
+        JsonValue jsonValue = json(object(field("someKey", "someValue")));
         Promise<ResourceResponse, ResourceException> promise = Promises
                 .newResultPromise(Responses.newResourceResponse("1", "1.0", jsonValue));
         given(provider.updateInstance(isA(Context.class), eq("123"), isA(UpdateRequest.class))).willReturn(promise);
@@ -237,8 +238,7 @@ public class PrivilegeAuthzModuleTest {
         Promise<ResourceResponse, ResourceException> result = router.handleUpdate(context, request);
 
         // Then...
-        assertThat(promise).isSameAs(result);
-        assertThat(result).succeeded().withContent().isSameAs(jsonValue);
+        assertThat(result).succeeded().withContent().stringAt("someKey").isEqualTo("someValue");
     }
 
     @Test
@@ -253,7 +253,7 @@ public class PrivilegeAuthzModuleTest {
         given(subjectContext.getCallerSSOToken()).willReturn(token);
         given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
 
-        JsonValue jsonValue = JsonValue.json(JsonValue.object());
+        JsonValue jsonValue = json(object(field("someKey", "someValue")));
         Promise<ResourceResponse, ResourceException> promise = Promises
                 .newResultPromise(Responses.newResourceResponse("1", "1.0", jsonValue));
         given(provider.deleteInstance(isA(Context.class), eq("123"), isA(DeleteRequest.class))).willReturn(promise);
@@ -269,8 +269,7 @@ public class PrivilegeAuthzModuleTest {
         Promise<ResourceResponse, ResourceException> result = router.handleDelete(context, request);
 
         // Then...
-        assertThat(promise).isSameAs(result);
-        assertThat(result).succeeded().withContent().isSameAs(jsonValue);
+        assertThat(result).succeeded().withContent().stringAt("someKey").isEqualTo("someValue");
     }
 
     @Test
@@ -285,7 +284,7 @@ public class PrivilegeAuthzModuleTest {
         given(subjectContext.getCallerSSOToken()).willReturn(token);
         given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
 
-        JsonValue jsonValue = JsonValue.json(JsonValue.object());
+        JsonValue jsonValue = json(object(field("someKey", "someValue")));
         Promise<ResourceResponse, ResourceException> promise = Promises
                 .newResultPromise(Responses.newResourceResponse("1", "1.0", jsonValue));
         given(provider.patchInstance(isA(Context.class), eq("123"), isA(PatchRequest.class))).willReturn(promise);
@@ -301,8 +300,7 @@ public class PrivilegeAuthzModuleTest {
         Promise<ResourceResponse, ResourceException> result = router.handlePatch(context, request);
 
         // Then...
-        assertThat(promise).isSameAs(result);
-        assertThat(result).succeeded().withContent().isSameAs(jsonValue);
+        assertThat(result).succeeded().withContent().stringAt("someKey").isEqualTo("someValue");
     }
 
     @Test
@@ -317,7 +315,7 @@ public class PrivilegeAuthzModuleTest {
         given(subjectContext.getCallerSSOToken()).willReturn(token);
         given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
 
-        JsonValue jsonValue = JsonValue.json(JsonValue.object());
+        JsonValue jsonValue = json(object(field("someKey", "someValue")));
         Promise<ActionResponse, ResourceException> promise = Promises
                 .newResultPromise(Responses.newActionResponse(jsonValue));
         given(provider.actionCollection(isA(Context.class), isA(ActionRequest.class))).willReturn(promise);
@@ -333,8 +331,7 @@ public class PrivilegeAuthzModuleTest {
         Promise<ActionResponse, ResourceException> result = router.handleAction(context, request);
 
         // Then...
-        assertThat(promise).isSameAs(result);
-        assertThat(result).succeeded().withContent().isSameAs(jsonValue);
+        assertThat(result).succeeded().withContent().stringAt("someKey").isEqualTo("someValue");
     }
 
     @Test
@@ -349,7 +346,7 @@ public class PrivilegeAuthzModuleTest {
         given(subjectContext.getCallerSSOToken()).willReturn(token);
         given(evaluator.isAllowed(eq(token), eq(permission), eq(ENVIRONMENT))).willReturn(true);
 
-        JsonValue jsonValue = JsonValue.json(JsonValue.object());
+        JsonValue jsonValue = json(object(field("someKey", "someValue")));
         Promise<ActionResponse, ResourceException> promise = Promises
                 .newResultPromise(Responses.newActionResponse(jsonValue));
         given(provider.actionCollection(isA(Context.class), isA(ActionRequest.class))).willReturn(promise);
@@ -365,8 +362,7 @@ public class PrivilegeAuthzModuleTest {
         Promise<ActionResponse, ResourceException> result = router.handleAction(context, request);
 
         // Then...
-        assertThat(promise).isSameAs(result);
-        assertThat(result).succeeded().withContent().isSameAs(jsonValue);
+        assertThat(result).succeeded().withContent().stringAt("someKey").isEqualTo("someValue");
     }
 
     @Test
