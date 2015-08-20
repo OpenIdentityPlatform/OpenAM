@@ -154,7 +154,7 @@ public class PendingRequestResourceTest {
 
         //Then
         verify(service).approvePendingRequest(eq(context), anyString(), any(JsonValue.class), anyString());
-        assertThat(promise).succeeded();
+        assertThat(promise).succeeded().withContent().isObject().containsOnly();
     }
 
     @SuppressWarnings("unchecked")

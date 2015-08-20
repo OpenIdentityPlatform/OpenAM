@@ -259,6 +259,7 @@ public class UmaPolicyServiceImpl implements UmaPolicyService {
                     .setQueryFilter(QueryFilter.equalTo(new JsonPointer("resourceTypeUuid"), resourceSet.getId()));
             final PolicyGraph policyGraph = new PolicyGraph(resourceSet);
             return policyResourceDelegate.queryPolicies(context, queryRequest, policyGraph)
+                    .thenOnException(policyGraph).thenOnResult(policyGraph)
                     .thenAsync(new AsyncFunction<QueryResponse, T, ResourceException>() {
                         @Override
                         public Promise<T, ResourceException> apply(QueryResponse queryResult) {

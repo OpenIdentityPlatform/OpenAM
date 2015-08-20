@@ -16,12 +16,11 @@
 
 package org.forgerock.openam.rest.uma;
 
-import static java.util.Collections.singleton;
+import static java.util.Collections.*;
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.openam.uma.UmaConstants.BackendPolicy.BACKEND_POLICY_ACTION_VALUES_KEY;
+import static org.forgerock.openam.uma.UmaConstants.BackendPolicy.*;
 import static org.forgerock.openam.uma.UmaConstants.UmaPolicy.*;
 
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -30,22 +29,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import org.forgerock.guava.common.collect.Sets;
 import org.forgerock.http.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.openam.uma.UmaPolicy;
 import org.forgerock.openam.uma.UmaPolicyUtils;
+import org.forgerock.util.Function;
+import org.forgerock.util.promise.ExceptionHandler;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
+import org.forgerock.util.promise.ResultHandler;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DirectedMultigraph;
-
 
 /**
  * Graph representation of the policy engine policies that represent all UMA policies for a single
@@ -54,7 +58,8 @@ import org.jgrapht.graph.DirectedMultigraph;
  * Clients should construct the object with the Resource representation of the policies, then
  * call the {@link #computeGraph()} method before using the other public methods.
  */
-public class PolicyGraph implements QueryResourceHandler {
+public class PolicyGraph implements QueryResourceHandler, ExceptionHandler<ResourceException>,
+        ResultHandler<QueryResponse> {
     /**
      * @see org.forgerock.openam.forgerockrest.entitlements.model.json.JsonPolicy
      */
@@ -285,6 +290,16 @@ public class PolicyGraph implements QueryResourceHandler {
             }
         }
         visited.remove(edge.subject);
+    }
+
+    @Override
+    public void handleException(ResourceException e) {
+        complete = false;
+    }
+
+    @Override
+    public void handleResult(QueryResponse queryResponse) {
+        complete = true;
     }
 
     private static class PolicyEdge extends DefaultEdge {

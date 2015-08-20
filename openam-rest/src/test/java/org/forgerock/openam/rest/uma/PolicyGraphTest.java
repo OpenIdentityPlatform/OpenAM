@@ -16,19 +16,17 @@
 
 package org.forgerock.openam.rest.uma;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
-import static org.forgerock.json.JsonValue.field;
+import static java.util.Arrays.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.uma.UmaConstants.BackendPolicy.*;
 import static org.forgerock.openam.uma.UmaConstants.UmaPolicy.*;
-import static org.forgerock.util.promise.Promises.newResultPromise;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.eq;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Matchers.isNull;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anySet;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.MockitoAnnotations.*;
 
 import java.util.ArrayList;
@@ -37,14 +35,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.assertj.core.api.Assertions;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.Context;
 import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.json.resource.Responses;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
@@ -285,7 +281,7 @@ public class PolicyGraphTest {
         for (ResourceResponse policy : policies) {
             graph.handleResource(policy);
         }
-        graph.handleResult(new QueryResult(null, 0));
+        graph.handleResult(Responses.newQueryResponse());
         return graph;
     }
 
@@ -321,7 +317,7 @@ public class PolicyGraphTest {
         for (String scope : scopes) {
             policy.putPermissive(new JsonPointer(BACKEND_POLICY_ACTION_VALUES_KEY + "/" + scope), true);
         }
-        return new ResourceResponse(policyId, String.valueOf(policyId.hashCode()), policy);
+        return Responses.newResourceResponse(policyId, String.valueOf(policyId.hashCode()), policy);
     }
 
     private static List<ResourceResponse> excludePolicies(String owner, String subject) {
