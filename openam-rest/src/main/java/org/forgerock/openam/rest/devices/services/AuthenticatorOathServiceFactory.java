@@ -19,12 +19,12 @@ import com.iplanet.sso.SSOException;
 import com.sun.identity.sm.SMSException;
 
 /**
- * Produces OathService's for a specific realm.
+ * Produces AuthenticatorOathService's for a specific realm.
  */
-public class OathServiceFactory implements DeviceServiceFactory {
+public class AuthenticatorOathServiceFactory implements DeviceServiceFactory {
 
     @Override
-    public OathService create(String realm) throws SSOException, SMSException {
-        return new OathService(realm);
+    public AuthenticatorOathService create(String realm) throws SSOException, SMSException {
+        return new AuthenticatorOathService(realm);
     }
 }

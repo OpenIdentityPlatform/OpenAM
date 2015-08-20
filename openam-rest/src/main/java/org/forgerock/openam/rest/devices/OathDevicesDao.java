@@ -17,7 +17,7 @@
 package org.forgerock.openam.rest.devices;
 
 import javax.inject.Inject;
-import org.forgerock.openam.rest.devices.services.OathServiceFactory;
+import org.forgerock.openam.rest.devices.services.AuthenticatorOathServiceFactory;
 
 /**
  * A DAO instance for accessing OATH user devices.
@@ -27,7 +27,7 @@ import org.forgerock.openam.rest.devices.services.OathServiceFactory;
 public class OathDevicesDao extends UserDevicesDao {
 
     @Inject
-    public OathDevicesDao(OathServiceFactory serviceFactory) {
+    public OathDevicesDao(AuthenticatorOathServiceFactory serviceFactory) {
         super(serviceFactory);
     }
 

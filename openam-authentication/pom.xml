@@ -56,6 +56,7 @@
         <module>openam-auth-msisdn</module>
         <module>openam-auth-nt</module>
         <module>openam-auth-oath</module>
+        <module>openam-auth-fr-oath</module>
         <module>openam-auth-oauth2</module>
         <module>openam-auth-radius</module>
         <module>openam-auth-windowsdesktopsso</module>

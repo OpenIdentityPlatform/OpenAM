@@ -16,14 +16,8 @@
 
 package org.forgerock.openam.rest.devices;
 
-import static org.forgerock.json.resource.Responses.newActionResponse;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
-import static org.forgerock.util.promise.Promises.newResultPromise;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.util.Collections;
-import java.util.Set;
+import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.util.promise.Promises.*;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.idm.AMIdentity;
@@ -31,6 +25,10 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
+import java.util.Collections;
+import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.forgerock.http.Context;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -38,8 +36,8 @@ import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.openam.rest.devices.services.OathService;
-import org.forgerock.openam.rest.devices.services.OathServiceFactory;
+import org.forgerock.openam.rest.devices.services.AuthenticatorOathService;
+import org.forgerock.openam.rest.devices.services.AuthenticatorOathServiceFactory;
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.JsonValueBuilder;
@@ -61,13 +59,13 @@ public class OathDevicesResource extends TwoFADevicesResource<OathDevicesDao> {
     private final static String RESULT = "result";
     private final static String RESET = "reset";
 
-    private final OathServiceFactory oathServiceFactory;
+    private final AuthenticatorOathServiceFactory oathServiceFactory;
     private final ContextHelper contextHelper;
     private final Debug debug;
 
     @Inject
     public OathDevicesResource(OathDevicesDao dao, ContextHelper helper,
-                               @Named("frRest") Debug debug, OathServiceFactory oathServiceFactory,
+                               @Named("frRest") Debug debug, AuthenticatorOathServiceFactory oathServiceFactory,
                                ContextHelper contextHelper) {
         super(dao, helper);
         this.debug = debug;
@@ -83,7 +81,7 @@ public class OathDevicesResource extends TwoFADevicesResource<OathDevicesDao> {
 
         try {
             final AMIdentity identity = getUserIdFromUri(context); //could be admin
-            final OathService realmOathService = oathServiceFactory.create(getRealm(context));
+            final AuthenticatorOathService realmOathService = oathServiceFactory.create(getRealm(context));
 
             switch (request.getAction()) {
                 case SKIP:
@@ -92,7 +90,7 @@ public class OathDevicesResource extends TwoFADevicesResource<OathDevicesDao> {
                         final boolean setValue = request.getContent().get(VALUE).asBoolean();
 
                         realmOathService.setUserSkipOath(identity,
-                                setValue ? OathService.SKIPPABLE : OathService.NOT_SKIPPABLE);
+                                setValue ? AuthenticatorOathService.SKIPPABLE : AuthenticatorOathService.NOT_SKIPPABLE);
                         return newResultPromise(newActionResponse(JsonValueBuilder.jsonValue().build()));
 
                     } catch (SSOException | IdRepoException e) {
@@ -107,7 +105,7 @@ public class OathDevicesResource extends TwoFADevicesResource<OathDevicesDao> {
                         if (CollectionUtils.isNotEmpty(resultSet)) {
                             String tmp = (String) resultSet.iterator().next();
                             int resultInt = Integer.valueOf(tmp);
-                            if (resultInt == OathService.SKIPPABLE) {
+                            if (resultInt == AuthenticatorOathService.SKIPPABLE) {
                                 result = true;
                             }
                         }
@@ -121,7 +119,7 @@ public class OathDevicesResource extends TwoFADevicesResource<OathDevicesDao> {
                 case RESET: //sets their 'skippable' selection to default (NOT_SET) and deletes their profiles attribute
                     try {
 
-                        realmOathService.setUserSkipOath(identity, OathService.NOT_SET);
+                        realmOathService.setUserSkipOath(identity, AuthenticatorOathService.NOT_SET);
                         identity.removeAttributes(
                                 Collections.singleton(realmOathService.getConfigStorageAttributeName()));
                         identity.store();
@@ -150,11 +148,11 @@ public class OathDevicesResource extends TwoFADevicesResource<OathDevicesDao> {
             DeleteRequest request) {
 
         try {
-            final OathService realmOathService = oathServiceFactory.create(getRealm(context));
+            final AuthenticatorOathService realmOathService = oathServiceFactory.create(getRealm(context));
             final AMIdentity identity = getUserIdFromUri(context); //could be admin
 
             Promise<ResourceResponse, ResourceException> promise = super.deleteInstance(context, resourceId, request);//make sure we successfully delete
-            realmOathService.setUserSkipOath(identity, OathService.NOT_SET); //then reset the skippable attr
+            realmOathService.setUserSkipOath(identity, AuthenticatorOathService.NOT_SET); //then reset the skippable attr
             return promise;
         } catch (InternalServerErrorException | SMSException e) {
             debug.error("OathDevicesResource :: Delete - Unable to communicate with the SMS.", e);

@@ -14,7 +14,7 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.authentication.modules.oath;
+package org.forgerock.openam.authentication.modules.fr.oath;
 
 import java.io.IOException;
 import java.util.ArrayList;

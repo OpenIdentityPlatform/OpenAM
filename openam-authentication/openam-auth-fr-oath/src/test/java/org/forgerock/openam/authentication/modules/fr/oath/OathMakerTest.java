@@ -14,13 +14,16 @@
  * Copyright 2015 ForgeRock AS.
  */
 
-package org.forgerock.openam.authentication.modules.oath;
+package org.forgerock.openam.authentication.modules.fr.oath;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import com.sun.identity.shared.debug.Debug;
+import java.security.SecureRandom;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.rest.devices.OathDeviceSettings;
 import org.forgerock.openam.rest.devices.OathDevicesDao;
@@ -29,10 +32,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.security.SecureRandom;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class OathMakerTest {
     private static final int SECRET_HEX_LENGTH = 20;

@@ -15,6 +15,6 @@
  */
 
 /**
- * This package contains classes for the OpenAM OATH implementation.
+ * This package contains classes for the OpenAM Authenticator OATH implementation.
  */
 package org.forgerock.openam.rest.devices.services;

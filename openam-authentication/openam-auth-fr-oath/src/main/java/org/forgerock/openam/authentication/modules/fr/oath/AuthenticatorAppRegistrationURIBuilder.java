@@ -14,9 +14,9 @@
 * Copyright 2015 ForgeRock AS.
 */
 
-package org.forgerock.openam.authentication.modules.oath;
+package org.forgerock.openam.authentication.modules.fr.oath;
 
-import static org.forgerock.openam.authentication.modules.oath.CodeLengthValidator.*;
+import static org.forgerock.openam.authentication.modules.fr.oath.validators.CodeLengthValidator.*;
 
 import com.sun.identity.idm.AMIdentity;
 import java.util.ArrayList;

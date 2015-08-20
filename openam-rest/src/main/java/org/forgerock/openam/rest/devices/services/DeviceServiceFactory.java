@@ -19,7 +19,7 @@ import com.iplanet.sso.SSOException;
 import com.sun.identity.sm.SMSException;
 
 /**
- * Defines the interface for providing {@link OathServiceFactory}s.
+ * Defines the interface for providing {@link AuthenticatorOathServiceFactory}s.
  */
 public interface DeviceServiceFactory {
 

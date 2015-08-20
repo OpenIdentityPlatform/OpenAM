@@ -13,4 +13,4 @@
 #
 # Copyright 2015 ForgeRock AS.
 #
-org.forgerock.openam.authentication.modules.oath.OathGuiceModule
+org.forgerock.openam.authentication.modules.fr.oath.AuthenticatorOathGuiceModule

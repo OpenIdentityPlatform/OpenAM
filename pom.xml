@@ -618,6 +618,11 @@
             </dependency>
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-fr-oath</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-auth-oauth2</artifactId>
                 <version>${project.version}</version>
             </dependency>

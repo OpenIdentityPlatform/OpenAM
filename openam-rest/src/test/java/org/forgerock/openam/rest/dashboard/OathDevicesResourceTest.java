@@ -49,8 +49,8 @@
 //import org.forgerock.http.Context;
 //import org.forgerock.openam.rest.devices.OathDevicesDao;
 //import org.forgerock.openam.rest.devices.OathDevicesResource;
-//import org.forgerock.openam.rest.devices.services.OathService;
-//import org.forgerock.openam.rest.devices.services.OathServiceFactory;
+//import org.forgerock.openam.rest.devices.services.AuthenticatorOathService;
+//import org.forgerock.openam.rest.devices.services.AuthenticatorOathServiceFactory;
 //import org.forgerock.openam.rest.resource.ContextHelper;
 //import org.forgerock.openam.rest.RealmContext;
 //import org.forgerock.openam.rest.resource.SSOTokenContext;
@@ -67,8 +67,8 @@
 //    private OathDevicesDao dao;
 //    private ContextHelper contextHelper;
 //    private Debug debug;
-//    private OathServiceFactory oathServiceFactory;
-//    private OathService oathService;
+//    private AuthenticatorOathServiceFactory AuthenticatorOathServiceFactory;
+//    private AuthenticatorOathService oathService;
 //
 //    @BeforeMethod
 //    public void setUp() throws SMSException, SSOException {
@@ -76,13 +76,13 @@
 //        dao = mock(OathDevicesDao.class);
 //        contextHelper = mock(ContextHelper.class);
 //        debug = mock(Debug.class);
-//        oathServiceFactory = mock(OathServiceFactory.class);
-//        oathService = mock(OathService.class);
+//        AuthenticatorOathServiceFactory = mock(AuthenticatorOathServiceFactory.class);
+//        oathService = mock(AuthenticatorOathService.class);
 //
-//        resource = new OathDevicesResourceTestClass(dao, contextHelper, debug, oathServiceFactory);
+//        resource = new OathDevicesResourceTestClass(dao, contextHelper, debug, AuthenticatorOathServiceFactory);
 //
 //        given(contextHelper.getUserId((Context) anyObject())).willReturn("demo");
-//        given(oathServiceFactory.create(anyString())).willReturn(oathService);
+//        given(AuthenticatorOathServiceFactory.create(anyString())).willReturn(oathService);
 //    }
 //
 //    private Context ctx() throws SSOException {
@@ -226,14 +226,14 @@
 //
 //
 //        public OathDevicesResourceTestClass(OathDevicesDao dao, ContextHelper helper, Debug debug,
-//                                            OathServiceFactory oathServiceFactory) {
-//            super(dao, helper, debug, oathServiceFactory, helper);
+//                                            AuthenticatorOathServiceFactory AuthenticatorOathServiceFactory) {
+//            super(dao, helper, debug, AuthenticatorOathServiceFactory, helper);
 //        }
 //
 //        protected AMIdentity getUserIdFromUri(Context context) throws InternalServerErrorException {
 //
 //            HashSet<String> attribute = new HashSet<>();
-//            attribute.add(String.valueOf(OathService.SKIPPABLE));
+//            attribute.add(String.valueOf(AuthenticatorOathService.SKIPPABLE));
 //
 //            AMIdentity mockId = mock(AMIdentity.class);
 //            try {

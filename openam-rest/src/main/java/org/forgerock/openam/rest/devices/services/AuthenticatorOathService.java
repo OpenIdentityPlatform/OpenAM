@@ -52,33 +52,33 @@ import java.util.Set;
  * Implementation of the OATH Service. Provides all necessary configuration information
  * at a realm-wide level to OATH authentication modules underneath it.
  */
-public class OathService implements DeviceService {
+public class AuthenticatorOathService implements DeviceService {
 
-    static public final String SERVICE_NAME = "OATH";
+    static public final String SERVICE_NAME = "AuthenticatorOATH";
     static public final String SERVICE_VERSION = "1.0";
 
     public static final int NOT_SET = 0;
     public static final int SKIPPABLE = 1;
     public static final int NOT_SKIPPABLE = 2;
 
-    final static private Debug debug = Debug.getInstance("amAuthOATH");
+    final static private Debug debug = Debug.getInstance("amAuthAuthenticatorOATH");
 
-    public static final String OATH_ATTRIBUTE_NAME = "iplanet-am-auth-oath-attr-name";
-    private static final String OATH_ENCRYPTION_SCHEME = "openam-auth-oath-device-settings-encryption-scheme";
-    private static final String OATH_KEYSTORE_FILE = "openam-auth-oath-device-settings-encryption-keystore";
-    private static final String OATH_KEYSTORE_TYPE = "openam-auth-oath-device-settings-encryption-keystore-type";
+    public static final String OATH_ATTRIBUTE_NAME = "iplanet-am-auth-authenticator-oath-attr-name";
+    private static final String OATH_ENCRYPTION_SCHEME = "openam-auth-authenticator-oath-device-settings-encryption-scheme";
+    private static final String OATH_KEYSTORE_FILE = "openam-auth-authenticator-oath-device-settings-encryption-keystore";
+    private static final String OATH_KEYSTORE_TYPE = "openam-auth-authenticator-oath-device-settings-encryption-keystore-type";
     private static final String OATH_KEYSTORE_PASSWORD =
-            "openam-auth-oath-device-settings-encryption-keystore-password";
+            "openam-auth-authenticator-oath-device-settings-encryption-keystore-password";
     private static final String OATH_KEYSTORE_KEYPAIR_ALIAS =
-            "openam-auth-oath-device-settings-encryption-keypair-alias";
+            "openam-auth-authenticator-oath-device-settings-encryption-keypair-alias";
     private static final String OATH_KEYSTORE_PRIVATEKEY_PASSWORD =
-            "openam-auth-oath-device-settings-encryption-privatekey-password";
+            "openam-auth-authenticator-oath-device-settings-encryption-privatekey-password";
     private static final String OATH_SKIPPABLE_ATTRIBUTE_NAME =
-            "iplanet-am-auth-oath-skippable-name";
+            "iplanet-am-auth-authenticator-oath-skippable-name";
 
     private Map<String, Set<String>> options;
 
-    public OathService(String realm) throws SMSException, SSOException {
+    public AuthenticatorOathService(String realm) throws SMSException, SSOException {
         try {
             ServiceConfigManager mgr = new ServiceConfigManager(
                     AccessController.doPrivileged(AdminTokenAction.getInstance()), SERVICE_NAME, SERVICE_VERSION);
@@ -86,7 +86,7 @@ public class OathService implements DeviceService {
             options = scm.getAttributes();
         } catch (SMSException | SSOException e) {
             if (debug.errorEnabled()) {
-                debug.error("Error connecting to SMS to retrieve config for OathService.", e);
+                debug.error("Error connecting to SMS to retrieve config for AuthenticatorOathService.", e);
             }
             throw e;
         }
@@ -104,7 +104,7 @@ public class OathService implements DeviceService {
     public DeviceSerialisation getDeviceSerialisationStrategy() {
         final SupportedOathEncryptionScheme encryptionScheme =
                 SupportedOathEncryptionScheme.valueOf(CollectionHelper.getMapAttr(options, OATH_ENCRYPTION_SCHEME,
-                SupportedOathEncryptionScheme.NONE.toString()));
+                        SupportedOathEncryptionScheme.NONE.toString()));
 
         if (encryptionScheme == null || encryptionScheme == SupportedOathEncryptionScheme.NONE) {
             return new JsonDeviceSerialisation();
@@ -133,7 +133,7 @@ public class OathService implements DeviceService {
         } catch (FileNotFoundException e) {
             throw new IllegalArgumentException("Invalid keystore location specified", e);
         } catch (KeyStoreException | UnrecoverableKeyException | NoSuchAlgorithmException e) {
-            debug.error("OathService.getEncryptionKeyPair(): Unable to load encryption key pair", e);
+            debug.error("AuthenticatorOathService.getEncryptionKeyPair(): Unable to load encryption key pair", e);
             throw new IllegalStateException(e);
         }
     }
@@ -148,7 +148,7 @@ public class OathService implements DeviceService {
     }
 
     /**
-     * Sets the user's ability to skip an OATH module (or any module configured to look at the
+     * Sets the user's ability to skip an Authenticator OATH module (or any module configured to look at the
      * supplied attrName for its skippable value).
      *
      * @param id User's identity.
@@ -160,7 +160,7 @@ public class OathService implements DeviceService {
             throws IdRepoException, SSOException {
         final HashMap<String, Set<String>> attributesToWrite = new HashMap<>();
         attributesToWrite.put(getSkippableAttributeName(),
-                        Collections.singleton(String.valueOf(userSkipOath)));
+                Collections.singleton(String.valueOf(userSkipOath)));
         id.setAttributes(attributesToWrite);
         id.store();
     }
