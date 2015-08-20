@@ -255,7 +255,7 @@ public class DefaultDebugRecorderTest extends DebugTestTemplate {
         }
     }
 
-    @Test
+    @Test(enabled = false)
     public void tryZip() throws RecordException, InvalidDebugConfigurationException, IOException,
             InterruptedException {
 

@@ -27,7 +27,7 @@ import java.io.IOException;
  */
 public class ZipUtilsTest {
 
-    @Test
+    @Test(enabled = false)
     public void tryZippingAFolder() throws IOException {
         String testFolder =  File.separator + "zipUtils" + File.separator + "FakeFolder";
         testFolder = ZipUtilsTest.class.getResource(testFolder).getPath();

@@ -78,7 +78,7 @@ public class RecordPropertiesTest extends DebugTestTemplate {
         assertEquals(recordProperties.getThreadDumpDelayInSeconds(), (Long) 1l);
     }
 
-    @Test
+    @Test(enabled = false)
     public void allOnRecord() throws Exception {
         RecordProperties recordProperties = RecordProperties.fromJson(JsonValueBuilder.toJsonValue(IOUtils
                 .getFileContentFromClassPath(RECORD_DIRECTORY + "allOnRecord.json")));
@@ -86,7 +86,7 @@ public class RecordPropertiesTest extends DebugTestTemplate {
 
     }
 
-    @Test
+    @Test(enabled = false)
     public void checkExportOnAllOnRecord() throws Exception {
         RecordProperties recordPropertiesBeforeExport = RecordProperties.fromJson(JsonValueBuilder.toJsonValue
                 (IOUtils.getFileContentFromClassPath(RECORD_DIRECTORY + "allOnRecord.json")));
@@ -122,7 +122,7 @@ public class RecordPropertiesTest extends DebugTestTemplate {
         assertEquals(recordProperties.getAutoStopTimeInMS(), (Long) TimeUnit.MINUTES.toMillis(10));
     }
 
-    @Test
+    @Test(enabled = false)
     public void checkConfigExportSharePassword() throws Exception {
 
         RecordProperties recordPropertiesSharePassword = RecordProperties.fromJson(JsonValueBuilder.toJsonValue(IOUtils
