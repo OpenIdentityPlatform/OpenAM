@@ -16,25 +16,30 @@
 
 package org.forgerock.openam.rest.uma;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.forgerock.json.JsonValue.*;
-import static org.mockito.BDDMockito.given;
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResultHandler;
-import org.forgerock.json.resource.Resource;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.http.Context;
+import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.json.resource.Responses;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
@@ -47,11 +52,11 @@ public class PolicyResourceDelegateTest {
 
     private PolicyResourceDelegate delegate;
 
-    private PromisedRequestHandler policyResource;
+    private RequestHandler policyResource;
 
     @BeforeMethod
     public void setup() {
-        policyResource = mock(PromisedRequestHandler.class);
+        policyResource = mock(RequestHandler.class);
 
         delegate = new PolicyResourceDelegate(policyResource);
     }
@@ -67,20 +72,20 @@ public class PolicyResourceDelegateTest {
         JsonValue policyTwo = json(object(field("name", "POLICY_TWO")));
         policies.add(policyOne);
         policies.add(policyTwo);
-        List<Resource> createdPolicies = new ArrayList<Resource>();
-        Resource createdPolicyOne = new Resource("ID_1", "REVISION_1", json(object()));
-        Resource createdPolicyTwo = new Resource("ID_2", "REVISION_2", json(object()));
+        List<ResourceResponse> createdPolicies = new ArrayList<ResourceResponse>();
+        ResourceResponse createdPolicyOne = newResourceResponse("ID_1", "REVISION_1", json(object()));
+        ResourceResponse createdPolicyTwo = newResourceResponse("ID_2", "REVISION_2", json(object()));
         createdPolicies.add(createdPolicyOne);
         createdPolicies.add(createdPolicyTwo);
-        Promise<Resource, ResourceException> createPolicyOnePromise = Promises.newResultPromise(createdPolicyOne);
-        Promise<Resource, ResourceException> createPolicyTwoPromise = Promises.newResultPromise(createdPolicyTwo);
+        Promise<ResourceResponse, ResourceException> createPolicyOnePromise = Promises.newResultPromise(createdPolicyOne);
+        Promise<ResourceResponse, ResourceException> createPolicyTwoPromise = Promises.newResultPromise(createdPolicyTwo);
 
         given(policyResource.handleCreate(eq(context), Matchers.<CreateRequest>anyObject()))
                 .willReturn(createPolicyOnePromise)
                 .willReturn(createPolicyTwoPromise);
 
         //When
-        List<Resource> returnedPolicies = delegate.createPolicies(context, policies).getOrThrowUninterruptibly();
+        List<ResourceResponse> returnedPolicies = delegate.createPolicies(context, policies).getOrThrowUninterruptibly();
 
         //Then
         verify(policyResource, never()).handleDelete(eq(context), Matchers.<DeleteRequest>anyObject());
@@ -98,11 +103,11 @@ public class PolicyResourceDelegateTest {
         JsonValue policyTwo = json(object(field("name", "POLICY_TWO")));
         policies.add(policyOne);
         policies.add(policyTwo);
-        Resource createdPolicyOne = new Resource("ID_1", "REVISION_1", json(object()));
+        ResourceResponse createdPolicyOne = newResourceResponse("ID_1", "REVISION_1", json(object()));
         ResourceException exception = mock(ResourceException.class);
-        Promise<Resource, ResourceException> createPolicyOnePromise = Promises.newResultPromise(createdPolicyOne);
-        Promise<Resource, ResourceException> createPolicyTwoPromise = Promises.newExceptionPromise(exception);
-        Promise<Resource, ResourceException> deletePolicyOnePromise = Promises.newResultPromise(createdPolicyOne);
+        Promise<ResourceResponse, ResourceException> createPolicyOnePromise = Promises.newResultPromise(createdPolicyOne);
+        Promise<ResourceResponse, ResourceException> createPolicyTwoPromise = Promises.newExceptionPromise(exception);
+        Promise<ResourceResponse, ResourceException> deletePolicyOnePromise = Promises.newResultPromise(createdPolicyOne);
 
         given(policyResource.handleCreate(eq(context), Matchers.<CreateRequest>anyObject()))
                 .willReturn(createPolicyOnePromise)
@@ -117,7 +122,7 @@ public class PolicyResourceDelegateTest {
             //Then
             ArgumentCaptor<DeleteRequest> requestCaptor = ArgumentCaptor.forClass(DeleteRequest.class);
             verify(policyResource).handleDelete(eq(context), requestCaptor.capture());
-            assertThat(requestCaptor.getValue().getResourceNameObject().leaf()).isEqualTo("ID_1");
+            assertThat(requestCaptor.getValue().getResourcePathObject().leaf()).isEqualTo("ID_1");
             throw e;
         }
     }
@@ -133,12 +138,12 @@ public class PolicyResourceDelegateTest {
         JsonValue policyTwo = json(object(field("name", "POLICY_TWO")));
         policies.add(policyOne);
         policies.add(policyTwo);
-        Resource createdPolicyOne = new Resource("ID_1", "REVISION_1", json(object()));
+        ResourceResponse createdPolicyOne = newResourceResponse("ID_1", "REVISION_1", json(object()));
         ResourceException createException = mock(ResourceException.class);
         ResourceException deleteException = mock(ResourceException.class);
-        Promise<Resource, ResourceException> createPolicyOnePromise = Promises.newResultPromise(createdPolicyOne);
-        Promise<Resource, ResourceException> createPolicyTwoPromise = Promises.newExceptionPromise(createException);
-        Promise<Resource, ResourceException> deletePolicyOnePromise = Promises.newExceptionPromise(deleteException);
+        Promise<ResourceResponse, ResourceException> createPolicyOnePromise = Promises.newResultPromise(createdPolicyOne);
+        Promise<ResourceResponse, ResourceException> createPolicyTwoPromise = Promises.newExceptionPromise(createException);
+        Promise<ResourceResponse, ResourceException> deletePolicyOnePromise = Promises.newExceptionPromise(deleteException);
 
         given(policyResource.handleCreate(eq(context), Matchers.<CreateRequest>anyObject()))
                 .willReturn(createPolicyOnePromise)
@@ -153,7 +158,7 @@ public class PolicyResourceDelegateTest {
             //Then
             ArgumentCaptor<DeleteRequest> requestCaptor = ArgumentCaptor.forClass(DeleteRequest.class);
             verify(policyResource).handleDelete(eq(context), requestCaptor.capture());
-            assertThat(requestCaptor.getValue().getResourceNameObject().leaf()).isEqualTo("ID_1");
+            assertThat(requestCaptor.getValue().getResourcePathObject().leaf()).isEqualTo("ID_1");
             assertThat(e).isEqualTo(deleteException);
             throw e;
         }
@@ -169,20 +174,20 @@ public class PolicyResourceDelegateTest {
         JsonValue policyTwo = json(object(field("name", "POLICY_TWO")));
         policies.add(policyOne);
         policies.add(policyTwo);
-        List<Resource> updatedPolicies = new ArrayList<Resource>();
-        Resource updatedPolicyOne = new Resource("ID_1", "REVISION_1", json(object()));
-        Resource updatedPolicyTwo = new Resource("ID_1", "REVISION_1", json(object()));
+        List<ResourceResponse> updatedPolicies = new ArrayList<ResourceResponse>();
+        ResourceResponse updatedPolicyOne = newResourceResponse("ID_1", "REVISION_1", json(object()));
+        ResourceResponse updatedPolicyTwo = newResourceResponse("ID_1", "REVISION_1", json(object()));
         updatedPolicies.add(updatedPolicyOne);
         updatedPolicies.add(updatedPolicyTwo);
-        Promise<Resource, ResourceException> updatePolicyOnePromise = Promises.newResultPromise(updatedPolicyOne);
-        Promise<Resource, ResourceException> updatePolicyTwoPromise = Promises.newResultPromise(updatedPolicyTwo);
+        Promise<ResourceResponse, ResourceException> updatePolicyOnePromise = Promises.newResultPromise(updatedPolicyOne);
+        Promise<ResourceResponse, ResourceException> updatePolicyTwoPromise = Promises.newResultPromise(updatedPolicyTwo);
 
         given(policyResource.handleUpdate(eq(context), Matchers.<UpdateRequest>anyObject()))
                 .willReturn(updatePolicyOnePromise)
                 .willReturn(updatePolicyTwoPromise);
 
         //When
-        List<Resource> returnedPolicies = delegate.updatePolicies(context, policies).getOrThrowUninterruptibly();
+        List<ResourceResponse> returnedPolicies = delegate.updatePolicies(context, policies).getOrThrowUninterruptibly();
 
         //Then
         assertThat(returnedPolicies).isEqualTo(updatedPolicies);
@@ -198,10 +203,10 @@ public class PolicyResourceDelegateTest {
         JsonValue policyTwo = json(object(field("name", "POLICY_TWO")));
         policies.add(policyOne);
         policies.add(policyTwo);
-        Resource updatedPolicyOne = new Resource("ID_1", "REVISION_1", json(object()));
+        ResourceResponse updatedPolicyOne = newResourceResponse("ID_1", "REVISION_1", json(object()));
         ResourceException exception = mock(ResourceException.class);
-        Promise<Resource, ResourceException> updatePolicyOnePromise = Promises.newResultPromise(updatedPolicyOne);
-        Promise<Resource, ResourceException> updatePolicyTwoPromise = Promises.newExceptionPromise(exception);
+        Promise<ResourceResponse, ResourceException> updatePolicyOnePromise = Promises.newResultPromise(updatedPolicyOne);
+        Promise<ResourceResponse, ResourceException> updatePolicyTwoPromise = Promises.newExceptionPromise(exception);
 
         given(policyResource.handleUpdate(eq(context), Matchers.<UpdateRequest>anyObject()))
                 .willReturn(updatePolicyOnePromise)
@@ -220,12 +225,13 @@ public class PolicyResourceDelegateTest {
         //Given
         Context context = mock(Context.class);
         QueryRequest request = mock(QueryRequest.class);
+        QueryResourceHandler handler = mock(QueryResourceHandler.class);
 
         //When
-        delegate.queryPolicies(context, request);
+        delegate.queryPolicies(context, request, handler);
 
         //Then
-        verify(policyResource).handleQuery(context, request);
+        verify(policyResource).handleQuery(context, request, handler);
     }
 
     @Test
@@ -234,7 +240,7 @@ public class PolicyResourceDelegateTest {
         //Given
         Context context = mock(Context.class);
         QueryRequest request = mock(QueryRequest.class);
-        QueryResultHandler handler = mock(QueryResultHandler.class);
+        QueryResourceHandler handler = mock(QueryResourceHandler.class);
 
         //When
         delegate.queryPolicies(context, request, handler);
@@ -248,23 +254,23 @@ public class PolicyResourceDelegateTest {
 
         //Given
         Context context = mock(Context.class);
-        List<Resource> policies = new ArrayList<Resource>();
-        Resource policyOne = new Resource("ID_1", "REVISION_1", json(object()));
-        Resource policyTwo = new Resource("ID_2", "REVISION_2", json(object()));
+        List<ResourceResponse> policies = new ArrayList<ResourceResponse>();
+        ResourceResponse policyOne = newResourceResponse("ID_1", "REVISION_1", json(object()));
+        ResourceResponse policyTwo = newResourceResponse("ID_2", "REVISION_2", json(object()));
         policies.add(policyOne);
         policies.add(policyTwo);
         Set<String> policyIds = new HashSet<String>();
         policyIds.add("ID_1");
         policyIds.add("ID_2");
-        Promise<Resource, ResourceException> deletePolicyOnePromise = Promises.newResultPromise(policyOne);
-        Promise<Resource, ResourceException> deletePolicyTwoPromise = Promises.newResultPromise(policyTwo);
+        Promise<ResourceResponse, ResourceException> deletePolicyOnePromise = Promises.newResultPromise(policyOne);
+        Promise<ResourceResponse, ResourceException> deletePolicyTwoPromise = Promises.newResultPromise(policyTwo);
 
         given(policyResource.handleDelete(eq(context), Matchers.<DeleteRequest>anyObject()))
                 .willReturn(deletePolicyOnePromise)
                 .willReturn(deletePolicyTwoPromise);
 
         //When
-        List<Resource> deletedPolicies = delegate.deletePolicies(context, policyIds).getOrThrowUninterruptibly();
+        List<ResourceResponse> deletedPolicies = delegate.deletePolicies(context, policyIds).getOrThrowUninterruptibly();
 
         //Then
         assertThat(deletedPolicies).isEqualTo(policies);
@@ -275,13 +281,13 @@ public class PolicyResourceDelegateTest {
 
         //Given
         Context context = mock(Context.class);
-        Resource policyOne = new Resource("ID_1", "REVISION_1", json(object()));
+        ResourceResponse policyOne = newResourceResponse("ID_1", "REVISION_1", json(object()));
         Set<String> policyIds = new HashSet<String>();
         policyIds.add("ID_1");
         policyIds.add("ID_2");
         ResourceException exception = mock(ResourceException.class);
-        Promise<Resource, ResourceException> deletePolicyOnePromise = Promises.newResultPromise(policyOne);
-        Promise<Resource, ResourceException> deletePolicyTwoPromise = Promises.newExceptionPromise(exception);
+        Promise<ResourceResponse, ResourceException> deletePolicyOnePromise = Promises.newResultPromise(policyOne);
+        Promise<ResourceResponse, ResourceException> deletePolicyTwoPromise = Promises.newExceptionPromise(exception);
 
         given(policyResource.handleDelete(eq(context), Matchers.<DeleteRequest>anyObject()))
                 .willReturn(deletePolicyOnePromise)
