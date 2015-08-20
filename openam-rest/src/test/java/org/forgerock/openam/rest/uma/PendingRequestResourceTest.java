@@ -16,38 +16,42 @@
 
 package org.forgerock.openam.rest.uma;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
+import static org.forgerock.json.resource.test.assertj.AssertJActionResponseAssert.assertThat;
+import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.assertThat;
+import static org.forgerock.util.test.assertj.AssertJPromiseAssert.assertThat;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.MockitoAnnotations.*;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.util.query.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Requests;
-import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.Context;
-import org.forgerock.openam.rest.resource.ContextHelper;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
 import org.forgerock.openam.uma.PendingRequestsService;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
-import org.mockito.ArgumentCaptor;
+import org.forgerock.util.query.QueryFilter;
 import org.mockito.Mock;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -69,116 +73,106 @@ public class PendingRequestResourceTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public Promise<ActionResponse, ResourceException> actionCollectionShouldReturnNotSupportedExceptionForUnsupportedAction() {
+    public void actionCollectionShouldReturnNotSupportedExceptionForUnsupportedAction() {
 
         //Given
         Context context = mock(Context.class);
         ActionRequest request = Requests.newActionRequest("", "other");
-        ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 
         //When
-        resource.actionCollection(context, request, handler);
+        Promise<ActionResponse, ResourceException> promise = resource.actionCollection(context, request);
 
         //Then
-        ArgumentCaptor<ResourceException> exceptionCaptor = ArgumentCaptor.forClass(ResourceException.class);
-        verify(handler).handleError(exceptionCaptor.capture());
-        assertThat(exceptionCaptor.getValue()).isInstanceOf(NotSupportedException.class);
+        assertThat(promise).failedWithResourceException().isInstanceOf(NotSupportedException.class);
     }
 
     @SuppressWarnings("unchecked")
     @Test
-    public Promise<ActionResponse, ResourceException> actionCollectionShouldHandleApproveAction() throws Exception {
+    public void actionCollectionShouldHandleApproveAction() throws Exception {
 
         //Given
         Context context = mockContext("REALM");
         ActionRequest request = Requests.newActionRequest("", "approve");
-        ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 
         mockPendingRequestsForUser("alice", "REALM", 2);
         mockPendingRequestApprovalService();
 
         //When
-        resource.actionCollection(context, request, handler);
+        Promise<ActionResponse, ResourceException> promise = resource.actionCollection(context, request);
 
         //Then
         verify(service, times(2)).approvePendingRequest(eq(context), anyString(), any(JsonValue.class), anyString());
-        verify(handler).handleResult(any(JsonValue.class));
+        assertThat(promise).succeeded();
     }
 
     @SuppressWarnings("unchecked")
     @Test
-    public Promise<ActionResponse, ResourceException> actionCollectionShouldHandleDenyAction() throws Exception {
+    public void actionCollectionShouldHandleDenyAction() throws Exception {
 
         //Given
         Context context = mockContext("REALM");
         ActionRequest request = Requests.newActionRequest("", "deny");
-        ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 
         mockPendingRequestsForUser("alice", "REALM", 2);
 
         //When
-        resource.actionCollection(context, request, handler);
+        Promise<ActionResponse, ResourceException> promise = resource.actionCollection(context, request);
 
         //Then
         verify(service, times(2)).denyPendingRequest(anyString(), anyString());
-        verify(handler).handleResult(any(JsonValue.class));
+        assertThat(promise).succeeded();
     }
 
     @SuppressWarnings("unchecked")
     @Test
-    public Promise<ActionResponse, ResourceException> actionInstanceShouldReturnNotSupportedExceptionForUnsupportedAction() {
+    public void actionInstanceShouldReturnNotSupportedExceptionForUnsupportedAction() {
 
         //Given
         Context context = mock(Context.class);
         ActionRequest request = Requests.newActionRequest("", "other");
-        ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 
         //When
-        resource.actionCollection(context, request, handler);
+        Promise<ActionResponse, ResourceException> promise = resource.actionCollection(context, request);
 
         //Then
-        ArgumentCaptor<ResourceException> exceptionCaptor = ArgumentCaptor.forClass(ResourceException.class);
-        verify(handler).handleError(exceptionCaptor.capture());
-        assertThat(exceptionCaptor.getValue()).isInstanceOf(NotSupportedException.class);
+        assertThat(promise).failedWithResourceException().isInstanceOf(NotSupportedException.class);
     }
 
     @SuppressWarnings("unchecked")
     @Test
-    public Promise<ActionResponse, ResourceException> actionInstanceShouldHandleApproveAction() throws Exception {
+    public void actionInstanceShouldHandleApproveAction() throws Exception {
 
         //Given
         Context context = mockContext("REALM");
         ActionRequest request = Requests.newActionRequest("", "approve");
-        ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 
         mockPendingRequestsForUser("alice", "REALM", 1);
         mockPendingRequestApprovalService();
 
         //When
-        resource.actionCollection(context, request, handler);
+        Promise<ActionResponse, ResourceException> promise = resource.actionCollection(context, request);
 
         //Then
         verify(service).approvePendingRequest(eq(context), anyString(), any(JsonValue.class), anyString());
-        verify(handler).handleResult(any(JsonValue.class));
+        assertThat(promise).succeeded();
     }
 
     @SuppressWarnings("unchecked")
     @Test
-    public Promise<ActionResponse, ResourceException> actionInstanceShouldHandleDenyAction() throws Exception {
+    public void actionInstanceShouldHandleDenyAction() throws Exception {
 
         //Given
         Context context = mockContext("REALM");
         ActionRequest request = Requests.newActionRequest("", "deny");
-        ResultHandler<JsonValue> handler = mock(ResultHandler.class);
 
         mockPendingRequestsForUser("alice", "REALM", 1);
 
         //When
-        resource.actionCollection(context, request, handler);
+        Promise<ActionResponse, ResourceException> promise = resource.actionCollection(context, request);
 
         //Then
         verify(service).denyPendingRequest(anyString(), anyString());
-        verify(handler).handleResult(any(JsonValue.class));
+        assertThat(promise).succeeded();
     }
 
     @Test
@@ -187,16 +181,16 @@ public class PendingRequestResourceTest {
         //Given
         Context context = mockContext("REALM");
         QueryRequest request = Requests.newQueryRequest("").setQueryFilter(QueryFilter.<JsonPointer>alwaysTrue());
-        QueryResultHandler handler = mock(QueryResultHandler.class);
+        QueryResourceHandler handler = mock(QueryResourceHandler.class);
 
         mockPendingRequestsForUser("alice", "REALM", 2);
 
         //When
-        resource.queryCollection(context, request, handler);
+        Promise<QueryResponse, ResourceException> promise = resource.queryCollection(context, request, handler);
 
         //Then
-        verify(handler, times(2)).handleResource(any(Resource.class));
-        verify(handler).handleResult(any(QueryResult.class));
+        verify(handler, times(2)).handleResource(any(ResourceResponse.class));
+        assertThat(promise).succeeded();
     }
 
     @SuppressWarnings("unchecked")
@@ -206,15 +200,14 @@ public class PendingRequestResourceTest {
         //Given
         Context context = mock(Context.class);
         ReadRequest request = Requests.newReadRequest("");
-        ResultHandler<Resource> handler = mock(ResultHandler.class);
 
         String id = mockPendingRequest();
 
         //When
-        resource.readInstance(context, id, request, handler);
+        Promise<ResourceResponse, ResourceException> promise = resource.readInstance(context, id, request);
 
         //Then
-        verify(handler).handleResult(any(Resource.class));
+        assertThat(promise).succeeded();
     }
 
     private Context mockContext(String realm) {
