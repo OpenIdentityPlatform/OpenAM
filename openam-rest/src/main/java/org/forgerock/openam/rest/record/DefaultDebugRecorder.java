@@ -29,6 +29,7 @@ import org.forgerock.json.JsonValueException;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.openam.utils.file.ZipUtils;
+import org.forgerock.util.annotations.VisibleForTesting;
 import org.forgerock.util.thread.ExecutorServiceFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -309,18 +310,17 @@ public class DefaultDebugRecorder implements DebugRecorder {
 
             if (currentRecord.getRecordProperties().isAutoStopTimeEnabled()) {
                 currentScheduledAutoStopTime = scheduledExecutorService.scheduleWithFixedDelay(new Runnable() {
-                                                                                                   @Override
-                                                                                                   public void run() {
-                                                                                                       try {
-                                                                                                           stopRecording();
-                                                                                                       } catch (RecordException e) {
-                                                                                                           debug.error("Can't stop recording", e);
-                                                                                                       } catch (Exception e) {
-                                                                                                           debug.error("Thread 'AutoStopTime' throws an unexpected error", e);
-                                                                                                       }
-                                                                                                   }
-                                                                                               }, currentRecord
-                        .getRecordProperties().getAutoStopTimeInMS(), currentRecord.getRecordProperties()
+                           @Override
+                           public void run() {
+                               try {
+                                   stopRecording();
+                               } catch (RecordException e) {
+                                   debug.error("Can't stop recording", e);
+                               } catch (Exception e) {
+                                   debug.error("Thread 'AutoStopTime' throws an unexpected error", e);
+                               }
+                           }
+                       }, currentRecord.getRecordProperties().getAutoStopTimeInMS(), currentRecord.getRecordProperties()
                         .getAutoStopTimeInMS(), TimeUnit.MILLISECONDS);
             }
 
@@ -486,7 +486,8 @@ public class DefaultDebugRecorder implements DebugRecorder {
         });
     }
 
-    private class ThreadsDumpRunnable implements Runnable {
+    @VisibleForTesting
+    protected class ThreadsDumpRunnable implements Runnable {
 
         private Record currentRecord;
 
@@ -525,6 +526,7 @@ public class DefaultDebugRecorder implements DebugRecorder {
         }
     }
 
+    @VisibleForTesting
     protected class AutoStopFileSizeRecord implements Runnable {
 
         private Record currentRecord;

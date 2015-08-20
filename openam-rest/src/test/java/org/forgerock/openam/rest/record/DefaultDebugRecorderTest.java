@@ -66,8 +66,7 @@ public class DefaultDebugRecorderTest extends DebugTestTemplate {
 
         Set<String> shouldBeNotPrint = new HashSet<String>();
 
-        JsonValue jsonRecordProperties = JsonValueBuilder.toJsonValue(IOUtils.getFileContentFromClassPath
-                (RecordPropertiesTest.RECORD_DIRECTORY + "oneRecordFirstRecord.json"));
+        JsonValue jsonRecordProperties = JsonValueBuilder.toJsonValue(IOUtils.getFileContentFromClassPath(RecordPropertiesTest.RECORD_DIRECTORY + "oneRecordFirstRecord.json"));
 
         //Initialize the debugger
         Debug debugTest = Debug.getInstance(logName);
@@ -131,10 +130,8 @@ public class DefaultDebugRecorderTest extends DebugTestTemplate {
 
         Set<String> shouldBeNotPrint = new HashSet<String>();
 
-        JsonValue jsonRecordProperties1 = JsonValueBuilder.toJsonValue(IOUtils.getFileContentFromClassPath
-                (RecordPropertiesTest.RECORD_DIRECTORY + "twoRecordsFirstRecord.json"));
-        JsonValue jsonRecordProperties2 = JsonValueBuilder.toJsonValue(IOUtils.getFileContentFromClassPath
-                (RecordPropertiesTest.RECORD_DIRECTORY + "twoRecordsSecondRecord.json"));
+        JsonValue jsonRecordProperties1 = JsonValueBuilder.toJsonValue(IOUtils.getFileContentFromClassPath(RecordPropertiesTest.RECORD_DIRECTORY + "twoRecordsFirstRecord.json"));
+        JsonValue jsonRecordProperties2 = JsonValueBuilder.toJsonValue(IOUtils.getFileContentFromClassPath(RecordPropertiesTest.RECORD_DIRECTORY + "twoRecordsSecondRecord.json"));
 
         //Initialize the debugger
         Debug debugTest = Debug.getInstance(logName);
@@ -194,8 +191,7 @@ public class DefaultDebugRecorderTest extends DebugTestTemplate {
 
         SystemPropertiesManager.initializeProperties(DebugConstants.CONFIG_DEBUG_LEVEL, DebugLevel.MESSAGE.getName());
 
-        JsonValue jsonRecordProperties = JsonValueBuilder.toJsonValue(IOUtils.getFileContentFromClassPath
-                (RecordPropertiesTest.RECORD_DIRECTORY + "autoStopFileSize.json"));
+        JsonValue jsonRecordProperties = JsonValueBuilder.toJsonValue(IOUtils.getFileContentFromClassPath(RecordPropertiesTest.RECORD_DIRECTORY + "autoStopFileSize.json"));
 
         Debug debugTest = Debug.getInstance(logName);
         debugTest.setDebug(DebugLevel.ERROR.toString());
@@ -219,40 +215,23 @@ public class DefaultDebugRecorderTest extends DebugTestTemplate {
     }
 
     @Test
-    public void tryThreadDump() throws RecordException, InvalidDebugConfigurationException, IOException,
+    public void shouldCreateThreadDumpFiles() throws RecordException, InvalidDebugConfigurationException, IOException,
             InterruptedException {
-
-        int issueID = 7;
-        String referenceID = "threadDump";
-        SystemPropertiesManager.initializeProperties(DebugConstants.CONFIG_DEBUG_LEVEL, DebugLevel.MESSAGE.getName());
 
         JsonValue jsonRecordProperties = JsonValueBuilder.toJsonValue(IOUtils.getFileContentFromClassPath
                 (RecordPropertiesTest.RECORD_DIRECTORY + "threadDump.json"));
 
         recordDebugController.startRecording(jsonRecordProperties);
-        Record currentRecord =recordDebugController.getCurrentRecord();
+        Record currentRecord = recordDebugController.getCurrentRecord();
+        recordDebugController.getThreadsDumpRunnable().run();
+        recordDebugController.stopRecording();
 
-        Set<String> shouldBeInThreadDump = new HashSet<String>();
         String threadDumpFolder = currentRecord.getFolderPath() + File.separator +
                 RecordConstants.THREAD_DUMP_FOLDER_NAME + File.separator;
-        shouldBeInThreadDump.add("tryThreadDump");
-
-        recordDebugController.stopRecording();
-        Thread.sleep(200);
 
         File[] threadDumpFiles = new File(threadDumpFolder).listFiles();
 
-        if(threadDumpFiles == null) {
-            Assert.fail("No thread dump file created.");
-        }
-
-        for(File threadDumpFile: threadDumpFiles) {
-            String relativeThreadDumpFileName  = RecordConstants.RECORD_FOLDER_NAME + File.separator + issueID + File
-                    .separator + referenceID + File
-                    .separator + RecordConstants.THREAD_DUMP_FOLDER_NAME + File.separator +
-                    threadDumpFile.getName();
-            checkLogMessagesAreInTheRightLogFiles(shouldBeInThreadDump, new String[]{relativeThreadDumpFileName}, new String[]{});
-        }
+        Assert.assertTrue(threadDumpFiles != null && threadDumpFiles.length > 0, "No thread dump file created.");
     }
 
     @Test(enabled = false)
@@ -357,6 +336,10 @@ public class DefaultDebugRecorderTest extends DebugTestTemplate {
          */
         public DefaultDebugRecorderForTest(ExecutorServiceFactory executorServiceFactory) {
             super(executorServiceFactory);
+        }
+
+        public ThreadsDumpRunnable getThreadsDumpRunnable() {
+            return new ThreadsDumpRunnable(getCurrentRecord());
         }
 
         public AutoStopFileSizeRecord getAutoStopFileSizeRecord() {
