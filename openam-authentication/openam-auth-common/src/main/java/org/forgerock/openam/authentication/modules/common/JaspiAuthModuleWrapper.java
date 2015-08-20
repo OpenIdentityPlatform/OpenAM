@@ -296,11 +296,13 @@ public abstract class JaspiAuthModuleWrapper<T extends ServerAuthModule> extends
             }
 
             @Override
-            public void setRequestMessage(Object o) {
+            public void setRequestMessage(Object ignored) {
+                //Not able to set request
             }
 
             @Override
-            public void setResponseMessage(Object o) {
+            public void setResponseMessage(Object ignored) {
+                //Not able to set request
             }
 
             @Override

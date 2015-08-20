@@ -51,7 +51,6 @@ import org.forgerock.util.promise.ResultHandler;
  *
  * @since 13.0.0
  */
-@Singleton
 public class AuditFilter implements Filter {
 
     private final Debug debug;

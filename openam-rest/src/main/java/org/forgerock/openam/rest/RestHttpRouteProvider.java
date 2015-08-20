@@ -92,7 +92,6 @@ public class RestHttpRouteProvider implements HttpRouteProvider {
         Handler authenticateHandlerV2 = Endpoints.from(AuthenticationServiceV2.class);
         authenticateVersionRouter.addRoute(RouteMatchers.requestResourceApiVersionMatcher(version(1, 1)), authenticateHandlerV1);
         authenticateVersionRouter.addRoute(RouteMatchers.requestResourceApiVersionMatcher(version(2)), authenticateHandlerV2);
-        //TODO authentication filter?
         return chainOf(authenticateVersionRouter, httpAuditFactory.createFilter(AUTHENTICATION));
     }
 

@@ -104,8 +104,6 @@ public class RestEndpointServlet extends HttpServlet {
      */
     @Override
     public void init() throws ServletException {
-        // Don't need to call init() as starts Restlet which is not needed as is not created by
-        // Servlet Container.
         restletXACMLHttpServlet.init();
     }
 

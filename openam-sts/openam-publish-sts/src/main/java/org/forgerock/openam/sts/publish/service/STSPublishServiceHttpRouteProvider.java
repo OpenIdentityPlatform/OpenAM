@@ -45,6 +45,11 @@ import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.slf4j.Logger;
 
+/**
+ * {@link HttpRouteProvider} for STS publish REST routes.
+ *
+ * @since 13.0.0
+ */
 public class STSPublishServiceHttpRouteProvider implements HttpRouteProvider {
 
     private RestRouter rootRouter;

@@ -19,6 +19,7 @@ package org.forgerock.openam.rest;
 import static org.forgerock.caf.authentication.framework.AuthenticationFilter.AuthenticationModuleBuilder.configureModule;
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
 import static org.forgerock.json.resource.RouteMatchers.requestUriMatcher;
+import static org.forgerock.json.resource.RouteMatchers.resourceApiVersionContextFilter;
 import static org.forgerock.json.resource.http.CrestHttp.newHttpHandler;
 
 import javax.inject.Named;
@@ -34,6 +35,8 @@ import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.sm.InvalidRealmNameManager;
 import org.forgerock.caf.authentication.api.AsyncServerAuthModule;
 import org.forgerock.caf.authentication.framework.AuditApi;
@@ -59,7 +62,7 @@ import org.slf4j.LoggerFactory;
 @GuiceModule
 public class RestGuiceModule extends PrivateModule {
 
-    private static final String SSO_TOKEN_COOKIE_NAME_PROPERTY = "com.iplanet.am.cookie.name";
+    private static final String SSO_TOKEN_COOKIE_NAME_PROPERTY = Constants.AM_COOKIE_NAME;
 
     @Override
     protected void configure() {
@@ -78,6 +81,7 @@ public class RestGuiceModule extends PrivateModule {
         expose(Key.get(org.forgerock.http.routing.Router.class, Names.named("RestRealmRouter")));
         expose(Key.get(Router.class, Names.named("CrestRootRouter")));
         expose(Key.get(Router.class, Names.named("CrestRealmRouter")));
+        expose(Key.get(Filter.class, Names.named("ResourceApiVersionFilter")));
         expose(Key.get(org.forgerock.http.Filter.class, Names.named("ResourceApiVersionFilter")));
         expose(Key.get(Filter.class, Names.named("LoggingFilter")));
         expose(Key.get(Filter.class, Names.named("ContextFilter")));
@@ -97,20 +101,22 @@ public class RestGuiceModule extends PrivateModule {
         bind(String.class)
                 .annotatedWith(Names.named(AuthnRequestUtils.SSOTOKEN_COOKIE_NAME))
                 .toProvider(new Provider<String>() {
+                    @Override
                     public String get() {
-                        return SystemProperties.get(SSO_TOKEN_COOKIE_NAME_PROPERTY);
+                        return CookieUtils.getAmCookieName();
                     }
                 });
         bind(new TypeLiteral<Config<String>>() {})
                 .annotatedWith(Names.named(AuthnRequestUtils.ASYNC_SSOTOKEN_COOKIE_NAME))
                 .toInstance(new Config<String>() {
-
+                    @Override
                     public boolean isReady() {
-                        return SystemProperties.get(SSO_TOKEN_COOKIE_NAME_PROPERTY) != null;
+                        return CookieUtils.getAmCookieName() != null;
                     }
 
+                    @Override
                     public String get() {
-                        return SystemProperties.get(SSO_TOKEN_COOKIE_NAME_PROPERTY);
+                        return CookieUtils.getAmCookieName();
                     }
                 });
         bind(new TypeLiteral<Config<TokenStore>>() {
@@ -131,10 +137,11 @@ public class RestGuiceModule extends PrivateModule {
     @Provides
     @Named("RestHandler")
     @Singleton
-    Handler getRestHandler(@Named("ResourceApiVersionFilter") org.forgerock.http.Filter resourceApiVersionFilter,
+    Handler getRestHandler(@Named("ResourceApiVersionFilter") org.forgerock.http.Filter chfResourceApiVersionFilter,
+            @Named("ResourceApiVersionFilter") Filter resourceApiVersionFilter,
             @Named("RestRootRouter") org.forgerock.http.routing.Router chfRootRouter,
             @Named("CrestRootRouter") Router crestRootRouter,  @Named("AuthenticationFilter") org.forgerock.http.Filter authenticationFilter) {
-        return Handlers.chainOf(new RestHandler(chfRootRouter, Handlers.chainOf(newHttpHandler(crestRootRouter), authenticationFilter), Collections.singleton("authenticate")), resourceApiVersionFilter);
+        return new RestHandler(Handlers.chainOf(chfRootRouter, chfResourceApiVersionFilter), Handlers.chainOf(newHttpHandler(new FilterChain(crestRootRouter, resourceApiVersionFilter)), authenticationFilter), Collections.singleton("authenticate"));
     }
 
     @Provides
@@ -142,6 +149,13 @@ public class RestGuiceModule extends PrivateModule {
     @Singleton //TODO this should be in openam-http
     org.forgerock.http.Filter getChfResourceApiVersionFilter(ResourceApiVersionBehaviourManager behaviourManager) {
         return RouteMatchers.resourceApiVersionContextFilter(behaviourManager);
+    }
+
+    @Provides
+    @Named("ResourceApiVersionFilter")
+    @Singleton //TODO this should be in openam-http
+    Filter getCrestResourceApiVersionFilter(ResourceApiVersionBehaviourManager behaviourManager) {
+        return resourceApiVersionContextFilter(behaviourManager);
     }
 
     @Provides

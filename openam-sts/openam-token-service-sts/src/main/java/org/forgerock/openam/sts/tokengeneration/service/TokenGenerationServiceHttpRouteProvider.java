@@ -45,6 +45,11 @@ import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.slf4j.Logger;
 
+/**
+ * {@link HttpRouteProvider} for STS token generation REST route.
+ *
+ * @since 13.0.0
+ */
 public class TokenGenerationServiceHttpRouteProvider implements HttpRouteProvider {
 
     private RestRouter rootRouter;

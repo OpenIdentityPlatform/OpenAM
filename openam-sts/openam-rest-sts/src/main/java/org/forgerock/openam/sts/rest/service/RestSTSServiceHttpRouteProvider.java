@@ -28,6 +28,11 @@ import org.forgerock.openam.http.HttpRouteProvider;
 import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 
+/**
+ * {@link HttpRouteProvider} for STS service REST routes.
+ *
+ * @since 13.0.0
+ */
 public class RestSTSServiceHttpRouteProvider implements HttpRouteProvider {
 
     @Override
@@ -36,8 +41,8 @@ public class RestSTSServiceHttpRouteProvider implements HttpRouteProvider {
             @Override
             public Handler apply(Void value) throws NeverThrowsException {
             return CrestHttp.newHttpHandler(
-                        RestSTSServiceConnectionFactoryProvider.getConnectionFactory(),
-                        RestSTSServiceHttpServletContextFactoryProvider.getHttpServletContextFactory());
+                    RestSTSServiceConnectionFactoryProvider.getConnectionFactory(),
+                    RestSTSServiceHttpServletContextFactoryProvider.getHttpServletContextFactory());
             }
         }));
     }

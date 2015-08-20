@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
 import org.forgerock.caf.authentication.api.AuthenticationException;
 import org.forgerock.caf.authentication.api.MessageContext;
@@ -51,7 +52,7 @@ import org.w3c.dom.Element;
  * An implementation of {@code ResourceExceptionHandler} that renders to XML.
  */
 public class XMLResourceExceptionHandler implements ResponseWriter {
-
+    private static final Debug LOGGER = Debug.getInstance("frRest");
     private static final List<MediaType> HANDLES = Arrays.asList(
             MediaType.XML_UTF_8.withoutParameters(), MediaType.APPLICATION_XML_UTF_8.withoutParameters());
 
@@ -73,7 +74,8 @@ public class XMLResourceExceptionHandler implements ResponseWriter {
             } else if (exception.getCause() instanceof ResourceException) {
                 jre = (ResourceException) exception.getCause();
             } else {
-                jre = new InternalServerErrorException(exception.getMessage(), exception);
+                LOGGER.error(exception.getMessage(), exception);
+                jre = new InternalServerErrorException("Authentication Failed", exception);
             }
             AuditTrail auditTrail = context.getAuditTrail();
             List<Map<String, Object>> failureReasonList = auditTrail.getFailureReasons();

@@ -93,14 +93,14 @@ public final class ClientUtils {
         if (request != null) {
             String ipAddrHeader = SystemPropertiesManager.get(Constants.CLIENT_IP_ADDR_HEADER);
 
-            if ((ipAddrHeader != null) && (ipAddrHeader.length() != 0)) {
+            if (StringUtils.isBlank(ipAddrHeader)) {
                 result = request.getHeaders().getFirst(ipAddrHeader);
                 if (result != null) {
                     String[] ips = result.split(",");
                     result = ips[0].trim();
                 }
             }
-            if ((result == null) || (result.length() == 0)) {
+            if (StringUtils.isBlank(result)) {
                 result = context.asContext(ClientInfoContext.class).getRemoteAddress();
                 if (utilDebug.messageEnabled()) {
                     utilDebug.message("ClientUtils.getClientIPAddress : remoteAddr=[" + result + "]");
