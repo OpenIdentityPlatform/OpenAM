@@ -16,39 +16,43 @@
 
 package org.forgerock.openam.rest.uma;
 
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.util.test.assertj.AssertJPromiseAssert.*;
+import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.*;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+
 import java.util.Collections;
 
-import com.google.inject.Provider;
-import com.sun.identity.common.ISLocaleContext;
-import com.sun.identity.common.LocaleContext;
+import org.forgerock.http.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.util.query.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
-import org.forgerock.json.resource.Resource;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.http.Context;
-import org.forgerock.json.resource.http.HttpContext;
+import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.openam.forgerockrest.UmaLabelResource;
-import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.oauth2.resources.labels.LabelType;
 import org.forgerock.openam.oauth2.resources.labels.ResourceSetLabel;
 import org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore;
+import org.forgerock.openam.rest.resource.ContextHelper;
+import org.forgerock.util.promise.Promise;
+import org.forgerock.util.query.QueryFilter;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static org.forgerock.json.JsonValue.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import com.google.inject.Provider;
+import com.sun.identity.common.LocaleContext;
 
 public class UmaLabelResourceTest {
     public static final String NAME_ATTRIBUTE_NAME = "name";
@@ -65,9 +69,8 @@ public class UmaLabelResourceTest {
     private Context serverContext;
     private CreateRequest createRequest;
     private DeleteRequest deleteRequest;
-    private ResultHandler<Resource> resultHandler;
     private QueryRequest queryRequest;
-    private QueryResultHandler queryResultHandler;
+    private QueryResourceHandler queryResourceHandler;
     private ClientRegistrationStore clientRegistrationStore;
     private LocaleContext localContext;
 
@@ -86,8 +89,7 @@ public class UmaLabelResourceTest {
         serverContext = mock(Context.class);
         createRequest = mock(CreateRequest.class);
         queryRequest = mock(QueryRequest.class);
-        resultHandler = mock(ResultHandler.class);
-        queryResultHandler = mock(QueryResultHandler.class);
+        queryResourceHandler = mock(QueryResourceHandler.class);
         deleteRequest = mock(DeleteRequest.class);
     }
 
@@ -95,7 +97,7 @@ public class UmaLabelResourceTest {
      * Should successfully create an UMA Label.
      */
     @Test
-    public Promise<ResourceResponse, ResourceException> createInstance() throws ResourceException {
+    public void createInstance() throws ResourceException {
         //Given
         JsonValue umaLabel = json(object(
                 field(NAME_ATTRIBUTE_NAME, LABEL_NAME),
@@ -109,18 +111,15 @@ public class UmaLabelResourceTest {
         given(umaLabelsStore.create(REALM_NAME, RESOURCE_OWNER_ID, resourceSetLabel)).willReturn(resourceSetLabel);
 
         //When
-        umaLabelResource.createInstance(serverContext, createRequest, resultHandler);
+        Promise<ResourceResponse, ResourceException> promise = umaLabelResource.createInstance(serverContext, createRequest);
 
         //Then
         verify(umaLabelsStore, Mockito.times(1)).create(REALM_NAME, RESOURCE_OWNER_ID, resourceSetLabel);
-        verify(resultHandler).handleResult(Matchers.<Resource>anyObject());
+        assertThat(promise).succeeded();
     }
 
-    /**
-     * Should throw an error when "name" attribute is missing.
-     */
     @Test
-    public Promise<ResourceResponse, ResourceException> createInstanceFails() {
+    public void createInstanceFailsWhenTypePropertyIsMissing() {
         //Given
         JsonValue umaLabel = json(object(
                 field(NAME_ATTRIBUTE_NAME, LABEL_NAME)
@@ -131,18 +130,15 @@ public class UmaLabelResourceTest {
         given(contextHelper.getUserId(serverContext)).willReturn(RESOURCE_OWNER_ID);
 
         //When
-        umaLabelResource.createInstance(serverContext, createRequest, resultHandler);
+        Promise<ResourceResponse, ResourceException> promise = umaLabelResource.createInstance(serverContext, createRequest);
 
         //Then
         verifyZeroInteractions(umaLabelsStore);
-        verify(resultHandler).handleError(Matchers.<NotSupportedException>anyObject());
+        assertThat(promise).failedWithResourceException().isInstanceOf(BadRequestException.class);
     }
 
-    /**
-     * Should throw an error when "type" attribute is missing.
-     */
     @Test
-    public Promise<ResourceResponse, ResourceException> createInstanceFails2() {
+    public void createInstanceFailsWhenNamePropertyIsMissing() {
         //Given
         JsonValue umaLabel = json(object(
                 field(TYPE_ATTRIBUTE_NAME, LABEL_TYPE)
@@ -153,11 +149,11 @@ public class UmaLabelResourceTest {
         given(contextHelper.getUserId(serverContext)).willReturn(RESOURCE_OWNER_ID);
 
         //When
-        umaLabelResource.createInstance(serverContext, createRequest, resultHandler);
+        Promise<ResourceResponse, ResourceException> promise = umaLabelResource.createInstance(serverContext, createRequest);
 
         //Then
         verifyZeroInteractions(umaLabelsStore);
-        verify(resultHandler).handleError(Matchers.<NotSupportedException>anyObject());
+        assertThat(promise).failedWithResourceException().isInstanceOf(BadRequestException.class);
     }
 
     /**
@@ -173,11 +169,11 @@ public class UmaLabelResourceTest {
         given(deleteRequest.getRevision()).willReturn(String.valueOf(resourceSetLabel.hashCode()));
 
         //When
-        umaLabelResource.deleteInstance(serverContext, LABEL_ID, deleteRequest, resultHandler);
+        Promise<ResourceResponse, ResourceException> promise = umaLabelResource.deleteInstance(serverContext, LABEL_ID, deleteRequest);
 
         //Then
         verify(umaLabelsStore, Mockito.times(1)).delete(REALM_NAME, RESOURCE_OWNER_ID, LABEL_ID);
-        verify(resultHandler).handleResult(Matchers.<Resource>anyObject());
+        assertThat(promise).succeeded();
     }
 
     /**
@@ -192,11 +188,12 @@ public class UmaLabelResourceTest {
         given(queryRequest.getQueryFilter()).willReturn(QueryFilter.<JsonPointer>alwaysTrue());
 
         //When
-        umaLabelResource.queryCollection(serverContext, queryRequest, queryResultHandler);
+        Promise<QueryResponse, ResourceException> promise = umaLabelResource.queryCollection(serverContext,
+                queryRequest, queryResourceHandler);
 
         //Then
         verify(umaLabelsStore, Mockito.times(1)).list(REALM_NAME, RESOURCE_OWNER_ID);
-        verify(queryResultHandler).handleResult(Matchers.<QueryResult>anyObject());
+        assertThat(promise).succeeded();
     }
 
     /**
@@ -206,14 +203,15 @@ public class UmaLabelResourceTest {
     public void queryLabelsFails() throws ResourceException {
         //Given
         given(umaLabelsStore.list(REALM_NAME, RESOURCE_OWNER_ID)).willReturn(Collections.<ResourceSetLabel>emptySet());
-        given(queryRequest.getQueryFilter()).willReturn(QueryFilter.alwaysFalse());
+        given(queryRequest.getQueryFilter()).willReturn(QueryFilter.<JsonPointer>alwaysFalse());
 
         //When
-        umaLabelResource.queryCollection(serverContext, queryRequest, queryResultHandler);
+        Promise<QueryResponse, ResourceException> promise = umaLabelResource.queryCollection(serverContext,
+                queryRequest, queryResourceHandler);
 
         //Then
         verifyZeroInteractions(umaLabelsStore);
-        verify(queryResultHandler).handleError(Matchers.<NotSupportedException>anyObject());
+        assertThat(promise).failedWithException().isInstanceOf(BadRequestException.class);
     }
 
 }
