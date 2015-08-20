@@ -15,12 +15,12 @@
  */
 package org.forgerock.openam.http.audit;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.openam.audit.AuditConstants.*;
 import static org.forgerock.openam.audit.AuditConstants.Component.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 import static org.mockito.Mockito.*;
 
-import org.assertj.core.api.Assertions;
 import org.forgerock.audit.AuditException;
 import org.forgerock.audit.events.AuditEvent;
 import org.forgerock.http.Context;
@@ -29,9 +29,10 @@ import org.forgerock.http.Session;
 import org.forgerock.http.context.ClientInfoContext;
 import org.forgerock.http.context.HttpRequestContext;
 import org.forgerock.http.context.RootContext;
-import org.forgerock.http.protocol.Entity;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
+import org.forgerock.http.protocol.Status;
+import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
 import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
@@ -77,7 +78,8 @@ public class AbstractHttpAccessAuditFilterTest {
 
         // Then
         verify(nextHandler, never()).handle(any(Context.class), any(Request.class));
-        Assertions.assertThat(result);
+        verify(eventPublisher).isAuditing(AuditConstants.ACCESS_TOPIC);
+        assertThat(result.get().getStatus()).isEqualTo(Status.INTERNAL_SERVER_ERROR);
     }
 
     @Test

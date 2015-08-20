@@ -130,8 +130,6 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
                             response.getStatus().getReasonPhrase())
                     .forRequest(request, context);
 
-            builder.forRequest(request, context);
-
             auditEventPublisher.tryPublish(AuditConstants.ACCESS_TOPIC, builder.toEvent());
         }
     }
