@@ -41,6 +41,11 @@ public class RestSTSServiceHttpServletContext extends AbstractContext {
         this.request = request;
     }
 
+    /**
+     * Returns the CHF http request.
+     *
+     * @return the CHF http request.
+     */
     public Request getRequest() {
         return request;
     }

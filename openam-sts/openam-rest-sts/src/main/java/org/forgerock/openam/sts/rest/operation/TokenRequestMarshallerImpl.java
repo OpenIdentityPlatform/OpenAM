@@ -16,14 +16,28 @@
 
 package org.forgerock.openam.sts.rest.operation;
 
+import static org.forgerock.guava.common.collect.Iterables.filter;
+import static org.forgerock.guava.common.collect.Iterables.toArray;
+
 import com.sun.identity.shared.encode.Base64;
-import org.forgerock.http.context.HttpRequestContext;
+
+import java.io.ByteArrayInputStream;
+import java.io.UnsupportedEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.List;
+import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.forgerock.http.context.ClientInfoContext;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.TokenMarshalException;
+import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.TokenTypeId;
 import org.forgerock.openam.sts.config.user.CustomTokenOperation;
 import org.forgerock.openam.sts.rest.operation.translate.CustomRestTokenProviderParametersImpl;
@@ -36,25 +50,15 @@ import org.forgerock.openam.sts.rest.token.provider.oidc.OpenIdConnectTokenCreat
 import org.forgerock.openam.sts.rest.token.provider.saml.Saml2TokenCreationState;
 import org.forgerock.openam.sts.rest.token.validator.RestIssuedTokenValidatorParameters;
 import org.forgerock.openam.sts.rest.token.validator.RestTokenTransformValidatorParameters;
-import org.forgerock.openam.sts.user.invocation.ProofTokenState;
-import org.forgerock.openam.sts.user.invocation.SAML2TokenCreationState;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
 import org.forgerock.openam.sts.token.model.RestUsernameToken;
+import org.forgerock.openam.sts.user.invocation.ProofTokenState;
+import org.forgerock.openam.sts.user.invocation.SAML2TokenCreationState;
 import org.forgerock.openam.sts.user.invocation.SAML2TokenState;
 import org.forgerock.openam.utils.ClientUtils;
 import org.slf4j.Logger;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @see TokenRequestMarshaller
@@ -375,13 +379,15 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
      * javax.servlet.request.X509Certificate attribute will be consulted.
      * An exception will be thrown if the client cert cannot be obtained.
      * @param httpContext The HttpContext instance corresponding to this invocation
-     * @param restSTSServiceHttpServletContext The AbstractContext instance which provides access to the HttpServletRequest,
+     * @param restSTSServiceHttpServletContext The AbstractContext instance which provides access to the
+     *                                         ClientInfoContext,
      *                                         and with it, access to the client cert presented via two-way-tls
      * @throws org.forgerock.openam.sts.TokenMarshalException if the client's X509 token cannot be obtained from the
      * javax.servlet.request.X509Certificate attribute, or from the header referenced by the offloadedTlsClientCertKey value.
      * @return a RestTokenTransformValidatorParameters instance with a X509Certificate[] generic type.
      */
-    private RestTokenTransformValidatorParameters<X509Certificate[]> buildX509CertTokenTransformValidatorParameters(HttpContext httpContext, RestSTSServiceHttpServletContext
+    private RestTokenTransformValidatorParameters<X509Certificate[]> buildX509CertTokenTransformValidatorParameters(
+            HttpContext httpContext, RestSTSServiceHttpServletContext
             restSTSServiceHttpServletContext) throws TokenMarshalException {
 
         X509Certificate[] certificates;
@@ -424,8 +430,11 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
         }
     }
 
-    private X509Certificate[] pullClientCertFromRequestAttribute(RestSTSServiceHttpServletContext restSTSServiceHttpServletContext) throws TokenMarshalException {
-        return (X509Certificate[])restSTSServiceHttpServletContext.asContext(HttpRequestContext.class).getAttributes().get(X509_CERTIFICATE_ATTRIBUTE);
+    private X509Certificate[] pullClientCertFromRequestAttribute(
+            RestSTSServiceHttpServletContext restSTSServiceHttpServletContext) throws TokenMarshalException {
+        // Filter the certs on the request to just the X509 ones and return as an array.
+        return toArray(filter(restSTSServiceHttpServletContext.asContext(ClientInfoContext.class).getCertificates(),
+                        X509Certificate.class), X509Certificate.class);
     }
 
     private X509Certificate[] pullClientCertFromHeader(HttpContext httpContext) throws TokenMarshalException {
