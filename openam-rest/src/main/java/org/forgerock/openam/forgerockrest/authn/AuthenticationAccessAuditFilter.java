@@ -69,7 +69,7 @@ public class AuthenticationAccessAuditFilter extends AbstractHttpAccessAuditFilt
     }
 
     @Override
-    protected String getContextIdForAccessAttempt(Request request) throws AuditException {
+    protected String getContextIdForAccessAttempt(Request request) {
         try {
             String jsonString = request.getEntity().getString();
             if (isNotEmpty(jsonString)) {
@@ -80,7 +80,7 @@ public class AuthenticationAccessAuditFilter extends AbstractHttpAccessAuditFilt
             }
             return super.getContextIdForAccessAttempt(request);
         } catch (IOException e) {
-            throw new AuditException(e);
+            return "";
         }
     }
 

@@ -151,7 +151,7 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
      * @param request the restlet request
      * @return the context ID
      */
-    protected String getContextIdForAccessAttempt(Request request) throws AuditException {
+    protected String getContextIdForAccessAttempt(Request request) {
         return AuditRequestContext.getProperty(AuditConstants.CONTEXT_ID);
     }
 
