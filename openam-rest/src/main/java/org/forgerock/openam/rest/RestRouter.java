@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.rest;
 
-import org.forgerock.http.routing.Router;
+import org.forgerock.json.resource.Router;
 import org.forgerock.openam.rest.Routers.Route;
 
 /**

@@ -19,9 +19,11 @@ package org.forgerock.openam.rest;
 import static org.forgerock.caf.authentication.framework.AuthenticationFilter.AuthenticationModuleBuilder.configureModule;
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
 import static org.forgerock.json.resource.RouteMatchers.requestUriMatcher;
+import static org.forgerock.json.resource.http.CrestHttp.newHttpHandler;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -69,6 +71,7 @@ public class RestGuiceModule extends PrivateModule {
         bind(AuditApi.class).to(NoopAuditApi.class);
         bind(Key.get(new TypeLiteral<Set<String>>(){}, Names.named("InvalidRealmNames")))
                 .toInstance(InvalidRealmNameManager.getInvalidRealmNames());
+        bind(AuthenticationEnforcer.class);
 
         expose(Key.get(Handler.class, Names.named("RestHandler")));
         expose(Key.get(org.forgerock.http.routing.Router.class, Names.named("RestRootRouter")));
@@ -79,16 +82,15 @@ public class RestGuiceModule extends PrivateModule {
         expose(Key.get(Filter.class, Names.named("LoggingFilter")));
         expose(Key.get(Filter.class, Names.named("ContextFilter")));
         expose(ResourceApiVersionBehaviourManager.class);
-        expose(Key.get(ExceptionableAuthenticationFilter.class, Names.named("RestAuthenticationFilter")));
-        expose(Key.get(new TypeLiteral<Set<String>>(){}, Names.named("InvalidRealmNames")));
+        expose(AuthenticationEnforcer.class);
+        expose(Key.get(org.forgerock.http.Filter.class, Names.named("AuthenticationFilter")));
+        expose(Key.get(new TypeLiteral<Set<String>>() {}, Names.named("InvalidRealmNames")));
         expose(Key.get(DynamicRealmRestRouter.class, Names.named("RestRouter")));
         expose(RestRouter.class);
 
 
 
         //From AuthFilterGuiceModule
-        bind(Key.get(AsyncServerAuthModule.class, Names.named("SsoTokenSession")))
-                .to(LocalSSOTokenSessionModule.class).in(Singleton.class);
         bind(Key.get(AsyncServerAuthModule.class, Names.named("OptionalSsoTokenSession")))
                 .to(OptionalSSOTokenSessionModule.class).in(Singleton.class);
 
@@ -130,8 +132,9 @@ public class RestGuiceModule extends PrivateModule {
     @Named("RestHandler")
     @Singleton
     Handler getRestHandler(@Named("ResourceApiVersionFilter") org.forgerock.http.Filter resourceApiVersionFilter,
-            @Named("RestRootRouter") org.forgerock.http.routing.Router rootRouter) {
-        return Handlers.chainOf(rootRouter, resourceApiVersionFilter);
+            @Named("RestRootRouter") org.forgerock.http.routing.Router chfRootRouter,
+            @Named("CrestRootRouter") Router crestRootRouter,  @Named("AuthenticationFilter") org.forgerock.http.Filter authenticationFilter) {
+        return Handlers.chainOf(new RestHandler(chfRootRouter, Handlers.chainOf(newHttpHandler(crestRootRouter), authenticationFilter), Collections.singleton("authenticate")), resourceApiVersionFilter);
     }
 
     @Provides
@@ -183,7 +186,7 @@ public class RestGuiceModule extends PrivateModule {
     @Named("AuthenticationFilter")
     @Singleton
     org.forgerock.http.Filter getAuthenticationFilter(@Named("RestAuthentication") Logger logger,
-            AuditApi auditApi, @Named("SsoTokenSession") AsyncServerAuthModule ssoTokenSessionModule) {
+            AuditApi auditApi, @Named("OptionalSsoTokenSession") AsyncServerAuthModule ssoTokenSessionModule) {
         return AuthenticationFilter.builder()
                 .logger(logger)
                 .auditApi(auditApi)
@@ -192,50 +195,30 @@ public class RestGuiceModule extends PrivateModule {
     }
 
     @Provides
-    @Named("RestAuthenticationFilter")
-    ExceptionableAuthenticationFilter getAuthenticationFilter(@Named("RestAuthentication") Logger logger,
-            AuditApi auditApi, @Named("RestAuthentication") AuthenticationModule sessionModule) {
-        return new ExceptionableAuthenticationFilter(AuthenticationFilter.builder()
-                .logger(logger)
-                .auditApi(auditApi)
-                .sessionModule(configureModule(sessionModule))
-                .build(), sessionModule);
-    }
-
-    @Provides
-    @Named("RestAuthentication")
-    AuthenticationModule getAuthenticationModule(@Named("SsoTokenSession") AsyncServerAuthModule ssoTokenSessionModule,
-            @Named("OptionalSsoTokenSession") AsyncServerAuthModule optionalSsoTokenSessionModule) {
-        return new AuthenticationModule(ssoTokenSessionModule, optionalSsoTokenSessionModule);
-    }
-
-    @Provides
     @Named("RestRouter")
     @Singleton
     DynamicRealmRestRouter getRestRouter(
-            @Named("RestRootRouter") final org.forgerock.http.routing.Router rootRouter,
-            @Named("RestRealmRouter") final org.forgerock.http.routing.Router realmRouter,
-            @Named("CrestRootRouter") final Router internalRootRouter,
-            @Named("CrestRealmRouter") final Router internalRealmRouter,
+            @Named("CrestRootRouter") final Router rootRouter,
+            @Named("CrestRealmRouter") final Router realmRouter,
             @Named("InvalidRealmNames") final Set<String> invalidRealms,
-            @Named("AuthenticationFilter") final org.forgerock.http.Filter defaultAuthenticationFilter,
+            final AuthenticationEnforcer defaultAuthenticationEnforcer,
             final AuditFilter auditFilter, @Named("ContextFilter") final Filter contextFilter,
             @Named("LoggingFilter") final Filter loggingFilter) {
         return new DynamicRealmRestRouter() {
             @Override
             public RestRouter dynamically() {
-                return new Routers.RestRouterImpl(realmRouter, internalRealmRouter, invalidRealms,
-                        defaultAuthenticationFilter, auditFilter, contextFilter, loggingFilter);
+                return new Routers.RestRouterImpl(realmRouter, invalidRealms,
+                        defaultAuthenticationEnforcer, auditFilter, contextFilter, loggingFilter);
             }
 
             @Override
             public Route route(String uriTemplate) {
-                return new Routers.RestRouterImpl(rootRouter, internalRootRouter, invalidRealms,
-                        defaultAuthenticationFilter, auditFilter, contextFilter, loggingFilter).route(uriTemplate);
+                return new Routers.RestRouterImpl(rootRouter, invalidRealms,
+                        defaultAuthenticationEnforcer, auditFilter, contextFilter, loggingFilter).route(uriTemplate);
             }
 
             @Override
-            public org.forgerock.http.routing.Router getRouter() {
+            public Router getRouter() {
                 return rootRouter;
             }
         };
@@ -243,29 +226,27 @@ public class RestGuiceModule extends PrivateModule {
 
     @Provides
     @Singleton
-    RestRouter getNewRestRouter(
-            final org.forgerock.http.routing.Router rootRouter,
-            final org.forgerock.http.routing.Router realmRouter,
-            final Router internalRootRouter,
-            final Router internalRealmRouter,
-            @Named("AuthenticationFilter") final org.forgerock.http.Filter defaultAuthenticationFilter,
+    RestRouter getNewRestRouter( //TODO look at this! where is it used? is it needed? does it work correctly?
+            final Router rootRouter,
+            final Router realmRouter,
+            final AuthenticationEnforcer defaultAuthenticationEnforcer,
             final AuditFilter auditFilter, @Named("ContextFilter") final Filter contextFilter,
             @Named("LoggingFilter") final Filter loggingFilter) {
         return new DynamicRealmRestRouter() {
             @Override
             public RestRouter dynamically() {
-                return new Routers.RestRouterImpl(realmRouter, internalRealmRouter, new HashSet<String>(),
-                        defaultAuthenticationFilter, auditFilter, contextFilter, loggingFilter);
+                return new Routers.RestRouterImpl(realmRouter, new HashSet<String>(),
+                        defaultAuthenticationEnforcer, auditFilter, contextFilter, loggingFilter);
             }
 
             @Override
             public Route route(String uriTemplate) {
-                return new Routers.RestRouterImpl(rootRouter, internalRootRouter, new HashSet<String>(),
-                        defaultAuthenticationFilter, auditFilter, contextFilter, loggingFilter).route(uriTemplate);
+                return new Routers.RestRouterImpl(rootRouter, new HashSet<String>(),
+                        defaultAuthenticationEnforcer, auditFilter, contextFilter, loggingFilter).route(uriTemplate);
             }
 
             @Override
-            public org.forgerock.http.routing.Router getRouter() {
+            public Router getRouter() {
                 return rootRouter;
             }
         };

@@ -17,6 +17,7 @@
 package org.forgerock.openam.sts.publish.service;
 
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
+import static org.forgerock.json.resource.http.CrestHttp.newHttpHandler;
 import static org.forgerock.openam.audit.AuditConstants.Component.STS;
 
 import javax.inject.Inject;
@@ -27,6 +28,7 @@ import java.util.Set;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import org.forgerock.http.Handler;
+import org.forgerock.http.handler.Handlers;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.openam.http.HttpRoute;
 import org.forgerock.openam.http.HttpRouteProvider;
@@ -46,10 +48,16 @@ import org.slf4j.Logger;
 public class STSPublishServiceHttpRouteProvider implements HttpRouteProvider {
 
     private RestRouter rootRouter;
+    private org.forgerock.http.Filter authenticationFilter;
 
     @Inject
     public void setRouters(RestRouter router) {
         this.rootRouter = router;
+    }
+
+    @Inject
+    public void setAuthenticationFilter(@Named("AuthenticationFilter") org.forgerock.http.Filter authenticationFilter) {
+        this.authenticationFilter = authenticationFilter;
     }
 
     @Override
@@ -85,6 +93,6 @@ public class STSPublishServiceHttpRouteProvider implements HttpRouteProvider {
                 .authorizeWith(STSPublishServiceAuthzModule.class)
                 .toRequestHandler(STARTS_WITH, soapPublishRequestHandler);
 
-        return rootRouter.getRouter();
+        return Handlers.chainOf(newHttpHandler(rootRouter.getRouter()), authenticationFilter);
     }
 }

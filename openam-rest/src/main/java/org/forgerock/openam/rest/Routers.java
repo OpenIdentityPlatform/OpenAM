@@ -17,11 +17,9 @@
 package org.forgerock.openam.rest;
 
 import static org.forgerock.authz.filter.crest.AuthorizationFilters.createAuthorizationFilter;
-import static org.forgerock.http.routing.RouteMatchers.requestUriMatcher;
 import static org.forgerock.http.routing.RoutingMode.EQUALS;
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
 import static org.forgerock.http.routing.Version.version;
-import static org.forgerock.json.resource.http.CrestHttp.newHttpHandler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,12 +27,8 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.inject.Key;
-import com.google.inject.name.Names;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.http.Handler;
-import org.forgerock.http.handler.Handlers;
-import org.forgerock.http.routing.Router;
 import org.forgerock.http.routing.RoutingMode;
 import org.forgerock.http.routing.Version;
 import org.forgerock.json.resource.CollectionResourceProvider;
@@ -43,11 +37,13 @@ import org.forgerock.json.resource.FilterChain;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.RouteMatchers;
+import org.forgerock.json.resource.Router;
 import org.forgerock.json.resource.SingletonResourceProvider;
 import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.rest.authz.LoggingAuthzModule;
 import org.forgerock.openam.rest.fluent.AuditFilter;
 import org.forgerock.openam.rest.fluent.AuditFilterWrapper;
+import org.forgerock.util.Reject;
 
 /**
  * Class containing methods for creating fluent route registration routers.
@@ -59,20 +55,18 @@ public class Routers {
     static final class RestRouterImpl implements RestRouter {
 
         private final Router router;
-        private final org.forgerock.json.resource.Router internalRouter;
         private final Set<String> invalidRealms;
-        private final org.forgerock.http.Filter defaultAuthenticationFilter;
+        private final Filter defaultAuthenticationEnforcer;
         private final AuditFilter auditFilter;
         private final Filter contextFilter;
         private final Filter loggingFilter;
 
-        RestRouterImpl(Router router, org.forgerock.json.resource.Router internalRouter,
-                Set<String> invalidRealms, org.forgerock.http.Filter defaultAuthenticationFilter,
+        RestRouterImpl(Router router,
+                Set<String> invalidRealms, Filter defaultAuthenticationEnforcer,
                 AuditFilter auditFilter, Filter contextFilter, Filter loggingFilter) {
             this.router = router;
-            this.internalRouter = internalRouter;
             this.invalidRealms = invalidRealms;
-            this.defaultAuthenticationFilter = defaultAuthenticationFilter;
+            this.defaultAuthenticationEnforcer = defaultAuthenticationEnforcer;
             this.contextFilter = contextFilter;
             this.loggingFilter = loggingFilter;
             this.auditFilter = auditFilter;
@@ -86,7 +80,7 @@ public class Routers {
         @Override
         public Route route(String uriTemplate) {
             invalidRealms.add(firstPathSegment(uriTemplate));
-            return new Route(router, internalRouter, defaultAuthenticationFilter, auditFilter, contextFilter, loggingFilter,
+            return new Route(router, defaultAuthenticationEnforcer, auditFilter, contextFilter, loggingFilter,
                     uriTemplate);
         }
 
@@ -111,11 +105,10 @@ public class Routers {
      * Creates a new authentication filter which allows for authentication
      * exceptions to be added for certain CREST operations.
      *
-     * @return A new {@link ExceptionableAuthenticationFilter}.
+     * @return A new {@link AuthenticationEnforcer}.
      */
-    public static ExceptionableAuthenticationFilter ssoToken() {
-        return InjectorHolder.getInstance(Key.get(ExceptionableAuthenticationFilter.class,
-                Names.named("RestAuthenticationFilter")));
+    public static AuthenticationEnforcer ssoToken() {
+        return InjectorHolder.getInstance(AuthenticationEnforcer.class);
     }
 
     /**
@@ -126,24 +119,22 @@ public class Routers {
     public static final class Route implements VersionableRoute {
 
         private final Router router;
-        private final org.forgerock.json.resource.Router internalRouter;
-        private final org.forgerock.http.Filter defaultAuthenticationFilter;
+        private final Filter defaultAuthenticationEnforcer;
         private final AuditFilter auditFilter;
         private final Filter contextFilter;
         private final Filter loggingFilter;
         private final String uriTemplate;
 
-        private org.forgerock.http.Filter authenticationFilter;
+        private Filter authenticationEnforcer;
         private AuditFilterWrapper auditFilterWrapper;
         private List<CrestAuthorizationModule> authorizationModules;
         private List<Filter> filters;
 
-        Route(Router router, org.forgerock.json.resource.Router internalRouter,
-                org.forgerock.http.Filter defaultAuthenticationFilter, AuditFilter auditFilter, Filter contextFilter,
+        Route(Router router,
+                Filter defaultAuthenticationEnforcer, AuditFilter auditFilter, Filter contextFilter,
                 Filter loggingFilter, String uriTemplate) {
             this.router = router;
-            this.internalRouter = internalRouter;
-            this.defaultAuthenticationFilter = defaultAuthenticationFilter;
+            this.defaultAuthenticationEnforcer = defaultAuthenticationEnforcer;
             this.auditFilter = auditFilter;
             this.contextFilter = contextFilter;
             this.loggingFilter = loggingFilter;
@@ -163,11 +154,12 @@ public class Routers {
          * @return This route.
          * @throws IllegalStateException If attempted to be set twice.
          */
-        public Route authenticateWith(org.forgerock.http.Filter authenticationFilter) {
-            if (this.authenticationFilter != null) {
+        public Route authenticateWith(Filter authenticationFilter) {
+            Reject.ifNull(authenticationFilter);
+            if (this.authenticationEnforcer != null) {
                 throw new IllegalStateException("Authentication Filter has already been set!");
             }
-            this.authenticationFilter = authenticationFilter;
+            this.authenticationEnforcer = authenticationFilter;
             return this;
         }
 
@@ -182,10 +174,31 @@ public class Routers {
          * @throws IllegalStateException If attempted to be set twice.
          */
         public Route auditAs(AuditConstants.Component component) {
+            Reject.ifNull(component);
             if (this.auditFilterWrapper != null) {
                 throw new IllegalStateException("Audit component has already been set!");
             }
             this.auditFilterWrapper = new AuditFilterWrapper(auditFilter, component);
+            return this;
+        }
+
+        /**
+         * Specifies the audit component to use when auditing requests to the endpoint.
+         *
+         * <p>Can only be set <strong>once</strong>, attempt to do so twice
+         * will result in an {@code IllegalStateException}.</p>
+         *
+         * @param component The audit component.
+         * @param filterClass The audit filter class.
+         * @return This route.
+         * @throws IllegalStateException If attempted to be set twice.
+         */
+        public Route auditAs(AuditConstants.Component component, Class<? extends Filter> filterClass) {
+            Reject.ifNull(component, filterClass);
+            if (this.auditFilterWrapper != null) {
+                throw new IllegalStateException("Audit component has already been set!");
+            }
+            this.auditFilterWrapper = new AuditFilterWrapper(InjectorHolder.getInstance(filterClass), component);
             return this;
         }
 
@@ -202,6 +215,7 @@ public class Routers {
          */
         @SafeVarargs
         public final Route authorizeWith(Class<? extends CrestAuthorizationModule>... authorizationModules) {
+            Reject.ifNull(authorizationModules);
             if (this.authorizationModules != null) {
                 throw new IllegalStateException("Authorization Filters have already been set!");
             } else {
@@ -227,6 +241,7 @@ public class Routers {
          */
         @SafeVarargs
         public final Route through(Class<? extends Filter>... filters) {
+            Reject.ifNull(filters);
             if (this.filters != null) {
                 throw new IllegalStateException("Filters have already been set!");
             } else {
@@ -248,6 +263,7 @@ public class Routers {
          * @param resourceClass The resource endpoint class.
          */
         public void toCollection(Class<? extends CollectionResourceProvider> resourceClass) {
+            Reject.ifNull(resourceClass);
             toCollection(Key.get(resourceClass));
         }
 
@@ -261,6 +277,7 @@ public class Routers {
          * @param resourceKey The resource endpoint key.
          */
         public void toCollection(Key<? extends CollectionResourceProvider> resourceKey) {
+            Reject.ifNull(resourceKey);
             forVersion(1).toCollection(resourceKey);
         }
 
@@ -274,6 +291,7 @@ public class Routers {
          * @param resource The resource endpoint instance.
          */
         public void toCollection(CollectionResourceProvider resource) {
+            Reject.ifNull(resource);
             forVersion(1).toCollection(resource);
         }
 
@@ -287,6 +305,7 @@ public class Routers {
          * @param resourceClass The resource endpoint class.
          */
         public void toSingleton(Class<? extends SingletonResourceProvider> resourceClass) {
+            Reject.ifNull(resourceClass);
             toSingleton(Key.get(resourceClass));
         }
 
@@ -300,6 +319,7 @@ public class Routers {
          * @param resourceKey The resource endpoint key.
          */
         public void toSingleton(Key<? extends SingletonResourceProvider> resourceKey) {
+            Reject.ifNull(resourceKey);
             forVersion(1).toSingleton(resourceKey);
         }
 
@@ -313,6 +333,7 @@ public class Routers {
          * @param resource The resource endpoint instance.
          */
         public void toSingleton(SingletonResourceProvider resource) {
+            Reject.ifNull(resource);
             forVersion(1).toSingleton(resource);
         }
 
@@ -327,6 +348,7 @@ public class Routers {
          * @param handlerClass The resource endpoint handler class.
          */
         public void toRequestHandler(RoutingMode mode, Class<? extends RequestHandler> handlerClass) {
+            Reject.ifNull(handlerClass);
             toRequestHandler(mode, Key.get(handlerClass));
         }
 
@@ -341,6 +363,7 @@ public class Routers {
          * @param handlerKey The resource endpoint handler key.
          */
         public void toRequestHandler(RoutingMode mode, Key<? extends RequestHandler> handlerKey) {
+            Reject.ifNull(handlerKey);
             forVersion(1).toRequestHandler(mode, handlerKey);
         }
 
@@ -355,10 +378,11 @@ public class Routers {
          * @param handler The resource endpoint handler instance.
          */
         public void toRequestHandler(RoutingMode mode, RequestHandler handler) {
+            Reject.ifNull(handler);
             forVersion(1).toRequestHandler(mode, handler);
         }
 
-        void addRoute(RoutingMode mode, RequestHandler resource) {
+        private void addRoute(RoutingMode mode, RequestHandler resource) {
             if (authorizationModules != null) {
                 resource = createAuthorizationFilter(resource, authorizationModules);
             }
@@ -366,14 +390,12 @@ public class Routers {
                 resource = new FilterChain(resource, filters);
             }
             resource = new FilterChain(resource, getFilters());
-            Handler handler = Handlers.chainOf(newHttpHandler(resource), getAuthenticationFilter());
-            router.addRoute(requestUriMatcher(STARTS_WITH, uriTemplate), handler);
-            internalRouter.addRoute(RouteMatchers.requestUriMatcher(mode, uriTemplate), resource);
+            router.addRoute(RouteMatchers.requestUriMatcher(mode, uriTemplate),
+                    new FilterChain(resource, getAuthenticationEnforcer()));
         }
 
         private List<Filter> getFilters() {
             List<Filter> filters = new ArrayList<>();
-            /*TODO authenticationCheckFilter*/
             filters.addAll(Arrays.asList(contextFilter, loggingFilter));
             if (auditFilterWrapper != null) {
                 filters.add(auditFilterWrapper);
@@ -381,11 +403,11 @@ public class Routers {
             return filters;
         }
 
-        private org.forgerock.http.Filter getAuthenticationFilter() {
-            if (authenticationFilter == null) {
-                authenticationFilter = defaultAuthenticationFilter;
+        private Filter getAuthenticationEnforcer() {
+            if (authenticationEnforcer == null) {
+                authenticationEnforcer = defaultAuthenticationEnforcer;
             }
-            return authenticationFilter;
+            return authenticationEnforcer;
         }
 
         @Override
@@ -400,7 +422,8 @@ public class Routers {
 
         @Override
         public VersionedRoute forVersion(Version version) {
-            return new VersionedRoute(this, version, getAuthenticationFilter());
+            Reject.ifNull(version);
+            return new VersionedRoute(this, version);
         }
     }
 
@@ -413,15 +436,19 @@ public class Routers {
 
         private final Route route;
         private final Version version;
-        private final org.forgerock.http.Filter authenticationFilter;
+        private final Router versionRouter;
 
         private List<CrestAuthorizationModule> authorizationModules;
         private List<Filter> filters;
 
-        VersionedRoute(Route route, Version version, org.forgerock.http.Filter authenticationFilter) {
+        VersionedRoute(Route route, Version version) {
+            this(route, version, new Router());
+        }
+
+        private VersionedRoute(Route route, Version version, Router versionRouter) {
             this.route = route;
             this.version = version;
-            this.authenticationFilter = authenticationFilter;
+            this.versionRouter = versionRouter;
         }
 
         /**
@@ -437,6 +464,7 @@ public class Routers {
          */
         @SafeVarargs
         public final VersionedRoute authorizeWith(Class<? extends CrestAuthorizationModule>... authorizationModules) {
+            Reject.ifNull(authorizationModules);
             if (this.authorizationModules != null) {
                 throw new IllegalStateException("Authorization Filters have already been set!");
             } else {
@@ -461,6 +489,7 @@ public class Routers {
          */
         @SafeVarargs
         public final VersionedRoute through(Class<? extends Filter>... filters) {
+            Reject.ifNull(filters);
             if (this.filters != null) {
                 throw new IllegalStateException("Filters have already been set!");
             } else {
@@ -479,6 +508,7 @@ public class Routers {
          * @param resourceClass The resource endpoint class.
          */
         public VersionableRoute toCollection(Class<? extends CollectionResourceProvider> resourceClass) {
+            Reject.ifNull(resourceClass);
             return toCollection(Key.get(resourceClass));
         }
 
@@ -489,6 +519,7 @@ public class Routers {
          * @param resourceKey The resource endpoint key.
          */
         public VersionableRoute toCollection(Key<? extends CollectionResourceProvider> resourceKey) {
+            Reject.ifNull(resourceKey);
             return addRoute(STARTS_WITH, Resources.newCollection(InjectorHolder.getInstance(resourceKey)));
         }
 
@@ -499,6 +530,7 @@ public class Routers {
          * @param resource The resource endpoint instance.
          */
         public VersionableRoute toCollection(CollectionResourceProvider resource) {
+            Reject.ifNull(resource);
             return addRoute(STARTS_WITH, Resources.newCollection(resource));
         }
 
@@ -509,6 +541,7 @@ public class Routers {
          * @param resourceClass The resource endpoint class.
          */
         public VersionableRoute toSingleton(Class<? extends SingletonResourceProvider> resourceClass) {
+            Reject.ifNull(resourceClass);
             return toSingleton(Key.get(resourceClass));
         }
 
@@ -519,6 +552,7 @@ public class Routers {
          * @param resourceKey The resource endpoint key.
          */
         public VersionableRoute toSingleton(Key<? extends SingletonResourceProvider> resourceKey) {
+            Reject.ifNull(resourceKey);
             return addRoute(EQUALS, Resources.newSingleton(InjectorHolder.getInstance(resourceKey)));
         }
 
@@ -529,6 +563,7 @@ public class Routers {
          * @param resource The resource endpoint instance.
          */
         public VersionableRoute toSingleton(SingletonResourceProvider resource) {
+            Reject.ifNull(resource);
             return addRoute(EQUALS, Resources.newSingleton(resource));
         }
 
@@ -540,6 +575,7 @@ public class Routers {
          * @param handlerClass The resource endpoint handler class.
          */
         public VersionableRoute toRequestHandler(RoutingMode mode, Class<? extends RequestHandler> handlerClass) {
+            Reject.ifNull(handlerClass);
             return toRequestHandler(mode, Key.get(handlerClass));
         }
 
@@ -551,6 +587,7 @@ public class Routers {
          * @param handlerKey The resource endpoint handler key.
          */
         public VersionableRoute toRequestHandler(RoutingMode mode, Key<? extends RequestHandler> handlerKey) {
+            Reject.ifNull(handlerKey);
             return addRoute(mode, InjectorHolder.getInstance(handlerKey));
         }
 
@@ -562,6 +599,7 @@ public class Routers {
          * @param handler The resource endpoint handler instance.
          */
         public VersionableRoute toRequestHandler(RoutingMode mode, RequestHandler handler) {
+            Reject.ifNull(handler);
             return addRoute(mode, handler);
         }
 
@@ -574,7 +612,6 @@ public class Routers {
                 resource = createAuthorizationFilter(resource, authorizationModules);
             }
 
-            org.forgerock.json.resource.Router versionRouter = new org.forgerock.json.resource.Router();
             versionRouter.addRoute(version, resource);
 
             route.addRoute(mode, versionRouter);
@@ -594,7 +631,8 @@ public class Routers {
 
         @Override
         public VersionedRoute forVersion(Version version) {
-            return new VersionedRoute(route, version, authenticationFilter);
+            Reject.ifNull(version);
+            return new VersionedRoute(route, version, versionRouter);
         }
     }
 

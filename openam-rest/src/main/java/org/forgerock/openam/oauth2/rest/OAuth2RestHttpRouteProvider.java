@@ -17,6 +17,7 @@
 package org.forgerock.openam.oauth2.rest;
 
 import static org.forgerock.http.routing.RoutingMode.STARTS_WITH;
+import static org.forgerock.json.resource.http.CrestHttp.newHttpHandler;
 import static org.forgerock.openam.audit.AuditConstants.Component.OAUTH2;
 
 import javax.inject.Inject;
@@ -24,6 +25,7 @@ import javax.inject.Named;
 import java.util.Collections;
 import java.util.Set;
 
+import org.forgerock.http.handler.Handlers;
 import org.forgerock.openam.http.HttpRoute;
 import org.forgerock.openam.http.HttpRouteProvider;
 import org.forgerock.openam.rest.RestRouter;
@@ -32,10 +34,16 @@ import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
 public class OAuth2RestHttpRouteProvider implements HttpRouteProvider {
 
     private RestRouter rootRouter;
+    private org.forgerock.http.Filter authenticationFilter;
 
     @Inject
     public void setRouters(RestRouter router) {
         this.rootRouter = router;
+    }
+
+    @Inject
+    public void setAuthenticationFilter(@Named("AuthenticationFilter") org.forgerock.http.Filter authenticationFilter) {
+        this.authenticationFilter = authenticationFilter;
     }
 
     @Override
@@ -50,6 +58,7 @@ public class OAuth2RestHttpRouteProvider implements HttpRouteProvider {
                 .authorizeWith(AdminOnlyAuthzModule.class)
                 .toCollection(ClientResource.class);
 
-        return Collections.singleton(HttpRoute.newHttpRoute(STARTS_WITH, "frrest/oauth2", rootRouter.getRouter()));
+        return Collections.singleton(HttpRoute.newHttpRoute(STARTS_WITH, "frrest/oauth2",
+                Handlers.chainOf(newHttpHandler(rootRouter.getRouter()), authenticationFilter)));
     }
 }

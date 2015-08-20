@@ -21,6 +21,7 @@ import static org.forgerock.openam.audit.AuditConstants.Component.AUDIT;
 
 import org.forgerock.audit.AuditService;
 import org.forgerock.openam.rest.authz.AgentOnlyAuthzModule;
+import org.forgerock.openam.rest.fluent.AuditEndpointAuditFilter;
 
 /**
  * A {@link RestRouteProvider} that add routes for the audit endpoint.
@@ -32,7 +33,7 @@ public class AuditRestRouteProvider implements RestRouteProvider {
     @Override
     public void addRoutes(RestRouter rootRouter, RestRouter realmRouter) {
         rootRouter.route("audit")
-                .auditAs(AUDIT)
+                .auditAs(AUDIT, AuditEndpointAuditFilter.class)
                 .authorizeWith(AgentOnlyAuthzModule.class)
                 .toRequestHandler(STARTS_WITH, AuditService.class);
     }

@@ -17,8 +17,6 @@
 package org.forgerock.openam.rest;
 
 import static org.forgerock.openam.audit.AuditConstants.Component.*;
-import static org.forgerock.openam.audit.AuditConstants.Component.DEVICES;
-import static org.forgerock.openam.audit.AuditConstants.Component.POLICY_AGENT;
 import static org.forgerock.openam.rest.Routers.ssoToken;
 
 import com.google.inject.Key;

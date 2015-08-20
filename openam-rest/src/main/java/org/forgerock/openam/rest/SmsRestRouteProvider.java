@@ -50,6 +50,11 @@ public class SmsRestRouteProvider implements RestRouteProvider {
                 .authorizeWith(PrivilegeAuthzModule.class)
                 .toRequestHandler(STARTS_WITH, smsRequestHandlerFactory.create(SchemaType.ORGANIZATION));
 
+        rootRouter.route("global-config")
+                .auditAs(CONFIG)
+                .authorizeWith(PrivilegeAuthzModule.class)
+                .toRequestHandler(STARTS_WITH, smsRequestHandlerFactory.create(SchemaType.GLOBAL));
+
         rootRouter.route("global-config/servers/{serverName}/properties/{tab}")
                 .auditAs(CONFIG)
                 .authorizeWith(PrivilegeAuthzModule.class)
