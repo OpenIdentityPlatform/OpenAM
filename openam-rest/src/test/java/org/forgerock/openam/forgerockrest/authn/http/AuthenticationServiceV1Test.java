@@ -54,6 +54,7 @@ public class AuthenticationServiceV1Test {
         // given
         HttpRequestContext context = new HttpRequestContext(mock(Context.class), mock(Session.class));
         Request httpRequest = new Request();
+        httpRequest.setEntity("<xml></xml>");
         httpRequest.getHeaders().putSingle(ContentTypeHeader.NAME, "application/xml");
 
         // when

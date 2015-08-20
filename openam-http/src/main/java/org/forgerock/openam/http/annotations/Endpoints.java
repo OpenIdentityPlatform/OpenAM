@@ -26,6 +26,8 @@ import org.forgerock.http.Handler;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
+import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
 
@@ -60,7 +62,9 @@ public class Endpoints {
             public Promise<Response, NeverThrowsException> handle(Context context, Request request) {
                 AnnotatedMethod method = methods.get(getMethod(request));
                 if (method == null) {
-                    return newResultPromise(new Response(Status.NOT_IMPLEMENTED));
+                    Response response = new Response(Status.METHOD_NOT_ALLOWED);
+                    response.setEntity(new NotSupportedException().toJsonValue().getObject());
+                    return newResultPromise(response);
                 }
                 return method.invoke(context, request);
             }

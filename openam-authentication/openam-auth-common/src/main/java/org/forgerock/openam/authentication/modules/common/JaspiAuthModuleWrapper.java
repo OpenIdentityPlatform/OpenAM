@@ -282,6 +282,7 @@ public abstract class JaspiAuthModuleWrapper<T extends ServerAuthModule> extends
      * @return A MessageInfo instance.
      */
     protected MessageInfo prepareMessageInfo(final HttpServletRequest request, final HttpServletResponse response) {
+        final HashMap<Object, Object> properties = new HashMap<>();
         return new MessageInfo() {
 
             @Override
@@ -304,7 +305,7 @@ public abstract class JaspiAuthModuleWrapper<T extends ServerAuthModule> extends
 
             @Override
             public Map getMap() {
-                return new HashMap<>();
+                return properties;
             }
         };
     }

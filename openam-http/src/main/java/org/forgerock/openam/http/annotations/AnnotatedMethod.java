@@ -30,6 +30,8 @@ import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
@@ -67,7 +69,9 @@ public class AnnotatedMethod {
 
     Promise<Response, NeverThrowsException> invoke(Context context, Request request) {
         if (method == null) {
-            return newResultPromise(createErrorResponse(Status.NOT_IMPLEMENTED, "Not supported"));
+            Object entity = ResourceException.getException(Status.METHOD_NOT_ALLOWED.getCode(),
+                    Status.METHOD_NOT_ALLOWED.getReasonPhrase()).toJsonValue().getObject();
+            return newResultPromise(createErrorResponse(Status.METHOD_NOT_ALLOWED, entity));
         }
         Object[] args = new Object[numberOfParameters];
         if (requestParameter > -1) {
@@ -88,8 +92,8 @@ public class AnnotatedMethod {
         }
     }
 
-    private Response createErrorResponse(Status status, String s) {
-        return new Response().setStatus(status).setEntity(s);
+    private Response createErrorResponse(Status status, Object entity) {
+        return new Response().setStatus(status).setEntity(entity);
     }
 
     static AnnotatedMethod findMethod(Object requestHandler, Class<? extends Annotation> annotation) {

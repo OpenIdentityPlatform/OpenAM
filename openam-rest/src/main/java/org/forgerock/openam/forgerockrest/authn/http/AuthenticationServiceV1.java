@@ -59,6 +59,8 @@ public class AuthenticationServiceV1 {
 
     private static final Debug DEBUG = Debug.getInstance("amAuthREST");
 
+    private static final ContentTypeHeader APPLICATION_JSON_CONTENT_TYPE =
+            ContentTypeHeader.valueOf("application/json");
     private static final String CACHE_CONTROL_HEADER_NAME = "Cache-Control";
     private static final String NO_CACHE_CACHE_CONTROL_HEADER = "no-cache, no-store, must-revalidate";
     private static final String PRAGMA_HEADER_NAME = "Pragma";
@@ -164,7 +166,8 @@ public class AuthenticationServiceV1 {
     }
 
     private boolean isSupportedMediaType(Request request) {
-        return "application/json".equals(ContentTypeHeader.valueOf(request).getType());//TODO need a better way of comparing
+        return !request.getEntity().mayContainData()
+                || APPLICATION_JSON_CONTENT_TYPE.getType().equals(ContentTypeHeader.valueOf(request).getType());
     }
 
     /**
