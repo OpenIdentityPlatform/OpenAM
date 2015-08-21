@@ -35,7 +35,7 @@ public class RecordPropertiesTest extends DebugTestTemplate {
     @Test
     public void simpleRecord() throws Exception {
         RecordProperties recordProperties = RecordProperties.fromJson(JsonValueBuilder.toJsonValue(IOUtils
-                .getFileContentFromClassPath(RECORD_DIRECTORY + "SimpleRecord.json")));
+                .getFileContentFromClassPath(RecordPropertiesTest.class, RECORD_DIRECTORY + "SimpleRecord.json")));
         assertEquals(recordProperties.getIssueID(), (Long) 1l);
         assertEquals(recordProperties.getReferenceID(), "successing_story");
         assertEquals(recordProperties.getDescription(), "Simple record");
@@ -46,8 +46,9 @@ public class RecordPropertiesTest extends DebugTestTemplate {
 
     @Test
     public void simpleRecordWithAutoStopFileSize() throws Exception {
-        RecordProperties recordProperties = RecordProperties.fromJson(JsonValueBuilder.toJsonValue(IOUtils
-                .getFileContentFromClassPath(RECORD_DIRECTORY + "SimpleRecordWithAutoStopFileSize.json")));
+        RecordProperties recordProperties = RecordProperties.fromJson(JsonValueBuilder.toJsonValue(
+                IOUtils.getFileContentFromClassPath(RecordPropertiesTest.class, RECORD_DIRECTORY +
+                        "SimpleRecordWithAutoStopFileSize.json")));
         assertTrue(recordProperties.isAutoStopEnabled());
         assertTrue(recordProperties.isAutoStopFileSizeEnabled());
         assertEquals(recordProperties.getAutoStopFileSizeInKB(), (Long) 200l);
@@ -55,8 +56,9 @@ public class RecordPropertiesTest extends DebugTestTemplate {
 
     @Test
     public void simpleRecordWithAutoStopTime() throws Exception {
-        RecordProperties recordProperties = RecordProperties.fromJson(JsonValueBuilder.toJsonValue(IOUtils
-                .getFileContentFromClassPath(RECORD_DIRECTORY + "SimpleRecordWithAutoStopTime.json")));
+        RecordProperties recordProperties = RecordProperties.fromJson(JsonValueBuilder.toJsonValue(
+                IOUtils.getFileContentFromClassPath(RecordPropertiesTest.class, RECORD_DIRECTORY +
+                        "SimpleRecordWithAutoStopTime.json")));
         assertTrue(recordProperties.isAutoStopEnabled());
         assertTrue(recordProperties.isAutoStopTimeEnabled());
         assertEquals(recordProperties.getAutoStopTimeInMS(), (Long) (3l * 1000));
@@ -64,37 +66,39 @@ public class RecordPropertiesTest extends DebugTestTemplate {
 
     @Test
     public void simpleRecordWithConfigExport() throws Exception {
-        RecordProperties recordProperties = RecordProperties.fromJson(JsonValueBuilder.toJsonValue(IOUtils
-                .getFileContentFromClassPath(RECORD_DIRECTORY + "SimpleRecordWithConfigExport.json")));
+        RecordProperties recordProperties = RecordProperties.fromJson(JsonValueBuilder.toJsonValue(
+                IOUtils.getFileContentFromClassPath(RecordPropertiesTest.class, RECORD_DIRECTORY +
+                        "SimpleRecordWithConfigExport.json")));
         assertTrue(recordProperties.isConfigExportEnabled());
         assertEquals(recordProperties.getConfigExportPassword(), "changeit");
     }
 
     @Test
     public void simpleRecordWithThreadDump() throws Exception {
-        RecordProperties recordProperties = RecordProperties.fromJson(JsonValueBuilder.toJsonValue(IOUtils
-                .getFileContentFromClassPath(RECORD_DIRECTORY + "SimpleRecordWithThreadDump.json")));
+        RecordProperties recordProperties = RecordProperties.fromJson(JsonValueBuilder.toJsonValue(
+                IOUtils.getFileContentFromClassPath(RecordPropertiesTest.class, RECORD_DIRECTORY +
+                        "SimpleRecordWithThreadDump.json")));
         assertTrue(recordProperties.isThreadDumpEnabled());
         assertEquals(recordProperties.getThreadDumpDelayInSeconds(), (Long) 1l);
     }
 
-    @Test(enabled = false)
+    @Test
     public void allOnRecord() throws Exception {
-        RecordProperties recordProperties = RecordProperties.fromJson(JsonValueBuilder.toJsonValue(IOUtils
-                .getFileContentFromClassPath(RECORD_DIRECTORY + "allOnRecord.json")));
+        RecordProperties recordProperties = RecordProperties.fromJson(JsonValueBuilder.toJsonValue(
+                IOUtils.getFileContentFromClassPath(RecordPropertiesTest.class, RECORD_DIRECTORY + "AllOnRecord" +
+                        ".json")));
         checkJsonAllOnRecord(recordProperties);
-
     }
 
-    @Test(enabled = false)
+    @Test
     public void checkExportOnAllOnRecord() throws Exception {
-        RecordProperties recordPropertiesBeforeExport = RecordProperties.fromJson(JsonValueBuilder.toJsonValue
-                (IOUtils.getFileContentFromClassPath(RECORD_DIRECTORY + "allOnRecord.json")));
+        RecordProperties recordPropertiesBeforeExport = RecordProperties.fromJson(JsonValueBuilder.toJsonValue(
+                IOUtils.getFileContentFromClassPath(RecordPropertiesTest.class, RECORD_DIRECTORY + "AllOnRecord" +
+                        ".json")));
         checkJsonAllOnRecord(recordPropertiesBeforeExport);
 
-        System.out.println("json: " + RecordProperties.toJson(recordPropertiesBeforeExport));
-
-        RecordProperties recordPropertiesAfterExport = RecordProperties.fromJson(RecordProperties.toJson(recordPropertiesBeforeExport));
+        RecordProperties recordPropertiesAfterExport = RecordProperties.fromJson(RecordProperties
+                .toJson(recordPropertiesBeforeExport));
 
         checkJsonAllOnRecord(recordPropertiesAfterExport);
     }
@@ -122,21 +126,20 @@ public class RecordPropertiesTest extends DebugTestTemplate {
         assertEquals(recordProperties.getAutoStopTimeInMS(), (Long) TimeUnit.MINUTES.toMillis(10));
     }
 
-    @Test(enabled = false)
+    @Test
     public void checkConfigExportSharePassword() throws Exception {
 
-        RecordProperties recordPropertiesSharePassword = RecordProperties.fromJson(JsonValueBuilder.toJsonValue(IOUtils
-                .getFileContentFromClassPath(RECORD_DIRECTORY + "OpenAMCOnfigExportSharePassword.json")));
+        RecordProperties recordPropertiesSharePassword = RecordProperties.fromJson(
+                JsonValueBuilder.toJsonValue(IOUtils.getFileContentFromClassPath(RecordPropertiesTest.class,
+                        RECORD_DIRECTORY + "OpenAMConfigExportSharePassword.json")));
         assertTrue(recordPropertiesSharePassword.isConfigExportEnabled());
         assertTrue(recordPropertiesSharePassword.isConfigExportSharePasswordEnabled());
 
-        RecordProperties recordPropertiesNotSharePassword = RecordProperties.fromJson(JsonValueBuilder.toJsonValue
-                (IOUtils.getFileContentFromClassPath(RECORD_DIRECTORY + "OpenAMCOnfigExportNotSharePassword.json")));
+        RecordProperties recordPropertiesNotSharePassword = RecordProperties.fromJson(JsonValueBuilder.toJsonValue(
+                IOUtils.getFileContentFromClassPath(RecordPropertiesTest.class,
+                        RECORD_DIRECTORY + "OpenAMConfigExportNotSharePassword.json")));
         assertTrue(recordPropertiesNotSharePassword.isConfigExportEnabled());
         assertFalse(recordPropertiesNotSharePassword.isConfigExportSharePasswordEnabled());
-
-
-
 
         RecordProperties recordPropertiesSharePasswordAfter =
                 RecordProperties.fromJson(RecordProperties.toJson(recordPropertiesSharePassword));
@@ -150,7 +153,8 @@ public class RecordPropertiesTest extends DebugTestTemplate {
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void wrongReferenceID() throws Exception {
-        RecordProperties.fromJson(JsonValueBuilder.toJsonValue(IOUtils.getFileContentFromClassPath(RECORD_DIRECTORY +
-                "WrongReferenceID.json")));
+        RecordProperties.fromJson(JsonValueBuilder.toJsonValue(
+                IOUtils.getFileContentFromClassPath(RecordPropertiesTest.class,
+                        RECORD_DIRECTORY + "WrongReferenceID.json")));
     }
 }

@@ -164,7 +164,7 @@ public class JSONSerialisationTest extends GuiceTestCase {
     }
 
     private static String getJSON(String path) throws Exception {
-        return IOUtils.getFileContentFromClassPath(path).replaceAll("\\s", "");
+        return IOUtils.getFileContentFromClassPath(JSONSerialisationTest.class, path).replaceAll("\\s", "");
     }
 
     private static void checkMapType(InternalSession is, String fieldName) throws Exception {
