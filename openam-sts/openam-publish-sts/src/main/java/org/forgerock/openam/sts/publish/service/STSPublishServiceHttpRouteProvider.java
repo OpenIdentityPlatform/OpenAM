@@ -22,6 +22,7 @@ import static org.forgerock.openam.audit.AuditConstants.Component.STS;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import java.util.Collections;
 import java.util.Set;
 
@@ -67,12 +68,12 @@ public class STSPublishServiceHttpRouteProvider implements HttpRouteProvider {
 
     @Override
     public Set<HttpRoute> get() {
-        return Collections.singleton(HttpRoute.newHttpRoute(STARTS_WITH, "sts-publish", new Function<Void, Handler, NeverThrowsException>() {
-                    @Override
-                    public Handler apply(Void value) {
-                        return getHandler();
-                    }
-                }));
+        return Collections.singleton(HttpRoute.newHttpRoute(STARTS_WITH, "sts-publish", new Provider<Handler>() {
+            @Override
+            public Handler get() {
+                return getHandler();
+            }
+        }));
     }
 
     private Handler getHandler() {

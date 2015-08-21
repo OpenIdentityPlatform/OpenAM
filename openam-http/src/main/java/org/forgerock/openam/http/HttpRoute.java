@@ -25,7 +25,6 @@ import org.forgerock.http.Handler;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.routing.RoutingMode;
-import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
 
@@ -52,35 +51,10 @@ public final class HttpRoute {
      * @return The {@code HttpRoute}.
      */
     public static HttpRoute newHttpRoute(RoutingMode mode, String uriTemplate, final Handler handler) {
-        return new HttpRoute(mode, uriTemplate, new Provider<Handler>() {
+        return newHttpRoute(mode, uriTemplate, new Provider<Handler>() {
             @Override
             public Handler get() {
                 return handler;
-            }
-        });
-    }
-
-    /**
-     * Creates a new {@code HttpRoute} for a route with the given {@code mode} and
-     * {@code template}. The {@code Handler} for this route will be the provided
-     * {@code handler} class.
-     *
-     * @param mode Indicates how the URI template should be matched against resource names.
-     * @param uriTemplate The URI template which request resource names must match.
-     * @param handlerFunction A {@link Function} that returns the handler to which
-     *                        matching requests will be routed.
-     * @return The {@code HttpRoute}.
-     */
-    public static HttpRoute newHttpRoute(RoutingMode mode, String uriTemplate,
-            final Function<Void, Handler, NeverThrowsException> handlerFunction) {
-        return newHttpRoute(mode, uriTemplate, new Handler() {
-            private volatile Handler handler;
-            @Override
-            public Promise<Response, NeverThrowsException> handle(Context context, Request request) {
-                if (handler == null) {
-                    handler = handlerFunction.apply(null);
-                }
-                return handler.handle(context, request);
             }
         });
     }
@@ -124,12 +98,27 @@ public final class HttpRoute {
      * @return The {@code HttpRoute}.
      */
     public static HttpRoute newHttpRoute(RoutingMode mode, String uriTemplate, final Key<? extends Handler> key) {
-        return new HttpRoute(mode, uriTemplate, new Provider<Handler>() {
+        return newHttpRoute(mode, uriTemplate, new Provider<Handler>() {
             @Override
             public Handler get() {
                 return new HandlerProvider(key);
             }
         });
+    }
+
+    /**
+     * Creates a new {@code HttpRoute} for a route with the given {@code mode} and
+     * {@code template}. The {@code Handler} for this route will be the provided
+     * {@code handler} class.
+     *
+     * @param mode Indicates how the URI template should be matched against resource names.
+     * @param uriTemplate The URI template which request resource names must match.
+     * @param provider A {@link Provider} that returns the handler to which
+     *                        matching requests will be routed.
+     * @return The {@code HttpRoute}.
+     */
+    public static HttpRoute newHttpRoute(RoutingMode mode, String uriTemplate, final Provider<Handler> provider) {
+        return new HttpRoute(mode, uriTemplate, provider);
     }
 
     private HttpRoute(RoutingMode mode, String uriTemplate, Provider<Handler> handler) {
