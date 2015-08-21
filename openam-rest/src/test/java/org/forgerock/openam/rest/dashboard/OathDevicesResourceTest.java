@@ -52,8 +52,8 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.devices.OathDevicesDao;
 import org.forgerock.openam.rest.devices.OathDevicesResource;
-import org.forgerock.openam.rest.devices.services.OathService;
-import org.forgerock.openam.rest.devices.services.OathServiceFactory;
+import org.forgerock.openam.rest.devices.services.AuthenticatorOathService;
+import org.forgerock.openam.rest.devices.services.AuthenticatorOathServiceFactory;
 import org.forgerock.openam.rest.resource.ContextHelper;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.JsonValueBuilder;
@@ -85,9 +85,9 @@ public class OathDevicesResourceTest {
     @Mock
     private Debug debug;
     @Mock
-    private OathServiceFactory oathServiceFactory;
+    private AuthenticatorOathServiceFactory oathServiceFactory;
     @Mock
-    private OathService oathService;
+    private AuthenticatorOathService oathService;
 
     @BeforeMethod
     public void setUp() throws SMSException, SSOException {
@@ -232,14 +232,14 @@ public class OathDevicesResourceTest {
     private static class OathDevicesResourceTestClass extends OathDevicesResource {
 
         public OathDevicesResourceTestClass(OathDevicesDao dao, ContextHelper helper, Debug debug,
-                OathServiceFactory oathServiceFactory) {
+                AuthenticatorOathServiceFactory oathServiceFactory) {
             super(dao, helper, debug, oathServiceFactory, helper);
         }
 
         protected AMIdentity getUserIdFromUri(Context context) throws InternalServerErrorException {
 
             HashSet<String> attribute = new HashSet<>();
-            attribute.add(String.valueOf(OathService.SKIPPABLE));
+            attribute.add(String.valueOf(AuthenticatorOathService.SKIPPABLE));
 
             AMIdentity mockId = mock(AMIdentity.class);
             try {
