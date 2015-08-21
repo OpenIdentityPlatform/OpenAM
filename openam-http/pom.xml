@@ -41,16 +41,20 @@
             <artifactId>guice-multibindings</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons</groupId>
-            <artifactId>forgerock-jaspi-runtime</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-audit-context</artifactId>
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-audit-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>forgerock-guice-test</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>forgerock-test-utils</artifactId>
         </dependency>
     </dependencies>
 

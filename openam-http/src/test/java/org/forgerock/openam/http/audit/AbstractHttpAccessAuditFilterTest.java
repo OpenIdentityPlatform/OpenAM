@@ -17,10 +17,18 @@
 package org.forgerock.openam.http.audit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.forgerock.openam.audit.AuditConstants.*;
-import static org.forgerock.openam.audit.AuditConstants.Component.*;
+import static org.forgerock.json.test.assertj.AssertJJsonValueAssert.assertThat;
+import static org.forgerock.openam.audit.AuditConstants.CONTEXT_ID;
+import static org.forgerock.openam.audit.AuditConstants.Component.AUTHENTICATION;
+import static org.forgerock.openam.audit.AuditConstants.EventName.AM_ACCESS_ATTEMPT;
+import static org.forgerock.openam.audit.AuditConstants.EventName.AM_ACCESS_OUTCOME;
+import static org.forgerock.openam.audit.AuditConstants.USER_ID;
 import static org.forgerock.util.promise.Promises.newResultPromise;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
+import static org.mockito.MockitoAnnotations.initMocks;
+
+import java.net.URI;
 
 import org.forgerock.audit.AuditException;
 import org.forgerock.audit.events.AuditEvent;
@@ -30,9 +38,11 @@ import org.forgerock.http.Session;
 import org.forgerock.http.context.ClientInfoContext;
 import org.forgerock.http.context.HttpRequestContext;
 import org.forgerock.http.context.RootContext;
+import org.forgerock.http.header.ContentTypeHeader;
 import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
+import org.forgerock.json.JsonValue;
 import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.audit.AuditEventFactory;
 import org.forgerock.openam.audit.AuditEventPublisher;
@@ -41,73 +51,209 @@ import org.forgerock.openam.audit.configuration.AuditServiceConfigurator;
 import org.forgerock.openam.audit.context.AuditRequestContext;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 public class AbstractHttpAccessAuditFilterTest {
 
-    private AuditEventFactory eventFactory;
-    private AuditEventPublisher eventPublisher;
     private MockAccessAuditFilter auditFilter;
-    private Handler nextHandler;
+
+    @Mock
+    private AuditEventPublisher eventPublisher;
 
     @BeforeMethod
     public void setUp() {
-        nextHandler = mock(Handler.class);
+        initMocks(this);
         AuditServiceConfigurator auditServiceConfigurator = mock(AuditServiceConfigurator.class);
         when(auditServiceConfigurator.getAuditServiceConfiguration()).thenReturn(new AMAuditServiceConfiguration());
-        eventFactory = new AuditEventFactory(auditServiceConfigurator);
-        eventPublisher = mock(AuditEventPublisher.class);
+        AuditEventFactory eventFactory = new AuditEventFactory(auditServiceConfigurator);
+
         auditFilter = new MockAccessAuditFilter(eventPublisher, eventFactory);
+
+        AuditRequestContext.putProperty(USER_ID, "USER_ID");
+        AuditRequestContext.putProperty(CONTEXT_ID, "CONTEXT_ID");
     }
 
-    @Test
-    public void shouldHandleAuditException() throws Exception {
-        // Given
+    @DataProvider
+    private Object[][] handlerResponses() {
+        return new Object[][]{
+            {Status.OK},
+            {Status.BAD_REQUEST},
+        };
+    }
+
+    @Test(dataProvider = "handlerResponses")
+    public void shouldNotAuditIfAuditingIsNotEnabledForAccessTopic(Status responseStatus) throws AuditException {
+
+        //Given
+        Context context = mockContext();
         Request request = new Request()
                 .setTime(System.currentTimeMillis())
-                .setUri("http://example.com");
-        Context context = new HttpRequestContext(ClientInfoContext.builder(new RootContext()).certificates().build(),
-                mock(Session.class));
-        AuditRequestContext.putProperty(USER_ID, "User 1");
-        AuditRequestContext.putProperty(CONTEXT_ID, "1234567890");
-        when(eventPublisher.isAuditing(anyString())).thenReturn(true);
-        when(eventPublisher.isSuppressExceptions()).thenReturn(false);
-        doThrow(AuditException.class).when(eventPublisher).publish(anyString(), any(AuditEvent.class));
+                .setUri(URI.create("http://example.com"));
 
-        // When
-        Promise<Response, NeverThrowsException> result = auditFilter.filter(context, request, nextHandler);
+        disableAccessTopicAuditing();
+        Handler handler = mockHandler(context, request, responseStatus);
 
-        // Then
-        verify(nextHandler, never()).handle(any(Context.class), any(Request.class));
-        verify(eventPublisher).isAuditing(AuditConstants.ACCESS_TOPIC);
-        assertThat(result.get().getStatus()).isEqualTo(Status.INTERNAL_SERVER_ERROR);
+        //When
+        auditFilter.filter(context, request, handler);
+
+        //Then
+        verify(eventPublisher, never()).publish(anyString(), any(AuditEvent.class));
     }
 
     @Test
-    public void shouldCallHandleOnHandler() {
-        // Given
-        Request request = new Request();
-        Context context = new HttpRequestContext(new RootContext(), mock(Session.class));
-        when(eventPublisher.isAuditing(anyString())).thenReturn(false);
-        final Promise<Response, NeverThrowsException> responseExceptionPromise = newResultPromise(new Response());
-        when(nextHandler.handle(context, request)).thenReturn(responseExceptionPromise);
+    public void shouldReturnInternalServerErrorResponseWhenAuditingFails() throws AuditException {
 
-        // When
-        Promise<Response, NeverThrowsException> result = auditFilter.filter(context, request, nextHandler);
+        //Given
+        Context context = mockContext();
+        Request request = new Request()
+                .setTime(System.currentTimeMillis())
+                .setUri(URI.create("http://example.com"));
 
-        // Then
-        verify(nextHandler, times(1)).handle(any(Context.class), any(Request.class));
+        enableAccessTopicAuditing();
+        Handler handler = mockHandler(context, request, Status.OK);
+
+        AuditException auditException = mock(AuditException.class);
+        doThrow(auditException).when(eventPublisher).publish(anyString(), any(AuditEvent.class));
+
+        //When
+        Promise<Response, NeverThrowsException> promise = auditFilter.filter(context, request, handler);
+
+        //Then
+        Response response = promise.getOrThrowUninterruptibly();
+        assertThat(response.getStatus()).isEqualTo(Status.INTERNAL_SERVER_ERROR);
+        assertThat(response.getCause()).isSameAs(auditException);
     }
 
-    /**
-     * Mock class to test AbstractRestletAccessAuditFilter.
-     */
-    private class MockAccessAuditFilter extends AbstractHttpAccessAuditFilter {
+    @Test(dataProvider = "handlerResponses")
+    public void shouldAuditAccessAttemptAndResult(Status responseStatus) throws AuditException {
 
+        //Given
+        Context context = mockContext();
+        Request request = new Request()
+                .setTime(System.currentTimeMillis())
+                .setMethod("GET")
+                .setUri(URI.create("http://example.com:8080?query=value"));
+        request.getHeaders().putSingle(ContentTypeHeader.valueOf("CONTENT_TYPE"));
+
+        enableAccessTopicAuditing();
+        Handler handler = mockHandler(context, request, responseStatus);
+
+        //When
+        auditFilter.filter(context, request, handler);
+
+        //Then
+        ArgumentCaptor<AuditEvent> accessAttemptAuditEventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
+        ArgumentCaptor<AuditEvent> accessResultAuditEventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
+        verify(eventPublisher).publish(eq(AuditConstants.ACCESS_TOPIC), accessAttemptAuditEventCaptor.capture());
+        verify(eventPublisher).tryPublish(eq(AuditConstants.ACCESS_TOPIC), accessResultAuditEventCaptor.capture());
+
+        verifyAccessAttemptAuditEvent(accessAttemptAuditEventCaptor.getValue().getValue());
+        if (responseStatus.isSuccessful()) {
+            verifyAccessSuccessAuditEvent(accessResultAuditEventCaptor.getValue().getValue());
+        } else {
+            verifyAccessFailedAuditEvent(accessResultAuditEventCaptor.getValue().getValue());
+        }
+    }
+
+    @Test
+    public void shouldGetUserIdForAccessAttemptIfNotSet() {
+
+        //Given
+        Request request = new Request();
+        AuditRequestContext.putProperty(USER_ID, null);
+
+        //When
+        String userId = auditFilter.getUserIdForAccessAttempt(request);
+
+        //Then
+        assertThat(userId).isEmpty();
+    }
+
+    @Test
+    public void shouldGetUserIdForAccessOutcomeIfNotSet() {
+
+        //Given
+        Response response = new Response();
+        AuditRequestContext.putProperty(USER_ID, null);
+
+        //When
+        String userId = auditFilter.getUserIdForAccessOutcome(response);
+
+        //Then
+        assertThat(userId).isEmpty();
+    }
+
+    private Context mockContext() {
+        return new HttpRequestContext(ClientInfoContext.builder(new RootContext())
+                .certificates()
+                .userAgent("USER_AGENT")
+                .remoteAddress("REMOTE_ADDRESS")
+                .remoteHost("REMOTE_HOST")
+                .remotePort(9000)
+                .remoteUser("REMOTE_USER")
+                .build(),
+                mock(Session.class));
+    }
+
+    private void disableAccessTopicAuditing() {
+        given(eventPublisher.isAuditing(anyString())).willReturn(true);
+        given(eventPublisher.isAuditing(AuditConstants.ACCESS_TOPIC)).willReturn(false);
+    }
+
+    private void enableAccessTopicAuditing() {
+        given(eventPublisher.isAuditing(anyString())).willReturn(false);
+        given(eventPublisher.isAuditing(AuditConstants.ACCESS_TOPIC)).willReturn(true);
+    }
+
+    private Handler mockHandler(Context context, Request request, Status status) {
+        Handler handler = mock(Handler.class);
+        Promise<Response, NeverThrowsException> promise = newResultPromise(new Response(status));
+        given(handler.handle(context, request)).willReturn(promise);
+        return handler;
+    }
+
+    private void verifyAccessAttemptAuditEvent(JsonValue auditEvent) {
+        verifyAccessAuditEvent(auditEvent);
+        assertThat(auditEvent).stringAt("eventName").isEqualTo(AM_ACCESS_ATTEMPT.toString());
+    }
+
+    private void verifyAccessSuccessAuditEvent(JsonValue auditEvent) {
+        verifyAccessAuditEvent(auditEvent);
+        assertThat(auditEvent).stringAt("eventName").isEqualTo(AM_ACCESS_OUTCOME.toString());
+        assertThat(auditEvent).stringAt("response/status").isEqualTo("SUCCESS");
+        assertThat(auditEvent).longAt("response/elapsedTime").isNotNull();
+    }
+
+    private void verifyAccessFailedAuditEvent(JsonValue auditEvent) {
+        verifyAccessAuditEvent(auditEvent);
+        assertThat(auditEvent).stringAt("eventName").isEqualTo(AM_ACCESS_OUTCOME.toString());
+        assertThat(auditEvent).stringAt("response/status").startsWith("FAILED");
+        assertThat(auditEvent).longAt("response/elapsedTime").isNotNull();
+        assertThat(auditEvent).stringAt("response/message").isNotNull();
+    }
+
+    private void verifyAccessAuditEvent(JsonValue auditEvent) {
+        assertThat(auditEvent).stringAt("timestamp").isNotNull();
+        assertThat(auditEvent).stringAt("transactionId").isNotNull();
+        assertThat(auditEvent).stringAt("component").isEqualTo(AUTHENTICATION.toString());
+        assertThat(auditEvent).stringAt("authentication/id").isEqualTo("USER_ID");
+        assertThat(auditEvent).stringAt("contextId").isEqualTo("CONTEXT_ID");
+        assertThat(auditEvent).stringAt("client/host").isEqualTo("");
+        assertThat(auditEvent).stringAt("client/ip").isEqualTo("REMOTE_ADDRESS");
+        assertThat(auditEvent).integerAt("client/port").isEqualTo(9000);
+        assertThat(auditEvent).stringAt("http/method").isEqualTo("GET");
+        assertThat(auditEvent).stringAt("http/path").isEqualTo("http://example.com:8080");
+        assertThat(auditEvent).stringAt("http/queryString").isEqualTo("query=value");
+        assertThat(auditEvent).hasArray("http/headers/" + ContentTypeHeader.NAME).contains("CONTENT_TYPE");
+    }
+
+    private class MockAccessAuditFilter extends AbstractHttpAccessAuditFilter {
         public MockAccessAuditFilter(AuditEventPublisher publisher, AuditEventFactory factory) {
             super(AUTHENTICATION, publisher, factory);
         }
     }
-
 }
