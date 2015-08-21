@@ -17,6 +17,7 @@ package org.forgerock.openam.forgerockrest.entitlements;
 
 import static com.sun.identity.entitlement.EntitlementException.*;
 import static org.forgerock.json.resource.Responses.newQueryResponse;
+import static org.forgerock.json.resource.Responses.newRemainingResultsResponse;
 import static org.forgerock.json.resource.Responses.newResourceResponse;
 import static org.forgerock.util.promise.Promises.newExceptionPromise;
 import static org.forgerock.util.promise.Promises.newResultPromise;
@@ -296,7 +297,8 @@ public class ResourceTypesResource extends RealmAwareResource {
             }
             int remaining = request.getPageSize() == 0 ? 0 :
                     filterResults.size() - (request.getPagedResultsOffset() + request.getPageSize());
-            return newResultPromise(newQueryResponse(request.getPagedResultsCookie(), CountPolicy.EXACT, remaining < 0 ? 0 : remaining));
+            return newResultPromise(newRemainingResultsResponse(request.getPagedResultsCookie(),
+                    remaining < 0 ? 0 : remaining));
         } catch (EntitlementException ee) {
             if (logger.errorEnabled()) {
                 logger.error("ResourceTypesResource :: QUERY by "

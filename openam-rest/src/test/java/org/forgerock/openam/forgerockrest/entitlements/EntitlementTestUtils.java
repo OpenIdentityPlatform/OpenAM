@@ -58,7 +58,7 @@ public class EntitlementTestUtils {
         return new Condition<Throwable>() {
             @Override
             public boolean matches(Throwable throwable) {
-                EntitlementException ee = (EntitlementException) throwable.getCause();
+                EntitlementException ee = (EntitlementException) throwable;
                 return ee.getErrorCode() == errorCode;
             }
         };
