@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ServicesConfiguration
+        PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+        "jar://com/sun/identity/sm/sms.dtd">
+<!--
+/*
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions Copyrighted [year] [name of copyright owner]".
+ *
+ * Copyright 2012-2015 ForgeRock AS.
+ */
+-->
+
+<ServicesConfiguration>
+<Service name="AuthenticatorOATH" version="1.0">
+    <Schema
+        serviceHierarchy="/DSAMEConfig/ForgeRockAuthenticatorOATHService"
+        i18nFileName="AuthenticatorOATHService"
+        revisionNumber="1"
+        resourceName="authenticatorOathService"
+        i18nKey="forgerock-authenticator-oath-service-description">
+        <Organization>
+
+            <AttributeSchema name="iplanet-am-authenticator-oath-attr-name"
+                             type="single"
+                             syntax="string"
+                             i18nKey="a100"
+                             resourceName="oathAttrName">
+                <DefaultValues>
+                    <Value>oathDeviceProfiles</Value>
+                </DefaultValues>
+            </AttributeSchema>
+
+            <AttributeSchema name="iplanet-am-authenticator-oath-skippable-name"
+                             type="single"
+                             syntax="string"
+                             i18nKey="a107"
+                             resourceName="authenticatorOATHSkippableName">
+                <DefaultValues>
+                    <Value>oath2faEnabled</Value>
+                </DefaultValues>
+            </AttributeSchema>
+
+            <AttributeSchema name="openam-authenticator-oath-device-settings-encryption-scheme"
+                type="single_choice"
+                i18nKey="a101"
+                resourceName="authenticatorOATHDeviceSettingsEncryptionScheme">
+                <ChoiceValues>
+                    <ChoiceValue i18nKey="RSAES_AES256CBC_HS512">RSAES_AES256CBC_HS512</ChoiceValue>
+                    <ChoiceValue i18nKey="RSAES_AES128CBC_HS256">RSAES_AES128CBC_HS256</ChoiceValue>
+                    <ChoiceValue i18nKey="None">NONE</ChoiceValue>
+                </ChoiceValues>
+                <DefaultValues>
+                    <Value>NONE</Value>
+                </DefaultValues>
+            </AttributeSchema>
+
+                <AttributeSchema name="openam-authenticator-oath-device-settings-encryption-keystore"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a102"
+                    resourceName="authenticatorOATHDeviceSettingsEncryptionKeystore">
+                    <DefaultValues>
+                <Value>@BASE_DIR@/@SERVER_URI@/keystore.jks</Value>
+            </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="openam-authenticator-oath-device-settings-encryption-keystore-type"
+                    type="single_choice"
+                    i18nKey="a103"
+                    resourceName="authenticatorOATHDeviceSettingsEncryptionKeystoreType">
+                    <ChoiceValues>
+                <ChoiceValue i18nKey="JKS">JKS</ChoiceValue>
+                <ChoiceValue i18nKey="JCEKS">JCEKS</ChoiceValue>
+                <ChoiceValue i18nKey="PKCS11">PKCS11</ChoiceValue>
+                <ChoiceValue i18nKey="PKCS12">PKCS12</ChoiceValue>
+            </ChoiceValues>
+                    <DefaultValues>
+                <Value>JKS</Value>
+            </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="openam-authenticator-oath-device-settings-encryption-keystore-password"
+                    type="single"
+                    syntax="password"
+                    i18nKey="a104"
+                    resourceName="authenticatorOATHDeviceSettingsEncryptionKeystorePassword">
+                    <DefaultValues>
+                <Value>changeit</Value>
+            </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="openam-authenticator-oath-device-settings-encryption-keypair-alias"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a105"
+                    resourceName="authenticatorOATHDeviceSettingsEncryptionKeystoreKeyPairAlias">
+                </AttributeSchema>
+
+                <AttributeSchema name="openam-authenticator-oath-device-settings-encryption-privatekey-password"
+                    type="single"
+                    syntax="password"
+                    i18nKey="a106"
+                    resourceName="authenticatorOATHDeviceSettingsEncryptionKeystorePrivateKeyPassword">
+                </AttributeSchema>
+
+            </Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>

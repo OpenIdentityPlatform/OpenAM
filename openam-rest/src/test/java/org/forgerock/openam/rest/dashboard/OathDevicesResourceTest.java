@@ -17,12 +17,10 @@
 package org.forgerock.openam.rest.dashboard;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.forgerock.json.JsonValue.field;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
+import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.test.assertj.AssertJActionResponseAssert.assertThat;
 import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.assertThat;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
@@ -30,12 +28,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-
 import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -63,13 +66,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSException;
 
 public class OathDevicesResourceTest {
 
