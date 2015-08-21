@@ -1,25 +1,17 @@
 /**
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
  *
- * Copyright (c) 2011-2015 ForgeRock AS. All rights reserved.
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
  *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
  *
- * You can obtain a copy of the License at
- * http://forgerock.org/license/CDDLv1.0.html
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at http://forgerock.org/license/CDDLv1.0.html
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
+ * Portions copyright 2011-2015 ForgeRock AS.
  */
 
 /*global define, window */
@@ -27,7 +19,7 @@ define("config/process/AMConfig", [
     "jquery",
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
-    'org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate',
+    "org/forgerock/openam/ui/admin/delegates/SMSGlobalDelegate",
     "org/forgerock/commons/ui/common/util/UIUtils"
 ], function ($, Constants, EventManager, SMSGlobalDelegate, UIUtils) {
     var obj = [
@@ -41,12 +33,12 @@ define("config/process/AMConfig", [
                 "org/forgerock/commons/ui/common/main/SessionManager"
             ],
             processDescription: function (event, router, conf, sessionManager) {
-                var argsURLFragment = event ? (event.args ? event.args[0] : '') : '',
+                var argsURLFragment = event ? (event.args ? event.args[0] : "") : "",
                     urlParams = UIUtils.convertQueryParametersToJSON(argsURLFragment),
                     gotoURL = urlParams.goto;
 
                 sessionManager.logout(function () {
-                    conf.setProperty('loggedUser', null);
+                    conf.setProperty("loggedUser", null);
                     EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true});
                     delete conf.gotoURL;
                     if (gotoURL) {
@@ -55,7 +47,7 @@ define("config/process/AMConfig", [
                         EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {route: router.configuration.routes.loggedOut });
                     }
                 }, function () {
-                    conf.setProperty('loggedUser', null);
+                    conf.setProperty("loggedUser", null);
                     EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true});
                     EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unauthorized");
                     if (gotoURL) {
@@ -74,11 +66,11 @@ define("config/process/AMConfig", [
                 "org/forgerock/commons/ui/common/main/Configuration"
             ],
             processDescription: function (event, router, conf) {
-                if (event.error.responseJSON.message.indexOf('Invalid realm') > -1) {
+                if (event.error.responseJSON.message.indexOf("Invalid realm") > -1) {
                     if (conf.baseTemplate) {
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidRealm");
                     } else {
-                        router.navigate('login', {trigger: true});
+                        router.navigate("login", {trigger: true});
                         EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidRealm");
                     }
                 }
@@ -145,27 +137,30 @@ define("config/process/AMConfig", [
                 "org/forgerock/commons/ui/common/components/Navigation"
             ],
             processDescription: function (event, _, Configuration, Navigation) {
-                if (_.contains(Configuration.loggedUser.roles, 'ui-admin')) {
-                    Navigation.configuration.links.admin.urls.realms.urls.push({
-                        'url': '#realms/' + encodeURIComponent('/'),
-                        'name': $.t('console.common.topLevelRealm'),
-                        'cssClass': 'dropdown-sub'
-                    }, {
-                        'url': '#realms',
-                        'name': $.t('config.AppConfiguration.Navigation.links.realms.viewAll'),
-                        'cssClass': 'dropdown-sub'
-                    });
+                if (_.contains(Configuration.loggedUser.roles, "ui-admin")) {
+
+                    Navigation.addLink({
+                        "url": "#realms/" + encodeURIComponent("/"),
+                        "name": $.t("console.common.topLevelRealm"),
+                        "cssClass": "dropdown-sub"
+                    }, "admin", "realms");
+
+                    Navigation.addLink({
+                        "url": "#realms",
+                        "name": $.t("config.AppConfiguration.Navigation.links.realms.viewAll"),
+                        "cssClass": "dropdown-sub"
+                    }, "admin", "realms");
 
                     SMSGlobalDelegate.realms.all().done(function (data) {
                         var urls = Navigation.configuration.links.admin.urls.realms.urls,
                             realms = [];
 
                         _.forEach(data.result, function (realm) {
-                            if (realm.active === true && realm.path !== '/' && realms.length < 2) {
+                            if (realm.active === true && realm.path !== "/" && realms.length < 2) {
                                 realms.push({
-                                    'url': '#realms/' + encodeURIComponent(realm.path),
-                                    'name': realm.name,
-                                    'cssClass': 'dropdown-sub'
+                                    "url": "#realms/" + encodeURIComponent(realm.path),
+                                    "name": realm.name,
+                                    "cssClass": "dropdown-sub"
                                 });
                             }
                         });
@@ -179,7 +174,6 @@ define("config/process/AMConfig", [
                 }
             }
         }
-
     ];
     return obj;
 });
