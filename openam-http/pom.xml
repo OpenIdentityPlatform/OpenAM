@@ -56,7 +56,10 @@
 
     <profiles>
         <profile>
-            <id>child-precommit</id>
+            <id>module-precommit</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <build>
                 <plugins>
                     <plugin>

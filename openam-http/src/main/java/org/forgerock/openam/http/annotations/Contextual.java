@@ -1,6 +1,7 @@
 /*
  * The contents of this file are subject to the terms of the Common Development and
- * Distribution License (the License). You may not use this file except in compliance with the License.
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
  *
  * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
  * specific language governing permission and limitations under the License.
@@ -23,6 +24,7 @@ import java.lang.annotation.Target;
 /**
  * Mark a method parameter as provided from the http-framework context.
  * e.g. {@code @Contextual Context context} or {@code @Contextual Request request}.
+ * @since 13.0.0
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)

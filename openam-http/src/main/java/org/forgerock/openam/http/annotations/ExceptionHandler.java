@@ -18,6 +18,7 @@ package org.forgerock.openam.http.annotations;
 
 /**
  * Mark a method that handles exceptions thrown by a service method and turns them into a response.
+ * @since 13.0.0
  */
 public @interface ExceptionHandler {
 }

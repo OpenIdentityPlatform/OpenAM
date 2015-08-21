@@ -22,7 +22,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.forgerock.http.Context;
@@ -30,12 +29,10 @@ import org.forgerock.http.protocol.Request;
 import org.forgerock.http.protocol.Response;
 import org.forgerock.http.protocol.Status;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.util.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
-import org.forgerock.util.promise.Promises;
 
 /**
  * A method annotated with one of {@link Get}, {@link Post}, {@link Put} or {@link Delete}. This class
@@ -137,9 +134,9 @@ public class AnnotatedMethod {
         if (Promise.class.equals(method.getReturnType())) {
             resourceCreator = new PromisedResponseCreator();
         } else if (Response.class.equals(method.getReturnType())) {
-            resourceCreator = new Function<Object, Promise<Response,NeverThrowsException>, NeverThrowsException>() {
+            resourceCreator = new Function<Object, Promise<Response, NeverThrowsException>, NeverThrowsException>() {
                 @Override
-                public Promise<Response, NeverThrowsException> apply(Object o) throws NeverThrowsException {
+                public Promise<Response, NeverThrowsException> apply(Object o) {
                     return newResultPromise((Response) o);
                 }
             };
@@ -154,7 +151,8 @@ public class AnnotatedMethod {
      * A function to create a {@link Response} from the generic type of a method that produces response
      * content.
      */
-    private static class ResponseCreator implements Function<Object, Promise<Response, NeverThrowsException>, NeverThrowsException> {
+    private final static class ResponseCreator
+            implements Function<Object, Promise<Response, NeverThrowsException>, NeverThrowsException> {
 
         private final Function<Object, Object, NeverThrowsException> entityConverter;
 
@@ -163,7 +161,7 @@ public class AnnotatedMethod {
         }
 
         @Override
-        public Promise<Response, NeverThrowsException> apply(Object o) throws IllegalStateException {
+        public Promise<Response, NeverThrowsException> apply(Object o) {
             Object content = entityConverter.apply(o);
             return newResultPromise(
                     new Response()
@@ -177,13 +175,14 @@ public class AnnotatedMethod {
          * @param type The type for the {@code Response} entity.
          * @return A new function.
          */
-        private static Function<Object, Promise<Response, NeverThrowsException>, NeverThrowsException> forType(Class<?> type) {
+        private static Function<Object, Promise<Response, NeverThrowsException>, NeverThrowsException> forType(
+                Class<?> type) {
             if (String.class.equals(type) || Void.class.equals(type) || byte[].class.equals(type)) {
                 return new ResponseCreator(IDENTITY_FUNCTION);
             } else if (JsonValue.class.equals(type)) {
                 return new ResponseCreator(new Function<Object, Object, NeverThrowsException>() {
                     @Override
-                    public Object apply(Object o) throws NeverThrowsException {
+                    public Object apply(Object o) {
                         return ((JsonValue) o).getObject();
                     }
                 });
@@ -193,23 +192,26 @@ public class AnnotatedMethod {
 
     }
 
-    private static class PromisedResponseCreator implements Function<Object, Promise<Response, NeverThrowsException>, NeverThrowsException> {
+    private static class PromisedResponseCreator
+            implements Function<Object, Promise<Response, NeverThrowsException>, NeverThrowsException> {
 
         @Override
-        public Promise<Response, NeverThrowsException> apply(Object o) throws NeverThrowsException {
+        public Promise<Response, NeverThrowsException> apply(Object o) {
             throw new UnsupportedOperationException("to be implemented");
         }
     }
 
-    private static final Function<Object, Object, NeverThrowsException> IDENTITY_FUNCTION = new Function<Object, Object, NeverThrowsException>() {
-
+    //@Checkstyle:off
+    private static final Function<Object, Object, NeverThrowsException> IDENTITY_FUNCTION =
+            new Function<Object, Object, NeverThrowsException>() {
         @Override
-        public Object apply(Object o) throws NeverThrowsException {
+        public Object apply(Object o) {
             return o;
         }
     };
+    //@Checkstyle:on
 
-    private static class ContextParameter {
+    private final static class ContextParameter {
         private final int index;
         private final Class<? extends Context> type;
 

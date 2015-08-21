@@ -15,11 +15,8 @@
  */
 
 /**
- * This package contains annotations that can be used to declare HTTP methods for being handled by
- * methods on a class. The {@link org.forgerock.openam.http.annotations.Endpoints} class provides a method
- * that will convert an object with methods with these annotations on them into a
- * {@link org.forgerock.http.Handler} that can be bound to a router or returned as the application
- * handler.
+ * This package contains classes for auditing requests to Commons HTTP
+ * Framework Handlers.
  * @since 13.0.0
  */
-package org.forgerock.openam.http.annotations;
+package org.forgerock.openam.http.audit;

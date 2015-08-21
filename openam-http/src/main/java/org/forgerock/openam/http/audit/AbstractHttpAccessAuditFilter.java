@@ -13,6 +13,7 @@
  *
  * Copyright 2015 ForgeRock AS.
  */
+
 package org.forgerock.openam.http.audit;
 
 import static org.forgerock.openam.audit.AuditConstants.*;
@@ -35,7 +36,7 @@ import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.promise.Promise;
 
 /**
- * Responsible for logging access audit events for restlet requests.
+ * Responsible for logging access audit events for CHF requests.
  *
  * @since 13.0.0
  */
@@ -46,7 +47,7 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
     private final Component component;
 
     /**
-     * Create a new filter for the given component and restlet.
+     * Create a new filter for the given component and handler.
      *
      * @param component The component for which events will be logged.
      * @param auditEventPublisher The publisher responsible for logging the events.
@@ -67,10 +68,9 @@ public abstract class AbstractHttpAccessAuditFilter implements Filter {
         } catch (AuditException e) {
             return newResultPromise(new Response().setStatus(Status.INTERNAL_SERVER_ERROR).setCause(e));
         }
-        ;
         return next.handle(context, request).then(new Function<Response, Response, NeverThrowsException>() {
             @Override
-            public Response apply(Response response) throws NeverThrowsException {
+            public Response apply(Response response) {
                 if (response.getStatus().isSuccessful()) {
                     auditAccessSuccess(request, context, response);
                 } else {

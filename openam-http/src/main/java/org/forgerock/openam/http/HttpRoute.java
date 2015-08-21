@@ -49,6 +49,7 @@ public final class HttpRoute {
      * @param mode Indicates how the URI template should be matched against resource names.
      * @param uriTemplate The URI template which request resource names must match.
      * @param handler The handler to which matching requests will be routed.
+     * @return The {@code HttpRoute}.
      */
     public static HttpRoute newHttpRoute(RoutingMode mode, String uriTemplate, final Handler handler) {
         return new HttpRoute(mode, uriTemplate, new Provider<Handler>() {
@@ -68,6 +69,7 @@ public final class HttpRoute {
      * @param uriTemplate The URI template which request resource names must match.
      * @param handlerFunction A {@link Function} that returns the handler to which
      *                        matching requests will be routed.
+     * @return The {@code HttpRoute}.
      */
     public static HttpRoute newHttpRoute(RoutingMode mode, String uriTemplate,
             final Function<Void, Handler, NeverThrowsException> handlerFunction) {
@@ -91,6 +93,7 @@ public final class HttpRoute {
      * @param mode Indicates how the URI template should be matched against resource names.
      * @param uriTemplate The URI template which request resource names must match.
      * @param annotation The Guice binding annotation.
+     * @return The {@code HttpRoute}.
      */
     public static HttpRoute newHttpRoute(RoutingMode mode, String uriTemplate, Annotation annotation) {
         return newHttpRoute(mode, uriTemplate, Key.get(Handler.class, annotation));
@@ -104,6 +107,7 @@ public final class HttpRoute {
      * @param mode Indicates how the URI template should be matched against resource names.
      * @param uriTemplate The URI template which request resource names must match.
      * @param handler The handler to which matching requests will be routed.
+     * @return The {@code HttpRoute}.
      */
     public static HttpRoute newHttpRoute(RoutingMode mode, String uriTemplate, Class<? extends Handler> handler) {
         return newHttpRoute(mode, uriTemplate, Key.get(handler));
@@ -117,8 +121,9 @@ public final class HttpRoute {
      * @param mode Indicates how the URI template should be matched against resource names.
      * @param uriTemplate The URI template which request resource names must match.
      * @param key The Guice binding {@link Key}.
+     * @return The {@code HttpRoute}.
      */
-    public static HttpRoute newHttpRoute(RoutingMode mode, String uriTemplate, final Key key) {
+    public static HttpRoute newHttpRoute(RoutingMode mode, String uriTemplate, final Key<? extends Handler> key) {
         return new HttpRoute(mode, uriTemplate, new Provider<Handler>() {
             @Override
             public Handler get() {

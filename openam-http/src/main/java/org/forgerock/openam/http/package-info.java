@@ -17,5 +17,6 @@
 /**
  * Provides integration with the Commons HTTP Framework for HTTP binding
  * support.
+ * @since 13.0.0
  */
 package org.forgerock.openam.http;

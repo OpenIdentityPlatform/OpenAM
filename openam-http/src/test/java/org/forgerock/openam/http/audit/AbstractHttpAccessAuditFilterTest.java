@@ -13,6 +13,7 @@
  *
  * Copyright 2015 ForgeRock AS.
  */
+
 package org.forgerock.openam.http.audit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -66,7 +67,8 @@ public class AbstractHttpAccessAuditFilterTest {
         Request request = new Request()
                 .setTime(System.currentTimeMillis())
                 .setUri("http://example.com");
-        Context context = new HttpRequestContext(ClientInfoContext.builder(new RootContext()).certificates().build(), mock(Session.class));
+        Context context = new HttpRequestContext(ClientInfoContext.builder(new RootContext()).certificates().build(),
+                mock(Session.class));
         AuditRequestContext.putProperty(USER_ID, "User 1");
         AuditRequestContext.putProperty(CONTEXT_ID, "1234567890");
         when(eventPublisher.isAuditing(anyString())).thenReturn(true);

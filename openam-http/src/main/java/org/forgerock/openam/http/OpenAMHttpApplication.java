@@ -20,9 +20,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import com.google.inject.Key;
-import com.google.inject.name.Names;
-import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.Handler;
 import org.forgerock.http.HttpApplication;
 import org.forgerock.http.HttpApplicationException;
@@ -56,6 +53,5 @@ final class OpenAMHttpApplication implements HttpApplication {
 
     @Override
     public void stop() {
-
     }
 }
