@@ -18,12 +18,15 @@ package org.forgerock.openam.rest;
 
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Map;
 
 import com.google.inject.Key;
@@ -75,7 +78,8 @@ public class RestEndpointServlet extends HttpServlet {
                 "umaRestletServiceServlet");
         this.authenticationFilter =
                 InjectorHolder.getInstance(Key.get(Filter.class, Names.named("AuthenticationFilter")));
-        this.restletXACMLHttpServlet = new HttpFrameworkServlet(new RestletAuthnHttpApplication());
+        this.restletXACMLHttpServlet = new HttpServletWrapper(this,
+                new HttpFrameworkServlet(new RestletAuthnHttpApplication()));
     }
 
     /**
@@ -179,5 +183,76 @@ public class RestEndpointServlet extends HttpServlet {
         restletXACMLServiceServlet.destroy();
         restletOAuth2ServiceServlet.destroy();
         restletUMAServiceServlet.destroy();
+    }
+
+    private static final class HttpServletWrapper extends HttpServlet {
+
+        private final javax.servlet.http.HttpServlet realServlet;
+        private final HttpFrameworkServlet frameworkServlet;
+
+        private HttpServletWrapper(javax.servlet.http.HttpServlet realServlet, HttpFrameworkServlet frameworkServlet) {
+            this.realServlet = realServlet;
+            this.frameworkServlet = frameworkServlet;
+        }
+
+        @Override
+        public void init(ServletConfig config) throws ServletException {
+            frameworkServlet.init(config);
+        }
+
+        @Override
+        public void init() throws ServletException {
+            init(getServletConfig());
+        }
+
+        @Override
+        public void destroy() {
+            frameworkServlet.destroy();
+        }
+
+        @Override
+        protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            frameworkServlet.service(req, resp);
+        }
+
+        @Override
+        public String getInitParameter(String name) {
+            return realServlet.getInitParameter(name);
+        }
+
+        @Override
+        public Enumeration getInitParameterNames() {
+            return realServlet.getInitParameterNames();
+        }
+
+        @Override
+        public ServletConfig getServletConfig() {
+            return realServlet.getServletConfig();
+        }
+
+        @Override
+        public ServletContext getServletContext() {
+            return realServlet.getServletContext();
+        }
+
+        @Override
+        public String getServletInfo() {
+            return realServlet.getServletInfo();
+        }
+
+        @Override
+        public String getServletName() {
+            return realServlet.getServletName();
+        }
+
+        @Override
+        public void log(String msg) {
+            realServlet.log(msg);
+        }
+
+        @Override
+        public void log(String message, Throwable t) {
+            realServlet.log(message, t);
+        }
     }
 }
