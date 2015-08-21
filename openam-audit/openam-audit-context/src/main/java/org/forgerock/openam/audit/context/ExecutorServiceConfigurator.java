@@ -33,12 +33,20 @@ public class ExecutorServiceConfigurator {
 
     private final ThreadPoolExecutor delegate;
 
+    /**
+     * Constructs a new {@code ExecutorServiceConfigurator}.
+     *
+     * @param delegate The {@code ThreadPoolExecutor} instance.
+     */
     public ExecutorServiceConfigurator(ThreadPoolExecutor delegate) {
         Reject.ifNull(delegate);
         this.delegate = delegate;
     }
 
     /**
+     * Sets the core number of threads.
+     *
+     * @param corePoolSize the new core size
      * @see ThreadPoolExecutor#setCorePoolSize(int)
      */
     public void setCorePoolSize(int corePoolSize) {
@@ -46,6 +54,9 @@ public class ExecutorServiceConfigurator {
     }
 
     /**
+     * Returns the core number of threads.
+     *
+     * @return the core number of threads
      * @see ThreadPoolExecutor#getCorePoolSize()
      */
     public int getCorePoolSize() {
@@ -53,6 +64,9 @@ public class ExecutorServiceConfigurator {
     }
 
     /**
+     * Sets the maximum allowed number of threads.
+     *
+     * @param maximumPoolSize the new maximum
      * @see ThreadPoolExecutor#setMaximumPoolSize(int)
      */
     public void setMaximumPoolSize(int maximumPoolSize) {
@@ -60,6 +74,9 @@ public class ExecutorServiceConfigurator {
     }
 
     /**
+     * Returns the maximum allowed number of threads.
+     *
+     * @return the maximum allowed number of threads
      * @see ThreadPoolExecutor#getMaximumPoolSize()
      */
     public int getMaximumPoolSize() {
@@ -67,6 +84,11 @@ public class ExecutorServiceConfigurator {
     }
 
     /**
+     * Sets the time limit for which threads may remain idle before being terminated.
+     *
+     * @param time the time to wait.  A time value of zero will cause excess threads
+     *             to terminate immediately after executing tasks.
+     * @param unit the time unit of the {@code time} argument
      * @see ThreadPoolExecutor#setKeepAliveTime(long, TimeUnit)
      */
     public void setKeepAliveTime(long time, TimeUnit unit) {
@@ -74,10 +96,14 @@ public class ExecutorServiceConfigurator {
     }
 
     /**
+     * Returns the thread keep-alive time.
+     *
+     * @param unit the desired time unit of the result
+     * @return the time limit
      * @see ThreadPoolExecutor#getKeepAliveTime(TimeUnit)
      */
     public long getKeepAliveTime(TimeUnit unit) {
         return delegate.getKeepAliveTime(unit);
     }
-
 }
+

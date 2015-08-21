@@ -20,6 +20,11 @@ import com.sun.identity.sm.ChoiceValues;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Contains all the possible values for audit topics.
+ *
+ * @since 13.0.0
+ */
 public class AuditTopicChoiceValues extends ChoiceValues {
 
     private static final Map<String, String> AUDIT_TOPICS = new HashMap<>();

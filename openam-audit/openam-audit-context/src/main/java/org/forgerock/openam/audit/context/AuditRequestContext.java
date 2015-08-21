@@ -28,7 +28,7 @@ import java.util.Map;
  */
 public class AuditRequestContext {
 
-    private static final ThreadLocal<AuditRequestContext> instances = new ThreadLocal<AuditRequestContext>() {
+    private static final ThreadLocal<AuditRequestContext> INSTANCES = new ThreadLocal<AuditRequestContext>() {
         @Override
         protected AuditRequestContext initialValue() {
             return new AuditRequestContext(new TransactionId());
@@ -74,6 +74,8 @@ public class AuditRequestContext {
     }
 
     /**
+     * Gets the transaction id.
+     *
      * @return Non-null, <code>TransactionId</code>.
      */
     public TransactionId getTransactionId() {
@@ -113,10 +115,12 @@ public class AuditRequestContext {
     }
 
     /**
+     * Gets the thread local {@code RequestContext}.
+     *
      * @return Non-null, thread local <code>RequestContext</code>.
      */
     public static AuditRequestContext get() {
-        return instances.get();
+        return INSTANCES.get();
     }
 
     /**
@@ -126,25 +130,30 @@ public class AuditRequestContext {
      */
     public static void set(AuditRequestContext auditRequestContext) {
         Reject.ifNull(auditRequestContext, "RequestContext should not be null.");
-        instances.set(auditRequestContext);
+        INSTANCES.set(auditRequestContext);
     }
 
     /**
      * Discards the <code>RequestContext</code> of the current thread.
      */
     public static void clear() {
-        instances.remove();
+        INSTANCES.remove();
     }
 
     /**
-     * @return Non-null, {@link TransactionId} value of the current thread.
+     * Gets the transaction value of the current thread.
+     *
+     * @return Non-null, {@link TransactionId} value.
      */
     public static String getTransactionIdValue() {
         return get().getTransactionId().getValue();
     }
 
     /**
-     * @return Non-null, {@link TransactionId} value of the current thread extended for propagation to another process.
+     * Creates a sub transaction id from the transaction id of the current
+     * thread, for propagation to another process.
+     *
+     * @return Non-null, sub-{@link TransactionId} value.
      */
     public static String createSubTransactionIdValue() {
         return get().getTransactionId().createSubTransactionId().getValue();

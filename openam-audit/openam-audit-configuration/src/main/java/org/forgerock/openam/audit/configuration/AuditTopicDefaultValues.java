@@ -20,6 +20,11 @@ import com.sun.identity.sm.DefaultValues;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Contains the default values for audit topics.
+ *
+ * @since 13.0.0
+ */
 public class AuditTopicDefaultValues extends DefaultValues {
 
     private static final Set<String> AUDIT_TOPICS = new HashSet<>();

@@ -165,5 +165,4 @@ public final class AMAccessAuditEventBuilder extends AccessAuditEventBuilder<AMA
         }
         return headers;
     }
-
 }

@@ -45,7 +45,10 @@ public class AuditEventPublisher {
     private final AuditServiceConfigurator configurator;
 
     /**
+     * Constructs a new {@code AuditEventPublisher}.
+     *
      * @param auditService AuditService to which events should be published.
+     * @param configurator AuditServiceConfigurator for configuring the audit service.
      */
     @Inject
     public AuditEventPublisher(AuditService auditService, AuditServiceConfigurator configurator) {
@@ -110,11 +113,19 @@ public class AuditEventPublisher {
         return jsonValue.isDefined(key) ? jsonValue.get(key).asString() : defaultValue;
     }
 
+    /**
+     * Determines if the audit service is auditing the specified {@literal topic}.
+     *
+     * @param topic The auditing topic.
+     * @return {@code true} if the topic should be audited.
+     */
     public boolean isAuditing(String topic) {
         return configurator.getAuditServiceConfiguration().isAuditEnabled() && auditService.isAuditing(topic);
     }
 
     /**
+     * Determines if exceptions from the audit service should be suppressed.
+     *
      * @return True if the operation being audited can proceed if an exception occurs while publishing an audit event.
      */
     public boolean isSuppressExceptions() {

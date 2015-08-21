@@ -59,6 +59,8 @@ public final class TransactionId {
 
     /**
      * Construct a <code>TransactionId</code> with the specified value.
+     *
+     * @param value The transaction id.
      */
     public TransactionId(String value) {
         Reject.ifNull(value, "value should not be null.");
@@ -67,14 +69,18 @@ public final class TransactionId {
     }
 
     /**
-     * @return Non-null, <code>TransactionId</code> value.
+     * Gets the transaction id value.
+     *
+     * @return Non-null, <code>TransactionId</code>.
      */
     public String getValue() {
         return value;
     }
 
     /**
-     * @return Non-null, <code>TransactionId</code> value that can be passed to an external system.
+     * Creates a sub transaction id that can be passed to an external system.
+     *
+     * @return Non-null, <code>TransactionId</code>.
      */
     public TransactionId createSubTransactionId() {
         final String subTransactionId = value + "/" + subTransactionIdCounter.getAndIncrement();

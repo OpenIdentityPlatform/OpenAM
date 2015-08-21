@@ -79,6 +79,8 @@ public final class AMAuditEventBuilderUtils {
     }
 
     /**
+     * Gets the contextId value from the {@code SSOToken}.
+     *
      * @param ssoToken The SSOToken from which the contextId value will be retrieved.
      * @return contextId for SSOToken or empty string if undefined.
      */

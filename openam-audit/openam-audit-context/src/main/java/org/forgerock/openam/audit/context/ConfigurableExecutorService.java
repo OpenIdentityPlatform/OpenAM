@@ -31,13 +31,17 @@ import java.util.concurrent.ExecutorService;
 public interface ConfigurableExecutorService extends ExecutorService {
 
     /**
+     * Determines if this service is configurable.
+     *
      * @return True if this objects can actually be re-configured.
      * @see #getConfigurator()
      */
     boolean isConfigurable();
 
     /**
-     * @return An ExecutorServiceConfigurator for this object if it supports re-configuration.
+     * Gets the {@link ExecutorServiceConfigurator} for this object if it supports re-configuration.
+     *
+     * @return An ExecutorServiceConfigurator.
      * @throws IllegalStateException if this object does not support re-configuration.
      */
     ExecutorServiceConfigurator getConfigurator();

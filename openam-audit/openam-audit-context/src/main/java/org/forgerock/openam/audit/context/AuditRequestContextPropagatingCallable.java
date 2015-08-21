@@ -21,6 +21,7 @@ import java.util.concurrent.Callable;
 /**
  * <code>Callable</code> Decorator that propagates thread local {@link AuditRequestContext} to worker thread.
  *
+ * @param <T> The callable return type.
  * @since 13.0.0
  */
 public class AuditRequestContextPropagatingCallable<T>

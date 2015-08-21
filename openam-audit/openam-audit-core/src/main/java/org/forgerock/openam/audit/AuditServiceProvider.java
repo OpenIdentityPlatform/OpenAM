@@ -26,8 +26,10 @@ import org.forgerock.audit.AuditService;
 public interface AuditServiceProvider {
 
     /**
-     * @return a new instance of the AuditService with any required configuration applied.
+     * Creates a new instance of the AuditService with any required configuration applied.
+     *
+     * @return a new AuditService instance.
+     * @throws AuditException If unable to configure the audit service.
      */
     AuditService createAuditService() throws AuditException;
-
 }

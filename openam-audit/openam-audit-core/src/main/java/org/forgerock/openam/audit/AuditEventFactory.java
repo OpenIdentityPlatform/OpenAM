@@ -31,6 +31,11 @@ public class AuditEventFactory {
 
     private final AuditServiceConfigurator configurator;
 
+    /**
+     * Constructs a new {@code AuditEventFactory}.
+     *
+     * @param configurator A {@code AuditServiceConfigurator} instance.
+     */
     @Inject
     public AuditEventFactory(AuditServiceConfigurator configurator) {
         this.configurator = configurator;

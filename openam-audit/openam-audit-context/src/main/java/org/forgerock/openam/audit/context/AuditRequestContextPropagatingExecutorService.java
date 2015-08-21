@@ -28,7 +28,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * ExecutorService decorator that propagates {@link AuditRequestContext} from task publishing thread to task consuming thread.
+ * ExecutorService decorator that propagates {@link AuditRequestContext} from
+ * task publishing thread to task consuming thread.
  *
  * @since 13.0.0
  */
@@ -36,6 +37,11 @@ public class AuditRequestContextPropagatingExecutorService implements Configurab
 
     final ExecutorService delegate;
 
+    /**
+     * Constructs a new {@code AuditRequestContextPropagatingExecutorService}.
+     *
+     * @param delegate The delegate {@code ExecutorService}.
+     */
     public AuditRequestContextPropagatingExecutorService(ExecutorService delegate) {
         this.delegate = delegate;
     }
@@ -156,7 +162,9 @@ public class AuditRequestContextPropagatingExecutorService implements Configurab
     }
 
     /**
-     * @return True if the <code>ExecutorService</code> delegate supports configuration.
+     * Determines if this service is configurable.
+     *
+     * @return {@code true} if the <code>ExecutorService</code> delegate supports configuration.
      * @see #getConfigurator()
      */
     @Override
@@ -188,5 +196,4 @@ public class AuditRequestContextPropagatingExecutorService implements Configurab
         }
         return results;
     }
-
 }

@@ -26,6 +26,11 @@ public class AuditRequestContextPropagatingRunnable
 
     private final Runnable delegate;
 
+    /**
+     * Constructs a new {@code AuditRequestContextPropagatingRunnable}.
+     *
+     * @param delegate The worker thread.
+     */
     public AuditRequestContextPropagatingRunnable(Runnable delegate) {
         this.delegate = delegate;
     }
@@ -39,5 +44,4 @@ public class AuditRequestContextPropagatingRunnable
             revertContext();
         }
     }
-
 }

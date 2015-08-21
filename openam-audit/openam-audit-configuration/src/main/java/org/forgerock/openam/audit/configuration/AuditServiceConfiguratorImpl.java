@@ -51,7 +51,7 @@ import java.util.Set;
 @Singleton
 public class AuditServiceConfiguratorImpl implements AuditServiceConfigurator, ServiceListener {
 
-    private static final Debug debug = Debug.getInstance("amAudit");
+    private static final Debug DEBUG = Debug.getInstance("amAudit");
 
     private final AMAuditServiceConfiguration configuration = new AMAuditServiceConfiguration();
 
@@ -59,7 +59,7 @@ public class AuditServiceConfiguratorImpl implements AuditServiceConfigurator, S
     public void registerEventHandlers(AuditService auditService) throws ResourceException, AuditException {
         refreshConfiguration();
         if (!configuration.isAuditEnabled()) {
-            debug.message("Audit logging is disabled. No event handlers will be registered.");
+            DEBUG.message("Audit logging is disabled. No event handlers will be registered.");
             return;
         }
 
@@ -70,7 +70,7 @@ public class AuditServiceConfiguratorImpl implements AuditServiceConfigurator, S
                 updateEventHandlerConfiguration(parentConfig.getSubConfig(handler), auditService);
             }
         } catch (SSOException | SMSException e) {
-            debug.error("Error accessing service {}", SERVICE_NAME, e);
+            DEBUG.error("Error accessing service {}", SERVICE_NAME, e);
         }
     }
 
@@ -98,7 +98,7 @@ public class AuditServiceConfiguratorImpl implements AuditServiceConfigurator, S
                 try {
                     registerEventHandlers(InjectorHolder.getInstance(AuditService.class));
                 } catch (ResourceException | AuditException e) {
-                    debug.error("Unable to register audit event handlers.", e);
+                    DEBUG.error("Unable to register audit event handlers.", e);
                 }
             }
         } else {
@@ -118,9 +118,9 @@ public class AuditServiceConfiguratorImpl implements AuditServiceConfigurator, S
             if (listenerId == null) {
                 throw new SMSException("Unable to register service config listener");
             }
-            debug.message("Registered service config listener: {}", listenerId);
+            DEBUG.message("Registered service config listener: {}", listenerId);
         } catch (SSOException | SMSException e) {
-            debug.error("Unable to create ServiceConfigManager", e);
+            DEBUG.error("Unable to create ServiceConfigManager", e);
             throw new IllegalStateException(e);
         }
     }
@@ -142,7 +142,7 @@ public class AuditServiceConfiguratorImpl implements AuditServiceConfigurator, S
         if (components.length == 1) {
             ServiceConfig eventHandlerConfig = getEventHandlerConfiguration(components[0]);
             if (eventHandlerConfig == null) {
-                debug.error(
+                DEBUG.error(
                         "No event handler configuration called {} found in service {}. No configuration changes made.",
                         components[0], SERVICE_NAME);
                 return;
@@ -150,7 +150,7 @@ public class AuditServiceConfiguratorImpl implements AuditServiceConfigurator, S
             try {
                 updateEventHandlerConfiguration(eventHandlerConfig, InjectorHolder.getInstance(AuditService.class));
             } catch (ResourceException | AuditException e) {
-                debug.error("Failed to configure the {} event handler", components[0], e);
+                DEBUG.error("Failed to configure the {} event handler", components[0], e);
             }
         }
     }
@@ -189,7 +189,7 @@ public class AuditServiceConfiguratorImpl implements AuditServiceConfigurator, S
         try {
             return getAuditGlobalConfiguration().getSubConfig(handler);
         } catch (SMSException | SSOException e) {
-            debug.error("Error accessing service {}", SERVICE_NAME, e);
+            DEBUG.error("Error accessing service {}", SERVICE_NAME, e);
         }
         return null;
     }
@@ -198,7 +198,7 @@ public class AuditServiceConfiguratorImpl implements AuditServiceConfigurator, S
         try {
             return new ServiceConfigManager(SERVICE_NAME, getAdminToken()).getGlobalConfig("default");
         } catch (SMSException | SSOException e) {
-            debug.error("Error accessing service {}", SERVICE_NAME, e);
+            DEBUG.error("Error accessing service {}", SERVICE_NAME, e);
             throw new IllegalStateException(e);
         }
     }

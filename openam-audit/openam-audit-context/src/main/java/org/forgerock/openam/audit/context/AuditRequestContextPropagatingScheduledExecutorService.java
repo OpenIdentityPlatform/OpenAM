@@ -22,7 +22,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * ExecutorService decorator that propagates {@link AuditRequestContext} from task publishing thread to task running thread.
+ * ExecutorService decorator that propagates {@link AuditRequestContext} from task publishing thread to task
+ * running thread.
  *
  * @since 13.0.0
  */
@@ -30,6 +31,11 @@ public class AuditRequestContextPropagatingScheduledExecutorService
         extends AuditRequestContextPropagatingExecutorService
         implements ScheduledExecutorService {
 
+    /**
+     * Constructs a new {@code AuditRequestContextPropagatingScheduledExecutorService}.
+     *
+     * @param delegate The task running thread.
+     */
     public AuditRequestContextPropagatingScheduledExecutorService(ScheduledExecutorService delegate) {
         super(delegate);
     }

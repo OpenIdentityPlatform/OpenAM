@@ -33,6 +33,11 @@ import java.util.concurrent.TimeUnit;
  */
 public class AuditRequestContextPropagatingExecutorServiceFactory extends ExecutorServiceFactory {
 
+    /**
+     * Constructs a new {@code AuditRequestContextPropagatingExecutorServiceFactory}.
+     *
+     * @param shutdownManager The {@code ShutdownManager}.
+     */
     public AuditRequestContextPropagatingExecutorServiceFactory(ShutdownManager shutdownManager) {
         super(shutdownManager);
     }
@@ -73,7 +78,8 @@ public class AuditRequestContextPropagatingExecutorServiceFactory extends Execut
     }
 
     @Override
-    public ExecutorService createThreadPool(int coreSize, int maxSize, long idleTimeout, TimeUnit timeoutTimeunit, BlockingQueue<Runnable> runnables) {
+    public ExecutorService createThreadPool(int coreSize, int maxSize, long idleTimeout, TimeUnit timeoutTimeunit,
+            BlockingQueue<Runnable> runnables) {
         return decorate(super.createThreadPool(coreSize, maxSize, idleTimeout, timeoutTimeunit, runnables));
     }
 
