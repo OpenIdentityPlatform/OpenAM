@@ -87,7 +87,7 @@ public class UmaPolicyResourceTest {
         //Then
         assertThat(result).succeeded().withId().isEqualTo("ID");
         assertThat(result).succeeded().withRevision().isEqualTo("REVISION");
-        assertThat(result).succeeded().withContent().isObject().containsOnly();
+        assertThat(result).succeeded().withContent().isEmpty();
     }
 
     @Test
@@ -217,7 +217,7 @@ public class UmaPolicyResourceTest {
         //Then
         assertThat(result).succeeded().withId().isEqualTo("RESOURCE_SET_UID");
         assertThat(result).succeeded().withRevision().isEqualTo("0");
-        assertThat(result).succeeded().withContent().isObject().containsOnly();
+        assertThat(result).succeeded().withContent().isEmpty();
     }
 
     @Test
