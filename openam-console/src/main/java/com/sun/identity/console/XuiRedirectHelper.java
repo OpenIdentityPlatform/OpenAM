@@ -16,20 +16,18 @@
 
 package com.sun.identity.console;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.text.MessageFormat;
-
-import com.iplanet.am.util.SystemProperties;
 import com.iplanet.jato.CompleteRequestException;
 import com.iplanet.jato.RequestContext;
 import com.iplanet.jato.RequestManager;
 import com.iplanet.jato.view.ViewBeanBase;
 import com.sun.identity.console.base.model.AMAdminConstants;
-import com.sun.identity.shared.Constants;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.xui.XUIState;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.text.MessageFormat;
 
 /**
  * Helper for redirecting back to the XUI.
@@ -38,8 +36,7 @@ import org.forgerock.openam.xui.XUIState;
  */
 public final class XuiRedirectHelper {
 
-    private static final String XUI_CONSOLE_BASE_PAGE = "{0}/XUI/{1}#{2}";
-    private static final String XUI_CONSOLE_REALM = "?realm={0}";
+    private static final String XUI_CONSOLE_BASE_PAGE = "{0}/XUI/#{1}";
 
     private XuiRedirectHelper() {
     }
@@ -54,14 +51,7 @@ public final class XuiRedirectHelper {
     public static void redirectToXui(HttpServletRequest request, String redirectRealm, String xuiHash) {
         String deploymentUri = InjectorHolder.getInstance(BaseURLProviderFactory.class).get(redirectRealm)
                 .getURL(request);
-        String redirect;
-        if (!"/".equals(redirectRealm)) {
-            redirect = MessageFormat.format(XUI_CONSOLE_BASE_PAGE, deploymentUri,
-                    MessageFormat.format(XUI_CONSOLE_REALM, redirectRealm), xuiHash);
-        } else {
-            redirect = MessageFormat.format(XUI_CONSOLE_BASE_PAGE, deploymentUri, "", xuiHash);
-        }
-
+        String redirect = MessageFormat.format(XUI_CONSOLE_BASE_PAGE, deploymentUri, xuiHash);
         RequestContext rc = RequestManager.getRequestContext();
         try {
             rc.getResponse().sendRedirect(redirect);
