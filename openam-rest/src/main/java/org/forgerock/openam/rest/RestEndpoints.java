@@ -16,7 +16,10 @@
 package org.forgerock.openam.rest;
 
 import static org.forgerock.http.routing.Version.version;
+import static org.forgerock.openam.audit.AuditConstants.Component.UMA;
 import static org.forgerock.openam.rest.service.RestletUtils.wrap;
+import static org.forgerock.openam.uma.UmaConstants.AUTHORIZATION_REQUEST_ENDPOINT;
+import static org.forgerock.openam.uma.UmaConstants.PERMISSION_REQUEST_ENDPOINT;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -37,6 +40,7 @@ import org.forgerock.oauth2.restlet.ValidationServerResource;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.forgerockrest.XacmlService;
 import org.forgerock.openam.rest.audit.HttpAccessAuditFilterFactory;
+import org.forgerock.openam.rest.audit.RestletAccessAuditFilterFactory;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.service.ResourceApiVersionRestlet;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
@@ -65,26 +69,31 @@ public class RestEndpoints {
     private final Restlet xacmlServiceRouter;
     private final Router umaServiceRouter;
     private final Router oauth2ServiceRouter;
+    private final RestletAccessAuditFilterFactory restletAuditFactory;
 
     /**
      * Constructs a new RestEndpoints instance.
      *
      * @param realmValidator An instance of the RestRealmValidator.
      * @param coreWrapper An instance of the CoreWrapper.
+     * @param restletAuditFactory An instance of the RestletAccessAuditFilterFactory.
      * @param versionBehaviourManager The ResourceApiVersionBehaviourManager.
      */
     @Inject
     public RestEndpoints(RestRealmValidator realmValidator, CoreWrapper coreWrapper,
-            ResourceApiVersionBehaviourManager versionBehaviourManager) {
-        this(realmValidator, coreWrapper, versionBehaviourManager,
+                         RestletAccessAuditFilterFactory restletAuditFactory,
+                         ResourceApiVersionBehaviourManager versionBehaviourManager) {
+        this(realmValidator, coreWrapper, restletAuditFactory, versionBehaviourManager,
                 InvalidRealmNameManager.getInvalidRealmNames());
     }
 
     RestEndpoints(RestRealmValidator realmValidator, CoreWrapper coreWrapper,
-            ResourceApiVersionBehaviourManager versionBehaviourManager, Set<String> invalidRealmNames) {
+                  RestletAccessAuditFilterFactory restletAuditFactory,
+                  ResourceApiVersionBehaviourManager versionBehaviourManager, Set<String> invalidRealmNames) {
         this.realmValidator = realmValidator;
         this.versionBehaviourManager = versionBehaviourManager;
         this.coreWrapper = coreWrapper;
+        this.restletAuditFactory = restletAuditFactory;
 
         this.xacmlServiceRouter = createXACMLServiceRouter(invalidRealmNames);
         this.umaServiceRouter = createUMAServiceRouter();
@@ -136,13 +145,16 @@ public class RestEndpoints {
 
         Router router = new RestletRealmRouter(realmValidator, coreWrapper);
 
-        router.attach("/permission_request", getRestlet(UmaConstants.PERMISSION_REQUEST_ENDPOINT));
-        router.attach("/authz_request", getRestlet(UmaConstants.AUTHORIZATION_REQUEST_ENDPOINT));
+        router.attach("/permission_request",
+                restletAuditFactory.createFilter(UMA, getRestlet(PERMISSION_REQUEST_ENDPOINT)));
+        router.attach("/authz_request",
+                restletAuditFactory.createFilter(UMA, getRestlet(AUTHORIZATION_REQUEST_ENDPOINT)));
 
         // Well-Known Discovery
 
         router.attach("/.well-known/uma-configuration",
-                new UmaExceptionFilter(wrap(UmaWellKnownConfigurationEndpoint.class)));
+                restletAuditFactory.createFilter(UMA,
+                        new UmaExceptionFilter(wrap(UmaWellKnownConfigurationEndpoint.class))));
 
         return router;
     }
