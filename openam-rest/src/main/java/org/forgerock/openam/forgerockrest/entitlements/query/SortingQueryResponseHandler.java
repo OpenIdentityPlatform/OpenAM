@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.forgerockrest.entitlements.query;
 
-import static org.forgerock.json.resource.Responses.newQueryResponse;
+import static org.forgerock.json.resource.Responses.newRemainingResultsResponse;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,7 +25,7 @@ import java.util.PriorityQueue;
 
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.CountPolicy;
+import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.SortKey;
@@ -40,10 +40,10 @@ import org.forgerock.util.Reject;
  */
 final class SortingQueryResponseHandler extends QueryResponseHandler {
     private static final int INITIAL_QUEUE_SIZE = 11;
-    private final org.forgerock.json.resource.QueryResourceHandler delegate;
+    private final QueryResourceHandler delegate;
     private final PriorityQueue<ResourceResponse> sortedResources;
 
-    SortingQueryResponseHandler(final org.forgerock.json.resource.QueryResourceHandler delegate, final List<SortKey> sortKeys) {
+    SortingQueryResponseHandler(final QueryResourceHandler delegate, final List<SortKey> sortKeys) {
         super(delegate);
         Reject.ifNull(delegate, sortKeys);
         Reject.ifTrue(sortKeys.isEmpty(), "No sort keys specified");
@@ -64,7 +64,7 @@ final class SortingQueryResponseHandler extends QueryResponseHandler {
         while (keepGoing && !sortedResources.isEmpty()) {
             keepGoing = delegate.handleResource(sortedResources.poll());
         }
-        return newQueryResponse(result.getPagedResultsCookie(), CountPolicy.EXACT, sortedResources.size());
+        return newRemainingResultsResponse(result.getPagedResultsCookie(), sortedResources.size());
     }
 
     /**

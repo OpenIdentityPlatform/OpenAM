@@ -18,8 +18,7 @@ package org.forgerock.openam.forgerockrest.entitlements.query;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.Responses.newQueryResponse;
-import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.json.resource.Responses.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
@@ -31,7 +30,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.forgerock.json.resource.CountPolicy;
 import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.SortKey;
@@ -151,7 +149,7 @@ public class SortingQueryResponseHandlerTest {
         // Given
         sortingHandler = new SortingQueryResponseHandler(mockHandler, SORT_BY_NAME);
         String cookie = "xxx";
-        QueryResponse queryResult = newQueryResponse(cookie, CountPolicy.EXACT, 12);
+        QueryResponse queryResult = newRemainingResultsResponse(cookie, 12);
         List<ResourceResponse> resources = namedResources("a", "b", "c");
         // Only accept a single resource
         given(mockHandler.handleResource(any(ResourceResponse.class))).willReturn(false);
@@ -164,8 +162,7 @@ public class SortingQueryResponseHandlerTest {
 
         // Then
         assertThat(result.getPagedResultsCookie()).isEqualTo(cookie);
-        // FIXME: the following method needs to be reinstated:
-        //assertThat(result.getRemainingPagedResults()).isEqualTo(resources.size() - 1);
+        assertThat(result.getRemainingPagedResults()).isEqualTo(resources.size() - 1);
     }
 
     private List<ResourceResponse> namedResources(String...names) {
