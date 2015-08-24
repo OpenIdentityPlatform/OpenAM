@@ -24,6 +24,14 @@
 package org.forgerock.openam.oauth2.rest;
 
 
+import static org.forgerock.json.resource.Responses.newResourceResponse;
+import static org.forgerock.util.test.assertj.AssertJPromiseAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.iplanet.sso.SSOException;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
@@ -47,14 +55,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.util.test.assertj.AssertJPromiseAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 
 public class ClientResourceTest {
