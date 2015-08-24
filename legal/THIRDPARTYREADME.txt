@@ -660,6 +660,9 @@ Copyright: Copyright (c) 2010-2014, The Dojo Foundation
 Version: spin-2.0.1-min.js
 Copyright:
 
+Version: squire-0.2.0.js
+Copyright: Copyright (c) 2013 Merrick Christensen
+
 Version: ui.multiselect-0.3.js
 Copyright: Copyright Michael Aufreiter, Yanick Rochon
 
