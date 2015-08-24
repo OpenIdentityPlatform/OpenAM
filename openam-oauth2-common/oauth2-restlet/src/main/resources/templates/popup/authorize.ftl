@@ -54,7 +54,7 @@
                     displayScopes: []
                 }
             };
-            <#list display_scope as r>pageData.oauth2Data.displayScopes.push("${r?js_string}");</#list>
+            <#list display_scope as r>pageData.oauth2Data.displayScopes.push({"name":"${r?js_string}"});</#list>
         </script>
         <script data-main="${baseUrl?html}/XUI/main-authorize" src="${baseUrl?html}/XUI/libs/requirejs-2.1.14-min.js"></script>
     </body>

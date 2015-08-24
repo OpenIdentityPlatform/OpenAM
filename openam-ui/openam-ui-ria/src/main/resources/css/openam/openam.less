@@ -388,3 +388,24 @@ body, .modal-open {
     background-color: #e6e6e6;
     border-color: #adadad;
 }
+
+.am-panel-heading-hover {
+    transition: color 0.3s ease-in-out, background 0.3s ease-in-out;
+    .fa-angle-down {
+        transition: color 0.3s ease-in-out;
+    }
+    &:hover{
+        cursor:pointer;
+        background-color: lighten(@base-theme-color, 45%);
+        color:@base-theme-color;
+    }
+
+    &[aria-expanded="true"]{
+        background-color: lighten(@base-theme-color, 45%);
+        color:@base-theme-color;
+
+        .fa-angle-down {
+            color: lighten(@base-theme-color, 45%);
+        }
+    }
+}
