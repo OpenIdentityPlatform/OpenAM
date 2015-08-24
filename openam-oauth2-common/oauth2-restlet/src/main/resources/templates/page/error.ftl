@@ -2,7 +2,7 @@
 <!--
   ~ DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   ~
-  ~ Copyright 2012-2014 ForgeRock AS.
+  ~ Copyright 2012-2015 ForgeRock AS.
   ~
   ~ The contents of this file are subject to the terms
   ~ of the Common Development and Distribution License
@@ -24,15 +24,14 @@
   ~
   ~ Portions Copyrighted 2014 Nomura Research Institute, Ltd
   -->
-  <html lang="en">
-      <head>
-          <meta charset="utf-8">
-          <meta http-equiv="X-UA-Compatible" content="IE=edge">
-          <meta name="viewport" content="width=device-width, initial-scale=1">
-          <meta name="description" content="OAuth2 Error">
-          <title>OAuth2 Error Page</title>
-      </head>
+<html lang="en">
 <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="OAuth2 Error">
+    <title>OAuth2 Error Page</title>
+</head>
 
 <body>
     <div id="wrapper" class="hidden">Loading...</div>
@@ -52,7 +51,7 @@
                 }
             }
         </#if>
-        </script>
-        <script data-main="${baseUrl?html}/XUI/main-authorize" src="${baseUrl?html}/XUI/libs/requirejs-2.1.14-min.js"></script>
-    </body>
+    </script>
+    <script data-main="${baseUrl?html}/XUI/main-authorize" src="${baseUrl?html}/XUI/libs/requirejs-2.1.14-min.js"></script>
+</body>
 </html>

@@ -11,25 +11,30 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.restlet;
 
 import org.forgerock.oauth2.core.OAuth2Constants.UrlLocation;
+import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Reference;
 import org.restlet.data.Status;
 import org.restlet.ext.jackson.JacksonRepresentation;
+import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.routing.Redirector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.forgerock.oauth2.core.Utils.isEmpty;
@@ -43,16 +48,22 @@ import static org.forgerock.oauth2.core.Utils.isEmpty;
 public class ExceptionHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger("OAuth2Provider");
 
-    private OAuth2Representation representation;
+    private final OAuth2Representation representation;
+    private final BaseURLProviderFactory baseURLProviderFactory;
+    private final OAuth2RequestFactory<Request> requestFactory;
 
     /**
      * Constructs a new ExceptionHandler.
      *
      * @param representation An instance of the OAuth2Representation.
+     * @param baseURLProviderFactory
      */
     @Inject
-    public ExceptionHandler(OAuth2Representation representation) {
+    public ExceptionHandler(OAuth2Representation representation, BaseURLProviderFactory baseURLProviderFactory,
+            OAuth2RequestFactory<Request> requestFactory) {
         this.representation = representation;
+        this.baseURLProviderFactory = baseURLProviderFactory;
+        this.requestFactory = requestFactory;
     }
 
     /**
@@ -114,8 +125,10 @@ public class ExceptionHandler {
             redirector.handle(request, response);
             return;
         }
-
-        response.setEntity(representation.getRepresentation(context, "page", "error.ftl", exception.asMap()));
+        final Map<String, String> data = new HashMap<>(exception.asMap());
+        final String realm = requestFactory.create(request).getParameter("realm");
+        data.put("baseUrl", baseURLProviderFactory.get(realm).getURL(ServletUtils.getRequest(request)));
+        response.setEntity(representation.getRepresentation(context, "page", "error.ftl", data));
     }
 
     /**

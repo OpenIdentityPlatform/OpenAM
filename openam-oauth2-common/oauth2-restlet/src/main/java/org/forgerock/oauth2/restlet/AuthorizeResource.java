@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -29,10 +29,12 @@ import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequired;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openam.rest.service.RouterContextResource;
+import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.xui.XUIState;
 import org.owasp.esapi.ESAPI;
 import org.restlet.Request;
 import org.restlet.data.Reference;
+import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
@@ -63,6 +65,7 @@ public class AuthorizeResource extends RouterContextResource {
     private final OAuth2Representation representation;
     private final Set<AuthorizeRequestHook> hooks;
     private final XUIState xuiState;
+    private final BaseURLProviderFactory baseURLProviderFactory;
 
     /**
      * Constructs a new AuthorizeResource.
@@ -75,7 +78,7 @@ public class AuthorizeResource extends RouterContextResource {
     @Inject
     public AuthorizeResource(OAuth2RequestFactory<Request> requestFactory, AuthorizationService authorizationService,
             ExceptionHandler exceptionHandler, OAuth2Representation representation, Set<AuthorizeRequestHook> hooks,
-            XUIState xuiState, @Named("OAuth2Router") Router router) {
+            XUIState xuiState, @Named("OAuth2Router") Router router, BaseURLProviderFactory baseURLProviderFactory) {
         super(router);
         this.requestFactory = requestFactory;
         this.authorizationService = authorizationService;
@@ -83,6 +86,7 @@ public class AuthorizeResource extends RouterContextResource {
         this.representation = representation;
         this.hooks = hooks;
         this.xuiState = xuiState;
+        this.baseURLProviderFactory = baseURLProviderFactory;
     }
 
     /**
@@ -129,7 +133,7 @@ public class AuthorizeResource extends RouterContextResource {
                     e.getRedirectUri().toString(), null);
         } catch (ResourceOwnerConsentRequired e) {
             return representation.getRepresentation(getContext(), request, "authorize.ftl",
-                    getDataModel(e.getClientName(), e.getClientDescription(), e.getScopeDescriptions(), getRequest()));
+                    getDataModel(e.getClientName(), e.getClientDescription(), e.getScopeDescriptions(), request));
         } catch (InvalidClientException e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
                     request.<String>getParameter("state"));
@@ -152,7 +156,7 @@ public class AuthorizeResource extends RouterContextResource {
      * @param request
      * @return The data model.
      */
-    private Map<String, Object> getDataModel(String displayName, String displayDescription, Set<String> displayScope, Request request) {
+    private Map<String, Object> getDataModel(String displayName, String displayDescription, Set<String> displayScope, OAuth2Request request) {
         Map<String, Object> data = new HashMap<String, Object>(getRequest().getAttributes());
         data.putAll(getQuery().getValuesMap());
         Reference resRef = getRequest().getResourceRef();
@@ -166,7 +170,8 @@ public class AuthorizeResource extends RouterContextResource {
         data.put("display_description", ESAPI.encoder().encodeForHTML(displayDescription));
         data.put("display_scope", encodeSetForHTML(displayScope));
         data.put("xui", xuiState.isXUIEnabled());
-        data.put("baseUrl", request.getRootRef() + "/..");
+        data.put("baseUrl", baseURLProviderFactory.get(request.<String>getParameter("realm"))
+                .getURL(ServletUtils.getRequest(getRequest())));
         return data;
     }
 

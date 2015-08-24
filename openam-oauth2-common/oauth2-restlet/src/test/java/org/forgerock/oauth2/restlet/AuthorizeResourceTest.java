@@ -58,7 +58,7 @@ public class AuthorizeResourceTest {
         when(oauth2RequestFactory.create(request)).thenReturn(o2request);
 
         resource = new AuthorizeResource(oauth2RequestFactory, service, null, representation,
-                CollectionUtils.asSet(hook), xuiState, mock(Router.class));
+                CollectionUtils.asSet(hook), xuiState, mock(Router.class), null);
         resource = spy(resource);
         doReturn(request).when(resource).getRequest();
         doReturn(response).when(resource).getResponse();

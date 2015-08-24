@@ -16,10 +16,8 @@
 
 package org.forgerock.oauth2.restlet;
 
-import org.forgerock.json.JsonValue;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AccessTokenService;
-import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.openam.utils.CollectionUtils;
@@ -34,7 +32,6 @@ import org.testng.annotations.Test;
 import static org.mockito.Mockito.*;
 import static org.testng.Assert.*;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.TOKEN_NAME;
 import static org.forgerock.oauth2.core.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN;
 
 public class TokenEndpointResourceTest {
@@ -52,7 +49,7 @@ public class TokenEndpointResourceTest {
         requestFactory = mock(OAuth2RequestFactory.class);
         accessTokenService = mock(AccessTokenService.class);
         OAuth2Representation representation = new OAuth2Representation();
-        exceptionHandler = new ExceptionHandler(representation);
+        exceptionHandler = new ExceptionHandler(representation, null, null);
         hook = mock(TokenRequestHook.class);
 
         tokenEndpointResource = new TokenEndpointResource(requestFactory, accessTokenService, exceptionHandler,
