@@ -277,8 +277,10 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
             return;
         }
 
-        String svcName = matcher.group(2);
-        String svcVersion = matcher.group(1);
+        refreshServiceRoute(type, matcher.group(2), matcher.group(1));
+    }
+
+    private synchronized void refreshServiceRoute(int type, String svcName, String svcVersion) {
         try {
             switch (type) {
                 case SMSObjectListener.DELETE:
@@ -328,7 +330,7 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
      * @throws SMSException From downstream service manager layer.
      * @throws SSOException From downstream service manager layer.
      */
-    private void createServices() throws SSOException, SMSException {
+    private synchronized void createServices() throws SSOException, SMSException {
         Map<String, Map<SmsRouteTree, Set<RouteMatcher<Request>>>> serviceRoutes = new HashMap<>();
         ServiceManager sm = getServiceManager();
         Set<String> serviceNames = sm.getServiceNames();
@@ -367,6 +369,9 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
      * Remove routes for the service name.
      */
     private void removeService(String name) {
+        if (serviceRoutes.get(name) == null) {
+            return;
+        }
         for (Map.Entry<SmsRouteTree, Set<RouteMatcher<Request>>> routeEntry : serviceRoutes.get(name).entrySet()) {
             for (RouteMatcher<Request> route : routeEntry.getValue()) {
                 routeEntry.getKey().removeRoute(route);

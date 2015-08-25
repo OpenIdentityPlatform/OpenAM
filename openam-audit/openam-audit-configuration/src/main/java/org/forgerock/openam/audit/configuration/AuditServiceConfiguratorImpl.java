@@ -20,7 +20,6 @@ import static com.iplanet.am.util.SystemProperties.get;
 import static com.sun.identity.shared.Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR;
 import static org.forgerock.openam.audit.AuditConstants.*;
 
-import com.google.inject.Singleton;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
@@ -39,6 +38,8 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.utils.StringUtils;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.security.AccessController;
 import java.util.Map;
 import java.util.Set;
@@ -54,30 +55,29 @@ public class AuditServiceConfiguratorImpl implements AuditServiceConfigurator, S
     private static final Debug DEBUG = Debug.getInstance("amAudit");
 
     private final AMAuditServiceConfiguration configuration = new AMAuditServiceConfiguration();
+    private final AuditService auditService;
+    private volatile boolean initialised = false;
 
-    @Override
-    public void registerEventHandlers(AuditService auditService) throws ResourceException, AuditException {
-        refreshConfiguration();
-        if (!configuration.isAuditEnabled()) {
-            DEBUG.message("Audit logging is disabled. No event handlers will be registered.");
-            return;
-        }
-
-        try {
-            ServiceConfig parentConfig = getAuditGlobalConfiguration();
-            Set<String> handlerNames = parentConfig.getSubConfigNames();
-            for (String handler : handlerNames) {
-                updateEventHandlerConfiguration(parentConfig.getSubConfig(handler), auditService);
-            }
-        } catch (SSOException | SMSException e) {
-            DEBUG.error("Error accessing service {}", SERVICE_NAME, e);
-        }
+    /**
+     * Create a new instance of {@code AuditServiceConfiguratorImpl}.
+     * @param auditService The audit service that needs to be configured.
+     */
+    @Inject
+    public AuditServiceConfiguratorImpl(AuditService auditService) {
+        this.auditService = auditService;
     }
 
     @Override
-    public void initializeAuditServiceConfiguration() {
-        refreshConfiguration();
-        registerServiceListener();
+    public void configureAuditService() {
+        try {
+            refreshConfiguration();
+            registerServiceListener();
+            registerEventHandlers();
+            auditService.configure(configuration);
+        } catch (ResourceException | AuditException e) {
+            DEBUG.error("Unable to configure AuditService", e);
+            throw new RuntimeException("Unable to configure AuditService.", e);
+        }
     }
 
     @Override
@@ -96,13 +96,30 @@ public class AuditServiceConfiguratorImpl implements AuditServiceConfigurator, S
 
             if (configuration.isAuditEnabled()) {
                 try {
-                    registerEventHandlers(InjectorHolder.getInstance(AuditService.class));
+                    registerEventHandlers();
                 } catch (ResourceException | AuditException e) {
                     DEBUG.error("Unable to register audit event handlers.", e);
                 }
             }
         } else {
             serviceComponentChanged(component);
+        }
+    }
+
+    private void registerEventHandlers() throws ResourceException, AuditException {
+        if (!configuration.isAuditEnabled()) {
+            DEBUG.message("Audit logging is disabled. No event handlers will be registered.");
+            return;
+        }
+
+        try {
+            ServiceConfig parentConfig = getAuditGlobalConfiguration();
+            Set<String> handlerNames = parentConfig.getSubConfigNames();
+            for (String handler : handlerNames) {
+                updateEventHandlerConfiguration(parentConfig.getSubConfig(handler), auditService);
+            }
+        } catch (SSOException | SMSException e) {
+            DEBUG.error("Error accessing service {}", SERVICE_NAME, e);
         }
     }
 
@@ -113,11 +130,15 @@ public class AuditServiceConfiguratorImpl implements AuditServiceConfigurator, S
      * @throws IllegalStateException if the configuration listener cannot be registered.
      */
     private void registerServiceListener() {
+        if (initialised) {
+            return;
+        }
         try {
             String listenerId = new ServiceConfigManager(SERVICE_NAME, getAdminToken()).addListener(this);
             if (listenerId == null) {
                 throw new SMSException("Unable to register service config listener");
             }
+            initialised = true;
             DEBUG.message("Registered service config listener: {}", listenerId);
         } catch (SSOException | SMSException e) {
             DEBUG.error("Unable to create ServiceConfigManager", e);

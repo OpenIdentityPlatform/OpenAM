@@ -16,12 +16,8 @@
 package org.forgerock.openam.audit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import org.forgerock.audit.AuditService;
-import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
-import org.forgerock.openam.audit.configuration.AuditServiceConfigurator;
 import org.testng.annotations.Test;
 
 /**
@@ -32,9 +28,7 @@ public class AuditServiceProviderImplTest {
     @Test
     public void shouldSetTransactionIdFromHttpHeaderAndClearRequestContextWhenFinished() throws Exception {
         // Given
-        AuditServiceConfigurator configurator = mock(AuditServiceConfigurator.class);
-        when(configurator.getAuditServiceConfiguration()).thenReturn(new AMAuditServiceConfiguration());
-        AuditServiceProvider factory = new AuditServiceProviderImpl(configurator);
+        AuditServiceProvider factory = new AuditServiceProviderImpl();
 
         // When
         AuditService auditService = factory.createAuditService();

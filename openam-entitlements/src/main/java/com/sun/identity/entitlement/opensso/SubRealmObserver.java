@@ -57,7 +57,8 @@ import javax.security.auth.Subject;
 public class SubRealmObserver implements ServiceListener, SetupListener {
     private static Subject adminSubject = SubjectUtils.createSuperAdminSubject();
 
-    public void addListener() {
+    @Override
+    public void setupComplete() {
         registerListener();
     }
 

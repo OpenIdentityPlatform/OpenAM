@@ -108,7 +108,6 @@ public class ScriptingGuiceModule extends AbstractModule {
      *
      * @param scriptEngineManager the script engine manager to use.
      * @param executorServiceFactory the factory for creating managed thread pools for script execution.
-     * @param configurator the service configuration listener.
      * @return an appropriately configured script evaluator for use with scripted authentication.
      */
     @Provides
@@ -117,9 +116,9 @@ public class ScriptingGuiceModule extends AbstractModule {
     @Named(AUTHENTICATION_SERVER_SIDE_NAME)
     ScriptEvaluator getAuthenticationServerSideScriptEvaluator(
             @Named(AUTHENTICATION_SERVER_SIDE_NAME) StandardScriptEngineManager scriptEngineManager,
-            ExecutorServiceFactory executorServiceFactory, ScriptEngineConfigurator configurator) {
+            ExecutorServiceFactory executorServiceFactory) {
 
-        return createEvaluator(scriptEngineManager, executorServiceFactory, configurator);
+        return createEvaluator(scriptEngineManager, executorServiceFactory);
     }
 
     /**
@@ -128,7 +127,6 @@ public class ScriptingGuiceModule extends AbstractModule {
      *
      * @param scriptEngineManager the script engine manager to use.
      * @param executorServiceFactory the factory for creating managed thread pools for script execution.
-     * @param configurator the service configuration listener.
      * @return an appropriately configured script evaluator for use with scripted entitlement condition.
      */
     @Provides
@@ -137,9 +135,9 @@ public class ScriptingGuiceModule extends AbstractModule {
     @Named(POLICY_CONDITION_NAME)
     ScriptEvaluator getPoliyConditionScriptEvaluator(
             @Named(POLICY_CONDITION_NAME) StandardScriptEngineManager scriptEngineManager,
-            ExecutorServiceFactory executorServiceFactory, ScriptEngineConfigurator configurator) {
+            ExecutorServiceFactory executorServiceFactory) {
 
-        return createEvaluator(scriptEngineManager, executorServiceFactory, configurator);
+        return createEvaluator(scriptEngineManager, executorServiceFactory);
     }
 
     /**
@@ -148,7 +146,6 @@ public class ScriptingGuiceModule extends AbstractModule {
      *
      * @param scriptEngineManager the script engine manager to use.
      * @param executorServiceFactory the factory for creating managed thread pools for script execution.
-     * @param configurator the service configuration listener.
      * @return an appropriately configured script evaluator for use with OIDC Claims scripts.
      */
     @Provides
@@ -157,9 +154,9 @@ public class ScriptingGuiceModule extends AbstractModule {
     @Named(OIDC_CLAIMS_NAME)
     ScriptEvaluator getOidcClaimsScriptEvaluator(
             @Named(OIDC_CLAIMS_NAME) StandardScriptEngineManager scriptEngineManager,
-            ExecutorServiceFactory executorServiceFactory, ScriptEngineConfigurator configurator) {
+            ExecutorServiceFactory executorServiceFactory) {
 
-        return createEvaluator(scriptEngineManager, executorServiceFactory, configurator);
+        return createEvaluator(scriptEngineManager, executorServiceFactory);
     }
 
     /**
@@ -168,7 +165,6 @@ public class ScriptingGuiceModule extends AbstractModule {
      *
      * @param scriptEngineManager the script engine manager to use.
      * @param executorServiceFactory the factory for creating managed thread pools for script execution.
-     * @param configurator the service configuration listener.
      * @return an appropriately configured script evaluator for use with OIDC Claims scripts.
      */
     @Provides
@@ -177,17 +173,13 @@ public class ScriptingGuiceModule extends AbstractModule {
     @Named(SDK_NAME)
     ScriptEvaluator getSDKScriptEvaluator(
             @Named(SDK_NAME) StandardScriptEngineManager scriptEngineManager,
-            ExecutorServiceFactory executorServiceFactory, ScriptEngineConfigurator configurator) {
+            ExecutorServiceFactory executorServiceFactory) {
 
-        return createEvaluator(scriptEngineManager, executorServiceFactory, configurator);
+        return createEvaluator(scriptEngineManager, executorServiceFactory);
     }
 
     private ThreadPoolScriptEvaluator createEvaluator(StandardScriptEngineManager scriptEngineManager,
-                                                      ExecutorServiceFactory executorServiceFactory,
-                                                      ScriptEngineConfigurator configurator) {
-
-        // Ensure configuration is up to date with service settings
-        configurator.registerServiceListener();
+                                                      ExecutorServiceFactory executorServiceFactory) {
 
         ScriptEngineConfiguration configuration = scriptEngineManager.getConfiguration();
 

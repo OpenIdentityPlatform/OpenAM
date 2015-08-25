@@ -15,10 +15,6 @@
  */
 package org.forgerock.openam.audit.configuration;
 
-import org.forgerock.audit.AuditException;
-import org.forgerock.audit.AuditService;
-import org.forgerock.json.resource.ResourceException;
-
 /**
  * Implementations of this interface are responsible for configuring the audit service.
  *
@@ -27,19 +23,9 @@ import org.forgerock.json.resource.ResourceException;
 public interface AuditServiceConfigurator {
 
     /**
-     * Register the required event handlers on the given audit service.
-     *
-     * @param auditService The audit service to which the event handlers should be registered.
-     * @throws ResourceException if there is a problem with the configuration
-     * @throws AuditException if there is a problem with the registration
+     * Configure the audit service and register the service config listener.
      */
-    void registerEventHandlers(AuditService auditService) throws ResourceException, AuditException;
-
-    /**
-     * Create an instance of and populate {@link org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration}
-     * from the given Json config and register the the service config listener.
-     */
-    void initializeAuditServiceConfiguration();
+    void configureAuditService();
 
     /**
      * Get the pre-configured audit service configuration.

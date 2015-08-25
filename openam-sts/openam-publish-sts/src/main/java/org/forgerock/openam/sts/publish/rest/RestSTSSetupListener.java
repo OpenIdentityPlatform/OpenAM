@@ -42,7 +42,7 @@ public class RestSTSSetupListener implements SetupListener {
      * new rest-sts instances are written to the SMS.
      */
     @Override
-    public void addListener() {
+    public void setupComplete() {
         new Thread(
             new Runnable() {
                 public void run() {

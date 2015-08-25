@@ -15,15 +15,13 @@
  */
 package org.forgerock.openam.audit;
 
-import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
 
-import com.google.inject.Inject;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.audit.AuditException;
 import org.forgerock.audit.AuditService;
 import org.forgerock.json.JsonValue;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.openam.audit.configuration.AuditServiceConfigurator;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.openam.utils.JsonValueBuilder;
 
@@ -41,36 +39,14 @@ public class AuditServiceProviderImpl implements AuditServiceProvider {
 
     private static Debug debug = Debug.getInstance("amAudit");
 
-    private final AuditServiceConfigurator configurator;
-
-    /**
-     * Create an instance of AuditServiceProviderImpl.
-     * @param configurator The configurator responsible for configuring the audit service.
-     */
-    @Inject
-    public AuditServiceProviderImpl(AuditServiceConfigurator configurator) {
-        this.configurator = configurator;
-    }
-
     /**
      * {@inheritDoc}
      */
     @Override
     public AuditService createAuditService() throws AuditException {
-
         JsonValue extendedEventTypes = readJsonFile("/org/forgerock/openam/audit/events-config.json");
         JsonValue customEventTypes = json(object());
-
-        AuditService auditService = new AuditService(extendedEventTypes, customEventTypes);
-        try {
-            configurator.initializeAuditServiceConfiguration();
-            configurator.registerEventHandlers(auditService);
-            auditService.configure(configurator.getAuditServiceConfiguration());
-        } catch (ResourceException|AuditException e) {
-            debug.error("Unable to configure AuditService", e);
-            throw new RuntimeException("Unable to configure AuditService.", e);
-        }
-        return auditService;
+        return new AuditService(extendedEventTypes, customEventTypes);
     }
 
     private JsonValue readJsonFile(String path) throws AuditException {

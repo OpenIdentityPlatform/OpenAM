@@ -1,4 +1,4 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2010 Sun Microsystems Inc. All Rights Reserved
@@ -23,14 +23,23 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: SetupListener.java,v 1.1 2010/01/20 17:01:35 veiming Exp $
+ *
+ * Portions Copyrighted 2015 ForgeRock AS.
  */
 
 package com.sun.identity.setup;
 
 /**
- *
- * @author dennis
+ * Implementors of this interface will be notified when setup is complete. Setup is complete when OpenDJ has started up
+ * and the configuration is in a valid state (either upgrade or new install was successful).
  */
 public interface SetupListener {
-    public void addListener();
+
+    /**
+     * Called once setup is complete to indicate to the implementor that it is safe to add listeners to the SMS.
+     *
+     * @see com.sun.identity.sm.SMSObjectListener
+     * @see com.sun.identity.sm.ServiceListener
+     */
+    void setupComplete();
 }

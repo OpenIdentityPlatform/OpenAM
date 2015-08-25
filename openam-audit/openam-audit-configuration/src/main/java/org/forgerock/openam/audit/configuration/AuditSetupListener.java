@@ -13,20 +13,20 @@
  *
  * Copyright 2015 ForgeRock AS.
  */
-
-package org.forgerock.openam.rest;
-
-import org.forgerock.guice.core.InjectorHolder;
+package org.forgerock.openam.audit.configuration;
 
 import com.sun.identity.setup.SetupListener;
+import org.forgerock.guice.core.InjectorHolder;
 
 /**
- * This class makes sure that the Guice configuration for the rest services are computed during container startup
- * rather than during the first request.
+ * This listener will be notified when setup is complete and then try to configure the audit service.
+ *
+ * @since 13.0.0
  */
-public class RestStartupTrigger implements SetupListener {
+public class AuditSetupListener implements SetupListener {
+
     @Override
     public void setupComplete() {
-        InjectorHolder.getInstance(RestEndpoints.class);
+        InjectorHolder.getInstance(AuditServiceConfigurator.class).configureAuditService();
     }
 }
