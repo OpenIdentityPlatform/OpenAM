@@ -23,6 +23,7 @@ import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
+import org.forgerock.openam.shared.sts.SharedSTSConstants;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.DefaultHttpURLConnectionFactory;
 import org.forgerock.openam.sts.HttpURLConnectionFactory;
@@ -60,8 +61,13 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -85,7 +91,6 @@ public class SoapSTSModule extends PrivateModule {
     public static final String AM_SESSION_COOKIE_NAME_PROPERTY_KEY = AMSTSConstants.AM_SESSION_COOKIE_NAME;
     public static final String SOAP_STS_AGENT_USERNAME_PROPERTY_KEY = "soap_sts_agent_username";
     public static final String SOAP_STS_AGENT_PASSWORD_PROPERTY_KEY = "soap_sts_agent_password";
-    public static final String SOAP_STS_AGENT_ENCRYPTION_KEY_PROPERTY_KEY = "soap_sts_agent_encryption_key";
     public static final String AGENT_REALM = AMSTSConstants.REALM;
 
     @Override
@@ -157,6 +162,20 @@ public class SoapSTSModule extends PrivateModule {
         return Executors.newSingleThreadScheduledExecutor();
     }
 
+    @Provides
+    @Singleton
+    KeyStore getAMInternalKeyStore() {
+        try {
+            final KeyStore soapSTSKeystore = KeyStore.getInstance(SharedSTSConstants.AM_INTERNAL_SOAP_STS_KEYSTORE_TYPE);
+            soapSTSKeystore.load(getClass().getResourceAsStream("/" + SharedSTSConstants.AM_INTERNAL_SOAP_STS_KEYSTORE),
+                    SharedSTSConstants.AM_INTERNAL_SOAP_STS_KEYSTORE_PW.toCharArray());
+            return soapSTSKeystore;
+        } catch (KeyStoreException | CertificateException | IOException | NoSuchAlgorithmException e) {
+            throw new IllegalStateException("Could not initialize soap-sts internal keystore. A JCEKS keystore with name "
+                    + SharedSTSConstants.AM_INTERNAL_SOAP_STS_KEYSTORE + " must be in the WEB-INF/classes directory of " +
+                    "the soap-sts .war. Exception: " + e);
+        }
+    }
     /*
         The following 6 methods provide the String constants corresponding to relatively static values relating to
         consumption of the OpenAM rest context. This information is necessary for the STS instances to consume this

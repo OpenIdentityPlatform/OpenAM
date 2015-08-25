@@ -186,7 +186,9 @@ class CommonTasksResource implements CollectionResourceProvider {
                             getSocialAuthenticationCommonTaskConfiguration(resourceBundle).getObject()),
                     field("testfederation",
                             getTestFederationConnectivityCommonTaskConfiguration(resourceBundle).getObject()),
-                    field("documenation", getProductDocumentationCommonTaskConfiguration(resourceBundle).getObject())
+                    field("documentation", getProductDocumentationCommonTaskConfiguration(resourceBundle).getObject()),
+                    field("soapstsdeployment",
+                            getCreateSoapSTSDeploymentCommonTaskConfiguration(resourceBundle).getObject())
             ));
         }
 
@@ -235,6 +237,11 @@ class CommonTasksResource implements CollectionResourceProvider {
             return createTaskGroup(resourceBundle, "documentation",
                     createTaskWithAbsoluteLink(resourceBundle, "doc",
                             "http://docs.forgerock.org/en/index.html?product=openam"));
+        }
+
+        private JsonValue getCreateSoapSTSDeploymentCommonTaskConfiguration(ResourceBundle resourceBundle) {
+            return createTaskGroup(resourceBundle, "soapSTSDeployment",
+                    createTask(resourceBundle, "create.soap.sts.deployment", "CreateSoapSTSDeployment"));
         }
 
         private JsonValue createTaskGroup(ResourceBundle resourceBundle, String nameSuffix, Object... tasks) {

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014-2015 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.shared.sts;
@@ -376,4 +376,24 @@ public class SharedSTSConstants {
      * implementations which will validate token elements included as ActAs/OnBehalfOf elements in a RST
      */
     public static final String CUSTOM_DELEGATION_TOKEN_HANDLERS = "delegation-custom-token-handlers";
+
+    /*
+    Name of keystore which stores the password encryption key for soap-sts deployments
+     */
+    public static final String AM_INTERNAL_SOAP_STS_KEYSTORE = "am_soap_sts.jks";
+
+    /*
+    The type of keystore used internally by the soap-sts
+     */
+    public static final String AM_INTERNAL_SOAP_STS_KEYSTORE_TYPE = "JCEKS";
+
+    /*
+    Alias for the soap-sts password encryption key
+     */
+    public static final String AM_INTERNAL_PEK_ALIAS = "soap_sts_pek";
+
+    /*
+    The soap-sts internal keystore pw
+     */
+    public static final String AM_INTERNAL_SOAP_STS_KEYSTORE_PW = "AQICcQXJAVayPq6zMlamHMDZD0Q4kgtX9wgd";
 }

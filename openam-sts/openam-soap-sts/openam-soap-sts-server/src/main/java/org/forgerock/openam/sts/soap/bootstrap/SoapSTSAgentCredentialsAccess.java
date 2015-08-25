@@ -16,10 +16,21 @@
 
 package org.forgerock.openam.sts.soap.bootstrap;
 
+import org.forgerock.openam.sts.STSInitializationException;
+
 /**
  * Defines the concerns of access to the soap-sts agent username and password, including any necessary decryption.
  */
 public interface SoapSTSAgentCredentialsAccess {
+    /**
+     *
+     * @return the soap-sts agent username.
+     */
     String getAgentUsername();
-    String getAgentPassword();
+
+    /**
+     *
+     * @return the decrypted soap-sts agent password
+     */
+    String getAgentPassword() throws STSInitializationException;
 }

@@ -1,0 +1,79 @@
+<!--
+  ~ The contents of this file are subject to the terms of the Common Development and
+  ~ Distribution License (the License). You may not use this file except in compliance with the
+  ~ License.
+  ~
+  ~ You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  ~ specific language governing permission and limitations under the License.
+  ~
+  ~ When distributing Covered Software, include this CDDL Header Notice in each file and include
+  ~ the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  ~ Header, with the fields enclosed by brackets [] replaced by your own identifying
+  ~ information: "Portions copyright [year] [name of copyright owner]".
+  ~
+  ~ Copyright 2015 ForgeRock AS.
+  -->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="config" defaultValue="create.soap.sts.deployment.section.config">
+        <property required="true">
+            <label name="lblRealm"
+                   defaultValue="create.soap.sts.deployment.label.realm"
+                   labelFor="tfRealm" />
+            <cc name="tfRealm" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
+            </cc>
+            <fieldhelp name="helpRealm" defaultValue="create.soap.sts.deployment.realm.help"/>
+        </property>
+        <property required="true">
+            <label name="lblOpenAMUrl" defaultValue="create.soap.sts.deployment.label.openam.url"
+                   labelFor="tfOpenAMUrl" />
+            <cc name="tfOpenAMUrl" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpOpenAMUrl" defaultValue="create.soap.sts.deployment.openam.url.help"/>
+        </property>
+        <property required="true">
+            <label name="lblSoapAgentName" defaultValue="create.soap.sts.deployment.label.soap.agent.name"
+                   labelFor="tfSoapAgentName" />
+            <cc name="tfSoapAgentName" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpSoapAgentName" defaultValue="create.soap.sts.deployment.soap.agent.name.help"/>
+        </property>
+        <property required="true">
+            <label name="lblSoapAgentPassword" defaultValue="create.soap.sts.deployment.label.soap.agent.password"
+                   labelFor="tfSoapAgentPassword" />
+            <cc name="tfSoapAgentPassword" tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
+            </cc>
+            <fieldhelp name="helpSoapAgentPassword" defaultValue="create.soap.sts.deployment.soap.agent.password.help"/>
+        </property>
+        <property required="true">
+            <label name="lblSoapAgentPasswordConfirm" defaultValue="create.soap.sts.deployment.label.soap.agent.password.confirm"
+                   labelFor="tfSoapAgentPassword_confirm" />
+            <cc name="tfSoapAgentPassword_confirm" tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
+            </cc>
+        </property>
+        <property required="false">
+            <label name="lblCustomWsdlFileNames" defaultValue="create.soap.sts.deployment.label.custom.wsdl.file.names"
+                   labelFor="elCustomWsdlFileNames" />
+            <cc name="elCustomWsdlFileNames"
+                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag">
+                <attribute name="name" value="list" />
+                <attribute name="listboxLabel" value="label.current.value" />
+                <attribute name="textboxLabel" value="label.new.value" />
+            </cc>
+            <fieldhelp name="helpCustomWsdlFileNames" defaultValue="create.soap.sts.deployment.custom.wsdl.file.names.help"/>
+        </property>
+        <property required="false">
+            <label name="lblKeystoreFileNames" defaultValue="create.soap.sts.deployment.label.keystore.file.names"
+                   labelFor="elKeystoreFileNames" />
+            <cc name="elKeystoreFileNames"
+                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag">
+                <attribute name="name" value="list" />
+                <attribute name="listboxLabel" value="label.current.value" />
+                <attribute name="textboxLabel" value="label.new.value" />
+            </cc>
+            <fieldhelp name="helpKeystoreFileNames" defaultValue="create.soap.sts.deployment.keystore.file.names.help"/>
+        </property>
+    </section>
+</propertysheet>

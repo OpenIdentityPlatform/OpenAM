@@ -16,28 +16,39 @@
 
 package org.forgerock.openam.sts.soap.bootstrap;
 
+import com.iplanet.services.util.JCEEncryption;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.shared.sts.SharedSTSConstants;
+import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.soap.config.SoapSTSModule;
+import org.forgerock.util.encode.Base64;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
 
 /**
  * @see org.forgerock.openam.sts.soap.bootstrap.SoapSTSAgentCredentialsAccess
- * TODO: note that this class is currently a placeholder, and the correct implementation will occur as part of AME-5703 -
- * the installation of the soap-sts context. Currently, the config contains the password in plain-text.
  */
 public class SoapSTSAgentCredentialsAccessImpl implements SoapSTSAgentCredentialsAccess {
     private final String agentUsername;
     private final String agentPassword;
-    private final String encryptionKey;
 
     @Inject
     SoapSTSAgentCredentialsAccessImpl(@Named(SoapSTSModule.SOAP_STS_AGENT_USERNAME_PROPERTY_KEY) String agentUsername,
-                                      @Named(SoapSTSModule.SOAP_STS_AGENT_PASSWORD_PROPERTY_KEY) String agentPassword,
-                                      @Named(SoapSTSModule.SOAP_STS_AGENT_ENCRYPTION_KEY_PROPERTY_KEY) String encryptionKey) {
+                                      @Named(SoapSTSModule.SOAP_STS_AGENT_PASSWORD_PROPERTY_KEY) String encryptedAgentPassword,
+                                      KeyStore soapSTSInternalKeystore) {
         this.agentUsername = agentUsername;
-        this.agentPassword = agentPassword;
-        this.encryptionKey = encryptionKey;
+        try {
+            this.agentPassword = decryptAgentPassword(encryptedAgentPassword, soapSTSInternalKeystore);
+        } catch (STSInitializationException e) {
+            throw new RuntimeException("Unable to decrypt the agent password based on keystore state bundled in " +
+                    "deployable soap-sts .war: " + e.getMessage(), e);
+        }
     }
 
     @Override
@@ -46,7 +57,25 @@ public class SoapSTSAgentCredentialsAccessImpl implements SoapSTSAgentCredential
     }
 
     @Override
-    public String getAgentPassword() {
+    public String getAgentPassword() throws STSInitializationException {
         return agentPassword;
+    }
+
+    private String decryptAgentPassword(String encryptedAgentPassword, KeyStore soapSTSInternalKeystore) throws STSInitializationException {
+        try {
+            KeyStore.SecretKeyEntry entry = (KeyStore.SecretKeyEntry)soapSTSInternalKeystore.getEntry(SharedSTSConstants.AM_INTERNAL_PEK_ALIAS,
+                    new KeyStore.PasswordProtection(SharedSTSConstants.AM_INTERNAL_SOAP_STS_KEYSTORE_PW.toCharArray()));
+            JCEEncryption jceEncryption = new JCEEncryption();
+            final byte[] decodedPassword = Base64.decode(encryptedAgentPassword);
+            try {
+                jceEncryption.setPassword(new String(entry.getSecretKey().getEncoded(), StandardCharsets.UTF_8));
+                final byte[] decryptedPassword = jceEncryption.decrypt(decodedPassword);
+                return new String(decryptedPassword, StandardCharsets.UTF_8);
+            } catch (Exception e) {
+                throw new STSInitializationException(ResourceException.INTERNAL_ERROR, e.getMessage(), e);
+            }
+        } catch (NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException e) {
+            throw new STSInitializationException(ResourceException.INTERNAL_ERROR, e.getMessage(), e);
+        }
     }
 }

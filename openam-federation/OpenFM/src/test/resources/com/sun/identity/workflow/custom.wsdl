@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions Copyrighted [year] [name of copyright owner]".
+ *
+ * Copyright 2015 ForgeRock AS.
+-->
+<wsdl:definitions
+        targetNamespace="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
+        xmlns:tns="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
+        xmlns:wstrust="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
+        xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+        xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+        xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+        xmlns:wsp="http://www.w3.org/ns/ws-policy"
+        xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+
+    <wsdl:import location="ws-trust-1.4-service.wsdl"	namespace="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"/>
+
+    <wsdl:binding name="am_token_bare_binding" type="wstrust:STS">
+        <wsp:PolicyReference URI="#am_token_bare_policy" />
+        <soap:binding style="document"
+                      transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="Issue">
+            <soap:operation
+                    soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Issue" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Validate">
+            <soap:operation
+                    soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Validate" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Cancel">
+            <soap:operation
+                    soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Cancel" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="Renew">
+            <soap:operation
+                    soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Renew" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="KeyExchangeToken">
+            <soap:operation
+                    soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/KeyExchangeToken" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="RequestCollection">
+            <soap:operation
+                    soapAction="http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/RequestCollection" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+
+
+    <wsp:Policy wsu:Id="am_token_bare_policy">
+        <sp:SupportingTokens>
+            <wsp:Policy>
+                <ForgeRock:OpenAMSessionToken
+                        sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient"
+                        xmlns:ForgeRock="http://schemas.forgerock.org/ws/securitypolicy">
+                    <wsp:Policy/>
+                </ForgeRock:OpenAMSessionToken>
+            </wsp:Policy>
+        </sp:SupportingTokens>
+    </wsp:Policy>
+
+    <wsdl:service name="sts_service">
+        <wsdl:port name="sts_service_port" binding="tns:am_token_bare_binding">
+            <soap:address location=""/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
+
