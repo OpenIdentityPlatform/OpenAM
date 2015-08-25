@@ -21,6 +21,7 @@ import static org.mockito.Mockito.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.utils.OpenAMSettings;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -53,6 +54,11 @@ public class ExtensionBaseURLProviderTest {
 
         @Override
         protected String getBaseURL(HttpServletRequest request) {
+            return "fred";
+        }
+
+        @Override
+        protected String getBaseURL(HttpContext context)  {
             return "fred";
         }
 

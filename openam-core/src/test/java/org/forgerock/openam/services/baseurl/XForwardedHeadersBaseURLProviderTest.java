@@ -17,12 +17,22 @@
 package org.forgerock.openam.services.baseurl;
 
 import static org.fest.assertions.Assertions.*;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.json;
+import static org.forgerock.json.JsonValue.object;
 import static org.mockito.Mockito.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.forgerock.json.resource.http.HttpContext;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class XForwardedHeadersBaseURLProviderTest {
 
@@ -34,7 +44,7 @@ public class XForwardedHeadersBaseURLProviderTest {
     }
 
     @Test
-    public void testGetBaseURL() throws Exception {
+    public void testGetBaseURLFromRequest() throws Exception {
         // Given
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getHeader("X-Forwarded-Proto")).thenReturn("http");
@@ -50,7 +60,7 @@ public class XForwardedHeadersBaseURLProviderTest {
     }
 
     @Test
-    public void testGetBaseURLWithContext() throws Exception {
+    public void testGetBaseURLFromRequestWithContext() throws Exception {
         // Given
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getContextPath()).thenReturn("/fred");
@@ -61,6 +71,44 @@ public class XForwardedHeadersBaseURLProviderTest {
 
         // When
         String url = provider.getURL(request);
+
+        // Then
+        assertThat(url).isEqualTo("http://fred:8080/openam");
+    }
+
+    @Test
+    public void testGetBaseURLFromHTTPContext() throws Exception {
+        // Given
+        Map<String, List<String>> headers = new HashMap<>();
+        headers.put("X-Forwarded-Proto", Arrays.asList("http"));
+        headers.put("X-Forwarded-Host", Arrays.asList("fred"));
+        HttpContext httpContext = new HttpContext(json(object(
+                field(BaseURLConstants.ATTR_HEADERS, headers),
+                field(BaseURLConstants.ATTR_PARAMETERS, Collections.emptyMap()))), null);
+
+        provider.setContextPath("");
+
+        // When
+        String url = provider.getURL(httpContext);
+
+        // Then
+        assertThat(url).isEqualTo("http://fred");
+    }
+
+    @Test
+    public void testGetBaseURLFromHTTPContextWithContextPath() throws Exception {
+        // Given
+        Map<String, List<String>> headers = new HashMap<>();
+        headers.put("X-Forwarded-Proto", Arrays.asList("http"));
+        headers.put("X-Forwarded-Host", Arrays.asList("fred:8080"));
+        HttpContext httpContext = new HttpContext(json(object(
+                field(BaseURLConstants.ATTR_HEADERS, headers),
+                field(BaseURLConstants.ATTR_PARAMETERS, Collections.emptyMap()))), null);
+
+        provider.setContextPath("/openam");
+
+        // When
+        String url = provider.getURL(httpContext);
 
         // Then
         assertThat(url).isEqualTo("http://fred:8080/openam");

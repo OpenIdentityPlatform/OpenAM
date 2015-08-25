@@ -19,6 +19,7 @@ package org.forgerock.openam.services.baseurl;
 import javax.servlet.http.HttpServletRequest;
 
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.utils.OpenAMSettings;
 
 /**
@@ -34,8 +35,18 @@ public class ExtensionBaseURLProvider extends BaseURLProvider {
     }
 
     @Override
+    protected String getBaseURL(HttpContext context) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public String getURL(HttpServletRequest request) {
         return delegate.getURL(request);
+    }
+
+    @Override
+    public String getURL(HttpContext context) {
+        return delegate.getURL(context);
     }
 
     @Override

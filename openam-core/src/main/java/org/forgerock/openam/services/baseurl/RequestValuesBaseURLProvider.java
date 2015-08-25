@@ -18,16 +18,41 @@ package org.forgerock.openam.services.baseurl;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.sun.identity.shared.debug.Debug;
+import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.utils.OpenAMSettings;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * A {@link BaseURLProvider} implementation that uses the scheme, serverName and serverPort properties of
  * the {@link javax.servlet.http.HttpServletRequest}.
  */
 public class RequestValuesBaseURLProvider extends BaseURLProvider {
+
+    private Debug debug = Debug.getInstance("amBaseURL");
+
     @Override
     protected String getBaseURL(HttpServletRequest request) {
-        return request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+        return getBaseUrl(request.getScheme(), request.getServerName(), request.getServerPort());
+    }
+
+    @Override
+    protected String getBaseURL(HttpContext context) {
+        // get URI
+        String path = context.getPath();
+        try {
+            URI uri = new URI(path);
+            return getBaseUrl(uri.getScheme(), uri.getHost(), uri.getPort());
+        } catch (URISyntaxException e) {
+            debug.error("URL '" + path + "' can't be parsed", e);
+            throw new IllegalArgumentException("URL '" + path + "' can't be parsed", e);
+        }
+    }
+
+    private String getBaseUrl(String scheme, String host, int port) {
+        return scheme + "://" + host + ":" + port;
     }
 
     @Override

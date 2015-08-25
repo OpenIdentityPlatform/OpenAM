@@ -103,6 +103,7 @@ import org.forgerock.openam.rest.uma.UmaPolicyServiceImpl;
 import org.forgerock.openam.rest.uma.UmaResourceSetRegistrationListener;
 import org.forgerock.openam.scripting.ScriptException;
 import org.forgerock.openam.services.RestSecurityProvider;
+import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.uma.UmaPolicyService;
 import org.forgerock.openam.utils.AMKeyProvider;
 import org.forgerock.openam.utils.Config;
@@ -271,9 +272,10 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV2 getUsersResource(MailServerLoader mailServerLoader,
-            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider) {
+            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider
+            restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
         return new IdentityResourceV2(IdentityResourceV2.USER_TYPE, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider);
+                restSecurityProvider, baseURLProviderFactory);
     }
 
     @Provides
@@ -281,9 +283,10 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV2 getGroupsResource(MailServerLoader mailServerLoader,
-            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider) {
+            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider
+            restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
         return new IdentityResourceV2(IdentityResourceV2.GROUP_TYPE, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider);
+                restSecurityProvider, baseURLProviderFactory);
     }
 
     @Provides
@@ -291,9 +294,10 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV2 getAgentsResource(MailServerLoader mailServerLoader,
-            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider) {
+            IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider
+            restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
         return new IdentityResourceV2(IdentityResourceV2.AGENT_TYPE, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider);
+                restSecurityProvider, baseURLProviderFactory);
     }
 
     @Provides

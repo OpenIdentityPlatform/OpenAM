@@ -16,15 +16,13 @@
 
 package org.forgerock.openam.services.baseurl;
 
-import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.utils.ForwardedHeader;
 import org.forgerock.openam.utils.OpenAMSettings;
-import org.forgerock.util.Pair;
 
 /**
  * A {@link BaseURLProvider} that uses the Forwarded headers to deduce the base URL.
@@ -34,8 +32,20 @@ public class ForwardedHeaderBaseURLProvider extends BaseURLProvider {
 
     @Override
     protected String getBaseURL(HttpServletRequest request) {
-        ForwardedHeader header = ForwardedHeader.parse(request);
+        return getBaseURL(ForwardedHeader.parse(request));
+    }
 
+    @Override
+    protected String getBaseURL(HttpContext context) {
+        return getBaseURL(ForwardedHeader.parse(context));
+    }
+
+    /**
+     * Get Base URL from headers
+     * @param header
+     * @return base URL
+     */
+    private String getBaseURL(ForwardedHeader header) {
         List<String> host = header.getHostValues();
         if (host.size() != 1) {
             throw new IllegalArgumentException("Cannot deduce host value from headers: " + host);

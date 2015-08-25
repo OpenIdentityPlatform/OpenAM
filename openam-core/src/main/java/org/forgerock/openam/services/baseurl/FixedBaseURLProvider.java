@@ -18,6 +18,7 @@ package org.forgerock.openam.services.baseurl;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.openam.utils.OpenAMSettings;
 
 /**
@@ -29,6 +30,11 @@ public class FixedBaseURLProvider extends BaseURLProvider {
 
     @Override
     protected String getBaseURL(HttpServletRequest request) {
+        return baseUrl;
+    }
+
+    @Override
+    protected String getBaseURL(HttpContext context) {
         return baseUrl;
     }
 
