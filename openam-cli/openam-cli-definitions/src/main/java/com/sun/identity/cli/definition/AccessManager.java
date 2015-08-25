@@ -3011,43 +3011,42 @@ public class AccessManager {
     private String delete_xacml;
 
     @SubCommandInfo(
-            implClassName="com.sun.identity.cli.record.StartRecord",
-            description="Start recording logs. It will generate a record bundle that contains logs, environment " +
-                    "information, thread dump.",
-            webSupport="true",
-            mandatoryOptions={
-                    "servername|s|s|Server name, e.g. http://openam.example.com:8080/openam",
-                    "jsonfile|J|s|Record json."},
-            optionAliases={},
-            macro="authentication",
-            optionalOptions={},
-            resourceStrings={})
-    private String recording_start;
+        implClassName="com.sun.identity.cli.record.StartRecord",
+        description="Start recording a bundle that contains troubleshooting information, including " +
+                "debug logs, thread dumps, and environment information.",
+        webSupport="true",
+        mandatoryOptions={
+                "servername|s|s|Server name, e.g. http://openam.example.com:8080/openam",
+                "jsonfile|J|s|JSON control file for a recording operation."},
+        optionAliases={},
+        macro="authentication",
+        optionalOptions={},
+        resourceStrings={})
+    private String start_recording;
 
     @SubCommandInfo(
-            implClassName="com.sun.identity.cli.record.StatusRecord",
-            description="Get the current recording status if any.",
-            webSupport="true",
-            mandatoryOptions={
-                    "servername|s|s|Server name, e.g. http://openam.example.com:8080/openam"
-            },
-            optionAliases={},
-            macro="authentication",
-            optionalOptions={},
-            resourceStrings={})
-    private String recording_status;
+        implClassName="com.sun.identity.cli.record.StatusRecord",
+        description="Get the status of recording operations.",
+        webSupport="true",
+        mandatoryOptions={
+                "servername|s|s|Server name, e.g. http://openam.example.com:8080/openam"
+        },
+        optionAliases={},
+        macro="authentication",
+        optionalOptions={},
+        resourceStrings={})
+    private String get_recording_status;
 
     @SubCommandInfo(
-            implClassName="com.sun.identity.cli.record.StopRecord",
-            description="Stop recording.",
-            webSupport="true",
-            mandatoryOptions={
-                    "servername|s|s|Server name, e.g. http://openam.example.com:8080/openam"
-            },
-            optionAliases={},
-            macro="authentication",
-            optionalOptions={},
-            resourceStrings={})
-    private String recording_stop;
-
+        implClassName="com.sun.identity.cli.record.StopRecord",
+        description="Stop an active recording operation.",
+        webSupport="true",
+        mandatoryOptions={
+                "servername|s|s|Server name, e.g. http://openam.example.com:8080/openam"
+        },
+        optionAliases={},
+        macro="authentication",
+        optionalOptions={},
+        resourceStrings={})
+    private String stop_recording;
 }
