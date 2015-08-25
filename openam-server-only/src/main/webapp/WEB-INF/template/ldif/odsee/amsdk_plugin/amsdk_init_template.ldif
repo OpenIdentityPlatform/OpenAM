@@ -209,7 +209,7 @@ aci: (targetattr != "aci || nsLookThroughLimit || nsSizeLimit || nsTimeLimit || 
 dn:@NORMALIZED_RS@
 changetype:modify
 add:aci
-aci: (target="ldap:///ou=services,@NORMALIZED_RS@")(targetfilter=(!(objectclass=sunServiceComponent)))(targetattr = "*")(version 3.0; acl "S1IS Services anonymous access"; allow (read, search, compare) userdn = "ldap:///anyone";)
+aci: (target="ldap:///ou=services,@NORMALIZED_RS@")(targetfilter=(!(objectclass=sunServiceComponent)))(targetattr != "userPassword")(version 3.0; acl "S1IS Services anonymous access"; allow (read, search, compare) userdn = "ldap:///anyone";)
 
 dn:@NORMALIZED_RS@
 changetype:modify
