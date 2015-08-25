@@ -172,23 +172,7 @@
     </filter-mapping>
     <filter-mapping>
         <filter-name>CacheForFiveMinutes</filter-name>
-        <url-pattern>/policyEditor/index.html</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>CacheForFiveMinutes</filter-name>
-        <url-pattern>/scripts/index.html</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>CacheForFiveMinutes</filter-name>
         <url-pattern>/XUI/index.html</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>CacheForAMonth</filter-name>
-        <url-pattern>/policyEditor/*</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>CacheForAMonth</filter-name>
-        <url-pattern>/scripts/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
         <filter-name>CacheForAMonth</filter-name>
