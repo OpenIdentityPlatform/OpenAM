@@ -18,7 +18,6 @@ package org.forgerock.openam.services.baseurl;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.common.RequestUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
@@ -48,7 +47,7 @@ public class BaseURLProviderFactory {
 
     private final ServletContext servletContext;
 
-    private final Debug debug = Debug.getInstance(RequestUtils.debugName);
+    private final Debug debug = Debug.getInstance("amBaseURL");
     private final Map<String, BaseURLProvider> providers = new ConcurrentHashMap<String, BaseURLProvider>();
 
     @Inject

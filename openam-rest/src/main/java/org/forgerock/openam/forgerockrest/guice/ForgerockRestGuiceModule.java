@@ -69,6 +69,7 @@ import org.forgerock.openam.rest.router.CTSPersistentStoreProxy;
 import org.forgerock.openam.rest.router.RestEndpointManager;
 import org.forgerock.openam.rest.router.RestEndpointManagerProxy;
 import org.forgerock.openam.services.RestSecurityProvider;
+import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.utils.AMKeyProvider;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.SignatureUtil;
@@ -217,8 +218,9 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV2 getUsersResource(MailServerLoader mailServerLoader,
-            RestSecurityProvider restSecurityProvider) {
-        return new IdentityResourceV2(IdentityResourceV2.USER_TYPE, mailServerLoader, restSecurityProvider);
+            RestSecurityProvider restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
+        return new IdentityResourceV2(IdentityResourceV2.USER_TYPE, mailServerLoader, restSecurityProvider, 
+        baseURLProviderFactory);
     }
 
     @Provides
@@ -226,8 +228,9 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV2 getGroupsResource(MailServerLoader mailServerLoader,
-            RestSecurityProvider restSecurityProvider) {
-        return new IdentityResourceV2(IdentityResourceV2.GROUP_TYPE, mailServerLoader, restSecurityProvider);
+            RestSecurityProvider restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
+        return new IdentityResourceV2(IdentityResourceV2.GROUP_TYPE, mailServerLoader, restSecurityProvider, 
+        baseURLProviderFactory);
     }
 
     @Provides
@@ -235,8 +238,9 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public IdentityResourceV2 getAgentsResource(MailServerLoader mailServerLoader,
-            RestSecurityProvider restSecurityProvider) {
-        return new IdentityResourceV2(IdentityResourceV2.AGENT_TYPE, mailServerLoader, restSecurityProvider);
+            RestSecurityProvider restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
+        return new IdentityResourceV2(IdentityResourceV2.AGENT_TYPE, mailServerLoader, restSecurityProvider, 
+        baseURLProviderFactory);
     }
 
     @Provides

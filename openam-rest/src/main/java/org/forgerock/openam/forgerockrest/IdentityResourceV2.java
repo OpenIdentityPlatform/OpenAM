@@ -81,6 +81,7 @@ import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
 import org.forgerock.openam.services.RestSecurity;
 import org.forgerock.openam.services.RestSecurityProvider;
+import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.services.email.MailServer;
 import org.forgerock.openam.services.email.MailServerImpl;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
@@ -147,13 +148,14 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
     private final MailServerLoader mailServerLoader;
     private final RestSecurityProvider restSecurityProvider;
 
+    private final BaseURLProviderFactory baseURLProviderFactory;
     private final IdentityResourceV1 identityResourceV1;
     /**
      * Creates a backend
      */
     public IdentityResourceV2(String userType, MailServerLoader mailServerLoader,
-            RestSecurityProvider restSecurityProvider) {
-        this(userType, null, null, mailServerLoader, restSecurityProvider);
+            RestSecurityProvider restSecurityProvider, BaseURLProviderFactory baseURLProviderFactory) {
+        this(userType, null, null, mailServerLoader, restSecurityProvider, baseURLProviderFactory);
     }
 
     /**
@@ -175,13 +177,15 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
 
     // Constructor used for testing...
     IdentityResourceV2(String userType, ServiceConfigManager mailmgr, ServiceConfig mailscm,
-            MailServerLoader mailServerLoader, RestSecurityProvider restSecurityProvider) {
+            MailServerLoader mailServerLoader, RestSecurityProvider restSecurityProvider, 
+            BaseURLProviderFactory baseURLProviderFactory) {
         this.userType = userType;
         this.mailmgr = mailmgr;
         this.mailscm = mailscm;
         this.mailServerLoader = mailServerLoader;
         this.restSecurityProvider = restSecurityProvider;
         this.identityResourceV1 = new IdentityResourceV1(userType, mailServerLoader, restSecurityProvider);
+        this.baseURLProviderFactory = baseURLProviderFactory;
     }
 
     /**
@@ -770,7 +774,8 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
 
                 // Get full deployment URL
                 HttpContext header = context.asContext(HttpContext.class);
-                StringBuilder deploymentURL = RestUtils.getFullDeploymentURI(header.getPath());
+
+                String baseURL = baseURLProviderFactory.get(realm).getURL(header);
 
                 String subject = jsonBody.get("subject").asString();
                 String message = jsonBody.get("message").asString();
@@ -799,8 +804,10 @@ public final class IdentityResourceV2 implements CollectionResourceProvider {
                 String confURL = restSecurity.getForgotPasswordConfirmationUrl();
                 StringBuilder confURLBuilder = new StringBuilder(100);
                 if (confURL == null || confURL.isEmpty()) {
-                    confURLBuilder.append(deploymentURL.append("/json/confirmation/forgotPassword").toString());
-                } else {
+                    confURLBuilder.append(baseURL).append("/json/confirmation/forgotPassword");
+                } else if(confURL.startsWith("/")) {
+                    confURLBuilder.append(baseURL).append(confURL);
+                }  else {
                     confURLBuilder.append(confURL);
                 }
                 String confirmationLink = confURLBuilder.append("?confirmationId=").append(requestParamEncode(confirmationId))

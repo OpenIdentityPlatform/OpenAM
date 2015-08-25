@@ -17,12 +17,17 @@
 package org.forgerock.openam.services.baseurl;
 
 import static org.fest.assertions.Assertions.*;
+import static org.forgerock.json.fluent.JsonValue.*;
+
 import static org.mockito.Mockito.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.forgerock.json.resource.servlet.HttpContext;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.util.Collections;
 
 public class RequestValuesBaseURLProviderTest {
 
@@ -34,7 +39,7 @@ public class RequestValuesBaseURLProviderTest {
     }
 
     @Test
-    public void testGetBaseURL() throws Exception {
+    public void testGetBaseURLFromRequest() throws Exception {
         // Given
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getScheme()).thenReturn("http");
@@ -51,7 +56,7 @@ public class RequestValuesBaseURLProviderTest {
     }
 
     @Test
-    public void testGetBaseURLWithContext() throws Exception {
+    public void testGetBaseURLFromRequestWithContext() throws Exception {
         // Given
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getContextPath()).thenReturn("/fred");
@@ -63,6 +68,42 @@ public class RequestValuesBaseURLProviderTest {
 
         // When
         String url = provider.getURL(request);
+
+        // Then
+        assertThat(url).isEqualTo("http://fred:8080/openam");
+    }
+
+    @Test
+    public void testGetBaseURLFromHTTPContext() throws Exception {
+        // Given
+        HttpContext httpContext = new HttpContext(json(object(
+                field(BaseURLConstants.ATTR_HEADERS, Collections.emptyMap()),
+                field(BaseURLConstants.ATTR_PARAMETERS, Collections.emptyMap()),
+                field("path", "http://fred:8080/toto"))
+
+        ), null);
+
+        // When
+        String url = provider.getURL(httpContext);
+
+        // Then
+        assertThat(url).isEqualTo("http://fred:8080");
+    }
+
+    @Test
+    public void testGetBaseURLFromHTTPContextWithContextPath() throws Exception {
+        // Given
+        HttpContext httpContext = new HttpContext(json(object(
+                        field(BaseURLConstants.ATTR_HEADERS, Collections.emptyMap()),
+                        field(BaseURLConstants.ATTR_PARAMETERS, Collections.emptyMap()),
+                        field("path", "http://fred:8080/toto"))
+
+        ), null);
+
+        provider.setContextPath("/openam");
+
+        // When
+        String url = provider.getURL(httpContext);
 
         // Then
         assertThat(url).isEqualTo("http://fred:8080/openam");

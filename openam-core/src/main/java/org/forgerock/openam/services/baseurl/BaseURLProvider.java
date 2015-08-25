@@ -18,6 +18,7 @@ package org.forgerock.openam.services.baseurl;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.utils.OpenAMSettings;
 import org.forgerock.openam.utils.StringUtils;
 
@@ -41,6 +42,13 @@ public abstract class BaseURLProvider {
     protected abstract String getBaseURL(HttpServletRequest request);
 
     /**
+     * The implementation of getting the base URL without the context path, which will be added if configured.
+     * @param context The http context.
+     * @return The base URL.
+     */
+    protected abstract String getBaseURL(HttpContext context);
+
+    /**
      * Initialise the provider from the settings.
      * @param settings The settings access object.
      * @param realm The realm that is being configured.
@@ -53,7 +61,25 @@ public abstract class BaseURLProvider {
      * @return The base URL. This will never end in a / character.
      */
     public String getURL(HttpServletRequest request) {
-        String baseUrl = getBaseURL(request);
+        return formatURL(getBaseURL(request));
+
+    }
+
+    /**
+     * Gets the base URL to use in the http context.
+     * @param context The current http context.
+     * @return The base URL. This will never end in a / character.
+     */
+    public String getURL(HttpContext context) {
+        return formatURL(getBaseURL(context));
+    }
+
+    /**
+     * Format the URL
+     * @param baseUrl base url to reformat
+     * @return the reformat base URL
+     */
+    private String formatURL(String baseUrl) {
         if (StringUtils.isNotBlank(contextPath)) {
             baseUrl += contextPath;
         }

@@ -18,12 +18,12 @@ package org.forgerock.openam.utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.util.Pair;
 
 /**
@@ -62,26 +62,36 @@ public class ForwardedHeader {
     }
 
     public static ForwardedHeader parse(HttpServletRequest request) {
-        final Enumeration<String> headers = request.getHeaders(HEADER_NAME);
-        ForwardedHeader header = new ForwardedHeader();
+        if (request.getHeaders(HEADER_NAME) == null) {
+            return new ForwardedHeader();
+        }
+        return parse(Collections.list(request.getHeaders(HEADER_NAME)));
+    }
+
+    public static ForwardedHeader parse(HttpContext context) {
+        return parse(context.getHeaders().get("Forwarded"));
+    }
+
+    private static ForwardedHeader parse(List<String> headers) {
+        ForwardedHeader forwardedHeader = new ForwardedHeader();
         if (headers != null) {
-            while (headers.hasMoreElements()) {
-                for (Pair<String, String> attribute : new HeaderAttributeIterable(headers.nextElement().toCharArray())) {
+            for(String header: headers) {
+                for (Pair<String, String> attribute : new HeaderAttributeIterable(header.toCharArray())) {
                     if (attribute.getFirst().equalsIgnoreCase(FOR_FIELD)) {
-                        header.forValues.add(attribute.getSecond());
+                        forwardedHeader.forValues.add(attribute.getSecond());
                     } else if (attribute.getFirst().equalsIgnoreCase(BY_FIELD)) {
-                        header.byValues.add(attribute.getSecond());
+                        forwardedHeader.byValues.add(attribute.getSecond());
                     } else if (attribute.getFirst().equalsIgnoreCase(HOST_FIELD)) {
-                        header.hostValues.add(attribute.getSecond());
+                        forwardedHeader.hostValues.add(attribute.getSecond());
                     } else if (attribute.getFirst().equalsIgnoreCase(PROTO_FIELD)) {
-                        header.protoValues.add(attribute.getSecond());
+                        forwardedHeader.protoValues.add(attribute.getSecond());
                     } else {
                         throw new IllegalArgumentException("Unknown Forwarded header attribute: " + attribute.getFirst());
                     }
                 }
             }
         }
-        return header;
+        return forwardedHeader;
     }
 
     static class HeaderAttributeIterable implements Iterable<Pair<String, String>> {
