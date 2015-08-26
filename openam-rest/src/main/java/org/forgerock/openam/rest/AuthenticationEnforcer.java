@@ -197,6 +197,6 @@ public class AuthenticationEnforcer implements Filter {
     }
 
     private <T extends Response> Promise<T, ResourceException> unauthorizedResponse() {
-        return newExceptionPromise(ResourceException.getException(Status.UNAUTHORIZED.getCode()));
+        return newExceptionPromise(ResourceException.getException(Status.UNAUTHORIZED.getCode(), "Access Denied"));
     }
 }
