@@ -103,7 +103,7 @@ public class ServerContextUtils {
 
     /**
      * Returns the UriRouterContext's matchedUri, and appends its id, if there is one.
-     * Id is retrieved via {@link ServerContextUtils#getId(org.forgerock.http.context.Context)}.
+     * Id is retrieved via {@link ServerContextUtils#getId(Context)}.
      *
      * @param context from which to gather the matched Uri and id information
      * @return a String in the form <code>matchedUri | id</code>, omitting either if they are null.
@@ -126,7 +126,8 @@ public class ServerContextUtils {
 
     /**
      * Returns the name of the resource requested, and appends its id, if there is one.
-     * Id is retrieved via {@link ServerContextUtils#getId(org.forgerock.http.context.Context)}.
+     * Id is retrieved via {@link ServerContextUtils#getId(Context)}. If the resource path can not be found on the
+     * request, the Matched Uri on the context will be queried via {@link ServerContextUtils#getMatchedUri(Context)}.
      *
      * @param request the request for a resource
      * @param context the context of the request, including its UriRouterContext
@@ -134,6 +135,10 @@ public class ServerContextUtils {
      */
     public static String getResourceId(Request request, Context context) {
         String resource = request.getResourcePath();
+        if (StringUtils.isEmpty(resource)) {
+            return getMatchedUri(context);
+        }
+
         String id = getId(context);
 
         if (id != null) {
