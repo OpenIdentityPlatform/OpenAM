@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.cts.utils;
 
+import com.google.inject.AbstractModule;
 import com.iplanet.dpro.session.DNOrIPAddressListTokenRestriction;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.TokenRestriction;
@@ -22,6 +23,8 @@ import com.iplanet.dpro.session.service.InternalSession;
 import org.forgerock.guice.core.GuiceModules;
 import org.forgerock.guice.core.GuiceTestCase;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.audit.configuration.AMAuditServiceConfiguration;
+import org.forgerock.openam.audit.configuration.AuditServiceConfigurator;
 import org.forgerock.openam.core.guice.CoreGuiceModule;
 import org.forgerock.openam.core.guice.DataLayerGuiceModule;
 import org.forgerock.openam.cts.TokenTestUtils;
@@ -43,7 +46,7 @@ import static org.fest.assertions.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 
-@GuiceModules({CoreGuiceModule.class, SharedGuiceModule.class, DataLayerGuiceModule.class})
+@GuiceModules({CoreGuiceModule.class, SharedGuiceModule.class, DataLayerGuiceModule.class, JSONSerialisationTest.DummyAuditConfigModule.class})
 public class JSONSerialisationTest extends GuiceTestCase {
 
     private JSONSerialisation serialization;
@@ -173,4 +176,25 @@ public class JSONSerialisationTest extends GuiceTestCase {
         Object obj = field.get(is);
         assertThat(obj).isInstanceOf(ConcurrentHashMap.class);
     }
+
+    public static class DummyAuditConfigModule extends AbstractModule {
+        @Override
+        protected void configure() {
+            bind(AuditServiceConfigurator.class).to(DummyAuditServiceConfigurator.class);
+        }
+    }
+
+    public static final class DummyAuditServiceConfigurator implements AuditServiceConfigurator {
+
+        @Override
+        public void configureAuditService() {
+
+        }
+
+        @Override
+        public AMAuditServiceConfiguration getAuditServiceConfiguration() {
+            return new AMAuditServiceConfiguration();
+        }
+    }
+
 }

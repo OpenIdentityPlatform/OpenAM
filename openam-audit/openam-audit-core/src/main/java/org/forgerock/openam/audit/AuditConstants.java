@@ -31,7 +31,21 @@ public final class AuditConstants {
         /** Access attempt audit event name. */
         AM_ACCESS_ATTEMPT("AM-ACCESS-ATTEMPT"),
         /** Access outcome audit event name. */
-        AM_ACCESS_OUTCOME("AM-ACCESS-OUTCOME");
+        AM_ACCESS_OUTCOME("AM-ACCESS-OUTCOME"),
+        /** Session created audit event name. */
+        AM_SESSION_CREATED("AM-SESSION-CREATED"),
+        /** Session idle timed out audit event name. */
+        AM_SESSION_IDLE_TIMED_OUT("AM-SESSION-IDLE_TIMED_OUT"),
+        /** Session max timed out audit event name. */
+        AM_SESSION_MAX_TIMED_OUT("AM-SESSION-MAX_TIMED_OUT"),
+        /** Session logged out audit event name. */
+        AM_SESSION_LOGGED_OUT("AM-SESSION-LOGGED_OUT"),
+        /** Session reactivated audit event name. */
+        AM_SESSION_REACTIVATED("AM-SESSION-REACTIVATED"),
+        /** Session destroyed audit event name. */
+        AM_SESSION_DESTROYED("AM-SESSION-DESTROYED"),
+        /** Session property changed audit event name. */
+        AM_SESSION_PROPERTY_CHANGED("AM-SESSION-PROPERTY_CHANGED");
 
         private final String name;
 
@@ -112,6 +126,11 @@ public final class AuditConstants {
      * The topic to which events built using {@link AMAccessAuditEventBuilder} should be routed.
      */
     public static final String ACCESS_TOPIC = "access";
+
+    /**
+     * The topic to which events built using {@link AMActivityAuditEventBuilder} should be routed.
+     */
+    public static final String ACTIVITY_TOPIC = "activity";
 
     /**
      * SMS service name for the audit service.

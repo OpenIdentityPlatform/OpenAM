@@ -54,4 +54,13 @@ public class AuditEventFactory {
         }
     }
 
+    /**
+     * Creates a new AMActivityAuditEventBuilder.
+     *
+     * @return AMActivityAuditEventBuilder
+     */
+    public AMActivityAuditEventBuilder activityEvent() {
+        return new AMActivityAuditEventBuilder();
+    }
+
 }

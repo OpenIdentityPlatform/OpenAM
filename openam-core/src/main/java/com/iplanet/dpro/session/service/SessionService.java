@@ -65,6 +65,7 @@ import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.stats.Stats;
 import org.apache.commons.collections.Predicate;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.adapters.SessionAdapter;
 import org.forgerock.openam.cts.api.tokens.Token;
@@ -109,6 +110,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_DESTROYED;
+import static org.forgerock.openam.audit.AuditConstants.EventName.AM_SESSION_LOGGED_OUT;
 import static org.forgerock.openam.session.SessionConstants.*;
 
 /**
@@ -137,6 +140,7 @@ public class SessionService {
     private final DsameAdminTokenProvider dsameAdminTokenProvider;
     private final MonitoringOperations monitoringOperations;
     private final SessionLogging sessionLogging;
+    private final SessionAuditor sessionAuditor;
     private final InternalSessionFactory internalSessionFactory;
     private final HttpConnectionFactory httpConnectionFactory;
     private final SessionNotificationSender sessionNotificationSender;
@@ -181,6 +185,7 @@ public class SessionService {
             final SessionAdapter tokenAdapter,
             final SessionInfoFactory sessionInfoFactory,
             final SessionLogging sessionLogging,
+            final SessionAuditor sessionAuditor,
             final HttpConnectionFactory httpConnectionFactory,
             final InternalSessionCache internalSessionCache,
             final InternalSessionFactory internalSessionFactory,
@@ -202,6 +207,7 @@ public class SessionService {
         this.tokenAdapter = tokenAdapter;
         this.sessionInfoFactory = sessionInfoFactory;
         this.sessionLogging = sessionLogging;
+        this.sessionAuditor = sessionAuditor;
         this.httpConnectionFactory = httpConnectionFactory;
         this.cache = internalSessionCache;
         this.internalSessionFactory = internalSessionFactory;
@@ -700,6 +706,7 @@ public class SessionService {
         }
         if (sess != null && sess.getState() != INVALID) {
             signalRemove(sess, SessionEvent.DESTROY);
+            sessionAuditor.auditActivity(sess, AM_SESSION_DESTROYED);
         }
         sessionCache.removeSID(sid);
     }
@@ -716,6 +723,7 @@ public class SessionService {
         }
         if (sess != null && sess.getState() != INVALID) {
             signalRemove(sess, SessionEvent.LOGOUT);
+            sessionAuditor.auditActivity(sess, AM_SESSION_LOGGED_OUT);
         }
     }
 
@@ -1445,7 +1453,8 @@ public class SessionService {
                  * maintains the session expiry function.
                  */
                 sess = tokenAdapter.fromToken(token);
-                sess.setSessionServiceDependencies(this, serviceConfig, sessionLogging, sessionCookies, sessionDebug);
+                sess.setSessionServiceDependencies(
+                        this, serviceConfig, sessionLogging, sessionAuditor, sessionCookies, sessionDebug);
                 sess.scheduleExpiry();
                 updateSessionMaps(sess);
 

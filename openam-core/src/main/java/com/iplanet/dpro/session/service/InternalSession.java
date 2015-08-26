@@ -49,6 +49,7 @@ import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.audit.AuditConstants;
 import org.forgerock.openam.session.SessionCookies;
 
 import javax.servlet.http.HttpServletResponse;
@@ -72,6 +73,7 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import static org.forgerock.openam.audit.AuditConstants.EventName.*;
 import static org.forgerock.openam.session.SessionConstants.*;
 
 /**
@@ -98,6 +100,7 @@ public class InternalSession implements TaskRunnable, Serializable {
     private transient SessionService sessionService;
     private transient SessionServiceConfig serviceConfig;
     private transient SessionLogging sessionLogging;
+    private transient SessionAuditor sessionAuditor;
 
     /* Session Id (sid) */
     private SessionID sessionID;
@@ -363,10 +366,11 @@ public class InternalSession implements TaskRunnable, Serializable {
                            SessionService service,
                            SessionServiceConfig serviceConfig,
                            SessionLogging sessionLogging,
+                           SessionAuditor sessionAuditor,
                            SessionCookies sessionCookies,
                            Debug debug) {
         sessionID = sid;
-        setSessionServiceDependencies(service, serviceConfig, sessionLogging, sessionCookies, debug);
+        setSessionServiceDependencies(service, serviceConfig, sessionLogging, sessionAuditor, sessionCookies, debug);
 
         maxIdleTime = maxDefaultIdleTime;
         maxSessionTime = maxDefaultIdleTime;
@@ -389,6 +393,7 @@ public class InternalSession implements TaskRunnable, Serializable {
                 InjectorHolder.getInstance(SessionService.class),
                 InjectorHolder.getInstance(SessionServiceConfig.class),
                 InjectorHolder.getInstance(SessionLogging.class),
+                InjectorHolder.getInstance(SessionAuditor.class),
                 InjectorHolder.getInstance(SessionCookies.class),
                 InjectorHolder.getInstance(Key.get(Debug.class, Names.named(SESSION_DEBUG))));
     }
@@ -401,7 +406,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      *
      * Instead this is deferred to
      * {@link com.iplanet.dpro.session.service.InternalSession#setSessionServiceDependencies(
-     * SessionService, SessionServiceConfig, SessionLogging,
+     * SessionService, SessionServiceConfig, SessionLogging, SessionAuditor,
      * org.forgerock.openam.session.SessionCookies, com.sun.identity.shared.debug.Debug)}
      */
     public InternalSession() {}
@@ -419,12 +424,13 @@ public class InternalSession implements TaskRunnable, Serializable {
      * @param service Non null SessionService.
      */
     public void setSessionServiceDependencies(SessionService service, SessionServiceConfig serviceConfig,
-                                              SessionLogging sessionLogging, SessionCookies sessionCookies,
-                                              Debug debug) {
+                                              SessionLogging sessionLogging, SessionAuditor sessionAuditor,
+                                              SessionCookies sessionCookies, Debug debug) {
 
         this.sessionService = service;
         this.serviceConfig = serviceConfig;
         this.sessionLogging = sessionLogging;
+        this.sessionAuditor = sessionAuditor;
         this.sessionCookies = sessionCookies;
         this.debug = debug;
     }
@@ -545,6 +551,7 @@ public class InternalSession implements TaskRunnable, Serializable {
                 long timeLeft = getTimeLeft();
                 if (timeLeft == 0) {
                     changeStateAndNotify(SessionEvent.MAX_TIMEOUT);
+                    sessionAuditor.auditActivity(this, AM_SESSION_MAX_TIMED_OUT);
                     if (timerPool != null) {
                         if (purgeDelay > 0) {
                             timerPool.schedule(this, new Date((timedOutAt +
@@ -555,6 +562,7 @@ public class InternalSession implements TaskRunnable, Serializable {
                     long idleTimeLeft = (maxIdleTime * 60) - getIdleTime();
                     if (idleTimeLeft <= 0 && sessionState != INACTIVE) {
                         changeStateAndNotify(SessionEvent.IDLE_TIMEOUT);
+                        sessionAuditor.auditActivity(this, AM_SESSION_IDLE_TIMED_OUT);
                         if (timerPool != null) {
                             if (purgeDelay > 0) {
                                 timerPool.schedule(this, new Date((timedOutAt +
@@ -943,8 +951,7 @@ public class InternalSession implements TaskRunnable, Serializable {
 		try {
         	SessionUtils.checkPermissionToSetProperty(clientToken, key, value);
 		} catch (SessionException se) {
-			sessionLogging.logIt(
-                    this, "SESSION_PROTECTED_PROPERTY_ERROR");
+			sessionLogging.logIt(this, "SESSION_PROTECTED_PROPERTY_ERROR");
 			throw se;
 		}
         internalPutProperty(key,value);
@@ -1014,6 +1021,7 @@ public class InternalSession implements TaskRunnable, Serializable {
         if (sessionState == VALID && serviceConfig.isSendPropertyNotification(key)) {
             sessionService.sendEvent(this, SessionEvent.PROPERTY_CHANGED);
             sessionLogging.logEvent(this, SessionEvent.PROPERTY_CHANGED);
+            sessionAuditor.auditActivity(this, AM_SESSION_PROPERTY_CHANGED);
         }
         updateForFailover();
     }
@@ -1122,6 +1130,7 @@ public class InternalSession implements TaskRunnable, Serializable {
             reschedule();
         }
         sessionLogging.logEvent(this, SessionEvent.SESSION_CREATION);
+        sessionAuditor.auditActivity(this, AM_SESSION_CREATED);
         sessionService.sendEvent(this, SessionEvent.SESSION_CREATION);
 
         if (!stateless && (!isAppSession() || serviceConfig.isReturnAppSessionEnabled())) {
@@ -1148,6 +1157,7 @@ public class InternalSession implements TaskRunnable, Serializable {
         setState(VALID);
         reschedule();
         sessionLogging.logEvent(this, SessionEvent.REACTIVATION);
+        sessionAuditor.auditActivity(this, AM_SESSION_REACTIVATED);
         sessionService.sendEvent(this, SessionEvent.REACTIVATION);
     }
 
@@ -1205,12 +1215,14 @@ public class InternalSession implements TaskRunnable, Serializable {
 
             if (getTimeLeft() == 0) {
                 changeStateAndNotify(SessionEvent.MAX_TIMEOUT);
+                sessionAuditor.auditActivity(this, AM_SESSION_MAX_TIMED_OUT);
                 return false;
             }
 
             if (getIdleTime() >= maxIdleTime * 60
                     && sessionState != INACTIVE) {
                 changeStateAndNotify(SessionEvent.IDLE_TIMEOUT);
+                sessionAuditor.auditActivity(this, AM_SESSION_IDLE_TIMED_OUT);
                 return false;
             }
             return false;
@@ -1219,6 +1231,7 @@ public class InternalSession implements TaskRunnable, Serializable {
             if (getTimeLeftBeforePurge() <= 0) {
                 // destroy the session
                 sessionLogging.logEvent(this, SessionEvent.DESTROY);
+                sessionAuditor.auditActivity(this, AM_SESSION_DESTROYED);
                 setState(DESTROYED);
                 sessionService.sendEvent(this, SessionEvent.DESTROY);
                 return true;
@@ -1813,6 +1826,7 @@ public class InternalSession implements TaskRunnable, Serializable {
                     long timeLeft = getTimeLeft();
                     if (timeLeft == 0) {
                         changeStateAndNotify(SessionEvent.MAX_TIMEOUT);
+                        sessionAuditor.auditActivity(this, AM_SESSION_MAX_TIMED_OUT);
                         if (timerPool != null) {
                             timerPool.schedule(this, new Date((timedOutAt +
                                 (purgeDelay * 60)) * 1000));
@@ -1822,6 +1836,7 @@ public class InternalSession implements TaskRunnable, Serializable {
                         if (idleTimeLeft <= 0 && 
                             sessionState != INACTIVE) {
                             changeStateAndNotify(SessionEvent.IDLE_TIMEOUT);
+                            sessionAuditor.auditActivity(this, AM_SESSION_IDLE_TIMED_OUT);
                             if (timerPool != null) {
                                 timerPool.schedule(this, new Date((timedOutAt +
                                     (purgeDelay * 60)) * 1000));
@@ -1862,6 +1877,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      */
     private void removeSession() {
         sessionLogging.logEvent(this, SessionEvent.DESTROY);
+        sessionAuditor.auditActivity(this, AM_SESSION_DESTROYED);
         setState(DESTROYED);
         sessionService.removeInternalSession(sessionID);
         sessionService.sendEvent(this, SessionEvent.DESTROY);
