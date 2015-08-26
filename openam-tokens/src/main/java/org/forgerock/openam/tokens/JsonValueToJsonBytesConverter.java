@@ -21,8 +21,9 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.json.JsonValue;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JsonValueToJsonBytesConverter implements Converter<JsonValue, byte[]> {
 

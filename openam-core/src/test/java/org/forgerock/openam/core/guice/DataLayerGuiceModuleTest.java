@@ -20,7 +20,6 @@ import static org.mockito.Mockito.*;
 
 import java.util.concurrent.ExecutorService;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.guice.core.GuiceModules;
 import org.forgerock.guice.core.GuiceTestCase;
 import org.forgerock.guice.core.InjectorHolder;
@@ -48,6 +47,7 @@ import org.forgerock.openam.sm.utils.ConfigurationValidator;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
 import com.google.inject.Provider;

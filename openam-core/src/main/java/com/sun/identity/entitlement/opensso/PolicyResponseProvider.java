@@ -25,6 +25,7 @@
 
 package com.sun.identity.entitlement.opensso;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.EntitlementException;
@@ -32,7 +33,6 @@ import com.sun.identity.entitlement.ResourceAttribute;
 import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.interfaces.ResponseProvider;
 import com.sun.identity.shared.JSONUtils;
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.json.JSONArray;
 import org.json.JSONException;

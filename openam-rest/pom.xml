@@ -80,15 +80,15 @@
             <artifactId>servlet-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.restlet.jse</groupId>
+            <groupId>org.restlet.osgi</groupId>
             <artifactId>org.restlet</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.restlet.jse</groupId>
+            <groupId>org.restlet.osgi</groupId>
             <artifactId>org.restlet.ext.json</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.restlet.jse</groupId>
+            <groupId>org.restlet.osgi</groupId>
             <artifactId>org.restlet.ext.xml</artifactId>
         </dependency>
         <dependency>

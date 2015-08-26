@@ -15,8 +15,13 @@
  */
 package org.forgerock.openam.sso.providers.stateless;
 
-import com.iplanet.dpro.session.share.SessionInfo;
-import org.codehaus.jackson.map.ObjectMapper;
+import java.io.IOException;
+import java.security.KeyPair;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
+
 import org.forgerock.guava.common.annotations.VisibleForTesting;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
 import org.forgerock.json.jose.exceptions.JwtRuntimeException;
@@ -29,11 +34,8 @@ import org.forgerock.json.jose.jws.handlers.SigningHandler;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.util.Reject;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
-import java.io.IOException;
-import java.security.KeyPair;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iplanet.dpro.session.share.SessionInfo;
 
 /**
  * Responsible for converting {@link SessionInfo} objects to/from JWT with optional signing &/or encryption.

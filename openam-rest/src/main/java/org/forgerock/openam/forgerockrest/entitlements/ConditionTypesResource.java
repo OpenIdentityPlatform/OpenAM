@@ -28,15 +28,16 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsonschema.JsonSchema;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.LogicalCondition;
 import com.sun.identity.shared.debug.Debug;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.ObjectNode;
-import org.codehaus.jackson.schema.JsonSchema;
 import org.forgerock.http.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -78,15 +79,16 @@ public class ConditionTypesResource implements CollectionResourceProvider {
 
     private final JsonPointer JSON_POINTER_TO_TITLE = new JsonPointer(JSON_OBJ_TITLE);
 
-    private final static ObjectMapper mapper;
+    private final static ObjectMapper mapper = new ObjectMapper().registerModule(new JsonEntitlementConditionModule() {
+        @Override
+        public void setupModule(SetupContext context) {
+            context.setMixInAnnotations(IPv4Condition.class, IPvXConditionMixin.class);
+            context.setMixInAnnotations(IPv6Condition.class, IPvXConditionMixin.class);
+            super.setupModule(context);
+        }
+    });
     private final Debug debug;
     private final EntitlementRegistry entitlementRegistry;
-
-    static {
-        mapper = new ObjectMapper().withModule(new JsonEntitlementConditionModule());
-        mapper.getSerializationConfig().addMixInAnnotations(IPv4Condition.class, IPvXConditionMixin.class);
-        mapper.getSerializationConfig().addMixInAnnotations(IPv6Condition.class, IPvXConditionMixin.class);
-    }
 
     /**
      * Guiced constructor.
@@ -286,6 +288,7 @@ public class ConditionTypesResource implements CollectionResourceProvider {
 
     private abstract class IPvXConditionMixin {
         //Ignore just for conditiontypes query
-        @JsonIgnore abstract List<String> getIpRange();
+        @JsonIgnore
+        abstract List<String> getIpRange();
     }
 }

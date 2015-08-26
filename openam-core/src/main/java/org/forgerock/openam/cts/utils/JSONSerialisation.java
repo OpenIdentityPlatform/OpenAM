@@ -21,8 +21,9 @@ import java.text.MessageFormat;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Responsible for serialising and deserialising objects to and from JSON.

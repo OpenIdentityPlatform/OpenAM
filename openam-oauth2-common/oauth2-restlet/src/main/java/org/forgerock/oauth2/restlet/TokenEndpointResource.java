@@ -11,10 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.restlet;
+
+import static java.util.Collections.*;
+import static org.forgerock.oauth2.restlet.RestletConstants.*;
 
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AccessTokenService;
@@ -24,12 +27,12 @@ import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.restlet.Request;
-import org.restlet.engine.header.Header;
+import org.restlet.data.ChallengeRequest;
+import org.restlet.data.ChallengeScheme;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
-import org.restlet.util.Series;
 
 import javax.inject.Inject;
 import java.util.Map;
@@ -91,13 +94,10 @@ public class TokenEndpointResource extends ServerResource {
             throw new OAuth2RestletException(400, "invalid_request", e.getMessage(),
                     request.<String>getParameter("redirect_uri"), request.<String>getParameter("state"));
         } catch (ClientAuthenticationFailedException e) {
-            Series<Header> responseHeaders =
-                    (Series<Header>) getResponse().getAttributes().get("org.restlet.http.headers");
-            if (responseHeaders == null) {
-                responseHeaders = new Series(Header.class);
-                getResponse().getAttributes().put("org.restlet.http.headers", responseHeaders);
-            }
-            responseHeaders.add(new Header(e.getHeaderName(), e.getHeaderValue()));
+            getResponse().setChallengeRequests(singletonList(
+                    new ChallengeRequest(
+                            ChallengeScheme.valueOf(SUPPORTED_RESTLET_CHALLENGE_SCHEMES.get(e.getChallengeScheme())),
+                            e.getChallengeRealm())));
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
                     request.<String>getParameter("state"));
         } catch (OAuth2Exception e) {

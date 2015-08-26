@@ -11,23 +11,24 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock, AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.entitlements.model.json;
 
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.jsontype.TypeIdResolver;
-import org.codehaus.jackson.map.type.TypeFactory;
-import org.codehaus.jackson.type.JavaType;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
+
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.jsontype.impl.TypeIdResolverBase;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 
 /**
  * Abstract base class for type id resolvers based on the {@link org.forgerock.openam.entitlement.EntitlementRegistry}.
  *
  * @since 12.0.0
  */
-public abstract class EntitlementsRegistryTypeIdResolver<T> implements TypeIdResolver {
+public abstract class EntitlementsRegistryTypeIdResolver<T> extends TypeIdResolverBase {
     private final EntitlementRegistry registry = EntitlementRegistry.load();
 
     private volatile JavaType baseType;
@@ -78,4 +79,5 @@ public abstract class EntitlementsRegistryTypeIdResolver<T> implements TypeIdRes
     public JsonTypeInfo.Id getMechanism() {
         return JsonTypeInfo.Id.CUSTOM;
     }
+
 }

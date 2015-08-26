@@ -20,10 +20,11 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.rest.devices.OathDeviceSettings;
 import org.forgerock.openam.utils.JsonValueBuilder;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Utility functions for ease of conversion between OathDeviceSettings objects and Json

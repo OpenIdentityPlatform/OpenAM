@@ -360,9 +360,9 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
     private void removeLoginPrompt(Request req) {
         Form query = req.getResourceRef().getQueryAsForm();
         Parameter param = query.getFirst(PROMPT);
-        if (param != null && param.getSecond() != null) {
-            String newValue = param.getSecond().toLowerCase().replace(OpenIdPrompt.PROMPT_LOGIN, "").trim();
-            param.setSecond(newValue);
+        if (param != null && param.getValue() != null) {
+            String newValue = param.getValue().toLowerCase().replace(OpenIdPrompt.PROMPT_LOGIN, "").trim();
+            param.setValue(newValue);
         }
         req.getResourceRef().setQuery(query.getQueryString());
     }

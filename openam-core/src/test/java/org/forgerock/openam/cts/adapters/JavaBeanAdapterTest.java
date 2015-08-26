@@ -27,7 +27,6 @@ import java.util.Map;
 
 import javax.inject.Named;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.guice.core.GuiceTestCase;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.tokens.Token;
@@ -41,6 +40,7 @@ import org.forgerock.openam.tokens.Type;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.name.Names;

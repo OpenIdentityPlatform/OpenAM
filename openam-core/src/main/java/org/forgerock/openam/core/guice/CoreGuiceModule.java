@@ -17,6 +17,21 @@
 
 package org.forgerock.openam.core.guice;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.Version;
+import com.fasterxml.jackson.databind.DeserializationConfig;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.KeyDeserializer;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationConfig;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import com.google.inject.Provides;
@@ -55,17 +70,6 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
-import org.codehaus.jackson.JsonProcessingException;
-import org.codehaus.jackson.Version;
-import org.codehaus.jackson.annotate.JsonAutoDetect;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.DeserializationContext;
-import org.codehaus.jackson.map.DeserializationProblemHandler;
-import org.codehaus.jackson.map.JsonDeserializer;
-import org.codehaus.jackson.map.KeyDeserializer;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
-import org.codehaus.jackson.map.module.SimpleModule;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonValue;
@@ -399,8 +403,8 @@ public class CoreGuiceModule extends AbstractModule {
     @Provides @Named(CoreTokenConstants.OBJECT_MAPPER) @Singleton
     ObjectMapper getCTSObjectMapper() {
         ObjectMapper mapper = new ObjectMapper()
-                .configure(SerializationConfig.Feature.SORT_PROPERTIES_ALPHABETICALLY, true)
-                .configure(DeserializationConfig.Feature.CAN_OVERRIDE_ACCESS_MODIFIERS, true);
+                .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
+                .configure(MapperFeature.CAN_OVERRIDE_ACCESS_MODIFIERS, true);
 
         /**
          * @see http://stackoverflow.com/questions/7105745/how-to-specify-jackson-to-only-use-fields-preferably-globally
@@ -414,13 +418,12 @@ public class CoreGuiceModule extends AbstractModule {
         SimpleModule customModule = new SimpleModule("openam", Version.unknownVersion());
         customModule.addKeyDeserializer(SessionID.class, new SessionIDKeyDeserialiser());
         mapper.registerModule(customModule);
-        mapper.getDeserializationConfig().addHandler(new CompatibilityProblemHandler());
-
+        mapper.addHandler(new CompatibilityProblemHandler());
         return mapper;
     }
 
     /**
-     * This simple {@link org.codehaus.jackson.map.KeyDeserializer} implementation allows us to use the {@link SessionID#toString()} value as a
+     * This simple {@link KeyDeserializer} implementation allows us to use the {@link SessionID#toString()} value as a
      * map key instead of a whole {@link SessionID} object. During deserialization this class will reconstruct the
      * original SessionID object from the session ID string.
      */
@@ -443,8 +446,9 @@ public class CoreGuiceModule extends AbstractModule {
         private static final String RESTRICTED_TOKENS_BY_RESTRICTION = "restrictedTokensByRestriction";
 
         @Override
-        public boolean handleUnknownProperty(DeserializationContext ctxt, JsonDeserializer<?> deserializer,
-                Object beanOrClass, String propertyName) throws IOException, JsonProcessingException {
+        public boolean handleUnknownProperty(DeserializationContext ctxt, JsonParser jp,
+                JsonDeserializer<?> deserializer, Object beanOrClass, String propertyName)
+                throws IOException, JsonProcessingException {
             if (propertyName.equals(RESTRICTED_TOKENS_BY_RESTRICTION)) {
                 ctxt.getParser().skipChildren();
                 return true;

@@ -155,27 +155,9 @@ public class RestSTSInstanceConfigTest {
         /*
         This is how the Crest HttpServletAdapter ultimately constitutes a JsonValue from a json string. See the
         org.forgerock.json.resource.servlet.HttpUtils.parseJsonBody (called from HttpServletAdapter.getJsonContent)
-        for details. This is using the older version of jackson
-        (org.codehaus.jackson.map.ObjectMapper), and I will do the same (albeit with the newer version), to reproduce
-        the same behavior.
-         */
-        JsonParser parser = new ObjectMapper().getJsonFactory().createJsonParser(origConfig.toJson().toString());
-        final Object content = parser.readValueAs(Object.class);
-
-        assertEquals(origConfig, RestSTSInstanceConfig.fromJson(new JsonValue(content)));
-    }
-
-    @Test
-    public void testOldJacksonJsonStringMarshalling() throws IOException {
-        RestSTSInstanceConfig origConfig = createInstanceConfig("/bob", WITH_TLS_OFFLOAD_CONFIG, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG,
-                WITH_CUSTOM_VALIDATOR, WITH_CUSTOM_PROVIDER, WITH_CTS_TOKEN_PERSISTENCE);
-        /*
-        This is how the Crest HttpServletAdapter ultimately constitutes a JsonValue from a json string. See the
-        org.forgerock.json.resource.servlet.HttpUtils.parseJsonBody (called from HttpServletAdapter.getJsonContent)
         for details.
          */
-        org.codehaus.jackson.JsonParser parser =
-                new org.codehaus.jackson.map.ObjectMapper().getJsonFactory().createJsonParser(origConfig.toJson().toString());
+        JsonParser parser = new ObjectMapper().getFactory().createParser(origConfig.toJson().toString());
         final Object content = parser.readValueAs(Object.class);
 
         assertEquals(origConfig, RestSTSInstanceConfig.fromJson(new JsonValue(content)));

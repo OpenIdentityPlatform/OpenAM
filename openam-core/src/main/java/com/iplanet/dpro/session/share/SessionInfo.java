@@ -31,8 +31,8 @@
  */
 package com.iplanet.dpro.session.share;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.identity.shared.xml.XMLUtils;
-import org.codehaus.jackson.annotate.JsonIgnore;
 
 import java.util.Enumeration;
 import java.util.Hashtable;

@@ -16,13 +16,14 @@
 
 package org.forgerock.openam.utils;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.json.JsonException;
 import org.forgerock.json.JsonValue;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Builder factory class for a fluent way of creating JsonValue objects.

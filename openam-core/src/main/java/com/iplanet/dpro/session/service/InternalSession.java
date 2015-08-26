@@ -28,6 +28,8 @@
  */
 package com.iplanet.dpro.session.service;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
@@ -46,8 +48,6 @@ import com.sun.identity.common.TimerPool;
 import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonSetter;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionCookies;
 

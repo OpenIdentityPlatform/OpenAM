@@ -24,13 +24,14 @@
  *
  * $Id: TokenRestriction.java,v 1.2 2008/06/25 05:41:29 qcheng Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session;
 
 import java.io.Serializable;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
+
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
  * Interface to handle the different token restriction(s).

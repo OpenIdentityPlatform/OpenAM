@@ -30,12 +30,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.shared.debug.Debug;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.http.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -80,7 +80,8 @@ public class ApplicationsResource extends RealmAwareResource {
 
     public static final String APPLICATION_QUERY_ATTRIBUTES = "ApplicationQueryAttributes";
 
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper mapper = new ObjectMapper()
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     private final ApplicationManagerWrapper appManager;
     private final ApplicationTypeManagerWrapper appTypeManagerWrapper;
     private final Map<String, QueryAttribute> queryAttributes;
@@ -110,8 +111,6 @@ public class ApplicationsResource extends RealmAwareResource {
         this.appTypeManagerWrapper = appTypeManagerWrapper;
         this.queryAttributes = queryAttributes;
         this.exceptionMappingHandler = exceptionMappingHandler;
-
-        mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
     /**

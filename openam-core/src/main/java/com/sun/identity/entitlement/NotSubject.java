@@ -35,11 +35,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.util.Reject;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * This class wrapped on an Entitlement Subject object to provide boolean

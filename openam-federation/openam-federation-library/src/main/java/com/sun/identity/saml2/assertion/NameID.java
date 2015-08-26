@@ -30,9 +30,9 @@ package com.sun.identity.saml2.assertion;
 
 import java.security.Key;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.sun.identity.saml2.assertion.impl.NameIDImpl;
 import com.sun.identity.saml2.common.SAML2Exception;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
 
 /**
  *  The <code>NameID</code> is used in various SAML assertion constructs

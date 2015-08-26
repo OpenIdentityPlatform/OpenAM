@@ -16,14 +16,15 @@
 
 package org.forgerock.openam.forgerockrest.entitlements;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.shared.debug.Debug;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.codehaus.jackson.map.exc.UnrecognizedPropertyException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.JsonDecision;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.JsonEntitlement;
@@ -57,7 +58,7 @@ public final class JsonPolicyParser implements PolicyParser {
      * caches etc. We configure the mapper with our entitlement module, which adds mixins to customise JSON format
      * for various entitlements classes.
      */
-    private static final ObjectMapper MAPPER = new ObjectMapper().withModule(new JsonEntitlementConditionModule());
+    private static final ObjectMapper MAPPER = new ObjectMapper().registerModule(new JsonEntitlementConditionModule());
 
     private static final EntitlementToDecisionMapper ENTITLEMENT_TO_DECISION = new EntitlementToDecisionMapper();
 
@@ -68,7 +69,7 @@ public final class JsonPolicyParser implements PolicyParser {
         iso8601FormatWithMilliseconds.setTimeZone(TimeZone.getTimeZone("UTC"));
         MAPPER.setDateFormat(iso8601FormatWithMilliseconds);
         // Exclude null fields from serialisation (e.g., condition names etc).
-        MAPPER.setSerializationInclusion(JsonSerialize.Inclusion.NON_NULL);
+        MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
     @Override

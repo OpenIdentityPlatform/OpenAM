@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core.exceptions;
@@ -23,37 +23,38 @@ package org.forgerock.oauth2.core.exceptions;
  */
 public class ClientAuthenticationFailedException extends OAuth2Exception {
 
-    private final String headerName;
-    private final String headerValue;
+    private final String challengeScheme;
+    private final String challengeRealm;
 
     /**
      * Constructs a new ClientAuthenticationFailedException with the specified message, header name and value.
      *
      * @param message The reason for the exception.
-     * @param headerName The name of the response header.
-     * @param headerValue The valud of the response header.
+     * @param challengeScheme The name of the challenge type for the WWW-Authenticate header.
+     * @param challengeRealm The name of the challenge realm for the WWW-Authenticate header.
      */
-    public ClientAuthenticationFailedException(final String message, final String headerName, final String headerValue) {
+    public ClientAuthenticationFailedException(final String message, final String challengeScheme,
+            final String challengeRealm) {
         super(401, "invalid_client", message);
-        this.headerName = headerName;
-        this.headerValue = headerValue;
+        this.challengeScheme = challengeScheme;
+        this.challengeRealm = challengeRealm;
     }
 
     /**
-     * Gets the name of the response header.
+     * Gets the challenge type for the WWW-Authenticate header.
      *
-     * @return The response header name.
+     * @return The challenge type.
      */
-    public String getHeaderName() {
-        return headerName;
+    public String getChallengeScheme() {
+        return challengeScheme;
     }
 
     /**
-     * Gets the value of the response header.
+     * Gets the challenge realm for the WWW-Authenticate header.
      *
-     * @return The response header value.
+     * @return The challenge realm.
      */
-    public String getHeaderValue() {
-        return headerValue;
+    public String getChallengeRealm() {
+        return challengeRealm;
     }
 }

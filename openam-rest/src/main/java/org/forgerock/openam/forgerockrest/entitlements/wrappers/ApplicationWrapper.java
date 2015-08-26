@@ -15,6 +15,9 @@
 */
 package org.forgerock.openam.forgerockrest.entitlements.wrappers;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.entitlement.EntitlementException;
@@ -22,9 +25,6 @@ import com.sun.identity.shared.debug.Debug;
 import java.io.IOException;
 import java.util.Set;
 import javax.security.auth.Subject;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.util.Reject;

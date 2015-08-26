@@ -127,7 +127,7 @@
         <forgerock.guice.version>1.1.0-SNAPSHOT</forgerock.guice.version>
 
         <guice.version>3.0</guice.version>
-        <restlet.version>2.1.7</restlet.version>
+        <restlet.version>2.3.4</restlet.version>
         <xercesj.version>2.11.0</xercesj.version>
         <powermock.version>1.5</powermock.version>
         <jackson.version>2.4.2</jackson.version>
@@ -180,7 +180,6 @@
         <webservices-extra-api.version>2003-09-04</webservices-extra-api.version>
         <webservices-rt.version>2009-29-07</webservices-rt.version>
         <webservices-api.version>2009-14-01</webservices-api.version>
-        <jackson-asl.version>1.9.7</jackson-asl.version>
         <javax.security.auth.message.version>3.1</javax.security.auth.message.version>
         <jquery-amd.version>1.7.1-alpha-1</jquery-amd.version>
         <freemarker.version>2.3.19</freemarker.version>
@@ -1567,32 +1566,22 @@
 
             <!-- Session HA Module Dependencies-->
             <dependency>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-core-asl</artifactId>
-                <version>${jackson-asl.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-mapper-asl</artifactId>
-                <version>${jackson-asl.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.restlet.jse</groupId>
+                <groupId>org.restlet.osgi</groupId>
                 <artifactId>org.restlet</artifactId>
                 <version>${restlet.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.restlet.jse</groupId>
+                <groupId>org.restlet.osgi</groupId>
                 <artifactId>org.restlet.ext.jackson</artifactId>
                 <version>${restlet.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.restlet.jse</groupId>
+                <groupId>org.restlet.osgi</groupId>
                 <artifactId>org.restlet.ext.json</artifactId>
                 <version>${restlet.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.restlet.jse</groupId>
+                <groupId>org.restlet.osgi</groupId>
                 <artifactId>org.restlet.ext.xml</artifactId>
                 <version>${restlet.version}</version>
             </dependency>
@@ -1627,18 +1616,18 @@
                 <version>${restlet.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.restlet.jse</groupId>
+                <groupId>org.restlet.osgi</groupId>
                 <artifactId>org.restlet.ext.simple</artifactId>
                 <version>${restlet.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.restlet.jse</groupId>
+                <groupId>org.restlet.osgi</groupId>
                 <artifactId>org.restlet.ext.crypto</artifactId>
                 <version>${restlet.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.restlet.jse</groupId>
+                <groupId>org.restlet.osgi</groupId>
                 <artifactId>org.restlet.ext.httpclient</artifactId>
                 <version>${restlet.version}</version>
             </dependency>

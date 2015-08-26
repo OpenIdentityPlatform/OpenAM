@@ -18,16 +18,13 @@ package org.forgerock.openam.uma;
 
 import static org.forgerock.json.JsonValue.*;
 
-import java.util.Calendar;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.json.JsonValue;
-import org.forgerock.oauth2.core.IntrospectableToken;
 import org.forgerock.openam.tokens.Converter;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.Field;
@@ -35,6 +32,8 @@ import org.forgerock.openam.tokens.JsonValueToJsonBytesConverter;
 import org.forgerock.openam.tokens.LongToCalendarConverter;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.tokens.Type;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Type(TokenType.REQUESTING_PARTY)
 public class RequestingPartyToken implements UmaToken {

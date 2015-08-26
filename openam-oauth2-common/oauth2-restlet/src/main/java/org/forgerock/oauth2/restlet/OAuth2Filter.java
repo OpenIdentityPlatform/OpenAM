@@ -11,24 +11,22 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.restlet;
 
+import java.util.Map;
+
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
-import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
 import org.restlet.data.CacheDirective;
-import org.restlet.engine.header.Header;
+import org.restlet.data.Form;
 import org.restlet.engine.header.HeaderConstants;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.routing.Filter;
-import org.restlet.util.Series;
-
-import java.util.Map;
 
 /**
  * Provides validation for OAuth2 endpoints to ensure that the request is valid for the endpoint being requested.
@@ -74,11 +72,10 @@ public abstract class OAuth2Filter extends Filter {
         // Pragma: no-cache
         // -------------------------------------
         response.getCacheDirectives().add(CacheDirective.noStore());
-        Series<Header> additionalHeaders =
-                (Series<Header>) response.getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
+        Form additionalHeaders = (Form) request.getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
         if (additionalHeaders == null) {
-            additionalHeaders = new Series<Header>(Header.class);
-            response.getAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, additionalHeaders);
+            additionalHeaders = new Form();
+            request.getAttributes().put("org.restlet.http.headers", additionalHeaders);
         }
         additionalHeaders.add(HeaderConstants.HEADER_PRAGMA, HeaderConstants.CACHE_NO_CACHE);
 

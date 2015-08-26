@@ -50,10 +50,6 @@
             <artifactId>openam-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.restlet.osgi</groupId>
-            <artifactId>org.restlet.ext.jackson</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>oauth2-restlet</artifactId>
         </dependency>

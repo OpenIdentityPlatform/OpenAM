@@ -239,22 +239,6 @@ public class SoapSTSInstanceConfigTest {
     }
 
     @Test
-    public void testOldJacksonJsonStringMarhalling() throws IOException {
-        SoapSTSInstanceConfig origConfig = createInstanceConfig("/bobo/instance1", "http://host.com:8080/am", WITH_KEYSTORE_CONFIG,
-                WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, !CUSTOM_DELEGATION_HANDLER, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG, WITH_CTS_TOKEN_PERSISTENCE);
-        /*
-        This is how the Crest HttpServletAdapter ultimately constitutes a JsonValue from a json string. See the
-        org.forgerock.json.resource.servlet.HttpUtils.parseJsonBody (called from HttpServletAdapter.getJsonContent)
-        for details. Covering old and new Jackson versions for completeness.
-         */
-        org.codehaus.jackson.JsonParser parser =
-                new org.codehaus.jackson.map.ObjectMapper().getJsonFactory().createJsonParser(origConfig.toJson().toString());
-        final Object content = parser.readValueAs(Object.class);
-
-        assertEquals(origConfig, SoapSTSInstanceConfig.fromJson(new JsonValue(content)));
-    }
-
-    @Test
     public void testJsonStringMarshalling() throws IOException {
         SoapSTSInstanceConfig origConfig = createInstanceConfig("/bobo/instance1", "http://host.com:8080/am", WITH_KEYSTORE_CONFIG,
                 WITH_VALIDATE_CONFIG, DELEGATION_VALIDATORS_SPECIFIED, CUSTOM_DELEGATION_HANDLER, WITH_SAML2_CONFIG, WITH_OIDC_CONFIG, !WITH_CTS_TOKEN_PERSISTENCE);
@@ -262,9 +246,9 @@ public class SoapSTSInstanceConfigTest {
         /*
         This is how the Crest HttpServletAdapter ultimately constitutes a JsonValue from a json string. See the
         org.forgerock.json.resource.servlet.HttpUtils.parseJsonBody (called from HttpServletAdapter.getJsonContent)
-        for details. Covering old and new Jackson versions for completeness.
+        for details.
          */
-        JsonParser parser = new ObjectMapper().getJsonFactory().createJsonParser(origConfig.toJson().toString());
+        JsonParser parser = new ObjectMapper().getFactory().createParser(origConfig.toJson().toString());
         final Object content = parser.readValueAs(Object.class);
 
         assertEquals(origConfig, SoapSTSInstanceConfig.fromJson(new JsonValue(content)));

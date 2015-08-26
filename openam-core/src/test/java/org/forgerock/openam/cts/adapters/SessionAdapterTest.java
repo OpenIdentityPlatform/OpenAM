@@ -15,11 +15,11 @@
  */
 package org.forgerock.openam.cts.adapters;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 
-import org.codehaus.jackson.annotate.JsonAutoDetect;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.cts.TokenTestUtils;
 import org.forgerock.openam.tokens.TokenType;

@@ -23,13 +23,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsonschema.JsonSchema;
 import com.sun.identity.entitlement.EntitlementCombiner;
 import com.sun.identity.shared.debug.Debug;
 import java.util.Map;
 import javax.security.auth.Subject;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.schema.JsonSchema;
 import org.forgerock.http.Context;
 import org.forgerock.json.resource.InternalContext;
 import org.forgerock.json.resource.NotFoundException;

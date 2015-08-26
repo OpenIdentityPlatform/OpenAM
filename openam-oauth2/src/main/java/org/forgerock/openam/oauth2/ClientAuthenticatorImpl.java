@@ -107,8 +107,7 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
             return clientRegistration;
         } catch (InvalidClientException e) {
             if (clientCredentials.usesBasicAuth()) {
-                throw new ClientAuthenticationFailedException("Client authentication failed", "WWW-Authenticate",
-                        "Basic realm=\"" + realm + "\"");
+                throw new ClientAuthenticationFailedException("Client authentication failed", "Basic", realm);
             }
             throw e;
         } finally {

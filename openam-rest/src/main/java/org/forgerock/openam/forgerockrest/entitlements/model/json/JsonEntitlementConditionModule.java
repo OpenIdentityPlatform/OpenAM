@@ -1,6 +1,4 @@
 /*
- * Copyright 2014 ForgeRock, AS.
- *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,15 +10,17 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2014-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.entitlements.model.json;
 
+import com.fasterxml.jackson.core.Version;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.EntitlementSubject;
 import com.sun.identity.entitlement.ResourceAttribute;
-import org.codehaus.jackson.Version;
-import org.codehaus.jackson.map.module.SimpleModule;
 
 /**
  * Jackson module to customise JSON serialisation for policies and entitlements. Registers custom "mixin" classes that
@@ -30,7 +30,7 @@ import org.codehaus.jackson.map.module.SimpleModule;
  */
 public class JsonEntitlementConditionModule extends SimpleModule {
     public JsonEntitlementConditionModule() {
-        super("EntitlementCondition", new Version(0, 0, 1, null));
+        super("EntitlementCondition", new Version(0, 0, 1, null, null, null));
     }
 
     @Override

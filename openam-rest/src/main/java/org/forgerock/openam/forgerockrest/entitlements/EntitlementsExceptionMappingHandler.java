@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.forgerockrest.entitlements;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.shared.debug.Debug;
 import java.util.Collections;
@@ -25,7 +26,6 @@ import java.util.Locale;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.forgerock.http.Context;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.RequestType;

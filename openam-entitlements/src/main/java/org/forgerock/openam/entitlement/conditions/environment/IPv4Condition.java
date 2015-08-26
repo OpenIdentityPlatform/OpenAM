@@ -12,18 +12,17 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2006 Sun Microsystems Inc
- */
-/*
- * Portions Copyright 2011-2014 ForgeRock AS
+ *
+ * Portions Copyright 2011-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.entitlement.conditions.environment;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
-import org.codehaus.jackson.annotate.JsonCreator;
-import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.List;
 import java.util.StringTokenizer;

@@ -29,7 +29,6 @@
 
 package com.sun.identity.entitlement;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.util.Reject;
 import org.json.JSONException;
@@ -39,6 +38,8 @@ import javax.security.auth.Subject;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * This class wrapped on an Entitlement Condition object to provide boolean

@@ -16,6 +16,9 @@
 
 package org.forgerock.openam.forgerockrest.entitlements;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsonschema.JsonSchema;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.EntitlementSubject;
 import com.sun.identity.entitlement.LogicalSubject;
@@ -26,9 +29,6 @@ import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
 
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.schema.JsonSchema;
 import static org.fest.assertions.Assertions.assertThat;
 
 import org.forgerock.json.resource.InternalContext;

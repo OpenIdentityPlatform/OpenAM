@@ -30,6 +30,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.EntitlementException;
@@ -40,8 +42,6 @@ import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.http.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -86,10 +86,10 @@ public class ReferralsResourceV1 extends RealmAwareResource {
     public ReferralsResourceV1(@Named("frRest") Debug debug) {
         this.debug = debug;
 
-        queryAttributes = new HashMap<String, QueryAttribute>();
+        queryAttributes = new HashMap<>();
         queryAttributes.put("applicationName", new QueryAttribute(STRING, Privilege.APPLICATION_SEARCH_ATTRIBUTE));
 
-        mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
     /**

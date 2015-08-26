@@ -69,17 +69,6 @@
             <artifactId>org.restlet.ext.json</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.restlet.osgi</groupId>
-            <artifactId>org.restlet.ext.net</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.restlet.osgi</groupId>
-            <artifactId>org.restlet.ext.ssl</artifactId>
-        </dependency>
-
-
         <!-- Restlet -->
         <dependency>
             <groupId>org.restlet.osgi</groupId>

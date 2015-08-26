@@ -20,6 +20,7 @@ package org.forgerock.openam.openidconnect;
 import static org.forgerock.oauth2.core.OAuth2Constants.Params.OPENID;
 import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.*;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.identity.shared.validation.ValidationException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -34,7 +35,6 @@ import java.util.Set;
 import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.json.JsonException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.JsonValueException;

@@ -17,14 +17,15 @@ package org.forgerock.openam.audit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.json.JsonValue;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonFactory;
 
 /**
  * Collection of static helper methods for use by tests.

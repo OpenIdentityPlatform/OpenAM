@@ -70,7 +70,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.restlet.jse</groupId>
+            <groupId>org.restlet.osgi</groupId>
             <artifactId>org.restlet</artifactId>
         </dependency>
 

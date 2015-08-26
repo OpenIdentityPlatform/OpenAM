@@ -12,7 +12,7 @@ the License file at legal/CDDLv1.0.txt. If applicable, add the following below t
 Header, with the fields enclosed by brackets [] replaced by your own identifying
 information: "Portions Copyrighted [year] [name of copyright owner]".
 
-Copyright 2014 ForgeRock AS.
+Copyright 2014-2015 ForgeRock AS.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -74,7 +74,7 @@ Copyright 2014 ForgeRock AS.
             <artifactId>forgerock-guice-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.restlet.jse</groupId>
+            <groupId>org.restlet.osgi</groupId>
             <artifactId>org.restlet</artifactId>
         </dependency>
         <dependency>

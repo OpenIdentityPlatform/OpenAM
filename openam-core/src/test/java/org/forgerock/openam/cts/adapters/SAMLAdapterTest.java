@@ -20,7 +20,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
 import static org.mockito.Matchers.*;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.openam.cts.TokenTestUtils;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.cts.api.fields.SAMLTokenField;
@@ -34,6 +33,8 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.Calendar;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class SAMLAdapterTest {
 

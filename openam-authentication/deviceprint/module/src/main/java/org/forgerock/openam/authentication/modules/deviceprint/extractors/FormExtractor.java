@@ -25,14 +25,14 @@
  */
 /*
  * Portions Copyrighted 2013 Syntegrity.
- * Portions Copyrighted 2013-2014 ForgeRock AS.
+ * Portions Copyrighted 2013-2015 ForgeRock AS.
  */
 
 package org.forgerock.openam.authentication.modules.deviceprint.extractors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.sun.identity.shared.debug.Debug;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
 import org.forgerock.openam.authentication.modules.deviceprint.model.DevicePrint;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,7 +44,8 @@ public class FormExtractor implements Extractor {
     /**
      * Singleton ObjectMapper instance for performance.
      */
-    private static final ObjectMapper mapper = new ObjectMapper().configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
+    private static final ObjectMapper mapper = new ObjectMapper()
+			.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 	private static final String DEVICE_PRINT_INFO = "IDToken0";
 	private static final Debug DEBUG = Debug.getInstance("amAuthDevicePrint");
 

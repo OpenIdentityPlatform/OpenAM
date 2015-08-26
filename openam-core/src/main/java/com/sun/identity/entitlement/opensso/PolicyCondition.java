@@ -37,6 +37,7 @@ import static com.sun.identity.entitlement.EntitlementException.POLICY_CLASS_NOT
 import static com.sun.identity.entitlement.EntitlementException.POLICY_CLASS_NOT_INSTANTIABLE;
 import static com.sun.identity.entitlement.EntitlementException.UNKNOWN_POLICY_CLASS;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.ConditionDecision;
@@ -44,7 +45,6 @@ import com.sun.identity.entitlement.EntitlementConditionAdaptor;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.interfaces.Condition;
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.json.JSONArray;

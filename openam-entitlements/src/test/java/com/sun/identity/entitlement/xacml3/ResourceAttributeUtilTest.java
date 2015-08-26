@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package com.sun.identity.entitlement.xacml3;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.ResourceAttribute;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.fest.util.Collections;
 import org.testng.annotations.Test;
 

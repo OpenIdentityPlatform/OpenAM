@@ -19,9 +19,10 @@ package org.forgerock.openam.tokens;
 import static org.assertj.core.api.Assertions.*;
 import static org.forgerock.json.JsonValue.*;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.json.JsonValue;
 import org.testng.annotations.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JsonValueToJsonBytesConverterTest {
 

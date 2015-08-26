@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2014-2015 ForgeRock AS.
  */
 package org.forgerock.http.client;
 
@@ -25,7 +25,6 @@ import org.restlet.Client;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.*;
-import org.restlet.engine.util.CookieSettingSeries;
 import org.restlet.util.Series;
 
 import java.io.UnsupportedEncodingException;
@@ -149,7 +148,7 @@ public class RestletHttpClient {
     }
 
     private void addCookiesToRequest(HttpClientRequest httpClientRequest, Request request) {
-        Series cookieSettingSeries = new CookieSettingSeries();
+        Series<Cookie> cookieSettingSeries = new Series<>(Cookie.class);
         for (HttpClientRequestCookie cookie : httpClientRequest.getCookies()) {
             CookieSetting cookieSetting = new CookieSetting();
             cookieSetting.setDomain(cookie.getDomain());

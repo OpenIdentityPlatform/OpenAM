@@ -24,11 +24,12 @@
  *
  * $Id: PolicySubject.java,v 1.1 2009/08/19 05:40:36 veiming Exp $
  *
- * Portions Copyrighted 2014-2015 ForgeRock AS
+ * Portions Copyrighted 2014-2015 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.opensso;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.EntitlementException;
@@ -40,7 +41,6 @@ import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.policy.interfaces.Subject;
 import com.sun.identity.security.AdminTokenAction;
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.json.JSONArray;
 import org.json.JSONException;
