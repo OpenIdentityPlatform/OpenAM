@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.google.inject.Key;
@@ -161,10 +162,15 @@ public class RestEndpointServlet extends HttpServlet {
 
         @Override
         public Promise<Response, NeverThrowsException> handle(Context context, Request request) {
-            Map<String, Object> attributes = context.asContext(HttpRequestContext.class).getAttributes();
-            HttpServletRequest httpRequest = (HttpServletRequest) attributes.get(HttpServletRequest.class.getName());
+            Map<String, Object> attributes = new HashMap<>(context.asContext(HttpRequestContext.class).getAttributes());
+            HttpServletRequest httpRequest = (HttpServletRequest) attributes.remove(HttpServletRequest.class.getName());
             HttpServletResponse httpResponse =
-                    (HttpServletResponse) attributes.get(HttpServletResponse.class.getName());
+                    (HttpServletResponse) attributes.remove(HttpServletResponse.class.getName());
+            for (Map.Entry<String, Object> attribute : attributes.entrySet()) {
+                if (httpRequest.getAttribute(attribute.getKey()) == null) {
+                    httpRequest.setAttribute(attribute.getKey(), attribute.getValue());
+                }
+            }
             try {
                 restletXACMLServiceServlet.service(new HttpServletRequestWrapper(httpRequest), httpResponse);
             } catch (ServletException | IOException e) {
