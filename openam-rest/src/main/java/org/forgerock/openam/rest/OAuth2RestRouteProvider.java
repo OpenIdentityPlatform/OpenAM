@@ -42,6 +42,7 @@ public class OAuth2RestRouteProvider implements RestRouteProvider {
         realmRouter.route("users/{user}/oauth2/resources/labels")
                 .auditAs(OAUTH2)
                 .authorizeWith(ResourceOwnerOrSuperUserAuthzModule.class)
+                .through(UmaEnabledFilter.class)
                 .toCollection(UmaLabelResource.class);
     }
 }

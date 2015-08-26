@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.rest.oauth2;
 
+import org.forgerock.json.JsonPointer;
 import org.forgerock.util.query.QueryFilter;
 
 /**
@@ -24,21 +25,37 @@ import org.forgerock.util.query.QueryFilter;
  * @since 13.0.0
  */
 final class ResourceSetWithPolicyQuery
-        extends AggregateQuery<org.forgerock.util.query.QueryFilter<String>, QueryFilter> {
+        extends AggregateQuery<org.forgerock.util.query.QueryFilter<String>, QueryFilter<JsonPointer>> {
 
+    /**
+     * Get the resource set query.
+     * @return The query.
+     */
     public org.forgerock.util.query.QueryFilter<String> getResourceSetQuery() {
         return getFirstQuery();
     }
 
+    /**
+     * Set the resource set query.
+     * @param query The query.
+     */
     public void setResourceSetQuery(org.forgerock.util.query.QueryFilter<String> query) {
         setFirstQuery(query);
     }
 
-    public QueryFilter getPolicyQuery() {
+    /**
+     * Get the policy query.
+     * @return The query.
+     */
+    public QueryFilter<JsonPointer> getPolicyQuery() {
         return getSecondQuery();
     }
 
-    public void setPolicyQuery(QueryFilter query) {
+    /**
+     * Set the policy query.
+     * @param query The query.
+     */
+    public void setPolicyQuery(QueryFilter<JsonPointer> query) {
         setSecondQuery(query);
     }
 }

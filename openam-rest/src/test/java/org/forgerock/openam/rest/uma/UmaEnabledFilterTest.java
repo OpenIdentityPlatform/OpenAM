@@ -16,21 +16,20 @@
 
 package org.forgerock.openam.rest.uma;
 
-import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.util.promise.Promises.newResultPromise;
-import static org.forgerock.util.test.assertj.AssertJPromiseAssert.*;
-import static org.assertj.core.api.Assertions.*;
 import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.util.promise.Promises.*;
+import static org.forgerock.util.test.assertj.AssertJPromiseAssert.*;
 import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.forgerock.json.JsonValue;
+import org.forgerock.http.Context;
+import org.forgerock.http.context.RootContext;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CreateRequest;
@@ -46,16 +45,12 @@ import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Requests;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.http.context.RootContext;
-import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.openam.forgerockrest.utils.RequestHolder;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.uma.UmaProviderSettings;
 import org.forgerock.openam.uma.UmaProviderSettingsFactory;
 import org.forgerock.util.promise.Promise;
-import org.mockito.ArgumentCaptor;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -73,16 +68,16 @@ public class UmaEnabledFilterTest {
     @BeforeClass
     public static void setupFactories() throws Exception {
         notYetConfiguredFactory = mock(UmaProviderSettingsFactory.class);
-        given(notYetConfiguredFactory.get(any(HttpServletRequest.class), anyString()))
+        given(notYetConfiguredFactory.get(any(Context.class), anyString()))
                 .willThrow(NotFoundException.class);
         UmaProviderSettings notEnabled = mock(UmaProviderSettings.class);
         given(notEnabled.isEnabled()).willReturn(false);
         notEnabledFactory = mock(UmaProviderSettingsFactory.class);
-        given(notEnabledFactory.get(any(HttpServletRequest.class), anyString())).willReturn(notEnabled);
+        given(notEnabledFactory.get(any(Context.class), anyString())).willReturn(notEnabled);
         UmaProviderSettings enabled = mock(UmaProviderSettings.class);
         given(enabled.isEnabled()).willReturn(true);
         enabledFactory = mock(UmaProviderSettingsFactory.class);
-        given(enabledFactory.get(any(HttpServletRequest.class), anyString())).willReturn(enabled);
+        given(enabledFactory.get(any(Context.class), anyString())).willReturn(enabled);
     }
 
     @BeforeMethod
@@ -104,7 +99,6 @@ public class UmaEnabledFilterTest {
                 .thenReturn(promise(newResourceResponse(null, null, null)));
         when(requestHandler.handleUpdate(any(Context.class), any(UpdateRequest.class)))
                 .thenReturn(promise(newResourceResponse(null, null, null)));
-        RequestHolder.set(mock(HttpServletRequest.class));
     }
 
     private <V> Promise<V, ResourceException> promise(V response) {

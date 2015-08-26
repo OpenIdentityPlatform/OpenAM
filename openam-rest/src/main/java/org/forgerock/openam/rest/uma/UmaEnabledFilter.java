@@ -16,9 +16,8 @@
 
 package org.forgerock.openam.rest.uma;
 
-import static org.forgerock.json.resource.ResourceException.newNotSupportedException;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
-import static org.forgerock.util.promise.Promises.newResultPromise;
+import static org.forgerock.json.resource.ResourceException.*;
+import static org.forgerock.util.promise.Promises.*;
 
 import javax.inject.Inject;
 
@@ -38,7 +37,6 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
-import org.forgerock.openam.forgerockrest.utils.RequestHolder;
 import org.forgerock.openam.forgerockrest.utils.ServerContextUtils;
 import org.forgerock.openam.uma.UmaProviderSettings;
 import org.forgerock.openam.uma.UmaProviderSettingsFactory;
@@ -61,7 +59,7 @@ public class UmaEnabledFilter implements Filter {
     private Promise<Void, ResourceException> enabled(Context serverContext) {
         try {
             final String realm = ServerContextUtils.getRealm(serverContext);
-            UmaProviderSettings settings = umaProviderSettingsFactory.get(RequestHolder.get(), realm);
+            UmaProviderSettings settings = umaProviderSettingsFactory.get(serverContext, realm);
             if (settings.isEnabled()) {
                 return newResultPromise(null);
             }

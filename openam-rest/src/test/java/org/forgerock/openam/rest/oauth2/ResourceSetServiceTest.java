@@ -33,6 +33,7 @@ import com.sun.identity.entitlement.Evaluator;
 import com.sun.identity.idm.AMIdentity;
 
 import org.forgerock.http.context.RootContext;
+import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.util.query.QueryFilter;
@@ -155,7 +156,7 @@ public class ResourceSetServiceTest {
         String resourceOwnerId = "RESOURCE_OWNER_ID";
         boolean augmentWithPolicies = false;
         QueryFilter<String> resourceSetQuery = mock(QueryFilter.class);
-        QueryFilter policyQuery = QueryFilter.alwaysFalse();
+        QueryFilter<JsonPointer> policyQuery = QueryFilter.alwaysFalse();
         Set<ResourceSetDescription> queriedResourceSets = new HashSet<>();
         Collection<UmaPolicy> queriedPolicies = new HashSet<>();
         Pair<QueryResponse, Collection<UmaPolicy>> queriedPoliciesPair = Pair.of(newQueryResponse(), queriedPolicies);

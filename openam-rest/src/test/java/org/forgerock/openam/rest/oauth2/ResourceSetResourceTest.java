@@ -216,7 +216,7 @@ public class ResourceSetResourceTest {
         verify(resourceSetService).getResourceSets(eq(context), eq("REALM"), queryCaptor.capture(), eq("RESOURCE_OWNER_ID"), eq(false));
         assertThat(queryCaptor.getValue().getOperator()).isEqualTo(AggregateQuery.Operator.AND);
         assertThat(queryCaptor.getValue().getPolicyQuery())
-                .isEqualTo(QueryFilter.equalTo("/permissions/subject", "SUBJECT"));
+                .isEqualTo(QueryFilter.equalTo(new JsonPointer("/permissions/subject"), "SUBJECT"));
         assertThat(queryCaptor.getValue().getResourceSetQuery())
                 .isEqualTo(QueryFilter.and(
                         QueryFilter.equalTo("name", "NAME"),

@@ -27,6 +27,9 @@ import com.google.inject.Singleton;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Evaluator;
 import com.sun.identity.shared.debug.Debug;
+
+import org.forgerock.http.Context;
+import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
@@ -117,13 +120,39 @@ public class UmaProviderSettingsFactory {
             if (providerSettings == null) {
                 OAuth2ProviderSettings oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(realm, request);
                 String baseUrlPattern = baseURLProviderFactory.get(realm).getURL(request);
-                UmaTokenStore tokenStore = tokenStoreFactory.create(realm);
-                providerSettings = new UmaProviderSettingsImpl(realm, baseUrlPattern, tokenStore,
-                        oAuth2ProviderSettings);
-                providerSettingsMap.put(realm, providerSettings);
+                providerSettings = getUmaProviderSettings(realm, oAuth2ProviderSettings, baseUrlPattern);
             }
             return providerSettings;
         }
+    }
+
+    /**
+     * <p>Gets the instance of the UmaProviderSettings.</p>
+     *
+     * <p>Cache each provider settings on the realm it was created for.</p>
+     *
+     * @param context The context instance from which the base URL can be deduced.
+     * @param realm The realm.
+     * @return The OAuth2ProviderSettings instance.
+     */
+    public UmaProviderSettings get(Context context, String realm) throws NotFoundException {
+        synchronized (providerSettingsMap) {
+            UmaProviderSettingsImpl providerSettings = providerSettingsMap.get(realm);
+            if (providerSettings == null) {
+                OAuth2ProviderSettings oAuth2ProviderSettings = oAuth2ProviderSettingsFactory.get(realm, context);
+                String baseUrlPattern = baseURLProviderFactory.get(realm).getURL(context.asContext(HttpContext.class));
+                providerSettings = getUmaProviderSettings(realm, oAuth2ProviderSettings, baseUrlPattern);
+            }
+            return providerSettings;
+        }
+    }
+
+    private UmaProviderSettingsImpl getUmaProviderSettings(String realm, OAuth2ProviderSettings oAuth2ProviderSettings, String baseUrlPattern) throws NotFoundException {
+        UmaProviderSettingsImpl providerSettings;UmaTokenStore tokenStore = tokenStoreFactory.create(realm);
+        providerSettings = new UmaProviderSettingsImpl(realm, baseUrlPattern, tokenStore,
+                oAuth2ProviderSettings);
+        providerSettingsMap.put(realm, providerSettings);
+        return providerSettings;
     }
 
     static final class UmaProviderSettingsImpl extends UmaSettingsImpl implements UmaProviderSettings {

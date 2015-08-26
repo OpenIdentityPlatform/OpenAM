@@ -18,6 +18,7 @@ package org.forgerock.oauth2.core;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.forgerock.http.Context;
 import org.forgerock.oauth2.core.exceptions.NotFoundException;
 
 /**
@@ -46,4 +47,13 @@ public interface OAuth2ProviderSettingsFactory {
      * @return The OAuth2ProviderSettings instance.
      */
     OAuth2ProviderSettings get(String realm, HttpServletRequest req) throws NotFoundException;
+
+    /**
+     * Gets the instance of the OAuth2ProviderSettings.
+     *
+     * @param realm The realm.
+     * @param context The context that can be used to obtain the base deployment url.
+     * @return The OAuth2ProviderSettings instance.
+     */
+    OAuth2ProviderSettings get(String realm, Context context) throws NotFoundException;
 }

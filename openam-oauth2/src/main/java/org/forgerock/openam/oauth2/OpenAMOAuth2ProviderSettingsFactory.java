@@ -20,6 +20,9 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
+
+import org.forgerock.http.Context;
+import org.forgerock.json.resource.http.HttpContext;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
@@ -30,6 +33,7 @@ import org.forgerock.oauth2.resources.ResourceSetStore;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
 import org.forgerock.openam.utils.RealmNormaliser;
+import org.forgerock.util.Reject;
 import org.restlet.Request;
 import org.restlet.ext.servlet.ServletUtils;
 
@@ -92,7 +96,21 @@ public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettin
      * {@inheritDoc}
      */
     public OAuth2ProviderSettings get(String realm, HttpServletRequest req) throws NotFoundException {
+        Reject.ifNull(realm, "Realm cannot be null");
+        Reject.ifNull(req, "Request cannot be null");
         String baseDeploymentUri = baseURLProviderFactory.get(realm).getURL(req);
+        return getProviderSettings(realm, baseDeploymentUri);
+    }
+
+    @Override
+    public OAuth2ProviderSettings get(String realm, Context context) throws NotFoundException {
+        Reject.ifNull(realm, "Realm cannot be null");
+        Reject.ifNull(context, "Context cannot be null");
+        String baseDeploymentUri = baseURLProviderFactory.get(realm).getURL(context.asContext(HttpContext.class));
+        return getProviderSettings(realm, baseDeploymentUri);
+    }
+
+    private OAuth2ProviderSettings getProviderSettings(String realm, String baseDeploymentUri) throws NotFoundException {
         synchronized (providerSettingsMap) {
             OAuth2ProviderSettings providerSettings = providerSettingsMap.get(realm);
             if (providerSettings == null) {

@@ -72,6 +72,7 @@ import org.forgerock.util.query.QueryFilterVisitor;
  */
 public class ResourceSetResource implements CollectionResourceProvider {
 
+    static final String SUBJECT_FIELD = "/permissions/subject";
     private final ResourceSetService resourceSetService;
     private final ContextHelper contextHelper;
     private final UmaLabelsStore umaLabelsStore;
@@ -303,7 +304,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
                 if (queryDepth > 1) {
                     throw new UnsupportedOperationException("Cannot nest queries on /policy/permissions/subject field");
                 }
-                query.setPolicyQuery(QueryFilter.equalTo("/permissions/subject", valueAssertion));
+                query.setPolicyQuery(QueryFilter.equalTo(new JsonPointer(SUBJECT_FIELD), valueAssertion));
             } else if (new JsonPointer("/labels").equals(field)) {
                 ResourceSetLabel label = null;
                 try {
@@ -330,7 +331,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
                 if (queryDepth > 1) {
                     throw new UnsupportedOperationException("Cannot nest queries on /policy/permissions/subject field");
                 }
-                query.setPolicyQuery(QueryFilter.startsWith("/permissions/subject", valueAssertion));
+                query.setPolicyQuery(QueryFilter.startsWith(new JsonPointer(SUBJECT_FIELD), valueAssertion));
             } else {
                 query.setResourceSetQuery(
                         QueryFilter.startsWith(verifyFieldIsQueryable(field), valueAssertion));
@@ -345,7 +346,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
                 if (queryDepth > 1) {
                     throw new UnsupportedOperationException("Cannot nest queries on /policy/permissions/subject field");
                 }
-                query.setPolicyQuery(QueryFilter.contains("/permissions/subject", valueAssertion));
+                query.setPolicyQuery(QueryFilter.contains(new JsonPointer(SUBJECT_FIELD), valueAssertion));
             } else {
                 query.setResourceSetQuery(
                         QueryFilter.contains(verifyFieldIsQueryable(field), valueAssertion));
