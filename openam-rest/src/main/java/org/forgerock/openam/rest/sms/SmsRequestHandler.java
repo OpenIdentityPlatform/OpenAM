@@ -245,9 +245,9 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
     private void addRealmHandler() {
         if (SchemaType.GLOBAL.equals(schemaType)) {
             Router realmRouter = new Router();
-            realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "{realm}"), realmRouter);
-            realmRouter.addRoute(requestUriMatcher(EQUALS, ""), new SmsRealmProvider());
-            routeTree.addRoute(RoutingMode.STARTS_WITH, "/realms", new FilterChain(realmRouter, realmContextFilter));
+            realmRouter.addRoute(requestUriMatcher(STARTS_WITH, "{realm}"), new FilterChain(realmRouter, realmContextFilter));
+            realmRouter.addRoute(requestUriMatcher(EQUALS, ""), new FilterChain(new SmsRealmProvider(), realmContextFilter));
+            routeTree.addRoute(RoutingMode.STARTS_WITH, "/realms", realmRouter);
         }
     }
 
