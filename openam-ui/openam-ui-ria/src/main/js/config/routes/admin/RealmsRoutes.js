@@ -96,30 +96,30 @@ define("config/routes/admin/RealmsRoutes", function () {
             pattern: "realms/?/privileges",
             role: "ui-admin"
         },
-        "realmsApplications": {
+        "realmsPolicySets": {
             view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
-            page: "org/forgerock/openam/ui/admin/views/realms/policies/applications/ApplicationsView",
-            url: scopedByRealm("applications\/list"),
-            pattern: "realms/?/applications/list",
+            page: "org/forgerock/openam/ui/admin/views/realms/authorization/policySets/PolicySetsView",
+            url: scopedByRealm("policySets\/list"),
+            pattern: "realms/?/policySets/list",
             role: "ui-admin"
         },
         "realmsApplicationEdit": {
             view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
-            page: "org/forgerock/openam/ui/admin/views/realms/policies/applications/EditApplicationView",
-            url: scopedByRealm("applications\/edit\/([^\/]*)"),
-            pattern: "realms/?/applications/edit/?",
+            page: "org/forgerock/openam/ui/admin/views/realms/authorization/policySets/EditPolicySetView",
+            url: scopedByRealm("policySets\/edit\/([^\/]*)"),
+            pattern: "realms/?/policySets/edit/?",
             role: "ui-admin"
         },
         "realmsResourceTypes": {
             view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
-            page: "org/forgerock/openam/ui/admin/views/realms/policies/resourceTypes/ResourceTypesView",
+            page: "org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/ResourceTypesView",
             url: scopedByRealm("resourceTypes\/list"),
             pattern: "realms/?/resourceTypes/list",
             role: "ui-admin"
         },
         "realmsResourceTypeEdit": {
             view: "org/forgerock/openam/ui/admin/views/realms/RealmTreeNavigationView",
-            page: "org/forgerock/openam/ui/admin/views/realms/policies/resourceTypes/EditResourceTypeView",
+            page: "org/forgerock/openam/ui/admin/views/realms/authorization/resourceTypes/EditResourceTypeView",
             url: scopedByRealm("resourceTypes\/edit\/([^\/]*)"),
             pattern: "realms/?/resourceTypes/edit/?",
             role: "ui-admin"

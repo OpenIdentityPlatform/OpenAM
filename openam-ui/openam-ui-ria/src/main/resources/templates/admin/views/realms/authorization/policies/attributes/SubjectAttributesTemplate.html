@@ -1,0 +1,12 @@
+<h5 class="list-group-header">{{t "console.authorization.common.subjectAttributes"}}</h5>
+
+{{#if allUserAttributes}}
+<select multiple id="avaliableUserAttributes" class="selectize">
+    <option disabled selected value="">{{t "console.authorization.policies.edit.subjectAttributesPlaceholder"}}</option>
+    {{#each allUserAttributes}}
+    <option {{#if selected}}selected{{/if}} value="{{propertyName}}">{{propertyName}}</option>
+    {{/each}}
+</select>
+{{else}}
+{{t "console.authorization.common.noSubjectAttributes"}}
+{{/if}}

@@ -1,0 +1,187 @@
+<p>{{t "console.authorization.policies.edit.summaryReview.switchView"}}</p>
+
+{{! The IDs are used for testing }}
+
+<div class="form-group">
+    <div class="col-sm-6">
+        <div class="panel panel-default review-panel {{#equals '' entity.name}}panel-danger{{/equals}}
+            {{#if options.invalidName}}panel-danger{{/if}} {{#if options.incorrectName}}panel-danger{{/if}}" tabindex="0">
+            <div class="panel-body">
+                <div class="panel-collapse">
+                    <div class="panel-heading" data-toggle="collapse" data-target="#reviewNamePanel">
+                        <h4 class="panel-title">{{t "console.common.name"}}</h4>
+                    </div>
+
+                    <div id="reviewNamePanel" class="collapse {{#if advancedMode}}in{{/if}}
+                        {{#equals '' entity.name}}in{{/equals}} {{#if options.invalidName}}in{{/if}} {{#if options.incorrectName}}in{{/if}}">
+                        <h5 class="review-title">{{t "console.common.name"}}</h5>
+
+                        <p id="reviewName" class="review-text {{#unless entity.name}}text-danger{{/unless}}">
+                            {{#if options.incorrectName}}
+                            {{t "console.authorization.policies.edit.summaryReview.invalidName"}}
+                            {{else}}
+                            {{#if entity.name}}
+                            {{entity.name}}
+                            {{else}}
+                            {{t "console.authorization.policies.edit.summaryReview.noName"}}
+                            {{/if}}
+                            {{/if}}
+                        </p>
+
+                        <h5 class="review-title">{{t "console.common.description"}}</h5>
+
+                        <p id="reviewDesc" class="review-text">
+                            {{#if entity.description}}
+                            {{entity.description}}
+                            {{else}}
+                            {{t "console.authorization.policies.edit.summaryReview.noDescription"}}
+                            {{/if}}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6">
+        <div class="panel panel-default review-panel {{#if options.invalidResource}}panel-danger{{/if}}
+            {{#unless entity.resources}}panel-danger{{/unless}}" tabindex="0">
+            <div class="panel-body">
+                <div class="panel-collapse">
+                    <div class="panel-heading" data-toggle="collapse" data-target="#reviewResPanel">
+                        <h4 class="panel-title">{{t "console.authorization.common.resources"}}</h4>
+                    </div>
+
+                    <div id="reviewResPanel" class="collapse {{#if advancedMode}}in{{/if}}
+                        {{#if options.invalidResource}}in{{/if}} {{#unless entity.resources}}in{{/unless}}">
+                        {{#if entity.resources}}
+                        <ul id="reviewRes" class="review-text">
+                            {{#each entity.resources}}
+                            <li
+                            {{#equals this ../../options.invalidResource}} class="text-danger"{{/equals}}>{{this}}</li>
+                            {{/each}}
+                        </ul>
+                        {{else}}
+                        <p class="review-text text-danger">{{t "console.authorization.common.noResources"}}</p>
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="form-group">
+    <div class="col-sm-6">
+        <div class="panel panel-default review-panel" tabindex="0">
+            <div class="panel-body">
+                <div class="panel-collapse">
+                    <div class="panel-heading" data-toggle="collapse" data-target="#reviewActionsPanel">
+                        <h4 class="panel-title">{{t "console.authorization.common.actions"}}</h4>
+                        {{#unless actionsString}}
+                        <small class="empty-msg">({{t "common.form.empty"}})</small>
+                        {{/unless}}
+                    </div>
+
+                    <div id="reviewActionsPanel" class="collapse {{#if advancedMode}}in{{/if}}">
+                        {{#if actionsString}}
+                        <pre id="reviewActions" class="review-text">{{actionsString}}</pre>
+                        {{else}}
+                        <p class="review-text">{{t "console.authorization.common.noActionsSelected"}}</p>
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6">
+        <div class="panel panel-default review-panel" tabindex="0">
+            <div class="panel-body">
+                <div class="panel-collapse">
+                    <div class="panel-heading" data-toggle="collapse" data-target="#reviewSubjPanel">
+                        <h4 class="panel-title">{{t "console.authorization.common.subjects"}}</h4>
+                        {{#unless subjectString}}
+                        <small class="empty-msg">({{t "common.form.empty"}})</small>
+                        {{/unless}}
+                    </div>
+
+                    <div id="reviewSubjPanel" class="collapse {{#if advancedMode}}in{{/if}}">
+                        {{#if subjectString}}
+                        <pre id="reviewSubj" class="review-text">{{subjectString}}</pre>
+                        {{else}}
+                        <p class="review-text">{{t "console.authorization.policies.edit.summaryReview.noSubjectConditions"}}</p>
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="form-group">
+    <div class="col-sm-6">
+        <div class="panel panel-default review-panel" tabindex="0">
+            <div class="panel-body">
+                <div class="panel-collapse">
+                    <div class="panel-heading" data-toggle="collapse" data-target="#reviewEnvPanel">
+                        <h4 class="panel-title">{{t "console.authorization.common.environments"}}</h4>
+                        {{#unless environmentString}}
+                        <small class="empty-msg">({{t "common.form.empty"}})</small>
+                        {{/unless}}
+                    </div>
+
+                    <div id="reviewEnvPanel" class="collapse {{#if advancedMode}}in{{/if}}">
+                        {{#if environmentString}}
+                        <pre id="reviewEnv" class="review-text">{{environmentString}}</pre>
+                        {{else}}
+                        <p class="review-text">{{t "console.authorization.policies.edit.summaryReview.noEnvironmentConditions"}}</p>
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6">
+        <div class="panel panel-default review-panel" tabindex="0">
+            <div class="panel-body">
+                <div class="panel-collapse">
+                    <div class="panel-heading" data-toggle="collapse" data-target="#reviewStAttrsPanel">
+                        <h4 class="panel-title">{{t "console.authorization.common.responseAttributes"}}</h4>
+                        {{#unless responseAttrs}}
+                        <small class="empty-msg">({{t "common.form.empty"}})</small>
+                        {{/unless}}
+                    </div>
+
+                    <div id="reviewStAttrsPanel" class="collapse {{#if advancedMode}}in{{/if}}">
+                        <h5 class="review-title">{{t "console.authorization.common.staticAttributes"}}</h5>
+                        {{#if combinedStaticAttrs}}
+                        <ul class="review-text">
+                            {{#each combinedStaticAttrs}}
+                            <li>
+                                <span>{{propertyName}}:</span> {{#each propertyValues}}{{this}}{{#unless @last}},
+                                {{/unless}}{{/each}}
+                            </li>
+                            {{/each}}
+                        </ul>
+                        {{else}}
+                        <p class="review-text">{{t "console.authorization.common.noStaticAttributes"}}</p>
+                        {{/if}}
+
+                        <h5 class="review-title">{{t "console.authorization.common.subjectAttributes"}}</h5>
+                        {{#if userAttrs}}
+                        <ul class="review-text">
+                            {{#each userAttrs}}
+                            <li>{{propertyName}}</li>
+                            {{/each}}
+                        </ul>
+                        {{else}}
+                        <p class="review-text">{{t "console.authorization.common.noSubjectAttributes"}}</p>
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

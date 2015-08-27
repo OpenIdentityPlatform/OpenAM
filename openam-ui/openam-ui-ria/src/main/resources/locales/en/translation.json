@@ -79,7 +79,7 @@
                     "unableToPersistPolicy": "Unable to persist policy in datastore",
                     "policiesUploaded": "Policies uploaded successfully",
                     "policiesUploadFailed": "Failed to upload policies",
-                    "importFailed": "Import Failed: __applicationName__ application not found in realm",
+                    "importFailed": "Import Failed: __applicationName__ policy set not found in realm",
                     "error": {
                         "cantStartWithHash": "LDAP entity can't start with #",
                         "noName": "Name is required",
@@ -592,11 +592,32 @@
     },
     "console": {
         "common": {
-            "topLevelRealm" : "Top Level Realm",
+            "topLevelRealm": "Top Level Realm",
             "realmStatus": "Status",
             "realmDnsAliases": "Aliases/DNS Aliases",
             "noResults": "No results to display",
             "name": "Name",
+            "nav": {
+                "dashboard": "Dashboard",
+                "authn": {
+                    "authn": "Authentication",
+                    "settings": "Settings",
+                    "chains": "Chains",
+                    "modules": "Modules"
+                },
+                "services": "Services",
+                "dataStores": "Data Stores",
+                "privileges": "Privileges",
+                "authz": {
+                    "authz": "Authorization",
+                    "policies": "Policies",
+                    "resourceTypes": "Resource Types"
+                },
+                "subjects": "Subjects",
+                "agents": "Agents",
+                "sts": "STS",
+                "scripts": "Scripts"
+            },
             "description": "Description",
             "type": "Type"
         },
@@ -660,7 +681,6 @@
         },
         "dashboard":{
             "realmProperties" : "Properties",
-            "dashboard" : "Dashboard",
             "title" : "Realm Overview",
             "quickStart" : "Common Tasks"
         },
@@ -725,12 +745,12 @@
                 "grid": ["Name", "Script Type", "Language", "Description"]
             }
         },
-        "policies": {
+        "authorization": {
             "common": {
                 "realm": "Realm",
                 "realms": "Realms",
-                "application": "Application",
-                "applications": "Applications",
+                "policySet": "Policy Set",
+                "policySets": "Policy Sets",
                 "pattern": "Pattern",
                 "patterns": "Patterns",
                 "responseAttributes": "Response attributes",
@@ -750,10 +770,10 @@
                 "noResourceTypes": "There are no selected resources types...",
                 "noStaticAttributes": "There are no static attributes...",
                 "noSubjectAttributes": "There are no subject attributes...",
-                "noApplications": "There are no selected applications...",
+                "noApplications": "There are no selected policy sets...",
                 "noPatterns": "There are no patterns...",
                 "noResourceTypesAvailable": "There are no available resource types...",
-                "noApplicationsAvailable": "There are no available applications...",
+                "noApplicationsAvailable": "There are no available policy sets...",
 
                 "weekdays": {
                     "Monday": {
@@ -791,7 +811,7 @@
                 }
             },
 
-            "applications":{
+            "policySets":{
                 "edit": {
                     "policies": "Policies",
                     "resourceTypes": {
@@ -800,10 +820,10 @@
                     }
                 },
                 "list": {
-                    "addNew": "New Application",
+                    "addNew": "New Policy Set",
                     "importPolicies": "Import Policies",
                     "exportPolicies": "Export Policies",
-                    "title": "Applications",
+                    "title": "Policy Sets",
                     "grid": ["Name", "Description", "Resource Types"]
                 }
             },

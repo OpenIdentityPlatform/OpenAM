@@ -1,0 +1,19 @@
+<button type="button" id="addNewApp" class="btn btn-primary pull-left">
+    <i class="fa fa-plus"></i> {{t "console.authorization.policySets.list.addNew"}}
+</button>
+
+<button type="button" id="deleteRecords" class="btn btn-default pull-left" {{#unless selectedItems}} disabled {{/unless}}>
+    <i class="fa fa-close"></i> {{t "common.form.delete"}} {{#if selectedItems}}({{selectedItems.length}}){{/if}}
+</button>
+
+<div class="pull-right">
+    <button type="button" class="btn btn-default" id="importPolicies">
+        <i class="fa fa-download"></i> {{t "console.authorization.policySets.list.importPolicies"}}
+    </button>
+
+    <button type="button" class="btn btn-default" id="exportPolicies">
+        <i class="fa fa-upload"></i> {{t "console.authorization.policySets.list.exportPolicies"}}
+    </button>
+
+    <input type="file" name="upload" class="hidden"/>
+</div>
