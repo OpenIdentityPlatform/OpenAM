@@ -488,7 +488,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema
-                            name="com.forgerock.openam.oauth2provider.accessTokenLifeTime"
+                            name="com.forgerock.openam.oauth2provider.refreshTokenLifeTime"
                             type="single"
                             syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                             i18nKey="a755">
@@ -497,7 +497,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema
-                            name="com.forgerock.openam.oauth2provider.refreshTokenLifeTime"
+                            name="com.forgerock.openam.oauth2provider.accessTokenLifeTime"
                             type="single"
                             syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                             i18nKey="a756">
