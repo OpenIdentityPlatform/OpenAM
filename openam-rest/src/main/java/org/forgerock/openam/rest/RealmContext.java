@@ -18,6 +18,7 @@ package org.forgerock.openam.rest;
 
 import org.forgerock.http.Context;
 import org.forgerock.http.context.AbstractContext;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Pair;
 
 /**
@@ -26,6 +27,8 @@ import org.forgerock.util.Pair;
  * @since 12.0.0
  */
 public class RealmContext extends AbstractContext {
+
+    private static final String ROOT_REALM = "/";
 
     private Pair<String, String> dnsAliasRealm;
     private Pair<String, String> relativeRealmPath = Pair.of("/", "/");
@@ -163,4 +166,28 @@ public class RealmContext extends AbstractContext {
     String getOverrideRealm() {
         return overrideRealm;
     }
+
+    /**
+     * Given the context will return an appropriate realm.
+     *
+     * @param context
+     *         the http context
+     *
+     * @return passed realm else defaults to the root realm
+     */
+    public static final String getRealm(Context context) {
+        if (!context.containsContext(RealmContext.class)) {
+            return ROOT_REALM;
+        }
+
+        RealmContext realmContext = context.asContext(RealmContext.class);
+        String realm = realmContext.getResolvedRealm();
+
+        if (StringUtils.isEmpty(realm)) {
+            realm = ROOT_REALM;
+        }
+
+        return realm;
+    }
+
 }

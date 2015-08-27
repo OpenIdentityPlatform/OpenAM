@@ -200,4 +200,18 @@ public class RealmContextTest {
         //Then
         assertThat(overrideRealm).isEqualTo("/OVERRIDE_REALM");
     }
+
+    @Test
+    public void staticHelperMethodReturnsAppropriateRealm() {
+        //Given
+        RealmContext context = new RealmContext(new RootContext());
+        context.addSubRealm("SUB_REALM", "/some/realm");
+
+        //When
+        String realm = RealmContext.getRealm(context);
+
+        //Then
+        assertThat(realm).isEqualTo("/some/realm");
+    }
+
 }
