@@ -31,10 +31,11 @@ public class ZipUtilsTest {
     public void tryZippingAFolder() throws IOException {
         String testFolder =  File.separator + "zipUtils" + File.separator + "FakeFolder";
         testFolder = ZipUtilsTest.class.getResource(testFolder).getPath();
-        String testFolderZipped =  testFolder + ".zip";
+        String testFolderZipped =  "target" + File.separator + "FakeFolder.zip";
 
         ZipUtils.generateZip(testFolder, testFolderZipped);
         File f = new File(testFolderZipped);
         Assert.assertTrue(f.exists() && !f.isDirectory());
+        new File(testFolderZipped).deleteOnExit();
     }
 }
