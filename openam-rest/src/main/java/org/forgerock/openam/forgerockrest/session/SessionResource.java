@@ -46,6 +46,7 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import org.forgerock.http.Context;
+import org.forgerock.http.header.CookieHeader;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -195,11 +196,14 @@ public class SessionResource implements CollectionResourceProvider {
     }
 
     protected String getTokenIdFromHeader(Context context, String cookieName) {
-        final List<String> header = context.asContext(HttpContext.class).getHeader
-                (cookieName.toLowerCase());
+        final List<String> headers = context.asContext(HttpContext.class).getHeader("cookie");
 
-        if (!header.isEmpty()) {
-            return header.get(0);
+        for (String header : headers) {
+            for (org.forgerock.http.protocol.Cookie cookie : CookieHeader.valueOf(header).getCookies()) {
+                if (cookie.getName().equalsIgnoreCase(cookieName)) {
+                    return cookie.getValue();
+                }
+            }
         }
         return null;
     }

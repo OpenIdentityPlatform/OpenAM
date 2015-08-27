@@ -458,7 +458,9 @@ public class SmsRequestHandler implements RequestHandler, SMSObjectListener {
         debug.message("Adding singleton path {}", path);
         serviceRoutes.putAll(addRoute(globalSchema, EQUALS, path, handler, ignoredRoutes, routeTree));
 
-        addPaths(parentPath, schemaPath, globalSchema, serviceRoutes, ignoredRoutes, routeTree);
+        if (globalSchema != organizationSchema) {
+            addPaths(parentPath, schemaPath, globalSchema, serviceRoutes, ignoredRoutes, routeTree);
+        }
     }
 
     private boolean excludeSingleton(String serviceName) {
