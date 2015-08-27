@@ -27,6 +27,7 @@ import org.restlet.data.Form;
 import org.restlet.engine.header.HeaderConstants;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.routing.Filter;
+import org.restlet.util.Series;
 
 /**
  * Provides validation for OAuth2 endpoints to ensure that the request is valid for the endpoint being requested.
@@ -72,7 +73,7 @@ public abstract class OAuth2Filter extends Filter {
         // Pragma: no-cache
         // -------------------------------------
         response.getCacheDirectives().add(CacheDirective.noStore());
-        Form additionalHeaders = (Form) request.getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
+        Series additionalHeaders = (Series) request.getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
         if (additionalHeaders == null) {
             additionalHeaders = new Form();
             request.getAttributes().put("org.restlet.http.headers", additionalHeaders);
