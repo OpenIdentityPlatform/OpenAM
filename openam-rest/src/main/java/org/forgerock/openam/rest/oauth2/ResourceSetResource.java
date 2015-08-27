@@ -54,6 +54,7 @@ import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.restlet.resources.ResourceSetDescriptionValidator;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
+import org.forgerock.openam.oauth2.resources.labels.LabelType;
 import org.forgerock.openam.oauth2.resources.labels.ResourceSetLabel;
 import org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore;
 import org.forgerock.openam.rest.resource.ContextHelper;
@@ -112,14 +113,14 @@ public class ResourceSetResource implements CollectionResourceProvider {
             ReadRequest request) {
         boolean augmentWithPolicies = augmentWithPolicies(request);
         String realm = getRealm(context);
-        String resourceOwnerId = getResourceOwnerId(context);
+        final String resourceOwnerId = getUserId(context);
         return resourceSetService.getResourceSet(context, realm, resourceId, resourceOwnerId, augmentWithPolicies)
                 .thenAsync(new AsyncFunction<ResourceSetDescription, ResourceResponse, ResourceException>() {
                     @Override
                     public Promise<ResourceResponse, ResourceException> apply(ResourceSetDescription result) {
                         try {
                             JsonValue content = null;
-                            content = getResourceSetJson(result);
+                            content = getResourceSetJson(result, resourceOwnerId);
                             return newResultPromise(newResource(result.getId(), content));
                         } catch (ResourceException e) {
                             return newExceptionPromise(e);
@@ -139,7 +140,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
 
         if ("revokeAll".equalsIgnoreCase(request.getAction())) {
             String realm = getRealm(context);
-            String resourceOwnerId = getResourceOwnerId(context);
+            String resourceOwnerId = getUserId(context);
             return resourceSetService.revokeAllPolicies(context, realm, resourceOwnerId)
                     .thenAsync(new AsyncFunction<Void, ActionResponse, ResourceException>() {
                         @Override
@@ -180,15 +181,15 @@ public class ResourceSetResource implements CollectionResourceProvider {
 
         boolean augmentWithPolicies = augmentWithPolicies(request);
         String realm = getRealm(context);
-        String resourceOwnerId = getResourceOwnerId(context);
-        return resourceSetService.getResourceSets(context, realm, query, resourceOwnerId, augmentWithPolicies)
+        final String userId = getUserId(context);
+        return resourceSetService.getResourceSets(context, realm, query, userId, augmentWithPolicies)
                 .thenAsync(new AsyncFunction<Collection<ResourceSetDescription>, QueryResponse, ResourceException>() {
                     @Override
                     public Promise<QueryResponse, ResourceException> apply(Collection<ResourceSetDescription> resourceSets) {
                         try {
                             for (ResourceSetDescription resourceSet : resourceSets) {
                                 queryHandler.handleResource(
-                                        newResource(resourceSet.getId(), getResourceSetJson(resourceSet)));
+                                        newResource(resourceSet.getId(), getResourceSetJson(resourceSet, userId)));
                             }
                             return newResultPromise(newQueryResponse());
                         } catch (ResourceException e) {
@@ -198,7 +199,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
                 });
     }
 
-    private String getResourceOwnerId(Context context) {
+    private String getUserId(Context context) {
         return contextHelper.getUserId(context);
     }
 
@@ -214,7 +215,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
         return newResourceResponse(id, Long.toString(content.hashCode()), content);
     }
 
-    private JsonValue getResourceSetJson(ResourceSetDescription resourceSet) throws ResourceException {
+    private JsonValue getResourceSetJson(ResourceSetDescription resourceSet, String userId) throws ResourceException {
         HashMap<String, Object> content = new HashMap<String, Object>(resourceSet.asMap());
         content.put("_id", resourceSet.getId());
         content.put("resourceServer", resourceSet.getClientId());
@@ -223,8 +224,15 @@ public class ResourceSetResource implements CollectionResourceProvider {
 
         Set<ResourceSetLabel> labels = umaLabelsStore.forResourceSet(resourceSet.getRealm(), resourceSet.getResourceOwnerId(), resourceSet.getId(), false);
         Set<String> labelIds = new HashSet<>();
+
+        boolean filterOutSystemLabels = userId.equals(resourceSet.getResourceOwnerId());
+
         for (ResourceSetLabel label : labels) {
-            labelIds.add(label.getId());
+            if (filterOutSystemLabels && label.getType().equals(LabelType.SYSTEM)) {
+                continue;
+            } else {
+                labelIds.add(label.getId());
+            }
         }
         content.put("labels", labelIds);
 
@@ -308,7 +316,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
             } else if (new JsonPointer("/labels").equals(field)) {
                 ResourceSetLabel label = null;
                 try {
-                    label = umaLabelsStore.read(getRealm(context), getResourceOwnerId(context), (String) valueAssertion);
+                    label = umaLabelsStore.read(getRealm(context), getUserId(context), (String) valueAssertion);
                 } catch (ResourceException e) {
                     throw new IllegalArgumentException("Unknown Label ID.");
                 }
@@ -496,7 +504,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
             resourceSetDescriptionAttributes = validator.validate(request.getContent().asMap());
 
             final String realm = getRealm(context);
-            final String userId = getResourceOwnerId(context);
+            final String userId = getUserId(context);
 
             //remove this resource set id from all labels
             Set<ResourceSetLabel> labels = umaLabelsStore.forResourceSet(realm, userId, resourceId, true);
@@ -520,7 +528,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
                         public Promise<ResourceResponse, ResourceException> apply(ResourceSetDescription result) {
                             try {
                                 JsonValue content = null;
-                                content = getResourceSetJson(result);
+                                content = getResourceSetJson(result, userId);
                                 return newResultPromise(newResource(result.getId(), content));
                             } catch (ResourceException e) {
                                 return newExceptionPromise(e);
