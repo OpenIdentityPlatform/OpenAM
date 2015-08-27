@@ -217,7 +217,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
                 .fail(function (e) {
                     var applicationNotFoundInRealm = " application not found in realm",
                         responseText = e ? e.responseText : '',
-                        message = $($.parseXML(responseText)).find("message").text(),
+                        messages = $($.parseXML(responseText)).find("message"),
+                        message = messages.length ? messages[0].textContent : "",
                         index = message ? message.indexOf(applicationNotFoundInRealm) : -1;
 
                     if (index > -1) {
@@ -239,7 +240,8 @@ define("org/forgerock/openam/ui/admin/views/realms/authorization/policySets/Poli
         },
 
         exportPolicies: function () {
-            this.$el.find("#exportPolicies").attr("href", Constants.host + "/" + Constants.context + "/xacml/policies");
+            var realm = this.realmPath === "/" ? "" : this.realmPath;
+            this.$el.find("#exportPolicies").attr("href", Constants.host + "/" + Constants.context + "/xacml" +  realm + "/policies");
         },
 
         addNewApplication: function (e) {

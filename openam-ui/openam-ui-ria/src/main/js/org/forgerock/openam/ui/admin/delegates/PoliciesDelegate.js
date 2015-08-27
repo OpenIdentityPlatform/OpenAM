@@ -101,7 +101,7 @@ define("org/forgerock/openam/ui/admin/delegates/PoliciesDelegate", [
     obj.importPolicies = function (data) {
         return obj.serviceCall({
             serviceUrl: Constants.host + "/" + Constants.context,
-            url: RealmHelper.decorateURLWithOverrideRealm("/xacml/policies"),
+            url: RealmHelper.decorateURLWithOverrideRealm("/xacml" + getCurrentAdministeredRealm() + "/policies"),
             type: "POST",
             data: data
         });
