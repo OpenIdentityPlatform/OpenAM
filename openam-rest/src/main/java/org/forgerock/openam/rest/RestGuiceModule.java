@@ -22,12 +22,19 @@ import static org.forgerock.json.resource.RouteMatchers.requestUriMatcher;
 import static org.forgerock.json.resource.RouteMatchers.resourceApiVersionContextFilter;
 import static org.forgerock.json.resource.http.CrestHttp.newHttpHandler;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import com.google.inject.Key;
 import com.google.inject.PrivateModule;
 import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
+import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.sm.InvalidRealmNameManager;
@@ -40,10 +47,8 @@ import org.forgerock.http.Handler;
 import org.forgerock.http.handler.Handlers;
 import org.forgerock.http.routing.ResourceApiVersionBehaviourManager;
 import org.forgerock.http.routing.RouteMatchers;
-import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.Filter;
 import org.forgerock.json.resource.FilterChain;
-import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.Router;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.openam.oauth2.OpenAMTokenStore;
@@ -53,12 +58,6 @@ import org.forgerock.openam.rest.fluent.CrestLoggingFilter;
 import org.forgerock.openam.utils.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 @GuiceModule
 public class RestGuiceModule extends PrivateModule {
@@ -176,23 +175,6 @@ public class RestGuiceModule extends PrivateModule {
         realmRouter.addRoute(RouteMatchers.requestUriMatcher(STARTS_WITH, "{realm}"),
                 Handlers.chainOf(realmRouter, realmContextFilter));
         return realmRouter;
-    }
-
-    @Provides
-    @Named("InternalRouter")
-    @Singleton
-    Router getInternalRouter(@Named("CrestRootRouter") Router rootRouter) {
-        Router internalRouter = new Router();
-        rootRouter.setDefaultRoute(new FilterChain(rootRouter));
-        return internalRouter;
-    }
-
-    @Provides
-    @Named("InternalConnectionFactory")
-    @Singleton
-    ConnectionFactory getInternalConnectionFactory(@Named("CrestRootRouter") Router internalRouter) {
-        // todo: really the named router should be "InternalRouter".
-        return Resources.newInternalConnectionFactory(internalRouter);
     }
 
     @Provides
