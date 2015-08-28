@@ -16,6 +16,9 @@
 
 package org.forgerock.openam.oauth2.saml2.core;
 
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.SCOPE;
+import static org.forgerock.oauth2.core.Utils.*;
+
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml2.assertion.Assertion;
 import com.sun.identity.saml2.assertion.AssertionFactory;
@@ -127,6 +130,12 @@ public class Saml2GrantTypeHandler implements GrantTypeHandler {
                 assertionObject.getSubject().getNameID().getValue(), clientRegistration.getClientId(), null,
                 validatedScope, null, null, request);
         logger.trace("Token created: " + accessToken.toString());
+        
+        providerSettings.additionalDataToReturnFromTokenEndpoint(accessToken, request);
+
+        if (validatedScope != null && !validatedScope.isEmpty()) {
+            accessToken.add(SCOPE, joinScope(validatedScope));
+        }
 
         return accessToken;
     }

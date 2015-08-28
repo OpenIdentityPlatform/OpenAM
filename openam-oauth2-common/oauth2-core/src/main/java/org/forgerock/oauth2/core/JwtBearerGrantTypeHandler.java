@@ -78,6 +78,8 @@ public class JwtBearerGrantTypeHandler implements GrantTypeHandler {
                 jwt.getSubject(), clientRegistration.getClientId(), redirectUri, authorizationScope, null,
                 null, request);
 
+        providerSettings.additionalDataToReturnFromTokenEndpoint(accessToken, request);
+
         if (authorizationScope != null && !authorizationScope.isEmpty()) {
             accessToken.addExtraData("scope", joinScope(authorizationScope));
         }
