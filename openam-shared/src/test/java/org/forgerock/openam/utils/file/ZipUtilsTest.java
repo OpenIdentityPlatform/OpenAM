@@ -21,6 +21,7 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -30,10 +31,10 @@ import java.nio.file.Path;
 public class ZipUtilsTest {
 
     @Test
-    public void tryZippingAFolder() throws IOException {
+    public void tryZippingAFolder() throws IOException, URISyntaxException {
 
         String testFolder =  File.separator + "zipUtils" + File.separator + "FakeFolder";
-        testFolder = ZipUtilsTest.class.getResource(testFolder).getPath();
+        testFolder = ZipUtilsTest.class.getResource(testFolder).toURI().getPath();
         Path zipTempFolder = Files.createTempDirectory("tmp");
 
         String outputZip = zipTempFolder + File.separator + "FakeFolder.zip";

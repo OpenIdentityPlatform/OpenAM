@@ -19,6 +19,7 @@ package org.forgerock.openam.utils.file;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
@@ -39,16 +40,20 @@ public class ZipUtils {
 
     /**
      * Generate a zip
+     *
+     * Due to a bug in Java 7 corrected in Java 8 http://bugs.java.com/bugdatabase/view_bug.do?bug_id=7156873
+     * srcFolder and outputZip can't be URL encoded if you're using java 7.
+     *
      * @param srcFolder source folder
      * @param outputZip zip folder
      * @throws IOException
      */
-    public static void generateZip(String srcFolder, String outputZip) throws IOException {
+    public static void generateZip(String srcFolder, String outputZip) throws IOException, URISyntaxException {
 
 
         final Path targetZip = Paths.get(outputZip);
         final Path sourceDir = Paths.get(srcFolder);
-        final URI uri = URI.create("jar:file:" + targetZip.toAbsolutePath());
+        final URI uri = new URI("jar", "file:" + targetZip, null);
 
         try (FileSystem zipfs = FileSystems.newFileSystem(uri, singletonMap("create", "true"))) {
             Files.walkFileTree(sourceDir, new SimpleFileVisitor<Path>() {

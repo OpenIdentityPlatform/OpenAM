@@ -40,6 +40,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -413,6 +414,8 @@ public class DefaultDebugRecorder implements DebugRecorder {
                     debug.warning("Zip file '{}' can't be delete.", zipArchiveName, e);
                 }
                 throw new RecordException("Issue '" + record + "' can't be zipped due to an IO issue.", e);
+            } catch (URISyntaxException e) {
+                debug.warning("Record '{}' can't be deleted", record.getFolderPath(), e);
             }
         }
     }
