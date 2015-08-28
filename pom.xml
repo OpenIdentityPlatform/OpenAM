@@ -125,6 +125,7 @@
         <forgerock.guava.version>18.0.1</forgerock.guava.version>
         <forgerock.audit.version>0.3.0-SNAPSHOT</forgerock.audit.version>
         <forgerock.guice.version>1.1.0-SNAPSHOT</forgerock.guice.version>
+        <forgerock.selfservice.version>0.1.0-SNAPSHOT</forgerock.selfservice.version>
 
         <guice.version>3.0</guice.version>
         <restlet.version>2.3.4</restlet.version>
@@ -370,6 +371,7 @@
         <module>openam-certs</module>
         <module>openam-upgrade</module>
         <module>openam-audit</module>
+        <module>openam-selfservice</module>
     </modules>
 
     <!-- Mailing Lists -->
@@ -779,6 +781,12 @@
                 <artifactId>openam-certs</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-selfservice</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
 
             <!-- OpenAM schema projects -->
             <dependency>
@@ -1744,6 +1752,16 @@
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-audit-handler-csv</artifactId>
                 <version>${forgerock.audit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-selfservice-core</artifactId>
+                <version>${forgerock.selfservice.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-selfservice-stages</artifactId>
+                <version>${forgerock.selfservice.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.code.findbugs</groupId>
