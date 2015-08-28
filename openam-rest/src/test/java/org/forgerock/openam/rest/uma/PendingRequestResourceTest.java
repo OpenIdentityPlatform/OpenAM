@@ -27,11 +27,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.*;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.forgerock.http.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -55,6 +50,10 @@ import org.forgerock.util.query.QueryFilter;
 import org.mockito.Mock;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 public class PendingRequestResourceTest {
 
@@ -182,6 +181,7 @@ public class PendingRequestResourceTest {
         Context context = mockContext("REALM");
         QueryRequest request = Requests.newQueryRequest("").setQueryFilter(QueryFilter.<JsonPointer>alwaysTrue());
         QueryResourceHandler handler = mock(QueryResourceHandler.class);
+        given(handler.handleResource(any(ResourceResponse.class))).willReturn(true);
 
         mockPendingRequestsForUser("alice", "REALM", 2);
 

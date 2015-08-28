@@ -15,30 +15,20 @@
  */
 package org.forgerock.openam.rest.scripting;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.openam.scripting.ScriptConstants.*;
-import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.POLICY_CONDITION;
-import static org.forgerock.openam.scripting.SupportedScriptingLanguage.GROOVY;
-import static org.forgerock.openam.scripting.SupportedScriptingLanguage.JAVASCRIPT;
-import static org.mockito.BDDMockito.given;
+import static org.forgerock.openam.scripting.ScriptConstants.ScriptContext.*;
+import static org.forgerock.openam.scripting.SupportedScriptingLanguage.*;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertNotNull;
-
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.testng.AssertJUnit.*;
 import com.sun.identity.shared.encode.Base64;
-
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.security.auth.Subject;
-
 import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -68,6 +58,15 @@ import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import javax.security.auth.Subject;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class ScriptResourceTest {
 
@@ -189,6 +188,7 @@ public class ScriptResourceTest {
 
         QueryRequest queryRequest = mock(QueryRequest.class);
         QueryResourceHandler mockHandler = mock(QueryResourceHandler.class);
+        given(mockHandler.handleResource(any(ResourceResponse.class))).willReturn(true);
 
         // when
         Promise<QueryResponse, ResourceException> promise =
@@ -217,6 +217,7 @@ public class ScriptResourceTest {
         assertEquals(responseJsonTwo.get(SCRIPT_TEXT).asString(), encodeScript);
         assertEquals(getLanguageFromString(responseJsonTwo.get(SCRIPT_LANGUAGE).asString()), GROOVY);
         assertEquals(getContextFromString(responseJsonTwo.get(SCRIPT_CONTEXT).asString()), POLICY_CONDITION);
+
     }
 
     @Test
@@ -427,6 +428,7 @@ public class ScriptResourceTest {
         }
 
         QueryResourceHandler resultHandler = mock(QueryResourceHandler.class);
+        given(resultHandler.handleResource(any(ResourceResponse.class))).willReturn(true);
         QueryRequest queryRequest = mock(QueryRequest.class);
         when(queryRequest.getPageSize()).thenReturn(5);
 
@@ -448,6 +450,7 @@ public class ScriptResourceTest {
 
         // when
         Mockito.reset(resultHandler);
+        given(resultHandler.handleResource(any(ResourceResponse.class))).willReturn(true);
         resources = ArgumentCaptor.forClass(ResourceResponse.class);
         when(queryRequest.getPagedResultsOffset()).thenReturn(5);
         scriptResource.queryCollection(context, queryRequest, resultHandler).getOrThrowUninterruptibly();

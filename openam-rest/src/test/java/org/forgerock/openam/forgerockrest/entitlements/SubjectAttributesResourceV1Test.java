@@ -16,23 +16,23 @@
 
 package org.forgerock.openam.forgerockrest.entitlements;
 
-import static org.forgerock.json.resource.test.assertj.AssertJQueryResponseAssert.assertThat;
-import static org.mockito.BDDMockito.given;
+import static org.forgerock.json.resource.test.assertj.AssertJQueryResponseAssert.*;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
-
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.SubjectAttributesManager;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.http.Context;
-import org.forgerock.json.resource.CountPolicy;
 import org.forgerock.json.resource.InternalContext;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.util.promise.Promise;
@@ -66,7 +66,6 @@ public class SubjectAttributesResourceV1Test {
         given(mockSSOTokenContext.getCallerSubject()).willReturn(mockSubject);
         QueryRequest mockRequest = mock(QueryRequest.class);
         QueryResourceHandler mockHandler = mock(QueryResourceHandler.class);
-        QueryResourceHandler resultHandler = QueryResourceHandlerBuilder.withPagingAndSorting(mockHandler, mockRequest);
         Set<String> attributes = new HashSet<>();
         attributes.add("attr");
         attributes.add("attr2");
@@ -74,7 +73,7 @@ public class SubjectAttributesResourceV1Test {
 
         //when
         Promise<QueryResponse, ResourceException> promise =
-                subjectAttributesResource.queryCollection(mockServerContext, mockRequest, resultHandler);
+                subjectAttributesResource.queryCollection(mockServerContext, mockRequest, mockHandler);
 
         //then
         promise.getOrThrowUninterruptibly();
@@ -92,13 +91,12 @@ public class SubjectAttributesResourceV1Test {
         given(mockSSOTokenContext.getCallerSubject()).willReturn(mockSubject);
         QueryRequest mockRequest = mock(QueryRequest.class);
         QueryResourceHandler mockHandler = mock(QueryResourceHandler.class);
-        QueryResourceHandler resultHandler = QueryResourceHandlerBuilder.withPagingAndSorting(mockHandler, mockRequest);
         Set<String> attributes = new HashSet<>();
         given(mockSAM.getAvailableSubjectAttributeNames()).willReturn(attributes);
 
         //when
         Promise<QueryResponse, ResourceException> promise =
-                subjectAttributesResource.queryCollection(mockServerContext, mockRequest, resultHandler);
+                subjectAttributesResource.queryCollection(mockServerContext, mockRequest, mockHandler);
 
         //then
         promise.getOrThrowUninterruptibly();
@@ -116,12 +114,11 @@ public class SubjectAttributesResourceV1Test {
         given(mockSSOTokenContext.getCallerSubject()).willReturn(mockSubject);
         QueryRequest mockRequest = mock(QueryRequest.class);
         QueryResourceHandler mockHandler = mock(QueryResourceHandler.class);
-        QueryResourceHandler resultHandler = QueryResourceHandlerBuilder.withPagingAndSorting(mockHandler, mockRequest);
         given(mockSAM.getAvailableSubjectAttributeNames()).willThrow(new EntitlementException(401));
 
         //when
         Promise<QueryResponse, ResourceException> promise =
-                subjectAttributesResource.queryCollection(mockServerContext, mockRequest, resultHandler);
+                subjectAttributesResource.queryCollection(mockServerContext, mockRequest, mockHandler);
 
         //then
         verify(mockDebug, times(1)).error(anyString());

@@ -16,20 +16,8 @@
 
 package org.forgerock.openam.forgerockrest.entitlements;
 
-import static org.forgerock.json.resource.Responses.newQueryResponse;
-import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
-import static org.forgerock.util.promise.Promises.newResultPromise;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.security.auth.Subject;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
+import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.util.promise.Promises.*;
 import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.http.Context;
@@ -37,7 +25,6 @@ import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
-import org.forgerock.json.resource.CountPolicy;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.PatchRequest;
@@ -50,11 +37,20 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.SecurityContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.RestUtils;
-import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResponsePresentation;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeWrapper;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.util.promise.Promise;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.security.auth.Subject;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Allows for CREST-handling of stored {@link ApplicationType}s.
@@ -64,7 +60,8 @@ import org.forgerock.util.promise.Promise;
  */
 public class ApplicationTypesResource extends SubjectAwareResource {
 
-    final JsonPointer JSON_POINTER_TO_NAME = new JsonPointer(ApplicationType.FIELD_NAME);
+    static final JsonPointer JSON_POINTER_TO_NAME = new JsonPointer(ApplicationType.FIELD_NAME);
+
 
     private final ApplicationTypeManagerWrapper typeManager;
     private final Debug debug;
@@ -176,30 +173,8 @@ public class ApplicationTypesResource extends SubjectAwareResource {
 
         final List<JsonValue> jsonifiedAppTypes = jsonify(appTypes);
 
-        handler = QueryResourceHandlerBuilder.withPagingAndSorting(handler, request);
-
-        int remaining = 0;
-        if (appTypes.size() > 0) {
-            remaining = appTypes.size();
-            for (JsonValue appTypesToReturn : jsonifiedAppTypes) {
-
-                final JsonValue resourceId = appTypesToReturn.get(JSON_POINTER_TO_NAME);
-                final String id = resourceId != null ? resourceId.toString() : null;
-
-                boolean keepGoing = handler.handleResource(newResourceResponse(id,
-                        String.valueOf(System.currentTimeMillis()), appTypesToReturn));
-                remaining--;
-                if (debug.messageEnabled()) {
-                    debug.message("ApplicationTypesResource :: QUERY by " + principalName +
-                            ": Added resource to response: " + id);
-                }
-                if (!keepGoing) {
-                    break;
-                }
-            }
-        }
-
-        return newResultPromise(newQueryResponse(null, CountPolicy.EXACT, remaining));
+        QueryResponsePresentation.enableDeprecatedRemainingQueryResponse(request);
+        return QueryResponsePresentation.perform(handler, request, jsonifiedAppTypes, JSON_POINTER_TO_NAME);
     }
 
     /**

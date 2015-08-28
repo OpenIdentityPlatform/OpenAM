@@ -16,23 +16,10 @@
 
 package org.forgerock.openam.rest.oauth2;
 
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
-import static org.forgerock.json.resource.ResourceException.newBadRequestException;
-import static org.forgerock.json.resource.ResourceException.newNotSupportedException;
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
-import static org.forgerock.util.promise.Promises.newResultPromise;
-
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import static org.forgerock.util.promise.Promises.*;
 import org.forgerock.http.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -53,7 +40,7 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.oauth2.resources.ResourceSetDescription;
 import org.forgerock.oauth2.restlet.resources.ResourceSetDescriptionValidator;
 import org.forgerock.openam.cts.api.fields.ResourceSetTokenField;
-import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResponsePresentation;
 import org.forgerock.openam.oauth2.resources.labels.LabelType;
 import org.forgerock.openam.oauth2.resources.labels.ResourceSetLabel;
 import org.forgerock.openam.oauth2.resources.labels.UmaLabelsStore;
@@ -62,6 +49,15 @@ import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
 import org.forgerock.util.query.QueryFilterVisitor;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>Resource Set resource to expose registered Resource Sets for a given user.</p>
@@ -72,6 +68,8 @@ import org.forgerock.util.query.QueryFilterVisitor;
  * @since 13.0.0
  */
 public class ResourceSetResource implements CollectionResourceProvider {
+
+    private static final String ID = "_id";
 
     static final String SUBJECT_FIELD = "/permissions/subject";
     private final ResourceSetService resourceSetService;
@@ -160,10 +158,8 @@ public class ResourceSetResource implements CollectionResourceProvider {
      * @param request {@inheritDoc}
      */
     @Override
-    public Promise<QueryResponse, ResourceException> queryCollection(final Context context, QueryRequest request,
-            QueryResourceHandler handler) {
-
-        final QueryResourceHandler queryHandler = QueryResourceHandlerBuilder.withPagingAndSorting(handler, request);
+    public Promise<QueryResponse, ResourceException> queryCollection(final Context context, final QueryRequest request,
+            final QueryResourceHandler handler) {
 
         final ResourceSetWithPolicyQuery query;
         try {
@@ -187,11 +183,12 @@ public class ResourceSetResource implements CollectionResourceProvider {
                     @Override
                     public Promise<QueryResponse, ResourceException> apply(Collection<ResourceSetDescription> resourceSets) {
                         try {
+                            Collection<JsonValue> values = new ArrayList<>();
                             for (ResourceSetDescription resourceSet : resourceSets) {
-                                queryHandler.handleResource(
-                                        newResource(resourceSet.getId(), getResourceSetJson(resourceSet, userId)));
+                                values.add(getResourceSetJson(resourceSet, userId));
                             }
-                            return newResultPromise(newQueryResponse());
+                            QueryResponsePresentation.enableDeprecatedRemainingQueryResponse(request);
+                            return QueryResponsePresentation.perform(handler, request, values, new JsonPointer(ID));
                         } catch (ResourceException e) {
                             return newExceptionPromise(e);
                         }
@@ -217,7 +214,7 @@ public class ResourceSetResource implements CollectionResourceProvider {
 
     private JsonValue getResourceSetJson(ResourceSetDescription resourceSet, String userId) throws ResourceException {
         HashMap<String, Object> content = new HashMap<String, Object>(resourceSet.asMap());
-        content.put("_id", resourceSet.getId());
+        content.put(ID, resourceSet.getId());
         content.put("resourceServer", resourceSet.getClientId());
         content.put("resourceOwnerId", resourceSet.getResourceOwnerId());
 
@@ -580,5 +577,17 @@ public class ResourceSetResource implements CollectionResourceProvider {
     public Promise<ActionResponse, ResourceException> actionInstance(Context context, String resourceId,
             ActionRequest request) {
         return newExceptionPromise(newNotSupportedException());
+    }
+
+    /**
+     * Used for containing all values required during a query to be converted to a ResourceResponse.
+     */
+    private static class QueryPayload {
+        ResourceSetDescription description;
+        String userId;
+        public QueryPayload(ResourceSetDescription description, String userId) {
+            this.description = description;
+            this.userId = userId;
+        }
     }
 }

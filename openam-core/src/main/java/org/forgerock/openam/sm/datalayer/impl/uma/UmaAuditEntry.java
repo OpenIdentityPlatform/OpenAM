@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.sm.datalayer.impl.uma;
 
+import static org.forgerock.json.JsonValue.*;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.Field;
@@ -24,10 +25,10 @@ import org.forgerock.openam.tokens.Type;
 
 import java.util.Calendar;
 
-import static org.forgerock.json.JsonValue.*;
-
 @Type(TokenType.UMA_AUDIT_ENTRY)
 public class UmaAuditEntry {
+    public static final String ID = "_id";
+
     @Field(field = CoreTokenField.TOKEN_ID, generated = true)
     private String id;
     @Field(field = CoreTokenField.STRING_ONE)
@@ -113,6 +114,7 @@ public class UmaAuditEntry {
 
     public JsonValue asJson() {
         JsonValue auditEntry = json(object(
+                field(ID, id),
                 field("resourceSetId", resourceSetId),
                 field("resourceSetName", resourceSetName),
                 field("requestingPartyId", requestingPartyId),

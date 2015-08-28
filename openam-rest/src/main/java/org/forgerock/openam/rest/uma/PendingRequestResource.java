@@ -16,20 +16,12 @@
 
 package org.forgerock.openam.rest.uma;
 
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
-import static org.forgerock.json.resource.ResourceException.newNotSupportedException;
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
-import static org.forgerock.util.promise.Promises.newResultPromise;
-
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
+import static org.forgerock.util.promise.Promises.*;
 import org.forgerock.http.Context;
+import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -44,7 +36,7 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResponsePresentation;
 import org.forgerock.openam.forgerockrest.utils.JsonValueQueryFilterVisitor;
 import org.forgerock.openam.forgerockrest.utils.ServerContextUtils;
 import org.forgerock.openam.rest.resource.ContextHelper;
@@ -53,6 +45,13 @@ import org.forgerock.openam.uma.PendingRequestsService;
 import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
  * CREST resource for UMA Pending Requests.
@@ -139,15 +138,18 @@ public class PendingRequestResource implements CollectionResourceProvider {
             return newExceptionPromise(newNotSupportedException("Only query filter is supported."));
         }
 
-        handler = QueryResourceHandlerBuilder.withPagingAndSorting(handler, request);
-
         try {
+            Collection<JsonValue> values = new ArrayList<>();
+            // Filter items based on query filter.
             for (UmaPendingRequest pendingRequest : queryResourceOwnerPendingRequests(context)) {
                 if (request.getQueryFilter().accept(QUERY_VISITOR, pendingRequest.asJson())) {
-                    handler.handleResource(newResource(pendingRequest));
+                    values.add(pendingRequest.asJson());
                 }
             }
-            return newResultPromise(newQueryResponse());
+
+            // Sort and Page for presentation
+            QueryResponsePresentation.enableDeprecatedRemainingQueryResponse(request);
+            return QueryResponsePresentation.perform(handler, request, values, new JsonPointer(UmaPendingRequest.ID));
         } catch (ResourceException e) {
             return newExceptionPromise(e);
         }

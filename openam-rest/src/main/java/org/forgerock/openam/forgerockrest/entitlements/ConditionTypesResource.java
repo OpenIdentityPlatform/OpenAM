@@ -16,22 +16,11 @@
 
 package org.forgerock.openam.forgerockrest.entitlements;
 
-import static org.forgerock.json.resource.Responses.newQueryResponse;
-import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
-import static org.forgerock.util.promise.Promises.newResultPromise;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
+import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.util.promise.Promises.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsonschema.JsonSchema;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -44,7 +33,6 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CollectionResourceProvider;
-import org.forgerock.json.resource.CountPolicy;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.PatchRequest;
@@ -60,10 +48,17 @@ import org.forgerock.openam.entitlement.conditions.environment.IPv4Condition;
 import org.forgerock.openam.entitlement.conditions.environment.IPv6Condition;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.JsonEntitlementConditionModule;
-import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResponsePresentation;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Allows for CREST-handling of stored {@link EntitlementCondition}s.
@@ -195,30 +190,8 @@ public class ConditionTypesResource implements CollectionResourceProvider {
             }
         }
 
-        handler = QueryResourceHandlerBuilder.withPagingAndSorting(handler, request);
-
-        int remaining = 0;
-        if (conditionTypes.size() > 0) {
-            remaining = conditionTypes.size();
-            for (JsonValue conditionTypesToReturn : conditionTypes) {
-
-                final JsonValue resourceId = conditionTypesToReturn.get(JSON_POINTER_TO_TITLE);
-                final String id = resourceId != null ? resourceId.toString() : null;
-
-                boolean keepGoing = handler.handleResource(newResourceResponse(id,
-                        String.valueOf(System.currentTimeMillis()), conditionTypesToReturn));
-                remaining--;
-                if (debug.messageEnabled()) {
-                    debug.message("ConditionTypesResource :: QUERY by " + principalName +
-                            ": Added resource to response: " + id);
-                }
-                if (!keepGoing) {
-                    break;
-                }
-            }
-        }
-
-        return newResultPromise(newQueryResponse(null, CountPolicy.EXACT, remaining));
+        QueryResponsePresentation.enableDeprecatedRemainingQueryResponse(request);
+        return QueryResponsePresentation.perform(handler, request, conditionTypes, JSON_POINTER_TO_TITLE);
     }
 
     /**

@@ -15,21 +15,8 @@
 */
 package org.forgerock.openam.forgerockrest.entitlements;
 
-import static org.forgerock.json.resource.Responses.newQueryResponse;
-import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
-import static org.forgerock.util.promise.Promises.newResultPromise;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.security.auth.Subject;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.util.promise.Promises.*;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.identity.entitlement.Application;
@@ -41,7 +28,6 @@ import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
-import org.forgerock.json.resource.CountPolicy;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.PatchRequest;
@@ -56,7 +42,7 @@ import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryFilterVisitorAdapter;
-import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResponsePresentation;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationWrapper;
@@ -65,6 +51,16 @@ import org.forgerock.opendj.ldap.DN;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.security.auth.Subject;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Endpoint for the ApplicationsResource.
@@ -353,12 +349,9 @@ public class ApplicationsResource extends RealmAwareResource {
         final String realm = getRealm(context);
         final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(mySubject);
 
-        List<ApplicationWrapper> apps = new LinkedList<ApplicationWrapper>();
-        int remaining = 0;
-
         try {
+            Collection<JsonValue> results = new ArrayList<>();
             final Set<String> appNames = query(request, mySubject, realm);
-
             for (String appName : appNames) {
                 final Application application = appManager.getApplication(mySubject, realm, appName);
 
@@ -367,26 +360,11 @@ public class ApplicationsResource extends RealmAwareResource {
                     continue;
                 }
 
-                apps.add(createApplicationWrapper(application, appTypeManagerWrapper));
+                results.add(createApplicationWrapper(application, appTypeManagerWrapper).toJsonValue());
             }
 
-            handler = QueryResourceHandlerBuilder.withPagingAndSorting(handler, request);
-
-            if (apps.size() > 0) {
-                remaining = apps.size();
-                for (ApplicationWrapper app : apps) {
-                    boolean keepGoing = handler.handleResource(
-                            newResourceResponse(app.getName(), Long.toString(app.getLastModifiedDate()), app.toJsonValue()));
-                    remaining--;
-                    if (debug.messageEnabled()) {
-                        debug.message("ApplicationsResource :: QUERY by " + principalName +
-                                ": Added resource to response: " + app.getName());
-                    }
-                    if (!keepGoing) {
-                        break;
-                    }
-                }
-            }
+            QueryResponsePresentation.enableDeprecatedRemainingQueryResponse(request);
+            return QueryResponsePresentation.perform(handler, request, results, new JsonPointer("name"));
         } catch (EntitlementException e) {
             if (debug.errorEnabled()) {
                 debug.error("ApplicationsResource :: QUERY by " + principalName +
@@ -395,8 +373,6 @@ public class ApplicationsResource extends RealmAwareResource {
             }
             return newExceptionPromise(exceptionMappingHandler.handleError(context, request, e));
         }
-
-        return newResultPromise(newQueryResponse(null, CountPolicy.EXACT, remaining));
     }
 
     /**

@@ -16,17 +16,15 @@
 
 package org.forgerock.openam.forgerockrest;
 
-import static org.forgerock.json.resource.ResourceException.newNotSupportedException;
-import static org.forgerock.json.resource.Responses.newActionResponse;
-import static org.forgerock.json.resource.Responses.newQueryResponse;
-import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
-import static org.forgerock.util.promise.Promises.newResultPromise;
-
+import static org.forgerock.json.resource.ResourceException.*;
+import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.util.promise.Promises.*;
 import com.google.inject.Inject;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdUtils;
+import org.forgerock.http.Context;
 import org.forgerock.http.routing.UriRouterContext;
+import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -35,21 +33,22 @@ import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.QueryResponse;
+import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
-import org.forgerock.util.promise.Promise;
-import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.http.Context;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResponsePresentation;
 import org.forgerock.openam.rest.RealmContext;
-import org.forgerock.openam.sm.datalayer.store.ServerException;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaAuditEntry;
+import org.forgerock.openam.sm.datalayer.store.ServerException;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
+import org.forgerock.util.promise.Promise;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Set;
 
 public class AuditHistory implements CollectionResourceProvider {
@@ -75,25 +74,25 @@ public class AuditHistory implements CollectionResourceProvider {
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         AMIdentity identity = getIdentity(context);
-        try {
-            Set<UmaAuditEntry> history;
 
+        Set<UmaAuditEntry> history;
+        try {
             if (request.getQueryFilter().toString().equals("true")) {
                 history = auditLogger.getEntireHistory(identity);
             } else {
                 history = auditLogger.getHistory(identity, request);
             }
-
-            final QueryResourceHandler resultHandler = QueryResourceHandlerBuilder.withPagingAndSorting(handler, request);
-
-            for (UmaAuditEntry entry : history) {
-                resultHandler.handleResource(newResourceResponse(entry.getId(), null, entry.asJson()));
-            }
-
-            return newResultPromise(newQueryResponse());
         } catch (ServerException e) {
             return newExceptionPromise((ResourceException) new InternalServerErrorException(e));
         }
+
+        Collection<JsonValue> results = new ArrayList<>();
+        for (UmaAuditEntry entry : history) {
+            results.add(entry.asJson());
+        }
+
+        QueryResponsePresentation.enableDeprecatedRemainingQueryResponse(request);
+        return QueryResponsePresentation.perform(handler, request, results, new JsonPointer(UmaAuditEntry.ID));
     }
 
     private AMIdentity getIdentity(Context context) {

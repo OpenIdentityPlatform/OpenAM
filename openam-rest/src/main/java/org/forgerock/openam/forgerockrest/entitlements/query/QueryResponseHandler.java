@@ -44,7 +44,7 @@ public class QueryResponseHandler implements QueryResourceHandler {
      * @param result The {@code QueryResponse}.
      * @return The paged and/or sorted {@code QueryResponse}.
      */
-    public QueryResponse getResult(QueryResponse result) {
+    QueryResponse getResult(QueryResponse result) {
         return result;
     }
 }

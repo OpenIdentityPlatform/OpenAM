@@ -16,27 +16,21 @@
 
 package org.forgerock.openam.forgerockrest.entitlements;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
-import static org.forgerock.json.resource.ResourceException.adapt;
+import static org.apache.commons.lang.StringUtils.*;
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
-import static org.forgerock.util.promise.Promises.newResultPromise;
-
-import javax.inject.Inject;
-import java.util.List;
-
+import static org.forgerock.util.promise.Promises.*;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.http.Context;
+import org.forgerock.json.JsonPointer;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CollectionResourceProvider;
-import org.forgerock.json.resource.CountPolicy;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.NotSupportedException;
@@ -51,10 +45,15 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.PolicyRequest;
-import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResponsePresentation;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Promise;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * REST endpoint for policy/entitlements management and evaluation.
@@ -222,22 +221,13 @@ public final class PolicyResource implements CollectionResourceProvider {
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         try {
-            handler = QueryResourceHandlerBuilder.withPagingAndSorting(handler, request);
-            List<Privilege> policies = policyStoreProvider.getPolicyStore(context).query(request);
-
-            int remaining = 0;
-            if (policies != null) {
-                remaining = policies.size();
-                for (Privilege policy : policies) {
-                    boolean keepGoing = handler.handleResource(policyResource(policy));
-                    remaining--;
-                    if (!keepGoing) {
-                        break;
-                    }
-                }
+            Collection<JsonValue> results = new ArrayList<>();
+            for (Privilege policy: policyStoreProvider.getPolicyStore(context).query(request)) {
+                results.add(policyParser.printPolicy(policy));
             }
 
-            return newResultPromise(newQueryResponse(null, CountPolicy.EXACT, remaining));
+            QueryResponsePresentation.enableDeprecatedRemainingQueryResponse(request);
+            return QueryResponsePresentation.perform(handler, request, results, new JsonPointer("name"));
         } catch (EntitlementException ex) {
             DEBUG.error("PolicyResource :: QUERY : Error querying policy collection.", ex);
             return newExceptionPromise(resourceErrorHandler.handleError(context, request, ex));

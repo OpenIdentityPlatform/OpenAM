@@ -42,6 +42,7 @@ import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryResponseHandler;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResponsePresentation;
 import org.forgerock.openam.forgerockrest.guice.ForgerockRestGuiceModule;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.query.QueryException;
@@ -529,8 +530,8 @@ public class ResourceTypesResourceTest {
     @Test
     public void queryShouldHandleAllResults() throws Exception {
         //given
-        QueryRequest queryRequest = mock(QueryRequest.class);
-        QueryResponseHandler queryHandler = mock(QueryResponseHandler.class);
+        QueryRequest queryRequest = makeMockQueryRequest();
+        QueryResponseHandler queryHandler = makeQueryResponseHandler();
 
         Map<String, Map<String, Set<String>>> resourceTypes = new HashMap<>();
         final int resultSize = 10;
@@ -541,7 +542,6 @@ public class ResourceTypesResourceTest {
         when(resourceTypeService.getResourceTypesData(any(Subject.class), anyString())).thenReturn(resourceTypes);
         when(resourceTypeService.getResourceType(any(Subject.class), anyString(), anyString())).thenReturn
                 (EntitlementUtils.resourceTypeFromMap(UUID.randomUUID().toString(), rawData));
-        when(queryHandler.handleResource(any(ResourceResponse.class))).thenReturn(true);
 
         //when
         Promise<QueryResponse, ResourceException> promise =
@@ -556,8 +556,9 @@ public class ResourceTypesResourceTest {
     @Test
     public void queryShouldPageResults() throws Exception {
         //given
-        QueryRequest queryRequest = mock(QueryRequest.class);
-        QueryResponseHandler queryHandler = mock(QueryResponseHandler.class);
+        QueryRequest queryRequest = makeMockQueryRequest();
+
+        QueryResponseHandler queryHandler = makeQueryResponseHandler();
 
         final int firstPageSize = 2;
         final int pageOffset = 0;
@@ -597,8 +598,9 @@ public class ResourceTypesResourceTest {
     @Test
     public void shouldHandleQueryPageLargerThanResults() throws Exception {
         //given
-        QueryRequest queryRequest = mock(QueryRequest.class);
-        QueryResponseHandler queryHandler = mock(QueryResponseHandler.class);
+        QueryRequest queryRequest = makeMockQueryRequest();
+
+        QueryResponseHandler queryHandler = makeQueryResponseHandler();
 
         final int lastPageSize = 5;
         final int pageOffset = 10;
@@ -642,7 +644,7 @@ public class ResourceTypesResourceTest {
         setupExistingResourceTypeFromJson(jsonResourceType);
 
         QueryRequest queryRequest = mock(QueryRequest.class);
-        QueryResponseHandler queryHandler = mock(QueryResponseHandler.class);
+        QueryResponseHandler queryHandler = makeQueryResponseHandler();
         Throwable t = new QueryException(QueryException.QueryErrorCode.FILTER_BOOLEAN_LITERAL_FALSE);
         when(resourceTypeService.getResourceTypesData(any(Subject.class), anyString())).thenThrow(t);
 
@@ -652,6 +654,24 @@ public class ResourceTypesResourceTest {
 
         //then
         assertThat(promise).failedWithResourceException().withCode(ResourceException.BAD_REQUEST);
+    }
+
+    /**
+     * Generates a mock request which will simulate the required behaviour of requesting
+     * the now deprecated behaviour of returning the remaining results.
+     *
+     * @return Non null.
+     */
+    private static QueryRequest makeMockQueryRequest() {
+        QueryRequest mockRequest = mock(QueryRequest.class);
+        given(mockRequest.getAdditionalParameter(QueryResponsePresentation.REMAINING)).willReturn("true");
+        return mockRequest;
+    }
+
+    private static QueryResponseHandler makeQueryResponseHandler() {
+        QueryResponseHandler mock = mock(QueryResponseHandler.class);
+        given(mock.handleResource(any(ResourceResponse.class))).willReturn(true);
+        return mock;
     }
 
 }

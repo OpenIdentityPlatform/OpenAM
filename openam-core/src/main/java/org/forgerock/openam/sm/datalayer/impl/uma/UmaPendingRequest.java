@@ -17,10 +17,6 @@
 package org.forgerock.openam.sm.datalayer.impl.uma;
 
 import static org.forgerock.json.JsonValue.*;
-
-import java.util.Calendar;
-import java.util.Set;
-
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.tokens.Field;
@@ -28,6 +24,9 @@ import org.forgerock.openam.tokens.JsonValueToJsonBytesConverter;
 import org.forgerock.openam.tokens.TokenType;
 import org.forgerock.openam.tokens.Type;
 import org.forgerock.opendj.ldap.GeneralizedTime;
+
+import java.util.Calendar;
+import java.util.Set;
 
 /**
  * A data layer persistent object for UMA Pending requests.
@@ -41,6 +40,7 @@ public class UmaPendingRequest {
     public static final String RESOURCE_OWNER_ID_FIELD = "resourceOwnerId";
     public static final String REALM_FIELD = "realm";
     public static final String REQUESTING_PARTY_ID_FIELD = "requestingPartyId";
+    public static final String ID = "_id";
 
     @Field(field = CoreTokenField.TOKEN_ID, generated = true)
     private String id;
@@ -140,7 +140,7 @@ public class UmaPendingRequest {
 
     public JsonValue asJson() {
         return json(object(
-                field("_id", id),
+                field(ID, id),
                 field("user", requestingPartyId),
                 field("resource", resourceSetName),
                 field("when", getRequestedAt()),

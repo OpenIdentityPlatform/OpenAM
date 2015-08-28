@@ -16,17 +16,10 @@
 package org.forgerock.openam.rest.scripting;
 
 import static org.forgerock.json.JsonValue.*;
-import static org.forgerock.json.resource.ResourceException.newNotSupportedException;
+import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.openam.scripting.ScriptConstants.*;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
-import static org.forgerock.util.promise.Promises.newResultPromise;
-
-import java.io.UnsupportedEncodingException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import static org.forgerock.util.promise.Promises.*;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.sun.identity.shared.encode.Base64;
@@ -47,7 +40,7 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.entitlements.RealmAwareResource;
-import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResponsePresentation;
 import org.forgerock.openam.rest.query.QueryByStringFilterConverter;
 import org.forgerock.openam.scripting.ScriptError;
 import org.forgerock.openam.scripting.ScriptException;
@@ -59,6 +52,13 @@ import org.forgerock.openam.scripting.service.ScriptingServiceFactory;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
 import org.slf4j.Logger;
+
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * A REST endpoint for managing scripts in OpenAM.
@@ -161,7 +161,6 @@ public class ScriptResource extends RealmAwareResource {
     @Override
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler resultHandler) {
-        resultHandler = QueryResourceHandlerBuilder.withPagingAndSorting(resultHandler, request);
         final QueryFilter<JsonPointer> filter = request.getQueryFilter();
         try {
             final Set<ScriptConfiguration> configs;
@@ -172,10 +171,14 @@ public class ScriptResource extends RealmAwareResource {
                         new QueryByStringFilterConverter(), null);
                 configs = serviceFactory.create(getContextSubject(context), getRealm(context)).get(stringQueryFilter);
             }
-            for (ScriptConfiguration sc : configs) {
-                resultHandler.handleResource(newResourceResponse(sc.getId(), String.valueOf(sc.hashCode()), asJson(sc)));
+
+            Collection<JsonValue> results = new ArrayList<>();
+            for (ScriptConfiguration configuration : configs) {
+                results.add(asJson(configuration));
             }
-            return newResultPromise(newQueryResponse());
+
+            QueryResponsePresentation.enableDeprecatedRemainingQueryResponse(request);
+            return QueryResponsePresentation.perform(resultHandler, request, results, new JsonPointer(JSON_UUID));
         } catch (ScriptException se) {
             return newExceptionPromise(exceptionMappingHandler.handleError(context, request, se));
         }

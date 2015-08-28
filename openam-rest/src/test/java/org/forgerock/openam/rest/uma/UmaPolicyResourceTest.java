@@ -18,16 +18,13 @@ package org.forgerock.openam.rest.uma;
 
 import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.Responses.*;
-import static org.forgerock.util.test.assertj.AssertJPromiseAssert.*;
-import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.*;
+import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.assertThat;
+import static org.forgerock.util.test.assertj.AssertJPromiseAssert.assertThat;
+import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
-import java.util.Collection;
-import java.util.HashSet;
-
 import org.forgerock.http.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -52,6 +49,9 @@ import org.forgerock.util.promise.Promises;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.util.Collection;
+import java.util.HashSet;
 
 public class UmaPolicyResourceTest {
 
@@ -291,6 +291,7 @@ public class UmaPolicyResourceTest {
         Context context = mock(Context.class);
         QueryRequest request = Requests.newQueryRequest("/policies");
         QueryResourceHandler handler = mock(QueryResourceHandler.class);
+        given(handler.handleResource(any(ResourceResponse.class))).willReturn(true);
         QueryResponse queryResult = newQueryResponse();
         Collection<UmaPolicy> umaPolicies = new HashSet<UmaPolicy>();
         UmaPolicy policy1 = mock(UmaPolicy.class);
@@ -303,11 +304,10 @@ public class UmaPolicyResourceTest {
         given(policyService.queryPolicies(context, request)).willReturn(promise);
 
         //When
-        Promise<QueryResponse, ResourceException> result = policyResource.queryCollection(context, request, handler);
+        policyResource.queryCollection(context, request, handler);
 
         //Then
         verify(handler, times(2)).handleResource(Matchers.<ResourceResponse>anyObject());
-        assertThat(result).succeeded().withObject().isEqualTo(queryResult);
     }
 
     @Test

@@ -16,17 +16,13 @@
 
 package org.forgerock.openam.rest.uma;
 
-import static org.forgerock.json.JsonValue.json;
-import static org.forgerock.json.JsonValue.object;
-import static org.forgerock.json.resource.ResourceException.newNotSupportedException;
-import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
-import static org.forgerock.util.promise.Promises.newResultPromise;
-
-import javax.inject.Inject;
-import java.util.Collection;
-
+import static org.forgerock.json.JsonValue.*;
+import static org.forgerock.json.resource.ResourceException.*;
+import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.util.promise.Promises.*;
 import org.forgerock.http.Context;
+import org.forgerock.json.JsonPointer;
+import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CollectionResourceProvider;
@@ -40,12 +36,17 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResponsePresentation;
+import org.forgerock.openam.uma.UmaConstants;
 import org.forgerock.openam.uma.UmaPolicy;
 import org.forgerock.openam.uma.UmaPolicyService;
 import org.forgerock.util.AsyncFunction;
 import org.forgerock.util.Pair;
 import org.forgerock.util.promise.Promise;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * REST endpoint for UMA policy management.
@@ -156,18 +157,17 @@ public class UmaPolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
-            QueryResourceHandler handler) {
-        final QueryResourceHandler resultHandler = new QueryResourceHandlerBuilder(handler)
-                .withPaging(request.getPageSize(), request.getPagedResultsOffset()).build();
+    public Promise<QueryResponse, ResourceException> queryCollection(Context context, final QueryRequest request,
+            final QueryResourceHandler handler) {
         return umaPolicyService.queryPolicies(context, request)
                 .thenAsync(new AsyncFunction<Pair<QueryResponse, Collection<UmaPolicy>>, QueryResponse, ResourceException>() {
                     @Override
                     public Promise<QueryResponse, ResourceException> apply(Pair<QueryResponse, Collection<UmaPolicy>> result) {
+                        Collection<JsonValue> values = new ArrayList<>();
                         for (UmaPolicy policy : result.getSecond()) {
-                            resultHandler.handleResource(newResourceResponse(policy.getId(), policy.getRevision(), policy.asJson()));
+                            values.add(policy.asJson());
                         }
-                        return newResultPromise(result.getFirst());
+                        return QueryResponsePresentation.perform(handler, request, values, new JsonPointer(UmaConstants.UmaPolicy.POLICY_ID_KEY));
                     }
                 });
     }

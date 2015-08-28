@@ -18,15 +18,9 @@ package org.forgerock.openam.forgerockrest.entitlements;
 import static com.sun.identity.entitlement.EntitlementException.*;
 import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.util.promise.Promises.*;
-
-import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.security.auth.Subject;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.http.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.JsonValue;
@@ -47,7 +41,7 @@ import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.openam.entitlement.service.ResourceTypeService;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
 import org.forgerock.openam.forgerockrest.RestUtils;
-import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResponsePresentation;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.JsonResourceType;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.forgerockrest.utils.ServerContextUtils;
@@ -57,9 +51,14 @@ import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.shared.debug.Debug;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.security.auth.Subject;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Allows for CREST-handling of stored {@link org.forgerock.openam.entitlement.ResourceType}s which know about realms.
@@ -273,7 +272,6 @@ public class ResourceTypesResource extends RealmAwareResource {
         String principalName = "unknown";
         String realm = getRealm(context);
         QueryFilter<JsonPointer> queryFilter = request.getQueryFilter();
-        handler = QueryResourceHandlerBuilder.withPagingAndSorting(handler, request);
 
         try {
             Subject subject = getSubject(context);
@@ -287,16 +285,15 @@ public class ResourceTypesResource extends RealmAwareResource {
                 filterResults = queryFilter.accept(new DataQueryFilterVisitor(), configData);
             }
 
+            Collection<JsonValue> results = new ArrayList<>();
             for (String uuid : filterResults) {
                 ResourceType resourceType = resourceTypeService.getResourceType(subject, realm, uuid);
-                handler.handleResource(newResourceResponse(uuid,
-                        String.valueOf(resourceType.hashCode()),
-                        new JsonResourceType(resourceType).toJsonValue()));
+                results.add(new JsonResourceType(resourceType).toJsonValue());
             }
-            int remaining = request.getPageSize() == 0 ? 0 :
-                    filterResults.size() - (request.getPagedResultsOffset() + request.getPageSize());
-            return newResultPromise(newRemainingResultsResponse(request.getPagedResultsCookie(),
-                    remaining < 0 ? 0 : remaining));
+
+            QueryResponsePresentation.enableDeprecatedRemainingQueryResponse(request);
+            return QueryResponsePresentation.perform(handler, request, results, new JsonPointer("uuid"));
+
         } catch (EntitlementException ee) {
             if (logger.errorEnabled()) {
                 logger.error("ResourceTypesResource :: QUERY by "

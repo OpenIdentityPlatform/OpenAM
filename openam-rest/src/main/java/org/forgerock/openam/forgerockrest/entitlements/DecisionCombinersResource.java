@@ -16,18 +16,8 @@
 
 package org.forgerock.openam.forgerockrest.entitlements;
 
-import static org.forgerock.json.resource.Responses.newQueryResponse;
-import static org.forgerock.json.resource.Responses.newResourceResponse;
-import static org.forgerock.util.promise.Promises.newExceptionPromise;
-import static org.forgerock.util.promise.Promises.newResultPromise;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
+import static org.forgerock.json.resource.Responses.*;
+import static org.forgerock.util.promise.Promises.*;
 import com.sun.identity.entitlement.EntitlementCombiner;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.http.Context;
@@ -36,7 +26,6 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.CollectionResourceProvider;
-import org.forgerock.json.resource.CountPolicy;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.PatchRequest;
@@ -49,9 +38,16 @@ import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.openam.forgerockrest.RestUtils;
-import org.forgerock.openam.forgerockrest.entitlements.query.QueryResourceHandlerBuilder;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResponsePresentation;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.util.promise.Promise;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Allows for CREST-handling of stored {@link EntitlementCombiner}s.
@@ -159,30 +155,8 @@ public class DecisionCombinersResource implements CollectionResourceProvider {
             }
         }
 
-        handler = QueryResourceHandlerBuilder.withPagingAndSorting(handler, request);
-
-        int remaining = 0;
-        if (combinerTypes.size() > 0) {
-            remaining = combinerTypes.size();
-            for (JsonValue comberTypeToReturn : combinerTypes) {
-
-                final JsonValue resourceId = comberTypeToReturn.get(JSON_POINTER_TO_TITLE);
-                final String id = resourceId != null ? resourceId.toString() : null;
-
-                boolean keepGoing = handler.handleResource(newResourceResponse(id,
-                        String.valueOf(System.currentTimeMillis()), comberTypeToReturn));
-                remaining--;
-                if (debug.messageEnabled()) {
-                    debug.message("SubjectTypesResource :: QUERY by " + principalName +
-                            ": Added resource to response: " + id);
-                }
-                if (!keepGoing) {
-                    break;
-                }
-            }
-        }
-
-        return newResultPromise(newQueryResponse(null, CountPolicy.EXACT, remaining));
+        QueryResponsePresentation.enableDeprecatedRemainingQueryResponse(request);
+        return QueryResponsePresentation.perform(handler, request, combinerTypes, JSON_POINTER_TO_TITLE);
     }
 
     /**

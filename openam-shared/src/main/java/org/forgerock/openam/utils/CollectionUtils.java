@@ -183,10 +183,10 @@ public class CollectionUtils {
     }
 
     /**
-     * Maps the values of a non-null list from one type to another type using a non-null mapper function.
+     * Maps the non-null values from one type to another type using a non-null mapper function.
      *
-     * @param list
-     *         the non-null original list
+     * @param values
+     *         the non-null original values
      * @param mapper
      *         the non-null mapping function
      * @param <I>
@@ -201,12 +201,12 @@ public class CollectionUtils {
      * @throws E
      *         should an exception occur during the mapping process
      */
-    public static <I, M, E extends Exception> List<M> transformList(final List<I> list,
+    public static <I, M, E extends Exception> List<M> transformList(final Collection<I> values,
                                                                     final Function<I, M, E> mapper) throws E {
-        Reject.ifNull(list, mapper);
-        final List<M> newList = new ArrayList<M>(list.size());
+        Reject.ifNull(values, mapper);
+        final List<M> newList = new ArrayList<M>(values.size());
 
-        for (I value : list) {
+        for (I value : values) {
             newList.add(mapper.apply(value));
         }
 
@@ -214,10 +214,10 @@ public class CollectionUtils {
     }
 
     /**
-     * Maps the values of a non-null set from one type to another type using a non-null mapper function.
+     * Maps the non-null values from one type to another type using a non-null mapper function.
      *
-     * @param set
-     *         the non-null original set
+     * @param values
+     *         the non-null original values
      * @param mapper
      *         the non-null mapping function
      * @param <I>
@@ -232,12 +232,12 @@ public class CollectionUtils {
      * @throws E
      *         should an exception occur during the mapping process
      */
-    public static <I, M, E extends Exception> Set<M> transformSet(final Set<I> set,
+    public static <I, M, E extends Exception> Set<M> transformSet(final Collection<I> values,
                                                                   final Function<I, M, E> mapper) throws E {
-        Reject.ifNull(set, mapper);
-        final Set<M> newSet = new HashSet<M>(set.size());
+        Reject.ifNull(values, mapper);
+        final Set<M> newSet = new HashSet<M>(values.size());
 
-        for (I value : set) {
+        for (I value : values) {
             newSet.add(mapper.apply(value));
         }
 

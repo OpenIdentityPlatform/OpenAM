@@ -16,12 +16,18 @@
 
 package org.forgerock.openam.forgerockrest.entitlements.query;
 
+import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.util.Reject;
 
 /**
  * Adds support for paging to a query resource handler.
+ *
+ * Paging operates by knowing its start position {@link QueryRequest#getPagedResultsOffset()}
+ * in a set of results and handles a page of results {@link QueryRequest#getPageSize()} from
+ * that start position.
  *
  * @since 12.0.0
  */
@@ -31,7 +37,7 @@ final class PagingQueryResponseHandler extends QueryResponseHandler {
     private final int endOffset;
     private int currentOffset = 0;
 
-    PagingQueryResponseHandler(final QueryResourceHandler delegate, final int pageSize,
+    PagingQueryResponseHandler(final QueryResponseHandler delegate, final int pageSize,
             final int pageOffset) {
         super(delegate);
         Reject.ifNull(delegate);
@@ -53,5 +59,23 @@ final class PagingQueryResponseHandler extends QueryResponseHandler {
         }
         currentOffset++;
         return needMore;
+    }
+
+    /**
+     * This implementation of {@link QueryResponseHandler} is unable to define
+     * anything about the result as it is unaware of the entire range of results
+     * that are available.
+     *
+     * It therefore does nothing with the response other than to forward it.
+     *
+     * Note: This implementation is redundant, but serves as useful reference for
+     * the reader.
+     *
+     * @param result {@inheritDoc}
+     * @return {@inheritDoc}
+     */
+    @Override
+    QueryResponse getResult(QueryResponse result) {
+        return super.getResult(result);
     }
 }
