@@ -24,6 +24,7 @@ import org.restlet.Response;
 import org.restlet.Restlet;
 import org.restlet.data.CacheDirective;
 import org.restlet.data.Form;
+import org.restlet.data.Header;
 import org.restlet.engine.header.HeaderConstants;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.routing.Filter;
@@ -73,12 +74,7 @@ public abstract class OAuth2Filter extends Filter {
         // Pragma: no-cache
         // -------------------------------------
         response.getCacheDirectives().add(CacheDirective.noStore());
-        Series additionalHeaders = (Series) request.getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
-        if (additionalHeaders == null) {
-            additionalHeaders = new Form();
-            request.getAttributes().put("org.restlet.http.headers", additionalHeaders);
-        }
-        additionalHeaders.add(HeaderConstants.HEADER_PRAGMA, HeaderConstants.CACHE_NO_CACHE);
+        response.getHeaders().add(HeaderConstants.HEADER_PRAGMA, HeaderConstants.CACHE_NO_CACHE);
 
         return super.beforeHandle(request, response);
     }
