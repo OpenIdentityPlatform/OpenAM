@@ -15,12 +15,17 @@
  */
 package org.forgerock.openam.upgrade.steps;
 
-import static org.forgerock.openam.upgrade.UpgradeServices.*;
+import static org.forgerock.openam.upgrade.UpgradeServices.LF;
+import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
+
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.setup.AMSetupServlet;
+import com.sun.identity.setup.EmbeddedOpenDS;
+import com.sun.identity.sm.SMSEntry;
 
 import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.inject.Inject;
 
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
@@ -28,18 +33,12 @@ import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
 import org.forgerock.openam.upgrade.DirectoryContentUpgrader;
 import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.UpgradeServices;
 import org.forgerock.openam.upgrade.UpgradeStepInfo;
-
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.setup.AMSetupServlet;
-import com.sun.identity.setup.EmbeddedOpenDS;
-import com.sun.identity.sm.SMSEntry;
 
 /**
  * This upgrade step is meant to upgrade the directory schema/content for external configuration stores. For the
  * details on the performed changes see {@link DirectoryContentUpgrader}.
- *
- * @author Peter Major
  */
 @UpgradeStepInfo
 public class UpgradeDirectoryContentStep extends AbstractUpgradeStep {
@@ -55,22 +54,22 @@ public class UpgradeDirectoryContentStep extends AbstractUpgradeStep {
 
     @Override
     public boolean isApplicable() {
-        //if in case of embedded, the upgrade should have happen long before this
-        return !EmbeddedOpenDS.isStarted() && upgrader.isApplicable();
+        return upgrader.isApplicable();
     }
 
     @Override
     public void initialize() throws UpgradeException {
-        if (!EmbeddedOpenDS.isStarted()) {
-            String baseDir = AMSetupServlet.getBaseDir();
-            String baseDN = SMSEntry.getRootSuffix();
-            upgrader = new DirectoryContentUpgrader(baseDir, baseDN);
-        }
+        String baseDir = AMSetupServlet.getBaseDir();
+        String baseDN = SMSEntry.getRootSuffix();
+        upgrader = new DirectoryContentUpgrader(baseDir, baseDN);
     }
 
     @Override
     public void perform() throws UpgradeException {
-        upgrader.upgrade();
+        upgrader.upgrade(false);
+        if (EmbeddedOpenDS.isStarted()) {
+            UpgradeServices.getInstance().setRebuildIndexes(true);
+        }
     }
 
     @Override

@@ -1,7 +1,7 @@
 #
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 #
-# Copyright (c) 2011-2013 ForgeRock AS. All Rights Reserved
+# Copyright 2011-2015 ForgeRock AS.
 #
 # The contents of this file are subject to the terms
 # of the Common Development and Distribution License
@@ -190,7 +190,7 @@ dn: ds-cfg-attribute=coreTokenDate01,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Bac
 objectClass: top
 objectClass: ds-cfg-local-db-index
 ds-cfg-attribute: coreTokenDate01
-ds-cfg-index-type: equality
+ds-cfg-index-type: ordering
 
 dn: ds-cfg-attribute=coreTokenDate02,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
 objectClass: top

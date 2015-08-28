@@ -185,7 +185,7 @@ public class BootstrapData {
             startEmbeddedDS(basedir + AMSetupServlet.OPENDS_DIR);
             if (AMSetupServlet.isOpenDJUpgraded()) {
                 try {
-                    new DirectoryContentUpgrader(basedir, dsbasedn).upgrade();
+                    new DirectoryContentUpgrader(basedir, dsbasedn).upgrade(true);
                 } catch (UpgradeException ue) {
                     throw new IllegalStateException("An error occurred while upgrading directory content", ue);
                 }

@@ -18,8 +18,8 @@ package org.forgerock.openam.upgrade;
 import com.google.inject.Key;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.EmbeddedOpenDS;
-import com.sun.identity.setup.SetupConstants;
 import com.sun.identity.shared.debug.Debug;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -28,10 +28,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.impl.CTSDataLayerConfiguration;
-import org.forgerock.openam.cts.impl.LDAPConfig;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.sm.datalayer.api.ConnectionType;
 import org.forgerock.openam.sm.datalayer.api.DataLayer;
@@ -45,6 +46,7 @@ import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.EntryNotFoundException;
 import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldap.schema.Schema;
 import org.forgerock.opendj.ldif.ChangeRecordReader;
 import org.forgerock.opendj.ldif.ChangeRecordWriter;
@@ -99,6 +101,7 @@ public class DirectoryContentUpgrader {
         upgraders.add(new CreateCTSContainer());
         if (isEmbedded) {
             upgraders.add(new CreateCTSIndexes());
+            upgraders.add(new UpdateCTSDate01Index());
             upgraders.add(new AddDashboardSchema());
             upgraders.add(new AddDevicePrintSchema());
             upgraders.add(new AddUmaAuditSchema());
@@ -215,28 +218,21 @@ public class DirectoryContentUpgrader {
      *
      * @throws UpgradeException If there was an error while processing the LDIF files.
      */
-    public void upgrade() throws UpgradeException {
-        Connection conn = null;
-        try {
-            conn = connFactory.create();
+    public void upgrade(boolean rebuildIndexes) throws UpgradeException {
+        try (Connection conn = connFactory.create()) {
             for (Upgrader upgrader : upgraders) {
                 processLDIF(conn, upgrader.getLDIFPath());
             }
         } catch (DataLayerException ere) {
             DEBUG.error("An error occurred while trying to get a connection", ere);
             throw new UpgradeException(ere);
-        } finally {
-            IOUtils.closeIfNotNull(conn);
         }
-        if (isEmbedded) {
+        if (isEmbedded && rebuildIndexes) {
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("Rebuilding indexes in embedded directory");
             }
-            Map<String, String> rebuildIndexData = new HashMap<String, String>(2);
-            rebuildIndexData.put(SetupConstants.CONFIG_VAR_BASE_DIR, baseDir);
-            rebuildIndexData.put(SetupConstants.CONFIG_VAR_ROOT_SUFFIX, baseDN);
             try {
-                EmbeddedOpenDS.rebuildIndex(rebuildIndexData);
+                EmbeddedOpenDS.rebuildIndex(baseDir, baseDN);
             } catch (Exception ex) {
                 throw new UpgradeException(ex);
             }
@@ -328,6 +324,34 @@ public class DirectoryContentUpgrader {
         }
     }
 
+    /**
+     * Update the CTS coreTokenDate01 index to be 'ordering' rather than 'equality' to support efficient range
+     * queries in session blacklisting.
+     */
+    private class UpdateCTSDate01Index implements Upgrader {
+        private static final String INDEX_TYPE_ATTR = "ds-cfg-index-type";
+        @Override
+        public String getLDIFPath() {
+            return "/WEB-INF/template/ldif/sfha/cts-update-date01-index.ldif";
+        }
+
+        @Override
+        public boolean isUpgradeNecessary(final Connection conn, final Schema schema) throws UpgradeException {
+            DN indexDN = DN.valueOf("ds-cfg-attribute=" + CoreTokenField.DATE_ONE.toString()
+                    + ",cn=Index,ds-cfg-backend-id=userRoot,cn=Backends,cn=config");
+
+            try {
+                SearchResultEntry result = conn.readEntry(indexDN, INDEX_TYPE_ATTR);
+                String indexType = result.getAttribute(INDEX_TYPE_ATTR).firstValueAsString();
+                return !"ordering".equalsIgnoreCase(indexType);
+            } catch (ErrorResultException e) {
+                throw new UpgradeException(e);
+            } catch (NoSuchElementException e) {
+                return true;
+            }
+        }
+    }
+
     private class AddDashboardSchema implements Upgrader {
 
         @Override
@@ -363,7 +387,7 @@ public class DirectoryContentUpgrader {
 
         @Override
         public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
-            return !schema.hasObjectClass("uma_audit");
+            return !entryExists(conn, DN.valueOf("ou=uma_audit," + baseDN));
         }
     }
 
@@ -376,7 +400,7 @@ public class DirectoryContentUpgrader {
 
         @Override
         public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
-            return !schema.hasObjectClass("resource_sets");
+            return !entryExists(conn, DN.valueOf("ou=resource_sets," + baseDN));
         }
     }
 
@@ -389,7 +413,7 @@ public class DirectoryContentUpgrader {
 
         @Override
         public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
-            return !schema.hasObjectClass("uma_pending_requests");
+            return !entryExists(conn, DN.valueOf("ou=uma_pending_requests," + baseDN));
         }
     }
 

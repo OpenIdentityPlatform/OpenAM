@@ -38,13 +38,10 @@ import com.sun.identity.password.plugins.PasswordGenerator;
 import com.sun.identity.password.plugins.RandomPasswordGenerator;
 import com.sun.identity.password.ui.model.PWResetException;
 import com.sun.identity.setup.AMSetupServlet;
+import com.sun.identity.setup.EmbeddedOpenDS;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
 import com.sun.identity.sm.ServiceManager;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.license.License;
-import org.forgerock.openam.license.LicenseSet;
-import org.forgerock.openam.upgrade.steps.UpgradeStep;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -57,6 +54,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.license.License;
+import org.forgerock.openam.license.LicenseSet;
+import org.forgerock.openam.upgrade.steps.UpgradeStep;
 
 /**
  * This is the primary upgrade class that determines the how the services need
@@ -82,6 +84,7 @@ public class UpgradeServices {
     private final SimpleDateFormat dateFormat;
     private final String createdDate;
     private final String existingVersion = VersionUtils.getCurrentVersion();
+    private boolean rebuildIndexes = false;
 
     private UpgradeServices() throws UpgradeException {
         dateFormat = new SimpleDateFormat(DATE_FORMAT);
@@ -155,6 +158,17 @@ public class UpgradeServices {
         UpgradeProgress.reportStart("upgrade.writingversionfile");
         updateDotVersionFile();
         UpgradeProgress.reportEnd("upgrade.success");
+
+        if (rebuildIndexes) {
+            UpgradeProgress.reportStart("upgrade.rebuildingindexes");
+            try {
+                EmbeddedOpenDS.rebuildSMSIndex();
+            } catch (Exception ex) {
+                UpgradeProgress.reportEnd("upgrade.failed");
+                throw new UpgradeException(ex);
+            }
+            UpgradeProgress.reportStart("upgrade.success");
+        }
 
         if (debug.messageEnabled()) {
             debug.message("Upgrade complete.");
@@ -345,6 +359,15 @@ public class UpgradeServices {
             content = content.replace(contents.getKey(), contents.getValue().toString());
         }
         return content;
+    }
+
+    /**
+     * Indicate whether indexes should be rebuilt after the upgrade process has completed.
+     *
+     * @param rebuildIndexes whether indexes should be rebuilt after the upgrade process.
+     */
+    public void setRebuildIndexes(final boolean rebuildIndexes) {
+        this.rebuildIndexes = rebuildIndexes;
     }
 
     /**

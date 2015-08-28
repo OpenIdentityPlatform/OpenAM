@@ -33,6 +33,8 @@ import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.SMSEntry;
+
 import org.forgerock.guava.common.io.ByteStreams;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.opendj.ldap.Attribute;
@@ -86,6 +88,7 @@ import java.nio.channels.WritableByteChannel;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -1277,6 +1280,30 @@ public class EmbeddedOpenDS {
 
         }
         return null;
+    }
+
+
+    /**
+     * Rebuilds SMS indexes for the embedded DJ config store.
+     *
+     * @return the status code.
+     */
+    public static int rebuildSMSIndex() throws Exception {
+        return rebuildIndex(AMSetupServlet.getBaseDir(), SMSEntry.getRootSuffix());
+    }
+
+    /**
+     * Rebuilds indexes for the given base DN and installation directory.
+     *
+     * @param baseDir the base installation directory.
+     * @param baseDN the base DN to rebuild indexes for.
+     * @return the status code
+     */
+    public static int rebuildIndex(String baseDir, String baseDN) throws Exception {
+        Map<String, String> rebuildIndexData = new HashMap<String, String>(2);
+        rebuildIndexData.put(SetupConstants.CONFIG_VAR_BASE_DIR, baseDir);
+        rebuildIndexData.put(SetupConstants.CONFIG_VAR_ROOT_SUFFIX, baseDN);
+        return rebuildIndex(rebuildIndexData);
     }
 
     // Programmatic way of rebuilding indexes in OpenDJ.
