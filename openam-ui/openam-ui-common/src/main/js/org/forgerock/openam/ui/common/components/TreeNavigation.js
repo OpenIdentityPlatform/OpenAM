@@ -56,8 +56,7 @@ define("org/forgerock/openam/ui/common/components/TreeNavigation", [
             if (this.route && this.nextRenderPage) {
                 ModuleLoader.load(this.route.page).then(
                     _.bind(function (module) {
-                        this.nextRenderPage = false;
-                        this.renderPage(module, this.args);
+                         this.renderPage(module, this.args);
                     }, this),
                     _.bind(function () {
                         throw "Unable to render page for module " + this.route.page;
@@ -65,6 +64,7 @@ define("org/forgerock/openam/ui/common/components/TreeNavigation", [
                 );
             }
         },
+
         render: function (args, callback) {
             var self = this;
 
@@ -73,14 +73,16 @@ define("org/forgerock/openam/ui/common/components/TreeNavigation", [
             self.parentRender(function () {
                 self.$el.find(".sidenav li").removeClass("active");
                 self.findActiveNavItem(Router.getURIFragment());
-                ModuleLoader.load(self.route.page).then(function (page) {
-                    self.renderPage(page, args, callback);
-                });
+                if (!self.nextRenderPage) {
+                    ModuleLoader.load(self.route.page).then(function (page) {
+                        self.renderPage(page, args, callback);
+                    });
+                }
             });
         },
         renderPage: function (Module, args, callback) {
             var page = new Module();
-
+            this.nextRenderPage = false;
             page.element = "#sidePageContent";
             page.render(args, callback);
             this.delegateEvents();
