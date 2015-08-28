@@ -21,20 +21,25 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * Test the ZipUtils
  */
 public class ZipUtilsTest {
 
-    @Test(enabled = false)
+    @Test
     public void tryZippingAFolder() throws IOException {
+
         String testFolder =  File.separator + "zipUtils" + File.separator + "FakeFolder";
         testFolder = ZipUtilsTest.class.getResource(testFolder).getPath();
-        String testFolderZipped =  testFolder + ".zip";
+        Path zipTempFolder = Files.createTempDirectory("tmp");
 
-        ZipUtils.generateZip(testFolder, testFolderZipped);
-        File f = new File(testFolderZipped);
+        String outputZip = zipTempFolder + File.separator + "FakeFolder.zip";
+
+        ZipUtils.generateZip(testFolder, outputZip);
+        File f = new File(outputZip);
         Assert.assertTrue(f.exists() && !f.isDirectory());
     }
 }

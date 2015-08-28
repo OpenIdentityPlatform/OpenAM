@@ -45,6 +45,7 @@ public class ZipUtils {
      */
     public static void generateZip(String srcFolder, String outputZip) throws IOException {
 
+
         final Path targetZip = Paths.get(outputZip);
         final Path sourceDir = Paths.get(srcFolder);
         final URI uri = URI.create("jar:file:" + targetZip.toAbsolutePath());
@@ -53,7 +54,8 @@ public class ZipUtils {
             Files.walkFileTree(sourceDir, new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    Path target = zipfs.getPath(file.getFileName().toString());
+                    Path target = zipfs.getPath(sourceDir.relativize(file).toString());
+
                     if (target.getParent() != null) {
                         Files.createDirectories(target.getParent());
                     }
