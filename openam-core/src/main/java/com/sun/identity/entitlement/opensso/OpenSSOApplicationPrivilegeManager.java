@@ -594,21 +594,26 @@ public class OpenSSOApplicationPrivilegeManager extends
 
     private void initPermissionObjects() throws EntitlementException {
         Set<String> actions = new HashSet<String>();
+        Map<String, Set<String>> allResourceNames = Collections.EMPTY_MAP;
+        if (bPolicyAdmin) {
+            allResourceNames = getAllResourceNamesInAllAppls();
+        }
+        
         actions.add(ACTION_READ);
         actions.add(ACTION_DELEGATE);
         delegatables = new Permission(actions, bPolicyAdmin,
-            resourcePrefix);
+            resourcePrefix, allResourceNames);
 
         actions.clear();
         actions.add(ACTION_READ);
         actions.add(ACTION_MODIFY);
         modifiables = new Permission(actions, bPolicyAdmin,
-            resourcePrefix);
+            resourcePrefix, allResourceNames);
 
         actions.clear();
         actions.add(ACTION_READ);
         readables = new Permission(actions, bPolicyAdmin,
-            resourcePrefix);
+            resourcePrefix, allResourceNames);
     }
 
     private void addToMap(
@@ -860,6 +865,19 @@ public class OpenSSOApplicationPrivilegeManager extends
             pm.remove(GHOST_PRIVILEGE_NAME_PREFIX + name);
         }
     }
+    
+
+    private Map<String, Set<String>> getAllResourceNamesInAllAppls() 
+        throws EntitlementException {
+        Map<String, Set<String>> map = new HashMap<String, Set<String>>();
+        Set<Application> appls = ApplicationManager.getApplications(
+            PrivilegeManager.superAdminSubject, realm);
+
+        for (Application app : appls) {
+            map.put(app.getName(), app.getResources());
+        }
+        return map;
+    }
 
 
     private class Permission {
@@ -870,7 +888,7 @@ public class OpenSSOApplicationPrivilegeManager extends
         private String resourcePrefix;
 
         private Permission(Set<String> action, boolean bPolicyAdmin,
-            String resourcePrefix) throws EntitlementException {
+            String resourcePrefix, Map<String, Set<String>> allResourceNames) throws EntitlementException {
             this.actions = new HashSet<String>();
             this.actions.addAll(action);
             this.bPolicyAdmin = bPolicyAdmin;
@@ -879,7 +897,7 @@ public class OpenSSOApplicationPrivilegeManager extends
             appNameToResourceNames = new HashMap<String, Set<String>>();
 
             if (bPolicyAdmin) {
-                appNameToResourceNames.putAll(getAllResourceNamesInAllAppls());
+                appNameToResourceNames.putAll(allResourceNames);
             }
         }
 
@@ -910,20 +928,6 @@ public class OpenSSOApplicationPrivilegeManager extends
 
         private Set<String> getResourceNames(String applName) {
             return appNameToResourceNames.get(applName);
-        }
-
-        private Map<String, Set<String>> getAllResourceNamesInAllAppls() 
-            throws EntitlementException {
-            Map<String, Set<String>> map = new HashMap<String, Set<String>>();
-            Set<String> applNames = ApplicationManager.getApplicationNames(
-                PrivilegeManager.superAdminSubject, realm);
-
-            for (String s : applNames) {
-                Application appl = ApplicationManager.getApplication(
-                    PrivilegeManager.superAdminSubject, realm, s);
-                map.put(s, appl.getResources());
-            }
-            return map;
         }
 
         private void evaluate(Privilege p, boolean subResource) {

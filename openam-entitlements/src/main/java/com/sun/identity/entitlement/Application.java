@@ -109,24 +109,10 @@ public class Application implements Cloneable {
     private ISaveIndex saveIndexInstance;
     private ISearchIndex searchIndexInstance;
 
-    private final EntitlementRegistry registry;
-
     /**
-     * Package-private contructor lets us test. The public default constructor
-     * passes through to here.
-     *
-     * @param registry Used to perform lookups for internal instantiations
-     */
-    Application(EntitlementRegistry registry) {
-        this.registry = registry;
-    }
-
-    /**
-     * Public, default constructor must be used so that derived classes
-     * can still use super().
+     * Public, default constructor
      */
     public Application() {
-        this(EntitlementRegistry.load());
     }
 
     /**
@@ -140,7 +126,6 @@ public class Application implements Cloneable {
             String name,
             ApplicationType applicationType
     ) {
-        this();
         this.realm = realm;
         this.name = name;
         this.applicationType = applicationType;
@@ -417,8 +402,8 @@ public class Application implements Cloneable {
      *
      * @param entitlementCombiner name of the entitlement combiner to look up
      */
-    public void setEntitlementCombinerName(String entitlementCombiner) {
-        this.entitlementCombiner = registry.getCombinerType(entitlementCombiner);
+    public void setEntitlementCombinerName(Class<? extends EntitlementCombiner> entitlementCombiner) {
+        this.entitlementCombiner = entitlementCombiner;
     }
 
     /**

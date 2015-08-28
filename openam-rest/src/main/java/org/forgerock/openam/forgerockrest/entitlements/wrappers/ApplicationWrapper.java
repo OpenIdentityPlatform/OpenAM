@@ -27,6 +27,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.util.Reject;
 
@@ -170,7 +171,7 @@ public class ApplicationWrapper implements Comparable<ApplicationWrapper> {
     @JsonProperty("entitlementCombiner")
     public void setEntitlementCombiner(String name) {
         Reject.ifNull(name);
-        application.setEntitlementCombinerName(name);
+        application.setEntitlementCombinerName(EntitlementUtils.getEntitlementCombiner(name));
     }
 
     @JsonProperty("entitlementCombiner")

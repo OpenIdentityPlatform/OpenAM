@@ -117,6 +117,10 @@ public class EntitlementService extends EntitlementConfiguration {
     public EntitlementService(String realm) {
         this.realm = realm;
     }
+    
+    public void setRealm(String realm) {
+        this.realm = realm;
+    }
 
     /**
      * Returns set of attribute values of a given attribute name,
@@ -354,6 +358,8 @@ public class EntitlementService extends EntitlementConfiguration {
             if (!hasWebAgent) {
                 hasWebAgent = app.getName().equals(
                     ApplicationTypeManager.URL_APPLICATION_TYPE_NAME);
+            } else {
+                break;
             }
         }
 
@@ -383,34 +389,13 @@ public class EntitlementService extends EntitlementConfiguration {
         return results;
     }
 
-    private Set<Application> getApplications(String curRealm) {
-        SSOToken token = getSSOToken();
-
-        Set<Application> results = getRawApplications(token, curRealm);
-        for (Application app : results) {
-            Set<String> resources = app.getResources();
-            Set<String> res = new HashSet<String>();
-
-            for (String r : resources) {
-                int idx = r.indexOf('\t');
-                if (idx != -1) {
-                    res.add(r.substring(idx+1));
-                } else {
-                    res.add(r);
-                }
-            }
-            app.setResources(res);
-        }
-        return results;
-    }
-
     /**
      * Returns a set of registered applications.
      *
      * @return a set of registered applications.
      */
-    private Set<Application> getRawApplications(
-        SSOToken token, String curRealm) {
+    private Set<Application> getApplications(String curRealm) {
+        SSOToken token = getSSOToken();
         Set<Application> results = new HashSet<Application>();
         try {
             if (token != null) {

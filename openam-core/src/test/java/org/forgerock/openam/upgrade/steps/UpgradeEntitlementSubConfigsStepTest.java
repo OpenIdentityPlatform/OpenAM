@@ -20,6 +20,7 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.entitlement.DenyOverride;
+import com.sun.identity.entitlement.EntitlementCombiner;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.ResourceMatch;
@@ -58,7 +59,7 @@ public class UpgradeEntitlementSubConfigsStepTest {
             "-------------------------------------------------------%ENTITLEMENT_DATA%-";
     private static final Map<String, Boolean> TYPE_ACTIONS = new HashMap<String, Boolean>();
 
-    private static final String DEFAULT_COMBINER = "DenyOverride";
+    private static final Class<? extends EntitlementCombiner> DEFAULT_COMBINER = DenyOverride.class;
 
     private UpgradeStep upgradeStep;
 

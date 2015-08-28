@@ -21,8 +21,10 @@ import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.entitlement.ApplicationTypeManager;
 import com.sun.identity.entitlement.DenyOverride;
+import com.sun.identity.entitlement.EntitlementCombiner;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
+
 import static com.sun.identity.entitlement.opensso.EntitlementService.APPLICATION_CLASSNAME;
 import static com.sun.identity.entitlement.opensso.EntitlementService.ATTR_NAME_META;
 import static com.sun.identity.entitlement.opensso.EntitlementService.ATTR_NAME_SUBJECT_ATTR_NAMES;
@@ -35,12 +37,18 @@ import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_RES
 import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_SAVE_INDEX_IMPL;
 import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_SEARCH_INDEX_IMPL;
 import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_SUBJECTS;
+
 import com.sun.identity.security.AdminTokenAction;
+
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.entitlement.EntitlementRegistry;
+
 import java.security.AccessController;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.forgerock.util.Reject;
 
 /**
@@ -106,6 +114,15 @@ public final class EntitlementUtils {
 
         Set<String> resources = data.get(CONFIG_RESOURCES);
         if (resources != null) {
+            Set<String> res = new HashSet<String>();
+            for (String r : resources) {
+                int idx = r.indexOf('\t');
+                if (idx != -1) {
+                    res.add(r.substring(idx+1));
+                } else {
+                    res.add(r);
+                }
+            }
             app.setResources(resources);
         }
 
@@ -115,7 +132,7 @@ public final class EntitlementUtils {
         }
 
         String entitlementCombiner = getAttribute(data, CONFIG_ENTITLEMENT_COMBINER);
-        Class combiner = getEntitlementCombiner(entitlementCombiner, app);
+        Class combiner = getEntitlementCombiner(entitlementCombiner);
         app.setEntitlementCombiner(combiner);
 
         Set<String> conditionClassNames = data.get(CONFIG_CONDITIONS);
@@ -300,22 +317,21 @@ public final class EntitlementUtils {
      * If this fails, we simply return the default: {@link DenyOverride}.
      *
      * @param name the name used to reference the combiner. Must not be null.
-     * @param app the application whose entitlement registry will be used to perform the lookup. Can be null.
      * @return the class represented by the name
      */
-    private static Class getEntitlementCombiner(String name, Application app) {
+    public static Class<? extends EntitlementCombiner> getEntitlementCombiner(String name) {
 
         Reject.ifNull(name);
 
-        if (app != null) {
-            app.setEntitlementCombinerName(name);
-            if (app.getEntitlementCombiner() != null) {
-                return app.getEntitlementCombinerClass();
-            }
+        EntitlementRegistry registry = InjectorHolder.getInstance(EntitlementRegistry.class);
+        Class<? extends EntitlementCombiner> combinerClass = registry.getCombinerType(name);
+
+        if (combinerClass != null) {
+            return combinerClass;
         }
 
         try {
-            return Class.forName(name);
+            return Class.forName(name).asSubclass(EntitlementCombiner.class);
         } catch (ClassNotFoundException ex) {
             PrivilegeManager.debug.error("EntitlementService.getEntitlementCombiner", ex);
         }
