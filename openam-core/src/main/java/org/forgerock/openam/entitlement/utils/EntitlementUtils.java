@@ -401,7 +401,7 @@ public final class EntitlementUtils {
 
         Reject.ifNull(name);
 
-        EntitlementRegistry registry = InjectorHolder.getInstance(EntitlementRegistry.class);
+        EntitlementRegistry registry = new EntitlementRegistry();
         Class<? extends EntitlementCombiner> combinerClass = registry.getCombinerType(name);
 
         if (combinerClass != null) {
