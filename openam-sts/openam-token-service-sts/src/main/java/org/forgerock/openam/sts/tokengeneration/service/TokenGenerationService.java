@@ -30,7 +30,11 @@ import java.util.UUID;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdUtils;
 import com.sun.identity.shared.encode.Hash;
+import com.sun.identity.sm.DNMapper;
 import org.forgerock.http.Context;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.resource.ActionRequest;
@@ -112,7 +116,7 @@ class TokenGenerationService implements CollectionResourceProvider {
         }
         SSOToken subjectToken;
         try {
-            subjectToken = validateAssertionSubjectSession(invocationState.getSsoTokenString());
+            subjectToken = validateAssertionSubjectSession(invocationState);
         } catch (ForbiddenException e) {
             return newExceptionPromise(adapt(e));
         }
@@ -172,19 +176,38 @@ class TokenGenerationService implements CollectionResourceProvider {
                 json(object(field(AMSTSConstants.ISSUED_TOKEN, assertion))));
     }
 
-    private SSOToken validateAssertionSubjectSession(String sessionId) throws ForbiddenException {
+    private SSOToken validateAssertionSubjectSession(TokenGenerationServiceInvocationState invocationState)
+            throws ForbiddenException {
         SSOToken subjectToken;
         SSOTokenManager tokenManager;
         try {
             tokenManager = SSOTokenManager.getInstance();
-            subjectToken = tokenManager.createSSOToken(sessionId);
+            subjectToken = tokenManager.createSSOToken(invocationState.getSsoTokenString());
         } catch (SSOException e) {
-            logger.debug("Exception caught creating the SSO token from the token string, almost certainly " +
-                    "because token string does not correspond to a valid session: " + e);
+            logger.debug("Exception caught creating the SSO token from the token string, almost certainly "
+                    + "because token string does not correspond to a valid session: " + e);
             throw new ForbiddenException(e.toString(), e);
         }
         if (!tokenManager.isValidToken(subjectToken)) {
             throw new ForbiddenException("SSO token string does not correspond to a valid SSOToken");
+        }
+        try {
+            AMIdentity subjectIdentity = IdUtils.getIdentity(subjectToken);
+            String invocationRealm = invocationState.getRealm();
+            String subjectSessionRealm = DNMapper.orgNameToRealmName(subjectIdentity.getRealm());
+            logger.debug("TokenGenerationService:validateAssertionSubjectSession subjectRealm " + subjectSessionRealm
+                    + " invocation realm: " + invocationRealm);
+            if (!invocationRealm.equalsIgnoreCase(subjectSessionRealm)) {
+                logger.error("TokenGenerationService:validateAssertionSubjectSession realms do not match: Subject realm : "
+                        + subjectSessionRealm + " invocation realm: " + invocationRealm);
+                throw new ForbiddenException("SSO token subject realm does not match invocation realm");
+            }
+        } catch (SSOException e) {
+            logger.error("TokenGenerationService:validateAssertionSubjectSession error while validating identity : " + e);
+            throw new ForbiddenException(e.toString(), e);
+        } catch (IdRepoException e) {
+            logger.error("TokenGenerationService:validateAssertionSubjectSession error while validating identity : " + e);
+            throw new ForbiddenException(e.toString(), e);
         }
         return subjectToken;
     }
