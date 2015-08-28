@@ -25,13 +25,11 @@ import java.util.Collections;
 
 public class ApplicationTest {
 
-    private EntitlementRegistry registry;
     private Application testApplication;
 
     @BeforeTest
     public void theSetUp() {
-        registry = new EntitlementRegistry();
-        testApplication = new Application(registry);
+        testApplication = new Application();
     }
 
     @Test

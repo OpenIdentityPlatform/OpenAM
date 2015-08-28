@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.sun.identity.entitlement.EntitlementCombiner;
 import org.forgerock.openam.entitlement.configuration.ResourceTypeConfiguration;
 import org.forgerock.openam.sm.datalayer.api.ConnectionFactory;
 import org.forgerock.openam.upgrade.UpgradeException;
@@ -59,7 +60,7 @@ public class UpgradeEntitlementSubConfigsStepTest {
             "-------------------------------------------------------%ENTITLEMENT_DATA%-";
     private static final Map<String, Boolean> TYPE_ACTIONS = new HashMap<String, Boolean>();
 
-    private static final String DEFAULT_COMBINER = "DenyOverride";
+    private static final Class<? extends EntitlementCombiner> DEFAULT_COMBINER = DenyOverride.class;
 
     private UpgradeStep upgradeStep;
 

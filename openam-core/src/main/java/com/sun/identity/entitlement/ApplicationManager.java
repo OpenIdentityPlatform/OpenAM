@@ -212,7 +212,7 @@ public final class ApplicationManager {
         }
     }
 
-    private static Set<Application> getApplications(Subject adminSubject,
+    public static Set<Application> getApplications(Subject adminSubject,
         String realm) throws EntitlementException {
         Set<Application> appls = getAllApplication(realm);
 

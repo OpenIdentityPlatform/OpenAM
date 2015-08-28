@@ -24,13 +24,11 @@ import static org.testng.Assert.assertEquals;
 
 public class ReferredApplicationTest {
 
-    private EntitlementRegistry registry;
     private Application application;
 
     @BeforeTest
     public void setUp() {
-        registry = new EntitlementRegistry();
-        application = new Application(registry);
+        application = new Application();
     }
 
     @Test(enabled = false)

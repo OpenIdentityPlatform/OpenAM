@@ -31,9 +31,12 @@ import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.entitlement.ApplicationTypeManager;
 import com.sun.identity.entitlement.DenyOverride;
+import com.sun.identity.entitlement.EntitlementCombiner;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.security.AdminTokenAction;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.entitlement.ResourceType;
 import org.forgerock.util.Reject;
@@ -132,7 +135,7 @@ public final class EntitlementUtils {
         }
 
         String entitlementCombiner = getAttribute(data, CONFIG_ENTITLEMENT_COMBINER);
-        Class combiner = getEntitlementCombiner(entitlementCombiner, app);
+        Class combiner = getEntitlementCombiner(entitlementCombiner);
         app.setEntitlementCombiner(combiner);
 
         Set<String> conditionClassNames = data.get(CONFIG_CONDITIONS);
@@ -392,22 +395,21 @@ public final class EntitlementUtils {
      * If this fails, we simply return the default: {@link DenyOverride}.
      *
      * @param name the name used to reference the combiner. Must not be null.
-     * @param app the application whose entitlement registry will be used to perform the lookup. Can be null.
      * @return the class represented by the name
      */
-    private static Class getEntitlementCombiner(String name, Application app) {
+    public static Class<? extends EntitlementCombiner> getEntitlementCombiner(String name) {
 
         Reject.ifNull(name);
 
-        if (app != null) {
-            app.setEntitlementCombinerName(name);
-            if (app.getEntitlementCombiner() != null) {
-                return app.getEntitlementCombinerClass();
-            }
+        EntitlementRegistry registry = InjectorHolder.getInstance(EntitlementRegistry.class);
+        Class<? extends EntitlementCombiner> combinerClass = registry.getCombinerType(name);
+
+        if (combinerClass != null) {
+            return combinerClass;
         }
 
         try {
-            return Class.forName(name);
+            return Class.forName(name).asSubclass(EntitlementCombiner.class);
         } catch (ClassNotFoundException ex) {
             PolicyConstants.DEBUG.error("EntitlementService.getEntitlementCombiner", ex);
         }

@@ -596,21 +596,26 @@ public class OpenSSOApplicationPrivilegeManager extends
 
     private void initPermissionObjects() throws EntitlementException {
         Set<String> actions = new HashSet<String>();
+        Map<String, Set<String>> allResourceNames = Collections.EMPTY_MAP;
+        if (bPolicyAdmin) {
+            allResourceNames = getAllResourceNamesInAllAppls();
+        }
+        
         actions.add(ACTION_READ);
         actions.add(ACTION_DELEGATE);
         delegatables = new Permission(actions, bPolicyAdmin,
-            resourcePrefix);
+            resourcePrefix, allResourceNames);
 
         actions.clear();
         actions.add(ACTION_READ);
         actions.add(ACTION_MODIFY);
         modifiables = new Permission(actions, bPolicyAdmin,
-            resourcePrefix);
+            resourcePrefix, allResourceNames);
 
         actions.clear();
         actions.add(ACTION_READ);
         readables = new Permission(actions, bPolicyAdmin,
-            resourcePrefix);
+            resourcePrefix, allResourceNames);
     }
 
     private void addToMap(
@@ -861,7 +866,46 @@ public class OpenSSOApplicationPrivilegeManager extends
             pm.remove(GHOST_PRIVILEGE_NAME_PREFIX + name);
         }
     }
+    
 
+    private Map<String, Set<String>> getAllResourceNamesInAllAppls() 
+        throws EntitlementException {
+        Map<String, Set<String>> map = new HashMap<String, Set<String>>();
+        Set<Application> appls = ApplicationManager.getApplications(
+            PrivilegeManager.superAdminSubject, realm);
+
+        for (Application app : appls) {
+            map.put(app.getName(), getAllBaseResource(app));
+        }
+        return map;
+    }
+
+    /**
+     * Retrieve all the base resources associated with the passed application.
+     *
+     * @param application
+     *      the application
+     * @return all base resources
+     *
+     * @throws EntitlementException
+     *      should an error occur retrieving the base resources
+     */
+    private Set<String> getAllBaseResource(final Application application) throws EntitlementException {
+        final Set<String> baseResources = new HashSet<String>();
+
+        for (String resourceTypeUuid : application.getResourceTypeUuids()) {
+            final ResourceType resourceType = resourceTypeService
+                    .getResourceType(PrivilegeManager.superAdminSubject, realm, resourceTypeUuid);
+
+            if (resourceType == null) {
+                throw new EntitlementException(EntitlementException.NO_SUCH_RESOURCE_TYPE, resourceTypeUuid, realm);
+            }
+
+            baseResources.addAll(resourceType.getPatterns());
+        }
+
+        return baseResources;
+    }
 
     private class Permission {
         private Map<String, Privilege> privileges;
@@ -871,7 +915,7 @@ public class OpenSSOApplicationPrivilegeManager extends
         private String resourcePrefix;
 
         private Permission(Set<String> action, boolean bPolicyAdmin,
-            String resourcePrefix) throws EntitlementException {
+            String resourcePrefix, Map<String, Set<String>> allResourceNames) throws EntitlementException {
             this.actions = new HashSet<String>();
             this.actions.addAll(action);
             this.bPolicyAdmin = bPolicyAdmin;
@@ -880,7 +924,7 @@ public class OpenSSOApplicationPrivilegeManager extends
             appNameToResourceNames = new HashMap<String, Set<String>>();
 
             if (bPolicyAdmin) {
-                appNameToResourceNames.putAll(getAllResourceNamesInAllAppls());
+                appNameToResourceNames.putAll(allResourceNames);
             }
         }
 
@@ -911,46 +955,6 @@ public class OpenSSOApplicationPrivilegeManager extends
 
         private Set<String> getResourceNames(String applName) {
             return appNameToResourceNames.get(applName);
-        }
-
-        private Map<String, Set<String>> getAllResourceNamesInAllAppls() 
-            throws EntitlementException {
-            Map<String, Set<String>> map = new HashMap<String, Set<String>>();
-            Set<String> applNames = ApplicationManager.getApplicationNames(
-                PrivilegeManager.superAdminSubject, realm);
-
-            for (String s : applNames) {
-                Application appl = ApplicationManager.getApplication(PrivilegeManager.superAdminSubject, realm, s);
-                map.put(s, getAllBaseResource(appl));
-            }
-            return map;
-        }
-
-        /**
-         * Retrieve all the base resources associated with the passed application.
-         *
-         * @param application
-         *      the application
-         * @return all base resources
-         *
-         * @throws EntitlementException
-         *      should an error occur retrieving the base resources
-         */
-        private Set<String> getAllBaseResource(final Application application) throws EntitlementException {
-            final Set<String> baseResources = new HashSet<String>();
-
-            for (String resourceTypeUuid : application.getResourceTypeUuids()) {
-                final ResourceType resourceType = resourceTypeService
-                        .getResourceType(PrivilegeManager.superAdminSubject, realm, resourceTypeUuid);
-
-                if (resourceType == null) {
-                    throw new EntitlementException(EntitlementException.NO_SUCH_RESOURCE_TYPE, resourceTypeUuid, realm);
-                }
-
-                baseResources.addAll(resourceType.getPatterns());
-            }
-
-            return baseResources;
         }
 
         private void evaluate(Privilege p, boolean subResource) {

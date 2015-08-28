@@ -351,19 +351,9 @@ public class EntitlementService extends EntitlementConfiguration {
      * @return a set of registered applications.
      */
     public Set<Application> getApplications() {
-        SSOToken token = getSSOToken();
-        return getRawApplications(token, realm);
-    }
-
-    /**
-     * Get a set of registered application names.
-     * @param token The admin token for access to the Service Config.
-     * @param realm The realm from which to retrieve the application names.
-     * @return a set of registered application names.
-     */
-    private Set<Application> getRawApplications(SSOToken token, String realm) {
         final Set<Application> results = new HashSet<Application>();
         try {
+            SSOToken token = getSSOToken();
             final ServiceConfig appConfig = getApplicationConfiguration(token, realm);
             if (appConfig != null) {
                 final Set<String> names = appConfig.getSubConfigNames();
