@@ -72,6 +72,9 @@ import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 
+import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.opendj.ldap.DN;
+
 import com.sun.identity.monitoring.Agent;
 import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.monitoring.SsoServerAuthSvcImpl;
@@ -1433,6 +1436,12 @@ public class AMLoginContext {
         // set username
 
         if ((indexType == IndexType.USER) && (pCookieMode)) {
+            if (indexName != null && indexName.toLowerCase().startsWith("id=")) {
+                DN dnObj = DN.valueOf(indexName);
+                if (dnObj.size() > 0) {
+                    indexName = LDAPUtils.getName(dnObj);
+                }
+            }
             loginState.setToken(indexName);
         }
     }
