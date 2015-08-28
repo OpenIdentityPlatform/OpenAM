@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Copyright 2015 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.sts.tokengeneration.service;
@@ -19,6 +19,10 @@ package org.forgerock.openam.sts.tokengeneration.service;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdUtils;
+import com.sun.identity.sm.DNMapper;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.InternalServerErrorException;
@@ -85,23 +89,15 @@ class TokenGenerationService implements SingletonResourceProvider {
                 handler.handleError(new BadRequestException("Only the REST STS can currently call the token generation service."));
                 return;
             }
-            if (TokenType.SAML2.equals(invocationState.getTokenType())) {
-                SSOToken subjectToken;
-                SSOTokenManager tokenManager;
-                try {
-                    tokenManager = SSOTokenManager.getInstance();
-                    subjectToken = tokenManager.createSSOToken(invocationState.getSsoTokenString());
-                } catch (SSOException e) {
-                    logger.debug("Exception caught creating the SSO token from the token string, almost certainly " +
-                            "because token string does not correspond to a valid session: " + e);
-                    handler.handleError(new ForbiddenException(e.toString(), e));
-                    return;
-                }
-                if (!tokenManager.isValidToken(subjectToken)) {
-                    handler.handleError(new ForbiddenException("SSO token string does not correspond to a valid SSOToken"));
-                    return;
-                }
+            SSOToken subjectToken;
+            try {
+                subjectToken = validateAssertionSubjectSession(invocationState);
+            } catch (ForbiddenException e) {
+                handler.handleError(e);
+                return;
+            }
 
+            if (TokenType.SAML2.equals(invocationState.getTokenType())) {
                 try {
                     final String assertion = saml2TokenGeneration.generate(
                             subjectToken,
@@ -143,5 +139,42 @@ class TokenGenerationService implements SingletonResourceProvider {
 
     public void updateInstance(ServerContext context, UpdateRequest request, ResultHandler<Resource> handler) {
         handler.handleError(new NotSupportedException());
+    }
+
+    private SSOToken validateAssertionSubjectSession(TokenGenerationServiceInvocationState invocationState)
+            throws ForbiddenException {
+        SSOToken subjectToken;
+        SSOTokenManager tokenManager;
+        try {
+            tokenManager = SSOTokenManager.getInstance();
+            subjectToken = tokenManager.createSSOToken(invocationState.getSsoTokenString());
+        } catch (SSOException e) {
+            logger.debug("Exception caught creating the SSO token from the token string, almost certainly "
+                    + "because token string does not correspond to a valid session: " + e);
+            throw new ForbiddenException(e.toString(), e);
+        }
+        if (!tokenManager.isValidToken(subjectToken)) {
+            throw new ForbiddenException("SSO token string does not correspond to a valid SSOToken");
+        }
+        try {
+            AMIdentity subjectIdentity = IdUtils.getIdentity(subjectToken);
+            String invocationRealm = invocationState.getRealm();
+            String subjectSessionRealm = subjectIdentity.getRealm();
+            subjectSessionRealm = DNMapper.orgNameToRealmName(subjectSessionRealm);
+            logger.debug("TokenGenerationService:validateAssertionSubjectSession subjectRealm " + subjectSessionRealm
+                    + " invocation realm: " + invocationRealm);
+            if (!invocationRealm.equalsIgnoreCase(subjectSessionRealm)) {
+                logger.error("TokenGenerationService:validateAssertionSubjectSession realms do not match: Subject realm : "
+                        + subjectSessionRealm + " invocation realm: " + invocationRealm);
+                throw new ForbiddenException("SSO token subject realm does not match invocation realm");
+            }
+        } catch (SSOException e) {
+            logger.error("TokenGenerationService:validateAssertionSubjectSession error while validating identity : " + e);
+            throw new ForbiddenException(e.toString(), e);
+        } catch (IdRepoException e) {
+            logger.error("TokenGenerationService:validateAssertionSubjectSession error while validating identity : " + e);
+            throw new ForbiddenException(e.toString(), e);
+        }
+        return subjectToken;
     }
 }
